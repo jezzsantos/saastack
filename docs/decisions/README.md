@@ -17,7 +17,7 @@ Name your file in this format: `0000-name.md` (lowercase, hyphenated) where the 
 
 > This numbering allows omissions to be added later between the numbers to maintain a specific ordering.
 
-```
+```markdown
 # {TheFileName}
 
 > The title assigns a {name} to the AD to be identified and searched for efficiently. 
