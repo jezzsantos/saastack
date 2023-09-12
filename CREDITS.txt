@@ -1,0 +1,8 @@
+The following open source contributions have been instrumental in the development of this codebase.
+
+You can find the source code and the open source projects along with their license information below. 
+We acknowledge and are grateful to these projects and their contributions to open source.
+
+QueryAny
+Project Site: https://github.com/jezzsantos/queryany
+License: (Apache 2.0): https://github.com/jezzsantos/queryany/blob/master/LICENSE

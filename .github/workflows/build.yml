@@ -1,0 +1,30 @@
+name: Build and Test
+
+on: [ push, pull_request ]
+
+env:
+  IS_CI_BUILD: 'true'
+  SOLUTION_PATH: 'src/SaaStack.sln'
+  TESTINGONLY_BUILD_CONFIGURATION: 'Release'
+  RELEASE_BUILD_CONFIGURATION: 'ReleaseForDeploy'
+
+jobs:
+  build-test:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+      - name: Restore dependencies
+        run: dotnet restore "${{env.SOLUTION_PATH}}"
+      - name: Build for Release
+        run: dotnet build "${{env.SOLUTION_PATH}}" --no-restore --configuration ${{env.RELEASE_BUILD_CONFIGURATION}}
+      - name: Build for Testing
+        run: dotnet build "${{env.SOLUTION_PATH}}" --no-restore --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}}
+      - name: Unit Test
+        run: dotnet test --filter Category=Unit "${{env.SOLUTION_PATH}}" --no-build --verbosity normal
+      - name: Integration Test
+        run: dotnet test --filter Category=Integration "${{env.SOLUTION_PATH}}" --no-build --verbosity normal

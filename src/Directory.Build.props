@@ -6,6 +6,7 @@
         <Nullable>enable</Nullable>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
         <IsPackable>false</IsPackable>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <!-- Hosting platform (`HOSTEDONAZURE` or `HOSTEDONAWS` or `HOSTEDONGC`) -->
@@ -74,7 +75,6 @@
         <DefineConstants>DEBUG;TRACE;TESTINGONLY;$(HostingPlatform)</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
-        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
@@ -84,7 +84,6 @@
         <DefineConstants>TRACE;TESTINGONLY;$(HostingPlatform)</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseForDeploy|AnyCPU'">
@@ -94,7 +93,6 @@
         <DefineConstants>TRACE;$(HostingPlatform)</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
 </Project>
