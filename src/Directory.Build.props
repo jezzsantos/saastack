@@ -1,0 +1,100 @@
+<Project>
+
+    <!-- Shared assembly information -->
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <!-- Hosting platform (`HOSTEDONAZURE` or `HOSTEDONAWS` or `HOSTEDONGC`) -->
+    <PropertyGroup>
+        <HostingPlatform>HOSTEDONAZURE</HostingPlatform>
+    </PropertyGroup>
+
+    <!-- NuGet package information -->
+    <PropertyGroup>
+        <Info>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\..\GlobalAssemblyInfo.cs'))</Info>
+        <Pattern>^\s*\[assembly: AssemblyDescription\(\s*"([^"]+)"</Pattern>
+        <Description>$([System.Text.RegularExpressions.Regex]::Match($(Info), $(Pattern), System.Text.RegularExpressions.RegexOptions.Multiline).Groups[1].Value)</Description>
+        <Pattern>^\s*\[assembly: AssemblyCompany\(\s*"([^"]+)"</Pattern>
+        <Authors>$([System.Text.RegularExpressions.Regex]::Match($(Info), $(Pattern), System.Text.RegularExpressions.RegexOptions.Multiline).Groups[1].Value)</Authors>
+        <Pattern>^\s*\[assembly: AssemblyCopyright\(\s*"([^"]+)"</Pattern>
+        <Copyright>$([System.Text.RegularExpressions.Regex]::Match($(Info), $(Pattern), System.Text.RegularExpressions.RegexOptions.Multiline).Groups[1].Value)</Copyright>
+        <Pattern>^\s*\[assembly: AssemblyInformationalVersion\(\s*"([^"]+)"</Pattern>
+        <PackageVersion>$([System.Text.RegularExpressions.Regex]::Match($(Info), $(Pattern), System.Text.RegularExpressions.RegexOptions.Multiline).Groups[1].Value)</PackageVersion>
+    </PropertyGroup>
+
+    <!-- Additional assembly information -->
+    <PropertyGroup>
+        <Info>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\..\GlobalAssemblyInfo.cs'))</Info>
+        <Pattern>^\s*\[assembly: AssemblyCompany\(\s*"([^"]+)"</Pattern>
+        <Company>$([System.Text.RegularExpressions.Regex]::Match($(Info), $(Pattern), System.Text.RegularExpressions.RegexOptions.Multiline).Groups[1].Value)</Company>
+        <Pattern>^\s*\[assembly: AssemblyConfiguration\(\s*"([^"]+)"</Pattern>
+        <Configuration>$([System.Text.RegularExpressions.Regex]::Match($(Info), $(Pattern), System.Text.RegularExpressions.RegexOptions.Multiline).Groups[1].Value)</Configuration>
+        <Pattern>^\s*\[assembly: AssemblyProduct\(\s*"([^"]+)"</Pattern>
+        <Product>$([System.Text.RegularExpressions.Regex]::Match($(Info), $(Pattern), System.Text.RegularExpressions.RegexOptions.Multiline).Groups[1].Value)</Product>
+        <Pattern>^\s*\[assembly: AssemblyInformationalVersion\(\s*"([^"]+)"</Pattern>
+        <InformationalVersion>$([System.Text.RegularExpressions.Regex]::Match($(Info), $(Pattern), System.Text.RegularExpressions.RegexOptions.Multiline).Groups[1].Value)</InformationalVersion>
+        <Pattern>^\s*\[assembly: AssemblyVersion\(\s*"([^"]+)"</Pattern>
+        <AssemblyVersion>$([System.Text.RegularExpressions.Regex]::Match($(Info), $(Pattern), System.Text.RegularExpressions.RegexOptions.Multiline).Groups[1].Value)</AssemblyVersion>
+        <Pattern>^\s*\[assembly: AssemblyFileVersion\(\s*"([^"]+)"</Pattern>
+        <FileVersion>$([System.Text.RegularExpressions.Regex]::Match($(Info), $(Pattern), System.Text.RegularExpressions.RegexOptions.Multiline).Groups[1].Value)</FileVersion>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <RepositoryUrl>https://github.com/jezzsantos/saastack-dotnet</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/jezzsantos/saastack-dotnet</PackageProjectUrl>
+        <RepositoryType>GitHub</RepositoryType>
+        <PackageReleaseNotes>https://github.com/jezzsantos/saastack-dotnet/blob/main/README.md</PackageReleaseNotes>
+        <RequireLicenseAcceptance>false</RequireLicenseAcceptance>
+    </PropertyGroup>
+
+    <!-- Strong naming -->
+    <PropertyGroup>
+        <SignAssembly>false</SignAssembly>
+        <DelaySign>false</DelaySign>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <NoWarn>436,NU5125</NoWarn>
+        <Configurations>Debug;Release;ReleaseForDeploy</Configurations>
+        <Platforms>AnyCPU</Platforms>
+    </PropertyGroup>
+
+    <!-- Build configurations -->
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\$(Configuration)\</OutputPath>
+        <DefineConstants>DEBUG;TRACE;TESTINGONLY;$(HostingPlatform)</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\$(Configuration)\</OutputPath>
+        <DefineConstants>TRACE;TESTINGONLY;$(HostingPlatform)</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseForDeploy|AnyCPU'">
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\$(Configuration)\</OutputPath>
+        <DefineConstants>TRACE;$(HostingPlatform)</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+</Project>
