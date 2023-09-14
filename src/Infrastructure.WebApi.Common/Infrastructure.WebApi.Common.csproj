@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
+        <ProjectReference Include="..\Infrastructure.WebApi.Interfaces\Infrastructure.WebApi.Interfaces.csproj" />
+    </ItemGroup>
+
+</Project>

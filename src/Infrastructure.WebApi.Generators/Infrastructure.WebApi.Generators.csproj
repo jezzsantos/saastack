@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <IsRoslynComponent>true</IsRoslynComponent>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebApiService.cs">
+            <Link>Reference\IWebApiService.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebResponse.cs">
+            <Link>Reference\IWebResponse.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\WebApiOperation.cs">
+            <Link>Reference\WebApiOperation.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\WebApiRouteAttribute.cs">
+            <Link>Reference\WebApiRouteAttribute.cs</Link>
+        </Compile>
+    </ItemGroup>
+</Project>

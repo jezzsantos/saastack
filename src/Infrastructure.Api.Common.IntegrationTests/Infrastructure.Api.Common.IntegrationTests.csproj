@@ -3,14 +3,14 @@
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     </ItemGroup>
-    
+
     <ItemGroup>
-      <ProjectReference Include="..\Common\Common.csproj" />
-      <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
+        <ProjectReference Include="..\ApiHost1\ApiHost1.csproj" />
+        <ProjectReference Include="..\IntegrationTesting.WebApi.Common\IntegrationTesting.WebApi.Common.csproj" />
     </ItemGroup>
 
 </Project>

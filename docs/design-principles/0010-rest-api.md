@@ -1,4 +1,4 @@
-# ﻿REST API Design
+# REST API Design
 
 Q. How is our web API to be designed?
 
@@ -24,9 +24,9 @@ Level 3 of the [Richardson Maturity Model](http://restcookbook.com/Miscellaneous
 
 Even though most web APIs are defined by the HTTP verbs: `POST`, `GET`, `PUT`, `PATCH`, `DELETE` (and others), 
 
-​    - AND these verbs *could be* conveniently translated nicely into `Create` `Retrieve`, `Update` and `Delete` (CRUD) functions of a database. 
+    - AND these verbs *could be* conveniently translated nicely into `Create` `Retrieve`, `Update` and `Delete` (CRUD) functions of a database. 
 
-​    - AND given that REST is designed around a "Resource", each with an identifier. 
+    - AND given that REST is designed around a "Resource", each with an identifier. 
 
 Designing a REST API for web interop is not to be confused with designing a database API with CRUD. 
 

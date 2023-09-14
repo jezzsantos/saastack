@@ -1,0 +1,6 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="AllHosts" type="CompoundRunConfigurationType">
+        <toRun name="ApiHost1: ApiHost1-Development" type="LaunchSettings" />
+        <method v="2" />
+    </configuration>
+</component>
