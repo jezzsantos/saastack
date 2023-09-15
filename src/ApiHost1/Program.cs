@@ -1,29 +1,30 @@
-using ApiHost1;
+using CarsApi;
 using CarsApplication;
+using Infrastructure.WebApi.Common;
 using JetBrains.Annotations;
-using MinimalApiRegistration = CarsApi.MinimalApiRegistration;
+
+//TODO: Add the modules of each API here
+var modules = new SubDomainModules();
+modules.Register(new Module());
+modules.Register(new ApiHost1.Module());
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMediatR(configuration =>
 {
-    //TODO: need to add API assembly of each module 
-    configuration.RegisterServicesFromAssemblies(typeof(ApiHost1.MinimalApiRegistration).Assembly,
-        typeof(MinimalApiRegistration).Assembly);
+    configuration.RegisterServicesFromAssemblies(modules.HandlerAssemblies.ToArray());
 });
 builder.Services.AddScoped<ICarsApplication, CarsApplication.CarsApplication>();
 
-//TODO: need register dependencies of each module
+modules.RegisterServices(builder.Configuration, builder.Services);
 
 var app = builder.Build();
 
-//TODO: need to add validation
-//TODO: need to add swaggerUI
+//TODO: need to add validation (https://www.youtube.com/watch?v=XKN0084p7WQ)
+//TODO: need to add authentication/authorization (https://www.youtube.com/watch?v=XKN0084p7WQ)
+//TODO: need to add swaggerUI (https://www.youtube.com/watch?v=XKN0084p7WQ)
 
-
-//TODO: need to call the registration function the minimal API endpoints of each module
-app.RegisterRoutes();
-MinimalApiRegistration.RegisterRoutes(app);
+modules.ConfigureHost(app);
 
 app.Run();
 

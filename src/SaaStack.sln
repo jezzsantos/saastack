@@ -71,6 +71,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTesting.WebApi.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.WebApi.Generators", "Infrastructure.WebApi.Generators\Infrastructure.WebApi.Generators.csproj", "{7AB39FD6-660F-4400-9955-B92684378492}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{19ADDB2F-B589-49EF-9BDA-BD9908057D60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.WebApi.Common.UnitTests", "Infrastructure.WebApi.Common.UnitTests\Infrastructure.WebApi.Common.UnitTests.csproj", "{4CF7C7E2-C95D-4440-9ECF-5D1CE2A46D7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -150,6 +154,12 @@ Global
 		{7AB39FD6-660F-4400-9955-B92684378492}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7AB39FD6-660F-4400-9955-B92684378492}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
 		{7AB39FD6-660F-4400-9955-B92684378492}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
+		{4CF7C7E2-C95D-4440-9ECF-5D1CE2A46D7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CF7C7E2-C95D-4440-9ECF-5D1CE2A46D7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CF7C7E2-C95D-4440-9ECF-5D1CE2A46D7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CF7C7E2-C95D-4440-9ECF-5D1CE2A46D7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CF7C7E2-C95D-4440-9ECF-5D1CE2A46D7A}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
+		{4CF7C7E2-C95D-4440-9ECF-5D1CE2A46D7A}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F5C77A86-38AF-40E4-82FC-617E624B2754} = {508E7DA4-4DF2-4201-955D-CCF70C41AD05}
@@ -179,5 +189,7 @@ Global
 		{23FF9513-1B26-41F4-A7FE-1D8A9F0808AE} = {BA1AEAEC-68CD-4855-A8CB-0DC2070B6A8C}
 		{A7CA7AD7-70CA-43F0-BE73-75A01342D571} = {5838EE94-374F-4A6F-A231-1BC1C87985F4}
 		{7AB39FD6-660F-4400-9955-B92684378492} = {B68592DF-E8E8-452A-A46F-5C8ECB178FDF}
+		{19ADDB2F-B589-49EF-9BDA-BD9908057D60} = {B68592DF-E8E8-452A-A46F-5C8ECB178FDF}
+		{4CF7C7E2-C95D-4440-9ECF-5D1CE2A46D7A} = {19ADDB2F-B589-49EF-9BDA-BD9908057D60}
 	EndGlobalSection
 EndGlobal
