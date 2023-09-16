@@ -1,28 +1,25 @@
-using CarsApi;
-using CarsApplication;
+using ApiHost1;
 using Infrastructure.WebApi.Common;
 using JetBrains.Annotations;
 
-//TODO: Add the modules of each API here
-var modules = new SubDomainModules();
-modules.Register(new Module());
-modules.Register(new ApiHost1.Module());
+var modules = HostedModules.Get();
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.RegisterValidators(modules.ApiAssemblies, out var validators);
 builder.Services.AddMediatR(configuration =>
 {
-    configuration.RegisterServicesFromAssemblies(modules.HandlerAssemblies.ToArray());
+    configuration.RegisterServicesFromAssemblies(modules.ApiAssemblies.ToArray())
+        .AddValidatorBehaviors(validators, modules.ApiAssemblies);
 });
-builder.Services.AddScoped<ICarsApplication, CarsApplication.CarsApplication>();
 
 modules.RegisterServices(builder.Configuration, builder.Services);
 
 var app = builder.Build();
 
-//TODO: need to add validation (https://www.youtube.com/watch?v=XKN0084p7WQ)
 //TODO: need to add authentication/authorization (https://www.youtube.com/watch?v=XKN0084p7WQ)
 //TODO: need to add swaggerUI (https://www.youtube.com/watch?v=XKN0084p7WQ)
+//TODO: Handle Result types, and not throwing exceptions to represent responses (Desriminating types)
 
 modules.ConfigureHost(app);
 

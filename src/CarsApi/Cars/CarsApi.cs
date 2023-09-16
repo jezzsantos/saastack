@@ -4,7 +4,7 @@ using Infrastructure.WebApi.Interfaces;
 using Infrastructure.WebApi.Interfaces.Operations.Cars;
 using Microsoft.AspNetCore.Http;
 
-namespace CarsApi;
+namespace CarsApi.Cars;
 
 public class CarsApi : IWebApiService
 {

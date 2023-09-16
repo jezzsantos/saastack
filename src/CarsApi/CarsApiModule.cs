@@ -1,4 +1,5 @@
 using System.Reflection;
+using CarsApplication;
 using Infrastructure.WebApi.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -6,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CarsApi;
 
-public class Module : ISubDomainModule
+public class CarsApiModule : ISubDomainModule
 {
     public Action<WebApplication> MinimalApiRegistrationFunction
     {
@@ -15,8 +16,8 @@ public class Module : ISubDomainModule
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServicesFunction
     {
-        get { return (configuration, services) => { }; }
+        get { return (_, services) => { services.AddScoped<ICarsApplication, CarsApplication.CarsApplication>(); }; }
     }
 
-    public Assembly ApiAssembly => typeof(CarsApi).Assembly;
+    public Assembly ApiAssembly => typeof(Cars.CarsApi).Assembly;
 }

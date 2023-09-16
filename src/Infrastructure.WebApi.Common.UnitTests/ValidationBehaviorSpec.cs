@@ -1,0 +1,69 @@
+using FluentAssertions;
+using FluentValidation;
+using FluentValidation.Results;
+using Infrastructure.WebApi.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Moq;
+
+namespace Infrastructure.WebApi.Common.UnitTests;
+
+[Trait("Category", "Unit")]
+public class ValidationBehaviorSpec
+{
+    private readonly ValidationBehavior<TestRequest, TestResponse> _behavior;
+    private readonly Mock<IValidator<TestRequest>> _validator;
+
+    public ValidationBehaviorSpec()
+    {
+        _validator = new Mock<IValidator<TestRequest>>();
+        _behavior = new ValidationBehavior<TestRequest, TestResponse>(_validator.Object);
+    }
+
+    [Fact]
+    public async Task WhenHandleAndValidatorPasses_ThenExecutesMiddleware()
+    {
+        var request = new TestRequest();
+        var wasNextCalled = false;
+        _validator.Setup(val => val.ValidateAsync(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult(new ValidationResult()));
+
+        var result = await _behavior.Handle(request, () =>
+        {
+            wasNextCalled = true;
+            return Task.FromResult(Results.Ok());
+        }, CancellationToken.None);
+
+        wasNextCalled.Should().BeTrue();
+        _validator.Verify(val => val.ValidateAsync(request, CancellationToken.None));
+        result.Should().Be(Results.Ok());
+    }
+
+    [Fact]
+    public async Task WhenHandleAndValidatorFails_ThenReturnsBadRequest()
+    {
+        var request = new TestRequest();
+        var wasNextCalled = false;
+        var errors = new ValidationResult(new List<ValidationFailure>
+            { new("aproperty", "anerror") });
+        _validator.Setup(val => val.ValidateAsync(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult(errors));
+
+        var result = await _behavior.Handle(request, () =>
+        {
+            wasNextCalled = true;
+            return Task.FromResult(Results.Ok());
+        }, CancellationToken.None);
+
+        wasNextCalled.Should().BeFalse();
+        _validator.Verify(val => val.ValidateAsync(request, CancellationToken.None));
+        result.Should().BeEquivalentTo(TypedResults.BadRequest(errors.Errors));
+    }
+}
+
+public class TestRequest : IWebRequest<TestResponse>
+{
+}
+
+public class TestResponse : IWebResponse
+{
+}

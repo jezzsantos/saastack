@@ -50,7 +50,7 @@ public class SubDomainModulesSpec
             RegisterServicesFunction = null!
         });
 
-        _modules.HandlerAssemblies.Should().ContainSingle();
+        _modules.ApiAssemblies.Should().ContainSingle();
     }
 
     [Fact]

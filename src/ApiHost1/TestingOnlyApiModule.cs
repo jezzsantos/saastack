@@ -3,7 +3,7 @@ using Infrastructure.WebApi.Common;
 
 namespace ApiHost1;
 
-public class Module : ISubDomainModule
+public class TestingOnlyApiModule : ISubDomainModule
 {
     public Action<WebApplication> MinimalApiRegistrationFunction
     {
@@ -12,7 +12,7 @@ public class Module : ISubDomainModule
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServicesFunction
     {
-        get { return (configuration, services) => { }; }
+        get { return (_, _) => { }; }
     }
 
     public Assembly ApiAssembly => typeof(Program).Assembly;

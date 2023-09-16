@@ -7,18 +7,18 @@ namespace Infrastructure.WebApi.Common;
 
 public class SubDomainModules
 {
-    private readonly List<Assembly> _handlerAssemblies;
+    private readonly List<Assembly> _apiAssemblies;
     private readonly List<Action<WebApplication>> _minimalApiRegistrationFunctions;
     private readonly List<Action<ConfigurationManager, IServiceCollection>> _serviceCollectionFunctions;
 
     public SubDomainModules()
     {
-        _handlerAssemblies = new List<Assembly>();
+        _apiAssemblies = new List<Assembly>();
         _minimalApiRegistrationFunctions = new List<Action<WebApplication>>();
         _serviceCollectionFunctions = new List<Action<ConfigurationManager, IServiceCollection>>();
     }
 
-    public IReadOnlyList<Assembly> HandlerAssemblies => _handlerAssemblies;
+    public IReadOnlyList<Assembly> ApiAssemblies => _apiAssemblies;
 
     public void Register(ISubDomainModule module)
     {
@@ -27,7 +27,7 @@ public class SubDomainModules
         ArgumentNullException.ThrowIfNull(module.MinimalApiRegistrationFunction,
             nameof(module.MinimalApiRegistrationFunction));
 
-        _handlerAssemblies.Add(module.ApiAssembly);
+        _apiAssemblies.Add(module.ApiAssembly);
         _minimalApiRegistrationFunctions.Add(module.MinimalApiRegistrationFunction);
         if (module.RegisterServicesFunction is not null)
         {
@@ -44,12 +44,4 @@ public class SubDomainModules
     {
         _minimalApiRegistrationFunctions.ForEach(func => func(app));
     }
-}
-
-public interface ISubDomainModule
-{
-    public Assembly ApiAssembly { get; }
-
-    public Action<WebApplication> MinimalApiRegistrationFunction { get; }
-    public Action<ConfigurationManager, IServiceCollection>? RegisterServicesFunction { get; }
 }
