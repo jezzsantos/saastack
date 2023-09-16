@@ -9,8 +9,8 @@
 You will need the following development tools to build, run, and test this project:
 
 * Jetbrains Rider - obtain a license key for Jetbrains dotUltimate 
-    
-* Install the .NET6.0 SDK. Available for [download here](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+
+* Install the .NET7.0 SDK. Available for [download here](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
 
 ------
 
