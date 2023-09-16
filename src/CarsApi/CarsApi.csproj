@@ -16,4 +16,7 @@
                           OutputItemType="Analyzer"
                           ReferenceOutputAssembly="false" />
     </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Apis\" />
+    </ItemGroup>
 </Project>

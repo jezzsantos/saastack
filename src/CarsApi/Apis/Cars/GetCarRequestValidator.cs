@@ -1,7 +1,7 @@
 using FluentValidation;
 using Infrastructure.WebApi.Interfaces.Operations.Cars;
 
-namespace CarsApi.Cars;
+namespace CarsApi.Apis.Cars;
 
 public class GetCarRequestValidator : AbstractValidator<GetCarRequest>
 {

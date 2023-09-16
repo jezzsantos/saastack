@@ -2,7 +2,7 @@
 using Infrastructure.WebApi.Interfaces;
 using Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
 
-namespace ApiHost1.Services.TestingOnly;
+namespace ApiHost1.Apis.TestingOnly;
 
 public class TestingOnlyApi : IWebApiService
 {

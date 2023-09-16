@@ -19,5 +19,5 @@ public class CarsApiModule : ISubDomainModule
         get { return (_, services) => { services.AddScoped<ICarsApplication, CarsApplication.CarsApplication>(); }; }
     }
 
-    public Assembly ApiAssembly => typeof(Cars.CarsApi).Assembly;
+    public Assembly ApiAssembly => typeof(Apis.Cars.CarsApi).Assembly;
 }

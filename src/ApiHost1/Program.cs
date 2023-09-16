@@ -26,7 +26,10 @@ modules.ConfigureHost(app);
 app.Run();
 
 
-[UsedImplicitly]
-public partial class Program
+namespace ApiHost1
 {
+    [UsedImplicitly]
+    public class Program
+    {
+    }
 }

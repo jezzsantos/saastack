@@ -7,7 +7,6 @@
     <ItemGroup>
         <ProjectReference Include="..\CarsApi\CarsApi.csproj" />
         <ProjectReference Include="..\Infrastructure.WebApi.Common\Infrastructure.WebApi.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.WebApi.Interfaces\Infrastructure.WebApi.Interfaces.csproj" />
     </ItemGroup>
 
     <!-- Runs the source generator (in memory) on build -->
