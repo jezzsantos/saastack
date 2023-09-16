@@ -1,3 +1,4 @@
+#if TESTINGONLY
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
@@ -5,8 +6,6 @@ using Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
-
-#if TESTINGONLY
 
 namespace Infrastructure.Api.Common.IntegrationTests;
 

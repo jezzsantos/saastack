@@ -108,7 +108,14 @@ public class SubDomainModulesSpec
 
 public class TestModule : ISubDomainModule
 {
-    public Assembly? ApiAssembly { get; init; }
-    public Action<WebApplication>? MinimalApiRegistrationFunction { get; init; }
+    public TestModule()
+    {
+        ApiAssembly = null!;
+        MinimalApiRegistrationFunction = null!;
+        RegisterServicesFunction = null!;
+    }
+
+    public Assembly ApiAssembly { get; init; }
+    public Action<WebApplication> MinimalApiRegistrationFunction { get; init; }
     public Action<ConfigurationManager, IServiceCollection>? RegisterServicesFunction { get; init; }
 }

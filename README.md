@@ -1,12 +1,17 @@
+[![Build and Test](https://github.com/jezzsantos/saastack-dotnet/actions/workflows/build.yml/badge.svg)](https://github.com/jezzsantos/saastack-dotnet/actions/workflows/build.yml)
+
 # SaaStack .NET
 
-A comprehensive codebase template for real-world, fully featured SaaS web products. On the .NET platform
+Are you thinking of building a new SaaS product from scratch? (on .NET)
 
-Ready to build, test, and deploy into a cloud of your choice.
+Then start with SaaStack. It is a complete "codebase template" for real-world, fully featured SaaS web products, that you can start with.
 
->  This is not a starter EXAMPLE template of the type you download to learn a new technology. It is a fully-fledged functional SaaS product that you can deploy from day one and get started building out your product with.
+Ready to build, test, and deploy into a cloud of your choice (e.g. Azure, AWS, Google Cloud, etc)
 
-The codebase demonstrates architectural such as:
+>  This is not a starter EXAMPLE template of the type you would download to learn a new technology. 
+>  This is a fully-fledged functional SaaS product that you can deploy from day one and get started building out your product with.
+
+The codebase demonstrates common architectural styles, you are going to need in the long run, such as:
 * [Modular-Monolith](https://www.thoughtworks.com/insights/blog/microservices/modular-monolith-better-way-build-software) - build a monolith first, the separate out to micro-services later
 * [Clean Architecture, Onion Architecture, and Hexagonal Architecture](https://medium.com/@edamtoft/onion-vs-clean-vs-hexagonal-architecture-9ad94a27da91) principles - low-coupling, high-cohesion, a shareable domain at the center
 * Host it behind a distributed REST API, in a CLI, or in another executable. 
@@ -78,11 +83,11 @@ You just have to decide which modules belong in which deployed components, split
 
 ## What does it contain?
 
-It is a fully-functioning and tested system, with some "base" functionality. 
+It is a fully-functioning and tested system, with some common "base" functionality.
 
-It includes a working example of a *made-up* SaaS car-sharing platform for demonstration purposes.
+It demonstrates a working example of a *made-up* SaaS car-sharing platform, just for demonstration purposes.
 
-
+> You would, of course, replace that stuff with your own product of course! It is only there to demonstrate real code examples you can learn from.
 
 The starter template also takes care of these specific kinds of things:
 
