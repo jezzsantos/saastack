@@ -23,7 +23,13 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="GetTestingOnlyValidatedRequest2Validator_InvalidId" xml:space="preserve">
+    <data name="GetTestingOnlyValidatedRequestValidator_InvalidId" xml:space="preserve">
         <value>The Id was either invalid or missing</value>
+    </data>
+    <data name="GetTestingOnlyValidatedRequestValidator_InvalidField1" xml:space="preserve">
+        <value>The Field1 was either invalid or missing</value>
+    </data>
+    <data name="GetTestingOnlyValidatedRequestValidator_InvalidField2" xml:space="preserve">
+        <value>The Field2 was either invalid or missing</value>
     </data>
 </root>

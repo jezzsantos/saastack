@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ApiHost1.Apis.TestingOnly {
+namespace ApiHost1 {
     using System;
     
     
@@ -38,7 +38,7 @@ namespace ApiHost1.Apis.TestingOnly {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ApiHost1.Apis.TestingOnly.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ApiHost1.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,11 +60,29 @@ namespace ApiHost1.Apis.TestingOnly {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Field1 was either invalid or missing.
+        /// </summary>
+        internal static string GetTestingOnlyValidatedRequestValidator_InvalidField1 {
+            get {
+                return ResourceManager.GetString("GetTestingOnlyValidatedRequestValidator_InvalidField1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Field2 was either invalid or missing.
+        /// </summary>
+        internal static string GetTestingOnlyValidatedRequestValidator_InvalidField2 {
+            get {
+                return ResourceManager.GetString("GetTestingOnlyValidatedRequestValidator_InvalidField2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Id was either invalid or missing.
         /// </summary>
-        internal static string GetTestingOnlyValidatedRequest2Validator_InvalidId {
+        internal static string GetTestingOnlyValidatedRequestValidator_InvalidId {
             get {
-                return ResourceManager.GetString("GetTestingOnlyValidatedRequest2Validator_InvalidId", resourceCulture);
+                return ResourceManager.GetString("GetTestingOnlyValidatedRequestValidator_InvalidId", resourceCulture);
             }
         }
     }

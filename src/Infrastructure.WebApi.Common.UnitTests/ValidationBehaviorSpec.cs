@@ -16,7 +16,14 @@ public class ValidationBehaviorSpec
     public ValidationBehaviorSpec()
     {
         _validator = new Mock<IValidator<TestRequest>>();
-        _behavior = new ValidationBehavior<TestRequest, TestResponse>(_validator.Object);
+        var httpContextAccessor = new Mock<IHttpContextAccessor>();
+        httpContextAccessor.Setup(hca => hca.HttpContext!.Request.Scheme).Returns("ascheme");
+        httpContextAccessor.Setup(hca => hca.HttpContext!.Request.Host).Returns(new HostString("ahost"));
+        httpContextAccessor.Setup(hca => hca.HttpContext!.Request.PathBase).Returns(new PathString("/abasepath"));
+        httpContextAccessor.Setup(hca => hca.HttpContext!.Request.Path).Returns("/apath");
+        httpContextAccessor.Setup(hca => hca.HttpContext!.Request.QueryString)
+            .Returns(new QueryString("?aquerystring"));
+        _behavior = new ValidationBehavior<TestRequest, TestResponse>(_validator.Object, httpContextAccessor.Object);
     }
 
     [Fact]
@@ -56,7 +63,8 @@ public class ValidationBehaviorSpec
 
         wasNextCalled.Should().BeFalse();
         _validator.Verify(val => val.ValidateAsync(request, CancellationToken.None));
-        result.Should().BeEquivalentTo(TypedResults.BadRequest(errors.Errors));
+        result.Should()
+            .BeEquivalentTo(TypedResults.Problem(errors.ToRfc7807("ascheme://ahost/abasepath/apath?aquerystring")));
     }
 }
 

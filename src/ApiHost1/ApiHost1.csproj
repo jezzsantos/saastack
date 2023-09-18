@@ -16,13 +16,13 @@
                           ReferenceOutputAssembly="false" />
     </ItemGroup>
     <ItemGroup>
-        <EmbeddedResource Update="Apis\TestingOnly\Resources.resx">
+        <EmbeddedResource Update="Resources.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Resources.Designer.cs</LastGenOutput>
         </EmbeddedResource>
     </ItemGroup>
     <ItemGroup>
-        <Compile Update="Apis\TestingOnly\Resources.Designer.cs">
+        <Compile Update="Resources.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>

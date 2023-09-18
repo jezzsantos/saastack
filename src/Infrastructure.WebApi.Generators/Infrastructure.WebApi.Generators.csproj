@@ -12,17 +12,20 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Include="..\Common\Extensions\StringExtensions.cs">
+            <Link>Reference\Extensions\StringExtensions.cs</Link>
+        </Compile>
         <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebApiService.cs">
-            <Link>Reference\IWebApiService.cs</Link>
+            <Link>Reference\Infrastruture.WebApi.Interfaces\IWebApiService.cs</Link>
         </Compile>
         <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebResponse.cs">
-            <Link>Reference\IWebResponse.cs</Link>
+            <Link>Reference\Infrastruture.WebApi.Interfaces\IWebResponse.cs</Link>
         </Compile>
         <Compile Include="..\Infrastructure.WebApi.Interfaces\WebApiOperation.cs">
-            <Link>Reference\WebApiOperation.cs</Link>
+            <Link>Reference\Infrastruture.WebApi.Interfaces\WebApiOperation.cs</Link>
         </Compile>
         <Compile Include="..\Infrastructure.WebApi.Interfaces\WebApiRouteAttribute.cs">
-            <Link>Reference\WebApiRouteAttribute.cs</Link>
+            <Link>Reference\Infrastruture.WebApi.Interfaces\WebApiRouteAttribute.cs</Link>
         </Compile>
     </ItemGroup>
 </Project>

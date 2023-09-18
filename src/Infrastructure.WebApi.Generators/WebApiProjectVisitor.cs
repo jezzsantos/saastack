@@ -1,3 +1,4 @@
+using Common.Extensions;
 using Infrastructure.WebApi.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -75,7 +76,7 @@ public class WebApiProjectVisitor : SymbolVisitor
         bool IsIgnoredNamespace()
         {
             var @namespace = symbol.Name;
-            if (string.IsNullOrEmpty(@namespace))
+            if (@namespace.HasNoValue())
             {
                 return false;
             }
@@ -164,15 +165,18 @@ public class WebApiProjectVisitor : SymbolVisitor
 
     private void AddRegistration(INamedTypeSymbol symbol)
     {
-        var constructorParameters = GetLongestConstructorByParameters();
         var usingNamespaces = GetUsingNamespaces();
+        var constructorParameters = GetLongestConstructorByParameters();
+        var serviceName = GetServiceName();
         var classRegistration = new ApiServiceClassRegistration
         {
+            TypeName = serviceName,
             CtorParameters = constructorParameters,
             UsingNamespaces = usingNamespaces
         };
 
         var methods = GetServiceOperationMethods();
+
         foreach (var method in methods)
         {
             var routeAttribute = GetRouteAttribute(method);
@@ -190,57 +194,56 @@ public class WebApiProjectVisitor : SymbolVisitor
                 ? bool.Parse(attributeParameters[2].Value!.ToString()!)
                 : false;
             var requestTypeName = method.Parameters[0].Type.Name;
-            var requestTypeFullName = method.Parameters[0].Type.ToDisplayString();
+            var requestTypeNamespace = method.Parameters[0].Type.ContainingNamespace.ToDisplayString();
             var requestMethodBody = GetMethodBody(method, requestTypeName);
 
             OperationRegistrations.Add(new ApiServiceOperationRegistration
             {
                 Class = classRegistration,
-                RequestDtoType = new TypeName
-                {
-                    Name = requestTypeName,
-                    FullName = requestTypeFullName
-                },
+                RequestDtoType = new TypeName(requestTypeNamespace, requestTypeName),
                 OperationType = operationType,
                 IsTestingOnly = isTestingOnly,
                 MethodBody = requestMethodBody,
                 RoutePath = routePath
             });
-
-            continue;
-
-            static string GetMethodBody(ISymbol method, string requestTypeName)
-            {
-                var syntaxReference = method.DeclaringSyntaxReferences.FirstOrDefault();
-                if (syntaxReference is null)
-                {
-                    return string.Empty;
-                }
-
-                var requestMethodSyntax = syntaxReference.SyntaxTree.GetRoot()
-                    .DescendantNodes()
-                    .OfType<MethodDeclarationSyntax>()
-                    .FirstOrDefault(x =>
-                        (x.ParameterList.Parameters.First().Type as IdentifierNameSyntax)!.Identifier.Text ==
-                        requestTypeName);
-                return
-                    requestMethodSyntax is not null
-                        ? requestMethodSyntax.Body!.GetText().ToString()
-                        : string.Empty;
-            }
-
-            static WebApiOperation FromOperationVerb(string? operation)
-            {
-                if (operation is null)
-                {
-                    return WebApiOperation.Get;
-                }
-
-                return Enum.Parse<WebApiOperation>(operation, true);
-            }
         }
 
         return;
+
+        TypeName GetServiceName()
+        {
+            return new TypeName(symbol.ContainingNamespace.ToDisplayString(), symbol.Name);
+        }
+
+        static string GetMethodBody(ISymbol method, string requestTypeName)
+        {
+            var syntaxReference = method.DeclaringSyntaxReferences.FirstOrDefault();
+            if (syntaxReference is null)
+            {
+                return string.Empty;
+            }
+
+            var requestMethodSyntax = syntaxReference.SyntaxTree.GetRoot()
+                .DescendantNodes()
+                .OfType<MethodDeclarationSyntax>()
+                .FirstOrDefault(x =>
+                    (x.ParameterList.Parameters.First().Type as IdentifierNameSyntax)!.Identifier.Text ==
+                    requestTypeName);
+            return
+                requestMethodSyntax is not null
+                    ? requestMethodSyntax.Body!.GetText().ToString()
+                    : string.Empty;
+        }
+
+        static WebApiOperation FromOperationVerb(string? operation)
+        {
+            if (operation is null)
+            {
+                return WebApiOperation.Get;
+            }
+
+            return Enum.Parse<WebApiOperation>(operation, true);
+        }
 
         List<ConstructorParameter> GetLongestConstructorByParameters()
         {
@@ -250,7 +253,7 @@ public class WebApiProjectVisitor : SymbolVisitor
             return longest is not null
                 ? longest.Parameters.Select(param => new ConstructorParameter
                 {
-                    TypeName = new TypeName { Name = param.Type.Name, FullName = param.Type.ToDisplayString() },
+                    TypeName = new TypeName(param.Type.ContainingNamespace.ToDisplayString(), param.Type.Name),
                     VariableName = param.Name
                 }).ToList()
                 : new List<ConstructorParameter>();
@@ -362,12 +365,42 @@ public class WebApiProjectVisitor : SymbolVisitor
 
     public record TypeName
     {
-        public required string FullName { get; set; }
-        public required string Name { get; set; }
+        public TypeName(string @namespace, string name)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(@namespace);
+            ArgumentException.ThrowIfNullOrEmpty(name);
+            Namespace = @namespace;
+            Name = name;
+        }
+
+        public string FullName => $"{Namespace}.{Name}";
+        public string Name { get; }
+        public string Namespace { get; }
+
+        public virtual bool Equals(TypeName? other)
+        {
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return Name == other.Name && Namespace == other.Namespace;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Namespace, Name);
+        }
     }
 
     public record ApiServiceClassRegistration
     {
+        public required TypeName TypeName { get; set; }
         public IEnumerable<ConstructorParameter> CtorParameters { get; set; } = new List<ConstructorParameter>();
         public IEnumerable<string> UsingNamespaces { get; set; } = new List<string>();
     }
