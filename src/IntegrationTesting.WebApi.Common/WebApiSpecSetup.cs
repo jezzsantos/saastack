@@ -10,7 +10,7 @@ public abstract class WebApiSpecSetup<THost> : IClassFixture<WebApplicationFacto
     protected WebApiSpecSetup(WebApplicationFactory<THost> factory)
     {
         Api = factory
-            .WithWebHostBuilder(builder => builder.ConfigureServices(services =>
+            .WithWebHostBuilder(builder => builder.ConfigureServices(_ =>
             {
                 //TODO: swap out dependencies
                 //services.AddScoped<ITodoItemService, TestTodoItemService>();

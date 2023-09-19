@@ -149,10 +149,10 @@ public sealed class ItemCanBeNullAttribute : Attribute
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class StringFormatMethodAttribute : Attribute
 {
-  /// <param name="formatParameterName">
-  ///     Specifies which parameter of an annotated method should be treated as the format string.
-  /// </param>
-  public StringFormatMethodAttribute([NotNull] string formatParameterName)
+    /// <param name="formatParameterName">
+    ///     Specifies which parameter of an annotated method should be treated as the format string.
+    /// </param>
+    public StringFormatMethodAttribute([NotNull] string formatParameterName)
     {
         FormatParameterName = formatParameterName;
     }
@@ -244,9 +244,6 @@ public sealed class ValueProviderAttribute : Attribute
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class ValueRangeAttribute : Attribute
 {
-    public object From { get; }
-    public object To { get; }
-
     public ValueRangeAttribute(long from, long to)
     {
         From = from;
@@ -268,6 +265,10 @@ public sealed class ValueRangeAttribute : Attribute
     {
         From = To = value;
     }
+
+    public object From { get; }
+
+    public object To { get; }
 }
 
 /// <summary>
@@ -706,12 +707,12 @@ public sealed class PublicAPIAttribute : Attribute
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class InstantHandleAttribute : Attribute
 {
-  /// <summary>
-  ///     Require the method invocation to be used under the 'await' expression for this attribute to take effect on the code
-  ///     analysis engine.
-  ///     Can be used for delegate/enumerable parameters of 'async' methods.
-  /// </summary>
-  public bool RequireAwait { get; set; }
+    /// <summary>
+    ///     Require the method invocation to be used under the 'await' expression for this attribute to take effect on the code
+    ///     analysis engine.
+    ///     Can be used for delegate/enumerable parameters of 'async' methods.
+    /// </summary>
+    public bool RequireAwait { get; set; }
 }
 
 /// <summary>
@@ -887,28 +888,28 @@ public sealed class SourceTemplateAttribute : Attribute
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class MacroAttribute : Attribute
 {
-  /// <summary>
-  ///     Allows specifying a macro that will be executed for a <see cref="SourceTemplateAttribute">source template</see>
-  ///     parameter when the template is expanded.
-  /// </summary>
-  [CanBeNull]
+    /// <summary>
+    ///     Allows specifying a macro that will be executed for a <see cref="SourceTemplateAttribute">source template</see>
+    ///     parameter when the template is expanded.
+    /// </summary>
+    [CanBeNull]
     public string Expression { get; set; }
 
-  /// <summary>
-  ///     Allows specifying which occurrence of the target parameter becomes editable when the template is deployed.
-  /// </summary>
-  /// <remarks>
-  ///     If the target parameter is used several times in the template, only one occurrence becomes editable;
-  ///     other occurrences are changed synchronously. To specify the zero-based index of the editable occurrence,
-  ///     use values >= 0. To make the parameter non-editable when the template is expanded, use -1.
-  /// </remarks>
-  public int Editable { get; set; }
+    /// <summary>
+    ///     Allows specifying which occurrence of the target parameter becomes editable when the template is deployed.
+    /// </summary>
+    /// <remarks>
+    ///     If the target parameter is used several times in the template, only one occurrence becomes editable;
+    ///     other occurrences are changed synchronously. To specify the zero-based index of the editable occurrence,
+    ///     use values >= 0. To make the parameter non-editable when the template is expanded, use -1.
+    /// </remarks>
+    public int Editable { get; set; }
 
-  /// <summary>
-  ///     Identifies the target parameter of a <see cref="SourceTemplateAttribute">source template</see> if the
-  ///     <see cref="MacroAttribute" /> is applied on a template method.
-  /// </summary>
-  [CanBeNull]
+    /// <summary>
+    ///     Identifies the target parameter of a <see cref="SourceTemplateAttribute">source template</see> if the
+    ///     <see cref="MacroAttribute" /> is applied on a template method.
+    /// </summary>
+    [CanBeNull]
     public string Target { get; set; }
 }
 
@@ -1464,12 +1465,12 @@ public sealed class AspRequiredAttributeAttribute : Attribute
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class AspTypePropertyAttribute : Attribute
 {
-    public bool CreateConstructorReferences { get; }
-
     public AspTypePropertyAttribute(bool createConstructorReferences)
     {
         CreateConstructorReferences = createConstructorReferences;
     }
+
+    public bool CreateConstructorReferences { get; }
 }
 
 #endregion
@@ -1798,13 +1799,14 @@ public sealed class RouteTemplateAttribute : Attribute
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class RouteParameterConstraintAttribute : Attribute
 {
-    [NotNull] public string ConstraintName { get; }
-    [CanBeNull] public Type ProposedType { get; set; }
-
     public RouteParameterConstraintAttribute([NotNull] string constraintName)
     {
         ConstraintName = constraintName;
     }
+
+    [NotNull] public string ConstraintName { get; }
+
+    [CanBeNull] public Type ProposedType { get; set; }
 }
 
 /// <summary>
@@ -2033,6 +2035,7 @@ public sealed class RazorPageBaseTypeAttribute : Attribute
     }
 
     [NotNull] public string BaseType { get; }
+
     [CanBeNull] public string PageName { get; }
 }
 
@@ -2154,20 +2157,20 @@ public sealed class XamlTwoWayBindingModeByDefaultAttribute : Attribute
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class TestSubjectAttribute : Attribute
 {
-  /// <summary>
-  ///     Gets the type of the subject being tested.
-  /// </summary>
-  [NotNull]
-    public Type Subject { get; }
-
-  /// <summary>
-  ///     Initializes a new instance of the <see cref="TestSubjectAttribute" /> class with the specified subject type.
-  /// </summary>
-  /// <param name="subject">The type of the subject being tested.</param>
-  public TestSubjectAttribute([NotNull] Type subject)
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="TestSubjectAttribute" /> class with the specified subject type.
+    /// </summary>
+    /// <param name="subject">The type of the subject being tested.</param>
+    public TestSubjectAttribute([NotNull] Type subject)
     {
         Subject = subject;
     }
+
+    /// <summary>
+    ///     Gets the type of the subject being tested.
+    /// </summary>
+    [NotNull]
+    public Type Subject { get; }
 }
 
 /// <summary>

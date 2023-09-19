@@ -70,7 +70,7 @@ public class ContentNegotiationFilter : IEndpointFilter
                 contentType = await ConvertToJsonAsync(value, context, content);
                 break;
             case NegotiatedMimeType.Xml:
-                contentType = await ConvertToXmlAsync(value, context, content);
+                contentType = await ConvertToXmlAsync(value, content);
                 break;
             default:
                 return Results.StatusCode((int)HttpStatusCode.UnsupportedMediaType);
@@ -105,8 +105,7 @@ public class ContentNegotiationFilter : IEndpointFilter
         }
     }
 
-    private static async Task<string> ConvertToXmlAsync(object value, EndpointFilterInvocationContext context,
-        Stream content)
+    private static async Task<string> ConvertToXmlAsync(object value, Stream content)
     {
         await Task.CompletedTask;
         var resultType = value.GetType();

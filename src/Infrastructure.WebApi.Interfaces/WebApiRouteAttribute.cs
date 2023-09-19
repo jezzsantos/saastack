@@ -20,6 +20,8 @@ public class WebApiRouteAttribute : Attribute
     }
 
     public string RouteTemplate { get; }
+
     public WebApiOperation Operation { get; }
+
     public bool IsTestingOnly { get; }
 }

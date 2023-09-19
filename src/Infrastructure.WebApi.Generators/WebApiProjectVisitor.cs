@@ -124,6 +124,8 @@ public class WebApiProjectVisitor : SymbolVisitor
             nestedType.Accept(this);
         }
 
+        return;
+
         bool IsServiceClass()
         {
             if (IsNotClass(symbol))
@@ -355,11 +357,15 @@ public class WebApiProjectVisitor : SymbolVisitor
     public record ApiServiceOperationRegistration
     {
         public required ApiServiceClassRegistration Class { get; set; }
+
         public required string RoutePath { get; set; }
+
         public required WebApiOperation OperationType { get; set; }
 
         public required bool IsTestingOnly { get; set; }
+
         public required TypeName RequestDtoType { get; set; }
+
         public string? MethodBody { get; set; }
     }
 
@@ -374,8 +380,15 @@ public class WebApiProjectVisitor : SymbolVisitor
         }
 
         public string FullName => $"{Namespace}.{Name}";
+
         public string Name { get; }
+
         public string Namespace { get; }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Namespace, Name);
+        }
 
         public virtual bool Equals(TypeName? other)
         {
@@ -391,23 +404,21 @@ public class WebApiProjectVisitor : SymbolVisitor
 
             return Name == other.Name && Namespace == other.Namespace;
         }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Namespace, Name);
-        }
     }
 
     public record ApiServiceClassRegistration
     {
         public required TypeName TypeName { get; set; }
+
         public IEnumerable<ConstructorParameter> CtorParameters { get; set; } = new List<ConstructorParameter>();
+
         public IEnumerable<string> UsingNamespaces { get; set; } = new List<string>();
     }
 
     public record ConstructorParameter
     {
         public required TypeName TypeName { get; set; }
+
         public required string VariableName { get; set; }
     }
 }

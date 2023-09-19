@@ -7,21 +7,21 @@ namespace ApiHost1.Apis.TestingOnly;
 public class TestingWebApi : IWebApiService
 {
     [WebApiRoute("/testingonly/{id}/unvalidated", WebApiOperation.Get, true)]
-    public async Task<IResult> Get(GetTestingOnlyUnvalidatedRequest request, CancellationToken cancellationToken)
+    public async Task<IResult> Get(GetWithoutValidatorTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
-        return Results.Ok(new GetTestingOnlyResponse { Message = $"amessage{request.Id}" });
+        return Results.Ok(new StringMessageTestingOnlyResponse { Message = $"amessage{request.Id}" });
     }
 
     [WebApiRoute("/testingonly/{id}/validated", WebApiOperation.Get, true)]
-    public async Task<IResult> Get(GetTestingOnlyValidatedRequest request, CancellationToken cancellationToken)
+    public async Task<IResult> Get(GetWithValidatorTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
-        return Results.Ok(new GetTestingOnlyResponse { Message = $"amessage{request.Field1}" });
+        return Results.Ok(new StringMessageTestingOnlyResponse { Message = $"amessage{request.Field1}" });
     }
 
-    [WebApiRoute("/testingonly/exception", WebApiOperation.Get, true)]
-    public async Task<IResult> Get(GetTestingOnlyExceptionRequest request, CancellationToken cancellationToken)
+    [WebApiRoute("/testingonly/throws", WebApiOperation.Get, true)]
+    public async Task<IResult> Get(ThrowsExceptionTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         throw new InvalidOperationException("amessage");

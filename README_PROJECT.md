@@ -8,7 +8,7 @@
 
 You will need the following development tools to build, run, and test this project:
 
-* Jetbrains Rider - obtain a license key for Jetbrains dotUltimate 
+* Jetbrains Rider - obtain a license key for Jetbrains dotUltimate
 
 * Install the .NET7.0 SDK. Available for [download here](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
 
@@ -120,7 +120,7 @@ When pushed, all branches will be built and tested with GitHub actions
 
 2. Run these tests:
 
-​	In Rider, run all C# tests with Category= `Unit`, `Unit.Architecture` and `Integration.Web`
+In Rider, run all C# tests with Category= `Unit`, `Unit.Architecture` and `Integration.Web`
 
 > Note: Use `Group By > Category` in Rider's unit test explorer to view these three categories easily.
 
@@ -182,7 +182,7 @@ This is what we modify and how:
 
 We run this API production DI code in-process in a Kestrel web server in the same process as your Integration Tests (e.g. in the process of `xunit.console.exe`, not as a separate process). We replace the `appsettings.json` file with the one in your integration testing project
 
->  Which should never ever contain ANY production settings or secrets!
+> Which should never ever contain ANY production settings or secrets!
 
 We then manipulate the DI container (seen in the `TestStartup.cs` of your integration testing project) and replace certain dependencies (e.g. the 3rd party adapters like: `INotificationsService,` etc) with their respective hardcoded Stubbed equivalents (found in the `Stubs` directory your integration testing project).
 

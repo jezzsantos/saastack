@@ -116,6 +116,8 @@ public class TestModule : ISubDomainModule
     }
 
     public Assembly ApiAssembly { get; init; }
+
     public Action<WebApplication> MinimalApiRegistrationFunction { get; init; }
+
     public Action<ConfigurationManager, IServiceCollection>? RegisterServicesFunction { get; init; }
 }

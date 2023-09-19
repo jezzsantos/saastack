@@ -1,12 +1,14 @@
 #if TESTINGONLY
 using FluentValidation;
 using Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
+using JetBrains.Annotations;
 
 namespace ApiHost1.Apis.TestingOnly;
 
-public class GetTestingOnlyValidatedRequestValidator : AbstractValidator<GetTestingOnlyValidatedRequest>
+[UsedImplicitly]
+public class GetWithValidatorTestingOnlyRequestValidator : AbstractValidator<GetWithValidatorTestingOnlyRequest>
 {
-    public GetTestingOnlyValidatedRequestValidator()
+    public GetWithValidatorTestingOnlyRequestValidator()
     {
         RuleFor(req => req.Id)
             .NotEmpty()

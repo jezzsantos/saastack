@@ -19,7 +19,7 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
     }
 
     [Fact]
-    public async Task WhenGetTestingOnlyUnvalidatedRequest_ThenReturns200()
+    public async Task WhenGetUnvalidatedRequest_ThenReturns200()
     {
         var result = await Api.GetAsync("/testingonly/1/unvalidated");
 
@@ -27,15 +27,15 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
     }
 
     [Fact]
-    public async Task WhenGetTestingOnlyUnvalidatedRequest_ThenReturnsJsonByDefault()
+    public async Task WhenGetUnvalidatedRequest_ThenReturnsJsonByDefault()
     {
-        var result = await Api.GetFromJsonAsync<GetTestingOnlyResponse>("/testingonly/1/unvalidated");
+        var result = await Api.GetFromJsonAsync<StringMessageTestingOnlyResponse>("/testingonly/1/unvalidated");
 
         result?.Message.Should().Be("amessage1");
     }
 
     [Fact]
-    public async Task WhenGetTestingOnlyValidatedRequestWithInvalidId_ThenReturnsValidationError()
+    public async Task WhenGetValidatedRequestWithInvalidId_ThenReturnsValidationError()
     {
         var result = await Api.GetAsync("/testingonly/1234/validated");
 
@@ -56,9 +56,9 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
     }
 
     [Fact]
-    public async Task WhenGetTestingOnlyException_ThenReturnsServerError()
+    public async Task WhenGetThrowsException_ThenReturnsServerError()
     {
-        var result = await Api.GetAsync("/testingonly/exception");
+        var result = await Api.GetAsync("/testingonly/throws");
 
         result.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
         var json = await result.Content.ReadAsStringAsync();
@@ -69,13 +69,13 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
                        "\"title\":\"An unexpected error occurred\"," +
                        "\"status\":500," +
                        "\"detail\":\"amessage\"," +
-                       "\"instance\":\"http://localhost/testingonly/exception\"," +
+                       "\"instance\":\"http://localhost/testingonly/throws\"," +
                        "\"exception\":\"System.InvalidOperationException: amessage");
     }
 
 
     [Fact]
-    public async Task WhenGetTestingOnlyWithNoAcceptAndNoFormat_ThenReturnsJsonResponse()
+    public async Task WhenGetWithNoAcceptAndNoFormat_ThenReturnsJsonResponse()
     {
         var result = await Api.GetAsync("/testingonly/1/unvalidated");
 
@@ -86,7 +86,7 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
     }
 
     [Fact]
-    public async Task WhenGetTestingOnlyWithAcceptForJson_ThenReturnsJsonResponse()
+    public async Task WhenGetWithAcceptForJson_ThenReturnsJsonResponse()
     {
         var request = new HttpRequestMessage
         {
@@ -103,7 +103,7 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
     }
 
     [Fact]
-    public async Task WhenGetTestingOnlyWithAcceptForXml_ThenReturnsXmlResponse()
+    public async Task WhenGetWithAcceptForXml_ThenReturnsXmlResponse()
     {
         var request = new HttpRequestMessage
         {
@@ -117,13 +117,13 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
         var content = await result.Content.ReadAsStringAsync();
 
         content.Should().Be($"<?xml version=\"1.0\" encoding=\"utf-8\"?>{Environment.NewLine}" +
-                            $"<GetTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">{Environment.NewLine}" +
+                            $"<StringMessageTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">{Environment.NewLine}" +
                             $"  <Message>amessage1</Message>{Environment.NewLine}" +
-                            "</GetTestingOnlyResponse>");
+                            "</StringMessageTestingOnlyResponse>");
     }
 
     [Fact]
-    public async Task WhenGetTestingOnlyWithAcceptForUnsupported_ThenReturns415()
+    public async Task WhenGetWithAcceptForUnsupported_ThenReturns415()
     {
         var request = new HttpRequestMessage
         {
@@ -140,7 +140,7 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
     }
 
     [Fact]
-    public async Task WhenGetTestingOnlyWithFormatForJson_ThenReturnsJsonResponse()
+    public async Task WhenGetWithFormatForJson_ThenReturnsJsonResponse()
     {
         var result = await Api.GetAsync("/testingonly/1/unvalidated?format=json");
 
@@ -151,7 +151,7 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
     }
 
     [Fact]
-    public async Task WhenGetTestingOnlyWithFormatForXml_ThenReturnsXmlResponse()
+    public async Task WhenGetWithFormatForXml_ThenReturnsXmlResponse()
     {
         var result = await Api.GetAsync("/testingonly/1/unvalidated?format=xml");
 
@@ -159,13 +159,13 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
         var content = await result.Content.ReadAsStringAsync();
 
         content.Should().Be($"<?xml version=\"1.0\" encoding=\"utf-8\"?>{Environment.NewLine}" +
-                            $"<GetTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">{Environment.NewLine}" +
+                            $"<StringMessageTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">{Environment.NewLine}" +
                             $"  <Message>amessage1</Message>{Environment.NewLine}" +
-                            "</GetTestingOnlyResponse>");
+                            "</StringMessageTestingOnlyResponse>");
     }
 
     [Fact]
-    public async Task WhenGetTestingOnlyWithFormatForUnsupported_ThenReturns415()
+    public async Task WhenGetWithFormatForUnsupported_ThenReturns415()
     {
         var result = await Api.GetAsync("/testingonly/1/unvalidated?format=unsupported");
 
