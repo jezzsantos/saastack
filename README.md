@@ -1,12 +1,14 @@
 [![Build and Test](https://github.com/jezzsantos/saastack-dotnet/actions/workflows/build.yml/badge.svg)](https://github.com/jezzsantos/saastack-dotnet/actions/workflows/build.yml)
 
-# SaaStack .NET
+# SaaStack
 
 Are you thinking of building a new SaaS product from scratch? (on .NET)
 
-Then start with SaaStack. It is a complete "codebase template" for real-world, fully featured SaaS web products, that you can start with.
+Then, start with SaaStack. It is a complete "codebase template" for building real-world, fully featured SaaS web products.
 
-Ready to build, test, and deploy into a cloud of your choice (e.g. Azure, AWS, Google Cloud, etc)
+Ready to build, test, and deploy into a cloud provider of your choice (e.g. Azure, AWS, Google Cloud, etc)
+
+Don't spend months building all this stuff from scratch. You and your team don't need to. We've done it for you already.
 
 >  This is not a starter EXAMPLE template of the type you would download to learn a new technology. 
 >  This is a fully-fledged functional SaaS product that you can deploy from day one and get started building out your product with.
