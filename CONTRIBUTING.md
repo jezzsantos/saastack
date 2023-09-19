@@ -38,7 +38,7 @@ Use one of the following resources for questions about using SaaStack or issues 
 
 - The `#questions` channel on our [Discord server](https://discord.gg/849Wy2Zwgg)
 - Ask on [Stack Overflow](https://stackoverflow.com/questions/tagged/SaaStack?tab=Frequent). Search with Google first using: `site:stackoverflow.com SaaStack {search term, exception message, etc.}`
-- Ask on our [GitHub Discussions](https://github.com/jezzsantos/saastack-dotnet/discussions) for long-term discussion or larger questions.
+- Ask on our [GitHub Discussions](https://github.com/jezzsantos/saastack/discussions) for long-term discussion or larger questions.
 
 # Code of Conduct
 
@@ -99,7 +99,7 @@ Your Responsibilities are:
 
 ## Product Documentation
 
-[This is where](https://github.com/jezzsantos/saastack-dotnet/tree/main/docs) we have all of our product documentation, aimed at the users of our product, which in this case are primarily developers themselves.
+[This is where](https://github.com/jezzsantos/saastack/tree/main/docs) we have all of our product documentation, aimed at the users of our product, which in this case are primarily developers themselves.
 
 That documentation is intended to be part of the template itself that users of the product will also own themselves.
 
@@ -147,13 +147,13 @@ There are 3 flavors of build configuration: `Debug`, `Release` and `ReleaseForDe
 
 > Releases to this project are a little different than ordinary projects, because we are releasing a codebase template.
 
-When our users first clone this template (as their own), they will be versioning the codebase their own way (using the [CHANGELOG.md](https://github.com/jezzsantos/saastack-dotnet/blob/main/CHANGELOG.md) included in their copy of the template itself.
+When our users first clone this template (as their own), they will be versioning the codebase their own way (using the [CHANGELOG.md](https://github.com/jezzsantos/saastack/blob/main/CHANGELOG.md) included in their copy of the template itself.
 
-> The included [CHANGELOG.md](https://github.com/jezzsantos/saastack-dotnet/blob/main/CHANGELOG.md) should not be updated by contributors of this project, for changes to this project.
+> The included [CHANGELOG.md](https://github.com/jezzsantos/saastack/blob/main/CHANGELOG.md) should not be updated by contributors of this project, for changes to this project.
 
 Therefore, our release strategy, and versioning should be captured outside the template itself.
 
-We will maintain the project [CHANGELOG](https://github.com/jezzsantos/saastack-dotnet/wiki/CHANGELOG) in the wiki, and we will document changes to the template of this project there, so that our users can keep track of changes we make to the template, as things change over time.
+We will maintain the project [CHANGELOG](https://github.com/jezzsantos/saastack/wiki/CHANGELOG) in the wiki, and we will document changes to the template of this project there, so that our users can keep track of changes we make to the template, as things change over time.
 
 ### Releases
 

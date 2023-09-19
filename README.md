@@ -1,4 +1,4 @@
-[![Build and Test](https://github.com/jezzsantos/saastack-dotnet/actions/workflows/build.yml/badge.svg)](https://github.com/jezzsantos/saastack-dotnet/actions/workflows/build.yml)
+[![Build and Test](https://github.com/jezzsantos/saastack/actions/workflows/build.yml/badge.svg)](https://github.com/jezzsantos/saastack/actions/workflows/build.yml)
 
 # SaaStack
 

@@ -45,10 +45,10 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <RepositoryUrl>https://github.com/jezzsantos/saastack-dotnet</RepositoryUrl>
-        <PackageProjectUrl>https://github.com/jezzsantos/saastack-dotnet</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/jezzsantos/saastack</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/jezzsantos/saastack</PackageProjectUrl>
         <RepositoryType>GitHub</RepositoryType>
-        <PackageReleaseNotes>https://github.com/jezzsantos/saastack-dotnet/blob/main/README.md</PackageReleaseNotes>
+        <PackageReleaseNotes>https://github.com/jezzsantos/saastack/blob/main/README.md</PackageReleaseNotes>
         <RequireLicenseAcceptance>false</RequireLicenseAcceptance>
     </PropertyGroup>
 
