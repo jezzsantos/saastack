@@ -1,8 +1,9 @@
 using Application.Interfaces;
+using Application.Interfaces.Resources;
 
 namespace CarsApplication;
 
 public interface ICarsApplication
 {
-    Task<string> GetCarAsync(ICallerContext caller, string? id, CancellationToken cancellationToken);
+    Task<Car> GetCarAsync(ICallerContext caller, string id, CancellationToken cancellationToken);
 }

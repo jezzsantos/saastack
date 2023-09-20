@@ -131,16 +131,16 @@ namespace {assemblyNamespace}
 
         foreach (var registration in serviceRegistrations)
         {
-            var constructor = BuildConstructor(registration.RequestDtoType.Name,
-                registration.Class.CtorParameters.ToList());
+            var constructorAndFields = BuildInjectorConstructorAndFields(registration.RequestDtoType.Name,
+                registration.Class.Constructors.ToList());
 
             handlerClasses.AppendLine(
                 $"    public class {registration.RequestDtoType.Name}Handler : global::MediatR.IRequestHandler<global::{registration.RequestDtoType.FullName}, global::Microsoft.AspNetCore.Http.IResult>");
             handlerClasses.AppendLine(
                 "    {");
-            if (constructor.HasValue())
+            if (constructorAndFields.HasValue())
             {
-                handlerClasses.AppendLine(constructor);
+                handlerClasses.AppendLine(constructorAndFields);
             }
 
             if (registration.IsTestingOnly)
@@ -148,12 +148,15 @@ namespace {assemblyNamespace}
                 handlerClasses.AppendLine($"#if {TestingOnlyDirective}");
             }
 
-            var requestBody = registration.MethodBody.HasValue()
-                ? $"{registration.MethodBody}"
-                : "    {}";
             handlerClasses.AppendLine(
                 $"        public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::{registration.RequestDtoType.FullName} request, global::System.Threading.CancellationToken cancellationToken)");
-            handlerClasses.Append($"{requestBody}");
+            handlerClasses.AppendLine("        {");
+            var callingParameters = BuildInjectedParameters(registration.Class.Constructors.ToList());
+            handlerClasses.AppendLine(
+                $"            var api = new global::{registration.Class.TypeName.FullName}({callingParameters});");
+            handlerClasses.AppendLine(
+                $"            return await api.{registration.MethodName}(request, cancellationToken);");
+            handlerClasses.AppendLine("        }");
             if (registration.IsTestingOnly)
             {
                 handlerClasses.AppendLine("#endif");
@@ -167,42 +170,68 @@ namespace {assemblyNamespace}
         handlerClasses.AppendLine();
     }
 
-    private static string BuildConstructor(string? requestTypeName,
-        List<WebApiProjectVisitor.ConstructorParameter> constructorParameters)
+    private static string BuildInjectorConstructorAndFields(string? requestTypeName,
+        List<WebApiProjectVisitor.Constructor> constructors)
     {
-        var handlerClassConstructor = new StringBuilder();
-        if (constructorParameters.Any())
+        var handlerClassConstructorAndFields = new StringBuilder();
+
+        var injectorCtor = constructors.FirstOrDefault(ctor => ctor.IsInjectionCtor);
+        if (injectorCtor is not null)
         {
-            foreach (var param in constructorParameters)
+            var parameters = injectorCtor.CtorParameters.ToList();
+            foreach (var param in parameters)
             {
-                handlerClassConstructor.AppendLine(
+                handlerClassConstructorAndFields.AppendLine(
                     $"        private readonly global::{param.TypeName.FullName} _{param.VariableName};");
             }
 
-            handlerClassConstructor.AppendLine();
-            handlerClassConstructor.Append($"        public {requestTypeName}Handler(");
-            var paramsRemaining = constructorParameters.Count();
-            foreach (var param in constructorParameters)
+            handlerClassConstructorAndFields.AppendLine();
+            handlerClassConstructorAndFields.Append($"        public {requestTypeName}Handler(");
+            var paramsRemaining = parameters.Count();
+            foreach (var param in parameters)
             {
-                handlerClassConstructor.Append($"global::{param.TypeName.FullName} {param.VariableName}");
+                handlerClassConstructorAndFields.Append($"global::{param.TypeName.FullName} {param.VariableName}");
                 if (--paramsRemaining > 0)
                 {
-                    handlerClassConstructor.Append(", ");
+                    handlerClassConstructorAndFields.Append(", ");
                 }
             }
 
-            handlerClassConstructor.AppendLine(")");
-            handlerClassConstructor.AppendLine("        {");
-            foreach (var param in constructorParameters)
+            handlerClassConstructorAndFields.AppendLine(")");
+            handlerClassConstructorAndFields.AppendLine("        {");
+            foreach (var param in parameters)
             {
-                handlerClassConstructor.AppendLine(
+                handlerClassConstructorAndFields.AppendLine(
                     $"            this._{param.VariableName} = {param.VariableName};");
             }
 
-            handlerClassConstructor.AppendLine("        }");
+            handlerClassConstructorAndFields.AppendLine("        }");
         }
 
-        return handlerClassConstructor.ToString();
+        return handlerClassConstructorAndFields.ToString();
+    }
+
+    private static string BuildInjectedParameters(List<WebApiProjectVisitor.Constructor> constructors)
+    {
+        var methodParameters = new StringBuilder();
+
+        var injectorCtor = constructors.FirstOrDefault(ctor => ctor.IsInjectionCtor);
+        if (injectorCtor is not null)
+        {
+            var parameters = injectorCtor.CtorParameters.ToList();
+
+            var paramsRemaining = parameters.Count();
+            foreach (var param in parameters)
+            {
+                methodParameters.Append($"this._{param.VariableName}");
+                if (--paramsRemaining > 0)
+                {
+                    methodParameters.Append(", ");
+                }
+            }
+        }
+
+        return methodParameters.ToString();
     }
 
     private static List<WebApiProjectVisitor.ApiServiceOperationRegistration> GetWebApiServiceOperationsFromAssembly(

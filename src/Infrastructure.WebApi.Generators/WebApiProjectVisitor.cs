@@ -168,12 +168,12 @@ public class WebApiProjectVisitor : SymbolVisitor
     private void AddRegistration(INamedTypeSymbol symbol)
     {
         var usingNamespaces = GetUsingNamespaces();
-        var constructorParameters = GetLongestConstructorByParameters();
+        var constructors = GetConstructors();
         var serviceName = GetServiceName();
         var classRegistration = new ApiServiceClassRegistration
         {
             TypeName = serviceName,
-            CtorParameters = constructorParameters,
+            Constructors = constructors,
             UsingNamespaces = usingNamespaces
         };
 
@@ -197,7 +197,8 @@ public class WebApiProjectVisitor : SymbolVisitor
                 : false;
             var requestTypeName = method.Parameters[0].Type.Name;
             var requestTypeNamespace = method.Parameters[0].Type.ContainingNamespace.ToDisplayString();
-            var requestMethodBody = GetMethodBody(method, requestTypeName);
+            var requestMethodBody = GetMethodBody(method);
+            var requestMethodName = method.Name;
 
             OperationRegistrations.Add(new ApiServiceOperationRegistration
             {
@@ -205,6 +206,7 @@ public class WebApiProjectVisitor : SymbolVisitor
                 RequestDtoType = new TypeName(requestTypeNamespace, requestTypeName),
                 OperationType = operationType,
                 IsTestingOnly = isTestingOnly,
+                MethodName = requestMethodName,
                 MethodBody = requestMethodBody,
                 RoutePath = routePath
             });
@@ -217,24 +219,17 @@ public class WebApiProjectVisitor : SymbolVisitor
             return new TypeName(symbol.ContainingNamespace.ToDisplayString(), symbol.Name);
         }
 
-        static string GetMethodBody(ISymbol method, string requestTypeName)
+        static string GetMethodBody(ISymbol method)
         {
             var syntaxReference = method.DeclaringSyntaxReferences.FirstOrDefault();
-            if (syntaxReference is null)
+
+            var syntax = syntaxReference?.GetSyntax();
+            if (syntax is MethodDeclarationSyntax methodDeclarationSyntax)
             {
-                return string.Empty;
+                return methodDeclarationSyntax.Body?.ToFullString() ?? string.Empty;
             }
 
-            var requestMethodSyntax = syntaxReference.SyntaxTree.GetRoot()
-                .DescendantNodes()
-                .OfType<MethodDeclarationSyntax>()
-                .FirstOrDefault(x =>
-                    (x.ParameterList.Parameters.First().Type as IdentifierNameSyntax)!.Identifier.Text ==
-                    requestTypeName);
-            return
-                requestMethodSyntax is not null
-                    ? requestMethodSyntax.Body!.GetText().ToString()
-                    : string.Empty;
+            return string.Empty;
         }
 
         static WebApiOperation FromOperationVerb(string? operation)
@@ -247,18 +242,37 @@ public class WebApiProjectVisitor : SymbolVisitor
             return Enum.Parse<WebApiOperation>(operation, true);
         }
 
-        List<ConstructorParameter> GetLongestConstructorByParameters()
+        List<Constructor> GetConstructors()
         {
-            var longest = symbol.InstanceConstructors
-                .MaxBy(info => info.Parameters.Length);
-
-            return longest is not null
-                ? longest.Parameters.Select(param => new ConstructorParameter
+            var ctors = new List<Constructor>();
+            var isInjectionCtor = false;
+            foreach (var constructor in symbol.InstanceConstructors.OrderByDescending(
+                         method => method.Parameters.Length))
+            {
+                if (!isInjectionCtor)
                 {
-                    TypeName = new TypeName(param.Type.ContainingNamespace.ToDisplayString(), param.Type.Name),
-                    VariableName = param.Name
-                }).ToList()
-                : new List<ConstructorParameter>();
+                    if (constructor is
+                        { IsStatic: false, DeclaredAccessibility: Accessibility.Public, Parameters.Length: > 0 })
+                    {
+                        isInjectionCtor = true;
+                    }
+                }
+
+                var body = constructor.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().ToFullString();
+                ctors.Add(new Constructor
+                {
+                    IsInjectionCtor = isInjectionCtor,
+                    CtorParameters = constructor.Parameters
+                        .Select(param => new ConstructorParameter
+                        {
+                            TypeName = new TypeName(param.Type.ContainingNamespace.ToDisplayString(), param.Type.Name),
+                            VariableName = param.Name
+                        }).ToList(),
+                    MethodBody = body
+                });
+            }
+
+            return ctors;
         }
 
         List<IMethodSymbol> GetServiceOperationMethods()
@@ -366,6 +380,8 @@ public class WebApiProjectVisitor : SymbolVisitor
 
         public required TypeName RequestDtoType { get; set; }
 
+        public required string MethodName { get; set; }
+
         public string? MethodBody { get; set; }
     }
 
@@ -410,9 +426,19 @@ public class WebApiProjectVisitor : SymbolVisitor
     {
         public required TypeName TypeName { get; set; }
 
-        public IEnumerable<ConstructorParameter> CtorParameters { get; set; } = new List<ConstructorParameter>();
+        public IEnumerable<Constructor> Constructors { get; set; } = new List<Constructor>();
+
 
         public IEnumerable<string> UsingNamespaces { get; set; } = new List<string>();
+    }
+
+    public record Constructor
+    {
+        public required bool IsInjectionCtor { get; set; }
+
+        public IEnumerable<ConstructorParameter> CtorParameters { get; set; } = new List<ConstructorParameter>();
+
+        public string? MethodBody { get; set; }
     }
 
     public record ConstructorParameter

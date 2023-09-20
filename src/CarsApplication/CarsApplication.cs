@@ -1,12 +1,17 @@
 using Application.Interfaces;
+using Application.Interfaces.Resources;
 
 namespace CarsApplication;
 
 public class CarsApplication : ICarsApplication
 {
-    public async Task<string> GetCarAsync(ICallerContext caller, string? id, CancellationToken cancellationToken)
+    public async Task<Car> GetCarAsync(ICallerContext caller, string id, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
-        return $"Hello car {id}!";
+
+        return new Car
+        {
+            Id = id
+        };
     }
 }

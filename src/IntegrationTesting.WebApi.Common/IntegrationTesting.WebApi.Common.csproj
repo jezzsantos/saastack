@@ -14,6 +14,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.WebApi.Common\Infrastructure.WebApi.Common.csproj" />
     </ItemGroup>
 
 </Project>

@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
         <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
