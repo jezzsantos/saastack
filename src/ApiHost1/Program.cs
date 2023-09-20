@@ -22,6 +22,10 @@ app.AddExceptionShielding();
 
 //TODO: need to add authentication/authorization (https://www.youtube.com/watch?v=XKN0084p7WQ)
 //TODO: need to add swaggerUI (https://www.youtube.com/watch?v=XKN0084p7WQ)
+//TODO: Multi-tenancy
+//TODO wire formats (IOptions<JsonOptions>)
+//TODO: IRecorder logging
+
 
 modules.ConfigureHost(app);
 

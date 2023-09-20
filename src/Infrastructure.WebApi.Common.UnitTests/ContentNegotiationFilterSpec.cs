@@ -41,10 +41,10 @@ public class ContentNegotiationFilterSpec
 
         var result = _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeOfType<ContentHttpResult>();
-        result.Result.As<ContentHttpResult>().ContentType.Should().Be(HttpContentTypes.JsonWithCharSet);
-        result.Result.As<ContentHttpResult>().StatusCode.Should().Be((int)HttpStatusCode.OK);
-        result.Result.As<ContentHttpResult>().ResponseContent.Should().Be(response.ToJson());
+        result.Result.Should().BeOfType<JsonHttpResult<object>>();
+        result.Result.As<JsonHttpResult<object>>().ContentType.Should().BeNull();
+        result.Result.As<JsonHttpResult<object>>().StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.Result.As<JsonHttpResult<object>>().Value.Should().Be(response);
     }
 
     [Fact]
@@ -64,18 +64,18 @@ public class ContentNegotiationFilterSpec
     [Fact]
     public void WhenInvokeAsyncWithIValueHttpResultResponse_ThenReturnsJsonContentAsOk()
     {
-        var response = Results.Ok(new TestResponse());
+        var payload = new TestResponse();
+        var response = Results.Ok(payload);
         var httpContext = SetupHttpContext();
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
         var result = _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeOfType<ContentHttpResult>();
-        result.Result.As<ContentHttpResult>().ContentType.Should().Be(HttpContentTypes.JsonWithCharSet);
-        result.Result.As<ContentHttpResult>().StatusCode.Should().Be((int)HttpStatusCode.OK);
-        result.Result.As<ContentHttpResult>().ResponseContent.Should()
-            .Be(response.As<IValueHttpResult>().Value.ToJson());
+        result.Result.Should().BeOfType<JsonHttpResult<object>>();
+        result.Result.As<JsonHttpResult<object>>().ContentType.Should().BeNull();
+        result.Result.As<JsonHttpResult<object>>().StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.Result.As<JsonHttpResult<object>>().Value.Should().Be(payload);
     }
 
     [Fact]
@@ -146,12 +146,10 @@ public class ContentNegotiationFilterSpec
 
         var result = _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeOfType<ContentHttpResult>();
-        result.Result.As<ContentHttpResult>().ContentType.Should().Be(HttpContentTypes.XmlWithCharSet);
-        result.Result.As<ContentHttpResult>().StatusCode.Should().Be((int)HttpStatusCode.OK);
-        result.Result.As<ContentHttpResult>().ResponseContent.Should().Be(
-            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n" +
-            "<TestResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" />");
+        result.Result.Should().BeOfType<XmlHttpResult<object>>();
+        result.Result.As<XmlHttpResult<object>>().ContentType.Should().Be(HttpContentTypes.XmlWithCharset);
+        result.Result.As<XmlHttpResult<object>>().StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.Result.As<XmlHttpResult<object>>().Value.Should().Be(response);
     }
 
     [Fact]
@@ -164,30 +162,27 @@ public class ContentNegotiationFilterSpec
 
         var result = _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeOfType<ContentHttpResult>();
-        result.Result.As<ContentHttpResult>().ContentType.Should().Be(HttpContentTypes.XmlWithCharSet);
-        result.Result.As<ContentHttpResult>().StatusCode.Should().Be((int)HttpStatusCode.OK);
-        result.Result.As<ContentHttpResult>().ResponseContent.Should().Be(
-            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n" +
-            "<TestResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" />");
+        result.Result.Should().BeOfType<XmlHttpResult<object>>();
+        result.Result.As<XmlHttpResult<object>>().ContentType.Should().Be(HttpContentTypes.XmlWithCharset);
+        result.Result.As<XmlHttpResult<object>>().StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.Result.As<XmlHttpResult<object>>().Value.Should().Be(response);
     }
 
     [Fact]
     public void WhenInvokeAsyncWithIResultResponseAndFormatXml_ThenReturnsXml()
     {
-        var response = Results.Ok(new TestResponse());
+        var payload = new TestResponse();
+        var response = Results.Ok(payload);
         var httpContext = SetupHttpContext(format: HttpContentTypeFormatters.Xml);
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
         var result = _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeOfType<ContentHttpResult>();
-        result.Result.As<ContentHttpResult>().ContentType.Should().Be(HttpContentTypes.XmlWithCharSet);
-        result.Result.As<ContentHttpResult>().StatusCode.Should().Be((int)HttpStatusCode.OK);
-        result.Result.As<ContentHttpResult>().ResponseContent.Should().Be(
-            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n" +
-            "<TestResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" />");
+        result.Result.Should().BeOfType<XmlHttpResult<object>>();
+        result.Result.As<XmlHttpResult<object>>().ContentType.Should().Be(HttpContentTypes.XmlWithCharset);
+        result.Result.As<XmlHttpResult<object>>().StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.Result.As<XmlHttpResult<object>>().Value.Should().Be(payload);
     }
 
     private Mock<HttpContext> SetupHttpContext(string? accept = null, string? format = null)

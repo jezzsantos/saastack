@@ -3,9 +3,9 @@ namespace Infrastructure.WebApi.Common;
 public static class HttpContentTypes
 {
     public const string Json = "application/json";
-    public const string JsonWithCharSet = "application/json; charset=utf-8";
+    public const string JsonWithCharset = "application/json; charset=utf-8";
     public const string Xml = "application/xml";
-    public const string XmlWithCharSet = "application/xml; charset=utf-8";
+    public const string XmlWithCharset = "application/xml; charset=utf-8";
     public const string OctetStream = "application/octet-stream";
 }
 

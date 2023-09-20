@@ -1,13 +1,6 @@
 using System.Net;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Xml.Serialization;
 using Common.Extensions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Json;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Infrastructure.WebApi.Common;
 
@@ -34,7 +27,7 @@ public class ContentNegotiationFilter : IEndpointFilter
                     return valueResult;
                 }
 
-                value = valueResult.Value; // i.e. Ok(somecontent), or NotFound(somecontent)
+                value = valueResult.Value; // i.e. Ok(avalue), or NotFound(avalue)
             }
             else
             {
@@ -61,58 +54,15 @@ public class ContentNegotiationFilter : IEndpointFilter
 
         var httpRequest = context.HttpContext.Request;
         var mimeType = NegotiateRequest(httpRequest);
-        string contentType;
-        await using var
-            content = new MemoryStream(); // HACK: must be a better perf way to do this, so that we dont allocate so much memory?
         switch (mimeType)
         {
             case NegotiatedMimeType.Json:
-                contentType = await ConvertToJsonAsync(value, context, content);
-                break;
+                return Results.Json(value, statusCode: statusCode);
             case NegotiatedMimeType.Xml:
-                contentType = await ConvertToXmlAsync(value, content);
-                break;
+                return new XmlHttpResult<object>(value, statusCode);
             default:
                 return Results.StatusCode((int)HttpStatusCode.UnsupportedMediaType);
         }
-
-        content.Position = 0;
-        using var streamReader = new StreamReader(content, Encoding.UTF8);
-        var textContent = await streamReader.ReadToEndAsync();
-
-        return Results.Content(textContent, contentType, Encoding.UTF8, statusCode);
-    }
-
-    private static async Task<string> ConvertToJsonAsync(object value, EndpointFilterInvocationContext context,
-        Stream content)
-    {
-        var resultType = value.GetType();
-        var jsonOptions = GetJsonOptionsFromRequest(context.HttpContext);
-        await JsonSerializer.SerializeAsync(content, value, resultType, jsonOptions,
-            CancellationToken.None);
-
-        return HttpContentTypes.JsonWithCharSet;
-
-        static JsonSerializerOptions GetJsonOptionsFromRequest(HttpContext httpContext)
-        {
-            var defaultOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
-            {
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            };
-
-            return httpContext.RequestServices.GetService<IOptions<JsonOptions>>()?.Value.SerializerOptions ??
-                   defaultOptions;
-        }
-    }
-
-    private static async Task<string> ConvertToXmlAsync(object value, Stream content)
-    {
-        await Task.CompletedTask;
-        var resultType = value.GetType();
-        var serializer = new XmlSerializer(resultType);
-        serializer.Serialize(content, value);
-
-        return HttpContentTypes.Xml;
     }
 
     private static NegotiatedMimeType? NegotiateRequest(HttpRequest httpRequest)
