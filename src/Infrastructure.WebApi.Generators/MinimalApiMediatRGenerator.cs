@@ -1,5 +1,5 @@
 using System.Text;
-using Common.Extensions;
+using Infrastructure.WebApi.Generators.Extensions;
 using Infrastructure.WebApi.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;

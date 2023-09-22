@@ -6,6 +6,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\CarsApplication\CarsApplication.csproj" />
+        <ProjectReference Include="..\CarsDomain\CarsDomain.csproj" />
         <ProjectReference Include="..\Infrastructure.WebApi.Common\Infrastructure.WebApi.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.WebApi.Interfaces\Infrastructure.WebApi.Interfaces.csproj" />
     </ItemGroup>
@@ -15,8 +16,5 @@
         <ProjectReference Include="..\Infrastructure.WebApi.Generators\Infrastructure.WebApi.Generators.csproj"
                           OutputItemType="Analyzer"
                           ReferenceOutputAssembly="false" />
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Apis\" />
     </ItemGroup>
 </Project>

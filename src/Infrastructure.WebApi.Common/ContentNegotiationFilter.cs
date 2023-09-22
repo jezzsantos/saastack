@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 namespace Infrastructure.WebApi.Common;
 
 /// <summary>
-///     Provides a response filter that outputs the response in the specified Accept header
+///     Provides a response filter that outputs the response in the specified Accept header, or ?format QueryString
 /// </summary>
 public class ContentNegotiationFilter : IEndpointFilter
 {

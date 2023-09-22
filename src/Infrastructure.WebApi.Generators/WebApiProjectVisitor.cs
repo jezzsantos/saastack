@@ -1,4 +1,4 @@
-using Common.Extensions;
+using Infrastructure.WebApi.Generators.Extensions;
 using Infrastructure.WebApi.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -370,17 +370,17 @@ public class WebApiProjectVisitor : SymbolVisitor
 
     public record ApiServiceOperationRegistration
     {
-        public required ApiServiceClassRegistration Class { get; set; }
+        public required ApiServiceClassRegistration Class { get; init; }
 
-        public required string RoutePath { get; set; }
+        public required string RoutePath { get; init; }
 
-        public required WebApiOperation OperationType { get; set; }
+        public required WebApiOperation OperationType { get; init; }
 
-        public required bool IsTestingOnly { get; set; }
+        public required bool IsTestingOnly { get; init; }
 
-        public required TypeName RequestDtoType { get; set; }
+        public required TypeName RequestDtoType { get; init; }
 
-        public required string MethodName { get; set; }
+        public required string MethodName { get; init; }
 
         public string? MethodBody { get; set; }
     }
@@ -424,27 +424,27 @@ public class WebApiProjectVisitor : SymbolVisitor
 
     public record ApiServiceClassRegistration
     {
-        public required TypeName TypeName { get; set; }
+        public required TypeName TypeName { get; init; }
 
-        public IEnumerable<Constructor> Constructors { get; set; } = new List<Constructor>();
+        public IEnumerable<Constructor> Constructors { get; init; } = new List<Constructor>();
 
 
-        public IEnumerable<string> UsingNamespaces { get; set; } = new List<string>();
+        public IEnumerable<string> UsingNamespaces { get; init; } = new List<string>();
     }
 
     public record Constructor
     {
-        public required bool IsInjectionCtor { get; set; }
+        public required bool IsInjectionCtor { get; init; }
 
-        public IEnumerable<ConstructorParameter> CtorParameters { get; set; } = new List<ConstructorParameter>();
+        public IEnumerable<ConstructorParameter> CtorParameters { get; init; } = new List<ConstructorParameter>();
 
         public string? MethodBody { get; set; }
     }
 
     public record ConstructorParameter
     {
-        public required TypeName TypeName { get; set; }
+        public required TypeName TypeName { get; init; }
 
-        public required string VariableName { get; set; }
+        public required string VariableName { get; init; }
     }
 }

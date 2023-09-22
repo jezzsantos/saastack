@@ -3,13 +3,12 @@ using System.Net;
 using System.Net.Http.Json;
 using ApiHost1;
 using FluentAssertions;
-using Infrastructure.WebApi.Common;
 using Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
-namespace Infrastructure.Api.Common.IntegrationTests;
+namespace Infrastructure.WebApi.Common.IntegrationTests;
 
 [Trait("Category", "Integration.Web")]
 public class TestingWebApiSpec : WebApiSpecSetup<Program>

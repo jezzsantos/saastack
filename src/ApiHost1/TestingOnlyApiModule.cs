@@ -7,6 +7,10 @@ namespace ApiHost1;
 
 public class TestingOnlyApiModule : ISubDomainModule
 {
+    public Assembly ApiAssembly => typeof(TestingWebApi).Assembly;
+
+    public Dictionary<Type, string> AggregatePrefixes => new();
+
     public Action<WebApplication> MinimalApiRegistrationFunction
     {
         get { return app => app.RegisterRoutes(); }
@@ -16,7 +20,5 @@ public class TestingOnlyApiModule : ISubDomainModule
     {
         get { return (_, _) => { }; }
     }
-
-    public Assembly ApiAssembly => typeof(TestingWebApi).Assembly;
 }
 #endif

@@ -4,6 +4,7 @@ using FluentValidation.Results;
 using Infrastructure.WebApi.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Moq;
+using Xunit;
 
 namespace Infrastructure.WebApi.Common.UnitTests;
 

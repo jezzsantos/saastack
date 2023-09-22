@@ -12,9 +12,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Include="..\Common\Extensions\StringExtensions.cs">
-            <Link>Reference\Extensions\StringExtensions.cs</Link>
-        </Compile>
         <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebApiService.cs">
             <Link>Reference\Infrastruture.WebApi.Interfaces\IWebApiService.cs</Link>
         </Compile>

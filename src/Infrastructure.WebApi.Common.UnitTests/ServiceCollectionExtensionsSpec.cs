@@ -4,6 +4,7 @@ using FluentValidation;
 using Infrastructure.WebApi.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
 namespace Infrastructure.WebApi.Common.UnitTests;
 

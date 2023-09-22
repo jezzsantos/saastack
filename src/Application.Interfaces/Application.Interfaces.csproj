@@ -4,5 +4,12 @@
         <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.19" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Domain.Interfaces\Domain.Interfaces.csproj" />
+    </ItemGroup>
 
 </Project>

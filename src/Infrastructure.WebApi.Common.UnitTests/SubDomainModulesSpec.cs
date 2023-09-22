@@ -3,18 +3,14 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
 namespace Infrastructure.WebApi.Common.UnitTests;
 
 [Trait("Category", "Unit")]
 public class SubDomainModulesSpec
 {
-    private readonly SubDomainModules _modules;
-
-    public SubDomainModulesSpec()
-    {
-        _modules = new SubDomainModules();
-    }
+    private readonly SubDomainModules _modules = new();
 
     [Fact]
     public void WhenRegisterAndNullModule_ThenThrows()
@@ -33,6 +29,14 @@ public class SubDomainModulesSpec
     }
 
     [Fact]
+    public void WhenRegisterAndNullAggregatePrefixes_ThenThrows()
+    {
+        _modules
+            .Invoking(x => x.Register(new TestModule { AggregatePrefixes = null! }))
+            .Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
     public void WhenRegisterAndNullMinimalApiRegistrationFunction_ThenThrows()
     {
         _modules
@@ -47,6 +51,7 @@ public class SubDomainModulesSpec
         _modules.Register(new TestModule
         {
             ApiAssembly = typeof(SubDomainModulesSpec).Assembly, MinimalApiRegistrationFunction = _ => { },
+            AggregatePrefixes = new Dictionary<Type, string>(),
             RegisterServicesFunction = null!
         });
 
@@ -71,6 +76,7 @@ public class SubDomainModulesSpec
         _modules.Register(new TestModule
         {
             ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
+            AggregatePrefixes = new Dictionary<Type, string>(),
             MinimalApiRegistrationFunction = _ => { },
             RegisterServicesFunction = (_, _) => { wasCalled = true; }
         });
@@ -96,6 +102,7 @@ public class SubDomainModulesSpec
         _modules.Register(new TestModule
         {
             ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
+            AggregatePrefixes = new Dictionary<Type, string>(),
             MinimalApiRegistrationFunction = _ => { wasCalled = true; },
             RegisterServicesFunction = (_, _) => { }
         });
@@ -108,16 +115,11 @@ public class SubDomainModulesSpec
 
 public class TestModule : ISubDomainModule
 {
-    public TestModule()
-    {
-        ApiAssembly = null!;
-        MinimalApiRegistrationFunction = null!;
-        RegisterServicesFunction = null!;
-    }
+    public Assembly ApiAssembly { get; init; } = null!;
 
-    public Assembly ApiAssembly { get; init; }
+    public Dictionary<Type, string> AggregatePrefixes { get; init; } = null!;
 
-    public Action<WebApplication> MinimalApiRegistrationFunction { get; init; }
+    public Action<WebApplication> MinimalApiRegistrationFunction { get; init; } = null!;
 
     public Action<ConfigurationManager, IServiceCollection>? RegisterServicesFunction { get; init; }
 }

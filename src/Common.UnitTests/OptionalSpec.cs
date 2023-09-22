@@ -1,0 +1,182 @@
+using FluentAssertions;
+using Xunit;
+
+namespace Common.UnitTests;
+
+[Trait("Category", "Unit")]
+public class OptionalSpec
+{
+    [Fact]
+    public void WhenConstructedWithoutAnyValue_ThenHasNoValue()
+    {
+        var result = new Optional<TestClass>();
+
+        result.HasValue.Should().BeFalse();
+        result.Value.Should().BeNull();
+        result.ToString().Should().Be(Optional<TestClass>.NoValueStringValue);
+    }
+
+    [Fact]
+    public void WhenConstructedWithNullInstance_ThenHasNoValue()
+    {
+        var result = new Optional<TestClass>(null!);
+
+        result.HasValue.Should().BeFalse();
+        result.Value.Should().BeNull();
+        result.ToString().Should().Be(Optional<TestClass>.NoValueStringValue);
+    }
+
+    [Fact]
+    public void WhenConstructedWithAnyValue_ThenHasValue()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var result = new Optional<TestClass>(instance);
+
+        result.HasValue.Should().BeTrue();
+        result.Value.Should().Be(instance);
+        result.ToString().Should().Be(typeof(TestClass).FullName);
+    }
+
+    [Fact]
+    public void WhenEqualsOperatorWithEmptyOptionals_ThenReturnsTrue()
+    {
+        var optional1 = new Optional<TestClass>();
+        var optional2 = new Optional<TestClass>();
+
+        (optional1 == optional2).Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenEqualsOperatorWithSameOptionals_ThenReturnsTrue()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional1 = new Optional<TestClass>(instance);
+        var optional2 = new Optional<TestClass>(instance);
+
+        (optional1 == optional2).Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenEqualsOperatorWithEmptyOptionalOfSameType_ThenReturnsFalse()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional = new Optional<TestClass>();
+
+        (instance == optional).Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenEqualsOperatorWithNull_ThenReturnsFalse()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+
+        (instance == null!).Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenEqualsOperatorOptionalOfInstance_ThenReturnsTrue()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional = new Optional<TestClass>(instance);
+
+        (optional == instance).Should().BeTrue();
+    }
+
+
+    [Fact]
+    public void WhenNotEqualsOperatorWithEmptyOptionalOfSameType_ThenReturnsTrue()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional = new Optional<TestClass>();
+
+        (instance != optional).Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenNotEqualsOperatorWithNull_ThenReturnsTrue()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+
+        (instance != null!).Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenNotEqualsOperatorOptionalOfInstance_ThenReturnsFalse()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional = new Optional<TestClass>(instance);
+
+        (optional != instance).Should().BeFalse();
+    }
+
+
+    [Fact]
+    public void WhenEqualsWithEmptyOptionalOfSameType_ThenReturnsFalse()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional = new Optional<TestClass>();
+
+        optional.Equals(instance).Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenEqualsWithNull_ThenReturnsFalse()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+
+        instance.Equals(null!).Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenEqualsOptionalOfInstance_ThenReturnsTrue()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional = new Optional<TestClass>(instance);
+
+        optional.Equals(instance).Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenObjectEqualsBetweenNullOptionalAndInstance_ThenReturnsFalse()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional = new Optional<TestClass>(null!);
+
+        // ReSharper disable once SuspiciousTypeConversion.Global
+        optional.Equals((object?)instance).Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenObjectEqualsBetweenEmptyOptionalAndInstanceOfSameType_ThenReturnsFalse()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional = new Optional<TestClass>();
+
+        // ReSharper disable once SuspiciousTypeConversion.Global
+        optional.Equals((object?)instance).Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenObjectEqualsBetweenOptionOfInstanceAndInstance_ThenReturnsTrue()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional = new Optional<TestClass>(instance);
+
+        // ReSharper disable once SuspiciousTypeConversion.Global
+        optional.Equals((object?)instance).Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenObjectEqualsBetweenOptionalOfInstanceAndOptionalOfInstance_ThenReturnsTrue()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional = new Optional<TestClass>(instance);
+
+        optional.Equals((object?)optional).Should().BeTrue();
+    }
+}
+
+public class TestClass
+{
+    public required string AProperty { get; set; }
+}

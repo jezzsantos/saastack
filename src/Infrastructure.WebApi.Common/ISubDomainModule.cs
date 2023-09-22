@@ -5,11 +5,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.WebApi.Common;
 
+/// <summary>
+///     Defines a sub domain module
+/// </summary>
 public interface ISubDomainModule
 {
-    public Assembly ApiAssembly { get; }
+    Assembly ApiAssembly { get; }
 
-    public Action<WebApplication> MinimalApiRegistrationFunction { get; }
+    Dictionary<Type, string> AggregatePrefixes { get; }
 
-    public Action<ConfigurationManager, IServiceCollection>? RegisterServicesFunction { get; }
+    Action<WebApplication> MinimalApiRegistrationFunction { get; }
+
+    Action<ConfigurationManager, IServiceCollection>? RegisterServicesFunction { get; }
 }

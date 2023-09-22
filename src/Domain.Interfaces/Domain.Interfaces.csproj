@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Common\Common.csproj" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <EmbeddedResource Update="Validations\CommonValidationResources.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+            <LastGenOutput>CommonValidationResources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Validations\CommonValidationResources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>CommonValidationResources.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <PackageReference Include="QueryAny" Version="1.1.0" />
+    </ItemGroup>
+
+
+</Project>

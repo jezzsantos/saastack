@@ -9,7 +9,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
         <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
+        <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.WebApi.Interfaces\Infrastructure.WebApi.Interfaces.csproj" />
     </ItemGroup>
 
@@ -31,5 +34,6 @@
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
     </ItemGroup>
+
 
 </Project>

@@ -3,6 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Infrastructure.WebApi.Interfaces;
 
+/// <summary>
+///     Provides a declarative way to define a REST route and service operation
+/// </summary>
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]
 public class WebApiRouteAttribute : Attribute
 {

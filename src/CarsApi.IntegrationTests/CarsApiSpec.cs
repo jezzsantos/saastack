@@ -18,8 +18,8 @@ public class CarsApiSpec : WebApiSpecSetup<Program>
     [Fact]
     public async Task WhenGetCar_ThenReturnsCar()
     {
-        var result = await Api.GetFromJsonAsync<GetCarResponse>("/cars/1234");
+        var result = await Api.GetFromJsonAsync<GetCarResponse>("/cars/car_12345678910");
 
-        result?.Car.Id.Should().Be("1234");
+        result?.Car.Id.Should().Be("car_12345678910");
     }
 }
