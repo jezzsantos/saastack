@@ -58,52 +58,6 @@ public class WebApiProjectVisitor : SymbolVisitor
         symbol.GlobalNamespace.Accept(this);
     }
 
-    public override void VisitNamespace(INamespaceSymbol symbol)
-    {
-        if (IsIgnoredNamespace())
-        {
-            return;
-        }
-
-        foreach (var namespaceOrType in symbol.GetMembers())
-        {
-            _cancellationToken.ThrowIfCancellationRequested();
-            namespaceOrType.Accept(this);
-        }
-
-        return;
-
-        bool IsIgnoredNamespace()
-        {
-            var @namespace = symbol.Name;
-            if (@namespace.HasNoValue())
-            {
-                return false;
-            }
-
-            foreach (var ignoredNamespace in IgnoredNamespaces)
-            {
-                if (ignoredNamespace.EndsWith("*"))
-                {
-                    var prefix = ignoredNamespace.Substring(0, ignoredNamespace.Length - 1);
-                    if (@namespace.StartsWith(prefix))
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    if (@namespace == ignoredNamespace)
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-    }
-
     public override void VisitNamedType(INamedTypeSymbol symbol)
     {
         _cancellationToken.ThrowIfCancellationRequested();
@@ -162,6 +116,52 @@ public class WebApiProjectVisitor : SymbolVisitor
         bool IsNotClass(ITypeSymbol type)
         {
             return type.TypeKind != TypeKind.Class;
+        }
+    }
+
+    public override void VisitNamespace(INamespaceSymbol symbol)
+    {
+        if (IsIgnoredNamespace())
+        {
+            return;
+        }
+
+        foreach (var namespaceOrType in symbol.GetMembers())
+        {
+            _cancellationToken.ThrowIfCancellationRequested();
+            namespaceOrType.Accept(this);
+        }
+
+        return;
+
+        bool IsIgnoredNamespace()
+        {
+            var @namespace = symbol.Name;
+            if (@namespace.HasNoValue())
+            {
+                return false;
+            }
+
+            foreach (var ignoredNamespace in IgnoredNamespaces)
+            {
+                if (ignoredNamespace.EndsWith("*"))
+                {
+                    var prefix = ignoredNamespace.Substring(0, ignoredNamespace.Length - 1);
+                    if (@namespace.StartsWith(prefix))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (@namespace == ignoredNamespace)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 
@@ -372,17 +372,17 @@ public class WebApiProjectVisitor : SymbolVisitor
     {
         public required ApiServiceClassRegistration Class { get; init; }
 
-        public required string RoutePath { get; init; }
-
-        public required WebApiOperation OperationType { get; init; }
-
         public required bool IsTestingOnly { get; init; }
 
-        public required TypeName RequestDtoType { get; init; }
+        public string? MethodBody { get; set; }
 
         public required string MethodName { get; init; }
 
-        public string? MethodBody { get; set; }
+        public required WebApiOperation OperationType { get; init; }
+
+        public required TypeName RequestDtoType { get; init; }
+
+        public required string RoutePath { get; init; }
     }
 
     public record TypeName
@@ -393,17 +393,6 @@ public class WebApiProjectVisitor : SymbolVisitor
             ArgumentException.ThrowIfNullOrEmpty(name);
             Namespace = @namespace;
             Name = name;
-        }
-
-        public string FullName => $"{Namespace}.{Name}";
-
-        public string Name { get; }
-
-        public string Namespace { get; }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Namespace, Name);
         }
 
         public virtual bool Equals(TypeName? other)
@@ -420,13 +409,24 @@ public class WebApiProjectVisitor : SymbolVisitor
 
             return Name == other.Name && Namespace == other.Namespace;
         }
+
+        public string FullName => $"{Namespace}.{Name}";
+
+        public string Name { get; }
+
+        public string Namespace { get; }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Namespace, Name);
+        }
     }
 
     public record ApiServiceClassRegistration
     {
-        public required TypeName TypeName { get; init; }
-
         public IEnumerable<Constructor> Constructors { get; init; } = new List<Constructor>();
+
+        public required TypeName TypeName { get; init; }
 
 
         public IEnumerable<string> UsingNamespaces { get; init; } = new List<string>();
@@ -434,9 +434,9 @@ public class WebApiProjectVisitor : SymbolVisitor
 
     public record Constructor
     {
-        public required bool IsInjectionCtor { get; init; }
-
         public IEnumerable<ConstructorParameter> CtorParameters { get; init; } = new List<ConstructorParameter>();
+
+        public required bool IsInjectionCtor { get; init; }
 
         public string? MethodBody { get; set; }
     }

@@ -13,13 +13,13 @@ public static class UsageConstants
 
     public static class Properties
     {
-        public const string Id = "ResourceId";
-        public const string UsedById = "UserId";
-        public const string TenantId = "TenantId";
+        public const string AuditCode = "Code";
         public const string CallId = "CallId";
         public const string Component = "Component";
-        public const string AuditCode = "Code";
+        public const string Id = "ResourceId";
         public const string MetricEventName = "Metric";
+        public const string TenantId = "TenantId";
+        public const string UsedById = "UserId";
     }
 
     public static class Events

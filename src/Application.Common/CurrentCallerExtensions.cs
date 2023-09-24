@@ -9,14 +9,6 @@ namespace Application.Common;
 public static class CurrentCallerExtensions
 {
     /// <summary>
-    ///     Returns the caller identifier from the context
-    /// </summary>
-    public static Identifier ToCallerId(this ICallerContext context)
-    {
-        return context.CallerId.ToIdentifier();
-    }
-
-    /// <summary>
     ///     Returns the call context from the context
     /// </summary>
     public static ICallContext ToCall(this ICallerContext context)
@@ -27,5 +19,13 @@ public static class CurrentCallerExtensions
         }
 
         return CallContext.CreateCustom(context.CallId, context.CallerId, context.TenantId);
+    }
+
+    /// <summary>
+    ///     Returns the caller identifier from the context
+    /// </summary>
+    public static Identifier ToCallerId(this ICallerContext context)
+    {
+        return context.CallerId.ToIdentifier();
     }
 }

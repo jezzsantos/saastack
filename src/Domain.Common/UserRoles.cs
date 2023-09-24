@@ -7,8 +7,8 @@ namespace Domain.Common;
 /// </summary>
 public static class UserRoles
 {
-    public const string ServiceAccount = "service";
     public const string ExternalWebhookService = "external_webhook_service";
+    public const string ServiceAccount = "service";
 
     // EXTEND: Add other roles that  UserAccounts can be assigned to control un-tenanted resources
     public const string Standard = "standard";

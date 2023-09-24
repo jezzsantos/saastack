@@ -22,9 +22,9 @@ public class WebApiRouteAttribute : Attribute
         IsTestingOnly = isTestingOnly;
     }
 
-    public string RouteTemplate { get; }
+    public bool IsTestingOnly { get; }
 
     public WebApiOperation Operation { get; }
 
-    public bool IsTestingOnly { get; }
+    public string RouteTemplate { get; }
 }

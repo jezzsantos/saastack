@@ -17,19 +17,19 @@ public class VersionedChangeEvent : IIdentifiableEntity, IQueryableEntity
         Version = version;
     }
 
+    Identifier IIdentifiableEntity.Id => Identifier.Create(Id);
+
+    public string Data { get; set; }
+
     public string EntityType { get; set; }
 
     public string EventType { get; set; }
 
-    public string Data { get; set; }
-
-    public string Metadata { get; set; }
+    public string Id { get; set; }
 
     public DateTime? LastPersistedAtUtc { get; set; }
 
+    public string Metadata { get; set; }
+
     public int Version { get; set; }
-
-    public string Id { get; set; }
-
-    Identifier IIdentifiableEntity.Id => Identifier.Create(Id);
 }

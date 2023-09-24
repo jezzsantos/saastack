@@ -7,8 +7,6 @@ namespace Infrastructure.WebApi.Common;
 /// </summary>
 public class HasSearchOptions : IHasSearchOptions
 {
-    public string? Distinct { get; set; }
-
     public int? Limit { get; set; }
 
     public int? Offset { get; set; }
@@ -18,4 +16,6 @@ public class HasSearchOptions : IHasSearchOptions
     public string? Filter { get; set; }
 
     public string? Embed { get; set; }
+
+    public string? Distinct { get; set; }
 }

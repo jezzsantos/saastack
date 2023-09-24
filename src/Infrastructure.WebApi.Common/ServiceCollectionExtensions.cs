@@ -11,29 +11,6 @@ namespace Infrastructure.WebApi.Common;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    ///     Registers every <see cref="IValidator{TRequest}" /> found in the specified
-    ///     <see cref="assembliesContainingValidators" />
-    /// </summary>
-    // ReSharper disable once UnusedMethodReturnValue.Global
-    public static IServiceCollection RegisterValidators(this IServiceCollection services,
-        IEnumerable<Assembly> assembliesContainingValidators, out IEnumerable<Type> registeredValidators)
-    {
-        ArgumentNullException.ThrowIfNull(services);
-        ArgumentNullException.ThrowIfNull(assembliesContainingValidators);
-
-        var validators = new List<Type>();
-        AssemblyScanner.FindValidatorsInAssemblies(assembliesContainingValidators)
-            .ForEach(result =>
-            {
-                services.AddScoped(result.InterfaceType, result.ValidatorType);
-                validators.Add(result.ValidatorType);
-            });
-
-        registeredValidators = validators;
-        return services;
-    }
-
-    /// <summary>
     ///     Registers <see cref="ValidationBehavior{TRequest,TResponse}" /> for every <see cref="IWebRequest{TResponse}" />
     ///     found in the specified <see cref="assembliesContainingApis" /> that has a corresponding registered
     ///     <see cref="IValidator{TRequest}" />
@@ -143,5 +120,28 @@ public static class ServiceCollectionExtensions
 
             return null;
         }
+    }
+
+    /// <summary>
+    ///     Registers every <see cref="IValidator{TRequest}" /> found in the specified
+    ///     <see cref="assembliesContainingValidators" />
+    /// </summary>
+    // ReSharper disable once UnusedMethodReturnValue.Global
+    public static IServiceCollection RegisterValidators(this IServiceCollection services,
+        IEnumerable<Assembly> assembliesContainingValidators, out IEnumerable<Type> registeredValidators)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(assembliesContainingValidators);
+
+        var validators = new List<Type>();
+        AssemblyScanner.FindValidatorsInAssemblies(assembliesContainingValidators)
+            .ForEach(result =>
+            {
+                services.AddScoped(result.InterfaceType, result.ValidatorType);
+                validators.Add(result.ValidatorType);
+            });
+
+        registeredValidators = validators;
+        return services;
     }
 }

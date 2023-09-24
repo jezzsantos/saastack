@@ -15,10 +15,10 @@ public class HasGetOptions : IHasGetOptions
     public static readonly HasGetOptions All = new() { Embed = EmbedAll };
     public static readonly HasGetOptions None = new() { Embed = EmbedNone };
 
+    public string? Embed { get; set; }
+
     public static HasGetOptions Custom<TResource>(params Expression<Func<TResource, object?>>[] resourceProperties)
     {
         return GetOptions.Custom(resourceProperties).ToHasGetOptions();
     }
-
-    public string? Embed { get; set; }
 }

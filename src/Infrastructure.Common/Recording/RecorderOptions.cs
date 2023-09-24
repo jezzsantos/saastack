@@ -67,14 +67,6 @@ public class RecorderOptions
         }
     };
 
-    public bool TrackUsageOfAllApis { get; private set; }
-
-    public string UsageComponentName { get; private set; } = string.Empty;
-
-    public RecordingEnvironmentOptions Production { get; private set; } = new();
-
-    public RecordingEnvironmentOptions Testing { get; private set; } = new();
-
     public RecordingEnvironmentOptions CurrentEnvironment
     {
         get
@@ -86,13 +78,21 @@ public class RecorderOptions
 #endif
         }
     }
+
+    public RecordingEnvironmentOptions Production { get; private set; } = new();
+
+    public RecordingEnvironmentOptions Testing { get; private set; } = new();
+
+    public bool TrackUsageOfAllApis { get; private set; }
+
+    public string UsageComponentName { get; private set; } = string.Empty;
 }
 
 public class RecordingEnvironmentOptions
 {
-    public CrashReporterOption CrashReporting { get; set; } = CrashReporterOption.None;
-
     public AuditReporterOption AuditReporting { get; set; } = AuditReporterOption.None;
+
+    public CrashReporterOption CrashReporting { get; set; } = CrashReporterOption.None;
 
     public MetricReporterOption MetricReporting { get; set; } = MetricReporterOption.None;
 

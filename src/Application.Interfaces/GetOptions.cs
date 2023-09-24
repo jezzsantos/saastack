@@ -5,9 +5,9 @@ namespace Application.Interfaces;
 
 public class GetOptions
 {
-    public const int MaxResourceReferences = 10;
     public const string EmbedRequestParamDelimiter = ",";
     public const string EmbedRequestParamName = "embed";
+    public const int MaxResourceReferences = 10;
 
     public static readonly GetOptions All = new(ExpandOptions.All, new List<string>());
     public static readonly GetOptions None = new(ExpandOptions.None, new List<string>());

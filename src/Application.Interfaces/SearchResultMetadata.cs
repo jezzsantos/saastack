@@ -5,7 +5,7 @@
 /// </summary>
 public class SearchResultMetadata
 {
-    public int Total { get; set; }
+    public Filtering? Filter { get; set; }
 
     public int Limit { get; set; }
 
@@ -13,5 +13,5 @@ public class SearchResultMetadata
 
     public Sorting? Sort { get; set; }
 
-    public Filtering? Filter { get; set; }
+    public int Total { get; set; }
 }

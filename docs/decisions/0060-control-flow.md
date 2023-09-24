@@ -116,16 +116,16 @@ The options are:
 `Throw Exceptions`
 
 - Throwing exceptions for exceptional cases is the convention in the .Net world.
-  - Yes, they are less performant than handling result types (depending on your context), but that cost in performance was by design in the first place, to achieve the accepted diagnostic outcomes.
-  - They at least guarantee that the system will not continue in an invalid state that may result in inconsistent states.
+    - Yes, they are less performant than handling result types (depending on your context), but that cost in performance was by design in the first place, to achieve the accepted diagnostic outcomes.
+    - They at least guarantee that the system will not continue in an invalid state that may result in inconsistent states.
 
 - Using result types for every layer in a large system is a pattern that must be enforced and used "all the way down" the call stack, to ensure correct usage and completeness.
-  - It is a staple of functional programming and, yes, can make the code more functional - if that is a design goal
-  - It can be easily [demonstrated as powerful in example code](https://m.youtube.com/watch?v=a1ye9eGTB98&pp=ygUXTmljayBjaGFwc2FzIGV4Y2VwdGlvbnM%3D) (as seen here, even by influential sources)
-  - However:
-    - Result "faults" can be easily ignored by the calling code - if the programmer is not permitted/disciplined enough to handle it properly (or is proficient in its application). The risk is that faults can thus allow inconsistent states of the system to be reached.
-    - Matching both cases (fault and success) doubles the number of code paths in every layer above the call, and that doubles the number of tests that need to be written to cover them, too.
-    - It makes all the code far more cluttered, and harder to maintain than code where thrown exceptions are used to bypass code.
+    - It is a staple of functional programming and, yes, can make the code more functional - if that is a design goal
+    - It can be easily [demonstrated as powerful in example code](https://m.youtube.com/watch?v=a1ye9eGTB98&pp=ygUXTmljayBjaGFwc2FzIGV4Y2VwdGlvbnM%3D) (as seen here, even by influential sources)
+    - However:
+        - Result "faults" can be easily ignored by the calling code - if the programmer is not permitted/disciplined enough to handle it properly (or is proficient in its application). The risk is that faults can thus allow inconsistent states of the system to be reached.
+        - Matching both cases (fault and success) doubles the number of code paths in every layer above the call, and that doubles the number of tests that need to be written to cover them, too.
+        - It makes all the code far more cluttered, and harder to maintain than code where thrown exceptions are used to bypass code.
 
 ## More Information
 

@@ -7,6 +7,19 @@ namespace Common.Extensions;
 public static class CollectionExtensions
 {
     /// <summary>
+    ///     Whether the <see cref="target" /> string exists in the <see cref="collection" />
+    /// </summary>
+    public static bool ContainsIgnoreCase(this IEnumerable<string> collection, string target)
+    {
+        if (target.HasNoValue())
+        {
+            return false;
+        }
+
+        return collection.Any(item => item.EqualsIgnoreCase(target));
+    }
+
+    /// <summary>
     ///     Whether the collection contains any items
     /// </summary>
     public static bool HasAny<T>(this IEnumerable<T> collection)
@@ -47,18 +60,5 @@ public static class CollectionExtensions
     public static bool NotContainsIgnoreCase(this IEnumerable<string> collection, string target)
     {
         return !collection.ContainsIgnoreCase(target);
-    }
-
-    /// <summary>
-    ///     Whether the <see cref="target" /> string exists in the <see cref="collection" />
-    /// </summary>
-    public static bool ContainsIgnoreCase(this IEnumerable<string> collection, string target)
-    {
-        if (target.HasNoValue())
-        {
-            return false;
-        }
-
-        return collection.Any(item => item.EqualsIgnoreCase(target));
     }
 }

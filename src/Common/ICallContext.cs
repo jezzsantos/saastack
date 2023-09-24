@@ -5,9 +5,9 @@ namespace Common;
 /// </summary>
 public interface ICallContext
 {
-    public string CallId { get; }
-
     public string CallerId { get; }
+
+    public string CallId { get; }
 
     public string? TenantId { get; }
 }

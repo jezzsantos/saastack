@@ -11,6 +11,16 @@ public static class EnumExtensions
     }
 
     /// <summary>
+    ///     Converts the value of the <see cref="TSourceEnum" /> to a value in the <see cref="TTargetEnum" />
+    /// </summary>
+    public static TTargetEnum ToEnum<TSourceEnum, TTargetEnum>(this TSourceEnum source)
+        where TSourceEnum : Enum
+        where TTargetEnum : Enum
+    {
+        return source.ToString().ToEnum<TTargetEnum>();
+    }
+
+    /// <summary>
     ///     Converts the <see cref="value" /> to an value of the <see cref="TTargetEnum" />,
     ///     and in the case where no value can be found, uses the <see cref="defaultValue" />
     /// </summary>
@@ -27,16 +37,6 @@ public static class EnumExtensions
         }
 
         return defaultValue;
-    }
-
-    /// <summary>
-    ///     Converts the value of the <see cref="TSourceEnum" /> to a value in the <see cref="TTargetEnum" />
-    /// </summary>
-    public static TTargetEnum ToEnum<TSourceEnum, TTargetEnum>(this TSourceEnum source)
-        where TSourceEnum : Enum
-        where TTargetEnum : Enum
-    {
-        return source.ToString().ToEnum<TTargetEnum>();
     }
 
     /// <summary>

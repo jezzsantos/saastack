@@ -17,49 +17,27 @@ public static class StringExtensions
     private static readonly TimeSpan DefaultRegexTimeout = TimeSpan.FromSeconds(10);
 
     /// <summary>
-    ///     Whether the string value contains any value except: null, empty or only whitespaces
+    ///     Whether the <see cref="other" /> is the same as the value (case-insensitive)
     /// </summary>
-    [ContractAnnotation("null => false; notnull => true")]
-    public static bool HasValue(this string? value)
+    public static bool EqualsIgnoreCase(this string value, string other)
     {
-        return !string.IsNullOrEmpty(value)
-               && !string.IsNullOrWhiteSpace(value);
+        return string.Equals(value, other, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
-    ///     Whether the string value contains no value: it is either: null, empty or only whitespaces
+    ///     Whether the <see cref="other" /> is precisely the same as the value (case-sensitive)
     /// </summary>
-    [ContractAnnotation("null => true; notnull => false")]
-    public static bool HasNoValue(this string? value)
+    public static bool EqualsOrdinal(this string value, string other)
     {
-        return string.IsNullOrEmpty(value)
-               || string.IsNullOrWhiteSpace(value);
+        return string.Equals(value, other, StringComparison.Ordinal);
     }
 
-
     /// <summary>
-    ///     Converts the object to a json format
+    ///     Formats the <see cref="value" /> with the <see cref="arguments" />
     /// </summary>
-    public static string? ToJson(this object? value, bool prettyPrint = true, JsonCasing? casing = null,
-        bool includeNulls = false)
+    public static string Format(this string value, params object[] arguments)
     {
-        if (value is null)
-        {
-            return null;
-        }
-
-        JsonNamingPolicy namingPolicy = null!; // PascalCase
-        if (casing == JsonCasing.Camel)
-        {
-            namingPolicy = JsonNamingPolicy.CamelCase;
-        }
-
-        return JsonSerializer.Serialize(value, new JsonSerializerOptions
-        {
-            WriteIndented = prettyPrint,
-            PropertyNamingPolicy = namingPolicy,
-            DefaultIgnoreCondition = includeNulls ? JsonIgnoreCondition.Never : JsonIgnoreCondition.WhenWritingNull
-        });
+        return string.Format(value, arguments);
     }
 
     /// <summary>
@@ -73,6 +51,26 @@ public static class StringExtensions
         }
 
         return JsonSerializer.Deserialize<TResult>(json, new JsonSerializerOptions());
+    }
+
+    /// <summary>
+    ///     Whether the string value contains no value: it is either: null, empty or only whitespaces
+    /// </summary>
+    [ContractAnnotation("null => true; notnull => false")]
+    public static bool HasNoValue(this string? value)
+    {
+        return string.IsNullOrEmpty(value)
+               || string.IsNullOrWhiteSpace(value);
+    }
+
+    /// <summary>
+    ///     Whether the string value contains any value except: null, empty or only whitespaces
+    /// </summary>
+    [ContractAnnotation("null => false; notnull => true")]
+    public static bool HasValue(this string? value)
+    {
+        return !string.IsNullOrEmpty(value)
+               && !string.IsNullOrWhiteSpace(value);
     }
 
     /// <summary>
@@ -91,30 +89,6 @@ public static class StringExtensions
     }
 
     /// <summary>
-    ///     Whether the <see cref="other" /> is precisely the same as the value (case-sensitive)
-    /// </summary>
-    public static bool EqualsOrdinal(this string value, string other)
-    {
-        return string.Equals(value, other, StringComparison.Ordinal);
-    }
-
-    /// <summary>
-    ///     Whether the <see cref="other" /> is not the same as the value (case-sensitive)
-    /// </summary>
-    public static bool NotEqualsOrdinal(this string value, string other)
-    {
-        return !value.EqualsOrdinal(other);
-    }
-
-    /// <summary>
-    ///     Whether the <see cref="other" /> is the same as the value (case-insensitive)
-    /// </summary>
-    public static bool EqualsIgnoreCase(this string value, string other)
-    {
-        return string.Equals(value, other, StringComparison.OrdinalIgnoreCase);
-    }
-
-    /// <summary>
     ///     Whether the <see cref="other" /> is not the same as the value (case-insensitive)
     /// </summary>
     public static bool NotEqualsIgnoreCase(this string value, string other)
@@ -123,11 +97,11 @@ public static class StringExtensions
     }
 
     /// <summary>
-    ///     Formats the <see cref="value" /> with the <see cref="arguments" />
+    ///     Whether the <see cref="other" /> is not the same as the value (case-sensitive)
     /// </summary>
-    public static string Format(this string value, params object[] arguments)
+    public static bool NotEqualsOrdinal(this string value, string other)
     {
-        return string.Format(value, arguments);
+        return !value.EqualsOrdinal(other);
     }
 
     /// <summary>
@@ -192,5 +166,31 @@ public static class StringExtensions
         }
 
         return defaultValue;
+    }
+
+
+    /// <summary>
+    ///     Converts the object to a json format
+    /// </summary>
+    public static string? ToJson(this object? value, bool prettyPrint = true, JsonCasing? casing = null,
+        bool includeNulls = false)
+    {
+        if (value is null)
+        {
+            return null;
+        }
+
+        JsonNamingPolicy namingPolicy = null!; // PascalCase
+        if (casing == JsonCasing.Camel)
+        {
+            namingPolicy = JsonNamingPolicy.CamelCase;
+        }
+
+        return JsonSerializer.Serialize(value, new JsonSerializerOptions
+        {
+            WriteIndented = prettyPrint,
+            PropertyNamingPolicy = namingPolicy,
+            DefaultIgnoreCondition = includeNulls ? JsonIgnoreCondition.Never : JsonIgnoreCondition.WhenWritingNull
+        });
     }
 }

@@ -7,7 +7,23 @@ namespace Common;
 /// </summary>
 public interface IRecorder
 {
+    void Audit(ICallContext? context, string auditCode, string messageTemplate, params object[] templateArgs);
+
+    void AuditAgainst(ICallContext? context, string againstId, string auditCode, string messageTemplate,
+        params object[] templateArgs);
+
+    void Crash(ICallContext? context, CrashLevel level, Exception exception);
+
+    void Crash(ICallContext? context, CrashLevel level, Exception exception, string messageTemplate,
+        params object[] templateArgs);
+
+    void Measure(string eventName, Dictionary<string, object>? context = null);
+
     void TraceDebug(ICallContext? context, string messageTemplate, params object[] templateArgs);
+
+    void TraceError(ICallContext? context, Exception exception, string messageTemplate, params object[] templateArgs);
+
+    void TraceError(ICallContext? context, string messageTemplate, params object[] templateArgs);
 
     void TraceInformation(ICallContext? context, Exception exception, string messageTemplate,
         params object[] templateArgs);
@@ -18,22 +34,6 @@ public interface IRecorder
         params object[] templateArgs);
 
     void TraceWarning(ICallContext? context, string messageTemplate, params object[] templateArgs);
-
-    void TraceError(ICallContext? context, Exception exception, string messageTemplate, params object[] templateArgs);
-
-    void TraceError(ICallContext? context, string messageTemplate, params object[] templateArgs);
-
-    void Crash(ICallContext? context, CrashLevel level, Exception exception);
-
-    void Crash(ICallContext? context, CrashLevel level, Exception exception, string messageTemplate,
-        params object[] templateArgs);
-
-    void Audit(ICallContext? context, string auditCode, string messageTemplate, params object[] templateArgs);
-
-    void AuditAgainst(ICallContext? context, string againstId, string auditCode, string messageTemplate,
-        params object[] templateArgs);
-
-    void Measure(string eventName, Dictionary<string, object>? context = null);
 
     void TrackUsage(ICallContext? context, string eventName, Dictionary<string, object>? additional = null);
 

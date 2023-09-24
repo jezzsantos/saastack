@@ -14,8 +14,8 @@ public interface IHasSearchOptionsValidator : IValidator<IHasSearchOptions>
 /// </summary>
 public class HasSearchOptionsValidator : AbstractValidator<IHasSearchOptions>, IHasSearchOptionsValidator
 {
-    private const string SortExpression = @"^((([\;\,]{0,1})([\+\-]{0,1})([\d\w\._]{1,25})){1,5})$";
     private const string FilterExpression = @"^((([\;\,]{0,1})([\d\w\._]{1,25})){1,25})$";
+    private const string SortExpression = @"^((([\;\,]{0,1})([\+\-]{0,1})([\d\w\._]{1,25})){1,5})$";
 
     public HasSearchOptionsValidator(IHasGetOptionsValidator hasGetOptionsValidator)
     {

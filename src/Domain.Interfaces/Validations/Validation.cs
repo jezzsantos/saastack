@@ -42,9 +42,9 @@ public class Validation<TValue>
         Substitutions = new List<string>();
     }
 
-    public Func<TValue, bool>? Function { get; }
-
     public string? Expression { get; }
+
+    public Func<TValue, bool>? Function { get; }
 
     public int? MaxLength { get; }
 

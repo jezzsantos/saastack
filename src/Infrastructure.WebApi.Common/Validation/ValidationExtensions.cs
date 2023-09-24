@@ -9,13 +9,12 @@ namespace Infrastructure.WebApi.Common.Validation;
 public static class ValidationExtensions
 {
     /// <summary>
-    ///     Whether the property matches the <see cref="validation" />
+    ///     Whether the property is a valid email address
     /// </summary>
-    public static IRuleBuilderOptions<T, TProperty> Matches<T, TProperty>(
-        this IRuleBuilder<T, TProperty> ruleBuilder, Validation<TProperty> validation)
-        where TProperty : notnull
+    public static IRuleBuilderOptions<T, TProperty> IsEmailAddress<T, TProperty>(
+        this IRuleBuilder<T, TProperty> ruleBuilder)
     {
-        return ruleBuilder.SetValidator(new ValidatorValidator<T, TProperty>(validation));
+        return ruleBuilder.SetValidator(new EmailAddressValidator<T, TProperty>());
     }
 
     /// <summary>
@@ -28,20 +27,21 @@ public static class ValidationExtensions
     }
 
     /// <summary>
-    ///     Whether the property is a valid email address
-    /// </summary>
-    public static IRuleBuilderOptions<T, TProperty> IsEmailAddress<T, TProperty>(
-        this IRuleBuilder<T, TProperty> ruleBuilder)
-    {
-        return ruleBuilder.SetValidator(new EmailAddressValidator<T, TProperty>());
-    }
-
-    /// <summary>
     ///     Whether the property is a valid URL
     /// </summary>
     public static IRuleBuilderOptions<T, TProperty> IsUrl<T, TProperty>(
         this IRuleBuilder<T, TProperty> ruleBuilder)
     {
         return ruleBuilder.SetValidator(new UrlValidator<T, TProperty>());
+    }
+
+    /// <summary>
+    ///     Whether the property matches the <see cref="validation" />
+    /// </summary>
+    public static IRuleBuilderOptions<T, TProperty> Matches<T, TProperty>(
+        this IRuleBuilder<T, TProperty> ruleBuilder, Validation<TProperty> validation)
+        where TProperty : notnull
+    {
+        return ruleBuilder.SetValidator(new ValidatorValidator<T, TProperty>(validation));
     }
 }

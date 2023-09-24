@@ -8,13 +8,13 @@ A. **RESTfully** modeling real-world processes as much as we can, with a sprinkl
 
 > We are going to be following conventions (not standards) around RESTful web service design. But we also recognize that in some cases, remote actions need to be presented as RPCs to make them more intuitive to our users (Developers).
 
-The primary influence of these design principles has been these: 
+The primary influence of these design principles has been these:
 
 * [RESTful Best Practices](https://github.com/tfredrich/RestApiTutorial.com/raw/master/media/RESTful%20Best%20Practices-v1_2.pdf)
 
 * [REST API design and escaping CRUD](https://www.thoughtworks.com/insights/blog/rest-api-design-resource-modeling), from Thoughtworks
 
-The goal is to adopt REST principles as far as they make sense, and at the pace we can adopt them. 
+The goal is to adopt REST principles as far as they make sense, and at the pace we can adopt them.
 
 Level 3 of the [Richardson Maturity Model](http://restcookbook.com/Miscellaneous/richardsonmaturitymodel/) is sufficient for us right now.
 
@@ -22,15 +22,15 @@ Level 3 of the [Richardson Maturity Model](http://restcookbook.com/Miscellaneous
 
 ### REST versus CRUD
 
-Even though most web APIs are defined by the HTTP verbs: `POST`, `GET`, `PUT`, `PATCH`, `DELETE` (and others), 
+Even though most web APIs are defined by the HTTP verbs: `POST`, `GET`, `PUT`, `PATCH`, `DELETE` (and others),
 
     - AND these verbs *could be* conveniently translated nicely into `Create` `Retrieve`, `Update` and `Delete` (CRUD) functions of a database. 
 
     - AND given that REST is designed around a "Resource", each with an identifier. 
 
-Designing a REST API for web interop is not to be confused with designing a database API with CRUD. 
+Designing a REST API for web interop is not to be confused with designing a database API with CRUD.
 
->  REST and CRUD are two different design styles for two different parts of the system, that ultimately must mesh together. But keeping them separate is important for usability.
+> REST and CRUD are two different design styles for two different parts of the system, that ultimately must mesh together. But keeping them separate is important for usability.
 
 #### A little history about CRUD
 
@@ -46,16 +46,16 @@ Once relational databases (RMDBS) were invented (1970-1990s) and then later obje
 >
 > It also seems evident that if a developer has only ever \[professionally\] built software using a relational database, they have no other tools than ORMs to access any data. Today, relational databases are not the only tool to store data, and ORMs not the only tool to access it.
 
-With RMDBS and ORMs being so prevalent, developers building CRUD systems only really then need to focus on two things: 
+With RMDBS and ORMs being so prevalent, developers building CRUD systems only really then need to focus on two things:
 
 1. Naming and data type selection of columns in a SQL database (and applying indexes in the right places)
-2. The relationships with other tables, using foreign keys. 
+2. The relationships with other tables, using foreign keys.
 
 Normalization dictated that duplicity of data should be eliminated, and thus, reuse of data to be maximized. Thus, we end up with simple relationships and muti-variant semantics crammed into the most efficient datatypes for minimizing storage space, and maximizing performance.
 
-This mantra of "data reuse" was then poorly extrapolated out and over-applied to reuse data across unrelated components in the system. In many medium-sized systems of this kind,  developers would start mapping new use cases (for new components) onto existing tables that were designed for other components of the system. Semantics and abstractions were mixed. Worse, these existing tables were then modified for newer use-cases for newer components of the system, breaking existing functionality in a way very hard to detect before releasing the software. 
+This mantra of "data reuse" was then poorly extrapolated out and over-applied to reuse data across unrelated components in the system. In many medium-sized systems of this kind, developers would start mapping new use cases (for new components) onto existing tables that were designed for other components of the system. Semantics and abstractions were mixed. Worse, these existing tables were then modified for newer use-cases for newer components of the system, breaking existing functionality in a way very hard to detect before releasing the software.
 
-In the blind pursuit of not duplicating any data in a database, developers were treating the entire database as having "global scope". Thus, no segregation existed between the data of unrelated components in the system. After a few hundred tables in the database and years of tangled development it became impossible to later split up the tables into separate databases. Since it was too hard to figure out (from the code) what components and use cases were coupled to what database tables. This resulted in big balls of mud (BBOM) codebases stagnating and dying after only a few years, as no one wanted to break them. The only thing worth keeping (after the fact) is the dataset itself. 
+In the blind pursuit of not duplicating any data in a database, developers were treating the entire database as having "global scope". Thus, no segregation existed between the data of unrelated components in the system. After a few hundred tables in the database and years of tangled development it became impossible to later split up the tables into separate databases. Since it was too hard to figure out (from the code) what components and use cases were coupled to what database tables. This resulted in big balls of mud (BBOM) codebases stagnating and dying after only a few years, as no one wanted to break them. The only thing worth keeping (after the fact) is the dataset itself.
 
 ##### Performance
 
@@ -69,23 +69,23 @@ Today, SSD disks are (at least) an order of magnitude faster than spinning disks
 
 The days of caring about these kinds of database optimizations early in the development of a software product are long gone.
 
-> Design Principle: If you design your system to be modular at the start, then you can optimize the individual parts of it to be far more performant later, once you know these things: (a) that this module is critical to the success of the system, and (b) that this module works well and is stable, and (b) that any specific optimization for this module has a predictable ROI for optimizing it. Three things you cannot know about a module, ahead of building it. 
+> Design Principle: If you design your system to be modular at the start, then you can optimize the individual parts of it to be far more performant later, once you know these things: (a) that this module is critical to the success of the system, and (b) that this module works well and is stable, and (b) that any specific optimization for this module has a predictable ROI for optimizing it. Three things you cannot know about a module, ahead of building it.
 
 ### Modeling REST resources
 
 Real-world SaaS products today are \[necessarily\] more complex than the CRUD systems of the 1990s. As such CRUD, whilst having its *niche* place in software development (i.e. for very simple systems centered on a database), is not a very useful pattern for defining web-based APIs anymore.
 
-Creates and updates in CRUD are far too generalized. To ben generalized, they must assume that their clients (the consumers of the API) must have more knowledge of the details of the underlying constraints of the system - than they reasonably should have. It is essentially a usability problem. 
+Creates and updates in CRUD are far too generalized. To ben generalized, they must assume that their clients (the consumers of the API) must have more knowledge of the details of the underlying constraints of the system - than they reasonably should have. It is essentially a usability problem.
 
->  More generalized -> increased scope of reuse -> less usable/optimal/specific in any given context
+> More generalized -> increased scope of reuse -> less usable/optimal/specific in any given context
 
 A REST API on the other hand is striving to model actual and very specific real-world processes, far closer to the mental models of the clients using the system. Thus, if you understand the real world (upon which the API is based), and you understand some basics of the constraints of the system underlying it, then a specific API can easily document and enforce those constraints just for that specific context.
 
 > REST APIs are not striving to "project" the semantics of tables of relational databases across the internet, and expecting the consumers to care about those semantics.
 
-Thus, REST "resources" are designed to be the *nouns* involved in the *state* changes of those real-world business processes or concepts, decorated with specific "actions" being the *verbs* operating on those processes or state changes. 
+Thus, REST "resources" are designed to be the *nouns* involved in the *state* changes of those real-world business processes or concepts, decorated with specific "actions" being the *verbs* operating on those processes or state changes.
 
-> Rather than being the *nouns* of the optimized data being stored in normalized relational database tables. 
+> Rather than being the *nouns* of the optimized data being stored in normalized relational database tables.
 
 There is no assumption anywhere in a software system today that a REST API will persist its *state* in a relational database, let alone a single consistent one (like we had to have back in the 1990s). Far from it, many REST APIs actually store their [aggregated] state across the stores of distributed systems, where individual pieces of state may or may not reside in any database of any kind.
 
@@ -113,7 +113,7 @@ For example:
 
 ## Verb Schemes
 
-There are a number of popular schemes for REST APIs today. 
+There are a number of popular schemes for REST APIs today.
 
 > They are designed around discoverability and usability.
 
@@ -227,7 +227,7 @@ Generally, it is a violation of REST to _expand_ associations in representations
 
 For example, a `car` resource has a `useraccount` resource for the owner of the `car`, and it also has a `membership` to an `organization` resource.
 
-REST strictly says that the `useraccount` resources **should not** be included (embedded) in the representation of the `car` resource. 
+REST strictly says that the `useraccount` resources **should not** be included (embedded) in the representation of the `car` resource.
 
 The resources are separate top-level resources. But if they are associated then the `useraccount` of the `car` should only be referenced by its ID.
 
@@ -329,12 +329,11 @@ These properties generally don't form part of the route.
 
 In the API the naming convention for search type API's has been the following:
 
-* For search type API's, where the request contains something to search for, (even in cases where only a single result is expected) we have been using the convention: `GET /resources/search`, and defining the search criteria in the QueryString. 
+* For search type API's, where the request contains something to search for, (even in cases where only a single result is expected) we have been using the convention: `GET /resources/search`, and defining the search criteria in the QueryString.
   * For example, to determine if a user exists for a specified email address, we have the SearchUsers API: `GET /users/search?email=bob@company.com`.
 
-* For Listing type API's, where the request may not contain any search criteria, and usually returns different variants of a resource based upon the caller, or context, we have been using the convention: `GET /resources`, and defining any parameters in the QueryString also. 
+* For Listing type API's, where the request may not contain any search criteria, and usually returns different variants of a resource based upon the caller, or context, we have been using the convention: `GET /resources`, and defining any parameters in the QueryString also.
   * For example, to list the car that you own, we have the ListForCallerCars API: `GET /cars`.
-
 
 The difference in the naming convention is purely for semantics. For search APIs, the route adds the `/search` part.
 
@@ -389,11 +388,11 @@ For example, for images, of a specific (system-wide, and well-known) size:
 
 ### Filters
 
-To limit the actual data sent over the wire. 
+To limit the actual data sent over the wire.
 
 > Useful for connections of reduced bandwidth.
 
-When you want to limit the data that comes back over the wire. 
+When you want to limit the data that comes back over the wire.
 
 For example, to tell the API not to send this data over the wire:
 
@@ -451,7 +450,7 @@ For example, to ensure no duplicate names of cars:
 
 * If necessary, then be explicit about the version in the base URL
 
-For example, 
+For example,
 
     /api/<dateornumber>/noun
 
@@ -459,11 +458,11 @@ For example,
 
 ## Response Formats
 
-The service will return JSON responses by default. 
+The service will return JSON responses by default.
 
 It will **try** to provide responses in formats that the client typically requests in the `Accept` header
 
->  Other formats (e.g. CSV, SOAP, XML, etc) may be supported as needed.
+> Other formats (e.g. CSV, SOAP, XML, etc) may be supported as needed.
 
 We support the following means to request different content types:
 
@@ -580,7 +579,7 @@ Furthermore, callers should expect appropriate response bodies for the following
 
 ### Successes
 
-We report successful requests as HTTP status codes `2XX`. 
+We report successful requests as HTTP status codes `2XX`.
 
 These are the common HTTP status codes for success:
 

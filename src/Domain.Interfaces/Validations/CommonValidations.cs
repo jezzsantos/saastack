@@ -7,20 +7,25 @@ namespace Domain.Interfaces.Validations;
 /// </summary>
 public static class CommonValidations
 {
-    private static readonly string FreeFormTextAllowedCharacters =
-        @"\d\w\`\~\!\@\#\$\%\:\&\*\(\)\-\+\=\[\]\{{\}}\:\;\'\""\<\,\>\.\?\|\/ \r\n";
+    public static readonly Validation EmailAddress = new(
+        @"^(?:[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+\.)*[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+@(?:(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!\.)){0,61}[a-zA-Z0-9]?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!$)){0,61}[a-zA-Z0-9]?)|(?:\[(?:(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\]))$");
 
     private static readonly string Emojis =
         "😀😁😂😃😉😋😎😍😗🤗🤔😣😫😴😌🤓😛😜😠😇😷😈👻😺😸😹😻😼😽🙀🙈🙉🙊👼👮🕵💂👳🎅👸👰👲🙍🙇🚶🏃💃⛷🏂🏌🏄🚣🏊⛹🏋🚴👫💪👈👉👆🖕👇🖖🤘🖐👌👍👎✊👊👏🙌🙏🐵🐶🐇🐥🐸🐌🐛🐜🐝🍉🍄🍔🍤🍨🍪🎂🍰🍾🍷🍸🍺🌍🚑⏰🌙🌝🌞⭐🌟🌠🌨🌩⛄🔥🎄🎈🎉🎊🎁🎗🏀🏈🎲🔇🔈📣🔔🎵🎷💰🖊📅✅❎💯";
 
-    public static readonly Validation EmailAddress = new(
-        @"^(?:[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+\.)*[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+@(?:(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!\.)){0,61}[a-zA-Z0-9]?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!$)){0,61}[a-zA-Z0-9]?)|(?:\[(?:(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\]))$");
-
-    public static readonly Validation Url = new(s => Uri.IsWellFormedUriString(s, UriKind.Absolute));
+    private static readonly string FreeFormTextAllowedCharacters =
+        @"\d\w\`\~\!\@\#\$\%\:\&\*\(\)\-\+\=\[\]\{{\}}\:\;\'\""\<\,\>\.\?\|\/ \r\n";
 
     public static readonly Validation Identifier = new(@"^[\w]{1,20}_[\d\w]{10,22}$", 12, 43);
 
     public static readonly Validation IdentifierPrefix = new(@"^[^\W_]*$", 1, 20);
+
+    public static readonly Validation Url = new(s => Uri.IsWellFormedUriString(s, UriKind.Absolute));
+
+    public static Validation Anything(int min = 1, int max = 100)
+    {
+        return new Validation(@".*", min, max);
+    }
 
     public static Validation DescriptiveName(int min = 1, int max = 100)
     {
@@ -39,11 +44,6 @@ public static class CommonValidations
         return
             new Validation(
                 $@"^[${FreeFormTextAllowedCharacters}${Emojis}]*$", min, max);
-    }
-
-    public static Validation Anything(int min = 1, int max = 100)
-    {
-        return new Validation(@".*", min, max);
     }
 
     public static bool Matches<TValue>(this Validation<TValue> format, TValue value)

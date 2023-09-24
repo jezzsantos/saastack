@@ -6,6 +6,13 @@ namespace Application.Interfaces;
 
 public static class GetOptionsExtensions
 {
+    internal static List<string> ReferencesToNames<TResource>(
+        this Expression<Func<TResource, object?>>[] propertyReferences)
+    {
+        return propertyReferences.Select(ToResourceReference)
+            .ToList();
+    }
+
     /// <summary>
     ///     Returns whether the named embedded resource should be expanded, according to the <see cref="GetOptions" />
     /// </summary>
@@ -18,13 +25,6 @@ public static class GetOptionsExtensions
         }
 
         return IsResourceIncluded(options, propertyReference);
-    }
-
-    internal static List<string> ReferencesToNames<TResource>(
-        this Expression<Func<TResource, object?>>[] propertyReferences)
-    {
-        return propertyReferences.Select(ToResourceReference)
-            .ToList();
     }
 
     private static string ToResourceReference<TResource>(Expression<Func<TResource, object?>> propertyReference)

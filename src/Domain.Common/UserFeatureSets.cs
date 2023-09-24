@@ -5,9 +5,10 @@ namespace Domain.Common;
 /// </summary>
 public static class UserFeatureSets
 {
+    public const string Basic = "basic_features";
+
     // EXTEND: Add new feature sets
     public const string Core = "core_features";
-    public const string Basic = "basic_features";
     public const string Premium = "premium_features";
 
 #if TESTINGONLY

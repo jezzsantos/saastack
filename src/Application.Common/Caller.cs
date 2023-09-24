@@ -8,6 +8,39 @@ namespace Application.Common;
 public static class Caller
 {
     /// <summary>
+    ///     Returns a caller used to represent an authenticated caller with no access
+    /// </summary>
+    public static ICallerContext CreateAsAnonymous()
+    {
+        return new AnonymousCaller();
+    }
+
+    /// <summary>
+    ///     Returns a caller used to represent an authenticated caller with no access
+    /// </summary>
+    public static ICallerContext CreateAsAnonymousTenant(string tenantId)
+    {
+        return new AnonymousCaller(tenantId);
+    }
+
+    /// <summary>
+    ///     Returns a caller used to represent the caller represented by the given <see cref="ICallContext" />
+    /// </summary>
+    public static ICallerContext CreateAsCallerFromCall(ICallContext call)
+    {
+        return new CustomCaller(call);
+    }
+
+    /// <summary>
+    ///     Returns a caller used to represent inbound webhook calls from 3rd party integrations
+    /// </summary>
+    public static ICallerContext CreateAsExternalWebHook(string callId)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(callId);
+        return new ExternalWebHookAccountCaller(callId);
+    }
+
+    /// <summary>
     ///     Returns a caller used for internal processing (e.g. raising domain event notifications)
     /// </summary>
     public static ICallerContext CreateAsMaintenance()
@@ -39,39 +72,6 @@ public static class Caller
     public static ICallerContext CreateAsServiceClient()
     {
         return new ServiceClientAccountCaller();
-    }
-
-    /// <summary>
-    ///     Returns a caller used to represent inbound webhook calls from 3rd party integrations
-    /// </summary>
-    public static ICallerContext CreateAsExternalWebHook(string callId)
-    {
-        ArgumentException.ThrowIfNullOrEmpty(callId);
-        return new ExternalWebHookAccountCaller(callId);
-    }
-
-    /// <summary>
-    ///     Returns a caller used to represent an authenticated caller with no access
-    /// </summary>
-    public static ICallerContext CreateAsAnonymousTenant(string tenantId)
-    {
-        return new AnonymousCaller(tenantId);
-    }
-
-    /// <summary>
-    ///     Returns a caller used to represent an authenticated caller with no access
-    /// </summary>
-    public static ICallerContext CreateAsAnonymous()
-    {
-        return new AnonymousCaller();
-    }
-
-    /// <summary>
-    ///     Returns a caller used to represent the caller represented by the given <see cref="ICallContext" />
-    /// </summary>
-    public static ICallerContext CreateAsCallerFromCall(ICallContext call)
-    {
-        return new CustomCaller(call);
     }
 
     public static string GenerateCallId()

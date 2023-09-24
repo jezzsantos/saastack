@@ -81,7 +81,6 @@ We are then leveraging FluentValidation for request validation.
 
 We are integrating standard ASP.NET services like Authentication and Authorization.
 
-
 ### Modularity
 
 One of the distinguishing design principles of a Modular Monolith (over a Monolith) is the ability to deploy any, all, or some of the subdomains/vertical slices (which includes its APIs) in any number of deployment units, at any time.
@@ -126,6 +125,7 @@ public Assembly ApiAssembly => typeof(Apis.Cars.CarsApi).Assembly;
     }
 
 }
+
   ```
 
 In this class, you will need to declare the following things:
@@ -172,10 +172,10 @@ So, we have designed a coding pattern and grouping mechanism for related endpoin
    - For example, in the project and folder: `CarsApi/Apis/Cars/CarsApi.cs`
 
    - ```c#
-     public class CarsApi : IWebApiService
-     {
-          private readonly ICarsApplication _carsApplication;
-          private readonly ICallerContext _context;
+   public class CarsApi : IWebApiService
+   {
+   private readonly ICarsApplication _carsApplication;
+   private readonly ICallerContext _context;
 
           public CarsApi(ICallerContext context, ICarsApplication carsApplication)
           {
@@ -192,7 +192,7 @@ So, we have designed a coding pattern and grouping mechanism for related endpoin
          }
          
          ...other methods
-     }
+   }
      ```
 
 3. You will define the request and response types in separate files in the project: `Infrastructure.WebApi.Interfaces` in a subfolder for the subdomain. For example,

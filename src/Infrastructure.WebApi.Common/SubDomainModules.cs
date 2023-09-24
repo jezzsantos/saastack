@@ -11,14 +11,19 @@ namespace Infrastructure.WebApi.Common;
 /// </summary>
 public class SubDomainModules
 {
+    private readonly Dictionary<Type, string> _aggregatePrefixes = new();
     private readonly List<Assembly> _apiAssemblies = new();
     private readonly List<Action<WebApplication>> _minimalApiRegistrationFunctions = new();
     private readonly List<Action<ConfigurationManager, IServiceCollection>> _serviceCollectionFunctions = new();
-    private readonly Dictionary<Type, string> _aggregatePrefixes = new();
+
+    public IDictionary<Type, string> AggregatePrefixes => _aggregatePrefixes;
 
     public IReadOnlyList<Assembly> ApiAssemblies => _apiAssemblies;
 
-    public IDictionary<Type, string> AggregatePrefixes => _aggregatePrefixes;
+    public void ConfigureHost(WebApplication app)
+    {
+        _minimalApiRegistrationFunctions.ForEach(func => func(app));
+    }
 
     public void Register(ISubDomainModule module)
     {
@@ -40,10 +45,5 @@ public class SubDomainModules
     public void RegisterServices(ConfigurationManager configuration, IServiceCollection serviceCollection)
     {
         _serviceCollectionFunctions.ForEach(func => func(configuration, serviceCollection));
-    }
-
-    public void ConfigureHost(WebApplication app)
-    {
-        _minimalApiRegistrationFunctions.ForEach(func => func(app));
     }
 }

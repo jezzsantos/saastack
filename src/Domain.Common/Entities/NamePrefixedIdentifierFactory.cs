@@ -13,8 +13,8 @@ namespace Domain.Common.Entities;
 /// </summary>
 public abstract class NamePrefixedIdentifierFactory : IIdentifierFactory
 {
-    private const string UnknownEntityPrefix = "xxx";
     private const string Delimiter = "_";
+    private const string UnknownEntityPrefix = "xxx";
     private readonly IDictionary<Type, string> _prefixes;
     private readonly List<string> _supportedPrefixes = new();
 
@@ -22,22 +22,6 @@ public abstract class NamePrefixedIdentifierFactory : IIdentifierFactory
     {
         prefixes.Merge(new Dictionary<Type, string>(prefixes) { { typeof(VersionedChangeEvent), "event" } });
         _prefixes = prefixes;
-    }
-
-    public IEnumerable<Type> RegisteredTypes => _prefixes.Keys;
-
-    public IReadOnlyList<string> SupportedPrefixes => _supportedPrefixes;
-
-#if TESTINGONLY
-    // ReSharper disable once CollectionNeverQueried.Global
-    public Dictionary<string, string> LastCreatedIds { get; } = new();
-#endif
-
-    public void AddSupportedPrefix(string prefix)
-    {
-        prefix.GuardAgainstInvalid(CommonValidations.IdentifierPrefix, nameof(prefix));
-
-        _supportedPrefixes.Add(prefix);
     }
 
     public Identifier Create(IIdentifiableEntity entity)
@@ -74,6 +58,22 @@ public abstract class NamePrefixedIdentifierFactory : IIdentifierFactory
         }
 
         return CommonValidations.Identifier.Matches(id);
+    }
+
+#if TESTINGONLY
+    // ReSharper disable once CollectionNeverQueried.Global
+    public Dictionary<string, string> LastCreatedIds { get; } = new();
+#endif
+
+    public IEnumerable<Type> RegisteredTypes => _prefixes.Keys;
+
+    public IReadOnlyList<string> SupportedPrefixes => _supportedPrefixes;
+
+    public void AddSupportedPrefix(string prefix)
+    {
+        prefix.GuardAgainstInvalid(CommonValidations.IdentifierPrefix, nameof(prefix));
+
+        _supportedPrefixes.Add(prefix);
     }
 
     internal static string ConvertGuid(Guid guid, string prefix)

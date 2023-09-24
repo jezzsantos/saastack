@@ -6,7 +6,7 @@
 
 # Context and Problem Statement
 
-This codebase is a codebase "template" that is expected to be used by all developers. 
+This codebase is a codebase "template" that is expected to be used by all developers.
 
 Since it contains source code, unfortunately, some of those files will have to be designed specifically for the tools, being used, to manipulate it.
 
@@ -27,6 +27,7 @@ The most popular .NET solution, project and file editors for C#, in the world ar
 ## Decision Outcome
 
 `Jetbrains Rider`
+
 * This tool defines more advanced code editing settings (i.e. inclusion of Resharper).
 * This tool has gained more popularity in the last few years for pure C# development, whereas Visual Studio Code has gained more popular for Javascript development.
 * The template is predominantly C# development, but may also include some TypeScript development.

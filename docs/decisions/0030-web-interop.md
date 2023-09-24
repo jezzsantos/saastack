@@ -25,6 +25,7 @@ A system may include it or others, such as:
 ## Considered Options
 
 The options are:
+
 1. REST
 2. OAR
 
@@ -32,14 +33,14 @@ The options are:
 
 `REST`
 
-- SaaS systems are expected to be long-lived and will involve incremental increases in complexity over time, they must exceed in usability to be effective with larger audiences. To be more generic and highly usable requires that remote clients have a well-known, and highly constrained interop interface to work with.   
+- SaaS systems are expected to be long-lived and will involve incremental increases in complexity over time, they must exceed in usability to be effective with larger audiences. To be more generic and highly usable requires that remote clients have a well-known, and highly constrained interop interface to work with.
 - DDD and other architectural styles used in the application layers, also rely on modeling behavior rather than just data, so REST is a better external interface for them.
 
 ### Consequences
 
 Most developers are well-versed in OAR patterns. They are a fundamental building block in any developer's competence.
 
-It is often the case that the data entities used in OAR systems correspond directly to tables in an SQL database, which makes the systems quicker to build. But this developer [premature] optimization is rarely a saving for more complex systems. 
+It is often the case that the data entities used in OAR systems correspond directly to tables in an SQL database, which makes the systems quicker to build. But this developer [premature] optimization is rarely a saving for more complex systems.
 
 The OAR pattern has real-world problems for long-lived products - and generally over time produces BBOM (big balls of mud), as [transaction scripts](https://martinfowler.com/eaaCatalog/transactionScript.html) and [anemic domain models](https://martinfowler.com/bliki/AnemicDomainModel.html) tend to add more accidental complexity over time, as the system is built out.
 
@@ -50,7 +51,5 @@ The challenge with choosing REST is applying the discipline to continuously evol
 REST does not just mean JSON over HTTP.
 
 REST defines "resources" that are involved in processes, that model the real world. They are not just defined by nouns modeled in SQL databases. In fact, it is possible that the REST resources are converted into other domain entities further down the stack in the domain model, and further that data entities in the database are different as well.
-
-
 
 Designing REST requires a deeper insight into remote client use cases. Read our [guidance on designing REST APIs](../principles/0010-rest-api.md)

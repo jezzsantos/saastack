@@ -6,19 +6,19 @@ public static class CallContext
     public const string UnknownCallerId = "unknown";
 
     /// <summary>
-    ///     Creates an unknown <see cref="ICallContext" />
-    /// </summary>
-    public static ICallContext CreateUnknown()
-    {
-        return new UnknownCall();
-    }
-
-    /// <summary>
     ///     Creates a custom <see cref="ICallContext" /> with its own call, caller and tenant identifiers
     /// </summary>
     public static ICallContext CreateCustom(string? callId, string callerId, string? tenantId)
     {
         return new CustomCall(callId ?? UncorrelatedCallId, callerId, tenantId);
+    }
+
+    /// <summary>
+    ///     Creates an unknown <see cref="ICallContext" />
+    /// </summary>
+    public static ICallContext CreateUnknown()
+    {
+        return new UnknownCall();
     }
 
     private sealed class UnknownCall : CustomCall

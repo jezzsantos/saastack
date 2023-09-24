@@ -6,6 +6,11 @@
 public interface IHasSearchOptions : IHasGetOptions
 {
     /// <summary>
+    ///     Fields to include and exclude in the search result
+    /// </summary>
+    string? Filter { get; set; }
+
+    /// <summary>
     ///     The maximum number of search results to return
     /// </summary>
     int? Limit { get; set; }
@@ -19,9 +24,4 @@ public interface IHasSearchOptions : IHasGetOptions
     ///     Fields to sort the results on
     /// </summary>
     string? Sort { get; set; }
-
-    /// <summary>
-    ///     Fields to include and exclude in the search result
-    /// </summary>
-    string? Filter { get; set; }
 }

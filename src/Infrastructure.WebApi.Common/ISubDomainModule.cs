@@ -10,9 +10,9 @@ namespace Infrastructure.WebApi.Common;
 /// </summary>
 public interface ISubDomainModule
 {
-    Assembly ApiAssembly { get; }
-
     Dictionary<Type, string> AggregatePrefixes { get; }
+
+    Assembly ApiAssembly { get; }
 
     Action<WebApplication> MinimalApiRegistrationFunction { get; }
 

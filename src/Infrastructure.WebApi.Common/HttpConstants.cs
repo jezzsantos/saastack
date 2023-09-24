@@ -7,9 +7,9 @@ public static class HttpContentTypes
 {
     public const string Json = "application/json";
     public const string JsonWithCharset = "application/json; charset=utf-8";
+    public const string OctetStream = "application/octet-stream";
     public const string Xml = "application/xml";
     public const string XmlWithCharset = "application/xml; charset=utf-8";
-    public const string OctetStream = "application/octet-stream";
 }
 
 /// <summary>

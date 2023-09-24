@@ -1,29 +1,53 @@
 namespace Application.Interfaces;
 
 /// <summary>
-///     The context of the current caller
+///     The context of the currently identified caller
 /// </summary>
 public interface ICallerContext
 {
-    string CallId { get; }
-
-    string CallerId { get; }
-
-    string? TenantId { get; }
-
-    CallerRoles Roles { get; }
-
-    CallerFeatureSets FeatureSets { get; }
-
+    /// <summary>
+    ///     The authorization token of the call. Passed to downstream clients
+    /// </summary>
     string? Authorization { get; }
 
+    /// <summary>
+    ///     The ID of the identified caller
+    /// </summary>
+    string CallerId { get; }
+
+    /// <summary>
+    ///     The ID of the (correlated) call
+    /// </summary>
+    string CallId { get; }
+
+    /// <summary>
+    ///     The feature sets belonging to the caller
+    /// </summary>
+    CallerFeatureSets FeatureSets { get; }
+
+    /// <summary>
+    ///     Whether the called is authenticated or not
+    /// </summary>
     public bool IsAuthenticated { get; }
 
+    /// <summary>
+    ///     Whether the called is an internal service account
+    /// </summary>
     public bool IsServiceAccount { get; }
+
+    /// <summary>
+    ///     The authorization roles belonging to the caller
+    /// </summary>
+    CallerRoles Roles { get; }
+
+    /// <summary>
+    ///     The ID of the tenant of the caller
+    /// </summary>
+    string? TenantId { get; }
 
 
     /// <summary>
-    ///     Defines the roles of the current caller
+    ///     Defines the authorization roles that a caller can have
     /// </summary>
     public class CallerRoles
     {
@@ -43,13 +67,13 @@ public interface ICallerContext
 
         public string[] All { get; }
 
-        public string[] User { get; }
-
         public string[] Organisation { get; }
+
+        public string[] User { get; }
     }
 
     /// <summary>
-    ///     Defines the sets of features allowed for the current caller
+    ///     Defines the sets of features that a caller can have
     /// </summary>
     public class CallerFeatureSets
     {
@@ -69,8 +93,8 @@ public interface ICallerContext
 
         public string[] All { get; }
 
-        public string[] User { get; }
-
         public string[] Organisation { get; }
+
+        public string[] User { get; }
     }
 }

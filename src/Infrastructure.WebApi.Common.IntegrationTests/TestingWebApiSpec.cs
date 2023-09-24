@@ -18,6 +18,24 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
     }
 
     [Fact]
+    public async Task WhenGetThrowsException_ThenReturnsServerError()
+    {
+        var result = await Api.GetAsync("/testingonly/throws");
+
+        result.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        var json = await result.Content.ReadAsStringAsync();
+
+        json.Should()
+            .StartWith("{\"" +
+                       "type\":\"https://tools.ietf.org/html/rfc7231#section-6.6.1\"," +
+                       "\"title\":\"An unexpected error occurred\"," +
+                       "\"status\":500," +
+                       "\"detail\":\"amessage\"," +
+                       "\"instance\":\"http://localhost/testingonly/throws\"," +
+                       "\"exception\":\"System.InvalidOperationException: amessage");
+    }
+
+    [Fact]
     public async Task WhenGetUnvalidatedRequest_ThenReturns200()
     {
         var result = await Api.GetAsync("/testingonly/1/unvalidated");
@@ -55,36 +73,6 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
     }
 
     [Fact]
-    public async Task WhenGetThrowsException_ThenReturnsServerError()
-    {
-        var result = await Api.GetAsync("/testingonly/throws");
-
-        result.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
-        var json = await result.Content.ReadAsStringAsync();
-
-        json.Should()
-            .StartWith("{\"" +
-                       "type\":\"https://tools.ietf.org/html/rfc7231#section-6.6.1\"," +
-                       "\"title\":\"An unexpected error occurred\"," +
-                       "\"status\":500," +
-                       "\"detail\":\"amessage\"," +
-                       "\"instance\":\"http://localhost/testingonly/throws\"," +
-                       "\"exception\":\"System.InvalidOperationException: amessage");
-    }
-
-
-    [Fact]
-    public async Task WhenGetWithNoAcceptAndNoFormat_ThenReturnsJsonResponse()
-    {
-        var result = await Api.GetAsync("/testingonly/1/unvalidated");
-
-        result.StatusCode.Should().Be(HttpStatusCode.OK);
-        var content = await result.Content.ReadAsStringAsync();
-
-        content.Should().Be("{\"message\":\"amessage1\"}");
-    }
-
-    [Fact]
     public async Task WhenGetWithAcceptForJson_ThenReturnsJsonResponse()
     {
         var request = new HttpRequestMessage
@@ -99,6 +87,23 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
         var content = await result.Content.ReadAsStringAsync();
 
         content.Should().Be("{\"message\":\"amessage1\"}");
+    }
+
+    [Fact]
+    public async Task WhenGetWithAcceptForUnsupported_ThenReturns415()
+    {
+        var request = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{Api.BaseAddress}testingonly/1/unvalidated")
+        };
+        request.Headers.Add(HttpHeaders.Accept, "application/unsupported");
+
+        var result = await Api.SendAsync(request);
+
+        result.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType);
+        var content = await result.Content.ReadAsStringAsync();
+
+        content.Should().BeEmpty();
     }
 
     [Fact]
@@ -122,23 +127,6 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
     }
 
     [Fact]
-    public async Task WhenGetWithAcceptForUnsupported_ThenReturns415()
-    {
-        var request = new HttpRequestMessage
-        {
-            RequestUri = new Uri($"{Api.BaseAddress}testingonly/1/unvalidated")
-        };
-        request.Headers.Add(HttpHeaders.Accept, "application/unsupported");
-
-        var result = await Api.SendAsync(request);
-
-        result.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType);
-        var content = await result.Content.ReadAsStringAsync();
-
-        content.Should().BeEmpty();
-    }
-
-    [Fact]
     public async Task WhenGetWithFormatForJson_ThenReturnsJsonResponse()
     {
         var result = await Api.GetAsync("/testingonly/1/unvalidated?format=json");
@@ -147,6 +135,17 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
         var content = await result.Content.ReadAsStringAsync();
 
         content.Should().Be("{\"message\":\"amessage1\"}");
+    }
+
+    [Fact]
+    public async Task WhenGetWithFormatForUnsupported_ThenReturns415()
+    {
+        var result = await Api.GetAsync("/testingonly/1/unvalidated?format=unsupported");
+
+        result.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType);
+        var content = await result.Content.ReadAsStringAsync();
+
+        content.Should().BeEmpty();
     }
 
     [Fact]
@@ -163,15 +162,16 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
                             "</StringMessageTestingOnlyResponse>");
     }
 
-    [Fact]
-    public async Task WhenGetWithFormatForUnsupported_ThenReturns415()
-    {
-        var result = await Api.GetAsync("/testingonly/1/unvalidated?format=unsupported");
 
-        result.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType);
+    [Fact]
+    public async Task WhenGetWithNoAcceptAndNoFormat_ThenReturnsJsonResponse()
+    {
+        var result = await Api.GetAsync("/testingonly/1/unvalidated");
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
         var content = await result.Content.ReadAsStringAsync();
 
-        content.Should().BeEmpty();
+        content.Should().Be("{\"message\":\"amessage1\"}");
     }
 }
 #endif

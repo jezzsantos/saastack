@@ -586,9 +586,9 @@ public sealed class UsedImplicitlyAttribute : Attribute
         TargetFlags = targetFlags;
     }
 
-    public ImplicitUseKindFlags UseKindFlags { get; }
-
     public ImplicitUseTargetFlags TargetFlags { get; }
+
+    public ImplicitUseKindFlags UseKindFlags { get; }
 }
 
 /// <summary>
@@ -623,9 +623,9 @@ public sealed class MeansImplicitUseAttribute : Attribute
         TargetFlags = targetFlags;
     }
 
-    [UsedImplicitly] public ImplicitUseKindFlags UseKindFlags { get; }
-
     [UsedImplicitly] public ImplicitUseTargetFlags TargetFlags { get; }
+
+    [UsedImplicitly] public ImplicitUseKindFlags UseKindFlags { get; }
 }
 
 /// <summary>
@@ -889,13 +889,6 @@ public sealed class SourceTemplateAttribute : Attribute
 public sealed class MacroAttribute : Attribute
 {
     /// <summary>
-    ///     Allows specifying a macro that will be executed for a <see cref="SourceTemplateAttribute">source template</see>
-    ///     parameter when the template is expanded.
-    /// </summary>
-    [CanBeNull]
-    public string Expression { get; set; }
-
-    /// <summary>
     ///     Allows specifying which occurrence of the target parameter becomes editable when the template is deployed.
     /// </summary>
     /// <remarks>
@@ -904,6 +897,13 @@ public sealed class MacroAttribute : Attribute
     ///     use values >= 0. To make the parameter non-editable when the template is expanded, use -1.
     /// </remarks>
     public int Editable { get; set; }
+
+    /// <summary>
+    ///     Allows specifying a macro that will be executed for a <see cref="SourceTemplateAttribute">source template</see>
+    ///     parameter when the template is expanded.
+    /// </summary>
+    [CanBeNull]
+    public string Expression { get; set; }
 
     /// <summary>
     ///     Identifies the target parameter of a <see cref="SourceTemplateAttribute">source template</see> if the
@@ -1364,11 +1364,14 @@ public sealed class CodeTemplateAttribute : Attribute
     }
 
     /// <summary>
-    ///     Structural search pattern to use in the code template.
-    ///     The pattern includes a textual part, which must contain only identifiers allowed in the target language,
-    ///     and placeholders, which allow matching variable parts of the target code blocks.
+    ///     Apply code formatting after code replacement.
     /// </summary>
-    public string SearchTemplate { get; }
+    public bool FormatAfterReplace { get; set; } = true;
+
+    /// <summary>
+    ///     Whether similar code blocks should be matched.
+    /// </summary>
+    public bool MatchSimilarConstructs { get; set; }
 
     /// <summary>
     ///     Message to show when the search pattern was found.
@@ -1380,24 +1383,21 @@ public sealed class CodeTemplateAttribute : Attribute
     public string Message { get; set; }
 
     /// <summary>
-    ///     Structural search replace pattern to use in code template replacement.
-    /// </summary>
-    public string ReplaceTemplate { get; set; }
-
-    /// <summary>
     ///     The replace message to show in the light bulb.
     /// </summary>
     public string ReplaceMessage { get; set; }
 
     /// <summary>
-    ///     Apply code formatting after code replacement.
+    ///     Structural search replace pattern to use in code template replacement.
     /// </summary>
-    public bool FormatAfterReplace { get; set; } = true;
+    public string ReplaceTemplate { get; set; }
 
     /// <summary>
-    ///     Whether similar code blocks should be matched.
+    ///     Structural search pattern to use in the code template.
+    ///     The pattern includes a textual part, which must contain only identifiers allowed in the target language,
+    ///     and placeholders, which allow matching variable parts of the target code blocks.
     /// </summary>
-    public bool MatchSimilarConstructs { get; set; }
+    public string SearchTemplate { get; }
 
     /// <summary>
     ///     Automatically insert namespace import directives or remove qualifiers that become redundant after the template is
@@ -1426,9 +1426,9 @@ public sealed class AspChildControlTypeAttribute : Attribute
         ControlType = controlType;
     }
 
-    [NotNull] public string TagName { get; }
-
     [NotNull] public Type ControlType { get; }
+
+    [NotNull] public string TagName { get; }
 }
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
@@ -2002,9 +2002,9 @@ public sealed class RazorInjectionAttribute : Attribute
         FieldName = fieldName;
     }
 
-    [NotNull] public string Type { get; }
-
     [NotNull] public string FieldName { get; }
+
+    [NotNull] public string Type { get; }
 }
 
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
