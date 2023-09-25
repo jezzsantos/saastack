@@ -1,9 +1,11 @@
+using System.Xml;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Infrastructure.WebApi.Common;
 
@@ -15,10 +17,12 @@ namespace Infrastructure.WebApi.Common;
 public sealed class XmlHttpResult<TValue> : IResult, IStatusCodeHttpResult, IValueHttpResult, IValueHttpResult<TValue>,
     IContentTypeHttpResult
 {
-    internal XmlHttpResult(TValue? value, int? statusCode)
+    internal XmlHttpResult(TValue? value, int? statusCode,
+        XmlSerializerOptions? xmlSerializerOptions = null)
     {
         Value = value;
         ContentType = HttpContentTypes.XmlWithCharset;
+        XmlSerializerOptions = xmlSerializerOptions;
 
         if (value is ProblemDetails problemDetails)
         {
@@ -44,11 +48,8 @@ public sealed class XmlHttpResult<TValue> : IResult, IStatusCodeHttpResult, IVal
             httpContext.Response.StatusCode = statusCode;
         }
 
-        return MicrosoftAspNetCoreExtensions.WriteResultAsXmlAsync(
-            httpContext,
-            logger,
-            Value,
-            ContentType);
+        return MicrosoftAspNetCoreExtensions.WriteResultAsXmlAsync(httpContext, logger, Value, ContentType,
+            XmlSerializerOptions);
     }
 
     public int? StatusCode { get; }
@@ -56,6 +57,8 @@ public sealed class XmlHttpResult<TValue> : IResult, IStatusCodeHttpResult, IVal
     object? IValueHttpResult.Value => Value;
 
     public TValue? Value { get; }
+
+    public XmlSerializerOptions? XmlSerializerOptions { get; }
 }
 
 /// <summary>
@@ -69,7 +72,9 @@ internal static partial class MicrosoftAspNetCoreExtensions
         HttpContext httpContext,
         ILogger logger,
         T? value,
-        string? contentType = null)
+        string? contentType,
+        XmlSerializerOptions? xmlSerializerOptions
+    )
     {
         if (value is null)
         {
@@ -84,8 +89,7 @@ internal static partial class MicrosoftAspNetCoreExtensions
             // In this case the polymorphism is not
             // relevant and we don't need to box.
             return httpContext.Response.WriteAsXmlAsync(
-                value,
-                contentType);
+                value, contentType, xmlSerializerOptions);
         }
 
         var runtimeType = value.GetType();
@@ -95,13 +99,15 @@ internal static partial class MicrosoftAspNetCoreExtensions
         return httpContext.Response.WriteAsXmlAsync(
             value,
             runtimeType,
-            contentType);
+            contentType,
+            xmlSerializerOptions);
     }
 
     private static Task WriteAsXmlAsync<TValue>(
         this HttpResponse response,
         TValue value,
         string? contentType,
+        XmlSerializerOptions? options,
         CancellationToken cancellationToken = default)
     {
         if (response == null)
@@ -109,15 +115,17 @@ internal static partial class MicrosoftAspNetCoreExtensions
             throw new ArgumentNullException(nameof(response));
         }
 
+        options ??= ResolveSerializerOptions(response.HttpContext);
+
         response.ContentType = contentType ?? HttpContentTypes.XmlWithCharset;
 
         // if no user provided token, pass the RequestAborted token and ignore OperationCanceledException
         if (!cancellationToken.CanBeCanceled)
         {
-            return WriteAsXmlAsyncSlow(response.Body, value, response.HttpContext.RequestAborted);
+            return WriteAsXmlAsyncSlow(response.Body, value, options, response.HttpContext.RequestAborted);
         }
 
-        return XmlSerializer.SerializeAsync(response.Body, value, cancellationToken);
+        return XmlSerializer.SerializeAsync(response.Body, value, options, cancellationToken);
     }
 
     private static Task WriteAsXmlAsync(
@@ -125,6 +133,7 @@ internal static partial class MicrosoftAspNetCoreExtensions
         object? value,
         Type type,
         string? contentType,
+        XmlSerializerOptions? options,
         CancellationToken cancellationToken = default)
     {
         if (response == null)
@@ -137,26 +146,30 @@ internal static partial class MicrosoftAspNetCoreExtensions
             throw new ArgumentNullException(nameof(type));
         }
 
+        options ??= ResolveSerializerOptions(response.HttpContext);
+
         response.ContentType = contentType ?? HttpContentTypes.XmlWithCharset;
 
         // if no user provided token, pass the RequestAborted token and ignore OperationCanceledException
         if (!cancellationToken.CanBeCanceled)
         {
-            return WriteAsXmlAsyncSlow(response.Body, value, type, response.HttpContext.RequestAborted);
+            return WriteAsXmlAsyncSlow(response.Body, value, type, options,
+                response.HttpContext.RequestAborted);
         }
 
-        return XmlSerializer.SerializeAsync(response.Body, value, type, cancellationToken);
+        return XmlSerializer.SerializeAsync(response.Body, value, type, options, cancellationToken);
     }
 
     private static async Task WriteAsXmlAsyncSlow(
         Stream body,
         object? value,
         Type type,
+        XmlSerializerOptions options,
         CancellationToken cancellationToken)
     {
         try
         {
-            await XmlSerializer.SerializeAsync(body, value, type, cancellationToken);
+            await XmlSerializer.SerializeAsync(body, value, type, options, cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -166,15 +179,23 @@ internal static partial class MicrosoftAspNetCoreExtensions
     private static async Task WriteAsXmlAsyncSlow<TValue>(
         Stream body,
         TValue value,
+        XmlSerializerOptions options,
         CancellationToken cancellationToken)
     {
         try
         {
-            await XmlSerializer.SerializeAsync(body, value, cancellationToken);
+            await XmlSerializer.SerializeAsync(body, value, options, cancellationToken);
         }
         catch (OperationCanceledException)
         {
         }
+    }
+
+    private static XmlSerializerOptions ResolveSerializerOptions(HttpContext httpContext)
+    {
+        // Attempt to resolve options from DI then fallback to default options
+        return httpContext.RequestServices.GetService<IOptions<XmlOptions>>()?.Value.SerializerOptions ??
+               XmlOptions.DefaultSerializerOptions;
     }
 
     /// <summary>
@@ -287,7 +308,8 @@ internal static partial class MicrosoftAspNetCoreExtensions
 
     internal static class XmlSerializer
     {
-        public static async Task SerializeAsync(Stream responseBody, object? value, CancellationToken cancellationToken)
+        public static async Task SerializeAsync(Stream responseBody, object? value,
+            XmlSerializerOptions xmlSerializerOptions, CancellationToken cancellationToken)
         {
             await Task.CompletedTask;
             if (value is null)
@@ -296,11 +318,11 @@ internal static partial class MicrosoftAspNetCoreExtensions
             }
 
             var resultType = value.GetType();
-            await SerializeAsync(responseBody, value, resultType, cancellationToken);
+            await SerializeAsync(responseBody, value, resultType, xmlSerializerOptions, cancellationToken);
         }
 
         public static async Task SerializeAsync(Stream responseBody, object? value, Type resultType,
-            CancellationToken cancellationToken)
+            XmlSerializerOptions xmlSerializerOptions, CancellationToken cancellationToken)
         {
             await Task.CompletedTask;
             if (value is null)
@@ -309,9 +331,34 @@ internal static partial class MicrosoftAspNetCoreExtensions
             }
 
             await using var stream = new FileBufferingWriteStream();
+            var settings = new XmlWriterSettings
+            {
+                Indent = xmlSerializerOptions.WriteIndented,
+                NewLineHandling = NewLineHandling.None,
+                Async = true
+            };
+            await using var writer = XmlWriter.Create(stream, settings);
+
             var serializer = new System.Xml.Serialization.XmlSerializer(resultType);
-            serializer.Serialize(stream, value);
+            serializer.Serialize(writer, value);
+            await writer.FlushAsync();
+
             await stream.DrainBufferAsync(responseBody, cancellationToken);
         }
     }
+}
+
+public class XmlSerializerOptions
+{
+    public bool WriteIndented { get; set; }
+}
+
+public class XmlOptions
+{
+    public static readonly XmlSerializerOptions DefaultSerializerOptions = new()
+    {
+        WriteIndented = false
+    };
+
+    public XmlSerializerOptions SerializerOptions { get; } = new();
 }

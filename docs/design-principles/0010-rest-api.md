@@ -2,9 +2,9 @@
 
 Q. How is our web API to be designed?
 
-A. **RESTfully** modeling real-world processes as much as we can, with a sprinkling of RPC as little as we can.
+A. **REST-fully** modeling real-world processes as much as we can, with a sprinkling of RPC as little as we can.
 
-## Drivers
+## Design Principles
 
 > We are going to be following conventions (not standards) around RESTful web service design. But we also recognize that in some cases, remote actions need to be presented as RPCs to make them more intuitive to our users (Developers).
 
@@ -22,10 +22,10 @@ Level 3 of the [Richardson Maturity Model](http://restcookbook.com/Miscellaneous
 
 ### REST versus CRUD
 
-Even though most web APIs are defined by the HTTP verbs: `POST`, `GET`, `PUT`, `PATCH`, `DELETE` (and others),
+Even though most web APIs are defined by the HTTP methods: `POST`, `GET`, `PUT`, `PATCH`, `DELETE` (and others),
 
-    - AND these verbs *could be* conveniently translated nicely into `Create` `Retrieve`, `Update` and `Delete` (CRUD) functions of a database. 
-
+    - AND these methods *could be* conveniently translated nicely into `Create` `Retrieve`, `Update` and `Delete` (CRUD) functions of a database. 
+    
     - AND given that REST is designed around a "Resource", each with an identifier. 
 
 Designing a REST API for web interop is not to be confused with designing a database API with CRUD.
@@ -91,7 +91,9 @@ There is no assumption anywhere in a software system today that a REST API will 
 
 See [this excellent piece](https://www.thoughtworks.com/insights/blog/rest-api-design-resource-modeling) on what you should be modeling in your REST APIs.
 
-## Home URLs
+## Implementation
+
+### Home URLs
 
 The home URL for any service will be in the form:
 
@@ -100,7 +102,7 @@ The home URL for any service will be in the form:
 where `{version}` is optional (typically of the form: `v3`)
 where `{resource}` is the pluralized name of the resource
 
-## Resource Base URLs
+### Resource Base URLs
 
 2 base URL's for each resource: one for collections, the other for elements
 
@@ -111,15 +113,15 @@ For example:
 
 > Resource names are always lowercased, and pluralized
 
-## Verb Schemes
+### Verb Schemes
 
 There are a number of popular schemes for REST APIs today.
 
 > They are designed around discoverability and usability.
 
-### GET-POST-DELETE
+#### GET-POST-DELETE
 
-Simple scheme. Only three HTTP verbs, to cover all possible actions.
+Simple scheme. Only three HTTP methods, to cover all possible actions.
 
 Use `GET` to fetch a resource, or fetch a collection of resources
 
@@ -129,9 +131,9 @@ Use `DELETE` to delete a resource or for any reductive action on the resource (i
 
 > For example, the Stripe API
 
-### GET-POST-PUT-DELETE
+#### GET-POST-PUT-DELETE
 
-Here, we add the `PUT` verb for changing to any existing resources.
+Here, we add the `PUT` method for changing to any existing resources.
 
 Use `GET` to fetch a resource, or fetch a collection of resources
 
@@ -141,9 +143,9 @@ Use `PUT` to change an existing resource, and to execute any action on the resou
 
 Use `DELETE` to delete a resource or for any reductive action on the resource (i.e. "cancel" a process)
 
-### GET-POST-PUT-PATCH-DELETE
+#### GET-POST-PUT-PATCH-DELETE
 
-Here, we add the `PUT` or the `PATCH` verb for changing any existing resources.
+Here, we add the `PUT` or the `PATCH` method for changing any existing resources.
 
 Use `GET` to fetch a resource, or fetch a collection of resources
 
@@ -155,11 +157,11 @@ Use `DELETE` to delete a resource, or for any reductive action on the resource (
 
 This is the current scheme in use for this API.
 
-## Verbs
+### Verbs
 
-* No verbs are permitted in the URL.
+* No methods are permitted in the URL.
 
-* We only support the following HTTP verbs: `GET`, `POST`, `PUT`, `PATCH` and `DELETE`
+* We only support the following HTTP methods: `GET`, `POST`, `PUT`, `PATCH` and `DELETE`
 
 For a collection resource:
 
@@ -189,13 +191,13 @@ For examples:
     DELETE /cars - N/A
     DELETE /cars/1234 - deletes car 1234
 
-## Nouns
+### Nouns
 
 We always pluralize the element base URL:
 
     /cars/{id}
 
-## Associations
+### Associations
 
 We chain associations (i.e. `ObjectA` has `ObjectB`)
 
@@ -219,7 +221,7 @@ Alternatively, depending on if `availabilities` are considered themselves a top-
 
   `POST /availabilities/{availabilityid}/timeslots/{timeslotid}`
 
-## Embedding Resources
+### Embedding Resources
 
 Generally, it is a violation of REST to _expand_ associations in representations by default, as this can lead to  `N+1` problems in distributed systems, and there have to be practical limits on how deep the resources should expand.
 
@@ -245,7 +247,7 @@ The only way to tackle all of these problems is for the client to have fine-gain
 
 To address some of the more common problems, the following general guidelines should be followed:
 
-### Single Resource Requests - Embed by default
+#### Single Resource Requests - Embed by default
 
 When requesting a single resource that has embedded relationships, then the embedded resources **can and should be fully expanded**, <u>unless</u> the client overrides with explicit expansions or no expansions.
 
@@ -271,7 +273,7 @@ Should return a car with its embedded resources for the owner and the feedback.
 
 > In general, this rule requires that the server must request all embedded child resources from other services, but that should be relatively limited unless the resource has any aggregations. In those cases, the server may choose whether to embed the aggregations or not, and the client can also influence that with the `?embed=off`.
 
-### Collection Resource Requests - Do Not Embed by default
+#### Collection Resource Requests - Do Not Embed by default
 
 When requesting a collection of resources (e.g. in a search or list API) then the embedded resources **should not be expanded by default**, <u>unless</u> the client overrides with explicit expansions, or all expansions.
 
@@ -303,7 +305,7 @@ Should return all cars without embedded resources for the owner.
 
 > In general, this rule eliminates the `N+1` problem on the server, but requires that the client must fetch all child resources from other services if needed. In that case, the client may choose to opt-in to the server doing the embedding with the `embed=resource.childresource` parameter, or the child requests the other resources itself.
 
-### Overriding Defaults
+#### Overriding Defaults
 
 When requesting a collection resource OR requesting a single resource, the following override options are supported to override the default policy:
 
@@ -311,7 +313,7 @@ When requesting a collection resource OR requesting a single resource, the follo
 - `embed=*` expand **all** embedded resources. (This is the default for all single resource requests.)
 - `embed=resource.childresource.grandchildresource,resource.childresource` expands only the specified resource properties. (e.g. only `resource.childresource.grandchildresource` and `resource.childresource`)
 
-### A Network Of Data
+#### A Network Of Data
 
 As a side note. In some REST domains, there is something that can be imagined as "a network of data", which is made up of all the cached resources previously requested by clients. That is, of both the services and the clients implement HTTP caching correctly.
 
@@ -321,7 +323,7 @@ The `N+1` problem mentioned in the Embedding section above, is alleviated somewh
 The network of data will not reside within the bounds of a single service, nor between resources that are served by the same service, since its unlikely that those in-process method calls are cached in the HTTP caches of the network of data.
 However, outside the services, and as services are separated (i.e. Move towards becoming micro-services), the network of data starts to have more of a performance benefit to the `N+1` problem.
 
-## Searches & Filtering
+### Searches & Filtering
 
 Use query string properties for limiting, sorting, and filtering on properties of resources.
 
@@ -337,7 +339,7 @@ In the API the naming convention for search type API's has been the following:
 
 The difference in the naming convention is purely for semantics. For search APIs, the route adds the `/search` part.
 
-### Search Metadata
+#### Search Metadata
 
 In all cases (Search-type API's, and List-type API's), the request will support ([IHasSearchOptions](../src/Application.Interfaces/IHasSearchOptions.cs)) filter, sorting, and pagination parameters, the results will contain Metadata about the actual results being returned. ([SearchMetadata](../src/Application.Interfaces/SearchMetadata.cs))
 
@@ -368,7 +370,7 @@ and the following in its response:
 }
 ```
 
-### Searching
+#### Searching
 
 Search APIs use the `/search ` action.
 
@@ -386,7 +388,7 @@ For example, for images, of a specific (system-wide, and well-known) size:
 
   `GET /images/thumb`
 
-### Filters
+#### Filters
 
 To limit the actual data sent over the wire.
 
@@ -400,7 +402,7 @@ For example, to tell the API not to send this data over the wire:
 ?filter=field1;field3
 ```
 
-### Pagination
+#### Pagination
 
 For limiting search results and for paging results.
 
@@ -415,7 +417,7 @@ For example, to fetch the 3rd page of results (a page containing 50 results):
 ?offset=2&limit=50
 ```
 
-### Sorting
+#### Sorting
 
 For sorting results (usually prior to limiting).
 
@@ -432,7 +434,7 @@ For example, to sort and then order the results:
 
 > In practice, both can be accomplished in the same syntax: i.e. `&sort=-field1` to sort descending on field name 'Field1'
 
-### Distinct
+#### Distinct
 
 For limiting the results (usually prior to limiting and sorting), on a given field
 
@@ -444,7 +446,7 @@ For example, to ensure no duplicate names of cars:
 ?distinct=name
 ```
 
-## Versioning
+### Versioning
 
 * Avoid versioning if at all possible.
 
@@ -456,7 +458,7 @@ For example,
 
 > Can use the date of release as the version number, or the version number itself.
 
-## Response Formats
+### Response Formats
 
 The service will return JSON responses by default.
 
@@ -470,9 +472,11 @@ We support the following means to request different content types:
 2. By appending the filetype (i.e. `.json`) suffix to the URL (i.e. `/cars.json`
 3. Appending the format to the query string: `?format=json` (i.e. `/cars?format=json`)
 
-## Response Bodies
+### Response Bodies
 
 All response bodies include bodies in an "enveloped" response.
+
+#### Successes
 
 For example, to fetch a list of `cars` (in JSON):
 
@@ -508,7 +512,7 @@ GET /car/car2
 
 The envelope may also contain other nodes, as well.
 
-For example, to fetch a list of `cars`, the envelop will also contain an extra node for the search `metadata`:
+For example, to fetch a list of `cars`, the envelope will also contain an extra node for the search `metadata`:
 
 ```json
 GET /cars
@@ -538,46 +542,60 @@ GET /cars
 }
 ```
 
-Error responses (all `4XX`) responses, will include at least one error in them:
+#### Errors
+
+Error responses (all `4XX` or `5XX`) responses, will include an [RFC7808](https://datatracker.ietf.org/doc/html/rfc7807) error in them.
+
+For example, a `500 - Internal Server Error` would look like this:
 
 ```json
 POST /users 
 {
     "color":"mauve"
 }
+500 - Internal Server Error
+{
+    "type": "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+    "title": "An unexpected error occurred",
+    "status": 500,
+    "detail": "amessage",
+    "instance": "http://localhost/testingonly/throws",
+    "exception": "System.InvalidOperationException: amessage"
+}
+```
+
+For example, a `400 - Bad Request` (from a failed validation) might look like this, with additional information:
+
+```json
+POST /cars/car_12345678901 
+{
+    "year": 2023
+}
 400 - BadRequest
 {
-    "errorCode": "GreaterThan",
-    "message": "'Age' must be greater than '0'.",
+    "type": "NotEmptyValidator",
+    "title": "Validation Error",
+    "status": 400,
+    "detail": "'Color' must not be empty.",
+    "instance": "http://localhost/cars/car_12345678901",
     "errors": [
         {
-            "errorCode": "GreaterThan",
-            "fieldName": "Age",
-            "message": "'Age' must be greater than '0'."
+            "rule":"NotEmptyValidator",
+            "reason": "'Make' must not be empty.",
+            "value": "null"
         },
         {
-            "errorCode": "NotEmpty",
-            "fieldName": "Company",
-            "message": "'Company' should not be empty."
+            "rule":"NotEmptyValidator",
+            "reason": "'Model' must not be empty.",
+            "value": "null"
         }
     ]
 }
 ```
 
-Furthermore, callers should expect appropriate response bodies for the following verbs:
+### Response Codes
 
-* `GET /cars/car1` should return a representation of the  `car` in a `200 - OK` response
-* `GET /cars` should return a representation of all the `cars` (and `metadata`)  a `200 - OK` response
-* `PUT /cars/car1` should return a modified representation of the `car` in a `202 - Accepted` response
-* `PATCH /cars/car1` should return a modified representation of the `car` in a `202 - Accepted` response
-* `POST /cars` should return the created representation of the `car` in a `201 - Created` response
-* `DELETE /cars` should return no content, in a `204 - NoContent` response
-
-> In distributed systems, the resource representation in the response may not include fully consistent values, due to downstream asynchronous processes. Consistency may be eventual, and up to date resources may need to be fetched later.
-
-## Response Codes
-
-### Successes
+#### Successes
 
 We report successful requests as HTTP status codes `2XX`.
 
@@ -592,33 +610,44 @@ These are the common HTTP status codes for success:
 
 > HTTP Status codes explained here: [HTTP Status Codes](http://en.wikipedia.org/wiki/Http_error_codes)
 
-### Errors
+For example, callers should expect appropriate response bodies for the following endpoints:
+
+* `GET /cars/car1` should return a representation of the  `car` in a `200 - OK` response
+* `GET /cars` should return a representation of all the `cars` (and `metadata`)  in a `200 - OK` response
+* `PUT /cars/car1` should return a modified representation of the `car` in a `202 - Accepted` response
+* `PATCH /cars/car1` should return a modified representation of the `car` in a `202 - Accepted` response
+* `POST /cars` should return the created representation of the `car` in a `201 - Created` response
+* `DELETE /cars` should return no content in a `204 - NoContent` response
+
+> Note: In distributed systems, the resource representation in the response may not include fully consistent values due to downstream asynchronous processes. Consistency may be eventual, and up-to-date resources may need to be fetched later.
+
+#### Errors
 
 We report errors as HTTP status codes `4XX` and `5XX`).
 
 These are the common HTTP status codes for errors:
 
 * `400 - BadRequest` (the request is incorrectly formatted)
-    * Validation failed
-    * A required input is missing or invalid at the time
-    * The request is not allowed at this time because the resource/context is not in a required state - (i.e. business rule violation).
+  * Validation failed
+  * A required input is missing or invalid at the time
+  * The request is not allowed at this time because the resource/context is not in a required state - (i.e. business rule violation).
 * `401 - NotAuthorized` (the user has not authenticated when authentication is required)
-    * No access_token provided for a secure call
-    * The access_token expired or is invalid
+  * No access_token provided for a secure call
+  * The access_token expired or is invalid
 * `402 - PaymentRequired` (the user is using a feature that has not been paid for)
-    * The caller is using a feature associated to a billing plan that the user does not have
+  * The caller is using a feature associated to a subscription plan that the user does not have
 * `403 - Forbidden` (the user may be authenticated, but they are not authorized to this specific resource at this time)
-    * The caller is not in the required role
-    * [May decide to throw 404 instead to obscure reason from hacker]
+  * The caller is not in the required role
+  * [May decide to throw 404 instead to obscure reason from hacker]
 * `404 - NotFound` (a resource does not exist)
-    * The resource does not exist
-    * [May decide to throw 404 instead of a 403 if the caller is not allowed access to this resource to obscure the resource rather than admit it exists but the authenticated user does not have access to it]
+  * The resource does not exist
+  * [May decide to throw 404 instead of a 403 if the caller is not allowed access to this resource to obscure the resource rather than admit it exists but the authenticated user does not have access to it]
 * `405 - MethodNotAllowed` (Verb/API cannot be called at this time)
-    * i.e. It is invalid to call it for this resource at this time.
-    * i.e. It no longer exists for this resource at this time, or it never existed for this resource (not implemented yet).
+  * i.e. It is invalid to call it for this resource at this time.
+  * i.e. It no longer exists for this resource at this time, or it never existed for this resource (not implemented yet).
 * `409 - Conflict` (conflict with the current state of the target resource)
-    * Resource already exists
+  * Resource already exists
 * `500 - InternalServerError` (something bad happened in our code that we did not expect, and did not handle in the code)
-    * Unhandled/Unexpected exception (not covered above)
+  * Unhandled/Unexpected exception (not covered above)
 
 > HTTP Status codes are explained in detail here: [HTTP Status Codes](http://en.wikipedia.org/wiki/Http_error_codes)

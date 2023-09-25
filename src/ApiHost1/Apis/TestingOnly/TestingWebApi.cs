@@ -26,5 +26,27 @@ public class TestingWebApi : IWebApiService
         await Task.CompletedTask;
         throw new InvalidOperationException("amessage");
     }
+
+    [WebApiRoute("/testingonly/roundtrip", WebApiOperation.Post, true)]
+    public async Task<IResult> Post(PostRoundTripDatesTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return Results.Ok(new DataTypesTestingOnlyResponse
+        {
+            Custom = new CustomDto
+            {
+                Time = request.Custom?.Time,
+                Double = request.Custom?.Double,
+                Integer = request.Custom?.Integer,
+                String = request.Custom?.String,
+                Enum = request.Custom?.Enum
+            },
+            Double = request.Double,
+            Integer = request.Integer,
+            String = request.String,
+            Time = request.Time,
+            Enum = request.Enum
+        });
+    }
 }
 #endif

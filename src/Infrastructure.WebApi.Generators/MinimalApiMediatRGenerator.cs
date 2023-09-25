@@ -108,8 +108,19 @@ namespace {assemblyNamespace}
 
             endpointRegistrations.AppendLine(
                 $"            {groupName}.{registerMethodName}(\"{registration.RoutePath}\",");
-            endpointRegistrations.AppendLine(
-                $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDtoType.FullName} request) =>");
+            if (registration.OperationType == WebApiOperation.Get ||
+                registration.OperationType == WebApiOperation.Search ||
+                registration.OperationType == WebApiOperation.Delete)
+            {
+                endpointRegistrations.AppendLine(
+                    $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDtoType.FullName} request) =>");
+            }
+            else
+            {
+                endpointRegistrations.AppendLine(
+                    $"                async (global::MediatR.IMediator mediator, global::{registration.RequestDtoType.FullName} request) =>");
+            }
+
             endpointRegistrations.AppendLine(
                 "                     await mediator.Send(request, global::System.Threading.CancellationToken.None));");
             if (registration.IsTestingOnly)

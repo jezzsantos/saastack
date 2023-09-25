@@ -1,7 +1,9 @@
 #if TESTINGONLY
 using System.Net;
 using System.Net.Http.Json;
+using System.Text;
 using ApiHost1;
+using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
 using IntegrationTesting.WebApi.Common;
@@ -68,8 +70,8 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
                 "\"detail\":\"'Field1' must not be empty.\"," +
                 "\"instance\":\"http://localhost/testingonly/1234/validated\"," +
                 "\"errors\":[" +
-                "{\"rule\":\"NotEmptyValidator\",\"reason\":\"'Field1' must not be empty.\",\"value\":null}," +
-                "{\"rule\":\"NotEmptyValidator\",\"reason\":\"'Field2' must not be empty.\",\"value\":null}]}");
+                "{\"rule\":\"NotEmptyValidator\",\"reason\":\"'Field1' must not be empty.\"}," +
+                "{\"rule\":\"NotEmptyValidator\",\"reason\":\"'Field2' must not be empty.\"}]}");
     }
 
     [Fact]
@@ -120,9 +122,9 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
         result.StatusCode.Should().Be(HttpStatusCode.OK);
         var content = await result.Content.ReadAsStringAsync();
 
-        content.Should().Be($"<?xml version=\"1.0\" encoding=\"utf-8\"?>{Environment.NewLine}" +
-                            $"<StringMessageTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">{Environment.NewLine}" +
-                            $"  <Message>amessage1</Message>{Environment.NewLine}" +
+        content.Should().Be("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                            "<StringMessageTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
+                            "<Message>amessage1</Message>" +
                             "</StringMessageTestingOnlyResponse>");
     }
 
@@ -156,12 +158,11 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
         result.StatusCode.Should().Be(HttpStatusCode.OK);
         var content = await result.Content.ReadAsStringAsync();
 
-        content.Should().Be($"<?xml version=\"1.0\" encoding=\"utf-8\"?>{Environment.NewLine}" +
-                            $"<StringMessageTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">{Environment.NewLine}" +
-                            $"  <Message>amessage1</Message>{Environment.NewLine}" +
+        content.Should().Be("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                            "<StringMessageTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
+                            "<Message>amessage1</Message>" +
                             "</StringMessageTestingOnlyResponse>");
     }
-
 
     [Fact]
     public async Task WhenGetWithNoAcceptAndNoFormat_ThenReturnsJsonResponse()
@@ -172,6 +173,176 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
         var content = await result.Content.ReadAsStringAsync();
 
         content.Should().Be("{\"message\":\"amessage1\"}");
+    }
+
+    [Fact]
+    public async Task WhenPostWithDifferentDataTypesForJson_ThenReturnsValues()
+    {
+        var time1 = DateTime.UtcNow;
+        var time2 = time1.AddHours(1);
+        var request = new
+        {
+            Time = time1.ToIso8601(),
+            Integer = 9,
+            Double = 99.9,
+            String = "avalue1",
+            Enum = $"{CustomEnum.OneHundredAndOne}",
+            Custom = new
+            {
+                Time = time2.ToIso8601(),
+                Integer = 91,
+                Double = 91.1,
+                String = "avalue2",
+                Enum = $"{CustomEnum.TwentyOne}"
+            }
+        }.ToJson()!;
+
+        var result = await Api.PostAsync("/testingonly/roundtrip",
+            new StringContent(request, Encoding.UTF8, HttpContentTypes.Json));
+
+        var response = await result.Content.ReadAsStringAsync();
+
+        response.Should().Be("{" +
+                             "\"custom\":" +
+                             "{" +
+                             "\"double\":91.1," +
+                             "\"enum\":\"twentyOne\"," +
+                             "\"integer\":91," +
+                             "\"string\":\"avalue2\"," +
+                             $"\"time\":\"{time2.ToIso8601()}\"" +
+                             "}," +
+                             "\"double\":99.9," +
+                             "\"enum\":\"oneHundredAndOne\"," +
+                             "\"integer\":9," +
+                             "\"string\":\"avalue1\"," +
+                             $"\"time\":\"{time1.ToIso8601()}\"" +
+                             "}");
+    }
+
+    [Fact]
+    public async Task WhenPostWithDifferentDataTypesForXml_ThenReturnsValues()
+    {
+        var time1 = DateTime.UtcNow;
+        var time2 = time1.AddHours(1);
+        var request = new
+        {
+            Time = time1.ToIso8601(),
+            Integer = 9,
+            Double = 99.9,
+            String = "avalue1",
+            Enum = $"{CustomEnum.OneHundredAndOne}",
+            Custom = new
+            {
+                Time = time2.ToIso8601(),
+                Integer = 91,
+                Double = 91.1,
+                String = "avalue2",
+                Enum = $"{CustomEnum.TwentyOne}"
+            }
+        }.ToJson()!;
+
+        var result = await Api.PostAsync("/testingonly/roundtrip?format=xml",
+            new StringContent(request, Encoding.UTF8, HttpContentTypes.Json));
+
+        var response = await result.Content.ReadAsStringAsync();
+
+        response.Should()
+            .Be("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                "<DataTypesTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
+                "<Custom>" +
+                "<Double>91.1</Double>" +
+                "<Enum>TwentyOne</Enum>" +
+                "<Integer>91</Integer>" +
+                "<String>avalue2</String>" +
+                $"<Time>{time2.ToIso8601()}</Time>" +
+                "</Custom><Double>99.9</Double>" +
+                "<Enum>OneHundredAndOne</Enum>" +
+                "<Integer>9</Integer>" +
+                "<String>avalue1</String>" +
+                $"<Time>{time1.ToIso8601()}</Time>" +
+                "</DataTypesTestingOnlyResponse>");
+    }
+
+    [Fact]
+    public async Task WhenPostWithIso8601DateTime_ThenReturnsUnixTimestamp()
+    {
+        var time1 = DateTime.UtcNow;
+        var time2 = time1.AddHours(1);
+        var request = new
+        {
+            Time = time1.ToIso8601(),
+            Custom = new
+            {
+                Time = time2.ToIso8601()
+            }
+        }.ToJson()!;
+
+        var result = await Api.PostAsync("/testingonly/roundtrip",
+            new StringContent(request, Encoding.UTF8, HttpContentTypes.Json));
+
+        var response = await result.Content.ReadAsStringAsync();
+
+        response.Should().Be("{" +
+                             "\"custom\":" +
+                             "{" +
+                             $"\"time\":\"{time2.ToIso8601()}\"" +
+                             "}," +
+                             $"\"time\":\"{time1.ToIso8601()}\"" +
+                             "}");
+    }
+
+    [Fact]
+    public async Task WhenPostWithUnixSecondsDateTime_ThenReturnsUnixTimestamp()
+    {
+        var time1 = DateTime.UtcNow.ToNearestSecond();
+        var time2 = time1.AddHours(1);
+        var request = new
+        {
+            Time = time1.ToUnixSeconds(),
+            Custom = new
+            {
+                Time = time2.ToUnixSeconds()
+            }
+        }.ToJson()!;
+
+        var result = await Api.PostAsync("/testingonly/roundtrip",
+            new StringContent(request, Encoding.UTF8, HttpContentTypes.Json));
+
+        var response = await result.Content.ReadAsStringAsync();
+
+        response.Should().Be("{" +
+                             "\"custom\":" +
+                             "{" +
+                             $"\"time\":\"{time2.ToIso8601()}\"" +
+                             "}," +
+                             $"\"time\":\"{time1.ToIso8601()}\"" +
+                             "}");
+    }
+
+    [Fact]
+    public async Task WhenPostWithLowercaseEnum_ThenReturnsCamelcased()
+    {
+        var request = new
+        {
+            Enum = $"{CustomEnum.OneHundredAndOne.ToString().ToLowerInvariant()}",
+            Custom = new
+            {
+                Enum = $"{CustomEnum.TwentyOne.ToString().ToLowerInvariant()}"
+            }
+        }.ToJson()!;
+
+        var result = await Api.PostAsync("/testingonly/roundtrip",
+            new StringContent(request, Encoding.UTF8, HttpContentTypes.Json));
+
+        var response = await result.Content.ReadAsStringAsync();
+
+        response.Should().Be("{" +
+                             "\"custom\":" +
+                             "{" +
+                             "\"enum\":\"twentyOne\"" +
+                             "}," +
+                             "\"enum\":\"oneHundredAndOne\"" +
+                             "}");
     }
 }
 #endif

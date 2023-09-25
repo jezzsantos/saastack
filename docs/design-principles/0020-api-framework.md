@@ -1,6 +1,6 @@
 # Web Framework
 
-## Design Drivers
+## Design Principles
 
 1. We want to leverage standard-supported Microsoft ASP.NET web infrastructure (that is well known across the developer community), rather than learning another web framework (like ServiceStack.net - as brilliant as it is).
    - We are choosing ASP.NET Minimal API's over ASP.NET Controllers.
@@ -113,12 +113,12 @@ public Assembly ApiAssembly => typeof(Apis.Cars.CarsApi).Assembly;
     {
         { typeof(Car), "car" }
     };
-
+    
     public Action<WebApplication> MinimalApiRegistrationFunction
     {
         get { return app => app.RegisterRoutes(); }
     }
-
+    
     public Action<ConfigurationManager, IServiceCollection> RegisterServicesFunction
     {
         get { return (_, services) => { services.AddScoped<ICarsApplication, CarsApplication.CarsApplication>(); }; }
@@ -149,7 +149,7 @@ public static class HostedModules
         return modules;
     }
 }
-```
+  ```
 
 > Note: this method `HostedModules.Get()` will be called in the startup of the Host project.
 
@@ -172,11 +172,11 @@ So, we have designed a coding pattern and grouping mechanism for related endpoin
    - For example, in the project and folder: `CarsApi/Apis/Cars/CarsApi.cs`
 
    - ```c#
-   public class CarsApi : IWebApiService
-   {
-   private readonly ICarsApplication _carsApplication;
-   private readonly ICallerContext _context;
-
+     public class CarsApi : IWebApiService
+     {
+     private readonly ICarsApplication _carsApplication;
+     private readonly ICallerContext _context;
+    
           public CarsApi(ICallerContext context, ICarsApplication carsApplication)
           {
               _context = context;
@@ -192,7 +192,7 @@ So, we have designed a coding pattern and grouping mechanism for related endpoin
          }
          
          ...other methods
-   }
+     }
      ```
 
 3. You will define the request and response types in separate files in the project: `Infrastructure.WebApi.Interfaces` in a subfolder for the subdomain. For example,
@@ -369,9 +369,9 @@ Your validator will be wired up automatically and executed automatically at run 
 
 All API endpoints (service operations) will be declared as `async`, in the API layer.
 
-While this may not be necessary, this is to support async operations in lower layers of the vertical slice/subdomain.
+While this may not be always necessary, this pattern is estabished in this layer to correctly support async operations in lower layers of the vertical slice/subdomain.
 
-> Note: To support `async` properly anywhere within a single HTTP request, we need to `async` from the entry point down all the way to the response.
+> Note: To support `async` properly anywhere within a single HTTP request, we need to `async` from the entry point [all the way down](https://learn.microsoft.com/en-us/archive/msdn-magazine/2013/march/async-await-best-practices-in-asynchronous-programming) (the stack) to the response.
 
 ### Authentication and Authorization
 
@@ -387,11 +387,52 @@ TBD
 
 ### Wire Formats
 
-TBD
+We support at least two wire formats:
 
-- what are the options, how to ask for others, what is the default?
-- Dates and other data type formats for JSON, and how to change?
-- Casing for JSON? and how to change
+* JSON
+* XML
+
+#### JSON
+
+JSON requests:
+
+* Fields in the body will be accepted in either camel-case or pascal-case.
+* Dates and times will be accepted as either ISO8601 (strings) or as UNIX timestamps (numbers, in seconds)
+* Enumerations will be only accepted as string values  (case-insensitive)
+
+JSON responses:
+
+- Fields in the response body will be camel-cased
+- `null` values will not be written to the JSON response
+- JSON will not include line breaks.
+- `DateTime` values will be serialized in ISO8601 format
+- `Enums` will output as string values (camel-case)
+
+For example, a typical response might look like this:
+
+```json
+{
+   "car": {
+      "id": "car2",
+      "bodyColor": "lightBlue",
+      "createdAtUtc": "2023-09-24T23:43:21.6178588Z"
+   }
+}
+```
+
+#### XML
+
+XML requests:
+
+* XML is not accepted in requests
+
+XML responses
+
+- Fields in the response body will be pascal-cased
+- `null` values will not be written to the JSON response
+- XML will not include line breaks.
+- `DateTime` values will be serialized in ISO8601 format
+- `Enums` will output as string values (pascal-case)
 
 ### Request Correlation
 
@@ -405,6 +446,6 @@ TBD
 
 TBD
 
-# Credits
+### Credits
 
-Many of the implementation patterns were inspired by content created by [Nick Chapsas](https://www.youtube.com/@nickchapsas)
+Some of the implementation patterns (that used MediatR) were inspired by content and recomendations created by [Nick Chapsas](https://www.youtube.com/@nickchapsas)

@@ -68,8 +68,8 @@ For security, and to ensure the Azure Functions can run when running locally, yo
 
 1. Open a Terminal.
 2. Navigate up to the `tools` directory
-    1. `cd ..`
-    2. `cd /tools`
+   1. `cd ..`
+   2. `cd /tools`
 
 3. Run: `npm install`
 
@@ -83,7 +83,7 @@ For security, and to ensure the Azure Functions can run when running locally, yo
 2. [Install Python package manager](https://pip.pypa.io/en/stable/installation/)
 3. [Install docker](https://docs.docker.com/get-docker/)
 4. Install localstack:
-    - `python -m pip install localstack` ([LocalStack CLI setup instructions](https://docs.localstack.cloud/getting-started/installation/#localstack-cli))
+   - `python -m pip install localstack` ([LocalStack CLI setup instructions](https://docs.localstack.cloud/getting-started/installation/#localstack-cli))
 5. Test it's working by running `localstack start` in your terminal
 
 > Docker will need to be running in the background for LocalStack to start up
@@ -237,8 +237,8 @@ To kill these processes:
 
 * On Windows, `taskkill /f /im dotnet.exe`
 * On MacOS:
-    * Find the processes: `lsof -Pni | grep "5001\|5101\|5656"`
-    * Kill the processes: `kill -9 <processid>` where `<processid>` is the ID of the process in the list
+   * Find the processes: `lsof -Pni | grep "5001\|5101\|5656"`
+   * Kill the processes: `kill -9 <processid>` where `<processid>` is the ID of the process in the list
 
 Alternatively, in MacOS:
 

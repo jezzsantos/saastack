@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Application.Interfaces;
 using Common.Recording;
 using Domain.Interfaces.Entities;
@@ -21,7 +22,7 @@ public static class HostExtensions
         SetupAuthenticationAuthorization();
         SetupMultiTenancy();
         SetupApplicationServices();
-        SetupJsonOnTheWire();
+        SetupWireFormats();
         SetupApiRequests();
 
         var app = builder.Build();
@@ -72,14 +73,20 @@ public static class HostExtensions
             modules.RegisterServices(builder.Configuration, builder.Services);
         }
 
-        void SetupJsonOnTheWire()
+        void SetupWireFormats()
         {
             builder.Services.ConfigureHttpJsonOptions(options =>
             {
-                options.SerializerOptions.PropertyNameCaseInsensitive = false;
+                options.SerializerOptions.PropertyNameCaseInsensitive = true;
                 options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.SerializerOptions.WriteIndented = false;
+                options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
+                options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase,
+                    false));
+                options.SerializerOptions.Converters.Add(new JsonDateTimeConverter(DateFormat.Iso8601));
             });
+
+            builder.Services.ConfigureHttpXmlOptions(options => { options.SerializerOptions.WriteIndented = false; });
         }
     }
 }

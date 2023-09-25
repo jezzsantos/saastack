@@ -100,7 +100,7 @@ The starter template also takes care of these specific kinds of things:
   * It defines a ruleset about how JSON is represented on the wire and how requests are deserialized (to cope with different client styles)
   * It localizes developer errors
   * It handles and maps common exceptions to standard HTTP status codes
-  * It returns standard HTTP statuses for successful requests based on the HTTP verb (e.g. 200, 201, 202, 204)
+  * It returns standard HTTP statuses for successful requests based on the HTTP method (e.g. GET = 200, POST = 201, PUT = 202, DELETE = 204)
   * Provides a Swagger UI.
 * Infrastructure
   * All infrastructure components are independently testable adapters

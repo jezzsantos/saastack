@@ -9,7 +9,7 @@
 
 When it comes to writing REST web APIs in the template, we want to establish scalable patterns that focus on the API's requests and responses and the cross-cutting concerns involved:
 
-* Routes and verbs
+* Routes and Methods (Verbs)
 * Authenticated or not
 * Authorized or not, by roles with (RBAC)
 * Authorized or not, by feature set
