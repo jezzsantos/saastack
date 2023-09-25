@@ -29,6 +29,11 @@ The codebase demonstrates common architectural styles, you are going to need in 
 
 This starter template gives you most of the things all SaaS products will need from day one whilst maximizing your ability to evolve the specific behaviors and infrastructure components of your specific product - for the long run (i.e. over the course of the next 1-5 years).  
 
+## What is in the box?
+![Azure](docs/images/Physical-Architecture-Azure.png)
+or if you prefer AWS:
+![AWS](docs/images/Physical-Architecture-AWS.png)
+
 ## Who is it for?
 
 This starter template is NOT for everyone, nor for EVERY software project, nor for EVERY skill level.
