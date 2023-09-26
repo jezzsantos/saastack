@@ -2,6 +2,11 @@ name: Build and Test
 
 on: [ push, pull_request ]
 
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
 env:
   IS_CI_BUILD: 'true'
   SOLUTION_PATH: 'src/SaaStack.sln'
@@ -25,7 +30,28 @@ jobs:
       - name: Build for Testing
         run: dotnet build --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}"
       - name: Unit Test
-        run: dotnet test --no-build --verbosity normal --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} --filter:Category="Unit" --collect:"XPlat Code Coverage" --results-directory:"src/TestResults/csharp" --logger:"trx" --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose" --test-adapter-path:. "${{env.SOLUTION_PATH}}"
+        continue-on-error: false
+        run: >
+          dotnet test --no-build --verbosity normal
+          --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}}
+          --filter:Category="Unit" --collect:"XPlat Code Coverage" --results-directory:"src/TestResults/csharp"
+          --logger:"trx"
+          --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
+          --test-adapter-path:. "${{env.SOLUTION_PATH}}"
       - name: Integration Test
         continue-on-error: true
-        run: dotnet test --no-build --verbosity normal --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} --filter:Category="Integration.Web" --collect:"XPlat Code Coverage" --results-directory:"src/TestResults/csharp" --logger:"trx" --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose" --test-adapter-path:. "${{env.SOLUTION_PATH}}"
+        run: >
+          dotnet test --no-build --verbosity normal
+          --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}}
+          --filter:Category="Integration.Web" --collect:"XPlat Code Coverage" --results-directory:"src/TestResults/csharp"
+          --logger:"trx"
+          --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
+          --test-adapter-path:. "${{env.SOLUTION_PATH}}"
+      - name: Testing Report
+        uses: dorny/test-reporter@v1.6.0
+        if: success() || failure()
+        with:
+          name: All Tests
+          path: 'src/TestResults/csharp/**/*.trx'
+          reporter: dotnet-trx
+          fail-on-error: 'false'

@@ -22,7 +22,10 @@ public class DateTimeExtensionsSpec
 
         var result = time.ToIso8601();
 
-        result.Should().Be("2023-09-23T23:00:00.0000000Z");
+        var offset = TimeZoneInfo.Local.GetUtcOffset(time);
+        var offsetTime = time.Subtract(offset);
+
+        result.Should().Be($"2023-09-{offsetTime.Day:D2}T{offsetTime.Hour:D2}:{offsetTime.Minute:D2}:00.0000000Z");
     }
 
     [Fact]
@@ -50,9 +53,9 @@ public class DateTimeExtensionsSpec
 
         var result = time.ToUnixSeconds();
 
-        //HACK: result varies according to the local timezone (of the code running) including daylight savings
-        var localTzOffsetMilliseconds = (long)TimeZoneInfo.Local.GetUtcOffset(time).Seconds;
-        var expected = 1695510000L + localTzOffsetMilliseconds;
+        var offset = TimeZoneInfo.Local.GetUtcOffset(time);
+        var offsetTime = time.Subtract(offset);
+        var expected = (long)offsetTime.Subtract(DateTime.UnixEpoch).TotalSeconds;
 
         result.Should().Be(expected);
     }
@@ -82,9 +85,9 @@ public class DateTimeExtensionsSpec
 
         var result = time.ToUnixMilliSeconds();
 
-        //HACK: result varies according to the local timezone (of the code running) including daylight savings
-        var localTzOffsetMilliseconds = (long)TimeZoneInfo.Local.GetUtcOffset(time).Milliseconds;
-        var expected = 1695510000000L + localTzOffsetMilliseconds;
+        var offset = TimeZoneInfo.Local.GetUtcOffset(time);
+        var offsetTime = time.Subtract(offset);
+        var expected = (long)offsetTime.Subtract(DateTime.UnixEpoch).TotalMilliseconds;
 
         result.Should().Be(expected);
     }
