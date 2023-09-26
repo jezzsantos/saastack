@@ -60,6 +60,15 @@ namespace Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The value is null.
+        /// </summary>
+        internal static string Optional_NullValue {
+            get {
+                return ResourceManager.GetString("Optional_NullValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Not a member access.
         /// </summary>
         internal static string Reflector_ErrorNotMemberAccess {
@@ -74,6 +83,24 @@ namespace Common {
         internal static string Reflector_ErrorNotProperty {
             get {
                 return ResourceManager.GetString("Reflector_ErrorNotProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The result is not in a faulted state.
+        /// </summary>
+        internal static string Result_FetchErrorWhenNotFaulted {
+            get {
+                return ResourceManager.GetString("Result_FetchErrorWhenNotFaulted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The result is in a faulted state, with error: {0}.
+        /// </summary>
+        internal static string Result_FetchValueWhenFaulted {
+            get {
+                return ResourceManager.GetString("Result_FetchValueWhenFaulted", resourceCulture);
             }
         }
     }

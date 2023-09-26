@@ -14,7 +14,10 @@ public class MinimalApiMediatRGenerator : ISourceGenerator
     private const string TestingOnlyDirective = "TESTINGONLY";
 
     private static readonly string[] RequiredUsingNamespaces =
-        { "System", "Microsoft.AspNetCore.Builder", "Microsoft.AspNetCore.Http" };
+    {
+        "System", "Microsoft.AspNetCore.Builder", "Microsoft.AspNetCore.Http",
+        "Infrastructure.WebApi.Common"
+    };
 
     public void Initialize(GeneratorInitializationContext context)
     {
@@ -146,7 +149,8 @@ namespace {assemblyNamespace}
                 registration.Class.Constructors.ToList());
 
             handlerClasses.AppendLine(
-                $"    public class {registration.RequestDtoType.Name}Handler : global::MediatR.IRequestHandler<global::{registration.RequestDtoType.FullName}, global::Microsoft.AspNetCore.Http.IResult>");
+                $"    public class {registration.RequestDtoType.Name}Handler : global::MediatR.IRequestHandler<global::{registration.RequestDtoType.FullName}," +
+                $" global::Microsoft.AspNetCore.Http.IResult>");
             handlerClasses.AppendLine(
                 "    {");
             if (constructorAndFields.HasValue())
@@ -160,13 +164,16 @@ namespace {assemblyNamespace}
             }
 
             handlerClasses.AppendLine(
-                $"        public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::{registration.RequestDtoType.FullName} request, global::System.Threading.CancellationToken cancellationToken)");
+                $"        public async Task<global::Microsoft.AspNetCore.Http.IResult>" +
+                $" Handle(global::{registration.RequestDtoType.FullName} request, global::System.Threading.CancellationToken cancellationToken)");
             handlerClasses.AppendLine("        {");
             var callingParameters = BuildInjectedParameters(registration.Class.Constructors.ToList());
             handlerClasses.AppendLine(
                 $"            var api = new global::{registration.Class.TypeName.FullName}({callingParameters});");
             handlerClasses.AppendLine(
-                $"            return await api.{registration.MethodName}(request, cancellationToken);");
+                $"            var result = await api.{registration.MethodName}(request, cancellationToken);");
+            handlerClasses.AppendLine(
+                "            return result.HandleApiResult();");
             handlerClasses.AppendLine("        }");
             if (registration.IsTestingOnly)
             {

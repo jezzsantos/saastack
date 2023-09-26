@@ -1,8 +1,9 @@
 using Application.Interfaces;
+using Application.Interfaces.Resources;
 using CarsApplication;
+using Infrastructure.WebApi.Common;
 using Infrastructure.WebApi.Interfaces;
 using Infrastructure.WebApi.Interfaces.Operations.Cars;
-using Microsoft.AspNetCore.Http;
 
 namespace CarsApi.Apis.Cars;
 
@@ -18,9 +19,10 @@ public class CarsApi : IWebApiService
     }
 
     [WebApiRoute("/cars/{id}", WebApiOperation.Get)]
-    public async Task<IResult> Get(GetCarRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
-        return Results.Ok(new GetCarResponse { Car = car });
+
+        return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }
 }

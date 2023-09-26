@@ -37,36 +37,44 @@ public class CarsApi : IWebApiService
 
     [AllowAnonymous]
     [WebApiRoute("/cars", WebApiOperation.Search)]
-    public async Task<IResult> Get(SearchCarsRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResult<Car, SearchAllCarsResponse>> Get(SearchCarsRequest request, CancellationToken cancellationToken)
     {
         var cars = await _carsApplication.SearchAllCarsAsync(_context, request.ToSearchOptions(),
             request.ToGetOptions(), cancellationToken);
-        return Results.Ok(new SearchCarsResponse { Cars = cars });
+        return () => cars.HandleApplicationResult(c => new SearchAllCarsResponse { Cars = c });
     }
 
     [AuthorizeForAnyRole(OrganisationRoles.Reserver, OrganisationRoles.Manager)]
     [WebApiRoute("/cars/{id}", WebApiOperation.Get)]
-    public async Task<IResult> Get(GetCarRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
-        return Results.Ok(new GetCarResponse { Car = car });
+        return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }
 
     [AuthorizeForAnyRole(OrganisationRoles.Manager)]
     [WebApiRoute("/cars", WebApiOperation.Post)]
-    public async Task<IResult> Post(RegisterCarRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResult<Car, RegisterCarResponse>> Post(RegisterCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.RegisterCarAsync(_context, request.Make, request.Model,
             request.Year, cancellationToken);
-        return Results.Ok(new RegisterCarResponse { Car = car });
+        return () => car.HandleApplicationResult(c => new RegisterCarResponse { Car = c });
     }
     
     [AuthorizeForAnyRole(OrganisationRoles.Manager)]
     [WebApiRoute("/cars/{i}/offline", WebApiOperation.Post)]
-    public async Task<IResult> PutPatch(TakeOfflineCarRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResult<Car, TakeOfflineCarResponse>> PutPatch(TakeOfflineCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.TakeOfflineCarAsync(_context, request.Id, request.Reason, request.StartAtUtc, request.EndAtUtc, cancellationToken);
-        return Results.Ok(new TakeOfflineCarResponse { Car = car });
+        return () => car.HandleApplicationResult(c => new TakeOfflineCarResponse { Car = c });
+    }
+        
+    [AuthorizeForAnyRole(OrganisationRoles.Manager)]
+    [WebApiRoute("/cars/{i}", WebApiOperation.Delete)]
+    public async Task<ApiResult<Car, DeleteCarResponse>> Delete(DeleteCarRequest request, CancellationToken cancellationToken)
+    {
+        var car = await _carsApplication.DeleteCarAsync(_context, request.Id, cancellationToken);
+        return () => car.HandleApplicationResult(c => new DeleteCarResponse());
     }
 }
 ```
@@ -104,11 +112,10 @@ Once you have defined your endpoints (see next section), a module class derived 
 For example, in the project and folder: `CarsApi/CarsApiModule.cs`
 
 - ```c#
-
-public class CarsApiModule : ISubDomainModule
-{
-public Assembly ApiAssembly => typeof(Apis.Cars.CarsApi).Assembly;
-
+  public class CarsApiModule : ISubDomainModule
+  {
+    public Assembly ApiAssembly => typeof(Apis.Cars.CarsApi).Assembly;
+  
     public Dictionary<Type, string> AggregatePrefixes => new()
     {
         { typeof(Car), "car" }
@@ -123,9 +130,7 @@ public Assembly ApiAssembly => typeof(Apis.Cars.CarsApi).Assembly;
     {
         get { return (_, services) => { services.AddScoped<ICarsApplication, CarsApplication.CarsApplication>(); }; }
     }
-
-}
-
+  }
   ```
 
 In this class, you will need to declare the following things:
@@ -149,7 +154,7 @@ public static class HostedModules
         return modules;
     }
 }
-  ```
+```
 
 > Note: this method `HostedModules.Get()` will be called in the startup of the Host project.
 
@@ -171,29 +176,28 @@ So, we have designed a coding pattern and grouping mechanism for related endpoin
 
    - For example, in the project and folder: `CarsApi/Apis/Cars/CarsApi.cs`
 
-   - ```c#
+   ```c#
      public class CarsApi : IWebApiService
      {
-     private readonly ICarsApplication _carsApplication;
-     private readonly ICallerContext _context;
-    
-          public CarsApi(ICallerContext context, ICarsApplication carsApplication)
-          {
-              _context = context;
-              _carsApplication = carsApplication;
-          }
+         private readonly ICarsApplication _carsApplication;
+         private readonly ICallerContext _context;
          
+         public CarsApi(ICallerContext context, ICarsApplication carsApplication)
+         {
+             _context = context;
+             _carsApplication = carsApplication;
+         }
+     
          [AuthorizeForAnyRole(OrganisationRoles.Reserver, OrganisationRoles.Manager)]
          [WebApiRoute("/cars/{id}", WebApiOperation.Get)]
-         public async Task<IResult> Get(GetCarRequest request, CancellationToken cancellationToken)
+         public async Task<ApiResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
          {
              var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
-             return Results.Ok(new GetCarResponse { Car = car });
+             return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
          }
          
-         ...other methods
+         ... other methods
      }
-     ```
 
 3. You will define the request and response types in separate files in the project: `Infrastructure.WebApi.Interfaces` in a subfolder for the subdomain. For example,
 
@@ -268,10 +272,10 @@ From that Application layer, a resource (DTO) will be returned, and this functio
 ```c#
     [AuthorizeForAnyRole(OrganisationRoles.Reserver, OrganisationRoles.Manager)]
     [WebApiRoute("/cars/{id}", WebApiOperation.Get)]
-    public async Task<IResult> Get(GetCarRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
-        return Results.Ok(new GetCarResponse { Car = car });
+        return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }
 ```
 
@@ -377,9 +381,25 @@ While this may not be always necessary, this pattern is estabished in this layer
 
 TBD
 
-### Exception Handling
+### Error Handling
 
-TBD
+> Note: We are supporting both: throwing exceptions, and returning error results in this stack.
+
+Any unhandled exceptions that are thrown (in any code, in a layer) will be caught and sanitized by an Exception Shielding strategy.
+
+In this strategy:
+
+* Exceptions are converted to [RFC7808](https://datatracker.ietf.org/doc/html/rfc7807) errors on the wire
+* The HTTP StatusCode will always be `500 - Internal Server Error`
+* An exception stack trace will only be included in the response in `TESTINGONLY` build configurations
+
+We are using the result type `Result<TValue, Error>` to pass errors through the Application and Domain layers up to the API layer, where that Error will have a `Code` that will be converted to an appropriate `HttpStatusCode` (with or without a message).
+
+There is a known mapping between an `ErrorCode` (that has semantic meaning to the Application and Domain layers) to a `HttpErrorCode` (that has meaning to HTTP APIs).
+
+### HTTP Status codes
+
+s
 
 ### Logging
 

@@ -52,7 +52,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{5838
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{E78C7FBE-ADD0-4124-A273-5D5AC0C02B27}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{B68592DF-E8E8-452A-A46F-5C8ECB178FDF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApi", "WebApi", "{B68592DF-E8E8-452A-A46F-5C8ECB178FDF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.WebApi.Common", "Infrastructure.WebApi.Common\Infrastructure.WebApi.Common.csproj", "{E343B553-2D44-4BA2-AEF0-3B1F7D2DBCF3}"
 EndProject

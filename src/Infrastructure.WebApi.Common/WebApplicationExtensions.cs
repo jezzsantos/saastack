@@ -1,18 +1,19 @@
+using System.Net;
 using Common.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 
 namespace Infrastructure.WebApi.Common;
 
-public static class ApplicationExtensions
+public static class WebApplicationExtensions
 {
     /// <summary>
-    ///     Provides a custom error when an exception is bubbled up.
-    ///     Shows the exception stack trace if in development mode
+    ///     Provides a global handler when an exception is encountered, and converts the exception
+    ///     to an <see href="https://datatracker.ietf.org/doc/html/rfc7807">RFC7807</see> error.
+    ///     Note: Shows the exception stack trace if in development mode
     /// </summary>
     public static IApplicationBuilder AddExceptionShielding(this WebApplication app)
     {
@@ -35,7 +36,7 @@ public static class ApplicationExtensions
                 {
                     Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
                     Title = "An unexpected error occurred",
-                    Status = 500,
+                    Status = (int)HttpStatusCode.InternalServerError,
                     Instance = context.Request.GetDisplayUrl(),
                     Detail = exceptionMessage
                 };
@@ -47,16 +48,5 @@ public static class ApplicationExtensions
 
                 await Results.Problem(details).ExecuteAsync(context);
             }));
-    }
-
-    /// <summary>
-    ///     Whether we are in either <see cref="Environments.Development" /> or CI
-    /// </summary>
-    public static bool IsTestingOnly(this IHostEnvironment hostEnvironment)
-    {
-        ArgumentNullException.ThrowIfNull(hostEnvironment);
-
-        return hostEnvironment.IsEnvironment(Environments.Development)
-               || hostEnvironment.IsEnvironment("CI");
     }
 }

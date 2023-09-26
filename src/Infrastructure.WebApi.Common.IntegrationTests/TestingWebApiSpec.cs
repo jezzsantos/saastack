@@ -19,6 +19,15 @@ public class TestingWebApiSpec : WebApiSpecSetup<Program>
     {
     }
 
+
+    [Fact]
+    public async Task WhenGetError_ThenReturnsError()
+    {
+        var result = await Api.GetAsync("/testingonly/error");
+
+        result.StatusCode.Should().Be(HttpStatusCode.Conflict);
+    }
+
     [Fact]
     public async Task WhenGetThrowsException_ThenReturnsServerError()
     {

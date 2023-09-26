@@ -5,9 +5,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Common\Common.csproj" />
+        <PackageReference Include="QueryAny" Version="1.1.0" />
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Common\Common.csproj" />
+    </ItemGroup>
 
     <ItemGroup>
         <EmbeddedResource Update="Validations\CommonValidationResources.resx">
@@ -23,11 +26,5 @@
             <DependentUpon>CommonValidationResources.resx</DependentUpon>
         </Compile>
     </ItemGroup>
-
-
-    <ItemGroup>
-        <PackageReference Include="QueryAny" Version="1.1.0" />
-    </ItemGroup>
-
 
 </Project>

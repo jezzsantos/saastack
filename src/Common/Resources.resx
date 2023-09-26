@@ -30,4 +30,13 @@
     <data name="Reflector_ErrorNotProperty" xml:space="preserve">
       <value>Member is not a property</value>
     </data>
+    <data name="Optional_NullValue" xml:space="preserve">
+        <value>The value is null</value>
+    </data>
+    <data name="Result_FetchValueWhenFaulted" xml:space="preserve">
+        <value>The result is in a faulted state, with error: {0}</value>
+    </data>
+    <data name="Result_FetchErrorWhenNotFaulted" xml:space="preserve">
+        <value>The result is not in a faulted state</value>
+    </data>
 </root>

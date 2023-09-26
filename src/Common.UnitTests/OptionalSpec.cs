@@ -12,7 +12,7 @@ public class OptionalSpec
         var result = new Optional<TestClass>();
 
         result.HasValue.Should().BeFalse();
-        result.Value.Should().BeNull();
+        result.TryGet(out _).Should().BeFalse();
         result.ToString().Should().Be(Optional<TestClass>.NoValueStringValue);
     }
 
@@ -22,7 +22,7 @@ public class OptionalSpec
         var result = new Optional<TestClass>(null!);
 
         result.HasValue.Should().BeFalse();
-        result.Value.Should().BeNull();
+        result.TryGet(out _).Should().BeFalse();
         result.ToString().Should().Be(Optional<TestClass>.NoValueStringValue);
     }
 
@@ -35,6 +35,67 @@ public class OptionalSpec
         result.HasValue.Should().BeTrue();
         result.Value.Should().Be(instance);
         result.ToString().Should().Be(typeof(TestClass).FullName);
+    }
+
+    [Fact]
+    public void WhenGetValueAndNullInstance_ThenThrows()
+    {
+        var optional = new Optional<TestClass>(null!);
+
+        optional.Invoking(x => x.Value)
+            .Should().Throw<InvalidOperationException>()
+            .WithMessage(Resources.Optional_NullValue);
+    }
+
+    [Fact]
+    public void WhenGetValue_ThenReturnsValue()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional = new Optional<TestClass>(instance);
+
+        var result = optional.Value;
+
+        result.Should().Be(instance);
+    }
+
+
+    [Fact]
+    public void WhenGetValueOrDefaultAndNullInstance_ThenReturnsNull()
+    {
+        var optional = new Optional<TestClass>(null!);
+
+        var result = optional.ValueOrDefault;
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenGetValueOrDefault_ThenReturnsValue()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional = new Optional<TestClass>(instance);
+
+        var result = optional.ValueOrDefault;
+
+        result.Should().Be(instance);
+    }
+
+    [Fact]
+    public void WhenEqualsOperatorWithEmptyOptionalAndWithNone_ThenReturnsTrue()
+    {
+        var optional1 = new Optional<TestClass>();
+        var optional2 = Optional<TestClass>.None;
+
+        (optional1 == optional2).Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenEqualsOperatorWithNoneAndWithNone_ThenReturnsTrue()
+    {
+        var optional1 = Optional<TestClass>.None;
+        var optional2 = Optional<TestClass>.None;
+
+        (optional1 == optional2).Should().BeTrue();
     }
 
     [Fact]

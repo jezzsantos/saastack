@@ -37,16 +37,11 @@ public class WebApiProjectVisitor : SymbolVisitor
     {
         _cancellationToken = cancellationToken;
         _serviceInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebApiService).FullName!)!;
-        _webRequestInterfaceSymbol =
-            compilation.GetTypeByMetadataName(
-                "Infrastructure.WebApi.Interfaces.IWebRequest`1")
+        _webRequestInterfaceSymbol = compilation.GetTypeByMetadataName("Infrastructure.WebApi.Interfaces.IWebRequest`1")
             !; //HACK: we cannot reference the real type here, as it causes runtime issues. See the README.md for more details
         _webRouteAttributeSymbol = compilation.GetTypeByMetadataName(typeof(WebApiRouteAttribute).FullName!)!;
         _cancellationTokenSymbol = compilation.GetTypeByMetadataName(typeof(CancellationToken).FullName!)!;
-        _webHandlerResponseSymbol = compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!
-            .Construct(compilation.GetTypeByMetadataName(
-                    "Microsoft.AspNetCore.Http.IResult")
-                !); //HACK: we cannot reference the real type here, as it causes runtime issues. See the README.md for more details
+        _webHandlerResponseSymbol = compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
     }
 
     public List<ApiServiceOperationRegistration> OperationRegistrations { get; } = new();
@@ -195,8 +190,12 @@ public class WebApiProjectVisitor : SymbolVisitor
             var isTestingOnly = attributeParameters.Length >= 3
                 ? bool.Parse(attributeParameters[2].Value!.ToString()!)
                 : false;
-            var requestTypeName = method.Parameters[0].Type.Name;
-            var requestTypeNamespace = method.Parameters[0].Type.ContainingNamespace.ToDisplayString();
+            var requestType = method.Parameters[0].Type;
+            var requestTypeName = requestType.Name;
+            var requestTypeNamespace = requestType.ContainingNamespace.ToDisplayString();
+            var responseType = GetResponseType(method.Parameters[0].Type);
+            var responseTypeName = responseType.Name;
+            var responseTypeNamespace = responseType.ContainingNamespace.ToDisplayString();
             var requestMethodBody = GetMethodBody(method);
             var requestMethodName = method.Name;
 
@@ -204,6 +203,7 @@ public class WebApiProjectVisitor : SymbolVisitor
             {
                 Class = classRegistration,
                 RequestDtoType = new TypeName(requestTypeNamespace, requestTypeName),
+                ResponseDtoType = new TypeName(responseTypeNamespace, responseTypeName),
                 OperationType = operationType,
                 IsTestingOnly = isTestingOnly,
                 MethodName = requestMethodName,
@@ -241,6 +241,20 @@ public class WebApiProjectVisitor : SymbolVisitor
 
             return Enum.Parse<WebApiOperation>(operation, true);
         }
+
+        // We assume that the request type derives from IWebRequest<TResponse>
+        ITypeSymbol GetResponseType(ITypeSymbol requestType)
+        {
+            var requestInterface = requestType.AllInterfaces.FirstOrDefault(@interface =>
+                SymbolEqualityComparer.Default.Equals(@interface.OriginalDefinition, _webRequestInterfaceSymbol));
+            if (requestInterface is null)
+            {
+                return requestType;
+            }
+
+            return requestInterface.TypeArguments[0];
+        }
+
 
         List<Constructor> GetConstructors()
         {
@@ -333,9 +347,12 @@ public class WebApiProjectVisitor : SymbolVisitor
             return !SupportedServiceOperationNames.Contains(methodName);
         }
 
+        // We assume that the return type is a Task<T>
         bool IsIncorrectReturnType(IMethodSymbol method)
         {
-            return !SymbolEqualityComparer.Default.Equals(method.ReturnType, _webHandlerResponseSymbol);
+            return method.ReturnType.AllInterfaces.Any(@interface =>
+                SymbolEqualityComparer.Default.Equals(@interface.OriginalDefinition,
+                    _webHandlerResponseSymbol));
         }
 
         bool HasWrongSetOfParameters(IMethodSymbol method)
@@ -367,7 +384,6 @@ public class WebApiProjectVisitor : SymbolVisitor
         }
     }
 
-
     public record ApiServiceOperationRegistration
     {
         public required ApiServiceClassRegistration Class { get; init; }
@@ -381,6 +397,8 @@ public class WebApiProjectVisitor : SymbolVisitor
         public required WebApiOperation OperationType { get; init; }
 
         public required TypeName RequestDtoType { get; init; }
+
+        public required TypeName ResponseDtoType { get; init; }
 
         public required string RoutePath { get; init; }
     }

@@ -18,7 +18,7 @@ public static class SearchOptionExtensions
                 Total = total,
                 Limit = options.Limit,
                 Offset = options.Offset,
-                Sort = options.Sort.Value,
+                Sort = options.Sort.ValueOrDefault,
                 Filter = options.Filter
             };
         }

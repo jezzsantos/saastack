@@ -19,3 +19,18 @@ To workaround this, we have file-linked certain source files from projects in th
 We have had to hardcode certain other types to avoid referencing AspNetCore, and these cannot be tracked by tooling if they are changed elsewhere.
 
 > None of this is ideal. But until we can figure the magic needed to build and run this Source Generator if it uses these types, this may be the best workaround we have for now.
+
+# Debugging Generator
+
+You can debug your source generator by setting a breakpoint in the code, and then running the `SourceGenerator-Development` run configuration from the `ApiHost1` project with the debugger. (found in the `launchSettings.json` file in any executable project).
+
+
+> Warning: C# source generators are heavily cached. If you try to debug new code that you've added you may need to clear the caches from the old code being used. Otherwise you breakpoints may not hit.
+
+The most reliable way to reset the generators:
+
+1. Restart Jetbrains Rider
+2. Kill any remaining `.Net Host (dotnet.exe)` processes on your machine, and any remaining `Jetbrains Rider` processes on your machine
+3. Restart Rider
+4. Set your breakpoints
+5. Start debugging the `SourceGenerator-Development` run configuration
