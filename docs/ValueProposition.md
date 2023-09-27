@@ -32,12 +32,41 @@ Using the Value Proposition model, let's explore the value proposition, its cust
 
 ## Who are the customers of SaaStack?
 
-Let's start by teasing apart the word **customer** into a few parts:
+Let's start by teasing apart the word **customer** into three parts:
 
-**Buyers
-** - We believe that the buyers of SaaStack are going to be founding CTOs and tech leads of new/existing tech startup businesses, trying to build a global SaaS product for their businesses. These are the people who will hear about, investigate, assess, judge, and make the decision to adopt SaaStack for their startup business. This audience will need to understand and accept the principles and practices behind SaaStack and understand how they can be changed easily enough to suit their context.
+**Buyers**
 
-**Users** - We believe that the users of SaaStack will be programmers/developers/engineers who are expected to build their global SaaS product for their business. These people will also be the ones to adopt the principles and practices that SaaStack has chosen to implement and be the ones to change them to suit their specific context.
+We believe that the "buyers" of SaaStack are going to be the startup CTOs or founding developers of new/existing tech startup businesses who are trying to build a global SaaS software product for their businesses as fast as they can.
+
+> About CTOs: You need to know that startup CTOs (in the early days of a startup) are not the same people as the professional/executive CTOs you will find with this same title in established enterprise businesses. Same title, different jobs, different skillsets. There is a lot of confusion and [semantic diffusion](https://martinfowler.com/bliki/SemanticDiffusion.html) about what a CTO is and does. In short, a professional/executive CTO and a startup CTO are two different kinds of CTO, irrespective of the fact that you may encounter a CTO of an enterprise who was once a CTO of a startup - that can also happen, but it happens much later on.
+>
+> Startup CTOs, in the main, are not experienced, professional/executive CTOs. It is very rare to find a professional/executive CTO being the founding developer of a new startup - i.e. being the one building the product from the ground up. The skill sets and experience levels are wildly different. There are exceptions, of course. For example, a tech startup that is
+*started* by a professional/executive CTO as a founder. In those cases, those CTOs are more than likely going to be hiring other founding developers to actually write the code for their product while they remain in the executive function of the business.
+>
+> In the main, a "Startup CTO" is just a fancy title for the most senior "founding developer" of the startup. It is a placeholder badge for them. They are more than likely to be just a "competent developer" with some professional experience. Experience levels may vary wildly from a novice (with a couple of years of experience writing software) to principal-level developers (with decades of experience building software). In terms of diversity of experience, regardless of years on the job, they may have very limited experience in building any durable, long-lived products from first principles, from scratch. Some may not even be used to working in teams or building software that needs to be maintained by teams of other people, and some are not experienced in building rapidly evolving distributed systems.
+>
+> Most founding developers will want to remain as the most "senior" technical person in their new company (as a founder, as an executive, and as a major shareholder) and remain paid the highest salary for all technical people. However, some may not want to rise up to obtain the future skill sets of an executive CTO of the company - once it scales and expands to be a stable business. Those founding developers (as current leaders of the startup business) will also unlikely want to hire more experienced technical people over the top of them, but that is a different, and future, problem.
+
+These founding developers are the people (in the new business) who will hear about and independently investigate, assess, and judge SaaStack as a starting point. We believe that it is they who will make the final decision to adopt SaaStack for their startup business or not.
+
+This person will need to quickly understand the value proposition of SaaStack and will likely be skeptical of it. Then, some of those will want to agree or disagree with some of the principles and practices behind SaaStack. Some will possibly even want to learn more about how they can change the code in the template to suit their context.
+
+They may encounter some objections, either design decisions or principles behind it, that they can't move past.
+
+* They will be guided by what they already know, so it will have to be a tech stack they know already.
+  * They may or may not trust examples of things they are not experienced with, and some may not adopt things they won't feel they have mastered yet.
+* They will be motivated by associating themselves with the latest and greatest in this technology stack (i.e. .NET).
+  * They may or may not be up to speed on those things. So they will see value in someone showing them the latest and greatest.
+* They will be interested to learn more about the proposed architectural styles (e.g. Event Sourcing, Microservices, Clean Architecture etc, etc.).
+  * They may or may not be experienced in their uses either. And will be looking for evidence or opinions on why they should consider them for their context.
+
+We believe that if the founding developer makes any kind of purchase or contribution to obtaining SaaStack, they are also going to have an expectation of having some support for adopting it, from some kind of community, where they can have questions answered and may provide feedback.
+
+**Users** - We believe that the users of SaaStack will be all the programmers/developers/engineers of the startup that are expected to build their global SaaS product for their business.
+
+These people will also be the ones who will be adopting the patterns, principles, and practices that SaaStack has chosen to implement. This audience will be the ones to change those patterns and extend them to suit their specific context. They will also desire some kind of support community to help them do that (given their potentially highly varied levels of experience).
+
+We believe that they will have some skepticism and many of the same concerns that the buyer will have. However, (as employees of the startup) they are far more likely to accept the decisions already being made by the founding developer.
 
 **Community**: We believe both audiences above will yield actionable feedback to a community that could help improve SaaStack's desirability, feasibility, and viability for reaching larger audiences.
 
