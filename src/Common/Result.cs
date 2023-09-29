@@ -1,11 +1,127 @@
+using System.Runtime.InteropServices;
 using Common.Extensions;
 
 namespace Common;
+
+public static class Result
+{
+    /// <summary>
+    ///     Returns a successful result
+    /// </summary>
+    public static Result<Error> Ok => new();
+}
+
+/// <summary>
+///     Provides a result type that can either be success OR a <see cref="TError" />, but never both, nor
+///     neither
+/// </summary>
+[StructLayout(LayoutKind.Auto)]
+public readonly struct Result<TError>
+    where TError : struct
+{
+    private const string OkStringValue = "OK";
+
+    private readonly TError? _error;
+
+    public Result()
+    {
+        _error = null;
+    }
+
+    public Result(TError error)
+    {
+        _error = error;
+    }
+
+    /// <summary>
+    ///     Whether the contained result has a value
+    /// </summary>
+    public bool IsSuccessful => !_error.HasValue;
+
+    /// <summary>
+    ///     Returns the contained <see cref="Error" /> if there is one
+    /// </summary>
+    /// <exception cref="InvalidOperationException">If the result is not in a faulted state</exception>
+    public TError Error
+    {
+        get
+        {
+            if (IsSuccessful)
+            {
+                throw new InvalidOperationException(Resources.Result_FetchErrorWhenNotFaulted);
+            }
+
+            return _error!.Value;
+        }
+    }
+
+    /// <summary>
+    ///     Creates a new <see cref="Result{TError}" /> in its faulted state, with the <see cref="error" />
+    /// </summary>
+    public static Result<TError> FromError(TError error)
+    {
+        return new Result<TError>(error);
+    }
+
+    /// <summary>
+    ///     Tries to return the contained <see cref="error" />, if it is faulted
+    /// </summary>
+    public bool TryGetError(out TError? error)
+    {
+        if (!IsSuccessful)
+        {
+            error = _error!.Value;
+            return true;
+        }
+
+        error = null;
+        return false;
+    }
+
+    /// <summary>
+    ///     Returns a string representation of the contained value or the contained error
+    /// </summary>
+    /// <returns></returns>
+    public override string? ToString()
+    {
+        return IsSuccessful
+            ? OkStringValue
+            : _error!.ToString();
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="error" /> into a <see cref="Result{TError}" />
+    /// </summary>
+    public static implicit operator Result<TError>(TError error)
+    {
+        return new Result<TError>(error);
+    }
+
+    /// <summary>
+    ///     Whether both the <see cref="left" /> and <see cref="right" /> results are successful
+    /// </summary>
+    public static bool operator &(in Result<TError> left, in Result<TError> right)
+    {
+        return left.IsSuccessful && right.IsSuccessful;
+    }
+
+    /// <summary>
+    ///     Returns the result from the <see cref="onSuccess" /> delegate or <see cref="onError" /> delegate
+    ///     depending on whether there is a successful value or not
+    /// </summary>
+    public TOut Match<TOut>(Func<TOut> onSuccess, Func<TError, TOut> onError)
+    {
+        return IsSuccessful
+            ? onSuccess()
+            : onError(_error!.Value);
+    }
+}
 
 /// <summary>
 ///     Provides a result type that can either be a <see cref="TValue" /> OR a <see cref="TError" />, but never both, nor
 ///     neither
 /// </summary>
+[StructLayout(LayoutKind.Auto)]
 public readonly struct Result<TValue, TError>
     where TError : struct
 {
@@ -70,14 +186,14 @@ public readonly struct Result<TValue, TError>
     }
 
     /// <summary>
-    ///     Returns whether the <see cref="Value" /> exists
+    ///     Returns whether the contained <see cref="Value" /> has a value
     /// </summary>
-    public bool HasValue => IsSuccessful;
+    public bool HasValue => IsSuccessful && _value.HasValue;
 
     /// <summary>
-    ///     Returns whether the <see cref="Value" /> exists
+    ///     Returns whether the contained &lt;see cref="Value" /&gt; has a value
     /// </summary>
-    public bool Exists => IsSuccessful;
+    public bool Exists => HasValue;
 
     /// <summary>
     ///     Creates a new <see cref="Result{TReturn, TError}" /> in its faulted state, with the <see cref="error" />
@@ -96,7 +212,7 @@ public readonly struct Result<TValue, TError>
     }
 
     /// <summary>
-    ///     Tries to return the contained <see cref="value" />, if there is one
+    ///     Tries to return the contained <see cref="Value" />, if there is one
     /// </summary>
     public bool TryGet(out TValue value)
     {

@@ -85,7 +85,7 @@ public static class HandlerExtensions
     }
 
     /// <summary>
-    ///     Converts the <see cref="TResource" /> in the <see cref="result" /> to an <see cref="Result{PostResult,Error}" />
+    ///     Converts the <see cref="TResource" /> in the <see cref="Result{TResource,Error}" /> to an <see cref="Result{PostResult,Error}" />
     ///     using the <see cref="onSuccess" /> callback
     /// </summary>
     public static Result<PostResult<TResponse>, Error> HandleApplicationResult<TResponse, TResource>(
@@ -97,7 +97,7 @@ public static class HandlerExtensions
     }
 
     /// <summary>
-    ///     Converts the <see cref="TResource" /> in the <see cref="result" /> to an <see cref="Result{TResponse,Error}" />
+    ///     Converts the <see cref="TResource" /> in the <see cref="Result{TResource,Error}" /> to an <see cref="Result{TResponse,Error}" />
     ///     using the <see cref="onSuccess" /> callback
     /// </summary>
     public static Result<TResponse, Error> HandleApplicationResult<TResponse, TResource>(
@@ -109,11 +109,20 @@ public static class HandlerExtensions
     }
 
     /// <summary>
-    ///     Converts the <see cref="result" /> to an <see cref="Result{EmptyResponse,Error}" />
+    ///     Converts the <see cref="Result{TResource,Error}" /> to an <see cref="Result{EmptyResponse,Error}" />
     /// </summary>
     public static Result<EmptyResponse, Error> HandleApplicationResult<TResource>(this Result<TResource, Error> result)
     {
         return result.Match(_ => new Result<EmptyResponse, Error>(new EmptyResponse()),
+            error => new Result<EmptyResponse, Error>(error));
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="Result{Error}" /> to an <see cref="Result{EmptyResponse,Error}" />
+    /// </summary>
+    public static Result<EmptyResponse, Error> HandleApplicationResult(this Result<Error> result)
+    {
+        return result.Match(() => new Result<EmptyResponse, Error>(new EmptyResponse()),
             error => new Result<EmptyResponse, Error>(error));
     }
 

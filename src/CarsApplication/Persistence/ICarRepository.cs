@@ -8,7 +8,7 @@ namespace CarsApplication.Persistence;
 
 public interface ICarRepository : IApplicationRepository
 {
-    Task<Result<None, Error>> DeleteCarAsync(string id);
+    Task<Result<Error>> DeleteCarAsync(string id);
 
     Task<Result<CarRoot, Error>> GetCarAsync(string id);
 

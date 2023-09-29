@@ -6,7 +6,7 @@ namespace CarsApplication;
 
 public interface ICarsApplication
 {
-    Task<Result<Car?, Error>> DeleteCarAsync(ICallerContext caller, string id, CancellationToken cancellationToken);
+    Task<Result<Error>> DeleteCarAsync(ICallerContext caller, string id, CancellationToken cancellationToken);
 
     Task<Result<Car, Error>> GetCarAsync(ICallerContext caller, string id, CancellationToken cancellationToken);
 

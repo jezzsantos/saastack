@@ -18,7 +18,7 @@ public class CarsApplication : ICarsApplication
         _repository = repository;
     }
 
-    public async Task<Result<Car?, Error>> DeleteCarAsync(ICallerContext caller, string id,
+    public async Task<Result<Error>> DeleteCarAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken)
     {
         var car = await _repository.GetCarAsync(id);
@@ -29,7 +29,7 @@ public class CarsApplication : ICarsApplication
 
         await _repository.DeleteCarAsync(car.Value.Id);
 
-        return null;
+        return Result.Ok;
     }
 
     public async Task<Result<Car, Error>> GetCarAsync(ICallerContext caller, string id,

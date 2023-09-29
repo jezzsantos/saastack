@@ -24,19 +24,19 @@ public class CarRepository : ICarRepository
         return car!;
     }
 
-    public async Task<Result<None, Error>> DeleteCarAsync(string id)
+    public async Task<Result<Error>> DeleteCarAsync(string id)
     {
         await Task.CompletedTask;
 
         var car = Cars.Find(root => root.Id == id);
         if (car.NotExists())
         {
-            return new Result<None, Error>(Error.EntityNotFound());
+            return new Result<Error>(Error.EntityNotFound());
         }
 
         Cars.Remove(car!);
 
-        return new None();
+        return Result.Ok;
     }
 
     public async Task<Result<IReadOnlyList<Car>, Error>> SearchAllCarsAsync(SearchOptions searchOptions,
