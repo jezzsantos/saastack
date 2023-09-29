@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="RegisterCarRequestValidator_InvalidMake" xml:space="preserve">
+        <value>The 'Make' is either missing or invalid</value>
+    </data>
+    <data name="RegisterCarRequestValidator_InvalidModel" xml:space="preserve">
+        <value>The 'Model' is either missing or invalid</value>
+    </data>
+    <data name="RegisterCarRequestValidator_InvalidYear" xml:space="preserve">
+        <value>The 'Year' is either missing or invalid</value>
+    </data>
+    <data name="TakeOfflineCarRequestValidator_InvalidReason" xml:space="preserve">
+        <value>The 'Reason' is invalid</value>
+    </data>
+    <data name="TakeOfflineCarRequestValidator_InvalidStartAtUtc" xml:space="preserve">
+        <value>The 'StartDateUtc' is either missing or in the past</value>
+    </data>
+    <data name="TakeOfflineCarRequestValidator_InvalidEndAtUtc" xml:space="preserve">
+        <value>The 'EndDateUtc' is either missing, or is not after the 'StartDateUtc'</value>
+    </data>
+</root>

@@ -4,8 +4,4 @@
         <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\Domain.Interfaces\Domain.Interfaces.csproj" />
-    </ItemGroup>
-
 </Project>

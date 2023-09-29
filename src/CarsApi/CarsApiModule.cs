@@ -1,6 +1,8 @@
 using System.Reflection;
 using CarsApplication;
+using CarsApplication.Persistence;
 using CarsDomain;
+using CarsInfrastructure.Persistence;
 using Infrastructure.WebApi.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -14,7 +16,7 @@ public class CarsApiModule : ISubDomainModule
 
     public Dictionary<Type, string> AggregatePrefixes => new()
     {
-        { typeof(Car), "car" }
+        { typeof(CarRoot), "car" }
     };
 
     public Action<WebApplication> MinimalApiRegistrationFunction
@@ -24,6 +26,13 @@ public class CarsApiModule : ISubDomainModule
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServicesFunction
     {
-        get { return (_, services) => { services.AddScoped<ICarsApplication, CarsApplication.CarsApplication>(); }; }
+        get
+        {
+            return (_, services) =>
+            {
+                services.AddScoped<ICarsApplication, CarsApplication.CarsApplication>();
+                services.AddScoped<ICarRepository, CarRepository>();
+            };
+        }
     }
 }

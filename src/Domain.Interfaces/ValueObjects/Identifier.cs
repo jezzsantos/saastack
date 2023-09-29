@@ -14,6 +14,11 @@ public class Identifier
 
     public string Value { get; }
 
+    public static implicit operator string(Identifier id)
+    {
+        return id.Value;
+    }
+
     public override string ToString()
     {
         return Value;

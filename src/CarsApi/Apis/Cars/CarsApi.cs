@@ -18,11 +18,49 @@ public class CarsApi : IWebApiService
         _carsApplication = carsApplication;
     }
 
+    [WebApiRoute("/cars/{id}", WebApiOperation.Delete)]
+    public async Task<ApiEmptyResult> Delete(DeleteCarRequest request, CancellationToken cancellationToken)
+    {
+        var car = await _carsApplication.DeleteCarAsync(_context, request.Id, cancellationToken);
+        return () => car.HandleApplicationResult();
+    }
+
     [WebApiRoute("/cars/{id}", WebApiOperation.Get)]
     public async Task<ApiResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
 
+        return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
+    }
+
+    [WebApiRoute("/cars", WebApiOperation.Post)]
+    public async Task<ApiPostResult<Car, GetCarResponse>> Register(RegisterCarRequest request,
+        CancellationToken cancellationToken)
+    {
+        var car = await _carsApplication.RegisterCarAsync(_context, request.Make, request.Model, request.Year,
+            cancellationToken);
+
+        return () => car.HandleApplicationResult<GetCarResponse, Car>(c =>
+            new PostResult<GetCarResponse>(new GetCarResponse { Car = c }, $"/cars/{c.Id}"));
+    }
+
+    [WebApiRoute("/cars", WebApiOperation.Search)]
+    public async Task<ApiResult<Car, SearchAllCarsResponse>> SearchAll(SearchAllCarsRequest request,
+        CancellationToken cancellationToken)
+    {
+        var cars = await _carsApplication.SearchAllCarsAsync(_context, request.ToSearchOptions(),
+            request.ToGetOptions(), cancellationToken);
+
+        return () =>
+            cars.HandleApplicationResult(c => new SearchAllCarsResponse { Cars = c.Results, Metadata = c.Metadata });
+    }
+
+    [WebApiRoute("/cars/{id}/offline", WebApiOperation.PutPatch)]
+    public async Task<ApiResult<Car, GetCarResponse>> TakeOffline(TakeOfflineCarRequest request,
+        CancellationToken cancellationToken)
+    {
+        var car = await _carsApplication.TakeOfflineCarAsync(_context, request.Id!, request.Reason, request.StartAtUtc,
+            request.EndAtUtc, cancellationToken);
         return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }
 }

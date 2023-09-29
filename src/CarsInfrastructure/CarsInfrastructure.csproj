@@ -4,11 +4,11 @@
         <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
-        <ProjectReference Include="..\Application.Persistence.Interfaces\Application.Persistence.Interfaces.csproj" />
-        <ProjectReference Include="..\CarsDomain\CarsDomain.csproj" />
-    </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\CarsApplication\CarsApplication.csproj" />
+        <ProjectReference Include="..\CarsDomain\CarsDomain.csproj" />
+        <ProjectReference Include="..\Common\Common.csproj" />
+    </ItemGroup>
 
 </Project>

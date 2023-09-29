@@ -7,6 +7,7 @@
     <ItemGroup>
         <ProjectReference Include="..\CarsApplication\CarsApplication.csproj" />
         <ProjectReference Include="..\CarsDomain\CarsDomain.csproj" />
+        <ProjectReference Include="..\CarsInfrastructure\CarsInfrastructure.csproj" />
         <ProjectReference Include="..\Infrastructure.WebApi.Common\Infrastructure.WebApi.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.WebApi.Interfaces\Infrastructure.WebApi.Interfaces.csproj" />
     </ItemGroup>
@@ -16,5 +17,24 @@
         <ProjectReference Include="..\Infrastructure.WebApi.Generators\Infrastructure.WebApi.Generators.csproj"
                           OutputItemType="Analyzer"
                           ReferenceOutputAssembly="false" />
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="ValidationResources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Update="ValidationResources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>ValidationResources.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 </Project>
