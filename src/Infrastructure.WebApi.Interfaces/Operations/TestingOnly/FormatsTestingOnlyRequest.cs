@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
 
 [UsedImplicitly]
-public class PostRoundTripDatesTestingOnlyRequest : IWebRequest<DataTypesTestingOnlyResponse>
+public class FormatsTestingOnlyRequest : IWebRequest<FormatsTestingOnlyResponse>
 {
     public CustomDto? Custom { get; set; }
 

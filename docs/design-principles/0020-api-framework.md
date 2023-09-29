@@ -21,7 +21,7 @@
    - All API declarations will be `async` by default
 8. We are striving to establish simple-to-understand patterns for the API author while using essential 3rd party libraries, but at the same time, limit the number of dependencies on 3rd party libraries.
 
-An example of a way we would prefer to define our endpoints related to a resource (e.g., a `car`), would look like a single class like this:
+An example of a way we prefer to define our endpoints related to a resource (e.g., a `Car`), would look like a single API class like this:
 
 ```c#
 public class CarsApi : IWebApiService
@@ -35,13 +35,13 @@ public class CarsApi : IWebApiService
         _carsApplication = carsApplication;
     }
 
-    [AllowAnonymous]
-    [WebApiRoute("/cars", WebApiOperation.Search)]
-    public async Task<ApiResult<Car, SearchAllCarsResponse>> Get(SearchCarsRequest request, CancellationToken cancellationToken)
+    [AuthorizeForAnyRole(OrganisationRoles.Manager)]
+    [WebApiRoute("/cars/{id}", WebApiOperation.Delete)]
+    public async Task<ApiEmptyResult> Delete(DeleteCarRequest request,
+        CancellationToken cancellationToken)
     {
-        var cars = await _carsApplication.SearchAllCarsAsync(_context, request.ToSearchOptions(),
-            request.ToGetOptions(), cancellationToken);
-        return () => cars.HandleApplicationResult(c => new SearchAllCarsResponse { Cars = c });
+        var car = await _carsApplication.DeleteCarAsync(_context, request.Id, cancellationToken);
+        return () => car.HandleApplicationResult();
     }
 
     [AuthorizeForAnyRole(OrganisationRoles.Reserver, OrganisationRoles.Manager)]
@@ -49,35 +49,83 @@ public class CarsApi : IWebApiService
     public async Task<ApiResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
+
         return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }
 
     [AuthorizeForAnyRole(OrganisationRoles.Manager)]
     [WebApiRoute("/cars", WebApiOperation.Post)]
-    public async Task<ApiResult<Car, RegisterCarResponse>> Post(RegisterCarRequest request, CancellationToken cancellationToken)
+    public async Task<ApiPostResult<Car, GetCarResponse>> Register(RegisterCarRequest request,
+        CancellationToken cancellationToken)
     {
-        var car = await _carsApplication.RegisterCarAsync(_context, request.Make, request.Model,
-            request.Year, cancellationToken);
-        return () => car.HandleApplicationResult(c => new RegisterCarResponse { Car = c });
+        var car = await _carsApplication.RegisterCarAsync(_context, request.Make, request.Model, request.Year,
+            cancellationToken);
+
+        return () => car.HandleApplicationResult<GetCarResponse, Car>(c =>
+            new PostResult<GetCarResponse>(new GetCarResponse { Car = c }, $"/cars/{c.Id}"));
     }
-    
-    [AuthorizeForAnyRole(OrganisationRoles.Manager)]
-    [WebApiRoute("/cars/{i}/offline", WebApiOperation.Post)]
-    public async Task<ApiResult<Car, TakeOfflineCarResponse>> PutPatch(TakeOfflineCarRequest request, CancellationToken cancellationToken)
+
+    [AllowAnonymous]
+    [WebApiRoute("/cars", WebApiOperation.Search)]
+    public async Task<ApiResult<Car, SearchAllCarsResponse>> SearchAll(SearchAllCarsRequest request,
+        CancellationToken cancellationToken)
     {
-        var car = await _carsApplication.TakeOfflineCarAsync(_context, request.Id, request.Reason, request.StartAtUtc, request.EndAtUtc, cancellationToken);
-        return () => car.HandleApplicationResult(c => new TakeOfflineCarResponse { Car = c });
+        var cars = await _carsApplication.SearchAllCarsAsync(_context, request.ToSearchOptions(),
+            request.ToGetOptions(), cancellationToken);
+
+        return () =>
+            cars.HandleApplicationResult(c => new SearchAllCarsResponse { Cars = c.Results, Metadata = c.Metadata });
     }
-        
+
     [AuthorizeForAnyRole(OrganisationRoles.Manager)]
-    [WebApiRoute("/cars/{i}", WebApiOperation.Delete)]
-    public async Task<ApiResult<Car, DeleteCarResponse>> Delete(DeleteCarRequest request, CancellationToken cancellationToken)
+    [WebApiRoute("/cars/{id}/offline", WebApiOperation.PutPatch)]
+    public async Task<ApiResult<Car, GetCarResponse>> TakeOffline(TakeOfflineCarRequest request,
+        CancellationToken cancellationToken)
     {
-        var car = await _carsApplication.DeleteCarAsync(_context, request.Id, cancellationToken);
-        return () => car.HandleApplicationResult(c => new DeleteCarResponse());
+        var car = await _carsApplication.TakeOfflineCarAsync(_context, request.Id!, request.Reason, request.StartAtUtc,
+            request.EndAtUtc, cancellationToken);
+        return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }
 }
 ```
+
+and we would prefer NOT to have to create code like this, for every single one of those methods.
+
+```c#
+            carsGroup.MapGet("/cars/{id}",
+                async (IMediator mediator, [AsParameters] GetCarRequest request) =>
+                     await mediator.Send(request, CancellationToken.None));
+```
+
+and then:
+
+```c#
+ public class GetCarRequest_Handler : IRequestHandler<GetCarRequest, IResult>
+    {
+        private readonly ICallerContext _context;
+        private readonly ICarsApplication _carsApplication;
+
+        public GetCarRequest_Handler(ICallerContext context, ICarsApplication carsApplication)
+        {
+            this._context = context;
+            this._carsApplication = carsApplication;
+        }
+
+        public async Task<IResult> Handle(GetCarRequest request, CancellationToken cancellationToken)
+        {
+            ... the body of the method
+        }
+    }
+```
+
+since the code above:
+
+1. Is very boiler-plate, tedious to type out for every endpoint, and can easily lead to typos
+2. It repeats the same things in every handler class (like the constructor and fields)
+3. There is no design-time binding between the minimal API route registration and the MediatR handler to make sure they are properly bound when things change
+4. You need to maintain 2 pieces together when you make changes
+
+There has to be a nicer way.
 
 ## Implementation
 
@@ -193,6 +241,7 @@ So, we have designed a coding pattern and grouping mechanism for related endpoin
          public async Task<ApiResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
          {
              var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
+
              return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
          }
          
@@ -275,8 +324,10 @@ From that Application layer, a resource (DTO) will be returned, and this functio
     public async Task<ApiResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
+
         return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }
+
 ```
 
 > Note: You must never pass request objects directly to the Application layer, as that would mean a dependency in the wrong direction. The Application layer should never be coupled to the API layer!
@@ -393,17 +444,20 @@ In this strategy:
 * The HTTP StatusCode will always be `500 - Internal Server Error`
 * An exception stack trace will only be included in the response in `TESTINGONLY` build configurations
 
-We are using the result type `Result<TValue, Error>` to pass errors through the Application and Domain layers up to the API layer, where that Error will have a `Code` that will be converted to an appropriate `HttpStatusCode` (with or without a message).
+We are also using the result type `Result<TValue, Error>` to pass errors through the Application and Domain layers up to the API layer, where that Error will have a `Code` that will be converted to an appropriate `HttpStatusCode` (with or without a message).
 
-There is a known mapping between an `ErrorCode` (that has semantic meaning to the Application and Domain layers) to a `HttpErrorCode` (that has meaning to HTTP APIs).
+For `Result<TValue, Error>` that reach the API layer and that contain an error, they will be automatically converted into HTTP Status codes.
+
+> There is a well-known mapping between the `Error.Code` (that has semantic meaning to the Application and Domain layers) to a `HttpErrorCode` (that has meaning to HTTP APIs).
 
 ### HTTP Status codes
 
-s
+By default, we set the status code of all responses based on the HTTP method used.
 
-### Logging
-
-TBD
+* If you `GET` a request, you will get a `200 - OK` response.
+* If you `POST` a request, you will either get a `201 - Created` with the `Location` of the created resource in the response headers, or you will get a `200 - OK` response.
+* If you `PUT` or `PATCH` a request, you will get a `202 - Accepted` response.
+* If you `DELETE` a request, you will get a `204 - No Content` response
 
 ### Wire Formats
 
@@ -454,7 +508,15 @@ XML responses
 - `DateTime` values will be serialized in ISO8601 format
 - `Enums` will output as string values (pascal-case)
 
+### HTTP Clients
+
+TBD
+
 ### Request Correlation
+
+TBD
+
+### Logging
 
 TBD
 

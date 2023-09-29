@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
 
 [UsedImplicitly]
-public class ThrowsExceptionTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>
+public class ContentNegotiationsTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>
 {
 }
 #endif

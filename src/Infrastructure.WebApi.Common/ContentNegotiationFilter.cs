@@ -1,6 +1,7 @@
 using System.Net;
 using Common.Extensions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Infrastructure.WebApi.Common;
 
@@ -20,6 +21,8 @@ public class ContentNegotiationFilter : IEndpointFilter
         object value;
         if (response is IResult result)
         {
+            CopyLocationHeader(result, context.HttpContext);
+
             if (response is IValueHttpResult valueResult)
             {
                 if (valueResult.Value is null)
@@ -27,16 +30,18 @@ public class ContentNegotiationFilter : IEndpointFilter
                     return valueResult;
                 }
 
-                value = valueResult.Value; // i.e. Ok(avalue), or NotFound(avalue)
+                value = valueResult
+                    .Value; // i.e. Ok(avalue), or NotFound(avalue), or Created(avalue), or Accepted(avalue)
             }
             else
             {
-                return result; // i.e. NoContent, or Ok(), or Stream()
+                return result; // i.e. NoContent, or Ok(), or Created(uri), or Accepted(uri), or Stream()
             }
         }
         else
         {
             value = response; // a naked object
+
             if (value is string stringValue)
             {
                 if (stringValue.HasNoValue())
@@ -102,6 +107,48 @@ public class ContentNegotiationFilter : IEndpointFilter
         }
 
         return null;
+    }
+
+    private static void CopyLocationHeader(IResult result, HttpContext httpContext)
+    {
+        if (result is Created created)
+        {
+            if (created.Location.HasValue())
+            {
+                httpContext.Response.Headers.Location = created.Location;
+                return;
+            }
+        }
+
+        if (result is Accepted accepted)
+        {
+            if (accepted.Location.HasValue())
+            {
+                httpContext.Response.Headers.Location = accepted.Location;
+                return;
+            }
+        }
+
+        var resultType = result.GetType();
+
+        if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Created<>))
+        {
+            var location = (string?)resultType.GetProperty(nameof(Created<object>.Location))!.GetValue(result);
+            if (location.HasValue())
+            {
+                httpContext.Response.Headers.Location = location;
+                return;
+            }
+        }
+
+        if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Accepted<>))
+        {
+            var location = (string?)resultType.GetProperty(nameof(Accepted<object>.Location))!.GetValue(result);
+            if (location.HasValue())
+            {
+                httpContext.Response.Headers.Location = location;
+            }
+        }
     }
 
     private enum NegotiatedMimeType

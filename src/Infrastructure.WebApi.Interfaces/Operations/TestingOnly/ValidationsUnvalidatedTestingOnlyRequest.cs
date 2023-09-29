@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
 
 [UsedImplicitly]
-public class GetWithoutValidatorTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>
+public class ValidationsUnvalidatedTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>
 {
     public string? Id { get; set; }
 }

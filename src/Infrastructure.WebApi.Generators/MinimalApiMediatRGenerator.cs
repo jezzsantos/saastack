@@ -28,8 +28,7 @@ public class MinimalApiMediatRGenerator : ISourceGenerator
     {
         var assemblyNamespace = context.Compilation.AssemblyName;
         var serviceClasses = GetWebApiServiceOperationsFromAssembly(context)
-            .GroupBy(registrations => registrations.Class.TypeName)
-            .ToList();
+            .GroupBy(registrations => registrations.Class.TypeName).ToList();
 
         var classUsingNamespaces = BuildUsingList(serviceClasses);
         var handlerClasses = new StringBuilder();
@@ -69,31 +68,23 @@ namespace {assemblyNamespace}
     }
 
     private static string BuildUsingList(
-        List<IGrouping<WebApiProjectVisitor.TypeName,
-                WebApiProjectVisitor.ApiServiceOperationRegistration>>
+        List<IGrouping<WebApiAssemblyVisitor.TypeName, WebApiAssemblyVisitor.ServiceOperationRegistration>>
             serviceClasses)
     {
         var usingList = new StringBuilder();
 
-        var allNamespaces = serviceClasses
-            .SelectMany(serviceClass => serviceClass)
-            .SelectMany(registration => registration.Class.UsingNamespaces)
-            .Concat(RequiredUsingNamespaces)
-            .Distinct()
-            .OrderByDescending(s => s)
-            .ToList();
+        var allNamespaces = serviceClasses.SelectMany(serviceClass => serviceClass)
+            .SelectMany(registration => registration.Class.UsingNamespaces).Concat(RequiredUsingNamespaces).Distinct()
+            .OrderByDescending(s => s).ToList();
 
-        allNamespaces.ForEach(@using =>
-            usingList.AppendLine($"using {@using};"));
+        allNamespaces.ForEach(@using => usingList.AppendLine($"using {@using};"));
 
         return usingList.ToString();
     }
 
     private static void BuildEndpointRegistrations(
-        IGrouping<WebApiProjectVisitor.TypeName,
-                WebApiProjectVisitor.ApiServiceOperationRegistration>
-            serviceRegistrations,
-        StringBuilder endpointRegistrations)
+        IGrouping<WebApiAssemblyVisitor.TypeName, WebApiAssemblyVisitor.ServiceOperationRegistration>
+            serviceRegistrations, StringBuilder endpointRegistrations)
     {
         var serviceClassName = serviceRegistrations.Key.Name;
         var groupName = $"{serviceClassName.ToLowerInvariant()}Group";
@@ -103,29 +94,33 @@ namespace {assemblyNamespace}
 
         foreach (var registration in serviceRegistrations)
         {
-            var registerMethodName = ToMinimalApiRegistrationMethodName(registration.OperationType);
             if (registration.IsTestingOnly)
             {
                 endpointRegistrations.AppendLine($"#if {TestingOnlyDirective}");
             }
 
-            endpointRegistrations.AppendLine(
-                $"            {groupName}.{registerMethodName}(\"{registration.RoutePath}\",");
-            if (registration.OperationType == WebApiOperation.Get ||
-                registration.OperationType == WebApiOperation.Search ||
-                registration.OperationType == WebApiOperation.Delete)
+            var routeEndpointMethodNames = ToMinimalApiRegistrationMethodNames(registration.OperationType);
+            foreach (var routeEndpointMethod in routeEndpointMethodNames)
             {
                 endpointRegistrations.AppendLine(
-                    $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDtoType.FullName} request) =>");
-            }
-            else
-            {
+                    $"            {groupName}.{routeEndpointMethod}(\"{registration.RoutePath}\",");
+                if (registration.OperationType == WebApiOperation.Get ||
+                    registration.OperationType == WebApiOperation.Search ||
+                    registration.OperationType == WebApiOperation.Delete)
+                {
+                    endpointRegistrations.AppendLine(
+                        $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDtoType.FullName} request) =>");
+                }
+                else
+                {
+                    endpointRegistrations.AppendLine(
+                        $"                async (global::MediatR.IMediator mediator, global::{registration.RequestDtoType.FullName} request) =>");
+                }
+
                 endpointRegistrations.AppendLine(
-                    $"                async (global::MediatR.IMediator mediator, global::{registration.RequestDtoType.FullName} request) =>");
+                    "                     await mediator.Send(request, global::System.Threading.CancellationToken.None));");
             }
 
-            endpointRegistrations.AppendLine(
-                "                     await mediator.Send(request, global::System.Threading.CancellationToken.None));");
             if (registration.IsTestingOnly)
             {
                 endpointRegistrations.AppendLine("#endif");
@@ -134,10 +129,8 @@ namespace {assemblyNamespace}
     }
 
     private static void BuildHandlerClasses(
-        IGrouping<WebApiProjectVisitor.TypeName,
-                WebApiProjectVisitor.ApiServiceOperationRegistration>
-            serviceRegistrations,
-        StringBuilder handlerClasses)
+        IGrouping<WebApiAssemblyVisitor.TypeName, WebApiAssemblyVisitor.ServiceOperationRegistration>
+            serviceRegistrations, StringBuilder handlerClasses)
     {
         var serviceClassNamespace = $"{serviceRegistrations.Key.FullName}MediatRHandlers";
         handlerClasses.AppendLine($"namespace {serviceClassNamespace}");
@@ -145,18 +138,9 @@ namespace {assemblyNamespace}
 
         foreach (var registration in serviceRegistrations)
         {
-            var constructorAndFields = BuildInjectorConstructorAndFields(registration.RequestDtoType.Name,
+            var handlerClassName = $"{registration.MethodName}_{registration.RequestDtoType.Name}_Handler";
+            var constructorAndFields = BuildInjectorConstructorAndFields(handlerClassName,
                 registration.Class.Constructors.ToList());
-
-            handlerClasses.AppendLine(
-                $"    public class {registration.RequestDtoType.Name}Handler : global::MediatR.IRequestHandler<global::{registration.RequestDtoType.FullName}," +
-                $" global::Microsoft.AspNetCore.Http.IResult>");
-            handlerClasses.AppendLine(
-                "    {");
-            if (constructorAndFields.HasValue())
-            {
-                handlerClasses.AppendLine(constructorAndFields);
-            }
 
             if (registration.IsTestingOnly)
             {
@@ -164,8 +148,16 @@ namespace {assemblyNamespace}
             }
 
             handlerClasses.AppendLine(
-                $"        public async Task<global::Microsoft.AspNetCore.Http.IResult>" +
-                $" Handle(global::{registration.RequestDtoType.FullName} request, global::System.Threading.CancellationToken cancellationToken)");
+                $"    public class {handlerClassName} : global::MediatR.IRequestHandler<global::{registration.RequestDtoType.FullName}," +
+                $" global::Microsoft.AspNetCore.Http.IResult>");
+            handlerClasses.AppendLine("    {");
+            if (constructorAndFields.HasValue())
+            {
+                handlerClasses.AppendLine(constructorAndFields);
+            }
+
+            handlerClasses.AppendLine($"        public async Task<global::Microsoft.AspNetCore.Http.IResult>" +
+                                      $" Handle(global::{registration.RequestDtoType.FullName} request, global::System.Threading.CancellationToken cancellationToken)");
             handlerClasses.AppendLine("        {");
             var callingParameters = BuildInjectedParameters(registration.Class.Constructors.ToList());
             handlerClasses.AppendLine(
@@ -173,14 +165,14 @@ namespace {assemblyNamespace}
             handlerClasses.AppendLine(
                 $"            var result = await api.{registration.MethodName}(request, cancellationToken);");
             handlerClasses.AppendLine(
-                "            return result.HandleApiResult();");
+                $"            return result.HandleApiResult(global::Infrastructure.WebApi.Interfaces.WebApiOperation.{registration.OperationType});");
             handlerClasses.AppendLine("        }");
+            handlerClasses.AppendLine("    }");
             if (registration.IsTestingOnly)
             {
                 handlerClasses.AppendLine("#endif");
             }
 
-            handlerClasses.AppendLine("    }");
             handlerClasses.AppendLine();
         }
 
@@ -188,8 +180,8 @@ namespace {assemblyNamespace}
         handlerClasses.AppendLine();
     }
 
-    private static string BuildInjectorConstructorAndFields(string? requestTypeName,
-        List<WebApiProjectVisitor.Constructor> constructors)
+    private static string BuildInjectorConstructorAndFields(string? handlerClassName,
+        List<WebApiAssemblyVisitor.Constructor> constructors)
     {
         var handlerClassConstructorAndFields = new StringBuilder();
 
@@ -204,7 +196,7 @@ namespace {assemblyNamespace}
             }
 
             handlerClassConstructorAndFields.AppendLine();
-            handlerClassConstructorAndFields.Append($"        public {requestTypeName}Handler(");
+            handlerClassConstructorAndFields.Append($"        public {handlerClassName}(");
             var paramsRemaining = parameters.Count();
             foreach (var param in parameters)
             {
@@ -229,7 +221,7 @@ namespace {assemblyNamespace}
         return handlerClassConstructorAndFields.ToString();
     }
 
-    private static string BuildInjectedParameters(List<WebApiProjectVisitor.Constructor> constructors)
+    private static string BuildInjectedParameters(List<WebApiAssemblyVisitor.Constructor> constructors)
     {
         var methodParameters = new StringBuilder();
 
@@ -252,24 +244,24 @@ namespace {assemblyNamespace}
         return methodParameters.ToString();
     }
 
-    private static List<WebApiProjectVisitor.ApiServiceOperationRegistration> GetWebApiServiceOperationsFromAssembly(
+    private static List<WebApiAssemblyVisitor.ServiceOperationRegistration> GetWebApiServiceOperationsFromAssembly(
         GeneratorExecutionContext context)
     {
-        var visitor = new WebApiProjectVisitor(context.CancellationToken, context.Compilation);
+        var visitor = new WebApiAssemblyVisitor(context.CancellationToken, context.Compilation);
         visitor.Visit(context.Compilation.Assembly);
         return visitor.OperationRegistrations;
     }
 
-    private static string ToMinimalApiRegistrationMethodName(WebApiOperation operation)
+    private static string[] ToMinimalApiRegistrationMethodNames(WebApiOperation operation)
     {
         return operation switch
         {
-            WebApiOperation.Get => "MapGet",
-            WebApiOperation.Search => "MapGet",
-            WebApiOperation.Post => "MapPost",
-            WebApiOperation.PutPatch => "MapPut",
-            WebApiOperation.Delete => "MapDelete",
-            _ => "MapGet"
+            WebApiOperation.Get => new[] { "MapGet" },
+            WebApiOperation.Search => new[] { "MapGet" },
+            WebApiOperation.Post => new[] { "MapPost" },
+            WebApiOperation.PutPatch => new[] { "MapPut", "MapPatch" },
+            WebApiOperation.Delete => new[] { "MapDelete" },
+            _ => new[] { "MapGet" }
         };
     }
 }

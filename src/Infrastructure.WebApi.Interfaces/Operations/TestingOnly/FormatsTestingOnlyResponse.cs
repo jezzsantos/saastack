@@ -1,7 +1,7 @@
 #if TESTINGONLY
 namespace Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
 
-public class DataTypesTestingOnlyResponse : IWebResponse
+public class FormatsTestingOnlyResponse : IWebResponse
 {
     public CustomDto? Custom { get; set; }
 
