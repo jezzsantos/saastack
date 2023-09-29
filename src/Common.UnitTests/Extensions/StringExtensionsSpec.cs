@@ -164,6 +164,54 @@ public class StringExtensionsSpec
     }
 
     [Fact]
+    public void WhenReplaceWithNull_ThenReturnsNull()
+    {
+        var result = ((string)null!).ReplaceWith("apattern", "areplacement");
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenReplaceWithEmpty_ThenReturnsEmpty()
+    {
+        var result = string.Empty.ReplaceWith("apattern", "areplacement");
+
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenReplaceWithNullPattern_ThenReturnsInput()
+    {
+        var result = "avalue".ReplaceWith(null!, "areplacement");
+
+        result.Should().Be("avalue");
+    }
+
+    [Fact]
+    public void WhenReplaceWithEmptyAndEmptyPattern_ThenReturnsInput()
+    {
+        var result = "avalue".ReplaceWith(string.Empty, "areplacement");
+
+        result.Should().Be("avalue");
+    }
+
+    [Fact]
+    public void WhenReplaceWithNoMatches_ThenReturnsInput()
+    {
+        var result = "avalue".ReplaceWith("apattern", "areplacement");
+
+        result.Should().Be("avalue");
+    }
+
+    [Fact]
+    public void WhenReplaceWithMatches_ThenReturnsReplaced()
+    {
+        var result = "avalue".ReplaceWith("a", "b");
+
+        result.Should().Be("bvblue");
+    }
+
+    [Fact]
     public void WhenToBoolAndEmpty_ThenReturnsFalse()
     {
         var result = "".ToBool();
@@ -174,9 +222,7 @@ public class StringExtensionsSpec
     [Fact]
     public void WhenToBoolAndNotMatches_ThenThrows()
     {
-        "notavalue"
-            .Invoking(x => x.ToBool())
-            .Should().Throw<FormatException>();
+        "notavalue".Invoking(x => x.ToBool()).Should().Throw<FormatException>();
     }
 
     [Fact]
@@ -243,7 +289,6 @@ public class StringExtensionsSpec
         result.Should().BeFalse();
     }
 
-
     [Fact]
     public void WhenToIntAndEmpty_ThenReturnsMinusOne()
     {
@@ -255,9 +300,7 @@ public class StringExtensionsSpec
     [Fact]
     public void WhenToIntAndNotMatches_ThenThrows()
     {
-        "notavalue"
-            .Invoking(x => x.ToInt())
-            .Should().Throw<FormatException>();
+        "notavalue".Invoking(x => x.ToInt()).Should().Throw<FormatException>();
     }
 
     [Fact]

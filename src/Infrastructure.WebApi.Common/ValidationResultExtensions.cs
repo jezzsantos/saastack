@@ -1,5 +1,6 @@
 using System.Net;
 using FluentValidation.Results;
+using Infrastructure.WebApi.Common.Validation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Infrastructure.WebApi.Common;
@@ -12,20 +13,19 @@ public static class ValidationResultExtensions
     /// </summary>
     public static ProblemDetails ToRfc7807(this ValidationResult result, string requestUrl)
     {
-        var validationDetails = result.Errors
-            .Select(error => new
-            {
-                Rule = error.ErrorCode,
-                Reason = error.ErrorMessage,
-                Value = error.AttemptedValue
-            }).ToList();
+        var validationDetails = result.Errors.Select(error => new
+        {
+            Rule = error.ErrorCode,
+            Reason = error.ErrorMessage,
+            Value = error.AttemptedValue
+        }).ToList();
         var firstMessage = result.Errors.Select(error => error.ErrorMessage).First();
         var firstCode = result.Errors.Select(error => error.ErrorCode).First();
 
         var details = new ProblemDetails
         {
             Type = firstCode,
-            Title = Resources.ValidationBehavior_ErrorTitle,
+            Title = ValidationResources.ValidationBehavior_ErrorTitle,
             Status = (int)HttpStatusCode.BadRequest,
             Detail = firstMessage,
             Instance = requestUrl

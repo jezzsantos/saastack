@@ -29,6 +29,6 @@ internal class UrlValidator<T, TProperty> : PropertyValidator<T, TProperty>
 
     protected override string GetDefaultMessageTemplate(string errorCode)
     {
-        return Resources.UrlValidator_ErrorMessage;
+        return ValidationResources.UrlValidator_ErrorMessage;
     }
 }

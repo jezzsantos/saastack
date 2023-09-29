@@ -6,14 +6,14 @@ namespace Domain.Interfaces.Validations;
 ///     Provides an <see cref="Validation{TValue}.Expression" /> or <see cref="Validation{TValue}.Function" /> that can
 ///     validated
 /// </summary>
-public class Validation : Validation<string>
+public class Validation : Validation<string?>
 {
     public Validation(string expression, int? minLength = null, int? maxLength = null,
         IEnumerable<string>? substitutions = null) : base(expression, minLength, maxLength, substitutions)
     {
     }
 
-    public Validation(Func<string, bool> predicate) : base(predicate)
+    public Validation(Func<string?, bool> predicate) : base(predicate)
     {
     }
 }
@@ -74,14 +74,13 @@ public class Validation<TValue>
         }
 
         var expression = Expression!;
-        values.ToList()
-            .ForEach(val =>
+        values.ToList().ForEach(val =>
+        {
+            if (Substitutions is not null && Substitutions.Contains(val.Key))
             {
-                if (Substitutions is not null && Substitutions.Contains(val.Key))
-                {
-                    expression = expression.Replace(val.Key, val.Value);
-                }
-            });
+                expression = expression.Replace(val.Key, val.Value);
+            }
+        });
 
         return expression;
     }

@@ -20,4 +20,9 @@
         <PackageReference Include="JunitXml.TestLogger" Version="3.0.134" />
     </ItemGroup>
 
+
+    <ItemGroup>
+        <ProjectReference Include="..\Common\Common.csproj" />
+    </ItemGroup>
+
 </Project>

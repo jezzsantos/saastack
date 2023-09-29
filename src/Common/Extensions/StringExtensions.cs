@@ -59,8 +59,7 @@ public static class StringExtensions
     [ContractAnnotation("null => true; notnull => false")]
     public static bool HasNoValue(this string? value)
     {
-        return string.IsNullOrEmpty(value)
-               || string.IsNullOrWhiteSpace(value);
+        return string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value);
     }
 
     /// <summary>
@@ -69,8 +68,7 @@ public static class StringExtensions
     [ContractAnnotation("null => false; notnull => true")]
     public static bool HasValue(this string? value)
     {
-        return !string.IsNullOrEmpty(value)
-               && !string.IsNullOrWhiteSpace(value);
+        return !string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value);
     }
 
     /// <summary>
@@ -102,6 +100,22 @@ public static class StringExtensions
     public static bool NotEqualsOrdinal(this string value, string other)
     {
         return !value.EqualsOrdinal(other);
+    }
+
+    /// <summary>
+    ///     This method ensures that we apply a timeout to the matching,
+    ///     to avoid potential DOS attacks where a regular expression is used on on outer boundary layer
+    /// </summary>
+    public static string ReplaceWith(this string value, [RegexPattern] string pattern, string replacement,
+        TimeSpan? timeout = null)
+    {
+        if (value.HasNoValue() || pattern.HasNoValue())
+        {
+            return value;
+        }
+
+        var timeoutSafe = timeout ?? DefaultRegexTimeout;
+        return Regex.Replace(value, pattern, replacement, RegexOptions.None, timeoutSafe);
     }
 
     /// <summary>
@@ -168,7 +182,6 @@ public static class StringExtensions
         return defaultValue;
     }
 
-
     /// <summary>
     ///     Converts the object to a json format
     /// </summary>
@@ -190,7 +203,9 @@ public static class StringExtensions
         {
             WriteIndented = prettyPrint,
             PropertyNamingPolicy = namingPolicy,
-            DefaultIgnoreCondition = includeNulls ? JsonIgnoreCondition.Never : JsonIgnoreCondition.WhenWritingNull
+            DefaultIgnoreCondition = includeNulls
+                ? JsonIgnoreCondition.Never
+                : JsonIgnoreCondition.WhenWritingNull
         });
     }
 }

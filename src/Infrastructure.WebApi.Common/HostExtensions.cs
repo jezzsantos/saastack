@@ -4,6 +4,7 @@ using Application.Interfaces;
 using Common.Recording;
 using Domain.Interfaces.Entities;
 using Infrastructure.Common.Recording;
+using Infrastructure.WebApi.Common.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -63,6 +64,8 @@ public static class HostExtensions
         void SetupApiRequests()
         {
             builder.Services.AddHttpContextAccessor();
+            builder.Services.AddSingleton<IHasSearchOptionsValidator, HasSearchOptionsValidator>();
+            builder.Services.AddSingleton<IHasGetOptionsValidator, HasGetOptionsValidator>();
             builder.Services.RegisterValidators(modules.ApiAssemblies, out var validators);
 
             builder.Services.AddMediatR(configuration =>

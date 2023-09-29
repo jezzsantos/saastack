@@ -34,20 +34,15 @@ public static class CommonValidations
 
     public static Validation FreeformText(int min = 1, int max = 1000)
     {
-        return
-            new Validation(
-                @$"^[${FreeFormTextAllowedCharacters}]*$", min, max);
+        return new Validation(@$"^[${FreeFormTextAllowedCharacters}]*$", min, max);
     }
 
     public static Validation Markdown(int min = 1, int max = 1000)
     {
-        return
-            new Validation(
-                $@"^[${FreeFormTextAllowedCharacters}${Emojis}]*$", min, max);
+        return new Validation($@"^[${FreeFormTextAllowedCharacters}${Emojis}]*$", min, max);
     }
 
     public static bool Matches<TValue>(this Validation<TValue> format, TValue value)
-        where TValue : notnull
     {
         if (format.Function.Exists())
         {
@@ -64,20 +59,24 @@ public static class CommonValidations
             return false;
         }
 
-        var valueToMatch = value.ToString() ?? string.Empty;
+        var valueToMatch = value!.ToString() ?? string.Empty;
 
         return valueToMatch.IsMatchWith(format.Expression!);
     }
 
     private static bool IsInvalidLength<TValue>(Validation<TValue> format, TValue value)
-        where TValue : notnull
     {
-        if (format.MinLength.HasValue && value.ToString()!.Length < format.MinLength.Value)
+        if (value.NotExists())
         {
             return true;
         }
 
-        if (format.MaxLength.HasValue && value.ToString()!.Length > format.MaxLength.Value)
+        if (format.MinLength.HasValue && value!.ToString()!.Length < format.MinLength.Value)
+        {
+            return true;
+        }
+
+        if (format.MaxLength.HasValue && value!.ToString()!.Length > format.MaxLength.Value)
         {
             return true;
         }

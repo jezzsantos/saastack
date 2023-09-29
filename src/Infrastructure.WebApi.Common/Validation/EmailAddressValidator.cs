@@ -30,6 +30,6 @@ internal class EmailAddressValidator<T, TProperty> : PropertyValidator<T, TPrope
 
     protected override string GetDefaultMessageTemplate(string errorCode)
     {
-        return Resources.EmailAddressValidator_InvalidEmailAddress;
+        return ValidationResources.EmailAddressValidator_InvalidEmailAddress;
     }
 }

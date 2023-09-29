@@ -5,12 +5,19 @@ namespace Domain.Common;
 
 public static class GuardExtensions
 {
-    public static void GuardAgainstInvalid<TValue>(this TValue value, Validation<TValue> format, string parameterName,
-        string? errorMessage = null) where TValue : notnull
+    /// <summary>
+    ///     Guards the <see cref="value" /> from being invalid according to the <see cref="validation" />
+    /// </summary>
+    /// <exception cref="ArgumentException">When the <see cref="parameterName" /> is missing</exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     When the <see cref="value" /> fails the <see cref="validation" />
+    /// </exception>
+    public static void GuardAgainstInvalid<TValue>(this TValue value, Validation<TValue> validation,
+        string parameterName, string? errorMessage = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(parameterName);
 
-        var isMatch = format.Matches(value);
+        var isMatch = validation.Matches(value);
         if (!isMatch)
         {
             if (errorMessage.HasValue())

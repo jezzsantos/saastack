@@ -9,7 +9,6 @@ namespace Infrastructure.WebApi.Common.Validation;
 ///     Validates a validation
 /// </summary>
 internal class ValidatorValidator<T, TProperty> : PropertyValidator<T, TProperty>
-    where TProperty : notnull
 {
     private readonly Validation<TProperty> _validation;
 
@@ -33,6 +32,6 @@ internal class ValidatorValidator<T, TProperty> : PropertyValidator<T, TProperty
 
     protected override string GetDefaultMessageTemplate(string errorCode)
     {
-        return Resources.ValidationValidator_InvalidProperty;
+        return ValidationResources.ValidationValidator_InvalidProperty;
     }
 }
