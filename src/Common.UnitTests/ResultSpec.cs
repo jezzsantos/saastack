@@ -52,8 +52,7 @@ public class ResultSpec
     {
         var result = new Result<string, TestError>(new TestError());
 
-        result.Invoking(x => x.Value)
-            .Should().Throw<InvalidOperationException>()
+        result.Invoking(x => x.Value).Should().Throw<InvalidOperationException>()
             .WithMessage(Resources.Result_FetchValueWhenFaulted.Format("atesterror"));
     }
 
@@ -72,8 +71,7 @@ public class ResultSpec
     {
         var result = new Result<string, TestError>("avalue");
 
-        result.Invoking(x => x.Error)
-            .Should().Throw<InvalidOperationException>()
+        result.Invoking(x => x.Error).Should().Throw<InvalidOperationException>()
             .WithMessage(Resources.Result_FetchErrorWhenNotFaulted);
     }
 
@@ -153,27 +151,6 @@ public class ResultSpec
     }
 
     [Fact]
-    public void WhenTryGetAndIsFaulted_ThenReturnsFalse()
-    {
-        var error = new TestError();
-        var result = new Result<string, TestError>(error);
-
-        var actual = result.TryGet();
-
-        actual.Should().Be(Optional<string>.None);
-    }
-
-    [Fact]
-    public void WhenTryGetAndIsNotFaulted_ThenReturnsTrue()
-    {
-        var result = new Result<string, TestError>("avalue");
-
-        var actual = result.TryGet();
-
-        actual.Should().Be("avalue");
-    }
-
-    [Fact]
     public void WhenToStringAndFaulted_ThenReturnsErrorRepresentation()
     {
         var error = new TestError();
@@ -247,7 +224,33 @@ public class ResultSpec
     }
 
     [Fact]
-    public void WhenMatchAndSuccessful_ThenReturnsTheSuccessfulDelegate()
+    public void WhenMatchAndSuccessfulContainingNullValue_ThenReturnsOptionalNone()
+    {
+        var result = new Result<string, TestError>();
+        var successWasCalled = false;
+        var errorWasCalled = false;
+        object? passedValue = null;
+
+        var match = result.Match(success =>
+        {
+            successWasCalled = true;
+            passedValue = success;
+            return true;
+        }, fail =>
+        {
+            errorWasCalled = true;
+            passedValue = fail;
+            return false;
+        });
+
+        match.Should().BeTrue();
+        successWasCalled.Should().BeTrue();
+        errorWasCalled.Should().BeFalse();
+        passedValue.Should().Be(Optional<string>.None);
+    }
+
+    [Fact]
+    public void WhenMatchAndSuccessfulContainingNonNullValue_ThenReturnsTheOptionalValue()
     {
         var result = new Result<string, TestError>("avalue");
         var successWasCalled = false;
@@ -273,7 +276,7 @@ public class ResultSpec
     }
 
     [Fact]
-    public void WhenMatchAndNotSuccessful_ThenReturnsTheErrorDelegate()
+    public void WhenMatchAndNotSuccessful_ThenReturnsTheError()
     {
         var error = new TestError();
         var result = new Result<string, TestError>(error);

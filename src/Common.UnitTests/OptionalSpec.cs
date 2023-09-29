@@ -42,8 +42,7 @@ public class OptionalSpec
     {
         var optional = new Optional<TestClass>(null!);
 
-        optional.Invoking(x => x.Value)
-            .Should().Throw<InvalidOperationException>()
+        optional.Invoking(x => x.Value).Should().Throw<InvalidOperationException>()
             .WithMessage(Resources.Optional_NullValue);
     }
 
@@ -57,7 +56,6 @@ public class OptionalSpec
 
         result.Should().Be(instance);
     }
-
 
     [Fact]
     public void WhenGetValueOrDefaultAndNullInstance_ThenReturnsNull()
@@ -143,7 +141,6 @@ public class OptionalSpec
         (optional == instance).Should().BeTrue();
     }
 
-
     [Fact]
     public void WhenNotEqualsOperatorWithEmptyOptionalOfSameType_ThenReturnsTrue()
     {
@@ -169,7 +166,6 @@ public class OptionalSpec
 
         (optional != instance).Should().BeFalse();
     }
-
 
     [Fact]
     public void WhenEqualsWithEmptyOptionalOfSameType_ThenReturnsFalse()
@@ -239,5 +235,6 @@ public class OptionalSpec
 
 public class TestClass
 {
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public required string AProperty { get; set; }
 }

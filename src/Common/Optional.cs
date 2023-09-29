@@ -4,7 +4,7 @@ namespace Common;
 
 /// <summary>
 ///     Provides an optional type that combines a <see cref="Value" /> and a <see cref="HasValue" /> which indicates
-///     whether or not the &lt;see cref="Value" /&gt; is meaningful.
+///     whether or not the <see cref="Value" /> is meaningful.
 /// </summary>
 public readonly struct Optional<T> : IEquatable<Optional<T>>
 {
@@ -47,7 +47,6 @@ public readonly struct Optional<T> : IEquatable<Optional<T>>
     ///     Returns the contained value
     /// </summary>
     public T? ValueOrDefault { get; }
-
 
     /// <summary>
     ///     Tries to obtain the value

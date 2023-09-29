@@ -9,25 +9,25 @@ namespace Common;
 public readonly struct Result<TValue, TError>
     where TError : struct
 {
-    private readonly Optional<TError> _error;
+    private readonly TError? _error;
     private readonly Optional<TValue> _value;
 
     public Result(TValue value)
     {
         _value = new Optional<TValue>(value);
-        _error = new Optional<TError>();
+        _error = null;
     }
 
     public Result(Optional<TValue> value)
     {
         _value = value;
-        _error = new Optional<TError>();
+        _error = null;
     }
 
     public Result(TError error)
     {
-        _error = new Optional<TError>(error);
-        _value = new Optional<TValue>();
+        _error = error;
+        _value = Optional<TValue>.None;
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public readonly struct Result<TValue, TError>
         {
             if (!IsSuccessful)
             {
-                throw new InvalidOperationException(Resources.Result_FetchValueWhenFaulted.Format(_error));
+                throw new InvalidOperationException(Resources.Result_FetchValueWhenFaulted.Format(_error!.Value));
             }
 
             return _value.Value;
@@ -65,9 +65,19 @@ public readonly struct Result<TValue, TError>
                 throw new InvalidOperationException(Resources.Result_FetchErrorWhenNotFaulted);
             }
 
-            return _error.Value;
+            return _error!.Value;
         }
     }
+
+    /// <summary>
+    ///     Returns whether the <see cref="Value" /> exists
+    /// </summary>
+    public bool HasValue => IsSuccessful;
+
+    /// <summary>
+    ///     Returns whether the <see cref="Value" /> exists
+    /// </summary>
+    public bool Exists => IsSuccessful;
 
     /// <summary>
     ///     Creates a new <see cref="Result{TReturn, TError}" /> in its faulted state, with the <see cref="error" />
@@ -101,21 +111,13 @@ public readonly struct Result<TValue, TError>
     }
 
     /// <summary>
-    ///     Returns the contained value
-    /// </summary>
-    public Optional<TValue> TryGet()
-    {
-        return IsSuccessful ? _value : Optional<TValue>.None;
-    }
-
-    /// <summary>
     ///     Tries to return the contained <see cref="error" />, if it is faulted
     /// </summary>
     public bool TryGetError(out TError? error)
     {
         if (!IsSuccessful)
         {
-            error = _error.Value;
+            error = _error!.Value;
             return true;
         }
 
@@ -123,14 +125,15 @@ public readonly struct Result<TValue, TError>
         return false;
     }
 
-
     /// <summary>
     ///     Returns a string representation of the contained value or the contained error
     /// </summary>
     /// <returns></returns>
-    public override string ToString()
+    public override string? ToString()
     {
-        return IsSuccessful ? _value.ToString() : _error.ToString();
+        return IsSuccessful
+            ? _value.ToString()
+            : _error!.ToString();
     }
 
     /// <summary>
@@ -169,10 +172,10 @@ public readonly struct Result<TValue, TError>
     ///     Returns the result from the <see cref="onSuccess" /> delegate or <see cref="onError" /> delegate
     ///     depending on whether there is a contained value or not
     /// </summary>
-    public TOut Match<TOut>(Func<TValue, TOut> onSuccess, Func<TError, TOut> onError)
+    public TOut Match<TOut>(Func<Optional<TValue>, TOut> onSuccess, Func<TError, TOut> onError)
     {
         return IsSuccessful
-            ? onSuccess(Value)
-            : onError(Error);
+            ? onSuccess(_value)
+            : onError(_error!.Value);
     }
 }
