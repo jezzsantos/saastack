@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
 using ApiHost1;
 using CarsApplication.Persistence;
 using FluentAssertions;
@@ -21,93 +20,82 @@ public class CarsApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenRegisterCar_ThenReturnsCar()
     {
-        var response = await Api.PostAsJsonAsync("/cars", new RegisterCarRequest
+        var result = await Api.PostAsync("/cars", new RegisterCarRequest
         {
             Make = "amake",
             Model = "amodel",
             Year = 2023
         });
 
-        var result = (await response.Content.ReadFromJsonAsync<GetCarResponse>())!.Car;
-        var location = response.Headers.Location?.ToString();
+        var location = result.Headers.Location?.ToString();
 
         location.Should().StartWith("/cars/car_");
-        result.Id.Should().NotBeEmpty();
-        result.Make.Should().Be("amake");
-        result.Model.Should().Be("amodel");
-        result.Year.Should().Be(2023);
+        result.Content.Car!.Id.Should().NotBeEmpty();
+        result.Content.Car.Make.Should().Be("amake");
+        result.Content.Car.Model.Should().Be("amodel");
+        result.Content.Car.Year.Should().Be(2023);
     }
 
     [Fact]
     public async Task WhenGetCar_ThenReturnsCar()
     {
-        var response = await Api.PostAsJsonAsync("/cars", new RegisterCarRequest
+        var car = (await Api.PostAsync("/cars", new RegisterCarRequest
         {
             Make = "amake",
             Model = "amodel",
             Year = 2023
-        });
+        })).Content.Car!;
 
-        var car = (await response.Content.ReadFromJsonAsync<GetCarResponse>())!.Car;
+        var result = (await Api.GetAsync<GetCarResponse>($"/cars/{car.Id}")).Content.Car!;
 
-        var result = await Api.GetFromJsonAsync<GetCarResponse>($"/cars/{car.Id}");
-
-        result?.Car.Id.Should().Be(car.Id);
+        result.Id.Should().Be(car.Id);
     }
 
     [Fact]
     public async Task WhenSearchAllCars_ThenReturnsCars()
     {
-        var response = await Api.PostAsJsonAsync("/cars", new RegisterCarRequest
+        var car = (await Api.PostAsync("/cars", new RegisterCarRequest
         {
             Make = "amake",
             Model = "amodel",
             Year = 2023
-        });
+        })).Content.Car!;
 
-        var car = (await response.Content.ReadFromJsonAsync<GetCarResponse>())!.Car;
+        var result = (await Api.GetAsync<SearchAllCarsResponse>("/cars")).Content.Cars!;
 
-        var result = await Api.GetFromJsonAsync<SearchAllCarsResponse>("/cars");
-
-        result?.Cars?.Count.Should().Be(1);
-        result?.Cars?[0].Id.Should().Be(car.Id);
+        result.Count.Should().Be(1);
+        result[0].Id.Should().Be(car.Id);
     }
 
     [Fact]
     public async Task WhenTakeCarOffline_ThenReturnsCar()
     {
-        var response = await Api.PostAsJsonAsync("/cars", new RegisterCarRequest
+        var car = (await Api.PostAsync("/cars", new RegisterCarRequest
         {
             Make = "amake",
             Model = "amodel",
             Year = 2023
-        });
+        })).Content.Car!;
 
-        var car = (await response.Content.ReadFromJsonAsync<GetCarResponse>())!.Car;
-
-        var result = await Api.PutAsJsonAsync($"/cars/{car.Id}/offline", new TakeOfflineCarRequest
+        var result = (await Api.PutAsync($"/cars/{car.Id}/offline", new TakeOfflineCarRequest
         {
             Id = car.Id,
             StartAtUtc = DateTime.UtcNow.AddHours(1),
             EndAtUtc = DateTime.UtcNow.AddHours(2)
-        });
+        })).Content.Car!;
 
-        var offline = (await result.Content.ReadFromJsonAsync<GetCarResponse>())!.Car;
-
-        offline.Id.Should().Be(car.Id);
+        result.Id.Should().Be(car.Id);
     }
 
     [Fact]
     public async Task WhenDeleteCar_ThenDeletes()
     {
-        var response = await Api.PostAsJsonAsync("/cars", new RegisterCarRequest
+        var car = (await Api.PostAsync("/cars", new RegisterCarRequest
         {
             Make = "amake",
             Model = "amodel",
             Year = 2023
-        });
-
-        var car = (await response.Content.ReadFromJsonAsync<GetCarResponse>())!.Car;
+        })).Content.Car!;
 
         var result = await Api.DeleteAsync($"/cars/{car.Id}");
 

@@ -1,3 +1,4 @@
+using Infrastructure.WebApi.Common.Clients;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +38,8 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
     where THost : class
 {
     private readonly WebApplicationFactory<THost> _setup;
-    protected readonly HttpClient Api;
+    protected readonly IHttpJsonClient Api;
+    protected readonly HttpClient HttpApi;
 
     protected WebApiSpec(WebApiSetup<THost> setup)
     {
@@ -46,7 +48,8 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
             //TODO: swap out dependencies
             //services.AddScoped<ITodoItemService, TestTodoItemService>();
         }));
-        Api = setup.CreateClient();
+        HttpApi = setup.CreateClient();
+        Api = new JsonClient(HttpApi);
     }
 
     public void Dispose()
@@ -59,7 +62,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
     {
         if (disposing)
         {
-            Api.Dispose();
+            HttpApi.Dispose();
             _setup.Dispose();
         }
     }

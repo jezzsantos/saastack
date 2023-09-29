@@ -1,6 +1,5 @@
 #if TESTINGONLY
 using System.Net;
-using System.Net.Http.Json;
 using ApiHost1;
 using FluentAssertions;
 using Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
@@ -19,82 +18,52 @@ public class ApiContentNegotiationSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenGetWithNoAccept_ThenReturnsJsonResponse()
     {
-        var request = new HttpRequestMessage
-        {
-            RequestUri = new Uri($"{Api.BaseAddress}testingonly/negotiations/get")
-        };
-        request.Headers.Remove(HttpHeaders.Accept);
-
-        var result = await Api.SendAsync(request);
-
-        var json = await result.Content.ReadFromJsonAsync<StringMessageTestingOnlyResponse>();
+        var result = await Api.GetAsync<StringMessageTestingOnlyResponse>("testingonly/negotiations/get",
+            request => request.Headers.Remove(HttpHeaders.Accept));
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        json?.Message.Should().Be("amessage");
+        result.Content.Message.Should().Be("amessage");
     }
 
     [Fact]
     public async Task WhenGetWithAcceptForUnsupported_ThenReturns415()
     {
-        var request = new HttpRequestMessage
-        {
-            RequestUri = new Uri($"{Api.BaseAddress}testingonly/negotiations/get")
-        };
-        request.Headers.Add(HttpHeaders.Accept, "application/unsupported");
-
-        var result = await Api.SendAsync(request);
-
-        var content = await result.Content.ReadAsStringAsync();
+        var result = await Api.GetAsync("/testingonly/negotiations/get",
+            request => request.Headers.Add(HttpHeaders.Accept, "application/unsupported"));
 
         result.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType);
-        content.Should().BeEmpty();
+        result.Content.Should().BeEmpty();
     }
 
     [Fact]
     public async Task WhenGetWithAcceptForJson_ThenReturnsJsonResponse()
     {
-        var request = new HttpRequestMessage
-        {
-            RequestUri = new Uri($"{Api.BaseAddress}testingonly/negotiations/get")
-        };
-        request.Headers.Add(HttpHeaders.Accept, HttpContentTypes.Json);
-
-        var result = await Api.SendAsync(request);
-
-        var json = await result.Content.ReadFromJsonAsync<StringMessageTestingOnlyResponse>();
+        var result = await Api.GetAsync<StringMessageTestingOnlyResponse>("/testingonly/negotiations/get",
+            request => request.Headers.Add(HttpHeaders.Accept, HttpContentTypes.Json));
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        json?.Message.Should().Be("amessage");
+        result.Content.Message.Should().Be("amessage");
     }
 
     [Fact]
     public async Task WhenGetWithAcceptForXml_ThenReturnsXmlResponse()
     {
-        var request = new HttpRequestMessage
-        {
-            RequestUri = new Uri($"{Api.BaseAddress}testingonly/negotiations/get")
-        };
-        request.Headers.Add(HttpHeaders.Accept, HttpContentTypes.Xml);
-
-        var result = await Api.SendAsync(request);
-
-        var content = await result.Content.ReadAsStringAsync();
+        var result = await Api.GetAsync("/testingonly/negotiations/get",
+            request => request.Headers.Add(HttpHeaders.Accept, HttpContentTypes.Xml));
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Be("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-                            "<StringMessageTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
-                            "<Message>amessage</Message>" + "</StringMessageTestingOnlyResponse>");
+        result.Content.Should().Be("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                                   "<StringMessageTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
+                                   "<Message>amessage</Message>" + "</StringMessageTestingOnlyResponse>");
     }
 
     [Fact]
     public async Task WhenGetWithNoFormat_ThenReturnsJsonResponse()
     {
-        var result = await Api.GetAsync("/testingonly/negotiations/get");
-
-        var json = await result.Content.ReadFromJsonAsync<StringMessageTestingOnlyResponse>();
+        var result = await Api.GetAsync<StringMessageTestingOnlyResponse>("/testingonly/negotiations/get");
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        json?.Message.Should().Be("amessage");
+        result.Content.Message.Should().Be("amessage");
     }
 
     [Fact]
@@ -102,21 +71,17 @@ public class ApiContentNegotiationSpec : WebApiSpec<Program>
     {
         var result = await Api.GetAsync("/testingonly/negotiations/get?format=unsupported");
 
-        var content = await result.Content.ReadAsStringAsync();
-
         result.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType);
-        content.Should().BeEmpty();
+        result.Content.Should().BeEmpty();
     }
 
     [Fact]
     public async Task WhenGetWithFormatForJson_ThenReturnsJsonResponse()
     {
-        var result = await Api.GetAsync("/testingonly/negotiations/get?format=json");
-
-        var json = await result.Content.ReadFromJsonAsync<StringMessageTestingOnlyResponse>();
+        var result = await Api.GetAsync<StringMessageTestingOnlyResponse>("/testingonly/negotiations/get?format=json");
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        json?.Message.Should().Be("amessage");
+        result.Content.Message.Should().Be("amessage");
     }
 
     [Fact]
@@ -124,12 +89,10 @@ public class ApiContentNegotiationSpec : WebApiSpec<Program>
     {
         var result = await Api.GetAsync("/testingonly/negotiations/get?format=xml");
 
-        var content = await result.Content.ReadAsStringAsync();
-
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Be("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-                            "<StringMessageTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
-                            "<Message>amessage</Message>" + "</StringMessageTestingOnlyResponse>");
+        result.Content.Should().Be("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                                   "<StringMessageTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
+                                   "<Message>amessage</Message>" + "</StringMessageTestingOnlyResponse>");
     }
 }
 #endif

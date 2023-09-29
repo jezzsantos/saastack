@@ -510,7 +510,9 @@ XML responses
 
 ### HTTP Clients
 
-TBD
+We have defined a `JsonClient` that can be used to call APIs, that provides convenient wrapper over `HttpClient`
+
+It is typed to requests `IWebRequest<TResponse`, making it easier to access responses
 
 ### Request Correlation
 
