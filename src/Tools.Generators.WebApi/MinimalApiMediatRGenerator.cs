@@ -1,11 +1,15 @@
 using System.Text;
-using Infrastructure.WebApi.Generators.Extensions;
 using Infrastructure.WebApi.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using Tools.Generators.WebApi.Extensions;
 
-namespace Infrastructure.WebApi.Generators;
+namespace Tools.Generators.WebApi;
 
+/// <summary>
+///     A source generators for converting <see cref="IWebApiService" /> to
+///     Minimal API registrations and MediatR handlers
+/// </summary>
 [Generator]
 public class MinimalApiMediatRGenerator : ISourceGenerator
 {

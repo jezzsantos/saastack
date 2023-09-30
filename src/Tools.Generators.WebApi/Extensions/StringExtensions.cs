@@ -1,4 +1,4 @@
-namespace Infrastructure.WebApi.Generators.Extensions;
+namespace Tools.Generators.WebApi.Extensions;
 
 public static class StringExtensions
 {

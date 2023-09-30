@@ -1,5 +1,8 @@
 namespace Common;
 
+/// <summary>
+///     Defines a <see cref="Result" /> error, used for result return values
+/// </summary>
 public struct Error
 {
     private Error(ErrorCode code, string? message = null)
@@ -63,8 +66,13 @@ public struct Error
     }
 }
 
+/// <summary>
+///     Defines the common types (codes) of errors that can happen in code at any layer,
+///     that return <see cref="Result{Error}" />
+/// </summary>
 public enum ErrorCode
 {
+    // EXTEND: add other kinds of errors you want to support in Result<TError>
     Validation,
     RuleViolation,
     RoleViolation,

@@ -1,9 +1,9 @@
-using Infrastructure.WebApi.Generators.Extensions;
 using Infrastructure.WebApi.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Tools.Generators.WebApi.Extensions;
 
-namespace Infrastructure.WebApi.Generators;
+namespace Tools.Generators.WebApi;
 
 /// <summary>
 ///     Visits all namespaces, and types in the current assembly (only),

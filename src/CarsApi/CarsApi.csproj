@@ -14,9 +14,7 @@
 
     <!-- Runs the source generator (in memory) on build -->
     <ItemGroup>
-        <ProjectReference Include="..\Infrastructure.WebApi.Generators\Infrastructure.WebApi.Generators.csproj"
-                          OutputItemType="Analyzer"
-                          ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\Tools.Generators.WebApi\Tools.Generators.WebApi.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Update="ValidationResources.resx">
