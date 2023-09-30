@@ -17,8 +17,7 @@ namespace Infrastructure.WebApi.Common;
 public sealed class XmlHttpResult<TValue> : IResult, IStatusCodeHttpResult, IValueHttpResult, IValueHttpResult<TValue>,
     IContentTypeHttpResult
 {
-    internal XmlHttpResult(TValue? value, int? statusCode,
-        XmlSerializerOptions? xmlSerializerOptions = null)
+    internal XmlHttpResult(TValue? value, int? statusCode, XmlSerializerOptions? xmlSerializerOptions = null)
     {
         Value = value;
         ContentType = HttpContentTypes.XmlWithCharset;
@@ -68,13 +67,8 @@ public sealed class XmlHttpResult<TValue> : IResult, IStatusCodeHttpResult, IVal
 /// </summary>
 internal static partial class MicrosoftAspNetCoreExtensions
 {
-    public static Task WriteResultAsXmlAsync<T>(
-        HttpContext httpContext,
-        ILogger logger,
-        T? value,
-        string? contentType,
-        XmlSerializerOptions? xmlSerializerOptions
-    )
+    public static Task WriteResultAsXmlAsync<T>(HttpContext httpContext, ILogger logger, T? value, string? contentType,
+        XmlSerializerOptions? xmlSerializerOptions)
     {
         if (value is null)
         {
@@ -88,27 +82,18 @@ internal static partial class MicrosoftAspNetCoreExtensions
 
             // In this case the polymorphism is not
             // relevant and we don't need to box.
-            return httpContext.Response.WriteAsXmlAsync(
-                value, contentType, xmlSerializerOptions);
+            return httpContext.Response.WriteAsXmlAsync(value, contentType, xmlSerializerOptions);
         }
 
         var runtimeType = value.GetType();
 
         Log.WritingResultAsXml(logger, runtimeType.Name);
 
-        return httpContext.Response.WriteAsXmlAsync(
-            value,
-            runtimeType,
-            contentType,
-            xmlSerializerOptions);
+        return httpContext.Response.WriteAsXmlAsync(value, runtimeType, contentType, xmlSerializerOptions);
     }
 
-    private static Task WriteAsXmlAsync<TValue>(
-        this HttpResponse response,
-        TValue value,
-        string? contentType,
-        XmlSerializerOptions? options,
-        CancellationToken cancellationToken = default)
+    private static Task WriteAsXmlAsync<TValue>(this HttpResponse response, TValue value, string? contentType,
+        XmlSerializerOptions? options, CancellationToken cancellationToken = default)
     {
         if (response == null)
         {
@@ -128,13 +113,8 @@ internal static partial class MicrosoftAspNetCoreExtensions
         return XmlSerializer.SerializeAsync(response.Body, value, options, cancellationToken);
     }
 
-    private static Task WriteAsXmlAsync(
-        this HttpResponse response,
-        object? value,
-        Type type,
-        string? contentType,
-        XmlSerializerOptions? options,
-        CancellationToken cancellationToken = default)
+    private static Task WriteAsXmlAsync(this HttpResponse response, object? value, Type type, string? contentType,
+        XmlSerializerOptions? options, CancellationToken cancellationToken = default)
     {
         if (response == null)
         {
@@ -153,18 +133,13 @@ internal static partial class MicrosoftAspNetCoreExtensions
         // if no user provided token, pass the RequestAborted token and ignore OperationCanceledException
         if (!cancellationToken.CanBeCanceled)
         {
-            return WriteAsXmlAsyncSlow(response.Body, value, type, options,
-                response.HttpContext.RequestAborted);
+            return WriteAsXmlAsyncSlow(response.Body, value, type, options, response.HttpContext.RequestAborted);
         }
 
         return XmlSerializer.SerializeAsync(response.Body, value, type, options, cancellationToken);
     }
 
-    private static async Task WriteAsXmlAsyncSlow(
-        Stream body,
-        object? value,
-        Type type,
-        XmlSerializerOptions options,
+    private static async Task WriteAsXmlAsyncSlow(Stream body, object? value, Type type, XmlSerializerOptions options,
         CancellationToken cancellationToken)
     {
         try
@@ -176,10 +151,7 @@ internal static partial class MicrosoftAspNetCoreExtensions
         }
     }
 
-    private static async Task WriteAsXmlAsyncSlow<TValue>(
-        Stream body,
-        TValue value,
-        XmlSerializerOptions options,
+    private static async Task WriteAsXmlAsyncSlow<TValue>(Stream body, TValue value, XmlSerializerOptions options,
         CancellationToken cancellationToken)
     {
         try
@@ -194,8 +166,8 @@ internal static partial class MicrosoftAspNetCoreExtensions
     private static XmlSerializerOptions ResolveSerializerOptions(HttpContext httpContext)
     {
         // Attempt to resolve options from DI then fallback to default options
-        return httpContext.RequestServices.GetService<IOptions<XmlOptions>>()?.Value.SerializerOptions ??
-               XmlOptions.DefaultSerializerOptions;
+        return httpContext.RequestServices.GetService<IOptions<XmlOptions>>()
+            ?.Value.SerializerOptions ?? XmlOptions.DefaultSerializerOptions;
     }
 
     /// <summary>
@@ -206,65 +178,26 @@ internal static partial class MicrosoftAspNetCoreExtensions
     {
         private static readonly Dictionary<int, (string Type, string Title)> Defaults = new()
         {
-            [400] =
-            (
-                "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-                "Bad Request"
-            ),
+            [400] = ("https://tools.ietf.org/html/rfc7231#section-6.5.1", "Bad Request"),
 
-            [401] =
-            (
-                "https://tools.ietf.org/html/rfc7235#section-3.1",
-                "Unauthorized"
-            ),
+            [401] = ("https://tools.ietf.org/html/rfc7235#section-3.1", "Unauthorized"),
 
-            [403] =
-            (
-                "https://tools.ietf.org/html/rfc7231#section-6.5.3",
-                "Forbidden"
-            ),
+            [403] = ("https://tools.ietf.org/html/rfc7231#section-6.5.3", "Forbidden"),
 
-            [404] =
-            (
-                "https://tools.ietf.org/html/rfc7231#section-6.5.4",
-                "Not Found"
-            ),
+            [404] = ("https://tools.ietf.org/html/rfc7231#section-6.5.4", "Not Found"),
 
-            [405] =
-            (
-                "https://tools.ietf.org/html/rfc7231#section-6.5.5",
-                "Method Not Allowed"
-            ),
+            [405] = ("https://tools.ietf.org/html/rfc7231#section-6.5.5", "Method Not Allowed"),
 
-            [406] =
-            (
-                "https://tools.ietf.org/html/rfc7231#section-6.5.6",
-                "Not Acceptable"
-            ),
+            [406] = ("https://tools.ietf.org/html/rfc7231#section-6.5.6", "Not Acceptable"),
 
-            [409] =
-            (
-                "https://tools.ietf.org/html/rfc7231#section-6.5.8",
-                "Conflict"
-            ),
+            [409] = ("https://tools.ietf.org/html/rfc7231#section-6.5.8", "Conflict"),
 
-            [415] =
-            (
-                "https://tools.ietf.org/html/rfc7231#section-6.5.13",
-                "Unsupported Media Type"
-            ),
+            [415] = ("https://tools.ietf.org/html/rfc7231#section-6.5.13", "Unsupported Media Type"),
 
-            [422] =
-            (
-                "https://tools.ietf.org/html/rfc4918#section-11.2",
-                "Unprocessable Entity"
-            ),
+            [422] = ("https://tools.ietf.org/html/rfc4918#section-11.2", "Unprocessable Entity"),
 
-            [500] =
-            (
-                "https://tools.ietf.org/html/rfc7231#section-6.6.1",
-                "An error occurred while processing your request."
-            )
+            [500] = ("https://tools.ietf.org/html/rfc7231#section-6.6.1",
+                "An error occurred while processing your request.")
         };
 
         public static void Apply(ProblemDetails problemDetails, int? statusCode)
@@ -296,8 +229,7 @@ internal static partial class MicrosoftAspNetCoreExtensions
 
     internal static partial class Log
     {
-        [LoggerMessage(1, LogLevel.Information,
-            "Setting HTTP status code {StatusCode}.",
+        [LoggerMessage(1, LogLevel.Information, "Setting HTTP status code {StatusCode}.",
             EventName = "WritingResultAsStatusCode")]
         public static partial void WritingResultAsStatusCode(ILogger logger, int statusCode);
 

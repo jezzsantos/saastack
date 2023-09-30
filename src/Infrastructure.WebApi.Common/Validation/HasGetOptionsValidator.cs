@@ -20,10 +20,14 @@ public class HasGetOptionsValidator : AbstractValidator<IHasGetOptions>, IHasGet
     {
         When(dto => dto.Embed.HasValue(), () =>
         {
-            RuleForEach(dto => dto.ToGetOptions(null, null).ResourceReferences).Matches(ResourceReferenceExpression)
+            RuleForEach(dto => dto.ToGetOptions(null, null)
+                    .ResourceReferences)
+                .Matches(ResourceReferenceExpression)
                 .WithMessage(ValidationResources.HasGetOptionsValidator_InvalidEmbed);
-            RuleFor(dto => dto.ToGetOptions(null, null).ResourceReferences.Count())
-                .LessThanOrEqualTo(GetOptions.MaxResourceReferences).WithMessage(
+            RuleFor(dto => dto.ToGetOptions(null, null)
+                    .ResourceReferences.Count())
+                .LessThanOrEqualTo(GetOptions.MaxResourceReferences)
+                .WithMessage(
                     ValidationResources.HasGetOptionsValidator_TooManyResourceReferences.Format(GetOptions
                         .MaxResourceReferences));
         });

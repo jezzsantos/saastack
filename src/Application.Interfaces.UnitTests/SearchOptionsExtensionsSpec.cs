@@ -11,7 +11,8 @@ public class SearchOptionsExtensionsSpec
     {
         var results = ((SearchOptions)null!).ToMetadata();
 
-        results.Total.Should().Be(0);
+        results.Total.Should()
+            .Be(0);
     }
 
     [Fact]
@@ -19,7 +20,8 @@ public class SearchOptionsExtensionsSpec
     {
         var results = ((SearchOptions)null!).ToMetadata(11);
 
-        results.Total.Should().Be(11);
+        results.Total.Should()
+            .Be(11);
     }
 
     [Fact]
@@ -29,7 +31,8 @@ public class SearchOptionsExtensionsSpec
 
         var results = searchOptions.ToMetadata();
 
-        results.Total.Should().Be(0);
+        results.Total.Should()
+            .Be(0);
     }
 
     [Fact]
@@ -45,13 +48,21 @@ public class SearchOptionsExtensionsSpec
 
         var results = searchOptions.ToMetadata();
 
-        results.Total.Should().Be(0);
-        results.Sort!.Direction.Should().Be(SortDirection.Descending);
-        results.Sort.By.Should().Be("asortfield");
-        results.Offset.Should().Be(9);
-        results.Limit.Should().Be(6);
-        results.Filter!.Fields.Count.Should().Be(1);
-        results.Filter.Fields[0].Should().Be("afilterfield");
+        results.Total.Should()
+            .Be(0);
+        results.Sort!.Direction.Should()
+            .Be(SortDirection.Descending);
+        results.Sort.By.Should()
+            .Be("asortfield");
+        results.Offset.Should()
+            .Be(9);
+        results.Limit.Should()
+            .Be(6);
+        results.Filter!.Fields.Count.Should()
+            .Be(1);
+        results.Filter.Fields[0]
+            .Should()
+            .Be("afilterfield");
     }
 
     [Fact]
@@ -67,12 +78,20 @@ public class SearchOptionsExtensionsSpec
 
         var results = searchOptions.ToMetadata(11);
 
-        results.Total.Should().Be(11);
-        results.Sort!.Direction.Should().Be(SortDirection.Descending);
-        results.Sort.By.Should().Be("asortfield");
-        results.Offset.Should().Be(9);
-        results.Limit.Should().Be(6);
-        results.Filter!.Fields.Count.Should().Be(1);
-        results.Filter.Fields[0].Should().Be("afilterfield");
+        results.Total.Should()
+            .Be(11);
+        results.Sort!.Direction.Should()
+            .Be(SortDirection.Descending);
+        results.Sort.By.Should()
+            .Be("asortfield");
+        results.Offset.Should()
+            .Be(9);
+        results.Limit.Should()
+            .Be(6);
+        results.Filter!.Fields.Count.Should()
+            .Be(1);
+        results.Filter.Fields[0]
+            .Should()
+            .Be("afilterfield");
     }
 }

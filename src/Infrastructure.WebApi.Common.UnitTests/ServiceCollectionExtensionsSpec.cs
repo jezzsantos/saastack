@@ -18,7 +18,8 @@ public class ServiceCollectionExtensionsSpec
 
         services.RegisterValidators(new[] { typeof(ServiceCollectionExtensionsSpec).Assembly }, out _);
 
-        services.Should().ContainSingle(service => service.ImplementationType == typeof(TestRequestValidator));
+        services.Should()
+            .ContainSingle(service => service.ImplementationType == typeof(TestRequestValidator));
     }
 
     [Fact]
@@ -29,9 +30,9 @@ public class ServiceCollectionExtensionsSpec
 
         configuration.AddValidatorBehaviors(Enumerable.Empty<Type>(), assemblies);
 
-        configuration.BehaviorsToRegister.Should().BeEmpty();
+        configuration.BehaviorsToRegister.Should()
+            .BeEmpty();
     }
-
 
     [Fact]
     public void WhenAddValidatorBehaviorsAndNoRequestTypes_ThenRegistersNoBehaviors()
@@ -41,9 +42,9 @@ public class ServiceCollectionExtensionsSpec
 
         configuration.AddValidatorBehaviors(validators, Enumerable.Empty<Assembly>());
 
-        configuration.BehaviorsToRegister.Should().BeEmpty();
+        configuration.BehaviorsToRegister.Should()
+            .BeEmpty();
     }
-
 
     [Fact]
     public void WhenAddValidatorBehaviorsAndNoMatchingValidators_ThenRegistersNoBehaviors()
@@ -54,7 +55,8 @@ public class ServiceCollectionExtensionsSpec
 
         configuration.AddValidatorBehaviors(validators, assemblies);
 
-        configuration.BehaviorsToRegister.Should().BeEmpty();
+        configuration.BehaviorsToRegister.Should()
+            .BeEmpty();
     }
 
     [Fact]

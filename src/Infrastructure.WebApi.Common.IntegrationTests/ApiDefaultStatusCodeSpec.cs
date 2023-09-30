@@ -20,9 +20,12 @@ public class ApiDefaultStatusCode : WebApiSpec<Program>
     {
         var result = await Api.PostAsync("/testingonly/statuses/post", new StatusesPostTestingOnlyRequest());
 
-        result.StatusCode.Should().Be(HttpStatusCode.Created);
-        result.Headers.Location.Should().Be("alocation");
-        result.Content.Message.Should().Be("amessage");
+        result.StatusCode.Should()
+            .Be(HttpStatusCode.Created);
+        result.Headers.Location.Should()
+            .Be("alocation");
+        result.Content.Message.Should()
+            .Be("amessage");
     }
 
     [Fact]
@@ -31,9 +34,12 @@ public class ApiDefaultStatusCode : WebApiSpec<Program>
         var result = await Api.PostAsync("/testingonly/statuses/post2",
             new StatusesPostWithLocationTestingOnlyRequest());
 
-        result.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Headers.Location.Should().BeNull();
-        result.Content.Message.Should().Be("amessage");
+        result.StatusCode.Should()
+            .Be(HttpStatusCode.OK);
+        result.Headers.Location.Should()
+            .BeNull();
+        result.Content.Message.Should()
+            .Be("amessage");
     }
 
     [Fact]
@@ -41,8 +47,10 @@ public class ApiDefaultStatusCode : WebApiSpec<Program>
     {
         var result = await Api.GetAsync<StatusesTestingOnlyResponse>("/testingonly/statuses/get");
 
-        result.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Content.Message.Should().Be("amessage");
+        result.StatusCode.Should()
+            .Be(HttpStatusCode.OK);
+        result.Content.Message.Should()
+            .Be("amessage");
     }
 
     [Fact]
@@ -50,8 +58,10 @@ public class ApiDefaultStatusCode : WebApiSpec<Program>
     {
         var result = await Api.GetAsync<StatusesTestingOnlyResponse>("/testingonly/statuses/search");
 
-        result.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Content.Message.Should().Be("amessage");
+        result.StatusCode.Should()
+            .Be(HttpStatusCode.OK);
+        result.Content.Message.Should()
+            .Be("amessage");
     }
 
     [Fact]
@@ -59,8 +69,10 @@ public class ApiDefaultStatusCode : WebApiSpec<Program>
     {
         var result = await Api.PutAsync("/testingonly/statuses/putpatch", new StatusesPutPatchTestingOnlyRequest());
 
-        result.StatusCode.Should().Be(HttpStatusCode.Accepted);
-        result.Content.Message.Should().Be("amessage");
+        result.StatusCode.Should()
+            .Be(HttpStatusCode.Accepted);
+        result.Content.Message.Should()
+            .Be("amessage");
     }
 
     [Fact]
@@ -68,8 +80,10 @@ public class ApiDefaultStatusCode : WebApiSpec<Program>
     {
         var result = await Api.PatchAsync("/testingonly/statuses/putpatch", new StatusesPutPatchTestingOnlyRequest());
 
-        result.StatusCode.Should().Be(HttpStatusCode.Accepted);
-        result.Content.Message.Should().Be("amessage");
+        result.StatusCode.Should()
+            .Be(HttpStatusCode.Accepted);
+        result.Content.Message.Should()
+            .Be("amessage");
     }
 
     [Fact]
@@ -77,8 +91,10 @@ public class ApiDefaultStatusCode : WebApiSpec<Program>
     {
         var result = await Api.DeleteAsync("/testingonly/statuses/delete");
 
-        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
-        result.Content.Should().BeEmpty();
+        result.StatusCode.Should()
+            .Be(HttpStatusCode.NoContent);
+        result.Content.Should()
+            .BeEmpty();
     }
 }
 #endif

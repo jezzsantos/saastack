@@ -18,7 +18,9 @@ public class NamePrefixedIdentifierFactorySpec
     {
         var result = _factory.Create(new UnknownEntity());
 
-        result.ToString().Should().MatchRegex(@"xxx_[\d\w]{10,22}");
+        result.ToString()
+            .Should()
+            .MatchRegex(@"xxx_[\d\w]{10,22}");
     }
 
     [Fact]
@@ -26,7 +28,9 @@ public class NamePrefixedIdentifierFactorySpec
     {
         var result = _factory.Create(new KnownEntity());
 
-        result.ToString().Should().MatchRegex(@"kno_[\d\w]{10,22}");
+        result.ToString()
+            .Should()
+            .MatchRegex(@"kno_[\d\w]{10,22}");
     }
 
     [Fact]
@@ -34,7 +38,8 @@ public class NamePrefixedIdentifierFactorySpec
     {
         var result = _factory.IsValid(Identifier.Create("tooshort"));
 
-        result.Should().BeFalse();
+        result.Should()
+            .BeFalse();
     }
 
     [Fact]
@@ -42,7 +47,8 @@ public class NamePrefixedIdentifierFactorySpec
     {
         var result = _factory.IsValid(Identifier.Create("999_123456789012"));
 
-        result.Should().BeFalse();
+        result.Should()
+            .BeFalse();
     }
 
     [Fact]
@@ -50,7 +56,8 @@ public class NamePrefixedIdentifierFactorySpec
     {
         var result = _factory.IsValid(Identifier.Create("xxx_123456789"));
 
-        result.Should().BeFalse();
+        result.Should()
+            .BeFalse();
     }
 
     [Fact]
@@ -58,7 +65,8 @@ public class NamePrefixedIdentifierFactorySpec
     {
         var result = _factory.IsValid(Identifier.Create("xxx_12345678901234567890123"));
 
-        result.Should().BeFalse();
+        result.Should()
+            .BeFalse();
     }
 
     [Fact]
@@ -66,7 +74,8 @@ public class NamePrefixedIdentifierFactorySpec
     {
         var result = _factory.IsValid(Identifier.Create("xxx_123456789012"));
 
-        result.Should().BeTrue();
+        result.Should()
+            .BeTrue();
     }
 
     [Fact]
@@ -74,7 +83,8 @@ public class NamePrefixedIdentifierFactorySpec
     {
         var result = _factory.IsValid(Identifier.Create("kno_123456789012"));
 
-        result.Should().BeTrue();
+        result.Should()
+            .BeTrue();
     }
 
     [Fact]
@@ -82,7 +92,8 @@ public class NamePrefixedIdentifierFactorySpec
     {
         var result = _factory.IsValid(CallerConstants.AnonymousUserId.ToIdentifier());
 
-        result.Should().BeTrue();
+        result.Should()
+            .BeTrue();
     }
 
     [Fact]
@@ -92,16 +103,17 @@ public class NamePrefixedIdentifierFactorySpec
 
         var result = _factory.IsValid(Identifier.Create("another_123456789012"));
 
-        result.Should().BeTrue();
+        result.Should()
+            .BeTrue();
     }
 
     [Fact]
     public void WhenConvertGuidWithKnownGuid_ThenReturnsConverted()
     {
-        var id = NamePrefixedIdentifierFactory.ConvertGuid(new Guid("65dd0b02-170b-4ea1-a5a5-00d2808b9aee"),
-            "known");
+        var id = NamePrefixedIdentifierFactory.ConvertGuid(new Guid("65dd0b02-170b-4ea1-a5a5-00d2808b9aee"), "known");
 
-        id.Should().Be("known_AgvdZQsXoU6lpQDSgIua7g");
+        id.Should()
+            .Be("known_AgvdZQsXoU6lpQDSgIua7g");
     }
 }
 

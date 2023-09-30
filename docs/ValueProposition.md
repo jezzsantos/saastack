@@ -58,11 +58,11 @@ This person will need to quickly understand the value proposition of SaaStack an
 They may encounter some objections, either design decisions or principles behind it, that they can't move past.
 
 * They will be guided by what they already know, so it will have to be a tech stack they know already.
-  * They may or may not trust examples of things they are not experienced with, and some may not adopt things they won't feel they have mastered yet.
+   * They may or may not trust examples of things they are not experienced with, and some may not adopt things they won't feel they have mastered yet.
 * They will be motivated by associating themselves with the latest and greatest in this technology stack (i.e. .NET).
-  * They may or may not be up to speed on those things. So they will see value in someone showing them the latest and greatest.
+   * They may or may not be up to speed on those things. So they will see value in someone showing them the latest and greatest.
 * They will be interested to learn more about the proposed architectural styles (e.g. Event Sourcing, Microservices, Clean Architecture, etc.).
-  * They may or may not be experienced in their uses either. And will be looking for evidence or opinions on why they should consider them for their context.
+   * They may or may not be experienced in their uses either. And will be looking for evidence or opinions on why they should consider them for their context.
 
 We believe that if the founding developer makes any kind of purchase or contribution to obtaining SaaStack, they are also going to have an expectation of having some support for adopting it, from some kind of community, where they can have questions answered and may provide feedback.
 
@@ -85,12 +85,12 @@ We assume that:
 - A tech startup has identified some kind of *problem* in some kind of target *market*, and this target market will (in the future) be able to sustain the growth of the business.
 - They understand that there is some kind of *opportunity* out there that this problem that the market represents to them, and they accept that there is some kind of risk in competing to be a solution to that problem, that the market will choose over/with other options.
 - They may or may not have a concrete solution to this problem at this stage, but must have some ideas to validate in a segment of the market.
-  - We believe that many tech startups already believe that they have a winning solution in mind, and some have already convinced themselves that they only have to build the solution in their mind, and the market will come knocking on their doors, throwing money at them.
+   - We believe that many tech startups already believe that they have a winning solution in mind, and some have already convinced themselves that they only have to build the solution in their mind, and the market will come knocking on their doors, throwing money at them.
 - In any case, some software will need to be designed, built, and deployed somewhere in order to test, validate, measure, or even acquire buyers/users for their new product business.
 - "Making" this software is the primary job of the CTO and/or tech lead of a startup.
-  - We believe that nowadays, it is imperative to research, design, build, deploy measure, and learn incrementally and iteratively to discover what really works in a market segment. These people understand that.
+   - We believe that nowadays, it is imperative to research, design, build, deploy measure, and learn incrementally and iteratively to discover what really works in a market segment. These people understand that.
 - Those people have to start somewhere with making some software product/prototype, and it is usually starting from scratch.
-  - We believe that sometimes, it is more cost-effective to start with other low-tech solutions, low-tech tools, no-code solutions, or adapt readily available tools before a tech company accepts the risk and cost of investing in doing their own custom development. All these approaches are very viable approaches, and would likely precede the need for a solution like SaaStack.
+   - We believe that sometimes, it is more cost-effective to start with other low-tech solutions, low-tech tools, no-code solutions, or adapt readily available tools before a tech company accepts the risk and cost of investing in doing their own custom development. All these approaches are very viable approaches, and would likely precede the need for a solution like SaaStack.
 
 **Early Validation:** So, our first job here is the job of getting some validated results (from a market segment) by using something more economical than making a full-blown software product of their own from scratch.
 

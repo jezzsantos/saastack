@@ -14,12 +14,18 @@ public class TakeOfflineCarRequestValidator : AbstractValidator<TakeOfflineCarRe
 {
     public TakeOfflineCarRequestValidator(IIdentifierFactory idFactory)
     {
-        RuleFor(req => req.Id).IsEntityId(idFactory).WithMessage(CommonValidationResources.AnyValidator_InvalidId);
-        RuleFor(req => req.Reason).Matches(Validations.Car.Reason).When(req => req.Reason.HasValue())
+        RuleFor(req => req.Id)
+            .IsEntityId(idFactory)
+            .WithMessage(CommonValidationResources.AnyValidator_InvalidId);
+        RuleFor(req => req.Reason)
+            .Matches(Validations.Car.Reason)
+            .When(req => req.Reason.HasValue())
             .WithMessage(ValidationResources.TakeOfflineCarRequestValidator_InvalidReason);
-        RuleFor(req => req.StartAtUtc).GreaterThan(DateTime.UtcNow)
+        RuleFor(req => req.StartAtUtc)
+            .GreaterThan(DateTime.UtcNow)
             .WithMessage(ValidationResources.TakeOfflineCarRequestValidator_InvalidStartAtUtc);
-        RuleFor(req => req.EndAtUtc).GreaterThan(req => req.StartAtUtc)
+        RuleFor(req => req.EndAtUtc)
+            .GreaterThan(req => req.StartAtUtc)
             .WithMessage(ValidationResources.TakeOfflineCarRequestValidator_InvalidEndAtUtc);
     }
 }

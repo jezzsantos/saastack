@@ -13,8 +13,7 @@ public class GetOptions
     public static readonly GetOptions None = new(ExpandOptions.None, new List<string>());
     private readonly List<string> _resourceReferences;
 
-    public GetOptions()
-        : this(ExpandOptions.All)
+    public GetOptions() : this(ExpandOptions.All)
     {
     }
 
@@ -23,7 +22,8 @@ public class GetOptions
         Initial = @default ?? ExpandOptions.All;
         Expand = expand;
         _resourceReferences = childReferences.Exists()
-            ? childReferences!.Where(cr => cr.HasValue()).ToList()
+            ? childReferences!.Where(cr => cr.HasValue())
+                .ToList()
             : new List<string>();
     }
 

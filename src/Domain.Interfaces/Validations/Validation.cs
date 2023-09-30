@@ -74,13 +74,14 @@ public class Validation<TValue>
         }
 
         var expression = Expression!;
-        values.ToList().ForEach(val =>
-        {
-            if (Substitutions is not null && Substitutions.Contains(val.Key))
+        values.ToList()
+            .ForEach(val =>
             {
-                expression = expression.Replace(val.Key, val.Value);
-            }
-        });
+                if (Substitutions is not null && Substitutions.Contains(val.Key))
+                {
+                    expression = expression.Replace(val.Key, val.Value);
+                }
+            });
 
         return expression;
     }
@@ -91,15 +92,16 @@ public class Validation<TValue>
 
         var substitutions = Substitutions?.ToList() ?? new List<string>();
         var counter = 0;
-        values.ToList().ForEach(val =>
-        {
-            if (substitutions.Count > counter)
+        values.ToList()
+            .ForEach(val =>
             {
-                result.Add(substitutions[counter], val);
+                if (substitutions.Count > counter)
+                {
+                    result.Add(substitutions[counter], val);
 
-                counter++;
-            }
-        });
+                    counter++;
+                }
+            });
 
         return result;
     }

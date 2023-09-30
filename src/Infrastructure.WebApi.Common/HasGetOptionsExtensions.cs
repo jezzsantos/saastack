@@ -9,8 +9,8 @@ public static class HasGetOptionsExtensions
     /// <summary>
     ///     Converts a <see cref="IHasGetOptions" /> to a <see cref="GetOptions" />
     /// </summary>
-    public static GetOptions ToGetOptions(this IHasGetOptions requestDto,
-        ExpandOptions? defaultExpand = null, List<string>? defaultChildResources = null)
+    public static GetOptions ToGetOptions(this IHasGetOptions requestDto, ExpandOptions? defaultExpand = null,
+        List<string>? defaultChildResources = null)
     {
         if (requestDto.NotExists())
         {
@@ -45,8 +45,9 @@ public static class HasGetOptionsExtensions
             return GetOptions.All;
         }
 
-        var values = (requestDto.Embed ?? string.Empty)
-            .Split(GetOptions.EmbedRequestParamDelimiter).Select(value => value.ToLowerInvariant().Trim())
+        var values = (requestDto.Embed ?? string.Empty).Split(GetOptions.EmbedRequestParamDelimiter)
+            .Select(value => value.ToLowerInvariant()
+                .Trim())
             .ToList();
 
         return GetOptions.Custom(values);

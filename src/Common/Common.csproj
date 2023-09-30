@@ -26,4 +26,11 @@
             <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
+
+    <!-- Runs the analyzers (in memory) on build -->
+    <ItemGroup>
+        <ProjectReference Include="..\Tools.CodingStandards\Tools.CodingStandards.csproj"
+                          OutputItemType="Analyzer"
+                          ReferenceOutputAssembly="false" />
+    </ItemGroup>
 </Project>

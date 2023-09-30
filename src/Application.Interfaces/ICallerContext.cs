@@ -45,7 +45,6 @@ public interface ICallerContext
     /// </summary>
     string? TenantId { get; }
 
-
     /// <summary>
     ///     Defines the authorization roles that a caller can have
     /// </summary>
@@ -62,7 +61,8 @@ public interface ICallerContext
         {
             User = user ?? Array.Empty<string>();
             Organisation = organisation ?? Array.Empty<string>();
-            All = User.Concat(Organisation).ToArray();
+            All = User.Concat(Organisation)
+                .ToArray();
         }
 
         public string[] All { get; }
@@ -88,7 +88,8 @@ public interface ICallerContext
         {
             User = user ?? Array.Empty<string>();
             Organisation = organisation ?? Array.Empty<string>();
-            All = User.Concat(Organisation).ToArray();
+            All = User.Concat(Organisation)
+                .ToArray();
         }
 
         public string[] All { get; }

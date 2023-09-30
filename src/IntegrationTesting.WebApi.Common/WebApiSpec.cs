@@ -27,7 +27,8 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
     {
         if (_scope is null)
         {
-            _scope = Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            _scope = Services.GetRequiredService<IServiceScopeFactory>()
+                .CreateScope();
         }
 
         return _scope.ServiceProvider.GetRequiredService<TInterface>();

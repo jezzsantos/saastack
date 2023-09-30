@@ -75,7 +75,8 @@ public class SearchOptions
 
         if (Sort.HasValue)
         {
-            unsorted = orderByFunc(unsorted, Sort.Value).ToList();
+            unsorted = orderByFunc(unsorted, Sort.Value)
+                .ToList();
         }
 
         IEnumerable<TResult> unPaged = unsorted.ToArray();
@@ -132,8 +133,7 @@ internal static class SearchOptions<TResult>
             var itemsToSort = items.ToArray();
             try
             {
-                return itemsToSort
-                    .AsQueryable()
+                return itemsToSort.AsQueryable()
                     .OrderBy(expression);
             }
             catch (ParseException)

@@ -28,7 +28,8 @@ public class MinimalApiMediatRGenerator : ISourceGenerator
     {
         var assemblyNamespace = context.Compilation.AssemblyName;
         var serviceClasses = GetWebApiServiceOperationsFromAssembly(context)
-            .GroupBy(registrations => registrations.Class.TypeName).ToList();
+            .GroupBy(registrations => registrations.Class.TypeName)
+            .ToList();
 
         var classUsingNamespaces = BuildUsingList(serviceClasses);
         var handlerClasses = new StringBuilder();
@@ -74,8 +75,11 @@ namespace {assemblyNamespace}
         var usingList = new StringBuilder();
 
         var allNamespaces = serviceClasses.SelectMany(serviceClass => serviceClass)
-            .SelectMany(registration => registration.Class.UsingNamespaces).Concat(RequiredUsingNamespaces).Distinct()
-            .OrderByDescending(s => s).ToList();
+            .SelectMany(registration => registration.Class.UsingNamespaces)
+            .Concat(RequiredUsingNamespaces)
+            .Distinct()
+            .OrderByDescending(s => s)
+            .ToList();
 
         allNamespaces.ForEach(@using => usingList.AppendLine($"using {@using};"));
 
@@ -104,9 +108,9 @@ namespace {assemblyNamespace}
             {
                 endpointRegistrations.AppendLine(
                     $"            {groupName}.{routeEndpointMethod}(\"{registration.RoutePath}\",");
-                if (registration.OperationType == WebApiOperation.Get ||
-                    registration.OperationType == WebApiOperation.Search ||
-                    registration.OperationType == WebApiOperation.Delete)
+                if (registration.OperationType == WebApiOperation.Get
+                    || registration.OperationType == WebApiOperation.Search
+                    || registration.OperationType == WebApiOperation.Delete)
                 {
                     endpointRegistrations.AppendLine(
                         $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDtoType.FullName} request) =>");
@@ -148,16 +152,16 @@ namespace {assemblyNamespace}
             }
 
             handlerClasses.AppendLine(
-                $"    public class {handlerClassName} : global::MediatR.IRequestHandler<global::{registration.RequestDtoType.FullName}," +
-                $" global::Microsoft.AspNetCore.Http.IResult>");
+                $"    public class {handlerClassName} : global::MediatR.IRequestHandler<global::{registration.RequestDtoType.FullName},"
+                + $" global::Microsoft.AspNetCore.Http.IResult>");
             handlerClasses.AppendLine("    {");
             if (constructorAndFields.HasValue())
             {
                 handlerClasses.AppendLine(constructorAndFields);
             }
 
-            handlerClasses.AppendLine($"        public async Task<global::Microsoft.AspNetCore.Http.IResult>" +
-                                      $" Handle(global::{registration.RequestDtoType.FullName} request, global::System.Threading.CancellationToken cancellationToken)");
+            handlerClasses.AppendLine($"        public async Task<global::Microsoft.AspNetCore.Http.IResult>"
+                                      + $" Handle(global::{registration.RequestDtoType.FullName} request, global::System.Threading.CancellationToken cancellationToken)");
             handlerClasses.AppendLine("        {");
             var callingParameters = BuildInjectedParameters(registration.Class.Constructors.ToList());
             handlerClasses.AppendLine(

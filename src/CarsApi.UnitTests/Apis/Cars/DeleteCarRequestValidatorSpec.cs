@@ -17,7 +17,8 @@ public class DeleteCarRequestValidatorSpec
     public DeleteCarRequestValidatorSpec()
     {
         var idFactory = new Mock<IIdentifierFactory>();
-        idFactory.Setup(idf => idf.IsValid(It.IsAny<Identifier>())).Returns(true);
+        idFactory.Setup(idf => idf.IsValid(It.IsAny<Identifier>()))
+            .Returns(true);
         _validator = new DeleteCarRequestValidator(idFactory.Object);
         _dto = new DeleteCarRequest
         {

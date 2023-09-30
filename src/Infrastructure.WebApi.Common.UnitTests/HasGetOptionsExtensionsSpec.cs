@@ -19,7 +19,8 @@ public class HasGetOptionsExtensionsSpec
     {
         var result = ((GetOptionsDto)null!).ToGetOptions();
 
-        result.Should().BeEquivalentTo(new GetOptions());
+        result.Should()
+            .BeEquivalentTo(new GetOptions());
     }
 
     [Fact]
@@ -32,8 +33,11 @@ public class HasGetOptionsExtensionsSpec
 
         var result = searchOptions.ToGetOptions();
 
-        result.Expand.Should().Be(ExpandOptions.None);
-        result.ResourceReferences.Count().Should().Be(0);
+        result.Expand.Should()
+            .Be(ExpandOptions.None);
+        result.ResourceReferences.Count()
+            .Should()
+            .Be(0);
     }
 
     [Fact]
@@ -43,8 +47,11 @@ public class HasGetOptionsExtensionsSpec
 
         var result = _hasGetOptions.ToGetOptions();
 
-        result.Expand.Should().Be(ExpandOptions.All);
-        result.ResourceReferences.Count().Should().Be(0);
+        result.Expand.Should()
+            .Be(ExpandOptions.All);
+        result.ResourceReferences.Count()
+            .Should()
+            .Be(0);
     }
 
     [Fact]
@@ -54,8 +61,11 @@ public class HasGetOptionsExtensionsSpec
 
         var result = _hasGetOptions.ToGetOptions();
 
-        result.Expand.Should().Be(ExpandOptions.None);
-        result.ResourceReferences.Count().Should().Be(0);
+        result.Expand.Should()
+            .Be(ExpandOptions.None);
+        result.ResourceReferences.Count()
+            .Should()
+            .Be(0);
     }
 
     [Fact]
@@ -65,8 +75,11 @@ public class HasGetOptionsExtensionsSpec
 
         var result = _hasGetOptions.ToGetOptions();
 
-        result.Expand.Should().Be(ExpandOptions.All);
-        result.ResourceReferences.Count().Should().Be(0);
+        result.Expand.Should()
+            .Be(ExpandOptions.All);
+        result.ResourceReferences.Count()
+            .Should()
+            .Be(0);
     }
 
     [Fact]
@@ -76,10 +89,19 @@ public class HasGetOptionsExtensionsSpec
 
         var result = _hasGetOptions.ToGetOptions();
 
-        result.Expand.Should().Be(ExpandOptions.Custom);
-        result.ResourceReferences.Count().Should().Be(3);
-        result.ResourceReferences.ToList()[0].Should().Be("aresourceref1");
-        result.ResourceReferences.ToList()[1].Should().Be("aresourceref2");
-        result.ResourceReferences.ToList()[2].Should().Be("aresourceref3");
+        result.Expand.Should()
+            .Be(ExpandOptions.Custom);
+        result.ResourceReferences.Count()
+            .Should()
+            .Be(3);
+        result.ResourceReferences.ToList()[0]
+            .Should()
+            .Be("aresourceref1");
+        result.ResourceReferences.ToList()[1]
+            .Should()
+            .Be("aresourceref2");
+        result.ResourceReferences.ToList()[2]
+            .Should()
+            .Be("aresourceref3");
     }
 }

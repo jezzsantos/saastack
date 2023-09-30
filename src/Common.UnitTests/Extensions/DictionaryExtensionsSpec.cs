@@ -14,7 +14,8 @@ public class DictionaryExtensionsSpec
 
         source.Merge(new Dictionary<string, string>());
 
-        source.Count.Should().Be(0);
+        source.Count.Should()
+            .Be(0);
     }
 
     [Fact]
@@ -27,8 +28,10 @@ public class DictionaryExtensionsSpec
 
         source.Merge(new Dictionary<string, string>());
 
-        source.Count.Should().Be(1);
-        source.Should().OnlyContain(pair => pair.Key == "aname");
+        source.Count.Should()
+            .Be(1);
+        source.Should()
+            .OnlyContain(pair => pair.Key == "aname");
     }
 
     [Fact]
@@ -41,8 +44,10 @@ public class DictionaryExtensionsSpec
             { "aname", "avalue" }
         });
 
-        source.Count.Should().Be(1);
-        source.Should().OnlyContain(pair => pair.Key == "aname");
+        source.Count.Should()
+            .Be(1);
+        source.Should()
+            .OnlyContain(pair => pair.Key == "aname");
     }
 
     [Fact]
@@ -58,9 +63,12 @@ public class DictionaryExtensionsSpec
             { "aname2", "avalue2" }
         });
 
-        source.Count.Should().Be(2);
-        source.Should().Contain(pair => pair.Key == "aname1");
-        source.Should().Contain(pair => pair.Key == "aname2");
+        source.Count.Should()
+            .Be(2);
+        source.Should()
+            .Contain(pair => pair.Key == "aname1");
+        source.Should()
+            .Contain(pair => pair.Key == "aname2");
     }
 
     [Fact]
@@ -78,9 +86,13 @@ public class DictionaryExtensionsSpec
             { "aname3", "avalue3" }
         });
 
-        source.Count.Should().Be(3);
-        source.Should().Contain(pair => pair.Key == "aname1");
-        source.Should().Contain(pair => pair.Key == "aname2");
-        source.Should().Contain(pair => pair.Key == "aname3");
+        source.Count.Should()
+            .Be(3);
+        source.Should()
+            .Contain(pair => pair.Key == "aname1");
+        source.Should()
+            .Contain(pair => pair.Key == "aname2");
+        source.Should()
+            .Contain(pair => pair.Key == "aname3");
     }
 }

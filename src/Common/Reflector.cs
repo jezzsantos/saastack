@@ -14,7 +14,8 @@ public static class Reflector
     /// </summary>
     public static string GetPropertyName<TTarget, TResult>(Expression<Func<TTarget, TResult>> property)
     {
-        return GetProperty(property).Name;
+        return GetProperty(property)
+            .Name;
     }
 
     private static PropertyInfo GetProperty<TTarget, TResult>(Expression<Func<TTarget, TResult>> property)

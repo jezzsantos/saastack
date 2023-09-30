@@ -51,10 +51,9 @@ namespace JetBrains.Annotations;
 /// }
 /// </code>
 /// </example>
-[AttributeUsage(
-    AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property |
-    AttributeTargets.Delegate | AttributeTargets.Field | AttributeTargets.Event |
-    AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.GenericParameter)]
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property
+                | AttributeTargets.Delegate | AttributeTargets.Field | AttributeTargets.Event | AttributeTargets.Class
+                | AttributeTargets.Interface | AttributeTargets.GenericParameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class CanBeNullAttribute : Attribute
 {
@@ -70,10 +69,9 @@ public sealed class CanBeNullAttribute : Attribute
 /// }
 /// </code>
 /// </example>
-[AttributeUsage(
-    AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property |
-    AttributeTargets.Delegate | AttributeTargets.Field | AttributeTargets.Event |
-    AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.GenericParameter)]
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property
+                | AttributeTargets.Delegate | AttributeTargets.Field | AttributeTargets.Event | AttributeTargets.Class
+                | AttributeTargets.Interface | AttributeTargets.GenericParameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class NotNullAttribute : Attribute
 {
@@ -95,9 +93,8 @@ public sealed class NotNullAttribute : Attribute
 /// }
 /// </code>
 /// </example>
-[AttributeUsage(
-    AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property |
-    AttributeTargets.Delegate | AttributeTargets.Field)]
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property
+                | AttributeTargets.Delegate | AttributeTargets.Field)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class ItemNotNullAttribute : Attribute
 {
@@ -120,9 +117,8 @@ public sealed class ItemNotNullAttribute : Attribute
 /// }
 /// </code>
 /// </example>
-[AttributeUsage(
-    AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property |
-    AttributeTargets.Delegate | AttributeTargets.Field)]
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property
+                | AttributeTargets.Delegate | AttributeTargets.Field)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class ItemCanBeNullAttribute : Attribute
 {
@@ -143,9 +139,8 @@ public sealed class ItemCanBeNullAttribute : Attribute
 /// }
 /// </code>
 /// </example>
-[AttributeUsage(
-    AttributeTargets.Constructor | AttributeTargets.Method |
-    AttributeTargets.Property | AttributeTargets.Delegate)]
+[AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property
+                | AttributeTargets.Delegate)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class StringFormatMethodAttribute : Attribute
 {
@@ -209,9 +204,7 @@ public sealed class StructuredMessageTemplateAttribute : Attribute
 /// }
 /// </code>
 /// </example>
-[AttributeUsage(
-    AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field,
-    AllowMultiple = true)]
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class ValueProviderAttribute : Attribute
 {
@@ -238,9 +231,8 @@ public sealed class ValueProviderAttribute : Attribute
 /// </code>
 /// </example>
 [AttributeUsage(
-    AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property |
-    AttributeTargets.Method | AttributeTargets.Delegate,
-    AllowMultiple = true)]
+    AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method
+    | AttributeTargets.Delegate, AllowMultiple = true)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class ValueRangeAttribute : Attribute
 {
@@ -283,9 +275,8 @@ public sealed class ValueRangeAttribute : Attribute
 /// }
 /// </code>
 /// </example>
-[AttributeUsage(
-    AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property |
-    AttributeTargets.Method | AttributeTargets.Delegate)]
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property
+                | AttributeTargets.Method | AttributeTargets.Delegate)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class NonNegativeValueAttribute : Attribute
 {
@@ -443,8 +434,7 @@ public sealed class NotifyPropertyChangedInvocatorAttribute : Attribute
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class ContractAnnotationAttribute : Attribute
 {
-    public ContractAnnotationAttribute([NotNull] string contract)
-        : this(contract, false)
+    public ContractAnnotationAttribute([NotNull] string contract) : this(contract, false)
     {
     }
 
@@ -565,18 +555,16 @@ public sealed class BaseTypeRequiredAttribute : Attribute
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class UsedImplicitlyAttribute : Attribute
 {
-    public UsedImplicitlyAttribute()
-        : this(ImplicitUseKindFlags.Default, ImplicitUseTargetFlags.Default)
+    public UsedImplicitlyAttribute() : this(ImplicitUseKindFlags.Default, ImplicitUseTargetFlags.Default)
     {
     }
 
-    public UsedImplicitlyAttribute(ImplicitUseKindFlags useKindFlags)
-        : this(useKindFlags, ImplicitUseTargetFlags.Default)
+    public UsedImplicitlyAttribute(ImplicitUseKindFlags useKindFlags) : this(useKindFlags,
+        ImplicitUseTargetFlags.Default)
     {
     }
 
-    public UsedImplicitlyAttribute(ImplicitUseTargetFlags targetFlags)
-        : this(ImplicitUseKindFlags.Default, targetFlags)
+    public UsedImplicitlyAttribute(ImplicitUseTargetFlags targetFlags) : this(ImplicitUseKindFlags.Default, targetFlags)
     {
     }
 
@@ -602,18 +590,17 @@ public sealed class UsedImplicitlyAttribute : Attribute
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class MeansImplicitUseAttribute : Attribute
 {
-    public MeansImplicitUseAttribute()
-        : this(ImplicitUseKindFlags.Default, ImplicitUseTargetFlags.Default)
+    public MeansImplicitUseAttribute() : this(ImplicitUseKindFlags.Default, ImplicitUseTargetFlags.Default)
     {
     }
 
-    public MeansImplicitUseAttribute(ImplicitUseKindFlags useKindFlags)
-        : this(useKindFlags, ImplicitUseTargetFlags.Default)
+    public MeansImplicitUseAttribute(ImplicitUseKindFlags useKindFlags) : this(useKindFlags,
+        ImplicitUseTargetFlags.Default)
     {
     }
 
-    public MeansImplicitUseAttribute(ImplicitUseTargetFlags targetFlags)
-        : this(ImplicitUseKindFlags.Default, targetFlags)
+    public MeansImplicitUseAttribute(ImplicitUseTargetFlags targetFlags) : this(ImplicitUseKindFlags.Default,
+        targetFlags)
     {
     }
 
@@ -799,9 +786,9 @@ public sealed class RequireStaticDelegateAttribute : Attribute
 /// }
 /// </code>
 /// </example>
-[AttributeUsage(
-    AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.Method |
-    AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct | AttributeTargets.GenericParameter)]
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter
+                | AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Interface
+                | AttributeTargets.Struct | AttributeTargets.GenericParameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class ProvidesContextAttribute : Attribute
 {
@@ -945,8 +932,8 @@ public sealed class MacroAttribute : Attribute
 /// }
 /// </code>
 /// </example>
-[AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor | AttributeTargets.Property |
-                AttributeTargets.ReturnValue)]
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor | AttributeTargets.Property
+                | AttributeTargets.ReturnValue)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class CollectionAccessAttribute : Attribute
 {
@@ -1147,8 +1134,7 @@ public sealed class LanguageInjectionAttribute : Attribute
 /// <remarks>
 ///     The attribute must be mentioned in your member reordering patterns.
 /// </remarks>
-[AttributeUsage(
-    AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct | AttributeTargets.Enum)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct | AttributeTargets.Enum)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class NoReorderAttribute : Attribute
 {
@@ -1344,17 +1330,9 @@ public sealed class NoReorderAttribute : Attribute
 ///     </para>
 /// </summary>
 [AttributeUsage(
-    AttributeTargets.Method
-    | AttributeTargets.Constructor
-    | AttributeTargets.Property
-    | AttributeTargets.Field
-    | AttributeTargets.Event
-    | AttributeTargets.Interface
-    | AttributeTargets.Class
-    | AttributeTargets.Struct
-    | AttributeTargets.Enum,
-    AllowMultiple = true,
-    Inherited = false)]
+    AttributeTargets.Method | AttributeTargets.Constructor | AttributeTargets.Property | AttributeTargets.Field
+    | AttributeTargets.Event | AttributeTargets.Interface | AttributeTargets.Class | AttributeTargets.Struct
+    | AttributeTargets.Enum, AllowMultiple = true, Inherited = false)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class CodeTemplateAttribute : Attribute
 {
@@ -1579,8 +1557,8 @@ public sealed class AspMvcViewLocationFormatAttribute : Attribute
 ///     implicitly from the context. Use this attribute for custom wrappers similar to
 ///     <c>System.Web.Mvc.Html.ChildActionExtensions.RenderAction(HtmlHelper, String)</c>.
 /// </summary>
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method | AttributeTargets.Field |
-                AttributeTargets.Property)]
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method | AttributeTargets.Field
+                | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class AspMvcActionAttribute : Attribute
 {
@@ -1623,8 +1601,8 @@ public sealed class AspMvcAreaAttribute : Attribute
 ///     implicitly from the context. Use this attribute for custom wrappers similar to
 ///     <c>System.Web.Mvc.Html.ChildActionExtensions.RenderAction(HtmlHelper, String, String)</c>.
 /// </summary>
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method | AttributeTargets.Field |
-                AttributeTargets.Property)]
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method | AttributeTargets.Field
+                | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class AspMvcControllerAttribute : Attribute
 {
@@ -1666,8 +1644,8 @@ public sealed class AspMvcModelTypeAttribute : Attribute
 ///     from the context. Use this attribute for custom wrappers similar to
 ///     <c>System.Web.Mvc.Html.RenderPartialExtensions.RenderPartial(HtmlHelper, String)</c>.
 /// </summary>
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method | AttributeTargets.Field |
-                AttributeTargets.Property)]
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method | AttributeTargets.Field
+                | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class AspMvcPartialViewAttribute : Attribute
 {
@@ -1721,8 +1699,8 @@ public sealed class AspMvcTemplateAttribute : Attribute
 ///     from the context. Use this attribute for custom wrappers similar to
 ///     <c>System.Web.Mvc.Controller.View(Object)</c>.
 /// </summary>
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method | AttributeTargets.Field |
-                AttributeTargets.Property)]
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method | AttributeTargets.Field
+                | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class AspMvcViewAttribute : Attribute
 {
@@ -1742,8 +1720,8 @@ public sealed class AspMvcViewComponentAttribute : Attribute
 ///     ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter
 ///     is an MVC view component view. If applied to a method, the MVC view component view name is default.
 /// </summary>
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method | AttributeTargets.Field |
-                AttributeTargets.Property)]
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method | AttributeTargets.Field
+                | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
 public sealed class AspMvcViewComponentViewAttribute : Attribute
 {

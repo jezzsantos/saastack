@@ -11,7 +11,6 @@ public static class HostEnvironmentExtensions
     {
         ArgumentNullException.ThrowIfNull(hostEnvironment);
 
-        return hostEnvironment.IsEnvironment(Environments.Development)
-               || hostEnvironment.IsEnvironment("CI");
+        return hostEnvironment.IsEnvironment(Environments.Development) || hostEnvironment.IsEnvironment("CI");
     }
 }

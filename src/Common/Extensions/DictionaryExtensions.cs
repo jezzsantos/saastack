@@ -9,6 +9,7 @@ public static class DictionaryExtensions
     public static void Merge<TKey, TValue>(this IDictionary<TKey, TValue> source, IDictionary<TKey, TValue> other)
         where TKey : notnull
     {
-        other.ToList().ForEach(entry => { source.TryAdd(entry.Key, entry.Value); });
+        other.ToList()
+            .ForEach(entry => { source.TryAdd(entry.Key, entry.Value); });
     }
 }

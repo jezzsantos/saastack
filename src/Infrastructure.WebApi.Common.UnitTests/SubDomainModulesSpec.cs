@@ -15,34 +15,34 @@ public class SubDomainModulesSpec
     [Fact]
     public void WhenRegisterAndNullModule_ThenThrows()
     {
-        _modules
-            .Invoking(x => x.Register(null!))
-            .Should().Throw<ArgumentNullException>();
+        _modules.Invoking(x => x.Register(null!))
+            .Should()
+            .Throw<ArgumentNullException>();
     }
 
     [Fact]
     public void WhenRegisterAndNullApiAssembly_ThenThrows()
     {
-        _modules
-            .Invoking(x => x.Register(new TestModule { ApiAssembly = null! }))
-            .Should().Throw<ArgumentNullException>();
+        _modules.Invoking(x => x.Register(new TestModule { ApiAssembly = null! }))
+            .Should()
+            .Throw<ArgumentNullException>();
     }
 
     [Fact]
     public void WhenRegisterAndNullAggregatePrefixes_ThenThrows()
     {
-        _modules
-            .Invoking(x => x.Register(new TestModule { AggregatePrefixes = null! }))
-            .Should().Throw<ArgumentNullException>();
+        _modules.Invoking(x => x.Register(new TestModule { AggregatePrefixes = null! }))
+            .Should()
+            .Throw<ArgumentNullException>();
     }
 
     [Fact]
     public void WhenRegisterAndNullMinimalApiRegistrationFunction_ThenThrows()
     {
-        _modules
-            .Invoking(x => x.Register(new TestModule
+        _modules.Invoking(x => x.Register(new TestModule
                 { ApiAssembly = typeof(SubDomainModulesSpec).Assembly, RegisterServicesFunction = (_, _) => { } }))
-            .Should().Throw<ArgumentNullException>();
+            .Should()
+            .Throw<ArgumentNullException>();
     }
 
     [Fact]
@@ -55,7 +55,8 @@ public class SubDomainModulesSpec
             RegisterServicesFunction = null!
         });
 
-        _modules.ApiAssemblies.Should().ContainSingle();
+        _modules.ApiAssemblies.Should()
+            .ContainSingle();
     }
 
     [Fact]
@@ -83,7 +84,8 @@ public class SubDomainModulesSpec
 
         _modules.RegisterServices(configuration, services);
 
-        wasCalled.Should().BeTrue();
+        wasCalled.Should()
+            .BeTrue();
     }
 
     [Fact]
@@ -109,7 +111,8 @@ public class SubDomainModulesSpec
 
         _modules.ConfigureHost(app);
 
-        wasCalled.Should().BeTrue();
+        wasCalled.Should()
+            .BeTrue();
     }
 }
 

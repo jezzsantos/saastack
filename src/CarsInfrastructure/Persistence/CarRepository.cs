@@ -44,7 +44,8 @@ public class CarRepository : ICarRepository
     {
         await Task.CompletedTask;
 
-        return new Result<IReadOnlyList<Car>, Error>((IReadOnlyList<Car>)Cars.Select(car => car.ToCar()).ToList());
+        return new Result<IReadOnlyList<Car>, Error>((IReadOnlyList<Car>)Cars.Select(car => car.ToCar())
+            .ToList());
     }
 
     public async Task<Result<CarRoot, Error>> Save(CarRoot car)

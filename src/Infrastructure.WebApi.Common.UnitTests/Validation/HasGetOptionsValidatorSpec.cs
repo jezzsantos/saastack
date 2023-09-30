@@ -70,7 +70,9 @@ public class HasGetOptionsValidatorSpec
     {
         _dto.Embed = "^aresourceref";
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto)).Should().Throw<ValidationException>()
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should()
+            .Throw<ValidationException>()
             .WithMessageLike(ValidationResources.HasGetOptionsValidator_InvalidEmbed);
     }
 
@@ -79,7 +81,9 @@ public class HasGetOptionsValidatorSpec
     {
         _dto.Embed = "aresourceref.^achildresourceref";
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto)).Should().Throw<ValidationException>()
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should()
+            .Throw<ValidationException>()
             .WithMessageLike(ValidationResources.HasGetOptionsValidator_InvalidEmbed);
     }
 
@@ -88,7 +92,9 @@ public class HasGetOptionsValidatorSpec
     {
         _dto.Embed = "aresourceref.achildresourceref.^agrandchildresourceref";
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto)).Should().Throw<ValidationException>()
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should()
+            .Throw<ValidationException>()
             .WithMessageLike(ValidationResources.HasGetOptionsValidator_InvalidEmbed);
     }
 
@@ -98,7 +104,9 @@ public class HasGetOptionsValidatorSpec
         _dto.Embed =
             "aresourceref1,aresourceref2,aresourceref3,aresourceref4,aresourceref5,aresourceref6,aresourceref7,aresourceref8,aresourceref9,aresourceref10,aresourceref11";
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto)).Should().Throw<ValidationException>()
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should()
+            .Throw<ValidationException>()
             .WithMessageLike(ValidationResources.HasGetOptionsValidator_TooManyResourceReferences);
     }
 }

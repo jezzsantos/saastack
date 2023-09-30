@@ -73,8 +73,9 @@ public static class HasSearchOptionsExtensions
 
     private static string ParseSortBy(string sortBy)
     {
-        return sortBy.StartsWith(SearchOptions.SortSigns[0].ToString()) ||
-               sortBy.StartsWith(SearchOptions.SortSigns[1].ToString())
+        return sortBy.StartsWith(SearchOptions.SortSigns[0]
+            .ToString()) || sortBy.StartsWith(SearchOptions.SortSigns[1]
+            .ToString())
             ? sortBy.TrimStart(SearchOptions.SortSigns)
             : sortBy;
     }
@@ -88,6 +89,7 @@ public static class HasSearchOptionsExtensions
 
     private static List<string> ParseFilters(string filter)
     {
-        return filter.Split(SearchOptions.FilterDelimiters).ToList();
+        return filter.Split(SearchOptions.FilterDelimiters)
+            .ToList();
     }
 }

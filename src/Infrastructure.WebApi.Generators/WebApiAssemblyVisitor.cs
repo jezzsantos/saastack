@@ -273,15 +273,18 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                     }
                 }
 
-                var body = constructor.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().ToFullString();
+                var body = constructor.DeclaringSyntaxReferences.FirstOrDefault()
+                    ?.GetSyntax()
+                    .ToFullString();
                 ctors.Add(new Constructor
                 {
                     IsInjectionCtor = isInjectionCtor,
                     CtorParameters = constructor.Parameters.Select(param => new ConstructorParameter
-                    {
-                        TypeName = new TypeName(param.Type.ContainingNamespace.ToDisplayString(), param.Type.Name),
-                        VariableName = param.Name
-                    }).ToList(),
+                        {
+                            TypeName = new TypeName(param.Type.ContainingNamespace.ToDisplayString(), param.Type.Name),
+                            VariableName = param.Name
+                        })
+                        .ToList(),
                     MethodBody = body
                 });
             }
@@ -291,20 +294,23 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
         List<IMethodSymbol> GetServiceOperationMethods()
         {
-            return symbol.GetMembers().OfType<IMethodSymbol>().Where(method =>
-            {
-                if (IsIncorrectReturnType(method))
+            return symbol.GetMembers()
+                .OfType<IMethodSymbol>()
+                .Where(method =>
                 {
-                    return false;
-                }
+                    if (IsIncorrectReturnType(method))
+                    {
+                        return false;
+                    }
 
-                if (HasWrongSetOfParameters(method))
-                {
-                    return false;
-                }
+                    if (HasWrongSetOfParameters(method))
+                    {
+                        return false;
+                    }
 
-                return true;
-            }).ToList();
+                    return true;
+                })
+                .ToList();
         }
 
         List<string> GetUsingNamespaces()
@@ -315,15 +321,21 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                 return new List<string>();
             }
 
-            var usingSyntaxes = syntaxReference.SyntaxTree.GetRoot().DescendantNodes().OfType<UsingDirectiveSyntax>();
+            var usingSyntaxes = syntaxReference.SyntaxTree.GetRoot()
+                .DescendantNodes()
+                .OfType<UsingDirectiveSyntax>();
 
-            return usingSyntaxes.Select(us => us.Name!.ToString()).Distinct().OrderDescending().ToList();
+            return usingSyntaxes.Select(us => us.Name!.ToString())
+                .Distinct()
+                .OrderDescending()
+                .ToList();
         }
 
         AttributeData? GetRouteAttribute(ISymbol method)
         {
-            return method.GetAttributes().FirstOrDefault(attribute =>
-                SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, _webRouteAttributeSymbol));
+            return method.GetAttributes()
+                .FirstOrDefault(attribute =>
+                    SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, _webRouteAttributeSymbol));
         }
 
         // We assume that the return type is a Task<T>

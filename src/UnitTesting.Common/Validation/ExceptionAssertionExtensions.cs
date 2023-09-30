@@ -11,10 +11,16 @@ public static class ExceptionAssertionExtensions
 {
     internal static bool IsFormattedFrom(string actualExceptionMessage, string expectedMessageWithFormatters)
     {
-        var escapedPattern = expectedMessageWithFormatters.Replace("[", "\\[").Replace("]", "\\]").Replace("(", "\\(")
-            .Replace(")", "\\)").Replace(".", "\\.").Replace("<", "\\<").Replace(">", "\\>");
+        var escapedPattern = expectedMessageWithFormatters.Replace("[", "\\[")
+            .Replace("]", "\\]")
+            .Replace("(", "\\(")
+            .Replace(")", "\\)")
+            .Replace(".", "\\.")
+            .Replace("<", "\\<")
+            .Replace(">", "\\>");
 
-        var pattern = escapedPattern.ReplaceWith(@"\{\d+\}", ".*").Replace(" ", @"\s");
+        var pattern = escapedPattern.ReplaceWith(@"\{\d+\}", ".*")
+            .Replace(" ", @"\s");
 
         return actualExceptionMessage.IsMatchWith(pattern);
     }
@@ -27,9 +33,11 @@ public static class ExceptionAssertionExtensions
         if (!string.IsNullOrEmpty(messageWithFormatters))
         {
             var exception = @throw.Subject.Single();
-            var expectedFormat = messageWithFormatters.Replace("{", "{{").Replace("}", "}}");
+            var expectedFormat = messageWithFormatters.Replace("{", "{{")
+                .Replace("}", "}}");
             Execute.Assertion.BecauseOf(because, becauseArgs)
-                .ForCondition(IsFormattedFrom(exception.Message, messageWithFormatters)).UsingLineBreaks.FailWith(
+                .ForCondition(IsFormattedFrom(exception.Message, messageWithFormatters))
+                .UsingLineBreaks.FailWith(
                     $"Expected exception message to match the equivalent of\n\"{expectedFormat}\", but\n\"{exception.Message}\" does not.");
         }
 
@@ -44,9 +52,11 @@ public static class ExceptionAssertionExtensions
         if (!string.IsNullOrEmpty(messageWithFormatters))
         {
             var exception = (await @throw).Subject.Single();
-            var expectedFormat = messageWithFormatters.Replace("{", "{{").Replace("}", "}}");
+            var expectedFormat = messageWithFormatters.Replace("{", "{{")
+                .Replace("}", "}}");
             Execute.Assertion.BecauseOf(because, becauseArgs)
-                .ForCondition(IsFormattedFrom(exception.Message, messageWithFormatters)).UsingLineBreaks.FailWith(
+                .ForCondition(IsFormattedFrom(exception.Message, messageWithFormatters))
+                .UsingLineBreaks.FailWith(
                     $"Expected exception message to match the equivalent of\n\"{expectedFormat}\", but\n\"{exception.Message}\" does not.");
         }
 

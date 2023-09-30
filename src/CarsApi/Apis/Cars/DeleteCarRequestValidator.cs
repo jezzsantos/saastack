@@ -12,6 +12,8 @@ public class DeleteCarRequestValidator : AbstractValidator<DeleteCarRequest>
 {
     public DeleteCarRequestValidator(IIdentifierFactory idFactory)
     {
-        RuleFor(req => req.Id).IsEntityId(idFactory).WithMessage(CommonValidationResources.AnyValidator_InvalidId);
+        RuleFor(req => req.Id)
+            .IsEntityId(idFactory)
+            .WithMessage(CommonValidationResources.AnyValidator_InvalidId);
     }
 }

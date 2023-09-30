@@ -7,8 +7,7 @@ public static class StringExtensions
     /// </summary>
     public static bool HasNoValue(this string? value)
     {
-        return string.IsNullOrEmpty(value)
-               || string.IsNullOrWhiteSpace(value);
+        return string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value);
     }
 
     /// <summary>
@@ -16,7 +15,6 @@ public static class StringExtensions
     /// </summary>
     public static bool HasValue(this string? value)
     {
-        return !string.IsNullOrEmpty(value)
-               && !string.IsNullOrWhiteSpace(value);
+        return !string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value);
     }
 }

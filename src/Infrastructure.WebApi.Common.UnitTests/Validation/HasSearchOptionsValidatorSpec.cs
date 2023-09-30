@@ -61,7 +61,9 @@ public class HasSearchOptionsValidatorSpec
     {
         _dto.Limit = SearchOptions.NoLimit - 1;
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto)).Should().Throw<ValidationException>()
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should()
+            .Throw<ValidationException>()
             .WithMessageLike(ValidationResources.HasSearchOptionsValidator_InvalidLimit);
     }
 
@@ -70,7 +72,9 @@ public class HasSearchOptionsValidatorSpec
     {
         _dto.Limit = SearchOptions.MaxLimit + 1;
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto)).Should().Throw<ValidationException>()
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should()
+            .Throw<ValidationException>()
             .WithMessageLike(ValidationResources.HasSearchOptionsValidator_InvalidLimit);
     }
 
@@ -103,7 +107,9 @@ public class HasSearchOptionsValidatorSpec
     {
         _dto.Offset = SearchOptions.NoOffset - 1;
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto)).Should().Throw<ValidationException>()
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should()
+            .Throw<ValidationException>()
             .WithMessageLike(ValidationResources.HasSearchOptionsValidator_InvalidOffset);
     }
 
@@ -112,7 +118,9 @@ public class HasSearchOptionsValidatorSpec
     {
         _dto.Offset = SearchOptions.MaxLimit + 1;
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto)).Should().Throw<ValidationException>()
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should()
+            .Throw<ValidationException>()
             .WithMessageLike(ValidationResources.HasSearchOptionsValidator_InvalidOffset);
     }
 
@@ -129,7 +137,9 @@ public class HasSearchOptionsValidatorSpec
     {
         _dto.Sort = "*";
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto)).Should().Throw<ValidationException>()
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should()
+            .Throw<ValidationException>()
             .WithMessageLike(ValidationResources.HasSearchOptionsValidator_InvalidSort);
     }
 
@@ -146,7 +156,9 @@ public class HasSearchOptionsValidatorSpec
     {
         _dto.Filter = "*";
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto)).Should().Throw<ValidationException>()
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should()
+            .Throw<ValidationException>()
             .WithMessageLike(ValidationResources.HasSearchOptionsValidator_InvalidFilter);
     }
 }

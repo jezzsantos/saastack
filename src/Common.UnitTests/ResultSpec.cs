@@ -16,7 +16,8 @@ public class ResultSpec
         {
             var result = new Result<string, TestError>(null!);
 
-            result.IsSuccessful.Should().BeTrue();
+            result.IsSuccessful.Should()
+                .BeTrue();
         }
 
         [Fact]
@@ -24,7 +25,8 @@ public class ResultSpec
         {
             var result = new Result<string, TestError>(string.Empty);
 
-            result.IsSuccessful.Should().BeTrue();
+            result.IsSuccessful.Should()
+                .BeTrue();
         }
 
         [Fact]
@@ -32,7 +34,8 @@ public class ResultSpec
         {
             var result = new Result<string, TestError>(new Optional<string>());
 
-            result.IsSuccessful.Should().BeTrue();
+            result.IsSuccessful.Should()
+                .BeTrue();
         }
 
         [Fact]
@@ -40,7 +43,8 @@ public class ResultSpec
         {
             var result = new Result<string, TestError>(new Optional<string>(string.Empty));
 
-            result.IsSuccessful.Should().BeTrue();
+            result.IsSuccessful.Should()
+                .BeTrue();
         }
 
         [Fact]
@@ -48,7 +52,8 @@ public class ResultSpec
         {
             var result = new Result<string, TestError>(new TestError());
 
-            result.IsSuccessful.Should().BeFalse();
+            result.IsSuccessful.Should()
+                .BeFalse();
         }
 
         [Fact]
@@ -56,7 +61,9 @@ public class ResultSpec
         {
             var result = new Result<string, TestError>(new TestError());
 
-            result.Invoking(x => x.Value).Should().Throw<InvalidOperationException>()
+            result.Invoking(x => x.Value)
+                .Should()
+                .Throw<InvalidOperationException>()
                 .WithMessage(Resources.Result_FetchValueWhenFaulted.Format("atesterror"));
         }
 
@@ -67,7 +74,8 @@ public class ResultSpec
 
             var actual = result.Value;
 
-            actual.Should().Be("avalue");
+            actual.Should()
+                .Be("avalue");
         }
 
         [Fact]
@@ -75,7 +83,9 @@ public class ResultSpec
         {
             var result = new Result<string, TestError>("avalue");
 
-            result.Invoking(x => x.Error).Should().Throw<InvalidOperationException>()
+            result.Invoking(x => x.Error)
+                .Should()
+                .Throw<InvalidOperationException>()
                 .WithMessage(Resources.Result_FetchErrorWhenNotFaulted);
         }
 
@@ -87,7 +97,8 @@ public class ResultSpec
 
             var actual = result.Error;
 
-            actual.Should().Be(error);
+            actual.Should()
+                .Be(error);
         }
 
         [Fact]
@@ -97,7 +108,8 @@ public class ResultSpec
 
             var actual = result.HasValue;
 
-            actual.Should().BeFalse();
+            actual.Should()
+                .BeFalse();
         }
 
         [Fact]
@@ -107,7 +119,8 @@ public class ResultSpec
 
             var actual = result.HasValue;
 
-            actual.Should().BeFalse();
+            actual.Should()
+                .BeFalse();
         }
 
         [Fact]
@@ -117,7 +130,8 @@ public class ResultSpec
 
             var actual = result.HasValue;
 
-            actual.Should().BeTrue();
+            actual.Should()
+                .BeTrue();
         }
 
         [Fact]
@@ -127,7 +141,8 @@ public class ResultSpec
 
             var actual = result.Exists;
 
-            actual.Should().BeFalse();
+            actual.Should()
+                .BeFalse();
         }
 
         [Fact]
@@ -137,7 +152,8 @@ public class ResultSpec
 
             var actual = result.Exists;
 
-            actual.Should().BeFalse();
+            actual.Should()
+                .BeFalse();
         }
 
         [Fact]
@@ -147,7 +163,8 @@ public class ResultSpec
 
             var actual = result.Exists;
 
-            actual.Should().BeTrue();
+            actual.Should()
+                .BeTrue();
         }
 
         [Fact]
@@ -157,7 +174,8 @@ public class ResultSpec
 
             var result = Result<string, TestError>.FromError(error);
 
-            result.Error.Should().Be(error);
+            result.Error.Should()
+                .Be(error);
         }
 
         [Fact]
@@ -165,7 +183,8 @@ public class ResultSpec
         {
             var result = Result<string, TestError>.FromResult("avalue");
 
-            result.Value.Should().Be("avalue");
+            result.Value.Should()
+                .Be("avalue");
         }
 
         [Fact]
@@ -176,8 +195,10 @@ public class ResultSpec
 
             var actual = result.TryGet(out var assigned);
 
-            actual.Should().BeFalse();
-            assigned.Should().Be(null);
+            actual.Should()
+                .BeFalse();
+            assigned.Should()
+                .Be(null);
         }
 
         [Fact]
@@ -187,8 +208,10 @@ public class ResultSpec
 
             var actual = result.TryGet(out var assigned);
 
-            actual.Should().BeTrue();
-            assigned.Should().Be("avalue");
+            actual.Should()
+                .BeTrue();
+            assigned.Should()
+                .Be("avalue");
         }
 
         [Fact]
@@ -198,8 +221,10 @@ public class ResultSpec
 
             var actual = result.TryGetError(out var assigned);
 
-            actual.Should().BeFalse();
-            assigned.Should().Be(null);
+            actual.Should()
+                .BeFalse();
+            assigned.Should()
+                .Be(null);
         }
 
         [Fact]
@@ -210,8 +235,10 @@ public class ResultSpec
 
             var actual = result.TryGetError(out var assigned);
 
-            actual.Should().BeTrue();
-            assigned.Should().Be(error);
+            actual.Should()
+                .BeTrue();
+            assigned.Should()
+                .Be(error);
         }
 
         [Fact]
@@ -222,7 +249,8 @@ public class ResultSpec
 
             var actual = result.ToString();
 
-            actual.Should().Be("atesterror");
+            actual.Should()
+                .Be("atesterror");
         }
 
         [Fact]
@@ -232,7 +260,8 @@ public class ResultSpec
 
             var actual = result.ToString();
 
-            actual.Should().Be("avalue");
+            actual.Should()
+                .Be("avalue");
         }
 
         [Fact]
@@ -240,8 +269,10 @@ public class ResultSpec
         {
             var result = (Result<string, TestError>)"avalue";
 
-            result.IsSuccessful.Should().BeTrue();
-            result.Value.Should().Be("avalue");
+            result.IsSuccessful.Should()
+                .BeTrue();
+            result.Value.Should()
+                .Be("avalue");
         }
 
         [Fact]
@@ -251,8 +282,10 @@ public class ResultSpec
 
             var result = (Result<string, TestError>)error;
 
-            result.IsSuccessful.Should().BeFalse();
-            result.Error.Should().Be(error);
+            result.IsSuccessful.Should()
+                .BeFalse();
+            result.Error.Should()
+                .Be(error);
         }
 
         [Fact]
@@ -262,7 +295,8 @@ public class ResultSpec
 
             var actual = (string)result;
 
-            actual.Should().Be("avalue");
+            actual.Should()
+                .Be("avalue");
         }
 
         [Fact]
@@ -273,7 +307,8 @@ public class ResultSpec
 
             var actual = result1 & result2;
 
-            actual.Should().BeFalse();
+            actual.Should()
+                .BeFalse();
         }
 
         [Fact]
@@ -284,7 +319,8 @@ public class ResultSpec
 
             var actual = result1 & result2;
 
-            actual.Should().BeTrue();
+            actual.Should()
+                .BeTrue();
         }
 
         [Fact]
@@ -307,10 +343,14 @@ public class ResultSpec
                 return false;
             });
 
-            match.Should().BeTrue();
-            successWasCalled.Should().BeTrue();
-            errorWasCalled.Should().BeFalse();
-            passedValue.Should().Be(Optional<string>.None);
+            match.Should()
+                .BeTrue();
+            successWasCalled.Should()
+                .BeTrue();
+            errorWasCalled.Should()
+                .BeFalse();
+            passedValue.Should()
+                .Be(Optional<string>.None);
         }
 
         [Fact]
@@ -333,10 +373,14 @@ public class ResultSpec
                 return false;
             });
 
-            match.Should().BeTrue();
-            successWasCalled.Should().BeTrue();
-            errorWasCalled.Should().BeFalse();
-            passedValue.Should().Be("avalue");
+            match.Should()
+                .BeTrue();
+            successWasCalled.Should()
+                .BeTrue();
+            errorWasCalled.Should()
+                .BeFalse();
+            passedValue.Should()
+                .Be("avalue");
         }
 
         [Fact]
@@ -360,10 +404,14 @@ public class ResultSpec
                 return true;
             });
 
-            match.Should().BeTrue();
-            successWasCalled.Should().BeFalse();
-            errorWasCalled.Should().BeTrue();
-            passedValue.Should().Be(error);
+            match.Should()
+                .BeTrue();
+            successWasCalled.Should()
+                .BeFalse();
+            errorWasCalled.Should()
+                .BeTrue();
+            passedValue.Should()
+                .Be(error);
         }
     }
 
@@ -375,7 +423,8 @@ public class ResultSpec
         {
             var result = new Result<TestError>();
 
-            result.IsSuccessful.Should().BeTrue();
+            result.IsSuccessful.Should()
+                .BeTrue();
         }
 
         [Fact]
@@ -383,7 +432,8 @@ public class ResultSpec
         {
             var result = new Result<TestError>(new TestError());
 
-            result.IsSuccessful.Should().BeFalse();
+            result.IsSuccessful.Should()
+                .BeFalse();
         }
 
         [Fact]
@@ -391,7 +441,9 @@ public class ResultSpec
         {
             var result = new Result<TestError>();
 
-            result.Invoking(x => x.Error).Should().Throw<InvalidOperationException>()
+            result.Invoking(x => x.Error)
+                .Should()
+                .Throw<InvalidOperationException>()
                 .WithMessage(Resources.Result_FetchErrorWhenNotFaulted);
         }
 
@@ -403,7 +455,8 @@ public class ResultSpec
 
             var actual = result.Error;
 
-            actual.Should().Be(error);
+            actual.Should()
+                .Be(error);
         }
 
         [Fact]
@@ -413,7 +466,8 @@ public class ResultSpec
 
             var result = Result<TestError>.FromError(error);
 
-            result.Error.Should().Be(error);
+            result.Error.Should()
+                .Be(error);
         }
 
         [Fact]
@@ -423,8 +477,10 @@ public class ResultSpec
 
             var actual = result.TryGetError(out var assigned);
 
-            actual.Should().BeFalse();
-            assigned.Should().Be(null);
+            actual.Should()
+                .BeFalse();
+            assigned.Should()
+                .Be(null);
         }
 
         [Fact]
@@ -435,8 +491,10 @@ public class ResultSpec
 
             var actual = result.TryGetError(out var assigned);
 
-            actual.Should().BeTrue();
-            assigned.Should().Be(error);
+            actual.Should()
+                .BeTrue();
+            assigned.Should()
+                .Be(error);
         }
 
         [Fact]
@@ -447,7 +505,8 @@ public class ResultSpec
 
             var actual = result.ToString();
 
-            actual.Should().Be("atesterror");
+            actual.Should()
+                .Be("atesterror");
         }
 
         [Fact]
@@ -457,7 +516,8 @@ public class ResultSpec
 
             var actual = result.ToString();
 
-            actual.Should().Be("OK");
+            actual.Should()
+                .Be("OK");
         }
 
         [Fact]
@@ -467,8 +527,10 @@ public class ResultSpec
 
             var result = (Result<TestError>)error;
 
-            result.IsSuccessful.Should().BeFalse();
-            result.Error.Should().Be(error);
+            result.IsSuccessful.Should()
+                .BeFalse();
+            result.Error.Should()
+                .Be(error);
         }
 
         [Fact]
@@ -479,7 +541,8 @@ public class ResultSpec
 
             var actual = result1 & result2;
 
-            actual.Should().BeFalse();
+            actual.Should()
+                .BeFalse();
         }
 
         [Fact]
@@ -490,7 +553,8 @@ public class ResultSpec
 
             var actual = result1 & result2;
 
-            actual.Should().BeTrue();
+            actual.Should()
+                .BeTrue();
         }
 
         [Fact]
@@ -513,10 +577,14 @@ public class ResultSpec
                 return false;
             });
 
-            match.Should().BeTrue();
-            successWasCalled.Should().BeTrue();
-            errorWasCalled.Should().BeFalse();
-            passedValue.Should().BeNull();
+            match.Should()
+                .BeTrue();
+            successWasCalled.Should()
+                .BeTrue();
+            errorWasCalled.Should()
+                .BeFalse();
+            passedValue.Should()
+                .BeNull();
         }
 
         [Fact]
@@ -540,10 +608,14 @@ public class ResultSpec
                 return true;
             });
 
-            match.Should().BeTrue();
-            successWasCalled.Should().BeFalse();
-            errorWasCalled.Should().BeTrue();
-            passedValue.Should().Be(error);
+            match.Should()
+                .BeTrue();
+            successWasCalled.Should()
+                .BeFalse();
+            errorWasCalled.Should()
+                .BeTrue();
+            passedValue.Should()
+                .Be(error);
         }
     }
 }

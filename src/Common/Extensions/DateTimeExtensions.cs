@@ -27,7 +27,9 @@ public static class DateTimeExtensions
         if (DateTime.TryParseExact(value!, supportedIsoFormats, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None,
                 out var date))
         {
-            return date.Kind == DateTimeKind.Utc ? date : date.ToUniversalTime();
+            return date.Kind == DateTimeKind.Utc
+                ? date
+                : date.ToUniversalTime();
         }
 
         return default;
@@ -100,7 +102,8 @@ public static class DateTimeExtensions
             ? value
             : value.ToUniversalTime();
 
-        return (long)utcDateTime.Subtract(DateTime.UnixEpoch).TotalMilliseconds;
+        return (long)utcDateTime.Subtract(DateTime.UnixEpoch)
+            .TotalMilliseconds;
     }
 
     /// <summary>
@@ -125,7 +128,8 @@ public static class DateTimeExtensions
             ? value
             : value.ToUniversalTime();
 
-        return utcDateTime.Subtract(DateTime.UnixEpoch).Ticks / TimeSpan.TicksPerSecond;
+        return utcDateTime.Subtract(DateTime.UnixEpoch)
+            .Ticks / TimeSpan.TicksPerSecond;
     }
 
     /// <summary>

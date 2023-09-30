@@ -9,7 +9,9 @@ public static class SearchOptionExtensions
     /// </summary>
     public static SearchResultMetadata ToMetadata(this SearchOptions? options, int total = 0)
     {
-        return Map(options.NotExists() ? new SearchOptions() : options!, total);
+        return Map(options.NotExists()
+            ? new SearchOptions()
+            : options!, total);
 
         static SearchResultMetadata Map(SearchOptions options, int total)
         {

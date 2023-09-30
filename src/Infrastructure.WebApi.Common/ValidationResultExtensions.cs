@@ -14,13 +14,16 @@ public static class ValidationResultExtensions
     public static ProblemDetails ToRfc7807(this ValidationResult result, string requestUrl)
     {
         var validationDetails = result.Errors.Select(error => new
-        {
-            Rule = error.ErrorCode,
-            Reason = error.ErrorMessage,
-            Value = error.AttemptedValue
-        }).ToList();
-        var firstMessage = result.Errors.Select(error => error.ErrorMessage).First();
-        var firstCode = result.Errors.Select(error => error.ErrorCode).First();
+            {
+                Rule = error.ErrorCode,
+                Reason = error.ErrorMessage,
+                Value = error.AttemptedValue
+            })
+            .ToList();
+        var firstMessage = result.Errors.Select(error => error.ErrorMessage)
+            .First();
+        var firstCode = result.Errors.Select(error => error.ErrorCode)
+            .First();
 
         var details = new ProblemDetails
         {

@@ -172,9 +172,7 @@ public static class Caller
         {
             CallId = callId ?? GenerateCallId();
             Roles = new ICallerContext.CallerRoles(new[] { UserRoles.ServiceAccount }, null);
-            FeatureSets =
-                new ICallerContext.CallerFeatureSets(
-                    new[] { UserFeatureSets.Core }, null);
+            FeatureSets = new ICallerContext.CallerFeatureSets(new[] { UserFeatureSets.Core }, null);
         }
 
         public ICallerContext.CallerRoles Roles { get; }

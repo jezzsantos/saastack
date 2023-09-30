@@ -19,6 +19,7 @@ public class HasGetOptions : IHasGetOptions
 
     public static HasGetOptions Custom<TResource>(params Expression<Func<TResource, object?>>[] resourceProperties)
     {
-        return GetOptions.Custom(resourceProperties).ToHasGetOptions();
+        return GetOptions.Custom(resourceProperties)
+            .ToHasGetOptions();
     }
 }

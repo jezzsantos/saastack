@@ -17,36 +17,35 @@ public static class WebApplicationExtensions
     /// </summary>
     public static IApplicationBuilder AddExceptionShielding(this WebApplication app)
     {
-        return app.UseExceptionHandler(configure =>
-            configure.Run(async context =>
+        return app.UseExceptionHandler(configure => configure.Run(async context =>
+        {
+            var exceptionMessage = string.Empty;
+            var exceptionStackTrace = string.Empty;
+            if (app.Environment.IsTestingOnly())
             {
-                var exceptionMessage = string.Empty;
-                var exceptionStackTrace = string.Empty;
-                if (app.Environment.IsTestingOnly())
+                var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+                if (contextFeature is not null)
                 {
-                    var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
-                    if (contextFeature is not null)
-                    {
-                        exceptionMessage = contextFeature.Error.Message;
-                        exceptionStackTrace = contextFeature.Error.ToString();
-                    }
+                    exceptionMessage = contextFeature.Error.Message;
+                    exceptionStackTrace = contextFeature.Error.ToString();
                 }
+            }
 
-                var details = new ProblemDetails
-                {
-                    Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
-                    Title = "An unexpected error occurred",
-                    Status = (int)HttpStatusCode.InternalServerError,
-                    Instance = context.Request.GetDisplayUrl(),
-                    Detail = exceptionMessage
-                };
-                if (exceptionStackTrace.HasValue())
-                {
-                    details.Extensions.Add("exception", exceptionStackTrace);
-                }
+            var details = new ProblemDetails
+            {
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+                Title = "An unexpected error occurred",
+                Status = (int)HttpStatusCode.InternalServerError,
+                Instance = context.Request.GetDisplayUrl(),
+                Detail = exceptionMessage
+            };
+            if (exceptionStackTrace.HasValue())
+            {
+                details.Extensions.Add("exception", exceptionStackTrace);
+            }
 
-
-                await Results.Problem(details).ExecuteAsync(context);
-            }));
+            await Results.Problem(details)
+                .ExecuteAsync(context);
+        }));
     }
 }

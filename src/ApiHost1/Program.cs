@@ -9,7 +9,6 @@ var app = WebApplication.CreateBuilder(args)
     .ConfigureApiHost(modules, RecorderOptions.BackEndApiHost);
 app.Run();
 
-
 namespace ApiHost1
 {
     [UsedImplicitly]

@@ -10,25 +10,27 @@ public class EnumExtensionsSpec
     [Fact]
     public void WhenToEnumAndEmpty_ThenThrows()
     {
-        ""
-            .Invoking(x => x.ToEnum<SourceEnum>())
-            .Should().Throw<ArgumentException>();
+        "".Invoking(x => x.ToEnum<SourceEnum>())
+            .Should()
+            .Throw<ArgumentException>();
     }
 
     [Fact]
     public void WhenToEnumAndNotMatches_ThenThrows()
     {
-        "notavalue"
-            .Invoking(x => x.ToEnum<SourceEnum>())
-            .Should().Throw<ArgumentException>();
+        "notavalue".Invoking(x => x.ToEnum<SourceEnum>())
+            .Should()
+            .Throw<ArgumentException>();
     }
 
     [Fact]
     public void WhenToEnumAndMatches_ThenReturnsMatched()
     {
-        var result = SourceEnum.OptionOne.ToString().ToEnum<SourceEnum>();
+        var result = SourceEnum.OptionOne.ToString()
+            .ToEnum<SourceEnum>();
 
-        result.Should().Be(SourceEnum.OptionOne);
+        result.Should()
+            .Be(SourceEnum.OptionOne);
     }
 
     [Fact]
@@ -36,7 +38,8 @@ public class EnumExtensionsSpec
     {
         var result = "".ToEnumOrDefault(SourceEnum.OptionTwo);
 
-        result.Should().Be(SourceEnum.OptionTwo);
+        result.Should()
+            .Be(SourceEnum.OptionTwo);
     }
 
     [Fact]
@@ -44,32 +47,35 @@ public class EnumExtensionsSpec
     {
         var result = "notavalue".ToEnumOrDefault(SourceEnum.OptionTwo);
 
-        result.Should().Be(SourceEnum.OptionTwo);
+        result.Should()
+            .Be(SourceEnum.OptionTwo);
     }
 
     [Fact]
     public void WhenToEnumOrDefaultAndMatches_ThenReturnsMatched()
     {
-        var result = SourceEnum.OptionOne.ToString().ToEnumOrDefault(SourceEnum.OptionTwo);
+        var result = SourceEnum.OptionOne.ToString()
+            .ToEnumOrDefault(SourceEnum.OptionTwo);
 
-        result.Should().Be(SourceEnum.OptionOne);
+        result.Should()
+            .Be(SourceEnum.OptionOne);
     }
-
 
     [Fact]
     public void WhenToEnumAndHasSameOption_ThenReturnsOption()
     {
         var result = SourceEnum.OptionTwo.ToEnum<SourceEnum, TargetEnum>();
 
-        result.Should().Be(TargetEnum.OptionTwo);
+        result.Should()
+            .Be(TargetEnum.OptionTwo);
     }
 
     [Fact]
     public void WhenToEnumAndMissingOptionInTarget_ThenThrows()
     {
-        SourceEnum.OptionOne
-            .Invoking(x => x.ToEnum<SourceEnum, TargetEnum>())
-            .Should().Throw<ArgumentException>()
+        SourceEnum.OptionOne.Invoking(x => x.ToEnum<SourceEnum, TargetEnum>())
+            .Should()
+            .Throw<ArgumentException>()
             .WithMessage($"Requested value '{SourceEnum.OptionOne}' was not found.");
     }
 
@@ -78,7 +84,8 @@ public class EnumExtensionsSpec
     {
         var result = SourceEnum.OptionTwo.ToEnumOrDefault(TargetEnum.OptionThree);
 
-        result.Should().Be(TargetEnum.OptionTwo);
+        result.Should()
+            .Be(TargetEnum.OptionTwo);
     }
 
     [Fact]
@@ -86,7 +93,8 @@ public class EnumExtensionsSpec
     {
         var result = SourceEnum.OptionOne.ToEnumOrDefault(TargetEnum.OptionThree);
 
-        result.Should().Be(TargetEnum.OptionThree);
+        result.Should()
+            .Be(TargetEnum.OptionThree);
     }
 }
 

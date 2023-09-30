@@ -19,7 +19,8 @@ public class JsonDateTimeConverterSpec
 
         var result = _converter.Read(ref reader, typeof(DateTime), JsonSerializerOptions.Default);
 
-        result.Should().Be(DateTime.MinValue);
+        result.Should()
+            .Be(DateTime.MinValue);
     }
 
     [Fact]
@@ -30,7 +31,8 @@ public class JsonDateTimeConverterSpec
 
         var result = _converter.Read(ref reader, typeof(DateTime), JsonSerializerOptions.Default);
 
-        result.Should().Be(DateTime.MinValue);
+        result.Should()
+            .Be(DateTime.MinValue);
     }
 
     [Fact]
@@ -42,7 +44,8 @@ public class JsonDateTimeConverterSpec
 
         var result = _converter.Read(ref reader, typeof(DateTime), JsonSerializerOptions.Default);
 
-        result.Should().Be(now);
+        result.Should()
+            .Be(now);
     }
 
     [Fact]
@@ -54,7 +57,8 @@ public class JsonDateTimeConverterSpec
 
         var result = _converter.Read(ref reader, typeof(DateTime), JsonSerializerOptions.Default);
 
-        result.Should().Be(now);
+        result.Should()
+            .Be(now);
     }
 
     [Fact]
@@ -71,7 +75,8 @@ public class JsonDateTimeConverterSpec
         stream.Seek(0, SeekOrigin.Begin);
         var result = new StreamReader(stream).ReadToEnd();
 
-        result.Should().Be($"{now.ToUnixSeconds()}");
+        result.Should()
+            .Be($"{now.ToUnixSeconds()}");
     }
 
     [Fact]
@@ -88,6 +93,7 @@ public class JsonDateTimeConverterSpec
         stream.Seek(0, SeekOrigin.Begin);
         var result = new StreamReader(stream).ReadToEnd();
 
-        result.Should().Be($"\"{now.ToIso8601()}\"");
+        result.Should()
+            .Be($"\"{now.ToIso8601()}\"");
     }
 }

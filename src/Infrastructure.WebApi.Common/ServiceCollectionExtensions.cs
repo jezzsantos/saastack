@@ -16,8 +16,7 @@ public static class ServiceCollectionExtensions
     ///     <see cref="IValidator{TRequest}" />
     /// </summary>
     public static MediatRServiceConfiguration AddValidatorBehaviors(this MediatRServiceConfiguration configuration,
-        IEnumerable<Type> registeredValidators,
-        IEnumerable<Assembly> assembliesContainingApis)
+        IEnumerable<Type> registeredValidators, IEnumerable<Assembly> assembliesContainingApis)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(registeredValidators);
@@ -29,8 +28,7 @@ public static class ServiceCollectionExtensions
             return configuration;
         }
 
-        var serviceClasses = assembliesContainingApis
-            .SelectMany(assembly => assembly.GetTypes())
+        var serviceClasses = assembliesContainingApis.SelectMany(assembly => assembly.GetTypes())
             .Where(IsServiceClass);
 
         var requestTypes = serviceClasses
@@ -75,9 +73,8 @@ public static class ServiceCollectionExtensions
             return validators.Find(type =>
             {
                 var implementedInterfaces = type.GetInterfaces();
-                var validatorInterface = implementedInterfaces
-                    .FirstOrDefault(@interface => @interface.IsGenericType
-                                                  && @interface.GetGenericTypeDefinition() == typeof(IValidator<>));
+                var validatorInterface = implementedInterfaces.FirstOrDefault(@interface =>
+                    @interface.IsGenericType && @interface.GetGenericTypeDefinition() == typeof(IValidator<>));
                 if (validatorInterface is not null)
                 {
                     var validatorRequestType = validatorInterface.GenericTypeArguments.FirstOrDefault();
@@ -105,9 +102,8 @@ public static class ServiceCollectionExtensions
         static Type? GetRequestType(Type type)
         {
             var interfaces = type.GetInterfaces();
-            return interfaces
-                .FirstOrDefault(@interface => @interface.IsGenericType
-                                              && @interface.GetGenericTypeDefinition() == typeof(IWebRequest<>));
+            return interfaces.FirstOrDefault(@interface =>
+                @interface.IsGenericType && @interface.GetGenericTypeDefinition() == typeof(IWebRequest<>));
         }
 
         static Type? GetResponseType(Type type)

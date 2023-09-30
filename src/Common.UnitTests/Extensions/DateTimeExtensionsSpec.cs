@@ -12,7 +12,8 @@ public class DateTimeExtensionsSpec
     {
         var result = ((DateTime?)null).ToIso8601();
 
-        result.Should().BeEmpty();
+        result.Should()
+            .BeEmpty();
     }
 
     [Fact]
@@ -25,7 +26,8 @@ public class DateTimeExtensionsSpec
         var offset = TimeZoneInfo.Local.GetUtcOffset(time);
         var offsetTime = time.Subtract(offset);
 
-        result.Should().Be($"2023-09-{offsetTime.Day:D2}T{offsetTime.Hour:D2}:{offsetTime.Minute:D2}:00.0000000Z");
+        result.Should()
+            .Be($"2023-09-{offsetTime.Day:D2}T{offsetTime.Hour:D2}:{offsetTime.Minute:D2}:00.0000000Z");
     }
 
     [Fact]
@@ -35,7 +37,8 @@ public class DateTimeExtensionsSpec
 
         var result = time.ToIso8601();
 
-        result.Should().Be("2023-09-24T12:00:00.0000000Z");
+        result.Should()
+            .Be("2023-09-24T12:00:00.0000000Z");
     }
 
     [Fact]
@@ -43,7 +46,8 @@ public class DateTimeExtensionsSpec
     {
         var result = ((DateTime?)null).ToUnixSeconds();
 
-        result.Should().Be(0);
+        result.Should()
+            .Be(0);
     }
 
     [Fact]
@@ -55,9 +59,11 @@ public class DateTimeExtensionsSpec
 
         var offset = TimeZoneInfo.Local.GetUtcOffset(time);
         var offsetTime = time.Subtract(offset);
-        var expected = (long)offsetTime.Subtract(DateTime.UnixEpoch).TotalSeconds;
+        var expected = (long)offsetTime.Subtract(DateTime.UnixEpoch)
+            .TotalSeconds;
 
-        result.Should().Be(expected);
+        result.Should()
+            .Be(expected);
     }
 
     [Fact]
@@ -67,7 +73,8 @@ public class DateTimeExtensionsSpec
 
         var result = time.ToUnixSeconds();
 
-        result.Should().Be(1695556800L);
+        result.Should()
+            .Be(1695556800L);
     }
 
     [Fact]
@@ -75,7 +82,8 @@ public class DateTimeExtensionsSpec
     {
         var result = ((DateTime?)null).ToUnixMilliSeconds();
 
-        result.Should().Be(0);
+        result.Should()
+            .Be(0);
     }
 
     [Fact]
@@ -87,9 +95,11 @@ public class DateTimeExtensionsSpec
 
         var offset = TimeZoneInfo.Local.GetUtcOffset(time);
         var offsetTime = time.Subtract(offset);
-        var expected = (long)offsetTime.Subtract(DateTime.UnixEpoch).TotalMilliseconds;
+        var expected = (long)offsetTime.Subtract(DateTime.UnixEpoch)
+            .TotalMilliseconds;
 
-        result.Should().Be(expected);
+        result.Should()
+            .Be(expected);
     }
 
     [Fact]
@@ -99,7 +109,8 @@ public class DateTimeExtensionsSpec
 
         var result = time.ToUnixMilliSeconds();
 
-        result.Should().Be(1695556800000L);
+        result.Should()
+            .Be(1695556800000L);
     }
 
     [Fact]
@@ -107,7 +118,8 @@ public class DateTimeExtensionsSpec
     {
         var result = ((string?)null).FromIso8601();
 
-        result.Should().Be(DateTime.MinValue);
+        result.Should()
+            .Be(DateTime.MinValue);
     }
 
     [Fact]
@@ -115,7 +127,8 @@ public class DateTimeExtensionsSpec
     {
         var result = string.Empty.FromIso8601();
 
-        result.Should().Be(DateTime.MinValue);
+        result.Should()
+            .Be(DateTime.MinValue);
     }
 
     [Fact]
@@ -123,15 +136,18 @@ public class DateTimeExtensionsSpec
     {
         var result = "notadate".FromIso8601();
 
-        result.Should().Be(DateTime.MinValue);
+        result.Should()
+            .Be(DateTime.MinValue);
     }
 
     [Fact]
     public void WhenFromIso8601AndOtherFormat_ThenReturnsMinDate()
     {
-        var result = DateTime.UtcNow.ToString("D").FromIso8601();
+        var result = DateTime.UtcNow.ToString("D")
+            .FromIso8601();
 
-        result.Should().Be(DateTime.MinValue);
+        result.Should()
+            .Be(DateTime.MinValue);
     }
 
     [Fact]
@@ -140,16 +156,19 @@ public class DateTimeExtensionsSpec
         var result = "2023-09-25T12:00:00Z".FromIso8601();
 
         var expected = new DateTime(2023, 09, 25, 12, 0, 0, DateTimeKind.Utc);
-        result.Should().Be(expected);
+        result.Should()
+            .Be(expected);
     }
 
     [Fact]
     public void WhenFromIso8601AndISO8601UtcWithMillionths_ThenReturnsUtcDate()
     {
         var now = DateTime.UtcNow;
-        var result = now.ToIso8601().FromIso8601();
+        var result = now.ToIso8601()
+            .FromIso8601();
 
-        result.Should().Be(now);
+        result.Should()
+            .Be(now);
     }
 
     [Fact]
@@ -158,7 +177,8 @@ public class DateTimeExtensionsSpec
         var result = "2023-09-25T12:00:00+13:00".FromIso8601();
 
         var expected = new DateTime(2023, 09, 24, 23, 0, 0, DateTimeKind.Utc);
-        result.Should().Be(expected);
+        result.Should()
+            .Be(expected);
     }
 
     [Fact]
@@ -166,7 +186,8 @@ public class DateTimeExtensionsSpec
     {
         var result = ((long?)null!).FromUnixTimestamp();
 
-        result.Should().Be(DateTime.MinValue);
+        result.Should()
+            .Be(DateTime.MinValue);
     }
 
     [Fact]
@@ -174,18 +195,21 @@ public class DateTimeExtensionsSpec
     {
         var result = 0L.FromUnixTimestamp();
 
-        result.Should().Be(DateTime.UnixEpoch);
+        result.Should()
+            .Be(DateTime.UnixEpoch);
     }
 
     [Fact]
     public void WhenFromUnixTimestampWithPastDateInSeconds_ThenReturnsDate()
     {
-        var hundredYearsAgo = DateTime.UtcNow.ToNearestSecond().Subtract(TimeSpan.FromDays(365 * 100));
+        var hundredYearsAgo = DateTime.UtcNow.ToNearestSecond()
+            .Subtract(TimeSpan.FromDays(365 * 100));
         var hundredYearsAgoUnixSeconds = hundredYearsAgo.ToUnixSeconds();
 
         var result = hundredYearsAgoUnixSeconds.FromUnixTimestamp();
 
-        result.Should().Be(hundredYearsAgo);
+        result.Should()
+            .Be(hundredYearsAgo);
     }
 
     [Fact]
@@ -196,17 +220,20 @@ public class DateTimeExtensionsSpec
 
         var result = nowUnixSeconds.FromUnixTimestamp();
 
-        result.Should().Be(now);
+        result.Should()
+            .Be(now);
     }
 
     [Fact]
     public void WhenFromUnixTimestampWithFutureDateInSeconds_ThenReturnsDate()
     {
-        var tenYearsAFromNow = DateTime.UtcNow.ToNearestSecond().Add(TimeSpan.FromDays(365 * 10));
+        var tenYearsAFromNow = DateTime.UtcNow.ToNearestSecond()
+            .Add(TimeSpan.FromDays(365 * 10));
         var tenYearsFromNowUnixSeconds = tenYearsAFromNow.ToUnixSeconds();
 
         var result = tenYearsFromNowUnixSeconds.FromUnixTimestamp();
 
-        result.Should().Be(tenYearsAFromNow);
+        result.Should()
+            .Be(tenYearsAFromNow);
     }
 }

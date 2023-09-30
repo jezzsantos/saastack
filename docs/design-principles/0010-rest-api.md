@@ -332,10 +332,10 @@ These properties generally don't form part of the route.
 In the API the naming convention for search type API's has been the following:
 
 * For search type API's, where the request contains something to search for, (even in cases where only a single result is expected) we have been using the convention: `GET /resources/search`, and defining the search criteria in the QueryString.
-  * For example, to determine if a user exists for a specified email address, we have the SearchUsers API: `GET /users/search?email=bob@company.com`.
+   * For example, to determine if a user exists for a specified email address, we have the SearchUsers API: `GET /users/search?email=bob@company.com`.
 
 * For Listing type API's, where the request may not contain any search criteria, and usually returns different variants of a resource based upon the caller, or context, we have been using the convention: `GET /resources`, and defining any parameters in the QueryString also.
-  * For example, to list the car that you own, we have the ListForCallerCars API: `GET /cars`.
+   * For example, to list the car that you own, we have the ListForCallerCars API: `GET /cars`.
 
 The difference in the naming convention is purely for semantics. For search APIs, the route adds the `/search` part.
 
@@ -628,26 +628,26 @@ We report errors as HTTP status codes `4XX` and `5XX`).
 These are the common HTTP status codes for errors:
 
 * `400 - BadRequest` (the request is incorrectly formatted)
-  * Validation failed
-  * A required input is missing or invalid at the time
-  * The request is not allowed at this time because the resource/context is not in a required state - (i.e. business rule violation).
+   * Validation failed
+   * A required input is missing or invalid at the time
+   * The request is not allowed at this time because the resource/context is not in a required state - (i.e. business rule violation).
 * `401 - NotAuthorized` (the user has not authenticated when authentication is required)
-  * No access_token provided for a secure call
-  * The access_token expired or is invalid
+   * No access_token provided for a secure call
+   * The access_token expired or is invalid
 * `402 - PaymentRequired` (the user is using a feature that has not been paid for)
-  * The caller is using a feature associated to a subscription plan that the user does not have
+   * The caller is using a feature associated to a subscription plan that the user does not have
 * `403 - Forbidden` (the user may be authenticated, but they are not authorized to this specific resource at this time)
-  * The caller is not in the required role
-  * [May decide to throw 404 instead to obscure reason from hacker]
+   * The caller is not in the required role
+   * [May decide to throw 404 instead to obscure reason from hacker]
 * `404 - NotFound` (a resource does not exist)
-  * The resource does not exist
-  * [May decide to throw 404 instead of a 403 if the caller is not allowed access to this resource to obscure the resource rather than admit it exists but the authenticated user does not have access to it]
+   * The resource does not exist
+   * [May decide to throw 404 instead of a 403 if the caller is not allowed access to this resource to obscure the resource rather than admit it exists but the authenticated user does not have access to it]
 * `405 - MethodNotAllowed` (Verb/API cannot be called at this time)
-  * i.e. It is invalid to call it for this resource at this time.
-  * i.e. It no longer exists for this resource at this time, or it never existed for this resource (not implemented yet).
+   * i.e. It is invalid to call it for this resource at this time.
+   * i.e. It no longer exists for this resource at this time, or it never existed for this resource (not implemented yet).
 * `409 - Conflict` (conflict with the current state of the target resource)
-  * Resource already exists
+   * Resource already exists
 * `500 - InternalServerError` (something bad happened in our code that we did not expect, and did not handle in the code)
-  * Unhandled/Unexpected exception (not covered above)
+   * Unhandled/Unexpected exception (not covered above)
 
 > HTTP Status codes are explained in detail here: [HTTP Status Codes](http://en.wikipedia.org/wiki/Http_error_codes)

@@ -51,8 +51,7 @@ public abstract class NamePrefixedIdentifierFactory : IIdentifierFactory
         }
 
         var prefix = id.Substring(0, delimiterIndex);
-        if (!IsKnownPrefix(prefix)
-            && prefix != UnknownEntityPrefix)
+        if (!IsKnownPrefix(prefix) && prefix != UnknownEntityPrefix)
         {
             return false;
         }
@@ -90,8 +89,7 @@ public abstract class NamePrefixedIdentifierFactory : IIdentifierFactory
 
     private bool IsKnownPrefix(string prefix)
     {
-        var allPossiblePrefixes = _prefixes
-            .Select(pre => pre.Value)
+        var allPossiblePrefixes = _prefixes.Select(pre => pre.Value)
             .Concat(SupportedPrefixes)
             .Distinct();
 

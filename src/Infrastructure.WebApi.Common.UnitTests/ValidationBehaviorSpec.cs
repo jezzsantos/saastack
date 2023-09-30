@@ -18,10 +18,14 @@ public class ValidationBehaviorSpec
     {
         _validator = new Mock<IValidator<TestRequest>>();
         var httpContextAccessor = new Mock<IHttpContextAccessor>();
-        httpContextAccessor.Setup(hca => hca.HttpContext!.Request.Scheme).Returns("ascheme");
-        httpContextAccessor.Setup(hca => hca.HttpContext!.Request.Host).Returns(new HostString("ahost"));
-        httpContextAccessor.Setup(hca => hca.HttpContext!.Request.PathBase).Returns(new PathString("/abasepath"));
-        httpContextAccessor.Setup(hca => hca.HttpContext!.Request.Path).Returns("/apath");
+        httpContextAccessor.Setup(hca => hca.HttpContext!.Request.Scheme)
+            .Returns("ascheme");
+        httpContextAccessor.Setup(hca => hca.HttpContext!.Request.Host)
+            .Returns(new HostString("ahost"));
+        httpContextAccessor.Setup(hca => hca.HttpContext!.Request.PathBase)
+            .Returns(new PathString("/abasepath"));
+        httpContextAccessor.Setup(hca => hca.HttpContext!.Request.Path)
+            .Returns("/apath");
         httpContextAccessor.Setup(hca => hca.HttpContext!.Request.QueryString)
             .Returns(new QueryString("?aquerystring"));
         _behavior = new ValidationBehavior<TestRequest, TestResponse>(_validator.Object, httpContextAccessor.Object);
@@ -41,9 +45,11 @@ public class ValidationBehaviorSpec
             return Task.FromResult(Results.Ok());
         }, CancellationToken.None);
 
-        wasNextCalled.Should().BeTrue();
+        wasNextCalled.Should()
+            .BeTrue();
         _validator.Verify(val => val.ValidateAsync(request, CancellationToken.None));
-        result.Should().Be(Results.Ok());
+        result.Should()
+            .Be(Results.Ok());
     }
 
     [Fact]
@@ -51,8 +57,7 @@ public class ValidationBehaviorSpec
     {
         var request = new TestRequest();
         var wasNextCalled = false;
-        var errors = new ValidationResult(new List<ValidationFailure>
-            { new("aproperty", "anerror") });
+        var errors = new ValidationResult(new List<ValidationFailure> { new("aproperty", "anerror") });
         _validator.Setup(val => val.ValidateAsync(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult(errors));
 
@@ -62,7 +67,8 @@ public class ValidationBehaviorSpec
             return Task.FromResult(Results.Ok());
         }, CancellationToken.None);
 
-        wasNextCalled.Should().BeFalse();
+        wasNextCalled.Should()
+            .BeFalse();
         _validator.Verify(val => val.ValidateAsync(request, CancellationToken.None));
         result.Should()
             .BeEquivalentTo(TypedResults.Problem(errors.ToRfc7807("ascheme://ahost/abasepath/apath?aquerystring")));

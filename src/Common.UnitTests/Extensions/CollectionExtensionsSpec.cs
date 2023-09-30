@@ -12,32 +12,33 @@ public class CollectionExtensionsSpec
     {
         var result = new List<string>().ContainsIgnoreCase("avalue");
 
-        result.Should().BeFalse();
+        result.Should()
+            .BeFalse();
     }
 
     [Fact]
     public void WhenContainsIgnoreCaseAndNoMatches_ThenReturnsFalse()
     {
         var result = new List<string>
-            {
-                "avalue1",
-                "avalue2"
-            }
-            .ContainsIgnoreCase("anothervalue");
+        {
+            "avalue1",
+            "avalue2"
+        }.ContainsIgnoreCase("anothervalue");
 
-        result.Should().BeFalse();
+        result.Should()
+            .BeFalse();
     }
 
     [Fact]
     public void WhenContainsIgnoreCaseAndMatches_ThenReturnsTrue()
     {
         var result = new List<string>
-            {
-                "avalue1",
-                "avalue2"
-            }
-            .ContainsIgnoreCase("avalue1");
+        {
+            "avalue1",
+            "avalue2"
+        }.ContainsIgnoreCase("avalue1");
 
-        result.Should().BeTrue();
+        result.Should()
+            .BeTrue();
     }
 }

@@ -61,8 +61,8 @@ public static class HandlerExtensions
         WebApiOperation operation)
         where TResource : class where TResponse : IWebResponse
     {
-        return result().Match(response => ((PostResult<TResponse>)response.Value).ToResult(operation),
-            error => error.ToResult());
+        return result()
+            .Match(response => ((PostResult<TResponse>)response.Value).ToResult(operation), error => error.ToResult());
     }
 
     /// <summary>
@@ -72,7 +72,8 @@ public static class HandlerExtensions
         WebApiOperation operation)
         where TResource : class where TResponse : IWebResponse
     {
-        return result().Match(response => response.Value.ToResult(operation), error => error.ToResult());
+        return result()
+            .Match(response => response.Value.ToResult(operation), error => error.ToResult());
     }
 
     /// <summary>
@@ -80,12 +81,14 @@ public static class HandlerExtensions
     /// </summary>
     public static IResult HandleApiResult(this ApiEmptyResult result, WebApiOperation operation)
     {
-        return result().Match(response => ((PostResult<EmptyResponse>)response.Value).ToResult(operation),
-            error => error.ToResult());
+        return result()
+            .Match(response => ((PostResult<EmptyResponse>)response.Value).ToResult(operation),
+                error => error.ToResult());
     }
 
     /// <summary>
-    ///     Converts the <see cref="TResource" /> in the <see cref="Result{TResource,Error}" /> to an <see cref="Result{PostResult,Error}" />
+    ///     Converts the <see cref="TResource" /> in the <see cref="Result{TResource,Error}" /> to an
+    ///     <see cref="Result{PostResult,Error}" />
     ///     using the <see cref="onSuccess" /> callback
     /// </summary>
     public static Result<PostResult<TResponse>, Error> HandleApplicationResult<TResponse, TResource>(
@@ -97,7 +100,8 @@ public static class HandlerExtensions
     }
 
     /// <summary>
-    ///     Converts the <see cref="TResource" /> in the <see cref="Result{TResource,Error}" /> to an <see cref="Result{TResponse,Error}" />
+    ///     Converts the <see cref="TResource" /> in the <see cref="Result{TResource,Error}" /> to an
+    ///     <see cref="Result{TResponse,Error}" />
     ///     using the <see cref="onSuccess" /> callback
     /// </summary>
     public static Result<TResponse, Error> HandleApplicationResult<TResponse, TResource>(

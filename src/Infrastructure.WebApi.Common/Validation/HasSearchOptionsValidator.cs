@@ -19,18 +19,30 @@ public class HasSearchOptionsValidator : AbstractValidator<IHasSearchOptions>, I
 
     public HasSearchOptionsValidator(IHasGetOptionsValidator hasGetOptionsValidator)
     {
-        RuleFor(dto => dto.Limit!.Value).InclusiveBetween(SearchOptions.NoLimit, SearchOptions.MaxLimit)
-            .When(dto => dto.Limit.HasValue).WithMessage(
+        RuleFor(dto => dto.Limit!.Value)
+            .InclusiveBetween(SearchOptions.NoLimit, SearchOptions.MaxLimit)
+            .When(dto => dto.Limit.HasValue)
+            .WithMessage(
                 ValidationResources.HasSearchOptionsValidator_InvalidLimit.Format(SearchOptions.NoLimit,
-                SearchOptions.DefaultLimit));
-        RuleFor(dto => dto.Offset!.Value).InclusiveBetween(SearchOptions.NoOffset, SearchOptions.MaxLimit)
-            .When(dto => dto.Offset.HasValue).WithMessage(
+                    SearchOptions.DefaultLimit));
+        RuleFor(dto => dto.Offset!.Value)
+            .InclusiveBetween(SearchOptions.NoOffset, SearchOptions.MaxLimit)
+            .When(dto => dto.Offset.HasValue)
+            .WithMessage(
                 ValidationResources.HasSearchOptionsValidator_InvalidOffset.Format(SearchOptions.NoOffset,
-                SearchOptions.MaxLimit));
-        RuleFor(dto => dto.Sort!).Matches(SortExpression).When(dto => dto.Sort.HasValue())
+                    SearchOptions.MaxLimit));
+        RuleFor(dto => dto.Sort!)
+            .Matches(SortExpression)
+            .When(dto => dto.Sort.HasValue())
             .WithMessage(ValidationResources.HasSearchOptionsValidator_InvalidSort);
-        RuleFor(dto => dto.Filter!).Matches(FilterExpression).When(dto => dto.Filter.HasValue())
+        RuleFor(dto => dto.Filter!)
+            .Matches(FilterExpression)
+            .When(dto => dto.Filter.HasValue())
             .WithMessage(ValidationResources.HasSearchOptionsValidator_InvalidFilter);
-        When(dto => dto.Embed.HasValue(), () => { RuleFor(dto => dto).SetValidator(hasGetOptionsValidator); });
+        When(dto => dto.Embed.HasValue(), () =>
+        {
+            RuleFor(dto => dto)
+                .SetValidator(hasGetOptionsValidator);
+        });
     }
 }
