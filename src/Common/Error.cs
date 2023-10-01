@@ -15,51 +15,81 @@ public struct Error
 
     public ErrorCode Code { get; }
 
+    /// <summary>
+    ///     Creates a <see cref="ErrorCode.Validation" /> error
+    /// </summary>
     public static Error Validation(string? message = null)
     {
         return new Error(ErrorCode.Validation, message);
     }
 
+    /// <summary>
+    ///     Creates a <see cref="ErrorCode.RuleViolation" /> error
+    /// </summary>
     public static Error RuleViolation(string? message = null)
     {
         return new Error(ErrorCode.RuleViolation, message);
     }
 
+    /// <summary>
+    ///     Creates a <see cref="ErrorCode.RoleViolation" /> error
+    /// </summary>
     public static Error RoleViolation(string? message = null)
     {
         return new Error(ErrorCode.RoleViolation, message);
     }
 
+    /// <summary>
+    ///     Creates a <see cref="ErrorCode.PreconditionViolation" /> error
+    /// </summary>
     public static Error PreconditionViolation(string? message = null)
     {
         return new Error(ErrorCode.PreconditionViolation, message);
     }
 
+    /// <summary>
+    ///     Creates a <see cref="ErrorCode.EntityNotFound" /> error
+    /// </summary>
     public static Error EntityNotFound(string? message = null)
     {
         return new Error(ErrorCode.EntityNotFound, message);
     }
 
+    /// <summary>
+    ///     Creates a <see cref="ErrorCode.EntityExists" /> error
+    /// </summary>
     public static Error EntityExists(string? message = null)
     {
         return new Error(ErrorCode.EntityExists, message);
     }
 
+    /// <summary>
+    ///     Creates a <see cref="ErrorCode.NotAuthenticated" /> error
+    /// </summary>
     public static Error NotAuthenticated(string? message = null)
     {
         return new Error(ErrorCode.NotAuthenticated, message);
     }
 
+    /// <summary>
+    ///     Creates a <see cref="ErrorCode.ForbiddenAccess" /> error
+    /// </summary>
     public static Error ForbiddenAccess(string? message = null)
     {
         return new Error(ErrorCode.ForbiddenAccess, message);
     }
 
+    /// <summary>
+    ///     Creates a <see cref="ErrorCode.NotSubscribed" /> error
+    /// </summary>
     public static Error NotSubscribed(string? message = null)
     {
         return new Error(ErrorCode.NotSubscribed, message);
     }
 
+    /// <summary>
+    ///     Creates a <see cref="ErrorCode.Unexpected" /> error
+    /// </summary>
     public static Error Unexpected(string? message = null)
     {
         return new Error(ErrorCode.Unexpected, message);

@@ -27,11 +27,17 @@ public static class CallerConstants
         ExternalWebhookAccountUserId
     };
 
+    /// <summary>
+    ///     Whether the user is the <see cref="AnonymousUserId" />
+    /// </summary>
     public static bool IsAnonymousUser(string userId)
     {
         return userId == AnonymousUserId;
     }
 
+    /// <summary>
+    ///     Whether the user is one of the <see cref="ServiceAccounts" />
+    /// </summary>
     public static bool IsServiceAccount(string userId)
     {
         return ServiceAccounts.Contains(userId);

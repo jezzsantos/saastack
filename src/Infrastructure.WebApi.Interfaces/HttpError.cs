@@ -1,5 +1,11 @@
+using System.Net;
+using Common;
+
 namespace Infrastructure.WebApi.Interfaces;
 
+/// <summary>
+///     Defines an error for using in <see cref="Result{TError}" /> return types
+/// </summary>
 public struct HttpError
 {
     public HttpError(HttpErrorCode code, string? message)
@@ -13,14 +19,17 @@ public struct HttpError
     public string? Message { get; }
 }
 
+/// <summary>
+///     Defines the commonly used HTTP StatusCodes
+/// </summary>
 public enum HttpErrorCode
 {
-    BadRequest = 400,
-    Unauthorized = 401,
-    PaymentRequired = 402,
-    Forbidden = 403,
-    NotFound = 404,
-    MethodNotAllowed = 405,
-    Conflict = 409,
-    InternalServerError = 500
+    BadRequest = HttpStatusCode.BadRequest,
+    Unauthorized = HttpStatusCode.Unauthorized,
+    PaymentRequired = HttpStatusCode.PaymentRequired,
+    Forbidden = HttpStatusCode.Forbidden,
+    NotFound = HttpStatusCode.NotFound,
+    MethodNotAllowed = HttpStatusCode.MethodNotAllowed,
+    Conflict = HttpStatusCode.Conflict,
+    InternalServerError = HttpStatusCode.InternalServerError
 }

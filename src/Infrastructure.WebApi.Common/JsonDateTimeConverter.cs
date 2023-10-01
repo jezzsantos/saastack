@@ -66,6 +66,9 @@ public class JsonDateTimeConverter : JsonConverter<DateTime>
     }
 }
 
+/// <summary>
+///     Defines the formats for JSON timestamps
+/// </summary>
 public enum DateFormat
 {
     UnixTimestamp,

@@ -26,6 +26,9 @@ public static class UserRoles
 #endif
     };
 
+    /// <summary>
+    ///     Whether the <see cref="role" /> is an assignable role
+    /// </summary>
     public static bool IsUserAssignableRole(string role)
     {
         return UserAssignableRoles.ContainsIgnoreCase(role);

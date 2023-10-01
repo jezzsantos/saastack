@@ -280,11 +280,17 @@ internal static partial class MicrosoftAspNetCoreExtensions
     }
 }
 
+/// <summary>
+///     Defines the options for the <see cref="System.Xml.Serialization.XmlSerializer" />
+/// </summary>
 public class XmlSerializerOptions
 {
     public bool WriteIndented { get; set; }
 }
 
+/// <summary>
+///     Defines the configurable options for XML serialization
+/// </summary>
 public class XmlOptions
 {
     public static readonly XmlSerializerOptions DefaultSerializerOptions = new()

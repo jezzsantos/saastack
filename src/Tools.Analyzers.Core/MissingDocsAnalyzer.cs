@@ -284,6 +284,7 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
         return false;
     }
 
+    // ReSharper disable once UnusedMember.Local
     private static bool IsPublicOrInternalExtensionMethod(MethodDeclarationSyntax methodDeclarationSyntax)
     {
         var isNotPublicOrInternal = IsNotPublicOrInternalStaticMethod(methodDeclarationSyntax);

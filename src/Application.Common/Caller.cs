@@ -74,6 +74,9 @@ public static class Caller
         return new ServiceClientAccountCaller();
     }
 
+    /// <summary>
+    ///     Returns a newly generated ID for the call
+    /// </summary>
     public static string GenerateCallId()
     {
         return $"{Guid.NewGuid():N}";

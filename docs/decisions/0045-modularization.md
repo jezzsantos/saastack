@@ -40,7 +40,7 @@ The options are:
 
 - At the start of building a SaaS product, the bounded contexts of the software are largely unknown, but what is known are the use cases being designed for in the early days. Subdomains will naturally evolve from grouping those use cases around specific aggregates/resources, as they are explored and built out.
 
-  - > Bounded contexts, at the beginning of a software build, pretty much represent a whole subdomain itself. More sophisticated definitions of bounded contexts be derived far later in the journey, when more about the domain is learned.
+   - > Bounded contexts, at the beginning of a software build, pretty much represent a whole subdomain itself. More sophisticated definitions of bounded contexts be derived far later in the journey, when more about the domain is learned.
 
 - REST resources are designed to expose a remote HTTP API to remote consumers. It is not the only way to interop with a SaaS product. Service buses, event hubs, queues, IoT, and other infrastructure are also interop mechanisms. REST resources are designed around real-world processes and use cases, so the overlap is close to aggregates and subdomains, but not precisely the same.
 

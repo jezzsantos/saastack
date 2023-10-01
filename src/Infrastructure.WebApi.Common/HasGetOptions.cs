@@ -17,6 +17,9 @@ public class HasGetOptions : IHasGetOptions
 
     public string? Embed { get; set; }
 
+    /// <summary>
+    ///     Converts the <see cref="resourceProperties" /> to a <see cref="HasGetOptions" />
+    /// </summary>
     public static HasGetOptions Custom<TResource>(params Expression<Func<TResource, object?>>[] resourceProperties)
     {
         return GetOptions.Custom(resourceProperties)

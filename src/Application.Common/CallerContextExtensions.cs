@@ -6,7 +6,7 @@ using Domain.Interfaces.ValueObjects;
 
 namespace Application.Common;
 
-public static class CurrentCallerExtensions
+public static class CallerContextExtensions
 {
     /// <summary>
     ///     Returns the call context from the context

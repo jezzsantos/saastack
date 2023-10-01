@@ -1,5 +1,8 @@
 namespace Infrastructure.WebApi.Interfaces;
 
+/// <summary>
+///     Defines the request of a SEARCH API
+/// </summary>
 public class SearchRequest<TResponse> : IWebSearchRequest<TResponse>
     where TResponse : IWebResponse
 {

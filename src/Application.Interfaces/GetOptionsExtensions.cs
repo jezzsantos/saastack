@@ -6,6 +6,9 @@ namespace Application.Interfaces;
 
 public static class GetOptionsExtensions
 {
+    /// <summary>
+    ///     Converts the <see cref="propertyReferences" /> expressions to names of the properties
+    /// </summary>
     internal static List<string> ReferencesToNames<TResource>(
         this Expression<Func<TResource, object?>>[] propertyReferences)
     {

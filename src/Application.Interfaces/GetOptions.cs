@@ -3,6 +3,9 @@ using Common.Extensions;
 
 namespace Application.Interfaces;
 
+/// <summary>
+///     Defines options for embedding resources in GET REST API calls
+/// </summary>
 public class GetOptions
 {
     public const string EmbedRequestParamDelimiter = ",";
@@ -50,6 +53,9 @@ public class GetOptions
     }
 }
 
+/// <summary>
+///     Defines the options for expanding child resources in REST responses
+/// </summary>
 public enum ExpandOptions
 {
     None = 0,
