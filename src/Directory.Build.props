@@ -96,8 +96,10 @@
     </PropertyGroup>
 
     <!-- Runs the analyzers (in memory) on build -->
-    <ItemGroup>
-        <ProjectReference Include="..\Tools.Analyzers.Core\Tools.Analyzers.Core.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" Condition="'$(IsTestProject)'=='' AND '$(IsRoslynComponent)'==''" />
+    <ItemGroup Condition="'$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true'">
+        <PackageReference Include="SaaStack.Tools.Analyzers.Core" Version="1.0.0">
+            <IncludeAssets>analyzers</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
 </Project>

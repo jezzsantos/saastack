@@ -4,10 +4,16 @@
         <TargetFramework>.net7.0</TargetFramework>
         <IsRoslynComponent>true</IsRoslynComponent>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <IsPackable>true</IsPackable>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <PackageId>SaaStack.Tools.Analyzers.Core</PackageId>
+        <Description>Roslyn analyzers for SaaStack codebases</Description>
+        <PackageReleaseNotes>https://github.com/jezzsantos/saastack/blob/main/src/Tools.Analyzers.Core/README.md</PackageReleaseNotes>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <NoWarn>RS2007</NoWarn>
+    <PropertyGroup>
+        <NoWarn>RS2007;NU5128</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -39,4 +45,13 @@
         <AdditionalFiles Remove="AnalyzerReleases.Unshipped.md" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    </ItemGroup>
+
+    <Target Name="CopyPackage" AfterTargets="Pack">
+        <Copy
+                SourceFiles="$(OutputPath)../$(PackageId).$(PackageVersion).nupkg"
+                DestinationFolder="../../tools/nuget" />
+    </Target>
 </Project>

@@ -24,6 +24,7 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
+    <!-- ReSharper disable once DuplicateResource -->
     <data name="SAS001Description" xml:space="preserve">
         <value>This type should have a &lt;summary&gt; to describe what it designed to do.</value>
     </data>
