@@ -1,5 +1,6 @@
 [![In Preview](https://img.shields.io/badge/Status-InPreview-red.svg)](README.md)
 [![Build and Test](https://github.com/jezzsantos/saastack/actions/workflows/build.yml/badge.svg)](https://github.com/jezzsantos/saastack/actions/workflows/build.yml)
+[![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/jezzsantos)
 
 # SaaStack
 
