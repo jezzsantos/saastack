@@ -13,16 +13,16 @@
 
     <ItemGroup>
         <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebApiService.cs">
-            <Link>Reference\Infrastruture.WebApi.Interfaces\IWebApiService.cs</Link>
+            <Link>Reference\Infrastructure.WebApi.Interfaces\IWebApiService.cs</Link>
         </Compile>
         <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebResponse.cs">
-            <Link>Reference\Infrastruture.WebApi.Interfaces\IWebResponse.cs</Link>
+            <Link>Reference\Infrastructure.WebApi.Interfaces\IWebResponse.cs</Link>
         </Compile>
         <Compile Include="..\Infrastructure.WebApi.Interfaces\WebApiOperation.cs">
-            <Link>Reference\Infrastruture.WebApi.Interfaces\WebApiOperation.cs</Link>
+            <Link>Reference\Infrastructure.WebApi.Interfaces\WebApiOperation.cs</Link>
         </Compile>
         <Compile Include="..\Infrastructure.WebApi.Interfaces\WebApiRouteAttribute.cs">
-            <Link>Reference\Infrastruture.WebApi.Interfaces\WebApiRouteAttribute.cs</Link>
+            <Link>Reference\Infrastructure.WebApi.Interfaces\WebApiRouteAttribute.cs</Link>
         </Compile>
     </ItemGroup>
 </Project>

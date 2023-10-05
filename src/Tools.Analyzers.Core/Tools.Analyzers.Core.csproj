@@ -4,16 +4,17 @@
         <TargetFramework>.net7.0</TargetFramework>
         <IsRoslynComponent>true</IsRoslynComponent>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <IsPackable>true</IsPackable>
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <PackageId>SaaStack.Tools.Analyzers.Core</PackageId>
         <Description>Roslyn analyzers for SaaStack codebases</Description>
         <PackageReleaseNotes>https://github.com/jezzsantos/saastack/blob/main/src/Tools.Analyzers.Core/README.md</PackageReleaseNotes>
+        <PackageVersion>1.0.0</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup>
-        <NoWarn>RS2007;NU5128</NoWarn>
+        <NoWarn>$(NoWarn),RS2007;NU5128</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -46,6 +47,42 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebApiService.cs">
+            <Link>Reference\Infrastructure.WebApi.Interfaces\IWebApiService.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebResponse.cs">
+            <Link>Reference\Infrastructure.WebApi.Interfaces\IWebResponse.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\WebApiOperation.cs">
+            <Link>Reference\Infrastructure.WebApi.Interfaces\WebApiOperation.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\WebApiRouteAttribute.cs">
+            <Link>Reference\Infrastructure.WebApi.Interfaces\WebApiRouteAttribute.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\EmptyResponse.cs">
+            <Link>Reference\Infrastruture.WebApi.Interfaces\EmptyResponse.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.WebApi.Common\ApiResult.cs">
+            <Link>Reference\Infrastruture.WebApi.Common\ApiResult.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Result.cs">
+            <Link>Reference\Common\Result.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Optional.cs">
+            <Link>Reference\Common\Optional.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Error.cs">
+            <Link>Reference\Common\Error.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Annotations.cs">
+            <Link>Reference\Common\Annotations.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Resources.Designer.cs">
+            <Link>Reference\Common\Resources.Designer.cs</Link>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     </ItemGroup>
 
@@ -54,4 +91,10 @@
                 SourceFiles="$(OutputPath)../$(PackageId).$(PackageVersion).nupkg"
                 DestinationFolder="../../tools/nuget" />
     </Target>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
 </Project>

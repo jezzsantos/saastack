@@ -5,6 +5,7 @@
 	
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ArrangeNamespaceBody/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ClassNeverInstantiated_002EGlobal/@EntryIndexedValue">WARNING</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=DuplicateResource/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=SeparateLocalFunctionsWithJumpStatement/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UnusedType_002EGlobal/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpCodeStyle/BRACES_FOR_FOR/@EntryValue">Required</s:String>
@@ -133,6 +134,7 @@
                 &lt;/And&gt;
             &lt;/Entry.Match&gt;
             &lt;Entry.SortBy&gt;
+                &lt;Access/&gt;
                 &lt;Name /&gt;
             &lt;/Entry.SortBy&gt;
         &lt;/Entry&gt;
@@ -159,6 +161,7 @@
             &lt;/Entry.Match&gt;
             &lt;Entry.SortBy&gt;
                 &lt;Kind Order="Constant Field" /&gt;
+                &lt;Access/&gt;
                 &lt;Name /&gt;
             &lt;/Entry.SortBy&gt;
         &lt;/Entry&gt;
@@ -172,6 +175,7 @@
                 &lt;/And&gt;
             &lt;/Entry.Match&gt;
             &lt;Entry.SortBy&gt;
+                &lt;Access/&gt;
                 &lt;Readonly /&gt;
                 &lt;Name /&gt;
             &lt;/Entry.SortBy&gt;
@@ -373,10 +377,12 @@ public void When$condition$_Then$outcome$()
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aname/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Anding/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anid/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=anotherresource/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anothervalue/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=apattern/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aproperty/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=areplacement/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=aresource/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aresourceref/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=asort/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=asortfield/@EntryIndexedValue">True</s:Boolean>

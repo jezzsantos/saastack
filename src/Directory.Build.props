@@ -56,14 +56,25 @@
     <PropertyGroup>
         <SignAssembly>false</SignAssembly>
         <DelaySign>false</DelaySign>
-        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-        <NoWarn>436,NU5125</NoWarn>
-        <Configurations>Debug;Release;ReleaseForDeploy</Configurations>
-        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
+
+    <!-- Analyzers -->
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn),1573,1574,1591,1712,1723</NoWarn>
+    </PropertyGroup>
+
+    <!-- Runs the analyzers (in memory) on build -->
+    <ItemGroup Condition="'$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true'">
+        <PackageReference Include="SaaStack.Tools.Analyzers.Core" Version="1.0.0" PrivateAssets="all" />
+    </ItemGroup>
 
     <!-- Build configurations -->
     <PropertyGroup>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <NoWarn>$(NoWarn),436,NU5125</NoWarn>
+        <Configurations>Debug;Release;ReleaseForDeploy</Configurations>
+        <Platforms>AnyCPU</Platforms>
         <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
         <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
     </PropertyGroup>
@@ -94,12 +105,5 @@
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
-
-    <!-- Runs the analyzers (in memory) on build -->
-    <ItemGroup Condition="'$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true'">
-        <PackageReference Include="SaaStack.Tools.Analyzers.Core" Version="1.0.0">
-            <IncludeAssets>analyzers</IncludeAssets>
-        </PackageReference>
-    </ItemGroup>
 
 </Project>

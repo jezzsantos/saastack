@@ -24,7 +24,7 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <!-- ReSharper disable once DuplicateResource -->
+    <!-- ReSharper disable DuplicateResource -->
     <data name="SAS001Description" xml:space="preserve">
         <value>This type should have a &lt;summary&gt; to describe what it designed to do.</value>
     </data>
@@ -42,5 +42,68 @@
     </data>
     <data name="SAS002Title" xml:space="preserve">
         <value>Missing documentation</value>
+    </data>
+    <data name="SAS010Description" xml:space="preserve">
+        <value>This method should return either a Task&lt;T&gt; or T, of a Result type.</value>
+    </data>
+    <data name="SAS010MessageFormat" xml:space="preserve">
+        <value>If method '{0}' is supposed to be a service operation, then it should return either: 'Task&lt;ApiEmptyResult&gt;', 'Task&lt;ApiResult&lt;TResource, TResponse&gt;&gt;', 'Task&lt;ApiPostResult&lt;TResource, TResponse&gt;&gt;' or 'ApiEmptyResult', 'ApiResult&lt;TResource, TResponse&gt;' or 'ApiPostResult&lt;TResource, TResponse&gt;'</value>
+    </data>
+    <data name="SAS010Title" xml:space="preserve">
+        <value>Wrong return type</value>
+    </data>
+    <data name="SAS011Description" xml:space="preserve">
+        <value>This service operation should have at least one parameter, and that parameter should be derived from: 'IWebRequest&lt;TResponse&gt;'.</value>
+    </data>
+    <data name="SAS011MessageFormat" xml:space="preserve">
+        <value>Service operation '{0}' should have at least one parameter of a type derived from; 'IWebRequest&lt;TResponse&gt;'</value>
+    </data>
+    <data name="SAS011Title" xml:space="preserve">
+        <value>Missing first parameter or wrong parameter type</value>
+    </data>
+    <data name="SAS012Description" xml:space="preserve">
+        <value>This service operation can only have a 'CancellationToken' as its second parameter.</value>
+    </data>
+    <data name="SAS012MessageFormat" xml:space="preserve">
+        <value>Service operation '{0}' can only have a 'CancellationToken' as its second parameter</value>
+    </data>
+    <data name="SAS012Title" xml:space="preserve">
+        <value>Wrong second parameter type</value>
+    </data>
+    <data name="SAS013Description" xml:space="preserve">
+        <value>This service operation should be declared with a 'WebApiRouteAttribute' on it.</value>
+    </data>
+    <data name="SAS013MessageFormat" xml:space="preserve">
+        <value>Service operation '{0}' should have a 'WebApiRouteAttribute'</value>
+    </data>
+    <data name="SAS013Title" xml:space="preserve">
+        <value>Missing 'WebApiRouteAttribute'</value>
+    </data>
+    <data name="SAS014Description" xml:space="preserve">
+        <value>This service operation has a route declared on it that is different from other service operations in this class.</value>
+    </data>
+    <data name="SAS014MessageFormat" xml:space="preserve">
+        <value>Service operation '{0}' is required to have the same route path as other service operations in this class</value>
+    </data>
+    <data name="SAS014Title" xml:space="preserve">
+        <value>Wrong route group</value>
+    </data>
+    <data name="SAS015Description" xml:space="preserve">
+        <value>This service operation has the same request type as another service operation in this class.</value>
+    </data>
+    <data name="SAS015MessageFormat" xml:space="preserve">
+        <value>Service operation '{0}' uses the same type for its first parameter as does another service operation in this class. They must use different request types</value>
+    </data>
+    <data name="SAS015Title" xml:space="preserve">
+        <value>Duplicate request type</value>
+    </data>
+    <data name="SAS016Description" xml:space="preserve">
+        <value>This service operation should return an appropriate result.</value>
+    </data>
+    <data name="SAS016MessageFormat" xml:space="preserve">
+        <value>Service operation '{0}' is defined as a '{1}' operation, and should return a 'Task&lt;{2}&gt;' or '{2}'</value>
+    </data>
+    <data name="SAS016Title" xml:space="preserve">
+        <value>Unexpected return type for operation</value>
     </data>
 </root>
