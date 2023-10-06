@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/template",
+  "author": "SaaStack",
+  "classifications": [
+    "SaaStack",
+    "Library"
+  ],
+  "identity": "SaaStack.AnyProject",
+  "name": "SaaStack Class Library",
+  "description": "",
+  "shortName": "saastackany",
+  "sourceName": "ProjectName",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "preferNameDirectory": false
+}

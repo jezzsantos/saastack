@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/template",
+  "author": "SaaStack",
+  "classifications": [
+    "SaaStack"
+  ],
+  "identity": "SaaStack.ApiHostProject",
+  "name": "SaaStack API Project",
+  "description": "",
+  "shortName": "saastackapi",
+  "sourceName": "ProjectName",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "preferNameDirectory": false
+}

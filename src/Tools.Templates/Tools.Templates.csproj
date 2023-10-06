@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Remove="AnyProject/**/*.cs" />
+        <None Include="AnyProject/**/*.*" />
+
+        <Compile Remove="ApiHostProject/**/*.cs" />
+        <None Include="ApiHostProject/**/*.*" />
+
+        <Compile Remove="IntegrationTestProject/**/*.cs" />
+        <None Include="IntegrationTestProject/**/*.*" />
+
+        <Compile Remove="UnitTestProject/**/*.cs" />
+        <None Include="UnitTestProject/**/*.*" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/template",
+  "author": "SaaStack",
+  "classifications": [
+    "SaaStack",
+    "Test",
+    "xUnit"
+  ],
+  "identity": "SaaStack.UnitTestProject",
+  "name": "SaaStack Unit Test Project",
+  "description": "",
+  "shortName": "saastacktest",
+  "sourceName": "ProjectName",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "preferNameDirectory": false
+}
