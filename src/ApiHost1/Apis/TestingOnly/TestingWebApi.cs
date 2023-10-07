@@ -57,6 +57,15 @@ public class TestingWebApi : IWebApiService
         });
     }
 
+    [WebApiRoute("testingonly/correlations/get", WebApiOperation.Get, true)]
+    public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> RequestCorrelationGet(
+        RequestCorrelationsTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () => new Result<StringMessageTestingOnlyResponse, Error>(new StringMessageTestingOnlyResponse
+            { Message = "amessage" });
+    }
+
     [WebApiRoute("/testingonly/statuses/delete", WebApiOperation.Delete, true)]
     public async Task<ApiEmptyResult> StatusesDelete(StatusesDeleteTestingOnlyRequest request,
         CancellationToken cancellationToken)

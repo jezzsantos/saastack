@@ -2,6 +2,7 @@ using Application.Common;
 using Application.Interfaces;
 using Domain.Common;
 using Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.WebApi.Common;
 
@@ -10,9 +11,17 @@ namespace Infrastructure.WebApi.Common;
 /// </summary>
 public class AnonymousCallerContext : ICallerContext
 {
+    public AnonymousCallerContext(IHttpContextAccessor httpContext)
+    {
+        CallId = httpContext.HttpContext!.Items.TryGetValue(RequestCorrelationFilter.CorrelationIdItemName,
+            out var callId)
+            ? callId!.ToString()!
+            : Caller.GenerateCallId();
+    }
+
     public string CallerId => CallerConstants.AnonymousUserId;
 
-    public string CallId => Caller.GenerateCallId();
+    public string CallId { get; init; }
 
     public string? TenantId => null;
 

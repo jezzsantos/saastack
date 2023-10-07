@@ -516,7 +516,25 @@ It is typed to requests `IWebRequest<TResponse`, making it easier to access resp
 
 ### Request Correlation
 
-TBD
+We are correlating all requests coming through all the Hosts of our API.
+
+> Whether we have a single host (monolith) or chain multiple hosts together (microservices).
+
+On all inbound HTTP requests (of all hosts) we are looking for a correlation ID in any of these request headers:
+
+* `Request-ID`
+* `X-Request-ID`
+* `Correlation-ID`
+* `X-Correlation-ID`
+
+If any of these headers are found in a request, we are then extracting that value and using it as the `ICallerContext.CallId` that is then passed down the call stack to all layers.
+Otherwise we are fabricating a brand new value for the Correlation ID, and starting with that value.
+
+> Correlation ID that are fabricated are simply UUIDs (see `Caller.GenerateCallId()`)
+
+This correlation ID is appended as a `Request-ID` HTTP response header on all outbound responses.
+
+Furthermore, when chaining together requests between modules, either in-process calls (via `ICallerContext`), or over HTTP service clients (using any of the `IHttpClient` clients), this value will be preserved for the entire chain of calls.
 
 ### Logging
 

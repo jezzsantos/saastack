@@ -18,6 +18,8 @@ public static class HostExtensions
     public static WebApplication ConfigureApiHost(this WebApplicationBuilder builder, SubDomainModules modules,
         RecorderOptions recorderOptions)
     {
+        builder.Services.AddHttpContextAccessor();
+
         SetupConfiguration();
         SetupRecording();
         SetupAuthenticationAuthorization();
@@ -63,7 +65,6 @@ public static class HostExtensions
 
         void SetupApiRequests()
         {
-            builder.Services.AddHttpContextAccessor();
             builder.Services.AddSingleton<IHasSearchOptionsValidator, HasSearchOptionsValidator>();
             builder.Services.AddSingleton<IHasGetOptionsValidator, HasGetOptionsValidator>();
             builder.Services.RegisterValidators(modules.ApiAssemblies, out var validators);

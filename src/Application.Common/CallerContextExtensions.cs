@@ -11,14 +11,14 @@ public static class CallerContextExtensions
     /// <summary>
     ///     Returns the call context from the context
     /// </summary>
-    public static ICallContext ToCall(this ICallerContext context)
+    public static ICallContext ToCall(this ICallerContext? context)
     {
         if (context.NotExists())
         {
             return CallContext.CreateUnknown();
         }
 
-        return CallContext.CreateCustom(context.CallId, context.CallerId, context.TenantId);
+        return CallContext.CreateCustom(context!.CallId, context.CallerId, context.TenantId);
     }
 
     /// <summary>

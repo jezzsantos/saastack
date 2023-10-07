@@ -98,6 +98,7 @@ namespace {assemblyNamespace}
         var groupName = $"{serviceClassName.ToLowerInvariant()}Group";
         endpointRegistrations.AppendLine($@"        var {groupName} = app.MapGroup(string.Empty)
                 .WithGroupName(""{serviceClassName}"")
+                .AddEndpointFilter<global::Infrastructure.WebApi.Common.RequestCorrelationFilter>()
                 .AddEndpointFilter<global::Infrastructure.WebApi.Common.ContentNegotiationFilter>();");
 
         foreach (var registration in serviceRegistrations)

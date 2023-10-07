@@ -18,6 +18,7 @@ public static class HttpContentTypes
 public static class HttpHeaders
 {
     public const string Accept = "Accept";
+    public const string RequestId = "Request-ID";
 }
 
 /// <summary>

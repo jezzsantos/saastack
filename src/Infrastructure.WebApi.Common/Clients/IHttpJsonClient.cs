@@ -51,6 +51,8 @@ public class JsonResponseMessage
 
     public required HttpResponseHeaders Headers { get; set; }
 
+    public required string RequestId { get; init; }
+
     public required HttpStatusCode StatusCode { get; init; }
 }
 

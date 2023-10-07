@@ -2,15 +2,12 @@ namespace Common;
 
 public static class CallContext
 {
-    public const string UncorrelatedCallId = "uncorrelated";
-    public const string UnknownCallerId = "unknown";
-
     /// <summary>
     ///     Creates a custom <see cref="ICallContext" /> with its own call, caller and tenant identifiers
     /// </summary>
     public static ICallContext CreateCustom(string? callId, string callerId, string? tenantId)
     {
-        return new CustomCall(callId ?? UncorrelatedCallId, callerId, tenantId);
+        return new CustomCall(callId ?? CallConstants.UncorrelatedCallId, callerId, tenantId);
     }
 
     /// <summary>
@@ -23,7 +20,7 @@ public static class CallContext
 
     private sealed class UnknownCall : CustomCall
     {
-        public UnknownCall() : base(UncorrelatedCallId, UnknownCallerId, null)
+        public UnknownCall() : base(CallConstants.UncorrelatedCallId, CallConstants.UnknownCallerId, null)
         {
         }
     }

@@ -162,7 +162,8 @@ public class JsonClient : IHttpJsonClient
         {
             StatusCode = response.StatusCode,
             Content = content ?? string.Empty,
-            Headers = response.Headers
+            Headers = response.Headers,
+            RequestId = response.GetOrCreateRequestId()
         };
     }
 
@@ -174,7 +175,8 @@ public class JsonClient : IHttpJsonClient
         {
             StatusCode = response.StatusCode,
             Content = content ?? new TResponse(),
-            Headers = response.Headers
+            Headers = response.Headers,
+            RequestId = response.GetOrCreateRequestId()
         };
     }
 }
