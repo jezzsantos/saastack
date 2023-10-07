@@ -1,4 +1,4 @@
-# Web Framework
+# Web API Framework
 
 ## Design Principles
 
@@ -21,7 +21,9 @@
    - All API declarations will be `async` by default
 8. We are striving to establish simple-to-understand patterns for the API author while using essential 3rd party libraries, but at the same time, limit the number of dependencies on 3rd party libraries.
 
-An example of a way we prefer to define our endpoints related to a resource (e.g., a `Car`), would look like a single API class like this:
+## Preferred Declarative syntax
+
+This is an example of the declarative way we prefer to define our endpoints, in a way that relates them to a specific resource (e.g., a `Car`):
 
 ```c#
 public class CarsApi : IWebApiService
@@ -89,23 +91,15 @@ public class CarsApi : IWebApiService
 }
 ```
 
-and we would prefer NOT to have to create code like this, for every single one of those methods.
+AND, we prefer NOT to have to create MediatR class like this, for every single one of those methods.
 
 ```c#
-            carsGroup.MapGet("/cars/{id}",
-                async (IMediator mediator, [AsParameters] GetCarRequest request) =>
-                     await mediator.Send(request, CancellationToken.None));
-```
-
-and then:
-
-```c#
- public class GetCarRequest_Handler : IRequestHandler<GetCarRequest, IResult>
+    public class GetCarRequestHandler : IRequestHandler<GetCarRequest, IResult>
     {
         private readonly ICallerContext _context;
         private readonly ICarsApplication _carsApplication;
 
-        public GetCarRequest_Handler(ICallerContext context, ICarsApplication carsApplication)
+        public GetCarRequestHandler(ICallerContext context, ICarsApplication carsApplication)
         {
             this._context = context;
             this._carsApplication = carsApplication;
@@ -118,24 +112,26 @@ and then:
     }
 ```
 
-since the code above:
+AND have to register the minimal API's like this:
+
+```c#
+            carsGroup.MapGet("/cars/{id}",
+                async (IMediator mediator, [AsParameters] GetCarRequest request) =>
+                     await mediator.Send(request, CancellationToken.None))
+                .AddEndpointFilter<FilterA>()
+                .AddEndpointFilter<FilterB>();;
+```
+
+since all the code above, is:
 
 1. Is very boiler-plate, tedious to type out for every endpoint, and can easily lead to typos
 2. It repeats the same things in every handler class (like the constructor and fields)
 3. There is no design-time binding between the minimal API route registration and the MediatR handler to make sure they are properly bound when things change
-4. You need to maintain 2 pieces together when you make changes
-
-There has to be a nicer way.
+4. You need to maintain 2 pieces of code together when you make changes, otherwise the API just stops responding!
 
 ## Implementation
 
-### Overview
-
-We are establishing our own authoring patterns built on top of ASP.NET Minimal API, using MediatR handlers, that make it easier to declare and organize endpoints into groups within subdomains.
-
-We are then leveraging FluentValidation for request validation.
-
-We are integrating standard ASP.NET services like Authentication and Authorization.
+This is how the web framework comes together in SaaStack.
 
 ### Modularity
 
@@ -159,9 +155,9 @@ Once you have defined your endpoints (see next section), a module class derived 
 
 For example, in the project and folder: `CarsApi/CarsApiModule.cs`
 
-- ```c#
-  public class CarsApiModule : ISubDomainModule
-  {
+```c#
+public class CarsApiModule : ISubDomainModule
+{
     public Assembly ApiAssembly => typeof(Apis.Cars.CarsApi).Assembly;
   
     public Dictionary<Type, string> AggregatePrefixes => new()
@@ -178,8 +174,8 @@ For example, in the project and folder: `CarsApi/CarsApiModule.cs`
     {
         get { return (_, services) => { services.AddScoped<ICarsApplication, CarsApplication.CarsApplication>(); }; }
     }
-  }
-  ```
+}
+```
 
 In this class, you will need to declare the following things:
 
@@ -206,13 +202,20 @@ public static class HostedModules
 
 > Note: this method `HostedModules.Get()` will be called in the startup of the Host project.
 
-### Endpoints
+### Declaring APIs
+
+* We are establishing our own authoring patterns built on top of ASP.NET Minimal API, using MediatR handlers, that make it easier to declare and organize endpoints into groups within subdomains.
+* We are then leveraging FluentValidation for request validation.
+* We are integrating standard ASP.NET services like Authentication and Authorization.
+* We are adding additional `IEndpointFilter` (and MediatR `IPipelineBehavior`) to provide the request and responses we desire.
 
 The design of Minimal APIs makes developing 10s or 100s of them in a single project quite unwieldy to manage well.
 
-> All the examples out there being learned from do little to demonstrate how to separate concerns within them in more complex systems. Since they are registered as individual handlers, there are not good collective ways to declare groups of related APIs. Especially since most REST APIs are grouped around resources. This is certainly the case when exposing a whole vertical slice/subdomain in a module.
+> All the examples out there (teaching minimal APIs) do little to demonstrate how to separate concerns across them in more complex systems. Since they are registered as individual handlers, there are not good collective ways to declare groups of related APIs. Especially since most REST APIs are grouped around resources. This is certainly the case when exposing a whole vertical slice/subdomain in a module.
 
-So, we have designed a coding pattern and grouping mechanism for related endpoints that results in automatic registration of Minimal APIs for you.
+A nicer way is to use a Source Generator to read the declarative code, and do the heavy lifting for us by generating the boiler plate code, reliably.
+
+Then we use Roslyn analyzers (and other tooling) to guide the author in creating the correct declarative syntax.
 
 #### Creating the API class
 
@@ -247,6 +250,10 @@ So, we have designed a coding pattern and grouping mechanism for related endpoin
          
          ... other methods
      }
+   ```
+   > Note: There are analyzers to guide you in how to write the methods (service operations) in your class, just start by writing a public method, and follow the warnings in the IDE.
+   >
+   > Note: You must use a unique request type (`IWebRequest`) for each service operation
 
 3. You will define the request and response types in separate files in the project: `Infrastructure.WebApi.Interfaces` in a subfolder for the subdomain. For example,
 
@@ -269,6 +276,8 @@ So, we have designed a coding pattern and grouping mechanism for related endpoin
    ```
 
    > Note: Your route should always begin with a leading slash `/`, and you can substitute into the route any public property you define in your request class. For example, `/cars/{id}` where `{id}` refers to the property `public string Id { get; set; }`
+   >
+   > Note: All service operations must share the same primary route segment, corresponding to your resource (e.g. they all start with `/cars`. This also permits sub resources (e.g. `/cars/wheels`, but not different primary resources in the same class.
 
 5. You inject any dependencies into a custom constructor of yours.
 
@@ -538,7 +547,13 @@ Furthermore, when chaining together requests between modules, either in-process 
 
 ### Logging
 
-TBD
+Logging (and crash reporting) is performed through the `IRecorder` interface.
+
+The `IRecorder` uses the ASP.NET `ILoggerFactory` under the covers to do all of its diagnostic logging.
+
+It takes advantage of the configured loggers (and infrastructure already in ASP.NET).
+
+For more details on the `IRecorder` see [Recording](0030-recording.md)
 
 ### Rate Limiting
 
@@ -550,4 +565,4 @@ TBD
 
 ### Credits
 
-Some of the implementation patterns (that used MediatR) were inspired by content and recomendations created by [Nick Chapsas](https://www.youtube.com/@nickchapsas)
+Some of the implementation patterns (that used MediatR) were inspired by content and recommendations created by [Nick Chapsas](https://www.youtube.com/@nickchapsas)
