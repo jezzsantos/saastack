@@ -42,8 +42,7 @@ public class TakeOfflineCarRequestValidatorSpec
         _dto.Reason = "aninvalidareason^";
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should()
-            .Throw<ValidationException>()
+            .Should().Throw<ValidationException>()
             .WithMessageLike(ValidationResources.TakeOfflineCarRequestValidator_InvalidReason);
     }
 
@@ -53,8 +52,7 @@ public class TakeOfflineCarRequestValidatorSpec
         _dto.StartAtUtc = DateTime.UtcNow.Subtract(TimeSpan.FromHours(1));
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should()
-            .Throw<ValidationException>()
+            .Should().Throw<ValidationException>()
             .WithMessageLike(ValidationResources.TakeOfflineCarRequestValidator_InvalidStartAtUtc);
     }
 
@@ -64,8 +62,7 @@ public class TakeOfflineCarRequestValidatorSpec
         _dto.EndAtUtc = DateTime.UtcNow.Subtract(TimeSpan.FromHours(1));
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should()
-            .Throw<ValidationException>()
+            .Should().Throw<ValidationException>()
             .WithMessageLike(ValidationResources.TakeOfflineCarRequestValidator_InvalidEndAtUtc);
     }
 
@@ -76,8 +73,7 @@ public class TakeOfflineCarRequestValidatorSpec
         _dto.EndAtUtc = DateTime.UtcNow.Add(TimeSpan.FromHours(1));
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should()
-            .Throw<ValidationException>()
+            .Should().Throw<ValidationException>()
             .WithMessageLike(ValidationResources.TakeOfflineCarRequestValidator_InvalidEndAtUtc);
     }
 }

@@ -12,8 +12,7 @@ public class StringExtensionsSpec
     {
         var result = ((string?)null).HasValue();
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -21,8 +20,7 @@ public class StringExtensionsSpec
     {
         var result = string.Empty.HasValue();
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -30,8 +28,7 @@ public class StringExtensionsSpec
     {
         var result = " ".HasValue();
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -39,8 +36,7 @@ public class StringExtensionsSpec
     {
         var result = "avalue".HasValue();
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -48,8 +44,7 @@ public class StringExtensionsSpec
     {
         var result = ((string)null!).ToJson();
 
-        result.Should()
-            .BeNull();
+        result.Should().BeNull();
     }
 
     [Fact]
@@ -62,13 +57,12 @@ public class StringExtensionsSpec
             Property3 = ""
         }.ToJson();
 
-        result.Should()
-            .Be("""
-                {
-                  "Property1": "avalue",
-                  "Property3": ""
-                }
-                """);
+        result.Should().Be("""
+                           {
+                             "Property1": "avalue",
+                             "Property3": ""
+                           }
+                           """);
     }
 
     [Fact]
@@ -81,13 +75,12 @@ public class StringExtensionsSpec
             Property3 = ""
         }.ToJson(casing: StringExtensions.JsonCasing.Camel);
 
-        result.Should()
-            .Be("""
-                {
-                  "property1": "avalue",
-                  "property3": ""
-                }
-                """);
+        result.Should().Be("""
+                           {
+                             "property1": "avalue",
+                             "property3": ""
+                           }
+                           """);
     }
 
     [Fact]
@@ -100,8 +93,7 @@ public class StringExtensionsSpec
             Property3 = ""
         }.ToJson(false);
 
-        result.Should()
-            .Be("{\"Property1\":\"avalue\",\"Property3\":\"\"}");
+        result.Should().Be("{\"Property1\":\"avalue\",\"Property3\":\"\"}");
     }
 
     [Fact]
@@ -114,14 +106,13 @@ public class StringExtensionsSpec
             Property3 = ""
         }.ToJson(includeNulls: true);
 
-        result.Should()
-            .Be("""
-                {
-                  "Property1": "avalue",
-                  "Property2": null,
-                  "Property3": ""
-                }
-                """);
+        result.Should().Be("""
+                           {
+                             "Property1": "avalue",
+                             "Property2": null,
+                             "Property3": ""
+                           }
+                           """);
     }
 
     [Fact]
@@ -129,8 +120,7 @@ public class StringExtensionsSpec
     {
         var result = ((string)null!).IsMatchWith("apattern");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -138,8 +128,7 @@ public class StringExtensionsSpec
     {
         var result = string.Empty.IsMatchWith("apattern");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -147,8 +136,7 @@ public class StringExtensionsSpec
     {
         var result = "avalue".IsMatchWith(null!);
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -156,8 +144,7 @@ public class StringExtensionsSpec
     {
         var result = string.Empty.IsMatchWith(string.Empty);
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -165,8 +152,7 @@ public class StringExtensionsSpec
     {
         var result = "avalue".IsMatchWith("anothervalue");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -174,8 +160,7 @@ public class StringExtensionsSpec
     {
         var result = "avalue".IsMatchWith("avalue");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -183,8 +168,7 @@ public class StringExtensionsSpec
     {
         var result = ((string)null!).ReplaceWith("apattern", "areplacement");
 
-        result.Should()
-            .BeNull();
+        result.Should().BeNull();
     }
 
     [Fact]
@@ -192,8 +176,7 @@ public class StringExtensionsSpec
     {
         var result = string.Empty.ReplaceWith("apattern", "areplacement");
 
-        result.Should()
-            .BeEmpty();
+        result.Should().BeEmpty();
     }
 
     [Fact]
@@ -201,8 +184,7 @@ public class StringExtensionsSpec
     {
         var result = "avalue".ReplaceWith(null!, "areplacement");
 
-        result.Should()
-            .Be("avalue");
+        result.Should().Be("avalue");
     }
 
     [Fact]
@@ -210,8 +192,7 @@ public class StringExtensionsSpec
     {
         var result = "avalue".ReplaceWith(string.Empty, "areplacement");
 
-        result.Should()
-            .Be("avalue");
+        result.Should().Be("avalue");
     }
 
     [Fact]
@@ -219,8 +200,7 @@ public class StringExtensionsSpec
     {
         var result = "avalue".ReplaceWith("apattern", "areplacement");
 
-        result.Should()
-            .Be("avalue");
+        result.Should().Be("avalue");
     }
 
     [Fact]
@@ -228,8 +208,7 @@ public class StringExtensionsSpec
     {
         var result = "avalue".ReplaceWith("a", "b");
 
-        result.Should()
-            .Be("bvblue");
+        result.Should().Be("bvblue");
     }
 
     [Fact]
@@ -237,16 +216,14 @@ public class StringExtensionsSpec
     {
         var result = "".ToBool();
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
     public void WhenToBoolAndNotMatches_ThenThrows()
     {
         "notavalue".Invoking(x => x.ToBool())
-            .Should()
-            .Throw<FormatException>();
+            .Should().Throw<FormatException>();
     }
 
     [Fact]
@@ -254,8 +231,7 @@ public class StringExtensionsSpec
     {
         var result = "true".ToBool();
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -263,8 +239,7 @@ public class StringExtensionsSpec
     {
         var result = "TRUE".ToBool();
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -272,8 +247,7 @@ public class StringExtensionsSpec
     {
         var result = "True".ToBool();
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -281,8 +255,7 @@ public class StringExtensionsSpec
     {
         var result = "".ToBoolOrDefault(true);
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -290,8 +263,7 @@ public class StringExtensionsSpec
     {
         var result = "notavalue".ToBoolOrDefault(true);
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -299,8 +271,7 @@ public class StringExtensionsSpec
     {
         var result = "false".ToBoolOrDefault(true);
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -308,8 +279,7 @@ public class StringExtensionsSpec
     {
         var result = "FALSE".ToBoolOrDefault(true);
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -317,8 +287,7 @@ public class StringExtensionsSpec
     {
         var result = "False".ToBoolOrDefault(true);
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -326,16 +295,14 @@ public class StringExtensionsSpec
     {
         var result = "".ToInt();
 
-        result.Should()
-            .Be(-1);
+        result.Should().Be(-1);
     }
 
     [Fact]
     public void WhenToIntAndNotMatches_ThenThrows()
     {
         "notavalue".Invoking(x => x.ToInt())
-            .Should()
-            .Throw<FormatException>();
+            .Should().Throw<FormatException>();
     }
 
     [Fact]
@@ -343,8 +310,7 @@ public class StringExtensionsSpec
     {
         var result = "9".ToInt();
 
-        result.Should()
-            .Be(9);
+        result.Should().Be(9);
     }
 
     [Fact]
@@ -352,8 +318,7 @@ public class StringExtensionsSpec
     {
         var result = "".ToIntOrDefault(9);
 
-        result.Should()
-            .Be(9);
+        result.Should().Be(9);
     }
 
     [Fact]
@@ -361,7 +326,6 @@ public class StringExtensionsSpec
     {
         var result = "notavalue".ToIntOrDefault(9);
 
-        result.Should()
-            .Be(9);
+        result.Should().Be(9);
     }
 }

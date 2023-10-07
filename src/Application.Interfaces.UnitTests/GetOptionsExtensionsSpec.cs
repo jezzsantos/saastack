@@ -12,8 +12,7 @@ public class GetOptionsExtensionsSpec
     {
         var result = ((GetOptions)null!).ShouldExpandEmbeddedResource<TestResource>(x => x.AProperty1);
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -21,8 +20,7 @@ public class GetOptionsExtensionsSpec
     {
         var result = new GetOptions(ExpandOptions.All).ShouldExpandEmbeddedResource<TestResource>(x => x.AProperty1);
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -30,8 +28,7 @@ public class GetOptionsExtensionsSpec
     {
         var result = new GetOptions(ExpandOptions.None).ShouldExpandEmbeddedResource<TestResource>(x => x.AProperty1);
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -41,8 +38,7 @@ public class GetOptionsExtensionsSpec
             new GetOptions(ExpandOptions.Custom, new List<string>()).ShouldExpandEmbeddedResource<TestResource>(x =>
                 x.AProperty1);
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -52,8 +48,7 @@ public class GetOptionsExtensionsSpec
             new GetOptions(ExpandOptions.Custom, new List<string> { "TestResource.AnotherProperty" })
                 .ShouldExpandEmbeddedResource<TestResource>(x => x.AProperty1);
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -63,8 +58,7 @@ public class GetOptionsExtensionsSpec
             new GetOptions(ExpandOptions.Custom, new List<string> { "TestResource.AProperty1" })
                 .ShouldExpandEmbeddedResource<TestResource>(x => x.AProperty1);
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 }
 

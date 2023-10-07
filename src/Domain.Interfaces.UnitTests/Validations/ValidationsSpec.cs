@@ -13,8 +13,7 @@ public class ValidationsSpec
         var result = CommonValidations.Anything(6, 10)
             .Matches("avalue");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -23,8 +22,7 @@ public class ValidationsSpec
         var result = CommonValidations.Anything(2, 6)
             .Matches("avalue");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -33,8 +31,7 @@ public class ValidationsSpec
         var result = CommonValidations.Anything()
             .Matches("atext^是⎈𐂯؄💩⚡");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -43,8 +40,7 @@ public class ValidationsSpec
         var result = CommonValidations.Anything(2, 10)
             .Matches("atoolongstring");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -52,8 +48,7 @@ public class ValidationsSpec
     {
         var result = CommonValidations.Anything(2, 10)
             .Matches("a");
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -62,8 +57,7 @@ public class ValidationsSpec
         var result = CommonValidations.DescriptiveName()
             .Matches("");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -72,8 +66,7 @@ public class ValidationsSpec
         var result = CommonValidations.DescriptiveName(2, 10)
             .Matches("^aninvalidstring");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -82,8 +75,7 @@ public class ValidationsSpec
         var result = CommonValidations.DescriptiveName(6, 10)
             .Matches("avalue");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -92,8 +84,7 @@ public class ValidationsSpec
         var result = CommonValidations.DescriptiveName(2, 6)
             .Matches("avalue");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -102,8 +93,7 @@ public class ValidationsSpec
         var result = CommonValidations.DescriptiveName(2, 10)
             .Matches("atoolongstring");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -112,8 +102,7 @@ public class ValidationsSpec
         var result = CommonValidations.DescriptiveName(2, 10)
             .Matches("a");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -122,8 +111,7 @@ public class ValidationsSpec
         var result = CommonValidations.DescriptiveName()
             .Matches("avalue");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -131,8 +119,7 @@ public class ValidationsSpec
     {
         var result = CommonValidations.EmailAddress.Matches("aname@acompany.com");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -140,8 +127,7 @@ public class ValidationsSpec
     {
         var result = CommonValidations.EmailAddress.Matches("aname@anaustraliancompany.com.au");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -149,8 +135,7 @@ public class ValidationsSpec
     {
         var result = CommonValidations.EmailAddress.Matches("@company.com");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -158,8 +143,7 @@ public class ValidationsSpec
     {
         var result = CommonValidations.EmailAddress.Matches(" @company.com");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -168,8 +152,7 @@ public class ValidationsSpec
         var result = CommonValidations.FreeformText(2, 10)
             .Matches("^aninvalidstring");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -178,8 +161,7 @@ public class ValidationsSpec
         var result = CommonValidations.FreeformText(6, 10)
             .Matches("avalue");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -188,8 +170,7 @@ public class ValidationsSpec
         var result = CommonValidations.FreeformText(2, 6)
             .Matches("avalue");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -198,8 +179,7 @@ public class ValidationsSpec
         var result = CommonValidations.FreeformText()
             .Matches("\raline1\raline2\r");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -208,8 +188,7 @@ public class ValidationsSpec
         var result = CommonValidations.FreeformText()
             .Matches("\r\naline1\r\naline2\r\n");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -218,8 +197,7 @@ public class ValidationsSpec
         var result = CommonValidations.FreeformText(2, 10)
             .Matches("atoolongstring");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -228,8 +206,7 @@ public class ValidationsSpec
         var result = CommonValidations.FreeformText(2, 10)
             .Matches("a");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -238,8 +215,7 @@ public class ValidationsSpec
         var result = CommonValidations.FreeformText()
             .Matches("avalue");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -248,8 +224,7 @@ public class ValidationsSpec
         var result = CommonValidations.FreeformText(0, 10)
             .Matches("");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -258,8 +233,7 @@ public class ValidationsSpec
         var result = CommonValidations.Markdown(2, 10)
             .Matches("^aninvalidstring");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -268,8 +242,7 @@ public class ValidationsSpec
         var result = CommonValidations.Markdown(6, 10)
             .Matches("avalue");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -278,8 +251,7 @@ public class ValidationsSpec
         var result = CommonValidations.Markdown(2, 6)
             .Matches("avalue");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -288,8 +260,7 @@ public class ValidationsSpec
         var result = CommonValidations.Markdown()
             .Matches("\raline1\raline2\r");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -298,8 +269,7 @@ public class ValidationsSpec
         var result = CommonValidations.Markdown()
             .Matches("\r\naline1\r\naline2\r\n");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -308,8 +278,7 @@ public class ValidationsSpec
         var result = CommonValidations.Markdown(2, 10)
             .Matches("atoolongstring");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -318,8 +287,7 @@ public class ValidationsSpec
         var result = CommonValidations.Markdown(2, 10)
             .Matches("a");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -328,8 +296,7 @@ public class ValidationsSpec
         var result = CommonValidations.Markdown()
             .Matches("avalue");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -338,8 +305,7 @@ public class ValidationsSpec
         var result = CommonValidations.Markdown(0, 10)
             .Matches("");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -348,8 +314,7 @@ public class ValidationsSpec
         var result = CommonValidations.Markdown()
             .Matches("avalue😛");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -359,8 +324,7 @@ public class ValidationsSpec
 
         var result = validationFormat.Matches("avalue");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -370,8 +334,7 @@ public class ValidationsSpec
 
         var result = validationFormat.Matches("aaaaaaa");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -381,8 +344,7 @@ public class ValidationsSpec
 
         var result = validationFormat.Matches("aaaaaaa");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -392,8 +354,7 @@ public class ValidationsSpec
 
         var result = validationFormat.Matches("avalue");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -403,7 +364,6 @@ public class ValidationsSpec
 
         var result = validationFormat.Matches("avalue");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 }

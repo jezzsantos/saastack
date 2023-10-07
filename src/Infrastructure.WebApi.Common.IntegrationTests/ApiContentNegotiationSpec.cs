@@ -21,10 +21,8 @@ public class ApiContentNegotiationSpec : WebApiSpec<Program>
         var result = await Api.GetAsync<StringMessageTestingOnlyResponse>("testingonly/negotiations/get",
             request => request.Headers.Remove(HttpHeaders.Accept));
 
-        result.StatusCode.Should()
-            .Be(HttpStatusCode.OK);
-        result.Content.Message.Should()
-            .Be("amessage");
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.Message.Should().Be("amessage");
     }
 
     [Fact]
@@ -33,10 +31,8 @@ public class ApiContentNegotiationSpec : WebApiSpec<Program>
         var result = await Api.GetAsync("/testingonly/negotiations/get",
             request => request.Headers.Add(HttpHeaders.Accept, "application/unsupported"));
 
-        result.StatusCode.Should()
-            .Be(HttpStatusCode.UnsupportedMediaType);
-        result.Content.Should()
-            .BeEmpty();
+        result.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType);
+        result.Content.Should().BeEmpty();
     }
 
     [Fact]
@@ -45,10 +41,8 @@ public class ApiContentNegotiationSpec : WebApiSpec<Program>
         var result = await Api.GetAsync<StringMessageTestingOnlyResponse>("/testingonly/negotiations/get",
             request => request.Headers.Add(HttpHeaders.Accept, HttpContentTypes.Json));
 
-        result.StatusCode.Should()
-            .Be(HttpStatusCode.OK);
-        result.Content.Message.Should()
-            .Be("amessage");
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.Message.Should().Be("amessage");
     }
 
     [Fact]
@@ -57,12 +51,10 @@ public class ApiContentNegotiationSpec : WebApiSpec<Program>
         var result = await Api.GetAsync("/testingonly/negotiations/get",
             request => request.Headers.Add(HttpHeaders.Accept, HttpContentTypes.Xml));
 
-        result.StatusCode.Should()
-            .Be(HttpStatusCode.OK);
-        result.Content.Should()
-            .Be("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-                + "<StringMessageTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">"
-                + "<Message>amessage</Message>" + "</StringMessageTestingOnlyResponse>");
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.Should().Be("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+                                   + "<StringMessageTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">"
+                                   + "<Message>amessage</Message>" + "</StringMessageTestingOnlyResponse>");
     }
 
     [Fact]
@@ -70,10 +62,8 @@ public class ApiContentNegotiationSpec : WebApiSpec<Program>
     {
         var result = await Api.GetAsync<StringMessageTestingOnlyResponse>("/testingonly/negotiations/get");
 
-        result.StatusCode.Should()
-            .Be(HttpStatusCode.OK);
-        result.Content.Message.Should()
-            .Be("amessage");
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.Message.Should().Be("amessage");
     }
 
     [Fact]
@@ -81,10 +71,8 @@ public class ApiContentNegotiationSpec : WebApiSpec<Program>
     {
         var result = await Api.GetAsync("/testingonly/negotiations/get?format=unsupported");
 
-        result.StatusCode.Should()
-            .Be(HttpStatusCode.UnsupportedMediaType);
-        result.Content.Should()
-            .BeEmpty();
+        result.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType);
+        result.Content.Should().BeEmpty();
     }
 
     [Fact]
@@ -92,10 +80,8 @@ public class ApiContentNegotiationSpec : WebApiSpec<Program>
     {
         var result = await Api.GetAsync<StringMessageTestingOnlyResponse>("/testingonly/negotiations/get?format=json");
 
-        result.StatusCode.Should()
-            .Be(HttpStatusCode.OK);
-        result.Content.Message.Should()
-            .Be("amessage");
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.Message.Should().Be("amessage");
     }
 
     [Fact]
@@ -103,12 +89,10 @@ public class ApiContentNegotiationSpec : WebApiSpec<Program>
     {
         var result = await Api.GetAsync("/testingonly/negotiations/get?format=xml");
 
-        result.StatusCode.Should()
-            .Be(HttpStatusCode.OK);
-        result.Content.Should()
-            .Be("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-                + "<StringMessageTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">"
-                + "<Message>amessage</Message>" + "</StringMessageTestingOnlyResponse>");
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.Should().Be("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+                                   + "<StringMessageTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">"
+                                   + "<Message>amessage</Message>" + "</StringMessageTestingOnlyResponse>");
     }
 }
 #endif

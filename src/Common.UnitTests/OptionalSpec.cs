@@ -11,14 +11,11 @@ public class OptionalSpec
     {
         var result = new Optional<TestClass>();
 
-        result.HasValue.Should()
-            .BeFalse();
+        result.HasValue.Should().BeFalse();
         result.TryGet(out _)
-            .Should()
-            .BeFalse();
+            .Should().BeFalse();
         result.ToString()
-            .Should()
-            .Be(Optional<TestClass>.NoValueStringValue);
+            .Should().Be(Optional<TestClass>.NoValueStringValue);
     }
 
     [Fact]
@@ -26,14 +23,11 @@ public class OptionalSpec
     {
         var result = new Optional<TestClass>(null!);
 
-        result.HasValue.Should()
-            .BeFalse();
+        result.HasValue.Should().BeFalse();
         result.TryGet(out _)
-            .Should()
-            .BeFalse();
+            .Should().BeFalse();
         result.ToString()
-            .Should()
-            .Be(Optional<TestClass>.NoValueStringValue);
+            .Should().Be(Optional<TestClass>.NoValueStringValue);
     }
 
     [Fact]
@@ -42,13 +36,10 @@ public class OptionalSpec
         var instance = new TestClass { AProperty = "avalue" };
         var result = new Optional<TestClass>(instance);
 
-        result.HasValue.Should()
-            .BeTrue();
-        result.Value.Should()
-            .Be(instance);
+        result.HasValue.Should().BeTrue();
+        result.Value.Should().Be(instance);
         result.ToString()
-            .Should()
-            .Be(typeof(TestClass).FullName);
+            .Should().Be(typeof(TestClass).FullName);
     }
 
     [Fact]
@@ -57,8 +48,7 @@ public class OptionalSpec
         var optional = new Optional<TestClass>(null!);
 
         optional.Invoking(x => x.Value)
-            .Should()
-            .Throw<InvalidOperationException>()
+            .Should().Throw<InvalidOperationException>()
             .WithMessage(Resources.Optional_NullValue);
     }
 
@@ -70,8 +60,7 @@ public class OptionalSpec
 
         var result = optional.Value;
 
-        result.Should()
-            .Be(instance);
+        result.Should().Be(instance);
     }
 
     [Fact]
@@ -81,8 +70,7 @@ public class OptionalSpec
 
         var result = optional.ValueOrDefault;
 
-        result.Should()
-            .BeNull();
+        result.Should().BeNull();
     }
 
     [Fact]
@@ -93,8 +81,7 @@ public class OptionalSpec
 
         var result = optional.ValueOrDefault;
 
-        result.Should()
-            .Be(instance);
+        result.Should().Be(instance);
     }
 
     [Fact]
@@ -103,8 +90,7 @@ public class OptionalSpec
         var optional1 = new Optional<TestClass>();
         var optional2 = Optional<TestClass>.None;
 
-        (optional1 == optional2).Should()
-            .BeTrue();
+        (optional1 == optional2).Should().BeTrue();
     }
 
     [Fact]
@@ -113,8 +99,7 @@ public class OptionalSpec
         var optional1 = Optional<TestClass>.None;
         var optional2 = Optional<TestClass>.None;
 
-        (optional1 == optional2).Should()
-            .BeTrue();
+        (optional1 == optional2).Should().BeTrue();
     }
 
     [Fact]
@@ -123,8 +108,7 @@ public class OptionalSpec
         var optional1 = new Optional<TestClass>();
         var optional2 = new Optional<TestClass>();
 
-        (optional1 == optional2).Should()
-            .BeTrue();
+        (optional1 == optional2).Should().BeTrue();
     }
 
     [Fact]
@@ -134,8 +118,7 @@ public class OptionalSpec
         var optional1 = new Optional<TestClass>(instance);
         var optional2 = new Optional<TestClass>(instance);
 
-        (optional1 == optional2).Should()
-            .BeTrue();
+        (optional1 == optional2).Should().BeTrue();
     }
 
     [Fact]
@@ -144,8 +127,7 @@ public class OptionalSpec
         var instance = new TestClass { AProperty = "avalue" };
         var optional = new Optional<TestClass>();
 
-        (instance == optional).Should()
-            .BeFalse();
+        (instance == optional).Should().BeFalse();
     }
 
     [Fact]
@@ -153,8 +135,7 @@ public class OptionalSpec
     {
         var instance = new TestClass { AProperty = "avalue" };
 
-        (instance == null!).Should()
-            .BeFalse();
+        (instance == null!).Should().BeFalse();
     }
 
     [Fact]
@@ -163,8 +144,7 @@ public class OptionalSpec
         var instance = new TestClass { AProperty = "avalue" };
         var optional = new Optional<TestClass>(instance);
 
-        (optional == instance).Should()
-            .BeTrue();
+        (optional == instance).Should().BeTrue();
     }
 
     [Fact]
@@ -173,8 +153,7 @@ public class OptionalSpec
         var instance = new TestClass { AProperty = "avalue" };
         var optional = new Optional<TestClass>();
 
-        (instance != optional).Should()
-            .BeTrue();
+        (instance != optional).Should().BeTrue();
     }
 
     [Fact]
@@ -182,8 +161,7 @@ public class OptionalSpec
     {
         var instance = new TestClass { AProperty = "avalue" };
 
-        (instance != null!).Should()
-            .BeTrue();
+        (instance != null!).Should().BeTrue();
     }
 
     [Fact]
@@ -192,8 +170,7 @@ public class OptionalSpec
         var instance = new TestClass { AProperty = "avalue" };
         var optional = new Optional<TestClass>(instance);
 
-        (optional != instance).Should()
-            .BeFalse();
+        (optional != instance).Should().BeFalse();
     }
 
     [Fact]
@@ -203,8 +180,7 @@ public class OptionalSpec
         var optional = new Optional<TestClass>();
 
         optional.Equals(instance)
-            .Should()
-            .BeFalse();
+            .Should().BeFalse();
     }
 
     [Fact]
@@ -213,8 +189,7 @@ public class OptionalSpec
         var instance = new TestClass { AProperty = "avalue" };
 
         instance.Equals(null!)
-            .Should()
-            .BeFalse();
+            .Should().BeFalse();
     }
 
     [Fact]
@@ -224,8 +199,7 @@ public class OptionalSpec
         var optional = new Optional<TestClass>(instance);
 
         optional.Equals(instance)
-            .Should()
-            .BeTrue();
+            .Should().BeTrue();
     }
 
     [Fact]
@@ -236,8 +210,7 @@ public class OptionalSpec
 
         // ReSharper disable once SuspiciousTypeConversion.Global
         optional.Equals((object?)instance)
-            .Should()
-            .BeFalse();
+            .Should().BeFalse();
     }
 
     [Fact]
@@ -248,8 +221,7 @@ public class OptionalSpec
 
         // ReSharper disable once SuspiciousTypeConversion.Global
         optional.Equals((object?)instance)
-            .Should()
-            .BeFalse();
+            .Should().BeFalse();
     }
 
     [Fact]
@@ -260,8 +232,7 @@ public class OptionalSpec
 
         // ReSharper disable once SuspiciousTypeConversion.Global
         optional.Equals((object?)instance)
-            .Should()
-            .BeTrue();
+            .Should().BeTrue();
     }
 
     [Fact]
@@ -271,8 +242,7 @@ public class OptionalSpec
         var optional = new Optional<TestClass>(instance);
 
         optional.Equals((object?)optional)
-            .Should()
-            .BeTrue();
+            .Should().BeTrue();
     }
 }
 

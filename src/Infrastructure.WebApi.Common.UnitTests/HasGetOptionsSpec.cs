@@ -14,8 +14,7 @@ public class HasGetOptionsSpec
     {
         var result = HasGetOptions.All.ToGetOptions();
 
-        result.Expand.Should()
-            .Be(ExpandOptions.All);
+        result.Expand.Should().Be(ExpandOptions.All);
     }
 
     [Fact]
@@ -23,8 +22,7 @@ public class HasGetOptionsSpec
     {
         var result = HasGetOptions.None.ToGetOptions();
 
-        result.Expand.Should()
-            .Be(ExpandOptions.None);
+        result.Expand.Should().Be(ExpandOptions.None);
     }
 
     [Fact]
@@ -33,14 +31,11 @@ public class HasGetOptionsSpec
         var result = HasGetOptions.Custom<TestResource>(x => x.AProperty1)
             .ToGetOptions();
 
-        result.Expand.Should()
-            .Be(ExpandOptions.Custom);
+        result.Expand.Should().Be(ExpandOptions.Custom);
         result.ResourceReferences.Count()
-            .Should()
-            .Be(1);
+            .Should().Be(1);
         result.ResourceReferences.ToList()[0]
-            .Should()
-            .Be("testresource.aproperty1");
+            .Should().Be("testresource.aproperty1");
     }
 
     [Fact]
@@ -49,17 +44,13 @@ public class HasGetOptionsSpec
         var result = HasGetOptions.Custom<TestResource>(x => x.AProperty1, x => x.AProperty2)
             .ToGetOptions();
 
-        result.Expand.Should()
-            .Be(ExpandOptions.Custom);
+        result.Expand.Should().Be(ExpandOptions.Custom);
         result.ResourceReferences.Count()
-            .Should()
-            .Be(2);
+            .Should().Be(2);
         result.ResourceReferences.ToList()[0]
-            .Should()
-            .Be("testresource.aproperty1");
+            .Should().Be("testresource.aproperty1");
         result.ResourceReferences.ToList()[1]
-            .Should()
-            .Be("testresource.aproperty2");
+            .Should().Be("testresource.aproperty2");
     }
 }
 

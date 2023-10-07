@@ -20,8 +20,7 @@ public class HasSearchOptionsExtensionsSpec
     {
         var result = ((SearchOptionsDto)null!).ToSearchOptions();
 
-        result.Should()
-            .BeEquivalentTo(new SearchOptions());
+        result.Should().BeEquivalentTo(new SearchOptions());
     }
 
     [Fact]
@@ -29,14 +28,10 @@ public class HasSearchOptionsExtensionsSpec
     {
         var result = _hasSearchOptions.ToSearchOptions();
 
-        result.Limit.Should()
-            .Be(SearchOptions.DefaultLimit);
-        result.Offset.Should()
-            .Be(SearchOptions.NoOffset);
-        result.Sort.HasValue.Should()
-            .BeFalse();
-        result.Filter.Fields.Count.Should()
-            .Be(0);
+        result.Limit.Should().Be(SearchOptions.DefaultLimit);
+        result.Offset.Should().Be(SearchOptions.NoOffset);
+        result.Sort.HasValue.Should().BeFalse();
+        result.Filter.Fields.Count.Should().Be(0);
     }
 
     [Fact]
@@ -47,14 +42,10 @@ public class HasSearchOptionsExtensionsSpec
 
         var result = _hasSearchOptions.ToSearchOptions();
 
-        result.Limit.Should()
-            .Be(9);
-        result.Offset.Should()
-            .Be(99);
-        result.Sort.HasValue.Should()
-            .BeFalse();
-        result.Filter.Fields.Count.Should()
-            .Be(0);
+        result.Limit.Should().Be(9);
+        result.Offset.Should().Be(99);
+        result.Sort.HasValue.Should().BeFalse();
+        result.Filter.Fields.Count.Should().Be(0);
     }
 
     [Fact]
@@ -65,14 +56,10 @@ public class HasSearchOptionsExtensionsSpec
 
         var result = _hasSearchOptions.ToSearchOptions();
 
-        result.Limit.Should()
-            .Be(SearchOptions.DefaultLimit);
-        result.Offset.Should()
-            .Be(99);
-        result.Sort.HasValue.Should()
-            .BeFalse();
-        result.Filter.Fields.Count.Should()
-            .Be(0);
+        result.Limit.Should().Be(SearchOptions.DefaultLimit);
+        result.Offset.Should().Be(99);
+        result.Sort.HasValue.Should().BeFalse();
+        result.Filter.Fields.Count.Should().Be(0);
     }
 
     [Fact]
@@ -82,19 +69,15 @@ public class HasSearchOptionsExtensionsSpec
 
         var result = _hasSearchOptions.ToSearchOptions();
 
-        result.Sort.Value.By.Should()
-            .Be("Field1");
-        result.Sort.Value.Direction.Should()
-            .Be(SortDirection.Ascending);
+        result.Sort.Value.By.Should().Be("Field1");
+        result.Sort.Value.Direction.Should().Be(SortDirection.Ascending);
 
         _hasSearchOptions.Sort = "-Field1";
 
         result = _hasSearchOptions.ToSearchOptions();
 
-        result.Sort.Value.By.Should()
-            .Be("Field1");
-        result.Sort.Value.Direction.Should()
-            .Be(SortDirection.Descending);
+        result.Sort.Value.By.Should().Be("Field1");
+        result.Sort.Value.Direction.Should().Be(SortDirection.Descending);
     }
 
     [Fact]
@@ -104,14 +87,11 @@ public class HasSearchOptionsExtensionsSpec
 
         var result = _hasSearchOptions.ToSearchOptions();
 
-        result.Filter.Fields.Count.Should()
-            .Be(2);
+        result.Filter.Fields.Count.Should().Be(2);
         result.Filter.Fields[0]
-            .Should()
-            .Be("Field1");
+            .Should().Be("Field1");
         result.Filter.Fields[1]
-            .Should()
-            .Be("Field2");
+            .Should().Be("Field2");
     }
 
     [Fact]
@@ -119,19 +99,13 @@ public class HasSearchOptionsExtensionsSpec
     {
         var result = _hasSearchOptions.ToSearchOptions(9, 99, "-asort", "afilter");
 
-        result.Limit.Should()
-            .Be(9);
-        result.Offset.Should()
-            .Be(99);
-        result.Sort.Value.By.Should()
-            .Be("asort");
-        result.Sort.Value.Direction.Should()
-            .Be(SortDirection.Descending);
-        result.Filter.Fields.Count.Should()
-            .Be(1);
+        result.Limit.Should().Be(9);
+        result.Offset.Should().Be(99);
+        result.Sort.Value.By.Should().Be("asort");
+        result.Sort.Value.Direction.Should().Be(SortDirection.Descending);
+        result.Filter.Fields.Count.Should().Be(1);
         result.Filter.Fields[0]
-            .Should()
-            .Be("afilter");
+            .Should().Be("afilter");
     }
 
     [Fact]
@@ -139,19 +113,13 @@ public class HasSearchOptionsExtensionsSpec
     {
         var result = _hasSearchOptions.ToSearchOptions(0, 99, "-asort", "afilter");
 
-        result.Limit.Should()
-            .Be(SearchOptions.DefaultLimit);
-        result.Offset.Should()
-            .Be(99);
-        result.Sort.Value.By.Should()
-            .Be("asort");
-        result.Sort.Value.Direction.Should()
-            .Be(SortDirection.Descending);
-        result.Filter.Fields.Count.Should()
-            .Be(1);
+        result.Limit.Should().Be(SearchOptions.DefaultLimit);
+        result.Offset.Should().Be(99);
+        result.Sort.Value.By.Should().Be("asort");
+        result.Sort.Value.Direction.Should().Be(SortDirection.Descending);
+        result.Filter.Fields.Count.Should().Be(1);
         result.Filter.Fields[0]
-            .Should()
-            .Be("afilter");
+            .Should().Be("afilter");
     }
 
     [Fact]
@@ -164,19 +132,13 @@ public class HasSearchOptionsExtensionsSpec
 
         var result = _hasSearchOptions.ToSearchOptions(9, 99, "asort2", "afilter2");
 
-        result.Limit.Should()
-            .Be(6);
-        result.Offset.Should()
-            .Be(66);
-        result.Sort.Value.By.Should()
-            .Be("asort1");
-        result.Sort.Value.Direction.Should()
-            .Be(SortDirection.Descending);
-        result.Filter.Fields.Count.Should()
-            .Be(1);
+        result.Limit.Should().Be(6);
+        result.Offset.Should().Be(66);
+        result.Sort.Value.By.Should().Be("asort1");
+        result.Sort.Value.Direction.Should().Be(SortDirection.Descending);
+        result.Filter.Fields.Count.Should().Be(1);
         result.Filter.Fields[0]
-            .Should()
-            .Be("afilter1");
+            .Should().Be("afilter1");
     }
 }
 

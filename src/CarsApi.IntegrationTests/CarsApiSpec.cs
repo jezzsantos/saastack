@@ -29,16 +29,11 @@ public class CarsApiSpec : WebApiSpec<Program>
 
         var location = result.Headers.Location?.ToString();
 
-        location.Should()
-            .StartWith("/cars/car_");
-        result.Content.Car!.Id.Should()
-            .NotBeEmpty();
-        result.Content.Car.Make.Should()
-            .Be("amake");
-        result.Content.Car.Model.Should()
-            .Be("amodel");
-        result.Content.Car.Year.Should()
-            .Be(2023);
+        location.Should().StartWith("/cars/car_");
+        result.Content.Car!.Id.Should().NotBeEmpty();
+        result.Content.Car.Make.Should().Be("amake");
+        result.Content.Car.Model.Should().Be("amodel");
+        result.Content.Car.Year.Should().Be(2023);
     }
 
     [Fact]
@@ -53,8 +48,7 @@ public class CarsApiSpec : WebApiSpec<Program>
 
         var result = (await Api.GetAsync<GetCarResponse>($"/cars/{car.Id}")).Content.Car!;
 
-        result.Id.Should()
-            .Be(car.Id);
+        result.Id.Should().Be(car.Id);
     }
 
     [Fact]
@@ -69,11 +63,9 @@ public class CarsApiSpec : WebApiSpec<Program>
 
         var result = (await Api.GetAsync<SearchAllCarsResponse>("/cars")).Content.Cars!;
 
-        result.Count.Should()
-            .Be(1);
+        result.Count.Should().Be(1);
         result[0]
-            .Id.Should()
-            .Be(car.Id);
+            .Id.Should().Be(car.Id);
     }
 
     [Fact]
@@ -93,8 +85,7 @@ public class CarsApiSpec : WebApiSpec<Program>
             EndAtUtc = DateTime.UtcNow.AddHours(2)
         })).Content.Car!;
 
-        result.Id.Should()
-            .Be(car.Id);
+        result.Id.Should().Be(car.Id);
     }
 
     [Fact]
@@ -109,7 +100,6 @@ public class CarsApiSpec : WebApiSpec<Program>
 
         var result = await Api.DeleteAsync($"/cars/{car.Id}");
 
-        result.StatusCode.Should()
-            .Be(HttpStatusCode.NoContent);
+        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 }

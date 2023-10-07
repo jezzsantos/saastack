@@ -12,8 +12,7 @@ public class CollectionExtensionsSpec
     {
         var result = new List<string>().ContainsIgnoreCase("avalue");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -25,8 +24,7 @@ public class CollectionExtensionsSpec
             "avalue2"
         }.ContainsIgnoreCase("anothervalue");
 
-        result.Should()
-            .BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -38,7 +36,6 @@ public class CollectionExtensionsSpec
             "avalue2"
         }.ContainsIgnoreCase("avalue1");
 
-        result.Should()
-            .BeTrue();
+        result.Should().BeTrue();
     }
 }

@@ -18,19 +18,13 @@ public class SearchOptionsSpec
 
         var result = _searchOptions.ApplyWithMetadata(queried);
 
-        result.Results.Count.Should()
-            .Be(SearchOptions.DefaultLimit);
+        result.Results.Count.Should().Be(SearchOptions.DefaultLimit);
         result.Metadata.Filter!.Fields.Any()
-            .Should()
-            .BeFalse();
-        result.Metadata.Sort!.Should()
-            .BeNull();
-        result.Metadata.Offset.Should()
-            .Be(SearchOptions.NoOffset);
-        result.Metadata.Limit.Should()
-            .Be(SearchOptions.NoLimit);
-        result.Metadata.Total.Should()
-            .Be(SearchOptions.MaxLimit + 1);
+            .Should().BeFalse();
+        result.Metadata.Sort!.Should().BeNull();
+        result.Metadata.Offset.Should().Be(SearchOptions.NoOffset);
+        result.Metadata.Limit.Should().Be(SearchOptions.NoLimit);
+        result.Metadata.Total.Should().Be(SearchOptions.MaxLimit + 1);
     }
 
     [Fact]
@@ -42,11 +36,9 @@ public class SearchOptionsSpec
 
         var result = _searchOptions.ApplyWithMetadata(queried);
 
-        result.Results.Count.Should()
-            .Be(SearchOptions.MaxLimit - 1);
+        result.Results.Count.Should().Be(SearchOptions.MaxLimit - 1);
         AssertSearchResults(result);
-        result.Metadata.Total.Should()
-            .Be(SearchOptions.MaxLimit + 1);
+        result.Metadata.Total.Should().Be(SearchOptions.MaxLimit + 1);
     }
 
     [Fact]
@@ -58,11 +50,9 @@ public class SearchOptionsSpec
 
         var result = _searchOptions.ApplyWithMetadata(queried);
 
-        result.Results.Count.Should()
-            .Be(SearchOptions.MaxLimit);
+        result.Results.Count.Should().Be(SearchOptions.MaxLimit);
         AssertSearchResults(result);
-        result.Metadata.Total.Should()
-            .Be(SearchOptions.MaxLimit + 1);
+        result.Metadata.Total.Should().Be(SearchOptions.MaxLimit + 1);
     }
 
     [Fact]
@@ -74,11 +64,9 @@ public class SearchOptionsSpec
 
         var result = _searchOptions.ApplyWithMetadata(queried);
 
-        result.Results.Count.Should()
-            .Be(66);
+        result.Results.Count.Should().Be(66);
         AssertSearchResults(result);
-        result.Metadata.Total.Should()
-            .Be(66);
+        result.Metadata.Total.Should().Be(66);
     }
 
     [Fact]
@@ -90,11 +78,9 @@ public class SearchOptionsSpec
 
         var result = _searchOptions.ApplyWithMetadata(queried);
 
-        result.Results.Count.Should()
-            .Be(66);
+        result.Results.Count.Should().Be(66);
         AssertSearchResults(result);
-        result.Metadata.Total.Should()
-            .Be(66);
+        result.Metadata.Total.Should().Be(66);
     }
 
     [Fact]
@@ -111,20 +97,15 @@ public class SearchOptionsSpec
         var result = _searchOptions.ApplyWithMetadata(queried);
 
         var results = result.Results.ToList();
-        results.Count.Should()
-            .Be(3);
+        results.Count.Should().Be(3);
         results[0]
-            .Should()
-            .Be(1);
+            .Should().Be(1);
         results[1]
-            .Should()
-            .Be(6);
+            .Should().Be(6);
         results[2]
-            .Should()
-            .Be(3);
+            .Should().Be(3);
         AssertSearchResults(result);
-        result.Metadata.Total.Should()
-            .Be(3);
+        result.Metadata.Total.Should().Be(3);
     }
 
     [Fact]
@@ -141,20 +122,15 @@ public class SearchOptionsSpec
         var result = _searchOptions.ApplyWithMetadata(queried);
 
         var results = result.Results.ToList();
-        results.Count.Should()
-            .Be(3);
+        results.Count.Should().Be(3);
         results[0]
-            .Should()
-            .Be(1);
+            .Should().Be(1);
         results[1]
-            .Should()
-            .Be(6);
+            .Should().Be(6);
         results[2]
-            .Should()
-            .Be(3);
+            .Should().Be(3);
         AssertSearchResults(result);
-        result.Metadata.Total.Should()
-            .Be(3);
+        result.Metadata.Total.Should().Be(3);
     }
 
     [Fact]
@@ -171,20 +147,15 @@ public class SearchOptionsSpec
         var result = _searchOptions.ApplyWithMetadata(queried);
 
         var results = result.Results.ToList();
-        results.Count.Should()
-            .Be(3);
+        results.Count.Should().Be(3);
         results[0]
-            .Should()
-            .Be(1);
+            .Should().Be(1);
         results[1]
-            .Should()
-            .Be(6);
+            .Should().Be(6);
         results[2]
-            .Should()
-            .Be(3);
+            .Should().Be(3);
         AssertSearchResults(result);
-        result.Metadata.Total.Should()
-            .Be(3);
+        result.Metadata.Total.Should().Be(3);
     }
 
     [Fact]
@@ -201,20 +172,15 @@ public class SearchOptionsSpec
         var result = _searchOptions.ApplyWithMetadata(queried);
 
         var results = result.Results.ToList();
-        results.Count.Should()
-            .Be(3);
+        results.Count.Should().Be(3);
         results[0]
-            .AProperty.Should()
-            .Be(1);
+            .AProperty.Should().Be(1);
         results[1]
-            .AProperty.Should()
-            .Be(3);
+            .AProperty.Should().Be(3);
         results[2]
-            .AProperty.Should()
-            .Be(6);
+            .AProperty.Should().Be(6);
         AssertSearchResults(result);
-        result.Metadata.Total.Should()
-            .Be(3);
+        result.Metadata.Total.Should().Be(3);
     }
 
     [Fact]
@@ -231,20 +197,15 @@ public class SearchOptionsSpec
         var result = _searchOptions.ApplyWithMetadata(queried);
 
         var results = result.Results.ToList();
-        results.Count.Should()
-            .Be(3);
+        results.Count.Should().Be(3);
         results[0]
-            .AProperty.Should()
-            .Be(1);
+            .AProperty.Should().Be(1);
         results[1]
-            .AProperty.Should()
-            .Be(3);
+            .AProperty.Should().Be(3);
         results[2]
-            .AProperty.Should()
-            .Be(6);
+            .AProperty.Should().Be(6);
         AssertSearchResults(result);
-        result.Metadata.Total.Should()
-            .Be(3);
+        result.Metadata.Total.Should().Be(3);
     }
 
     [Fact]
@@ -261,26 +222,20 @@ public class SearchOptionsSpec
         var result = _searchOptions.ApplyWithMetadata(queried);
 
         var results = result.Results.ToList();
-        results.Count.Should()
-            .Be(3);
+        results.Count.Should().Be(3);
         results[0]
-            .AProperty.Should()
-            .Be(6);
+            .AProperty.Should().Be(6);
         results[1]
-            .AProperty.Should()
-            .Be(3);
+            .AProperty.Should().Be(3);
         results[2]
-            .AProperty.Should()
-            .Be(1);
+            .AProperty.Should().Be(1);
         AssertSearchResults(result);
-        result.Metadata.Total.Should()
-            .Be(3);
+        result.Metadata.Total.Should().Be(3);
     }
 
     private void AssertSearchResults<T>(SearchResults<T> result)
     {
-        result.Metadata.Filter!.Fields.Should()
-            .BeSameAs(_searchOptions.Filter.Fields);
+        result.Metadata.Filter!.Fields.Should().BeSameAs(_searchOptions.Filter.Fields);
         if (_searchOptions.Sort.HasValue)
         {
             result.Metadata.Sort!.By.Should()
@@ -294,10 +249,8 @@ public class SearchOptionsSpec
                 .BeNull();
         }
 
-        result.Metadata.Offset.Should()
-            .Be(_searchOptions.Offset);
-        result.Metadata.Limit.Should()
-            .Be(_searchOptions.Limit);
+        result.Metadata.Offset.Should().Be(_searchOptions.Offset);
+        result.Metadata.Limit.Should().Be(_searchOptions.Limit);
     }
 }
 

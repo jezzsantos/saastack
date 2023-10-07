@@ -45,11 +45,9 @@ public class ValidationBehaviorSpec
             return Task.FromResult(Results.Ok());
         }, CancellationToken.None);
 
-        wasNextCalled.Should()
-            .BeTrue();
+        wasNextCalled.Should().BeTrue();
         _validator.Verify(val => val.ValidateAsync(request, CancellationToken.None));
-        result.Should()
-            .Be(Results.Ok());
+        result.Should().Be(Results.Ok());
     }
 
     [Fact]
@@ -67,8 +65,7 @@ public class ValidationBehaviorSpec
             return Task.FromResult(Results.Ok());
         }, CancellationToken.None);
 
-        wasNextCalled.Should()
-            .BeFalse();
+        wasNextCalled.Should().BeFalse();
         _validator.Verify(val => val.ValidateAsync(request, CancellationToken.None));
         result.Should()
             .BeEquivalentTo(TypedResults.Problem(errors.ToRfc7807("ascheme://ahost/abasepath/apath?aquerystring")));

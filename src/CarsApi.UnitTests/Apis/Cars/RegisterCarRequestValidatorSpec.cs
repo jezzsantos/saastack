@@ -37,8 +37,7 @@ public class RegisterCarRequestValidatorSpec
         _dto.Make = null!;
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should()
-            .Throw<ValidationException>()
+            .Should().Throw<ValidationException>()
             .WithMessageLike(ValidationResources.RegisterCarRequestValidator_InvalidMake);
     }
 
@@ -48,8 +47,7 @@ public class RegisterCarRequestValidatorSpec
         _dto.Model = null!;
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should()
-            .Throw<ValidationException>()
+            .Should().Throw<ValidationException>()
             .WithMessageLike(ValidationResources.RegisterCarRequestValidator_InvalidModel);
     }
 
@@ -59,8 +57,7 @@ public class RegisterCarRequestValidatorSpec
         _dto.Year = Validations.Car.Year.Min - 1;
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should()
-            .Throw<ValidationException>()
+            .Should().Throw<ValidationException>()
             .WithMessageLike(ValidationResources.RegisterCarRequestValidator_InvalidYear);
     }
 
@@ -70,8 +67,7 @@ public class RegisterCarRequestValidatorSpec
         _dto.Year = Validations.Car.Year.Max + 1;
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should()
-            .Throw<ValidationException>()
+            .Should().Throw<ValidationException>()
             .WithMessageLike(ValidationResources.RegisterCarRequestValidator_InvalidYear);
     }
 }
