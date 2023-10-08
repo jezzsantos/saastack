@@ -50,6 +50,9 @@
         <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebApiService.cs">
             <Link>Reference\Infrastructure.WebApi.Interfaces\IWebApiService.cs</Link>
         </Compile>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebRequest.cs">
+            <Link>Reference\Infrastructure.WebApi.Interfaces\IWebRequest.cs</Link>
+        </Compile>
         <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebResponse.cs">
             <Link>Reference\Infrastructure.WebApi.Interfaces\IWebResponse.cs</Link>
         </Compile>
@@ -60,10 +63,10 @@
             <Link>Reference\Infrastructure.WebApi.Interfaces\WebApiRouteAttribute.cs</Link>
         </Compile>
         <Compile Include="..\Infrastructure.WebApi.Interfaces\EmptyResponse.cs">
-            <Link>Reference\Infrastruture.WebApi.Interfaces\EmptyResponse.cs</Link>
+            <Link>Reference\Infrastructure.WebApi.Interfaces\EmptyResponse.cs</Link>
         </Compile>
         <Compile Include="..\Infrastructure.WebApi.Common\ApiResult.cs">
-            <Link>Reference\Infrastruture.WebApi.Common\ApiResult.cs</Link>
+            <Link>Reference\Infrastructure.WebApi.Common\ApiResult.cs</Link>
         </Compile>
         <Compile Include="..\Common\Result.cs">
             <Link>Reference\Common\Result.cs</Link>

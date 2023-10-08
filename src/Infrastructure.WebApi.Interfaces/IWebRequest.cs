@@ -1,13 +1,11 @@
-using MediatR;
-using Microsoft.AspNetCore.Http;
-
 namespace Infrastructure.WebApi.Interfaces;
 
 /// <summary>
 ///     Defines a incoming REST request and response.
-///     Note: <see cref="IRequest{IResult}" /> is required for the MediatR handlers to be wired up
+///     Note: we have split this interface definition so it can be reused in Roslyn components
 /// </summary>
-public interface IWebRequest : IRequest<IResult>
+// ReSharper disable once PartialTypeWithSinglePart
+public partial interface IWebRequest
 {
 }
 

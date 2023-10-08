@@ -8,13 +8,12 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.1" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.1.1" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" Version="1.1.1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Tools.Analyzers.Core\Tools.Analyzers.Core.csproj" Aliases="Analyzers" />
+        <ProjectReference Include="..\Tools.Generators.WebApi\Tools.Generators.WebApi.csproj" Aliases="Generators" />
         <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
     </ItemGroup>
 

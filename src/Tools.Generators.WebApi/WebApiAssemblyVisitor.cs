@@ -1,6 +1,5 @@
 using Infrastructure.WebApi.Interfaces;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Tools.Generators.WebApi.Extensions;
 
 namespace Tools.Generators.WebApi;
@@ -13,20 +12,20 @@ namespace Tools.Generators.WebApi;
 ///     2. That are public or internal
 ///     Where the methods represent service operations, that are:
 ///     1. Have any method name
-///     2. They return the type <see cref="_webHandlerReturnTypeSymbol" />
+///     2. They return type that is not void
 ///     3. They have a request dto type derived from <see cref="_webRequestInterfaceSymbol" /> as their first parameter
 ///     4. They may have a <see cref="CancellationToken" /> as their second parameter, but no other parameters
 ///     5. Are decorated with the <see cref="_webRouteAttributeSymbol" /> attribute, and have both a route and operation
 /// </summary>
 public class WebApiAssemblyVisitor : SymbolVisitor
 {
-    private static readonly string[] IgnoredNamespaces =
+    internal static readonly string[] IgnoredNamespaces =
         { "System", "Microsoft", "MediatR", "MessagePack", "NerdBank*" };
 
     private readonly CancellationToken _cancellationToken;
     private readonly INamedTypeSymbol _cancellationTokenSymbol;
     private readonly INamedTypeSymbol _serviceInterfaceSymbol;
-    private readonly INamedTypeSymbol _webHandlerReturnTypeSymbol;
+    private readonly INamedTypeSymbol _voidSymbol;
     private readonly INamedTypeSymbol _webRequestInterfaceSymbol;
     private readonly INamedTypeSymbol _webRequestResponseInterfaceSymbol;
     private readonly INamedTypeSymbol _webRouteAttributeSymbol;
@@ -35,16 +34,11 @@ public class WebApiAssemblyVisitor : SymbolVisitor
     {
         _cancellationToken = cancellationToken;
         _serviceInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebApiService).FullName!)!;
-        _webRequestInterfaceSymbol =
-            compilation.GetTypeByMetadataName(
-                "Infrastructure.WebApi.Interfaces.IWebRequest")
-            !; //HACK: we cannot reference the real type here, as it causes runtime issues. See the README.md for more details
-        _webRequestResponseInterfaceSymbol =
-            compilation.GetTypeByMetadataName("Infrastructure.WebApi.Interfaces.IWebRequest`1")
-            !; //HACK: we cannot reference the real type here, as it causes runtime issues. See the README.md for more details
+        _webRequestInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebRequest).FullName!)!;
+        _webRequestResponseInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebRequest<>).FullName!)!;
         _webRouteAttributeSymbol = compilation.GetTypeByMetadataName(typeof(WebApiRouteAttribute).FullName!)!;
         _cancellationTokenSymbol = compilation.GetTypeByMetadataName(typeof(CancellationToken).FullName!)!;
-        _webHandlerReturnTypeSymbol = compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
+        _voidSymbol = compilation.GetTypeByMetadataName(typeof(void).FullName!)!;
     }
 
     public List<ServiceOperationRegistration> OperationRegistrations { get; } = new();
@@ -52,6 +46,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
     public override void VisitAssembly(IAssemblySymbol symbol)
     {
         _cancellationToken.ThrowIfCancellationRequested();
+
         symbol.GlobalNamespace.Accept(this);
     }
 
@@ -66,7 +61,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
         foreach (var nestedType in symbol.GetTypeMembers())
         {
-            if (IsNotClass(nestedType))
+            if (!nestedType.IsClass())
             {
                 continue;
             }
@@ -79,44 +74,34 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
         bool IsServiceClass()
         {
-            if (IsNotClass(symbol))
+            if (!symbol.IsClass())
             {
                 return false;
             }
 
-            var accessibility = symbol.DeclaredAccessibility;
-            if (accessibility != Accessibility.Public && accessibility != Accessibility.Internal)
+            if (!symbol.IsPublicOrInternalClass())
             {
                 return false;
             }
 
-            if (symbol is not { IsAbstract: false, IsStatic: false })
+            if (!symbol.IsConcreteInstanceClass())
             {
                 return false;
             }
 
-            if (IsIncorrectDerivedType(symbol))
+            if (!symbol.IsDerivedFrom(_serviceInterfaceSymbol))
             {
                 return false;
             }
 
             return true;
         }
-
-        bool IsIncorrectDerivedType(INamedTypeSymbol @class)
-        {
-            return !@class.AllInterfaces.Any(@interface =>
-                SymbolEqualityComparer.Default.Equals(@interface, _serviceInterfaceSymbol));
-        }
-
-        bool IsNotClass(ITypeSymbol type)
-        {
-            return type.TypeKind != TypeKind.Class;
-        }
     }
 
     public override void VisitNamespace(INamespaceSymbol symbol)
     {
+        _cancellationToken.ThrowIfCancellationRequested();
+
         if (IsIgnoredNamespace())
         {
             return;
@@ -124,7 +109,6 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
         foreach (var namespaceOrType in symbol.GetMembers())
         {
-            _cancellationToken.ThrowIfCancellationRequested();
             namespaceOrType.Accept(this);
         }
 
@@ -163,7 +147,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
     private void AddRegistration(INamedTypeSymbol symbol)
     {
-        var usingNamespaces = GetUsingNamespaces();
+        var usingNamespaces = symbol.GetUsingNamespaces();
         var constructors = GetConstructors();
         var serviceName = GetServiceName();
         var classRegistration = new ApiServiceClassRegistration
@@ -174,16 +158,14 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         };
 
         var methods = GetServiceOperationMethods();
-
         foreach (var method in methods)
         {
-            var routeAttribute = GetRouteAttribute(method);
-            if (routeAttribute is null)
+            if (!HasRouteAttribute(method, out var routeAttribute))
             {
                 continue;
             }
 
-            var attributeParameters = routeAttribute.ConstructorArguments;
+            var attributeParameters = routeAttribute!.ConstructorArguments;
             var routePath = attributeParameters[0].Value!.ToString()!;
             var operationType = attributeParameters.Length >= 2
                 ? FromOperationVerb(attributeParameters[1].Value!.ToString()!)
@@ -197,8 +179,10 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             var responseType = GetResponseType(method.Parameters[0].Type);
             var responseTypeName = responseType.Name;
             var responseTypeNamespace = responseType.ContainingNamespace.ToDisplayString();
-            var requestMethodBody = GetMethodBody(method);
-            var requestMethodName = method.Name;
+            var methodBody = method.GetMethodBody();
+            var methodName = method.Name;
+            var isAsync = method.IsAsync;
+            var hasCancellationToken = method.Parameters.Length == 2;
 
             OperationRegistrations.Add(new ServiceOperationRegistration
             {
@@ -207,8 +191,10 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                 ResponseDtoType = new TypeName(responseTypeNamespace, responseTypeName),
                 OperationType = operationType,
                 IsTestingOnly = isTestingOnly,
-                MethodName = requestMethodName,
-                MethodBody = requestMethodBody,
+                IsAsync = isAsync,
+                HasCancellationToken = hasCancellationToken,
+                MethodName = methodName,
+                MethodBody = methodBody,
                 RoutePath = routePath
             });
         }
@@ -218,19 +204,6 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         TypeName GetServiceName()
         {
             return new TypeName(symbol.ContainingNamespace.ToDisplayString(), symbol.Name);
-        }
-
-        static string GetMethodBody(ISymbol method)
-        {
-            var syntaxReference = method.DeclaringSyntaxReferences.FirstOrDefault();
-
-            var syntax = syntaxReference?.GetSyntax();
-            if (syntax is MethodDeclarationSyntax methodDeclarationSyntax)
-            {
-                return methodDeclarationSyntax.Body?.ToFullString() ?? string.Empty;
-            }
-
-            return string.Empty;
         }
 
         static WebApiOperation FromOperationVerb(string? operation)
@@ -246,9 +219,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         // We assume that the request type derives from IWebRequest<TResponse>
         ITypeSymbol GetResponseType(ITypeSymbol requestType)
         {
-            var requestInterface = requestType.AllInterfaces.FirstOrDefault(@interface =>
-                SymbolEqualityComparer.Default.Equals(@interface.OriginalDefinition,
-                    _webRequestResponseInterfaceSymbol));
+            var requestInterface = requestType.GetBaseType(_webRequestResponseInterfaceSymbol);
             if (requestInterface is null)
             {
                 return requestType;
@@ -261,21 +232,23 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         {
             var ctors = new List<Constructor>();
             var isInjectionCtor = false;
+            if (symbol.InstanceConstructors.IsDefaultOrEmpty)
+            {
+                return new List<Constructor>();
+            }
+
             foreach (var constructor in symbol.InstanceConstructors.OrderByDescending(
                          method => method.Parameters.Length))
             {
                 if (!isInjectionCtor)
                 {
-                    if (constructor is
-                        { IsStatic: false, DeclaredAccessibility: Accessibility.Public, Parameters.Length: > 0 })
+                    if (constructor.IsPublicInstance() && !constructor.IsParameterless())
                     {
                         isInjectionCtor = true;
                     }
                 }
 
-                var body = constructor.DeclaringSyntaxReferences.FirstOrDefault()
-                    ?.GetSyntax()
-                    .ToFullString();
+                var body = constructor.GetMethodBody();
                 ctors.Add(new Constructor
                 {
                     IsInjectionCtor = isInjectionCtor,
@@ -298,7 +271,12 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                 .OfType<IMethodSymbol>()
                 .Where(method =>
                 {
-                    if (IsIncorrectReturnType(method))
+                    if (!method.IsPublicOrInternalInstanceMethod())
+                    {
+                        return false;
+                    }
+
+                    if (!IsCorrectReturnType(method))
                     {
                         return false;
                     }
@@ -313,36 +291,10 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                 .ToList();
         }
 
-        List<string> GetUsingNamespaces()
+        // We assume that the return type is anything but void
+        bool IsCorrectReturnType(IMethodSymbol method)
         {
-            var syntaxReference = symbol.DeclaringSyntaxReferences.FirstOrDefault();
-            if (syntaxReference is null)
-            {
-                return new List<string>();
-            }
-
-            var usingSyntaxes = syntaxReference.SyntaxTree.GetRoot()
-                .DescendantNodes()
-                .OfType<UsingDirectiveSyntax>();
-
-            return usingSyntaxes.Select(us => us.Name!.ToString())
-                .Distinct()
-                .OrderDescending()
-                .ToList();
-        }
-
-        AttributeData? GetRouteAttribute(ISymbol method)
-        {
-            return method.GetAttributes()
-                .FirstOrDefault(attribute =>
-                    SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, _webRouteAttributeSymbol));
-        }
-
-        // We assume that the return type is a Task<T>
-        bool IsIncorrectReturnType(IMethodSymbol method)
-        {
-            return method.ReturnType.AllInterfaces.Any(@interface =>
-                SymbolEqualityComparer.Default.Equals(@interface.OriginalDefinition, _webHandlerReturnTypeSymbol));
+            return !method.ReturnType.IsTypeOf(_voidSymbol);
         }
 
         // We assume that the method one or two params:
@@ -357,8 +309,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             }
 
             var firstParameter = parameters[0];
-            if (!firstParameter.Type.AllInterfaces.Any(@interface =>
-                    SymbolEqualityComparer.Default.Equals(@interface.OriginalDefinition, _webRequestInterfaceSymbol)))
+            if (!firstParameter.Type.IsDerivedFrom(_webRequestInterfaceSymbol))
             {
                 return true;
             }
@@ -366,7 +317,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             if (parameters.Length == 2)
             {
                 var secondParameter = parameters[1];
-                if (!SymbolEqualityComparer.Default.Equals(secondParameter.Type, _cancellationTokenSymbol))
+                if (!secondParameter.Type.IsTypeOf(_cancellationTokenSymbol))
                 {
                     return true;
                 }
@@ -374,11 +325,22 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
             return false;
         }
+
+        // We assume it is decorated with a WebRouteAttribute
+        bool HasRouteAttribute(IMethodSymbol method, out AttributeData? routeAttribute)
+        {
+            routeAttribute = method.GetAttribute(_webRouteAttributeSymbol);
+            return routeAttribute is not null;
+        }
     }
 
     public record ServiceOperationRegistration
     {
         public required ApiServiceClassRegistration Class { get; init; }
+
+        public required bool HasCancellationToken { get; init; }
+
+        public required bool IsAsync { get; init; }
 
         public required bool IsTestingOnly { get; init; }
 

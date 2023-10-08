@@ -20,7 +20,9 @@ We have had to hardcode certain other types to avoid referencing AspNetCore, and
 
 > None of this is ideal. But until we can figure the magic needed to build and run this Source Generator if it uses these types, this may be the best workaround we have for now.
 
-# Debugging Generator
+# Debugging Generators
+
+You can debug the analyzers easily from the unit tests.
 
 You can debug your source generator by setting a breakpoint in the code, and then running the `SourceGenerator-Development` run configuration from the `ApiHost1` project with the debugger. (found in the `launchSettings.json` file in any executable project).
 

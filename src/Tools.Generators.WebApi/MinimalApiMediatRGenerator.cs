@@ -168,11 +168,23 @@ namespace {assemblyNamespace}
             handlerClasses.AppendLine($"        public async Task<global::Microsoft.AspNetCore.Http.IResult>"
                                       + $" Handle(global::{registration.RequestDtoType.FullName} request, global::System.Threading.CancellationToken cancellationToken)");
             handlerClasses.AppendLine("        {");
+            if (!registration.IsAsync)
+            {
+                handlerClasses.AppendLine(
+                    "            await Task.CompletedTask;");
+            }
+
             var callingParameters = BuildInjectedParameters(registration.Class.Constructors.ToList());
             handlerClasses.AppendLine(
                 $"            var api = new global::{registration.Class.TypeName.FullName}({callingParameters});");
+            var asyncAwait = registration.IsAsync
+                ? "await "
+                : string.Empty;
+            var hasCancellationToken = registration.HasCancellationToken
+                ? ", cancellationToken"
+                : string.Empty;
             handlerClasses.AppendLine(
-                $"            var result = await api.{registration.MethodName}(request, cancellationToken);");
+                $"            var result = {asyncAwait}api.{registration.MethodName}(request{hasCancellationToken});");
             handlerClasses.AppendLine(
                 $"            return result.HandleApiResult(global::Infrastructure.WebApi.Interfaces.WebApiOperation.{registration.OperationType});");
             handlerClasses.AppendLine("        }");

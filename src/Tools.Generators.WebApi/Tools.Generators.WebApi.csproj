@@ -18,11 +18,20 @@
         <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebResponse.cs">
             <Link>Reference\Infrastructure.WebApi.Interfaces\IWebResponse.cs</Link>
         </Compile>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebRequest.cs">
+            <Link>Reference\Infrastructure.WebApi.Interfaces\IWebRequest.cs</Link>
+        </Compile>
         <Compile Include="..\Infrastructure.WebApi.Interfaces\WebApiOperation.cs">
             <Link>Reference\Infrastructure.WebApi.Interfaces\WebApiOperation.cs</Link>
         </Compile>
         <Compile Include="..\Infrastructure.WebApi.Interfaces\WebApiRouteAttribute.cs">
             <Link>Reference\Infrastructure.WebApi.Interfaces\WebApiRouteAttribute.cs</Link>
         </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 </Project>

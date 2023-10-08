@@ -14,7 +14,8 @@ public class MissingDocsAnalyzerSpec
         [Fact]
         public async Task WhenInJetbrainsAnnotationsNamespace_ThenNoAlert()
         {
-            const string input = @"namespace JetBrains.Annotations;
+            const string input = @"
+namespace JetBrains.Annotations;
 public class AClass
 {
 }";
@@ -25,7 +26,8 @@ public class AClass
         [Fact]
         public async Task WhenInApiHost1Namespace_ThenNoAlert()
         {
-            const string input = @"namespace ApiHost1;
+            const string input = @"
+namespace ApiHost1;
 public class AClass
 {
 }";
@@ -52,107 +54,118 @@ public class AClass
         [Fact]
         public async Task WhenPublicInterface_ThenAlerts()
         {
-            const string input = @"public interface AnInterface
+            const string input = @"
+public interface AnInterface
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1, 18, "AnInterface");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 18, "AnInterface");
         }
 
         [Fact]
         public async Task WhenInternalInterface_ThenAlerts()
         {
-            const string input = @"internal interface AnInterface
+            const string input = @"
+internal interface AnInterface
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1, 20, "AnInterface");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 20, "AnInterface");
         }
 
         [Fact]
         public async Task WhenPublicEnum_ThenAlerts()
         {
-            const string input = @"public enum AnEnum
+            const string input = @"
+public enum AnEnum
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1, 13, "AnEnum");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 13, "AnEnum");
         }
 
         [Fact]
         public async Task WhenInternalEnum_ThenAlerts()
         {
-            const string input = @"internal enum AnEnum
+            const string input = @"
+internal enum AnEnum
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1, 15, "AnEnum");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 15, "AnEnum");
         }
 
         [Fact]
         public async Task WhenPublicStruct_ThenAlerts()
         {
-            const string input = @"public struct AStruct
+            const string input = @"
+public struct AStruct
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1, 15, "AStruct");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 15, "AStruct");
         }
 
         [Fact]
         public async Task WhenInternalStruct_ThenAlerts()
         {
-            const string input = @"internal struct AStruct
+            const string input = @"
+internal struct AStruct
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1, 17, "AStruct");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 17, "AStruct");
         }
 
         [Fact]
         public async Task WhenPublicReadOnlyStruct_ThenAlerts()
         {
-            const string input = @"public readonly struct AStruct
+            const string input = @"
+public readonly struct AStruct
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1, 24, "AStruct");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 24, "AStruct");
         }
 
         [Fact]
         public async Task WhenInternalReadOnlyStruct_ThenAlerts()
         {
-            const string input = @"internal readonly struct AStruct
+            const string input = @"
+internal readonly struct AStruct
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1, 26, "AStruct");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 26, "AStruct");
         }
 
         [Fact]
         public async Task WhenPublicRecord_ThenAlerts()
         {
-            const string input = @"public record ARecord()
+            const string input = @"
+public record ARecord()
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1, 15, "ARecord");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 15, "ARecord");
         }
 
         [Fact]
         public async Task WhenInternalRecord_ThenAlerts()
         {
-            const string input = @"internal record ARecord
+            const string input = @"
+internal record ARecord
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1, 17, "ARecord");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 17, "ARecord");
         }
 
         [Fact]
         public async Task WhenPublicStaticClass_ThenNoAlert()
         {
-            const string input = @"public static class AClass
+            const string input = @"
+public static class AClass
 {
 }
 ";
@@ -163,7 +176,8 @@ public class AClass
         [Fact]
         public async Task WhenInternalStaticClass_ThenNoAlert()
         {
-            const string input = @"internal static class AClass
+            const string input = @"
+internal static class AClass
 {
 }
 ";
@@ -174,7 +188,8 @@ public class AClass
         [Fact]
         public async Task WhenNestedPublicStaticClass_ThenNoAlert()
         {
-            const string input = @"public static class AClass1
+            const string input = @"
+public static class AClass1
 {
     public static class AClass2
     {
@@ -242,23 +257,25 @@ public class AClass1
         [Fact]
         public async Task WhenPublicClassNoSummary_ThenAlerts()
         {
-            const string input = @"public class AClass
+            const string input = @"
+public class AClass
 {
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1, 14, "AClass");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 14, "AClass");
         }
 
         [Fact]
         public async Task WhenInternalClassNoSummary_ThenAlerts()
         {
-            const string input = @"internal class AClass
+            const string input = @"
+internal class AClass
 {
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1, 16, "AClass");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 16, "AClass");
         }
 
         [Fact]
@@ -404,67 +421,73 @@ public static class AClass
         [Fact]
         public async Task WhenPublicStaticMethod_ThenAlerts()
         {
-            const string input = @"public static class AClass
+            const string input = @"
+public static class AClass
 {
     public static void AMethod(){}
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 3, 24, "AMethod");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4, 24, "AMethod");
         }
 
         [Fact]
         public async Task WhenInternalStaticMethod_ThenAlerts()
         {
-            const string input = @"public static class AClass
+            const string input = @"
+public static class AClass
 {
     internal static void AMethod(){}
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 3, 26, "AMethod");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4, 26, "AMethod");
         }
 
         [Fact]
         public async Task WhenPublicStaticMethodWithParams_ThenAlerts()
         {
-            const string input = @"public static class AClass
+            const string input = @"
+public static class AClass
 {
     public static void AMethod(string value){}
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 3, 24, "AMethod");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4, 24, "AMethod");
         }
 
         [Fact]
         public async Task WhenInternalStaticMethodWithParams_ThenAlerts()
         {
-            const string input = @"public static class AClass
+            const string input = @"
+public static class AClass
 {
     internal static void AMethod(string value){}
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 3, 26, "AMethod");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4, 26, "AMethod");
         }
 
         [Fact]
         public async Task WhenInternalExtension_ThenAlerts()
         {
-            const string input = @"public static class AClass
+            const string input = @"
+public static class AClass
 {
     internal static void AMethod(this string value){}
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 3, 26, "AMethod");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4, 26, "AMethod");
         }
 
         [Fact]
         public async Task WhenPrivateExtension_ThenNoAlerts()
         {
-            const string input = @"public static class AClass
+            const string input = @"
+public static class AClass
 {
     private static void AMethod(this string value){}
 }
@@ -476,13 +499,14 @@ public static class AClass
         [Fact]
         public async Task WhenPublicExtensionHasNoSummary_ThenAlerts()
         {
-            const string input = @"public static class AClass
+            const string input = @"
+public static class AClass
 {
     public static void AMethod(this string value){}
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 3, 24, "AMethod");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4, 24, "AMethod");
         }
 
         [Fact]
@@ -494,7 +518,7 @@ public static class AClass
     /// <summary>
     /// avalue
     /// </summary>
-    private static void AMethod(this string value){}
+    public static void AMethod(this string value){}
 }
 ";
 
