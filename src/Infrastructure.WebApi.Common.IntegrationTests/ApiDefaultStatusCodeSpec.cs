@@ -48,10 +48,10 @@ public class ApiDefaultStatusCode : WebApiSpec<Program>
     [Fact]
     public async Task WhenSearch_ThenReturnsOk()
     {
-        var result = await Api.GetAsync<StatusesTestingOnlyResponse>("/testingonly/statuses/search");
+        var result = await Api.GetAsync<StatusesTestingOnlySearchResponse>("/testingonly/statuses/search");
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Content.Message.Should().Be("amessage");
+        result.Content.Messages.Should().ContainInOrder("amessage");
     }
 
     [Fact]

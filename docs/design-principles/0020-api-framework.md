@@ -39,7 +39,7 @@ public class CarsApi : IWebApiService
 
     [AuthorizeForAnyRole(OrganisationRoles.Manager)]
     [WebApiRoute("/cars/{id}", WebApiOperation.Delete)]
-    public async Task<ApiEmptyResult> Delete(DeleteCarRequest request,
+    public async Task<ApiDeleteResult> Delete(DeleteCarRequest request,
         CancellationToken cancellationToken)
     {
         var car = await _carsApplication.DeleteCarAsync(_context, request.Id, cancellationToken);
@@ -48,7 +48,7 @@ public class CarsApi : IWebApiService
 
     [AuthorizeForAnyRole(OrganisationRoles.Reserver, OrganisationRoles.Manager)]
     [WebApiRoute("/cars/{id}", WebApiOperation.Get)]
-    public async Task<ApiResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
+    public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
 
@@ -69,7 +69,7 @@ public class CarsApi : IWebApiService
 
     [AllowAnonymous]
     [WebApiRoute("/cars", WebApiOperation.Search)]
-    public async Task<ApiResult<Car, SearchAllCarsResponse>> SearchAll(SearchAllCarsRequest request,
+    public async Task<ApiSearchResult<Car, SearchAllCarsResponse>> SearchAll(SearchAllCarsRequest request,
         CancellationToken cancellationToken)
     {
         var cars = await _carsApplication.SearchAllCarsAsync(_context, request.ToSearchOptions(),
@@ -81,7 +81,7 @@ public class CarsApi : IWebApiService
 
     [AuthorizeForAnyRole(OrganisationRoles.Manager)]
     [WebApiRoute("/cars/{id}/offline", WebApiOperation.PutPatch)]
-    public async Task<ApiResult<Car, GetCarResponse>> TakeOffline(TakeOfflineCarRequest request,
+    public async Task<ApiPutPatchResult<Car, GetCarResponse>> TakeOffline(TakeOfflineCarRequest request,
         CancellationToken cancellationToken)
     {
         var car = await _carsApplication.TakeOfflineCarAsync(_context, request.Id!, request.Reason, request.StartAtUtc,
@@ -241,7 +241,7 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
      
          [AuthorizeForAnyRole(OrganisationRoles.Reserver, OrganisationRoles.Manager)]
          [WebApiRoute("/cars/{id}", WebApiOperation.Get)]
-         public async Task<ApiResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
+         public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
          {
              var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
 
@@ -330,7 +330,7 @@ From that Application layer, a resource (DTO) will be returned, and this functio
 ```c#
     [AuthorizeForAnyRole(OrganisationRoles.Reserver, OrganisationRoles.Manager)]
     [WebApiRoute("/cars/{id}", WebApiOperation.Get)]
-    public async Task<ApiResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
+    public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
 

@@ -10,8 +10,7 @@ internal static class SyntaxFilterExtensions
     public static AttributeData? GetAttributeOfType<TAttribute>(this MethodDeclarationSyntax methodDeclarationSyntax,
         SyntaxNodeAnalysisContext context)
     {
-        var symbol = context.Compilation.GetSemanticModel(methodDeclarationSyntax.SyntaxTree)
-            .GetDeclaredSymbol(methodDeclarationSyntax);
+        var symbol = context.SemanticModel.GetDeclaredSymbol(methodDeclarationSyntax);
         if (symbol is null)
         {
             return null;
@@ -20,15 +19,13 @@ internal static class SyntaxFilterExtensions
         var attributeType = context.Compilation.GetTypeByMetadataName(typeof(TAttribute).FullName!)!;
         var attributes = symbol.GetAttributes();
 
-        return attributes.FirstOrDefault(attr =>
-            SymbolEqualityComparer.Default.Equals(attr.AttributeClass, attributeType));
+        return attributes.FirstOrDefault(attr => attr.AttributeClass!.IsOfType(attributeType));
     }
 
     public static ITypeSymbol? GetBaseOfType<TType>(this ParameterSyntax parameterSyntax,
         SyntaxNodeAnalysisContext context)
     {
-        var symbol = context.Compilation.GetSemanticModel(parameterSyntax.SyntaxTree)
-            .GetDeclaredSymbol(parameterSyntax);
+        var symbol = context.SemanticModel.GetDeclaredSymbol(parameterSyntax);
         if (symbol is null)
         {
             return null;
@@ -36,14 +33,13 @@ internal static class SyntaxFilterExtensions
 
         var parameterType = context.Compilation.GetTypeByMetadataName(typeof(TType).FullName!)!;
 
-        var isOfType = SymbolEqualityComparer.Default.Equals(symbol.Type.OriginalDefinition, parameterType);
+        var isOfType = symbol.Type.IsOfType(parameterType);
         if (isOfType)
         {
             return null;
         }
 
-        var isDerivedFrom = symbol.Type.AllInterfaces.Any(@interface =>
-            SymbolEqualityComparer.Default.Equals(@interface.OriginalDefinition, parameterType));
+        var isDerivedFrom = symbol.Type.AllInterfaces.Any(@interface => @interface.IsOfType(parameterType));
         if (isDerivedFrom)
         {
             return symbol.Type;
@@ -159,8 +155,7 @@ internal static class SyntaxFilterExtensions
     public static bool IsNotType<TParent>(this ClassDeclarationSyntax classDeclarationSyntax,
         SyntaxNodeAnalysisContext context)
     {
-        var symbol = context.Compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree)
-            .GetDeclaredSymbol(classDeclarationSyntax);
+        var symbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
         if (symbol is null)
         {
             return false;
@@ -168,16 +163,14 @@ internal static class SyntaxFilterExtensions
 
         var parentType = context.Compilation.GetTypeByMetadataName(typeof(TParent).FullName!)!;
 
-        var isOfType = symbol.AllInterfaces.Any(@interface =>
-            SymbolEqualityComparer.Default.Equals(@interface.OriginalDefinition, parentType));
+        var isOfType = symbol.AllInterfaces.Any(@interface => @interface.IsOfType(parentType));
 
         return !isOfType;
     }
 
     public static bool IsNotType<TType>(this ParameterSyntax parameterSyntax, SyntaxNodeAnalysisContext context)
     {
-        var symbol = context.Compilation.GetSemanticModel(parameterSyntax.SyntaxTree)
-            .GetDeclaredSymbol(parameterSyntax);
+        var symbol = context.SemanticModel.GetDeclaredSymbol(parameterSyntax);
         if (symbol is null)
         {
             return false;
@@ -185,14 +178,13 @@ internal static class SyntaxFilterExtensions
 
         var parameterType = context.Compilation.GetTypeByMetadataName(typeof(TType).FullName!)!;
 
-        var isOfType = SymbolEqualityComparer.Default.Equals(symbol.Type.OriginalDefinition, parameterType);
+        var isOfType = symbol.Type.IsOfType(parameterType);
         if (isOfType)
         {
             return false;
         }
 
-        var isDerivedFrom = symbol.Type.AllInterfaces.Any(@interface =>
-            SymbolEqualityComparer.Default.Equals(@interface.OriginalDefinition, parameterType));
+        var isDerivedFrom = symbol.Type.AllInterfaces.Any(@interface => @interface.IsOfType(parameterType));
 
         return !isDerivedFrom;
     }
@@ -236,67 +228,6 @@ internal static class SyntaxFilterExtensions
         }
 
         return true;
-    }
-
-    public static bool IsReturnTypeNotMatching(this MemberDeclarationSyntax memberDeclaration,
-        SyntaxNodeAnalysisContext context, out ITypeSymbol? returnType, params Type[] allowedTypes)
-    {
-        returnType = null;
-        var symbol = context.Compilation.GetSemanticModel(memberDeclaration.SyntaxTree)
-            .GetDeclaredSymbol(memberDeclaration);
-        if (symbol is null)
-        {
-            return true;
-        }
-
-        if (symbol is not IMethodSymbol methodSymbol)
-        {
-            return true;
-        }
-
-        returnType = methodSymbol.ReturnType;
-
-        var voidSymbol = context.Compilation.GetTypeByMetadataName(typeof(void).FullName!)!;
-        if (SymbolEqualityComparer.Default.Equals(returnType.OriginalDefinition, voidSymbol))
-        {
-            return true;
-        }
-
-        var taskSymbol = context.Compilation.GetTypeByMetadataName(typeof(Task).FullName!)!;
-        if (SymbolEqualityComparer.Default.Equals(returnType.OriginalDefinition, taskSymbol))
-        {
-            return true;
-        }
-
-        var genericTaskSymbol = context.Compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
-        if (SymbolEqualityComparer.Default.Equals(returnType.OriginalDefinition, genericTaskSymbol))
-        {
-            //Task<T>
-            if (returnType is not INamedTypeSymbol namedTypeSymbol)
-            {
-                return true;
-            }
-
-            var genericType = namedTypeSymbol.TypeArguments.First();
-            return NotMatches(genericType);
-        }
-
-        //Naked type
-        return NotMatches(returnType);
-
-        bool NotMatches(ITypeSymbol type)
-        {
-            foreach (var allowedType in allowedTypes)
-            {
-                var allowedSymbol = context.Compilation.GetTypeByMetadataName(allowedType.FullName!)!;
-                if (SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, allowedSymbol))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
     }
 }
 

@@ -1,6 +1,5 @@
 #if TESTINGONLY
 using Common;
-using Infrastructure.WebApi.Common;
 using Infrastructure.WebApi.Interfaces;
 using Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
 
@@ -67,7 +66,7 @@ public class TestingWebApi : IWebApiService
     }
 
     [WebApiRoute("/testingonly/statuses/delete", WebApiOperation.Delete, true)]
-    public async Task<ApiEmptyResult> StatusesDelete(StatusesDeleteTestingOnlyRequest request,
+    public async Task<ApiDeleteResult> StatusesDelete(StatusesDeleteTestingOnlyRequest request,
         CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
@@ -75,7 +74,8 @@ public class TestingWebApi : IWebApiService
     }
 
     [WebApiRoute("/testingonly/statuses/get", WebApiOperation.Get, true)]
-    public async Task<ApiResult<string, StatusesTestingOnlyResponse>> StatusesGet(StatusesGetTestingOnlyRequest request,
+    public async Task<ApiGetResult<string, StatusesTestingOnlyResponse>> StatusesGet(
+        StatusesGetTestingOnlyRequest request,
         CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
@@ -94,16 +94,16 @@ public class TestingWebApi : IWebApiService
     }
 
     [WebApiRoute("/testingonly/statuses/post2", WebApiOperation.Post, true)]
-    public async Task<ApiResult<string, StatusesTestingOnlyResponse>> StatusesPost2(
+    public async Task<ApiPostResult<string, StatusesTestingOnlyResponse>> StatusesPost2(
         StatusesPostWithLocationTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         return () =>
-            new Result<StatusesTestingOnlyResponse, Error>(new StatusesTestingOnlyResponse { Message = "amessage" });
+            new PostResult<StatusesTestingOnlyResponse>(new StatusesTestingOnlyResponse { Message = "amessage" });
     }
 
     [WebApiRoute("/testingonly/statuses/putpatch", WebApiOperation.PutPatch, true)]
-    public async Task<ApiResult<string, StatusesTestingOnlyResponse>> StatusesPutPatch(
+    public async Task<ApiPutPatchResult<string, StatusesTestingOnlyResponse>> StatusesPutPatch(
         StatusesPutPatchTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
@@ -112,12 +112,13 @@ public class TestingWebApi : IWebApiService
     }
 
     [WebApiRoute("/testingonly/statuses/search", WebApiOperation.Search, true)]
-    public async Task<ApiResult<string, StatusesTestingOnlyResponse>> StatusesSearch(
+    public async Task<ApiSearchResult<string, StatusesTestingOnlySearchResponse>> StatusesSearch(
         StatusesSearchTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         return () =>
-            new Result<StatusesTestingOnlyResponse, Error>(new StatusesTestingOnlyResponse { Message = "amessage" });
+            new Result<StatusesTestingOnlySearchResponse, Error>(new StatusesTestingOnlySearchResponse
+                { Messages = new List<string> { "amessage" } });
     }
 
     [WebApiRoute("/testingonly/validations/unvalidated", WebApiOperation.Get, true)]

@@ -44,10 +44,10 @@
         <value>Missing documentation</value>
     </data>
     <data name="SAS010Description" xml:space="preserve">
-        <value>This method should return either a Task&lt;T&gt; or T, of a Result type.</value>
+        <value>This method should return a Result type.</value>
     </data>
     <data name="SAS010MessageFormat" xml:space="preserve">
-        <value>If method '{0}' is supposed to be a service operation, then it should return either: 'Task&lt;ApiEmptyResult&gt;', 'Task&lt;ApiResult&lt;TResource, TResponse&gt;&gt;', 'Task&lt;ApiPostResult&lt;TResource, TResponse&gt;&gt;' or 'ApiEmptyResult', 'ApiResult&lt;TResource, TResponse&gt;' or 'ApiPostResult&lt;TResource, TResponse&gt;'</value>
+        <value>If method '{0}' is supposed to be a service operation, then it should return one of these possible types: '{1}'</value>
     </data>
     <data name="SAS010Title" xml:space="preserve">
         <value>Wrong return type</value>
@@ -98,10 +98,10 @@
         <value>Duplicate request type</value>
     </data>
     <data name="SAS016Description" xml:space="preserve">
-        <value>This service operation should return an appropriate result.</value>
+        <value>This service operation should return an appropriate Result type for the operation.</value>
     </data>
     <data name="SAS016MessageFormat" xml:space="preserve">
-        <value>Service operation '{0}' is defined as a '{1}' operation, and should return a 'Task&lt;{2}&gt;' or '{2}'</value>
+        <value>Service operation '{0}' is defined as a '{1}' operation, and can only return one of these types: '{2}'</value>
     </data>
     <data name="SAS016Title" xml:space="preserve">
         <value>Unexpected return type for operation</value>

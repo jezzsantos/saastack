@@ -25,3 +25,12 @@ We have had to hardcode certain other types to avoid referencing AspNetCore, and
 You can debug the analyzers easily from the unit tests.
 
 You can debug your analyzers by setting a breakpoint in the code, and then running the `Tools-Analyzers-Core-Development` run configuration from the `Tools.Analyzers.Core` project with the debugger. (found in the `launchSettings.json` file in any executable project).
+
+# Updating Analyzers
+
+After you have made changes to the analyzers they need to be refreshed in the current solution, as most of the projects in the solution are already using the Analyzers.
+
+1. Rebuild the solution
+2. Change to the solution directory, and pack the nuget and a new version is created on disk (same version number): `dotnet pack`
+3. Clear the cache for the local source (`..\..\tools\nuget`): `dotnet nuget locals all --clear`
+4. restore all packages: `dotnet restore`

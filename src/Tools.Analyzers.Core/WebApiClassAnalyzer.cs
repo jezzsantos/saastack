@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
+using System.Text;
 using Common.Extensions;
-using Infrastructure.WebApi.Common;
 using Infrastructure.WebApi.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -15,7 +15,7 @@ namespace Tools.Analyzers.Core;
 /// <summary>
 ///     An analyzer to ensure that WebAPI classes are configured correctly.
 ///     SAS010. Warning: Methods that are public, should return a <see cref="Task{T}" /> or just any T, where T is either:
-///     <see cref="ApiEmptyResult" /> or <see cref="ApiResult{TResource, TResponse}" /> or
+///     <see cref="ApiEmptyResult" /> or <see cref="ApiResult{TResource,TResponse}" /> or
 ///     <see cref="ApiPostResult{TResource, TResponse}" />
 ///     SAS011. Warning: These methods must have at least one parameter, and first parameter must be
 ///     <see cref="IWebRequest{TResponse}" />, where
@@ -28,6 +28,42 @@ namespace Tools.Analyzers.Core;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class WebApiClassAnalyzer : DiagnosticAnalyzer
 {
+    internal static readonly Dictionary<WebApiOperation, List<Type>> AllowableOperationReturnTypes =
+        new()
+        {
+            { WebApiOperation.Post, new List<Type> { typeof(ApiEmptyResult), typeof(ApiPostResult<,>) } },
+            {
+                WebApiOperation.Get,
+                new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>) }
+            },
+            {
+                WebApiOperation.Search,
+                new List<Type>
+                {
+                    typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>), typeof(ApiSearchResult<,>)
+                }
+            },
+            {
+                WebApiOperation.PutPatch,
+                new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiPutPatchResult<,>) }
+            },
+            {
+                WebApiOperation.Delete,
+                new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiDeleteResult) }
+            }
+        };
+
+    internal static readonly Type[] AllowableReturnTypes =
+    {
+        typeof(ApiEmptyResult),
+        typeof(ApiResult<,>),
+        typeof(ApiPostResult<,>),
+        typeof(ApiGetResult<,>),
+        typeof(ApiSearchResult<,>),
+        typeof(ApiPutPatchResult<,>),
+        typeof(ApiDeleteResult)
+    };
+
     internal static readonly DiagnosticDescriptor Sas010 = "SAS010".GetDescriptor(DiagnosticSeverity.Warning,
         AnalyzerConstants.Categories.WebApi, nameof(Resources.SAS010Title), nameof(Resources.SAS010Description),
         nameof(Resources.SAS010MessageFormat));
@@ -130,35 +166,63 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
     private static bool OperationAndReturnsTypeDontMatch(SyntaxNodeAnalysisContext context,
         MethodDeclarationSyntax methodDeclarationSyntax, WebApiOperation operation, ITypeSymbol returnType)
     {
-        if (operation != WebApiOperation.Post)
+        var allowedReturnTypes = AllowableOperationReturnTypes[operation];
+
+        if (MatchesAllowedTypes(context, returnType, allowedReturnTypes.ToArray()))
         {
             return false;
         }
 
-        var type = typeof(ApiPostResult<,>);
-        var postResult = context.Compilation.GetTypeByMetadataName(type.FullName!)!;
-        if (!SymbolEqualityComparer.Default.Equals(returnType.OriginalDefinition, postResult))
-        {
-            var typeName =
-                "ApiPostResult<TResource, TResponse>"; // HACK: dont know how to get this same string from the type itself 
-            context.ReportDiagnostic(Sas016, methodDeclarationSyntax, operation, typeName);
-            return true;
-        }
+        context.ReportDiagnostic(Sas016, methodDeclarationSyntax, operation,
+            allowedReturnTypes.ToArray().Stringify());
 
-        return false;
+        return true;
     }
 
     private static bool ReturnTypeIsNotCorrect(SyntaxNodeAnalysisContext context,
         MethodDeclarationSyntax methodDeclarationSyntax, out ITypeSymbol? returnType)
     {
-        if (methodDeclarationSyntax.IsReturnTypeNotMatching(context, out returnType, typeof(ApiEmptyResult),
-                typeof(ApiResult<,>), typeof(ApiPostResult<,>)))
+        returnType = null;
+        context.SemanticModel.GetDeclaredSymbol(methodDeclarationSyntax);
+
+        var symbol = context.SemanticModel.GetDeclaredSymbol(methodDeclarationSyntax);
+        if (symbol is null)
         {
-            context.ReportDiagnostic(Sas010, methodDeclarationSyntax);
+            return true;
+        }
+
+        returnType = symbol.ReturnType;
+        if (IsVoid(returnType))
+        {
+            context.ReportDiagnostic(Sas010, methodDeclarationSyntax, AllowableReturnTypes.Stringify());
+            return true;
+        }
+
+        if (IsVoidTask(returnType))
+        {
+            context.ReportDiagnostic(Sas010, methodDeclarationSyntax, AllowableReturnTypes.Stringify());
+            return true;
+        }
+
+        if (!MatchesAllowedTypes(context, returnType, AllowableReturnTypes))
+        {
+            context.ReportDiagnostic(Sas010, methodDeclarationSyntax, AllowableReturnTypes.Stringify());
             return true;
         }
 
         return false;
+
+        bool IsVoid(ITypeSymbol returnType)
+        {
+            var voidSymbol = context.Compilation.GetTypeByMetadataName(typeof(void).FullName!)!;
+            return returnType.IsOfType(voidSymbol);
+        }
+
+        bool IsVoidTask(ITypeSymbol returnType)
+        {
+            var taskSymbol = context.Compilation.GetTypeByMetadataName(typeof(Task).FullName!)!;
+            return returnType.IsOfType(taskSymbol);
+        }
     }
 
     private static bool AttributeIsNotPresent(SyntaxNodeAnalysisContext context,
@@ -247,6 +311,53 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
         }
     }
 
+    /// <summary>
+    ///     Determines whether the <see cref="returnType" /> is the same as one of the <see cref="AllowableReturnTypes" />
+    ///     , or one of the <see cref="AllowableReturnTypes" /> as a <see cref="Task{T}" />
+    /// </summary>
+    private static bool MatchesAllowedTypes(SyntaxNodeAnalysisContext context, ITypeSymbol returnType,
+        Type[] allowableReturnTypes)
+    {
+        var nakedType = returnType;
+        if (IsGenericTask())
+        {
+            //Task<T>
+            if (returnType is not INamedTypeSymbol namedTypeSymbol)
+            {
+                return false;
+            }
+
+            nakedType = namedTypeSymbol.TypeArguments.First();
+        }
+
+        foreach (var allowedType in allowableReturnTypes)
+        {
+            var allowedTypeNaked = context.Compilation.GetTypeByMetadataName(allowedType.FullName!)!;
+            if (nakedType.IsOfType(allowedTypeNaked))
+            {
+                return true;
+            }
+
+            var taskType = context.Compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
+            var returnTypeTasked =
+                taskType.Construct(context.Compilation.GetTypeByMetadataName(allowedType.FullName!)!);
+            var allowedTypeTasked =
+                taskType.Construct(context.Compilation.GetTypeByMetadataName(allowedType.FullName!)!);
+            if (returnTypeTasked.IsOfType(allowedTypeTasked))
+            {
+                return true;
+            }
+        }
+
+        return false;
+
+        bool IsGenericTask()
+        {
+            var genericTaskSymbol = context.Compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
+            return returnType.IsOfType(genericTaskSymbol);
+        }
+    }
+
     private class ServiceOperation
     {
         public ServiceOperation(ITypeSymbol requestType)
@@ -265,5 +376,38 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
                 RouteSegments = routePath!.Split("/", StringSplitOptions.RemoveEmptyEntries);
             }
         }
+    }
+}
+
+internal static class TypeExtensions
+{
+    public static string Stringify(this Type[] allowableReturnTypes)
+    {
+        var taskOfList = new StringBuilder();
+        var nakedList = new StringBuilder();
+
+        var stringifiedTypes = allowableReturnTypes.Select(Stringify).ToList();
+        nakedList.AppendJoin(", ", stringifiedTypes);
+        taskOfList.AppendJoin(", ", stringifiedTypes.Select(s => $"Task<{s}>"));
+
+        return $"{taskOfList}, or {nakedList}";
+    }
+
+    private static string Stringify(this Type type)
+    {
+        if (!type.IsGenericType)
+        {
+            return type.Name;
+        }
+
+        var arguments = type.GetGenericArguments();
+        var builder = new StringBuilder();
+
+        builder.Append(type.Name.Substring(0, type.Name.LastIndexOf('`')));
+        builder.Append("<");
+        builder.AppendJoin(", ", arguments.Select(arg => arg.Name));
+        builder.Append(">");
+
+        return builder.ToString();
     }
 }

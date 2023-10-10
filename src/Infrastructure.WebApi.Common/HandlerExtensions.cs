@@ -10,6 +10,16 @@ public static class HandlerExtensions
     /// <summary>
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
+    public static IResult HandleApiResult(this ApiEmptyResult result, WebApiOperation operation)
+    {
+        return result()
+            .Match(response => ((PostResult<EmptyResponse>)response.Value).ToResult(operation),
+                error => error.ToResult());
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
+    /// </summary>
     public static IResult HandleApiResult<TResource, TResponse>(this ApiResult<TResource, TResponse> result,
         WebApiOperation operation)
         where TResource : class where TResponse : IWebResponse
@@ -32,7 +42,41 @@ public static class HandlerExtensions
     /// <summary>
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
-    public static IResult HandleApiResult(this ApiEmptyResult result, WebApiOperation operation)
+    public static IResult HandleApiResult<TResource, TResponse>(this ApiPutPatchResult<TResource, TResponse> result,
+        WebApiOperation operation)
+        where TResource : class where TResponse : IWebResponse
+    {
+        return result()
+            .Match(response => ((PostResult<TResponse>)response.Value).ToResult(operation), error => error.ToResult());
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
+    /// </summary>
+    public static IResult HandleApiResult<TResource, TResponse>(this ApiGetResult<TResource, TResponse> result,
+        WebApiOperation operation)
+        where TResource : class where TResponse : IWebResponse
+    {
+        return result()
+            .Match(response => ((PostResult<TResponse>)response.Value).ToResult(operation), error => error.ToResult());
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
+    /// </summary>
+    public static IResult HandleApiResult<TResource, TResponse>(this ApiSearchResult<TResource, TResponse> result,
+        WebApiOperation operation)
+        where TResource : class where TResponse : IWebSearchResponse
+    {
+        return result()
+            .Match(response => ((PostResult<TResponse>)response.Value).ToResult(operation), error => error.ToResult());
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
+    /// </summary>
+    public static IResult HandleApiResult(this ApiDeleteResult result,
+        WebApiOperation operation)
     {
         return result()
             .Match(response => ((PostResult<EmptyResponse>)response.Value).ToResult(operation),
@@ -40,16 +84,12 @@ public static class HandlerExtensions
     }
 
     /// <summary>
-    ///     Converts the <see cref="TResource" /> in the <see cref="Result{TResource,Error}" /> to an
-    ///     <see cref="Result{PostResult,Error}" />
-    ///     using the <see cref="onSuccess" /> callback
+    ///     Converts the <see cref="Result{TResource,Error}" /> to an <see cref="Result{EmptyResponse,Error}" />
     /// </summary>
-    public static Result<PostResult<TResponse>, Error> HandleApplicationResult<TResponse, TResource>(
-        this Result<TResource, Error> result, Func<TResource, PostResult<TResponse>> onSuccess)
-        where TResponse : IWebResponse
+    public static Result<EmptyResponse, Error> HandleApplicationResult<TResource>(this Result<TResource, Error> result)
     {
-        return result.Match(resource => new Result<PostResult<TResponse>, Error>(onSuccess(resource.Value)),
-            error => new Result<PostResult<TResponse>, Error>(error));
+        return result.Match(_ => new Result<EmptyResponse, Error>(new EmptyResponse()),
+            error => new Result<EmptyResponse, Error>(error));
     }
 
     /// <summary>
@@ -66,12 +106,16 @@ public static class HandlerExtensions
     }
 
     /// <summary>
-    ///     Converts the <see cref="Result{TResource,Error}" /> to an <see cref="Result{EmptyResponse,Error}" />
+    ///     Converts the <see cref="TResource" /> in the <see cref="Result{TResource,Error}" /> to an
+    ///     <see cref="Result{PostResult,Error}" />
+    ///     using the <see cref="onSuccess" /> callback
     /// </summary>
-    public static Result<EmptyResponse, Error> HandleApplicationResult<TResource>(this Result<TResource, Error> result)
+    public static Result<PostResult<TResponse>, Error> HandleApplicationResult<TResponse, TResource>(
+        this Result<TResource, Error> result, Func<TResource, PostResult<TResponse>> onSuccess)
+        where TResponse : IWebResponse
     {
-        return result.Match(_ => new Result<EmptyResponse, Error>(new EmptyResponse()),
-            error => new Result<EmptyResponse, Error>(error));
+        return result.Match(resource => new Result<PostResult<TResponse>, Error>(onSuccess(resource.Value)),
+            error => new Result<PostResult<TResponse>, Error>(error));
     }
 
     /// <summary>

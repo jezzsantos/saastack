@@ -1,12 +1,12 @@
 extern alias Analyzers;
 using System.Reflection;
-using Analyzers::Infrastructure.WebApi.Common;
 using Common.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using NuGet.Frameworks;
+using AnalyzerConstants = Analyzers::Tools.Analyzers.Core.AnalyzerConstants;
 
 namespace Tools.Analyzers.Core.UnitTests;
 
@@ -15,9 +15,7 @@ public static class Verify
     private static readonly Assembly[] AdditionalReferences =
     {
         typeof(Verify).Assembly,
-        //typeof(Error).Assembly,
-        typeof(ApiEmptyResult).Assembly
-        //typeof(IWebApiService).Assembly
+        typeof(AnalyzerConstants).Assembly
     };
 
     // HACK: we have to define the .NET 7.0 framework here,

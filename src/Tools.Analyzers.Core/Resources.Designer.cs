@@ -114,7 +114,7 @@ namespace Tools.Analyzers.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This method should return either a Task&lt;T&gt; or T, of a Result type..
+        ///   Looks up a localized string similar to This method should return a Result type..
         /// </summary>
         internal static string SAS010Description {
             get {
@@ -123,7 +123,7 @@ namespace Tools.Analyzers.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to If method &apos;{0}&apos; is supposed to be a service operation, then it should return either: &apos;Task&lt;ApiEmptyResult&gt;&apos;, &apos;Task&lt;ApiResult&lt;TResource, TResponse&gt;&gt;&apos;, &apos;Task&lt;ApiPostResult&lt;TResource, TResponse&gt;&gt;&apos; or &apos;ApiEmptyResult&apos;, &apos;ApiResult&lt;TResource, TResponse&gt;&apos; or &apos;ApiPostResult&lt;TResource, TResponse&gt;&apos;.
+        ///   Looks up a localized string similar to If method &apos;{0}&apos; is supposed to be a service operation, then it should return one of these possible types: &apos;{1}&apos;.
         /// </summary>
         internal static string SAS010MessageFormat {
             get {
@@ -276,7 +276,7 @@ namespace Tools.Analyzers.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This service operation should return an appropriate result..
+        ///   Looks up a localized string similar to This service operation should return an appropriate Result type for the operation..
         /// </summary>
         internal static string SAS016Description {
             get {
@@ -285,7 +285,7 @@ namespace Tools.Analyzers.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; is defined as a &apos;{1}&apos; operation, and should return a &apos;Task&lt;{2}&gt;&apos; or &apos;{2}&apos;.
+        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; is defined as a &apos;{1}&apos; operation, and can only return one of these types: &apos;{2}&apos;.
         /// </summary>
         internal static string SAS016MessageFormat {
             get {

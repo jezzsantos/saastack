@@ -294,7 +294,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         // We assume that the return type is anything but void
         bool IsCorrectReturnType(IMethodSymbol method)
         {
-            return !method.ReturnType.IsTypeOf(_voidSymbol);
+            return !method.ReturnType.IsOfType(_voidSymbol);
         }
 
         // We assume that the method one or two params:
@@ -317,7 +317,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             if (parameters.Length == 2)
             {
                 var secondParameter = parameters[1];
-                if (!secondParameter.Type.IsTypeOf(_cancellationTokenSymbol))
+                if (!secondParameter.Type.IsOfType(_cancellationTokenSymbol))
                 {
                     return true;
                 }

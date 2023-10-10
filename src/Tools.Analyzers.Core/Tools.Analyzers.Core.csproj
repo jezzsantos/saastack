@@ -10,6 +10,7 @@
         <PackageId>SaaStack.Tools.Analyzers.Core</PackageId>
         <Description>Roslyn analyzers for SaaStack codebases</Description>
         <PackageReleaseNotes>https://github.com/jezzsantos/saastack/blob/main/src/Tools.Analyzers.Core/README.md</PackageReleaseNotes>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageVersion>1.0.0</PackageVersion>
     </PropertyGroup>
 
@@ -65,8 +66,20 @@
         <Compile Include="..\Infrastructure.WebApi.Interfaces\EmptyResponse.cs">
             <Link>Reference\Infrastructure.WebApi.Interfaces\EmptyResponse.cs</Link>
         </Compile>
-        <Compile Include="..\Infrastructure.WebApi.Common\ApiResult.cs">
-            <Link>Reference\Infrastructure.WebApi.Common\ApiResult.cs</Link>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebSearchResponse.cs">
+            <Link>Reference\Infrastructure.WebApi.Interfaces\IWebSearchResponse.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\ApiResult.cs">
+            <Link>Reference\Infrastructure.WebApi.Interfaces\ApiResult.cs</Link>
+        </Compile>
+        <Compile Include="..\Application.Interfaces\Filtering.cs">
+            <Link>Reference\Application.Interfaces\Filtering.cs</Link>
+        </Compile>
+        <Compile Include="..\Application.Interfaces\SearchResultMetadata.cs">
+            <Link>Reference\Application.Interfaces\SearchResultMetadata.cs</Link>
+        </Compile>
+        <Compile Include="..\Application.Interfaces\Sorting.cs">
+            <Link>Reference\Application.Interfaces\Sorting.cs</Link>
         </Compile>
         <Compile Include="..\Common\Result.cs">
             <Link>Reference\Common\Result.cs</Link>
@@ -83,6 +96,10 @@
         <Compile Include="..\Common\Resources.Designer.cs">
             <Link>Reference\Common\Resources.Designer.cs</Link>
         </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
     <ItemGroup>

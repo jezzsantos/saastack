@@ -8,12 +8,12 @@ public static class SymbolExtensions
     public static AttributeData? GetAttribute(this ISymbol symbol, INamedTypeSymbol attributeType)
     {
         return symbol.GetAttributes()
-            .FirstOrDefault(attribute => attribute.AttributeClass!.IsTypeOf(attributeType));
+            .FirstOrDefault(attribute => attribute.AttributeClass!.IsOfType(attributeType));
     }
 
     public static INamedTypeSymbol? GetBaseType(this ITypeSymbol symbol, INamedTypeSymbol baseType)
     {
-        return symbol.AllInterfaces.FirstOrDefault(@interface => @interface.IsTypeOf(baseType));
+        return symbol.AllInterfaces.FirstOrDefault(@interface => @interface.IsOfType(baseType));
     }
 
     public static string GetMethodBody(this ISymbol method)
@@ -62,7 +62,7 @@ public static class SymbolExtensions
     public static bool IsDerivedFrom(this ITypeSymbol symbol, INamedTypeSymbol baseType)
     {
         ArgumentNullException.ThrowIfNull(baseType);
-        return symbol.AllInterfaces.Any(@interface => @interface.IsTypeOf(baseType));
+        return symbol.AllInterfaces.Any(@interface => @interface.IsOfType(baseType));
     }
 
     public static bool IsParameterless(this IMethodSymbol symbol)
@@ -86,7 +86,7 @@ public static class SymbolExtensions
         return symbol is { IsStatic: false, DeclaredAccessibility: Accessibility.Public or Accessibility.Internal };
     }
 
-    public static bool IsTypeOf(this ISymbol symbol, INamedTypeSymbol baseType)
+    public static bool IsOfType(this ISymbol symbol, INamedTypeSymbol baseType)
     {
         return SymbolEqualityComparer.Default.Equals(symbol.OriginalDefinition, baseType);
     }
