@@ -10,8 +10,8 @@ public class StatusesTestingOnlyResponse : IWebResponse
 
 public class StatusesTestingOnlySearchResponse : IWebSearchResponse
 {
-    public List<string>? Messages { get; set; }
-
     public SearchResultMetadata? Metadata { get; set; }
+
+    public List<string>? Messages { get; set; }
 }
 #endif

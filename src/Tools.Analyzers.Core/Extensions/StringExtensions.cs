@@ -6,6 +6,14 @@ namespace Common.Extensions;
 public static class StringExtensions
 {
     /// <summary>
+    ///     Formats the <see cref="value" /> with the <see cref="arguments" />
+    /// </summary>
+    public static string Format(this string value, params object[] arguments)
+    {
+        return string.Format(value, arguments);
+    }
+
+    /// <summary>
     ///     Whether the string value contains no value: it is either: null, empty or only whitespaces
     /// </summary>
     [ContractAnnotation("null => true; notnull => false")]
@@ -21,13 +29,5 @@ public static class StringExtensions
     public static bool HasValue(this string? value)
     {
         return !string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value);
-    }
-
-    /// <summary>
-    ///     Formats the <see cref="value" /> with the <see cref="arguments" />
-    /// </summary>
-    public static string Format(this string value, params object[] arguments)
-    {
-        return string.Format(value, arguments);
     }
 }

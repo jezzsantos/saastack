@@ -38,9 +38,9 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
 public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDisposable
     where THost : class
 {
-    private readonly WebApplicationFactory<THost> _setup;
     protected readonly IHttpJsonClient Api;
     protected readonly HttpClient HttpApi;
+    private readonly WebApplicationFactory<THost> _setup;
 
     protected WebApiSpec(WebApiSetup<THost> setup)
     {

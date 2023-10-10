@@ -65,6 +65,11 @@ public static class SymbolExtensions
         return symbol.AllInterfaces.Any(@interface => @interface.IsOfType(baseType));
     }
 
+    public static bool IsOfType(this ISymbol symbol, INamedTypeSymbol baseType)
+    {
+        return SymbolEqualityComparer.Default.Equals(symbol.OriginalDefinition, baseType);
+    }
+
     public static bool IsParameterless(this IMethodSymbol symbol)
     {
         return symbol.Parameters.Length == 0;
@@ -84,10 +89,5 @@ public static class SymbolExtensions
     public static bool IsPublicOrInternalInstanceMethod(this IMethodSymbol symbol)
     {
         return symbol is { IsStatic: false, DeclaredAccessibility: Accessibility.Public or Accessibility.Internal };
-    }
-
-    public static bool IsOfType(this ISymbol symbol, INamedTypeSymbol baseType)
-    {
-        return SymbolEqualityComparer.Default.Equals(symbol.OriginalDefinition, baseType);
     }
 }
