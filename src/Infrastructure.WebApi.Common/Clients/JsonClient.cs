@@ -126,7 +126,7 @@ public class JsonClient : IHttpJsonClient
     {
         var requestUri = request.GetRequestInfo().Route;
         var content = new StringContent(request.ToJson()!, new MediaTypeHeaderValue(HttpContentTypes.Json));
-        
+
         return await SendRequestAsync(method, requestUri, content, requestFilter, cancellationToken);
     }
 

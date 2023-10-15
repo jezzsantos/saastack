@@ -598,7 +598,6 @@ public class AClass : IWebApiService
 
             await Verify.DiagnosticExists<WebApiClassAnalyzer>(input, (WebApiClassAnalyzer.Sas013, 10, 27, "AMethod"),
                 (WebApiClassAnalyzer.Sas017, 10, 35, "TestNoneRequest"));
-
         }
 
         [Fact]

@@ -32,11 +32,9 @@ public class ApiRequestCorrelationSpec
         [Fact]
         public async Task WhenGetWithRequestId_ThenReturnsSameResponseHeader()
         {
-            var result = await Api.GetAsync(new RequestCorrelationsTestingOnlyRequest(), message =>
-            {
-                message.Headers.Add("Request-ID", "acorrelationid");
-            });
-            
+            var result = await Api.GetAsync(new RequestCorrelationsTestingOnlyRequest(),
+                message => { message.Headers.Add("Request-ID", "acorrelationid"); });
+
             result.StatusCode.Should().Be(HttpStatusCode.OK);
             result.Headers.GetValues(HttpHeaders.RequestId).FirstOrDefault().Should()
                 .Be("acorrelationid");
@@ -45,10 +43,8 @@ public class ApiRequestCorrelationSpec
         [Fact]
         public async Task WhenGetWithXRequestId_ThenReturnsSameResponseHeader()
         {
-            var result = await Api.GetAsync(new RequestCorrelationsTestingOnlyRequest(), message =>
-            {
-                message.Headers.Add("X-Request-ID", "acorrelationid");
-            });
+            var result = await Api.GetAsync(new RequestCorrelationsTestingOnlyRequest(),
+                message => { message.Headers.Add("X-Request-ID", "acorrelationid"); });
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
             result.Headers.GetValues(HttpHeaders.RequestId).FirstOrDefault().Should()
@@ -58,10 +54,8 @@ public class ApiRequestCorrelationSpec
         [Fact]
         public async Task WhenGetWithXCorrelationId_ThenReturnsSameResponseHeader()
         {
-            var result = await Api.GetAsync(new RequestCorrelationsTestingOnlyRequest(), message =>
-            {
-                message.Headers.Add("X-Correlation-ID", "acorrelationid");
-            });
+            var result = await Api.GetAsync(new RequestCorrelationsTestingOnlyRequest(),
+                message => { message.Headers.Add("X-Correlation-ID", "acorrelationid"); });
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
             result.Headers.GetValues(HttpHeaders.RequestId).FirstOrDefault().Should()

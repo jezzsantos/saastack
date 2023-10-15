@@ -15,7 +15,8 @@ namespace Tools.Generators.WebApi;
 ///     2. They return type that is not void
 ///     3. They have a request DTO type derived from <see cref="_webRequestInterfaceSymbol" /> as their first parameter
 ///     4. They may have a <see cref="CancellationToken" /> as their second parameter, but no other parameters
-///     5. Their request DTO type is decorated with the <see cref="_routeAttributeSymbol" /> attribute, and have both a route and operation
+///     5. Their request DTO type is decorated with the <see cref="_routeAttributeSymbol" /> attribute, and have both a
+///     route and operation
 /// </summary>
 public class WebApiAssemblyVisitor : SymbolVisitor
 {
@@ -24,11 +25,11 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
     private readonly CancellationToken _cancellationToken;
     private readonly INamedTypeSymbol _cancellationTokenSymbol;
+    private readonly INamedTypeSymbol _routeAttributeSymbol;
     private readonly INamedTypeSymbol _serviceInterfaceSymbol;
     private readonly INamedTypeSymbol _voidSymbol;
     private readonly INamedTypeSymbol _webRequestInterfaceSymbol;
     private readonly INamedTypeSymbol _webRequestResponseInterfaceSymbol;
-    private readonly INamedTypeSymbol _routeAttributeSymbol;
 
     public WebApiAssemblyVisitor(CancellationToken cancellationToken, Compilation compilation)
     {

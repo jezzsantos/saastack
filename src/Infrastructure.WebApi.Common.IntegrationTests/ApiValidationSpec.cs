@@ -60,6 +60,7 @@ public class ApiValidationSpec : WebApiSpec<Program>
             new() { Rule = "NotEmptyValidator", Reason = "'Field2' must not be empty.", Value = null }
         });
     }
+
     [Fact]
     public async Task WhenGetValidatedRequestWithValidId_ThenReturnsResponse()
     {

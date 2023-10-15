@@ -24,7 +24,7 @@ public static class DiagnosticExtensions
         var diagnostic = Diagnostic.Create(descriptor, identifier.GetLocation(), arguments.ToArray());
         context.ReportDiagnostic(diagnostic);
     }
-    
+
     public static void ReportDiagnostic(this SyntaxNodeAnalysisContext context, DiagnosticDescriptor descriptor,
         MethodDeclarationSyntax methodDeclarationSyntax, params object?[]? messageArgs)
     {

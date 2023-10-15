@@ -1,6 +1,8 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=DE31F486_002DAE81_002D49C0_002DBA00_002D3A6A325B7C42_002Ff_003AAnalyzerReleases_002EShipped_002Emd/@EntryIndexedValue">ExplicitlyExcluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=DE31F486_002DAE81_002D49C0_002DBA00_002D3A6A325B7C42_002Ff_003AAnalyzerReleases_002EUnshipped_002Emd/@EntryIndexedValue">ExplicitlyExcluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=7AB39FD6_002D660F_002D4400_002D9955_002DB92684378492_002Fd_003AReference/@EntryIndexedValue">7AB39FD6-660F-4400-9955-B92684378492/d:Reference</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/GeneratedFilesAndFolders/=DE31F486_002DAE81_002D49C0_002DBA00_002D3A6A325B7C42_002Fd_003AReference/@EntryIndexedValue">DE31F486-AE81-49C0-BA00-3A6A325B7C42/d:Reference</s:String>
 	
 	
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ArrangeNamespaceBody/@EntryIndexedValue">WARNING</s:String>

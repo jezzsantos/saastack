@@ -36,7 +36,6 @@ public class ApiErrorSpec : WebApiSpec<Program>
         result.Content.Error.Instance.Should().Be("http://localhost/testingonly/errors/throws");
         result.Content.Error.Exception.Should().StartWith("System.InvalidOperationException: amessage");
         result.Content.Error.Errors.Should().BeNull();
-        
     }
 }
 #endif

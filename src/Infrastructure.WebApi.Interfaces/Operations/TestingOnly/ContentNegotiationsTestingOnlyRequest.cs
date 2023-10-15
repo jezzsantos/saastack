@@ -8,6 +8,5 @@ namespace Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
 public class ContentNegotiationsTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>
 {
     public string? Format { get; set; }
-
 }
 #endif
