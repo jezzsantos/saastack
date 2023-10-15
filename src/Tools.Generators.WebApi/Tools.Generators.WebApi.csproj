@@ -21,11 +21,11 @@
         <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebRequest.cs">
             <Link>Reference\Infrastructure.WebApi.Interfaces\IWebRequest.cs</Link>
         </Compile>
-        <Compile Include="..\Infrastructure.WebApi.Interfaces\WebApiOperation.cs">
-            <Link>Reference\Infrastructure.WebApi.Interfaces\WebApiOperation.cs</Link>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\ServiceOperation.cs">
+            <Link>Reference\Infrastructure.WebApi.Interfaces\ServiceOperation.cs</Link>
         </Compile>
-        <Compile Include="..\Infrastructure.WebApi.Interfaces\WebApiRouteAttribute.cs">
-            <Link>Reference\Infrastructure.WebApi.Interfaces\WebApiRouteAttribute.cs</Link>
+        <Compile Include="..\Infrastructure.WebApi.Interfaces\RouteAttribute.cs">
+            <Link>Reference\Infrastructure.WebApi.Interfaces\RouteAttribute.cs</Link>
         </Compile>
     </ItemGroup>
 

@@ -113,9 +113,9 @@ namespace {assemblyNamespace}
             {
                 endpointRegistrations.AppendLine(
                     $"            {groupName}.{routeEndpointMethod}(\"{registration.RoutePath}\",");
-                if (registration.OperationType == WebApiOperation.Get
-                    || registration.OperationType == WebApiOperation.Search
-                    || registration.OperationType == WebApiOperation.Delete)
+                if (registration.OperationType == ServiceOperation.Get
+                    || registration.OperationType == ServiceOperation.Search
+                    || registration.OperationType == ServiceOperation.Delete)
                 {
                     endpointRegistrations.AppendLine(
                         $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDtoType.FullName} request) =>");
@@ -186,7 +186,7 @@ namespace {assemblyNamespace}
             handlerClasses.AppendLine(
                 $"            var result = {asyncAwait}api.{registration.MethodName}(request{hasCancellationToken});");
             handlerClasses.AppendLine(
-                $"            return result.HandleApiResult(global::Infrastructure.WebApi.Interfaces.WebApiOperation.{registration.OperationType});");
+                $"            return result.HandleApiResult(global::Infrastructure.WebApi.Interfaces.ServiceOperation.{registration.OperationType});");
             handlerClasses.AppendLine("        }");
             handlerClasses.AppendLine("    }");
             if (registration.IsTestingOnly)
@@ -273,15 +273,15 @@ namespace {assemblyNamespace}
         return visitor.OperationRegistrations;
     }
 
-    private static string[] ToMinimalApiRegistrationMethodNames(WebApiOperation operation)
+    private static string[] ToMinimalApiRegistrationMethodNames(ServiceOperation operation)
     {
         return operation switch
         {
-            WebApiOperation.Get => new[] { "MapGet" },
-            WebApiOperation.Search => new[] { "MapGet" },
-            WebApiOperation.Post => new[] { "MapPost" },
-            WebApiOperation.PutPatch => new[] { "MapPut", "MapPatch" },
-            WebApiOperation.Delete => new[] { "MapDelete" },
+            ServiceOperation.Get => new[] { "MapGet" },
+            ServiceOperation.Search => new[] { "MapGet" },
+            ServiceOperation.Post => new[] { "MapPost" },
+            ServiceOperation.PutPatch => new[] { "MapPut", "MapPatch" },
+            ServiceOperation.Delete => new[] { "MapDelete" },
             _ => new[] { "MapGet" }
         };
     }

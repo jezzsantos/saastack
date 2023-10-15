@@ -28,6 +28,7 @@ public class RequestCorrelationFilter : IEndpointFilter
             SaveToRequestPipeline(context.HttpContext, correlationId);
         }
 
+        // Complete the request and response pipelines
         var response = await next(context);
 
         SetOnResponse(context.HttpContext, correlationId);

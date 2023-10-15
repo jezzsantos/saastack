@@ -6,15 +6,15 @@ namespace Infrastructure.WebApi.Interfaces;
 /// <summary>
 ///     Provides a declarative way to define a REST route and service operation
 /// </summary>
-[AttributeUsage(AttributeTargets.Method, Inherited = false)]
-public class WebApiRouteAttribute : Attribute
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
+public class RouteAttribute : Attribute
 {
-    public WebApiRouteAttribute([StringSyntax("Route")] string routeTemplate, WebApiOperation operation,
+    public RouteAttribute([StringSyntax("Route")] string routeTemplate, ServiceOperation operation,
         bool isTestingOnly = false)
     {
-        if (!Enum.IsDefined(typeof(WebApiOperation), operation))
+        if (!Enum.IsDefined(typeof(ServiceOperation), operation))
         {
-            throw new InvalidEnumArgumentException(nameof(operation), (int)operation, typeof(WebApiOperation));
+            throw new InvalidEnumArgumentException(nameof(operation), (int)operation, typeof(ServiceOperation));
         }
 
         RouteTemplate = routeTemplate;
@@ -24,7 +24,7 @@ public class WebApiRouteAttribute : Attribute
 
     public bool IsTestingOnly { get; }
 
-    public WebApiOperation Operation { get; }
+    public ServiceOperation Operation { get; }
 
     public string RouteTemplate { get; }
 }

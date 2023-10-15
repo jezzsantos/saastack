@@ -9,7 +9,8 @@
  SAS010  | SaaStackWebApi        | Warning  | The service operation returns wrong type.                
  SAS011  | SaaStackWebApi        | Warning  | The service operation first param is invalid.            
  SAS012  | SaaStackWebApi        | Warning  | The service operation second param is invalid.           
- SAS013  | SaaStackWebApi        | Warning  | The service operation missing attribute.                 
+ SAS013  | SaaStackWebApi        | Warning  | The service operation request type is missing attribute. 
  SAS014  | SaaStackWebApi        | Warning  | A service operation has wrong primary resource.          
  SAS015  | SaaStackWebApi        | Warning  | A service operation has duplicate request type.          
  SAS016  | SaaStackWebApi        | Warning  | A service operation should return an appropriate result. 
+ SAS017  | SaaStackWebApi        | Warning  | A request type is missing attribute.                     

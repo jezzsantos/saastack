@@ -2,6 +2,7 @@
 using System.Net;
 using ApiHost1;
 using FluentAssertions;
+using Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
 using IntegrationTesting.WebApi.Common;
 using JetBrains.Annotations;
 using Xunit;
@@ -21,11 +22,7 @@ public class ApiRequestCorrelationSpec
         [Fact]
         public async Task WhenGetWithNoRequestId_ThenReturnsGeneratedResponseHeader()
         {
-            var result = await HttpApi.SendAsync(new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri("testingonly/correlations/get", UriKind.Relative)
-            });
+            var result = await Api.GetAsync(new RequestCorrelationsTestingOnlyRequest());
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
             result.Headers.GetValues(HttpHeaders.RequestId).FirstOrDefault().Should()
@@ -35,13 +32,11 @@ public class ApiRequestCorrelationSpec
         [Fact]
         public async Task WhenGetWithRequestId_ThenReturnsSameResponseHeader()
         {
-            var result = await HttpApi.SendAsync(new HttpRequestMessage
+            var result = await Api.GetAsync(new RequestCorrelationsTestingOnlyRequest(), message =>
             {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri("testingonly/correlations/get", UriKind.Relative),
-                Headers = { { "Request-ID", "acorrelationid" } }
+                message.Headers.Add("Request-ID", "acorrelationid");
             });
-
+            
             result.StatusCode.Should().Be(HttpStatusCode.OK);
             result.Headers.GetValues(HttpHeaders.RequestId).FirstOrDefault().Should()
                 .Be("acorrelationid");
@@ -50,11 +45,9 @@ public class ApiRequestCorrelationSpec
         [Fact]
         public async Task WhenGetWithXRequestId_ThenReturnsSameResponseHeader()
         {
-            var result = await HttpApi.SendAsync(new HttpRequestMessage
+            var result = await Api.GetAsync(new RequestCorrelationsTestingOnlyRequest(), message =>
             {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri("testingonly/correlations/get", UriKind.Relative),
-                Headers = { { "X-Request-ID", "acorrelationid" } }
+                message.Headers.Add("X-Request-ID", "acorrelationid");
             });
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -65,11 +58,9 @@ public class ApiRequestCorrelationSpec
         [Fact]
         public async Task WhenGetWithXCorrelationId_ThenReturnsSameResponseHeader()
         {
-            var result = await HttpApi.SendAsync(new HttpRequestMessage
+            var result = await Api.GetAsync(new RequestCorrelationsTestingOnlyRequest(), message =>
             {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri("testingonly/correlations/get", UriKind.Relative),
-                Headers = { { "X-Correlation-ID", "acorrelationid" } }
+                message.Headers.Add("X-Correlation-ID", "acorrelationid");
             });
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -88,7 +79,7 @@ public class ApiRequestCorrelationSpec
         [Fact]
         public async Task WhenGetWithNoRequestId_ThenReturnsGeneratedResponseHeader()
         {
-            var result = await Api.GetAsync("testingonly/correlations/get");
+            var result = await Api.GetAsync(new RequestCorrelationsTestingOnlyRequest());
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
             result.RequestId.Should().NotBeNullOrEmpty();

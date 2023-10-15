@@ -30,6 +30,7 @@ public static class HostExtensions
 
         var app = builder.Build();
 
+        app.EnableRequestRewind();
         app.AddExceptionShielding();
 
         modules.ConfigureHost(app);

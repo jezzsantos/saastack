@@ -1,8 +1,6 @@
-using JetBrains.Annotations;
-
 namespace Infrastructure.WebApi.Interfaces.Operations.Cars;
 
-[UsedImplicitly]
+[Route("/cars/{id}/offline", ServiceOperation.PutPatch)]
 public class TakeOfflineCarRequest : IWebRequest<GetCarResponse>
 {
     public DateTime? EndAtUtc { get; set; }

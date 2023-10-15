@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Infrastructure.WebApi.Common;
 
@@ -17,10 +16,11 @@ namespace Infrastructure.WebApi.Common;
 public sealed class XmlHttpResult<TValue> : IResult, IStatusCodeHttpResult, IValueHttpResult, IValueHttpResult<TValue>,
     IContentTypeHttpResult
 {
-    internal XmlHttpResult(TValue? value, int? statusCode, XmlSerializerOptions? xmlSerializerOptions = null)
+    internal XmlHttpResult(TValue? value, int? statusCode, string? contentType = null,
+        XmlSerializerOptions? xmlSerializerOptions = null)
     {
         Value = value;
-        ContentType = HttpContentTypes.XmlWithCharset;
+        ContentType = contentType;
         XmlSerializerOptions = xmlSerializerOptions;
 
         if (value is ProblemDetails problemDetails)
@@ -100,7 +100,7 @@ internal static partial class MicrosoftAspNetCoreExtensions
             throw new ArgumentNullException(nameof(response));
         }
 
-        options ??= ResolveSerializerOptions(response.HttpContext);
+        options ??= response.HttpContext.ResolveXmlSerializerOptions();
 
         response.ContentType = contentType ?? HttpContentTypes.XmlWithCharset;
 
@@ -126,7 +126,7 @@ internal static partial class MicrosoftAspNetCoreExtensions
             throw new ArgumentNullException(nameof(type));
         }
 
-        options ??= ResolveSerializerOptions(response.HttpContext);
+        options ??= response.HttpContext.ResolveXmlSerializerOptions();
 
         response.ContentType = contentType ?? HttpContentTypes.XmlWithCharset;
 
@@ -161,13 +161,6 @@ internal static partial class MicrosoftAspNetCoreExtensions
         catch (OperationCanceledException)
         {
         }
-    }
-
-    private static XmlSerializerOptions ResolveSerializerOptions(HttpContext httpContext)
-    {
-        // Attempt to resolve options from DI then fallback to default options
-        return httpContext.RequestServices.GetService<IOptions<XmlOptions>>()
-            ?.Value.SerializerOptions ?? XmlOptions.DefaultSerializerOptions;
     }
 
     /// <summary>

@@ -13,9 +13,9 @@ namespace Tools.Generators.WebApi;
 ///     Where the methods represent service operations, that are:
 ///     1. Have any method name
 ///     2. They return type that is not void
-///     3. They have a request dto type derived from <see cref="_webRequestInterfaceSymbol" /> as their first parameter
+///     3. They have a request DTO type derived from <see cref="_webRequestInterfaceSymbol" /> as their first parameter
 ///     4. They may have a <see cref="CancellationToken" /> as their second parameter, but no other parameters
-///     5. Are decorated with the <see cref="_webRouteAttributeSymbol" /> attribute, and have both a route and operation
+///     5. Their request DTO type is decorated with the <see cref="_routeAttributeSymbol" /> attribute, and have both a route and operation
 /// </summary>
 public class WebApiAssemblyVisitor : SymbolVisitor
 {
@@ -28,7 +28,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
     private readonly INamedTypeSymbol _voidSymbol;
     private readonly INamedTypeSymbol _webRequestInterfaceSymbol;
     private readonly INamedTypeSymbol _webRequestResponseInterfaceSymbol;
-    private readonly INamedTypeSymbol _webRouteAttributeSymbol;
+    private readonly INamedTypeSymbol _routeAttributeSymbol;
 
     public WebApiAssemblyVisitor(CancellationToken cancellationToken, Compilation compilation)
     {
@@ -36,7 +36,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         _serviceInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebApiService).FullName!)!;
         _webRequestInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebRequest).FullName!)!;
         _webRequestResponseInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebRequest<>).FullName!)!;
-        _webRouteAttributeSymbol = compilation.GetTypeByMetadataName(typeof(WebApiRouteAttribute).FullName!)!;
+        _routeAttributeSymbol = compilation.GetTypeByMetadataName(typeof(RouteAttribute).FullName!)!;
         _cancellationTokenSymbol = compilation.GetTypeByMetadataName(typeof(CancellationToken).FullName!)!;
         _voidSymbol = compilation.GetTypeByMetadataName(typeof(void).FullName!)!;
     }
@@ -169,7 +169,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             var routePath = attributeParameters[0].Value!.ToString()!;
             var operationType = attributeParameters.Length >= 2
                 ? FromOperationVerb(attributeParameters[1].Value!.ToString()!)
-                : WebApiOperation.Get;
+                : ServiceOperation.Get;
             var isTestingOnly = attributeParameters.Length >= 3
                 ? bool.Parse(attributeParameters[2].Value!.ToString()!)
                 : false;
@@ -206,14 +206,14 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             return new TypeName(symbol.ContainingNamespace.ToDisplayString(), symbol.Name);
         }
 
-        static WebApiOperation FromOperationVerb(string? operation)
+        static ServiceOperation FromOperationVerb(string? operation)
         {
             if (operation is null)
             {
-                return WebApiOperation.Get;
+                return ServiceOperation.Get;
             }
 
-            return Enum.Parse<WebApiOperation>(operation, true);
+            return Enum.Parse<ServiceOperation>(operation, true);
         }
 
         // We assume that the request type derives from IWebRequest<TResponse>
@@ -326,10 +326,18 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             return false;
         }
 
-        // We assume it is decorated with a WebRouteAttribute
+        // We assume that the request DTO it is decorated with a RouteAttribute
         bool HasRouteAttribute(IMethodSymbol method, out AttributeData? routeAttribute)
         {
-            routeAttribute = method.GetAttribute(_webRouteAttributeSymbol);
+            var parameters = method.Parameters;
+            if (parameters.Length == 0)
+            {
+                routeAttribute = null;
+                return false;
+            }
+
+            var requestDto = method.Parameters[0].Type;
+            routeAttribute = requestDto.GetAttribute(_routeAttributeSymbol);
             return routeAttribute is not null;
         }
     }
@@ -348,7 +356,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
         public required string MethodName { get; init; }
 
-        public required WebApiOperation OperationType { get; init; }
+        public required ServiceOperation OperationType { get; init; }
 
         public required TypeName RequestDtoType { get; init; }
 

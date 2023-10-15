@@ -18,36 +18,57 @@ public class ApiValidationSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenGetUnvalidatedRequest_ThenReturns200()
     {
-        var result = await Api.GetAsync<StringMessageTestingOnlyResponse>("/testingonly/validations/unvalidated");
+        var result = await Api.GetAsync(new ValidationsUnvalidatedTestingOnlyRequest());
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Content.Message.Should().Be("amessage");
+        result.Content.Value.Message.Should().Be("amessage");
     }
 
     [Fact]
     public async Task WhenGetValidatedRequestWithInvalidFields_ThenReturnsValidationError()
     {
-        var result = await Api.GetAsync("/testingonly/validations/validated/1234");
+        var result = await Api.GetAsync(new ValidationsValidatedTestingOnlyRequest { Id = "1234" });
 
         result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        result.Content.Should().Be("{" + "\"type\":\"NotEmptyValidator\"," + "\"title\":\"Validation Error\","
-                                   + "\"status\":400,"
-                                   + "\"detail\":\"'Field1' must not be empty.\","
-                                   + "\"instance\":\"http://localhost/testingonly/validations/validated/1234\","
-                                   + "\"errors\":["
-                                   + "{\"rule\":\"NotEmptyValidator\",\"reason\":\"'Field1' must not be empty.\"},"
-                                   + "{\"rule\":\"NotEmptyValidator\",\"reason\":\"'Field2' must not be empty.\"}]}");
+        result.Content.Error.Type.Should().Be("NotEmptyValidator");
+        result.Content.Error.Title.Should().Be("Validation Error");
+        result.Content.Error.Status.Should().Be(400);
+        result.Content.Error.Detail.Should().Be("'Field1' must not be empty.");
+        result.Content.Error.Instance.Should().Be("http://localhost/testingonly/validations/validated/1234");
+        result.Content.Error.Exception.Should().BeNull();
+        result.Content.Error.Errors.Should().BeEquivalentTo(new ValidatorProblem[]
+        {
+            new() { Rule = "NotEmptyValidator", Reason = "'Field1' must not be empty.", Value = null },
+            new() { Rule = "NotEmptyValidator", Reason = "'Field2' must not be empty.", Value = null }
+        });
     }
 
+    [Fact]
+    public async Task WhenGetValidatedRequestWithPartialInvalidFields_ThenReturnsValidationError()
+    {
+        var result = await Api.GetAsync(new ValidationsValidatedTestingOnlyRequest { Id = "1234", Field1 = "123" });
+
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        result.Content.Error.Type.Should().Be("NotEmptyValidator");
+        result.Content.Error.Title.Should().Be("Validation Error");
+        result.Content.Error.Status.Should().Be(400);
+        result.Content.Error.Detail.Should().Be("'Field2' must not be empty.");
+        result.Content.Error.Instance.Should().Be("http://localhost/testingonly/validations/validated/1234?field1=123");
+        result.Content.Error.Exception.Should().BeNull();
+        result.Content.Error.Errors.Should().BeEquivalentTo(new ValidatorProblem[]
+        {
+            new() { Rule = "NotEmptyValidator", Reason = "'Field2' must not be empty.", Value = null }
+        });
+    }
     [Fact]
     public async Task WhenGetValidatedRequestWithValidId_ThenReturnsResponse()
     {
         var result =
-            await Api.GetAsync<StringMessageTestingOnlyResponse>(
-                "/testingonly/validations/validated/1234?Field1=123&Field2=456");
+            await Api.GetAsync(new ValidationsValidatedTestingOnlyRequest
+                { Id = "1234", Field1 = "123", Field2 = "456" });
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Content.Message.Should().Be("amessage123");
+        result.Content.Value.Message.Should().Be("amessage123");
     }
 }
 #endif

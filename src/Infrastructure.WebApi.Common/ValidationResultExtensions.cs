@@ -13,7 +13,7 @@ public static class ValidationResultExtensions
     /// </summary>
     public static ProblemDetails ToRfc7807(this ValidationResult result, string requestUrl)
     {
-        var validationDetails = result.Errors.Select(error => new
+        var validationDetails = result.Errors.Select(error => new ValidatorProblem
             {
                 Rule = error.ErrorCode,
                 Reason = error.ErrorMessage,

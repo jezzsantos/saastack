@@ -18,67 +18,66 @@ public class ApiDefaultStatusCode : WebApiSpec<Program>
     [Fact]
     public async Task WhenPost_ThenReturnsCreated()
     {
-        var result = await Api.PostAsync("/testingonly/statuses/post", new StatusesPostTestingOnlyRequest());
+        var result = await Api.PostAsync(new StatusesPostTestingOnlyRequest());
 
         result.StatusCode.Should().Be(HttpStatusCode.Created);
         result.Headers.Location.Should().Be("alocation");
-        result.Content.Message.Should().Be("amessage");
+        result.Content.Value.Message.Should().Be("amessage");
     }
 
     [Fact]
     public async Task WhenPostWithoutLocation_ThenReturnsOk()
     {
-        var result = await Api.PostAsync("/testingonly/statuses/post2",
-            new StatusesPostWithLocationTestingOnlyRequest());
+        var result = await Api.PostAsync(new StatusesPostWithLocationTestingOnlyRequest());
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
         result.Headers.Location.Should().BeNull();
-        result.Content.Message.Should().Be("amessage");
+        result.Content.Value.Message.Should().Be("amessage");
     }
 
     [Fact]
     public async Task WhenGet_ThenReturnsOk()
     {
-        var result = await Api.GetAsync<StatusesTestingOnlyResponse>("/testingonly/statuses/get");
+        var result = await Api.GetAsync(new StatusesGetTestingOnlyRequest());
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Content.Message.Should().Be("amessage");
+        result.Content.Value.Message.Should().Be("amessage");
     }
 
     [Fact]
     public async Task WhenSearch_ThenReturnsOk()
     {
-        var result = await Api.GetAsync<StatusesTestingOnlySearchResponse>("/testingonly/statuses/search");
+        var result = await Api.GetAsync(new StatusesSearchTestingOnlyRequest());
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Content.Messages.Should().ContainInOrder("amessage");
+        result.Content.Value.Messages.Should().ContainInOrder("amessage");
     }
 
     [Fact]
     public async Task WhenPut_ThenReturnsAccepted()
     {
-        var result = await Api.PutAsync("/testingonly/statuses/putpatch", new StatusesPutPatchTestingOnlyRequest());
+        var result = await Api.PutAsync(new StatusesPutPatchTestingOnlyRequest());
 
         result.StatusCode.Should().Be(HttpStatusCode.Accepted);
-        result.Content.Message.Should().Be("amessage");
+        result.Content.Value.Message.Should().Be("amessage");
     }
 
     [Fact]
     public async Task WhenPatch_ThenReturnsAccepted()
     {
-        var result = await Api.PatchAsync("/testingonly/statuses/putpatch", new StatusesPutPatchTestingOnlyRequest());
+        var result = await Api.PatchAsync(new StatusesPutPatchTestingOnlyRequest());
 
         result.StatusCode.Should().Be(HttpStatusCode.Accepted);
-        result.Content.Message.Should().Be("amessage");
+        result.Content.Value.Message.Should().Be("amessage");
     }
 
     [Fact]
     public async Task WhenDelete_ThenReturnsNoContent()
     {
-        var result = await Api.DeleteAsync("/testingonly/statuses/delete");
+        var result = await Api.DeleteAsync(new StatusesDeleteTestingOnlyRequest());
 
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);
-        result.Content.Should().BeEmpty();
+        result.Content.HasValue.Should().BeFalse();
     }
 }
 #endif

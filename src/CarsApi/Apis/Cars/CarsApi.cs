@@ -18,14 +18,12 @@ public class CarsApi : IWebApiService
         _carsApplication = carsApplication;
     }
 
-    [WebApiRoute("/cars/{id}", WebApiOperation.Delete)]
     public async Task<ApiDeleteResult> Delete(DeleteCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.DeleteCarAsync(_context, request.Id, cancellationToken);
         return () => car.HandleApplicationResult();
     }
 
-    [WebApiRoute("/cars/{id}", WebApiOperation.Get)]
     public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
@@ -33,7 +31,6 @@ public class CarsApi : IWebApiService
         return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }
 
-    [WebApiRoute("/cars", WebApiOperation.Post)]
     public async Task<ApiPostResult<Car, GetCarResponse>> Register(RegisterCarRequest request,
         CancellationToken cancellationToken)
     {
@@ -44,7 +41,6 @@ public class CarsApi : IWebApiService
             new PostResult<GetCarResponse>(new GetCarResponse { Car = c }, $"/cars/{c.Id}"));
     }
 
-    [WebApiRoute("/cars", WebApiOperation.Search)]
     public async Task<ApiSearchResult<Car, SearchAllCarsResponse>> SearchAll(SearchAllCarsRequest request,
         CancellationToken cancellationToken)
     {
@@ -55,7 +51,6 @@ public class CarsApi : IWebApiService
             cars.HandleApplicationResult(c => new SearchAllCarsResponse { Cars = c.Results, Metadata = c.Metadata });
     }
 
-    [WebApiRoute("/cars/{id}/offline", WebApiOperation.PutPatch)]
     public async Task<ApiPutPatchResult<Car, GetCarResponse>> TakeOffline(TakeOfflineCarRequest request,
         CancellationToken cancellationToken)
     {

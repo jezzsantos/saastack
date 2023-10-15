@@ -7,19 +7,18 @@ namespace Tools.Analyzers.Core.Extensions;
 
 internal static class SyntaxFilterExtensions
 {
-    public static AttributeData? GetAttributeOfType<TAttribute>(this MethodDeclarationSyntax methodDeclarationSyntax,
+    public static AttributeData? GetAttributeOfType<TAttribute>(this ISymbol? symbol,
         SyntaxNodeAnalysisContext context)
     {
-        var symbol = context.SemanticModel.GetDeclaredSymbol(methodDeclarationSyntax);
         if (symbol is null)
         {
             return null;
         }
 
-        var attributeType = context.Compilation.GetTypeByMetadataName(typeof(TAttribute).FullName!)!;
+        var attributeMetadata = context.Compilation.GetTypeByMetadataName(typeof(TAttribute).FullName!)!;
         var attributes = symbol.GetAttributes();
 
-        return attributes.FirstOrDefault(attr => attr.AttributeClass!.IsOfType(attributeType));
+        return attributes.FirstOrDefault(attr => attr.AttributeClass!.IsOfType(attributeMetadata));
     }
 
     public static ITypeSymbol? GetBaseOfType<TType>(this ParameterSyntax parameterSyntax,
@@ -31,15 +30,14 @@ internal static class SyntaxFilterExtensions
             return null;
         }
 
-        var parameterType = context.Compilation.GetTypeByMetadataName(typeof(TType).FullName!)!;
-
-        var isOfType = symbol.Type.IsOfType(parameterType);
+        var parameterMetadata = context.Compilation.GetTypeByMetadataName(typeof(TType).FullName!)!;
+        var isOfType = symbol.Type.IsOfType(parameterMetadata);
         if (isOfType)
         {
             return null;
         }
 
-        var isDerivedFrom = symbol.Type.AllInterfaces.Any(@interface => @interface.IsOfType(parameterType));
+        var isDerivedFrom = symbol.Type.AllInterfaces.Any(@interface => @interface.IsOfType(parameterMetadata));
         if (isDerivedFrom)
         {
             return symbol.Type;
@@ -161,9 +159,9 @@ internal static class SyntaxFilterExtensions
             return false;
         }
 
-        var parentType = context.Compilation.GetTypeByMetadataName(typeof(TParent).FullName!)!;
+        var parentMetadata = context.Compilation.GetTypeByMetadataName(typeof(TParent).FullName!)!;
 
-        var isOfType = symbol.AllInterfaces.Any(@interface => @interface.IsOfType(parentType));
+        var isOfType = symbol.AllInterfaces.Any(@interface => @interface.IsOfType(parentMetadata));
 
         return !isOfType;
     }
@@ -176,15 +174,15 @@ internal static class SyntaxFilterExtensions
             return false;
         }
 
-        var parameterType = context.Compilation.GetTypeByMetadataName(typeof(TType).FullName!)!;
+        var parameterMetadata = context.Compilation.GetTypeByMetadataName(typeof(TType).FullName!)!;
 
-        var isOfType = symbol.Type.IsOfType(parameterType);
+        var isOfType = symbol.Type.IsOfType(parameterMetadata);
         if (isOfType)
         {
             return false;
         }
 
-        var isDerivedFrom = symbol.Type.AllInterfaces.Any(@interface => @interface.IsOfType(parameterType));
+        var isDerivedFrom = symbol.Type.AllInterfaces.Any(@interface => @interface.IsOfType(parameterMetadata));
 
         return !isDerivedFrom;
     }

@@ -7,7 +7,6 @@ namespace ApiHost1.Apis.TestingOnly;
 
 public class TestingWebApi : IWebApiService
 {
-    [WebApiRoute("testingonly/negotiations/get", WebApiOperation.Get, true)]
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ContentNegotiationGet(
         ContentNegotiationsTestingOnlyRequest request, CancellationToken cancellationToken)
     {
@@ -16,7 +15,6 @@ public class TestingWebApi : IWebApiService
             { Message = "amessage" });
     }
 
-    [WebApiRoute("/testingonly/errors/error", WebApiOperation.Get, true)]
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ErrorsError(
         ErrorsErrorTestingOnlyRequest request, CancellationToken cancellationToken)
     {
@@ -24,7 +22,6 @@ public class TestingWebApi : IWebApiService
         return () => new Result<StringMessageTestingOnlyResponse, Error>(Error.EntityExists());
     }
 
-    [WebApiRoute("/testingonly/errors/throws", WebApiOperation.Get, true)]
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ErrorsThrows(
         ErrorsThrowTestingOnlyRequest request, CancellationToken cancellationToken)
     {
@@ -32,7 +29,6 @@ public class TestingWebApi : IWebApiService
         throw new InvalidOperationException("amessage");
     }
 
-    [WebApiRoute("/testingonly/formats/roundtrip", WebApiOperation.Post, true)]
     public async Task<ApiPostResult<string, FormatsTestingOnlyResponse>> FormatsRoundTrip(
         FormatsTestingOnlyRequest request, CancellationToken cancellationToken)
     {
@@ -56,7 +52,6 @@ public class TestingWebApi : IWebApiService
         });
     }
 
-    [WebApiRoute("testingonly/correlations/get", WebApiOperation.Get, true)]
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> RequestCorrelationGet(
         RequestCorrelationsTestingOnlyRequest request, CancellationToken cancellationToken)
     {
@@ -65,7 +60,6 @@ public class TestingWebApi : IWebApiService
             { Message = "amessage" });
     }
 
-    [WebApiRoute("/testingonly/statuses/delete", WebApiOperation.Delete, true)]
     public async Task<ApiDeleteResult> StatusesDelete(StatusesDeleteTestingOnlyRequest request,
         CancellationToken cancellationToken)
     {
@@ -73,17 +67,14 @@ public class TestingWebApi : IWebApiService
         return () => new Result<EmptyResponse, Error>(new EmptyResponse());
     }
 
-    [WebApiRoute("/testingonly/statuses/get", WebApiOperation.Get, true)]
     public async Task<ApiGetResult<string, StatusesTestingOnlyResponse>> StatusesGet(
-        StatusesGetTestingOnlyRequest request,
-        CancellationToken cancellationToken)
+        StatusesGetTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         return () =>
             new Result<StatusesTestingOnlyResponse, Error>(new StatusesTestingOnlyResponse { Message = "amessage" });
     }
 
-    [WebApiRoute("/testingonly/statuses/post", WebApiOperation.Post, true)]
     public async Task<ApiPostResult<string, StatusesTestingOnlyResponse>> StatusesPost(
         StatusesPostTestingOnlyRequest request, CancellationToken cancellationToken)
     {
@@ -93,7 +84,6 @@ public class TestingWebApi : IWebApiService
                 "alocation");
     }
 
-    [WebApiRoute("/testingonly/statuses/post2", WebApiOperation.Post, true)]
     public async Task<ApiPostResult<string, StatusesTestingOnlyResponse>> StatusesPost2(
         StatusesPostWithLocationTestingOnlyRequest request, CancellationToken cancellationToken)
     {
@@ -102,7 +92,6 @@ public class TestingWebApi : IWebApiService
             new PostResult<StatusesTestingOnlyResponse>(new StatusesTestingOnlyResponse { Message = "amessage" });
     }
 
-    [WebApiRoute("/testingonly/statuses/putpatch", WebApiOperation.PutPatch, true)]
     public async Task<ApiPutPatchResult<string, StatusesTestingOnlyResponse>> StatusesPutPatch(
         StatusesPutPatchTestingOnlyRequest request, CancellationToken cancellationToken)
     {
@@ -111,7 +100,6 @@ public class TestingWebApi : IWebApiService
             new Result<StatusesTestingOnlyResponse, Error>(new StatusesTestingOnlyResponse { Message = "amessage" });
     }
 
-    [WebApiRoute("/testingonly/statuses/search", WebApiOperation.Search, true)]
     public async Task<ApiSearchResult<string, StatusesTestingOnlySearchResponse>> StatusesSearch(
         StatusesSearchTestingOnlyRequest request, CancellationToken cancellationToken)
     {
@@ -121,7 +109,6 @@ public class TestingWebApi : IWebApiService
                 { Messages = new List<string> { "amessage" } });
     }
 
-    [WebApiRoute("/testingonly/validations/unvalidated", WebApiOperation.Get, true)]
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ValidationsUnvalidated(
         ValidationsUnvalidatedTestingOnlyRequest request, CancellationToken cancellationToken)
     {
@@ -130,7 +117,6 @@ public class TestingWebApi : IWebApiService
             { Message = $"amessage{request.Id}" });
     }
 
-    [WebApiRoute("/testingonly/validations/validated/{id}", WebApiOperation.Get, true)]
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ValidationsValidated(
         ValidationsValidatedTestingOnlyRequest request, CancellationToken cancellationToken)
     {

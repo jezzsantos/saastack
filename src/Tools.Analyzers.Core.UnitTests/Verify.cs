@@ -57,6 +57,20 @@ public static class Verify
         await RunAnalyzerTest<TAnalyzer>(inputSnippet, new[] { expectation1, expectation2 });
     }
 
+    public static async Task DiagnosticExists<TAnalyzer>(string inputSnippet,
+        (DiagnosticDescriptor, int, int, string) expected1, (DiagnosticDescriptor, int, int, string) expected2)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+    {
+        var expectation1 = CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>.Diagnostic(expected1.Item1)
+            .WithLocation(expected1.Item2, expected1.Item3)
+            .WithArguments(expected1.Item4);
+        var expectation2 = CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>.Diagnostic(expected2.Item1)
+            .WithLocation(expected2.Item2, expected2.Item3)
+            .WithArguments(expected2.Item4);
+
+        await RunAnalyzerTest<TAnalyzer>(inputSnippet, new[] { expectation1, expectation2 });
+    }
+
     public static async Task NoDiagnosticExists<TAnalyzer>(string inputSnippet)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {

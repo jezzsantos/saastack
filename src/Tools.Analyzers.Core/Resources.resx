@@ -71,25 +71,25 @@
         <value>Wrong second parameter type</value>
     </data>
     <data name="SAS013Description" xml:space="preserve">
-        <value>This service operation should be declared with a 'WebApiRouteAttribute' on it.</value>
+        <value>The request type for this service operation should be declared with a 'RouteAttribute' on it.</value>
     </data>
     <data name="SAS013MessageFormat" xml:space="preserve">
-        <value>Service operation '{0}' should have a 'WebApiRouteAttribute'</value>
+        <value>Service operation '{0}' has a request type that does not have a 'RouteAttribute' on it</value>
     </data>
     <data name="SAS013Title" xml:space="preserve">
-        <value>Missing 'WebApiRouteAttribute'</value>
+        <value>Missing 'RouteAttribute' on request type</value>
     </data>
     <data name="SAS014Description" xml:space="preserve">
-        <value>This service operation has a route declared on it that is different from other service operations in this class.</value>
+        <value>This service operation has a route declared on its request that is different from other service operations in this class.</value>
     </data>
     <data name="SAS014MessageFormat" xml:space="preserve">
-        <value>Service operation '{0}' is required to have the same route path as other service operations in this class</value>
+        <value>Service operation '{0}' is required to have a request with a route for the same primary resource as the other service operations in this class</value>
     </data>
     <data name="SAS014Title" xml:space="preserve">
         <value>Wrong route group</value>
     </data>
     <data name="SAS015Description" xml:space="preserve">
-        <value>This service operation has the same request type as another service operation in this class.</value>
+        <value>This service operation uses the same request type as another service operation in this class.</value>
     </data>
     <data name="SAS015MessageFormat" xml:space="preserve">
         <value>Service operation '{0}' uses the same type for its first parameter as does another service operation in this class. They must use different request types</value>
@@ -105,5 +105,14 @@
     </data>
     <data name="SAS016Title" xml:space="preserve">
         <value>Unexpected return type for operation</value>
+    </data>
+    <data name="SAS017Description" xml:space="preserve">
+        <value>The request type should be declared with a 'RouteAttribute' on it.</value>
+    </data>
+    <data name="SAS017MessageFormat" xml:space="preserve">
+        <value>Request type '{0}' should declare a 'RouteAttribute'</value>
+    </data>
+    <data name="SAS017Title" xml:space="preserve">
+        <value>Missing 'RouteAttribute'</value>
     </data>
 </root>

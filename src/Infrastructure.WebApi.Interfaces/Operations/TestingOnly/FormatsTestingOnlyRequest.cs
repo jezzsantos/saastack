@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 
 namespace Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
 
+[Route("/testingonly/formats/roundtrip", ServiceOperation.Post, true)]
 [UsedImplicitly]
 public class FormatsTestingOnlyRequest : IWebRequest<FormatsTestingOnlyResponse>
 {

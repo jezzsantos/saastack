@@ -1,8 +1,6 @@
-using JetBrains.Annotations;
-
 namespace Infrastructure.WebApi.Interfaces.Operations.Cars;
 
-[UsedImplicitly]
+[Route("/cars", ServiceOperation.Post)]
 public class RegisterCarRequest : IWebRequest<GetCarResponse>
 {
     public required string Make { get; set; }

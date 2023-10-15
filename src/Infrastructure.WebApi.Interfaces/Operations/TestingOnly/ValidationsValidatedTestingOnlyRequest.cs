@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 
 namespace Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
 
+[Route("/testingonly/validations/validated/{id}", ServiceOperation.Get, true)]
 [UsedImplicitly]
 public class ValidationsValidatedTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>
 {

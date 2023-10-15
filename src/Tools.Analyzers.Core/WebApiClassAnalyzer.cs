@@ -21,37 +21,42 @@ namespace Tools.Analyzers.Core;
 ///     <see cref="IWebRequest{TResponse}" />, where
 ///     TResponse is same type as in the return value.
 ///     SAS012. Warning: The second parameter can only be a <see cref="CancellationToken" />
-///     SAS013. Warning: These methods must be decorated with a <see cref="WebApiRouteAttribute" />
+///     SAS013. Warning: These methods must be decorated with a <see cref="RouteAttribute" />
 ///     SAS014. Warning: The route (of all these methods in this class) should start with the same path
 ///     SAS015. Warning: There should be no methods in this class with the same <see cref="IWebRequest{TResponse}" />
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class WebApiClassAnalyzer : DiagnosticAnalyzer
 {
-    internal static readonly Dictionary<WebApiOperation, List<Type>> AllowableOperationReturnTypes =
-        new()
-        {
-            { WebApiOperation.Post, new List<Type> { typeof(ApiEmptyResult), typeof(ApiPostResult<,>) } },
+    internal static readonly Dictionary<Infrastructure.WebApi.Interfaces.ServiceOperation, List<Type>>
+        AllowableOperationReturnTypes =
+            new()
             {
-                WebApiOperation.Get,
-                new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>) }
-            },
-            {
-                WebApiOperation.Search,
-                new List<Type>
                 {
-                    typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>), typeof(ApiSearchResult<,>)
+                    Infrastructure.WebApi.Interfaces.ServiceOperation.Post,
+                    new List<Type> { typeof(ApiEmptyResult), typeof(ApiPostResult<,>) }
+                },
+                {
+                    Infrastructure.WebApi.Interfaces.ServiceOperation.Get,
+                    new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>) }
+                },
+                {
+                    Infrastructure.WebApi.Interfaces.ServiceOperation.Search,
+                    new List<Type>
+                    {
+                        typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>),
+                        typeof(ApiSearchResult<,>)
+                    }
+                },
+                {
+                    Infrastructure.WebApi.Interfaces.ServiceOperation.PutPatch,
+                    new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiPutPatchResult<,>) }
+                },
+                {
+                    Infrastructure.WebApi.Interfaces.ServiceOperation.Delete,
+                    new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiDeleteResult) }
                 }
-            },
-            {
-                WebApiOperation.PutPatch,
-                new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiPutPatchResult<,>) }
-            },
-            {
-                WebApiOperation.Delete,
-                new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiDeleteResult) }
-            }
-        };
+            };
 
     internal static readonly Type[] AllowableReturnTypes =
     {
@@ -92,8 +97,12 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
         AnalyzerConstants.Categories.WebApi, nameof(Resources.SAS016Title), nameof(Resources.SAS016Description),
         nameof(Resources.SAS016MessageFormat));
 
+    internal static readonly DiagnosticDescriptor Sas017 = "SAS017".GetDescriptor(DiagnosticSeverity.Warning,
+        AnalyzerConstants.Categories.WebApi, nameof(Resources.SAS017Title), nameof(Resources.SAS017Description),
+        nameof(Resources.SAS017MessageFormat));
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(Sas010, Sas011, Sas012, Sas013, Sas014, Sas015, Sas016);
+        ImmutableArray.Create(Sas010, Sas011, Sas012, Sas013, Sas014, Sas015, Sas016, Sas017);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -135,19 +144,21 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
                 continue;
             }
 
-            if (ParametersAreInCorrect(context, methodDeclarationSyntax, out var requestType))
+            if (ParametersAreInCorrect(context, methodDeclarationSyntax, out var requestTypeSyntax))
             {
                 continue;
             }
 
+            if (AttributeIsNotPresent(context, methodDeclarationSyntax, requestTypeSyntax!, out var attribute))
+            {
+                continue;
+            }
+
+            var requestType = requestTypeSyntax!.GetBaseOfType<IWebRequest>(context);
             operations.Add(methodDeclarationSyntax, new ServiceOperation(requestType!));
 
-            if (AttributeIsNotPresent(context, methodDeclarationSyntax, out var attribute))
-            {
-                continue;
-            }
-
-            var operation = (WebApiOperation)attribute!.ConstructorArguments[1].Value!;
+            var operation =
+                (Infrastructure.WebApi.Interfaces.ServiceOperation)attribute!.ConstructorArguments[1].Value!;
             if (OperationAndReturnsTypeDontMatch(context, methodDeclarationSyntax, operation, returnType!))
             {
                 continue;
@@ -164,7 +175,8 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
     }
 
     private static bool OperationAndReturnsTypeDontMatch(SyntaxNodeAnalysisContext context,
-        MethodDeclarationSyntax methodDeclarationSyntax, WebApiOperation operation, ITypeSymbol returnType)
+        MethodDeclarationSyntax methodDeclarationSyntax, Infrastructure.WebApi.Interfaces.ServiceOperation operation,
+        ITypeSymbol returnType)
     {
         var allowedReturnTypes = AllowableOperationReturnTypes[operation];
 
@@ -226,20 +238,19 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
     }
 
     private static bool AttributeIsNotPresent(SyntaxNodeAnalysisContext context,
-        MethodDeclarationSyntax methodDeclarationSyntax, out AttributeData? attribute)
+        MethodDeclarationSyntax methodDeclarationSyntax, ParameterSyntax requestTypeSyntax,
+        out AttributeData? attribute)
     {
-        attribute = null;
-        var attributes = methodDeclarationSyntax.AttributeLists;
-        if (attributes.Count == 0)
-        {
-            context.ReportDiagnostic(Sas013, methodDeclarationSyntax);
-            return true;
-        }
-
-        attribute = methodDeclarationSyntax.GetAttributeOfType<WebApiRouteAttribute>(context);
+        var requestTypeSymbol = context.SemanticModel.GetSymbolInfo(requestTypeSyntax.Type!).Symbol!;
+        attribute = requestTypeSymbol.GetAttributeOfType<RouteAttribute>(context);
         if (attribute is null)
         {
             context.ReportDiagnostic(Sas013, methodDeclarationSyntax);
+            if (requestTypeSyntax.Type is IdentifierNameSyntax nameSyntax)
+            {
+                context.ReportDiagnostic(Sas017, nameSyntax);
+            }
+
             return true;
         }
 
@@ -247,9 +258,9 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
     }
 
     private static bool ParametersAreInCorrect(SyntaxNodeAnalysisContext context,
-        MethodDeclarationSyntax methodDeclarationSyntax, out ITypeSymbol? requestType)
+        MethodDeclarationSyntax methodDeclarationSyntax, out ParameterSyntax? requestTypeSyntax)
     {
-        requestType = null;
+        requestTypeSyntax = null;
         var parameters = methodDeclarationSyntax.ParameterList.Parameters;
         if (parameters.Count is < 1 or > 2)
         {
@@ -258,12 +269,14 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
         }
 
         var firstParam = parameters.First();
-        requestType = firstParam.GetBaseOfType<IWebRequest>(context);
+        var requestType = firstParam.GetBaseOfType<IWebRequest>(context);
         if (requestType is null)
         {
             context.ReportDiagnostic(Sas011, methodDeclarationSyntax);
             return true;
         }
+
+        requestTypeSyntax = firstParam;
 
         if (parameters.Count == 2)
         {

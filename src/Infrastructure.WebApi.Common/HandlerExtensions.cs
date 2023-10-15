@@ -10,7 +10,7 @@ public static class HandlerExtensions
     /// <summary>
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
-    public static IResult HandleApiResult(this ApiEmptyResult result, WebApiOperation operation)
+    public static IResult HandleApiResult(this ApiEmptyResult result, ServiceOperation operation)
     {
         return result()
             .Match(response => ((PostResult<EmptyResponse>)response.Value).ToResult(operation),
@@ -21,7 +21,7 @@ public static class HandlerExtensions
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
     public static IResult HandleApiResult<TResource, TResponse>(this ApiResult<TResource, TResponse> result,
-        WebApiOperation operation)
+        ServiceOperation operation)
         where TResource : class where TResponse : IWebResponse
     {
         return result()
@@ -32,7 +32,7 @@ public static class HandlerExtensions
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
     public static IResult HandleApiResult<TResource, TResponse>(this ApiPostResult<TResource, TResponse> result,
-        WebApiOperation operation)
+        ServiceOperation operation)
         where TResource : class where TResponse : IWebResponse
     {
         return result()
@@ -43,7 +43,7 @@ public static class HandlerExtensions
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
     public static IResult HandleApiResult<TResource, TResponse>(this ApiPutPatchResult<TResource, TResponse> result,
-        WebApiOperation operation)
+        ServiceOperation operation)
         where TResource : class where TResponse : IWebResponse
     {
         return result()
@@ -54,7 +54,7 @@ public static class HandlerExtensions
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
     public static IResult HandleApiResult<TResource, TResponse>(this ApiGetResult<TResource, TResponse> result,
-        WebApiOperation operation)
+        ServiceOperation operation)
         where TResource : class where TResponse : IWebResponse
     {
         return result()
@@ -65,7 +65,7 @@ public static class HandlerExtensions
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
     public static IResult HandleApiResult<TResource, TResponse>(this ApiSearchResult<TResource, TResponse> result,
-        WebApiOperation operation)
+        ServiceOperation operation)
         where TResource : class where TResponse : IWebSearchResponse
     {
         return result()
@@ -76,7 +76,7 @@ public static class HandlerExtensions
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
     public static IResult HandleApiResult(this ApiDeleteResult result,
-        WebApiOperation operation)
+        ServiceOperation operation)
     {
         return result()
             .Match(response => ((PostResult<EmptyResponse>)response.Value).ToResult(operation),
@@ -127,25 +127,25 @@ public static class HandlerExtensions
             error => new Result<EmptyResponse, Error>(error));
     }
 
-    private static IResult ToResult<TResponse>(this PostResult<TResponse> postResult, WebApiOperation operation)
+    private static IResult ToResult<TResponse>(this PostResult<TResponse> postResult, ServiceOperation operation)
         where TResponse : IWebResponse
     {
         var response = postResult.Response;
         var location = postResult.Location;
         switch (operation)
         {
-            case WebApiOperation.Get:
-            case WebApiOperation.Search:
+            case ServiceOperation.Get:
+            case ServiceOperation.Search:
                 return Results.Ok(response);
-            case WebApiOperation.Post:
+            case ServiceOperation.Post:
             {
                 return location.HasValue()
                     ? Results.Created(location!, response)
                     : Results.Ok(response);
             }
-            case WebApiOperation.PutPatch:
+            case ServiceOperation.PutPatch:
                 return Results.Accepted(null, response);
-            case WebApiOperation.Delete:
+            case ServiceOperation.Delete:
                 return Results.NoContent();
             default:
                 return Results.Ok(response);

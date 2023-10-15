@@ -15,6 +15,17 @@ public static class DiagnosticExtensions
     }
 
     public static void ReportDiagnostic(this SyntaxNodeAnalysisContext context, DiagnosticDescriptor descriptor,
+        IdentifierNameSyntax nameSyntax, params object?[]? messageArgs)
+    {
+        var identifier = nameSyntax.Identifier;
+        var arguments = messageArgs is not null && messageArgs.Any()
+            ? new object[] { identifier.Text }.Concat(messageArgs)
+            : new object[] { identifier.Text };
+        var diagnostic = Diagnostic.Create(descriptor, identifier.GetLocation(), arguments.ToArray());
+        context.ReportDiagnostic(diagnostic);
+    }
+    
+    public static void ReportDiagnostic(this SyntaxNodeAnalysisContext context, DiagnosticDescriptor descriptor,
         MethodDeclarationSyntax methodDeclarationSyntax, params object?[]? messageArgs)
     {
         var identifier = methodDeclarationSyntax.Identifier;

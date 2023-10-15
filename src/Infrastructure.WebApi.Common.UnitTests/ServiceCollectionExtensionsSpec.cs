@@ -2,6 +2,7 @@ using System.Reflection;
 using FluentAssertions;
 using FluentValidation;
 using Infrastructure.WebApi.Interfaces;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -84,13 +85,14 @@ public class ServiceCollectionExtensionsSpec
 
     public class TestApi : IWebApiService
     {
-        [WebApiRoute("/aroute", WebApiOperation.Get)]
         public Task<IResult> Get(TestRequest request, CancellationToken cancellationToken)
         {
             return Task.FromResult(Results.Ok("amessage"));
         }
     }
 
+    [Route("/aroute", ServiceOperation.Get)]
+    [UsedImplicitly]
     public class TestRequest2 : IWebRequest<TestResponse>
     {
     }

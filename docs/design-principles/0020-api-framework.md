@@ -38,7 +38,6 @@ public class CarsApi : IWebApiService
     }
 
     [AuthorizeForAnyRole(OrganisationRoles.Manager)]
-    [WebApiRoute("/cars/{id}", WebApiOperation.Delete)]
     public async Task<ApiDeleteResult> Delete(DeleteCarRequest request,
         CancellationToken cancellationToken)
     {
@@ -47,7 +46,6 @@ public class CarsApi : IWebApiService
     }
 
     [AuthorizeForAnyRole(OrganisationRoles.Reserver, OrganisationRoles.Manager)]
-    [WebApiRoute("/cars/{id}", WebApiOperation.Get)]
     public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
@@ -56,7 +54,6 @@ public class CarsApi : IWebApiService
     }
 
     [AuthorizeForAnyRole(OrganisationRoles.Manager)]
-    [WebApiRoute("/cars", WebApiOperation.Post)]
     public async Task<ApiPostResult<Car, GetCarResponse>> Register(RegisterCarRequest request,
         CancellationToken cancellationToken)
     {
@@ -68,7 +65,6 @@ public class CarsApi : IWebApiService
     }
 
     [AllowAnonymous]
-    [WebApiRoute("/cars", WebApiOperation.Search)]
     public async Task<ApiSearchResult<Car, SearchAllCarsResponse>> SearchAll(SearchAllCarsRequest request,
         CancellationToken cancellationToken)
     {
@@ -80,7 +76,6 @@ public class CarsApi : IWebApiService
     }
 
     [AuthorizeForAnyRole(OrganisationRoles.Manager)]
-    [WebApiRoute("/cars/{id}/offline", WebApiOperation.PutPatch)]
     public async Task<ApiPutPatchResult<Car, GetCarResponse>> TakeOffline(TakeOfflineCarRequest request,
         CancellationToken cancellationToken)
     {
@@ -88,6 +83,16 @@ public class CarsApi : IWebApiService
             request.EndAtUtc, cancellationToken);
         return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }
+}
+```
+
+where each service operation (method above) would have a unique request DTO that would be defined like this:
+
+```c#
+[Route("/cars/{id}", ServiceOperation.Get)]
+public class GetCarRequest : IWebRequest<GetCarResponse>
+{
+    public required string Id { get; set; }
 }
 ```
 
@@ -240,7 +245,6 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
          }
      
          [AuthorizeForAnyRole(OrganisationRoles.Reserver, OrganisationRoles.Manager)]
-         [WebApiRoute("/cars/{id}", WebApiOperation.Get)]
          public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
          {
              var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
@@ -257,7 +261,22 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
 
 3. You will define the request and response types in separate files in the project: `Infrastructure.WebApi.Interfaces` in a subfolder for the subdomain. For example,
 
-   - `Infrastructure.WebApi.Interfaces/Operations/Cars/GetCarRequest.cs` and `Infrastructure.WebApi.Interfaces/Operations/Cars/GetCarResponse.cs`
+   - In `Infrastructure.WebApi.Interfaces/Operations/Cars/GetCarRequest.cs`
+
+   ```c#
+     [Route("/cars/{id}", ServiceOperation.Get)]
+     public class GetCarRequest : IWebRequest<GetCarResponse>
+     {
+         public required string Id { get; set; }
+     }
+   ```
+   and, in `Infrastructure.WebApi.Interfaces/Operations/Cars/GetCarResponse.cs`:
+   ```c#
+     public class GetCarResponse : IWebResponse
+     {
+         public Car? Car { get; set; }
+     }
+   ```
 
    > Note: The request class derives from `IWebRequest<TResponse>`, and the response class derives from `IWebResponse`
    >
@@ -267,12 +286,16 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
    >
    > All these resource DTO types are defined in the project folder: `Application.Interfaces/Resources`
 
-4. You decorate each service operation/endpoint method with a `[WebApiRoute]` and define the route template and operation type: `Get`, `Search`, `Post`, `PutPatch`, or `Delete`.
+4. You decorate the request DTO class with a `[Route]` attribute and define the route template and operation type: `Get`, `Search`, `Post`, `PutPatch`, or `Delete`.
 
    - For example:
 
    ```c#
-   [WebApiRoute("/cars/{id}", WebApiOperation.Get)]
+     [Route("/cars/{id}", ServiceOperation.Get)]
+     public class GetCarRequest : IWebRequest<GetCarResponse>
+     {
+         public required string Id { get; set; }
+     }
    ```
 
    > Note: Your route should always begin with a leading slash `/`, and you can substitute into the route any public property you define in your request class. For example, `/cars/{id}` where `{id}` refers to the property `public string Id { get; set; }`
@@ -329,7 +352,6 @@ From that Application layer, a resource (DTO) will be returned, and this functio
 
 ```c#
     [AuthorizeForAnyRole(OrganisationRoles.Reserver, OrganisationRoles.Manager)]
-    [WebApiRoute("/cars/{id}", WebApiOperation.Get)]
     public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
@@ -433,7 +455,7 @@ Your validator will be wired up automatically and executed automatically at run 
 
 All API endpoints (service operations) will be declared as `async`, in the API layer.
 
-While this may not be always necessary, this pattern is estabished in this layer to correctly support async operations in lower layers of the vertical slice/subdomain.
+While this may not be always necessary, this pattern is established in this layer to correctly support async operations in lower layers of the vertical slice/subdomain.
 
 > Note: To support `async` properly anywhere within a single HTTP request, we need to `async` from the entry point [all the way down](https://learn.microsoft.com/en-us/archive/msdn-magazine/2013/march/async-await-best-practices-in-asynchronous-programming) (the stack) to the response.
 
@@ -474,6 +496,15 @@ We support at least two wire formats:
 
 * JSON
 * XML
+
+JSON is the default wire format for all responses, if none of the following are specified in a request, and the response contains any content (except binary).
+
+You can request either JSON or XML responses in the following ways:
+
+1. Including an `Accept` header, to be either: `application/json` or `text/xml`.
+2. Including a `Content-Type` header with `application/x-www-form-urlencoded`, and a form field called `format`, to be either: `json` or `xml`.
+3. Including a `Content-Type` header with `application/json`, and a JSON field called `format`, to be either: `json` or `xml`.
+4. Including a `QueryString` called `format`, to be either: `json` or `xml`.
 
 #### JSON
 
@@ -565,4 +596,5 @@ TBD
 
 ### Credits
 
-Some of the implementation patterns (that used MediatR) were inspired by content and recommendations created by [Nick Chapsas](https://www.youtube.com/@nickchapsas)
+* The implementation of the [REPR design pattern](https://deviq.com/design-patterns/repr-design-pattern) used here was heavily influenced by the REPR design in [ServiceStack](http://www.servicestack.net), due its declarative and explicit nature, the benefits of typed clients, and its testability aspects.
+* Some of the implementation patterns (based on MediatR) were inspired by content created by [Nick Chapsas](https://www.youtube.com/@nickchapsas)

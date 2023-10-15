@@ -48,4 +48,16 @@ public static class WebApplicationExtensions
                 .ExecuteAsync(context);
         }));
     }
+
+    /// <summary>
+    ///     Enables request buffering, so that request bodies can be read in filters
+    /// </summary>
+    public static void EnableRequestRewind(this WebApplication app)
+    {
+        app.Use(async (context, next) =>
+        {
+            context.Request.EnableBuffering();
+            await next();
+        });
+    }
 }

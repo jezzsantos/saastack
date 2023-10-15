@@ -144,8 +144,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public Task<ApiEmptyResult> AMethod(TestRequest1 request)
+    public Task<ApiEmptyResult> AMethod(TestGetRequest request)
     { 
         return Task.FromResult<ApiEmptyResult>(() => new Result<EmptyResponse, Error>());
     }
@@ -165,8 +164,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public Task<ApiResult<TestResource, TestResponse>> AMethod(TestRequest1 request)
+    public Task<ApiResult<TestResource, TestResponse>> AMethod(TestGetRequest request)
     {
         return Task.FromResult<ApiResult<TestResource, TestResponse>>(() => new Result<TestResponse, Error>());
     }
@@ -186,8 +184,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Post)]
-    public Task<ApiPostResult<TestResource, TestResponse>> AMethod(TestRequest1 request)
+    public Task<ApiPostResult<TestResource, TestResponse>> AMethod(TestPostRequest request)
     {
         return Task.FromResult<ApiPostResult<TestResource, TestResponse>>(() => new Result<PostResult<TestResponse>, Error>());
     }
@@ -207,8 +204,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public Task<ApiGetResult<TestResource, TestResponse>> AMethod(TestRequest1 request)
+    public Task<ApiGetResult<TestResource, TestResponse>> AMethod(TestGetRequest request)
     {
         return Task.FromResult<ApiGetResult<TestResource, TestResponse>>(() => new Result<TestResponse, Error>());
     }
@@ -228,8 +224,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Search)]
-    public Task<ApiSearchResult<TestResource, TestSearchResponse>> AMethod(TestRequest1 request)
+    public Task<ApiSearchResult<TestResource, TestSearchResponse>> AMethod(TestSearchRequest request)
     {
         return Task.FromResult<ApiSearchResult<TestResource, TestSearchResponse>>(() => new Result<TestSearchResponse, Error>());
     }
@@ -249,8 +244,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.PutPatch)]
-    public Task<ApiPutPatchResult<TestResource, TestResponse>> AMethod(TestRequest1 request)
+    public Task<ApiPutPatchResult<TestResource, TestResponse>> AMethod(TestPutPatchRequest request)
     {
         return Task.FromResult<ApiPutPatchResult<TestResource, TestResponse>>(() => new Result<TestResponse, Error>());
     }
@@ -270,8 +264,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Delete)]
-    public Task<ApiDeleteResult> AMethod(TestRequest1 request)
+    public Task<ApiDeleteResult> AMethod(TestDeleteRequest request)
     {
         return Task.FromResult<ApiDeleteResult>(() => new Result<EmptyResponse, Error>());
     }
@@ -306,8 +299,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod(TestRequest1 request)
+    public ApiEmptyResult AMethod(TestGetRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -327,8 +319,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiResult<TestResource, TestResponse> AMethod(TestRequest1 request)
+    public ApiResult<TestResource, TestResponse> AMethod(TestGetRequest request)
     {
         return () => new Result<TestResponse, Error>();
     }
@@ -348,8 +339,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Post)]
-    public ApiPostResult<TestResource, TestResponse> AMethod(TestRequest1 request)
+    public ApiPostResult<TestResource, TestResponse> AMethod(TestPostRequest request)
     {
         return () => new Result<PostResult<TestResponse>, Error>();
     }
@@ -369,8 +359,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiGetResult<TestResource, TestResponse> AMethod(TestRequest1 request)
+    public ApiGetResult<TestResource, TestResponse> AMethod(TestGetRequest request)
     {
         return () => new Result<TestResponse, Error>();
     }
@@ -390,8 +379,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Search)]
-    public ApiSearchResult<TestResource, TestSearchResponse> AMethod(TestRequest1 request)
+    public ApiSearchResult<TestResource, TestSearchResponse> AMethod(TestSearchRequest request)
     {
         return () => new Result<TestSearchResponse, Error>();
     }
@@ -411,8 +399,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.PutPatch)]
-    public ApiPutPatchResult<TestResource, TestResponse> AMethod(TestRequest1 request)
+    public ApiPutPatchResult<TestResource, TestResponse> AMethod(TestPutPatchRequest request)
     {
         return () => new Result<TestResponse, Error>();
     }
@@ -432,8 +419,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Delete)]
-    public ApiDeleteResult AMethod(TestRequest1 request)
+    public ApiDeleteResult AMethod(TestDeleteRequest request)
     {
         return () => new Result<EmptyResponse, Error>();
     }
@@ -477,7 +463,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    public ApiEmptyResult AMethod(TestRequest1 request, CancellationToken cancellationToken, string value)
+    public ApiEmptyResult AMethod(TestGetRequest request, CancellationToken cancellationToken, string value)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -516,7 +502,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    public ApiEmptyResult AMethod(TestRequest1 request, string value)
+    public ApiEmptyResult AMethod(TestGetRequest request, string value)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -537,8 +523,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod(TestRequest1 request)
+    public ApiEmptyResult AMethod(TestGetRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -559,8 +544,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod(TestRequest1 request, CancellationToken cancellationToken)
+    public ApiEmptyResult AMethod(TestGetRequest request, CancellationToken cancellationToken)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -584,13 +568,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    public ApiEmptyResult AMethod(TestRequest1 request)
+    public ApiEmptyResult AMethod(TestNoneRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas013, input, 9, 27, "AMethod");
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(input, (WebApiClassAnalyzer.Sas013, 9, 27, "AMethod"),
+                (WebApiClassAnalyzer.Sas017, 9, 35, "TestNoneRequest"));
         }
 
         [Fact]
@@ -605,13 +590,15 @@ namespace ANamespace;
 public class AClass : IWebApiService
 {
     [TestAttribute]
-    public ApiEmptyResult AMethod(TestRequest1 request)
+    public ApiEmptyResult AMethod(TestNoneRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas013, input, 10, 27, "AMethod");
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(input, (WebApiClassAnalyzer.Sas013, 10, 27, "AMethod"),
+                (WebApiClassAnalyzer.Sas017, 10, 35, "TestNoneRequest"));
+
         }
 
         [Fact]
@@ -625,8 +612,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod(TestRequest1 request)
+    public ApiEmptyResult AMethod(TestGetRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -650,8 +636,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod1(TestRequest1 request)
+    public ApiEmptyResult AMethod1(TestGetRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -671,13 +656,11 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod1(TestRequest1 request)
+    public ApiEmptyResult AMethod1(TestGetRequest1 request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod2(TestRequest2 request)
+    public ApiEmptyResult AMethod2(TestGetRequest2 request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -697,18 +680,15 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource/1"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod1(TestRequest1 request)
+    public ApiEmptyResult AMethod1(TestGetRequest1 request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
-    [WebApiRoute(""/aresource/2"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod2(TestRequest2 request)
+    public ApiEmptyResult AMethod2(TestGetRequest2 request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
-    [WebApiRoute(""/aresource/3"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod3(TestRequest3 request)
+    public ApiEmptyResult AMethod3(TestGetRequest3 request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -728,24 +708,21 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource/1"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod1(TestRequest1 request)
+    public ApiEmptyResult AMethod1(TestGetRequest1 request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
-    [WebApiRoute(""/aresource/2"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod2(TestRequest2 request)
+    public ApiEmptyResult AMethod2(TestGetRequest2 request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
-    [WebApiRoute(""/anotherresource/1"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod3(TestRequest3 request)
+    public ApiEmptyResult AMethod4(TestGetRequest4 request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas014, input, 20, 27, "AMethod3");
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas014, input, 17, 27, "AMethod4");
         }
     }
 
@@ -763,8 +740,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod(TestRequest1 request)
+    public ApiEmptyResult AMethod(TestGetRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -784,25 +760,22 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod1(TestRequest1 request)
+    public ApiEmptyResult AMethod1(TestGetRequest1 request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod2(TestRequest1 request)
+    public ApiEmptyResult AMethod2(TestGetRequest1 request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod3(TestRequest2 request)
+    public ApiEmptyResult AMethod3(TestGetRequest2 request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas015, input, (10, 27, "AMethod1"),
-                (15, 27, "AMethod2"));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas015, input, (9, 27, "AMethod1"),
+                (13, 27, "AMethod2"));
         }
     }
 
@@ -820,8 +793,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Post)]
-    public ApiEmptyResult AMethod(TestRequest1 request)
+    public ApiEmptyResult AMethod(TestPostRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -841,8 +813,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiEmptyResult AMethod(TestRequest1 request)
+    public ApiEmptyResult AMethod(TestGetRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -862,8 +833,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Search)]
-    public ApiEmptyResult AMethod(TestRequest1 request)
+    public ApiEmptyResult AMethod(TestSearchRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -883,8 +853,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.PutPatch)]
-    public ApiEmptyResult AMethod(TestRequest1 request)
+    public ApiEmptyResult AMethod(TestPutPatchRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -904,8 +873,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Delete)]
-    public ApiEmptyResult AMethod(TestRequest1 request)
+    public ApiEmptyResult AMethod(TestDeleteRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -925,15 +893,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Post)]
-    public ApiResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiResult<string, TestResponse> AMethod(TestPostRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 44, "AMethod",
-                WebApiOperation.Post, ExpectedAllowedResultTypes(WebApiOperation.Post));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 44, "AMethod",
+                ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
         }
 
         [Fact]
@@ -947,8 +914,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiResult<string, TestResponse> AMethod(TestGetRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
@@ -968,8 +934,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Search)]
-    public ApiResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiResult<string, TestResponse> AMethod(TestSearchRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
@@ -989,8 +954,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.PutPatch)]
-    public ApiResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiResult<string, TestResponse> AMethod(TestPutPatchRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
@@ -1010,8 +974,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Delete)]
-    public ApiResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiResult<string, TestResponse> AMethod(TestDeleteRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
@@ -1031,8 +994,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Post)]
-    public ApiPostResult<TestResource, TestResponse> AMethod(TestRequest1 request)
+    public ApiPostResult<TestResource, TestResponse> AMethod(TestPostRequest request)
     { 
         return () => new PostResult<TestResponse>(new TestResponse(), ""/alocation"");
     }
@@ -1052,15 +1014,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiPostResult<TestResource, TestResponse> AMethod(TestRequest1 request)
+    public ApiPostResult<TestResource, TestResponse> AMethod(TestGetRequest request)
     { 
         return () => new PostResult<TestResponse>(new TestResponse(), ""/alocation"");
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 54, "AMethod",
-                WebApiOperation.Get, ExpectedAllowedResultTypes(WebApiOperation.Get));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 54, "AMethod",
+                ServiceOperation.Get, ExpectedAllowedResultTypes(ServiceOperation.Get));
         }
 
         [Fact]
@@ -1074,15 +1035,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Search)]
-    public ApiPostResult<TestResource, TestResponse> AMethod(TestRequest1 request)
+    public ApiPostResult<TestResource, TestResponse> AMethod(TestSearchRequest request)
     { 
         return () => new PostResult<TestResponse>(new TestResponse(), ""/alocation"");
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 54, "AMethod",
-                WebApiOperation.Search, ExpectedAllowedResultTypes(WebApiOperation.Search));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 54, "AMethod",
+                ServiceOperation.Search, ExpectedAllowedResultTypes(ServiceOperation.Search));
         }
 
         [Fact]
@@ -1096,15 +1056,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.PutPatch)]
-    public ApiPostResult<TestResource, TestResponse> AMethod(TestRequest1 request)
+    public ApiPostResult<TestResource, TestResponse> AMethod(TestPutPatchRequest request)
     { 
         return () => new PostResult<TestResponse>(new TestResponse(), ""/alocation"");
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 54, "AMethod",
-                WebApiOperation.PutPatch, ExpectedAllowedResultTypes(WebApiOperation.PutPatch));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 54, "AMethod",
+                ServiceOperation.PutPatch, ExpectedAllowedResultTypes(ServiceOperation.PutPatch));
         }
 
         [Fact]
@@ -1118,15 +1077,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Delete)]
-    public ApiPostResult<TestResource, TestResponse> AMethod(TestRequest1 request)
+    public ApiPostResult<TestResource, TestResponse> AMethod(TestDeleteRequest request)
     { 
         return () => new PostResult<TestResponse>(new TestResponse(), ""/alocation"");
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 54, "AMethod",
-                WebApiOperation.Delete, ExpectedAllowedResultTypes(WebApiOperation.Delete));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 54, "AMethod",
+                ServiceOperation.Delete, ExpectedAllowedResultTypes(ServiceOperation.Delete));
         }
 
         [Fact]
@@ -1140,15 +1098,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Post)]
-    public ApiGetResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiGetResult<string, TestResponse> AMethod(TestPostRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 47, "AMethod",
-                WebApiOperation.Post, ExpectedAllowedResultTypes(WebApiOperation.Post));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 47, "AMethod",
+                ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
         }
 
         [Fact]
@@ -1162,8 +1119,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiGetResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiGetResult<string, TestResponse> AMethod(TestGetRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
@@ -1183,8 +1139,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Search)]
-    public ApiGetResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiGetResult<string, TestResponse> AMethod(TestSearchRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
@@ -1204,15 +1159,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.PutPatch)]
-    public ApiGetResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiGetResult<string, TestResponse> AMethod(TestPutPatchRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 47, "AMethod",
-                WebApiOperation.PutPatch, ExpectedAllowedResultTypes(WebApiOperation.PutPatch));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 47, "AMethod",
+                ServiceOperation.PutPatch, ExpectedAllowedResultTypes(ServiceOperation.PutPatch));
         }
 
         [Fact]
@@ -1226,15 +1180,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Delete)]
-    public ApiGetResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiGetResult<string, TestResponse> AMethod(TestDeleteRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 47, "AMethod",
-                WebApiOperation.Delete, ExpectedAllowedResultTypes(WebApiOperation.Delete));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 47, "AMethod",
+                ServiceOperation.Delete, ExpectedAllowedResultTypes(ServiceOperation.Delete));
         }
 
         [Fact]
@@ -1248,15 +1201,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Post)]
-    public ApiSearchResult<string, TestSearchResponse> AMethod(TestRequest1 request)
+    public ApiSearchResult<string, TestSearchResponse> AMethod(TestPostRequest request)
     { 
         return () => new Result<TestSearchResponse, Error>(new TestSearchResponse());
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 56, "AMethod",
-                WebApiOperation.Post, ExpectedAllowedResultTypes(WebApiOperation.Post));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 56, "AMethod",
+                ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
         }
 
         [Fact]
@@ -1270,15 +1222,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiSearchResult<string, TestSearchResponse> AMethod(TestRequest1 request)
+    public ApiSearchResult<string, TestSearchResponse> AMethod(TestGetRequest request)
     { 
         return () => new Result<TestSearchResponse, Error>(new TestSearchResponse());
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 56, "AMethod",
-                WebApiOperation.Get, ExpectedAllowedResultTypes(WebApiOperation.Get));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 56, "AMethod",
+                ServiceOperation.Get, ExpectedAllowedResultTypes(ServiceOperation.Get));
         }
 
         [Fact]
@@ -1292,8 +1243,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Search)]
-    public ApiSearchResult<string, TestSearchResponse> AMethod(TestRequest1 request)
+    public ApiSearchResult<string, TestSearchResponse> AMethod(TestSearchRequest request)
     { 
         return () => new Result<TestSearchResponse, Error>(new TestSearchResponse());
     }
@@ -1313,15 +1263,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.PutPatch)]
-    public ApiSearchResult<string, TestSearchResponse> AMethod(TestRequest1 request)
+    public ApiSearchResult<string, TestSearchResponse> AMethod(TestPutPatchRequest request)
     { 
         return () => new Result<TestSearchResponse, Error>(new TestSearchResponse());
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 56, "AMethod",
-                WebApiOperation.PutPatch, ExpectedAllowedResultTypes(WebApiOperation.PutPatch));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 56, "AMethod",
+                ServiceOperation.PutPatch, ExpectedAllowedResultTypes(ServiceOperation.PutPatch));
         }
 
         [Fact]
@@ -1335,15 +1284,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Delete)]
-    public ApiSearchResult<string, TestSearchResponse> AMethod(TestRequest1 request)
+    public ApiSearchResult<string, TestSearchResponse> AMethod(TestDeleteRequest request)
     { 
         return () => new Result<TestSearchResponse, Error>(new TestSearchResponse());
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 56, "AMethod",
-                WebApiOperation.Delete, ExpectedAllowedResultTypes(WebApiOperation.Delete));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 56, "AMethod",
+                ServiceOperation.Delete, ExpectedAllowedResultTypes(ServiceOperation.Delete));
         }
 
         [Fact]
@@ -1357,15 +1305,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Post)]
-    public ApiPutPatchResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiPutPatchResult<string, TestResponse> AMethod(TestPostRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 52, "AMethod",
-                WebApiOperation.Post, ExpectedAllowedResultTypes(WebApiOperation.Post));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 52, "AMethod",
+                ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
         }
 
         [Fact]
@@ -1379,15 +1326,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiPutPatchResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiPutPatchResult<string, TestResponse> AMethod(TestGetRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 52, "AMethod",
-                WebApiOperation.Get, ExpectedAllowedResultTypes(WebApiOperation.Get));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 52, "AMethod",
+                ServiceOperation.Get, ExpectedAllowedResultTypes(ServiceOperation.Get));
         }
 
         [Fact]
@@ -1401,15 +1347,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Search)]
-    public ApiPutPatchResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiPutPatchResult<string, TestResponse> AMethod(TestSearchRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 52, "AMethod",
-                WebApiOperation.Search, ExpectedAllowedResultTypes(WebApiOperation.Search));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 52, "AMethod",
+                ServiceOperation.Search, ExpectedAllowedResultTypes(ServiceOperation.Search));
         }
 
         [Fact]
@@ -1423,8 +1368,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.PutPatch)]
-    public ApiPutPatchResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiPutPatchResult<string, TestResponse> AMethod(TestPutPatchRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
@@ -1444,15 +1388,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Delete)]
-    public ApiPutPatchResult<string, TestResponse> AMethod(TestRequest1 request)
+    public ApiPutPatchResult<string, TestResponse> AMethod(TestDeleteRequest request)
     { 
         return () => new Result<TestResponse, Error>(new TestResponse());
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 52, "AMethod",
-                WebApiOperation.Delete, ExpectedAllowedResultTypes(WebApiOperation.Delete));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 52, "AMethod",
+                ServiceOperation.Delete, ExpectedAllowedResultTypes(ServiceOperation.Delete));
         }
 
         [Fact]
@@ -1466,15 +1409,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Post)]
-    public ApiDeleteResult AMethod(TestRequest1 request)
+    public ApiDeleteResult AMethod(TestPostRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 28, "AMethod",
-                WebApiOperation.Post, ExpectedAllowedResultTypes(WebApiOperation.Post));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 28, "AMethod",
+                ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
         }
 
         [Fact]
@@ -1488,15 +1430,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Get)]
-    public ApiDeleteResult AMethod(TestRequest1 request)
+    public ApiDeleteResult AMethod(TestGetRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 28, "AMethod",
-                WebApiOperation.Get, ExpectedAllowedResultTypes(WebApiOperation.Get));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 28, "AMethod",
+                ServiceOperation.Get, ExpectedAllowedResultTypes(ServiceOperation.Get));
         }
 
         [Fact]
@@ -1510,15 +1451,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Search)]
-    public ApiDeleteResult AMethod(TestRequest1 request)
+    public ApiDeleteResult AMethod(TestSearchRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 28, "AMethod",
-                WebApiOperation.Search, ExpectedAllowedResultTypes(WebApiOperation.Search));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 28, "AMethod",
+                ServiceOperation.Search, ExpectedAllowedResultTypes(ServiceOperation.Search));
         }
 
         [Fact]
@@ -1532,15 +1472,14 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.PutPatch)]
-    public ApiDeleteResult AMethod(TestRequest1 request)
+    public ApiDeleteResult AMethod(TestPutPatchRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 10, 28, "AMethod",
-                WebApiOperation.PutPatch, ExpectedAllowedResultTypes(WebApiOperation.PutPatch));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 28, "AMethod",
+                ServiceOperation.PutPatch, ExpectedAllowedResultTypes(ServiceOperation.PutPatch));
         }
 
         [Fact]
@@ -1554,8 +1493,7 @@ using Tools.Analyzers.Core.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    [WebApiRoute(""/aresource"", WebApiOperation.Delete)]
-    public ApiDeleteResult AMethod(TestRequest1 request)
+    public ApiDeleteResult AMethod(TestDeleteRequest request)
     { 
         return () => new Result<EmptyResponse, Error>();
     }
@@ -1564,7 +1502,7 @@ public class AClass : IWebApiService
             await Verify.NoDiagnosticExists<WebApiClassAnalyzer>(input);
         }
 
-        private static string ExpectedAllowedResultTypes(WebApiOperation operation)
+        private static string ExpectedAllowedResultTypes(ServiceOperation operation)
         {
             return TypeExtensions.Stringify(WebApiClassAnalyzer.AllowableOperationReturnTypes[operation].ToArray());
         }
@@ -1587,18 +1525,62 @@ public class TestSearchResponse : IWebSearchResponse
     public SearchResultMetadata? Metadata { get; set; }
 }
 
-[UsedImplicitly]
-public class TestRequest1 : IWebRequest<TestResponse>
+[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+public class TestNoneRequest : IWebRequest<TestResponse>
 {
 }
 
-[UsedImplicitly]
-public class TestRequest2 : IWebRequest<TestResponse>
+[Route("/aresource", ServiceOperation.Search)]
+[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+public class TestSearchRequest : IWebRequest<TestResponse>
 {
 }
 
-[UsedImplicitly]
-public class TestRequest3 : IWebRequest<TestResponse>
+[Route("/aresource", ServiceOperation.Post)]
+[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+public class TestPostRequest : IWebRequest<TestResponse>
+{
+}
+
+[Route("/aresource", ServiceOperation.Get)]
+[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+public class TestGetRequest : IWebRequest<TestResponse>
+{
+}
+
+[Route("/aresource/1", ServiceOperation.Get)]
+[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+public class TestGetRequest1 : IWebRequest<TestResponse>
+{
+}
+
+[Route("/aresource/2", ServiceOperation.Get)]
+[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+public class TestGetRequest2 : IWebRequest<TestResponse>
+{
+}
+
+[Route("/aresource/3", ServiceOperation.Get)]
+[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+public class TestGetRequest3 : IWebRequest<TestResponse>
+{
+}
+
+[Route("/anotherresource/1", ServiceOperation.Get)]
+[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+public class TestGetRequest4 : IWebRequest<TestResponse>
+{
+}
+
+[Route("/aresource", ServiceOperation.PutPatch)]
+[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+public class TestPutPatchRequest : IWebRequest<TestResponse>
+{
+}
+
+[Route("/aresource", ServiceOperation.Delete)]
+[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+public class TestDeleteRequest : IWebRequest<TestResponse>
 {
 }
 

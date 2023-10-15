@@ -1,13 +1,15 @@
 using System.Net;
+using System.Text;
 using Common.Extensions;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Xunit;
+using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 namespace Infrastructure.WebApi.Common.UnitTests;
 
@@ -22,52 +24,52 @@ public class ContentNegotiationFilterSpec
     }
 
     [Fact]
-    public void WhenInvokeAsyncWithNullResponse_ThenReturnsNull()
+    public async Task WhenInvokeAsyncWithNullResponse_ThenReturnsNull()
     {
         var context = new DefaultEndpointFilterInvocationContext(new DefaultHttpContext());
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>());
 
-        var result = _filter.InvokeAsync(context, next);
+        var result = await _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeNull();
+        result.Should().BeNull();
     }
 
     [Fact]
-    public void WhenInvokeAsyncWithNakedObjectResponse_ThenReturnsJsonContentAsOk()
+    public async Task WhenInvokeAsyncWithNakedObjectResponse_ThenReturnsJsonContentAsOk()
     {
         var response = new TestResponse();
         var httpContext = SetupHttpContext();
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
-        var result = _filter.InvokeAsync(context, next);
+        var result = await _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeOfType<JsonHttpResult<object>>();
-        result.Result.As<JsonHttpResult<object>>()
+        result.Should().BeOfType<JsonHttpResult<object>>();
+        result.As<JsonHttpResult<object>>()
             .ContentType.Should().BeNull();
-        result.Result.As<JsonHttpResult<object>>()
+        result.As<JsonHttpResult<object>>()
             .StatusCode.Should().Be((int)HttpStatusCode.OK);
-        result.Result.As<JsonHttpResult<object>>()
+        result.As<JsonHttpResult<object>>()
             .Value.Should().Be(response);
     }
 
     [Fact]
-    public void WhenInvokeAsyncWithNakedEmptyStringResponse_ThenReturnsJsonContentAsOk()
+    public async Task WhenInvokeAsyncWithNakedEmptyStringResponse_ThenReturnsJsonContentAsOk()
     {
         var response = string.Empty;
         var httpContext = SetupHttpContext();
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
-        var result = _filter.InvokeAsync(context, next);
+        var result = await _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeOfType<NoContent>();
-        result.Result.As<NoContent>()
+        result.Should().BeOfType<NoContent>();
+        result.As<NoContent>()
             .StatusCode.Should().Be((int)HttpStatusCode.NoContent);
     }
 
     [Fact]
-    public void WhenInvokeAsyncWithIValueHttpResultResponse_ThenReturnsJsonContentAsOk()
+    public async Task WhenInvokeAsyncWithIValueHttpResultResponse_ThenReturnsJsonContentAsOk()
     {
         var payload = new TestResponse();
         var response = Results.Ok(payload);
@@ -75,19 +77,19 @@ public class ContentNegotiationFilterSpec
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
-        var result = _filter.InvokeAsync(context, next);
+        var result = await _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeOfType<JsonHttpResult<object>>();
-        result.Result.As<JsonHttpResult<object>>()
+        result.Should().BeOfType<JsonHttpResult<object>>();
+        result.As<JsonHttpResult<object>>()
             .ContentType.Should().BeNull();
-        result.Result.As<JsonHttpResult<object>>()
+        result.As<JsonHttpResult<object>>()
             .StatusCode.Should().Be((int)HttpStatusCode.OK);
-        result.Result.As<JsonHttpResult<object>>()
+        result.As<JsonHttpResult<object>>()
             .Value.Should().Be(payload);
     }
 
     [Fact]
-    public void WhenInvokeAsyncWithStreamResultResponse_ThenReturnsJsonContentAsOk()
+    public async Task WhenInvokeAsyncWithStreamResultResponse_ThenReturnsJsonContentAsOk()
     {
         using var stream = new MemoryStream();
         var response = Results.Stream(stream);
@@ -95,119 +97,380 @@ public class ContentNegotiationFilterSpec
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
-        var result = _filter.InvokeAsync(context, next);
+        var result = await _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeOfType<FileStreamHttpResult>();
-        result.Result.As<FileStreamHttpResult>()
+        result.Should().BeOfType<FileStreamHttpResult>();
+        result.As<FileStreamHttpResult>()
             .ContentType.Should().Be(HttpContentTypes.OctetStream);
-        result.Result.As<FileStreamHttpResult>()
+        result.As<FileStreamHttpResult>()
             .FileStream.Should().BeSameAs(stream);
     }
 
     [Fact]
-    public void WhenInvokeAsyncWithNoContentResponse_ThenReturnsJsonContentAsOk()
+    public async Task WhenInvokeAsyncWithEmptyProblemResultResponse_ThenReturnsJsonContentAsInternalServerError()
+    {
+        var response = Results.Problem();
+        var httpContext = SetupHttpContext();
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<JsonHttpResult<object>>();
+        result.As<JsonHttpResult<object>>()
+            .ContentType.Should().Be(HttpContentTypes.JsonProblem);
+        result.As<JsonHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
+        result.As<JsonHttpResult<object>>().Value.As<ProblemDetails>().Status.Should().Be(500);
+        result.As<JsonHttpResult<object>>().Value.As<ProblemDetails>().Title.Should()
+            .Be("An error occurred while processing your request.");
+        result.As<JsonHttpResult<object>>().Value.As<ProblemDetails>().Type.Should()
+            .Be("https://tools.ietf.org/html/rfc7231#section-6.6.1");
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithProblemResultResponse_ThenReturnsJsonContentAsError()
+    {
+        var problem = new ProblemDetails
+        {
+            Type = "atype",
+            Title = "atitle",
+            Status = 999
+        };
+        var response = Results.Problem(problem);
+        var httpContext = SetupHttpContext();
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<JsonHttpResult<object>>();
+        result.As<JsonHttpResult<object>>()
+            .ContentType.Should().Be(HttpContentTypes.JsonProblem);
+        result.As<JsonHttpResult<object>>()
+            .StatusCode.Should().Be(999);
+        result.As<JsonHttpResult<object>>().Value.As<ProblemDetails>().Status.Should().Be(999);
+        result.As<JsonHttpResult<object>>().Value.As<ProblemDetails>().Title.Should().Be("atitle");
+        result.As<JsonHttpResult<object>>().Value.As<ProblemDetails>().Type.Should().Be("atype");
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithValidationProblemResultResponse_ThenReturnsJsonContentAsBadRequest()
+    {
+        var errors = new Dictionary<string, string[]>
+        {
+            { "aname", new[] { "avalue1", "avalue2", "avalue3" } }
+        };
+        var response = Results.ValidationProblem(errors, type: "atype", title: "atitle", statusCode: 999);
+        var httpContext = SetupHttpContext();
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<JsonHttpResult<object>>();
+        result.As<JsonHttpResult<object>>()
+            .ContentType.Should().Be(HttpContentTypes.JsonProblem);
+        result.As<JsonHttpResult<object>>()
+            .StatusCode.Should().Be(999);
+        result.As<JsonHttpResult<object>>().Value.As<HttpValidationProblemDetails>().Status.Should().Be(999);
+        result.As<JsonHttpResult<object>>().Value.As<HttpValidationProblemDetails>().Title.Should().Be("atitle");
+        result.As<JsonHttpResult<object>>().Value.As<HttpValidationProblemDetails>().Type.Should().Be("atype");
+        result.As<JsonHttpResult<object>>().Value.As<HttpValidationProblemDetails>().Errors.Should()
+            .BeEquivalentTo(errors);
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithNoContentResponse_ThenReturnsJsonContentAsOk()
     {
         var response = Results.NoContent();
         var httpContext = SetupHttpContext();
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
-        var result = _filter.InvokeAsync(context, next);
+        var result = await _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeOfType<NoContent>();
-        result.Result.As<NoContent>()
+        result.Should().BeOfType<NoContent>();
+        result.As<NoContent>()
             .StatusCode.Should().Be((int)HttpStatusCode.NoContent);
     }
 
     [Fact]
-    public void WhenInvokeAsyncWithOtherEmptyIResultResponse_ThenReturnsJsonContentAsOk()
+    public async Task WhenInvokeAsyncWithOtherEmptyIResultResponse_ThenReturnsJsonContentAsOk()
     {
         var response = Results.Ok();
         var httpContext = SetupHttpContext();
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
-        var result = _filter.InvokeAsync(context, next);
+        var result = await _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeOfType<Ok>();
-        result.Result.As<Ok>()
+        result.Should().BeOfType<Ok>();
+        result.As<Ok>()
             .StatusCode.Should().Be((int)HttpStatusCode.OK);
     }
 
     [Fact]
-    public void WhenInvokeAsyncWithNullValueIResultResponse_ThenReturnsJsonContentAsOk()
+    public async Task WhenInvokeAsyncWithNullValueIResultResponse_ThenReturnsJsonContentAsOk()
     {
         var response = TypedResults.Ok((string)null!);
         var httpContext = SetupHttpContext();
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
-        var result = _filter.InvokeAsync(context, next);
+        var result = await _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeOfType<Ok<string>>();
-        result.Result.As<Ok<string>>()
+        result.Should().BeOfType<Ok<string>>();
+        result.As<Ok<string>>()
             .StatusCode.Should().Be(200);
     }
 
     [Fact]
-    public void WhenInvokeAsyncWithNakedObjectResponseAndAcceptXml_ThenReturnsXml()
+    public async Task WhenInvokeAsyncWithNakedObjectResponseAndAcceptJson_ThenReturnsJson()
     {
         var response = new TestResponse();
-        var httpContext = SetupHttpContext(HttpContentTypes.Xml);
+        var httpContext = SetupHttpContext(FormatMechanism.AcceptHeader(HttpContentTypes.Json));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
-        var result = _filter.InvokeAsync(context, next);
+        var result = await _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeOfType<XmlHttpResult<object>>();
-        result.Result.As<XmlHttpResult<object>>()
-            .ContentType.Should().Be(HttpContentTypes.XmlWithCharset);
-        result.Result.As<XmlHttpResult<object>>()
+        result.Should().BeOfType<JsonHttpResult<object>>();
+        result.As<JsonHttpResult<object>>()
             .StatusCode.Should().Be((int)HttpStatusCode.OK);
-        result.Result.As<XmlHttpResult<object>>()
+        result.As<JsonHttpResult<object>>()
             .Value.Should().Be(response);
     }
 
     [Fact]
-    public void WhenInvokeAsyncWithNakedObjectResponseAndFormatXml_ThenReturnsXml()
-    {
-        var response = new TestResponse();
-        var httpContext = SetupHttpContext(format: HttpContentTypeFormatters.Xml);
-        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
-        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
-
-        var result = _filter.InvokeAsync(context, next);
-
-        result.Result.Should().BeOfType<XmlHttpResult<object>>();
-        result.Result.As<XmlHttpResult<object>>()
-            .ContentType.Should().Be(HttpContentTypes.XmlWithCharset);
-        result.Result.As<XmlHttpResult<object>>()
-            .StatusCode.Should().Be((int)HttpStatusCode.OK);
-        result.Result.As<XmlHttpResult<object>>()
-            .Value.Should().Be(response);
-    }
-
-    [Fact]
-    public void WhenInvokeAsyncWithIResultResponseAndFormatXml_ThenReturnsXml()
+    public async Task WhenInvokeAsyncWithIResultResponseAndAcceptJson_ThenReturnsJson()
     {
         var payload = new TestResponse();
         var response = Results.Ok(payload);
-        var httpContext = SetupHttpContext(format: HttpContentTypeFormatters.Xml);
+        var httpContext = SetupHttpContext(FormatMechanism.AcceptHeader(HttpContentTypes.Json));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
-        var result = _filter.InvokeAsync(context, next);
+        var result = await _filter.InvokeAsync(context, next);
 
-        result.Result.Should().BeOfType<XmlHttpResult<object>>();
-        result.Result.As<XmlHttpResult<object>>()
-            .ContentType.Should().Be(HttpContentTypes.XmlWithCharset);
-        result.Result.As<XmlHttpResult<object>>()
+        result.Should().BeOfType<JsonHttpResult<object>>();
+        result.As<JsonHttpResult<object>>()
             .StatusCode.Should().Be((int)HttpStatusCode.OK);
-        result.Result.As<XmlHttpResult<object>>()
+        result.As<JsonHttpResult<object>>()
             .Value.Should().Be(payload);
     }
 
-    private Mock<HttpContext> SetupHttpContext(string? accept = null, string? format = null)
+    [Fact]
+    public async Task WhenInvokeAsyncWithNakedObjectResponseAndAcceptXml_ThenReturnsXml()
+    {
+        var response = new TestResponse();
+        var httpContext = SetupHttpContext(FormatMechanism.AcceptHeader(HttpContentTypes.Xml));
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<XmlHttpResult<object>>();
+        result.As<XmlHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<XmlHttpResult<object>>()
+            .Value.Should().Be(response);
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithIResultResponseAndAcceptXml_ThenReturnsXml()
+    {
+        var payload = new TestResponse();
+        var response = Results.Ok(payload);
+        var httpContext = SetupHttpContext(FormatMechanism.AcceptHeader(HttpContentTypes.Xml));
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<XmlHttpResult<object>>();
+        result.As<XmlHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<XmlHttpResult<object>>()
+            .Value.Should().Be(payload);
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithNakedObjectResponseAndQueryStringFormatJson_ThenReturnsJson()
+    {
+        var response = new TestResponse();
+        var httpContext = SetupHttpContext(FormatMechanism.QueryString(HttpContentTypeFormatters.Json));
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<JsonHttpResult<object>>();
+        result.As<JsonHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<JsonHttpResult<object>>()
+            .Value.Should().Be(response);
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithIResultResponseAndQueryStringFormatJson_ThenReturnsJson()
+    {
+        var payload = new TestResponse();
+        var response = Results.Ok(payload);
+        var httpContext = SetupHttpContext(FormatMechanism.QueryString(HttpContentTypeFormatters.Json));
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<JsonHttpResult<object>>();
+        result.As<JsonHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<JsonHttpResult<object>>()
+            .Value.Should().Be(payload);
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithNakedObjectResponseAndQueryStringFormatXml_ThenReturnsXml()
+    {
+        var response = new TestResponse();
+        var httpContext = SetupHttpContext(FormatMechanism.QueryString(HttpContentTypeFormatters.Xml));
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<XmlHttpResult<object>>();
+        result.As<XmlHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<XmlHttpResult<object>>()
+            .Value.Should().Be(response);
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithIResultResponseAndQueryStringFormatXml_ThenReturnsXml()
+    {
+        var payload = new TestResponse();
+        var response = Results.Ok(payload);
+        var httpContext = SetupHttpContext(FormatMechanism.QueryString(HttpContentTypeFormatters.Xml));
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<XmlHttpResult<object>>();
+        result.As<XmlHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<XmlHttpResult<object>>()
+            .Value.Should().Be(payload);
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithNakedObjectResponseAndFormBodyFormatJson_ThenReturnsJson()
+    {
+        var response = new TestResponse();
+        var httpContext = SetupHttpContext(FormatMechanism.FormBody(HttpContentTypeFormatters.Json));
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<JsonHttpResult<object>>();
+        result.As<JsonHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<JsonHttpResult<object>>()
+            .Value.Should().Be(response);
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithIResultResponseAndFormBodyFormatJson_ThenReturnsJson()
+    {
+        var payload = new TestResponse();
+        var response = Results.Ok(payload);
+        var httpContext = SetupHttpContext(FormatMechanism.FormBody(HttpContentTypeFormatters.Json));
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<JsonHttpResult<object>>();
+        result.As<JsonHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<JsonHttpResult<object>>()
+            .Value.Should().Be(payload);
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithNakedObjectResponseAndFormBodyFormatXml_ThenReturnsXml()
+    {
+        var response = new TestResponse();
+        var httpContext = SetupHttpContext(FormatMechanism.FormBody(HttpContentTypeFormatters.Xml));
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<XmlHttpResult<object>>();
+        result.As<XmlHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<XmlHttpResult<object>>()
+            .Value.Should().Be(response);
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithIResultResponseAndFormBodyFormatXml_ThenReturnsXml()
+    {
+        var payload = new TestResponse();
+        var response = Results.Ok(payload);
+        var httpContext = SetupHttpContext(FormatMechanism.FormBody(HttpContentTypeFormatters.Xml));
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<XmlHttpResult<object>>();
+        result.As<XmlHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<XmlHttpResult<object>>()
+            .Value.Should().Be(payload);
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithNakedObjectResponseAndJsonBodyFormatXml_ThenReturnsXml()
+    {
+        var response = new TestResponse();
+        var httpContext = SetupHttpContext(FormatMechanism.JsonBody(HttpContentTypeFormatters.Xml));
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<XmlHttpResult<object>>();
+        result.As<XmlHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<XmlHttpResult<object>>()
+            .Value.Should().Be(response);
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithIResultResponseAndJsonBodyFormatXml_ThenReturnsXml()
+    {
+        var payload = new TestResponse();
+        var response = Results.Ok(payload);
+        var httpContext = SetupHttpContext(FormatMechanism.JsonBody(HttpContentTypeFormatters.Xml));
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<XmlHttpResult<object>>();
+        result.As<XmlHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<XmlHttpResult<object>>()
+            .Value.Should().Be(payload);
+    }
+
+    private static Mock<HttpContext> SetupHttpContext(FormatMechanism? mechanism = null)
     {
         var jsonOptions = new Mock<IOptions<JsonOptions>>();
         jsonOptions.Setup(jo => jo.Value)
@@ -215,26 +478,81 @@ public class ContentNegotiationFilterSpec
 
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(hr => hr.Headers)
-            .Returns(accept.HasNoValue()
+            .Returns(mechanism is null || mechanism.AcceptHeaderFormat.HasNoValue()
                 ? new HeaderDictionary()
                 : new HeaderDictionary(new Dictionary<string, StringValues>
                 {
-                    { HttpHeaders.Accept, new StringValues(accept) }
+                    { HttpHeaders.Accept, new StringValues(mechanism.AcceptHeaderFormat) }
                 }));
         httpRequest.Setup(hr => hr.Query)
-            .Returns(format.HasNoValue()
+            .Returns(mechanism is null || mechanism.QueryStringFormat.HasNoValue()
                 ? new QueryCollection()
                 : new QueryCollection(new Dictionary<string, StringValues>
                 {
-                    { HttpQueryParams.Format, new StringValues(format) }
+                    { HttpQueryParams.Format, new StringValues(mechanism.QueryStringFormat) }
                 }));
+        if (mechanism is not null && mechanism.FormBodyFormat.HasValue())
+        {
+            httpRequest.Setup(hr => hr.HasFormContentType).Returns(true);
+            httpRequest.Setup(hr => hr.Form).Returns(new FormCollection(new Dictionary<string, StringValues>
+            {
+                { "format", new StringValues(mechanism.FormBodyFormat) }
+            }));
+        }
+
+        if (mechanism is not null && mechanism.JsonBodyFormat.HasValue())
+        {
+            httpRequest.Setup(hr => hr.ContentType).Returns(HttpContentTypes.Json);
+            httpRequest.Setup(hr => hr.Body)
+                .Returns(new MemoryStream(Encoding.UTF8.GetBytes($"{{\"format\":\"{mechanism.JsonBodyFormat}\"}}")));
+        }
 
         var httpContext = new Mock<HttpContext>();
         httpContext.Setup(hc => hc.RequestServices.GetService(It.IsAny<Type>()))
             .Returns(jsonOptions.Object);
+        httpRequest.Setup(hr => hr.HttpContext).Returns(httpContext.Object);
         httpContext.Setup(hc => hc.Request)
             .Returns(httpRequest.Object);
 
         return httpContext;
+    }
+
+    private class FormatMechanism
+    {
+        private FormatMechanism(string? accept, string? queryString, string? formBody, string? jsonBody)
+        {
+            AcceptHeaderFormat = accept;
+            QueryStringFormat = queryString;
+            FormBodyFormat = formBody;
+            JsonBodyFormat = jsonBody;
+        }
+
+        public string? AcceptHeaderFormat { get; }
+
+        public string? FormBodyFormat { get; }
+
+        public string? JsonBodyFormat { get; }
+
+        public string? QueryStringFormat { get; }
+
+        public static FormatMechanism AcceptHeader(string value)
+        {
+            return new FormatMechanism(value, null, null, null);
+        }
+
+        public static FormatMechanism FormBody(string value)
+        {
+            return new FormatMechanism(null, null, value, null);
+        }
+
+        public static FormatMechanism JsonBody(string value)
+        {
+            return new FormatMechanism(null, null, null, value);
+        }
+
+        public static FormatMechanism QueryString(string value)
+        {
+            return new FormatMechanism(null, value, null, null);
+        }
     }
 }

@@ -195,7 +195,7 @@ namespace Tools.Analyzers.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This service operation should be declared with a &apos;WebApiRouteAttribute&apos; on it..
+        ///   Looks up a localized string similar to The request type for this service operation should be declared with a &apos;RouteAttribute&apos; on it..
         /// </summary>
         internal static string SAS013Description {
             get {
@@ -204,7 +204,7 @@ namespace Tools.Analyzers.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; should have a &apos;WebApiRouteAttribute&apos;.
+        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; has a request type that does not have a &apos;RouteAttribute&apos; on it.
         /// </summary>
         internal static string SAS013MessageFormat {
             get {
@@ -213,7 +213,7 @@ namespace Tools.Analyzers.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Missing &apos;WebApiRouteAttribute&apos;.
+        ///   Looks up a localized string similar to Missing &apos;RouteAttribute&apos; on request type.
         /// </summary>
         internal static string SAS013Title {
             get {
@@ -222,7 +222,7 @@ namespace Tools.Analyzers.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This service operation has a route declared on it that is different from other service operations in this class..
+        ///   Looks up a localized string similar to This service operation has a route declared on its request that is different from other service operations in this class..
         /// </summary>
         internal static string SAS014Description {
             get {
@@ -231,7 +231,7 @@ namespace Tools.Analyzers.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; is required to have the same route path as other service operations in this class.
+        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; is required to have a request with a route for the same primary resource as the other service operations in this class.
         /// </summary>
         internal static string SAS014MessageFormat {
             get {
@@ -249,7 +249,7 @@ namespace Tools.Analyzers.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This service operation has the same request type as another service operation in this class..
+        ///   Looks up a localized string similar to This service operation uses the same request type as another service operation in this class..
         /// </summary>
         internal static string SAS015Description {
             get {
@@ -299,6 +299,33 @@ namespace Tools.Analyzers.Core {
         internal static string SAS016Title {
             get {
                 return ResourceManager.GetString("SAS016Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The request type should be declared with a &apos;RouteAttribute&apos; on it..
+        /// </summary>
+        internal static string SAS017Description {
+            get {
+                return ResourceManager.GetString("SAS017Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request type &apos;{0}&apos; should declare a &apos;RouteAttribute&apos;.
+        /// </summary>
+        internal static string SAS017MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS017MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing &apos;RouteAttribute&apos;.
+        /// </summary>
+        internal static string SAS017Title {
+            get {
+                return ResourceManager.GetString("SAS017Title", resourceCulture);
             }
         }
     }

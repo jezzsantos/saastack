@@ -108,7 +108,8 @@ public class WebApiAssemblyVisitorSpec
         public void WhenVisitNamedTypeAndNotServiceClass_ThenStopsVisiting()
         {
             var type = new Mock<INamedTypeSymbol>();
-            type.Setup(t => t.GetTypeMembers()).Returns(ImmutableArray<INamedTypeSymbol>.Empty);
+            type.Setup(t => t.GetTypeMembers())
+                .Returns(ImmutableArray<INamedTypeSymbol>.Empty);
             type.Setup(t => t.TypeKind).Returns(TypeKind.Interface);
 
             _visitor.VisitNamedType(type.Object);
@@ -121,7 +122,8 @@ public class WebApiAssemblyVisitorSpec
         public void WhenVisitNamedTypeAndIsClassButNotPublic_ThenCreatesNoRegistrations()
         {
             var type = new Mock<INamedTypeSymbol>();
-            type.Setup(t => t.GetTypeMembers()).Returns(ImmutableArray<INamedTypeSymbol>.Empty);
+            type.Setup(t => t.GetTypeMembers())
+                .Returns(ImmutableArray<INamedTypeSymbol>.Empty);
             type.Setup(t => t.TypeKind).Returns(TypeKind.Class);
             type.Setup(t => t.DeclaredAccessibility).Returns(Accessibility.Private);
 
@@ -250,12 +252,12 @@ public class WebApiAssemblyVisitorSpec
         [Fact]
         public void WhenVisitNamedTypeAndVoidReturnType_ThenCreatesNoRegistrations()
         {
-            var voidType = _compilation.GetTypeByMetadataName(typeof(void).FullName!)!;
+            var voidMetadata = _compilation.GetTypeByMetadataName(typeof(void).FullName!)!;
             var type = SetupServiceClass(_compilation);
             var method = new Mock<IMethodSymbol>();
             method.Setup(m => m.DeclaredAccessibility).Returns(Accessibility.Public);
             method.Setup(m => m.IsStatic).Returns(false);
-            method.Setup(m => m.ReturnType).Returns(voidType);
+            method.Setup(m => m.ReturnType).Returns(voidMetadata);
             type.Setup(t => t.GetMembers()).Returns(ImmutableArray.Create<ISymbol>(method.Object));
 
             _visitor.VisitNamedType(type.Object);
@@ -267,12 +269,12 @@ public class WebApiAssemblyVisitorSpec
         [Fact]
         public void WhenVisitNamedTypeAndHasNoParameters_ThenCreatesNoRegistrations()
         {
-            var taskType = _compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
+            var taskMetadata = _compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
             var type = SetupServiceClass(_compilation);
             var method = new Mock<IMethodSymbol>();
             method.Setup(m => m.DeclaredAccessibility).Returns(Accessibility.Public);
             method.Setup(m => m.IsStatic).Returns(false);
-            method.Setup(m => m.ReturnType).Returns(taskType);
+            method.Setup(m => m.ReturnType).Returns(taskMetadata);
             method.Setup(m => m.Parameters).Returns(ImmutableArray.Create<IParameterSymbol>());
             type.Setup(t => t.GetMembers()).Returns(ImmutableArray.Create<ISymbol>(method.Object));
 
@@ -285,12 +287,12 @@ public class WebApiAssemblyVisitorSpec
         [Fact]
         public void WhenVisitNamedTypeAndHasWrongFirstParameter_ThenCreatesNoRegistrations()
         {
-            var taskType = _compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
+            var taskMetadata = _compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
             var type = SetupServiceClass(_compilation);
             var method = new Mock<IMethodSymbol>();
             method.Setup(m => m.DeclaredAccessibility).Returns(Accessibility.Public);
             method.Setup(m => m.IsStatic).Returns(false);
-            method.Setup(m => m.ReturnType).Returns(taskType);
+            method.Setup(m => m.ReturnType).Returns(taskMetadata);
             var parameter = new Mock<IParameterSymbol>();
             var classBaseType = new Mock<INamedTypeSymbol>();
             parameter.Setup(p => p.Type.AllInterfaces).Returns(ImmutableArray.Create(classBaseType.Object));
@@ -306,18 +308,18 @@ public class WebApiAssemblyVisitorSpec
         [Fact]
         public void WhenVisitNamedTypeAndHasWrongSecondParameter_ThenCreatesNoRegistrations()
         {
-            var requestType = _compilation.GetTypeByMetadataName(typeof(IWebRequest).FullName!)!;
-            var stringType = _compilation.GetTypeByMetadataName(typeof(string).FullName!)!;
-            var taskType = _compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
+            var requestMetadata = _compilation.GetTypeByMetadataName(typeof(IWebRequest).FullName!)!;
+            var stringMetadata = _compilation.GetTypeByMetadataName(typeof(string).FullName!)!;
+            var taskMetadata = _compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
             var type = SetupServiceClass(_compilation);
             var method = new Mock<IMethodSymbol>();
             method.Setup(m => m.DeclaredAccessibility).Returns(Accessibility.Public);
             method.Setup(m => m.IsStatic).Returns(false);
-            method.Setup(m => m.ReturnType).Returns(taskType);
+            method.Setup(m => m.ReturnType).Returns(taskMetadata);
             var firstParameter = new Mock<IParameterSymbol>();
-            firstParameter.Setup(p => p.Type.AllInterfaces).Returns(ImmutableArray.Create(requestType));
+            firstParameter.Setup(p => p.Type.AllInterfaces).Returns(ImmutableArray.Create(requestMetadata));
             var secondParameter = new Mock<IParameterSymbol>();
-            secondParameter.Setup(p => p.Type).Returns(stringType);
+            secondParameter.Setup(p => p.Type).Returns(stringMetadata);
             method.Setup(m => m.Parameters)
                 .Returns(ImmutableArray.Create(firstParameter.Object, secondParameter.Object));
             type.Setup(t => t.GetMembers()).Returns(ImmutableArray.Create<ISymbol>(method.Object));
@@ -331,21 +333,21 @@ public class WebApiAssemblyVisitorSpec
         [Fact]
         public void WhenVisitNamedTypeAndHasNoAttributes_ThenCreatesNoRegistrations()
         {
-            var requestType = _compilation.GetTypeByMetadataName(typeof(IWebRequest).FullName!)!;
-            var cancellationTokenType = _compilation.GetTypeByMetadataName(typeof(CancellationToken).FullName!)!;
-            var taskType = _compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
+            var requestMetadata = _compilation.GetTypeByMetadataName(typeof(IWebRequest).FullName!)!;
+            var cancellationTokenMetadata = _compilation.GetTypeByMetadataName(typeof(CancellationToken).FullName!)!;
+            var taskMetadata = _compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
             var type = SetupServiceClass(_compilation);
             var method = new Mock<IMethodSymbol>();
             method.Setup(m => m.DeclaredAccessibility).Returns(Accessibility.Public);
             method.Setup(m => m.IsStatic).Returns(false);
-            method.Setup(m => m.ReturnType).Returns(taskType);
+            method.Setup(m => m.ReturnType).Returns(taskMetadata);
             var firstParameter = new Mock<IParameterSymbol>();
-            firstParameter.Setup(p => p.Type.AllInterfaces).Returns(ImmutableArray.Create(requestType));
+            firstParameter.Setup(p => p.Type.GetAttributes()).Returns(ImmutableArray.Create<AttributeData>());
+            firstParameter.Setup(p => p.Type.AllInterfaces).Returns(ImmutableArray.Create(requestMetadata));
             var secondParameter = new Mock<IParameterSymbol>();
-            secondParameter.Setup(p => p.Type).Returns(cancellationTokenType);
+            secondParameter.Setup(p => p.Type).Returns(cancellationTokenMetadata);
             method.Setup(m => m.Parameters)
                 .Returns(ImmutableArray.Create(firstParameter.Object, secondParameter.Object));
-            method.Setup(t => t.GetAttributes()).Returns(ImmutableArray.Create<AttributeData>());
             type.Setup(t => t.GetMembers()).Returns(ImmutableArray.Create<ISymbol>(method.Object));
 
             _visitor.VisitNamedType(type.Object);
@@ -369,12 +371,12 @@ public class WebApiAssemblyVisitorSpec
                                                     public class AResponse : IWebResponse
                                                     {
                                                     }
+                                                    [Route("aroute", ServiceOperation.Get)]
                                                     public class ARequest : IWebRequest<AResponse>
                                                     {
                                                     }
                                                     public class AServiceClass : Infrastructure.WebApi.Interfaces.IWebApiService
                                                     {
-                                                        [WebApiRoute("aroute", WebApiOperation.Get)]
                                                         public string AMethod(ARequest request)
                                                         {
                                                              return "";
@@ -401,7 +403,7 @@ public class WebApiAssemblyVisitorSpec
                                                     + $"         return \"\";{Environment.NewLine}"
                                                     + $"    }}{Environment.NewLine}");
                 registration.MethodName.Should().Be("AMethod");
-                registration.OperationType.Should().Be(WebApiOperation.Get);
+                registration.OperationType.Should().Be(ServiceOperation.Get);
                 registration.RoutePath.Should().Be("aroute");
                 registration.IsTestingOnly.Should().BeFalse();
                 registration.RequestDtoType.Name.Should().Be("ARequest");
@@ -413,14 +415,14 @@ public class WebApiAssemblyVisitorSpec
 
         private static Mock<INamedTypeSymbol> SetupServiceClass(CSharpCompilation compilation)
         {
-            var serviceClassBaseInterface = compilation.GetTypeByMetadataName(typeof(IWebApiService).FullName!)!;
+            var serviceClassMetadata = compilation.GetTypeByMetadataName(typeof(IWebApiService).FullName!)!;
             var type = new Mock<INamedTypeSymbol>();
             type.Setup(t => t.GetTypeMembers()).Returns(ImmutableArray<INamedTypeSymbol>.Empty);
             type.Setup(t => t.TypeKind).Returns(TypeKind.Class);
             type.Setup(t => t.DeclaredAccessibility).Returns(Accessibility.Public);
             type.Setup(t => t.IsStatic).Returns(false);
             type.Setup(t => t.IsAbstract).Returns(false);
-            type.Setup(t => t.AllInterfaces).Returns(ImmutableArray.Create(serviceClassBaseInterface));
+            type.Setup(t => t.AllInterfaces).Returns(ImmutableArray.Create(serviceClassMetadata));
             var @namespace = new Mock<INamespaceSymbol>();
             @namespace.As<ISymbol>().Setup(ns => ns.ToDisplayString(It.IsAny<SymbolDisplayFormat?>()))
                 .Returns("adisplaystring");
