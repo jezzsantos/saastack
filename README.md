@@ -1,19 +1,18 @@
-[![In Preview](https://img.shields.io/badge/Status-InPreview-red.svg)](README.md)
+[![In Preview](https://img.shields.io/badge/Status-InDevelopment-yellow.svg)](README.md)
 [![Build and Test](https://github.com/jezzsantos/saastack/actions/workflows/build.yml/badge.svg)](https://github.com/jezzsantos/saastack/actions/workflows/build.yml)
 [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/jezzsantos)
 
 # SaaStack
 
-Are you thinking of building a new SaaS product from scratch? (on .NET)
+Are you about to build a new SaaS product from scratch and do that on .NET?
 
 Then, start with SaaStack. It is a complete "codebase template" for building real-world, fully featured SaaS web products.
 
 Ready to build, test, and deploy into a cloud provider of your choice (e.g., Azure, AWS, Google Cloud, etc.)
 
-Don't spend months building all this stuff from scratch. You and your team don't need to. We've done all that for you already, just take it from here.
-
->  This is not a starter EXAMPLE template of the type you would download to learn a new technology. 
->  This is a partial but fully functional SaaS product that you can deploy from day one and start building your product on. But it is not yet complete. That part is up to you.
+> Don't spend months building all this stuff from scratch. You and your team don't need to. We've done all that for you already; just take it from here.
+> It is not an EXAMPLE template like those you would download to learn a new technology or see in demos online. This is way more comprehensive and contextualized.
+> This template contains a partial (but fully functional) SaaS product that you can deploy from day one and start building your product on. But it is not yet complete. That part is up to you.
 
 The codebase demonstrates common architectural styles that you are going to need in the long run, such as:
 * [Modular-Monolith](https://www.thoughtworks.com/insights/blog/microservices/modular-monolith-better-way-build-software) - build a monolith first, the separate out to micro-services later
