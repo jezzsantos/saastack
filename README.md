@@ -10,10 +10,10 @@ Then, start with SaaStack. It is a complete "codebase template" for building rea
 
 Ready to build, test, and deploy into a cloud provider of your choice (e.g., Azure, AWS, Google Cloud, etc.)
 
-Don't spend months building all this stuff from scratch. You and your team don't need to. We've done it for you already.
+Don't spend months building all this stuff from scratch. You and your team don't need to. We've done all that for you already, just take it from here.
 
 >  This is not a starter EXAMPLE template of the type you would download to learn a new technology. 
->  This is a fully-fledged functional SaaS product that you can deploy from day one and get started building out your product with.
+>  This is a partial but fully functional SaaS product that you can deploy from day one and start building your product on. But it is not yet complete. That part is up to you.
 
 The codebase demonstrates common architectural styles that you are going to need in the long run, such as:
 * [Modular-Monolith](https://www.thoughtworks.com/insights/blog/microservices/modular-monolith-better-way-build-software) - build a monolith first, the separate out to micro-services later
