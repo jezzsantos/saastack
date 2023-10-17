@@ -1,6 +1,4 @@
-using Infrastructure.WebApi.Interfaces;
-
-namespace Infrastructure.WebApi.Common.Clients;
+namespace Infrastructure.WebApi.Interfaces.Clients;
 
 /// <summary>
 ///     Defines a JSON <see cref="HttpClient" />

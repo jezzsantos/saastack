@@ -1,4 +1,4 @@
-namespace Infrastructure.WebApi.Common;
+namespace Infrastructure.WebApi.Interfaces;
 
 /// <summary>
 ///     Defines a problem for a specific validator

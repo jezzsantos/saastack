@@ -1,4 +1,4 @@
-namespace Infrastructure.WebApi.Common.Clients;
+namespace Infrastructure.WebApi.Interfaces.Clients;
 
 /// <summary>
 ///     Defines a problem returned in a response

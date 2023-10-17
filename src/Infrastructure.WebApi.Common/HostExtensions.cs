@@ -20,13 +20,13 @@ public static class HostExtensions
     {
         builder.Services.AddHttpContextAccessor();
 
-        SetupConfiguration();
-        SetupRecording();
-        SetupAuthenticationAuthorization();
-        SetupMultiTenancy();
-        SetupApplicationServices();
-        SetupWireFormats();
-        SetupApiRequests();
+        ConfigureConfiguration();
+        ConfigureRecording();
+        ConfigureAuthenticationAuthorization();
+        ConfigureMultiTenancy();
+        ConfigureApplicationServices();
+        ConfigureWireFormats();
+        ConfigureApiRequests();
 
         var app = builder.Build();
 
@@ -37,34 +37,36 @@ public static class HostExtensions
 
         return app;
 
-        void SetupConfiguration()
+        void ConfigureConfiguration()
         {
             //TODO: register configuration classes
         }
 
-        void SetupRecording()
+        void ConfigureRecording()
         {
             builder.Services.AddSingleton(NullRecorder.Instance);
         }
 
-        void SetupAuthenticationAuthorization()
+        void ConfigureAuthenticationAuthorization()
         {
             //TODO: need to add authentication/authorization (https://www.youtube.com/watch?v=XKN0084p7WQ)
         }
 
-        void SetupMultiTenancy()
+        void ConfigureMultiTenancy()
         {
             //TODO: setup multi-tenancy
         }
 
-        void SetupApplicationServices()
+        void ConfigureApplicationServices()
         {
+            builder.Services.AddHttpClient();
+
             var factory = new HostIdentifierFactory(modules.AggregatePrefixes);
             builder.Services.AddSingleton<IIdentifierFactory>(factory);
             builder.Services.AddScoped<ICallerContext, AnonymousCallerContext>();
         }
 
-        void SetupApiRequests()
+        void ConfigureApiRequests()
         {
             builder.Services.AddSingleton<IHasSearchOptionsValidator, HasSearchOptionsValidator>();
             builder.Services.AddSingleton<IHasGetOptionsValidator, HasGetOptionsValidator>();
@@ -78,7 +80,7 @@ public static class HostExtensions
             modules.RegisterServices(builder.Configuration, builder.Services);
         }
 
-        void SetupWireFormats()
+        void ConfigureWireFormats()
         {
             builder.Services.ConfigureHttpJsonOptions(options =>
             {

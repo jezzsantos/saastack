@@ -18,7 +18,7 @@ internal class UrlValidator<T, TProperty> : PropertyValidator<T, TProperty>
             return false;
         }
 
-        var propertyValue = value?.ToString();
+        var propertyValue = value.ToString();
         if (propertyValue.HasNoValue())
         {
             return false;

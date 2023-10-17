@@ -19,13 +19,13 @@ internal class EmailAddressValidator<T, TProperty> : PropertyValidator<T, TPrope
             return false;
         }
 
-        var propertyValue = value?.ToString();
+        var propertyValue = value.ToString();
         if (propertyValue.HasNoValue())
         {
             return false;
         }
 
-        return propertyValue!.IsMatchWith(CommonValidations.EmailAddress.Expression!);
+        return propertyValue.IsMatchWith(CommonValidations.EmailAddress.Expression!);
     }
 
     protected override string GetDefaultMessageTemplate(string errorCode)

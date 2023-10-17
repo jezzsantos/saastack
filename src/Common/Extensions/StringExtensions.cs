@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -57,7 +58,7 @@ public static class StringExtensions
     ///     Whether the string value contains no value: it is either: null, empty or only whitespaces
     /// </summary>
     [ContractAnnotation("null => true; notnull => false")]
-    public static bool HasNoValue(this string? value)
+    public static bool HasNoValue([NotNullWhen(false)] this string? value)
     {
         return string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value);
     }
@@ -66,7 +67,7 @@ public static class StringExtensions
     ///     Whether the string value contains any value except: null, empty or only whitespaces
     /// </summary>
     [ContractAnnotation("null => false; notnull => true")]
-    public static bool HasValue(this string? value)
+    public static bool HasValue([NotNullWhen(true)] this string? value)
     {
         return !string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value);
     }

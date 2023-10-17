@@ -1,4 +1,5 @@
 using Infrastructure.WebApi.Common.Clients;
+using Infrastructure.WebApi.Interfaces.Clients;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,6 +50,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
             //TODO: swap out dependencies
             //services.AddScoped<ITodoItemService, TestTodoItemService>();
         }));
+        
         HttpApi = setup.CreateClient();
         Api = new JsonClient(HttpApi);
     }

@@ -1,9 +1,8 @@
 using System.Net;
 using System.Net.Http.Headers;
 using Common;
-using Infrastructure.WebApi.Interfaces;
 
-namespace Infrastructure.WebApi.Common.Clients;
+namespace Infrastructure.WebApi.Interfaces.Clients;
 
 /// <summary>
 ///     Defines a JSON response

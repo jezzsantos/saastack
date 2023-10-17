@@ -24,6 +24,7 @@ public static class HttpHeaders
 {
     public const string Accept = "Accept";
     public const string RequestId = "Request-ID";
+    public const string Authorization = "Authorization";
 }
 
 /// <summary>

@@ -3,19 +3,39 @@ using System.Net.Http.Json;
 using Common;
 using Common.Extensions;
 using Infrastructure.WebApi.Interfaces;
+using Infrastructure.WebApi.Interfaces.Clients;
 
 namespace Infrastructure.WebApi.Common.Clients;
 
 /// <summary>
 ///     Provides a convenient typed <see cref="HttpClient" /> that accepts and returns JSON
 /// </summary>
-public class JsonClient : IHttpJsonClient
+public class JsonClient : IHttpJsonClient, IDisposable
 {
     private readonly HttpClient _client;
+
+    public JsonClient(IHttpClientFactory clientFactory)
+    {
+        _client = clientFactory.CreateClient();
+    }
 
     public JsonClient(HttpClient client)
     {
         _client = client;
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _client.Dispose();
+        }
     }
 
     public async Task<JsonResponse> DeleteAsync<TResponse>(IWebRequest<TResponse> request,
@@ -121,6 +141,17 @@ public class JsonClient : IHttpJsonClient
         return CreateResponse(response, content);
     }
 
+    public async Task SendOneWayAsync(IWebRequest request, Action<HttpRequestMessage>? requestFilter = null,
+        CancellationToken? cancellationToken = default)
+    {
+        await SendRequestAsync(HttpMethod.Put, request, requestFilter, cancellationToken);
+    }
+
+    public void SetBaseUrl(string baseUrl)
+    {
+        _client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
+    }
+
     private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod method, IWebRequest request,
         Action<HttpRequestMessage>? requestFilter, CancellationToken? cancellationToken = default)
     {
@@ -137,7 +168,7 @@ public class JsonClient : IHttpJsonClient
         var request = new HttpRequestMessage
         {
             Method = method,
-            RequestUri = new Uri(requestUri, UriKind.Relative),
+            RequestUri = new Uri(_client.BaseAddress!, requestUri),
             Content = requestContent,
             Headers = { { HttpHeaders.Accept, HttpContentTypes.Json } }
         };
@@ -159,7 +190,7 @@ public class JsonClient : IHttpJsonClient
             return new TResponse();
         }
 
-        if (contentType!.MediaType == HttpContentTypes.JsonProblem)
+        if (contentType.MediaType == HttpContentTypes.JsonProblem)
         {
             return await response.Content.ReadFromJsonAsync<ResponseProblem>(
                 cancellationToken: cancellationToken ?? CancellationToken.None);
@@ -183,7 +214,7 @@ public class JsonClient : IHttpJsonClient
             return default;
         }
 
-        if (contentType!.MediaType == HttpContentTypes.JsonProblem)
+        if (contentType.MediaType == HttpContentTypes.JsonProblem)
         {
             return await response.Content.ReadFromJsonAsync<ResponseProblem>(
                 cancellationToken: cancellationToken ?? CancellationToken.None);

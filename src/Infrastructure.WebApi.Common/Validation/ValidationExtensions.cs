@@ -23,7 +23,7 @@ public static class ValidationExtensions
     public static IRuleBuilderOptions<TDto, string> IsEntityId<TDto>(this IRuleBuilder<TDto, string?> rule,
         IIdentifierFactory identifierFactory)
     {
-        return rule.Must(id => id.HasValue() && identifierFactory.IsValid(Identifier.Create(id!)))!;
+        return rule.Must(id => id.HasValue() && identifierFactory.IsValid(Identifier.Create(id)))!;
     }
 
     /// <summary>
