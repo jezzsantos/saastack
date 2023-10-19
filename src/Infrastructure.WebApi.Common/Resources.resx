@@ -27,4 +27,13 @@
     <data name="RequestExtensions_MissingRouteAttribute" xml:space="preserve">
         <value>The request DTO type '{0}' is missing a '{1}' declared on the class</value>
     </data>
+    <data name="AspNetConfigurationSettings_KeyNotFound" xml:space="preserve">
+        <value>The setting '{0}' cannot be found in any configuration</value>
+    </data>
+    <data name="AspNetConfigurationSettings_ValueNotBoolean" xml:space="preserve">
+        <value>The setting '{0}' exists, but is not a recognizable boolean value</value>
+    </data>
+    <data name="AspNetConfigurationSettings_ValueNotNumber" xml:space="preserve">
+        <value>The setting '{0}' exists, but is not a recognizable number value</value>
+    </data>
 </root>

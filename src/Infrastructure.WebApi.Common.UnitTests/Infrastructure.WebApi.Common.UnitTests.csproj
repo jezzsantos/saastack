@@ -14,5 +14,16 @@
         <ProjectReference Include="..\Infrastructure.WebApi.Common\Infrastructure.WebApi.Common.csproj" />
     </ItemGroup>
 
-
+    <ItemGroup>
+        <Content Include="tenantsettings.testing.encrypted.json">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+        <Content Include="tenantsettings.testing.json">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+    </ItemGroup>
 </Project>

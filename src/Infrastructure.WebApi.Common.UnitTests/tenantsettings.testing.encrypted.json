@@ -1,0 +1,10 @@
+{
+  "SettingsEncryptedAtRest": "AGroup:ASubGroup:ASetting1,AnUnknownSettingKey AGroup:ASubGroup:ASetting3;AGroup:AnUnknownSubGroup;AGroup:ASubGroup:AnUnknownSetting",
+  "AGroup": {
+    "ASubGroup": {
+      "ASetting1": "avalue1",
+      "ASetting2": "avalue2",
+      "ASetting3": "avalue3"
+    }
+  }
+}

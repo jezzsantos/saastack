@@ -1,12 +1,11 @@
 using ApiHost1;
-using Infrastructure.Common.Recording;
 using Infrastructure.WebApi.Common;
 using JetBrains.Annotations;
 
 var modules = HostedModules.Get();
 
 var app = WebApplication.CreateBuilder(args)
-    .ConfigureApiHost(modules, RecorderOptions.BackEndApiHost);
+    .ConfigureApiHost(modules, WebHostOptions.BackEndApiHost);
 app.Run();
 
 namespace ApiHost1

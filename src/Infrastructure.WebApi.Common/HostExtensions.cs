@@ -1,11 +1,18 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application.Interfaces;
+using Application.Interfaces.Services;
+using Common.Configuration;
 using Common.Recording;
 using Domain.Interfaces.Entities;
-using Infrastructure.Common.Recording;
+using Domain.Interfaces.Services;
+using Infrastructure.Common;
+using Infrastructure.Common.DomainServices;
+using Infrastructure.Interfaces;
+using Infrastructure.WebApi.Common.ApplicationServices;
 using Infrastructure.WebApi.Common.Validation;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.WebApi.Common;
@@ -16,54 +23,68 @@ public static class HostExtensions
     ///     Configures a WebHost
     /// </summary>
     public static WebApplication ConfigureApiHost(this WebApplicationBuilder builder, SubDomainModules modules,
-        RecorderOptions recorderOptions)
+        WebHostOptions options)
     {
-        builder.Services.AddHttpContextAccessor();
-
-        ConfigureConfiguration();
+        ConfigureSharedServices();
+        ConfigureMultiTenancy(options.IsMultiTenanted);
+        ConfigureConfiguration(options.IsMultiTenanted);
         ConfigureRecording();
         ConfigureAuthenticationAuthorization();
-        ConfigureMultiTenancy();
-        ConfigureApplicationServices();
         ConfigureWireFormats();
         ConfigureApiRequests();
+        ConfigureApplicationServices();
 
         var app = builder.Build();
 
         app.EnableRequestRewind();
         app.AddExceptionShielding();
+        //TODO: app.AddMultiTenancyDetection(); we need a TenantDetective
 
         modules.ConfigureHost(app);
 
         return app;
 
-        void ConfigureConfiguration()
+        void ConfigureSharedServices()
         {
-            //TODO: register configuration classes
+            builder.Services.AddHttpContextAccessor();
+        }
+
+        void ConfigureMultiTenancy(bool isMultiTenanted)
+        {
+            if (isMultiTenanted)
+            {
+                builder.Services.AddScoped<ITenancyContext, SimpleTenancyContext>();
+            }
+        }
+
+        void ConfigureConfiguration(bool isMultiTenanted)
+        {
+            if (isMultiTenanted)
+            {
+                builder.Services.AddSingleton<ITenantSettingsService, AspNetHostLocalFileTenantSettingsService>();
+                builder.Services.AddSingleton<ITenantSettingService>(c => new TenantSettingService(
+                    new AesEncryptionService(c
+                        .GetRequiredService<IConfigurationSettings>().Platform
+                        .GetString(TenantSettingService.EncryptionServiceSecretSettingName))));
+                builder.Services.AddScoped<IConfigurationSettings>(c =>
+                    new AspNetConfigurationSettings(c.GetRequiredService<IConfiguration>(),
+                        c.GetRequiredService<ITenancyContext>()));
+            }
+            else
+            {
+                builder.Services.AddSingleton<IConfigurationSettings>(c =>
+                    new AspNetConfigurationSettings(c.GetRequiredService<IConfiguration>()));
+            }
         }
 
         void ConfigureRecording()
         {
-            builder.Services.AddSingleton(NullRecorder.Instance);
+            builder.Services.AddSingleton(NullRecorder.Instance); // TODO: we need a HostRecorder for Azure and AWS
         }
 
         void ConfigureAuthenticationAuthorization()
         {
             //TODO: need to add authentication/authorization (https://www.youtube.com/watch?v=XKN0084p7WQ)
-        }
-
-        void ConfigureMultiTenancy()
-        {
-            //TODO: setup multi-tenancy
-        }
-
-        void ConfigureApplicationServices()
-        {
-            builder.Services.AddHttpClient();
-
-            var factory = new HostIdentifierFactory(modules.AggregatePrefixes);
-            builder.Services.AddSingleton<IIdentifierFactory>(factory);
-            builder.Services.AddScoped<ICallerContext, AnonymousCallerContext>();
         }
 
         void ConfigureApiRequests()
@@ -82,18 +103,27 @@ public static class HostExtensions
 
         void ConfigureWireFormats()
         {
-            builder.Services.ConfigureHttpJsonOptions(options =>
+            builder.Services.ConfigureHttpJsonOptions(opts =>
             {
-                options.SerializerOptions.PropertyNameCaseInsensitive = true;
-                options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.SerializerOptions.WriteIndented = false;
-                options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
-                options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase,
+                opts.SerializerOptions.PropertyNameCaseInsensitive = true;
+                opts.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                opts.SerializerOptions.WriteIndented = false;
+                opts.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
+                opts.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase,
                     false));
-                options.SerializerOptions.Converters.Add(new JsonDateTimeConverter(DateFormat.Iso8601));
+                opts.SerializerOptions.Converters.Add(new JsonDateTimeConverter(DateFormat.Iso8601));
             });
 
-            builder.Services.ConfigureHttpXmlOptions(options => { options.SerializerOptions.WriteIndented = false; });
+            builder.Services.ConfigureHttpXmlOptions(opts => { opts.SerializerOptions.WriteIndented = false; });
+        }
+
+        void ConfigureApplicationServices()
+        {
+            builder.Services.AddHttpClient();
+
+            var factory = new HostIdentifierFactory(modules.AggregatePrefixes);
+            builder.Services.AddSingleton<IIdentifierFactory>(factory);
+            builder.Services.AddScoped<ICallerContext, AnonymousCallerContext>();
         }
     }
 }

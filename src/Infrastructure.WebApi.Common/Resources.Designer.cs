@@ -60,6 +60,33 @@ namespace Infrastructure.WebApi.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The setting &apos;{0}&apos; cannot be found in any configuration.
+        /// </summary>
+        internal static string AspNetConfigurationSettings_KeyNotFound {
+            get {
+                return ResourceManager.GetString("AspNetConfigurationSettings_KeyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The setting &apos;{0}&apos; exists, but is not a recognizable boolean value.
+        /// </summary>
+        internal static string AspNetConfigurationSettings_ValueNotBoolean {
+            get {
+                return ResourceManager.GetString("AspNetConfigurationSettings_ValueNotBoolean", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The setting &apos;{0}&apos; exists, but is not a recognizable number value.
+        /// </summary>
+        internal static string AspNetConfigurationSettings_ValueNotNumber {
+            get {
+                return ResourceManager.GetString("AspNetConfigurationSettings_ValueNotNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The request DTO type &apos;{0}&apos; is missing a &apos;{1}&apos; declared on the class.
         /// </summary>
         internal static string RequestExtensions_MissingRouteAttribute {
