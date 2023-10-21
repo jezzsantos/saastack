@@ -149,10 +149,10 @@ public readonly struct Optional<T> : IEquatable<Optional<T>>
     {
         if (right.NotExists())
         {
-            return left.NotExists();
+            return left.Exists();
         }
 
-        return !(left == right!);
+        return !(left == right);
     }
 
     /// <summary>
@@ -170,9 +170,9 @@ public readonly struct Optional<T> : IEquatable<Optional<T>>
     {
         if (left.NotExists())
         {
-            return right.NotExists();
+            return right.Exists();
         }
 
-        return !(right == left!);
+        return !(right == left);
     }
 }

@@ -59,7 +59,7 @@ public static class CommonValidations
             return false;
         }
 
-        var valueToMatch = value!.ToString() ?? string.Empty;
+        var valueToMatch = value.ToString() ?? string.Empty;
 
         return valueToMatch.IsMatchWith(format.Expression!);
     }
@@ -71,12 +71,12 @@ public static class CommonValidations
             return true;
         }
 
-        if (format.MinLength.HasValue && value!.ToString()!.Length < format.MinLength.Value)
+        if (format.MinLength.HasValue && value.ToString()!.Length < format.MinLength.Value)
         {
             return true;
         }
 
-        if (format.MaxLength.HasValue && value!.ToString()!.Length > format.MaxLength.Value)
+        if (format.MaxLength.HasValue && value.ToString()!.Length > format.MaxLength.Value)
         {
             return true;
         }

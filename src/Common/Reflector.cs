@@ -26,7 +26,7 @@ public static class Reflector
             throw new ArgumentException(Resources.Reflector_ErrorNotProperty);
         }
 
-        return info!;
+        return info;
     }
 
     private static MemberInfo GetMemberInfo(LambdaExpression lambda)

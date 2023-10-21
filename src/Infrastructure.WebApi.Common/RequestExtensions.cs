@@ -51,7 +51,7 @@ public static class RequestExtensions
                 Resources.RequestExtensions_MissingRouteAttribute.Format(requestTypeName, nameof(RouteAttribute)));
         }
 
-        return attribute!;
+        return attribute;
     }
 
     private static string ExpandRouteTemplate(IWebRequest request, RouteAttribute attribute)
@@ -85,7 +85,7 @@ public static class RequestExtensions
             if (requestFields.TryGetValue(requestFieldName, out var substitute))
             {
                 unSubstitutedRequestFields.Remove(requestFieldName);
-                if (substitute.Exists() && substitute!.ToString().HasValue())
+                if (substitute.Exists() && substitute.ToString().HasValue())
                 {
                     route.Append(substitute);
                 }
@@ -145,7 +145,7 @@ public static class RequestExtensions
         foreach (var requestField in requestFields)
         {
             var value = requestField.Value;
-            if (value.Exists() && value!.ToString().HasValue())
+            if (value.Exists() && value.ToString().HasValue())
             {
                 route.Append(count == 0
                     ? '?'

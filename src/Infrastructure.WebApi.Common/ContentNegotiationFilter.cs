@@ -132,12 +132,12 @@ public class ContentNegotiationFilter : IEndpointFilter
 
         if (bodyField.HasValue())
         {
-            if (bodyField!.EqualsIgnoreCase(HttpContentTypeFormatters.Json))
+            if (bodyField.EqualsIgnoreCase(HttpContentTypeFormatters.Json))
             {
                 return NegotiatedMimeType.Json;
             }
 
-            if (bodyField!.EqualsIgnoreCase(HttpContentTypeFormatters.Xml))
+            if (bodyField.EqualsIgnoreCase(HttpContentTypeFormatters.Xml))
             {
                 return NegotiatedMimeType.Xml;
             }

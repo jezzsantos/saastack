@@ -24,7 +24,7 @@ public static class DateTimeExtensions
             "yyyy-MM-ddTHH:mm:ss.FFFFZ", "yyyy-MM-ddTHH:mm:ss.FFFFFZ", "yyyy-MM-ddTHH:mm:ss.FFFFFFZ",
             "yyyy-MM-ddTHH:mm:ss.FFFFFFFZ"
         };
-        if (DateTime.TryParseExact(value!, supportedIsoFormats, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None,
+        if (DateTime.TryParseExact(value, supportedIsoFormats, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None,
                 out var date))
         {
             return date.Kind == DateTimeKind.Utc

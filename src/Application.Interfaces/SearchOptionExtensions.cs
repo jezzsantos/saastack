@@ -11,7 +11,7 @@ public static class SearchOptionExtensions
     {
         return Map(options.NotExists()
             ? new SearchOptions()
-            : options!, total);
+            : options, total);
 
         static SearchResultMetadata Map(SearchOptions options, int total)
         {

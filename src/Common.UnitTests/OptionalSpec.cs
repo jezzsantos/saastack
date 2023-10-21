@@ -244,6 +244,86 @@ public class OptionalSpec
         optional.Equals((object?)optional)
             .Should().BeTrue();
     }
+
+    [Fact]
+    public void WhenNotEqualsOperatorWithEmptyOptionalAndNullInstance_ThenReturnsTrue()
+    {
+        var optional = new Optional<TestClass>();
+
+        (optional != null!)
+            .Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenNotEqualsOperatorWithEmptyOptionalAndInstance_ThenReturnsTrue()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional = new Optional<TestClass>();
+
+        (optional != instance)
+            .Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenNotEqualsOperatorWithOtherOptionalAndOtherInstance_ThenReturnsTrue()
+    {
+        var instance1 = new TestClass { AProperty = "avalue1" };
+        var instance2 = new TestClass { AProperty = "avalue2" };
+        var optional = new Optional<TestClass>(instance1);
+
+        (optional != instance2)
+            .Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenNotEqualsOperatorWithOptionalOfInstanceAndInstance_ThenReturnsFalse()
+    {
+        var instance = new TestClass { AProperty = "avalue1" };
+        var optional = new Optional<TestClass>(instance);
+
+        (optional != instance)
+            .Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenNotEqualsOperatorWithNullInstanceAndEmptyOptional_ThenReturnsTrue()
+    {
+        var optional = new Optional<TestClass>();
+
+        (null! != optional)
+            .Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenNotEqualsOperatorWithInstanceAndEmptyOptional_ThenReturnsTrue()
+    {
+        var instance = new TestClass { AProperty = "avalue" };
+        var optional = new Optional<TestClass>();
+
+        (instance != optional)
+            .Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenNotEqualsOperatorWithInstanceAndOptionalOfOtherInstance_ThenReturnsTrue()
+    {
+        var instance1 = new TestClass { AProperty = "avalue1" };
+        var instance2 = new TestClass { AProperty = "avalue2" };
+        var optional = new Optional<TestClass>(instance1);
+
+        (instance2 != optional)
+            .Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenNotEqualsOperatorWithInstanceAndOptionalOfInstance_ThenReturnsFalse()
+    {
+        var instance = new TestClass { AProperty = "avalue1" };
+        var optional = new Optional<TestClass>(instance);
+
+        (instance != optional)
+            .Should().BeFalse();
+    }
 }
 
 public class TestClass

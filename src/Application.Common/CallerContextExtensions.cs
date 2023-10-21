@@ -18,7 +18,7 @@ public static class CallerContextExtensions
             return CallContext.CreateUnknown();
         }
 
-        return CallContext.CreateCustom(context!.CallId, context.CallerId, context.TenantId);
+        return CallContext.CreateCustom(context.CallId, context.CallerId, context.TenantId);
     }
 
     /// <summary>

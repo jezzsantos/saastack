@@ -62,8 +62,17 @@ public class AesEncryptionService
         return (cryptKey, iv);
     }
 
-#if TESTINGONLY
+    private static SymmetricAlgorithm CreateAes()
+    {
+        var aes = Aes.Create();
+        aes.KeySize = 256;
+        aes.BlockSize = 128;
+        aes.Mode = CipherMode.CBC;
+        aes.Padding = PaddingMode.PKCS7;
+        return aes;
+    }
 
+#if TESTINGONLY
     public static string CreateAesSecret()
     {
         CreateKeyAndIv(out var cryptKey, out var iv);
@@ -75,16 +84,6 @@ public class AesEncryptionService
         using var aes = CreateAes();
         cryptKey = aes.Key;
         iv = aes.IV;
-    }
-
-    private static SymmetricAlgorithm CreateAes()
-    {
-        var aes = Aes.Create();
-        aes.KeySize = 256;
-        aes.BlockSize = 128;
-        aes.Mode = CipherMode.CBC;
-        aes.Padding = PaddingMode.PKCS7;
-        return aes;
     }
 #endif
 }

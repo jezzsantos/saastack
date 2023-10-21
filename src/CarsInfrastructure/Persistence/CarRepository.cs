@@ -21,7 +21,7 @@ public class CarRepository : ICarRepository
             return new Result<CarRoot, Error>(Error.EntityNotFound());
         }
 
-        return car!;
+        return car;
     }
 
     public async Task<Result<Error>> DeleteCarAsync(string id)
@@ -34,7 +34,7 @@ public class CarRepository : ICarRepository
             return new Result<Error>(Error.EntityNotFound());
         }
 
-        Cars.Remove(car!);
+        Cars.Remove(car);
 
         return Result.Ok;
     }

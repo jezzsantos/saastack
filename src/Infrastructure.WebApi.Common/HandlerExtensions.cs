@@ -140,7 +140,7 @@ public static class HandlerExtensions
             case ServiceOperation.Post:
             {
                 return location.HasValue()
-                    ? Results.Created(location!, response)
+                    ? Results.Created(location, response)
                     : Results.Ok(response);
             }
             case ServiceOperation.PutPatch:

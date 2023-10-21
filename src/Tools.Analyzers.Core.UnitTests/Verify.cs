@@ -81,8 +81,8 @@ public static class Verify
         (int, int, string) expected1, params object?[]? messageArgs)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {
-        var arguments = messageArgs.Exists() && messageArgs!.Any()
-            ? new object[] { expected1.Item3 }.Concat(messageArgs!)
+        var arguments = messageArgs.Exists() && messageArgs.Any()
+            ? new object[] { expected1.Item3 }.Concat(messageArgs)
             : new object[] { expected1.Item3 };
 
         var expectation = CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>.Diagnostic(descriptor)

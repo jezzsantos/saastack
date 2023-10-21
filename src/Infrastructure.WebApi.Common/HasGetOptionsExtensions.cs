@@ -32,15 +32,15 @@ public static class HasGetOptionsExtensions
                     : new GetOptions(ExpandOptions.All);
             }
 
-            return new GetOptions(defaultExpand!.Value);
+            return new GetOptions(defaultExpand.Value);
         }
 
-        if (embedValue!.EqualsIgnoreCase(HasGetOptions.EmbedNone))
+        if (embedValue.EqualsIgnoreCase(HasGetOptions.EmbedNone))
         {
             return GetOptions.None;
         }
 
-        if (embedValue!.EqualsIgnoreCase(HasGetOptions.EmbedAll))
+        if (embedValue.EqualsIgnoreCase(HasGetOptions.EmbedAll))
         {
             return GetOptions.All;
         }

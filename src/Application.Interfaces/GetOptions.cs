@@ -25,7 +25,7 @@ public class GetOptions
         Initial = @default ?? ExpandOptions.All;
         Expand = expand;
         _resourceReferences = childReferences.Exists()
-            ? childReferences!.Where(cr => cr.HasValue())
+            ? childReferences.Where(cr => cr.HasValue())
                 .ToList()
             : new List<string>();
     }

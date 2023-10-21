@@ -33,7 +33,7 @@ public static class HasSearchOptionsExtensions
         {
             if (defaultSort.HasValue())
             {
-                result.Sort = new Sorting(ParseSortBy(defaultSort!), ParseSortDirection(defaultSort!));
+                result.Sort = new Sorting(ParseSortBy(defaultSort), ParseSortDirection(defaultSort));
             }
         }
 
@@ -45,7 +45,7 @@ public static class HasSearchOptionsExtensions
         {
             if (defaultFilter.HasValue())
             {
-                result.Filter = new Filtering(ParseFilters(defaultFilter!));
+                result.Filter = new Filtering(ParseFilters(defaultFilter));
             }
         }
 
