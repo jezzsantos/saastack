@@ -1,5 +1,5 @@
 using System.Text;
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Tools.Generators.WebApi.Extensions;
@@ -20,7 +20,7 @@ public class MinimalApiMediatRGenerator : ISourceGenerator
     private static readonly string[] RequiredUsingNamespaces =
     {
         "System", "Microsoft.AspNetCore.Builder", "Microsoft.AspNetCore.Http",
-        "Infrastructure.WebApi.Common"
+        "Infrastructure.Web.Api.Common"
     };
 
     public void Initialize(GeneratorInitializationContext context)
@@ -98,8 +98,8 @@ namespace {assemblyNamespace}
         var groupName = $"{serviceClassName.ToLowerInvariant()}Group";
         endpointRegistrations.AppendLine($@"        var {groupName} = app.MapGroup(string.Empty)
                 .WithGroupName(""{serviceClassName}"")
-                .AddEndpointFilter<global::Infrastructure.WebApi.Common.RequestCorrelationFilter>()
-                .AddEndpointFilter<global::Infrastructure.WebApi.Common.ContentNegotiationFilter>();");
+                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
+                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();");
 
         foreach (var registration in serviceRegistrations)
         {
@@ -186,7 +186,7 @@ namespace {assemblyNamespace}
             handlerClasses.AppendLine(
                 $"            var result = {asyncAwait}api.{registration.MethodName}(request{hasCancellationToken});");
             handlerClasses.AppendLine(
-                $"            return result.HandleApiResult(global::Infrastructure.WebApi.Interfaces.ServiceOperation.{registration.OperationType});");
+                $"            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.{registration.OperationType});");
             handlerClasses.AppendLine("        }");
             handlerClasses.AppendLine("    }");
             if (registration.IsTestingOnly)

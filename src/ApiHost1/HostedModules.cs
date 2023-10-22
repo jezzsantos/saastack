@@ -1,5 +1,5 @@
 using CarsApi;
-using Infrastructure.WebApi.Common;
+using Infrastructure.Web.Hosting.Common;
 
 namespace ApiHost1;
 

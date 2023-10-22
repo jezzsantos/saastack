@@ -8,8 +8,7 @@
         <ProjectReference Include="..\CarsApplication\CarsApplication.csproj" />
         <ProjectReference Include="..\CarsDomain\CarsDomain.csproj" />
         <ProjectReference Include="..\CarsInfrastructure\CarsInfrastructure.csproj" />
-        <ProjectReference Include="..\Infrastructure.WebApi.Common\Infrastructure.WebApi.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.WebApi.Interfaces\Infrastructure.WebApi.Interfaces.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Hosting.Common\Infrastructure.Web.Hosting.Common.csproj" />
     </ItemGroup>
 
     <!-- Runs the source generator (in memory) on build -->

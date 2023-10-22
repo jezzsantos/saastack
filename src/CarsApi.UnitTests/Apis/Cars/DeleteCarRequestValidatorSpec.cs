@@ -2,7 +2,7 @@ using CarsApi.Apis.Cars;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 using FluentValidation;
-using Infrastructure.WebApi.Interfaces.Operations.Cars;
+using Infrastructure.Web.Api.Interfaces.Operations.Cars;
 using Moq;
 using Xunit;
 

@@ -12,20 +12,20 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebApiService.cs">
-            <Link>Reference\Infrastructure.WebApi.Interfaces\IWebApiService.cs</Link>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebApiService.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebApiService.cs</Link>
         </Compile>
-        <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebResponse.cs">
-            <Link>Reference\Infrastructure.WebApi.Interfaces\IWebResponse.cs</Link>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebRequest.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebRequest.cs</Link>
         </Compile>
-        <Compile Include="..\Infrastructure.WebApi.Interfaces\IWebRequest.cs">
-            <Link>Reference\Infrastructure.WebApi.Interfaces\IWebRequest.cs</Link>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebResponse.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebResponse.cs</Link>
         </Compile>
-        <Compile Include="..\Infrastructure.WebApi.Interfaces\ServiceOperation.cs">
-            <Link>Reference\Infrastructure.WebApi.Interfaces\ServiceOperation.cs</Link>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\RouteAttribute.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\RouteAttribute.cs</Link>
         </Compile>
-        <Compile Include="..\Infrastructure.WebApi.Interfaces\RouteAttribute.cs">
-            <Link>Reference\Infrastructure.WebApi.Interfaces\RouteAttribute.cs</Link>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\ServiceOperation.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\ServiceOperation.cs</Link>
         </Compile>
     </ItemGroup>
 

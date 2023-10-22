@@ -103,5 +103,14 @@ namespace Common {
                 return ResourceManager.GetString("Result_FetchValueWhenFaulted", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unexpected error occurred.
+        /// </summary>
+        internal static string WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage {
+            get {
+                return ResourceManager.GetString("WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage", resourceCulture);
+            }
+        }
     }
 }

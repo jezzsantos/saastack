@@ -1,6 +1,6 @@
 extern alias Analyzers;
 using Analyzers::Application.Interfaces;
-using Analyzers::Infrastructure.WebApi.Interfaces;
+using Analyzers::Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
 using Xunit;
 using TypeExtensions = Analyzers::Tools.Analyzers.Core.TypeExtensions;
@@ -20,7 +20,7 @@ public class WebApiClassAnalyzerSpec
         public async Task WhenInExcludedNamespace_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 namespace Common;
 public class AClass : IWebApiService
 {
@@ -45,7 +45,7 @@ public class AClass
         public async Task WhenHasNoMethods_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -58,7 +58,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPrivateMethod_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -72,7 +72,7 @@ public class AClass : IWebApiService
         public async Task WhenHasInternalMethod_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -90,7 +90,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithVoidReturnType_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -105,7 +105,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithTaskReturnType_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 namespace ANamespace;
 public class AClass : IWebApiService
@@ -121,7 +121,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithWrongTaskReturnType_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 namespace ANamespace;
 public class AClass : IWebApiService
@@ -137,7 +137,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithTaskOfApiEmptyResultReturnType_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -157,7 +157,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithTaskOfApiResultReturnType_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -177,7 +177,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithTaskOfApiPostResultReturnType_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -197,7 +197,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithTaskOfApiGetResultReturnType_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -217,7 +217,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithTaskOfApiSearchResultReturnType_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -237,7 +237,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithTaskOfApiPutPatchResultReturnType_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -257,7 +257,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithTaskOfApiDeleteResultReturnType_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -277,7 +277,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithWrongNakedReturnType_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -292,7 +292,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithNakedApiEmptyResultReturnType_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -312,7 +312,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithNakedApiResultReturnType_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -332,7 +332,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithNakedApiPostResultReturnType_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -352,7 +352,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithNakedApiGetResultReturnType_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -372,7 +372,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithNakedApiSearchResultReturnType_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -392,7 +392,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithNakedApiPutPatchResultReturnType_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -412,7 +412,7 @@ public class AClass : IWebApiService
         public async Task WhenHasPublicMethodWithNakedApiDeleteResultReturnType_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -436,7 +436,7 @@ public class AClass : IWebApiService
         public async Task WhenHasNoParameters_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 namespace ANamespace;
@@ -455,7 +455,7 @@ public class AClass : IWebApiService
         public async Task WhenHasTooManyParameters_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
@@ -476,7 +476,7 @@ public class AClass : IWebApiService
         public async Task WhenFirstParameterIsNotRequestType_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 namespace ANamespace;
@@ -495,7 +495,7 @@ public class AClass : IWebApiService
         public async Task WhenSecondParameterIsNotCancellationToken_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -515,7 +515,7 @@ public class AClass : IWebApiService
         public async Task WhenOnlyRequest_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
@@ -536,7 +536,7 @@ public class AClass : IWebApiService
         public async Task WhenRequestAndCancellation_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
@@ -561,7 +561,7 @@ public class AClass : IWebApiService
         public async Task WhenHasNoAttributes_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -582,7 +582,7 @@ public class AClass : IWebApiService
         public async Task WhenMissingAttribute_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -604,7 +604,7 @@ public class AClass : IWebApiService
         public async Task WhenAttribute_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -628,7 +628,7 @@ public class AClass : IWebApiService
         public async Task WhenOneRoute_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -648,7 +648,7 @@ public class AClass : IWebApiService
         public async Task WhenTwoWithSameRoute_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -672,7 +672,7 @@ public class AClass : IWebApiService
         public async Task WhenThreeWithSameRouteFirstSegment_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -700,7 +700,7 @@ public class AClass : IWebApiService
         public async Task WhenDifferentRouteSegments_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -732,7 +732,7 @@ public class AClass : IWebApiService
         public async Task WhenNoDuplicateRequests_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -752,7 +752,7 @@ public class AClass : IWebApiService
         public async Task WhenDuplicateRequests_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -785,7 +785,7 @@ public class AClass : IWebApiService
         public async Task WhenPostAndReturnsApiEmptyResult_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -805,7 +805,7 @@ public class AClass : IWebApiService
         public async Task WhenGetAndReturnsApiEmptyResult_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -825,7 +825,7 @@ public class AClass : IWebApiService
         public async Task WhenSearchAndReturnsApiEmptyResult_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -845,7 +845,7 @@ public class AClass : IWebApiService
         public async Task WhenPutPatchAndReturnsApiEmptyResult_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -865,7 +865,7 @@ public class AClass : IWebApiService
         public async Task WhenDeleteAndReturnsApiEmptyResult_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -885,7 +885,7 @@ public class AClass : IWebApiService
         public async Task WhenPostAndReturnsApiResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -906,7 +906,7 @@ public class AClass : IWebApiService
         public async Task WhenGetAndReturnsApiResult_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -926,7 +926,7 @@ public class AClass : IWebApiService
         public async Task WhenSearchAndReturnsApiResult_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -946,7 +946,7 @@ public class AClass : IWebApiService
         public async Task WhenPutPatchAndReturnsApiResult_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -966,7 +966,7 @@ public class AClass : IWebApiService
         public async Task WhenDeleteAndReturnsApiResult_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -986,7 +986,7 @@ public class AClass : IWebApiService
         public async Task WhenPostAndReturnsApiPostResult_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1006,7 +1006,7 @@ public class AClass : IWebApiService
         public async Task WhenGetAndReturnsApiPostResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1027,7 +1027,7 @@ public class AClass : IWebApiService
         public async Task WhenSearchAndReturnsApiPostResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1048,7 +1048,7 @@ public class AClass : IWebApiService
         public async Task WhenPutPatchAndReturnsApiPostResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1069,7 +1069,7 @@ public class AClass : IWebApiService
         public async Task WhenDeleteAndReturnsApiPostResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1090,7 +1090,7 @@ public class AClass : IWebApiService
         public async Task WhenPostAndReturnsApiGetResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1111,7 +1111,7 @@ public class AClass : IWebApiService
         public async Task WhenGetAndReturnsApiGetResult_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1131,7 +1131,7 @@ public class AClass : IWebApiService
         public async Task WhenSearchAndReturnsApiGetResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1151,7 +1151,7 @@ public class AClass : IWebApiService
         public async Task WhenPutPatchAndReturnsApiGetResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1172,7 +1172,7 @@ public class AClass : IWebApiService
         public async Task WhenDeleteAndReturnsApiGetResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1193,7 +1193,7 @@ public class AClass : IWebApiService
         public async Task WhenPostAndReturnsApiSearchResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1214,7 +1214,7 @@ public class AClass : IWebApiService
         public async Task WhenGetAndReturnsApiSearchResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1235,7 +1235,7 @@ public class AClass : IWebApiService
         public async Task WhenSearchAndReturnsApiSearchResult_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1255,7 +1255,7 @@ public class AClass : IWebApiService
         public async Task WhenPutPatchAndReturnsApiSearchResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1276,7 +1276,7 @@ public class AClass : IWebApiService
         public async Task WhenDeleteAndReturnsApiSearchResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1297,7 +1297,7 @@ public class AClass : IWebApiService
         public async Task WhenPostAndReturnsApiPutPatchResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1318,7 +1318,7 @@ public class AClass : IWebApiService
         public async Task WhenGetAndReturnsApiPutPatchResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1339,7 +1339,7 @@ public class AClass : IWebApiService
         public async Task WhenSearchAndReturnsApiPutPatchResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1360,7 +1360,7 @@ public class AClass : IWebApiService
         public async Task WhenPutPatchAndReturnsApiPutPatchResult_ThenNoAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1380,7 +1380,7 @@ public class AClass : IWebApiService
         public async Task WhenDeleteAndReturnsApiPutPatchResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1401,7 +1401,7 @@ public class AClass : IWebApiService
         public async Task WhenPostAndReturnsApiDeleteResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1422,7 +1422,7 @@ public class AClass : IWebApiService
         public async Task WhenGetAndReturnsApiDeleteResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1443,7 +1443,7 @@ public class AClass : IWebApiService
         public async Task WhenSearchAndReturnsApiDeleteResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1464,7 +1464,7 @@ public class AClass : IWebApiService
         public async Task WhenPutPatchAndReturnsApiDeleteResult_ThenAlerts()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;
@@ -1485,7 +1485,7 @@ public class AClass : IWebApiService
         public async Task WhenDeleteAndReturnsApiDeleteResult_ThenNotAlert()
         {
             const string input = @"
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.Core.UnitTests;

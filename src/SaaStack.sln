@@ -52,17 +52,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{5838
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{E78C7FBE-ADD0-4124-A273-5D5AC0C02B27}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApi", "WebApi", "{B68592DF-E8E8-452A-A46F-5C8ECB178FDF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{B68592DF-E8E8-452A-A46F-5C8ECB178FDF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.WebApi.Common", "Infrastructure.WebApi.Common\Infrastructure.WebApi.Common.csproj", "{E343B553-2D44-4BA2-AEF0-3B1F7D2DBCF3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Web.Api.Common", "Infrastructure.Web.Api.Common\Infrastructure.Web.Api.Common.csproj", "{E343B553-2D44-4BA2-AEF0-3B1F7D2DBCF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.WebApi.Interfaces", "Infrastructure.WebApi.Interfaces\Infrastructure.WebApi.Interfaces.csproj", "{F9B4357E-7FD0-45FA-87B9-44D7EEB974C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Web.Api.Interfaces", "Infrastructure.Web.Api.Interfaces\Infrastructure.Web.Api.Interfaces.csproj", "{F9B4357E-7FD0-45FA-87B9-44D7EEB974C5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiHost1", "ApiHost1\ApiHost1.csproj", "{AC380EA5-16A1-4713-99B4-F259F5397F30}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarsApplication", "CarsApplication\CarsApplication.csproj", "{1B29051C-EE8E-4699-94DD-B2502C7A54C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.WebApi.Common.IntegrationTests", "Infrastructure.WebApi.Common.IntegrationTests\Infrastructure.WebApi.Common.IntegrationTests.csproj", "{AE57212B-9A30-4577-A795-7B411621BCDA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Web.Api.IntegrationTests", "Infrastructure.Web.Api.IntegrationTests\Infrastructure.Web.Api.IntegrationTests.csproj", "{AE57212B-9A30-4577-A795-7B411621BCDA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarsApi", "CarsApi\CarsApi.csproj", "{B76CF102-CE56-4321-9060-F81E63B982D6}"
 EndProject
@@ -74,7 +74,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.Generators.WebApi", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{19ADDB2F-B589-49EF-9BDA-BD9908057D60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.WebApi.Common.UnitTests", "Infrastructure.WebApi.Common.UnitTests\Infrastructure.WebApi.Common.UnitTests.csproj", "{4CF7C7E2-C95D-4440-9ECF-5D1CE2A46D7A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Web.Api.Common.UnitTests", "Infrastructure.Web.Api.Common.UnitTests\Infrastructure.Web.Api.Common.UnitTests.csproj", "{4CF7C7E2-C95D-4440-9ECF-5D1CE2A46D7A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{865285E7-B20A-41D8-935F-D3A31C91A0D6}"
 EndProject
@@ -129,6 +129,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Common.UnitTests", "Infrastructure.Common.UnitTests\Infrastructure.Common.UnitTests.csproj", "{6E32D6FE-E53F-4D40-9644-8F3B19EC094C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Web.Hosting.Common", "Infrastructure.Web.Hosting.Common\Infrastructure.Web.Hosting.Common.csproj", "{16B71536-8CF7-4F58-8CE3-277B8CB0FE45}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Web.Hosting.Common.UnitTests", "Infrastructure.Web.Hosting.Common.UnitTests\Infrastructure.Web.Hosting.Common.UnitTests.csproj", "{4BFC7B38-975F-4470-9D4C-FB95E76B9055}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -335,6 +337,12 @@ Global
 		{16B71536-8CF7-4F58-8CE3-277B8CB0FE45}.Release|Any CPU.Build.0 = Release|Any CPU
 		{16B71536-8CF7-4F58-8CE3-277B8CB0FE45}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
 		{16B71536-8CF7-4F58-8CE3-277B8CB0FE45}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
+		{4BFC7B38-975F-4470-9D4C-FB95E76B9055}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BFC7B38-975F-4470-9D4C-FB95E76B9055}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BFC7B38-975F-4470-9D4C-FB95E76B9055}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BFC7B38-975F-4470-9D4C-FB95E76B9055}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BFC7B38-975F-4470-9D4C-FB95E76B9055}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
+		{4BFC7B38-975F-4470-9D4C-FB95E76B9055}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F5C77A86-38AF-40E4-82FC-617E624B2754} = {508E7DA4-4DF2-4201-955D-CCF70C41AD05}
@@ -395,5 +403,6 @@ Global
 		{64762CCC-834E-47C9-AFAD-B88DB80E3FF8} = {A25A3BA8-5602-4825-9595-2CF96B166920}
 		{6E32D6FE-E53F-4D40-9644-8F3B19EC094C} = {19ADDB2F-B589-49EF-9BDA-BD9908057D60}
 		{16B71536-8CF7-4F58-8CE3-277B8CB0FE45} = {B68592DF-E8E8-452A-A46F-5C8ECB178FDF}
+		{4BFC7B38-975F-4470-9D4C-FB95E76B9055} = {19ADDB2F-B589-49EF-9BDA-BD9908057D60}
 	EndGlobalSection
 EndGlobal

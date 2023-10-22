@@ -12,7 +12,7 @@ This is especially problematic when those referenced projects have transient dep
 
 If any dependencies are taken, special workarounds (in the project file of this project) are required in order for this source generators to work properly.
 
-We are avoiding including certain types from any projects in this solution (e.g. from the `Infrastructure.WebApi.Interfaces` project) even though we need it in the code of the Source generator, since that project is dependent on types in AspNetCore framework.
+We are avoiding including certain types from any projects in this solution (e.g. from the `Infrastructure.Web.Api.Interfaces` project) even though we need it in the code of the Source generator, since that project is dependent on types in AspNetCore framework.
 
 To workaround this, we have file-linked certain source files from projects in the solution, so that we can use those symbols in the Source Generator code.
 

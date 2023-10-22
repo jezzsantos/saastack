@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using System.Text;
 using Common.Extensions;
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -28,20 +28,20 @@ namespace Tools.Analyzers.Core;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class WebApiClassAnalyzer : DiagnosticAnalyzer
 {
-    internal static readonly Dictionary<Infrastructure.WebApi.Interfaces.ServiceOperation, List<Type>>
+    internal static readonly Dictionary<Infrastructure.Web.Api.Interfaces.ServiceOperation, List<Type>>
         AllowableOperationReturnTypes =
             new()
             {
                 {
-                    Infrastructure.WebApi.Interfaces.ServiceOperation.Post,
+                    Infrastructure.Web.Api.Interfaces.ServiceOperation.Post,
                     new List<Type> { typeof(ApiEmptyResult), typeof(ApiPostResult<,>) }
                 },
                 {
-                    Infrastructure.WebApi.Interfaces.ServiceOperation.Get,
+                    Infrastructure.Web.Api.Interfaces.ServiceOperation.Get,
                     new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>) }
                 },
                 {
-                    Infrastructure.WebApi.Interfaces.ServiceOperation.Search,
+                    Infrastructure.Web.Api.Interfaces.ServiceOperation.Search,
                     new List<Type>
                     {
                         typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>),
@@ -49,11 +49,11 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
                     }
                 },
                 {
-                    Infrastructure.WebApi.Interfaces.ServiceOperation.PutPatch,
+                    Infrastructure.Web.Api.Interfaces.ServiceOperation.PutPatch,
                     new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiPutPatchResult<,>) }
                 },
                 {
-                    Infrastructure.WebApi.Interfaces.ServiceOperation.Delete,
+                    Infrastructure.Web.Api.Interfaces.ServiceOperation.Delete,
                     new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiDeleteResult) }
                 }
             };
@@ -158,7 +158,7 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
             operations.Add(methodDeclarationSyntax, new ServiceOperation(requestType!));
 
             var operation =
-                (Infrastructure.WebApi.Interfaces.ServiceOperation)attribute!.ConstructorArguments[1].Value!;
+                (Infrastructure.Web.Api.Interfaces.ServiceOperation)attribute!.ConstructorArguments[1].Value!;
             if (OperationAndReturnsTypeDontMatch(context, methodDeclarationSyntax, operation, returnType!))
             {
                 continue;
@@ -175,7 +175,7 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
     }
 
     private static bool OperationAndReturnsTypeDontMatch(SyntaxNodeAnalysisContext context,
-        MethodDeclarationSyntax methodDeclarationSyntax, Infrastructure.WebApi.Interfaces.ServiceOperation operation,
+        MethodDeclarationSyntax methodDeclarationSyntax, Infrastructure.Web.Api.Interfaces.ServiceOperation operation,
         ITypeSymbol returnType)
     {
         var allowedReturnTypes = AllowableOperationReturnTypes[operation];

@@ -3,7 +3,7 @@ using CarsApplication;
 using CarsApplication.Persistence;
 using CarsDomain;
 using CarsInfrastructure.Persistence;
-using Infrastructure.WebApi.Common;
+using Infrastructure.Web.Hosting.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

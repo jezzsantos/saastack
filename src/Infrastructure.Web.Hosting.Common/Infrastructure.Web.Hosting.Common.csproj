@@ -5,9 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Common\Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Interfaces\Infrastructure.Interfaces.csproj" />
-        <ProjectReference Include="..\Infrastructure.WebApi.Common\Infrastructure.WebApi.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Common\Infrastructure.Web.Api.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -27,6 +25,12 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 
 </Project>

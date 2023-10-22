@@ -10,7 +10,7 @@ public static class AnalyzerConstants
         "Common", "UnitTesting.Common", "IntegrationTesting.Common",
         "Infrastructure.Common", "Infrastructure.Interfaces",
         "Infrastructure.Persistence.Common", "Infrastructure.Persistence.Interfaces",
-        "Infrastructure.WebApi.Common", "Infrastructure.WebApi.Interfaces",
+        "Infrastructure.Web.Api.Common", "Infrastructure.Web.Api.Interfaces",
         "Domain.Common", "Domain.Interfaces", "Application.Common", "Application.Interfaces"
     };
 

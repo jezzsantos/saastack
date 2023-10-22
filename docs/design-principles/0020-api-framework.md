@@ -259,9 +259,9 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
    >
    > Note: You must use a unique request type (`IWebRequest`) for each service operation
 
-3. You will define the request and response types in separate files in the project: `Infrastructure.WebApi.Interfaces` in a subfolder for the subdomain. For example,
+3. You will define the request and response types in separate files in the project: `Infrastructure.Web.Api.Interfaces` in a subfolder for the subdomain. For example,
 
-   - In `Infrastructure.WebApi.Interfaces/Operations/Cars/GetCarRequest.cs`
+   - In `Infrastructure.Web.Api.Interfaces/Operations/Cars/GetCarRequest.cs`
 
    ```c#
      [Route("/cars/{id}", ServiceOperation.Get)]
@@ -270,7 +270,7 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
          public required string Id { get; set; }
      }
    ```
-   and, in `Infrastructure.WebApi.Interfaces/Operations/Cars/GetCarResponse.cs`:
+   and, in `Infrastructure.Web.Api.Interfaces/Operations/Cars/GetCarResponse.cs`:
    ```c#
      public class GetCarResponse : IWebResponse
      {

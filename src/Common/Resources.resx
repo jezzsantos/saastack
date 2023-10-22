@@ -39,4 +39,7 @@
     <data name="Result_FetchErrorWhenNotFaulted" xml:space="preserve">
         <value>The result is not in a faulted state</value>
     </data>
+    <data name="WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage" xml:space="preserve">
+        <value>An unexpected error occurred</value>
+    </data>
 </root>

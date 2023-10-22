@@ -14,7 +14,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.WebApi.Common\Infrastructure.WebApi.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Common\Infrastructure.Web.Api.Common.csproj" />
     </ItemGroup>
 
 </Project>

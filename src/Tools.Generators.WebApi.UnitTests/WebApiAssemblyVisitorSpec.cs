@@ -2,7 +2,7 @@ extern alias Generators;
 using System.Collections.Immutable;
 using System.Reflection;
 using FluentAssertions;
-using Generators::Infrastructure.WebApi.Interfaces;
+using Generators::Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -364,7 +364,7 @@ public class WebApiAssemblyVisitorSpec
             {
                 var compilation = CreateCompilation("""
                                                     using System;
-                                                    using Infrastructure.WebApi.Interfaces;
+                                                    using Infrastructure.Web.Api.Interfaces;
 
                                                     namespace ANamespace;
 
@@ -375,7 +375,7 @@ public class WebApiAssemblyVisitorSpec
                                                     public class ARequest : IWebRequest<AResponse>
                                                     {
                                                     }
-                                                    public class AServiceClass : Infrastructure.WebApi.Interfaces.IWebApiService
+                                                    public class AServiceClass : Infrastructure.Web.Api.Interfaces.IWebApiService
                                                     {
                                                         public string AMethod(ARequest request)
                                                         {

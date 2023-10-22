@@ -1,5 +1,5 @@
-using Infrastructure.WebApi.Common.Clients;
-using Infrastructure.WebApi.Interfaces.Clients;
+using Infrastructure.Web.Api.Common.Clients;
+using Infrastructure.Web.Api.Interfaces.Clients;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;

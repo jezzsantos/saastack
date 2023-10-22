@@ -2,7 +2,7 @@ using CarsApi.Apis.Cars;
 using CarsDomain;
 using FluentAssertions;
 using FluentValidation;
-using Infrastructure.WebApi.Interfaces.Operations.Cars;
+using Infrastructure.Web.Api.Interfaces.Operations.Cars;
 using UnitTesting.Common.Validation;
 using Xunit;
 

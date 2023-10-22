@@ -1,4 +1,4 @@
-using Infrastructure.WebApi.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using Microsoft.CodeAnalysis;
 using Tools.Generators.WebApi.Extensions;
 

@@ -49,7 +49,7 @@ public class MinimalApiMediatRGeneratorSpec
         {
             var compilation = CreateCompilation("""
                                                 using System;
-                                                using Infrastructure.WebApi.Interfaces;
+                                                using Infrastructure.Web.Api.Interfaces;
 
                                                 namespace ANamespace;
 
@@ -72,7 +72,7 @@ public class MinimalApiMediatRGeneratorSpec
                 using System;
                 using Microsoft.AspNetCore.Http;
                 using Microsoft.AspNetCore.Builder;
-                using Infrastructure.WebApi.Common;
+                using Infrastructure.Web.Api.Common;
 
                 namespace compilation
                 {
@@ -94,7 +94,7 @@ public class MinimalApiMediatRGeneratorSpec
         {
             var compilation = CreateCompilation("""
                                                 using System;
-                                                using Infrastructure.WebApi.Interfaces;
+                                                using Infrastructure.Web.Api.Interfaces;
 
                                                 namespace ANamespace;
 
@@ -122,8 +122,8 @@ public class MinimalApiMediatRGeneratorSpec
                 using System;
                 using Microsoft.AspNetCore.Http;
                 using Microsoft.AspNetCore.Builder;
-                using Infrastructure.WebApi.Interfaces;
-                using Infrastructure.WebApi.Common;
+                using Infrastructure.Web.Api.Interfaces;
+                using Infrastructure.Web.Api.Common;
 
                 namespace compilation
                 {
@@ -133,8 +133,8 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
-                                .AddEndpointFilter<global::Infrastructure.WebApi.Common.RequestCorrelationFilter>()
-                                .AddEndpointFilter<global::Infrastructure.WebApi.Common.ContentNegotiationFilter>();
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None));
@@ -152,7 +152,7 @@ public class MinimalApiMediatRGeneratorSpec
                             await Task.CompletedTask;
                             var api = new global::ANamespace.AServiceClass();
                             var result = api.AMethod(request);
-                            return result.HandleApiResult(global::Infrastructure.WebApi.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
                         }
                     }
 
@@ -167,7 +167,7 @@ public class MinimalApiMediatRGeneratorSpec
         {
             var compilation = CreateCompilation("""
                                                 using System;
-                                                using Infrastructure.WebApi.Interfaces;
+                                                using Infrastructure.Web.Api.Interfaces;
 
                                                 namespace ANamespace;
 
@@ -195,8 +195,8 @@ public class MinimalApiMediatRGeneratorSpec
                 using System;
                 using Microsoft.AspNetCore.Http;
                 using Microsoft.AspNetCore.Builder;
-                using Infrastructure.WebApi.Interfaces;
-                using Infrastructure.WebApi.Common;
+                using Infrastructure.Web.Api.Interfaces;
+                using Infrastructure.Web.Api.Common;
 
                 namespace compilation
                 {
@@ -206,8 +206,8 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
-                                .AddEndpointFilter<global::Infrastructure.WebApi.Common.RequestCorrelationFilter>()
-                                .AddEndpointFilter<global::Infrastructure.WebApi.Common.ContentNegotiationFilter>();
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None));
@@ -224,7 +224,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var api = new global::ANamespace.AServiceClass();
                             var result = await api.AMethod(request);
-                            return result.HandleApiResult(global::Infrastructure.WebApi.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
                         }
                     }
 
@@ -240,7 +240,7 @@ public class MinimalApiMediatRGeneratorSpec
             var compilation = CreateCompilation("""
                                                 using System;
                                                 using System.Threading;
-                                                using Infrastructure.WebApi.Interfaces;
+                                                using Infrastructure.Web.Api.Interfaces;
 
                                                 namespace ANamespace;
 
@@ -269,8 +269,8 @@ public class MinimalApiMediatRGeneratorSpec
                 using System;
                 using Microsoft.AspNetCore.Http;
                 using Microsoft.AspNetCore.Builder;
-                using Infrastructure.WebApi.Interfaces;
-                using Infrastructure.WebApi.Common;
+                using Infrastructure.Web.Api.Interfaces;
+                using Infrastructure.Web.Api.Common;
 
                 namespace compilation
                 {
@@ -280,8 +280,8 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
-                                .AddEndpointFilter<global::Infrastructure.WebApi.Common.RequestCorrelationFilter>()
-                                .AddEndpointFilter<global::Infrastructure.WebApi.Common.ContentNegotiationFilter>();
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None));
@@ -298,7 +298,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var api = new global::ANamespace.AServiceClass();
                             var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.WebApi.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
                         }
                     }
 
@@ -314,7 +314,7 @@ public class MinimalApiMediatRGeneratorSpec
             var compilation = CreateCompilation("""
                                                 using System;
                                                 using System.Threading;
-                                                using Infrastructure.WebApi.Interfaces;
+                                                using Infrastructure.Web.Api.Interfaces;
 
                                                 namespace ANamespace;
 
@@ -343,8 +343,8 @@ public class MinimalApiMediatRGeneratorSpec
                 using System;
                 using Microsoft.AspNetCore.Http;
                 using Microsoft.AspNetCore.Builder;
-                using Infrastructure.WebApi.Interfaces;
-                using Infrastructure.WebApi.Common;
+                using Infrastructure.Web.Api.Interfaces;
+                using Infrastructure.Web.Api.Common;
 
                 namespace compilation
                 {
@@ -354,8 +354,8 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
-                                .AddEndpointFilter<global::Infrastructure.WebApi.Common.RequestCorrelationFilter>()
-                                .AddEndpointFilter<global::Infrastructure.WebApi.Common.ContentNegotiationFilter>();
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                 #if TESTINGONLY
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
@@ -375,7 +375,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var api = new global::ANamespace.AServiceClass();
                             var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.WebApi.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
                         }
                     }
                 #endif
@@ -393,7 +393,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 using System;
                                                 using System.Threading;
                                                 using Application.Interfaces;
-                                                using Infrastructure.WebApi.Interfaces;
+                                                using Infrastructure.Web.Api.Interfaces;
 
                                                 namespace ANamespace;
 
@@ -430,8 +430,8 @@ public class MinimalApiMediatRGeneratorSpec
                 using System;
                 using Microsoft.AspNetCore.Http;
                 using Microsoft.AspNetCore.Builder;
-                using Infrastructure.WebApi.Interfaces;
-                using Infrastructure.WebApi.Common;
+                using Infrastructure.Web.Api.Interfaces;
+                using Infrastructure.Web.Api.Common;
                 using Application.Interfaces;
 
                 namespace compilation
@@ -442,8 +442,8 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
-                                .AddEndpointFilter<global::Infrastructure.WebApi.Common.RequestCorrelationFilter>()
-                                .AddEndpointFilter<global::Infrastructure.WebApi.Common.ContentNegotiationFilter>();
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None));
@@ -467,7 +467,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var api = new global::ANamespace.AServiceClass(this._context);
                             var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.WebApi.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
                         }
                     }
 

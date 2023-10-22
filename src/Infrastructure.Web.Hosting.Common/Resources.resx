@@ -23,6 +23,15 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
+    <data name="AspNetConfigurationSettings_KeyNotFound" xml:space="preserve">
+        <value>The setting '{0}' cannot be found in any configuration</value>
+    </data>
+    <data name="AspNetConfigurationSettings_ValueNotBoolean" xml:space="preserve">
+        <value>The setting '{0}' exists, but is not a recognizable boolean value</value>
+    </data>
+    <data name="AspNetConfigurationSettings_ValueNotNumber" xml:space="preserve">
+        <value>The setting '{0}' exists, but is not a recognizable number value</value>
+    </data>
     <data name="TracingOnlyRecorder_Started" xml:space="preserve">
         <value>Recorder is ready to record</value>
     </data>

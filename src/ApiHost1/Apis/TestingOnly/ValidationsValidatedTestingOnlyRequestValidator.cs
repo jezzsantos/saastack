@@ -1,6 +1,6 @@
 #if TESTINGONLY
 using FluentValidation;
-using Infrastructure.WebApi.Interfaces.Operations.TestingOnly;
+using Infrastructure.Web.Api.Interfaces.Operations.TestingOnly;
 using JetBrains.Annotations;
 
 namespace ApiHost1.Apis.TestingOnly;

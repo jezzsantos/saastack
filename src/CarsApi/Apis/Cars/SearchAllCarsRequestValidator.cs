@@ -1,6 +1,6 @@
 using FluentValidation;
-using Infrastructure.WebApi.Common.Validation;
-using Infrastructure.WebApi.Interfaces.Operations.Cars;
+using Infrastructure.Web.Api.Common.Validation;
+using Infrastructure.Web.Api.Interfaces.Operations.Cars;
 using JetBrains.Annotations;
 
 namespace CarsApi.Apis.Cars;

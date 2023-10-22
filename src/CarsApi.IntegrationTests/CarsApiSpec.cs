@@ -2,7 +2,7 @@ using System.Net;
 using ApiHost1;
 using CarsApplication.Persistence;
 using FluentAssertions;
-using Infrastructure.WebApi.Interfaces.Operations.Cars;
+using Infrastructure.Web.Api.Interfaces.Operations.Cars;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
 
