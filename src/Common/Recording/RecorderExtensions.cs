@@ -8,16 +8,16 @@ public static class RecorderExtensions
     /// <summary>
     ///     Measure a metric
     /// </summary>
-    public static TReturn MeasureWith<TReturn>(this IRecorder recorder, string eventName,
+    public static TReturn MeasureWith<TReturn>(this IRecorder recorder, ICallContext context, string eventName,
         Func<Dictionary<string, object>, TReturn> action)
     {
-        var context = new Dictionary<string, object>();
+        var addtional = new Dictionary<string, object>();
 
-        var result = action(context);
+        var result = action(addtional);
 
-        recorder.Measure(eventName, context.HasNone()
+        recorder.Measure(context, eventName, addtional.HasNone()
             ? null
-            : context);
+            : addtional);
 
         return result;
     }
@@ -25,17 +25,17 @@ public static class RecorderExtensions
     /// <summary>
     ///     Measure a metric and how long it took
     /// </summary>
-    public static TReturn MeasureWithDuration<TReturn>(this IRecorder recorder, string eventName,
+    public static TReturn MeasureWithDuration<TReturn>(this IRecorder recorder, ICallContext context, string eventName,
         Func<Dictionary<string, object>, TReturn> action)
     {
-        var result = recorder.MeasureWith(eventName, context =>
+        var result = recorder.MeasureWith(context, eventName, additional =>
         {
             var stopwatch = Stopwatch.StartNew();
 
-            var result = action(context);
+            var result = action(additional);
 
             stopwatch.Stop();
-            context.Add("DurationInMS", $"{stopwatch.Elapsed.TotalMilliseconds:N}");
+            additional.Add("DurationInMS", $"{stopwatch.Elapsed.TotalMilliseconds:N}");
 
             return result;
         });

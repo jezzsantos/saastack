@@ -128,6 +128,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.Generators.WebApi.Uni
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Common.UnitTests", "Infrastructure.Common.UnitTests\Infrastructure.Common.UnitTests.csproj", "{6E32D6FE-E53F-4D40-9644-8F3B19EC094C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Web.Hosting.Common", "Infrastructure.Web.Hosting.Common\Infrastructure.Web.Hosting.Common.csproj", "{16B71536-8CF7-4F58-8CE3-277B8CB0FE45}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -327,6 +329,12 @@ Global
 		{6E32D6FE-E53F-4D40-9644-8F3B19EC094C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6E32D6FE-E53F-4D40-9644-8F3B19EC094C}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
 		{6E32D6FE-E53F-4D40-9644-8F3B19EC094C}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
+		{16B71536-8CF7-4F58-8CE3-277B8CB0FE45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16B71536-8CF7-4F58-8CE3-277B8CB0FE45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16B71536-8CF7-4F58-8CE3-277B8CB0FE45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16B71536-8CF7-4F58-8CE3-277B8CB0FE45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16B71536-8CF7-4F58-8CE3-277B8CB0FE45}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
+		{16B71536-8CF7-4F58-8CE3-277B8CB0FE45}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F5C77A86-38AF-40E4-82FC-617E624B2754} = {508E7DA4-4DF2-4201-955D-CCF70C41AD05}
@@ -386,5 +394,6 @@ Global
 		{A67A4EA1-58CF-41ED-AEED-591D4A8A0633} = {5B6DE1D9-649A-47EE-A565-0B641B7838FF}
 		{64762CCC-834E-47C9-AFAD-B88DB80E3FF8} = {A25A3BA8-5602-4825-9595-2CF96B166920}
 		{6E32D6FE-E53F-4D40-9644-8F3B19EC094C} = {19ADDB2F-B589-49EF-9BDA-BD9908057D60}
+		{16B71536-8CF7-4F58-8CE3-277B8CB0FE45} = {B68592DF-E8E8-452A-A46F-5C8ECB178FDF}
 	EndGlobalSection
 EndGlobal

@@ -17,7 +17,7 @@ public interface IRecorder
     void Crash(ICallContext? context, CrashLevel level, Exception exception, string messageTemplate,
         params object[] templateArgs);
 
-    void Measure(string eventName, Dictionary<string, object>? additional = null);
+    void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null);
 
     void TraceDebug(ICallContext? context, string messageTemplate, params object[] templateArgs);
 

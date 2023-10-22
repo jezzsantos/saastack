@@ -2,20 +2,22 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application.Interfaces;
 using Application.Interfaces.Services;
+using Common;
 using Common.Configuration;
-using Common.Recording;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Infrastructure.Common;
 using Infrastructure.Common.DomainServices;
 using Infrastructure.Interfaces;
+using Infrastructure.WebApi.Common;
 using Infrastructure.WebApi.Common.ApplicationServices;
 using Infrastructure.WebApi.Common.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.WebApi.Common;
+namespace Infrastructure.Web.Hosting.Common;
 
 public static class HostExtensions
 {
@@ -26,9 +28,9 @@ public static class HostExtensions
         WebHostOptions options)
     {
         ConfigureSharedServices();
+        ConfigureRecording();
         ConfigureMultiTenancy(options.IsMultiTenanted);
         ConfigureConfiguration(options.IsMultiTenanted);
-        ConfigureRecording();
         ConfigureAuthenticationAuthorization();
         ConfigureWireFormats();
         ConfigureApiRequests();
@@ -47,6 +49,13 @@ public static class HostExtensions
         void ConfigureSharedServices()
         {
             builder.Services.AddHttpContextAccessor();
+        }
+
+        void ConfigureRecording()
+        {
+            builder.Services.AddSingleton<IRecorder>(c =>
+                new TracingOnlyRecorder(options.HostName,
+                    c.GetRequiredService<ILoggerFactory>())); // TODO: we need a more comprehensive HostRecorder using Azure or AWS or GC
         }
 
         void ConfigureMultiTenancy(bool isMultiTenanted)
@@ -75,11 +84,6 @@ public static class HostExtensions
                 builder.Services.AddSingleton<IConfigurationSettings>(c =>
                     new AspNetConfigurationSettings(c.GetRequiredService<IConfiguration>()));
             }
-        }
-
-        void ConfigureRecording()
-        {
-            builder.Services.AddSingleton(NullRecorder.Instance); // TODO: we need a HostRecorder for Azure and AWS
         }
 
         void ConfigureAuthenticationAuthorization()

@@ -1,4 +1,5 @@
 using ApiHost1;
+using Infrastructure.Web.Hosting.Common;
 using Infrastructure.WebApi.Common;
 using JetBrains.Annotations;
 

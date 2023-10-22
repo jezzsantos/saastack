@@ -60,7 +60,7 @@ public sealed class NullRecorder : IRecorder
     {
     }
 
-    public void Measure(string eventName, Dictionary<string, object>? additional = null)
+    public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
     {
     }
 

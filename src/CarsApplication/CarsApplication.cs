@@ -1,3 +1,4 @@
+using Application.Common;
 using Application.Interfaces;
 using Application.Interfaces.Resources;
 using CarsApplication.Persistence;
@@ -9,11 +10,13 @@ namespace CarsApplication;
 
 public class CarsApplication : ICarsApplication
 {
+    private readonly IRecorder _recorder;
     private readonly IIdentifierFactory _idFactory;
     private readonly ICarRepository _repository;
 
-    public CarsApplication(IIdentifierFactory idFactory, ICarRepository repository)
+    public CarsApplication(IRecorder recorder, IIdentifierFactory idFactory, ICarRepository repository)
     {
+        _recorder = recorder;
         _idFactory = idFactory;
         _repository = repository;
     }
@@ -29,6 +32,8 @@ public class CarsApplication : ICarsApplication
 
         await _repository.DeleteCarAsync(car.Value.Id);
 
+        _recorder.TraceInformation(caller.ToCall(), "Car {Id} was deleted", car.Value.Id);
+
         return Result.Ok;
     }
 
@@ -41,6 +46,8 @@ public class CarsApplication : ICarsApplication
             return Error.EntityNotFound();
         }
 
+        _recorder.TraceInformation(caller.ToCall(), "Car {Id} was fetched", car.Value.Id);
+
         return car.Value.ToCar();
     }
 
@@ -50,6 +57,8 @@ public class CarsApplication : ICarsApplication
         var car = new CarRoot(_idFactory);
 
         var created = await _repository.Save(car);
+
+        _recorder.TraceInformation(caller.ToCall(), "Car {Id} was registered", car.Id);
 
         return created.Match<Result<Car, Error>>(c => c.Value.ToCar(), error => error);
     }
@@ -62,6 +71,8 @@ public class CarsApplication : ICarsApplication
         {
             return Error.EntityNotFound();
         }
+
+        _recorder.TraceInformation(caller.ToCall(), "All cars were fetched");
 
         return searchOptions.ApplyWithMetadata(cars.Value.Select(car => car.ToCar()));
     }
@@ -77,6 +88,8 @@ public class CarsApplication : ICarsApplication
 
         //TODO change the state of the root
         var updated = await _repository.Save(car.Value);
+
+        _recorder.TraceInformation(caller.ToCall(), "Car {Id} was taken offline", car.Value.Id);
 
         return updated.Value.ToCar();
     }

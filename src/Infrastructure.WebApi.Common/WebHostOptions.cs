@@ -7,7 +7,7 @@ namespace Infrastructure.WebApi.Common;
 /// </summary>
 public class WebHostOptions
 {
-    public static readonly WebHostOptions BackEndApiHost = new()
+    public static readonly WebHostOptions BackEndApiHost = new("BackendAPI")
     {
         DefaultApiPath = string.Empty,
         AllowCors = true,
@@ -15,7 +15,7 @@ public class WebHostOptions
         Recording = RecorderOptions.BackEndApiHost
     };
 
-    public static readonly WebHostOptions BackEndForFrontEndWebHost = new()
+    public static readonly WebHostOptions BackEndForFrontEndWebHost = new("FrontendSite")
     {
         DefaultApiPath = "api",
         AllowCors = true,
@@ -23,7 +23,7 @@ public class WebHostOptions
         Recording = RecorderOptions.BackEndForFrontEndWebHost
     };
 
-    public static readonly WebHostOptions TestingStubsHost = new()
+    public static readonly WebHostOptions TestingStubsHost = new("TestingStubs")
     {
         DefaultApiPath = string.Empty,
         AllowCors = true,
@@ -31,13 +31,16 @@ public class WebHostOptions
         Recording = RecorderOptions.TestingStubsHost
     };
 
-    private WebHostOptions()
+    private WebHostOptions(string hostName)
     {
+        HostName = hostName;
         DefaultApiPath = string.Empty;
         AllowCors = true;
         IsMultiTenanted = false;
         Recording = new RecorderOptions();
     }
+
+    public string HostName { get; private init; }
 
     public bool AllowCors { get; private init; }
 

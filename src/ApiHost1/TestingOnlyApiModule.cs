@@ -1,6 +1,7 @@
 #if TESTINGONLY
 using System.Reflection;
 using ApiHost1.Apis.TestingOnly;
+using CarsApi;
 using Infrastructure.WebApi.Common;
 
 namespace ApiHost1;

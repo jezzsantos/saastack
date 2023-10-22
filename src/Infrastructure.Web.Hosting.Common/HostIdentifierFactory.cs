@@ -1,7 +1,7 @@
 using Domain.Common.Entities;
 using Domain.Interfaces.Entities;
 
-namespace Infrastructure.WebApi.Common;
+namespace Infrastructure.Web.Hosting.Common;
 
 /// <summary>
 ///     Provides a <see cref="IIdentifierFactory" /> that registers domain aggregates
