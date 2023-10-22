@@ -1,4 +1,4 @@
-[![In Preview](https://img.shields.io/badge/Status-InDevelopment-yellow.svg)](README.md)
+[![Under Construction](https://img.shields.io/badge/Status-UnderConstruction-yellow.svg)](README.md)
 [![Build and Test](https://github.com/jezzsantos/saastack/actions/workflows/build.yml/badge.svg)](https://github.com/jezzsantos/saastack/actions/workflows/build.yml)
 [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/jezzsantos)
 
@@ -6,29 +6,32 @@
 
 Are you about to build a new SaaS product from scratch and do that on .NET?
 
-Then, start with SaaStack. It is a complete "codebase template" for building real-world, fully featured SaaS web products.
+Then, start with SaaStack. 
+
+It is a complete "codebase template" for building real-world, fully featured SaaS web products.
 
 Ready to build, test, and deploy into a cloud provider of your choice (e.g., Azure, AWS, Google Cloud, etc.)
 
-> Don't spend months building all this stuff from scratch. You and your team don't need to. We've done all that for you already; just take it from here.
-> It is not an EXAMPLE template like those you would download to learn a new technology or see in demos online. This is way more comprehensive and contextualized.
+> Don't spend months building all this stuff from scratch. You and your team don't need to. We've done all that for you already; just take a look, see hat is there and take it from here. You can always change it the way you like it as you proceed, you are not locked into anyone else framework.
+> 
+> This is not some code sample like those you would download to learn a new technology or see in demos online. This is way more comprehensive, way more contextualized, and way more realistic about the complexities you are going to encounter in reality.
 > This template contains a partial (but fully functional) SaaS product that you can deploy from day one and start building your product on. But it is not yet complete. That part is up to you.
 
-The codebase demonstrates common architectural styles that you are going to need in the long run, such as:
-* [Modular-Monolith](https://www.thoughtworks.com/insights/blog/microservices/modular-monolith-better-way-build-software) - build a monolith first, the separate out to micro-services later
-* [Clean Architecture, Onion Architecture, and Hexagonal Architecture](https://medium.com/@edamtoft/onion-vs-clean-vs-hexagonal-architecture-9ad94a27da91) principles - low-coupling, high-cohesion, a shareable domain at the center
-* Host it behind a distributed REST API, in a CLI, or in another executable. 
-* [Domain Driven Design](https://martinfowler.com/bliki/DomainDrivenDesign.html) (and Aggregates) - Domain Modelling (behavior) over Data Modelling (data)
-* [Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) - because you cannot predict upfront when you will need historical data later 
-* [Event-Driven Architecture](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/event-driven) - to keep your modules de-coupled and asynchronous
-* [Polyglot Persistence](https://martinfowler.com/bliki/PolyglotPersistence.html) - makes your entire system easy to test, and then select a more appropriate database technology later
-* Extensive Test Automation (e.g., Unit, Integration, and E2E)
-* B2B or B2C Multitenancy
-* Extensibility for all integrations with any 3rd party provider (e.g., Stripe, Twilio, LaunchDarkly, etc.) 
+The codebase demonstrates common architectural styles that you are going to need in your product in the long run, such as:
+* [A Modular-Monolith](https://www.thoughtworks.com/insights/blog/microservices/modular-monolith-better-way-build-software) - always build a monolith first, then separate out to micro-services later
+* [Clean Architecture, Onion Architecture, and Hexagonal Architecture](https://medium.com/@edamtoft/onion-vs-clean-vs-hexagonal-architecture-9ad94a27da91) all the same principles - low-coupling, high-cohesion, a shareable and protected domain at the center
+* Hosted behind a distributed REST API, or in a CLI, (or in another executable). 
+* [Domain Driven Design](https://martinfowler.com/bliki/DomainDrivenDesign.html) (with Aggregates and Domain Events) - modeling actual real-world behaviors, not modeling just anemic data
+* [Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) - because you cannot predict upfront when you will need historical data later, and when you do, will be stuck, also makes domain events a cinch
+* [Event-Driven Architecture](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/event-driven) - to keep your modules de-coupled and asynchronous from each other, on focused on meaningful events in your product
+* [Polyglot Persistence](https://martinfowler.com/bliki/PolyglotPersistence.html) - decouples you from infrastructure, makes your entire system easy to test, and then upgrade as your business scales later
+* Extensive Test Automation (e.g., Unit, Integration, and E2E) so you can keep moving years into the future
+* B2B or B2C Multitenancy, you choose
+* Extensibility for all integrations with any 3rd party provider (e.g., Stripe, Twilio, LaunchDarkly, etc.) - because you want to start cheaply, and change over time as your new business changes and grows. 
 
-> The fundamental design principle behind this particular combination of architectural styles is to help defer making key (irreversible) decisions until later in your product development cycle, based on what you learn about building your specific product (which is realistically not predictable at the start of it). 
+> The fundamental design principle behind this particular combination of architectural styles is to maximize change since it is change that you need to make efficient to succeed in SaaS startups. It is the cost of change in software that determines the cost of designing and building software in the long run.
 
-This starter template gives you most of the things all SaaS products will need from day one whilst maximizing your ability to evolve the specific behaviors and infrastructure components of your specific product - for the long run (i.e., over the course of the next 1-5 years).  
+This starter template gives you most of the things all SaaS products will need from day one while maximizing your ability to evolve the specific behaviors and infrastructure components of your specific product - for the long run (i.e., over the course of the next 1-5 years).  
 
 ## What is in the box?
 ![Azure](docs/images/Physical-Architecture-Azure.png)
