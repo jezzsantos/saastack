@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Tools.Analyzers.Core.Extensions;
+namespace Tools.Analyzers.Platform.Extensions;
 
 public static class DiagnosticExtensions
 {

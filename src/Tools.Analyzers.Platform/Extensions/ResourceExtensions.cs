@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace Tools.Analyzers.Core.Extensions;
+namespace Tools.Analyzers.Platform.Extensions;
 
 public static class ResourceExtensions
 {

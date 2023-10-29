@@ -1,9 +1,9 @@
 extern alias Analyzers;
 using JetBrains.Annotations;
 using Xunit;
-using MissingDocsAnalyzer = Analyzers::Tools.Analyzers.Core.MissingDocsAnalyzer;
+using MissingDocsAnalyzer = Analyzers::Tools.Analyzers.Platform.MissingDocsAnalyzer;
 
-namespace Tools.Analyzers.Core.UnitTests;
+namespace Tools.Analyzers.Platform.UnitTests;
 
 [UsedImplicitly]
 public class MissingDocsAnalyzerSpec

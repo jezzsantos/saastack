@@ -1,4 +1,4 @@
-namespace Tools.Analyzers.Core;
+namespace Tools.Analyzers.Platform;
 
 public static class AnalyzerConstants
 {
@@ -7,11 +7,15 @@ public static class AnalyzerConstants
 #if TESTINGONLY
         "<global namespace>",
 #endif
-        "Common", "UnitTesting.Common", "IntegrationTesting.Common",
+        "Common",
         "Infrastructure.Common", "Infrastructure.Interfaces",
         "Infrastructure.Persistence.Common", "Infrastructure.Persistence.Interfaces",
         "Infrastructure.Web.Api.Common", "Infrastructure.Web.Api.Interfaces",
-        "Domain.Common", "Domain.Interfaces", "Application.Common", "Application.Interfaces"
+        "Infrastructure.Web.Hosting.Common",
+        "Application.Common", "Application.Interfaces",
+        "Application.Persistence.Common", "Application.Persistence.Interfaces",
+        "Domain.Common", "Domain.Interfaces",
+        "IntegrationTesting.WebApi.Common", "UnitTesting.Common"
     };
 
     public static class Categories

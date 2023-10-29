@@ -66,7 +66,7 @@
 
     <!-- Runs the analyzers (in memory) on build -->
     <ItemGroup Condition="'$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true'">
-        <PackageReference Include="SaaStack.Tools.Analyzers.Core" Version="1.0.0" PrivateAssets="all" />
+        <PackageReference Include="SaaStack.Tools.Analyzers.Platform" Version="1.0.0" PrivateAssets="all" />
     </ItemGroup>
 
     <!-- Build configurations -->

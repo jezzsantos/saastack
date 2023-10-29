@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Tools.Analyzers.Core\Tools.Analyzers.Core.csproj" Aliases="Analyzers" />
+        <ProjectReference Include="..\Tools.Analyzers.Platform\Tools.Analyzers.Platform.csproj" Aliases="Analyzers" />
         <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
     </ItemGroup>
 

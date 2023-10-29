@@ -3,10 +3,10 @@ using Analyzers::Application.Interfaces;
 using Analyzers::Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
 using Xunit;
-using TypeExtensions = Analyzers::Tools.Analyzers.Core.TypeExtensions;
-using WebApiClassAnalyzer = Analyzers::Tools.Analyzers.Core.WebApiClassAnalyzer;
+using TypeExtensions = Analyzers::Tools.Analyzers.Platform.TypeExtensions;
+using WebApiClassAnalyzer = Analyzers::Tools.Analyzers.Platform.WebApiClassAnalyzer;
 
-namespace Tools.Analyzers.Core.UnitTests;
+namespace Tools.Analyzers.Platform.UnitTests;
 
 extern alias Analyzers;
 
@@ -140,7 +140,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -160,7 +160,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -180,7 +180,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -200,7 +200,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -220,7 +220,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -240,7 +240,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -260,7 +260,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -295,7 +295,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -315,7 +315,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -335,7 +335,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -355,7 +355,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -375,7 +375,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -395,7 +395,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -415,7 +415,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -459,7 +459,7 @@ using Infrastructure.Web.Api.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -498,7 +498,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -519,7 +519,7 @@ using Infrastructure.Web.Api.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -540,7 +540,7 @@ using Infrastructure.Web.Api.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -564,7 +564,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -585,7 +585,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -607,7 +607,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -631,7 +631,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -651,7 +651,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -675,7 +675,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -703,7 +703,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -735,7 +735,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -755,7 +755,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -788,7 +788,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -808,7 +808,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -828,7 +828,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -848,7 +848,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -868,7 +868,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -888,7 +888,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -909,7 +909,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -929,7 +929,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -949,7 +949,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -969,7 +969,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -989,7 +989,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1009,7 +1009,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1030,7 +1030,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1051,7 +1051,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1072,7 +1072,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1093,7 +1093,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1114,7 +1114,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1134,7 +1134,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1154,7 +1154,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1175,7 +1175,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1196,7 +1196,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1217,7 +1217,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1238,7 +1238,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1258,7 +1258,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1279,7 +1279,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1300,7 +1300,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1321,7 +1321,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1342,7 +1342,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1363,7 +1363,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1383,7 +1383,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1404,7 +1404,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1425,7 +1425,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1446,7 +1446,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1467,7 +1467,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1488,7 +1488,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Core.UnitTests;
+using Tools.Analyzers.Platform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {

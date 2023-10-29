@@ -7,9 +7,9 @@
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <IsPackable>true</IsPackable>
         <IncludeBuildOutput>false</IncludeBuildOutput>
-        <PackageId>SaaStack.Tools.Analyzers.Core</PackageId>
-        <Description>Roslyn analyzers for SaaStack codebases</Description>
-        <PackageReleaseNotes>https://github.com/jezzsantos/saastack/blob/main/src/Tools.Analyzers.Core/README.md</PackageReleaseNotes>
+        <PackageId>SaaStack.Tools.Analyzers.Platform</PackageId>
+        <Description>Roslyn analyzers for writing SaaStack codebases</Description>
+        <PackageReleaseNotes>https://github.com/jezzsantos/saastack/blob/main/src/Tools.Analyzers.Platform/README.md</PackageReleaseNotes>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageVersion>1.0.0</PackageVersion>
     </PropertyGroup>

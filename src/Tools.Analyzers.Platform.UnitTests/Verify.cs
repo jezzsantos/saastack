@@ -6,9 +6,9 @@ using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using NuGet.Frameworks;
-using AnalyzerConstants = Analyzers::Tools.Analyzers.Core.AnalyzerConstants;
+using AnalyzerConstants = Analyzers::Tools.Analyzers.Platform.AnalyzerConstants;
 
-namespace Tools.Analyzers.Core.UnitTests;
+namespace Tools.Analyzers.Platform.UnitTests;
 
 public static class Verify
 {

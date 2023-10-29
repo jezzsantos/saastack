@@ -3,9 +3,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Tools.Analyzers.Core.Extensions;
+using Tools.Analyzers.Platform.Extensions;
 
-namespace Tools.Analyzers.Core;
+namespace Tools.Analyzers.Platform;
 
 /// <summary>
 ///     An analyzer to find public declarations that are missing a documentation &lt;summary&gt; node.
