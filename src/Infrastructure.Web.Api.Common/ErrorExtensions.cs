@@ -1,6 +1,7 @@
 using Common;
+using Infrastructure.Web.Api.Interfaces;
 
-namespace Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Common;
 
 public static class ErrorExtensions
 {
@@ -13,8 +14,9 @@ public static class ErrorExtensions
         {
             ErrorCode.Unexpected => HttpErrorCode.InternalServerError,
             ErrorCode.RuleViolation => HttpErrorCode.BadRequest,
-            ErrorCode.RoleViolation => HttpErrorCode.Forbidden,
+            ErrorCode.Validation => HttpErrorCode.BadRequest,
             ErrorCode.PreconditionViolation => HttpErrorCode.MethodNotAllowed,
+            ErrorCode.RoleViolation => HttpErrorCode.Forbidden,
             ErrorCode.EntityNotFound => HttpErrorCode.NotFound,
             ErrorCode.EntityExists => HttpErrorCode.Conflict,
             ErrorCode.NotAuthenticated => HttpErrorCode.Unauthorized,

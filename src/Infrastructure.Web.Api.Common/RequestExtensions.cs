@@ -145,18 +145,34 @@ public static class RequestExtensions
         foreach (var requestField in requestFields)
         {
             var value = requestField.Value;
-            if (value.Exists() && value.ToString().HasValue())
+            if (value.NotExists())
+            {
+                continue;
+            }
+
+            var stringValue = GetStringValue(value);
+            if (stringValue.HasValue())
             {
                 route.Append(count == 0
                     ? '?'
                     : '&');
 
-                route.Append($"{requestField.Key}={HttpUtility.UrlEncode(value.ToString())}");
+                route.Append($"{requestField.Key}={HttpUtility.UrlEncode(stringValue)}");
                 count++;
             }
         }
 
         return route;
+    }
+
+    private static string? GetStringValue(object value)
+    {
+        return value switch
+        {
+            DateTime dateTimeValue => dateTimeValue.ToIso8601(),
+            string stringValue => stringValue,
+            _ => value.ToString()
+        };
     }
 
     private static Dictionary<string, (int Index, int Length)> GetPlaceholders(string routeTemplate)

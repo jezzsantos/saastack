@@ -54,7 +54,7 @@ public class ApiDataFormatsSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenPostWithDifferentDataTypesForXml_ThenReturnsValues()
     {
-        var time1 = DateTime.UtcNow;
+        var time1 = DateTime.UtcNow.ToNearestSecond();
         var time2 = time1.AddHours(1);
         var request = new
         {
@@ -81,11 +81,11 @@ public class ApiDataFormatsSpec : WebApiSpec<Program>
                             + "<FormatsTestingOnlyResponse xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">"
                             + "<Custom>" + "<Double>91.1</Double>" + "<Enum>TwentyOne</Enum>"
                             + "<Integer>91</Integer>"
-                            + "<String>avalue2</String>" + $"<Time>{time2.ToIso8601()}</Time>"
+                            + "<String>avalue2</String>" + $"<Time>{time2:yyyy-MM-ddTHH:mm:ssZ}</Time>"
                             + "</Custom><Double>99.9</Double>"
                             + "<Enum>OneHundredAndOne</Enum>" + "<Integer>9</Integer>"
                             + "<String>avalue1</String>"
-                            + $"<Time>{time1.ToIso8601()}</Time>" + "</FormatsTestingOnlyResponse>");
+                            + $"<Time>{time1:yyyy-MM-ddTHH:mm:ssZ}</Time>" + "</FormatsTestingOnlyResponse>");
     }
 
     [Fact]

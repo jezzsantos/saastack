@@ -50,16 +50,20 @@ public class RequestExtensionsSpec
     [Fact]
     public void WhenGetRequestInfoAndRouteTemplateContainsNoPlaceholdersWithDataForGet_ThenReturnsInfo()
     {
+        var datum = new DateTime(2023, 10, 29, 12, 30, 15, DateTimeKind.Utc).ToNearestSecond();
         var request = new HasNoPlaceholdersGetRequest
         {
             Id = "anid",
             ANumberProperty = 999,
+            ADateTimeProperty = datum,
             AStringProperty = "avalue"
         };
 
         var result = request.GetRequestInfo();
 
-        result.Route.Should().Be("/aroute?anumberproperty=999&astringproperty=avalue&id=anid");
+        result.Route.Should()
+            .Be(
+                "/aroute?adatetimeproperty=2023-10-29T12%3a30%3a00.0000000Z&anumberproperty=999&astringproperty=avalue&id=anid");
         result.Operation.Should().Be(ServiceOperation.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
@@ -67,10 +71,12 @@ public class RequestExtensionsSpec
     [Fact]
     public void WhenGetRequestInfoAndRouteTemplateContainsNoPlaceholdersWithDataForPost_ThenReturnsInfo()
     {
+        var datum = new DateTime(2023, 10, 29, 12, 30, 15, DateTimeKind.Utc).ToNearestSecond();
         var request = new HasNoPlaceholdersPostRequest
         {
             Id = "anid",
             ANumberProperty = 999,
+            ADateTimeProperty = datum,
             AStringProperty = "avalue"
         };
 
@@ -96,16 +102,20 @@ public class RequestExtensionsSpec
     [Fact]
     public void WhenGetRequestInfoAndRouteTemplateHasUnknownPlaceholderWithDataForGet_ThenReturnsInfo()
     {
+        var datum = new DateTime(2023, 10, 29, 12, 30, 15, DateTimeKind.Utc).ToNearestSecond();
         var request = new HasUnknownPlaceholderGetRequest
         {
             Id = "anid",
             ANumberProperty = 999,
+            ADateTimeProperty = datum,
             AStringProperty = "avalue"
         };
 
         var result = request.GetRequestInfo();
 
-        result.Route.Should().Be("/aroute/{unknown}?anumberproperty=999&astringproperty=avalue&id=anid");
+        result.Route.Should()
+            .Be(
+                "/aroute/{unknown}?adatetimeproperty=2023-10-29T12%3a30%3a00.0000000Z&anumberproperty=999&astringproperty=avalue&id=anid");
         result.Operation.Should().Be(ServiceOperation.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
@@ -113,10 +123,12 @@ public class RequestExtensionsSpec
     [Fact]
     public void WhenGetRequestInfoAndRouteTemplateHasUnknownPlaceholderWithDataForPost_ThenReturnsInfo()
     {
+        var datum = new DateTime(2023, 10, 29, 12, 30, 15, DateTimeKind.Utc).ToNearestSecond();
         var request = new HasUnknownPlaceholderPostRequest
         {
             Id = "anid",
             ANumberProperty = 999,
+            ADateTimeProperty = datum,
             AStringProperty = "avalue"
         };
 
@@ -136,7 +148,8 @@ public class RequestExtensionsSpec
             AStringProperty1 = null,
             AStringProperty2 = null,
             AStringProperty3 = null,
-            ANumberProperty = null
+            ANumberProperty = null,
+            ADateTimeProperty = null
         };
 
         var result = request.GetRequestInfo();
@@ -149,18 +162,22 @@ public class RequestExtensionsSpec
     [Fact]
     public void WhenGetRequestInfoAndRouteTemplateHasPlaceholdersWithDataValuesForGet_ThenReturnsInfo()
     {
+        var datum = new DateTime(2023, 10, 29, 12, 30, 15, DateTimeKind.Utc).ToNearestSecond();
         var request = new HasPlaceholdersGetRequest
         {
             Id = "anid",
             AStringProperty1 = "avalue1",
             AStringProperty2 = "avalue2",
             AStringProperty3 = "avalue3",
-            ANumberProperty = 999
+            ANumberProperty = 999,
+            ADateTimeProperty = datum
         };
 
         var result = request.GetRequestInfo();
 
-        result.Route.Should().Be("/aroute/anid/apath1/xxx999yyy/apath2/avalue1avalue2/apath3?astringproperty3=avalue3");
+        result.Route.Should()
+            .Be(
+                "/aroute/anid/apath1/xxx999yyy/apath2/avalue1avalue2/apath3?adatetimeproperty=2023-10-29T12%3a30%3a00.0000000Z&astringproperty3=avalue3");
         result.Operation.Should().Be(ServiceOperation.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
@@ -168,18 +185,21 @@ public class RequestExtensionsSpec
     [Fact]
     public void WhenGetRequestInfoAndRouteTemplateHasPlaceholdersWithSomeDataValuesForGet_ThenReturnsInfo()
     {
+        var datum = new DateTime(2023, 10, 29, 12, 30, 15, DateTimeKind.Utc).ToNearestSecond();
         var request = new HasPlaceholdersGetRequest
         {
             Id = "anid",
             AStringProperty1 = "avalue1",
             AStringProperty2 = null,
             AStringProperty3 = null,
-            ANumberProperty = null
+            ANumberProperty = null,
+            ADateTimeProperty = datum
         };
 
         var result = request.GetRequestInfo();
 
-        result.Route.Should().Be("/aroute/anid/apath1/xxxyyy/apath2/avalue1/apath3");
+        result.Route.Should()
+            .Be("/aroute/anid/apath1/xxxyyy/apath2/avalue1/apath3?adatetimeproperty=2023-10-29T12%3a30%3a00.0000000Z");
         result.Operation.Should().Be(ServiceOperation.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
@@ -193,7 +213,8 @@ public class RequestExtensionsSpec
             AStringProperty1 = null,
             AStringProperty2 = null,
             AStringProperty3 = null,
-            ANumberProperty = null
+            ANumberProperty = null,
+            ADateTimeProperty = null
         };
 
         var result = request.GetRequestInfo();
@@ -206,13 +227,15 @@ public class RequestExtensionsSpec
     [Fact]
     public void WhenGetRequestInfoAndRouteTemplateHasPlaceholdersWithDataValuesForPost_ThenReturnsInfo()
     {
+        var datum = new DateTime(2023, 10, 29, 12, 30, 15, DateTimeKind.Utc).ToNearestSecond();
         var request = new HasPlaceholdersPostRequest
         {
             Id = "anid",
             AStringProperty1 = "avalue1",
             AStringProperty2 = "avalue2",
             AStringProperty3 = "avalue3",
-            ANumberProperty = 999
+            ANumberProperty = 999,
+            ADateTimeProperty = datum
         };
 
         var result = request.GetRequestInfo();
@@ -225,13 +248,15 @@ public class RequestExtensionsSpec
     [Fact]
     public void WhenGetRequestInfoAndRouteTemplateHasPlaceholdersWithSomeDataValuesForPost_ThenReturnsInfo()
     {
+        var datum = new DateTime(2023, 10, 29, 12, 30, 15, DateTimeKind.Utc).ToNearestSecond();
         var request = new HasPlaceholdersPostRequest
         {
             Id = "anid",
             AStringProperty1 = "avalue1",
             AStringProperty2 = null,
             AStringProperty3 = null,
-            ANumberProperty = null
+            ANumberProperty = null,
+            ADateTimeProperty = datum
         };
 
         var result = request.GetRequestInfo();
@@ -253,6 +278,8 @@ public class RequestExtensionsSpec
     [Route("/aroute", ServiceOperation.Get)]
     private class HasNoPlaceholdersGetRequest : IWebRequest<TestResponse>
     {
+        public DateTime? ADateTimeProperty { get; set; }
+
         public int? ANumberProperty { get; set; }
 
         public string? AStringProperty { get; set; }
@@ -263,6 +290,8 @@ public class RequestExtensionsSpec
     [Route("/aroute", ServiceOperation.Post)]
     private class HasNoPlaceholdersPostRequest : IWebRequest<TestResponse>
     {
+        public DateTime? ADateTimeProperty { get; set; }
+
         public int? ANumberProperty { get; set; }
 
         public string? AStringProperty { get; set; }
@@ -273,6 +302,8 @@ public class RequestExtensionsSpec
     [Route("/aroute/{unknown}", ServiceOperation.Get)]
     private class HasUnknownPlaceholderGetRequest : IWebRequest<TestResponse>
     {
+        public DateTime? ADateTimeProperty { get; set; }
+
         public int? ANumberProperty { get; set; }
 
         public string? AStringProperty { get; set; }
@@ -283,6 +314,8 @@ public class RequestExtensionsSpec
     [Route("/aroute/{unknown}", ServiceOperation.Post)]
     private class HasUnknownPlaceholderPostRequest : IWebRequest<TestResponse>
     {
+        public DateTime? ADateTimeProperty { get; set; }
+
         public int? ANumberProperty { get; set; }
 
         public string? AStringProperty { get; set; }
@@ -294,6 +327,8 @@ public class RequestExtensionsSpec
         ServiceOperation.Get)]
     private class HasPlaceholdersGetRequest : IWebRequest<TestResponse>
     {
+        public DateTime? ADateTimeProperty { get; set; }
+
         public int? ANumberProperty { get; set; }
 
         public string? AStringProperty1 { get; set; }
@@ -309,6 +344,8 @@ public class RequestExtensionsSpec
         ServiceOperation.Post)]
     private class HasPlaceholdersPostRequest : IWebRequest<TestResponse>
     {
+        public DateTime? ADateTimeProperty { get; set; }
+
         public int? ANumberProperty { get; set; }
 
         public string? AStringProperty1 { get; set; }

@@ -10,7 +10,7 @@ namespace Infrastructure.Web.Api.Common;
 
 /// <summary>
 ///     An action result which formats the given object as XML.
-///     Note: We expect this class to be deleted once AspNetCore has its own XmlHttpResult
+///     Note: We expect this class to be deleted once AspNet has its own XmlHttpResult
 ///     This class was very closely based off the <see cref="JsonHttpResult{TValue}" />
 /// </summary>
 public sealed class XmlHttpResult<TValue> : IResult, IStatusCodeHttpResult, IValueHttpResult, IValueHttpResult<TValue>,
