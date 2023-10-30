@@ -20,6 +20,14 @@ public static class CollectionExtensions
     }
 
     /// <summary>
+    ///     Returns the first item in the collection
+    /// </summary>
+    public static TResult First<TResult>(this IReadOnlyList<TResult> list)
+    {
+        return list[0];
+    }
+
+    /// <summary>
     ///     Whether the collection contains any items
     /// </summary>
     public static bool HasAny<T>(this IEnumerable<T> collection)
@@ -52,6 +60,14 @@ public static class CollectionExtensions
         }
 
         return stringBuilder.ToString();
+    }
+
+    /// <summary>
+    ///     Returns the last item in the collection
+    /// </summary>
+    public static TResult Last<TResult>(this IReadOnlyList<TResult> list)
+    {
+        return list[^1];
     }
 
     /// <summary>

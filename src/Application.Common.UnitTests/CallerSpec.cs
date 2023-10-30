@@ -1,5 +1,5 @@
 using Common;
-using Domain.Common;
+using Domain.Common.Authorization;
 using Domain.Interfaces;
 using FluentAssertions;
 using Moq;
@@ -19,7 +19,7 @@ public class CallerSpec
         result.Authorization.Should().BeNull();
         result.IsAuthenticated.Should().BeFalse();
         result.Roles.All.Should().BeEmpty();
-        result.FeatureSets.All.Should().ContainSingle(UserFeatureSets.Core);
+        result.FeatureSets.All.Should().ContainSingle(UserFeatureSets.Basic);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.AnonymousUserId);
         result.CallId.Should().NotBeNull();
@@ -34,7 +34,7 @@ public class CallerSpec
         result.Authorization.Should().BeNull();
         result.IsAuthenticated.Should().BeFalse();
         result.Roles.All.Should().BeEmpty();
-        result.FeatureSets.All.Should().ContainSingle(UserFeatureSets.Core);
+        result.FeatureSets.All.Should().ContainSingle(UserFeatureSets.Basic);
         result.TenantId.Should().Be("atenantid");
         result.CallerId.Should().Be(CallerConstants.AnonymousUserId);
         result.CallId.Should().NotBeNullOrEmpty();
@@ -54,7 +54,7 @@ public class CallerSpec
         result.Authorization.Should().BeNull();
         result.IsAuthenticated.Should().BeFalse();
         result.Roles.All.Should().BeEmpty();
-        result.FeatureSets.All.Should().ContainSingle(UserFeatureSets.Core);
+        result.FeatureSets.All.Should().ContainSingle(UserFeatureSets.Basic);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be("acallerid");
         result.CallId.Should().Be("acallid");
@@ -69,7 +69,7 @@ public class CallerSpec
         result.Authorization.Should().BeNull();
         result.IsAuthenticated.Should().BeTrue();
         result.Roles.All.Should().ContainSingle(UserRoles.ServiceAccount);
-        result.FeatureSets.All.Should().ContainSingle(UserFeatureSets.Core);
+        result.FeatureSets.All.Should().ContainSingle(UserFeatureSets.Basic);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.ExternalWebhookAccountUserId);
         result.CallId.Should().Be("acallid");
@@ -84,7 +84,7 @@ public class CallerSpec
         result.Authorization.Should().BeNull();
         result.IsAuthenticated.Should().BeTrue();
         result.Roles.All.Should().ContainSingle(UserRoles.ServiceAccount);
-        result.FeatureSets.All.Should().Contain(UserFeatureSets.Core, UserFeatureSets.Basic, UserFeatureSets.Premium);
+        result.FeatureSets.All.Should().Contain(UserFeatureSets.Basic, UserFeatureSets.Pro, UserFeatureSets.Premium);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.MaintenanceAccountUserId);
         result.CallId.Should().NotBeNullOrEmpty();
@@ -99,7 +99,7 @@ public class CallerSpec
         result.Authorization.Should().BeNull();
         result.IsAuthenticated.Should().BeTrue();
         result.Roles.All.Should().ContainSingle(UserRoles.ServiceAccount);
-        result.FeatureSets.All.Should().Contain(UserFeatureSets.Core, UserFeatureSets.Basic, UserFeatureSets.Premium);
+        result.FeatureSets.All.Should().Contain(UserFeatureSets.Basic, UserFeatureSets.Pro, UserFeatureSets.Premium);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.MaintenanceAccountUserId);
         result.CallId.Should().Be("acallid");
@@ -114,7 +114,7 @@ public class CallerSpec
         result.Authorization.Should().BeNull();
         result.IsAuthenticated.Should().BeTrue();
         result.Roles.All.Should().ContainSingle(UserRoles.ServiceAccount);
-        result.FeatureSets.All.Should().Contain(UserFeatureSets.Core, UserFeatureSets.Basic, UserFeatureSets.Premium);
+        result.FeatureSets.All.Should().Contain(UserFeatureSets.Basic, UserFeatureSets.Pro, UserFeatureSets.Premium);
         result.TenantId.Should().Be("atenantid");
         result.CallerId.Should().Be(CallerConstants.MaintenanceAccountUserId);
         result.CallId.Should().NotBeNullOrEmpty();
@@ -129,7 +129,7 @@ public class CallerSpec
         result.Authorization.Should().BeNull();
         result.IsAuthenticated.Should().BeTrue();
         result.Roles.All.Should().ContainSingle(UserRoles.ServiceAccount);
-        result.FeatureSets.All.Should().Contain(UserFeatureSets.Core, UserFeatureSets.Basic, UserFeatureSets.Premium);
+        result.FeatureSets.All.Should().Contain(UserFeatureSets.Basic, UserFeatureSets.Pro, UserFeatureSets.Premium);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.ServiceClientAccountUserId);
         result.CallId.Should().NotBeNullOrEmpty();

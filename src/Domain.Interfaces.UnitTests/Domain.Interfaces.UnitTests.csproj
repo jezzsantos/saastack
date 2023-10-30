@@ -14,5 +14,4 @@
         <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
     </ItemGroup>
 
-
 </Project>

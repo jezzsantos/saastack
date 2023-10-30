@@ -59,6 +59,30 @@ public static class DateTimeExtensions
     }
 
     /// <summary>
+    ///     Subtracts the <see cref="days" /> from the <see cref="value" />
+    /// </summary>
+    public static DateTime SubtractDays(this DateTime value, int days)
+    {
+        return value.AddDays(-days);
+    }
+
+    /// <summary>
+    ///     Subtracts the <see cref="hours" /> from the <see cref="value" />
+    /// </summary>
+    public static DateTime SubtractHours(this DateTime value, int hours)
+    {
+        return value.AddHours(-hours);
+    }
+
+    /// <summary>
+    ///     Subtracts the <see cref="seconds" /> from the <see cref="value" />
+    /// </summary>
+    public static DateTime SubtractSeconds(this DateTime value, int seconds)
+    {
+        return value.AddSeconds(-seconds);
+    }
+
+    /// <summary>
     ///     Converts the <see cref="value" /> to UTC and then to
     ///     <see href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO8601</see>
     /// </summary>

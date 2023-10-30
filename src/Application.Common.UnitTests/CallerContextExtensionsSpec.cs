@@ -1,5 +1,6 @@
 using Application.Interfaces;
 using Common;
+using Domain.Common.ValueObjects;
 using FluentAssertions;
 using Moq;
 using Xunit;
@@ -42,6 +43,6 @@ public class CallerContextExtensionsSpec
 
         var result = context.Object.ToCallerId();
 
-        result.Value.Should().Be("acallerid");
+        result.Should().Be("acallerid".ToId());
     }
 }

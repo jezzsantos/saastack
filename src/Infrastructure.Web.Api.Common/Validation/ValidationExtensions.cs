@@ -1,7 +1,7 @@
 ﻿using Common.Extensions;
-using Domain.Interfaces.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
 using Domain.Interfaces.Validations;
-using Domain.Interfaces.ValueObjects;
 using FluentValidation;
 
 namespace Infrastructure.Web.Api.Common.Validation;

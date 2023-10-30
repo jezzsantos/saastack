@@ -11,13 +11,13 @@ public static class RecorderExtensions
     public static TReturn MeasureWith<TReturn>(this IRecorder recorder, ICallContext context, string eventName,
         Func<Dictionary<string, object>, TReturn> action)
     {
-        var addtional = new Dictionary<string, object>();
+        var additional = new Dictionary<string, object>();
 
-        var result = action(addtional);
+        var result = action(additional);
 
-        recorder.Measure(context, eventName, addtional.HasNone()
+        recorder.Measure(context, eventName, additional.HasNone()
             ? null
-            : addtional);
+            : additional);
 
         return result;
     }

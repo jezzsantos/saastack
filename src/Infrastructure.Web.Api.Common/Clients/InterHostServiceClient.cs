@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Application.Interfaces;
 using Common;
 using Common.Extensions;
@@ -10,6 +11,7 @@ namespace Infrastructure.Web.Api.Common.Clients;
 /// <summary>
 ///     A service client used to call between API hosts, with retries
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class InterHostServiceClient : IServiceClient
 {
     private const int RetryCount = 2;

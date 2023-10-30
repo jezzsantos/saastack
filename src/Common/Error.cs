@@ -13,7 +13,12 @@ public struct Error
 
     public string? Message { get; }
 
-    public ErrorCode Code { get; }
+    public ErrorCode Code { get; } = ErrorCode.NoError;
+
+    /// <summary>
+    ///     Creates a <see cref="ErrorCode.NoError" /> error
+    /// </summary>
+    public static Error NoError => new(ErrorCode.NoError);
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.Validation" /> error
@@ -103,6 +108,7 @@ public struct Error
 public enum ErrorCode
 {
     // EXTEND: add other kinds of errors you want to support in Result<TError>
+    NoError = -1,
     Validation,
     RuleViolation,
     RoleViolation,

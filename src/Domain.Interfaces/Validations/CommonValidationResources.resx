@@ -27,4 +27,32 @@
     <data name="AnyValidator_InvalidId" xml:space="preserve">
         <value>The Id is either invalid or missing</value>
     </data>
+    <data name="HasGetOptionsValidator_InvalidEmbed" xml:space="preserve">
+      <value>The format of the Embed expression is invalid</value>
+    </data>
+    <data name="HasGetOptionsValidator_TooManyResourceReferences" xml:space="preserve">
+      <value>The Embed expression contains too many resources. Maximum of {0} allowed</value>
+    </data>
+    <data name="HasSearchOptionsValidator_InvalidFilter" xml:space="preserve">
+      <value>The format of the Filter expression is invalid</value>
+    </data>
+    <data name="HasSearchOptionsValidator_InvalidLimit" xml:space="preserve">
+      <value>The Limit for this operation must be between {0} and {1}</value>
+    </data>
+    <data name="HasSearchOptionsValidator_InvalidOffset" xml:space="preserve">
+      <value>The offset must be between {0} and {1}</value>
+    </data>
+    <data name="HasSearchOptionsValidator_InvalidSort" xml:space="preserve">
+      <value>The format of the Sort expression is invalid</value>
+    </data>
+    <data name="EmailAddressValidator_InvalidEmailAddress" xml:space="preserve">
+      <value>The EmailAddress was invalid or missing</value>
+    </data>
+    <data name="ValidationValidator_InvalidProperty" xml:space="preserve">
+      <value>The property was invalid</value>
+    </data>
+    <data name="UrlValidator_ErrorMessage" xml:space="preserve">
+      <value>'{PropertyName}' is not a valid URL</value>
+    </data>
+
 </root>

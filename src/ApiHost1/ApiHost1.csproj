@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\BookingsApi\BookingsApi.csproj" />
         <ProjectReference Include="..\CarsApi\CarsApi.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Hosting.Common\Infrastructure.Web.Hosting.Common.csproj" />
     </ItemGroup>
@@ -13,6 +14,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Tools.Generators.WebApi\Tools.Generators.WebApi.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
+
     <ItemGroup>
         <EmbeddedResource Update="Resources.resx">
             <Generator>ResXFileCodeGenerator</Generator>

@@ -4,7 +4,7 @@ using Application.Interfaces;
 using Application.Interfaces.Services;
 using Common;
 using Common.Configuration;
-using Domain.Interfaces.Entities;
+using Domain.Common.Identity;
 using Domain.Interfaces.Services;
 using Infrastructure.Common;
 using Infrastructure.Common.DomainServices;

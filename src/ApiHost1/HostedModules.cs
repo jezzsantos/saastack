@@ -1,3 +1,4 @@
+using BookingsApi;
 using CarsApi;
 using Infrastructure.Web.Hosting.Common;
 
@@ -14,6 +15,7 @@ public static class HostedModules
         modules.Register(new TestingOnlyApiModule());
 #endif
         modules.Register(new CarsApiModule());
+        modules.Register(new BookingsApiModule());
 
         return modules;
     }

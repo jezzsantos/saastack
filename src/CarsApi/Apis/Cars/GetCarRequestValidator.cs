@@ -1,4 +1,4 @@
-using Domain.Interfaces.Entities;
+using Domain.Common.Identity;
 using Domain.Interfaces.Validations;
 using FluentValidation;
 using Infrastructure.Web.Api.Common.Validation;

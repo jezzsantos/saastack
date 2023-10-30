@@ -7,6 +7,9 @@ using Xunit;
 
 namespace IntegrationTesting.WebApi.Common;
 
+/// <summary>
+///     Provides an xUnit class fixture for integration testing APIs
+/// </summary>
 [UsedImplicitly]
 public class WebApiSetup<THost> : WebApplicationFactory<THost>
     where THost : class
@@ -36,6 +39,9 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
     }
 }
 
+/// <summary>
+///     Provides an xUnit class fixture for integration testing APIs
+/// </summary>
 public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDisposable
     where THost : class
 {
@@ -50,7 +56,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
             //TODO: swap out dependencies
             //services.AddScoped<ITodoItemService, TestTodoItemService>();
         }));
-        
+
         HttpApi = setup.CreateClient();
         Api = new JsonClient(HttpApi);
     }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Common.Extensions;
 
@@ -44,6 +45,7 @@ public readonly struct Result<TError>
     /// <exception cref="InvalidOperationException">If the result is not in a faulted state</exception>
     public TError Error
     {
+        [DebuggerStepThrough]
         get
         {
             if (IsSuccessful)
@@ -125,6 +127,7 @@ public readonly struct Result<TError>
 public readonly struct Result<TValue, TError>
     where TError : struct
 {
+    private const string NoValueStringValue = "unspecified";
     private readonly TError? _error;
     private readonly Optional<TValue> _value;
 
@@ -157,11 +160,15 @@ public readonly struct Result<TValue, TError>
     /// <exception cref="InvalidOperationException">If the result is in a faulted state</exception>
     public TValue Value
     {
+        [DebuggerStepThrough]
         get
         {
             if (!IsSuccessful)
             {
-                throw new InvalidOperationException(Resources.Result_FetchValueWhenFaulted.Format(_error!.Value));
+                var errorDescription = _error!.HasValue
+                    ? _error.Value.ToJson()!
+                    : NoValueStringValue;
+                throw new InvalidOperationException(Resources.Result_FetchValueWhenFaulted.Format(errorDescription));
             }
 
             return _value.Value;
@@ -174,11 +181,16 @@ public readonly struct Result<TValue, TError>
     /// <exception cref="InvalidOperationException">If the result is not in a faulted state</exception>
     public TError Error
     {
+        [DebuggerStepThrough]
         get
         {
             if (IsSuccessful)
             {
-                throw new InvalidOperationException(Resources.Result_FetchErrorWhenNotFaulted);
+                var successDescription = _value.HasValue
+                    ? _value.Value.ToJson()!
+                    : NoValueStringValue;
+                throw new InvalidOperationException(
+                    Resources.Result_FetchErrorWhenNotFaulted.Format(successDescription));
             }
 
             return _error!.Value;
@@ -191,7 +203,7 @@ public readonly struct Result<TValue, TError>
     public bool HasValue => IsSuccessful && _value.HasValue;
 
     /// <summary>
-    ///     Returns whether the contained &lt;see cref="Value" /&gt; has a value
+    ///     Returns whether the contained <see cref="Value" /> has a value
     /// </summary>
     public bool Exists => HasValue;
 
@@ -288,6 +300,7 @@ public readonly struct Result<TValue, TError>
     ///     Returns the result from the <see cref="onSuccess" /> delegate or <see cref="onError" /> delegate
     ///     depending on whether there is a contained value or not
     /// </summary>
+    [DebuggerStepThrough]
     public TOut Match<TOut>(Func<Optional<TValue>, TOut> onSuccess, Func<TError, TOut> onError)
     {
         return IsSuccessful

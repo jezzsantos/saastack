@@ -87,7 +87,7 @@ namespace Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The result is not in a faulted state.
+        ///   Looks up a localized string similar to The result is not faulted, but has a value: `{0}`.
         /// </summary>
         internal static string Result_FetchErrorWhenNotFaulted {
             get {
@@ -96,7 +96,7 @@ namespace Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The result is in a faulted state, with error: {0}.
+        ///   Looks up a localized string similar to The result is in a faulted state, with error: `{0}`.
         /// </summary>
         internal static string Result_FetchValueWhenFaulted {
             get {

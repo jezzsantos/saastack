@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Common.Extensions;
 
 namespace Common;
@@ -32,6 +33,7 @@ public readonly struct Optional<T> : IEquatable<Optional<T>>
     /// </summary>
     public T Value
     {
+        [DebuggerStepThrough]
         get
         {
             if (!HasValue)

@@ -193,7 +193,7 @@
                 &lt;/And&gt;
             &lt;/Entry.Match&gt;
             &lt;Entry.SortBy&gt;
-                &lt;Static /&gt;
+                &lt;Static/&gt;
             &lt;/Entry.SortBy&gt;
         &lt;/Entry&gt;
         &lt;Entry DisplayName="Constructors"&gt;
@@ -221,6 +221,30 @@
                 &lt;Access Order="Public Internal ProtectedInternal Protected Private"/&gt;
             &lt;/Entry.SortBy&gt;
         &lt;/Entry&gt;
+        &lt;Entry DisplayName="Aggregate Class Methods"&gt;
+            &lt;Entry.Match&gt;
+                &lt;And&gt;
+                    &lt;Kind Is="Method" /&gt;
+                    &lt;Or&gt;
+                       &lt;Name Is="Dehydrate"/&gt;
+                       &lt;Name Is="Rehydrate"/&gt;
+                       &lt;Name Is="OnStateChanged"/&gt;
+                       &lt;Name Is="EnsureInvariants"/&gt;
+                    &lt;/Or&gt;
+                &lt;/And&gt;
+            &lt;/Entry.Match&gt;
+        &lt;/Entry&gt;
+        &lt;Entry DisplayName="ValueObject Class Methods"&gt;
+            &lt;Entry.Match&gt;
+                &lt;And&gt;
+                    &lt;Kind Is="Method" /&gt;
+                    &lt;Or&gt;
+                       &lt;Name Is="Rehydrate"/&gt;
+                       &lt;Name Is="GetAtomicValues"/&gt;
+                    &lt;/Or&gt;
+                &lt;/And&gt;
+            &lt;/Entry.Match&gt;
+        &lt;/Entry&gt;        
         &lt;Entry Priority="100" DisplayName="Interface Implementations"&gt;
             &lt;Entry.Match&gt;
                 &lt;And&gt;
@@ -281,6 +305,9 @@
 &lt;/Patterns&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=LocalFunctions/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb"&gt;&lt;ExtraRule Prefix="Configure" Suffix="" Style="AaBb" /&gt;&lt;/Policy&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=Method/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="When" Suffix="" Style="AaBb_AaBb"&gt;&lt;ExtraRule Prefix="" Suffix="" Style="AaBb" /&gt;&lt;ExtraRule Prefix="Setup" Suffix="" Style="AaBb" /&gt;&lt;ExtraRule Prefix="Configure" Suffix="" Style="AaBb" /&gt;&lt;/Policy&gt;</s:String>
+	<s:Boolean x:Key="/Default/Environment/Filtering/FileMasksToExclude/=src_002FApplication_002EInterfaces_002FResources_002F_002A_002E_002A/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/Filtering/FileMasksToExclude/=src_002FCommon_002FAnnotations_002Ecs/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/Filtering/HideAutoProperties/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpKeepExistingMigration/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpPlaceEmbeddedOnSameLineMigration/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpUseContinuousIndentInsideBracesMigration/@EntryIndexedValue">True</s:Boolean>
@@ -372,6 +399,8 @@ public void When$condition$_Then$outcome$()
 {
     $END$
 }</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=abookingid/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=aborrowerid/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=abxy/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=acallerid/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=acallid/@EntryIndexedValue">True</s:Boolean>
@@ -393,10 +422,12 @@ public void When$condition$_Then$outcome$()
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aname/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anamespace/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Anding/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=anend/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anentityid/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anentitytype/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anerror/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aneventid/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=aneventname/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aneventtype/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anid/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aninvalidplate/@EntryIndexedValue">True</s:Boolean>
@@ -422,12 +453,15 @@ public void When$condition$_Then$outcome$()
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=areference/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=areferenceid/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=areplacement/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=arequestid/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aresource/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aresourceref/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=arootid/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aroute/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aserviceclass/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=asort/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=asortfield/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=astart/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=astatus/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=astringproperty/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=astringvalue/@EntryIndexedValue">True</s:Boolean>
@@ -443,11 +477,13 @@ public void When$condition$_Then$outcome$()
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Dehydratable/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=el_0022_002C_0020Y/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Equals_0028_0022adif/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=FFFFFFFK/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Hydratable/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Mediat/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Mixedcase/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=notadate/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=notajurisdiction/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=notreserved/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Persistable/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=putpatch/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=stringified/@EntryIndexedValue">True</s:Boolean>
@@ -455,6 +491,7 @@ public void When$condition$_Then$outcome$()
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=tenantsettings/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=testresource/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=tooshort/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=unavail/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Unavailabilities/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Underlapped/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_0020_0020_0020_0020_0020_0020/@EntryIndexedValue">True</s:Boolean>

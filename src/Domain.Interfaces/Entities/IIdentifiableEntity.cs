@@ -7,5 +7,5 @@ namespace Domain.Interfaces.Entities;
 /// </summary>
 public interface IIdentifiableEntity
 {
-    Identifier Id { get; }
+    ISingleValueObject<string> Id { get; }
 }

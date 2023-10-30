@@ -18,7 +18,7 @@
     <ItemGroup>
         <EmbeddedResource Update="ValidationResources.resx">
             <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+            <LastGenOutput>ValidationResources.Designer.cs</LastGenOutput>
         </EmbeddedResource>
     </ItemGroup>
     <ItemGroup>

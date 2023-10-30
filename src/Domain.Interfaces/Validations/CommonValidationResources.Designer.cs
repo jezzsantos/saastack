@@ -67,5 +67,86 @@ namespace Domain.Interfaces.Validations {
                 return ResourceManager.GetString("AnyValidator_InvalidId", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The EmailAddress was invalid or missing.
+        /// </summary>
+        public static string EmailAddressValidator_InvalidEmailAddress {
+            get {
+                return ResourceManager.GetString("EmailAddressValidator_InvalidEmailAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The format of the Embed expression is invalid.
+        /// </summary>
+        public static string HasGetOptionsValidator_InvalidEmbed {
+            get {
+                return ResourceManager.GetString("HasGetOptionsValidator_InvalidEmbed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Embed expression contains too many resources. Maximum of {0} allowed.
+        /// </summary>
+        public static string HasGetOptionsValidator_TooManyResourceReferences {
+            get {
+                return ResourceManager.GetString("HasGetOptionsValidator_TooManyResourceReferences", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The format of the Filter expression is invalid.
+        /// </summary>
+        public static string HasSearchOptionsValidator_InvalidFilter {
+            get {
+                return ResourceManager.GetString("HasSearchOptionsValidator_InvalidFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Limit for this operation must be between {0} and {1}.
+        /// </summary>
+        public static string HasSearchOptionsValidator_InvalidLimit {
+            get {
+                return ResourceManager.GetString("HasSearchOptionsValidator_InvalidLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The offset must be between {0} and {1}.
+        /// </summary>
+        public static string HasSearchOptionsValidator_InvalidOffset {
+            get {
+                return ResourceManager.GetString("HasSearchOptionsValidator_InvalidOffset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The format of the Sort expression is invalid.
+        /// </summary>
+        public static string HasSearchOptionsValidator_InvalidSort {
+            get {
+                return ResourceManager.GetString("HasSearchOptionsValidator_InvalidSort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{PropertyName}&apos; is not a valid URL.
+        /// </summary>
+        public static string UrlValidator_ErrorMessage {
+            get {
+                return ResourceManager.GetString("UrlValidator_ErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property was invalid.
+        /// </summary>
+        public static string ValidationValidator_InvalidProperty {
+            get {
+                return ResourceManager.GetString("ValidationValidator_InvalidProperty", resourceCulture);
+            }
+        }
     }
 }

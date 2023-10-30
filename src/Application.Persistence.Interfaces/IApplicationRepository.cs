@@ -1,3 +1,5 @@
+using Common;
+
 namespace Application.Persistence.Interfaces;
 
 /// <summary>
@@ -5,5 +7,5 @@ namespace Application.Persistence.Interfaces;
 /// </summary>
 public interface IApplicationRepository
 {
-    void DestroyAll();
+    Task<Result<Error>> DestroyAllAsync();
 }

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="Year_InvalidNumber" xml:space="preserve">
+        <value>The Year of manufacturer must be between {0} and {1}</value>
+    </data>
+    <data name="Manufacturer_UnknownMake" xml:space="preserve">
+        <value>The Make of the manufacturer is unknown</value>
+    </data>
+    <data name="Manufacturer_UnknownModel" xml:space="preserve">
+        <value>The Model of the manufacturer is unknown</value>
+    </data>
+    <data name="TimeSlot_FromDateBeforeToDate" xml:space="preserve">
+        <value>The To date must be after the From date</value>
+    </data>
+    <data name="CarRoot_NotRegistered" xml:space="preserve">
+        <value>The registration for the car is not yet been defined</value>
+    </data>
+    <data name="CarRoot_NotOwned" xml:space="preserve">
+        <value>The ownership of the car is not yet been defined</value>
+    </data>
+    <data name="CarRoot_NotManufactured" xml:space="preserve">
+        <value>The manufacturer details for the car have not yet been defined</value>
+    </data>
+    <data name="CarRoot_OfflineInPast" xml:space="preserve">
+        <value>The car cannot be taken offline in the past</value>
+    </data>
+    <data name="CarRoot_ReserveInPast" xml:space="preserve">
+        <value>The car cannot be reserved in the past</value>
+    </data>
+    <data name="CarRoot_Unavailable" xml:space="preserve">
+        <value>The car is not available for this time slot</value>
+    </data>
+    <data name="CarRoot_ScheduleMaintenanceLessThanMinimumLeadTime" xml:space="preserve">
+        <value>The From date must not be less than {0:#}hrs from now</value>
+    </data>
+    <data name="CausedBy_ReservationWithoutReference" xml:space="preserve">
+        <value>The slot is reserved without a reservation reference</value>
+    </data>
+    <data name="CausedBy_InvalidReference" xml:space="preserve">
+        <value>The CausedByReference is invalid</value>
+    </data>
+    <data name="Unavailabilities_OverlappingSlot" xml:space="preserve">
+        <value>The slot overlaps and existing slot with a different cause or reference</value>
+    </data>
+    <data name="UnavailabilityEntity_NotAssigned" xml:space="preserve">
+        <value>The unavailability is not configured</value>
+    </data>
+    <data name="NumberPlate_InvalidNumberPlate" xml:space="preserve">
+        <value>The number is not a valid license number plate</value>
+    </data>
+    <data name="Jurisdiction_UnknownJurisdiction" xml:space="preserve">
+        <value>The jurisdiction is not known</value>
+    </data>
+
+</root>

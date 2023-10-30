@@ -1,5 +1,4 @@
-using Domain.Common.Entities;
-using Domain.Interfaces.Entities;
+using Domain.Common.Identity;
 
 namespace Infrastructure.Web.Hosting.Common;
 

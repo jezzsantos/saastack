@@ -37,7 +37,7 @@ public class CarsApi : IWebApiService
         _carsApplication = carsApplication;
     }
 
-    [AuthorizeForAnyRole(OrganisationRoles.Manager)]
+    [AuthorizeForAnyRole(OrganizationRoles.Manager)]
     public async Task<ApiDeleteResult> Delete(DeleteCarRequest request,
         CancellationToken cancellationToken)
     {
@@ -45,7 +45,7 @@ public class CarsApi : IWebApiService
         return () => car.HandleApplicationResult();
     }
 
-    [AuthorizeForAnyRole(OrganisationRoles.Reserver, OrganisationRoles.Manager)]
+    [AuthorizeForAnyRole(OrganizationRoles.Reserver, OrganizationRoles.Manager)]
     public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
@@ -53,7 +53,7 @@ public class CarsApi : IWebApiService
         return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }
 
-    [AuthorizeForAnyRole(OrganisationRoles.Manager)]
+    [AuthorizeForAnyRole(OrganizationRoles.Manager)]
     public async Task<ApiPostResult<Car, GetCarResponse>> Register(RegisterCarRequest request,
         CancellationToken cancellationToken)
     {
@@ -75,7 +75,7 @@ public class CarsApi : IWebApiService
             cars.HandleApplicationResult(c => new SearchAllCarsResponse { Cars = c.Results, Metadata = c.Metadata });
     }
 
-    [AuthorizeForAnyRole(OrganisationRoles.Manager)]
+    [AuthorizeForAnyRole(OrganizationRoles.Manager)]
     public async Task<ApiPutPatchResult<Car, GetCarResponse>> TakeOffline(TakeOfflineCarRequest request,
         CancellationToken cancellationToken)
     {
@@ -244,7 +244,7 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
              _carsApplication = carsApplication;
          }
      
-         [AuthorizeForAnyRole(OrganisationRoles.Reserver, OrganisationRoles.Manager)]
+         [AuthorizeForAnyRole(OrganizationRoles.Reserver, OrganizationRoles.Manager)]
          public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
          {
              var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
@@ -351,7 +351,7 @@ From that Application layer, a resource (DTO) will be returned, and this functio
 > A typical service operation would look like this:
 
 ```c#
-    [AuthorizeForAnyRole(OrganisationRoles.Reserver, OrganisationRoles.Manager)]
+    [AuthorizeForAnyRole(OrganizationRoles.Reserver, OrganizationRoles.Manager)]
     public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
         var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);

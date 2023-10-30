@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Web.Api.Common;
 
+[ExcludeFromCodeCoverage]
 public static class HandlerExtensions
 {
     /// <summary>

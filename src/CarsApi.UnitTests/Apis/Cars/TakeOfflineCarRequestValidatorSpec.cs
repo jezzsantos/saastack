@@ -1,6 +1,7 @@
 using CarsApi.Apis.Cars;
-using Domain.Interfaces.Entities;
-using Domain.Interfaces.ValueObjects;
+using Common.Extensions;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
 using FluentAssertions;
 using FluentValidation;
 using Infrastructure.Web.Api.Interfaces.Operations.Cars;
@@ -25,8 +26,8 @@ public class TakeOfflineCarRequestValidatorSpec
         _dto = new TakeOfflineCarRequest
         {
             Id = "anid",
-            StartAtUtc = DateTime.UtcNow.AddHours(1),
-            EndAtUtc = DateTime.UtcNow.AddHours(2)
+            FromUtc = DateTime.UtcNow.AddHours(1),
+            ToUtc = DateTime.UtcNow.AddHours(2)
         };
     }
 
@@ -37,43 +38,33 @@ public class TakeOfflineCarRequestValidatorSpec
     }
 
     [Fact]
-    public void WhenReasonIsInvalid_ThenThrows()
+    public void WhenFromUtcIsPast_ThenThrows()
     {
-        _dto.Reason = "aninvalidareason^";
+        _dto.FromUtc = DateTime.UtcNow.SubtractHours(1);
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
-            .WithMessageLike(ValidationResources.TakeOfflineCarRequestValidator_InvalidReason);
+            .WithMessageLike(ValidationResources.TakeOfflineCarRequestValidator_InvalidFromUtc);
     }
 
     [Fact]
-    public void WhenStartAtUtcIsPast_ThenThrows()
+    public void WhenToUtcIsPast_ThenThrows()
     {
-        _dto.StartAtUtc = DateTime.UtcNow.Subtract(TimeSpan.FromHours(1));
+        _dto.ToUtc = DateTime.UtcNow.SubtractHours(1);
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
-            .WithMessageLike(ValidationResources.TakeOfflineCarRequestValidator_InvalidStartAtUtc);
+            .WithMessageLike(ValidationResources.TakeOfflineCarRequestValidator_InvalidToUtc);
     }
 
     [Fact]
-    public void WhenEndAtUtcIsPast_ThenThrows()
+    public void WhenToUtcIsLessThanFromUtc_ThenThrows()
     {
-        _dto.EndAtUtc = DateTime.UtcNow.Subtract(TimeSpan.FromHours(1));
+        _dto.FromUtc = DateTime.UtcNow.AddHours(2);
+        _dto.ToUtc = DateTime.UtcNow.AddHours(1);
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
-            .WithMessageLike(ValidationResources.TakeOfflineCarRequestValidator_InvalidEndAtUtc);
-    }
-
-    [Fact]
-    public void WhenEndAtUtcIsLessThanStartAtUtc_ThenThrows()
-    {
-        _dto.StartAtUtc = DateTime.UtcNow.Add(TimeSpan.FromHours(2));
-        _dto.EndAtUtc = DateTime.UtcNow.Add(TimeSpan.FromHours(1));
-
-        _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should().Throw<ValidationException>()
-            .WithMessageLike(ValidationResources.TakeOfflineCarRequestValidator_InvalidEndAtUtc);
+            .WithMessageLike(ValidationResources.TakeOfflineCarRequestValidator_InvalidToUtc);
     }
 }

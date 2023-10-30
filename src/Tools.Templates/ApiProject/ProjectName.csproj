@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\{SubDomainName}sApplication\{SubDomainName}sApplication.csproj" />
+        <ProjectReference Include="..\{SubDomainName}sDomain\{SubDomainName}sDomain.csproj" />
+        <ProjectReference Include="..\{SubDomainName}sInfrastructure\{SubDomainName}sInfrastructure.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Hosting.Common\Infrastructure.Web.Hosting.Common.csproj" />
+    </ItemGroup>
+
+    <!-- Runs the source generator (in memory) on build -->
+    <ItemGroup>
+        <ProjectReference Include="..\Tools.Generators.WebApi\Tools.Generators.WebApi.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="ValidationResources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>ValidationResources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Update="ValidationResources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>ValidationResources.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+</Project>

@@ -1,6 +1,6 @@
 using CarsApi.Apis.Cars;
-using Domain.Interfaces.Entities;
-using Domain.Interfaces.ValueObjects;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
 using FluentValidation;
 using Infrastructure.Web.Api.Interfaces.Operations.Cars;
 using Moq;

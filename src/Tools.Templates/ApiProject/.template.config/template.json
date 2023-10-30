@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/template",
+  "author": "SaaStack",
+  "classifications": [
+    "SaaStack"
+  ],
+  "identity": "SaaStack.ApiProject",
+  "name": "SaaStack API Project",
+  "description": "",
+  "shortName": "saastackapi",
+  "sourceName": "ProjectName",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "preferNameDirectory": false,
+  "symbols": {
+    "SubDomainName": {
+      "type": "parameter",
+      "datatype": "string",
+      "isRequired": true,
+      "description": "Name of the subdomain (singular)",
+      "replaces": "{SubDomainName}"
+    }
+  }
+}

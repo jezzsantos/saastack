@@ -33,13 +33,25 @@
     <data name="RegisterCarRequestValidator_InvalidYear" xml:space="preserve">
         <value>The 'Year' is either missing or invalid</value>
     </data>
-    <data name="TakeOfflineCarRequestValidator_InvalidReason" xml:space="preserve">
-        <value>The 'Reason' is invalid</value>
+    <data name="RegisterCarRequestValidator_InvalidJurisdiction" xml:space="preserve">
+        <value>The 'Jurisdiction' is either missing or invalid</value>
     </data>
-    <data name="TakeOfflineCarRequestValidator_InvalidStartAtUtc" xml:space="preserve">
-        <value>The 'StartDateUtc' is either missing or in the past</value>
+    <data name="RegisterCarRequestValidator_InvalidNumberPlate" xml:space="preserve">
+        <value>The 'NumberPlate' is either missing or invalid</value>
     </data>
-    <data name="TakeOfflineCarRequestValidator_InvalidEndAtUtc" xml:space="preserve">
-        <value>The 'EndDateUtc' is either missing, or is not after the 'StartDateUtc'</value>
+    <data name="TakeOfflineCarRequestValidator_InvalidFromUtc" xml:space="preserve">
+        <value>The 'FromUtc' is either missing or in the past</value>
+    </data>
+    <data name="TakeOfflineCarRequestValidator_InvalidToUtc" xml:space="preserve">
+        <value>The 'ToUtc' is either missing, or is before the 'FromUtc'</value>
+    </data>
+    <data name="ScheduleMaintenanceCarRequestValidator_InvalidFromUtc" xml:space="preserve">
+        <value>The 'FromUtc' is either missing or in the past</value>
+    </data>
+    <data name="ScheduleMaintenanceCarRequestValidator_InvalidToUtc" xml:space="preserve">
+        <value>The 'ToUtc' is either missing, or is before the 'FromUtc'</value>
+    </data>
+    <data name="SearchAllAvailableCarsRequestValidator_InvalidToUtc" xml:space="preserve">
+        <value>The 'ToUtc' must be greater than 'FromUtc'</value>
     </data>
 </root>

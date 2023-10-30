@@ -1,4 +1,5 @@
-using Domain.Interfaces.ValueObjects;
+﻿using System.Diagnostics;
+using Domain.Common.Identity;
 
 namespace Domain.Common.ValueObjects;
 
@@ -7,16 +8,27 @@ public static class IdentifierExtensions
     /// <summary>
     ///     Converts a <see cref="string" /> to an <see cref="Identifier" />
     /// </summary>
+    [DebuggerStepThrough]
     public static Identifier ToId(this string id)
     {
-        return id.ToIdentifier();
+        return Identifier.Create(id);
     }
 
     /// <summary>
-    ///     Converts a <see cref="string" /> to an <see cref="Identifier" />
+    ///     Returns a, <see cref="IIdentifierFactory" /> that creates identifiers with the <see cref="identifier" /> specified
     /// </summary>
-    public static Identifier ToIdentifier(this string id)
+    [DebuggerStepThrough]
+    public static IIdentifierFactory ToIdentifierFactory(this string identifier)
     {
-        return Identifier.Create(id);
+        return new FixedIdentifierFactory(identifier);
+    }
+
+    /// <summary>
+    ///     Returns a, <see cref="IIdentifierFactory" /> that creates identifiers with the <see cref="Identifier" /> specified
+    /// </summary>
+    [DebuggerStepThrough]
+    public static IIdentifierFactory ToIdentifierFactory(this Identifier identifier)
+    {
+        return new FixedIdentifierFactory(identifier);
     }
 }

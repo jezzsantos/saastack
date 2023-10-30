@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -65,6 +66,7 @@ public sealed class XmlHttpResult<TValue> : IResult, IStatusCodeHttpResult, IVal
 ///     that we need for creating our own XmlHttpResult class.
 ///     We expect this code to be deleted when Microsoft releases their own XmlHttpResult type
 /// </summary>
+[ExcludeFromCodeCoverage]
 internal static partial class MicrosoftAspNetCoreExtensions
 {
     public static Task WriteResultAsXmlAsync<T>(HttpContext httpContext, ILogger logger, T? value, string? contentType,

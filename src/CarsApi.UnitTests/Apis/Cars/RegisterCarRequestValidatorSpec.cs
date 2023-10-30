@@ -21,7 +21,9 @@ public class RegisterCarRequestValidatorSpec
         {
             Make = "amake",
             Model = "amodel",
-            Year = Validations.Car.Year.Min
+            Year = Validations.Car.Year.Min,
+            Jurisdiction = Jurisdiction.AllowedCountries[0],
+            NumberPlate = "aplate"
         };
     }
 
@@ -69,5 +71,45 @@ public class RegisterCarRequestValidatorSpec
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(ValidationResources.RegisterCarRequestValidator_InvalidYear);
+    }
+
+    [Fact]
+    public void WhenJurisdictionIsNull_ThenThrows()
+    {
+        _dto.Jurisdiction = null!;
+
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should().Throw<ValidationException>()
+            .WithMessageLike(ValidationResources.RegisterCarRequestValidator_InvalidJurisdiction);
+    }
+
+    [Fact]
+    public void WhenJurisdictionIsInvalid_ThenThrows()
+    {
+        _dto.Jurisdiction = "notajurisdiction";
+
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should().Throw<ValidationException>()
+            .WithMessageLike(ValidationResources.RegisterCarRequestValidator_InvalidJurisdiction);
+    }
+
+    [Fact]
+    public void WhenNumberPlateIsNull_ThenThrows()
+    {
+        _dto.NumberPlate = null!;
+
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should().Throw<ValidationException>()
+            .WithMessageLike(ValidationResources.RegisterCarRequestValidator_InvalidNumberPlate);
+    }
+
+    [Fact]
+    public void WhenNumberPlateIsInvalid_ThenThrows()
+    {
+        _dto.NumberPlate = "^aninvalidplate^";
+
+        _validator.Invoking(x => x.ValidateAndThrow(_dto))
+            .Should().Throw<ValidationException>()
+            .WithMessageLike(ValidationResources.RegisterCarRequestValidator_InvalidNumberPlate);
     }
 }

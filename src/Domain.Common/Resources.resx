@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="EventStream_OutOfOrderChange" xml:space="preserve">
+        <value>The version of this loaded event ('{0}') was not expected. Expected version '{1}' instead. Perhaps there is a missing event or this event was replayed out of order?</value>
+    </data>
+    <data name="EventStream_ZeroFirstVersion" xml:space="preserve">
+        <value>First version cannot be 0</value>
+    </data>
+    <data name="EventStream_ZeroLastVersion" xml:space="preserve">
+        <value>Last version cannot be 0</value>
+    </data>
+    <data name="EventMetadataExtensions_CreateEventFromJson_FailedDeserialization" xml:space="preserve">
+        <value>Failed to deserialize event '{0}' as type: '{1}'</value>
+    </data>
+    <data name="EventingAggregateRootBase_ChangesAlreadyLoaded" xml:space="preserve">
+        <value>Change events have already been loaded into the aggregate</value>
+    </data>
+    <data name="EventingAggregateRootBase_HasNoIdentifier" xml:space="preserve">
+        <value>The entity has no identifier</value>
+    </data>
+    <data name="EventingEntityBase_HandleUnKnownStateChangedEvent_UnknownEvent" xml:space="preserve">
+        <value>Unknown event {0}</value>
+    </data>
+    <data name="ChangeEventMigrator_UnknownType" xml:space="preserve">
+        <value>Failed to deserialize event '{0}'. The serialized type: '{1}' cannot be found in the current AppDomain. Perhaps the type '{1}' has been renamed or no longer exists in the codebase?</value>
+    </data>
+</root>

@@ -1,6 +1,6 @@
 using Application.Interfaces;
 using Common;
-using Domain.Common;
+using Domain.Common.Authorization;
 using Domain.Interfaces;
 
 namespace Application.Common;
@@ -91,7 +91,7 @@ public static class Caller
         {
             TenantId = tenantId;
             Roles = new ICallerContext.CallerRoles();
-            FeatureSets = new ICallerContext.CallerFeatureSets(new[] { UserFeatureSets.Core }, null);
+            FeatureSets = new ICallerContext.CallerFeatureSets(new[] { UserFeatureSets.Basic }, null);
         }
 
         public ICallerContext.CallerRoles Roles { get; }
@@ -123,7 +123,7 @@ public static class Caller
             Roles = new ICallerContext.CallerRoles(new[] { UserRoles.ServiceAccount }, null);
             FeatureSets =
                 new ICallerContext.CallerFeatureSets(
-                    new[] { UserFeatureSets.Core, UserFeatureSets.Basic, UserFeatureSets.Premium }, null);
+                    new[] { UserFeatureSets.Basic, UserFeatureSets.Pro, UserFeatureSets.Premium }, null);
         }
 
         public ICallerContext.CallerRoles Roles { get; }
@@ -151,7 +151,7 @@ public static class Caller
         public ICallerContext.CallerRoles Roles { get; } = new(new[] { UserRoles.ServiceAccount }, null);
 
         public ICallerContext.CallerFeatureSets FeatureSets { get; } = new(
-            new[] { UserFeatureSets.Core, UserFeatureSets.Basic, UserFeatureSets.Premium }, null);
+            new[] { UserFeatureSets.Basic, UserFeatureSets.Pro, UserFeatureSets.Premium }, null);
 
         public string? Authorization => null;
 
@@ -175,7 +175,7 @@ public static class Caller
         {
             CallId = callId ?? GenerateCallId();
             Roles = new ICallerContext.CallerRoles(new[] { UserRoles.ServiceAccount }, null);
-            FeatureSets = new ICallerContext.CallerFeatureSets(new[] { UserFeatureSets.Core }, null);
+            FeatureSets = new ICallerContext.CallerFeatureSets(new[] { UserFeatureSets.Basic }, null);
         }
 
         public ICallerContext.CallerRoles Roles { get; }
@@ -206,7 +206,7 @@ public static class Caller
             CallId = call.CallId;
             TenantId = call.TenantId;
             Roles = new ICallerContext.CallerRoles();
-            FeatureSets = new ICallerContext.CallerFeatureSets(new[] { UserFeatureSets.Core }, null);
+            FeatureSets = new ICallerContext.CallerFeatureSets(new[] { UserFeatureSets.Basic }, null);
         }
 
         public ICallerContext.CallerRoles Roles { get; }

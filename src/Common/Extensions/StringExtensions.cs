@@ -55,6 +55,19 @@ public static class StringExtensions
     }
 
     /// <summary>
+    ///     Converts the <see cref="json" /> to an object of the specified <see cref="type" />
+    /// </summary>
+    public static object? FromJson(this string json, Type type)
+    {
+        if (json.HasNoValue())
+        {
+            return default;
+        }
+
+        return JsonSerializer.Deserialize(json, type, new JsonSerializerOptions());
+    }
+
+    /// <summary>
     ///     Whether the string value contains no value: it is either: null, empty or only whitespaces
     /// </summary>
     [ContractAnnotation("null => true; notnull => false")]

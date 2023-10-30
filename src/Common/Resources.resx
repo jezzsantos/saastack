@@ -34,10 +34,10 @@
         <value>The value is null</value>
     </data>
     <data name="Result_FetchValueWhenFaulted" xml:space="preserve">
-        <value>The result is in a faulted state, with error: {0}</value>
+        <value>The result is in a faulted state, with error: `{0}`</value>
     </data>
     <data name="Result_FetchErrorWhenNotFaulted" xml:space="preserve">
-        <value>The result is not in a faulted state</value>
+        <value>The result is not faulted, but has a value: `{0}`</value>
     </data>
     <data name="WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage" xml:space="preserve">
         <value>An unexpected error occurred</value>

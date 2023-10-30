@@ -116,6 +116,72 @@ public class StringExtensionsSpec
     }
 
     [Fact]
+    public void WhenFromJsonTypedWithEmptyJson_ThenReturnsNull()
+    {
+        var result = string.Empty.FromJson<SerializableClass>();
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenFromJsonTypedWithIncompatibleJson_ThenReturnsInstance()
+    {
+        var instance = new { AnotherProperty = "anotherproperty" };
+
+        var result = instance.ToJson()!.FromJson<SerializableClass>();
+
+        result.Should().BeOfType<SerializableClass>();
+        result.As<SerializableClass>().AProperty.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenFromJsonTyped_ThenReturnsInstance()
+    {
+        var instance = new SerializableClass
+        {
+            AProperty = "aproperty"
+        };
+
+        var result = instance.ToJson()!.FromJson<SerializableClass>();
+
+        result.Should().BeOfType<SerializableClass>();
+        result.As<SerializableClass>().AProperty.Should().Be("aproperty");
+    }
+
+    [Fact]
+    public void WhenFromJsonUntypedWithEmptyJson_ThenReturnsNull()
+    {
+        var result = string.Empty.FromJson(typeof(SerializableClass));
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenFromJsonUntypedWithIncompatibleJson_ThenReturnsInstance()
+    {
+        var instance = new { AnotherProperty = "anotherproperty" };
+
+        var result = instance.ToJson()!.FromJson(typeof(SerializableClass));
+
+        result.Should().BeOfType<SerializableClass>();
+        result.As<SerializableClass>().AProperty.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenFromJsonUntyped_ThenReturnsInstance()
+    {
+        var instance = new SerializableClass
+        {
+            AProperty = "aproperty"
+        };
+
+        var result = instance.ToJson()!.FromJson(typeof(SerializableClass));
+
+        result.Should().BeOfType<SerializableClass>();
+        result.As<SerializableClass>().AProperty.Should().Be("aproperty");
+    }
+
+    [Fact]
     public void WhenIsMatchWithNull_ThenReturnsFalse()
     {
         var result = ((string)null!).IsMatchWith("apattern");
@@ -327,5 +393,10 @@ public class StringExtensionsSpec
         var result = "notavalue".ToIntOrDefault(9);
 
         result.Should().Be(9);
+    }
+
+    public class SerializableClass
+    {
+        public string? AProperty { get; set; }
     }
 }

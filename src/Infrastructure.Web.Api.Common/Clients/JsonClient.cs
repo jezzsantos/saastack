@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Common;
@@ -10,6 +11,7 @@ namespace Infrastructure.Web.Api.Common.Clients;
 /// <summary>
 ///     Provides a convenient typed <see cref="HttpClient" /> that accepts and returns JSON
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class JsonClient : IHttpJsonClient, IDisposable
 {
     private readonly HttpClient _client;

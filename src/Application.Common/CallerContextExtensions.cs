@@ -2,7 +2,6 @@ using Application.Interfaces;
 using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
-using Domain.Interfaces.ValueObjects;
 
 namespace Application.Common;
 
@@ -26,6 +25,6 @@ public static class CallerContextExtensions
     /// </summary>
     public static Identifier ToCallerId(this ICallerContext context)
     {
-        return context.CallerId.ToIdentifier();
+        return context.CallerId.ToId();
     }
 }

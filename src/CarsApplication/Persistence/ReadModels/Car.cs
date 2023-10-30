@@ -1,14 +1,27 @@
-using Application.Persistence.Interfaces;
+using Application.Persistence.Common;
+using CarsDomain;
+using QueryAny;
 
 namespace CarsApplication.Persistence.ReadModels;
 
-public class Car : IReadModelEntity
+[EntityName("Car")]
+public class Car : ReadModelEntity
 {
-    public string Id { get; set; } = null!;
+    public required string LicenseJurisdiction { get; set; }
 
-    public string? Make { get; set; }
+    public required string LicenseNumber { get; set; }
 
-    public string? Model { get; set; }
+    public required VehicleManagers ManagerIds { get; set; }
 
-    public int? Year { get; set; }
+    public required string ManufactureMake { get; set; }
+
+    public required string ManufactureModel { get; set; }
+
+    public required int ManufactureYear { get; set; }
+
+    public required string OrganisationId { get; set; }
+
+    public required string Status { get; set; }
+
+    public required string VehicleOwnerId { get; set; }
 }

@@ -54,20 +54,20 @@ public interface ICallerContext
         {
             All = Array.Empty<string>();
             User = Array.Empty<string>();
-            Organisation = Array.Empty<string>();
+            Organization = Array.Empty<string>();
         }
 
-        public CallerRoles(string[]? user, string[]? organisation)
+        public CallerRoles(string[]? user, string[]? organization)
         {
             User = user ?? Array.Empty<string>();
-            Organisation = organisation ?? Array.Empty<string>();
-            All = User.Concat(Organisation)
+            Organization = organization ?? Array.Empty<string>();
+            All = User.Concat(Organization)
                 .ToArray();
         }
 
         public string[] All { get; }
 
-        public string[] Organisation { get; }
+        public string[] Organization { get; }
 
         public string[] User { get; }
     }
@@ -81,20 +81,20 @@ public interface ICallerContext
         {
             All = Array.Empty<string>();
             User = Array.Empty<string>();
-            Organisation = Array.Empty<string>();
+            Organization = Array.Empty<string>();
         }
 
-        public CallerFeatureSets(string[]? user, string[]? organisation)
+        public CallerFeatureSets(string[]? user, string[]? organization)
         {
             User = user ?? Array.Empty<string>();
-            Organisation = organisation ?? Array.Empty<string>();
-            All = User.Concat(Organisation)
+            Organization = organization ?? Array.Empty<string>();
+            All = User.Concat(Organization)
                 .ToArray();
         }
 
         public string[] All { get; }
 
-        public string[] Organisation { get; }
+        public string[] Organization { get; }
 
         public string[] User { get; }
     }
