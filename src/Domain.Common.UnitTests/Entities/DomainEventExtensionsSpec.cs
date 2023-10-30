@@ -54,7 +54,7 @@ public class DomainEventExtensionsSpec
     [Fact]
     public void WhenToVersioned_ThenReturnsEvent()
     {
-        var datum = DateTime.UtcNow;
+        var datum = DateTime.UtcNow.ToNearestSecond();
 
         var result = new TestEvent
         {

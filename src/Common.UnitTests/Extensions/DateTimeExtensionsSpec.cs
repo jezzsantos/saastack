@@ -25,7 +25,7 @@ public class DateTimeExtensionsSpec
         var offset = TimeZoneInfo.Local.GetUtcOffset(time);
         var offsetTime = time.Subtract(offset);
 
-        result.Should().Be($"2023-09-{offsetTime.Day:D2}T{offsetTime.Hour:D2}:{offsetTime.Minute:D2}:00.0000000Z");
+        result.Should().Be($"2023-09-{offsetTime.Day:D2}T{offsetTime.Hour:D2}:{offsetTime.Minute:D2}:00Z");
     }
 
     [Fact]
@@ -35,7 +35,37 @@ public class DateTimeExtensionsSpec
 
         var result = time.ToIso8601();
 
-        result.Should().Be("2023-09-24T12:00:00.0000000Z");
+        result.Should().Be("2023-09-24T12:00:00Z");
+    }
+
+    [Fact]
+    public void WhenToIso8601WithSeconds_ThenReturnsUtcTime()
+    {
+        var time = new DateTime(2023, 09, 24, 12, 0, 59, 0, 0, DateTimeKind.Utc);
+
+        var result = time.ToIso8601();
+
+        result.Should().Be("2023-09-24T12:00:59Z");
+    }
+
+    [Fact]
+    public void WhenToIso8601WithMilliseconds_ThenReturnsUtcTime()
+    {
+        var time = new DateTime(2023, 09, 24, 12, 0, 0, 99, 0, DateTimeKind.Utc);
+
+        var result = time.ToIso8601();
+
+        result.Should().Be("2023-09-24T12:00:00.099Z");
+    }
+
+    [Fact]
+    public void WhenToIso8601WithMicroseconds_ThenReturnsUtcTime()
+    {
+        var time = new DateTime(2023, 09, 24, 12, 0, 0, 0, 99, DateTimeKind.Utc);
+
+        var result = time.ToIso8601();
+
+        result.Should().Be("2023-09-24T12:00:00.000099Z");
     }
 
     [Fact]

@@ -92,7 +92,8 @@ public static class DateTimeExtensions
             ? value
             : value.ToUniversalTime();
 
-        return utcDateTime.ToString("O");
+        // Note: we are using the custom format, instead of using the built-in formatter "O", because we don't want any trailing zeros before the 'Z' character
+        return utcDateTime.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'FFFFFFFK");
     }
 
     /// <summary>
@@ -114,7 +115,13 @@ public static class DateTimeExtensions
     /// </summary>
     public static DateTime ToNearestSecond(this DateTime value)
     {
-        return new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, 0, value.Kind);
+        var microsecondOffset = TimeSpan.FromSeconds(value.Second)
+            .Add(TimeSpan.FromMilliseconds(value.Millisecond))
+            .Add(TimeSpan.FromMicroseconds(value.Microsecond));
+        var nanosecondsInTicks = value.Nanosecond != 0
+            ? value.Nanosecond / 100
+            : 0;
+        return value.Subtract(microsecondOffset).AddTicks(-nanosecondsInTicks);
     }
 
     /// <summary>
