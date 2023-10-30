@@ -61,10 +61,10 @@ public delegate Result<EmptyResponse, Error> ApiDeleteResult();
 public class PostResult<TResponse>
     where TResponse : IWebResponse
 {
-    public PostResult(TResponse response, string? location = null)
+    public PostResult(TResponse response, string? resourceLocation = null)
     {
         Response = response;
-        Location = location;
+        Location = resourceLocation;
     }
 
     public string? Location { get; }

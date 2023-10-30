@@ -5,6 +5,7 @@ using CarsApplication.Persistence;
 using CarsDomain;
 using Domain.Interfaces;
 using FluentAssertions;
+using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Interfaces.Operations.Cars;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
@@ -60,9 +61,9 @@ public class CarsApiSpec : WebApiSpec<Program>
             NumberPlate = "aplate"
         });
 
-        var location = result.Headers.Location?.ToString();
-        location.Should().StartWith("/cars/car_");
         var car = result.Content.Value.Car!;
+        var location = result.Headers.Location?.ToString();
+        location.Should().Be(new GetCarRequest { Id = car.Id }.ToUrl());
         car.Id.Should().NotBeEmpty();
         car.Manufacturer!.Make.Should().Be(Manufacturer.AllowedMakes[0]);
         car.Manufacturer!.Model.Should().Be(Manufacturer.AllowedModels[0]);

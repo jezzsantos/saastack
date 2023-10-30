@@ -41,6 +41,14 @@ public static class RequestExtensions
         }
     }
 
+    /// <summary>
+    ///     Returns the <see cref="RequestInfo.Route" /> for the <see cref="request" />
+    /// </summary>
+    public static string ToUrl(this IWebRequest request)
+    {
+        return request.GetRequestInfo().Route;
+    }
+
     private static RouteAttribute GetRouteFromAttribute(IWebRequest request)
     {
         var attribute = request.GetType().GetCustomAttribute<RouteAttribute>();

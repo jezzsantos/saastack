@@ -39,7 +39,7 @@ public class CarsApi : IWebApiService
             request.Year, request.Jurisdiction, request.NumberPlate, cancellationToken);
 
         return () => car.HandleApplicationResult<GetCarResponse, Car>(c =>
-            new PostResult<GetCarResponse>(new GetCarResponse { Car = c }, $"/cars/{c.Id}"));
+            new PostResult<GetCarResponse>(new GetCarResponse { Car = c }, new GetCarRequest { Id = c.Id }.ToUrl()));
     }
 
     public async Task<ApiPutPatchResult<Car, GetCarResponse>> ScheduleMaintenance(ScheduleMaintenanceCarRequest request,

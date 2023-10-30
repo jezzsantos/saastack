@@ -266,6 +266,25 @@ public class RequestExtensionsSpec
         result.IsTestingOnly.Should().BeFalse();
     }
 
+    [Fact]
+    public void WhenToUrl_ThenReturnsUrl()
+    {
+        var datum = new DateTime(2023, 10, 29, 12, 30, 15, DateTimeKind.Utc).ToNearestSecond();
+        var request = new HasPlaceholdersPostRequest
+        {
+            Id = "anid",
+            AStringProperty1 = "avalue1",
+            AStringProperty2 = null,
+            AStringProperty3 = null,
+            ANumberProperty = null,
+            ADateTimeProperty = datum
+        };
+
+        var result = request.ToUrl();
+
+        result.Should().Be("/aroute/anid/apath1/xxxyyy/apath2/avalue1/apath3");
+    }
+
     private class NoRouteRequest : IWebRequest<TestResponse>
     {
     }
