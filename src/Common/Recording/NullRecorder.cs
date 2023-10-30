@@ -1,8 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
+
 namespace Common.Recording;
 
 /// <summary>
 ///     A <see cref="IRecorder" /> that does nothing
 /// </summary>
+[ExcludeFromCodeCoverage]
 public sealed class NullRecorder : IRecorder
 {
     public static readonly IRecorder Instance = new NullRecorder();
@@ -11,34 +15,41 @@ public sealed class NullRecorder : IRecorder
     {
     }
 
-    public void TraceDebug(ICallContext? context, string messageTemplate, params object[] templateArgs)
-    {
-    }
-
-    public void TraceInformation(ICallContext? context, Exception exception, string messageTemplate,
+    public void TraceDebug(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
     }
 
-    public void TraceInformation(ICallContext? context, string messageTemplate, params object[] templateArgs)
-    {
-    }
-
-    public void TraceError(ICallContext? context, Exception exception, string messageTemplate,
+    public void TraceInformation(ICallContext? context, Exception exception,
+        [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
     }
 
-    public void TraceError(ICallContext? context, string messageTemplate, params object[] templateArgs)
-    {
-    }
-
-    public void TraceWarning(ICallContext? context, Exception exception, string messageTemplate,
+    public void TraceInformation(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
     }
 
-    public void TraceWarning(ICallContext? context, string messageTemplate, params object[] templateArgs)
+    public void TraceError(ICallContext? context, Exception exception,
+        [StructuredMessageTemplate] string messageTemplate,
+        params object[] templateArgs)
+    {
+    }
+
+    public void TraceError(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+        params object[] templateArgs)
+    {
+    }
+
+    public void TraceWarning(ICallContext? context, Exception exception,
+        [StructuredMessageTemplate] string messageTemplate,
+        params object[] templateArgs)
+    {
+    }
+
+    public void TraceWarning(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+        params object[] templateArgs)
     {
     }
 
@@ -46,16 +57,19 @@ public sealed class NullRecorder : IRecorder
     {
     }
 
-    public void Crash(ICallContext? context, CrashLevel level, Exception exception, string messageTemplate,
+    public void Crash(ICallContext? context, CrashLevel level, Exception exception,
+        [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
     }
 
-    public void Audit(ICallContext? context, string auditCode, string messageTemplate, params object[] templateArgs)
+    public void Audit(ICallContext? context, string auditCode, [StructuredMessageTemplate] string messageTemplate,
+        params object[] templateArgs)
     {
     }
 
-    public void AuditAgainst(ICallContext? context, string againstId, string auditCode, string messageTemplate,
+    public void AuditAgainst(ICallContext? context, string againstId, string auditCode,
+        [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
     }

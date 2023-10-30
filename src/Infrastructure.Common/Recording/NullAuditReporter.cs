@@ -1,15 +1,18 @@
+using System.Diagnostics.CodeAnalysis;
 using Common;
 using Common.Recording;
+using JetBrains.Annotations;
 
 namespace Infrastructure.Common.Recording;
 
 /// <summary>
 ///     An <see cref="IAuditReporter" /> that does nothing
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class NullAuditReporter : IAuditReporter
 {
-    public void Audit(ICallContext? context, string againstId, string auditCode, string messageTemplate,
-        params object[] templateArgs)
+    public void Audit(ICallContext? context, string againstId, string auditCode,
+        [StructuredMessageTemplate] string messageTemplate, params object[] templateArgs)
     {
     }
 }

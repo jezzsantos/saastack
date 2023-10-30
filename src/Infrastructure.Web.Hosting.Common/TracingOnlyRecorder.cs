@@ -3,6 +3,7 @@ using Common;
 using Common.Extensions;
 using Common.Recording;
 using Domain.Interfaces;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Web.Hosting.Common;
@@ -20,14 +21,16 @@ public sealed class TracingOnlyRecorder : IRecorder
         _logger.Log(LogLevel.Debug, Resources.TracingOnlyRecorder_Started);
     }
 
-    public void Audit(ICallContext? context, string auditCode, string messageTemplate, params object[] templateArgs)
+    public void Audit(ICallContext? context, string auditCode, [StructuredMessageTemplate] string messageTemplate,
+        params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, $"Audit: {messageTemplate}", templateArgs);
         TraceInformation(context, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void AuditAgainst(ICallContext? context, string againstId, string auditCode, string messageTemplate,
+    public void AuditAgainst(ICallContext? context, string againstId, string auditCode,
+        [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
@@ -40,7 +43,8 @@ public sealed class TracingOnlyRecorder : IRecorder
         TraceError(context, exception, "Crash");
     }
 
-    public void Crash(ICallContext? context, CrashLevel level, Exception exception, string messageTemplate,
+    public void Crash(ICallContext? context, CrashLevel level, Exception exception,
+        [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
@@ -58,14 +62,16 @@ public sealed class TracingOnlyRecorder : IRecorder
         TraceInformation(context, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceDebug(ICallContext? context, string messageTemplate, params object[] templateArgs)
+    public void TraceDebug(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+        params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
         _logger.LogDebug(augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceError(ICallContext? context, Exception exception, string messageTemplate,
+    public void TraceError(ICallContext? context, Exception exception,
+        [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
@@ -73,14 +79,16 @@ public sealed class TracingOnlyRecorder : IRecorder
         _logger.LogError(exception, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceError(ICallContext? context, string messageTemplate, params object[] templateArgs)
+    public void TraceError(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+        params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
         _logger.LogError(augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceInformation(ICallContext? context, Exception exception, string messageTemplate,
+    public void TraceInformation(ICallContext? context, Exception exception,
+        [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
@@ -88,14 +96,16 @@ public sealed class TracingOnlyRecorder : IRecorder
         _logger.LogInformation(exception, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceInformation(ICallContext? context, string messageTemplate, params object[] templateArgs)
+    public void TraceInformation(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+        params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
         _logger.LogInformation(augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceWarning(ICallContext? context, Exception exception, string messageTemplate,
+    public void TraceWarning(ICallContext? context, Exception exception,
+        [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
@@ -103,7 +113,8 @@ public sealed class TracingOnlyRecorder : IRecorder
         _logger.LogWarning(exception, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceWarning(ICallContext? context, string messageTemplate, params object[] templateArgs)
+    public void TraceWarning(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+        params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
@@ -133,7 +144,7 @@ public sealed class TracingOnlyRecorder : IRecorder
     }
 
     private static (string MessageTemplate, object[] Arguments) AugmentMessageTemplateAndArguments(
-        ICallContext? context, string messageTemplate, params object[] templateArgs)
+        ICallContext? context, [StructuredMessageTemplate] string messageTemplate, params object[] templateArgs)
     {
         var arguments = new List<object>(templateArgs);
         var builder = new StringBuilder();

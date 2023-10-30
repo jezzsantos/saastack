@@ -1,3 +1,5 @@
+using JetBrains.Annotations;
+
 namespace Common.Recording;
 
 /// <summary>
@@ -5,6 +7,7 @@ namespace Common.Recording;
 /// </summary>
 public interface ICrashReporter
 {
-    void Crash(ICallContext? context, CrashLevel level, Exception exception, string messageTemplate,
+    void Crash(ICallContext? context, CrashLevel level, Exception exception,
+        [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs);
 }
