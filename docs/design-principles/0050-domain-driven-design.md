@@ -171,6 +171,8 @@ public sealed class CarRoot : AggregateRootBase
 }
 ```
 
+> Tip: In Rider, you can use the shortcut called `aggregate` to create yourself a full skeleton of a DDD aggregate class.
+
 #### Creation
 
 When a new aggregate is created, it must be constructed with a class factory method. This method will then be called from the Application Layer when a new aggregate needs to be created.
@@ -509,6 +511,8 @@ public sealed class UnavailabilityEntity : EntityBase
 }
 ```
 
+> Tip: In Rider, you can use the shortcut called `entity` to create yourself a full skeleton of a DDD entity class.
+
 #### Creation
 
 Entities are not created directly. They are always created by their parent/ancestor root aggregate in response to a domain event. The aggregate will handle the entity creation domain event, it will instantiate an instance of the entity, and it will relay the domain event to the entity that will then set its own internal state.
@@ -628,7 +632,7 @@ There are two supported persistence mechanisms:
 **Snap Shotting**: Entities that are going to be persisted by "dehydrating" their current/latest in-memory state (e.g., to be stored in a database) will need to implement these characteristics:
 
 1. They will declare a `[EntityName("TableName")]` on their class declaration. This will be used to identify the storage container (i.e., the table name in a relational SQL database or the document/collection name in a NoSQL database) by the persistence layer.
-2. They will implement a private constructor that populates the in-memory state of the aggregate, which is called by the `EntityFactory<TEntity> Rehydrate()` method.
+2. They will implement a private constructor that populates the in-memory state of the aggregate, which is called by the `public static EntityFactory<TEntity> Rehydrate()` method.
 3. They will implement the `public override Dictionary<string, object?> Dehydrate()` method, and populate the dictionary with values of the internal state of the entity.
 
 For example,
@@ -786,6 +790,8 @@ public sealed class Jurisdiction : SingleValueObjectBase<Jurisdiction, string>
 {
 }
 ```
+
+> Tip: In Rider, you can use the shortcut called `valueobjectsingle` or `valueobjectmultiple` to create yourself a full skeleton of a DDD value object class.
 
 #### Creation
 
