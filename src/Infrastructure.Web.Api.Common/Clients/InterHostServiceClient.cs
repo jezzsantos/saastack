@@ -16,8 +16,8 @@ public class InterHostServiceClient : IServiceClient
 {
     private const int RetryCount = 2;
     private readonly string _baseUrl;
-    private readonly AsyncRetryPolicy _retryPolicy;
     private readonly IHttpClientFactory _clientFactory;
+    private readonly AsyncRetryPolicy _retryPolicy;
 
     public InterHostServiceClient(IHttpClientFactory clientFactory, string baseUrl)
     {

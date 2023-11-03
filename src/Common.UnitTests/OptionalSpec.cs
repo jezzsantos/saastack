@@ -83,7 +83,7 @@ public class OptionalSpec
 
         result.Should().Be(instance);
     }
-    
+
     [Fact]
     public void WhenEqualsOperatorWithEmptyOptionalAndWithNone_ThenReturnsTrue()
     {
@@ -129,7 +129,6 @@ public class OptionalSpec
 
         (optional1 != optional2).Should().BeFalse();
     }
-    
 
     [Fact]
     public void WhenEqualsOperatorWithEmptyOptionalOfSameType_ThenReturnsFalse()
@@ -156,7 +155,6 @@ public class OptionalSpec
 
         (optional == instance).Should().BeTrue();
     }
-
 
     [Fact]
     public void WhenNotEqualsOperatorWithEmptyOptionalOfSameType_ThenReturnsTrue()

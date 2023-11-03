@@ -40,11 +40,11 @@ public class WebHostOptions
         Recording = new RecorderOptions();
     }
 
-    public string HostName { get; private init; }
-
     public bool AllowCors { get; private init; }
 
     public string DefaultApiPath { get; private init; }
+
+    public string HostName { get; private init; }
 
     public bool IsMultiTenanted { get; private init; }
 
