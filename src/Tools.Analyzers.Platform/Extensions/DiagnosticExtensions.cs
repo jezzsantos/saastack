@@ -54,6 +54,18 @@ public static class DiagnosticExtensions
             text = delegateType.Identifier.Text;
         }
 
+        if (memberDeclarationSyntax is ConstructorDeclarationSyntax ctorType)
+        {
+            location = ctorType.Identifier.GetLocation();
+            text = ctorType.Identifier.Text;
+        }
+
+        if (memberDeclarationSyntax is PropertyDeclarationSyntax propertyType)
+        {
+            location = propertyType.Identifier.GetLocation();
+            text = propertyType.Identifier.Text;
+        }
+
         var arguments = messageArgs is not null && messageArgs.Any()
             ? new object[] { text }.Concat(messageArgs)
             : new object[] { text };

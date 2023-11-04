@@ -25,6 +25,15 @@ public abstract class NamePrefixedIdentifierFactory : IIdentifierFactory
         _prefixes = prefixes;
     }
 
+#if TESTINGONLY
+    // ReSharper disable once CollectionNeverQueried.Global
+    public Dictionary<string, string> LastCreatedIds { get; } = new();
+#endif
+
+    public IEnumerable<Type> RegisteredTypes => _prefixes.Keys;
+
+    public IReadOnlyList<string> SupportedPrefixes => _supportedPrefixes;
+
     public Result<Identifier, Error> Create(IIdentifiableEntity entity)
     {
         var entityType = entity.GetType();
@@ -60,15 +69,6 @@ public abstract class NamePrefixedIdentifierFactory : IIdentifierFactory
 
         return CommonValidations.Identifier.Matches(id);
     }
-
-#if TESTINGONLY
-    // ReSharper disable once CollectionNeverQueried.Global
-    public Dictionary<string, string> LastCreatedIds { get; } = new();
-#endif
-
-    public IEnumerable<Type> RegisteredTypes => _prefixes.Keys;
-
-    public IReadOnlyList<string> SupportedPrefixes => _supportedPrefixes;
 
     public Result<Error> AddSupportedPrefix(string prefix)
     {

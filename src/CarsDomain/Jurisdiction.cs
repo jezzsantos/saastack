@@ -29,6 +29,8 @@ public sealed class Jurisdiction : SingleValueObjectBase<Jurisdiction, string>
     {
     }
 
+    public string Name => Value;
+
     public static ValueObjectFactory<Jurisdiction> Rehydrate()
     {
         return (property, _) =>
@@ -37,6 +39,4 @@ public sealed class Jurisdiction : SingleValueObjectBase<Jurisdiction, string>
             return new Jurisdiction(parts[0]);
         };
     }
-
-    public string Name => Value;
 }

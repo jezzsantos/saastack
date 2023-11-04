@@ -37,6 +37,20 @@ public sealed class BookingRoot : AggregateRootBase
         OrganizationId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(OrganizationId))!;
     }
 
+    public Identifier? BorrowerId { get; private set; }
+
+    private bool CanBeCancelled => Start > DateTime.UtcNow;
+
+    public Identifier? CarId { get; private set; }
+
+    public DateTime? End { get; private set; }
+
+    public Identifier OrganizationId { get; private set; } = Identifier.Empty();
+
+    public DateTime? Start { get; private set; }
+
+    public Trips Trips { get; } = new();
+
     public override Dictionary<string, object?> Dehydrate()
     {
         var properties = base.Dehydrate();
@@ -129,20 +143,6 @@ public sealed class BookingRoot : AggregateRootBase
         }
     }
 
-    public Identifier? BorrowerId { get; private set; }
-
-    private bool CanBeCancelled => Start > DateTime.UtcNow;
-
-    public Identifier? CarId { get; private set; }
-
-    public DateTime? End { get; private set; }
-
-    public Identifier OrganizationId { get; private set; } = Identifier.Empty();
-
-    public DateTime? Start { get; private set; }
-
-    public Trips Trips { get; } = new();
-
     public Result<Error> Cancel()
     {
         if (!CanBeCancelled)
@@ -187,10 +187,10 @@ public sealed class BookingRoot : AggregateRootBase
 
     public Result<Error> StartTrip(Location from)
     {
-        var thing = RaiseChangeEvent(Booking.TripAdded.Create(Id, OrganizationId));
-        if (!thing.IsSuccessful)
+        var added = RaiseChangeEvent(Booking.TripAdded.Create(Id, OrganizationId));
+        if (!added.IsSuccessful)
         {
-            return thing.Error;
+            return added.Error;
         }
 
         var trip = Trips.Latest()!;

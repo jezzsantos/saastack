@@ -33,6 +33,8 @@ public sealed class VehicleManagers : ValueObjectBase<VehicleManagers>
         _managers = managerIds;
     }
 
+    public IReadOnlyList<Identifier> Managers => _managers;
+
     public override string Dehydrate()
     {
         return _managers
@@ -49,8 +51,6 @@ public sealed class VehicleManagers : ValueObjectBase<VehicleManagers>
     {
         return new[] { Managers };
     }
-
-    public IReadOnlyList<Identifier> Managers => _managers;
 
     public VehicleManagers Append(Identifier id)
     {

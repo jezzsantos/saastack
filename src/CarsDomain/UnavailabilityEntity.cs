@@ -17,10 +17,17 @@ public sealed class UnavailabilityEntity : EntityBase
     }
 
     private UnavailabilityEntity(IRecorder recorder, IIdentifierFactory idFactory,
-        RootEventHandler rootEventHandler) : base(recorder, idFactory,
-        rootEventHandler)
+        RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
     }
+
+    public Identifier? CarId { get; private set; }
+
+    public CausedBy? CausedBy { get; private set; }
+
+    public Identifier? OrganizationId { get; private set; }
+
+    public TimeSlot? Slot { get; private set; }
 
     public override Result<Error> EnsureInvariants()
     {
@@ -67,14 +74,6 @@ public sealed class UnavailabilityEntity : EntityBase
                 return HandleUnKnownStateChangedEvent(@event);
         }
     }
-
-    public Identifier? CarId { get; private set; }
-
-    public CausedBy? CausedBy { get; private set; }
-
-    public Identifier? OrganizationId { get; private set; }
-
-    public TimeSlot? Slot { get; private set; }
 
     public bool IsDifferentCause(UnavailabilityEntity unavailability)
     {

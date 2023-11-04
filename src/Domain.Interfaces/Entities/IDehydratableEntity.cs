@@ -7,9 +7,9 @@ namespace Domain.Interfaces.Entities;
 /// </summary>
 public interface IDehydratableEntity : IIdentifiableEntity, IQueryableEntity
 {
-    Dictionary<string, object?> Dehydrate();
-
     bool? IsDeleted { get; }
 
     DateTime? LastPersistedAtUtc { get; }
+
+    Dictionary<string, object?> Dehydrate();
 }

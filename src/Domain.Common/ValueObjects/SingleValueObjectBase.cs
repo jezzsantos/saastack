@@ -18,14 +18,14 @@ public abstract partial class SingleValueObjectBase<TValueObject, TValue> : Valu
         Value = value;
     }
 
+    protected TValue Value { get; }
+
     protected override IEnumerable<object?> GetAtomicValues()
     {
         return new object?[] { Value };
     }
 
     TValue ISingleValueObject<TValue>.Value => Value;
-
-    protected TValue Value { get; }
 
     public static implicit operator TValue(SingleValueObjectBase<TValueObject, TValue> valueObject)
     {

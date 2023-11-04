@@ -2,7 +2,8 @@ namespace Tools.Analyzers.Platform;
 
 public static class AnalyzerConstants
 {
-    public static readonly string[] CommonNamespaces =
+    public static readonly string CommonDomainNamespace = "Domain.Common";
+    public static readonly string[] PlatformNamespaces =
     {
 #if TESTINGONLY
         "<global namespace>",
@@ -14,7 +15,7 @@ public static class AnalyzerConstants
         "Infrastructure.Web.Hosting.Common",
         "Application.Common", "Application.Interfaces",
         "Application.Persistence.Common", "Application.Persistence.Interfaces",
-        "Domain.Common", "Domain.Interfaces",
+        CommonDomainNamespace, "Domain.Interfaces",
         "IntegrationTesting.WebApi.Common", "UnitTesting.Common"
     };
 
@@ -22,5 +23,6 @@ public static class AnalyzerConstants
     {
         public const string Documentation = "SaaStackDocumentation";
         public const string WebApi = "SaaStackWebApi";
+        public const string Ddd = "SaaStackDDD";
     }
 }

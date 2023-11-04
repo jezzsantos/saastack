@@ -18,13 +18,13 @@ public static class Car
             };
         }
 
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
-
         public required string OrganizationId { get; set; }
 
         public required string Status { get; set; }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
     }
 
     public class ManufacturerChanged : IDomainEvent
@@ -43,10 +43,6 @@ public static class Car
             };
         }
 
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
-
         public required string Make { get; set; }
 
         public required string Model { get; set; }
@@ -54,6 +50,10 @@ public static class Car
         public required string OrganizationId { get; set; }
 
         public required int Year { get; set; }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
     }
 
     public class OwnershipChanged : IDomainEvent
@@ -70,15 +70,15 @@ public static class Car
             };
         }
 
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
-
         public required List<string> Managers { get; set; }
 
         public required string OrganisationId { get; set; }
 
         public required string Owner { get; set; }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
     }
 
     public class RegistrationChanged : IDomainEvent
@@ -96,10 +96,6 @@ public static class Car
             };
         }
 
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
-
         public required string Jurisdiction { get; set; }
 
         public required string Number { get; set; }
@@ -107,6 +103,10 @@ public static class Car
         public required string OrganisationId { get; set; }
 
         public required string Status { get; set; }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
     }
 
     public class UnavailabilitySlotAdded : IDomainEvent
@@ -127,10 +127,6 @@ public static class Car
             };
         }
 
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
-
         public required UnavailabilityCausedBy CausedByReason { get; set; }
 
         public string? CausedByReference { get; set; }
@@ -142,6 +138,10 @@ public static class Car
         public required DateTime To { get; set; }
 
         public string? UnavailabilityId { get; set; }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
     }
 
     public class UnavailabilitySlotRemoved : IDomainEvent
@@ -158,12 +158,12 @@ public static class Car
             };
         }
 
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
-
         public required string OrganizationId { get; set; }
 
         public required string UnavailabilityId { get; set; }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
     }
 }

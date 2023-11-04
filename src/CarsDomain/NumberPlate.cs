@@ -28,6 +28,8 @@ public sealed class NumberPlate : SingleValueObjectBase<NumberPlate, string>
     {
     }
 
+    public string Registration => Value;
+
     public static ValueObjectFactory<NumberPlate> Rehydrate()
     {
         return (property, _) =>
@@ -36,6 +38,4 @@ public sealed class NumberPlate : SingleValueObjectBase<NumberPlate, string>
             return new NumberPlate(parts[0]);
         };
     }
-
-    public string Registration => Value;
 }

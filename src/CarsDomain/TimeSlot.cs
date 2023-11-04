@@ -33,6 +33,10 @@ public sealed class TimeSlot : ValueObjectBase<TimeSlot>
         To = to;
     }
 
+    public DateTime From { get; }
+
+    public DateTime To { get; }
+
     public static ValueObjectFactory<TimeSlot> Rehydrate()
     {
         return (property, _) =>
@@ -46,10 +50,6 @@ public sealed class TimeSlot : ValueObjectBase<TimeSlot>
     {
         return new[] { From.ToIso8601(), To.ToIso8601() };
     }
-
-    public DateTime From { get; }
-
-    public DateTime To { get; }
 }
 
 public static class TimeSlotExtensions

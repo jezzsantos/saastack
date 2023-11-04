@@ -1,3 +1,4 @@
+using Common.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -7,6 +8,18 @@ namespace Tools.Analyzers.Platform.Extensions;
 
 internal static class SyntaxFilterExtensions
 {
+    public static AttributeData? GetAttributeOfType<TAttribute>(this MemberDeclarationSyntax memberDeclarationSyntax,
+        SyntaxNodeAnalysisContext context)
+    {
+        var symbol = context.SemanticModel.GetDeclaredSymbol(memberDeclarationSyntax);
+        if (symbol is null)
+        {
+            return null;
+        }
+
+        return symbol.GetAttributeOfType<TAttribute>(context);
+    }
+
     public static AttributeData? GetAttributeOfType<TAttribute>(this ISymbol? symbol,
         SyntaxNodeAnalysisContext context)
     {
@@ -44,6 +57,33 @@ internal static class SyntaxFilterExtensions
         }
 
         return null;
+    }
+
+    public static bool HasPublicSetter(this PropertyDeclarationSyntax propertyDeclarationSyntax)
+    {
+        var propertyAccessibility = new Accessibility(propertyDeclarationSyntax.Modifiers);
+        var isPublicProperty = propertyAccessibility.IsPublic;
+
+        var accessors = propertyDeclarationSyntax.AccessorList;
+        if (accessors.NotExists())
+        {
+            return false;
+        }
+
+        var setter = accessors.Accessors.FirstOrDefault(accessor =>
+            accessor.IsKind(SyntaxKind.SetAccessorDeclaration));
+        if (setter.NotExists())
+        {
+            return false;
+        }
+
+        if (setter.Modifiers.HasNone())
+        {
+            return isPublicProperty;
+        }
+
+        var setterAccessibility = new Accessibility(setter.Modifiers);
+        return setterAccessibility is { IsPublic: true, IsStatic: false };
     }
 
     public static bool IsEmptyNode(this XmlNodeSyntax nodeSyntax)
@@ -93,6 +133,12 @@ internal static class SyntaxFilterExtensions
     public static bool IsLanguageForCSharp(this SyntaxNode docs)
     {
         return docs.Language == "C#";
+    }
+
+    public static bool IsNamed(this MethodDeclarationSyntax methodDeclarationSyntax, string name)
+    {
+        var methodName = methodDeclarationSyntax.Identifier.Text;
+        return name.EqualsIgnoreCase(methodName);
     }
 
     public static bool IsNestedAndNotPublicType(this MemberDeclarationSyntax memberDeclaration)
@@ -204,6 +250,12 @@ internal static class SyntaxFilterExtensions
         return true;
     }
 
+    public static bool IsPrivateInstanceConstructor(this ConstructorDeclarationSyntax constructorDeclarationSyntax)
+    {
+        var accessibility = new Accessibility(constructorDeclarationSyntax.Modifiers);
+        return accessibility is { IsPrivate: true, IsStatic: false };
+    }
+
     // ReSharper disable once UnusedMember.Local
     public static bool IsPublicOrInternalExtensionMethod(this MethodDeclarationSyntax methodDeclarationSyntax)
     {
@@ -227,18 +279,50 @@ internal static class SyntaxFilterExtensions
 
         return true;
     }
+
+    public static bool IsPublicOrInternalInstanceMethod(this MethodDeclarationSyntax methodDeclarationSyntax)
+    {
+        var accessibility = new Accessibility(methodDeclarationSyntax.Modifiers);
+        if (accessibility is { IsPublic: false, IsInternal: false })
+        {
+            return false;
+        }
+
+        if (accessibility.IsStatic)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static bool IsPublicOverrideMethod(this MethodDeclarationSyntax methodDeclarationSyntax)
+    {
+        var accessibility = new Accessibility(methodDeclarationSyntax.Modifiers);
+        return accessibility is { IsPublic: true, IsStatic: false }
+               && methodDeclarationSyntax.Modifiers.Any(mod => mod.IsKind(SyntaxKind.OverrideKeyword));
+    }
+
+    public static bool IsPublicStaticMethod(this MethodDeclarationSyntax methodDeclarationSyntax)
+    {
+        var accessibility = new Accessibility(methodDeclarationSyntax.Modifiers);
+        return accessibility is { IsPublic: true, IsStatic: true };
+    }
 }
 
 public class Accessibility
 {
     public Accessibility(SyntaxTokenList modifiers)
     {
+        IsPrivate = modifiers.Any(mod => mod.IsKind(SyntaxKind.PrivateKeyword));
         IsPublic = modifiers.Any(mod => mod.IsKind(SyntaxKind.PublicKeyword));
         IsInternal = modifiers.Any(mod => mod.IsKind(SyntaxKind.InternalKeyword));
         IsStatic = modifiers.Any(mod => mod.IsKind(SyntaxKind.StaticKeyword));
     }
 
     public bool IsInternal { get; }
+
+    public bool IsPrivate { get; }
 
     public bool IsPublic { get; }
 

@@ -34,6 +34,10 @@ public sealed class LicensePlate : ValueObjectBase<LicensePlate>
         Number = number;
     }
 
+    public Jurisdiction Jurisdiction { get; }
+
+    public NumberPlate Number { get; }
+
     public static ValueObjectFactory<LicensePlate> Rehydrate()
     {
         return (property, container) =>
@@ -48,8 +52,4 @@ public sealed class LicensePlate : ValueObjectBase<LicensePlate>
     {
         return new object[] { Jurisdiction, Number };
     }
-
-    public Jurisdiction Jurisdiction { get; }
-
-    public NumberPlate Number { get; }
 }

@@ -36,6 +36,10 @@ public sealed class CausedBy : ValueObjectBase<CausedBy>
         Reference = reference;
     }
 
+    public UnavailabilityCausedBy Reason { get; }
+
+    public string? Reference { get; }
+
     public static ValueObjectFactory<CausedBy> Rehydrate()
     {
         return (property, _) =>
@@ -49,8 +53,4 @@ public sealed class CausedBy : ValueObjectBase<CausedBy>
     {
         return new object?[] { Reason, Reference };
     }
-
-    public UnavailabilityCausedBy Reason { get; }
-
-    public string? Reference { get; }
 }

@@ -221,41 +221,6 @@
                 &lt;Access Order="Public Internal ProtectedInternal Protected Private"/&gt;
             &lt;/Entry.SortBy&gt;
         &lt;/Entry&gt;
-        &lt;Entry DisplayName="Aggregate Class Methods"&gt;
-            &lt;Entry.Match&gt;
-                &lt;And&gt;
-                    &lt;Kind Is="Method" /&gt;
-                    &lt;Or&gt;
-                       &lt;Name Is="Dehydrate"/&gt;
-                       &lt;Name Is="Rehydrate"/&gt;
-                       &lt;Name Is="OnStateChanged"/&gt;
-                       &lt;Name Is="EnsureInvariants"/&gt;
-                    &lt;/Or&gt;
-                &lt;/And&gt;
-            &lt;/Entry.Match&gt;
-        &lt;/Entry&gt;
-        &lt;Entry DisplayName="ValueObject Class Methods"&gt;
-            &lt;Entry.Match&gt;
-                &lt;And&gt;
-                    &lt;Kind Is="Method" /&gt;
-                    &lt;Or&gt;
-                       &lt;Name Is="Rehydrate"/&gt;
-                       &lt;Name Is="GetAtomicValues"/&gt;
-                    &lt;/Or&gt;
-                &lt;/And&gt;
-            &lt;/Entry.Match&gt;
-        &lt;/Entry&gt;        
-        &lt;Entry Priority="100" DisplayName="Interface Implementations"&gt;
-            &lt;Entry.Match&gt;
-                &lt;And&gt;
-                    &lt;Kind Is="Member" /&gt;
-                    &lt;ImplementsInterface /&gt;
-                &lt;/And&gt;
-            &lt;/Entry.Match&gt;
-            &lt;Entry.SortBy&gt;
-                &lt;ImplementsInterface Immediate="True" /&gt;
-            &lt;/Entry.SortBy&gt;
-        &lt;/Entry&gt;
         &lt;Entry DisplayName="Properties, Indexers"&gt;
             &lt;Entry.Match&gt;
                 &lt;Or&gt;
@@ -265,6 +230,40 @@
             &lt;/Entry.Match&gt;
             &lt;Entry.SortBy&gt;
                 &lt;Name/&gt;
+            &lt;/Entry.SortBy&gt;
+        &lt;/Entry&gt;
+        &lt;Entry DisplayName="DDD Persistence Methods"&gt;
+            &lt;Entry.Match&gt;
+                &lt;And&gt;
+                    &lt;Kind Is="Method" /&gt;
+                    &lt;Or&gt;
+                       &lt;Name Is="Dehydrate"/&gt;
+                       &lt;Name Is="Rehydrate"/&gt;
+                        &lt;Name Is="GetAtomicValues"/&gt;
+                    &lt;/Or&gt;
+                &lt;/And&gt;
+            &lt;/Entry.Match&gt;
+        &lt;/Entry&gt;
+        &lt;Entry DisplayName="DDD Aggregate Root Methods"&gt;
+            &lt;Entry.Match&gt;
+                &lt;And&gt;
+                    &lt;Kind Is="Method" /&gt;
+                    &lt;Or&gt;
+                        &lt;Name Is="OnStateChanged"/&gt;
+                        &lt;Name Is="EnsureInvariants"/&gt;
+                    &lt;/Or&gt;
+                &lt;/And&gt;
+            &lt;/Entry.Match&gt;
+        &lt;/Entry&gt;
+        &lt;Entry Priority="100" DisplayName="Interface Implementations"&gt;
+            &lt;Entry.Match&gt;
+                &lt;And&gt;
+                    &lt;Kind Is="Member" /&gt;
+                    &lt;ImplementsInterface /&gt;
+                &lt;/And&gt;
+            &lt;/Entry.Match&gt;
+            &lt;Entry.SortBy&gt;
+                &lt;ImplementsInterface Immediate="True" /&gt;
             &lt;/Entry.SortBy&gt;
         &lt;/Entry&gt;
         &lt;Entry DisplayName="Public Methods"&gt;
@@ -648,6 +647,11 @@ public sealed class $name$Root : AggregateRootBase
     private $name$Root(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
     }
+    
+    // TODO: delete this constructor if your root aggregate is using snapshotting, instead of event sourcing 
+    private CarRoot(IRecorder recorder, IIdentifierFactory idFactory, Identifier identifier) : base(recorder, idFactory, identifier)
+    {
+    }
 
     // TODO: delete this constructor if your root aggregate is using event sourcing, instead of snapshotting 
     private $name$Root(Identifier identifier, IDependencyContainer container,
@@ -667,9 +671,16 @@ public sealed class $name$Root : AggregateRootBase
         return properties;
     }
 
+    // TODO: delete this method if your root aggregate is using event sourcing, instead of snapshotting 
     public static AggregateRootFactory&lt;$name$Root&gt; Rehydrate()
     {
         return (identifier, container, properties) =&gt; new $name$Root(identifier, container, properties);
+    }
+    // TODO: delete this method if your root aggregate is using snapshotting, instead of event sourcing 
+    public static AggregateRootFactory&lt;$name$Root&gt; Rehydrate()
+    {
+        return (identifier, container, properties) =&gt; new $name$Root(container.Resolve&lt;IRecorder&gt;(),
+            container.Resolve&lt;IIdentifierFactory&gt;(), identifier);
     }
 
     public override Result&lt;Error&gt; EnsureInvariants()

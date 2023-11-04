@@ -22,6 +22,8 @@ public class ChangeEventTypeMigrator : IEventSourcedChangeEventMigrator
         _typeNameMappings = typeNameMappings;
     }
 
+    public IReadOnlyDictionary<string, string> Mappings => _typeNameMappings;
+
     public Result<IDomainEvent, Error> Rehydrate(string eventId, string eventJson, string originalEventTypeName)
     {
         var migratedTypeName = originalEventTypeName;
@@ -39,6 +41,4 @@ public class ChangeEventTypeMigrator : IEventSourcedChangeEventMigrator
 
         return new Result<IDomainEvent, Error>(eventJson.FromEventJson(eventType));
     }
-
-    public IReadOnlyDictionary<string, string> Mappings => _typeNameMappings;
 }

@@ -17,11 +17,11 @@ public static class Booking
             };
         }
 
+        public required string OrganizationId { get; set; }
+
         public required string RootId { get; set; }
 
         public required DateTime OccurredUtc { get; set; }
-
-        public required string OrganizationId { get; set; }
     }
 
     public class ReservationMade : IDomainEvent
@@ -40,10 +40,6 @@ public static class Booking
             };
         }
 
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
-
         public required Identifier BorrowerId { get; set; }
 
         public required DateTime End { get; set; }
@@ -51,6 +47,10 @@ public static class Booking
         public required string OrganizationId { get; set; }
 
         public required DateTime Start { get; set; }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
     }
 
     public class CarChanged : IDomainEvent
@@ -66,13 +66,13 @@ public static class Booking
             };
         }
 
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
-
         public required string CarId { get; set; }
 
         public required string OrganizationId { get; set; }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
     }
 
     public class TripAdded : IDomainEvent
@@ -88,13 +88,13 @@ public static class Booking
             };
         }
 
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
-
         public required string OrganizationId { get; set; }
 
         public string? TripId { get; set; }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
     }
 
     public class TripBegan : IDomainEvent
@@ -113,10 +113,6 @@ public static class Booking
             };
         }
 
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
-
         public required DateTime BeganAt { get; set; }
 
         public required string BeganFrom { get; set; }
@@ -124,6 +120,10 @@ public static class Booking
         public required string OrganizationId { get; set; }
 
         public string? TripId { get; set; }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
     }
 
     public class TripEnded : IDomainEvent
@@ -144,10 +144,6 @@ public static class Booking
             };
         }
 
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
-
         public required DateTime BeganAt { get; set; }
 
         public required string BeganFrom { get; set; }
@@ -159,5 +155,9 @@ public static class Booking
         public required string OrganizationId { get; set; }
 
         public string? TripId { get; set; }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
     }
 }

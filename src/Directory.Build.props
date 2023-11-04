@@ -65,8 +65,8 @@
     </PropertyGroup>
 
     <!-- Runs the analyzers (in memory) on build -->
-    <ItemGroup Condition="'$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true'">
-        <PackageReference Include="SaaStack.Tools.Analyzers.Platform" Version="1.0.0" PrivateAssets="all" />
+    <ItemGroup Condition="'$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true' AND '$(IsPlatformProject)'!='true'">
+        <ProjectReference Include="$(MSBuildThisFileDirectory)\Tools.Analyzers.Platform\Tools.Analyzers.Platform.csproj" PrivateAssets="all" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <!-- Build configurations -->

@@ -26,6 +26,8 @@ public sealed class Year : SingleValueObjectBase<Year, int>
     {
     }
 
+    public int Number => Value;
+
     public static ValueObjectFactory<Year> Rehydrate()
     {
         return (property, _) =>
@@ -34,6 +36,4 @@ public sealed class Year : SingleValueObjectBase<Year, int>
             return new Year(parts[0].ToIntOrDefault(0));
         };
     }
-
-    public int Number => Value;
 }

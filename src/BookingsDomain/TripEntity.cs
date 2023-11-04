@@ -36,6 +36,18 @@ public sealed class TripEntity : EntityBase
         To = rehydratingProperties.GetValueOrDefault<Location>(nameof(To));
     }
 
+    public DateTime? BeganAt { get; private set; }
+
+    public DateTime? EndedAt { get; private set; }
+
+    public Location? From { get; private set; }
+
+    public Identifier? OrganizationId { get; private set; }
+
+    public Identifier? RootId { get; private set; }
+
+    public Location? To { get; private set; }
+
     public static EntityFactory<TripEntity> Rehydrate()
     {
         return (identifier, container, properties) => new TripEntity(container, properties, identifier);
@@ -120,18 +132,6 @@ public sealed class TripEntity : EntityBase
 
         return Result.Ok;
     }
-
-    public DateTime? BeganAt { get; private set; }
-
-    public DateTime? EndedAt { get; private set; }
-
-    public Location? From { get; private set; }
-
-    public Identifier? OrganizationId { get; private set; }
-
-    public Identifier? RootId { get; private set; }
-
-    public Location? To { get; private set; }
 
     public Result<Error> Begin(Location from)
     {

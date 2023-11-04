@@ -20,6 +20,8 @@ public sealed class Name : SingleValueObjectBase<Name, string>
     {
     }
 
+    public string Text => Value;
+
     public static ValueObjectFactory<Name> Rehydrate()
     {
         return (property, _) =>
@@ -28,6 +30,4 @@ public sealed class Name : SingleValueObjectBase<Name, string>
             return new Name(parts[0]);
         };
     }
-
-    public string Text => Value;
 }

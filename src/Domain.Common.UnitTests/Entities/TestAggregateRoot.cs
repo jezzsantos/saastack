@@ -51,11 +51,11 @@ public class TestAggregateRoot : AggregateRootBase
 
     public class ChangeEvent : IDomainEvent
     {
+        public required string APropertyName { get; set; }
+
         public string RootId { get; set; } = "anid";
 
         public DateTime OccurredUtc { get; set; }
-
-        public required string APropertyName { get; set; }
     }
 }
 

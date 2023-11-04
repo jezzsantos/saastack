@@ -28,6 +28,20 @@ public sealed class CarRoot : AggregateRootBase
     {
     }
 
+    public LicensePlate? License { get; private set; }
+
+    public VehicleManagers Managers { get; private set; } = VehicleManagers.Create();
+
+    public Manufacturer? Manufacturer { get; private set; }
+
+    public Identifier OrganizationId { get; private set; } = Identifier.Empty();
+
+    public VehicleOwner? Owner { get; private set; }
+
+    public CarStatus Status { get; private set; }
+
+    public Unavailabilities Unavailabilities { get; } = new();
+
     public static AggregateRootFactory<CarRoot> Rehydrate()
     {
         return (identifier, container, _) => new CarRoot(container.Resolve<IRecorder>(),
@@ -160,20 +174,6 @@ public sealed class CarRoot : AggregateRootBase
                 return HandleUnKnownStateChangedEvent(@event);
         }
     }
-
-    public LicensePlate? License { get; private set; }
-
-    public VehicleManagers Managers { get; private set; } = VehicleManagers.Create();
-
-    public Manufacturer? Manufacturer { get; private set; }
-
-    public Identifier OrganizationId { get; private set; } = Identifier.Empty();
-
-    public VehicleOwner? Owner { get; private set; }
-
-    public CarStatus Status { get; private set; }
-
-    public Unavailabilities Unavailabilities { get; } = new();
 
     public Result<Error> ChangeRegistration(LicensePlate plate)
     {

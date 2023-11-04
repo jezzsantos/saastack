@@ -4,19 +4,20 @@
         <TargetFramework>.net7.0</TargetFramework>
         <IsRoslynComponent>true</IsRoslynComponent>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <IsPackable>true</IsPackable>
-        <IncludeBuildOutput>false</IncludeBuildOutput>
-        <PackageId>SaaStack.Tools.Analyzers.Platform</PackageId>
-        <Description>Roslyn analyzers for writing SaaStack codebases</Description>
-        <PackageReleaseNotes>https://github.com/jezzsantos/saastack/blob/main/src/Tools.Analyzers.Platform/README.md</PackageReleaseNotes>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageVersion>1.0.0</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup>
         <NoWarn>$(NoWarn),RS2007;NU5128</NoWarn>
     </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Interfaces\Infrastructure.Web.Api.Interfaces.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
@@ -25,6 +26,8 @@
         </PackageReference>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" />
+        <PackageReference Include="QueryAny" Version="1.1.0" GeneratePathProperty="true" PrivateAssets="all" />
+        <PackageReference Include="MediatR.Contracts" Version="2.0.1" GeneratePathProperty="true" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>
@@ -42,79 +45,74 @@
         </Compile>
     </ItemGroup>
 
-    <ItemGroup>
-        <AdditionalFiles Remove="AnalyzerReleases.Shipped.md" />
-        <AdditionalFiles Remove="AnalyzerReleases.Unshipped.md" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Include="..\Infrastructure.Web.Api.Interfaces\ApiResult.cs">
-            <Link>Reference\Infrastructure.Web.Api.Interfaces\ApiResult.cs</Link>
-        </Compile>
-        <Compile Include="..\Infrastructure.Web.Api.Interfaces\EmptyResponse.cs">
-            <Link>Reference\Infrastructure.Web.Api.Interfaces\EmptyResponse.cs</Link>
-        </Compile>
-        <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebApiService.cs">
-            <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebApiService.cs</Link>
-        </Compile>
-        <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebRequest.cs">
-            <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebRequest.cs</Link>
-        </Compile>
-        <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebResponse.cs">
-            <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebResponse.cs</Link>
-        </Compile>
-        <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebSearchResponse.cs">
-            <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebSearchResponse.cs</Link>
-        </Compile>
-        <Compile Include="..\Infrastructure.Web.Api.Interfaces\RouteAttribute.cs">
-            <Link>Reference\Infrastructure.Web.Api.Interfaces\RouteAttribute.cs</Link>
-        </Compile>
-        <Compile Include="..\Infrastructure.Web.Api.Interfaces\ServiceOperation.cs">
-            <Link>Reference\Infrastructure.Web.Api.Interfaces\ServiceOperation.cs</Link>
-        </Compile>
-        <Compile Include="..\Application.Interfaces\Filtering.cs">
-            <Link>Reference\Application.Interfaces\Filtering.cs</Link>
-        </Compile>
-        <Compile Include="..\Application.Interfaces\SearchResultMetadata.cs">
-            <Link>Reference\Application.Interfaces\SearchResultMetadata.cs</Link>
-        </Compile>
-        <Compile Include="..\Application.Interfaces\Sorting.cs">
-            <Link>Reference\Application.Interfaces\Sorting.cs</Link>
-        </Compile>
-        <Compile Include="..\Common\Result.cs">
-            <Link>Reference\Common\Result.cs</Link>
-        </Compile>
-        <Compile Include="..\Common\Optional.cs">
-            <Link>Reference\Common\Optional.cs</Link>
-        </Compile>
-        <Compile Include="..\Common\Error.cs">
-            <Link>Reference\Common\Error.cs</Link>
-        </Compile>
-        <Compile Include="..\Common\Annotations.cs">
-            <Link>Reference\Common\Annotations.cs</Link>
-        </Compile>
-        <Compile Include="..\Common\Resources.Designer.cs">
-            <Link>Reference\Common\Resources.Designer.cs</Link>
-        </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    </ItemGroup>
-
-    <Target Name="CopyPackage" AfterTargets="Pack">
-        <Copy
-                SourceFiles="$(OutputPath)../$(PackageId).$(PackageVersion).nupkg"
-                DestinationFolder="../../tools/nuget" />
-    </Target>
-
+    <!-- HACK: To Support Transitive Dependencies https://github.com/dotnet/roslyn/discussions/47517 -->
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
+    <PropertyGroup>
+        <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+    </PropertyGroup>
+    <Target Name="GetDependencyTargetPaths">
+        <ItemGroup>
+            <!-- We have to manually identify the assemblies here to include in this package. These will certainly change over time -->
+            <TargetPathWithTargetPlatformMoniker Include="$(PKGQueryAny)\lib\net6.0\QueryAny.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="$(PKGMediatR_Contracts)\lib\netstandard2.0\MediatR.Contracts.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="$(TargetDir)Common.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="$(TargetDir)Domain.Common.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="$(TargetDir)Domain.Interfaces.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="$(TargetDir)Application.Interfaces.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="$(TargetDir)Infrastructure.Web.Api.Interfaces.dll" IncludeRuntimeDependency="false" />
+            <!-- HACK: until we can find a better way to reference these assemblies -->
+            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.13\Microsoft.AspNetCore.Http.Abstractions.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.13\Microsoft.AspNetCore.Http.Features.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.13\Microsoft.Extensions.Primitives.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.13\System.IO.Pipelines.dll" IncludeRuntimeDependency="false" />
+        </ItemGroup>
+    </Target>
+
+    <!-- To Support Nuget Packaging as an alternative way to use the analyzers -->
+    <!--    <PropertyGroup>-->
+    <!--        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>-->
+    <!--        <IsPackable>true</IsPackable>-->
+    <!--        <IncludeBuildOutput>true</IncludeBuildOutput>-->
+    <!--        <PackageId>SaaStack.Tools.Analyzers.Platform</PackageId>-->
+    <!--        <Description>Roslyn analyzers for writing SaaStack codebases</Description>-->
+    <!--        <PackageReleaseNotes>https://github.com/jezzsantos/saastack/blob/main/src/Tools.Analyzers.Platform/README.md</PackageReleaseNotes>-->
+    <!--        <PackageReadmeFile>README.md</PackageReadmeFile>-->
+    <!--        <PackageVersion>1.0.0</PackageVersion>-->
+    <!--        <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>-->
+    <!--    </PropertyGroup>-->
+
+    <!--    <ItemGroup>-->
+    <!--        <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" PrivateAssets="All" />-->
+    <!--        <ProjectReference Include="..\Infrastructure.Web.Api.Interfaces\Infrastructure.Web.Api.Interfaces.csproj" PrivateAssets="All" />-->
+    <!--    </ItemGroup>-->
+
+    <!--    <ItemGroup>-->
+    <!--        <AdditionalFiles Remove="AnalyzerReleases.Shipped.md" />-->
+    <!--        <AdditionalFiles Remove="AnalyzerReleases.Unshipped.md" />-->
+    <!--    </ItemGroup>-->
+
+    <!--    <ItemGroup>-->
+    <!--        <None Include="README.md" Pack="true" PackagePath="\" />-->
+    <!--    </ItemGroup>-->
+
+    <!--    <ItemGroup>-->
+    <!--        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />-->
+    <!--    </ItemGroup>-->
+
+    <!--    <Target Name="CopyPackage" AfterTargets="Pack">-->
+    <!--        <Copy-->
+    <!--                SourceFiles="$(OutputPath)../$(PackageId).$(PackageVersion).nupkg"-->
+    <!--                DestinationFolder="../../tools/nuget" />-->
+    <!--    </Target>-->
+
+    <!--    <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">-->
+    <!--        <ItemGroup>-->
+    <!--            <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />-->
+    <!--        </ItemGroup>-->
+    <!--    </Target>-->
+
 </Project>

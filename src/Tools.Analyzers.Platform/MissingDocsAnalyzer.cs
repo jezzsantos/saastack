@@ -11,7 +11,7 @@ namespace Tools.Analyzers.Platform;
 ///     An analyzer to find public declarations that are missing a documentation &lt;summary&gt; node.
 ///     SAS001: All public/internal classes, structs, records, interfaces, delegates and enums
 ///     SAS002: All public/internal static methods and all public/internal extension methods (in public types)
-///     Document declarations are only enforced for Core common/interfaces projects.
+///     Note: Document declarations are only enforced for Platform projects.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class MissingDocsAnalyzer : DiagnosticAnalyzer
@@ -47,7 +47,7 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (!context.IsIncludedInNamespace(AnalyzerConstants.CommonNamespaces))
+        if (!context.IsIncludedInNamespace(AnalyzerConstants.PlatformNamespaces))
         {
             return;
         }
@@ -97,7 +97,7 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (!context.IsIncludedInNamespace(AnalyzerConstants.CommonNamespaces))
+        if (!context.IsIncludedInNamespace(AnalyzerConstants.PlatformNamespaces))
         {
             return;
         }

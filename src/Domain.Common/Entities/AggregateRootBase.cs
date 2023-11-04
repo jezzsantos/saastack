@@ -26,7 +26,7 @@ namespace Domain.Common.Entities;
 ///     This aggregate's state can persisted from memory into a stream of events (using <see cref="GetChanges" />),
 ///     or it's state can be persisted from memory using the <see cref="Dehydrate" /> method.
 /// </summary>
-public abstract class AggregateRootBase : IEventSourcedAggregateRoot, IDehydratableAggregateRoot
+public abstract class AggregateRootBase : IAggregateRoot, IEventSourcedAggregateRoot, IDehydratableAggregateRoot
 {
     private readonly List<IDomainEvent> _events;
     private readonly bool _isInstantiating;
@@ -92,6 +92,15 @@ public abstract class AggregateRootBase : IEventSourcedAggregateRoot, IDehydrata
             : DateTime.MinValue;
         EventStream = EventStream.Create();
     }
+
+    protected internal EventStream EventStream { get; private set; }
+
+    public Identifier Id { get; }
+
+    // ReSharper disable once MemberCanBePrivate.Global
+    protected IIdentifierFactory IdFactory { get; }
+
+    protected IRecorder Recorder { get; }
 
     /// <summary>
     ///     Verifies that all invariants are still valid
@@ -235,15 +244,6 @@ public abstract class AggregateRootBase : IEventSourcedAggregateRoot, IDehydrata
     }
 
     public IReadOnlyList<IDomainEvent> Events => _events;
-
-    protected internal EventStream EventStream { get; private set; }
-
-    public Identifier Id { get; }
-
-    // ReSharper disable once MemberCanBePrivate.Global
-    protected IIdentifierFactory IdFactory { get; }
-
-    protected IRecorder Recorder { get; }
 
     public override bool Equals(object? other)
     {

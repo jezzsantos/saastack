@@ -1,8 +1,8 @@
 namespace Domain.Interfaces.ValueObjects;
 
 /// <summary>
-///     Defines a value object
+///     Defines a DDD value object
 /// </summary>
-public interface IValueObject : IPersistableValueObject
+public interface IValueObject
 {
 }

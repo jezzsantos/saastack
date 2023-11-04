@@ -57,6 +57,12 @@ public sealed class Manufacturer : ValueObjectBase<Manufacturer>
         Model = model;
     }
 
+    public Name Make { get; }
+
+    public Name Model { get; }
+
+    public Year Year { get; }
+
     public static ValueObjectFactory<Manufacturer> Rehydrate()
     {
         return (property, container) =>
@@ -71,10 +77,4 @@ public sealed class Manufacturer : ValueObjectBase<Manufacturer>
     {
         return new object[] { Year, Make, Model };
     }
-
-    public Name Make { get; }
-
-    public Name Model { get; }
-
-    public Year Year { get; }
 }

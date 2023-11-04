@@ -48,7 +48,7 @@ public class DomainEventExtensionsSpec
 
         result.Should()
             .Be(
-                $"{{\"RootId\":\"anid\",\"OccurredUtc\":\"{datum.ToIso8601()}\",\"APropertyValue\":\"apropertyvalue\"}}");
+                $"{{\"APropertyValue\":\"apropertyvalue\",\"RootId\":\"anid\",\"OccurredUtc\":\"{datum.ToIso8601()}\"}}");
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class DomainEventExtensionsSpec
         result.LastPersistedAtUtc.Should().BeNull();
         result.Data.Should()
             .Be(
-                $"{{\"RootId\":\"anid\",\"OccurredUtc\":\"{datum.ToIso8601()}\",\"APropertyValue\":\"apropertyvalue\"}}");
+                $"{{\"APropertyValue\":\"apropertyvalue\",\"RootId\":\"anid\",\"OccurredUtc\":\"{datum.ToIso8601()}\"}}");
         result.Metadata.Should()
             .Be(
                 "Domain.Common.UnitTests.Entities.TestEvent, Domain.Common.UnitTests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");

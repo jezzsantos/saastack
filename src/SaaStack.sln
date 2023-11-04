@@ -16,7 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.UnitTests", "Common.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTesting.Common", "UnitTesting.Common\UnitTesting.Common.csproj", "{7154EBD1-642F-4161-AA25-F1DE82E6930E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{9270A12C-E16F-4932-89C4-F4ADDDA55AF3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platform", "Platform", "{9270A12C-E16F-4932-89C4-F4ADDDA55AF3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Subdomains", "Subdomains", "{864DED88-9252-46EB-9D13-00269C7333F9}"
 EndProject

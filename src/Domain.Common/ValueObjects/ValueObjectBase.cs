@@ -9,7 +9,7 @@ namespace Domain.Common.ValueObjects;
 ///     Value objects are equal when their internal data is the same.
 ///     Value objects support being persisted
 /// </summary>
-public abstract partial class ValueObjectBase<TValueObject> : IValueObject
+public abstract partial class ValueObjectBase<TValueObject> : IValueObject, IPersistableValueObject
 {
     internal const string NullValue = "NULL";
 

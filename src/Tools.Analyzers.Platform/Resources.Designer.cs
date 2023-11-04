@@ -328,5 +328,302 @@ namespace Tools.Analyzers.Platform {
                 return ResourceManager.GetString("SAS017Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create() class factory method must return the correct type..
+        /// </summary>
+        internal static string SAS020Description {
+            get {
+                return ResourceManager.GetString("SAS020Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Factory method &apos;{0}&apos; must return one of these types: &apos;{1}&apos;.
+        /// </summary>
+        internal static string SAS020MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS020MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong return type.
+        /// </summary>
+        internal static string SAS020Title {
+            get {
+                return ResourceManager.GetString("SAS020Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Constructor must be private..
+        /// </summary>
+        internal static string SAS021Description {
+            get {
+                return ResourceManager.GetString("SAS021Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Constructor &apos;{0}&apos; must be private.
+        /// </summary>
+        internal static string SAS021MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS021MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong accessibility.
+        /// </summary>
+        internal static string SAS021Title {
+            get {
+                return ResourceManager.GetString("SAS021Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class must implement the Rehydrate() method..
+        /// </summary>
+        internal static string SAS022Description {
+            get {
+                return ResourceManager.GetString("SAS022Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class &apos;{0}&apos; must implement the Rehydrate() method.
+        /// </summary>
+        internal static string SAS022MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS022MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing Rehydrate() method.
+        /// </summary>
+        internal static string SAS022Title {
+            get {
+                return ResourceManager.GetString("SAS022Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class must implement the Dehydrate() method..
+        /// </summary>
+        internal static string SAS023Description {
+            get {
+                return ResourceManager.GetString("SAS023Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class &apos;{0}&apos; must implement the Dehydrate() method.
+        /// </summary>
+        internal static string SAS023MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS023MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing Dehydrate() method.
+        /// </summary>
+        internal static string SAS023Title {
+            get {
+                return ResourceManager.GetString("SAS023Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class must declare the [EntityName] attribute..
+        /// </summary>
+        internal static string SAS024Description {
+            get {
+                return ResourceManager.GetString("SAS024Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class &apos;{0}&apos; must use the [EntityNameAttribute].
+        /// </summary>
+        internal static string SAS024MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS024MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing [EntityName] attribute.
+        /// </summary>
+        internal static string SAS024Title {
+            get {
+                return ResourceManager.GetString("SAS024Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must not have a public setter..
+        /// </summary>
+        internal static string SAS025Description {
+            get {
+                return ResourceManager.GetString("SAS025Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must not have a public setter.
+        /// </summary>
+        internal static string SAS025MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS025MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must not be settable.
+        /// </summary>
+        internal static string SAS025Title {
+            get {
+                return ResourceManager.GetString("SAS025Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aggregate roots must have at least one Create() class factory method..
+        /// </summary>
+        internal static string SAS030Description {
+            get {
+                return ResourceManager.GetString("SAS030Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aggregate root type &apos;{0}&apos; must implement a class factory method called Create() to create new instances.
+        /// </summary>
+        internal static string SAS030MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS030MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing Create() method.
+        /// </summary>
+        internal static string SAS030Title {
+            get {
+                return ResourceManager.GetString("SAS030Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create() class factory method must call specific code..
+        /// </summary>
+        internal static string SAS032Description {
+            get {
+                return ResourceManager.GetString("SAS032Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Factory method &apos;{0}&apos; must make a call to method &apos;{1}&apos;.
+        /// </summary>
+        internal static string SAS032MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS032MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing required call to method.
+        /// </summary>
+        internal static string SAS032Title {
+            get {
+                return ResourceManager.GetString("SAS032Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entities must have at least one Create() class factory method..
+        /// </summary>
+        internal static string SAS040Description {
+            get {
+                return ResourceManager.GetString("SAS040Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entity type &apos;{0}&apos; must implement a class factory method called Create() to create new instances.
+        /// </summary>
+        internal static string SAS040MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS040MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing Create() method.
+        /// </summary>
+        internal static string SAS040Title {
+            get {
+                return ResourceManager.GetString("SAS040Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ValueObjects must have at least one Create() class factory method..
+        /// </summary>
+        internal static string SAS050Description {
+            get {
+                return ResourceManager.GetString("SAS050Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ValueObject type &apos;{0}&apos; must implement a class factory method called Create() to create new instances.
+        /// </summary>
+        internal static string SAS050MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS050MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing Create() method.
+        /// </summary>
+        internal static string SAS050Title {
+            get {
+                return ResourceManager.GetString("SAS050Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method must not mutate the ValueObject..
+        /// </summary>
+        internal static string SAS055Description {
+            get {
+                return ResourceManager.GetString("SAS055Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method &apos;{0}&apos; must not mutate this ValueObject&apos;s state, and must return a new instance in one of these types: &apos;{1}&apos;.
+        /// </summary>
+        internal static string SAS055MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS055MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method mutates ValueObject state.
+        /// </summary>
+        internal static string SAS055Title {
+            get {
+                return ResourceManager.GetString("SAS055Title", resourceCulture);
+            }
+        }
     }
 }

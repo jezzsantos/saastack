@@ -11,10 +11,10 @@ public sealed class EventMetadata : SingleValueObjectBase<EventMetadata, string>
     {
     }
 
+    public string Fqn => Value;
+
     public static ValueObjectFactory<EventMetadata> Rehydrate()
     {
         return (property, _) => new EventMetadata(property);
     }
-
-    public string Fqn => Value;
 }

@@ -14,16 +14,18 @@ namespace Tools.Analyzers.Platform;
 
 /// <summary>
 ///     An analyzer to ensure that WebAPI classes are configured correctly.
-///     SAS010. Warning: Methods that are public, should return a <see cref="Task{T}" /> or just any T, where T is either:
+///     SAS010: Warning: Methods that are public, should return a <see cref="Task{T}" /> or just any T, where T is either:
 ///     <see cref="ApiEmptyResult" /> or <see cref="ApiResult{TResource,TResponse}" /> or
 ///     <see cref="ApiPostResult{TResource, TResponse}" />
-///     SAS011. Warning: These methods must have at least one parameter, and first parameter must be
+///     SAS011: Warning: These methods must have at least one parameter, and first parameter must be
 ///     <see cref="IWebRequest{TResponse}" />, where
 ///     TResponse is same type as in the return value.
-///     SAS012. Warning: The second parameter can only be a <see cref="CancellationToken" />
-///     SAS013. Warning: These methods must be decorated with a <see cref="RouteAttribute" />
-///     SAS014. Warning: The route (of all these methods in this class) should start with the same path
-///     SAS015. Warning: There should be no methods in this class with the same <see cref="IWebRequest{TResponse}" />
+///     SAS012: Warning: The second parameter can only be a <see cref="CancellationToken" />
+///     SAS013: Warning: These methods must be decorated with a <see cref="RouteAttribute" />
+///     SAS014: Warning: The route (of all these methods in this class) should start with the same path
+///     SAS015: Warning: There should be no methods in this class with the same <see cref="IWebRequest{TResponse}" />
+///     SAS016: Warning: This service operation should return an appropriate Result type for the operation
+///     SAS017: Warning: The request type should be declared with a <see cref="RouteAttribute" /> on it
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class WebApiClassAnalyzer : DiagnosticAnalyzer
@@ -119,7 +121,7 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (context.IsExcludedInNamespace(AnalyzerConstants.CommonNamespaces))
+        if (context.IsExcludedInNamespace(AnalyzerConstants.PlatformNamespaces))
         {
             return;
         }
@@ -195,8 +197,6 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
         MethodDeclarationSyntax methodDeclarationSyntax, out ITypeSymbol? returnType)
     {
         returnType = null;
-        context.SemanticModel.GetDeclaredSymbol(methodDeclarationSyntax);
-
         var symbol = context.SemanticModel.GetDeclaredSymbol(methodDeclarationSyntax);
         if (symbol is null)
         {
@@ -204,13 +204,13 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
         }
 
         returnType = symbol.ReturnType;
-        if (IsVoid(returnType))
+        if (returnType.IsVoid(context))
         {
             context.ReportDiagnostic(Sas010, methodDeclarationSyntax, AllowableReturnTypes.Stringify());
             return true;
         }
 
-        if (IsVoidTask(returnType))
+        if (returnType.IsVoidTask(context))
         {
             context.ReportDiagnostic(Sas010, methodDeclarationSyntax, AllowableReturnTypes.Stringify());
             return true;
@@ -223,18 +223,6 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
         }
 
         return false;
-
-        bool IsVoid(ITypeSymbol returnType)
-        {
-            var voidSymbol = context.Compilation.GetTypeByMetadataName(typeof(void).FullName!)!;
-            return returnType.IsOfType(voidSymbol);
-        }
-
-        bool IsVoidTask(ITypeSymbol returnType)
-        {
-            var taskSymbol = context.Compilation.GetTypeByMetadataName(typeof(Task).FullName!)!;
-            return returnType.IsOfType(taskSymbol);
-        }
     }
 
     private static bool AttributeIsNotPresent(SyntaxNodeAnalysisContext context,
@@ -346,7 +334,7 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
         foreach (var allowedType in allowableReturnTypes)
         {
             var allowedTypeNaked = context.Compilation.GetTypeByMetadataName(allowedType.FullName!)!;
-            if (nakedType.IsOfType(allowedTypeNaked))
+            if (nakedType.OriginalDefinition.IsOfType(allowedTypeNaked))
             {
                 return true;
             }
@@ -356,7 +344,7 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
                 taskType.Construct(context.Compilation.GetTypeByMetadataName(allowedType.FullName!)!);
             var allowedTypeTasked =
                 taskType.Construct(context.Compilation.GetTypeByMetadataName(allowedType.FullName!)!);
-            if (returnTypeTasked.IsOfType(allowedTypeTasked))
+            if (returnTypeTasked.OriginalDefinition.IsOfType(allowedTypeTasked))
             {
                 return true;
             }
@@ -367,7 +355,7 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
         bool IsGenericTask()
         {
             var genericTaskSymbol = context.Compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
-            return returnType.IsOfType(genericTaskSymbol);
+            return returnType.OriginalDefinition.IsOfType(genericTaskSymbol);
         }
     }
 
@@ -386,7 +374,7 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
         {
             if (routePath.HasValue())
             {
-                RouteSegments = routePath!.Split("/", StringSplitOptions.RemoveEmptyEntries);
+                RouteSegments = routePath.Split("/", StringSplitOptions.RemoveEmptyEntries);
             }
         }
     }

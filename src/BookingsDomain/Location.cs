@@ -21,6 +21,8 @@ public sealed class Location : SingleValueObjectBase<Location, string>
     {
     }
 
+    public string Name => Value;
+
     public static ValueObjectFactory<Location> Rehydrate()
     {
         return (property, _) =>
@@ -29,6 +31,4 @@ public sealed class Location : SingleValueObjectBase<Location, string>
             return new Location(parts[0]);
         };
     }
-
-    public string Name => Value;
 }

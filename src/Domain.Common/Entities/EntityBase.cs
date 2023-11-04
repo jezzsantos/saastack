@@ -29,7 +29,7 @@ public delegate Result<Error> RootEventHandler(IDomainEvent @event);
 ///     <see cref="AggregateRootBase.GetChanges" />),
 ///     or it's state can be persisted from memory using the <see cref="Dehydrate" /> method.
 /// </summary>
-public abstract class EntityBase : IEventSourcedEntity, IDehydratableEntity
+public abstract class EntityBase : IEntity, IEventSourcedEntity, IDehydratableEntity
 {
     private RootEventHandler? _rootEventHandler;
 
@@ -97,6 +97,12 @@ public abstract class EntityBase : IEventSourcedEntity, IDehydratableEntity
             ? now
             : DateTime.MinValue;
     }
+
+    public Identifier Id { get; }
+
+    protected IIdentifierFactory IdFactory { get; }
+
+    protected IRecorder Recorder { get; }
 
     /// <summary>
     ///     Verifies that all invariants are still valid
@@ -173,12 +179,6 @@ public abstract class EntityBase : IEventSourcedEntity, IDehydratableEntity
         LastModifiedAtUtc = DateTime.UtcNow;
         return Result.Ok;
     }
-
-    public Identifier Id { get; }
-
-    protected IIdentifierFactory IdFactory { get; }
-
-    protected IRecorder Recorder { get; }
 
     public sealed override bool Equals(object? obj)
     {

@@ -45,6 +45,12 @@ public sealed class EventStream : ValueObjectBase<EventStream>
         LastEventVersion = lastEventVersion;
     }
 
+    public int FirstEventVersion { get; }
+
+    public bool HasChanges => FirstEventVersion != NoVersion;
+
+    public int LastEventVersion { get; }
+
     public static ValueObjectFactory<EventStream> Rehydrate()
     {
         return (property, _) =>
@@ -58,12 +64,6 @@ public sealed class EventStream : ValueObjectBase<EventStream>
     {
         return new object[] { FirstEventVersion, LastEventVersion };
     }
-
-    public int FirstEventVersion { get; }
-
-    public bool HasChanges => FirstEventVersion != NoVersion;
-
-    public int LastEventVersion { get; }
 
     public Result<EventStream, Error> Next()
     {

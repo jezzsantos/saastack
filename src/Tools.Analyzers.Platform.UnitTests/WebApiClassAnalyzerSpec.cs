@@ -1,6 +1,6 @@
 extern alias Analyzers;
-using Analyzers::Application.Interfaces;
-using Analyzers::Infrastructure.Web.Api.Interfaces;
+using Application.Interfaces;
+using Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
 using Xunit;
 using TypeExtensions = Analyzers::Tools.Analyzers.Platform.TypeExtensions;
@@ -126,7 +126,7 @@ using System.Threading.Tasks;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    public Task<string> AMethod(){ return Task.FromResult(""""); }
+    public Task<string> AMethod(){ return Task.FromResult(string.Empty); }
 }";
 
             await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas010, input, 7, 25, "AMethod",
@@ -281,7 +281,7 @@ using Infrastructure.Web.Api.Interfaces;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
-    public string AMethod(){ return """"; }
+    public string AMethod(){ return string.Empty; }
 }";
 
             await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas010, input, 6, 19, "AMethod",
@@ -1524,61 +1524,61 @@ public class TestSearchResponse : IWebSearchResponse
     public SearchResultMetadata? Metadata { get; set; }
 }
 
-[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+[UsedImplicitlyAttribute]
 public class TestNoneRequest : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource", ServiceOperation.Search)]
-[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+[UsedImplicitlyAttribute]
 public class TestSearchRequest : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource", ServiceOperation.Post)]
-[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+[UsedImplicitlyAttribute]
 public class TestPostRequest : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource", ServiceOperation.Get)]
-[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+[UsedImplicitlyAttribute]
 public class TestGetRequest : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource/1", ServiceOperation.Get)]
-[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+[UsedImplicitlyAttribute]
 public class TestGetRequest1 : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource/2", ServiceOperation.Get)]
-[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+[UsedImplicitlyAttribute]
 public class TestGetRequest2 : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource/3", ServiceOperation.Get)]
-[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+[UsedImplicitlyAttribute]
 public class TestGetRequest3 : IWebRequest<TestResponse>
 {
 }
 
 [Route("/anotherresource/1", ServiceOperation.Get)]
-[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+[UsedImplicitlyAttribute]
 public class TestGetRequest4 : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource", ServiceOperation.PutPatch)]
-[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+[UsedImplicitlyAttribute]
 public class TestPutPatchRequest : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource", ServiceOperation.Delete)]
-[Analyzers::JetBrains.Annotations.UsedImplicitlyAttribute]
+[UsedImplicitlyAttribute]
 public class TestDeleteRequest : IWebRequest<TestResponse>
 {
 }

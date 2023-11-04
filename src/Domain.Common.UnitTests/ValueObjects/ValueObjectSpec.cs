@@ -207,12 +207,12 @@ public class ValueObjectSpec
         {
         }
 
+        public List<string> Values => Value;
+
         public static ValueObjectFactory<TestSingleListStringValueObject> Rehydrate()
         {
             return (property, _) => new TestSingleListStringValueObject(property.FromJson<List<string>>()!);
         }
-
-        public List<string> Values => Value;
     }
 
     public sealed class TestSingleStringValueObject : SingleValueObjectBase<TestSingleStringValueObject, string>
@@ -221,12 +221,12 @@ public class ValueObjectSpec
         {
         }
 
+        public string StringValue => Value;
+
         public static ValueObjectFactory<TestSingleStringValueObject> Rehydrate()
         {
             return (property, _) => new TestSingleStringValueObject(property);
         }
-
-        public string StringValue => Value;
     }
 
     public sealed class TestSingleIntValueObject : SingleValueObjectBase<TestSingleIntValueObject, int>
@@ -235,12 +235,12 @@ public class ValueObjectSpec
         {
         }
 
+        public int IntValue => Value;
+
         public static ValueObjectFactory<TestSingleStringValueObject> Rehydrate()
         {
             return (property, _) => new TestSingleStringValueObject(property);
         }
-
-        public int IntValue => Value;
     }
 
     public sealed class TestSingleEnumValueObject : SingleValueObjectBase<TestSingleEnumValueObject, TestEnum>
@@ -249,12 +249,12 @@ public class ValueObjectSpec
         {
         }
 
+        public TestEnum EnumValue => Value;
+
         public static ValueObjectFactory<TestSingleEnumValueObject> Rehydrate()
         {
             return (property, _) => new TestSingleEnumValueObject(property.ToEnumOrDefault(TestEnum.ADefault));
         }
-
-        public TestEnum EnumValue => Value;
     }
 
     public sealed class TestSingleListValueObjectValueObject : SingleValueObjectBase<
@@ -265,14 +265,14 @@ public class ValueObjectSpec
         {
         }
 
+        public List<TestSingleStringValueObject> Values => Value;
+
         public static ValueObjectFactory<TestSingleListValueObjectValueObject> Rehydrate()
         {
             return (property, _) => new TestSingleListValueObjectValueObject(property.FromJson<List<string>>()!
                 .Select(item => new TestSingleStringValueObject(item))
                 .ToList());
         }
-
-        public List<TestSingleStringValueObject> Values => Value;
     }
 
     public sealed class TestMultiValueObject : ValueObjectBase<TestMultiValueObject>
@@ -283,6 +283,12 @@ public class ValueObjectSpec
             AnIntegerValue = integer;
             ABooleanValue = boolean;
         }
+
+        public bool ABooleanValue { get; }
+
+        public int AnIntegerValue { get; }
+
+        public string AStringValue { get; }
 
         public static ValueObjectFactory<TestMultiValueObject> Rehydrate()
         {
@@ -297,12 +303,6 @@ public class ValueObjectSpec
         {
             return new object[] { AStringValue, AnIntegerValue, ABooleanValue };
         }
-
-        public bool ABooleanValue { get; }
-
-        public int AnIntegerValue { get; }
-
-        public string AStringValue { get; }
 
         public new static List<string> RehydrateToList(string hydratedValue, bool isSingleValueObject,
             bool isSingleListValueObject = false)

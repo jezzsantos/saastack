@@ -17,14 +17,14 @@ public sealed class TestEntity : EntityBase
     {
     }
 
+    // ReSharper disable once UnusedAutoPropertyAccessor.Local
+    public string? APropertyName { get; private set; }
+
     protected override Result<Error> OnStateChanged(IDomainEvent @event)
     {
         //Not used in testing
         return Result.Ok;
     }
-
-    // ReSharper disable once UnusedAutoPropertyAccessor.Local
-    public string? APropertyName { get; private set; }
 
     public void ChangeProperty(string value)
     {
@@ -33,11 +33,11 @@ public sealed class TestEntity : EntityBase
 
     public class ChangeEvent : IDomainEvent
     {
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
+        public string? APropertyName { get; set; }
+
         public string RootId { get; set; } = "anentityid";
 
         public DateTime OccurredUtc { get; set; }
-
-        // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public string? APropertyName { get; set; }
     }
 }

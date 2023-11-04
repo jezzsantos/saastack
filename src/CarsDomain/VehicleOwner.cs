@@ -21,10 +21,10 @@ public sealed class VehicleOwner : SingleValueObjectBase<VehicleOwner, string>
     {
     }
 
+    public string OwnerId => Value;
+
     public static ValueObjectFactory<VehicleOwner> Rehydrate()
     {
         return (property, _) => new VehicleOwner(property);
     }
-
-    public string OwnerId => Value;
 }
