@@ -384,6 +384,15 @@ namespace Tools.Analyzers.Platform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add missing &apos;Rehydrate&apos; method.
+        /// </summary>
+        internal static string SAS022CodeFixTitle {
+            get {
+                return ResourceManager.GetString("SAS022CodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Class must implement the Rehydrate() method..
         /// </summary>
         internal static string SAS022Description {

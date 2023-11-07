@@ -196,7 +196,6 @@
     <data name="SAS040Title" xml:space="preserve">
         <value>Missing Create() method</value>
     </data>
-
     <data name="SAS050Description" xml:space="preserve">
         <value>ValueObjects must have at least one Create() class factory method.</value>
     </data>
@@ -214,5 +213,8 @@
     </data>
     <data name="SAS055Title" xml:space="preserve">
         <value>Method mutates ValueObject state</value>
+    </data>
+    <data name="SAS022CodeFixTitle" xml:space="preserve">
+        <value>Add missing 'Rehydrate' method</value>
     </data>
 </root>

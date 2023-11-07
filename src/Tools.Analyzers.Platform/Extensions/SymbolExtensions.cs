@@ -6,23 +6,6 @@ namespace Tools.Analyzers.Platform.Extensions;
 
 public static class SymbolExtensions
 {
-    public static bool IsOfType(this ISymbol symbol, INamedTypeSymbol baseType)
-    {
-        return SymbolEqualityComparer.Default.Equals(symbol, baseType);
-    }
-
-    public static bool IsVoid(this ITypeSymbol returnType, SyntaxNodeAnalysisContext context)
-    {
-        var voidSymbol = context.Compilation.GetTypeByMetadataName(typeof(void).FullName!)!;
-        return returnType.IsOfType(voidSymbol);
-    }
-
-    public static bool IsVoidTask(this ITypeSymbol returnType, SyntaxNodeAnalysisContext context)
-    {
-        var taskSymbol = context.Compilation.GetTypeByMetadataName(typeof(Task).FullName!)!;
-        return returnType.IsOfType(taskSymbol);
-    }
-
     public static string GetMethodBody(this ISymbol method)
     {
         var syntaxReference = method.DeclaringSyntaxReferences.FirstOrDefault();
@@ -34,5 +17,27 @@ public static class SymbolExtensions
         }
 
         return string.Empty;
+    }
+
+    public static bool IsOfType(this ISymbol symbol, INamedTypeSymbol baseType)
+    {
+        return SymbolEqualityComparer.Default.Equals(symbol, baseType);
+    }
+
+    public static bool IsVoid(this ITypeSymbol returnType, SyntaxNodeAnalysisContext context)
+    {
+        return IsVoid(returnType, context.Compilation);
+    }
+
+    public static bool IsVoid(this ITypeSymbol returnType, Compilation compilation)
+    {
+        var voidSymbol = compilation.GetTypeByMetadataName(typeof(void).FullName!)!;
+        return returnType.IsOfType(voidSymbol);
+    }
+
+    public static bool IsVoidTask(this ITypeSymbol returnType, SyntaxNodeAnalysisContext context)
+    {
+        var taskSymbol = context.Compilation.GetTypeByMetadataName(typeof(Task).FullName!)!;
+        return returnType.IsOfType(taskSymbol);
     }
 }

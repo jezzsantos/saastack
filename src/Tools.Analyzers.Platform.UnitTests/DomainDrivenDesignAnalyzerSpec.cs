@@ -187,7 +187,7 @@ public class AClass : AggregateRootBase
         var root = new AClass(null!, null!);
         root.RaiseCreateEvent(new CreateEvent());
         return root;
-    }    
+    }
 }
 public class CreateEvent : IDomainEvent
 {
@@ -240,7 +240,7 @@ public class AClass : AggregateRootBase
     {
         var root = new AClass(null!, null!);
         root.RaiseCreateEvent(new CreateEvent());
-    }    
+    }
 }
 public class CreateEvent : IDomainEvent
 {
@@ -292,7 +292,7 @@ public class AClass : AggregateRootBase
         var root = new AClass(null!, null!);
         root.RaiseCreateEvent(new CreateEvent());
         return string.Empty;
-    }    
+    }
 }
 public class CreateEvent : IDomainEvent
 {
@@ -344,7 +344,7 @@ public class AClass : AggregateRootBase
         var root = new AClass(null!, null!);
         root.RaiseCreateEvent(new CreateEvent());
         return root;
-    }    
+    }
 }
 public class CreateEvent : IDomainEvent
 {
@@ -394,7 +394,7 @@ public class AClass : AggregateRootBase
         var root = new AClass(null!, null!);
         root.RaiseCreateEvent(new CreateEvent());
         return root;
-    }    
+    }
 }
 public class CreateEvent : IDomainEvent
 {
@@ -445,7 +445,7 @@ public class AClass : AggregateRootBase
     public static AClass Create()
     {
         return null!;
-    }    
+    }
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(DomainDrivenDesignAnalyzer.Sas032, input, 30,
@@ -491,7 +491,7 @@ public class AClass : AggregateRootBase
         var root = new AClass(null!, null!);
         root.RaiseCreateEvent(new CreateEvent());
         return root;
-    }    
+    }
 }
 public class CreateEvent : IDomainEvent
 {
@@ -545,7 +545,7 @@ public class AClass : AggregateRootBase
         var root = new AClass(null!, null!);
         root.RaiseCreateEvent(new CreateEvent());
         return root;
-    }    
+    }
 }
 public class CreateEvent : IDomainEvent
 {
@@ -596,7 +596,7 @@ public class AClass : AggregateRootBase
         var root = new AClass(null!, null!);
         root.RaiseCreateEvent(new CreateEvent());
         return root;
-    }    
+    }
 }
 public class CreateEvent : IDomainEvent
 {
@@ -638,7 +638,7 @@ public class AClass : AggregateRootBase
         var root = new AClass(null!, null!);
         root.RaiseCreateEvent(new CreateEvent());
         return root;
-    }    
+    }
 }
 public class CreateEvent : IDomainEvent
 {
@@ -712,7 +712,6 @@ public class CreateEvent : IDomainEvent
             {
                 const string input = @"
 using System;
-using System.Collections.Generic;
 using Common;
 using Domain.Common;
 using Domain.Common.Entities;
@@ -757,9 +756,8 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(DomainDrivenDesignAnalyzer.Sas035, input, 13,
-                    14,
-                    "AClass");
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(DomainDrivenDesignAnalyzer.Sas035, input, 12,
+                    14, "AClass");
             }
 
             [Fact]
@@ -1247,7 +1245,7 @@ public class AClass : EntityBase
     public static AClass Create()
     {
         return new AClass(null!, null!, null!);
-    }    
+    }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -1282,7 +1280,7 @@ public class AClass : EntityBase
 
     public static void Create()
     {
-    }    
+    }
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(DomainDrivenDesignAnalyzer.Sas041, input, 21,
@@ -1315,7 +1313,7 @@ public class AClass : EntityBase
     public static string Create()
     {
         return string.Empty;
-    }    
+    }
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(DomainDrivenDesignAnalyzer.Sas041, input, 21,
@@ -1348,7 +1346,7 @@ public class AClass : EntityBase
     public static AClass Create()
     {
         return new AClass(null!, null!, null!);
-    }    
+    }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -1380,7 +1378,7 @@ public class AClass : EntityBase
     public static Result<AClass, Error> Create()
     {
         return new AClass(null!, null!, null!);
-    }    
+    }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -1416,7 +1414,7 @@ public class AClass : EntityBase
     public static AClass Create()
     {
         return new AClass(null!, null!, null!);
-    }    
+    }
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(DomainDrivenDesignAnalyzer.Sas042, input, 12,
@@ -1449,7 +1447,7 @@ public class AClass : EntityBase
     public static AClass Create()
     {
         return new AClass(null!, null!, null!);
-    }    
+    }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -1481,7 +1479,7 @@ public class AClass : EntityBase
     {
     }
 
-    private AClass(IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties, Identifier identifier) : base(identifier, container, rehydratingProperties)
+    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -1527,7 +1525,7 @@ public class AClass : EntityBase
     {
     }
 
-    private AClass(IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties, Identifier identifier) : base(identifier, container, rehydratingProperties)
+    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -1548,7 +1546,7 @@ public class AClass : EntityBase
 
     public static EntityFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container, properties, identifier);
+        return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }";
 
@@ -1581,7 +1579,7 @@ public class AClass : EntityBase
     {
     }
 
-    private AClass(IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties, Identifier identifier) : base(identifier, container, rehydratingProperties)
+    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -1597,7 +1595,7 @@ public class AClass : EntityBase
 
     public static EntityFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container, properties, identifier);
+        return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }";
 
@@ -1627,7 +1625,7 @@ public class AClass : EntityBase
     {
     }
 
-    private AClass(IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties, Identifier identifier) : base(identifier, container, rehydratingProperties)
+    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -1648,7 +1646,7 @@ public class AClass : EntityBase
 
     public static EntityFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container, properties, identifier);
+        return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }";
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -1679,7 +1677,7 @@ public class AClass : EntityBase
     {
     }
 
-    private AClass(IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties, Identifier identifier) : base(identifier, container, rehydratingProperties)
+    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -1700,7 +1698,7 @@ public class AClass : EntityBase
 
     public static EntityFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container, properties, identifier);
+        return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }";
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(DomainDrivenDesignAnalyzer.Sas045, input, 13,
@@ -1730,7 +1728,7 @@ public class AClass : EntityBase
     {
     }
 
-    private AClass(IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties, Identifier identifier) : base(identifier, container, rehydratingProperties)
+    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -1751,7 +1749,7 @@ public class AClass : EntityBase
 
     public static EntityFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container, properties, identifier);
+        return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }";
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -2010,13 +2008,13 @@ public class AClass : ValueObjectBase<AClass>
     public static AClass Create()
     {
         return new AClass(null!);
-    }    
+    }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
         return new object[] { AProperty };
     }
-    
+
     public static ValueObjectFactory<AClass> Rehydrate()
     {
         return (property, container) => new AClass(null!);
@@ -2054,7 +2052,7 @@ public class AClass : ValueObjectBase<AClass>
 
     public static void Create()
     {
-    }    
+    }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
@@ -2096,7 +2094,7 @@ public class AClass : ValueObjectBase<AClass>
     public static string Create()
     {
         return string.Empty;
-    }    
+    }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
@@ -2138,7 +2136,7 @@ public class AClass : ValueObjectBase<AClass>
     public static AClass Create()
     {
         return new AClass(null!);
-    }    
+    }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
@@ -2179,7 +2177,7 @@ public class AClass : ValueObjectBase<AClass>
     public static Result<AClass, Error> Create()
     {
         return new AClass(null!);
-    }    
+    }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
@@ -2224,7 +2222,7 @@ public class AClass : ValueObjectBase<AClass>
     public static AClass Create()
     {
         return new AClass(null!);
-    }    
+    }
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
@@ -2318,7 +2316,7 @@ public class AClass : ValueObjectBase<AClass>
     {
         return new object[] { AProperty };
     }
-    
+
     public string AProperty { get;}
 }";
 

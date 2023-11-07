@@ -11,27 +11,25 @@ internal static class SyntaxFilterExtensions
     public static AttributeData? GetAttributeOfType<TAttribute>(this MemberDeclarationSyntax memberDeclarationSyntax,
         SyntaxNodeAnalysisContext context)
     {
-        var symbol = context.SemanticModel.GetDeclaredSymbol(memberDeclarationSyntax);
+        return GetAttributeOfType<TAttribute>(memberDeclarationSyntax, context.SemanticModel, context.Compilation);
+    }
+
+    public static AttributeData? GetAttributeOfType<TAttribute>(this MemberDeclarationSyntax memberDeclarationSyntax,
+        SemanticModel semanticModel, Compilation compilation)
+    {
+        var symbol = semanticModel.GetDeclaredSymbol(memberDeclarationSyntax);
         if (symbol is null)
         {
             return null;
         }
 
-        return symbol.GetAttributeOfType<TAttribute>(context);
+        return symbol.GetAttributeOfType<TAttribute>(compilation);
     }
 
     public static AttributeData? GetAttributeOfType<TAttribute>(this ISymbol? symbol,
         SyntaxNodeAnalysisContext context)
     {
-        if (symbol is null)
-        {
-            return null;
-        }
-
-        var attributeMetadata = context.Compilation.GetTypeByMetadataName(typeof(TAttribute).FullName!)!;
-        var attributes = symbol.GetAttributes();
-
-        return attributes.FirstOrDefault(attr => attr.AttributeClass!.IsOfType(attributeMetadata));
+        return GetAttributeOfType<TAttribute>(symbol, context.Compilation);
     }
 
     public static ITypeSymbol? GetBaseOfType<TType>(this ParameterSyntax parameterSyntax,
@@ -307,6 +305,20 @@ internal static class SyntaxFilterExtensions
     {
         var accessibility = new Accessibility(methodDeclarationSyntax.Modifiers);
         return accessibility is { IsPublic: true, IsStatic: true };
+    }
+
+    private static AttributeData? GetAttributeOfType<TAttribute>(this ISymbol? symbol,
+        Compilation compilation)
+    {
+        if (symbol is null)
+        {
+            return null;
+        }
+
+        var attributeMetadata = compilation.GetTypeByMetadataName(typeof(TAttribute).FullName!)!;
+        var attributes = symbol.GetAttributes();
+
+        return attributes.FirstOrDefault(attr => attr.AttributeClass!.IsOfType(attributeMetadata));
     }
 }
 

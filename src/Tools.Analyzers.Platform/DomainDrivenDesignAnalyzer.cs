@@ -157,9 +157,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var excludedNamespaces = new List<string>(AnalyzerConstants.PlatformNamespaces)
-            .Except(new[] { AnalyzerConstants.CommonDomainNamespace }).ToArray();
-        if (context.IsExcludedInNamespace(excludedNamespaces))
+        if (context.IsExcludedInNamespace(AnalyzerConstants.PlatformNamespaces))
         {
             return;
         }
@@ -184,7 +182,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             foreach (var method in classFactoryMethods)
             {
                 var allowedReturnTypes = GetAllowableClassFactoryReturnTypes(context, classDeclarationSyntax);
-                if (HasIncorrectReturnType(context, method, allowedReturnTypes))
+                if (context.HasIncorrectReturnType(method, allowedReturnTypes))
                 {
                     var acceptableReturnTypes =
                         allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(", ");
@@ -212,21 +210,18 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             }
         }
 
-        var implementsRehydrate = ImplementsAggregateRehydrateMethod(context, classDeclarationSyntax, allMethods);
-        if (!implementsRehydrate)
+        var dehydratable = context.IsDehydratableAggregateRoot(classDeclarationSyntax);
+        if (!dehydratable.ImplementsRehydrate)
         {
             context.ReportDiagnostic(Sas034, classDeclarationSyntax);
         }
 
-        var implementsDehydrate = ImplementsDehydrateMethod(context, classDeclarationSyntax, allMethods);
-        var hasAttribute = HasEntityNameAttribute(context, classDeclarationSyntax);
-        var isDehydratableEntity = hasAttribute || implementsDehydrate;
-        if (isDehydratableEntity && !implementsDehydrate)
+        if (dehydratable is { IsDehydratable: true, ImplementsDehydrate: false })
         {
             context.ReportDiagnostic(Sas035, classDeclarationSyntax);
         }
 
-        if (isDehydratableEntity && !hasAttribute)
+        if (dehydratable is { IsDehydratable: true, MarkedAsEntityName: false })
         {
             context.ReportDiagnostic(Sas036, classDeclarationSyntax);
         }
@@ -254,9 +249,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var excludedNamespaces = new List<string>(AnalyzerConstants.PlatformNamespaces)
-            .Except(new[] { AnalyzerConstants.CommonDomainNamespace }).ToArray();
-        if (context.IsExcludedInNamespace(excludedNamespaces))
+        if (context.IsExcludedInNamespace(AnalyzerConstants.PlatformNamespaces))
         {
             return;
         }
@@ -281,7 +274,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             foreach (var method in classFactoryMethods)
             {
                 var allowedReturnTypes = GetAllowableClassFactoryReturnTypes(context, classDeclarationSyntax);
-                if (HasIncorrectReturnType(context, method, allowedReturnTypes))
+                if (context.HasIncorrectReturnType(method, allowedReturnTypes))
                 {
                     var acceptableReturnTypes =
                         allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(", ");
@@ -304,21 +297,18 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             }
         }
 
-        var implementsRehydrate = ImplementsEntityRehydrateMethod(context, classDeclarationSyntax, allMethods);
-        var implementsDehydrate = ImplementsDehydrateMethod(context, classDeclarationSyntax, allMethods);
-        var hasAttribute = HasEntityNameAttribute(context, classDeclarationSyntax);
-        var isDehydratableEntity = hasAttribute || implementsDehydrate || implementsRehydrate;
-        if (isDehydratableEntity && !implementsRehydrate)
+        var dehydratable = context.IsDehydratableEntity(classDeclarationSyntax);
+        if (dehydratable is { IsDehydratable: true, ImplementsRehydrate: false })
         {
             context.ReportDiagnostic(Sas043, classDeclarationSyntax);
         }
 
-        if (isDehydratableEntity && !implementsDehydrate)
+        if (dehydratable is { IsDehydratable: true, ImplementsDehydrate: false })
         {
             context.ReportDiagnostic(Sas044, classDeclarationSyntax);
         }
 
-        if (isDehydratableEntity && !hasAttribute)
+        if (dehydratable is { IsDehydratable: true, MarkedAsEntityName: false })
         {
             context.ReportDiagnostic(Sas045, classDeclarationSyntax);
         }
@@ -346,9 +336,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var excludedNamespaces = new List<string>(AnalyzerConstants.PlatformNamespaces)
-            .Except(new[] { AnalyzerConstants.CommonDomainNamespace }).ToArray();
-        if (context.IsExcludedInNamespace(excludedNamespaces))
+        if (context.IsExcludedInNamespace(AnalyzerConstants.PlatformNamespaces))
         {
             return;
         }
@@ -373,7 +361,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             foreach (var method in classFactoryMethods)
             {
                 var allowedReturnTypes = GetAllowableClassFactoryReturnTypes(context, classDeclarationSyntax);
-                if (HasIncorrectReturnType(context, method, allowedReturnTypes))
+                if (context.HasIncorrectReturnType(method, allowedReturnTypes))
                 {
                     var acceptableReturnTypes =
                         allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(", ");
@@ -396,8 +384,8 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             }
         }
 
-        var implementsRehydrate = ImplementsValueObjectRehydrateMethod(context, classDeclarationSyntax, allMethods);
-        if (!implementsRehydrate)
+        var dehydratable = context.IsDehydratableValueObject(classDeclarationSyntax);
+        if (!dehydratable.ImplementsRehydrate)
         {
             context.ReportDiagnostic(Sas053, classDeclarationSyntax);
         }
@@ -427,75 +415,13 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
         foreach (var method in allImmutableMethods)
         {
             var allowedReturnTypes = GetAllowableValueObjectMutableMethodReturnTypes(context, classDeclarationSyntax);
-            if (HasIncorrectReturnType(context, method, allowedReturnTypes))
+            if (context.HasIncorrectReturnType(method, allowedReturnTypes))
             {
                 var acceptableReturnTypes =
                     allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(", ");
                 context.ReportDiagnostic(Sas055, method, acceptableReturnTypes);
             }
         }
-    }
-
-    /// <summary>
-    ///     Whether the class either has a <see cref="EntityNameAttribute" /> declaration
-    /// </summary>
-    private static bool HasEntityNameAttribute(SyntaxNodeAnalysisContext context,
-        ClassDeclarationSyntax classDeclarationSyntax)
-    {
-        var attribute = classDeclarationSyntax.GetAttributeOfType<EntityNameAttribute>(context);
-        return attribute.Exists();
-    }
-
-    /// <summary>
-    ///     Whether the class implements the <see cref="IDehydratableEntity.Dehydrate" /> method
-    /// </summary>
-    private static bool ImplementsDehydrateMethod(SyntaxNodeAnalysisContext context,
-        ClassDeclarationSyntax classDeclarationSyntax, IEnumerable<MethodDeclarationSyntax> allMethods)
-    {
-        var allowableTypes = GetAllowableDehydrateReturnType(context, classDeclarationSyntax);
-        return allMethods
-            .Any(method => method.IsPublicOverrideMethod()
-                           && method.IsNamed(nameof(IDehydratableEntity.Dehydrate))
-                           && !HasIncorrectReturnType(context, method, allowableTypes));
-    }
-
-    /// <summary>
-    ///     Whether the class implements the <see cref="IRehydratableObject.Rehydrate" /> method
-    /// </summary>
-    private static bool ImplementsAggregateRehydrateMethod(SyntaxNodeAnalysisContext context,
-        ClassDeclarationSyntax classDeclarationSyntax, IEnumerable<MethodDeclarationSyntax> allMethods)
-    {
-        var allowableTypes = GetAllowableAggregateRehydrateReturnType(context, classDeclarationSyntax);
-        return allMethods
-            .Any(method => method.IsPublicStaticMethod()
-                           && method.IsNamed(nameof(IRehydratableObject.Rehydrate))
-                           && !HasIncorrectReturnType(context, method, allowableTypes));
-    }
-
-    /// <summary>
-    ///     Whether the class implements the <see cref="IRehydratableObject.Rehydrate" /> method
-    /// </summary>
-    private static bool ImplementsEntityRehydrateMethod(SyntaxNodeAnalysisContext context,
-        ClassDeclarationSyntax classDeclarationSyntax, IEnumerable<MethodDeclarationSyntax> allMethods)
-    {
-        var allowableTypes = GetAllowableEntityRehydrateReturnType(context, classDeclarationSyntax);
-        return allMethods
-            .Any(method => method.IsPublicStaticMethod()
-                           && method.IsNamed(nameof(IRehydratableObject.Rehydrate))
-                           && !HasIncorrectReturnType(context, method, allowableTypes));
-    }
-
-    /// <summary>
-    ///     Whether the class implements the <see cref="IRehydratableObject.Rehydrate" /> method
-    /// </summary>
-    private static bool ImplementsValueObjectRehydrateMethod(SyntaxNodeAnalysisContext context,
-        ClassDeclarationSyntax classDeclarationSyntax, IEnumerable<MethodDeclarationSyntax> allMethods)
-    {
-        var allowableTypes = GetAllowableValueObjectRehydrateReturnType(context, classDeclarationSyntax);
-        return allMethods
-            .Any(method => method.IsPublicStaticMethod()
-                           && method.IsNamed(nameof(IRehydratableObject.Rehydrate))
-                           && !HasIncorrectReturnType(context, method, allowableTypes));
     }
 
     private static bool IsMissingContent(SyntaxNodeAnalysisContext context,
@@ -527,51 +453,6 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
         return new[] { classSymbol, resultOfClassAndErrorType };
     }
 
-    private static INamedTypeSymbol[] GetAllowableAggregateRehydrateReturnType(SyntaxNodeAnalysisContext context,
-        ClassDeclarationSyntax classDeclarationSyntax)
-    {
-        var classSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
-        if (classSymbol is null)
-        {
-            return Array.Empty<INamedTypeSymbol>();
-        }
-
-        var factoryType = context.Compilation.GetTypeByMetadataName(typeof(AggregateRootFactory<>).FullName!)!;
-        var factoryOfClass = factoryType.Construct(classSymbol);
-
-        return new[] { factoryOfClass };
-    }
-
-    private static INamedTypeSymbol[] GetAllowableEntityRehydrateReturnType(SyntaxNodeAnalysisContext context,
-        ClassDeclarationSyntax classDeclarationSyntax)
-    {
-        var classSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
-        if (classSymbol is null)
-        {
-            return Array.Empty<INamedTypeSymbol>();
-        }
-
-        var factoryType = context.Compilation.GetTypeByMetadataName(typeof(EntityFactory<>).FullName!)!;
-        var factoryOfClass = factoryType.Construct(classSymbol);
-
-        return new[] { factoryOfClass };
-    }
-
-    private static INamedTypeSymbol[] GetAllowableValueObjectRehydrateReturnType(SyntaxNodeAnalysisContext context,
-        ClassDeclarationSyntax classDeclarationSyntax)
-    {
-        var classSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
-        if (classSymbol is null)
-        {
-            return Array.Empty<INamedTypeSymbol>();
-        }
-
-        var factoryType = context.Compilation.GetTypeByMetadataName(typeof(ValueObjectFactory<>).FullName!)!;
-        var factoryOfClass = factoryType.Construct(classSymbol);
-
-        return new[] { factoryOfClass };
-    }
-
     private static INamedTypeSymbol[] GetAllowableValueObjectMutableMethodReturnTypes(SyntaxNodeAnalysisContext context,
         ClassDeclarationSyntax classDeclarationSyntax)
     {
@@ -587,33 +468,101 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
 
         return new[] { classSymbol, resultOfClassAndErrorType };
     }
+}
 
-    private static INamedTypeSymbol[] GetAllowableDehydrateReturnType(SyntaxNodeAnalysisContext context,
-        ClassDeclarationSyntax classDeclarationSyntax)
-    {
-        var classSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
-        if (classSymbol is null)
-        {
-            return Array.Empty<INamedTypeSymbol>();
-        }
-
-        var dictionaryType = context.Compilation.GetTypeByMetadataName(typeof(Dictionary<,>).FullName!)!;
-        var objectDictionary = dictionaryType.Construct(context.Compilation.GetSpecialType(SpecialType.System_String),
-            context.Compilation.GetSpecialType(SpecialType.System_Object));
-        return new[] { objectDictionary };
-    }
-
-    private static bool HasIncorrectReturnType(SyntaxNodeAnalysisContext context,
+internal static class DomainDrivenDesignExtensions
+{
+    public static bool HasIncorrectReturnType(this SyntaxNodeAnalysisContext context,
         MethodDeclarationSyntax methodDeclarationSyntax, INamedTypeSymbol[] allowableTypes)
     {
-        var methodSymbol = context.SemanticModel.GetDeclaredSymbol(methodDeclarationSyntax);
+        var semanticModel = context.SemanticModel;
+        var compilation = context.Compilation;
+        return semanticModel.HasIncorrectReturnType(compilation, methodDeclarationSyntax, allowableTypes);
+    }
+
+    public static DehydratableStatus IsDehydratableAggregateRoot(this SyntaxNodeAnalysisContext context,
+        ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        return context.SemanticModel.IsDehydratableAggregateRoot(context.Compilation, classDeclarationSyntax);
+    }
+
+    public static DehydratableStatus IsDehydratableAggregateRoot(this SemanticModel semanticModel,
+        Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        var allMethods = classDeclarationSyntax.Members.Where(member => member is MethodDeclarationSyntax)
+            .Cast<MethodDeclarationSyntax>()
+            .ToList();
+        var implementsRehydrate =
+            ImplementsAggregateRehydrateMethod(semanticModel, compilation, classDeclarationSyntax, allMethods);
+        var implementsDehydrate =
+            ImplementsDehydrateMethod(semanticModel, compilation, classDeclarationSyntax, allMethods);
+        var hasAttribute = HasEntityNameAttribute(semanticModel, compilation, classDeclarationSyntax);
+        return new DehydratableStatus(implementsDehydrate, implementsRehydrate, hasAttribute,
+            () => implementsDehydrate || hasAttribute);
+    }
+
+    public static DehydratableStatus IsDehydratableEntity(this SyntaxNodeAnalysisContext context,
+        ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        return context.SemanticModel.IsDehydratableEntity(context.Compilation, classDeclarationSyntax);
+    }
+
+    public static DehydratableStatus IsDehydratableValueObject(this SyntaxNodeAnalysisContext context,
+        ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        return context.SemanticModel.IsDehydratableValueObject(context.Compilation, classDeclarationSyntax);
+    }
+
+    public static bool IsSingleValueValueObject(this SemanticModel semanticModel,
+        Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        var symbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax);
+        if (symbol is null)
+        {
+            return false;
+        }
+
+        var singleValueObject = compilation.GetTypeByMetadataName(typeof(ISingleValueObject<>).FullName!)!;
+        return symbol.AllInterfaces.Any(@interface => @interface.OriginalDefinition.IsOfType(singleValueObject));
+    }
+
+    private static DehydratableStatus IsDehydratableEntity(this SemanticModel semanticModel, Compilation compilation,
+        ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        var allMethods = classDeclarationSyntax.Members.Where(member => member is MethodDeclarationSyntax)
+            .Cast<MethodDeclarationSyntax>()
+            .ToList();
+        var implementsRehydrate =
+            ImplementsEntityRehydrateMethod(semanticModel, compilation, classDeclarationSyntax, allMethods);
+        var implementsDehydrate =
+            ImplementsDehydrateMethod(semanticModel, compilation, classDeclarationSyntax, allMethods);
+        var hasAttribute = HasEntityNameAttribute(semanticModel, compilation, classDeclarationSyntax);
+        return new DehydratableStatus(implementsDehydrate, implementsRehydrate, hasAttribute,
+            () => implementsRehydrate || hasAttribute || implementsRehydrate);
+    }
+
+    private static DehydratableStatus IsDehydratableValueObject(this SemanticModel semanticModel,
+        Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        var allMethods = classDeclarationSyntax.Members.Where(member => member is MethodDeclarationSyntax)
+            .Cast<MethodDeclarationSyntax>()
+            .ToList();
+        var implementsRehydrate =
+            ImplementsValueObjectRehydrateMethod(semanticModel, compilation, classDeclarationSyntax, allMethods);
+        return new DehydratableStatus(true, implementsRehydrate, false, () => true);
+    }
+
+    private static bool HasIncorrectReturnType(this SemanticModel semanticModel, Compilation compilation,
+        MethodDeclarationSyntax methodDeclarationSyntax, INamedTypeSymbol[] allowableTypes)
+    {
+        var methodSymbol = semanticModel.GetDeclaredSymbol(methodDeclarationSyntax);
         if (methodSymbol is null)
         {
             return true;
         }
 
         var returnType = methodSymbol.ReturnType;
-        if (returnType.IsVoid(context))
+        if (returnType.IsVoid(compilation))
         {
             return true;
         }
@@ -627,5 +576,152 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
         }
 
         return true;
+    }
+
+    /// <summary>
+    ///     Whether the class either has a <see cref="EntityNameAttribute" /> declaration
+    /// </summary>
+    private static bool HasEntityNameAttribute(SemanticModel semanticModel, Compilation compilation,
+        ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        var attribute = classDeclarationSyntax.GetAttributeOfType<EntityNameAttribute>(semanticModel, compilation);
+        return attribute.Exists();
+    }
+
+    /// <summary>
+    ///     Whether the class implements the <see cref="IDehydratableEntity.Dehydrate" /> method
+    /// </summary>
+    private static bool ImplementsDehydrateMethod(SemanticModel semanticModel, Compilation compilation,
+        ClassDeclarationSyntax classDeclarationSyntax, IEnumerable<MethodDeclarationSyntax> allMethods)
+    {
+        var allowableTypes = GetAllowableDehydrateReturnType(semanticModel, compilation, classDeclarationSyntax);
+        return allMethods
+            .Any(method => method.IsPublicOverrideMethod()
+                           && method.IsNamed(nameof(IDehydratableEntity.Dehydrate))
+                           && !HasIncorrectReturnType(semanticModel, compilation, method, allowableTypes));
+    }
+
+    private static INamedTypeSymbol[] GetAllowableDehydrateReturnType(SemanticModel semanticModel,
+        Compilation compilation,
+        ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax);
+        if (classSymbol is null)
+        {
+            return Array.Empty<INamedTypeSymbol>();
+        }
+
+        var dictionaryType = compilation.GetTypeByMetadataName(typeof(Dictionary<,>).FullName!)!;
+        var objectDictionary = dictionaryType.Construct(compilation.GetSpecialType(SpecialType.System_String),
+            compilation.GetSpecialType(SpecialType.System_Object));
+        return new[] { objectDictionary };
+    }
+
+    /// <summary>
+    ///     Whether the class implements the <see cref="IRehydratableObject.Rehydrate" /> method
+    /// </summary>
+    private static bool ImplementsAggregateRehydrateMethod(SemanticModel semanticModel, Compilation compilation,
+        ClassDeclarationSyntax classDeclarationSyntax, IEnumerable<MethodDeclarationSyntax> allMethods)
+    {
+        var allowableTypes =
+            GetAllowableAggregateRehydrateReturnType(semanticModel, compilation, classDeclarationSyntax);
+        return allMethods
+            .Any(method => method.IsPublicStaticMethod()
+                           && method.IsNamed(nameof(IRehydratableObject.Rehydrate))
+                           && !semanticModel.HasIncorrectReturnType(compilation, method, allowableTypes));
+    }
+
+    /// <summary>
+    ///     Whether the class implements the <see cref="IRehydratableObject.Rehydrate" /> method
+    /// </summary>
+    private static bool ImplementsEntityRehydrateMethod(SemanticModel semanticModel, Compilation compilation,
+        ClassDeclarationSyntax classDeclarationSyntax, IEnumerable<MethodDeclarationSyntax> allMethods)
+    {
+        var allowableTypes = GetAllowableEntityRehydrateReturnType(semanticModel, compilation, classDeclarationSyntax);
+        return allMethods
+            .Any(method => method.IsPublicStaticMethod()
+                           && method.IsNamed(nameof(IRehydratableObject.Rehydrate))
+                           && !semanticModel.HasIncorrectReturnType(compilation, method, allowableTypes));
+    }
+
+    /// <summary>
+    ///     Whether the class implements the <see cref="IRehydratableObject.Rehydrate" /> method
+    /// </summary>
+    private static bool ImplementsValueObjectRehydrateMethod(SemanticModel semanticModel, Compilation compilation,
+        ClassDeclarationSyntax classDeclarationSyntax, IEnumerable<MethodDeclarationSyntax> allMethods)
+    {
+        var allowableTypes =
+            GetAllowableValueObjectRehydrateReturnType(semanticModel, compilation, classDeclarationSyntax);
+        return allMethods
+            .Any(method => method.IsPublicStaticMethod()
+                           && method.IsNamed(nameof(IRehydratableObject.Rehydrate))
+                           && !semanticModel.HasIncorrectReturnType(compilation, method, allowableTypes));
+    }
+
+    private static INamedTypeSymbol[] GetAllowableAggregateRehydrateReturnType(SemanticModel semanticModel,
+        Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax);
+        if (classSymbol is null)
+        {
+            return Array.Empty<INamedTypeSymbol>();
+        }
+
+        var factoryType = compilation.GetTypeByMetadataName(typeof(AggregateRootFactory<>).FullName!)!;
+        var factoryOfClass = factoryType.Construct(classSymbol);
+
+        return new[] { factoryOfClass };
+    }
+
+    private static INamedTypeSymbol[] GetAllowableEntityRehydrateReturnType(SemanticModel semanticModel,
+        Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax);
+        if (classSymbol is null)
+        {
+            return Array.Empty<INamedTypeSymbol>();
+        }
+
+        var factoryType = compilation.GetTypeByMetadataName(typeof(EntityFactory<>).FullName!)!;
+        var factoryOfClass = factoryType.Construct(classSymbol);
+
+        return new[] { factoryOfClass };
+    }
+
+    private static INamedTypeSymbol[] GetAllowableValueObjectRehydrateReturnType(SemanticModel semanticModel,
+        Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax);
+        if (classSymbol is null)
+        {
+            return Array.Empty<INamedTypeSymbol>();
+        }
+
+        var factoryType = compilation.GetTypeByMetadataName(typeof(ValueObjectFactory<>).FullName!)!;
+        var factoryOfClass = factoryType.Construct(classSymbol);
+
+        return new[] { factoryOfClass };
+    }
+
+    public class DehydratableStatus
+    {
+        private readonly Func<bool> _isDehydratable;
+
+        public DehydratableStatus(bool implementsDehydrate, bool implementsRehydrate, bool markedWithEntityAttribute,
+            Func<bool> isDehydratable)
+        {
+            _isDehydratable = isDehydratable;
+            ImplementsDehydrate = implementsDehydrate;
+            ImplementsRehydrate = implementsRehydrate;
+            MarkedAsEntityName = markedWithEntityAttribute;
+        }
+
+        public bool ImplementsDehydrate { get; }
+
+        public bool ImplementsRehydrate { get; }
+
+        public bool IsDehydratable => _isDehydratable();
+
+        public bool MarkedAsEntityName { get; }
     }
 }

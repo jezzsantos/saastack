@@ -25,8 +25,8 @@ public sealed class TripEntity : EntityBase
     {
     }
 
-    private TripEntity(IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties,
-        Identifier identifier) : base(identifier, container, rehydratingProperties)
+    private TripEntity(Identifier identifier, IDependencyContainer container,
+        IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
         RootId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(RootId))!;
         OrganizationId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(OrganizationId))!;
@@ -50,7 +50,7 @@ public sealed class TripEntity : EntityBase
 
     public static EntityFactory<TripEntity> Rehydrate()
     {
-        return (identifier, container, properties) => new TripEntity(container, properties, identifier);
+        return (identifier, container, properties) => new TripEntity(identifier, container, properties);
     }
 
     public override Dictionary<string, object?> Dehydrate()
