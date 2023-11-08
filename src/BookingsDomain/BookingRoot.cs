@@ -17,9 +17,9 @@ public sealed class BookingRoot : AggregateRootBase
     public static Result<BookingRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
         Identifier organizationId)
     {
-        var booking = new BookingRoot(recorder, idFactory);
-        booking.RaiseCreateEvent(Booking.Created.Create(booking.Id, organizationId));
-        return booking;
+        var root = new BookingRoot(recorder, idFactory);
+        root.RaiseCreateEvent(Booking.Created.Create(root.Id, organizationId));
+        return root;
     }
 
     private BookingRoot(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)

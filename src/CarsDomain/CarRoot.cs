@@ -14,9 +14,9 @@ public sealed class CarRoot : AggregateRootBase
     public static Result<CarRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
         Identifier organizationId)
     {
-        var car = new CarRoot(recorder, idFactory);
-        car.RaiseCreateEvent(Car.Created.Create(car.Id, organizationId));
-        return car;
+        var root = new CarRoot(recorder, idFactory);
+        root.RaiseCreateEvent(Car.Created.Create(root.Id, organizationId));
+        return root;
     }
 
     private CarRoot(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)

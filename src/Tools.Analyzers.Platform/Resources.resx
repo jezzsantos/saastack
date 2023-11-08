@@ -217,4 +217,19 @@
     <data name="SAS022CodeFixTitle" xml:space="preserve">
         <value>Add missing 'Rehydrate' method</value>
     </data>
+    <data name="SAS023CodeFixTitle" xml:space="preserve">
+        <value>Add missing 'Dehydrate' method</value>
+    </data>
+    <data name="SAS024CodeFixTitle" xml:space="preserve">
+        <value>Add missing '[EntityName]' attribute</value>
+    </data>
+    <data name="SAS030CodeFixTitle" xml:space="preserve">
+        <value>Add missing 'Create' method</value>
+    </data>
+    <data name="SAS040CodeFixTitle" xml:space="preserve">
+        <value>Add missing 'Create' method</value>
+    </data>
+    <data name="SAS050CodeFixTitle" xml:space="preserve">
+        <value>Add missing 'Create' method</value>
+    </data>
 </root>

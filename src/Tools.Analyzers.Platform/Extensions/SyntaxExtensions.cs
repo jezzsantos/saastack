@@ -24,6 +24,12 @@ internal static class SyntaxExtensions
             .FirstOrDefault();
     }
 
+    public static ClassDeclarationSyntax InsertMember(this ClassDeclarationSyntax classDeclarationSyntax, int index,
+        MemberDeclarationSyntax newMember)
+    {
+        return classDeclarationSyntax.WithMembers(classDeclarationSyntax.Members.Insert(index, newMember));
+    }
+
     private static IEnumerable<XmlNodeSyntax> GetXmlElements(this SyntaxList<XmlNodeSyntax> content, string elementName)
     {
         foreach (var syntax in content)

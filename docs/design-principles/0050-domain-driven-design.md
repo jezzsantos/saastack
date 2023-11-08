@@ -199,10 +199,10 @@ For example, a typical aggregate class factory creation method for a tenanted ag
         Identifier organizationId)
     {
         // Note: call the private ctor (below)
-        var car = new CarRoot(recorder, idFactory);
+        var root = new CarRoot(recorder, idFactory);
         // Note: you must raise the Create event immediately after instantiating the class
-        car.RaiseCreateEvent(Car.Created.Create(car.Id, organizationId));
-        return car;
+        root.RaiseCreateEvent(Car.Created.Create(car.Id, organizationId));
+        return root;
     }
 
     // Note: this ctor must be private and must call the base class ctor

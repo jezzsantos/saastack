@@ -420,6 +420,15 @@ namespace Tools.Analyzers.Platform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add missing &apos;Dehydrate&apos; method.
+        /// </summary>
+        internal static string SAS023CodeFixTitle {
+            get {
+                return ResourceManager.GetString("SAS023CodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Class must implement the Dehydrate() method..
         /// </summary>
         internal static string SAS023Description {
@@ -443,6 +452,15 @@ namespace Tools.Analyzers.Platform {
         internal static string SAS023Title {
             get {
                 return ResourceManager.GetString("SAS023Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add missing &apos;[EntityName]&apos; attribute.
+        /// </summary>
+        internal static string SAS024CodeFixTitle {
+            get {
+                return ResourceManager.GetString("SAS024CodeFixTitle", resourceCulture);
             }
         }
         
@@ -501,6 +519,15 @@ namespace Tools.Analyzers.Platform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add missing &apos;Create&apos; method.
+        /// </summary>
+        internal static string SAS030CodeFixTitle {
+            get {
+                return ResourceManager.GetString("SAS030CodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Aggregate roots must have at least one Create() class factory method..
         /// </summary>
         internal static string SAS030Description {
@@ -555,6 +582,15 @@ namespace Tools.Analyzers.Platform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add missing &apos;Create&apos; method.
+        /// </summary>
+        internal static string SAS040CodeFixTitle {
+            get {
+                return ResourceManager.GetString("SAS040CodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Entities must have at least one Create() class factory method..
         /// </summary>
         internal static string SAS040Description {
@@ -578,6 +614,15 @@ namespace Tools.Analyzers.Platform {
         internal static string SAS040Title {
             get {
                 return ResourceManager.GetString("SAS040Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add missing &apos;Create&apos; method.
+        /// </summary>
+        internal static string SAS050CodeFixTitle {
+            get {
+                return ResourceManager.GetString("SAS050CodeFixTitle", resourceCulture);
             }
         }
         
