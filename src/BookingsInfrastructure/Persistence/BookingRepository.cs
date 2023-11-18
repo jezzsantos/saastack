@@ -1,71 +1,76 @@
 using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
+using Application.Persistence.Interfaces;
 using BookingsApplication.Persistence;
 using BookingsApplication.Persistence.ReadModels;
 using BookingsDomain;
 using Common;
-using Common.Extensions;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Infrastructure.Persistence.Common;
+using Infrastructure.Persistence.Interfaces;
+using QueryAny;
 
 namespace BookingsInfrastructure.Persistence;
 
-//TODO: stop using this in-memory repo and move to persistence layer
 public class BookingRepository : IBookingRepository
 {
-    private static readonly List<BookingRoot> Bookings = new();
+    private readonly ISnapshottingDddQueryStore<Booking> _bookingQueries;
+    private readonly ISnapshottingDddCommandStore<BookingRoot> _bookings;
 
-    public async Task<Result<Error>> DestroyAllAsync()
+    public BookingRepository(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
-        await Task.CompletedTask;
+        _bookings = new SnapshottingDddCommandStore<BookingRoot>(recorder, domainFactory, store);
+        _bookingQueries = new SnapshottingDddQueryStore<Booking>(recorder, domainFactory, store);
+    }
 
-        Bookings.Clear();
-
-        return Result.Ok;
+    public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
+    {
+        return await _bookings.DestroyAllAsync(cancellationToken);
     }
 
     public async Task<Result<Error>> DeleteBookingAsync(Identifier organizationId, Identifier id,
         CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
+        var retrieved = await _bookings.GetAsync(id, true, false, cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
 
-        var booking = Bookings.Find(root => root.Id == id);
-        if (booking.NotExists())
+        if (retrieved.Value.Value.OrganizationId != organizationId)
         {
             return Error.EntityNotFound();
         }
 
-        Bookings.Remove(booking);
-
-        return Result.Ok;
+        var deleted = await _bookings.DeleteAsync(id, false, cancellationToken);
+        return !deleted.IsSuccessful
+            ? deleted.Error
+            : Result.Ok;
     }
 
     public async Task<Result<BookingRoot, Error>> LoadAsync(Identifier organizationId, Identifier id,
         CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
-
-        var booking = Bookings.Find(root => root.Id == id);
-        if (booking.NotExists())
+        var retrieved = await _bookings.GetAsync(id, true, false, cancellationToken);
+        if (!retrieved.IsSuccessful)
         {
-            return Error.EntityNotFound();
+            return retrieved.Error;
         }
 
-        return booking;
+        return retrieved.Value.Value;
     }
 
     public async Task<Result<BookingRoot, Error>> SaveAsync(BookingRoot booking, bool reload,
         CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
-
-        var existing = Bookings.Find(root => root.Id == booking.Id);
-        if (existing.NotExists())
+        var upserted = await _bookings.UpsertAsync(booking, false, cancellationToken);
+        if (!upserted.IsSuccessful)
         {
-            Bookings.Add(booking);
-            return booking;
+            return upserted.Error;
         }
 
-        existing = booking;
-        return existing;
+        return upserted.Value;
     }
 
     public async Task<Result<BookingRoot, Error>> SaveAsync(BookingRoot booking, CancellationToken cancellationToken)
@@ -77,27 +82,16 @@ public class BookingRepository : IBookingRepository
         DateTime from, DateTime to, SearchOptions searchOptions,
         CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
-
-        return Bookings
-            .FindAll(booking => booking.Start >= from && booking.End <= to)
-            .Select(booking => booking.ToBooking())
-            .ToList();
-    }
-}
-
-internal static class RepositoryExtensions
-{
-    public static Booking ToBooking(this BookingRoot booking)
-    {
-        return new Booking
+        var bookings = await _bookingQueries.QueryAsync(Query.From<Booking>()
+            .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
+            .AndWhere<DateTime>(u => u.Start, ConditionOperator.GreaterThanEqualTo, from)
+            .AndWhere<DateTime>(u => u.End, ConditionOperator.LessThanEqualTo, to)
+            .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
+        if (!bookings.IsSuccessful)
         {
-            Id = booking.Id,
-            OrganisationId = booking.OrganizationId,
-            BorrowerId = booking.BorrowerId!,
-            CarId = booking.CarId!,
-            Start = booking.Start!.Value,
-            End = booking.End!.Value
-        };
+            return bookings.Error;
+        }
+
+        return bookings.Value.Results;
     }
 }

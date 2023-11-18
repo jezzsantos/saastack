@@ -15,6 +15,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
 using QueryAny;
 using Tools.Analyzers.Platform.Extensions;
+using Task = System.Threading.Tasks.Task;
 
 namespace Tools.Analyzers.Platform;
 
@@ -179,7 +180,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         var newMethod = GenerateMethod(
             new[] { SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword },
             nameof(IRehydratableObject.Rehydrate),
-            $"Domain.Common.AggregateRootFactory<{className}>",
+            $"Domain.Interfaces.AggregateRootFactory<{className}>",
             null,
             isDehydratable.IsDehydratable
                 ? $"return (identifier, container, properties) => new {className}(identifier, container, properties);"
@@ -232,7 +233,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         var newMethod = GenerateMethod(
             new[] { SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword },
             nameof(IRehydratableObject.Rehydrate),
-            $"Domain.Common.EntityFactory<{className}>",
+            $"Domain.Interfaces.EntityFactory<{className}>",
             null,
             $"return (identifier, container, properties) => new {className}(identifier, container, properties);");
         var modifiedClassDeclaration = classDeclarationSyntax.AddMembers(newMethod);
@@ -288,7 +289,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         var newMethod = GenerateMethod(
             new[] { SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword },
             nameof(IRehydratableObject.Rehydrate),
-            $"Domain.Common.ValueObjectFactory<{className}>",
+            $"Domain.Interfaces.ValueObjectFactory<{className}>",
             null,
             isSingleValueObject
                 ? $"return (property, container) =>\n{{\nvar parts = RehydrateToList(property, true);\nreturn new {className}(parts[0]);\n}};"
@@ -367,7 +368,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         var newMethod = GenerateMethod(
             new[] { SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword },
             nameof(IDehydratableEntity.Dehydrate),
-            "Dictionary<string, object?>",
+            "HydrationProperties",
             null,
             "var properties = base.Dehydrate();\nreturn properties;");
         var modifiedClassDeclaration = classDeclarationSyntax.AddMembers(newMethod);
@@ -389,7 +390,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         var newMethod = GenerateMethod(
             new[] { SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword },
             nameof(IDehydratableEntity.Dehydrate),
-            "Dictionary<string, object?>",
+            "HydrationProperties",
             null,
             "var properties = base.Dehydrate();\nproperties.Add(nameof(RootId), RootId);\nreturn properties;");
         var modifiedClassDeclaration = classDeclarationSyntax.AddMembers(newMethod);

@@ -1,3 +1,4 @@
+using Common;
 using QueryAny;
 
 namespace Domain.Interfaces.Entities;
@@ -7,9 +8,9 @@ namespace Domain.Interfaces.Entities;
 /// </summary>
 public interface IDehydratableEntity : IIdentifiableEntity, IQueryableEntity
 {
-    bool? IsDeleted { get; }
+    Optional<bool> IsDeleted { get; }
 
-    DateTime? LastPersistedAtUtc { get; }
+    Optional<DateTime> LastPersistedAtUtc { get; }
 
-    Dictionary<string, object?> Dehydrate();
+    HydrationProperties Dehydrate();
 }

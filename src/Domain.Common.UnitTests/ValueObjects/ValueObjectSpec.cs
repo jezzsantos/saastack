@@ -1,5 +1,6 @@
 using Common.Extensions;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using FluentAssertions;
 using Xunit;
 

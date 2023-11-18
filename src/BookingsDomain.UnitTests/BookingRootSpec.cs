@@ -29,10 +29,10 @@ public class BookingRootSpec
     [Fact]
     public void WhenCreate_ThenNotReserved()
     {
-        _booking.CarId.Should().BeNull();
-        _booking.BorrowerId.Should().BeNull();
-        _booking.Start.Should().BeNull();
-        _booking.End.Should().BeNull();
+        _booking.CarId.Should().BeNone();
+        _booking.BorrowerId.Should().BeNone();
+        _booking.Start.Should().BeNone();
+        _booking.End.Should().BeNone();
     }
 
     [Fact]
@@ -108,8 +108,18 @@ public class BookingRootSpec
     }
 
     [Fact]
+    public void WhenStartTripAndNoCar_ThenReturnsError()
+    {
+        var result = _booking.StartTrip(Location.Create("alocation").Value);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.BookingRoot_ReservationRequiresCar);
+    }
+
+    [Fact]
     public void WhenStartTrip_ThenAddsTrip()
     {
+        _booking.ChangeCar("acarid".ToId());
+
         var result = _booking.StartTrip(Location.Create("alocation").Value);
 
         result.Should().BeSuccess();

@@ -1,8 +1,9 @@
 ﻿using Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
-using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
+using Domain.Interfaces.ValueObjects;
 
 namespace Domain.Common.UnitTests.Entities;
 
@@ -20,7 +21,7 @@ public class TestAggregateRoot : AggregateRootBase
     {
     }
 
-    private TestAggregateRoot(IRecorder recorder, IIdentifierFactory idFactory, Identifier identifier)
+    private TestAggregateRoot(IRecorder recorder, IIdentifierFactory idFactory, ISingleValueObject<string> identifier)
         : base(recorder, idFactory, identifier)
     {
     }
@@ -73,7 +74,7 @@ public class TestAggregateRoot2 : AggregateRootBase
     {
     }
 
-    private TestAggregateRoot2(IRecorder recorder, IIdentifierFactory idFactory, Identifier identifier)
+    private TestAggregateRoot2(IRecorder recorder, IIdentifierFactory idFactory, ISingleValueObject<string> identifier)
         : base(recorder, idFactory, identifier)
     {
     }

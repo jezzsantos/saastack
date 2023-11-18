@@ -121,7 +121,7 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (context.IsExcludedInNamespace(AnalyzerConstants.PlatformNamespaces))
+        if (context.IsExcludedInNamespace(classDeclarationSyntax, AnalyzerConstants.PlatformNamespaces))
         {
             return;
         }

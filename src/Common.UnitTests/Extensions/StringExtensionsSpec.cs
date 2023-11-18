@@ -395,7 +395,23 @@ public class StringExtensionsSpec
         result.Should().Be(9);
     }
 
-    public class SerializableClass
+    [Fact]
+    public void WhenWithoutTrailingSlashWithSlash_ThenReturnsPathWithoutSlash()
+    {
+        var result = "apath/".WithoutTrailingSlash();
+
+        result.Should().Be("apath");
+    }
+
+    [Fact]
+    public void WhenWithoutTrailingSlashWithSlashes_ThenReturnsPathWithoutSlash()
+    {
+        var result = "apath///".WithoutTrailingSlash();
+
+        result.Should().Be("apath");
+    }
+
+    private class SerializableClass
     {
         public string? AProperty { get; set; }
     }

@@ -42,36 +42,36 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeType(SyntaxNodeAnalysisContext context)
     {
         var typeSyntax = context.Node;
-        if (typeSyntax is not MemberDeclarationSyntax typeDeclarationSyntax) //class, struct, interface, record
+        if (typeSyntax is not MemberDeclarationSyntax memberDeclarationSyntax) //class, struct, interface, record
         {
             return;
         }
 
-        if (!context.IsIncludedInNamespace(AnalyzerConstants.PlatformNamespaces))
+        if (!context.IsIncludedInNamespace(memberDeclarationSyntax, AnalyzerConstants.PlatformNamespaces))
         {
             return;
         }
 
-        if (typeDeclarationSyntax.IsNotPublicNorInternalInstanceType())
+        if (memberDeclarationSyntax.IsNotPublicNorInternalInstanceType())
         {
             return;
         }
 
-        if (typeDeclarationSyntax.IsNestedAndNotPublicType())
+        if (memberDeclarationSyntax.IsNestedAndNotPublicType())
         {
             return;
         }
 
-        var docs = typeDeclarationSyntax.GetDocumentationCommentTriviaSyntax();
+        var docs = memberDeclarationSyntax.GetDocumentationCommentTriviaSyntax();
         if (docs is null)
         {
-            context.ReportDiagnostic(Sas001, typeDeclarationSyntax);
+            context.ReportDiagnostic(Sas001, memberDeclarationSyntax);
             return;
         }
 
         if (!docs.IsLanguageForCSharp())
         {
-            context.ReportDiagnostic(Sas001, typeDeclarationSyntax);
+            context.ReportDiagnostic(Sas001, memberDeclarationSyntax);
             return;
         }
 
@@ -79,13 +79,13 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
         var summary = xmlContent.GetFirstXmlElement(SummaryXmlElementName);
         if (summary is null)
         {
-            context.ReportDiagnostic(Sas001, typeDeclarationSyntax);
+            context.ReportDiagnostic(Sas001, memberDeclarationSyntax);
             return;
         }
 
         if (summary.IsEmptyNode())
         {
-            context.ReportDiagnostic(Sas001, typeDeclarationSyntax);
+            context.ReportDiagnostic(Sas001, memberDeclarationSyntax);
         }
     }
 
@@ -97,7 +97,7 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (!context.IsIncludedInNamespace(AnalyzerConstants.PlatformNamespaces))
+        if (!context.IsIncludedInNamespace(methodDeclarationSyntax, AnalyzerConstants.PlatformNamespaces))
         {
             return;
         }

@@ -1,5 +1,6 @@
 using ApiHost1;
 using Infrastructure.Web.Hosting.Common;
+using Infrastructure.Web.Hosting.Common.Extensions;
 using JetBrains.Annotations;
 
 var modules = HostedModules.Get();

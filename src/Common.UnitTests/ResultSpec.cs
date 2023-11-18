@@ -14,7 +14,7 @@ public class ResultSpec
         [Fact]
         public void WhenConstructedWithNullScalarValue_ThenInitialized()
         {
-            var result = new Result<string, TestError>(null!);
+            var result = new Result<string, TestError>((string?)null!);
 
             result.IsSuccessful.Should().BeTrue();
         }
@@ -105,7 +105,7 @@ public class ResultSpec
         [Fact]
         public void WhenHasValueAndNotFaultedWithNull_ThenReturnsFalse()
         {
-            var result = new Result<string, TestError>(null!);
+            var result = new Result<string, TestError>((string)null!);
 
             var actual = result.HasValue;
 
@@ -135,7 +135,7 @@ public class ResultSpec
         [Fact]
         public void WhenExistsAndNotFaultedWithNull_ThenReturnsFalse()
         {
-            var result = new Result<string, TestError>(null!);
+            var result = new Result<string, TestError>((string)null!);
 
             var actual = result.Exists;
 
@@ -300,7 +300,7 @@ public class ResultSpec
             var match = result.Match(success =>
             {
                 successWasCalled = true;
-                passedValue = success;
+                passedValue = success.ValueOrDefault;
                 return true;
             }, fail =>
             {
@@ -312,7 +312,7 @@ public class ResultSpec
             match.Should().BeTrue();
             successWasCalled.Should().BeTrue();
             errorWasCalled.Should().BeFalse();
-            passedValue.Should().Be(Optional<string>.None);
+            passedValue.Should().BeNull();
         }
 
         [Fact]
@@ -326,7 +326,7 @@ public class ResultSpec
             var match = result.Match(success =>
             {
                 successWasCalled = true;
-                passedValue = success;
+                passedValue = success.ValueOrDefault;
                 return true;
             }, fail =>
             {
@@ -353,7 +353,7 @@ public class ResultSpec
             var match = result.Match(success =>
             {
                 successWasCalled = true;
-                passedValue = success;
+                passedValue = success.ValueOrDefault;
                 return false;
             }, fail =>
             {

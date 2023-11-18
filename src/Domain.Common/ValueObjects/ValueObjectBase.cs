@@ -9,7 +9,7 @@ namespace Domain.Common.ValueObjects;
 ///     Value objects are equal when their internal data is the same.
 ///     Value objects support being persisted
 /// </summary>
-public abstract partial class ValueObjectBase<TValueObject> : IValueObject, IPersistableValueObject
+public abstract partial class ValueObjectBase<TValueObject> : IValueObject
 {
     internal const string NullValue = "NULL";
 
@@ -132,12 +132,12 @@ public abstract partial class ValueObjectBase<TValueObject> : IValueObject, IPer
             return NullValue;
         }
 
-        if (value is IPersistableValueObject valueObject)
+        if (value is IDehydratableValueObject valueObject)
         {
             return valueObject.Dehydrate();
         }
 
-        if (value is IEnumerable<IPersistableValueObject> enumerable)
+        if (value is IEnumerable<IDehydratableValueObject> enumerable)
         {
             return enumerable
                 .Select(e => e.Exists()

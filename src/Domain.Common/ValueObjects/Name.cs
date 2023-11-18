@@ -1,5 +1,6 @@
 using Common;
 using Common.Extensions;
+using Domain.Interfaces;
 
 namespace Domain.Common.ValueObjects;
 

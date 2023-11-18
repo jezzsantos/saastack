@@ -10,6 +10,7 @@ using Microsoft.Extensions.Primitives;
 using Moq;
 using Xunit;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
+using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Web.Api.Common.UnitTests;
 

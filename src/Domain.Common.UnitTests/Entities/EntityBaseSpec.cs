@@ -5,6 +5,7 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using FluentAssertions;
 using Moq;
+using UnitTesting.Common;
 using UnitTesting.Common.Validation;
 using Xunit;
 
@@ -41,7 +42,7 @@ public class EntityBaseSpec
     {
         var now = DateTime.UtcNow;
 
-        _entity.LastPersistedAtUtc.Should().BeNull();
+        _entity.LastPersistedAtUtc.Should().BeNone();
         _entity.CreatedAtUtc.Should().BeNear(now);
         _entity.LastModifiedAtUtc.Should().Be(_entity.CreatedAtUtc);
     }

@@ -1,4 +1,5 @@
 using Common.Extensions;
+using Domain.Interfaces;
 using Domain.Interfaces.ValueObjects;
 
 namespace Domain.Common.ValueObjects;
@@ -13,6 +14,8 @@ public sealed class Identifier : SingleValueObjectBase<Identifier, string>
     private Identifier(string value) : base(value)
     {
     }
+
+    public string Text => Value;
 
     public static ValueObjectFactory<Identifier> Rehydrate()
     {

@@ -7,6 +7,7 @@ using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Interfaces.Operations.TestingOnly;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
+using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Web.Api.IntegrationTests;
 

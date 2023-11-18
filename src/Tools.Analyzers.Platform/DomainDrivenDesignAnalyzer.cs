@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
 using Common;
 using Common.Extensions;
-using Domain.Common;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
@@ -157,7 +156,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (context.IsExcludedInNamespace(AnalyzerConstants.PlatformNamespaces))
+        if (context.IsExcludedInNamespace(classDeclarationSyntax, AnalyzerConstants.PlatformNamespaces))
         {
             return;
         }
@@ -249,7 +248,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (context.IsExcludedInNamespace(AnalyzerConstants.PlatformNamespaces))
+        if (context.IsExcludedInNamespace(classDeclarationSyntax, AnalyzerConstants.PlatformNamespaces))
         {
             return;
         }
@@ -336,7 +335,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (context.IsExcludedInNamespace(AnalyzerConstants.PlatformNamespaces))
+        if (context.IsExcludedInNamespace(classDeclarationSyntax, AnalyzerConstants.PlatformNamespaces))
         {
             return;
         }
@@ -602,8 +601,7 @@ internal static class DomainDrivenDesignExtensions
     }
 
     private static INamedTypeSymbol[] GetAllowableDehydrateReturnType(SemanticModel semanticModel,
-        Compilation compilation,
-        ClassDeclarationSyntax classDeclarationSyntax)
+        Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax)
     {
         var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax);
         if (classSymbol is null)
@@ -611,10 +609,8 @@ internal static class DomainDrivenDesignExtensions
             return Array.Empty<INamedTypeSymbol>();
         }
 
-        var dictionaryType = compilation.GetTypeByMetadataName(typeof(Dictionary<,>).FullName!)!;
-        var objectDictionary = dictionaryType.Construct(compilation.GetSpecialType(SpecialType.System_String),
-            compilation.GetSpecialType(SpecialType.System_Object));
-        return new[] { objectDictionary };
+        var propertiesType = compilation.GetTypeByMetadataName(typeof(HydrationProperties).FullName!)!;
+        return new[] { propertiesType };
     }
 
     /// <summary>

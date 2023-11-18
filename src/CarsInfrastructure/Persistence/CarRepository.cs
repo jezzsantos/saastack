@@ -1,118 +1,62 @@
 using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
+using Application.Persistence.Interfaces;
 using CarsApplication.Persistence;
 using CarsApplication.Persistence.ReadModels;
 using CarsDomain;
 using Common;
-using Common.Extensions;
-using Domain.Common.Entities;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Infrastructure.Persistence.Common;
+using Infrastructure.Persistence.Interfaces;
+using QueryAny;
+using Task = Common.Extensions.Task;
 
 namespace CarsInfrastructure.Persistence;
 
-//TODO: stop using this in-memory repo and move to persistence layer
 public class CarRepository : ICarRepository
 {
-    private static readonly List<CarRoot> Cars = new();
+    private readonly ISnapshottingDddQueryStore<Car> _carQueries;
+    private readonly IEventingDddCommandStore<CarRoot> _cars;
+    private readonly ISnapshottingDddQueryStore<Unavailability> _unavailabilitiesQueries;
 
-    private static readonly List<Unavailability> Unavailabilities = new();
-
-    public async Task<Result<Error>> DestroyAllAsync()
+    public CarRepository(IRecorder recorder, IDomainFactory domainFactory,
+        IEventingDddCommandStore<CarRoot> carsStore, IDataStore store)
     {
-        await Task.CompletedTask;
-
-        Cars.Clear();
-        Unavailabilities.Clear();
-
-        return Result.Ok;
+        _carQueries = new SnapshottingDddQueryStore<Car>(recorder, domainFactory, store);
+        _cars = carsStore;
+        _unavailabilitiesQueries = new SnapshottingDddQueryStore<Unavailability>(recorder, domainFactory, store);
     }
 
-    public async Task<Result<Error>> DeleteCarAsync(Identifier organizationId, Identifier id,
-        CancellationToken cancellationToken)
+    public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
-
-        var car = Cars.Find(root => root.Id == id);
-        if (car.NotExists())
-        {
-            return Error.EntityNotFound();
-        }
-
-        Cars.Remove(car);
-
-        return Result.Ok;
+        return await Task.WhenAllAsync(
+            _carQueries.DestroyAllAsync(cancellationToken),
+            _cars.DestroyAllAsync(cancellationToken),
+            _unavailabilitiesQueries.DestroyAllAsync(cancellationToken));
     }
 
     public async Task<Result<CarRoot, Error>> LoadAsync(Identifier organizationId, Identifier id,
         CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
-
-        var car = Cars.Find(root => root.Id == id);
-        if (car.NotExists())
+        var car = await _cars.LoadAsync(id, cancellationToken);
+        if (!car.IsSuccessful)
         {
-            return Error.EntityNotFound();
+            return car.Error;
         }
 
-        return car;
+        return car.Value.OrganizationId != organizationId
+            ? Error.EntityNotFound()
+            : car;
     }
 
     public async Task<Result<CarRoot, Error>> SaveAsync(CarRoot car, bool reload, CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
+        await _cars.SaveAsync(car, cancellationToken);
 
-        var existing = Cars.Find(root => root.Id == car.Id);
-        if (existing.NotExists())
-        {
-            Cars.Add(car);
-            AddRemoveAvailabilities(car);
-            return car;
-        }
-
-        AddRemoveAvailabilities(car);
-        existing = car;
-        return existing;
-
-        static void AddRemoveAvailabilities(CarRoot car)
-        {
-            var events = car.GetChanges().Value;
-            foreach (var @event in events)
-            {
-                if (@event.EventType == nameof(CarsDomain.Events.Car.UnavailabilitySlotAdded))
-                {
-                    var domainEvent =
-                        (CarsDomain.Events.Car.UnavailabilitySlotAdded)@event.Data.FromEventJson(
-                            typeof(CarsDomain.Events.Car.UnavailabilitySlotAdded));
-                    var unavailability = Unavailabilities.Find(una => una.Id == domainEvent.UnavailabilityId);
-                    if (unavailability.NotExists())
-                    {
-                        Unavailabilities.Add(new Unavailability
-                        {
-                            Id = domainEvent.UnavailabilityId!,
-                            IsDeleted = null,
-                            LastPersistedAtUtc = DateTime.UtcNow,
-                            CarId = car.Id,
-                            CausedBy = domainEvent.CausedByReason,
-                            CausedByReference = domainEvent.CausedByReference,
-                            From = domainEvent.From,
-                            OrganisationId = domainEvent.OrganizationId,
-                            To = domainEvent.To
-                        });
-                    }
-                }
-
-                if (@event.EventType == nameof(CarsDomain.Events.Car.UnavailabilitySlotRemoved))
-                {
-                    var domainEvent =
-                        (CarsDomain.Events.Car.UnavailabilitySlotRemoved)@event.Data.FromEventJson(
-                            typeof(CarsDomain.Events.Car.UnavailabilitySlotRemoved));
-                    var unavailability = Unavailabilities.Find(una => una.Id == domainEvent.UnavailabilityId);
-                    if (unavailability.Exists())
-                    {
-                        Unavailabilities.Remove(unavailability);
-                    }
-                }
-            }
-        }
+        return reload
+            ? await LoadAsync(car.OrganizationId, car.Id, cancellationToken)
+            : car;
     }
 
     public async Task<Result<CarRoot, Error>> SaveAsync(CarRoot car, CancellationToken cancellationToken)
@@ -123,62 +67,62 @@ public class CarRepository : ICarRepository
     public async Task<Result<IReadOnlyList<Car>, Error>> SearchAllAvailableCarsAsync(Identifier organizationId,
         DateTime from, DateTime to, SearchOptions searchOptions, CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
+        var unavailabilities = await _unavailabilitiesQueries.QueryAsync(Query.From<Unavailability>()
+                .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
+                .AndWhere<DateTime>(u => u.From, ConditionOperator.LessThanEqualTo, from)
+                .AndWhere<DateTime>(u => u.To, ConditionOperator.GreaterThanEqualTo, to),
+            cancellationToken: cancellationToken);
+        if (!unavailabilities.IsSuccessful)
+        {
+            return unavailabilities.Error;
+        }
 
-        var unavailableCarIds = Unavailabilities
-            .FindAll(unavailability => unavailability.From >= from && unavailability.To <= to)
-            .Select(unavailability => unavailability.CarId)
-            .Distinct();
+        var limit = searchOptions.Limit;
+        var offset = searchOptions.Offset;
+        searchOptions.ClearLimitAndOffset();
 
-        var allCarsIds = Cars.Select(car => car.Id.ToString());
+        var cars = await _carQueries.QueryAsync(Query.From<Car>()
+            .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
+            .AndWhere<string>(c => c.Status, ConditionOperator.EqualTo, CarStatus.Registered.ToString())
+            .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
+        if (!cars.IsSuccessful)
+        {
+            return cars.Error;
+        }
 
-        return allCarsIds.Except(unavailableCarIds)
-            .Select(carId => Cars.First(car => car.Id == carId).ToCar())
+        return cars.Value.Results
+            .Where(car => unavailabilities.Value.Results.All(unavailability => unavailability.CarId != car.Id))
+            .Skip(offset)
+            .Take(limit)
             .ToList();
     }
 
     public async Task<Result<IReadOnlyList<Car>, Error>> SearchAllCarsAsync(Identifier organizationId,
         SearchOptions searchOptions, CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
+        var cars = await _carQueries.QueryAsync(Query.From<Car>()
+            .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
+            .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
+        if (!cars.IsSuccessful)
+        {
+            return cars.Error;
+        }
 
-        return Cars.Select(car => car.ToCar())
-            .ToList();
+        return cars.Value.Results;
     }
 
     public async Task<Result<IReadOnlyList<Unavailability>, Error>> SearchAllCarUnavailabilitiesAsync(
         Identifier organizationId, Identifier id, SearchOptions searchOptions, CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
-
-        return Unavailabilities
-            .Where(unavailability => unavailability.CarId == id)
-            .ToList();
-    }
-}
-
-internal static class RepositoryExtensions
-{
-    public static Car ToCar(this CarRoot car)
-    {
-        return new Car
+        var unavailabilities = await _unavailabilitiesQueries.QueryAsync(Query.From<Unavailability>()
+            .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
+            .AndWhere<string>(u => u.CarId, ConditionOperator.EqualTo, id)
+            .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
+        if (!unavailabilities.IsSuccessful)
         {
-            Id = car.Id,
-            OrganisationId = car.OrganizationId,
-            ManufactureMake = (car.Manufacturer.Exists()
-                ? car.Manufacturer.Make
-                : null)!,
-            ManufactureModel = (car.Manufacturer.Exists()
-                ? car.Manufacturer.Model
-                : null)!,
-            ManufactureYear = (car.Manufacturer.Exists()
-                ? car.Manufacturer.Year
-                : null)!,
-            LicenseJurisdiction = car.License!.Jurisdiction,
-            LicenseNumber = car.License.Number,
-            ManagerIds = car.Managers,
-            Status = car.Status.ToString(),
-            VehicleOwnerId = car.Owner?.OwnerId!
-        };
+            return unavailabilities.Error;
+        }
+
+        return unavailabilities.Value.Results;
     }
 }

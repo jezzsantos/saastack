@@ -5,6 +5,7 @@ using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Interfaces.Clients;
+using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Web.Api.Common.Clients;
 

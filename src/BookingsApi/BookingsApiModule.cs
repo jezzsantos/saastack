@@ -14,6 +14,8 @@ public class BookingsApiModule : ISubDomainModule
 {
     public Assembly ApiAssembly => typeof(Apis.Bookings.BookingsApi).Assembly;
 
+    public Assembly DomainAssembly => typeof(BookingRoot).Assembly;
+
     public Dictionary<Type, string> AggregatePrefixes => new()
     {
         { typeof(BookingRoot), "booking" }

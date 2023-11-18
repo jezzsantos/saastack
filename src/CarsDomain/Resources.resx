@@ -42,6 +42,9 @@
     <data name="CarRoot_NotOwned" xml:space="preserve">
         <value>The ownership of the car is not yet been defined</value>
     </data>
+    <data name="CarRoot_NotDeletedByOwner" xml:space="preserve">
+        <value>The car cannot be deleted by anyone but it owner</value>
+    </data>
     <data name="CarRoot_NotManufactured" xml:space="preserve">
         <value>The manufacturer details for the car have not yet been defined</value>
     </data>

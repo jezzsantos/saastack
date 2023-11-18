@@ -58,12 +58,12 @@ public static class Car
 
     public class OwnershipChanged : IDomainEvent
     {
-        public static OwnershipChanged Create(Identifier id, Identifier organisationId, VehicleOwner owner)
+        public static OwnershipChanged Create(Identifier id, Identifier organizationId, VehicleOwner owner)
         {
             return new OwnershipChanged
             {
                 RootId = id,
-                OrganisationId = organisationId,
+                OrganizationId = organizationId,
                 Owner = owner.OwnerId,
                 Managers = new List<string> { owner.OwnerId },
                 OccurredUtc = DateTime.UtcNow
@@ -72,7 +72,7 @@ public static class Car
 
         public required List<string> Managers { get; set; }
 
-        public required string OrganisationId { get; set; }
+        public required string OrganizationId { get; set; }
 
         public required string Owner { get; set; }
 
@@ -83,12 +83,12 @@ public static class Car
 
     public class RegistrationChanged : IDomainEvent
     {
-        public static RegistrationChanged Create(Identifier id, Identifier organisationId, LicensePlate plate)
+        public static RegistrationChanged Create(Identifier id, Identifier organizationId, LicensePlate plate)
         {
             return new RegistrationChanged
             {
                 RootId = id,
-                OrganisationId = organisationId,
+                OrganizationId = organizationId,
                 Jurisdiction = plate.Jurisdiction,
                 Number = plate.Number,
                 Status = CarStatus.Registered.ToString(),
@@ -100,7 +100,7 @@ public static class Car
 
         public required string Number { get; set; }
 
-        public required string OrganisationId { get; set; }
+        public required string OrganizationId { get; set; }
 
         public required string Status { get; set; }
 

@@ -18,7 +18,7 @@ public class CarsApiSpec : WebApiSpec<Program>
     public CarsApiSpec(WebApiSetup<Program> setup) : base(setup)
     {
         var repository = setup.GetRequiredService<ICarRepository>();
-        repository.DestroyAllAsync();
+        repository.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
 
     [Fact]

@@ -14,6 +14,7 @@ using Microsoft.CodeAnalysis.Testing;
 using NuGet.Frameworks;
 using QueryAny;
 using AnalyzerConstants = Analyzers::Tools.Analyzers.Platform.AnalyzerConstants;
+using Task = System.Threading.Tasks.Task;
 
 namespace Tools.Analyzers.Platform.UnitTests;
 

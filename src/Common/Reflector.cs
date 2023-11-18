@@ -31,7 +31,12 @@ public static class Reflector
 
     private static MemberInfo GetMemberInfo(LambdaExpression lambda)
     {
-        if (lambda.Body.NodeType == ExpressionType.Convert && lambda.Body.Type == typeof(object))
+        if (lambda.Body.NodeType == ExpressionType.MemberAccess)
+        {
+            return ((MemberExpression)lambda.Body).Member;
+        }
+
+        if (lambda.Body.NodeType == ExpressionType.Convert)
         {
             var expression = Expression.Lambda(((UnaryExpression)lambda.Body).Operand, lambda.Parameters);
             if (expression.NodeType == ExpressionType.Lambda)
@@ -40,11 +45,6 @@ public static class Reflector
             }
         }
 
-        if (lambda.Body.NodeType == ExpressionType.MemberAccess)
-        {
-            return ((MemberExpression)lambda.Body).Member;
-        }
-
-        throw new ArgumentException(Resources.Reflector_ErrorNotMemberAccess, nameof(lambda));
+        throw new ArgumentException(Resources.Reflector_ErrorNotMemberAccessOrConvertible, nameof(lambda));
     }
 }

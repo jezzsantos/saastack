@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="DomainFactory_EntityTypeNotFound" xml:space="preserve">
+      <value>No Entity Factory is registered in the DomainFactory for type '{0}'</value>
+    </data>
+    <data name="DomainFactory_AggregateTypeNotFound" xml:space="preserve">
+      <value>No Aggregate Factory is registered in the DomainFactory for type '{0}'</value>
+    </data>
+    <data name="DomainFactory_ValueObjectTypeNotFound" xml:space="preserve">
+      <value>No ValueObject Factory is registered in the DomainFactory for type '{0}'</value>
+    </data>
+    <data name="DomainFactory_FactoryMethodHasParameters" xml:space="preserve">
+      <value>Failed to register method: '{0}.{1}()' in DomainFactory. This method must be named '{2}' and declared with no parameters</value>
+    </data>
+    <data name="DomainFactory_EntityFactoryMethodNotFound" xml:space="preserve">
+      <value>Failed to register Entity: '{0}' in DomainFactory. This class must declare a factory method with signature 'public static PersistableEntityOrAggregateFactory&lt;{0}&gt; {1}()''</value>
+    </data>
+    <data name="DomainFactory_ValueObjectFactoryMethodNotFound" xml:space="preserve">
+      <value>Failed to register ValueObject: '{0}' in DomainFactory. This class must declare a factory method with signature 'public static ValueObjectFactory&lt;{0}&gt; {1}()''</value>
+    </data>
+    <data name="DomainFactory_AggregateRootFactoryMethodNotFound" xml:space="preserve">
+      <value>Failed to register AggregateRoot: '{0}' in DomainFactory. This class must declare a factory method with signature 'public static EventingAggregateRootFactory&lt;{0}&gt; {1}()''</value>
+    </data>
+</root>

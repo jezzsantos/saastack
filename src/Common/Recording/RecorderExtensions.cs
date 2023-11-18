@@ -8,7 +8,7 @@ public static class RecorderExtensions
     /// <summary>
     ///     Measure a metric
     /// </summary>
-    public static TReturn MeasureWith<TReturn>(this IRecorder recorder, ICallContext context, string eventName,
+    public static TReturn MeasureWith<TReturn>(this IRecorder recorder, ICallContext? context, string eventName,
         Func<Dictionary<string, object>, TReturn> action)
     {
         var additional = new Dictionary<string, object>();
@@ -25,7 +25,7 @@ public static class RecorderExtensions
     /// <summary>
     ///     Measure a metric and how long it took
     /// </summary>
-    public static TReturn MeasureWithDuration<TReturn>(this IRecorder recorder, ICallContext context, string eventName,
+    public static TReturn MeasureWithDuration<TReturn>(this IRecorder recorder, ICallContext? context, string eventName,
         Func<Dictionary<string, object>, TReturn> action)
     {
         var result = recorder.MeasureWith(context, eventName, additional =>

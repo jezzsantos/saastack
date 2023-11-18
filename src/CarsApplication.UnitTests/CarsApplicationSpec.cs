@@ -11,6 +11,7 @@ using FluentAssertions;
 using Moq;
 using UnitTesting.Common;
 using Xunit;
+using Task = System.Threading.Tasks.Task;
 
 namespace CarsApplication.UnitTests;
 
@@ -33,7 +34,7 @@ public class CarsApplicationSpec
             .Returns(true);
         _repository = new Mock<ICarRepository>();
         _repository.Setup(rep => rep.SaveAsync(It.IsAny<CarRoot>(), It.IsAny<CancellationToken>()))
-            .Returns((CarRoot car, CancellationToken _) => Task.FromResult(new Result<CarRoot, Error>(car)));
+            .Returns((CarRoot car, CancellationToken _) => Task.FromResult<Result<CarRoot, Error>>(car));
         _caller = new Mock<ICallerContext>();
         _caller.Setup(c => c.CallerId).Returns("acallerid");
         _application = new CarsApplication(_recorder.Object, _idFactory.Object,
@@ -45,15 +46,12 @@ public class CarsApplicationSpec
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(new Result<CarRoot, Error>(Error.EntityNotFound())));
+            .Returns(Task.FromResult<Result<CarRoot, Error>>(Error.EntityNotFound()));
 
         var result =
             await _application.DeleteCarAsync(_caller.Object, "anorganizationid", "anid", CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityNotFound);
-        _repository.Verify(
-            rep => rep.DeleteCarAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()),
-            Times.Never);
     }
 
     [Fact]
@@ -61,6 +59,7 @@ public class CarsApplicationSpec
     {
         var car = CarRoot.Create(_recorder.Object, _idFactory.Object,
             "anorganizationid".ToId());
+        car.Value.SetOwnership(VehicleOwner.Create("acallerid").Value);
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult(car));
@@ -68,9 +67,7 @@ public class CarsApplicationSpec
         var result =
             await _application.DeleteCarAsync(_caller.Object, "anorganizationid", "anid", CancellationToken.None);
 
-        result.Should().Be(Result.Ok);
-        _repository.Verify(rep =>
-            rep.DeleteCarAsync("anorganizationid".ToId(), "anid".ToId(), It.IsAny<CancellationToken>()));
+        result.Should().BeSuccess();
     }
 
     [Fact]
@@ -78,7 +75,7 @@ public class CarsApplicationSpec
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(new Result<CarRoot, Error>(Error.EntityNotFound())));
+            .Returns(Task.FromResult<Result<CarRoot, Error>>(Error.EntityNotFound()));
 
         var result =
             await _application.GetCarAsync(_caller.Object, "anorganizationid", "anid", CancellationToken.None);
@@ -112,7 +109,7 @@ public class CarsApplicationSpec
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(new Result<CarRoot, Error>(Error.EntityNotFound())));
+            .Returns(Task.FromResult<Result<CarRoot, Error>>(Error.EntityNotFound()));
 
         var result =
             await _application.ScheduleMaintenanceCarAsync(_caller.Object, "anorganizationid", "anid", DateTime.UtcNow,
@@ -167,15 +164,15 @@ public class CarsApplicationSpec
         _repository.Verify(rep => rep.SaveAsync(It.Is<CarRoot>(c =>
             c.Id == "anid"
             && c.OrganizationId == "anorganizationid"
-            && c.Manufacturer!.Make == Manufacturer.AllowedMakes[0]
-            && c.Manufacturer.Model == Manufacturer.AllowedModels[0]
-            && c.Manufacturer.Year == 2023
+            && c.Manufacturer.Value.Make == Manufacturer.AllowedMakes[0]
+            && c.Manufacturer.Value.Model == Manufacturer.AllowedModels[0]
+            && c.Manufacturer.Value.Year == 2023
             && c.Unavailabilities.Count == 0
-            && c.Owner!.OwnerId == "acallerid"
+            && c.Owner.Value.OwnerId == "acallerid"
             && c.Managers.Managers.Count == 1
             && c.Managers.Managers[0] == "acallerid"
-            && c.License!.Jurisdiction == Jurisdiction.AllowedCountries[0]
-            && c.License.Number == "aplate"
+            && c.License.Value.Jurisdiction == Jurisdiction.AllowedCountries[0]
+            && c.License.Value.Number == "aplate"
             && c.Status == CarStatus.Registered
         ), It.IsAny<CancellationToken>()));
     }
@@ -185,7 +182,7 @@ public class CarsApplicationSpec
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(new Result<CarRoot, Error>(Error.EntityNotFound())));
+            .Returns(Task.FromResult<Result<CarRoot, Error>>(Error.EntityNotFound()));
 
         var result =
             await _application.ReleaseCarAvailabilityAsync(_caller.Object, "anorganizationid", "anid", DateTime.UtcNow,
@@ -251,7 +248,7 @@ public class CarsApplicationSpec
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(new Result<CarRoot, Error>(Error.EntityNotFound())));
+            .Returns(Task.FromResult<Result<CarRoot, Error>>(Error.EntityNotFound()));
 
         var result =
             await _application.ReserveCarIfAvailableAsync(_caller.Object, "anorganizationid", "anid", DateTime.UtcNow,
@@ -319,23 +316,22 @@ public class CarsApplicationSpec
         _repository.Setup(rep =>
                 rep.SearchAllAvailableCarsAsync(It.IsAny<Identifier>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(),
                     It.IsAny<SearchOptions>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(new Result<IReadOnlyList<Car>, Error>(
-                (IReadOnlyList<Car>)new List<Car>
+            .Returns(Task.FromResult<Result<IReadOnlyList<Car>, Error>>(new List<Car>
+            {
+                new()
                 {
-                    new()
-                    {
-                        Id = "acarid",
-                        LicenseJurisdiction = "ajurisdiction",
-                        LicenseNumber = "aplate",
-                        ManagerIds = VehicleManagers.Create("amanagerid").Value,
-                        ManufactureMake = "amake",
-                        ManufactureModel = "amodel",
-                        ManufactureYear = 2023,
-                        OrganisationId = "anorganizationid",
-                        Status = "astatus",
-                        VehicleOwnerId = "anownerid"
-                    }
-                })));
+                    Id = "acarid",
+                    LicenseJurisdiction = "ajurisdiction",
+                    LicenseNumber = "aplate",
+                    ManagerIds = VehicleManagers.Create("amanagerid").Value,
+                    ManufactureMake = "amake",
+                    ManufactureModel = "amodel",
+                    ManufactureYear = 2023,
+                    OrganizationId = "anorganizationid",
+                    Status = "astatus",
+                    VehicleOwnerId = "anownerid"
+                }
+            }));
 
         var result =
             await _application.SearchAllAvailableCarsAsync(_caller.Object, "anorganizationid", DateTime.UtcNow,
@@ -360,23 +356,22 @@ public class CarsApplicationSpec
         _repository.Setup(rep =>
                 rep.SearchAllCarsAsync(It.IsAny<Identifier>(), It.IsAny<SearchOptions>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(new Result<IReadOnlyList<Car>, Error>(
-                (IReadOnlyList<Car>)new List<Car>
+            .Returns(Task.FromResult<Result<IReadOnlyList<Car>, Error>>(new List<Car>
+            {
+                new()
                 {
-                    new()
-                    {
-                        Id = "acarid",
-                        LicenseJurisdiction = "ajurisdiction",
-                        LicenseNumber = "aplate",
-                        ManagerIds = VehicleManagers.Create("amanagerid").Value,
-                        ManufactureMake = "amake",
-                        ManufactureModel = "amodel",
-                        ManufactureYear = 2023,
-                        OrganisationId = "anorganizationid",
-                        Status = "astatus",
-                        VehicleOwnerId = "anownerid"
-                    }
-                })));
+                    Id = "acarid",
+                    LicenseJurisdiction = "ajurisdiction",
+                    LicenseNumber = "aplate",
+                    ManagerIds = VehicleManagers.Create("amanagerid").Value,
+                    ManufactureMake = "amake",
+                    ManufactureModel = "amodel",
+                    ManufactureYear = 2023,
+                    OrganizationId = "anorganizationid",
+                    Status = "astatus",
+                    VehicleOwnerId = "anownerid"
+                }
+            }));
 
         var result =
             await _application.SearchAllCarsAsync(_caller.Object, "anorganizationid", new SearchOptions(),
@@ -400,7 +395,7 @@ public class CarsApplicationSpec
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(new Result<CarRoot, Error>(Error.EntityNotFound())));
+            .Returns(Task.FromResult<Result<CarRoot, Error>>(Error.EntityNotFound()));
 
         var result =
             await _application.TakeOfflineCarAsync(_caller.Object, "anorganizationid", "anid", null, null,

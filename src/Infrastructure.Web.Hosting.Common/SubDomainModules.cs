@@ -13,12 +13,15 @@ public class SubDomainModules
 {
     private readonly Dictionary<Type, string> _aggregatePrefixes = new();
     private readonly List<Assembly> _apiAssemblies = new();
+    private readonly List<Assembly> _domainAssemblies = new();
     private readonly List<Action<WebApplication>> _minimalApiRegistrationFunctions = new();
     private readonly List<Action<ConfigurationManager, IServiceCollection>> _serviceCollectionFunctions = new();
 
     public IDictionary<Type, string> AggregatePrefixes => _aggregatePrefixes;
 
     public IReadOnlyList<Assembly> ApiAssemblies => _apiAssemblies;
+
+    public IReadOnlyList<Assembly> DomainAssemblies => _domainAssemblies;
 
     public void ConfigureHost(WebApplication app)
     {
@@ -29,11 +32,13 @@ public class SubDomainModules
     {
         ArgumentNullException.ThrowIfNull(module);
         ArgumentNullException.ThrowIfNull(module.ApiAssembly, nameof(module.ApiAssembly));
+        ArgumentNullException.ThrowIfNull(module.DomainAssembly, nameof(module.DomainAssembly));
         ArgumentNullException.ThrowIfNull(module.ApiAssembly, nameof(module.AggregatePrefixes));
         ArgumentNullException.ThrowIfNull(module.MinimalApiRegistrationFunction,
             nameof(module.MinimalApiRegistrationFunction));
 
         _apiAssemblies.Add(module.ApiAssembly);
+        _domainAssemblies.Add(module.DomainAssembly);
         _aggregatePrefixes.Merge(module.AggregatePrefixes);
         _minimalApiRegistrationFunctions.Add(module.MinimalApiRegistrationFunction);
         if (module.RegisterServicesFunction is not null)

@@ -26,11 +26,11 @@
 2. All dependencies only point inward. i.e., The Domain Layer strictly has no dependency on the Application Layer, nor on the Infrastructure Layer. In contrast, the Infrastructure Layer and Application Layer can have dependencies on the Domain Layer (directly or indirectly).
 3. We want to avoid building [Transaction Scripts (and anemic domain models)](https://martinfowler.com/eaaCatalog/transactionScript.html) in the Application Layer, as that encourages tight coupling, and anemic domain models.
 4. Application interfaces/contracts will be composed of commands and queries (CQRS):
-      1. For "commands" it will delegate the command to one (or more) Root Aggregates (i.e., that results in a change of state).
-      2. For "queries" it will delegate the query directly to a read model in a Repository. In rare cases, the query may involve an Aggregate to check access rules.
+   1. For "commands" it will delegate the command to one (or more) Root Aggregates (i.e., that results in a change of state).
+   2. For "queries" it will delegate the query directly to a read model in a DataStore. In rare cases, the query may involve an Aggregate to check access rules.
 5. The Application Layer delegates all decisions (in a command or query) to an Aggregate. The only decisions that should exist in the Application Layer, are:
-      1. The statelessness of the contract. Stateless or Stateful. i.e., Where to pull data from (which ApplicationService/Repository) and where to push it (which ApplicationService/Repository) and when.
-      2. Which Aggregate use case to invoke, when.
+   1. The statelessness of the contract. Stateless or Stateful. i.e., Where to pull data from (which ApplicationService/Repository) and where to push it (which ApplicationService/Repository) and when.
+   2. Which Aggregate use case to invoke, when.
 6. The Application Layer is responsible for providing the Domain Layer with all the data it needs to execute the specific use case.
 7. The Application Layer is responsible for converting all data it obtains (either from Repository/ApplicationService, or from its contract parameters) into ValueObjects that the Domain Layer requires.
 8. The Application Layer will use the [Tell Don't Ask](https://martinfowler.com/bliki/TellDontAsk.html) pattern to instruct the Aggregate to execute the use case.
@@ -223,7 +223,7 @@ There are two supported persistence mechanisms:
 
 1. They will declare a `[EntityName("TableName")]` on their class declaration. This will be used to identify the storage container (i.e., the table name in a relational SQL database or the document/collection name in a NoSQL database) by the persistence layer.
 2. They will implement a private constructor that populates the in-memory state of the aggregate, which is called by the `AggregateRootFactory<TAggregateRoot> Rehydrate()` method.
-3. They will implement the `public override Dictionary<string, object?> Dehydrate()` method, and populate the dictionary with values of the internal state of the aggregate.
+3. They will implement the `public override HydrationProperties Dehydrate()` method, and populate the dictionary with values of the internal state of the aggregate.
 
 For example,
 
@@ -251,7 +251,7 @@ public sealed class BookingRoot : AggregateRootBase
     }
 
     // Note: this method is called by the runtime when the aggregate is saved to a persistence store
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         var properties = base.Dehydrate();
         properties.Add(nameof(Start), Start);
@@ -633,7 +633,7 @@ There are two supported persistence mechanisms:
 
 1. They will declare a `[EntityName("TableName")]` on their class declaration. This will be used to identify the storage container (i.e., the table name in a relational SQL database or the document/collection name in a NoSQL database) by the persistence layer.
 2. They will implement a private constructor that populates the in-memory state of the aggregate, which is called by the `public static EntityFactory<TEntity> Rehydrate()` method.
-3. They will implement the `public override Dictionary<string, object?> Dehydrate()` method, and populate the dictionary with values of the internal state of the entity.
+3. They will implement the `public override HydrationProperties Dehydrate()` method, and populate the dictionary with values of the internal state of the entity.
 
 For example,
 
@@ -662,7 +662,7 @@ public sealed class TripEntity : EntityBase
     }
 
     // Note: this method is called by the runtime when the entity is saved to a persistence store
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         var properties = base.Dehydrate();
         properties.Add(nameof(RootId), RootId);

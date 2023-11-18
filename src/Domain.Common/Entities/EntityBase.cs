@@ -2,8 +2,10 @@
 using Common;
 using Common.Extensions;
 using Domain.Common.Events;
+using Domain.Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
@@ -38,7 +40,7 @@ public abstract class EntityBase : IEntity, IEventSourcedEntity, IDehydratableEn
     ///     Should only be used by entity class factories.
     /// </summary>
     protected EntityBase(IRecorder recorder, IIdentifierFactory idFactory,
-        RootEventHandler eventHandler) : this(recorder, idFactory, Identifier.Empty())
+        RootEventHandler? eventHandler) : this(recorder, idFactory, Identifier.Empty())
     {
         SetRootEventHandler(eventHandler);
     }
@@ -48,13 +50,13 @@ public abstract class EntityBase : IEntity, IEventSourcedEntity, IDehydratableEn
     ///     <see cref="rehydratingProperties" />values.
     ///     Should be only used by a ctor used in Rehydration, when persisting in-memory state.
     /// </summary>
-    protected EntityBase(Identifier identifier, IDependencyContainer container,
-        IReadOnlyDictionary<string, object?> rehydratingProperties)
+    protected EntityBase(ISingleValueObject<string> identifier, IDependencyContainer container,
+        HydrationProperties rehydratingProperties)
         : this(container.Resolve<IRecorder>(), container.Resolve<IIdentifierFactory>(), identifier)
     {
-        Id = rehydratingProperties.GetValueOrDefault(nameof(Id), Identifier.Empty())!;
-        LastPersistedAtUtc = rehydratingProperties.GetValueOrDefault<DateTime?>(nameof(LastPersistedAtUtc));
-        IsDeleted = rehydratingProperties.GetValueOrDefault<bool?>(nameof(IsDeleted));
+        Id = rehydratingProperties.GetValueOrDefault(nameof(Id), Identifier.Empty());
+        LastPersistedAtUtc = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(LastPersistedAtUtc));
+        IsDeleted = rehydratingProperties.GetValueOrDefault<bool>(nameof(IsDeleted));
         CreatedAtUtc = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(CreatedAtUtc));
         LastModifiedAtUtc = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(LastModifiedAtUtc));
     }
@@ -66,12 +68,12 @@ public abstract class EntityBase : IEntity, IEventSourcedEntity, IDehydratableEn
     ///     when there is an error generating a new identifier from the
     ///     <see cref="idFactory" />
     /// </exception>
-    private EntityBase(IRecorder recorder, IIdentifierFactory idFactory, Identifier identifier)
+    private EntityBase(IRecorder recorder, IIdentifierFactory idFactory, ISingleValueObject<string> identifier)
     {
         Recorder = recorder;
         IdFactory = idFactory;
 
-        var isInstantiating = identifier == Identifier.Empty();
+        var isInstantiating = identifier.Value == string.Empty;
         if (isInstantiating)
         {
             var create = idFactory.Create(this);
@@ -84,12 +86,12 @@ public abstract class EntityBase : IEntity, IEventSourcedEntity, IDehydratableEn
         }
         else
         {
-            Id = identifier;
+            Id = Identifier.Create(identifier.Value);
         }
 
         var now = DateTime.UtcNow;
-        LastPersistedAtUtc = null;
-        IsDeleted = null;
+        LastPersistedAtUtc = Optional<DateTime>.None;
+        IsDeleted = Optional<bool>.None;
         CreatedAtUtc = isInstantiating
             ? now
             : DateTime.MinValue;
@@ -120,9 +122,9 @@ public abstract class EntityBase : IEntity, IEventSourcedEntity, IDehydratableEn
     /// <summary>
     ///     Dehydrates the entity to a set of persistable properties
     /// </summary>
-    public virtual Dictionary<string, object?> Dehydrate()
+    public virtual HydrationProperties Dehydrate()
     {
-        return new Dictionary<string, object?>
+        return new HydrationProperties
         {
             { nameof(Id), Id },
             { nameof(LastPersistedAtUtc), LastPersistedAtUtc },
@@ -132,9 +134,9 @@ public abstract class EntityBase : IEntity, IEventSourcedEntity, IDehydratableEn
         };
     }
 
-    public bool? IsDeleted { get; private protected set; }
+    public Optional<bool> IsDeleted { get; private protected set; }
 
-    public DateTime? LastPersistedAtUtc { get; }
+    public Optional<DateTime> LastPersistedAtUtc { get; }
 
     public DateTime CreatedAtUtc { get; }
 
@@ -203,7 +205,7 @@ public abstract class EntityBase : IEntity, IEventSourcedEntity, IDehydratableEn
     /// <summary>
     ///     Sets the handler to raise events to the parent/ancestor aggregate root
     /// </summary>
-    public void SetRootEventHandler(RootEventHandler eventHandler)
+    public void SetRootEventHandler(RootEventHandler? eventHandler)
     {
         _rootEventHandler = eventHandler;
     }

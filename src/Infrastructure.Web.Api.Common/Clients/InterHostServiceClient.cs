@@ -5,6 +5,7 @@ using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Interfaces.Clients;
 using Polly.Retry;
+using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Web.Api.Common.Clients;
 

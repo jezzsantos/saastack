@@ -222,4 +222,12 @@ public static class StringExtensions
                 : JsonIgnoreCondition.WhenWritingNull
         });
     }
+
+    /// <summary>
+    ///     Returns the specified <see cref="path" /> without any trailing slashes
+    /// </summary>
+    public static string WithoutTrailingSlash(this string path)
+    {
+        return path.TrimEnd('/');
+    }
 }

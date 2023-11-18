@@ -97,8 +97,8 @@ public abstract partial class ValueObjectBase<TValueObject> : IEqualityComparer,
                 continue;
             }
 
-            if (leftValue is IEnumerable<IPersistableValueObject> leftEnumerable
-                && rightValue is IEnumerable<IPersistableValueObject> rightEnumerable)
+            if (leftValue is IEnumerable<IDehydratableValueObject> leftEnumerable
+                && rightValue is IEnumerable<IDehydratableValueObject> rightEnumerable)
             {
                 if (!leftEnumerable.SequenceEqual(rightEnumerable))
                 {

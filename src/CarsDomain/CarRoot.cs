@@ -1,11 +1,12 @@
 ﻿using CarsDomain.Events;
 using Common;
 using Common.Extensions;
-using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
+using Domain.Interfaces.ValueObjects;
 
 namespace CarsDomain;
 
@@ -23,20 +24,20 @@ public sealed class CarRoot : AggregateRootBase
     {
     }
 
-    private CarRoot(IRecorder recorder, IIdentifierFactory idFactory, Identifier identifier) : base(recorder,
-        idFactory, identifier)
+    private CarRoot(IRecorder recorder, IIdentifierFactory idFactory, ISingleValueObject<string> identifier) : base(
+        recorder, idFactory, identifier)
     {
     }
 
-    public LicensePlate? License { get; private set; }
+    public Optional<LicensePlate> License { get; private set; }
 
     public VehicleManagers Managers { get; private set; } = VehicleManagers.Create();
 
-    public Manufacturer? Manufacturer { get; private set; }
+    public Optional<Manufacturer> Manufacturer { get; private set; }
 
     public Identifier OrganizationId { get; private set; } = Identifier.Empty();
 
-    public VehicleOwner? Owner { get; private set; }
+    public Optional<VehicleOwner> Owner { get; private set; }
 
     public CarStatus Status { get; private set; }
 
@@ -64,17 +65,17 @@ public sealed class CarRoot : AggregateRootBase
 
         if (Unavailabilities.Count > 0)
         {
-            if (Manufacturer.NotExists())
+            if (!Manufacturer.HasValue)
             {
                 return Error.RuleViolation(Resources.CarRoot_NotManufactured);
             }
 
-            if (Owner.NotExists())
+            if (!Owner.HasValue)
             {
                 return Error.RuleViolation(Resources.CarRoot_NotOwned);
             }
 
-            if (License.NotExists())
+            if (!License.HasValue)
             {
                 return Error.RuleViolation(Resources.CarRoot_NotRegistered);
             }
@@ -96,7 +97,7 @@ public sealed class CarRoot : AggregateRootBase
 
             case Car.ManufacturerChanged changed:
             {
-                var manufacturer = Manufacturer.Create(changed.Year, changed.Make, changed.Model);
+                var manufacturer = CarsDomain.Manufacturer.Create(changed.Year, changed.Make, changed.Model);
                 return manufacturer.Match(manu =>
                 {
                     Manufacturer = manu.Value;
@@ -178,6 +179,21 @@ public sealed class CarRoot : AggregateRootBase
     public Result<Error> ChangeRegistration(LicensePlate plate)
     {
         return RaiseChangeEvent(Car.RegistrationChanged.Create(Id, OrganizationId, plate));
+    }
+
+    public Result<Error> Delete(Identifier deleterId)
+    {
+        if (!Owner.HasValue)
+        {
+            return Error.RuleViolation(Resources.CarRoot_NotOwned);
+        }
+
+        if (deleterId != Owner.Value.OwnerId)
+        {
+            return Error.RuleViolation(Resources.CarRoot_NotDeletedByOwner);
+        }
+
+        return RaisePermanentDeleteEvent(deleterId);
     }
 
     public Result<Error> ReleaseUnavailability(TimeSlot slot)
@@ -289,7 +305,8 @@ public sealed class CarRoot : AggregateRootBase
             causedBy));
     }
 
-    public void TestingOnly_ResetDetails(Manufacturer? manufacturer, VehicleOwner? owner, LicensePlate? plate)
+    public void TestingOnly_ResetDetails(Optional<Manufacturer> manufacturer, Optional<VehicleOwner> owner,
+        Optional<LicensePlate> plate)
     {
         Manufacturer = manufacturer;
         Owner = owner;

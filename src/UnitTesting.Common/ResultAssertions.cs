@@ -107,7 +107,7 @@ public class ResultAssertions<TValue> : ObjectAssertions<Result<TValue, Error>, 
                 result => !result.IsSuccessful
                     ? result.Error.Code
                     : ErrorCode.NoError, result => !result.IsSuccessful
-                    ? result.Error.Message ?? "empty"
+                    ? result.Error.Message
                     : string.Empty);
 
         return new AndConstraint<ResultAssertions<TValue>>(this);

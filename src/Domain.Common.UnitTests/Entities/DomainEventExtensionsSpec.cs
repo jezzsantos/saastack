@@ -1,7 +1,8 @@
 using Common.Extensions;
-using Domain.Common.Entities;
+using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using FluentAssertions;
+using UnitTesting.Common;
 using Xunit;
 
 namespace Domain.Common.UnitTests.Entities;
@@ -64,7 +65,7 @@ public class DomainEventExtensionsSpec
         }.ToVersioned("anid".ToIdentifierFactory(), "anentitytype", 6).Value;
 
         result.Id.Should().Be("anid".ToId());
-        result.LastPersistedAtUtc.Should().BeNull();
+        result.LastPersistedAtUtc.Should().BeNone();
         result.Data.Should()
             .Be(
                 $"{{\"APropertyValue\":\"apropertyvalue\",\"RootId\":\"anid\",\"OccurredUtc\":\"{datum.ToIso8601()}\"}}");

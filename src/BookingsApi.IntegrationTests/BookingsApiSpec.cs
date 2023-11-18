@@ -9,6 +9,7 @@ using Infrastructure.Web.Api.Interfaces.Operations.Bookings;
 using Infrastructure.Web.Api.Interfaces.Operations.Cars;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
+using Task = System.Threading.Tasks.Task;
 
 namespace BookingsApi.IntegrationTests;
 
@@ -18,7 +19,7 @@ public class BookingsApiSpec : WebApiSpec<Program>
     public BookingsApiSpec(WebApiSetup<Program> setup) : base(setup)
     {
         var repository = setup.GetRequiredService<IBookingRepository>();
-        repository.DestroyAllAsync();
+        repository.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
 
     [Fact]

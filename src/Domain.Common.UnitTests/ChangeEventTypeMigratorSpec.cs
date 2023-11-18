@@ -1,6 +1,6 @@
 ﻿using Common;
 using Common.Extensions;
-using Domain.Common.Entities;
+using Domain.Common.Extensions;
 using Domain.Interfaces.Entities;
 using FluentAssertions;
 using UnitTesting.Common;

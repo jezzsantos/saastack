@@ -30,8 +30,8 @@ public class TripEntitySpec
         var result = _trip.Begin(Location.Create("alocation").Value);
 
         result.Should().BeSuccess();
-        _trip.BeganAt!.Value.Should().BeNear(DateTime.UtcNow);
-        _trip.From!.Name.Should().Be("alocation");
+        _trip.BeganAt.Value.Should().BeNear(DateTime.UtcNow);
+        _trip.From.Value.Name.Should().Be("alocation");
     }
 
     [Fact]
@@ -71,10 +71,10 @@ public class TripEntitySpec
         var result = _trip.End(Location.Create("anend").Value);
 
         result.Should().BeSuccess();
-        _trip.BeganAt!.Value.Should().BeNear(DateTime.UtcNow);
-        _trip.From!.Name.Should().Be("astart");
-        _trip.EndedAt!.Value.Should().BeNear(DateTime.UtcNow);
-        _trip.To!.Name.Should().Be("anend");
+        _trip.BeganAt.Value.Should().BeNear(DateTime.UtcNow);
+        _trip.From.Value.Name.Should().Be("astart");
+        _trip.EndedAt.Value.Should().BeNear(DateTime.UtcNow);
+        _trip.To.Value.Name.Should().Be("anend");
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class TripEntitySpec
     public void WhenEnsureInvariantsAndBeganWithNoLocation_ThenReturnsError()
     {
         _trip.Begin(Location.Create("alocation").Value);
-        _trip.TestingOnly_Assign(null, Location.Create("alocation").Value);
+        _trip.TestingOnly_Assign(Optional<Location>.None, Location.Create("alocation").Value);
 
         var result = _trip.EnsureInvariants();
 
@@ -104,7 +104,7 @@ public class TripEntitySpec
     {
         _trip.Begin(Location.Create("alocation").Value);
         _trip.End(Location.Create("alocation").Value);
-        _trip.TestingOnly_Assign(Location.Create("alocation").Value, null);
+        _trip.TestingOnly_Assign(Location.Create("alocation").Value, Optional<Location>.None);
 
         var result = _trip.EnsureInvariants();
 

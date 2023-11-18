@@ -1,19 +1,44 @@
+using Common.Extensions;
+
 namespace Common;
 
 /// <summary>
 ///     Defines a <see cref="Result" /> error, used for result return values
 /// </summary>
-public struct Error
+public readonly struct Error
 {
+    public const string NoErrorMessage = "unexplained";
+
+    public Error()
+    {
+        Code = ErrorCode.NoError;
+        Message = NoErrorMessage;
+    }
+
     private Error(ErrorCode code, string? message = null)
     {
         Code = code;
-        Message = message;
+        Message = message ?? NoErrorMessage;
     }
 
-    public string? Message { get; }
+    public string Message { get; }
 
-    public ErrorCode Code { get; } = ErrorCode.NoError;
+    public ErrorCode Code { get; }
+
+    /// <summary>
+    ///     Wraps the existing message within the specified message
+    /// </summary>
+    public Error Wrap(string message)
+    {
+        if (message.HasNoValue())
+        {
+            return new Error(Code, Message);
+        }
+
+        return new Error(Code, Message.HasValue() && Message != NoErrorMessage
+            ? $"{message}{Environment.NewLine}\t{Message}"
+            : message);
+    }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.NoError" /> error
@@ -98,6 +123,11 @@ public struct Error
     public static Error Unexpected(string? message = null)
     {
         return new Error(ErrorCode.Unexpected, message);
+    }
+
+    public override string ToString()
+    {
+        return $"{Code}: {Message}";
     }
 }
 

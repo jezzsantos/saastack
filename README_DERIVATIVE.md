@@ -8,9 +8,11 @@
 
 You will need the following development tools to build, run, and test this project:
 
-* Jetbrains Rider - obtain a license key for Jetbrains dotUltimate
-
+* Windows or MacOS.
+* Jetbrains Rider or Visual Studio (There is most support for JetBrains dotUltimate)
 * Install the .NET7.0 SDK. Available for [download here](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
+
+> We have ensured that do wont need any other infrastructure running on your local machine (i.e. SQLServer database), unless you want to run infrastructure specific integration tests.
 
 ------
 
@@ -33,62 +35,11 @@ Open a terminal and run: `dotnet dev-certs https --trust`
 
 You only need the tools below installed if you are going to run specific `Integration.Storage` tests, for the storage adapters you need to use in your codebase.
 
-* If using the `SqlServerRepository`, install `SQL Server 2019 Developer`. Available for [download here](https://go.microsoft.com/fwlink/?linkid=866662)
+* If using the `SqlServerDataStore`, install `SQL Server 2019 Developer`. Available for [download here](https://go.microsoft.com/fwlink/?linkid=866662)
 * If using the `RedisInMemRepository`, install `Redis Server` locally to run the tests. Available for [download here](https://redis.io/download)
-* If using the `EventStoreEventository`, install `EventStore` locally to run the tests. Install using the Chocolatey command: `choco install eventstore-oss`
+* If using the `EventStoreEventStore`, install `EventStore` locally to run the tests. Install using the Chocolatey command: `choco install eventstore-oss`
 
-> We normally run these storage integration tests in CI periodically.
-
-## Azure Local Environment
-
-### Azure Functions Host
-
-For security, and to ensure the Azure Functions can run when running locally, you need to create your own version of `local.settings.json`.
-
-1. In the `AzureFunctionsHost` project add a new file called `local.settings.json`
-2. Copy the following JSON:
-
-```json
-{
-   "IsEncrypted": false,
-   "Values": {
-      "DebugMode": true,
-      "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-      "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-      "APPINSIGHTS_INSTRUMENTATIONKEY": ""
-   }
-}
-```
-
-> DO NOT add this file to source control!
-
-### Azurite
-
-> You only need this step prior to running the `Integration.Storage` tests against Azure Storage (Queues, blobs, and tables)
-
-1. Open a Terminal.
-2. Navigate up to the `tools` directory
-   1. `cd ..`
-   2. `cd /tools`
-
-3. Run: `npm install`
-
-## AWS Local Environment
-
-### LocalStack
-
-> You only need this step prior to running the `Integration.Storage` tests against AWS Storage (SQS, S3, DynamoDB, and RDS)
-
-1. [Install python](https://www.python.org/downloads/)
-2. [Install Python package manager](https://pip.pypa.io/en/stable/installation/)
-3. [Install docker](https://docs.docker.com/get-docker/)
-4. Install localstack:
-   - `python -m pip install localstack` ([LocalStack CLI setup instructions](https://docs.localstack.cloud/getting-started/installation/#localstack-cli))
-5. Test it's working by running `localstack start` in your terminal
-
-> Docker will need to be running in the background for LocalStack to start up
-
-------
+> We would normally run these storage integration tests in CI periodically.
 
 # Branching Strategy
 
@@ -120,13 +71,13 @@ When pushed, all branches will be built and tested with GitHub actions
 
 2. Run these tests:
 
-In Rider, run all C# tests with Category= `Unit`, `Unit.Architecture` and `Integration.Web`
+In Rider, run all C# tests with Category= `Unit` and `Integration.Web`
 
 > Note: Use `Group By > Category` in Rider's unit test explorer to view these three categories easily.
 
 OR, in a terminal:
 
-- `dotnet test --filter:"Category=Unit|Category=Unit.Architecture" src\SaaStack.sln`
+- `dotnet test --filter:"Category=Unit" src\SaaStack.sln`
 
 - `dotnet test --filter Category=Integration.Web src\SaaStack.sln`
 
@@ -161,18 +112,22 @@ In production builds, we build and deploy the code in the `ReleaseForDeploy` bui
 
 > Note: In this build configuration certain testing stubs, certain testing endpoints and certain hardcoded testing values and functions are compiled out of the code (behind the `TESTINGONLY` conditional compilation variable). We absolutely need to do this because these specific testing code pieces should never exist in the production codebase, and may even expose security vulnerabilities and exposures we simply don't want in production.
 
-The various 3rd party *adapters* we need in production (eg `SendGridHttpServiceClient` and the `SqlServerRepository`)
-will be configured in the DI container (in `Program.cs` of the Api/WebHost project) to use code to talk to real 3rd party APIs, and will be configured with specific production settings in the `appsettings.json` file (overwritten by your CD server).
+The various 3rd party *adapters* we need in production (eg `SendGridHttpServiceClient` and the `SqlServerDataStore`)
+will be configured in the DI containers (of `Program.cs` of the Api/WebHost project, and modules of each subdomain) to use code to talk to real 3rd party APIs, and will be configured with specific production settings in the `appsettings.json` file (overwritten by your CD server).
 
 These are the real 3rd party public API adapters, which if used with production settings, locally or in testing, may incur financial service charges and/or corrupted customer data!
 
 > Note: This should never happen by accident, but read and follow the next 2 sections to avoid the possibility of this happening - there are several safeguards in place, that should make this impossible, without engineering that possibly intentionally.
 
-You will notice that in production we configure the current `IRepository` to be the `SqlServerRepository` .
+You will notice that in production build (`ReleaseForDeploy`) we have configured the code:
+
+* By injecting the `SqlServerDataStore` as the primary `IDataStore`.
+* By injecting various other dependencies according to the current value of the `$(HostingPlatform)` MS build property (e.g. `HOSTEDONAZURE`).
 
 ### Automated Integration Testing
 
-> On the CI server, integration testing is run in the `Release` build configuration, which permits the inclusion of `TESTINGONLY` code in the compilation necessary for integration testing. Integration testing on your local machine should be done in the `Debug` build configuration. The only difference between the two configurations is that there are some compiler optimizations configured in `Release`, which are closer to code in Production.
+> On the CI server, integration testing is run in the `Release` build configuration, which permits the inclusion of `TESTINGONLY` code in the compilation necessary for integration testing.
+> Integration testing on your local machine should be done in the `Debug` build configuration. The only difference between the two configurations is that there are some compiler optimizations configured in `Release`, which are closer to code in Production.
 
 In automated integration testing, (executed on both your local machine and on the CI build server) we run the APIs you are testing in their original production DI configuration defined in the `Program.cs` file (in the respective ApiHost project of the API code you are testing).
 
@@ -186,7 +141,7 @@ We run this API production DI code in-process in a Kestrel web server in the sam
 
 We then manipulate the DI container (seen in the `TestStartup.cs` of your integration testing project) and replace certain dependencies (e.g. the 3rd party adapters like: `INotificationsService,` etc) with their respective hardcoded Stubbed equivalents (found in the `Stubs` directory your integration testing project).
 
-You will notice that in integration testing we have switched out the currently configured `IRepository` for the `LocalMachineFileRepository`, so that you can do all your testing without a SQL database being available on your local machine.
+You will notice that in integration testing we have switched out the currently configured `IDataStore` for the `LocalMachineFileDataStore`, so that you can do all your testing without a SQL database being available on your local machine.
 
 > Note: These integration testing stubs will likely use no configuration settings from `appsettings.json` as their responses and behavior are hardcoded/canned in that test project.
 
@@ -204,9 +159,9 @@ In local testing, all external services (i.e. SendGrid, Unleash, etc.) should be
 
 There will be numerous statements in the code using `#if TESTINGONLY` to determine which concrete dependencies are actually used in `Debug` (or `Release`) configuration.
 
-You will notice that in local debugging we have switched out the currently configured `IRepository` for the `LocalMachineFileRepository`, so that you can do all your local debugging without a SQL database being available on your local machine.
+You will notice that in local debugging we have switched out the currently configured `IDataStore` for the `LocalMachineFileDataStore`, so that you can do all your local debugging without a SQL database being available on your local machine.
 
-The `LocalMachineFileRepository` is configured to place your files in `Environment.SpecialFolder.LocalApplicationData`, which resolves to `%appdata%` on Windows and `/home/<you>/.local/share` on MacOS.
+The `LocalMachineFileDataStore` is configured to place your files in `Environment.SpecialFolder.LocalApplicationData`, which resolves to `%appdata%` on Windows and `/home/<you>/.local/share` on MacOS.
 
 ---
 
@@ -251,11 +206,11 @@ Alternatively, in MacOS:
 
 ### Everyday tests
 
-In Rider, run all C# tests with Category= `Unit`, `Unit.Architecture` and `Integration.Web`
+In Rider, run all C# tests with Category= `Unit` and `Integration.Web`
 
 OR, in a terminal:
 
-- `dotnet test --filter:"Category=Unit|Category=Unit.Architecture" src\SaaStack.sln`
+- `dotnet test --filter:"Category=Unit" src\SaaStack.sln`
 
 - `dotnet test --filter Category=Integration.Web src\SaaStack.sln`
 

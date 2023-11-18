@@ -1,4 +1,5 @@
 using Application.Persistence.Interfaces;
+using Common;
 
 namespace Application.Persistence.Common;
 
@@ -7,9 +8,9 @@ namespace Application.Persistence.Common;
 /// </summary>
 public class ReadModelEntity : IReadModelEntity
 {
-    public required string Id { get; set; }
+    public Optional<string> Id { get; set; }
 
-    public bool? IsDeleted { get; set; }
+    public Optional<bool> IsDeleted { get; set; }
 
-    public DateTime? LastPersistedAtUtc { get; set; }
+    public Optional<DateTime> LastPersistedAtUtc { get; set; }
 }

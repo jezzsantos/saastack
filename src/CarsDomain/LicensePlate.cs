@@ -1,6 +1,6 @@
 ﻿using Common;
-using Domain.Common;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 
 namespace CarsDomain;
 

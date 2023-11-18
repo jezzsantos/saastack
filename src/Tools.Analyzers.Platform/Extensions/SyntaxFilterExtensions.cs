@@ -100,32 +100,30 @@ internal static class SyntaxFilterExtensions
         return true;
     }
 
-    public static bool IsExcludedInNamespace(this SyntaxNodeAnalysisContext context, string[] excludedNamespaces)
+    public static bool IsExcludedInNamespace(this SyntaxNodeAnalysisContext context,
+        MemberDeclarationSyntax memberDeclarationSyntax, string[] excludedNamespaces)
     {
-        var parentContext = context.ContainingSymbol;
-        if (parentContext is null)
+        var symbol = context.SemanticModel.GetDeclaredSymbol(memberDeclarationSyntax);
+        if (symbol is null)
         {
-            return true;
+            return false;
         }
 
-        var containingNamespace = parentContext.ContainingNamespace.ToDisplayString();
-        var excluded = excludedNamespaces.Contains(containingNamespace);
-
-        return excluded;
+        var memberNamespace = symbol.ContainingNamespace.ToDisplayString();
+        return excludedNamespaces.Any(ns => memberNamespace.StartsWith(ns));
     }
 
-    public static bool IsIncludedInNamespace(this SyntaxNodeAnalysisContext context, string[] includedNamespaces)
+    public static bool IsIncludedInNamespace(this SyntaxNodeAnalysisContext context,
+        MemberDeclarationSyntax memberDeclarationSyntax, string[] includedNamespaces)
     {
-        var parentContext = context.ContainingSymbol;
-        if (parentContext is null)
+        var symbol = context.SemanticModel.GetDeclaredSymbol(memberDeclarationSyntax);
+        if (symbol is null)
         {
-            return true;
+            return false;
         }
 
-        var containingNamespace = parentContext.ContainingNamespace.ToDisplayString();
-        var included = includedNamespaces.Contains(containingNamespace);
-
-        return included;
+        var memberNamespace = symbol.ContainingNamespace.ToDisplayString();
+        return includedNamespaces.Any(ns => memberNamespace.StartsWith(ns));
     }
 
     public static bool IsLanguageForCSharp(this SyntaxNode docs)

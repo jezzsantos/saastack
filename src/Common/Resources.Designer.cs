@@ -69,11 +69,11 @@ namespace Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Not a member access.
+        ///   Looks up a localized string similar to The expression is not a property expression or is not convertable.
         /// </summary>
-        internal static string Reflector_ErrorNotMemberAccess {
+        internal static string Reflector_ErrorNotMemberAccessOrConvertible {
             get {
-                return ResourceManager.GetString("Reflector_ErrorNotMemberAccess", resourceCulture);
+                return ResourceManager.GetString("Reflector_ErrorNotMemberAccessOrConvertible", resourceCulture);
             }
         }
         

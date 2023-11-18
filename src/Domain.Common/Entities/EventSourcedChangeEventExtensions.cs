@@ -14,6 +14,6 @@ public static class EventSourcedChangeEventExtensions
         IEventSourcedChangeEventMigrator migrator)
     {
         var metadata = EventMetadata.Create(changeEvent.Metadata);
-        return metadata.RehydrateEventFromJson(changeEvent.Id.Value, changeEvent.Data, migrator);
+        return metadata.RehydrateEventFromJson(changeEvent.Id, changeEvent.Data, migrator);
     }
 }

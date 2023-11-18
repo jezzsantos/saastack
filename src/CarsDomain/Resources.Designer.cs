@@ -60,6 +60,15 @@ namespace CarsDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The car cannot be deleted by anyone but it owner.
+        /// </summary>
+        internal static string CarRoot_NotDeletedByOwner {
+            get {
+                return ResourceManager.GetString("CarRoot_NotDeletedByOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The manufacturer details for the car have not yet been defined.
         /// </summary>
         internal static string CarRoot_NotManufactured {

@@ -1,7 +1,7 @@
 ﻿using Common;
 using Common.Extensions;
-using Domain.Common;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 
 namespace CarsDomain;
 

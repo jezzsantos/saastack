@@ -7,8 +7,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\CarsApplication\CarsApplication.csproj" />
-        <ProjectReference Include="..\CarsDomain\CarsDomain.csproj" />
-        <ProjectReference Include="..\Common\Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Common\Infrastructure.Persistence.Common.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,8 +1,10 @@
 ﻿using Common;
 using Common.Recording;
 using Domain.Common.Entities;
+using Domain.Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using FluentAssertions;
@@ -49,7 +51,7 @@ public class AggregateRootBaseSpec
     {
         var now = DateTime.UtcNow;
 
-        _aggregate.LastPersistedAtUtc.Should().BeNull();
+        _aggregate.LastPersistedAtUtc.Should().BeNone();
         _aggregate.CreatedAtUtc.Should().BeNear(now);
         _aggregate.LastModifiedAtUtc.Should().BeAfter(_aggregate.CreatedAtUtc);
     }
@@ -128,7 +130,7 @@ public class AggregateRootBaseSpec
     public void WhenRehydrateAndCreates_ThenReturnsInstance()
     {
         var result = TestAggregateRoot.Rehydrate()("anid".ToId(), _dependencyContainer.Object,
-            new Dictionary<string, object?>());
+            new HydrationProperties());
 
         result.Id.Should().Be("anid".ToId());
     }
@@ -144,10 +146,10 @@ public class AggregateRootBaseSpec
 
         var created =
             TestAggregateRoot.Rehydrate()("anid".ToId(), container.Object,
-                new Dictionary<string, object?>());
+                new HydrationProperties());
 
         created.GetChanges().Value.Should().BeEmpty();
-        created.LastPersistedAtUtc.Should().BeNull();
+        created.LastPersistedAtUtc.Should().BeNone();
         created.CreatedAtUtc.Should().Be(DateTime.MinValue);
         created.LastModifiedAtUtc.Should().Be(DateTime.MinValue);
     }
@@ -247,7 +249,7 @@ public class AggregateRootBaseSpec
     {
         _aggregate.ClearChanges();
 
-        _aggregate.LastPersistedAtUtc.Should().BeNear(DateTime.UtcNow);
+        _aggregate.LastPersistedAtUtc.Value.Should().BeNear(DateTime.UtcNow);
     }
 
     private static EventSourcedChangeEvent CreateEventEntity(string id, int version)

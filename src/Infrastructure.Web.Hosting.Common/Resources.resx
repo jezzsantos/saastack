@@ -36,4 +36,10 @@
     <data name="TracingOnlyRecorder_Started" xml:space="preserve">
         <value>Recorder is ready to record</value>
     </data>
+    <data name="WebApiHostSettings_WebHostBaseUrlMissing" xml:space="preserve">
+        <value>'{0}' cannot be found in appsettings.json for this host</value>
+    </data>
+    <data name="WebApiHostSettings_ApiHostBaseUrlMissing" xml:space="preserve">
+        <value>'{0}' cannot be found in appsettings.json for this host</value>
+    </data>
 </root>

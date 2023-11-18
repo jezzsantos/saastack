@@ -32,12 +32,14 @@ public class CarsApplication : ICarsApplication
             return car.Error;
         }
 
-        var deleted = await _repository.DeleteCarAsync(organizationId.ToId(), car.Value.Id, cancellationToken);
-        return deleted.Match(() =>
+        var deleted = car.Value.Delete(caller.ToCallerId());
+        if (!deleted.IsSuccessful)
         {
-            _recorder.TraceInformation(caller.ToCall(), "Car {Id} was deleted", car.Value.Id);
-            return Result.Ok;
-        }, error => error);
+            return deleted.Error;
+        }
+
+        _recorder.TraceInformation(caller.ToCall(), "Car {Id} was deleted", car.Value.Id);
+        return Result.Ok;
     }
 
     public async Task<Result<Car, Error>> GetCarAsync(ICallerContext caller, string organizationId, string id,
@@ -305,11 +307,11 @@ internal static class CarConversionExtensions
         return new Car
         {
             Id = car.Id,
-            Owner = car.Owner.ToOwner(),
+            Owner = car.Owner.ToOwner().ValueOrDefault,
             Managers = car.Managers.ToManagers(),
             Status = car.Status.ToString(),
-            Manufacturer = car.Manufacturer.ToManufacturer(),
-            Plate = car.License.ToLicensePlate()
+            Manufacturer = car.Manufacturer.ToManufacturer().ValueOrDefault,
+            Plate = car.License.ToLicensePlate().ValueOrDefault
         };
     }
 
@@ -342,32 +344,32 @@ internal static class CarConversionExtensions
             Id = unavailability.Id,
             CarId = unavailability.CarId,
             CausedByReason = unavailability.CausedBy.ToString(),
-            CausedByReference = unavailability.CausedByReference
+            CausedByReference = unavailability.CausedByReference.ValueOrDefault
         };
     }
 #endif
 
-    private static CarManufacturer? ToManufacturer(this Manufacturer? manufacturer)
+    private static Optional<CarManufacturer> ToManufacturer(this Optional<Manufacturer> manufacturer)
     {
-        return manufacturer.Exists()
+        return manufacturer.HasValue
             ? new CarManufacturer
             {
-                Year = manufacturer.Year,
-                Make = manufacturer.Make,
-                Model = manufacturer.Model
+                Year = manufacturer.Value.Year,
+                Make = manufacturer.Value.Make,
+                Model = manufacturer.Value.Model
             }
-            : null;
+            : Optional<CarManufacturer>.None;
     }
 
-    private static CarLicensePlate? ToLicensePlate(this LicensePlate? plate)
+    private static Optional<CarLicensePlate> ToLicensePlate(this Optional<LicensePlate> plate)
     {
-        return plate.Exists()
+        return plate.HasValue
             ? new CarLicensePlate
             {
-                Jurisdiction = plate.Jurisdiction,
-                Number = plate.Number
+                Jurisdiction = plate.Value.Jurisdiction,
+                Number = plate.Value.Number
             }
-            : null;
+            : Optional<CarLicensePlate>.None;
     }
 
     private static List<CarManager> ToManagers(this VehicleManagers managers)
@@ -377,10 +379,10 @@ internal static class CarConversionExtensions
             : new List<CarManager>();
     }
 
-    private static CarOwner? ToOwner(this VehicleOwner? owner)
+    private static Optional<CarOwner> ToOwner(this Optional<VehicleOwner> owner)
     {
-        return owner.Exists()
-            ? new CarOwner { Id = owner }
-            : null;
+        return owner.HasValue
+            ? new CarOwner { Id = owner.Value.OwnerId }
+            : Optional<CarOwner>.None;
     }
 }

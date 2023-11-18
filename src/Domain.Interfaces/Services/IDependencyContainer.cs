@@ -5,5 +5,6 @@ namespace Domain.Interfaces.Services;
 /// </summary>
 public interface IDependencyContainer
 {
-    TService Resolve<TService>();
+    TService Resolve<TService>()
+        where TService : notnull;
 }

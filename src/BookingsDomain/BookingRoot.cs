@@ -1,12 +1,14 @@
 ﻿using BookingsDomain.Events;
 using Common;
 using Common.Extensions;
-using Domain.Common;
 using Domain.Common.Entities;
+using Domain.Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 using QueryAny;
 
 namespace BookingsDomain;
@@ -26,32 +28,32 @@ public sealed class BookingRoot : AggregateRootBase
     {
     }
 
-    private BookingRoot(Identifier identifier, IDependencyContainer container,
-        IReadOnlyDictionary<string, object?> rehydratingProperties) : base(
+    private BookingRoot(ISingleValueObject<string> identifier, IDependencyContainer container,
+        HydrationProperties rehydratingProperties) : base(
         identifier, container, rehydratingProperties)
     {
         Start = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(Start));
         End = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(End));
         CarId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(CarId));
         BorrowerId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(BorrowerId));
-        OrganizationId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(OrganizationId))!;
+        OrganizationId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(OrganizationId));
     }
 
-    public Identifier? BorrowerId { get; private set; }
+    public Optional<Identifier> BorrowerId { get; private set; }
 
-    private bool CanBeCancelled => Start > DateTime.UtcNow;
+    private bool CanBeCancelled => Start.HasValue && Start.Value > DateTime.UtcNow;
 
-    public Identifier? CarId { get; private set; }
+    public Optional<Identifier> CarId { get; private set; }
 
-    public DateTime? End { get; private set; }
+    public Optional<DateTime> End { get; private set; }
 
     public Identifier OrganizationId { get; private set; } = Identifier.Empty();
 
-    public DateTime? Start { get; private set; }
+    public Optional<DateTime> Start { get; private set; }
 
     public Trips Trips { get; } = new();
 
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         var properties = base.Dehydrate();
         properties.Add(nameof(Start), Start);
@@ -77,7 +79,7 @@ public sealed class BookingRoot : AggregateRootBase
 
         if (BorrowerId.Exists())
         {
-            if (CarId.NotExists())
+            if (!CarId.HasValue)
             {
                 return Error.RuleViolation(Resources.BookingRoot_ReservationRequiresCar);
             }
@@ -160,7 +162,7 @@ public sealed class BookingRoot : AggregateRootBase
 
     public Result<Error> MakeReservation(Identifier borrowerId, DateTime start, DateTime end)
     {
-        if (CarId.NotExists())
+        if (!CarId.HasValue)
         {
             return Error.RuleViolation(Resources.BookingRoot_ReservationRequiresCar);
         }
@@ -187,6 +189,11 @@ public sealed class BookingRoot : AggregateRootBase
 
     public Result<Error> StartTrip(Location from)
     {
+        if (!CarId.HasValue)
+        {
+            return Error.RuleViolation(Resources.BookingRoot_ReservationRequiresCar);
+        }
+
         var added = RaiseChangeEvent(Booking.TripAdded.Create(Id, OrganizationId));
         if (!added.IsSuccessful)
         {

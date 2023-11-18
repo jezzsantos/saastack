@@ -24,8 +24,8 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="Reflector_ErrorNotMemberAccess" xml:space="preserve">
-      <value>Not a member access</value>
+    <data name="Reflector_ErrorNotMemberAccessOrConvertible" xml:space="preserve">
+      <value>The expression is not a property expression or is not convertable</value>
     </data>
     <data name="Reflector_ErrorNotProperty" xml:space="preserve">
       <value>Member is not a property</value>

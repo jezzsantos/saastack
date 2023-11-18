@@ -22,14 +22,34 @@ public class SubDomainModulesSpec
     [Fact]
     public void WhenRegisterAndNullApiAssembly_ThenThrows()
     {
-        _modules.Invoking(x => x.Register(new TestModule { ApiAssembly = null! }))
+        _modules.Invoking(x => x.Register(new TestModule
+            {
+                ApiAssembly = null!,
+                DomainAssembly = typeof(SubDomainModulesSpec).Assembly
+            }))
+            .Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void WhenRegisterAndNullDomainAssembly_ThenThrows()
+    {
+        _modules.Invoking(x => x.Register(new TestModule
+            {
+                ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
+                DomainAssembly = null!
+            }))
             .Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
     public void WhenRegisterAndNullAggregatePrefixes_ThenThrows()
     {
-        _modules.Invoking(x => x.Register(new TestModule { AggregatePrefixes = null! }))
+        _modules.Invoking(x => x.Register(new TestModule
+            {
+                AggregatePrefixes = null!,
+                ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
+                DomainAssembly = typeof(SubDomainModulesSpec).Assembly
+            }))
             .Should().Throw<ArgumentNullException>();
     }
 
@@ -37,7 +57,12 @@ public class SubDomainModulesSpec
     public void WhenRegisterAndNullMinimalApiRegistrationFunction_ThenThrows()
     {
         _modules.Invoking(x => x.Register(new TestModule
-                { ApiAssembly = typeof(SubDomainModulesSpec).Assembly, RegisterServicesFunction = (_, _) => { } }))
+            {
+                AggregatePrefixes = new Dictionary<Type, string>(),
+                ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
+                DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
+                RegisterServicesFunction = (_, _) => { }
+            }))
             .Should().Throw<ArgumentNullException>();
     }
 
@@ -46,8 +71,10 @@ public class SubDomainModulesSpec
     {
         _modules.Register(new TestModule
         {
-            ApiAssembly = typeof(SubDomainModulesSpec).Assembly, MinimalApiRegistrationFunction = _ => { },
             AggregatePrefixes = new Dictionary<Type, string>(),
+            ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
+            DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
+            MinimalApiRegistrationFunction = _ => { },
             RegisterServicesFunction = null!
         });
 
@@ -72,6 +99,7 @@ public class SubDomainModulesSpec
         _modules.Register(new TestModule
         {
             ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
+            DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
             AggregatePrefixes = new Dictionary<Type, string>(),
             MinimalApiRegistrationFunction = _ => { },
             RegisterServicesFunction = (_, _) => { wasCalled = true; }
@@ -98,6 +126,7 @@ public class SubDomainModulesSpec
         _modules.Register(new TestModule
         {
             ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
+            DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
             AggregatePrefixes = new Dictionary<Type, string>(),
             MinimalApiRegistrationFunction = _ => { wasCalled = true; },
             RegisterServicesFunction = (_, _) => { }
@@ -112,6 +141,8 @@ public class SubDomainModulesSpec
 public class TestModule : ISubDomainModule
 {
     public Assembly ApiAssembly { get; init; } = null!;
+
+    public Assembly DomainAssembly { get; init; } = null!;
 
     public Dictionary<Type, string> AggregatePrefixes { get; init; } = null!;
 

@@ -9,6 +9,8 @@ public class TestingOnlyApiModule : ISubDomainModule
 {
     public Assembly ApiAssembly => typeof(TestingWebApi).Assembly;
 
+    public Assembly DomainAssembly => typeof(TestingWebApi).Assembly;
+
     public Dictionary<Type, string> AggregatePrefixes => new();
 
     public Action<WebApplication> MinimalApiRegistrationFunction

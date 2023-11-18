@@ -1524,61 +1524,61 @@ public class TestSearchResponse : IWebSearchResponse
     public SearchResultMetadata? Metadata { get; set; }
 }
 
-[UsedImplicitlyAttribute]
+[UsedImplicitly]
 public class TestNoneRequest : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource", ServiceOperation.Search)]
-[UsedImplicitlyAttribute]
+[UsedImplicitly]
 public class TestSearchRequest : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource", ServiceOperation.Post)]
-[UsedImplicitlyAttribute]
+[UsedImplicitly]
 public class TestPostRequest : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource", ServiceOperation.Get)]
-[UsedImplicitlyAttribute]
+[UsedImplicitly]
 public class TestGetRequest : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource/1", ServiceOperation.Get)]
-[UsedImplicitlyAttribute]
+[UsedImplicitly]
 public class TestGetRequest1 : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource/2", ServiceOperation.Get)]
-[UsedImplicitlyAttribute]
+[UsedImplicitly]
 public class TestGetRequest2 : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource/3", ServiceOperation.Get)]
-[UsedImplicitlyAttribute]
+[UsedImplicitly]
 public class TestGetRequest3 : IWebRequest<TestResponse>
 {
 }
 
 [Route("/anotherresource/1", ServiceOperation.Get)]
-[UsedImplicitlyAttribute]
+[UsedImplicitly]
 public class TestGetRequest4 : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource", ServiceOperation.PutPatch)]
-[UsedImplicitlyAttribute]
+[UsedImplicitly]
 public class TestPutPatchRequest : IWebRequest<TestResponse>
 {
 }
 
 [Route("/aresource", ServiceOperation.Delete)]
-[UsedImplicitlyAttribute]
+[UsedImplicitly]
 public class TestDeleteRequest : IWebRequest<TestResponse>
 {
 }

@@ -28,8 +28,10 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
 public class AClass : AggregateRootBase
 {
@@ -37,7 +39,7 @@ public class AClass : AggregateRootBase
     {
     }
 
-    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -77,8 +79,10 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
 public class AClass : AggregateRootBase
 {
@@ -92,7 +96,7 @@ public class AClass : AggregateRootBase
     {
     }
 
-    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -127,7 +131,7 @@ public class Created : IDomainEvent
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas030,
-                    problem, fix, 12, 14, "AClass");
+                    problem, fix, 14, 14, "AClass");
             }
         }
 
@@ -145,8 +149,10 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
@@ -156,7 +162,7 @@ public class AClass : AggregateRootBase
     {
     }
 
-    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -172,7 +178,7 @@ public class AClass : AggregateRootBase
         return root;
     }
 
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         return base.Dehydrate();
     }
@@ -191,8 +197,10 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
@@ -202,7 +210,7 @@ public class AClass : AggregateRootBase
     {
     }
 
-    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -218,12 +226,12 @@ public class AClass : AggregateRootBase
         return root;
     }
 
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         return base.Dehydrate();
     }
 
-    public static Domain.Common.AggregateRootFactory<AClass> Rehydrate()
+    public static Domain.Interfaces.AggregateRootFactory<AClass> Rehydrate()
     {
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
@@ -237,7 +245,7 @@ public class CreateEvent : IDomainEvent
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas034,
-                    problem, fix, 14, 14, "AClass");
+                    problem, fix, 16, 14, "AClass");
             }
 
             [Fact]
@@ -251,6 +259,7 @@ using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
+using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
 public class AClass : AggregateRootBase
 {
@@ -258,7 +267,7 @@ public class AClass : AggregateRootBase
     {
     }
 
-    private AClass(IRecorder recorder, IIdentifierFactory idFactory, Identifier identifier) : base(recorder, idFactory, identifier)
+    private AClass(IRecorder recorder, IIdentifierFactory idFactory, ISingleValueObject<string> identifier) : base(recorder, idFactory, identifier)
     {
     }
 
@@ -288,6 +297,7 @@ using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
+using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
 public class AClass : AggregateRootBase
 {
@@ -295,7 +305,7 @@ public class AClass : AggregateRootBase
     {
     }
 
-    private AClass(IRecorder recorder, IIdentifierFactory idFactory, Identifier identifier) : base(recorder, idFactory, identifier)
+    private AClass(IRecorder recorder, IIdentifierFactory idFactory, ISingleValueObject<string> identifier) : base(recorder, idFactory, identifier)
     {
     }
 
@@ -311,7 +321,7 @@ public class AClass : AggregateRootBase
         return root;
     }
 
-    public static Domain.Common.AggregateRootFactory<AClass> Rehydrate()
+    public static Domain.Interfaces.AggregateRootFactory<AClass> Rehydrate()
     {
         return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(), container.Resolve<IIdentifierFactory>(), identifier);
     }
@@ -325,7 +335,7 @@ public class CreateEvent : IDomainEvent
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas034,
-                    problem, fix, 10, 14, "AClass");
+                    problem, fix, 11, 14, "AClass");
             }
         }
 
@@ -343,8 +353,10 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
@@ -354,7 +366,7 @@ public class AClass : AggregateRootBase
     {
     }
 
-    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -389,8 +401,10 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
@@ -400,7 +414,7 @@ public class AClass : AggregateRootBase
     {
     }
 
-    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -421,7 +435,7 @@ public class AClass : AggregateRootBase
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         var properties = base.Dehydrate();
         return properties;
@@ -436,7 +450,7 @@ public class CreateEvent : IDomainEvent
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas035,
-                    problem, fix, 14, 14, "AClass");
+                    problem, fix, 16, 14, "AClass");
             }
         }
 
@@ -454,8 +468,10 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 public class AClass : AggregateRootBase
@@ -464,7 +480,7 @@ public class AClass : AggregateRootBase
     {
     }
 
-    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -485,7 +501,7 @@ public class AClass : AggregateRootBase
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         var properties = base.Dehydrate();
         return properties;
@@ -505,8 +521,10 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 
@@ -517,7 +535,7 @@ public class AClass : AggregateRootBase
     {
     }
 
-    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -538,7 +556,7 @@ public class AClass : AggregateRootBase
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         var properties = base.Dehydrate();
         return properties;
@@ -553,7 +571,7 @@ public class CreateEvent : IDomainEvent
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas036,
-                    problem, fix, 13, 14, "AClass");
+                    problem, fix, 15, 14, "AClass");
             }
         }
     }
@@ -575,8 +593,10 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
 public class AClass : EntityBase
 {
@@ -584,7 +604,7 @@ public class AClass : EntityBase
     {
     }
 
-    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -593,7 +613,7 @@ public class AClass : EntityBase
         return Result.Ok;
     }
 
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         return base.Dehydrate();
     }
@@ -606,8 +626,10 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
 public class AClass : EntityBase
 {
@@ -619,7 +641,7 @@ public class AClass : EntityBase
     {
     }
 
-    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -628,7 +650,7 @@ public class AClass : EntityBase
         return Result.Ok;
     }
 
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         return base.Dehydrate();
     }
@@ -636,7 +658,7 @@ public class AClass : EntityBase
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas040,
-                    problem, fix, 12, 14, "AClass");
+                    problem, fix, 14, 14, "AClass");
             }
         }
 
@@ -654,8 +676,10 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
@@ -665,7 +689,7 @@ public class AClass : EntityBase
     {
     }
 
-    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -679,7 +703,7 @@ public class AClass : EntityBase
         return new AClass(recorder, idFactory, rootEventHandler);
     }
 
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         return base.Dehydrate();
     }
@@ -692,8 +716,10 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
@@ -703,7 +729,7 @@ public class AClass : EntityBase
     {
     }
 
-    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -717,12 +743,12 @@ public class AClass : EntityBase
         return new AClass(recorder, idFactory, rootEventHandler);
     }
 
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         return base.Dehydrate();
     }
 
-    public static Domain.Common.EntityFactory<AClass> Rehydrate()
+    public static Domain.Interfaces.EntityFactory<AClass> Rehydrate()
     {
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
@@ -730,7 +756,7 @@ public class AClass : EntityBase
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas043,
-                    problem, fix, 14, 14, "AClass");
+                    problem, fix, 16, 14, "AClass");
             }
         }
 
@@ -748,8 +774,10 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 public class AClass : EntityBase
@@ -758,7 +786,7 @@ public class AClass : EntityBase
     {
     }
 
-    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -772,12 +800,12 @@ public class AClass : EntityBase
         return new AClass(recorder, idFactory, rootEventHandler);
     }
 
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         return base.Dehydrate();
     }
 
-    public static Domain.Common.EntityFactory<AClass> Rehydrate()
+    public static EntityFactory<AClass> Rehydrate()
     {
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
@@ -790,8 +818,10 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 
@@ -802,7 +832,7 @@ public class AClass : EntityBase
     {
     }
 
-    private AClass(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
     }
 
@@ -816,12 +846,12 @@ public class AClass : EntityBase
         return new AClass(recorder, idFactory, rootEventHandler);
     }
 
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         return base.Dehydrate();
     }
 
-    public static Domain.Common.EntityFactory<AClass> Rehydrate()
+    public static EntityFactory<AClass> Rehydrate()
     {
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
@@ -829,7 +859,7 @@ public class AClass : EntityBase
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas045,
-                    problem, fix, 13, 14, "AClass");
+                    problem, fix, 15, 14, "AClass");
             }
         }
     }
@@ -852,6 +882,7 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
@@ -864,7 +895,7 @@ public class AClass : SingleValueObjectBase<AClass, string>
 
     public string AProperty { get;}
 
-    public static Domain.Common.ValueObjectFactory<AClass> Rehydrate()
+    public static ValueObjectFactory<AClass> Rehydrate()
     {
         return (property, container) =>
         {
@@ -882,6 +913,7 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
@@ -903,7 +935,7 @@ public class AClass : SingleValueObjectBase<AClass, string>
 
     public string AProperty { get;}
 
-    public static Domain.Common.ValueObjectFactory<AClass> Rehydrate()
+    public static ValueObjectFactory<AClass> Rehydrate()
     {
         return (property, container) =>
         {
@@ -915,7 +947,7 @@ public class AClass : SingleValueObjectBase<AClass, string>
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas050,
-                    problem, fix, 13, 14, "AClass");
+                    problem, fix, 14, 14, "AClass");
             }
 
             [Fact]
@@ -930,6 +962,7 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
@@ -942,7 +975,7 @@ public class AClass : ValueObjectBase<AClass>
 
     public string AProperty { get;}
 
-    public static Domain.Common.ValueObjectFactory<AClass> Rehydrate()
+    public static ValueObjectFactory<AClass> Rehydrate()
     {
         return (property, container) =>
         {
@@ -960,6 +993,7 @@ using Domain.Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
@@ -985,7 +1019,7 @@ public class AClass : ValueObjectBase<AClass>
 
     public string AProperty { get;}
 
-    public static Domain.Common.ValueObjectFactory<AClass> Rehydrate()
+    public static ValueObjectFactory<AClass> Rehydrate()
     {
         return (property, container) =>
         {
@@ -997,7 +1031,7 @@ public class AClass : ValueObjectBase<AClass>
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas050,
-                    problem, fix, 13, 14, "AClass");
+                    problem, fix, 14, 14, "AClass");
             }
         }
 
@@ -1057,7 +1091,7 @@ public class AClass : SingleValueObjectBase<AClass, string>
 
     public string AProperty { get;}
 
-    public static Domain.Common.ValueObjectFactory<AClass> Rehydrate()
+    public static Domain.Interfaces.ValueObjectFactory<AClass> Rehydrate()
     {
         return (property, container) =>
         {
@@ -1135,7 +1169,7 @@ public class AClass : ValueObjectBase<AClass>
 
     public string AProperty { get;}
 
-    public static Domain.Common.ValueObjectFactory<AClass> Rehydrate()
+    public static Domain.Interfaces.ValueObjectFactory<AClass> Rehydrate()
     {
         return (property, container) =>
         {

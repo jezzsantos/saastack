@@ -1,12 +1,13 @@
 using BookingsDomain.Events;
 using Common;
-using Common.Extensions;
-using Domain.Common;
 using Domain.Common.Entities;
+using Domain.Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
 using QueryAny;
 
 namespace BookingsDomain;
@@ -25,35 +26,35 @@ public sealed class TripEntity : EntityBase
     {
     }
 
-    private TripEntity(Identifier identifier, IDependencyContainer container,
-        IReadOnlyDictionary<string, object?> rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private TripEntity(ISingleValueObject<string> identifier, IDependencyContainer container,
+        HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
-        RootId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(RootId))!;
-        OrganizationId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(OrganizationId))!;
-        BeganAt = rehydratingProperties.GetValueOrDefault<DateTime?>(nameof(BeganAt));
-        EndedAt = rehydratingProperties.GetValueOrDefault<DateTime?>(nameof(EndedAt));
+        RootId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(RootId));
+        OrganizationId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(OrganizationId));
+        BeganAt = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(BeganAt));
+        EndedAt = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(EndedAt));
         From = rehydratingProperties.GetValueOrDefault<Location>(nameof(From));
         To = rehydratingProperties.GetValueOrDefault<Location>(nameof(To));
     }
 
-    public DateTime? BeganAt { get; private set; }
+    public Optional<DateTime> BeganAt { get; private set; }
 
-    public DateTime? EndedAt { get; private set; }
+    public Optional<DateTime> EndedAt { get; private set; }
 
-    public Location? From { get; private set; }
+    public Optional<Location> From { get; private set; }
 
-    public Identifier? OrganizationId { get; private set; }
+    public Optional<Identifier> OrganizationId { get; private set; }
 
-    public Identifier? RootId { get; private set; }
+    public Optional<Identifier> RootId { get; private set; }
 
-    public Location? To { get; private set; }
+    public Optional<Location> To { get; private set; }
 
     public static EntityFactory<TripEntity> Rehydrate()
     {
         return (identifier, container, properties) => new TripEntity(identifier, container, properties);
     }
 
-    public override Dictionary<string, object?> Dehydrate()
+    public override HydrationProperties Dehydrate()
     {
         var properties = base.Dehydrate();
         properties.Add(nameof(RootId), RootId);
@@ -115,7 +116,7 @@ public sealed class TripEntity : EntityBase
             return ensureInvariants.Error;
         }
 
-        if (BeganAt.HasValue && From.NotExists())
+        if (BeganAt.HasValue && !From.HasValue)
         {
             return Error.RuleViolation(Resources.TripEntity_NoStartingLocation);
         }
@@ -125,7 +126,7 @@ public sealed class TripEntity : EntityBase
             return Error.RuleViolation(Resources.TripEntity_NotBegun);
         }
 
-        if (EndedAt.HasValue && To.NotExists())
+        if (EndedAt.HasValue && !To.HasValue)
         {
             return Error.RuleViolation(Resources.TripEntity_NoEndingLocation);
         }
@@ -141,7 +142,7 @@ public sealed class TripEntity : EntityBase
         }
 
         var starts = DateTime.UtcNow;
-        return RaiseChangeEvent(Booking.TripBegan.Create(RootId!, OrganizationId!, Id, starts, from));
+        return RaiseChangeEvent(Booking.TripBegan.Create(RootId.Value, OrganizationId.Value, Id, starts, from));
     }
 
     public Result<Error> End(Location to)
@@ -157,12 +158,12 @@ public sealed class TripEntity : EntityBase
         }
 
         var ends = DateTime.UtcNow;
-        return RaiseChangeEvent(Booking.TripEnded.Create(RootId!, OrganizationId!, Id, BeganAt.GetValueOrDefault(),
-            From!, ends, to));
+        return RaiseChangeEvent(Booking.TripEnded.Create(RootId.Value, OrganizationId.Value, Id, BeganAt.Value,
+            From.Value, ends, to));
     }
 
 #if TESTINGONLY
-    internal void TestingOnly_Assign(Location? from, Location? to)
+    internal void TestingOnly_Assign(Optional<Location> from, Optional<Location> to)
     {
         From = from;
         To = to;

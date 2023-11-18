@@ -12,6 +12,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\BookingsApplication\BookingsApplication.csproj" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Common\Infrastructure.Persistence.Common.csproj" />
     </ItemGroup>
 
 </Project>

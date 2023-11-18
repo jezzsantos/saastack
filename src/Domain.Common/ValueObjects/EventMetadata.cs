@@ -1,3 +1,5 @@
+using Domain.Interfaces;
+
 namespace Domain.Common.ValueObjects;
 
 public sealed class EventMetadata : SingleValueObjectBase<EventMetadata, string>
@@ -7,7 +9,7 @@ public sealed class EventMetadata : SingleValueObjectBase<EventMetadata, string>
         return new EventMetadata(fqn);
     }
 
-    private EventMetadata(string fqn) : base(fqn)
+    public EventMetadata(string fqn) : base(fqn)
     {
     }
 

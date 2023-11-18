@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using AutoMapper;
 using JetBrains.Annotations;
 
 namespace Common.Extensions;
@@ -60,6 +61,39 @@ public static class ObjectExtensions
     public static bool NotExists([NotNullWhen(false)] this object? instance)
     {
         return instance is null;
+    }
+
+    /// <summary>
+    ///     Populates the public properties of the <see cref="target" /> instance with the values of matching public properties
+    ///     of the
+    ///     <see cref="source" /> instance, whether those values have default or non-default values.
+    /// </summary>
+    public static void PopulateWith<TType>(this TType target, TType source)
+    {
+        target.PopulateWith(source.ToObjectDictionary());
+    }
+
+    /// <summary>
+    ///     Populates the public properties of the <see cref="target" /> instance with the values of matching properties of the
+    ///     <see cref="source" /> instance, whether those values have default or non-default values.
+    /// </summary>
+    public static void PopulateWith<TType>(this TType target, IReadOnlyDictionary<string, object?> source)
+    {
+        var configuration = new MapperConfiguration(_ => { });
+        var mapper = configuration.CreateMapper();
+
+        mapper.Map(source, target);
+    }
+
+    /// <summary>
+    ///     Throws an <see cref="ArgumentOutOfRangeException" /> if the specified <see cref="value" /> does not have a value
+    /// </summary>
+    public static void ThrowIfNotValuedParameter(this string? value, string parameterName, string? errorMessage = null)
+    {
+        if (value.IsNotValuedParameter(parameterName, errorMessage, out _))
+        {
+            throw new ArgumentOutOfRangeException(parameterName, errorMessage);
+        }
     }
 
     private static bool IsInvalidParameter(Func<bool> validationFunc, string parameterName, string? errorMessage,

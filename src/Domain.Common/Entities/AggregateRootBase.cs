@@ -4,8 +4,10 @@ using System.Reflection;
 using Common;
 using Common.Extensions;
 using Domain.Common.Events;
+using Domain.Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
@@ -57,13 +59,13 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventSourcedAggregate
     ///     Should be only used by a ctor used in Rehydration, when persisting in-memory state.
     ///     Should never raise any events.
     /// </summary>
-    protected AggregateRootBase(Identifier identifier, IDependencyContainer container,
-        IReadOnlyDictionary<string, object?> rehydratingProperties) : this(container.Resolve<IRecorder>(),
+    protected AggregateRootBase(ISingleValueObject<string> identifier, IDependencyContainer container,
+        HydrationProperties rehydratingProperties) : this(container.Resolve<IRecorder>(),
         container.Resolve<IIdentifierFactory>(), identifier)
     {
-        Id = rehydratingProperties.GetValueOrDefault(nameof(Id), Identifier.Empty())!;
-        LastPersistedAtUtc = rehydratingProperties.GetValueOrDefault<DateTime?>(nameof(LastPersistedAtUtc));
-        IsDeleted = rehydratingProperties.GetValueOrDefault<bool?>(nameof(IsDeleted));
+        Id = rehydratingProperties.GetValueOrDefault(nameof(Id), Identifier.Empty());
+        LastPersistedAtUtc = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(LastPersistedAtUtc));
+        IsDeleted = rehydratingProperties.GetValueOrDefault<bool>(nameof(IsDeleted));
         CreatedAtUtc = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(CreatedAtUtc));
         LastModifiedAtUtc = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(LastModifiedAtUtc));
     }
@@ -73,17 +75,17 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventSourcedAggregate
     ///     Should be only used by a ctor used in Rehydration, when persisting domain events.
     ///     Should never raise any events.
     /// </summary>
-    protected AggregateRootBase(IRecorder recorder, IIdentifierFactory idFactory, Identifier identifier)
+    protected AggregateRootBase(IRecorder recorder, IIdentifierFactory idFactory, ISingleValueObject<string> identifier)
     {
         Recorder = recorder;
         IdFactory = idFactory;
-        Id = identifier;
+        Id = Identifier.Create(identifier.Value);
         _events = new List<IDomainEvent>();
-        _isInstantiating = identifier == Identifier.Empty();
+        _isInstantiating = identifier.Value == string.Empty;
 
         var now = DateTime.UtcNow;
-        LastPersistedAtUtc = null;
-        IsDeleted = null;
+        LastPersistedAtUtc = Optional<DateTime>.None;
+        IsDeleted = Optional<bool>.None;
         CreatedAtUtc = _isInstantiating
             ? now
             : DateTime.MinValue;
@@ -119,14 +121,12 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventSourcedAggregate
     /// </summary>
     protected abstract Result<Error> OnStateChanged(IDomainEvent @event, bool isReconstituting);
 
-    public bool? IsDeleted { get; private set; }
-
     /// <summary>
     ///     Dehydrates the aggregate to a set of persistable properties
     /// </summary>
-    public virtual Dictionary<string, object?> Dehydrate()
+    public virtual HydrationProperties Dehydrate()
     {
-        return new Dictionary<string, object?>
+        return new HydrationProperties
         {
             { nameof(Id), Id },
             { nameof(LastPersistedAtUtc), LastPersistedAtUtc },
@@ -136,7 +136,9 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventSourcedAggregate
         };
     }
 
-    public DateTime? LastPersistedAtUtc { get; private set; }
+    public Optional<bool> IsDeleted { get; private set; }
+
+    public Optional<DateTime> LastPersistedAtUtc { get; private set; }
 
     public DateTime CreatedAtUtc { get; }
 
@@ -430,16 +432,4 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventSourcedAggregate
 
         return Result.Ok;
     }
-
-#if TESTINGONLY
-    public void Delete()
-    {
-        IsDeleted = true;
-    }
-
-    public void Undelete()
-    {
-        IsDeleted = false;
-    }
-#endif
 }

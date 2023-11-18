@@ -1,6 +1,7 @@
 ﻿using CarsDomain.Events;
 using Common;
 using Common.Extensions;
+using Domain.Common.Events;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
@@ -72,6 +73,35 @@ public class CarRootSpec
         _car.License.Should().Be(LicensePlate.Create(Jurisdiction.AllowedCountries[0], "aplate").Value);
         _car.Status.Should().Be(CarStatus.Registered);
         _car.Events.Last().Should().BeOfType<Car.RegistrationChanged>();
+    }
+
+    [Fact]
+    public void WhenDeleteAndNotOwned_ThenReturnsError()
+    {
+        var result = _car.Delete("adeleterid".ToId());
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.CarRoot_NotOwned);
+    }
+
+    [Fact]
+    public void WhenDeleteAndNotByOwner_ThenReturnsError()
+    {
+        _car.SetOwnership(VehicleOwner.Create("anownerid").Value);
+
+        var result = _car.Delete("adeleterid".ToId());
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.CarRoot_NotDeletedByOwner);
+    }
+
+    [Fact]
+    public void WhenDeleteByOwner_ThenDeleted()
+    {
+        _car.SetOwnership(VehicleOwner.Create("anownerid").Value);
+
+        var result = _car.Delete("anownerid".ToId());
+
+        result.Should().BeSuccess();
+        _car.Events.Last().Should().BeOfType<Global.StreamDeleted>();
     }
 
     [Fact]
@@ -481,7 +511,7 @@ public class CarRootSpec
         var datum = DateTime.UtcNow;
         var slot = TimeSlot.Create(datum, datum.AddMinutes(1)).Value;
         _car.TestingOnly_AddUnavailability(slot, CausedBy.Create(UnavailabilityCausedBy.Other, "areference1").Value);
-        _car.TestingOnly_ResetDetails(null, _car.Owner, _car.License);
+        _car.TestingOnly_ResetDetails(Optional<Manufacturer>.None, _car.Owner, _car.License);
 
         var result = _car.EnsureInvariants();
 
@@ -497,7 +527,7 @@ public class CarRootSpec
         var datum = DateTime.UtcNow;
         var slot = TimeSlot.Create(datum, datum.AddMinutes(1)).Value;
         _car.TestingOnly_AddUnavailability(slot, CausedBy.Create(UnavailabilityCausedBy.Other, "areference1").Value);
-        _car.TestingOnly_ResetDetails(_car.Manufacturer, null, _car.License);
+        _car.TestingOnly_ResetDetails(_car.Manufacturer, Optional<VehicleOwner>.None, _car.License);
 
         var result = _car.EnsureInvariants();
 
@@ -513,7 +543,7 @@ public class CarRootSpec
         var datum = DateTime.UtcNow;
         var slot = TimeSlot.Create(datum, datum.AddMinutes(1)).Value;
         _car.TestingOnly_AddUnavailability(slot, CausedBy.Create(UnavailabilityCausedBy.Other, "areference1").Value);
-        _car.TestingOnly_ResetDetails(_car.Manufacturer, _car.Owner, null);
+        _car.TestingOnly_ResetDetails(_car.Manufacturer, _car.Owner, Optional<LicensePlate>.None);
 
         var result = _car.EnsureInvariants();
 
