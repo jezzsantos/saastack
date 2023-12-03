@@ -1,6 +1,7 @@
 using Common.Extensions;
 using Domain.Interfaces.ValueObjects;
 using FluentAssertions;
+using Infrastructure.Persistence.Common.Extensions;
 using Xunit;
 
 namespace Infrastructure.Persistence.Common.UnitTests;

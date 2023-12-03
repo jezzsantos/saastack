@@ -7,8 +7,8 @@ namespace Application.Persistence.Interfaces;
 /// <summary>
 ///     Defines a store for reading/writing individual DDD Aggregate by [CQRS] commands, that use snapshotting
 /// </summary>
-public interface ISnapshottingDddCommandStore<TEntity>
-    where TEntity : IDehydratableEntity
+public interface ISnapshottingDddCommandStore<TAggregateRootOrEntity>
+    where TAggregateRootOrEntity : IDehydratableEntity
 {
     /// <summary>
     ///     Returns the total count of entities in the store
@@ -36,7 +36,7 @@ public interface ISnapshottingDddCommandStore<TEntity>
     ///     <see cref="ErrorCode.EntityNotFound" /> or <see cref="Optional{TValue}.None" /> is returned depending on the value
     ///     of <see cref="errorIfNotFound" />
     /// </summary>
-    Task<Result<Optional<TEntity>, Error>> GetAsync(Identifier id, bool errorIfNotFound = true,
+    Task<Result<Optional<TAggregateRootOrEntity>, Error>> GetAsync(Identifier id, bool errorIfNotFound = true,
         bool includeDeleted = false, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -44,7 +44,8 @@ public interface ISnapshottingDddCommandStore<TEntity>
     ///     If the entity does not exist, then <see cref="ErrorCode.EntityNotFound" /> is returned
     ///     If the entity exists and is not soft-deleted then it is returned as is.
     /// </summary>
-    Task<Result<TEntity, Error>> ResurrectDeletedAsync(Identifier id, CancellationToken cancellationToken);
+    Task<Result<TAggregateRootOrEntity, Error>> ResurrectDeletedAsync(Identifier id,
+        CancellationToken cancellationToken);
 
     /// <summary>
     ///     Updates an existing entity in the store or inserts a new entity into the store, depending on whether it
@@ -52,6 +53,6 @@ public interface ISnapshottingDddCommandStore<TEntity>
     ///     If the existing entity exists as soft-deleted, and <see cref="includeDeleted" /> is false, then the error
     ///     <see cref="ErrorCode.EntityNotFound" /> is returned.
     /// </summary>
-    Task<Result<TEntity, Error>> UpsertAsync(TEntity entity, bool includeDeleted = false,
+    Task<Result<TAggregateRootOrEntity, Error>> UpsertAsync(TAggregateRootOrEntity entity, bool includeDeleted = false,
         CancellationToken cancellationToken = default);
 }

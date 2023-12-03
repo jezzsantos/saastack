@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Application.Persistence.Interfaces;
 using Common;
 using Domain.Interfaces.Entities;
@@ -14,6 +15,7 @@ namespace Infrastructure.Persistence.Common.ApplicationServices;
 /// <summary>
 ///     Defines a combined store that does nothing
 /// </summary>
+[ExcludeFromCodeCoverage]
 [UsedImplicitly]
 public class NullStore : IDataStore, IBlobStore, IQueueStore,
     IEventStore

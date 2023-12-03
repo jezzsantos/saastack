@@ -15,13 +15,13 @@ namespace BookingsInfrastructure.Persistence;
 
 public class BookingRepository : IBookingRepository
 {
-    private readonly ISnapshottingDddQueryStore<Booking> _bookingQueries;
+    private readonly ISnapshottingQueryStore<Booking> _bookingQueries;
     private readonly ISnapshottingDddCommandStore<BookingRoot> _bookings;
 
     public BookingRepository(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
         _bookings = new SnapshottingDddCommandStore<BookingRoot>(recorder, domainFactory, store);
-        _bookingQueries = new SnapshottingDddQueryStore<Booking>(recorder, domainFactory, store);
+        _bookingQueries = new SnapshottingQueryStore<Booking>(recorder, domainFactory, store);
     }
 
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)

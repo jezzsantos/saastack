@@ -16,16 +16,16 @@ namespace CarsInfrastructure.Persistence;
 
 public class CarRepository : ICarRepository
 {
-    private readonly ISnapshottingDddQueryStore<Car> _carQueries;
-    private readonly IEventingDddCommandStore<CarRoot> _cars;
-    private readonly ISnapshottingDddQueryStore<Unavailability> _unavailabilitiesQueries;
+    private readonly ISnapshottingQueryStore<Car> _carQueries;
+    private readonly IEventSourcingDddCommandStore<CarRoot> _cars;
+    private readonly ISnapshottingQueryStore<Unavailability> _unavailabilitiesQueries;
 
     public CarRepository(IRecorder recorder, IDomainFactory domainFactory,
-        IEventingDddCommandStore<CarRoot> carsStore, IDataStore store)
+        IEventSourcingDddCommandStore<CarRoot> carsStore, IDataStore store)
     {
-        _carQueries = new SnapshottingDddQueryStore<Car>(recorder, domainFactory, store);
+        _carQueries = new SnapshottingQueryStore<Car>(recorder, domainFactory, store);
         _cars = carsStore;
-        _unavailabilitiesQueries = new SnapshottingDddQueryStore<Unavailability>(recorder, domainFactory, store);
+        _unavailabilitiesQueries = new SnapshottingQueryStore<Unavailability>(recorder, domainFactory, store);
     }
 
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)

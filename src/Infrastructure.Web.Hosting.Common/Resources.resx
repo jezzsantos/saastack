@@ -42,4 +42,7 @@
     <data name="WebApiHostSettings_ApiHostBaseUrlMissing" xml:space="preserve">
         <value>'{0}' cannot be found in appsettings.json for this host</value>
     </data>
+    <data name="EventStreamHandlerBase_OutOfOrderEvents" xml:space="preserve">
+        <value>The event stream {0} contains events with out of order versions.</value>
+    </data>
 </root>

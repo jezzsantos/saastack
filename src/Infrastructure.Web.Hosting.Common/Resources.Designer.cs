@@ -87,6 +87,15 @@ namespace Infrastructure.Web.Hosting.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The event stream {0} contains events with out of order versions..
+        /// </summary>
+        internal static string EventStreamHandlerBase_OutOfOrderEvents {
+            get {
+                return ResourceManager.GetString("EventStreamHandlerBase_OutOfOrderEvents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Recorder is ready to record.
         /// </summary>
         internal static string TracingOnlyRecorder_Started {

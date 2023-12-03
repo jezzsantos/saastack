@@ -1,3 +1,4 @@
+#if TESTINGONLY
 using Infrastructure.Persistence.Common.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 using JetBrains.Annotations;
@@ -13,13 +14,13 @@ public class AllInProcessInMemStoreSpecs : ICollectionFixture<InProcessInMemStor
 [UsedImplicitly]
 public class InProcessInMemStoreSpecSetup
 {
-    public IBlobStore BlobStore { get; } = new InProcessInMemStoreTrigger();
+    public IBlobStore BlobStore { get; } = new InProcessInMemStore();
 
-    public IDataStore DataStore { get; } = new InProcessInMemStoreTrigger();
+    public IDataStore DataStore { get; } = new InProcessInMemStore();
 
-    public IEventStore EventStore { get; } = new InProcessInMemStoreTrigger();
+    public IEventStore EventStore { get; } = new InProcessInMemStore();
 
-    public IQueueStore QueueStore { get; } = new InProcessInMemStoreTrigger();
+    public IQueueStore QueueStore { get; } = new InProcessInMemStore();
 }
 
 [Trait("Category", "Integration.Storage")]
@@ -61,3 +62,4 @@ public class InProcessInMemEventStoreSpec : AnyEventStoreBaseSpec
     {
     }
 }
+#endif

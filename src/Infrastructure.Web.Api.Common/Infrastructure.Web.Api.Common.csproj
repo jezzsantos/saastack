@@ -13,6 +13,7 @@
         <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
         <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Eventing.Interfaces\Infrastructure.Eventing.Interfaces.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Api.Interfaces\Infrastructure.Web.Api.Interfaces.csproj" />
     </ItemGroup>
 

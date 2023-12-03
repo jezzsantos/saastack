@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Infrastructure.Eventing.Common\Infrastructure.Eventing.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Eventing.Interfaces\Infrastructure.Eventing.Interfaces.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.Common\Infrastructure.Persistence.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.Interfaces\Infrastructure.Persistence.Interfaces.csproj" />

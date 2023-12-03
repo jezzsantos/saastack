@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Infrastructure.Persistence.Common.Extensions;
 using QueryAny;
 using Xunit;
 

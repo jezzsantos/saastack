@@ -96,33 +96,6 @@ namespace Infrastructure.Persistence.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Handling of event stream failed. Error was: {0}.
-        /// </summary>
-        internal static string EventingDddCommandStore_SaveEventRelayFailed {
-            get {
-                return ResourceManager.GetString("EventingDddCommandStore_SaveEventRelayFailed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The aggregate does not have an Identifier.
-        /// </summary>
-        internal static string EventingDddCommandStore_SaveWithAggregateIdMissing {
-            get {
-                return ResourceManager.GetString("EventingDddCommandStore_SaveWithAggregateIdMissing", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This stream has been previously deleted and cannot be revived.
-        /// </summary>
-        internal static string EventingDddCommandStore_StreamTombstoned {
-            get {
-                return ResourceManager.GetString("EventingDddCommandStore_StreamTombstoned", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Could not write new events to event stream: {0}, events between version {1} and version {2} have not been entered into stream yet.
         /// </summary>
         internal static string EventStoreExtensions_ConcurrencyVerificationFailed_MissingUpdates {
@@ -146,6 +119,33 @@ namespace Infrastructure.Persistence.Common {
         internal static string EventStoreExtensions_ConcurrencyVerificationFailed_StreamReset {
             get {
                 return ResourceManager.GetString("EventStoreExtensions_ConcurrencyVerificationFailed_StreamReset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Publishing of event stream {0} failed..
+        /// </summary>
+        internal static string IEventSourcingDddCommandStore_PublishFailed {
+            get {
+                return ResourceManager.GetString("IEventSourcingDddCommandStore_PublishFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The aggregate does not have an Identifier.
+        /// </summary>
+        internal static string IEventSourcingDddCommandStore_SaveWithAggregateIdMissing {
+            get {
+                return ResourceManager.GetString("IEventSourcingDddCommandStore_SaveWithAggregateIdMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This stream has been previously deleted and cannot be revived.
+        /// </summary>
+        internal static string IEventSourcingDddCommandStore_StreamTombstoned {
+            get {
+                return ResourceManager.GetString("IEventSourcingDddCommandStore_StreamTombstoned", resourceCulture);
             }
         }
         

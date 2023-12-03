@@ -40,14 +40,14 @@ public class CarsApiModule : ISubDomainModule
         {
             return (_, services) =>
             {
-                services.AddScoped<ICarsApplication, CarsApplication.CarsApplication>();
-                services.AddScoped<ICarRepository, CarRepository>();
+                services.RegisterTenanted<ICarsApplication, CarsApplication.CarsApplication>();
+                services.RegisterTenanted<ICarRepository, CarRepository>();
                 services.AddTenantedEventing<CarRoot, CarProjection>(
-                    c => new CarProjection(c.GetRequiredService<IRecorder>(), c.GetRequiredService<IDomainFactory>(),
-                        c.GetRequiredService<IDataStore>())
+                    c => new CarProjection(c.ResolveForUnshared<IRecorder>(), c.ResolveForUnshared<IDomainFactory>(),
+                        c.ResolveForTenant<IDataStore>())
                 );
 
-                services.AddScoped<ICarsService, CarsInProcessService>();
+                services.RegisterTenanted<ICarsService, CarsInProcessService>();
             };
         }
     }

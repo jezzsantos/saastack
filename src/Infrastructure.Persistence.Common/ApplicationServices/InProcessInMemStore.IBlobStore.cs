@@ -8,7 +8,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-public partial class InProcessInMemStoreTrigger : IBlobStore
+public partial class InProcessInMemStore : IBlobStore
 {
     private readonly Dictionary<string, Dictionary<string, HydrationProperties>> _blobs = new();
 

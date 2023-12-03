@@ -1,4 +1,7 @@
-﻿namespace Application.Persistence.Interfaces;
+﻿using Common;
+using Task = Common.Extensions.Task;
+
+namespace Application.Persistence.Interfaces;
 
 /// <summary>
 ///     Defines a store that can be notified when an event stream changes
@@ -8,23 +11,44 @@ public interface IEventNotifyingStore
     /// <summary>
     ///     Fired when one or more events is added to an event stream
     /// </summary>
-    event EventStreamChanged OnEventStreamChanged;
+    event EventStreamChangedAsync<EventStreamChangedArgs> OnEventStreamChanged;
 }
 
 /// <summary>
 ///     Defines a delegate for handling changes to an event stream
 /// </summary>
-public delegate void EventStreamChanged(object sender, EventStreamChangedArgs args);
+public delegate void EventStreamChangedAsync<in TArgs>(object sender, TArgs args, CancellationToken cancellationToken);
 
 /// <summary>
-///     Defines the arguments for the <see cref="EventStreamChanged" /> delegate
+///     Defines the arguments for the <see cref="EventStreamChangedAsync" /> delegate
 /// </summary>
-public sealed class EventStreamChangedArgs
+public sealed class EventStreamChangedArgs : EventArgs
 {
+    private readonly List<Task<Result<Error>>> _tasks = new();
+
     public EventStreamChangedArgs(IReadOnlyList<EventStreamChangeEvent> events)
     {
         Events = events;
     }
 
+    /// <summary>
+    ///     Returns the events
+    /// </summary>
     public IReadOnlyList<EventStreamChangeEvent> Events { get; }
+
+    /// <summary>
+    ///     Completes all the tasks
+    /// </summary>
+    public async Task<Result<Error>> CompleteAsync()
+    {
+        return await Task.WhenAllAsync(_tasks.ToArray());
+    }
+
+    /// <summary>
+    ///     Creates a list of tasks to perform
+    /// </summary>
+    public void CreateTasksAsync(Func<IReadOnlyList<EventStreamChangeEvent>, Task<Result<Error>>> func)
+    {
+        _tasks.Add(func(Events));
+    }
 }

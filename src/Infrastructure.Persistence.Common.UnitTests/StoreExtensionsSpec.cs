@@ -1,6 +1,7 @@
 using Common;
 using Domain.Interfaces;
 using FluentAssertions;
+using Infrastructure.Persistence.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using JetBrains.Annotations;
 using QueryAny;

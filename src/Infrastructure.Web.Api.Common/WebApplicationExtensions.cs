@@ -1,15 +1,41 @@
 using System.Net;
 using Common.Extensions;
+using Infrastructure.Eventing.Interfaces.Notifications;
+using Infrastructure.Eventing.Interfaces.Projections;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Web.Api.Common;
 
 public static class WebApplicationExtensions
 {
+    /// <summary>
+    ///     Starts the relays for eventing projections and notifications
+    /// </summary>
+    public static IApplicationBuilder AddEventingListeners(this WebApplication app)
+    {
+        return app.Use(async (context, next) =>
+        {
+            var readModelRelay = context.RequestServices.GetRequiredService<IEventNotifyingStoreProjectionRelay>();
+            if (!readModelRelay.IsStarted)
+            {
+                readModelRelay.Start();
+            }
+
+            var notificationRelay = context.RequestServices.GetRequiredService<IEventNotifyingStoreNotificationRelay>();
+            if (!notificationRelay.IsStarted)
+            {
+                notificationRelay.Start();
+            }
+
+            await next();
+        });
+    }
+
     /// <summary>
     ///     Provides a global handler when an exception is encountered, and converts the exception
     ///     to an <see href="https://datatracker.ietf.org/doc/html/rfc7807">RFC7807</see> error.

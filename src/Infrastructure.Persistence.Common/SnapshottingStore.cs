@@ -7,7 +7,7 @@ using QueryAny;
 namespace Infrastructure.Persistence.Common;
 
 /// <summary>
-///     Provides read/write access for [CQRS] commands and queries that use snapshotting for any DTO
+///     Provides read/write access for [CQRS] commands and queries that use snapshotting for any kind of DTO
 /// </summary>
 public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
     where TDto : IPersistableDto, new()

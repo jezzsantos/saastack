@@ -1,6 +1,7 @@
 ﻿using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
+using Infrastructure.Persistence.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using Moq;
 using UnitTesting.Common;

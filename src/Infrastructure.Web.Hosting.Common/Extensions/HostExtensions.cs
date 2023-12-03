@@ -14,7 +14,6 @@ using Infrastructure.Common.DomainServices;
 using Infrastructure.Interfaces;
 using Infrastructure.Persistence.Common.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
-using Infrastructure.Persistence.Interfaces.ApplicationServices;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Validation;
 using Infrastructure.Web.Api.Interfaces;
@@ -23,6 +22,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+#if TESTINGONLY
+using Infrastructure.Persistence.Interfaces.ApplicationServices;
+#endif
 
 namespace Infrastructure.Web.Hosting.Common.Extensions;
 
@@ -42,13 +44,14 @@ public static class HostExtensions
         ConfigureWireFormats();
         ConfigureApiRequests();
         ConfigureApplicationServices();
-        ConfigurePersistence();
+        ConfigurePersistence(options.IsMultiTenanted);
 
         var app = builder.Build();
 
         app.EnableRequestRewind();
         app.AddExceptionShielding();
         //TODO: app.AddMultiTenancyDetection(); we need a TenantDetective
+        app.AddEventingListeners();
 
         modules.ConfigureHost(app);
 
@@ -61,16 +64,16 @@ public static class HostExtensions
 
         void ConfigureRecording()
         {
-            builder.Services.AddSingleton<IRecorder>(c =>
+            builder.Services.RegisterUnshared<IRecorder>(c =>
                 new TracingOnlyRecorder(options.HostName,
-                    c.GetRequiredService<ILoggerFactory>())); // TODO: we need a more comprehensive HostRecorder using Azure or AWS or GC
+                    c.ResolveForUnshared<ILoggerFactory>())); // TODO: we need a more comprehensive HostRecorder using Azure or AWS or GC
         }
 
         void ConfigureMultiTenancy(bool isMultiTenanted)
         {
             if (isMultiTenanted)
             {
-                builder.Services.AddScoped<ITenancyContext, SimpleTenancyContext>();
+                builder.Services.RegisterTenanted<ITenancyContext, SimpleTenancyContext>();
             }
         }
 
@@ -78,22 +81,22 @@ public static class HostExtensions
         {
             if (isMultiTenanted)
             {
-                builder.Services.AddSingleton<ITenantSettingsService, AspNetHostLocalFileTenantSettingsService>();
-                builder.Services.AddSingleton<ITenantSettingService>(c => new TenantSettingService(
+                builder.Services.RegisterUnshared<ITenantSettingsService, AspNetHostLocalFileTenantSettingsService>();
+                builder.Services.RegisterUnshared<ITenantSettingService>(c => new TenantSettingService(
                     new AesEncryptionService(c
-                        .GetRequiredService<IConfigurationSettings>().Platform
+                        .ResolveForTenant<IConfigurationSettings>().Platform
                         .GetString(TenantSettingService.EncryptionServiceSecretSettingName))));
-                builder.Services.AddScoped<IConfigurationSettings>(c =>
+                builder.Services.RegisterTenanted<IConfigurationSettings>(c =>
                     new AspNetConfigurationSettings(c.GetRequiredService<IConfiguration>(),
-                        c.GetRequiredService<ITenancyContext>()));
+                        c.ResolveForTenant<ITenancyContext>()));
             }
             else
             {
-                builder.Services.AddSingleton<IConfigurationSettings>(c =>
+                builder.Services.RegisterUnshared<IConfigurationSettings>(c =>
                     new AspNetConfigurationSettings(c.GetRequiredService<IConfiguration>()));
             }
 
-            builder.Services.AddSingleton<IApiHostSetting>(c =>
+            builder.Services.RegisterUnshared<IApiHostSetting>(c =>
                 new WebApiHostSettings(new AspNetConfigurationSettings(c.GetRequiredService<IConfiguration>())));
         }
 
@@ -104,8 +107,8 @@ public static class HostExtensions
 
         void ConfigureApiRequests()
         {
-            builder.Services.AddSingleton<IHasSearchOptionsValidator, HasSearchOptionsValidator>();
-            builder.Services.AddSingleton<IHasGetOptionsValidator, HasGetOptionsValidator>();
+            builder.Services.RegisterUnshared<IHasSearchOptionsValidator, HasSearchOptionsValidator>();
+            builder.Services.RegisterUnshared<IHasGetOptionsValidator, HasGetOptionsValidator>();
             builder.Services.RegisterValidators(modules.ApiAssemblies, out var validators);
 
             builder.Services.AddMediatR(configuration =>
@@ -135,40 +138,46 @@ public static class HostExtensions
         void ConfigureApplicationServices()
         {
             builder.Services.AddHttpClient();
-
-            var factory = new HostIdentifierFactory(modules.AggregatePrefixes);
-            builder.Services.AddSingleton<IIdentifierFactory>(factory);
-            builder.Services.AddScoped<ICallerContext, AnonymousCallerContext>();
+            builder.Services.RegisterUnshared<IIdentifierFactory>(_ =>
+                new HostIdentifierFactory(modules.AggregatePrefixes));
+            builder.Services.RegisterTenanted<ICallerContext, AnonymousCallerContext>();
         }
 
-        void ConfigurePersistence()
+        void ConfigurePersistence(bool isMultiTenanted)
         {
             var domainAssemblies = modules.DomainAssemblies
                 .Concat(new[] { typeof(DomainCommonMarker).Assembly })
                 .ToArray();
-            builder.Services.AddSingleton<IDependencyContainer>(c => new DotNetDependencyContainer(c));
-            builder.Services.AddSingleton<IDomainFactory>(c => DomainFactory.CreateRegistered(
-                c.GetRequiredService<IDependencyContainer>(), domainAssemblies));
-            builder.Services.AddSingleton<IEventSourcedChangeEventMigrator, ChangeEventTypeMigrator>();
+            builder.Services.RegisterUnshared<IDependencyContainer>(c => new DotNetDependencyContainer(c));
+            builder.Services.RegisterUnshared<IDomainFactory>(c => DomainFactory.CreateRegistered(
+                c.ResolveForUnshared<IDependencyContainer>(), domainAssemblies));
+            builder.Services.RegisterUnshared<IEventSourcedChangeEventMigrator, ChangeEventTypeMigrator>();
 
+            var lifetime = isMultiTenanted
+                ? DependencyScope.PerTenant
+                : DependencyScope.NotSharedSingleton;
 #if TESTINGONLY
             builder.Services
-                .AddSingleton<IDataStore, IEventStore, IBlobStore, IQueueStore, InProcessInMemStoreTrigger>(c =>
-                    new InProcessInMemStoreTrigger(c.GetRequiredService<IQueueStoreNotificationHandler>()
+                .RegisterPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, InProcessInMemStore>(c =>
+                    new InProcessInMemStore(c.ResolveForUnshared<IQueueStoreNotificationHandler>()
+                        .ToOptional()));
+            builder.Services
+                .RegisterLifetime<IDataStore, IEventStore, IBlobStore, IQueueStore, InProcessInMemStore>(lifetime, c =>
+                    new InProcessInMemStore(c.ResolveForUnshared<IQueueStoreNotificationHandler>()
                         .ToOptional()));
             RegisterStubMessageQueueDrainingService();
-
 #else
             //HACK: we need a reasonable value for production here like SQLServerDataStore
-            builder.Services.AddSingleton<IDataStore>(c=> NullStore.Instance);
+            builder.Services.RegisterPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(_ => NullStore.Instance);
+            builder.Services.RegisterLifetime<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(lifetime, _ => NullStore.Instance);
 #endif
         }
 
 #if TESTINGONLY
         void RegisterStubMessageQueueDrainingService()
         {
-            builder.Services.AddSingleton<IMonitoredMessageQueues, MonitoredMessageQueues>();
-            builder.Services.AddSingleton<IQueueStoreNotificationHandler, StubQueueStoreNotificationHandler>();
+            builder.Services.RegisterUnshared<IMonitoredMessageQueues, MonitoredMessageQueues>();
+            builder.Services.RegisterUnshared<IQueueStoreNotificationHandler, StubQueueStoreNotificationHandler>();
             var drainApiMappings = new Dictionary<string, IWebRequest>();
             // TODO: add these requests for testing locally
             // {
@@ -179,9 +188,9 @@ public static class HostExtensions
             // };
             builder.Services.AddHostedService(services =>
                 new StubQueueDrainingService(services.GetRequiredService<IHttpClientFactory>(),
-                    services.GetRequiredService<IApiHostSetting>(),
+                    services.ResolveForUnshared<IApiHostSetting>(),
                     services.GetRequiredService<ILogger<StubQueueDrainingService>>(),
-                    services.GetRequiredService<IMonitoredMessageQueues>(), drainApiMappings));
+                    services.ResolveForUnshared<IMonitoredMessageQueues>(), drainApiMappings));
         }
 #endif
     }

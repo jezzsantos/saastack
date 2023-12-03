@@ -11,7 +11,7 @@ public class WebHostOptions
     {
         DefaultApiPath = string.Empty,
         AllowCors = true,
-        IsMultiTenanted = true,
+        IsMultiTenanted = false, //TODO: change for multi-tenanted
         Recording = RecorderOptions.BackEndApiHost
     };
 
@@ -19,7 +19,7 @@ public class WebHostOptions
     {
         DefaultApiPath = "api",
         AllowCors = true,
-        IsMultiTenanted = false,
+        IsMultiTenanted = false, //TODO: change for multi-tenanted
         Recording = RecorderOptions.BackEndForFrontEndWebHost
     };
 
@@ -27,7 +27,7 @@ public class WebHostOptions
     {
         DefaultApiPath = string.Empty,
         AllowCors = true,
-        IsMultiTenanted = false,
+        IsMultiTenanted = false, //TODO: change for multi-tenanted
         Recording = RecorderOptions.TestingStubsHost
     };
 

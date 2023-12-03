@@ -13,13 +13,13 @@ namespace CarsInfrastructure.Persistence.ReadModels;
 
 public class CarProjection : IReadModelProjection
 {
-    private readonly IReadModelStore<Car> _cars;
-    private readonly IReadModelStore<Unavailability> _unavailabilities;
+    private readonly IReadModelProjectionStore<Car> _cars;
+    private readonly IReadModelProjectionStore<Unavailability> _unavailabilities;
 
     public CarProjection(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
-        _cars = new ReadModelStore<Car>(recorder, domainFactory, store);
-        _unavailabilities = new ReadModelStore<Unavailability>(recorder, domainFactory, store);
+        _cars = new ReadModelProjectionStore<Car>(recorder, domainFactory, store);
+        _unavailabilities = new ReadModelProjectionStore<Unavailability>(recorder, domainFactory, store);
     }
 
     public Type RootAggregateType => typeof(CarRoot);

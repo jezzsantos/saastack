@@ -11,8 +11,7 @@ namespace Infrastructure.Persistence.Common;
 
 /// <summary>
 ///     Provides read/write access to individual <see cref="IDehydratableEntity" /> DDD aggregates/entities for [CQRS]
-///     commands that
-///     use snapshotting persistence
+///     commands that use snapshotting persistence
 /// </summary>
 public sealed class
     SnapshottingDddCommandStore<TAggregateRootOrEntity> : ISnapshottingDddCommandStore<TAggregateRootOrEntity>

@@ -45,13 +45,10 @@
     <data name="ReadModelStore_NoId" xml:space="preserve">
         <value>Id cannot be empty</value>
     </data>
-    <data name="EventingDddCommandStore_SaveEventRelayFailed" xml:space="preserve">
-        <value>Handling of event stream failed. Error was: {0}</value>
-    </data>
-    <data name="EventingDddCommandStore_SaveWithAggregateIdMissing" xml:space="preserve">
+    <data name="IEventSourcingDddCommandStore_SaveWithAggregateIdMissing" xml:space="preserve">
         <value>The aggregate does not have an Identifier</value>
     </data>
-    <data name="EventingDddCommandStore_StreamTombstoned" xml:space="preserve">
+    <data name="IEventSourcingDddCommandStore_StreamTombstoned" xml:space="preserve">
         <value>This stream has been previously deleted and cannot be revived</value>
     </data>
     <data name="AnyStore_MissingId" xml:space="preserve">
@@ -93,5 +90,7 @@
     <data name="EventStoreExtensions_ConcurrencyVerificationFailed_MissingUpdates" xml:space="preserve">
         <value>Could not write new events to event stream: {0}, events between version {1} and version {2} have not been entered into stream yet</value>
     </data>
-
+    <data name="IEventSourcingDddCommandStore_PublishFailed" xml:space="preserve">
+        <value>Publishing of event stream {0} failed.</value>
+    </data>
 </root>

@@ -83,7 +83,7 @@ public class DomainFactory : IDomainFactory
     public IDehydratableValueObject RehydrateValueObject(Type valueObjectType, string rehydratingPropertyValue)
     {
         ArgumentNullException.ThrowIfNull(valueObjectType);
-        ArgumentException.ThrowIfNullOrEmpty(rehydratingPropertyValue);
+        ArgumentNullException.ThrowIfNull(rehydratingPropertyValue);
 
         var baseValueObjectType = GetBaseType(valueObjectType);
         if (!_valueObjectFactories.ContainsKey(baseValueObjectType))

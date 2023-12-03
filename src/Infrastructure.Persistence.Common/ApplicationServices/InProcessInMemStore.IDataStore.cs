@@ -2,13 +2,14 @@
 using Common;
 using Common.Extensions;
 using Domain.Interfaces;
+using Infrastructure.Persistence.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
 using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-public partial class InProcessInMemStoreTrigger : IDataStore
+public partial class InProcessInMemStore : IDataStore
 {
     private readonly Dictionary<string, Dictionary<string, HydrationProperties>> _documents = new();
 

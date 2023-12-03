@@ -5,30 +5,33 @@ namespace Application.Persistence.Common.Extensions;
 
 public static class ReadModelStoreExtensions
 {
-    /// <inheritdoc cref="IReadModelStore{TDto}.CreateAsync" />
-    public static async Task<Result<bool, Error>> HandleCreateAsync<TDto>(this IReadModelStore<TDto> readModel,
-        string id, Action<TDto> action, CancellationToken cancellationToken)
-        where TDto : IReadModelEntity, new()
+    /// <inheritdoc cref="IReadModelProjectionStore{TReadModelEntity}.CreateAsync" />
+    public static async Task<Result<bool, Error>> HandleCreateAsync<TReadModelEntity>(
+        this IReadModelProjectionStore<TReadModelEntity> store,
+        string id, Action<TReadModelEntity> action, CancellationToken cancellationToken)
+        where TReadModelEntity : IReadModelEntity, new()
     {
-        return (await readModel.CreateAsync(id, action, cancellationToken))
+        return (await store.CreateAsync(id, action, cancellationToken))
             .Match<Result<bool, Error>>(_ => true, error => error);
     }
 
-    /// <inheritdoc cref="IReadModelStore{TDto}.DeleteAsync" />
-    public static async Task<Result<bool, Error>> HandleDeleteAsync<TDto>(this IReadModelStore<TDto> readModel,
+    /// <inheritdoc cref="IReadModelProjectionStore{TReadModelEntity}.DeleteAsync" />
+    public static async Task<Result<bool, Error>> HandleDeleteAsync<TReadModelEntity>(
+        this IReadModelProjectionStore<TReadModelEntity> store,
         string id, CancellationToken cancellationToken)
-        where TDto : IReadModelEntity, new()
+        where TReadModelEntity : IReadModelEntity, new()
     {
-        return (await readModel.DeleteAsync(id, cancellationToken))
+        return (await store.DeleteAsync(id, cancellationToken))
             .Match<Result<bool, Error>>(() => true, error => error);
     }
 
-    /// <inheritdoc cref="IReadModelStore{TDto}.UpdateAsync" />
-    public static async Task<Result<bool, Error>> HandleUpdateAsync<TDto>(this IReadModelStore<TDto> readModel,
-        string id, Action<TDto> action, CancellationToken cancellationToken)
-        where TDto : IReadModelEntity, new()
+    /// <inheritdoc cref="IReadModelProjectionStore{TReadModelEntity}.UpdateAsync" />
+    public static async Task<Result<bool, Error>> HandleUpdateAsync<TReadModelEntity>(
+        this IReadModelProjectionStore<TReadModelEntity> store,
+        string id, Action<TReadModelEntity> action, CancellationToken cancellationToken)
+        where TReadModelEntity : IReadModelEntity, new()
     {
-        return (await readModel.UpdateAsync(id, action, cancellationToken))
+        return (await store.UpdateAsync(id, action, cancellationToken))
             .Match<Result<bool, Error>>(_ => true, error => error);
     }
 }

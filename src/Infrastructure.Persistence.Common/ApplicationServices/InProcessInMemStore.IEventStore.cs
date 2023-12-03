@@ -3,13 +3,14 @@ using Common;
 using Common.Extensions;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
+using Infrastructure.Persistence.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
 using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-public partial class InProcessInMemStoreTrigger : IEventStore
+public partial class InProcessInMemStore : IEventStore
 {
     private readonly Dictionary<string, Dictionary<string, HydrationProperties>> _events = new();
 
