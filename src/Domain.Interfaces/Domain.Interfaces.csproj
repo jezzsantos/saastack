@@ -6,11 +6,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="QueryAny" Version="1.1.1" />
+        <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Common\Common.csproj" />
+        <PackageReference Include="QueryAny" Version="1.1.1" />
     </ItemGroup>
 
     <ItemGroup>

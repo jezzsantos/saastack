@@ -11,12 +11,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Web.Api.Interfaces\Infrastructure.Web.Api.Interfaces.csproj" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
     <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Interfaces\Infrastructure.Web.Api.Interfaces.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -28,6 +28,12 @@
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" />
         <PackageReference Include="QueryAny" Version="1.1.1" GeneratePathProperty="true" PrivateAssets="all" />
         <PackageReference Include="MediatR.Contracts" Version="2.0.1" GeneratePathProperty="true" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 
     <ItemGroup>
@@ -46,11 +52,6 @@
     </ItemGroup>
 
     <!-- HACK: To Support Transitive Dependencies https://github.com/dotnet/roslyn/discussions/47517 -->
-    <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
-        </AssemblyAttribute>
-    </ItemGroup>
     <PropertyGroup>
         <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
     </PropertyGroup>

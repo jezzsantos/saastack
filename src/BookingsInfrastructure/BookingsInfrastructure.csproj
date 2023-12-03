@@ -5,14 +5,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
-        </AssemblyAttribute>
+        <ProjectReference Include="..\BookingsApplication\BookingsApplication.csproj" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Common\Infrastructure.Persistence.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\BookingsApplication\BookingsApplication.csproj" />
-        <ProjectReference Include="..\Infrastructure.Persistence.Common\Infrastructure.Persistence.Common.csproj" />
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 
 </Project>

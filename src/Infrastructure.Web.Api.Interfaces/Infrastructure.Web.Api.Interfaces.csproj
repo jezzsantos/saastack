@@ -10,12 +10,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="MediatR" Version="12.1.1" />
+        <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
-        <ProjectReference Include="..\Common\Common.csproj" />
+        <PackageReference Include="MediatR" Version="12.1.1" />
     </ItemGroup>
 
 </Project>

@@ -5,19 +5,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
-        </AssemblyAttribute>
+        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
+        <ProjectReference Include="..\Application.Persistence.Common\Application.Persistence.Common.csproj" />
+        <ProjectReference Include="..\BookingsDomain\BookingsDomain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
-        <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
-        <ProjectReference Include="..\Application.Persistence.Common\Application.Persistence.Common.csproj" />
-        <ProjectReference Include="..\Application.Persistence.Interfaces\Application.Persistence.Interfaces.csproj" />
-        <ProjectReference Include="..\BookingsDomain\BookingsDomain.csproj" />
-        <ProjectReference Include="..\Common\Common.csproj" />
-        <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 
     <ItemGroup>

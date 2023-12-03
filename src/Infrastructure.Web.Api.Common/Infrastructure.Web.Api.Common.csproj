@@ -10,8 +10,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
-        <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Eventing.Interfaces\Infrastructure.Eventing.Interfaces.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Api.Interfaces\Infrastructure.Web.Api.Interfaces.csproj" />
@@ -21,6 +19,12 @@
         <PackageReference Include="FluentValidation" Version="11.7.1" />
         <PackageReference Include="Polly" Version="7.2.4" />
         <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 
     <ItemGroup>
@@ -45,12 +49,6 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
-        </AssemblyAttribute>
     </ItemGroup>
 
 </Project>

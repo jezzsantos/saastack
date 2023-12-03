@@ -10,6 +10,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
         <EmbeddedResource Update="Resources.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -21,12 +27,6 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
-        </AssemblyAttribute>
     </ItemGroup>
 
 </Project>

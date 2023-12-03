@@ -12,6 +12,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebApiService.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebApiService.cs</Link>
         </Compile>
@@ -29,9 +35,4 @@
         </Compile>
     </ItemGroup>
 
-    <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
-        </AssemblyAttribute>
-    </ItemGroup>
 </Project>

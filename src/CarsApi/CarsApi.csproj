@@ -5,10 +5,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CarsApplication\CarsApplication.csproj" />
-        <ProjectReference Include="..\CarsDomain\CarsDomain.csproj" />
         <ProjectReference Include="..\CarsInfrastructure\CarsInfrastructure.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Hosting.Common\Infrastructure.Web.Hosting.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 
     <!-- Runs the source generator (in memory) on build -->
@@ -29,9 +33,4 @@
         </Compile>
     </ItemGroup>
 
-    <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
-        </AssemblyAttribute>
-    </ItemGroup>
 </Project>

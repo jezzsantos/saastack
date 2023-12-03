@@ -6,12 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.3.6" />
+        <ProjectReference Include="..\Application.Persistence.Common\Application.Persistence.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Interfaces\Infrastructure.Persistence.Interfaces.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Application.Persistence.Common\Application.Persistence.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Persistence.Interfaces\Infrastructure.Persistence.Interfaces.csproj" />
+        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.3.6" />
     </ItemGroup>
 
     <ItemGroup>
