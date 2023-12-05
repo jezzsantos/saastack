@@ -47,7 +47,7 @@ public static class Verify
             throw new NotSupportedException("The 'net6.0' target framework is not supported by this version of NuGet.");
         }
 
-        return new ReferenceAssemblies("net7.0", new PackageIdentity("Microsoft.NETCore.App.Ref", "7.0.0"),
+        return new ReferenceAssemblies("net7.0", new PackageIdentity("Microsoft.NETCore.App.Ref", "7.0.14"),
             Path.Combine("ref", "net7.0"));
     });
 

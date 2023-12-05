@@ -66,10 +66,10 @@
             <TargetPathWithTargetPlatformMoniker Include="$(TargetDir)Application.Interfaces.dll" IncludeRuntimeDependency="false" />
             <TargetPathWithTargetPlatformMoniker Include="$(TargetDir)Infrastructure.Web.Api.Interfaces.dll" IncludeRuntimeDependency="false" />
             <!-- HACK: until we can find a better way to reference these assemblies -->
-            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.13\Microsoft.AspNetCore.Http.Abstractions.dll" IncludeRuntimeDependency="false" />
-            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.13\Microsoft.AspNetCore.Http.Features.dll" IncludeRuntimeDependency="false" />
-            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.13\Microsoft.Extensions.Primitives.dll" IncludeRuntimeDependency="false" />
-            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.13\System.IO.Pipelines.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.14\Microsoft.AspNetCore.Http.Abstractions.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.14\Microsoft.AspNetCore.Http.Features.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.14\Microsoft.Extensions.Primitives.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.14\System.IO.Pipelines.dll" IncludeRuntimeDependency="false" />
         </ItemGroup>
     </Target>
 

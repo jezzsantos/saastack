@@ -10,9 +10,9 @@ You will need the following development tools to build, run, and test this proje
 
 * Windows or MacOS.
 * Jetbrains Rider or Visual Studio (There is most support for JetBrains dotUltimate)
-* Install the .NET7.0 SDK. Available for [download here](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
+* Install the .NET7.0 SDK (specifically version 7.0.14). Available for [download here](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
 
-> We have ensured that do wont need any other infrastructure running on your local machine (i.e. SQLServer database), unless you want to run infrastructure specific integration tests.
+> We have ensured that you wont need any other infrastructure running on your local machine (i.e. SQLServer database), unless you want to run infrastructure specific integration tests.
 
 ------
 

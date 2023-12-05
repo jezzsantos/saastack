@@ -107,14 +107,19 @@ That documentation is intended to be part of the template itself that users of t
 
 ## Developer Environment
 
-We recommend using JetBrains Rider to develop this codebase.
+* Windows or MacOS.
+* Jetbrains Rider or Visual Studio (There is most support for JetBrains dotUltimate)
+* Install the .NET7.0 SDK (specifically version 7.0.14). Available for [download here](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
+*
 
 > Included in the codebase there are many formatting rules that need to be run before committing your code. These rules may not be supported by other developer tools.
 
 > It is possible to apply for a personal free license for Rider from Jetbrains, for OSS projects
 
+> We have ensured that you wont need any other infrastructure running on your local machine (i.e. SQLServer database), unless you want to run infrastructure specific integration tests.
+
 * Clone the repo locally
-* Ensure that you have `.NET6.0` installed on your system. [Download](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+* Ensure that you have `.NET7.0` (specifically version `7.0.14`) installed on your system. [Download](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 * Open the `src/SaaStack.sln` solution
 
 ## Building the code
@@ -135,7 +140,7 @@ There are 3 flavors of build configuration: `Debug`, `Release` and `ReleaseForDe
 ## Testing the code
 
 * Run all the **unit** tests (`Category=Unit`)
-* Run all the **integration** tests (`Category=Integration`)
+* Run all the **integration** tests (`Category=Integration.Web`)
 
 > All automated tests must pass in GitHub Actions to submit changes to the codebase
 
