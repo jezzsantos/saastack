@@ -4,7 +4,7 @@ using FluentAssertions;
 using Infrastructure.Persistence.Common.Extensions;
 using Xunit;
 
-namespace Infrastructure.Persistence.Common.UnitTests;
+namespace Infrastructure.Persistence.Common.UnitTests.Extensions;
 
 [Trait("Category", "Unit")]
 public class TypeExtensionsSpec

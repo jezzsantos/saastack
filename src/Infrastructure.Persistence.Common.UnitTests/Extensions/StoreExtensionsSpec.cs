@@ -8,7 +8,7 @@ using QueryAny;
 using UnitTesting.Common;
 using Xunit;
 
-namespace Infrastructure.Persistence.Common.UnitTests;
+namespace Infrastructure.Persistence.Common.UnitTests.Extensions;
 
 [Trait("Category", "Unit")]
 public class StoreExtensionsSpec

@@ -83,8 +83,7 @@ public class CarsApiSpec : WebApiSpec<Program>
         var result = (await Api.GetAsync(new SearchAllCarsRequest())).Content.Value.Cars!;
 
         result.Count.Should().Be(1);
-        result[0]
-            .Id.Should().Be(car.Id);
+        result[0].Id.Should().Be(car.Id);
     }
 
     [Fact]

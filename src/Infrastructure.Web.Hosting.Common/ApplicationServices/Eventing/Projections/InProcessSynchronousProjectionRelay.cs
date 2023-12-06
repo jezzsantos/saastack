@@ -8,13 +8,13 @@ namespace Infrastructure.Web.Hosting.Common.ApplicationServices.Eventing.Project
 
 /// <summary>
 ///     Defines an in-process service that subscribes to one or more <see cref="IEventNotifyingStore" />
-///     instances, listens to them raise change events, and relays them to registered read model projections.
+///     instances, listens to them raise change events, and relays them to
+///     registered read model projections synchronously.
 /// </summary>
-/// A
-public class InProcessNotifyingStoreProjectionRelay : EventStreamHandlerBase, IEventNotifyingStoreProjectionRelay
+public class InProcessSynchronousProjectionRelay : EventStreamHandlerBase, IEventNotifyingStoreProjectionRelay
 {
-    public InProcessNotifyingStoreProjectionRelay(IRecorder recorder, IEventSourcedChangeEventMigrator migrator,
-        IReadModelCheckpointRepository checkpointStore, IEnumerable<IReadModelProjection> projections,
+    public InProcessSynchronousProjectionRelay(IRecorder recorder, IEventSourcedChangeEventMigrator migrator,
+        IProjectionCheckpointRepository checkpointStore, IEnumerable<IReadModelProjection> projections,
         params IEventNotifyingStore[] eventingStores) : base(recorder, eventingStores)
     {
         Projector = new ReadModelProjector(recorder, checkpointStore, migrator, projections.ToArray());

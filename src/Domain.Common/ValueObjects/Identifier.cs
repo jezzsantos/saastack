@@ -1,9 +1,14 @@
+using System.Diagnostics;
 using Common.Extensions;
 using Domain.Interfaces;
 using Domain.Interfaces.ValueObjects;
 
 namespace Domain.Common.ValueObjects;
 
+/// <summary>
+///     Provides an identifier
+/// </summary>
+[DebuggerStepThrough]
 public sealed class Identifier : SingleValueObjectBase<Identifier, string>
 {
     public static Identifier Create(string value)

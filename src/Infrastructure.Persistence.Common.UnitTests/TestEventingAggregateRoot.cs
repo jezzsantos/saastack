@@ -8,7 +8,7 @@ using QueryAny;
 namespace Infrastructure.Persistence.Common.UnitTests;
 
 [EntityName("acontainername")]
-public class TestEventingAggregateRoot : IEventSourcedAggregateRoot, IDehydratableAggregateRoot
+public class TestEventingAggregateRoot : IEventingAggregateRoot, IDehydratableAggregateRoot
 {
     public TestEventingAggregateRoot(Identifier identifier)
     {

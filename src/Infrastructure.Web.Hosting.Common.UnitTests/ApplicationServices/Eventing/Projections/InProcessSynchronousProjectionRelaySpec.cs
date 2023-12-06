@@ -14,13 +14,13 @@ using Xunit;
 namespace Infrastructure.Web.Hosting.Common.UnitTests.ApplicationServices.Eventing.Projections;
 
 [Trait("Category", "Unit")]
-public class InProcessNotifyingStoreProjectionRelaySpec
+public class InProcessSynchronousProjectionRelaySpec
 {
     private readonly EventSourcingDddCommandStore<TestEventingAggregateRoot> _eventSourcingStore;
     private readonly TestProjection _projection;
-    private readonly InProcessNotifyingStoreProjectionRelay _relay;
+    private readonly InProcessSynchronousProjectionRelay _relay;
 
-    public InProcessNotifyingStoreProjectionRelaySpec()
+    public InProcessSynchronousProjectionRelaySpec()
     {
         var recorder = new Mock<IRecorder>();
         var migrator = new Mock<IEventSourcedChangeEventMigrator>();
@@ -29,7 +29,7 @@ public class InProcessNotifyingStoreProjectionRelaySpec
             {
                 Id = id
             });
-        var checkpointStore = new Mock<IReadModelCheckpointRepository>();
+        var checkpointStore = new Mock<IProjectionCheckpointRepository>();
         checkpointStore.Setup(cs => cs.LoadCheckpointAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<int, Error>>(1));
         var domainFactory = new Mock<IDomainFactory>();
@@ -46,7 +46,7 @@ public class InProcessNotifyingStoreProjectionRelaySpec
             _projection
         };
 
-        _relay = new InProcessNotifyingStoreProjectionRelay(recorder.Object, migrator.Object, checkpointStore.Object,
+        _relay = new InProcessSynchronousProjectionRelay(recorder.Object, migrator.Object, checkpointStore.Object,
             projections, _eventSourcingStore);
     }
 

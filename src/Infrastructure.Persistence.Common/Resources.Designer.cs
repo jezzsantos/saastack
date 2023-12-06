@@ -96,6 +96,15 @@ namespace Infrastructure.Persistence.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Publishing of changed events for {0} failed..
+        /// </summary>
+        internal static string EventSourcingDddCommandStore_PublishFailed {
+            get {
+                return ResourceManager.GetString("EventSourcingDddCommandStore_PublishFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not write new events to event stream: {0}, events between version {1} and version {2} have not been entered into stream yet.
         /// </summary>
         internal static string EventStoreExtensions_ConcurrencyVerificationFailed_MissingUpdates {
@@ -119,15 +128,6 @@ namespace Infrastructure.Persistence.Common {
         internal static string EventStoreExtensions_ConcurrencyVerificationFailed_StreamReset {
             get {
                 return ResourceManager.GetString("EventStoreExtensions_ConcurrencyVerificationFailed_StreamReset", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Publishing of event stream {0} failed..
-        /// </summary>
-        internal static string IEventSourcingDddCommandStore_PublishFailed {
-            get {
-                return ResourceManager.GetString("IEventSourcingDddCommandStore_PublishFailed", resourceCulture);
             }
         }
         

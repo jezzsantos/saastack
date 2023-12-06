@@ -185,12 +185,12 @@ public class AggregateRootBaseSpec
     [Fact]
     public void WhenLoadChangesAgain_ThenReturnsError()
     {
-        ((IEventSourcedAggregateRoot)_aggregate).LoadChanges(new List<EventSourcedChangeEvent>
+        ((IEventingAggregateRoot)_aggregate).LoadChanges(new List<EventSourcedChangeEvent>
         {
             CreateEventEntity("aneventid1", 1)
         }, _typeMigrator);
 
-        var result = ((IEventSourcedAggregateRoot)_aggregate).LoadChanges(new List<EventSourcedChangeEvent>
+        var result = ((IEventingAggregateRoot)_aggregate).LoadChanges(new List<EventSourcedChangeEvent>
         {
             CreateEventEntity("aneventid2", 2)
         }, _typeMigrator);
@@ -201,7 +201,7 @@ public class AggregateRootBaseSpec
     [Fact]
     public void WhenLoadChanges_ThenSetsEventsAndUpdatesVersion()
     {
-        ((IEventSourcedAggregateRoot)_aggregate).LoadChanges(new List<EventSourcedChangeEvent>
+        ((IEventingAggregateRoot)_aggregate).LoadChanges(new List<EventSourcedChangeEvent>
         {
             CreateEventEntity("aneventid1", 1),
             CreateEventEntity("aneventid2", 2),
@@ -215,7 +215,7 @@ public class AggregateRootBaseSpec
     [Fact]
     public void WhenLoadChangesWithOffsetVersions_ThenSetsEventsAndUpdatesVersion()
     {
-        ((IEventSourcedAggregateRoot)_aggregate).LoadChanges(new List<EventSourcedChangeEvent>
+        ((IEventingAggregateRoot)_aggregate).LoadChanges(new List<EventSourcedChangeEvent>
         {
             CreateEventEntity("aneventid1", 3),
             CreateEventEntity("aneventid2", 4),

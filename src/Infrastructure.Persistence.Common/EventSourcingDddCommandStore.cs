@@ -7,17 +7,18 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
+using Infrastructure.Persistence.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
 
 namespace Infrastructure.Persistence.Common;
 
 /// <summary>
-///     Provides read/write access to individual <see cref="IEventSourcedAggregateRoot" /> DDD aggregate roots for [CQRS]
+///     Provides read/write access to individual <see cref="IEventingAggregateRoot" /> DDD aggregate roots for [CQRS]
 ///     commands that use event sourced persistence
 /// </summary>
 public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCommandStore<TAggregateRoot>
-    where TAggregateRoot : IEventSourcedAggregateRoot
+    where TAggregateRoot : IEventingAggregateRoot
 {
     private readonly IDomainFactory _domainFactory;
     private readonly string _entityName;
@@ -94,31 +95,12 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
             return Error.EntityExists(Resources.IEventSourcingDddCommandStore_SaveWithAggregateIdMissing);
         }
 
-        var latestChanges = aggregate.GetChanges();
-        if (!latestChanges.IsSuccessful)
+        var published = await this.SaveAndPublishEventsAsync(aggregate, OnEventStreamChanged,
+            (root, changedEvents, token) =>
+                _eventStore.AddEventsAsync(_entityName, root.Id.Value, changedEvents, token), cancellationToken);
+        if (!published.IsSuccessful)
         {
-            return latestChanges.Error;
-        }
-
-        var changedEvents = latestChanges.Value;
-        if (changedEvents.HasNone())
-        {
-            return Result.Ok;
-        }
-
-        var added = await _eventStore.AddEventsAsync(_entityName, aggregate.Id.Value, changedEvents, cancellationToken);
-        if (!added.IsSuccessful)
-        {
-            return added.Error;
-        }
-
-        var streamName = added.Value;
-        aggregate.ClearChanges();
-
-        var raised = await PublishChangeEvents(changedEvents, streamName, cancellationToken);
-        if (!raised.IsSuccessful)
-        {
-            return raised.Error;
+            return published.Error;
         }
 
         return Result.Ok;
@@ -135,56 +117,14 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
         return eventTypeName == tombstoneEventTypeName;
     }
 
-    private async Task<Result<Error>> PublishChangeEvents(IEnumerable<EventSourcedChangeEvent> changes,
-        string streamName, CancellationToken cancellationToken)
-    {
-        if (OnEventStreamChanged.NotExists())
-        {
-            return Result.Ok;
-        }
-
-        var changeEvents = changes
-            .Select(changeEvent => ToChangeEvent(changeEvent, streamName))
-            .ToList();
-
-        return await PublishToListeners(streamName, changeEvents, cancellationToken);
-    }
-
-    private async Task<Result<Error>> PublishToListeners(string streamName,
-        IReadOnlyList<EventStreamChangeEvent> changeEvents,
-        CancellationToken cancellationToken)
-    {
-        var args = new EventStreamChangedArgs(changeEvents);
-        OnEventStreamChanged!.Invoke(this, args, cancellationToken);
-        var completed = await args.CompleteAsync();
-        return !completed.IsSuccessful
-            ? completed.Error.Wrap(Resources.IEventSourcingDddCommandStore_PublishFailed.Format(streamName))
-            : Result.Ok;
-    }
-
-    internal static EventStreamChangeEvent ToChangeEvent(EventSourcedChangeEvent changeEvent, string streamName)
-    {
-        return new EventStreamChangeEvent
-        {
-            Data = changeEvent.Data,
-            EntityType = changeEvent.EntityType,
-            EventType = changeEvent.EventType,
-            Id = changeEvent.Id,
-            LastPersistedAtUtc = changeEvent.LastPersistedAtUtc,
-            Metadata = new EventMetadata(changeEvent.Metadata),
-            StreamName = streamName,
-            Version = changeEvent.Version
-        };
-    }
-
     private TAggregateRoot RehydrateAggregateRoot(ISingleValueObject<string> id, Optional<DateTime> lastPersistedAtUtc)
     {
         return (TAggregateRoot)_domainFactory.RehydrateAggregateRoot(typeof(TAggregateRoot),
             new HydrationProperties
             {
-                { nameof(IEventSourcedAggregateRoot.Id), id.ToOptional<object>() },
+                { nameof(IEventingAggregateRoot.Id), id.ToOptional<object>() },
                 {
-                    nameof(IEventSourcedAggregateRoot.LastPersistedAtUtc),
+                    nameof(IEventingAggregateRoot.LastPersistedAtUtc),
                     lastPersistedAtUtc.ValueOrDefault.ToOptional<object>()
                 }
             });

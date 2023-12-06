@@ -14,8 +14,6 @@ public static class DependencyExtensions
         {
             DependencyScope.Platform => ServiceLifetime.Singleton,
             DependencyScope.PerTenant => ServiceLifetime.Scoped,
-            DependencyScope.NotSharedSingleton => ServiceLifetime.Singleton,
-            DependencyScope.NotSharedScoped => ServiceLifetime.Scoped,
             _ => throw new ArgumentOutOfRangeException(nameof(scope))
         };
     }

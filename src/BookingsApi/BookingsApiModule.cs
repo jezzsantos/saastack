@@ -4,6 +4,7 @@ using BookingsApplication.Persistence;
 using BookingsDomain;
 using BookingsInfrastructure.Persistence;
 using Infrastructure.Web.Hosting.Common;
+using Infrastructure.Web.Hosting.Common.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,8 +33,9 @@ public class BookingsApiModule : ISubDomainModule
         {
             return (_, services) =>
             {
-                services.AddScoped<IBookingsApplication, BookingsApplication.BookingsApplication>();
-                services.AddScoped<IBookingRepository, BookingRepository>();
+                services.RegisterTenanted<IBookingsApplication, BookingsApplication.BookingsApplication>();
+                services.RegisterTenanted<IBookingRepository, BookingRepository>();
+                services.RegisterTenantedEventing<BookingRoot>();
             };
         }
     }

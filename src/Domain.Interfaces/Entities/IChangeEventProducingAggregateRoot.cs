@@ -3,9 +3,9 @@ using Common;
 namespace Domain.Interfaces.Entities;
 
 /// <summary>
-///     Defines an aggregate root that can be persisted to a stream of events for an event store
+///     Defines an aggregate root that produces a stream of change events
 /// </summary>
-public interface IEventSourcedAggregateRoot : IEventSourcedEntity
+public interface IChangeEventProducingAggregateRoot
 {
     IReadOnlyList<IDomainEvent> Events { get; }
 
@@ -14,6 +14,4 @@ public interface IEventSourcedAggregateRoot : IEventSourcedEntity
     Result<Error> ClearChanges();
 
     Result<List<EventSourcedChangeEvent>, Error> GetChanges();
-
-    Result<Error> LoadChanges(IEnumerable<EventSourcedChangeEvent> history, IEventSourcedChangeEventMigrator migrator);
 }

@@ -42,7 +42,7 @@ public class CarsApiModule : ISubDomainModule
             {
                 services.RegisterTenanted<ICarsApplication, CarsApplication.CarsApplication>();
                 services.RegisterTenanted<ICarRepository, CarRepository>();
-                services.AddTenantedEventing<CarRoot, CarProjection>(
+                services.RegisterTenantedEventing<CarRoot, CarProjection>(
                     c => new CarProjection(c.ResolveForUnshared<IRecorder>(), c.ResolveForUnshared<IDomainFactory>(),
                         c.ResolveForTenant<IDataStore>())
                 );

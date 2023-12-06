@@ -90,7 +90,7 @@
     <data name="EventStoreExtensions_ConcurrencyVerificationFailed_MissingUpdates" xml:space="preserve">
         <value>Could not write new events to event stream: {0}, events between version {1} and version {2} have not been entered into stream yet</value>
     </data>
-    <data name="IEventSourcingDddCommandStore_PublishFailed" xml:space="preserve">
-        <value>Publishing of event stream {0} failed.</value>
+    <data name="EventSourcingDddCommandStore_PublishFailed" xml:space="preserve">
+        <value>Publishing of changed events for {0} failed.</value>
     </data>
 </root>

@@ -9,7 +9,10 @@ using QueryAny;
 
 namespace Infrastructure.Eventing.Common.Projections;
 
-public sealed class ReadModelCheckpointRepository : IReadModelCheckpointRepository
+/// <summary>
+///     Provides a repository for checkpoints used in projections
+/// </summary>
+public sealed class ProjectionCheckpointRepository : IProjectionCheckpointRepository
 {
     public const int StartingCheckpointVersion = 1;
     private readonly IDomainFactory _domainFactory;
@@ -17,7 +20,7 @@ public sealed class ReadModelCheckpointRepository : IReadModelCheckpointReposito
     private readonly IRecorder _recorder;
     private readonly IDataStore _store;
 
-    public ReadModelCheckpointRepository(IRecorder recorder, IIdentifierFactory idFactory,
+    public ProjectionCheckpointRepository(IRecorder recorder, IIdentifierFactory idFactory,
         IDomainFactory domainFactory, IDataStore store)
     {
         _recorder = recorder;

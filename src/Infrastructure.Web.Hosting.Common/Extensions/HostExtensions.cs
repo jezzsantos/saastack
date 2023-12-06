@@ -44,7 +44,7 @@ public static class HostExtensions
         ConfigureWireFormats();
         ConfigureApiRequests();
         ConfigureApplicationServices();
-        ConfigurePersistence(options.IsMultiTenanted);
+        ConfigurePersistence();
 
         var app = builder.Build();
 
@@ -143,7 +143,7 @@ public static class HostExtensions
             builder.Services.RegisterTenanted<ICallerContext, AnonymousCallerContext>();
         }
 
-        void ConfigurePersistence(bool isMultiTenanted)
+        void ConfigurePersistence()
         {
             var domainAssemblies = modules.DomainAssemblies
                 .Concat(new[] { typeof(DomainCommonMarker).Assembly })
@@ -153,23 +153,18 @@ public static class HostExtensions
                 c.ResolveForUnshared<IDependencyContainer>(), domainAssemblies));
             builder.Services.RegisterUnshared<IEventSourcedChangeEventMigrator, ChangeEventTypeMigrator>();
 
-            var lifetime = isMultiTenanted
-                ? DependencyScope.PerTenant
-                : DependencyScope.NotSharedSingleton;
 #if TESTINGONLY
             builder.Services
-                .RegisterPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, InProcessInMemStore>(c =>
-                    new InProcessInMemStore(c.ResolveForUnshared<IQueueStoreNotificationHandler>()
-                        .ToOptional()));
+                .RegisterPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, InProcessInMemStore>(StoreExtensions
+                    .GetStoreForTestingOnly);
             builder.Services
-                .RegisterLifetime<IDataStore, IEventStore, IBlobStore, IQueueStore, InProcessInMemStore>(lifetime, c =>
-                    new InProcessInMemStore(c.ResolveForUnshared<IQueueStoreNotificationHandler>()
-                        .ToOptional()));
+                .RegisterTenanted<IDataStore, IEventStore, IBlobStore, IQueueStore, InProcessInMemStore>(StoreExtensions
+                    .GetStoreForTestingOnly);
             RegisterStubMessageQueueDrainingService();
 #else
             //HACK: we need a reasonable value for production here like SQLServerDataStore
             builder.Services.RegisterPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(_ => NullStore.Instance);
-            builder.Services.RegisterLifetime<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(lifetime, _ => NullStore.Instance);
+            builder.Services.RegisterTenanted<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(_ => NullStore.Instance);
 #endif
         }
 
@@ -195,3 +190,22 @@ public static class HostExtensions
 #endif
     }
 }
+
+#if TESTINGONLY
+internal static class StoreExtensions
+{
+    private static InProcessInMemStore? _store;
+
+    public static InProcessInMemStore GetStoreForTestingOnly(IServiceProvider container)
+    {
+        // HACK: we need to return the same instance, because it is all keep in same memory
+        if (_store is null)
+        {
+            _store = new InProcessInMemStore(container.ResolveForUnshared<IQueueStoreNotificationHandler>()
+                .ToOptional());
+        }
+
+        return _store;
+    }
+}
+#endif

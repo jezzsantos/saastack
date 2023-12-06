@@ -7,7 +7,7 @@ namespace Infrastructure.Eventing.Common.Notifications;
 ///     Provides a registration for a consumer that handles all events but does nothing with them
 /// </summary>
 public sealed class NoOpConsumerRegistration<TAggregateRoot> : IEventNotificationRegistration
-    where TAggregateRoot : IEventSourcedAggregateRoot
+    where TAggregateRoot : IEventingAggregateRoot
 {
     public IEventNotificationProducer Producer => new PassThroughEventNotificationProducer<TAggregateRoot>();
 

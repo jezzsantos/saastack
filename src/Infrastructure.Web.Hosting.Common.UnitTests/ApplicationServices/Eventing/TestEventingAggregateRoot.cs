@@ -10,7 +10,7 @@ using QueryAny;
 namespace Infrastructure.Web.Hosting.Common.UnitTests.ApplicationServices.Eventing;
 
 [EntityName("acontainername")]
-public class TestEventingAggregateRoot : IEventSourcedAggregateRoot, IDehydratableAggregateRoot
+public class TestEventingAggregateRoot : IEventingAggregateRoot, IDehydratableAggregateRoot
 {
     private readonly List<EventSourcedChangeEvent> _changeEvents = new();
 

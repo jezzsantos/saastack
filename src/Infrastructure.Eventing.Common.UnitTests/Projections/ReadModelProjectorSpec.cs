@@ -17,14 +17,14 @@ namespace Infrastructure.Eventing.Common.UnitTests.Projections;
 [Trait("Category", "Unit")]
 public sealed class ReadModelProjectorSpec : IDisposable
 {
-    private readonly Mock<IReadModelCheckpointRepository> _checkpointRepository;
+    private readonly Mock<IProjectionCheckpointRepository> _checkpointRepository;
     private readonly Mock<IReadModelProjection> _projection;
     private readonly ReadModelProjector _projector;
 
     public ReadModelProjectorSpec()
     {
         var recorder = new Mock<IRecorder>();
-        _checkpointRepository = new Mock<IReadModelCheckpointRepository>();
+        _checkpointRepository = new Mock<IProjectionCheckpointRepository>();
         var changeEventTypeMigrator = new ChangeEventTypeMigrator();
         _projection = new Mock<IReadModelProjection>();
         _projection.Setup(prj => prj.RootAggregateType)
@@ -216,7 +216,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
     [Fact]
     public async Task WhenWriteEventStreamAsyncAndFirstEverEvent_ThenProjectsEvents()
     {
-        const int startingCheckpoint = ReadModelCheckpointRepository.StartingCheckpointVersion;
+        const int startingCheckpoint = ProjectionCheckpointRepository.StartingCheckpointVersion;
         _checkpointRepository.Setup(cs => cs.LoadCheckpointAsync("astreamname", It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<int, Error>>(startingCheckpoint));
 

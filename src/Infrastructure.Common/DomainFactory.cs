@@ -193,12 +193,12 @@ public class DomainFactory : IDomainFactory
 
     private static bool IsEventingAggregateRoot(Type type)
     {
-        return !type.IsAbstract && typeof(IEventSourcedAggregateRoot).IsAssignableFrom(type);
+        return !type.IsAbstract && typeof(IEventingAggregateRoot).IsAssignableFrom(type);
     }
 
     private static bool IsEventingEntity(Type type)
     {
-        return !type.IsAbstract && typeof(IEventSourcedEntity).IsAssignableFrom(type);
+        return !type.IsAbstract && typeof(IEventingEntity).IsAssignableFrom(type);
     }
 
     private static bool IsDehydratableEntityOrAggregate(Type type)
@@ -216,7 +216,7 @@ public class DomainFactory : IDomainFactory
                                       && method.ReturnType.BaseType == typeof(MulticastDelegate)
                                       && method.ReturnType.IsGenericType
                                       && method.ReturnType.GenericTypeArguments.Any()
-                                      && typeof(IEventSourcedAggregateRoot).IsAssignableFrom(
+                                      && typeof(IEventingAggregateRoot).IsAssignableFrom(
                                           method.ReturnType.GenericTypeArguments[0])
                                       && method.ReturnType.GetGenericTypeDefinition()
                                           .IsAssignableFrom(typeof(AggregateRootFactory<>)));

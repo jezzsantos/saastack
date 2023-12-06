@@ -18,9 +18,10 @@ public class BookingRepository : IBookingRepository
     private readonly ISnapshottingQueryStore<Booking> _bookingQueries;
     private readonly ISnapshottingDddCommandStore<BookingRoot> _bookings;
 
-    public BookingRepository(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
+    public BookingRepository(IRecorder recorder, ISnapshottingDddCommandStore<BookingRoot> bookingsStore,
+        IDomainFactory domainFactory, IDataStore store)
     {
-        _bookings = new SnapshottingDddCommandStore<BookingRoot>(recorder, domainFactory, store);
+        _bookings = bookingsStore;
         _bookingQueries = new SnapshottingQueryStore<Booking>(recorder, domainFactory, store);
     }
 

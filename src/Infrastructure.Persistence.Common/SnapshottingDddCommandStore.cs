@@ -4,8 +4,10 @@ using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
+using Infrastructure.Persistence.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
+using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common;
 
@@ -158,8 +160,7 @@ public sealed class
     }
 
     public async Task<Result<TAggregateRootOrEntity, Error>> UpsertAsync(TAggregateRootOrEntity entity,
-        bool includeDeleted = false,
-        CancellationToken cancellationToken = default)
+        bool includeDeleted = false, CancellationToken cancellationToken = default)
     {
         if (!entity.Id.Value.HasValue())
         {
@@ -208,8 +209,27 @@ public sealed class
 
         _recorder.TraceDebug(null, "Entity {Id} was updated in the {Store} store", entity.Id,
             _dataStore.GetType().Name);
-        return replaced.Value.Value.ToDomainEntity<TAggregateRootOrEntity>(_domainFactory);
+        var updated = replaced.Value.Value.ToDomainEntity<TAggregateRootOrEntity>(_domainFactory);
+
+        if (entity is not IChangeEventProducingAggregateRoot aggregate)
+        {
+            return updated;
+        }
+
+        var published = await this.SaveAndPublishEventsAsync(aggregate, OnEventStreamChanged, (_, _, _) =>
+        {
+            var aggregateName = $"{_containerName}_{entity.Id}";
+            return Task.FromResult<Result<string, Error>>(aggregateName);
+        }, cancellationToken);
+        if (!published.IsSuccessful)
+        {
+            return published.Error;
+        }
+
+        return updated;
     }
+
+    public event EventStreamChangedAsync<EventStreamChangedArgs>? OnEventStreamChanged;
 
     private CommandEntity MergeEntities(TAggregateRootOrEntity updated, CommandEntity persisted)
     {

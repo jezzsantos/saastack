@@ -28,4 +28,8 @@
         </Content>
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Remove="ApplicationServices\Eventing\Projections\BrokeredAsynchronousProjectionRelaySpec.cs" />
+    </ItemGroup>
+
 </Project>

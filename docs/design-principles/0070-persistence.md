@@ -13,7 +13,9 @@
 * We want to be able to physically partition individual tenants' data, whether that is to a separate data center or to a separate account/tenant in the cloud. Equally, we want to be able to logically partition a group of tenants and their data in a single data center, or database. This should be configurable dynamically.
 * We want the specific technologies that persist the data (in staging/production environments) to not be a concern of the developer at design time, and further, we don't want the developer leaking implementation details of the specific technology beyond the adapter that connects to the specific technology. In other words, the Application and Domain layers have no idea or care about where data comes from or in what specific form.
 * We need to design a general set of capabilities for reading/writing data from any persistence technology, that can be supported by any technology. Clearly, this abstraction will not be optimized for any specific technology.
-* We need to be able to rip & replace any general abstractions with specific optimized abstractions at a time and place where that is needed without having to disruptively change the rest of the system. In other words, when changing the specific adapter for a specific Application Layer, the Application and Domain layers are not affected (i.e., the port does not change). Only the implementation of the adapter changes to be specific.
+* Any relaying of domain events for updating of read models or of notifications (to other components), needs to be reliable, and in order. We must appropriately guard against any inconsistencies that could occur between the stages of (1) writing of updates to aggregates (either snapshotting or event sourcing) and (2) propagation of domain events. Such patterns as "outbox" must be appropriately deployed.
+* We want any propagation of domain events for updating of read models or of notifications (to other components) to be asynchronous by default, since being asynchronous/synchronous has a dramatic effect on both "downstream consumers" and "upstream producers". "Upstream producers" (e.g. API clients) that trigger domain event creation via aggregate commands will need to adopt strategies for retrieval of updated data immediately after issuing state changing commands. As there will be non-deterministic latency (and eventual consistency) between the time of receiving a response from a command, and the time a an updated read model is actually updated. "Downstream consumers" will always be eventually consistent by default.
+* We need to be able to rip & replace any implementations of repositories with optimized implementations at a time and place where that is required without having to disruptively change the contract to the rest of the system. In other words, when changing the specific adapter for a specific Application Layer, the Application and Domain layers are not affected (i.e., the ports do not change). Only the implementation of the repository adapter will change from using general storage abstractions to using specific technology abstractions.
 
 ## Implementation
 
@@ -153,19 +155,21 @@ public class CarRepository : ICarRepository
 }
 ```
 
-These store implementations make it very easy to access data through the lower-level technology adapters (i.e., `IDataStore` and `EventStore`, etc), which they use.
+These store implementations make it very easy to access data through the lower-level technology adapters (i.e., `IDataStore` and `EventStore`, etc) that they use.
 
 > Note: at no point in this code does the developer have to know what technology adapter is being used at runtime. There is no leaky abstraction from the actual technology adapter in this code, such as what query language is being used. The developer has no idea if the data is saved to an RMDBS like Microsoft SQL Server or as a KV pair to a Redis cache. That is all defined by dependency injection, making all of this code highly testable and decoupled.
 
 ### Persistence Patterns
 
-As you may appreciate by now, specifically for aggregate state persistence (as opposed to blob or queues, etc), there are two schemes for persisting the state of your root aggregates. Snapshotting and Event Sourcing.
+As you may appreciate by now, specifically for aggregate state persistence (as opposed to blob or queues, etc.), there are two schemes for persisting the state of your root aggregates. Snapshotting and Event Sourcing.
 
-Both schemes can persist the state of an aggregate (and all its descendant entities and value objects), but each scheme use different mechanisms to do it. The choice of this scheme affects the code you need to write in the aggregate and the code you need to write in your domain-specific `IApplicationRepository`. However, the code you write in the application layer can remain the same.
+> Note: it is important to remember that even though all aggregates generate and consume domain events in order to change their internal state, their internal state can be persisted in different ways. The domain events are there to communicate state changes with other domains.
 
-> This means that if/when you change your mind down the track  and you switch from one scheme to the other, you only need to change the implementation of your domain-specific `IApplicationRepository` and you need to add/remove the `Dehydration()` method and constructor to/from your aggregate classes.
+Both persistence schemes can persist the state of an aggregate (and all its descendant entities and value objects), but each scheme uses different mechanisms to do it. The choice of this scheme affects the code you need to write in the aggregate and the code you need to write in your domain-specific `IApplicationRepository`. However, the code you write in the application layer can remain the same.
 
-The code flows from the Application's perspective is the same, but the implementation of the domain-specific `IApplicationRepository` and the aggregate are slightly different.
+> This means that if/when you change your mind down the track and you switch from one scheme to the other, you only need to change the implementation of your domain-specific `IApplicationRepository,` and you need to add/remove the `Dehydration()` method and constructor to/from your aggregate classes.
+
+The code flows from the Application's perspective are the same, but the implementation of the domain-specific `IApplicationRepository` and the aggregate are slightly different.
 
 #### Snapshotting Persistence
 
@@ -208,7 +212,7 @@ The code flow for querying data looks like this:
 
 One or more "records" are read (as "read models") from various containers in the injected instance of the `IDataStore` implementation.
 
-This is an example overview of how both these persistence flows work, for the `BookingsApplication`:
+This is an example overview of how both these persistence flows work for the `BookingsApplication`:
 
 ![Persistence-Snapshotting-CQRS](../images/Persistence-Snapshotting-CQRS.png)
 
@@ -252,10 +256,52 @@ The code flow for querying data looks like this:
 
 One or more "records" are read (as "read models") from various containers in the injected instance of the `IDataStore` implementation.
 
-This is an example overview of how both these persistence flows work, for the `BookingsApplication`:
+This is an example overview of how both these persistence flows work for the `BookingsApplication`:
 
-![Persistence-Snapshotting-CQRS](../images/Persistence-Snapshotting-CQRS.png)
+![Persistence-EventSourcing-CQRS](../images/Persistence-EventSourcing-CQRS.png)
 
 ### Projections and Notifications
 
-TBD
+Regardless of the chosen persistence scheme, when the state of any aggregate is saved, it will yield some change events (most recently raised domain events, since the last rehydration) that can and will be relayed to other components in the system to drive Read Model Projections (Event Sourcing) and Notifications (Event Driven Architecture).
+
+Read Models are typically always used within the same sub-domain or by other sub-domains running in the same process. Notifications are designed to be transmitted to remote subdomains or to other external systems - via an asynchronous "event broker".
+
+Projections and Notifications must be "consistent" with the update of the aggregates that produce the change events. This requires reliable implementations (e.g. Outbox Pattern) and they must guarantee delivery of the change events in order (e.g. FIFO Queues). If either of these technical requirements cannot be guaranteed then there is a high probability (when the system comes under load or stress) that downstream consumers of these change events will be permanently out of date, affecting data integrity of dependent systems.
+
+> By default, both mechanisms of updating read models and sending notifications should be done reliably and asynchronously after a source aggregate is changed, such that the collective system is eventually consistent. This asynchronous update (typically expected to take anywhere between ~100ms-500ms) means that read model data and consumers of notifications can be immediately out of date with the subdomains that update their source aggregates.
+>
+> When this update process is synchronous (and in-process), that part of the system will achieve 100% consistency, which is convenient, but this is not a true reality for when the system is eventually split up and has become a distributed system. (this is the goal of all modular monoliths). In distributed systems that are eventually consistent, API clients are required to employ different strategies to handle this eventual consistency, which are disruptive to switch to later when a monolithic backend becomes distributed.
+>
+> For example, if a client calls a command API and then after receiving a response, immediately calls a query API that would include the changed data, the queried data may have not yet been updated yet. This is one reason why commands should return changed data synchronously in their responses, to help clients predict changed data.
+>
+> Because of this constraint, it is better to start the modular monolith on an eventually consistent model rather than start a fully consistent model since these client strategies should to be established sooner rather than being later re-engineered.
+
+The following diagram illustrates the "logical" process that is triggered when an aggregate state is updated.
+
+![Persistence-Eventing](../images/Persistence-Eventing.png)
+
+> The implementation details of this "logical" process can be different depending on the specific "relay" mechanisms in place.
+
+#### Read Model Projections
+
+Read model "projections" are a mechanism to produce (and keep up to date) one (or more) "read models", which are typically "records" that represent the latest state of the aggregates and entities, in event sourced persistent schemes. These read models are typically used directly by CQRS queries.
+
+> Note: In snapshotting persistence schemes, "read models" are the exact same as the "write models", they share the same data. However, there is no "write model" in an event source scheme, and write models cannot be queried.
+
+One major advantage of producing "read models" is that they are all built from the historical stream of events. This means that we can have several of them at the same time, containing different data, and all coherent with each other, unlike what is possible with snapshotting stores.
+
+Another advantage of this scheme is that we can build several "denormalized" sets of records (e.g. in a relational database) that are optimized for specific queries - no longer requiring complex joins to give desired results.
+
+Another advantage (only available to event-sourced persistence scheme) is that we can rebuild any read model at any time, in any way we like, and never lose any historical data. Read models then become temporary and disposable. All the source data is in the event streams. The advantage here is that when the software changes and the queried data needs changing, we can use any of the historical data that already exists in the aggregate event streams to rebuild different data in completely new read models.
+
+> This capability is impossible in snapshotting persistence schemes.
+
+#### Notifications
+
+Notifications are the mechanism by which subdomains can communicate to other subdomains or to other systems about what is happening in the source subdomain. Particularly necessary in micros-services deployments. This is normally done in distributed systems with a message broker of some kind (i.e., a queue, a message bus, or a message broker).
+
+Change events raised through notifications are not expected to be coupled to consuming systems, so they can be mapped to more granular or coarse events.
+
+Consumers of notifications must register to receive notifications.
+
+A "notification registration" consists of a producer and a consumer. The producer translates the source `IDomainEvent` to an appropriate `IDomainEvent` to share outside the source component, and then that event is relayed to the consumer to handle.

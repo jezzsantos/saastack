@@ -28,7 +28,7 @@ namespace Domain.Common.Entities;
 ///     This aggregate's state can persisted from memory into a stream of events (using <see cref="GetChanges" />),
 ///     or it's state can be persisted from memory using the <see cref="Dehydrate" /> method.
 /// </summary>
-public abstract class AggregateRootBase : IAggregateRoot, IEventSourcedAggregateRoot, IDehydratableAggregateRoot
+public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot, IDehydratableAggregateRoot
 {
     private readonly List<IDomainEvent> _events;
     private readonly bool _isInstantiating;
@@ -183,7 +183,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventSourcedAggregate
     }
 
     /// <summary>
-    ///     Clears the recent changes ot the aggregate
+    ///     Clears the recent changes to the aggregate
     /// </summary>
     public Result<Error> ClearChanges()
     {
@@ -197,7 +197,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventSourcedAggregate
     ///     Reconstitutes the aggregates in-memory state from the past <see cref="history" /> of events,
     ///     using the <see cref="migrator" /> to handle any unknown event types no longer present in the codebase
     /// </summary>
-    Result<Error> IEventSourcedAggregateRoot.LoadChanges(IEnumerable<EventSourcedChangeEvent> history,
+    Result<Error> IChangeEventConsumingAggregateRoot.LoadChanges(IEnumerable<EventSourcedChangeEvent> history,
         IEventSourcedChangeEventMigrator migrator)
     {
         if (EventStream.HasChanges)
@@ -318,7 +318,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventSourcedAggregate
         TChangeEvent @event,
         Func<IIdentifierFactory, Result<TEntity, Error>> childEntityFactory,
         Expression<Func<TChangeEvent, string>> eventChildId)
-        where TEntity : IEventSourcedEntity
+        where TEntity : IEventingEntity
         where TChangeEvent : IDomainEvent
     {
         var identifierFactory = isReconstituting
@@ -352,7 +352,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventSourcedAggregate
     /// </summary>
     // ReSharper disable once MemberCanBeMadeStatic.Global
     protected Result<Error> RaiseEventToChildEntity<TEntity, TChangeEvent>(TChangeEvent @event, TEntity childEntity)
-        where TEntity : IEventSourcedEntity
+        where TEntity : IEventingEntity
         where TChangeEvent : IDomainEvent
     {
         return childEntity.HandleStateChanged(@event);

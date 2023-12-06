@@ -12,13 +12,13 @@ namespace Infrastructure.Eventing.Common.Projections;
 /// </summary>
 public sealed class ReadModelProjector : IReadModelProjector, IDisposable
 {
-    private readonly IReadModelCheckpointRepository _checkpointStore;
+    private readonly IProjectionCheckpointRepository _checkpointStore;
     private readonly IEventSourcedChangeEventMigrator _migrator;
 
     // ReSharper disable once NotAccessedField.Local
     private readonly IRecorder _recorder;
 
-    public ReadModelProjector(IRecorder recorder, IReadModelCheckpointRepository checkpointStore,
+    public ReadModelProjector(IRecorder recorder, IProjectionCheckpointRepository checkpointStore,
         IEventSourcedChangeEventMigrator migrator, params IReadModelProjection[] projections)
     {
         _recorder = recorder;

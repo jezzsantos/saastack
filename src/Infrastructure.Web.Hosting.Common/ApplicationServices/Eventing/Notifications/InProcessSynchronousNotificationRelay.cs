@@ -8,12 +8,12 @@ namespace Infrastructure.Web.Hosting.Common.ApplicationServices.Eventing.Notific
 
 /// <summary>
 ///     Defines an in-process service that subscribes to one or more <see cref="IEventNotifyingStore" />
-///     instances, listens to them raise change events, and relays them to listening consumers.
+///     instances, listens to them raise change events, and relays them to listening consumers synchronously.
 /// </summary>
-public class InProcessEventNotifyingStoreNotificationRelay : EventStreamHandlerBase,
+public class InProcessSynchronousNotificationRelay : EventStreamHandlerBase,
     IEventNotifyingStoreNotificationRelay
 {
-    public InProcessEventNotifyingStoreNotificationRelay(IRecorder recorder, IEventSourcedChangeEventMigrator migrator,
+    public InProcessSynchronousNotificationRelay(IRecorder recorder, IEventSourcedChangeEventMigrator migrator,
         IEnumerable<IEventNotificationRegistration> registrations,
         params IEventNotifyingStore[] eventingStores) : base(recorder, eventingStores)
     {

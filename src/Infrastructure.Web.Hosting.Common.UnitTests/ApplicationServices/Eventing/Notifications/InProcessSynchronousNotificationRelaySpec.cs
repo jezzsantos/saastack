@@ -14,13 +14,13 @@ using Xunit;
 namespace Infrastructure.Web.Hosting.Common.UnitTests.ApplicationServices.Eventing.Notifications;
 
 [Trait("Category", "Unit")]
-public class InProcessEventNotifyingStoreNotificationRelaySpec
+public class InProcessSynchronousNotificationRelaySpec
 {
     private readonly TestConsumer _consumer;
     private readonly EventSourcingDddCommandStore<TestEventingAggregateRoot> _eventSourcingStore;
-    private readonly InProcessEventNotifyingStoreNotificationRelay _relay;
+    private readonly InProcessSynchronousNotificationRelay _relay;
 
-    public InProcessEventNotifyingStoreNotificationRelaySpec()
+    public InProcessSynchronousNotificationRelaySpec()
     {
         var recorder = new Mock<IRecorder>();
         var migrator = new Mock<IEventSourcedChangeEventMigrator>();
@@ -46,7 +46,7 @@ public class InProcessEventNotifyingStoreNotificationRelaySpec
             registration
         };
 
-        _relay = new InProcessEventNotifyingStoreNotificationRelay(recorder.Object, migrator.Object, registrations,
+        _relay = new InProcessSynchronousNotificationRelay(recorder.Object, migrator.Object, registrations,
             _eventSourcingStore);
     }
 

@@ -14,13 +14,13 @@ using Xunit;
 namespace Infrastructure.Eventing.Common.UnitTests.Projections;
 
 [Trait("Category", "Unit")]
-public class ReadModelCheckpointStoreSpec
+public class ProjectionCheckpointRepositorySpec
 {
     private readonly Mock<IIdentifierFactory> _idFactory;
-    private readonly ReadModelCheckpointRepository _repository;
+    private readonly ProjectionCheckpointRepository _repository;
     private readonly Mock<IDataStore> _store;
 
-    public ReadModelCheckpointStoreSpec()
+    public ProjectionCheckpointRepositorySpec()
     {
         var recorder = new Mock<IRecorder>();
         _idFactory = new Mock<IIdentifierFactory>();
@@ -33,7 +33,7 @@ public class ReadModelCheckpointStoreSpec
         _store.Setup(repo => repo.QueryAsync(It.IsAny<string>(), It.IsAny<QueryClause<Checkpoint>>(),
                 It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<List<QueryEntity>, Error>>(new List<QueryEntity>()));
-        _repository = new ReadModelCheckpointRepository(recorder.Object, _idFactory.Object,
+        _repository = new ProjectionCheckpointRepository(recorder.Object, _idFactory.Object,
             domainFactory.Object, _store.Object);
     }
 
@@ -42,7 +42,7 @@ public class ReadModelCheckpointStoreSpec
     {
         var result = await _repository.LoadCheckpointAsync("astreamname", CancellationToken.None);
 
-        result.Value.Should().Be(ReadModelCheckpointRepository.StartingCheckpointVersion);
+        result.Value.Should().Be(ProjectionCheckpointRepository.StartingCheckpointVersion);
     }
 
     [Fact]

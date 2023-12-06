@@ -3,7 +3,7 @@
 /// <summary>
 ///     Defines an entity that is event sourced
 /// </summary>
-public interface IEventSourcedEntity : IDomainEventProducingEntity, IDomainEventConsumingEntity
+public interface IEventingEntity : IDomainEventProducingEntity, IDomainEventConsumingEntity
 {
     DateTime CreatedAtUtc { get; }
 

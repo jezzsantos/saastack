@@ -3,7 +3,10 @@ using Common;
 
 namespace Infrastructure.Eventing.Interfaces.Projections;
 
-public interface IReadModelCheckpointRepository : IApplicationRepository
+/// <summary>
+///     Defines a repository for checkpoints used in projections
+/// </summary>
+public interface IProjectionCheckpointRepository : IApplicationRepository
 {
     Task<Result<int, Error>> LoadCheckpointAsync(string streamName, CancellationToken cancellationToken);
 

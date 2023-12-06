@@ -8,7 +8,7 @@ namespace Application.Persistence.Interfaces;
 ///     Defines a store for reading/writing individual DDD Aggregate by [CQRS] commands, that use event sourcing
 /// </summary>
 public interface IEventSourcingDddCommandStore<TAggregateRoot> : IEventNotifyingStore
-    where TAggregateRoot : IEventSourcedAggregateRoot
+    where TAggregateRoot : IEventingAggregateRoot
 {
     /// <summary>
     ///     Permanently destroys all aggregates in the store

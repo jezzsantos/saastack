@@ -31,7 +31,7 @@ public delegate Result<Error> RootEventHandler(IDomainEvent @event);
 ///     <see cref="AggregateRootBase.GetChanges" />),
 ///     or it's state can be persisted from memory using the <see cref="Dehydrate" /> method.
 /// </summary>
-public abstract class EntityBase : IEntity, IEventSourcedEntity, IDehydratableEntity
+public abstract class EntityBase : IEntity, IEventingEntity, IDehydratableEntity
 {
     private RootEventHandler? _rootEventHandler;
 

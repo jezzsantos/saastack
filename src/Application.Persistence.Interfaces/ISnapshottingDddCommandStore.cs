@@ -7,7 +7,7 @@ namespace Application.Persistence.Interfaces;
 /// <summary>
 ///     Defines a store for reading/writing individual DDD Aggregate by [CQRS] commands, that use snapshotting
 /// </summary>
-public interface ISnapshottingDddCommandStore<TAggregateRootOrEntity>
+public interface ISnapshottingDddCommandStore<TAggregateRootOrEntity> : IEventNotifyingStore
     where TAggregateRootOrEntity : IDehydratableEntity
 {
     /// <summary>
