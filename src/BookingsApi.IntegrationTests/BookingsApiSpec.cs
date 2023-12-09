@@ -1,6 +1,5 @@
 using ApiHost1;
 using Application.Interfaces.Resources;
-using BookingsApplication.Persistence;
 using CarsDomain;
 using Common.Extensions;
 using Domain.Interfaces;
@@ -18,8 +17,7 @@ public class BookingsApiSpec : WebApiSpec<Program>
 {
     public BookingsApiSpec(WebApiSetup<Program> setup) : base(setup)
     {
-        var repository = setup.GetRequiredService<IBookingRepository>();
-        repository.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
+        EmptyAllRepositories(setup);
     }
 
     [Fact]

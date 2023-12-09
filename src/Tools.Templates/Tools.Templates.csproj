@@ -22,4 +22,10 @@
         <None Include="UnitTestProject/**/*.*" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Update="IntegrationTestProject\appsettings.Testing.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
 </Project>

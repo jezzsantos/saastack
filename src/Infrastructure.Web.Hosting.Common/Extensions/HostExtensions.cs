@@ -11,6 +11,7 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Infrastructure.Common;
 using Infrastructure.Common.DomainServices;
+using Infrastructure.Eventing.Common.Projections.ReadModels;
 using Infrastructure.Interfaces;
 using Infrastructure.Persistence.Common.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
@@ -138,8 +139,9 @@ public static class HostExtensions
         void ConfigureApplicationServices()
         {
             builder.Services.AddHttpClient();
-            builder.Services.RegisterUnshared<IIdentifierFactory>(_ =>
-                new HostIdentifierFactory(modules.AggregatePrefixes));
+            var prefixes = modules.AggregatePrefixes;
+            prefixes.Add(typeof(Checkpoint), "check");
+            builder.Services.RegisterUnshared<IIdentifierFactory>(_ => new HostIdentifierFactory(prefixes));
             builder.Services.RegisterTenanted<ICallerContext, AnonymousCallerContext>();
         }
 
@@ -154,13 +156,7 @@ public static class HostExtensions
             builder.Services.RegisterUnshared<IEventSourcedChangeEventMigrator, ChangeEventTypeMigrator>();
 
 #if TESTINGONLY
-            builder.Services
-                .RegisterPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, InProcessInMemStore>(StoreExtensions
-                    .GetStoreForTestingOnly);
-            builder.Services
-                .RegisterTenanted<IDataStore, IEventStore, IBlobStore, IQueueStore, InProcessInMemStore>(StoreExtensions
-                    .GetStoreForTestingOnly);
-            RegisterStubMessageQueueDrainingService();
+            RegisterStoreForTestingOnly(builder);
 #else
             //HACK: we need a reasonable value for production here like SQLServerDataStore
             builder.Services.RegisterPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(_ => NullStore.Instance);
@@ -169,7 +165,25 @@ public static class HostExtensions
         }
 
 #if TESTINGONLY
-        void RegisterStubMessageQueueDrainingService()
+        static void RegisterStoreForTestingOnly(WebApplicationBuilder builder)
+        {
+            builder.Services
+                .RegisterPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
+                    LocalMachineJsonFileStore.Create(c.ResolveForUnshared<IConfigurationSettings>().Platform,
+                        c.ResolveForUnshared<IQueueStoreNotificationHandler>()
+                            .ToOptional()));
+            //HACK: In TESTINGONLY there won't be any physical partitioning of data for different tenants,
+            // even if the host is multi-tenanted. So we can register a singleton for this specific store,
+            // as we only ever want to resolve one instance for this store for all its uses (tenanted or unshared, except for platform use)
+            builder.Services
+                .RegisterUnshared<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
+                    LocalMachineJsonFileStore.Create(c.ResolveForUnshared<IConfigurationSettings>().Platform,
+                        c.ResolveForUnshared<IQueueStoreNotificationHandler>()
+                            .ToOptional()));
+            RegisterStubMessageQueueDrainingService(builder);
+        }
+
+        static void RegisterStubMessageQueueDrainingService(WebApplicationBuilder builder)
         {
             builder.Services.RegisterUnshared<IMonitoredMessageQueues, MonitoredMessageQueues>();
             builder.Services.RegisterUnshared<IQueueStoreNotificationHandler, StubQueueStoreNotificationHandler>();
@@ -190,22 +204,3 @@ public static class HostExtensions
 #endif
     }
 }
-
-#if TESTINGONLY
-internal static class StoreExtensions
-{
-    private static InProcessInMemStore? _store;
-
-    public static InProcessInMemStore GetStoreForTestingOnly(IServiceProvider container)
-    {
-        // HACK: we need to return the same instance, because it is all keep in same memory
-        if (_store is null)
-        {
-            _store = new InProcessInMemStore(container.ResolveForUnshared<IQueueStoreNotificationHandler>()
-                .ToOptional());
-        }
-
-        return _store;
-    }
-}
-#endif

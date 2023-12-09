@@ -10,9 +10,13 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-public partial class InProcessInMemStore : IEventStore
+/// <summary>
+///     Defines a file repository on the local machine, that stores each entity as raw JSON.
+///     store is located in named folders under the <see cref="_rootPath" />
+/// </summary>
+public partial class LocalMachineJsonFileStore : IEventStore
 {
-    private readonly Dictionary<string, Dictionary<string, HydrationProperties>> _events = new();
+    private const string EventStoreContainerName = "Events";
 
     public Task<Result<string, Error>> AddEventsAsync(string entityName, string entityId,
         List<EventSourcedChangeEvent> events, CancellationToken cancellationToken)
@@ -22,7 +26,7 @@ public partial class InProcessInMemStore : IEventStore
 
         var streamName = GetEventStreamName(entityName, entityId);
 
-        var latestStoredEvent = GetLatestEvent(entityName, streamName);
+        var latestStoredEvent = GetLatestEvent(entityName, entityId, streamName);
         var latestStoredEventVersion = latestStoredEvent.HasValue
             ? latestStoredEvent.Value.Version.ToOptional()
             : Optional<int>.None;
@@ -36,12 +40,9 @@ public partial class InProcessInMemStore : IEventStore
         events.ForEach(@event =>
         {
             var entity = CommandEntity.FromDto(@event.ToTabulated(entityName, streamName));
-            if (!_events.ContainsKey(entityName))
-            {
-                _events.Add(entityName, new Dictionary<string, HydrationProperties>());
-            }
 
-            _events[entityName].Add(entity.Id, entity.ToHydrationProperties());
+            var container = EnsureContainer(GetEventStoreContainerPath(entityName, entityId));
+            container.Write(entity.Id, entity.ToFileProperties());
         });
 
         return Task.FromResult<Result<string, Error>>(streamName);
@@ -51,10 +52,8 @@ public partial class InProcessInMemStore : IEventStore
     {
         entityName.ThrowIfNotValuedParameter(nameof(entityName), Resources.InProcessInMemDataStore_MissingEntityName);
 
-        if (_events.ContainsKey(entityName))
-        {
-            _events.Remove(entityName);
-        }
+        var eventStore = EnsureContainer(GetEventStoreContainerPath(entityName));
+        eventStore.Erase();
 
         return Task.FromResult(Result.Ok);
     }
@@ -66,36 +65,64 @@ public partial class InProcessInMemStore : IEventStore
         entityId.ThrowIfNotValuedParameter(nameof(entityId), Resources.InProcessInMemDataStore_MissingEntityId);
 
         var streamName = GetEventStreamName(entityName, entityId);
+
         var query = Query.From<EventStoreEntity>()
             .Where<string>(ee => ee.StreamName, ConditionOperator.EqualTo, streamName)
             .OrderBy(ee => ee.Version);
 
         //HACK: we use QueryEntity.ToDto() here, since EventSourcedChangeEvent can be rehydrated without a IDomainFactory 
-        var events = QueryEventStores(entityName, query)
+        var events = QueryEventStores(entityName, entityId, query)
             .ConvertAll(entity => entity.ToDto<EventSourcedChangeEvent>());
 
         return Task.FromResult<Result<IReadOnlyList<EventSourcedChangeEvent>, Error>>(events);
     }
 
-    private List<QueryEntity> QueryEventStores<TQueryableEntity>(string entityName,
+    private static string GetEventStoreContainerPath(string containerName, string? entityId = null)
+    {
+        if (entityId.HasValue())
+        {
+            return $"{EventStoreContainerName}/{containerName}/{entityId}";
+        }
+
+        return $"{EventStoreContainerName}/{containerName}";
+    }
+
+    private Optional<EventStoreEntity> GetLatestEvent(string entityName, string entityId, string streamName)
+    {
+        entityId.ThrowIfNotValuedParameter(nameof(entityId));
+        streamName.ThrowIfNotValuedParameter(nameof(streamName));
+
+        var query = Query.From<EventStoreEntity>()
+            .Where<string>(ee => ee.StreamName, ConditionOperator.EqualTo, streamName)
+            .OrderBy(ee => ee.Version, OrderDirection.Descending)
+            .Take(1);
+
+        var latest = QueryEventStores(entityName, entityId, query)
+            .FirstOrDefault();
+
+        return latest.Exists()
+            ? latest.ToDto<EventStoreEntity>()
+            : Optional<EventStoreEntity>.None;
+    }
+
+    private List<QueryEntity> QueryEventStores<TQueryableEntity>(string entityName, string entityId,
         QueryClause<TQueryableEntity> query)
         where TQueryableEntity : IQueryableEntity
     {
-        entityName.ThrowIfNotValuedParameter(nameof(entityName), Resources.InProcessInMemDataStore_MissingEntityName);
-
         if (query.NotExists() || query.Options.IsEmpty)
         {
             return new List<QueryEntity>();
         }
 
-        if (!_events.ContainsKey(entityName))
+        var container = EnsureContainer(GetEventStoreContainerPath(entityName, entityId));
+        if (container.IsEmpty())
         {
             return new List<QueryEntity>();
         }
 
         var metadata = PersistedEntityMetadata.FromType<EventStoreEntity>();
         var results = query.FetchAllIntoMemory(MaxQueryResults, metadata,
-            () => _events[entityName],
+            () => QueryPrimaryEntities(container, metadata),
             _ => new Dictionary<string, HydrationProperties>());
 
         return results;
@@ -104,20 +131,6 @@ public partial class InProcessInMemStore : IEventStore
     private static string GetEventStreamName(string entityName, string entityId)
     {
         return $"{entityName}_{entityId}";
-    }
-
-    private Optional<EventStoreEntity> GetLatestEvent(string entityName, string streamName)
-    {
-        var query = Query.From<EventStoreEntity>()
-            .Where<string>(ee => ee.StreamName, ConditionOperator.EqualTo, streamName)
-            .OrderBy(ee => ee.Version, OrderDirection.Descending)
-            .Take(1);
-
-        var latest = QueryEventStores(entityName, query)
-            .FirstOrDefault();
-        return latest.Exists()
-            ? latest.ToDto<EventStoreEntity>()
-            : Optional<EventStoreEntity>.None;
     }
 }
 #endif

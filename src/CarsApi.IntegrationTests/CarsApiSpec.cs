@@ -1,7 +1,6 @@
 using System.Net;
 using ApiHost1;
 using Application.Interfaces.Resources;
-using CarsApplication.Persistence;
 using CarsDomain;
 using Domain.Interfaces;
 using FluentAssertions;
@@ -17,8 +16,7 @@ public class CarsApiSpec : WebApiSpec<Program>
 {
     public CarsApiSpec(WebApiSetup<Program> setup) : base(setup)
     {
-        var repository = setup.GetRequiredService<ICarRepository>();
-        repository.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
+        EmptyAllRepositories(setup);
     }
 
     [Fact]

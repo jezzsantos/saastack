@@ -1,4 +1,5 @@
-﻿using Common.Extensions;
+﻿using Common;
+using Common.Extensions;
 using Domain.Interfaces.ValueObjects;
 
 namespace Infrastructure.Persistence.Common.Extensions;
@@ -35,6 +36,24 @@ public static class TypeExtensions
     public static bool IsNullableEnum(this Type type)
     {
         return Nullable.GetUnderlyingType(type)?.IsEnum == true;
+    }
+
+    /// <summary>
+    ///     Whether the <see cref="type" /> represents a <see cref="Optional{Enum}" />
+    /// </summary>
+    public static bool IsOptionalEnum(this Type type)
+    {
+        if (!Optional.IsOptionalType(type))
+        {
+            return false;
+        }
+
+        if (Optional.TryGetContainedType(type, out var containedType))
+        {
+            return containedType!.IsEnum;
+        }
+
+        return false;
     }
 
     /// <summary>

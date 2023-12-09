@@ -59,6 +59,54 @@ public static class DateTimeExtensions
     }
 
     /// <summary>
+    ///     Whether the specified <see cref="value" /> is not the default value of <see cref="DateTime.MinValue" />
+    /// </summary>
+    public static bool HasValue(this DateTime value)
+    {
+        if (value.Kind == DateTimeKind.Local)
+        {
+            return value != DateTime.MinValue.ToLocalTime()
+                   && value != DateTime.MinValue;
+        }
+
+        return value != DateTime.MinValue;
+    }
+
+    /// <summary>
+    ///     Whether the specified <see cref="value" /> is not the default value of <see cref="DateTime.MinValue" />
+    /// </summary>
+    public static bool HasValue(this DateTime? value)
+    {
+        if (!value.HasValue)
+        {
+            return false;
+        }
+
+        return value.Value.HasValue();
+    }
+
+    /// <summary>
+    ///     Whether the specified <see cref="value" /> is not the default value of <see cref="DateTime.MinValue" />
+    /// </summary>
+    public static bool HasValue(this DateOnly value)
+    {
+        return value != DateOnly.MinValue;
+    }
+
+    /// <summary>
+    ///     Whether the specified <see cref="value" /> is not the default value of <see cref="DateTime.MinValue" />
+    /// </summary>
+    public static bool HasValue(this DateOnly? value)
+    {
+        if (!value.HasValue)
+        {
+            return false;
+        }
+
+        return value.Value.HasValue();
+    }
+
+    /// <summary>
     ///     Subtracts the <see cref="days" /> from the <see cref="value" />
     /// </summary>
     public static DateTime SubtractDays(this DateTime value, int days)
@@ -110,6 +158,17 @@ public static class DateTimeExtensions
         return value.Value.ToIso8601();
     }
 
+    /// <summary>
+    ///     Converts the <see cref="value" /> to UTC and then to
+    ///     <see href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO8601</see>
+    /// </summary>
+    public static string ToIso8601(this DateTimeOffset value)
+    {
+        var utcDateTime = value.ToUniversalTime();
+
+        return utcDateTime.ToString("O");
+    }
+    
     /// <summary>
     ///     Truncates the <see cref="value" /> to the nearest second.
     /// </summary>

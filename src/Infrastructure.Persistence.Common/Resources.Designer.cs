@@ -204,6 +204,15 @@ namespace Infrastructure.Persistence.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The specified root path: {0}, is not a valid path or for some reason cannot be created on this local machine..
+        /// </summary>
+        internal static string LocalMachineJsonFileStore_VerifyRootPath_CreateFailed {
+            get {
+                return ResourceManager.GetString("LocalMachineJsonFileStore_VerifyRootPath_CreateFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Id cannot be empty.
         /// </summary>
         internal static string ReadModelStore_NoId {

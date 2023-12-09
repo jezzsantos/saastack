@@ -5,7 +5,6 @@ using Domain.Interfaces.Entities;
 using Infrastructure.Persistence.Interfaces;
 using JetBrains.Annotations;
 using QueryAny;
-using IBlobStore = Infrastructure.Persistence.Interfaces.IBlobStore;
 #if TESTINGONLY
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
 #endif

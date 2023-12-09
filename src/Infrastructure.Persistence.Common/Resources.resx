@@ -93,4 +93,7 @@
     <data name="EventSourcingDddCommandStore_PublishFailed" xml:space="preserve">
         <value>Publishing of changed events for {0} failed.</value>
     </data>
+    <data name="LocalMachineJsonFileStore_VerifyRootPath_CreateFailed" xml:space="preserve">
+        <value>The specified root path: {0}, is not a valid path or for some reason cannot be created on this local machine.</value>
+    </data>
 </root>

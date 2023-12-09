@@ -15,4 +15,10 @@
         <ProjectReference Include="..\IntegrationTesting.WebApi.Common\IntegrationTesting.WebApi.Common.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="appsettings.Testing.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
 </Project>

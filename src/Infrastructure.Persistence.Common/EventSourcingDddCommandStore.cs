@@ -1,4 +1,5 @@
-﻿using Application.Persistence.Interfaces;
+﻿using System.Reflection;
+using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
 using Common.Recording;
@@ -33,7 +34,7 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
         _eventStore = eventStore;
         _domainFactory = domainFactory;
         _migrator = migrator;
-        _entityName = typeof(TAggregateRoot).GetEntityNameSafe();
+        _entityName = GetEntityName();
     }
 
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
@@ -107,6 +108,33 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
     }
 
     public event EventStreamChangedAsync<EventStreamChangedArgs>? OnEventStreamChanged;
+
+    private static string GetEntityName()
+    {
+        var customAttribute = typeof(TAggregateRoot).GetCustomAttribute<EntityNameAttribute>();
+        if (customAttribute.Exists())
+        {
+            return customAttribute.EntityName;
+        }
+
+        var name = typeof(TAggregateRoot).Name;
+        if (name.EndsWith("Entity"))
+        {
+            name = name.Substring(0, name.LastIndexOf("Entity", StringComparison.Ordinal));
+        }
+
+        if (name.EndsWith("Aggregate"))
+        {
+            name = name.Substring(0, name.LastIndexOf("Aggregate", StringComparison.Ordinal));
+        }
+
+        if (name.EndsWith("Root"))
+        {
+            name = name.Substring(0, name.LastIndexOf("Root", StringComparison.Ordinal));
+        }
+
+        return name;
+    }
 
     private static bool IsTombstoned(IEnumerable<EventSourcedChangeEvent> events)
     {
