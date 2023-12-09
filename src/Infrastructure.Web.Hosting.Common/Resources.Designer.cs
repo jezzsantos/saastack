@@ -87,6 +87,15 @@ namespace Infrastructure.Web.Hosting.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to relay new events to read model for: {0}.
+        /// </summary>
+        internal static string EventStreamHandlerBase_OnEventStreamStateChanged_FailedToProject {
+            get {
+                return ResourceManager.GetString("EventStreamHandlerBase_OnEventStreamStateChanged_FailedToProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The event stream {0} contains events with out of order versions..
         /// </summary>
         internal static string EventStreamHandlerBase_OutOfOrderEvents {

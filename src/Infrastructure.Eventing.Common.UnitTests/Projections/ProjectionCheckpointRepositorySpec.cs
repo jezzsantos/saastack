@@ -68,7 +68,7 @@ public class ProjectionCheckpointRepositorySpec
 
         await _repository.SaveCheckpointAsync("astreamname", 10, CancellationToken.None);
 
-        _store.Verify(cs => cs.AddAsync("EventCheckpoints", It.Is<CommandEntity>(
+        _store.Verify(cs => cs.AddAsync(GetContainerName(), It.Is<CommandEntity>(
             entity =>
                 entity.Id == "anewid"
                 && (int)entity.Properties[nameof(Checkpoint.Position)] == 10
@@ -89,10 +89,15 @@ public class ProjectionCheckpointRepositorySpec
 
         await _repository.SaveCheckpointAsync("astreamname", 10, CancellationToken.None);
 
-        _store.Verify(cs => cs.ReplaceAsync("EventCheckpoints", "anid".ToId(), It.Is<CommandEntity>(
+        _store.Verify(cs => cs.ReplaceAsync(GetContainerName(), "anid".ToId(), It.Is<CommandEntity>(
             entity =>
                 entity.Id == "anid"
                 && (int)entity.Properties[nameof(Checkpoint.Position)] == 10
         ), It.IsAny<CancellationToken>()));
+    }
+
+    private static string GetContainerName()
+    {
+        return typeof(Checkpoint).GetEntityNameSafe();
     }
 }

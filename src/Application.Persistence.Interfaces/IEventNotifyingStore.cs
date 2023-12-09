@@ -44,6 +44,8 @@ public sealed class EventStreamChangedArgs : EventArgs
         return await Task.WhenAllAsync(_tasks.ToArray());
     }
 
+    public IReadOnlyList<Task<Result<Error>>> Tasks => _tasks;
+
     /// <summary>
     ///     Creates a list of tasks to perform
     /// </summary>

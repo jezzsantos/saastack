@@ -7,7 +7,7 @@ using QueryAny;
 
 namespace Infrastructure.Eventing.Common.Projections.ReadModels;
 
-[EntityName("EventCheckpoints")]
+[EntityName("ProjectionCheckpoints")]
 public class Checkpoint : ReadModelEntity, IIdentifiableEntity
 {
     public Optional<int> Position { get; set; }

@@ -1,9 +1,12 @@
 ﻿using Application.Persistence.Interfaces;
 using Common;
+using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Hosting.Common.ApplicationServices.Eventing;
 using Moq;
+using UnitTesting.Common;
 using Xunit;
+using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Web.Hosting.Common.UnitTests.ApplicationServices.Eventing;
 
@@ -51,43 +54,43 @@ public sealed class EventHandlerBaseSpec : IDisposable
     [Fact]
     public void WhenEventStreamChangedEventRaisedAndFromDifferentStreams_ThenWritesBatchedEvents()
     {
-        _handler.OnEventStreamStateChanged(null,
-            new EventStreamChangedArgs(new List<EventStreamChangeEvent>
+        var args = new EventStreamChangedArgs(new List<EventStreamChangeEvent>
+        {
+            new()
             {
-                new()
-                {
-                    Id = "aneventid1",
-                    StreamName = "astreamname1",
-                    Version = 5,
-                    Data = null!,
-                    Metadata = null!,
-                    EntityType = null!,
-                    EventType = null!,
-                    LastPersistedAtUtc = default
-                },
-                new()
-                {
-                    Id = "aneventid2",
-                    StreamName = "astreamname2",
-                    Version = 3,
-                    Data = null!,
-                    Metadata = null!,
-                    EntityType = null!,
-                    EventType = null!,
-                    LastPersistedAtUtc = default
-                },
-                new()
-                {
-                    Id = "aneventid3",
-                    StreamName = "astreamname1",
-                    Version = 4,
-                    Data = null!,
-                    Metadata = null!,
-                    EntityType = null!,
-                    EventType = null!,
-                    LastPersistedAtUtc = default
-                }
-            }), CancellationToken.None);
+                Id = "aneventid1",
+                StreamName = "astreamname1",
+                Version = 5,
+                Data = null!,
+                Metadata = null!,
+                EntityType = null!,
+                EventType = null!,
+                LastPersistedAtUtc = default
+            },
+            new()
+            {
+                Id = "aneventid2",
+                StreamName = "astreamname2",
+                Version = 3,
+                Data = null!,
+                Metadata = null!,
+                EntityType = null!,
+                EventType = null!,
+                LastPersistedAtUtc = default
+            },
+            new()
+            {
+                Id = "aneventid3",
+                StreamName = "astreamname1",
+                Version = 4,
+                Data = null!,
+                Metadata = null!,
+                EntityType = null!,
+                EventType = null!,
+                LastPersistedAtUtc = default
+            }
+        });
+        _handler.OnEventStreamStateChanged(null, args, CancellationToken.None);
 
         _action.Verify(
             rms => rms("astreamname1", It.Is<List<EventStreamChangeEvent>>(batch =>
@@ -100,52 +103,54 @@ public sealed class EventHandlerBaseSpec : IDisposable
                 batch.Count == 1
                 && batch[0].Id == "aneventid2"
             )), Times.Once);
+        args.Tasks.Count.Should().Be(1);
     }
 
     [Fact]
-    public void WhenEventStreamChangedEventRaisedAndFromDifferentStreamsAndWriteFails_ThenWritesRemainingBatches()
+    public void WhenEventStreamChangedEventRaisedAndFromDifferentStreamsAndWriteFails_ThenThrows()
     {
-        _action.Setup(rms =>
-                rms(It.IsAny<string>(), It.IsAny<List<EventStreamChangeEvent>>()))
-            .Throws<Exception>();
+        var exception = new Exception("amessage");
+        _action.Setup(rms => rms(It.IsAny<string>(), It.IsAny<List<EventStreamChangeEvent>>()))
+            .Throws(exception);
 
-        _handler.OnEventStreamStateChanged(null,
-            new EventStreamChangedArgs(new List<EventStreamChangeEvent>
+        var args = new EventStreamChangedArgs(new List<EventStreamChangeEvent>
+        {
+            new()
             {
-                new()
-                {
-                    Id = "aneventid1",
-                    StreamName = "astreamname1",
-                    Version = 5,
-                    Data = null!,
-                    Metadata = null!,
-                    EntityType = null!,
-                    EventType = null!,
-                    LastPersistedAtUtc = default
-                },
-                new()
-                {
-                    Id = "aneventid2",
-                    StreamName = "astreamname2",
-                    Version = 3,
-                    Data = null!,
-                    Metadata = null!,
-                    EntityType = null!,
-                    EventType = null!,
-                    LastPersistedAtUtc = default
-                },
-                new()
-                {
-                    Id = "aneventid3",
-                    StreamName = "astreamname1",
-                    Version = 4,
-                    Data = null!,
-                    Metadata = null!,
-                    EntityType = null!,
-                    EventType = null!,
-                    LastPersistedAtUtc = default
-                }
-            }), CancellationToken.None);
+                Id = "aneventid1",
+                StreamName = "astreamname1",
+                Version = 5,
+                Data = null!,
+                Metadata = null!,
+                EntityType = null!,
+                EventType = null!,
+                LastPersistedAtUtc = default
+            },
+            new()
+            {
+                Id = "aneventid2",
+                StreamName = "astreamname2",
+                Version = 3,
+                Data = null!,
+                Metadata = null!,
+                EntityType = null!,
+                EventType = null!,
+                LastPersistedAtUtc = default
+            },
+            new()
+            {
+                Id = "aneventid3",
+                StreamName = "astreamname1",
+                Version = 4,
+                Data = null!,
+                Metadata = null!,
+                EntityType = null!,
+                EventType = null!,
+                LastPersistedAtUtc = default
+            }
+        });
+        _handler.OnEventStreamStateChanged(null,
+            args, CancellationToken.None);
 
         _action.Verify(
             rms => rms("astreamname1", It.Is<List<EventStreamChangeEvent>>(batch =>
@@ -153,56 +158,60 @@ public sealed class EventHandlerBaseSpec : IDisposable
                 && batch[0].Id == "aneventid3"
                 && batch[1].Id == "aneventid1"
             )), Times.Once);
-        _action.Verify(
-            rms => rms("astreamname2", It.Is<List<EventStreamChangeEvent>>(batch =>
-                batch.Count == 1
-                && batch[0].Id == "aneventid2"
-            )), Times.Once);
+        _action.Verify(rms => rms("astreamname2", It.IsAny<List<EventStreamChangeEvent>>()), Times.Never);
+        args.Tasks.Count.Should().Be(1);
+        args.Tasks[0].Invoking(x => x.Result)
+            .Should().Throw<Exception>()
+            .WithMessage(
+                Resources.EventStreamHandlerBase_OnEventStreamStateChanged_FailedToProject.Format("astreamname1"))
+            .WithInnerException<Exception>().WithMessage("amessage");
     }
 
     [Fact]
-    public void WhenEventStreamChangedEventRaisedAndEventsAreOutOfOrder_ThenCapturesErrors()
+    public void WhenEventStreamChangedEventRaisedAndEventsAreOutOfOrder_ThenReturnsError()
     {
-        _handler.OnEventStreamStateChanged(null,
-            new EventStreamChangedArgs(new List<EventStreamChangeEvent>
+        var args = new EventStreamChangedArgs(new List<EventStreamChangeEvent>
+        {
+            new()
             {
-                new()
-                {
-                    Id = "aneventid1",
-                    StreamName = "astreamname1",
-                    Version = 5,
-                    Data = null!,
-                    Metadata = null!,
-                    EntityType = null!,
-                    EventType = null!,
-                    LastPersistedAtUtc = default
-                },
-                new()
-                {
-                    Id = "aneventid2",
-                    StreamName = "astreamname1",
-                    Version = 2,
-                    Data = null!,
-                    Metadata = null!,
-                    EntityType = null!,
-                    EventType = null!,
-                    LastPersistedAtUtc = default
-                },
-                new()
-                {
-                    Id = "aneventid3",
-                    StreamName = "astreamname1",
-                    Version = 4,
-                    Data = null!,
-                    Metadata = null!,
-                    EntityType = null!,
-                    EventType = null!,
-                    LastPersistedAtUtc = default
-                }
-            }), CancellationToken.None);
+                Id = "aneventid1",
+                StreamName = "astreamname1",
+                Version = 5,
+                Data = null!,
+                Metadata = null!,
+                EntityType = null!,
+                EventType = null!,
+                LastPersistedAtUtc = default
+            },
+            new()
+            {
+                Id = "aneventid2",
+                StreamName = "astreamname1",
+                Version = 2,
+                Data = null!,
+                Metadata = null!,
+                EntityType = null!,
+                EventType = null!,
+                LastPersistedAtUtc = default
+            },
+            new()
+            {
+                Id = "aneventid3",
+                StreamName = "astreamname1",
+                Version = 4,
+                Data = null!,
+                Metadata = null!,
+                EntityType = null!,
+                EventType = null!,
+                LastPersistedAtUtc = default
+            }
+        });
+        _handler.OnEventStreamStateChanged(null,
+            args, CancellationToken.None);
 
-        _handler.ProcessingErrors.Should().HaveCount(1);
-        _handler.ProcessingErrors[0].Exception.Should().BeOfType<InvalidOperationException>();
+        args.Tasks.Count.Should().Be(1);
+        args.Tasks[0].Result.Should().BeError(ErrorCode.RuleViolation,
+            Resources.EventStreamHandlerBase_OutOfOrderEvents.Format("astreamname1"));
     }
 }
 

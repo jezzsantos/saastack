@@ -17,7 +17,6 @@ public abstract class EventStreamHandlerBase : IDisposable
     {
         _recorder = recorder;
         _eventingStores = eventingStores;
-        ProcessingErrors = new List<EventProcessingError>();
     }
 
     public void Dispose()
@@ -46,8 +45,6 @@ public abstract class EventStreamHandlerBase : IDisposable
 
     public bool IsStarted { get; private set; }
 
-    internal List<EventProcessingError> ProcessingErrors { get; }
-
     public void Start()
     {
         if (!IsStarted)
@@ -75,44 +72,38 @@ public abstract class EventStreamHandlerBase : IDisposable
 
         args.CreateTasksAsync(async events =>
         {
-            return await WithProcessMonitoringAsync(async () =>
+            var eventsStreams = events.GroupBy(e => e.StreamName)
+                .Select(grp => grp.AsEnumerable())
+                .Select(grp => grp.OrderBy(e => e.Version).ToList());
+
+            foreach (var eventStream in eventsStreams)
             {
-                var eventsStreams = events.GroupBy(e => e.StreamName)
-                    .Select(grp => grp.AsEnumerable())
-                    .Select(grp => grp.OrderBy(e => e.Version).ToList());
+                var firstEvent = Enumerable.First(eventStream);
+                var streamName = firstEvent.StreamName;
 
-                foreach (var eventStream in eventsStreams)
+                var ensured = EnsureContiguousVersions(streamName, eventStream);
+                if (!ensured.IsSuccessful)
                 {
-                    var firstEvent = Enumerable.First(eventStream);
-                    var streamName = firstEvent.StreamName;
-
-                    try
-                    {
-                        var ensured = EnsureContiguousVersions(streamName, eventStream);
-                        if (!ensured.IsSuccessful)
-                        {
-                            ProcessingErrors.Add(
-                                new EventProcessingError(ensured.Error, streamName));
-                        }
-
-                        var handled = await HandleStreamEventsAsync(streamName, eventStream, CancellationToken.None);
-                        if (!handled.IsSuccessful)
-                        {
-                            ProcessingErrors.Add(
-                                new EventProcessingError(handled.Error, streamName));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ProcessingErrors.Add(
-                            new EventProcessingError(ex, streamName));
-
-                        //Continue onto next stream
-                    }
+                    return ensured.Error;
                 }
 
-                return Result.Ok;
-            });
+                try
+                {
+                    var handled = await HandleStreamEventsAsync(streamName, eventStream, CancellationToken.None);
+                    if (!handled.IsSuccessful)
+                    {
+                        return handled.Error;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException(
+                        Resources.EventStreamHandlerBase_OnEventStreamStateChanged_FailedToProject.Format(streamName),
+                        ex);
+                }
+            }
+
+            return Result.Ok;
         });
     }
 
@@ -124,40 +115,6 @@ public abstract class EventStreamHandlerBase : IDisposable
         }
 
         return Result.Ok;
-    }
-
-    private Task<Result<Error>> WithProcessMonitoringAsync(Func<Task<Result<Error>>> process)
-    {
-        ProcessingErrors.Clear();
-
-        var result = process.Invoke();
-        if (ProcessingErrors.Any())
-        {
-            ProcessingErrors.ForEach(error =>
-                _recorder.TraceError(null, error.Exception,
-                    "Failed to relay new events to read model for: {StreamName}", error.StreamName));
-        }
-
-        return result;
-    }
-
-    internal class EventProcessingError
-    {
-        public EventProcessingError(Exception ex, string streamName)
-        {
-            Exception = ex;
-            StreamName = streamName;
-        }
-
-        public EventProcessingError(Error error, string streamName)
-        {
-            Exception = new InvalidOperationException(error.ToString());
-            StreamName = streamName;
-        }
-
-        public Exception Exception { get; }
-
-        public string StreamName { get; }
     }
 }
 

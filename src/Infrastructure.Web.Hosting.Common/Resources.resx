@@ -45,4 +45,7 @@
     <data name="EventStreamHandlerBase_OutOfOrderEvents" xml:space="preserve">
         <value>The event stream {0} contains events with out of order versions.</value>
     </data>
+    <data name="EventStreamHandlerBase_OnEventStreamStateChanged_FailedToProject" xml:space="preserve">
+        <value>Failed to relay new events to read model for: {0}</value>
+    </data>
 </root>
