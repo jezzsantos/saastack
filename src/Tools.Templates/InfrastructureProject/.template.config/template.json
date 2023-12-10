@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/template",
+  "author": "SaaStack",
+  "classifications": [
+    "SaaStack"
+  ],
+  "identity": "SaaStack.InfrastructureProject",
+  "name": "SaaStack Infrastructure Project",
+  "description": "",
+  "shortName": "saastackinfrastructure",
+  "sourceName": "ProjectName",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "preferNameDirectory": false,
+  "symbols": {
+    "SubDomainName": {
+      "type": "parameter",
+      "datatype": "string",
+      "isRequired": true,
+      "description": "Name of the subdomain (singular, Title-cased)",
+      "replaces": "{SubDomainName}"
+    },
+    "SubDomainNameLower": {
+      "type": "generated",
+      "generator": "casing",
+      "parameters": {
+        "source": "SubDomainName",
+        "toLower": true
+      },
+      "replaces": "{SubDomainNameLower}"
+    }
+  }
+}

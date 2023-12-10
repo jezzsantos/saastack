@@ -9,11 +9,11 @@
         <Compile Remove="AnyProject/**/*.cs" />
         <None Include="AnyProject/**/*.*" />
 
-        <Compile Remove="ApiProject/**/*.cs" />
-        <None Include="ApiProject/**/*.*" />
-
         <Compile Remove="HostProject/**/*.cs" />
         <None Include="HostProject/**/*.*" />
+
+        <Compile Remove="InfrastructureProject/**/*.cs" />
+        <None Include="InfrastructureProject/**/*.*" />
 
         <Compile Remove="IntegrationTestProject/**/*.cs" />
         <None Include="IntegrationTestProject/**/*.*" />

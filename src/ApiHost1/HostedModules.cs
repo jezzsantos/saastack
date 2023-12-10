@@ -1,5 +1,5 @@
-using BookingsApi;
-using CarsApi;
+using BookingsInfrastructure;
+using CarsInfrastructure;
 using Infrastructure.Web.Hosting.Common;
 
 namespace ApiHost1;
@@ -14,8 +14,8 @@ public static class HostedModules
 #if TESTINGONLY
         modules.Register(new TestingOnlyApiModule());
 #endif
-        modules.Register(new CarsApiModule());
-        modules.Register(new BookingsApiModule());
+        modules.Register(new CarsModule());
+        modules.Register(new BookingsModule());
 
         return modules;
     }
