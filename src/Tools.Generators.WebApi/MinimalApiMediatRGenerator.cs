@@ -20,7 +20,7 @@ public class MinimalApiMediatRGenerator : ISourceGenerator
     private static readonly string[] RequiredUsingNamespaces =
     {
         "System", "Microsoft.AspNetCore.Builder", "Microsoft.AspNetCore.Http",
-        "Infrastructure.Web.Api.Common"
+        "Infrastructure.Web.Api.Common.Extensions"
     };
 
     public void Initialize(GeneratorInitializationContext context)

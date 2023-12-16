@@ -3,8 +3,10 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Common;
 using Common.Extensions;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Interfaces.Clients;
+using Microsoft.AspNetCore.Mvc;
 using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Web.Api.Common.Clients;
@@ -195,8 +197,9 @@ public class JsonClient : IHttpJsonClient, IDisposable
 
         if (contentType.MediaType == HttpContentTypes.JsonProblem)
         {
-            return await response.Content.ReadFromJsonAsync<ResponseProblem>(
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(
                 cancellationToken: cancellationToken ?? CancellationToken.None);
+            return problem.ToResponseProblem();
         }
 
         if (contentType.MediaType == HttpContentTypes.Json)
@@ -219,8 +222,9 @@ public class JsonClient : IHttpJsonClient, IDisposable
 
         if (contentType.MediaType == HttpContentTypes.JsonProblem)
         {
-            return await response.Content.ReadFromJsonAsync<ResponseProblem>(
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(
                 cancellationToken: cancellationToken ?? CancellationToken.None);
+            return problem.ToResponseProblem();
         }
 
         return await response.Content.ReadAsStringAsync(cancellationToken ?? CancellationToken.None);

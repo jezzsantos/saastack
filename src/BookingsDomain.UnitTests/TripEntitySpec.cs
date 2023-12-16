@@ -1,4 +1,3 @@
-using BookingsDomain.Events;
 using Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
@@ -21,7 +20,7 @@ public class TripEntitySpec
         var idFactory = new FixedIdentifierFactory("anid");
 
         _trip = TripEntity.Create(recorder.Object, idFactory, _ => Result.Ok).Value;
-        _trip.RaiseChangeEvent(Booking.TripAdded.Create("arootid".ToId(), "anorganizationid".ToId()));
+        _trip.RaiseChangeEvent(Events.TripAdded.Create("arootid".ToId(), "anorganizationid".ToId()));
     }
 
     [Fact]

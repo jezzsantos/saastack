@@ -3,7 +3,7 @@ using Common.Extensions;
 using FluentAssertions;
 using FluentValidation;
 using Infrastructure.Web.Api.Common.Validation;
-using Infrastructure.Web.Api.Interfaces.Operations.Bookings;
+using Infrastructure.Web.Api.Operations.Shared.Bookings;
 using UnitTesting.Common.Validation;
 using Xunit;
 

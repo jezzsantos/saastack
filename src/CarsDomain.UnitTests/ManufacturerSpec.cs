@@ -1,5 +1,5 @@
 ﻿using Common;
-using Domain.Common.ValueObjects;
+using Domain.Shared;
 using FluentAssertions;
 using UnitTesting.Common;
 using Xunit;

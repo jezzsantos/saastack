@@ -1,5 +1,5 @@
 using Application.Interfaces;
-using Application.Interfaces.Resources;
+using Application.Resources.Shared;
 using Common;
 
 namespace CarsApplication;
@@ -19,8 +19,7 @@ public interface ICarsApplication
         string id, DateTime fromUtc, DateTime toUtc, CancellationToken cancellationToken);
 
     Task<Result<bool, Error>> ReserveCarIfAvailableAsync(ICallerContext caller, string organizationId,
-        string id, DateTime fromUtc,
-        DateTime toUtc, string referenceId, CancellationToken cancellationToken);
+        string id, DateTime fromUtc, DateTime toUtc, string referenceId, CancellationToken cancellationToken);
 
     Task<Result<Car, Error>> ScheduleMaintenanceCarAsync(ICallerContext caller, string organizationId, string id,
         DateTime fromUtc, DateTime toUtc, CancellationToken cancellationToken);

@@ -1,5 +1,4 @@
-﻿using CarsDomain.Events;
-using Common;
+﻿using Common;
 using Common.Extensions;
 using Domain.Common.Events;
 using Domain.Common.Identity;
@@ -51,7 +50,7 @@ public class CarRootSpec
         _car.SetManufacturer(manufacturer);
 
         _car.Manufacturer.Should().Be(manufacturer);
-        _car.Events.Last().Should().BeOfType<Car.ManufacturerChanged>();
+        _car.Events.Last().Should().BeOfType<Events.ManufacturerChanged>();
     }
 
     [Fact]
@@ -62,7 +61,7 @@ public class CarRootSpec
 
         _car.Owner.Should().Be(VehicleOwner.Create(owner.OwnerId).Value);
         _car.Managers.Managers.Single().Should().Be("anownerid".ToId());
-        _car.Events.Last().Should().BeOfType<Car.OwnershipChanged>();
+        _car.Events.Last().Should().BeOfType<Events.OwnershipChanged>();
     }
 
     [Fact]
@@ -72,7 +71,7 @@ public class CarRootSpec
 
         _car.License.Should().Be(LicensePlate.Create(Jurisdiction.AllowedCountries[0], "aplate").Value);
         _car.Status.Should().Be(CarStatus.Registered);
-        _car.Events.Last().Should().BeOfType<Car.RegistrationChanged>();
+        _car.Events.Last().Should().BeOfType<Events.RegistrationChanged>();
     }
 
     [Fact]
@@ -145,7 +144,7 @@ public class CarRootSpec
         _car.Unavailabilities[0].Slot.Should().Be(slot);
         _car.Unavailabilities[0].CausedBy!.Reason.Should().Be(UnavailabilityCausedBy.Offline);
         _car.Unavailabilities[0].CausedBy!.Reference.Should().BeNull();
-        _car.Events.Last().Should().BeOfType<Car.UnavailabilitySlotAdded>();
+        _car.Events.Last().Should().BeOfType<Events.UnavailabilitySlotAdded>();
     }
 
     [Fact]
@@ -191,7 +190,7 @@ public class CarRootSpec
         _car.Unavailabilities[0].Slot.Should().Be(slot);
         _car.Unavailabilities[0].CausedBy!.Reason.Should().Be(UnavailabilityCausedBy.Maintenance);
         _car.Unavailabilities[0].CausedBy!.Reference.Should().BeNull();
-        _car.Events.Last().Should().BeOfType<Car.UnavailabilitySlotAdded>();
+        _car.Events.Last().Should().BeOfType<Events.UnavailabilitySlotAdded>();
     }
 
     [Fact]
@@ -238,7 +237,7 @@ public class CarRootSpec
         _car.Unavailabilities[0].Slot.Should().Be(slot);
         _car.Unavailabilities[0].CausedBy!.Reason.Should().Be(UnavailabilityCausedBy.Reservation);
         _car.Unavailabilities[0].CausedBy!.Reference.Should().Be("areference");
-        _car.Events.Last().Should().BeOfType<Car.UnavailabilitySlotAdded>();
+        _car.Events.Last().Should().BeOfType<Events.UnavailabilitySlotAdded>();
     }
 
     [Fact]
@@ -331,8 +330,8 @@ public class CarRootSpec
         _car.Unavailabilities[0].Slot.Should().Be(slot);
         _car.Unavailabilities[0].CausedBy!.Reason.Should().Be(UnavailabilityCausedBy.Other);
         _car.Unavailabilities[0].CausedBy!.Reference.Should().BeNull();
-        _car.Events.Last().Should().BeOfType<Car.UnavailabilitySlotAdded>();
-        _car.Events.Last().As<Car.UnavailabilitySlotAdded>().UnavailabilityId.Should()
+        _car.Events.Last().Should().BeOfType<Events.UnavailabilitySlotAdded>();
+        _car.Events.Last().As<Events.UnavailabilitySlotAdded>().UnavailabilityId.Should()
             .Be("anunavailbilityid1");
     }
 #endif
@@ -349,7 +348,7 @@ public class CarRootSpec
 
         _car.Unavailabilities.Count.Should().Be(1);
         _car.Unavailabilities[0].Slot.Should().Be(slot);
-        _car.Events.Last().Should().BeOfType<Car.UnavailabilitySlotAdded>();
+        _car.Events.Last().Should().BeOfType<Events.UnavailabilitySlotAdded>();
     }
 #endif
 
@@ -367,8 +366,8 @@ public class CarRootSpec
 
         _car.Unavailabilities.Count.Should().Be(1);
         _car.Unavailabilities[0].Slot.Should().Be(slot2);
-        _car.Events[4].Should().BeOfType<Car.UnavailabilitySlotAdded>();
-        _car.Events.Last().Should().BeOfType<Car.UnavailabilitySlotAdded>();
+        _car.Events[4].Should().BeOfType<Events.UnavailabilitySlotAdded>();
+        _car.Events.Last().Should().BeOfType<Events.UnavailabilitySlotAdded>();
     }
 #endif
 
@@ -386,8 +385,8 @@ public class CarRootSpec
 
         _car.Unavailabilities.Count.Should().Be(1);
         _car.Unavailabilities[0].Slot.Should().Be(slot2);
-        _car.Events[4].Should().BeOfType<Car.UnavailabilitySlotAdded>();
-        _car.Events.Last().Should().BeOfType<Car.UnavailabilitySlotAdded>();
+        _car.Events[4].Should().BeOfType<Events.UnavailabilitySlotAdded>();
+        _car.Events.Last().Should().BeOfType<Events.UnavailabilitySlotAdded>();
     }
 #endif
 
@@ -457,8 +456,8 @@ public class CarRootSpec
         _car.Unavailabilities.Count.Should().Be(2);
         _car.Unavailabilities[0].Slot.Should().Be(slot1);
         _car.Unavailabilities[1].Slot.Should().Be(slot2);
-        _car.Events[4].Should().BeOfType<Car.UnavailabilitySlotAdded>();
-        _car.Events.Last().Should().BeOfType<Car.UnavailabilitySlotAdded>();
+        _car.Events[4].Should().BeOfType<Events.UnavailabilitySlotAdded>();
+        _car.Events.Last().Should().BeOfType<Events.UnavailabilitySlotAdded>();
     }
 #endif
 
@@ -477,8 +476,8 @@ public class CarRootSpec
         _car.Unavailabilities.Count.Should().Be(2);
         _car.Unavailabilities[0].Slot.Should().Be(slot1);
         _car.Unavailabilities[1].Slot.Should().Be(slot2);
-        _car.Events[4].Should().BeOfType<Car.UnavailabilitySlotAdded>();
-        _car.Events.Last().Should().BeOfType<Car.UnavailabilitySlotAdded>();
+        _car.Events[4].Should().BeOfType<Events.UnavailabilitySlotAdded>();
+        _car.Events.Last().Should().BeOfType<Events.UnavailabilitySlotAdded>();
     }
 #endif
 
@@ -498,8 +497,8 @@ public class CarRootSpec
         _car.Unavailabilities.Count.Should().Be(2);
         _car.Unavailabilities[0].Slot.Should().Be(slot1);
         _car.Unavailabilities[1].Slot.Should().Be(slot2);
-        _car.Events[4].Should().BeOfType<Car.UnavailabilitySlotAdded>();
-        _car.Events.Last().Should().BeOfType<Car.UnavailabilitySlotAdded>();
+        _car.Events[4].Should().BeOfType<Events.UnavailabilitySlotAdded>();
+        _car.Events.Last().Should().BeOfType<Events.UnavailabilitySlotAdded>();
     }
 #endif
 

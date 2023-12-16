@@ -1,6 +1,6 @@
 using Application.Interfaces;
-using Application.Interfaces.Resources;
-using Application.Interfaces.Services;
+using Application.Resources.Shared;
+using Application.Services.Shared;
 using BookingsApplication.Persistence;
 using BookingsDomain;
 using Common;

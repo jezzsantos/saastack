@@ -4,7 +4,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using FluentValidation;
 using Infrastructure.Web.Api.Common.Validation;
-using Infrastructure.Web.Api.Interfaces.Operations.Cars;
+using Infrastructure.Web.Api.Operations.Shared.Cars;
 using Moq;
 using Xunit;
 

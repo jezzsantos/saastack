@@ -19,9 +19,11 @@ public static class IdentifierExtensions
     ///     Converts a <see cref="string" /> to an <see cref="Identifier" />
     /// </summary>
     [DebuggerStepThrough]
-    public static Identifier ToId(this string id)
+    public static Identifier ToId(this string? id)
     {
-        return Identifier.Create(id);
+        return id.HasValue()
+            ? Identifier.Create(id)
+            : Identifier.Empty();
     }
 
     /// <summary>

@@ -1,11 +1,11 @@
 using System.Net;
 using ApiHost1;
-using Application.Interfaces.Resources;
+using Application.Resources.Shared;
 using CarsDomain;
 using Domain.Interfaces;
 using FluentAssertions;
-using Infrastructure.Web.Api.Common;
-using Infrastructure.Web.Api.Interfaces.Operations.Cars;
+using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Operations.Shared.Cars;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
 

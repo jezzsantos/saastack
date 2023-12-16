@@ -1,10 +1,12 @@
 using Application.Persistence.Interfaces;
 using Common;
+using Common.Extensions;
 using Infrastructure.Web.Api.Common.Clients;
 using Infrastructure.Web.Api.Interfaces.Clients;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -18,6 +20,7 @@ namespace IntegrationTesting.WebApi.Common;
 public class WebApiSetup<THost> : WebApplicationFactory<THost>
     where THost : class
 {
+    private Action<IServiceCollection>? _overridenTestingDependencies;
     private IServiceScope? _scope;
 
     protected override void Dispose(bool disposing)
@@ -44,6 +47,11 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
         return _scope.ServiceProvider.GetRequiredService<TInterface>();
     }
 
+    public void OverrideTestingDependencies(Action<IServiceCollection> overrideDependencies)
+    {
+        _overridenTestingDependencies = overrideDependencies;
+    }
+
     public TInterface? TryGetService<TInterface>(Type serviceType)
     {
         if (_scope is null)
@@ -66,6 +74,14 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
         });
 
         base.ConfigureWebHost(builder);
+
+        builder.ConfigureTestServices(services =>
+        {
+            if (_overridenTestingDependencies.Exists())
+            {
+                _overridenTestingDependencies.Invoke(services);
+            }
+        });
     }
 }
 
@@ -82,11 +98,16 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
     private static IReadOnlyList<IApplicationRepository>? _repositories;
     protected readonly IHttpJsonClient Api;
     protected readonly HttpClient HttpApi;
-    private readonly WebApplicationFactory<THost> _setup;
+    protected readonly WebApplicationFactory<THost> Setup;
 
-    protected WebApiSpec(WebApiSetup<THost> setup)
+    protected WebApiSpec(WebApiSetup<THost> setup, Action<IServiceCollection>? overrideDependencies = null)
     {
-        _setup = setup.WithWebHostBuilder(_ => { });
+        if (overrideDependencies.Exists())
+        {
+            setup.OverrideTestingDependencies(overrideDependencies);
+        }
+
+        Setup = setup.WithWebHostBuilder(_ => { });
 
         HttpApi = setup.CreateClient();
         Api = new JsonClient(HttpApi);
@@ -103,7 +124,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         if (disposing)
         {
             HttpApi.Dispose();
-            _setup.Dispose();
+            Setup.Dispose();
         }
     }
 

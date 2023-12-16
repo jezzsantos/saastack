@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using FluentAssertions;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
 using Xunit;

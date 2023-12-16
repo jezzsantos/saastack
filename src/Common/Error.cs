@@ -15,7 +15,7 @@ public readonly struct Error
         Message = NoErrorMessage;
     }
 
-    private Error(ErrorCode code, string? message = null)
+    internal Error(ErrorCode code, string? message = null)
     {
         Code = code;
         Message = message ?? NoErrorMessage;

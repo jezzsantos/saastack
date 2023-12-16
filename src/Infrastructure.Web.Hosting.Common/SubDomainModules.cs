@@ -32,13 +32,16 @@ public class SubDomainModules
     {
         ArgumentNullException.ThrowIfNull(module);
         ArgumentNullException.ThrowIfNull(module.ApiAssembly, nameof(module.ApiAssembly));
-        ArgumentNullException.ThrowIfNull(module.DomainAssembly, nameof(module.DomainAssembly));
         ArgumentNullException.ThrowIfNull(module.ApiAssembly, nameof(module.AggregatePrefixes));
         ArgumentNullException.ThrowIfNull(module.MinimalApiRegistrationFunction,
             nameof(module.MinimalApiRegistrationFunction));
 
         _apiAssemblies.Add(module.ApiAssembly);
-        _domainAssemblies.Add(module.DomainAssembly);
+        if (module.DomainAssembly.Exists())
+        {
+            _domainAssemblies.Add(module.DomainAssembly);
+        }
+
         _aggregatePrefixes.Merge(module.AggregatePrefixes);
         _minimalApiRegistrationFunctions.Add(module.MinimalApiRegistrationFunction);
         if (module.RegisterServicesFunction is not null)

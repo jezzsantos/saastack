@@ -1,7 +1,7 @@
 using CarsDomain;
 using FluentValidation;
 using Infrastructure.Web.Api.Common.Validation;
-using Infrastructure.Web.Api.Interfaces.Operations.Cars;
+using Infrastructure.Web.Api.Operations.Shared.Cars;
 using JetBrains.Annotations;
 
 namespace CarsInfrastructure.Api.Cars;

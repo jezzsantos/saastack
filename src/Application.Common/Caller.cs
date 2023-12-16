@@ -60,6 +60,15 @@ public static class Caller
     /// <summary>
     ///     Returns a caller used for internal processing (e.g. raising domain event notifications)
     /// </summary>
+    public static ICallerContext CreateAsMaintenanceTenant(string callId, string? tenantId)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(callId);
+        return new MaintenanceAccountCaller(callId, tenantId);
+    }
+
+    /// <summary>
+    ///     Returns a caller used for internal processing (e.g. raising domain event notifications)
+    /// </summary>
     public static ICallerContext CreateAsMaintenanceTenant(string tenantId)
     {
         ArgumentException.ThrowIfNullOrEmpty(tenantId);

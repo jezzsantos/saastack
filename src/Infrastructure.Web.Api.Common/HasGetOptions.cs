@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Application.Interfaces;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Common;

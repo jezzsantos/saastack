@@ -3,7 +3,7 @@ using System.Net;
 using ApiHost1;
 using FluentAssertions;
 using Infrastructure.Web.Api.Interfaces;
-using Infrastructure.Web.Api.Interfaces.Operations.TestingOnly;
+using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
 

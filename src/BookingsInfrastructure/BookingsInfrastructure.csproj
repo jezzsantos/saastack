@@ -7,6 +7,7 @@
     <ItemGroup>
         <ProjectReference Include="..\BookingsApplication\BookingsApplication.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.Common\Infrastructure.Persistence.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Operations.Shared\Infrastructure.Web.Api.Operations.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Hosting.Common\Infrastructure.Web.Hosting.Common.csproj" />
     </ItemGroup>
 
@@ -24,7 +25,7 @@
     <ItemGroup>
         <EmbeddedResource Update="Resources.resx">
             <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>ValidationResources.Designer.cs</LastGenOutput>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
         </EmbeddedResource>
     </ItemGroup>
 

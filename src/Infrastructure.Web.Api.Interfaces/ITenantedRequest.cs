@@ -1,9 +1,17 @@
 namespace Infrastructure.Web.Api.Interfaces;
 
 /// <summary>
-///     Defines the request for an Organization
+///     Defines the request for a specific Tenant
 /// </summary>
 public interface ITenantedRequest
+{
+    public string? OrganizationId { get; set; }
+}
+
+/// <summary>
+///     Defines the request of a POST/GET/PUT/PATCH API for an Organization, with an empty response
+/// </summary>
+public class TenantedEmptyRequest : IWebRequest<EmptyResponse>, ITenantedRequest
 {
     public string? OrganizationId { get; set; }
 }
@@ -21,7 +29,7 @@ public class TenantedRequest<TResponse> : IWebRequest<TResponse>, ITenantedReque
 ///     Defines the request of a SEARCH API for an Organization
 /// </summary>
 public class TenantedSearchRequest<TResponse> : SearchRequest<TResponse>, ITenantedRequest
-    where TResponse : IWebResponse
+    where TResponse : IWebSearchResponse
 {
     public string? OrganizationId { get; set; }
 }

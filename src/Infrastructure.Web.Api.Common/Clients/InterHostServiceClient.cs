@@ -1,7 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
+using Application.Common;
 using Application.Interfaces;
 using Common;
 using Common.Extensions;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Interfaces.Clients;
 using Polly.Retry;
@@ -126,14 +128,13 @@ public class InterHostServiceClient : IServiceClient
         return client;
     }
 
-    private static void AddCorrelationId(HttpRequestMessage request, ICallerContext context)
+    private static void AddCorrelationId(HttpRequestMessage message, ICallerContext context)
     {
-        var correlationId = context.CallId;
-        request.Headers.Add(HttpHeaders.RequestId, correlationId);
+        message.SetRequestId(context.ToCall());
     }
 
-    private static void AddBearerToken(HttpRequestMessage request, ICallerContext context)
+    private static void AddBearerToken(HttpRequestMessage message, ICallerContext context)
     {
-        request.Headers.Add(HttpHeaders.Authorization, context.Authorization);
+        message.SetBearerToken(context);
     }
 }

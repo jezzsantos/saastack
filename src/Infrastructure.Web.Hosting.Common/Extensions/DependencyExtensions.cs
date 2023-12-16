@@ -12,8 +12,8 @@ public static class DependencyExtensions
     {
         return scope switch
         {
-            DependencyScope.Platform => ServiceLifetime.Singleton,
-            DependencyScope.PerTenant => ServiceLifetime.Scoped,
+            DependencyScope.UnTenanted => ServiceLifetime.Singleton,
+            DependencyScope.Tenanted => ServiceLifetime.Scoped,
             _ => throw new ArgumentOutOfRangeException(nameof(scope))
         };
     }

@@ -45,7 +45,7 @@ public sealed class CausedBy : ValueObjectBase<CausedBy>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new CausedBy(parts[0].ToEnum<UnavailabilityCausedBy>(), parts[1]);
+            return new CausedBy(parts[0]!.ToEnum<UnavailabilityCausedBy>(), parts[1]);
         };
     }
 

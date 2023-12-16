@@ -121,11 +121,19 @@ public class ValueObjectSpec
     }
 
     [Fact]
-    public void WhenRehydrateToListWithSomeValues_ThenReturnsValues()
+    public void WhenRehydrateToListWithANullValue_ThenReturnsValues()
     {
         var result = TestMultiValueObject.RehydrateToList("{\"Val1\":\"NULL\",\"Val2\":25,\"Val3\":true}", false);
 
         result.Should().ContainInOrder(null, "25", "True");
+    }
+
+    [Fact]
+    public void WhenRehydrateToListWithAnEmptyValue_ThenReturnsValues()
+    {
+        var result = TestMultiValueObject.RehydrateToList("{\"Val1\":\"\",\"Val2\":25,\"Val3\":true}", false);
+
+        result.Should().ContainInOrder(string.Empty, "25", "True");
     }
 
     [Fact]
@@ -148,9 +156,9 @@ public class ValueObjectSpec
     [Fact]
     public void WhenRehydrateToListWithEmptyValueForSingleValue_ThenReturnsValue()
     {
-        var result = TestMultiValueObject.RehydrateToList("", true);
+        var result = TestMultiValueObject.RehydrateToList(string.Empty, true);
 
-        result.Should().ContainInOrder("");
+        result.Should().ContainInOrder(string.Empty);
     }
 
     [Fact]
@@ -158,7 +166,7 @@ public class ValueObjectSpec
     {
         var result = TestMultiValueObject.RehydrateToList(ValueObjectBase<TestMultiValueObject>.NullValue, true);
 
-        result.Should().BeEmpty();
+        result.Should().ContainInOrder((string?)null);
     }
 
     [Fact]
@@ -296,7 +304,7 @@ public class ValueObjectSpec
             return (property, _) =>
             {
                 var values = ValueObjectBase<TestMultiValueObject>.RehydrateToList(property, false);
-                return new TestMultiValueObject(values[0], values[1].ToInt(), values[2].ToBool());
+                return new TestMultiValueObject(values[0]!, values[1]!.ToInt(), values[2]!.ToBool());
             };
         }
 
@@ -309,7 +317,7 @@ public class ValueObjectSpec
             bool isSingleListValueObject = false)
         {
             return ValueObjectBase<TestMultiValueObject>.RehydrateToList(hydratedValue, isSingleValueObject,
-                isSingleListValueObject);
+                isSingleListValueObject)!;
         }
     }
 

@@ -3,7 +3,7 @@ using Common.Extensions;
 using FluentAssertions;
 using FluentValidation;
 using Infrastructure.Web.Api.Common.Validation;
-using Infrastructure.Web.Api.Interfaces.Operations.Cars;
+using Infrastructure.Web.Api.Operations.Shared.Cars;
 using UnitTesting.Common.Validation;
 using Xunit;
 

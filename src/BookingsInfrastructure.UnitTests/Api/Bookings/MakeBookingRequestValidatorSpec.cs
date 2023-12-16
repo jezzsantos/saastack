@@ -5,7 +5,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using FluentAssertions;
 using FluentValidation;
-using Infrastructure.Web.Api.Interfaces.Operations.Bookings;
+using Infrastructure.Web.Api.Operations.Shared.Bookings;
 using Moq;
 using UnitTesting.Common.Validation;
 using Xunit;

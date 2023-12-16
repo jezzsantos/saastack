@@ -54,4 +54,19 @@
     <data name="SearchAllAvailableCarsRequestValidator_InvalidToUtc" xml:space="preserve">
         <value>The 'ToUtc' must be greater than 'FromUtc'</value>
     </data>
+    <data name="ReserveCarIfAvailableRequestValidator_InvalidFromUtc" xml:space="preserve">
+        <value>The 'FromUtc' is either missing or in the past</value>
+    </data>
+    <data name="ReserveCarIfAvailableRequestValidator_InvalidToUtc" xml:space="preserve">
+        <value>The 'ToUtc' is either missing, or is before the 'FromUtc'</value>
+    </data>
+    <data name="ReserveCarIfAvailableRequestValidator_InvalidReferenceId" xml:space="preserve">
+        <value>The 'ReferenceId' is either missing or invalid</value>
+    </data>
+    <data name="ReleaseCarAvailabilityRequestValidator_InvalidFromUtc" xml:space="preserve">
+        <value>The 'FromUtc' is either missing or in the past</value>
+    </data>
+    <data name="ReleaseCarAvailabilityRequestValidator_InvalidToUtc" xml:space="preserve">
+        <value>The 'ToUtc' is either missing, or is before the 'FromUtc'</value>
+    </data>
 </root>

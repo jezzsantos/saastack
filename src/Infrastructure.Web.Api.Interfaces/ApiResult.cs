@@ -14,7 +14,7 @@ public delegate Result<EmptyResponse, Error> ApiEmptyResult();
 /// </summary>
 // ReSharper disable once UnusedTypeParameter
 public delegate Result<TResponse, Error> ApiResult<TResource, TResponse>()
-    where TResource : class where TResponse : IWebResponse;
+    where TResponse : IWebResponse;
 
 /// <summary>
 ///     Defines a callback that returns a <see cref="PostResult{TResponse}" /> or <see cref="Error" />.
@@ -22,7 +22,7 @@ public delegate Result<TResponse, Error> ApiResult<TResource, TResponse>()
 /// </summary>
 // ReSharper disable once UnusedTypeParameter
 public delegate Result<PostResult<TResponse>, Error> ApiPostResult<TResource, TResponse>()
-    where TResource : class where TResponse : IWebResponse;
+    where TResponse : IWebResponse;
 
 /// <summary>
 ///     Defines a callback that returns any <see cref="TResponse" /> or <see cref="Error" />.
@@ -30,7 +30,7 @@ public delegate Result<PostResult<TResponse>, Error> ApiPostResult<TResource, TR
 /// </summary>
 // ReSharper disable once UnusedTypeParameter
 public delegate Result<TResponse, Error> ApiPutPatchResult<TResource, TResponse>()
-    where TResource : class where TResponse : IWebResponse;
+    where TResponse : IWebResponse;
 
 /// <summary>
 ///     Defines a callback that returns any <see cref="TResponse" /> or <see cref="Error" />.
@@ -38,7 +38,7 @@ public delegate Result<TResponse, Error> ApiPutPatchResult<TResource, TResponse>
 /// </summary>
 // ReSharper disable once UnusedTypeParameter
 public delegate Result<TResponse, Error> ApiGetResult<TResource, TResponse>()
-    where TResource : class where TResponse : IWebResponse;
+    where TResponse : IWebResponse;
 
 /// <summary>
 ///     Defines a callback that returns any <see cref="TResponse" /> or <see cref="Error" />.
@@ -46,7 +46,7 @@ public delegate Result<TResponse, Error> ApiGetResult<TResource, TResponse>()
 /// </summary>
 // ReSharper disable once UnusedTypeParameter
 public delegate Result<TResponse, Error> ApiSearchResult<TResource, TResponse>()
-    where TResource : class where TResponse : IWebSearchResponse;
+    where TResponse : IWebSearchResponse;
 
 /// <summary>
 ///     Defines a callback that returns an <see cref="EmptyResponse" /> or <see cref="Error" />.

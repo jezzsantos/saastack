@@ -7,6 +7,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
         <ProjectReference Include="..\Application.Persistence.Common\Application.Persistence.Common.csproj" />
+        <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
         <ProjectReference Include="..\BookingsDomain\BookingsDomain.csproj" />
     </ItemGroup>
 

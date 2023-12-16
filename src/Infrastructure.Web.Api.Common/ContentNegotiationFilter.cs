@@ -1,5 +1,6 @@
 using System.Net;
 using Common.Extensions;
+using Infrastructure.Web.Api.Common.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;

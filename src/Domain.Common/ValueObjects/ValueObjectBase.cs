@@ -90,7 +90,7 @@ public abstract partial class ValueObjectBase<TValueObject> : IValueObject
         return Dehydrate();
     }
 
-    protected static List<string> RehydrateToList(string hydratedValue, bool isSingleValueObject,
+    protected static List<string?> RehydrateToList(string hydratedValue, bool isSingleValueObject,
         bool isSingleListValueObject = false)
     {
         if (isSingleValueObject)
@@ -98,28 +98,38 @@ public abstract partial class ValueObjectBase<TValueObject> : IValueObject
             if (isSingleListValueObject)
             {
                 return Rehydrate<List<string>>(hydratedValue)
-                    .Where(value => value.HasValue() && !value.Equals(NullValue))
-                    .Select(value => value)
+                    .Select(value => value.Equals(NullValue)
+                        ? null
+                        : value)
                     .ToList();
             }
 
             if (hydratedValue.NotExists())
             {
-                return new List<string>();
+                return new List<string?>();
             }
 
             return hydratedValue.Equals(NullValue)
-                ? new List<string>()
-                : new List<string> { hydratedValue };
+                ? new List<string?> { null }
+                : new List<string?> { hydratedValue };
         }
 
         return Rehydrate<Dictionary<string, object>>(hydratedValue)
-            .Where(pair => !pair.Value.Equals(NullValue))
             .Select(pair =>
             {
-                var value = pair.Value.ToString()!;
+                if (pair.Value.NotExists())
+                {
+                    return null;
+                }
+
+                var value = pair.Value.ToString();
+                if (value.NotExists())
+                {
+                    return null;
+                }
+
                 return value.Equals(NullValue)
-                    ? null!
+                    ? null
                     : value;
             })
             .ToList();

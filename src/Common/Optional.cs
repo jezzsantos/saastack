@@ -120,7 +120,7 @@ public readonly struct Optional<TValue> : IEquatable<Optional<TValue>>
     /// <summary>
     ///     Returns the container with a value
     /// </summary>
-    public static Optional<TValue> Some(TValue some)
+    public static Optional<TValue> Some(TValue? some)
     {
         return new Optional<TValue>(some);
     }

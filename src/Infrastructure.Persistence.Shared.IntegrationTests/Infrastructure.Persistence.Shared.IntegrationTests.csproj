@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Azure\Infrastructure.Persistence.Azure.csproj" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Shared\Infrastructure.Persistence.Shared.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Hosting.Common\Infrastructure.Web.Hosting.Common.csproj" />
+        <ProjectReference Include="..\IntegrationTesting.Persistence.Common\IntegrationTesting.Persistence.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="appsettings.Testing.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+</Project>

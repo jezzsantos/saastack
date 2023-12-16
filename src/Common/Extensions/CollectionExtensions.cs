@@ -30,8 +30,13 @@ public static class CollectionExtensions
     /// <summary>
     ///     Whether the collection contains any items
     /// </summary>
-    public static bool HasAny<T>(this IEnumerable<T> collection)
+    public static bool HasAny<T>(this IEnumerable<T>? collection)
     {
+        if (collection.NotExists())
+        {
+            return false;
+        }
+
         return !collection.HasNone();
     }
 

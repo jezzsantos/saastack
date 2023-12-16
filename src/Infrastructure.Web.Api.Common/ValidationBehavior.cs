@@ -1,4 +1,5 @@
 using FluentValidation;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
 using MediatR;

@@ -1,7 +1,7 @@
 #if TESTINGONLY
 using Common;
 using Infrastructure.Web.Api.Interfaces;
-using Infrastructure.Web.Api.Interfaces.Operations.TestingOnly;
+using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 
 namespace ApiHost1.Api.TestingOnly;
 

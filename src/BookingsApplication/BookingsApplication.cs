@@ -1,7 +1,7 @@
 ﻿using Application.Common;
 using Application.Interfaces;
-using Application.Interfaces.Resources;
-using Application.Interfaces.Services;
+using Application.Resources.Shared;
+using Application.Services.Shared;
 using BookingsApplication.Persistence;
 using BookingsDomain;
 using Common;
@@ -30,40 +30,41 @@ public class BookingsApplication : IBookingsApplication
     public async Task<Result<Error>> CancelBookingAsync(ICallerContext caller, string organizationId, string id,
         CancellationToken cancellationToken)
     {
-        var booking = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!booking.IsSuccessful)
+        var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
         {
-            return booking.Error;
+            return retrieved.Error;
         }
 
-        var cancellation = booking.Value.Cancel();
+        var booking = retrieved.Value;
+        var cancellation = booking.Cancel();
         if (!cancellation.IsSuccessful)
         {
             return cancellation.Error;
         }
 
-        var released = await _carsService.ReleaseCarAvailabilityAsync(caller, organizationId, booking.Value.CarId.Value,
-            booking.Value.Start.Value, booking.Value.End.Value, cancellationToken);
+        var released = await _carsService.ReleaseCarAvailabilityAsync(caller, organizationId, booking.CarId.Value,
+            booking.Start.Value, booking.End.Value, cancellationToken);
         if (!released.IsSuccessful)
         {
             return released.Error;
         }
 
-        var deleted = await _repository.DeleteBookingAsync(organizationId.ToId(), booking.Value.Id, cancellationToken);
+        var deleted = await _repository.DeleteBookingAsync(organizationId.ToId(), booking.Id, cancellationToken);
         if (!deleted.IsSuccessful)
         {
             return deleted.Error;
         }
 
-        _recorder.TraceInformation(caller.ToCall(), "Booking {Id} was cancelled", booking.Value.Id);
+        _recorder.TraceInformation(caller.ToCall(), "Booking {Id} was cancelled", booking.Id);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.BookingCancelled,
             new Dictionary<string, object>
             {
-                { UsageConstants.Properties.Id, booking.Value.Id },
-                { UsageConstants.Properties.Started, booking.Value.Start.Value.Hour },
+                { UsageConstants.Properties.Id, booking.Id },
+                { UsageConstants.Properties.Started, booking.Start.Value.Hour },
                 {
                     UsageConstants.Properties.Duration,
-                    booking.Value.End.Value.Subtract(booking.Value.Start.Value).Hours
+                    booking.End.Value.Subtract(booking.Start.Value).Hours
                 }
             });
 
@@ -81,17 +82,18 @@ public class BookingsApplication : IBookingsApplication
         }
 
         var bookingEndUtc = endUtc.GetValueOrDefault(startUtc.Add(DefaultBookingDuration));
-        var booking = BookingRoot.Create(_recorder, _idFactory, organizationId.ToId());
-        if (!booking.IsSuccessful)
+        var created = BookingRoot.Create(_recorder, _idFactory, organizationId.ToId());
+        if (!created.IsSuccessful)
         {
-            return booking.Error;
+            return created.Error;
         }
 
-        booking.Value.ChangeCar(carId.ToId());
-        booking.Value.MakeReservation(caller.ToCallerId(), startUtc, bookingEndUtc);
+        var booking = created.Value;
+        booking.ChangeCar(carId.ToId());
+        booking.MakeReservation(caller.ToCallerId(), startUtc, bookingEndUtc);
 
         var reserved = await _carsService.ReserveCarIfAvailableAsync(caller, organizationId, carId, startUtc,
-            bookingEndUtc, booking.Value.Id, cancellationToken);
+            bookingEndUtc, booking.Id, cancellationToken);
         if (!reserved.IsSuccessful)
         {
             return reserved.Error;
@@ -102,40 +104,41 @@ public class BookingsApplication : IBookingsApplication
             return Error.RuleViolation(Resources.BookingsApplication_CarNotAvailable);
         }
 
-        var created = await _repository.SaveAsync(booking.Value, cancellationToken);
-        if (!created.IsSuccessful)
+        var updated = await _repository.SaveAsync(booking, cancellationToken);
+        if (!updated.IsSuccessful)
         {
-            return created.Error;
+            return updated.Error;
         }
 
-        _recorder.TraceInformation(caller.ToCall(), "Booking {Id} was created", created.Value.Id);
+        _recorder.TraceInformation(caller.ToCall(), "Booking {Id} was created", updated.Value.Id);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.BookingCreated,
             new Dictionary<string, object>
             {
-                { UsageConstants.Properties.Id, created.Value.Id },
-                { UsageConstants.Properties.Started, created.Value.Start.Value.Hour },
+                { UsageConstants.Properties.Id, updated.Value.Id },
+                { UsageConstants.Properties.Started, updated.Value.Start.Value.Hour },
                 {
                     UsageConstants.Properties.Duration,
-                    created.Value.End.Value.Subtract(created.Value.Start.Value).Hours
+                    updated.Value.End.Value.Subtract(updated.Value.Start.Value).Hours
                 }
             });
 
-        return created.Value.ToBooking();
+        return updated.Value.ToBooking();
     }
 
     public async Task<Result<SearchResults<Booking>, Error>> SearchAllBookingsAsync(ICallerContext caller,
         string organizationId, DateTime? fromUtc, DateTime? toUtc, SearchOptions searchOptions, GetOptions getOptions,
         CancellationToken cancellationToken)
     {
-        var bookings = await _repository.SearchAllBookingsAsync(organizationId.ToId(),
+        var searched = await _repository.SearchAllBookingsAsync(organizationId.ToId(),
             fromUtc ?? DateTime.MinValue, toUtc ?? DateTime.MaxValue, searchOptions, cancellationToken);
-        if (!bookings.IsSuccessful)
+        if (!searched.IsSuccessful)
         {
-            return bookings.Error;
+            return searched.Error;
         }
 
+        var bookings = searched.Value;
         return searchOptions.ApplyWithMetadata(
-            bookings.Value.Select(booking => booking.ToBooking()));
+            bookings.Select(booking => booking.ToBooking()));
     }
 }
 
@@ -148,12 +151,8 @@ internal static class BookingConversionExtensions
             Id = booking.Id,
             StartUtc = booking.Start.ValueOrDefault,
             EndUtc = booking.End.ValueOrDefault,
-            BorrowerId = booking.BorrowerId.HasValue
-                ? booking.BorrowerId.Value.Text
-                : null,
-            CarId = booking.CarId.HasValue
-                ? booking.CarId.Value.Text
-                : null
+            BorrowerId = booking.BorrowerId.ValueOrDefault!,
+            CarId = booking.CarId.ValueOrDefault!
         };
     }
 
@@ -164,8 +163,8 @@ internal static class BookingConversionExtensions
             Id = booking.Id.ValueOrDefault!,
             StartUtc = booking.Start.ValueOrDefault,
             EndUtc = booking.End.ValueOrDefault,
-            BorrowerId = booking.BorrowerId.ValueOrDefault,
-            CarId = booking.CarId.ValueOrDefault
+            BorrowerId = booking.BorrowerId.ValueOrDefault!,
+            CarId = booking.CarId.ValueOrDefault!
         };
     }
 }

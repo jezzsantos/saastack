@@ -1,4 +1,3 @@
-using BookingsDomain.Events;
 using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
@@ -41,7 +40,7 @@ public class BookingRootSpec
         _booking.ChangeCar("acarid".ToId());
 
         _booking.CarId.Should().Be("acarid".ToId());
-        _booking.Events.Last().Should().BeOfType<Booking.CarChanged>();
+        _booking.Events.Last().Should().BeOfType<Events.CarChanged>();
     }
 
     [Fact]
@@ -104,7 +103,7 @@ public class BookingRootSpec
         _booking.BorrowerId.Should().Be("aborrowerid".ToId());
         _booking.Start.Should().Be(start);
         _booking.End.Should().Be(end);
-        _booking.Events.Last().Should().BeOfType<Booking.ReservationMade>();
+        _booking.Events.Last().Should().BeOfType<Events.ReservationMade>();
     }
 
     [Fact]
@@ -124,6 +123,6 @@ public class BookingRootSpec
 
         result.Should().BeSuccess();
         _booking.Trips.Count().Should().Be(1);
-        _booking.Events.Last().Should().BeOfType<Booking.TripBegan>();
+        _booking.Events.Last().Should().BeOfType<Events.TripBegan>();
     }
 }

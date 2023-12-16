@@ -16,7 +16,7 @@ public interface IQueuedMessage
     string CallId { get; set; }
 
     /// <summary>
-    ///     Returns the ID of the message
+    ///     Returns the unique ID of the message
     /// </summary>
     string? MessageId { get; set; }
 

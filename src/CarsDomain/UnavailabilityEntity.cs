@@ -1,5 +1,4 @@
-﻿using CarsDomain.Events;
-using Common;
+﻿using Common;
 using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
@@ -49,7 +48,7 @@ public sealed class UnavailabilityEntity : EntityBase
     {
         switch (@event)
         {
-            case Car.UnavailabilitySlotAdded added:
+            case Events.UnavailabilitySlotAdded added:
             {
                 var slot = TimeSlot.Create(added.From, added.To);
                 if (!slot.IsSuccessful)
@@ -110,7 +109,7 @@ public sealed class UnavailabilityEntity : EntityBase
     public void TestingOnly_Assign(Identifier carId, Identifier organizationId, TimeSlot timeSlot,
         CausedBy causedBy)
     {
-        RaiseChangeEvent(Car.UnavailabilitySlotAdded.Create(carId, organizationId, timeSlot, causedBy));
+        RaiseChangeEvent(Events.UnavailabilitySlotAdded.Create(carId, organizationId, timeSlot, causedBy));
     }
 #endif
 }

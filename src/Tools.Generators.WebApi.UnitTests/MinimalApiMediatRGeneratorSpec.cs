@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using MinimalApiMediatRGenerator = Generators::Tools.Generators.WebApi.MinimalApiMediatRGenerator;
+using WebApi_MinimalApiMediatRGenerator = Generators::Tools.Generators.WebApi.MinimalApiMediatRGenerator;
 
 namespace Tools.Generators.WebApi.UnitTests;
 
@@ -23,7 +23,7 @@ public class MinimalApiMediatRGeneratorSpec
             },
             new[]
             {
-                MetadataReference.CreateFromFile(typeof(MinimalApiMediatRGenerator).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(WebApi_MinimalApiMediatRGenerator).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location),
                 MetadataReference.CreateFromFile(Path.Combine(assemblyPath,
                     "System.Runtime.dll")) //HACK: this is required to make custom attributes work
@@ -40,7 +40,7 @@ public class MinimalApiMediatRGeneratorSpec
 
         public GivenAServiceCLass()
         {
-            var generator = new MinimalApiMediatRGenerator();
+            var generator = new WebApi_MinimalApiMediatRGenerator();
             _driver = CSharpGeneratorDriver.Create(generator);
         }
 
@@ -72,7 +72,7 @@ public class MinimalApiMediatRGeneratorSpec
                 using System;
                 using Microsoft.AspNetCore.Http;
                 using Microsoft.AspNetCore.Builder;
-                using Infrastructure.Web.Api.Common;
+                using Infrastructure.Web.Api.Common.Extensions;
 
                 namespace compilation
                 {
@@ -123,7 +123,7 @@ public class MinimalApiMediatRGeneratorSpec
                 using Microsoft.AspNetCore.Http;
                 using Microsoft.AspNetCore.Builder;
                 using Infrastructure.Web.Api.Interfaces;
-                using Infrastructure.Web.Api.Common;
+                using Infrastructure.Web.Api.Common.Extensions;
 
                 namespace compilation
                 {
@@ -196,7 +196,7 @@ public class MinimalApiMediatRGeneratorSpec
                 using Microsoft.AspNetCore.Http;
                 using Microsoft.AspNetCore.Builder;
                 using Infrastructure.Web.Api.Interfaces;
-                using Infrastructure.Web.Api.Common;
+                using Infrastructure.Web.Api.Common.Extensions;
 
                 namespace compilation
                 {
@@ -270,7 +270,7 @@ public class MinimalApiMediatRGeneratorSpec
                 using Microsoft.AspNetCore.Http;
                 using Microsoft.AspNetCore.Builder;
                 using Infrastructure.Web.Api.Interfaces;
-                using Infrastructure.Web.Api.Common;
+                using Infrastructure.Web.Api.Common.Extensions;
 
                 namespace compilation
                 {
@@ -344,7 +344,7 @@ public class MinimalApiMediatRGeneratorSpec
                 using Microsoft.AspNetCore.Http;
                 using Microsoft.AspNetCore.Builder;
                 using Infrastructure.Web.Api.Interfaces;
-                using Infrastructure.Web.Api.Common;
+                using Infrastructure.Web.Api.Common.Extensions;
 
                 namespace compilation
                 {
@@ -431,7 +431,7 @@ public class MinimalApiMediatRGeneratorSpec
                 using Microsoft.AspNetCore.Http;
                 using Microsoft.AspNetCore.Builder;
                 using Infrastructure.Web.Api.Interfaces;
-                using Infrastructure.Web.Api.Common;
+                using Infrastructure.Web.Api.Common.Extensions;
                 using Application.Interfaces;
 
                 namespace compilation

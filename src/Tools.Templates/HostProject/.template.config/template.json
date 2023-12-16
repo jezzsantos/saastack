@@ -8,6 +8,7 @@
   "name": "SaaStack Host Project",
   "description": "",
   "shortName": "saastackhost",
+  "defaultName": "ApiHost",
   "sourceName": "ProjectName",
   "tags": {
     "language": "C#",

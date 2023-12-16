@@ -1,9 +1,9 @@
 using Application.Interfaces;
-using Application.Interfaces.Resources;
+using Application.Resources.Shared;
 using BookingsApplication;
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
-using Infrastructure.Web.Api.Interfaces.Operations.Bookings;
+using Infrastructure.Web.Api.Operations.Shared.Bookings;
 
 namespace BookingsInfrastructure.Api.Bookings;
 

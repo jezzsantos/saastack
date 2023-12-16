@@ -33,7 +33,7 @@ public sealed class Year : SingleValueObjectBase<Year, int>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, true);
-            return new Year(parts[0].ToIntOrDefault(0));
+            return new Year(parts[0]!.ToIntOrDefault(0));
         };
     }
 }

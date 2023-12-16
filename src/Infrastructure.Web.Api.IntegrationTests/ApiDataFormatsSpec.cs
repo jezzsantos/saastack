@@ -4,7 +4,7 @@ using ApiHost1;
 using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common;
-using Infrastructure.Web.Api.Interfaces.Operations.TestingOnly;
+using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
 using Task = System.Threading.Tasks.Task;

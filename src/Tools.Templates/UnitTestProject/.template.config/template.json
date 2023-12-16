@@ -10,6 +10,7 @@
   "name": "SaaStack Unit Test Project",
   "description": "",
   "shortName": "saastacktest",
+  "defaultName": "SubDomain.UnitTests",
   "sourceName": "ProjectName",
   "tags": {
     "language": "C#",

@@ -6,6 +6,7 @@ namespace Infrastructure.Web.Hosting.Common;
 
 public class WebApiHostSettings : IApiHostSetting
 {
+    internal const string AncillaryApiHmacSecretSettingName = "Hosts:AncillaryApi:HmacAuthNSecret";
     internal const string AncillaryApiHostBaseUrlSettingName = "Hosts:AncillaryApi:BaseUrl";
     internal const string WebsiteHostBaseUrlSettingName = "Hosts:WebsiteHost:BaseUrl";
 
@@ -18,25 +19,37 @@ public class WebApiHostSettings : IApiHostSetting
 
     public string GetAncillaryApiHostBaseUrl()
     {
-        var apiHostBaseUrl = _settings.Platform.GetString(AncillaryApiHostBaseUrlSettingName);
-        if (apiHostBaseUrl.HasValue())
+        var baseUrl = _settings.Platform.GetString(AncillaryApiHostBaseUrlSettingName);
+        if (baseUrl.HasValue())
         {
-            return apiHostBaseUrl.WithoutTrailingSlash();
+            return baseUrl.WithoutTrailingSlash();
         }
 
         throw new InvalidOperationException(
-            Resources.WebApiHostSettings_ApiHostBaseUrlMissing.Format(AncillaryApiHostBaseUrlSettingName));
+            Resources.WebApiHostSettings_MissingSetting.Format(AncillaryApiHostBaseUrlSettingName));
     }
 
     public string GetWebsiteHostBaseUrl()
     {
-        var webHostBaseUrl = _settings.Platform.GetString(WebsiteHostBaseUrlSettingName);
-        if (webHostBaseUrl.HasValue())
+        var baseUrl = _settings.Platform.GetString(WebsiteHostBaseUrlSettingName);
+        if (baseUrl.HasValue())
         {
-            return webHostBaseUrl.WithoutTrailingSlash();
+            return baseUrl.WithoutTrailingSlash();
         }
 
         throw new InvalidOperationException(
-            Resources.WebApiHostSettings_WebHostBaseUrlMissing.Format(WebsiteHostBaseUrlSettingName));
+            Resources.WebApiHostSettings_MissingSetting.Format(WebsiteHostBaseUrlSettingName));
+    }
+
+    public string GetAncillaryApiHostHmacAuthSecret()
+    {
+        var secret = _settings.Platform.GetString(AncillaryApiHmacSecretSettingName);
+        if (secret.HasValue())
+        {
+            return secret;
+        }
+
+        throw new InvalidOperationException(
+            Resources.WebApiHostSettings_MissingSetting.Format(AncillaryApiHmacSecretSettingName));
     }
 }

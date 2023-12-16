@@ -1,5 +1,5 @@
 using System.Reflection;
-using Application.Interfaces.Services;
+using Application.Services.Shared;
 using CarsApplication;
 using CarsApplication.Persistence;
 using CarsDomain;
@@ -48,7 +48,7 @@ public class CarsModule : ISubDomainModule
                         c.ResolveForTenant<IDataStore>())
                 );
 
-                services.RegisterTenanted<ICarsService, CarsInProcessService>();
+                services.RegisterTenanted<ICarsService, CarsInProcessServiceClient>();
             };
         }
     }

@@ -51,7 +51,10 @@ public static class StringExtensions
             return default;
         }
 
-        return JsonSerializer.Deserialize<TResult>(json, new JsonSerializerOptions());
+        return JsonSerializer.Deserialize<TResult>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
     }
 
     /// <summary>
@@ -64,7 +67,10 @@ public static class StringExtensions
             return default;
         }
 
-        return JsonSerializer.Deserialize(json, type, new JsonSerializerOptions());
+        return JsonSerializer.Deserialize(json, type, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
     }
 
     /// <summary>

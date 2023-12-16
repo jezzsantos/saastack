@@ -1,7 +1,7 @@
 using Common;
 using Common.Configuration;
 using Infrastructure.Web.Api.Interfaces;
-using Infrastructure.Web.Api.Interfaces.Operations.TestingOnly.Stubs;
+using Infrastructure.Web.Api.Operations.Shared.TestingOnly.Stubs;
 
 namespace TestingStubApiHost.Api;
 

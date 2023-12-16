@@ -1,9 +1,9 @@
 using Application.Interfaces;
-using Application.Interfaces.Resources;
+using Application.Resources.Shared;
 using CarsApplication;
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
-using Infrastructure.Web.Api.Interfaces.Operations.Cars;
+using Infrastructure.Web.Api.Operations.Shared.Cars;
 
 namespace CarsInfrastructure.Api.Cars;
 

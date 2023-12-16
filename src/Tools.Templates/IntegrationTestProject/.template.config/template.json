@@ -10,6 +10,7 @@
   "name": "SaaStack Integration Test Project",
   "description": "",
   "shortName": "saastackinttest",
+  "defaultName": "SubDomain.IntegrationTests",
   "sourceName": "ProjectName",
   "tags": {
     "language": "C#",

@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces;
-using Application.Interfaces.Resources;
+using Application.Resources.Shared;
 using Common;
 
 namespace BookingsApplication;

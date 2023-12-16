@@ -11,6 +11,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\CarsInfrastructure\CarsInfrastructure.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Operations.Shared\Infrastructure.Web.Api.Operations.Shared.csproj" />
         <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
     </ItemGroup>
 

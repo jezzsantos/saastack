@@ -2,7 +2,7 @@ using BookingsInfrastructure.Api.Bookings;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using FluentValidation;
-using Infrastructure.Web.Api.Interfaces.Operations.Bookings;
+using Infrastructure.Web.Api.Operations.Shared.Bookings;
 using Moq;
 using Xunit;
 

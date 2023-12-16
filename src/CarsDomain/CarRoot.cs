@@ -1,5 +1,4 @@
-﻿using CarsDomain.Events;
-using Common;
+﻿using Common;
 using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
@@ -16,7 +15,7 @@ public sealed class CarRoot : AggregateRootBase
         Identifier organizationId)
     {
         var root = new CarRoot(recorder, idFactory);
-        root.RaiseCreateEvent(Car.Created.Create(root.Id, organizationId));
+        root.RaiseCreateEvent(CarsDomain.Events.Created.Create(root.Id, organizationId));
         return root;
     }
 
@@ -88,14 +87,14 @@ public sealed class CarRoot : AggregateRootBase
     {
         switch (@event)
         {
-            case Car.Created created:
+            case Events.Created created:
             {
                 OrganizationId = created.OrganizationId.ToId();
                 Status = created.Status.ToEnum<CarStatus>();
                 return Result.Ok;
             }
 
-            case Car.ManufacturerChanged changed:
+            case Events.ManufacturerChanged changed:
             {
                 var manufacturer = CarsDomain.Manufacturer.Create(changed.Year, changed.Make, changed.Model);
                 return manufacturer.Match(manu =>
@@ -107,7 +106,7 @@ public sealed class CarRoot : AggregateRootBase
                 }, error => error);
             }
 
-            case Car.OwnershipChanged changed:
+            case Events.OwnershipChanged changed:
             {
                 var owner = VehicleOwner.Create(changed.Owner);
                 if (!owner.IsSuccessful)
@@ -121,7 +120,7 @@ public sealed class CarRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Car.RegistrationChanged changed:
+            case Events.RegistrationChanged changed:
             {
                 var jurisdiction = Jurisdiction.Create(changed.Jurisdiction);
                 if (!jurisdiction.IsSuccessful)
@@ -148,7 +147,7 @@ public sealed class CarRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Car.UnavailabilitySlotAdded created:
+            case Events.UnavailabilitySlotAdded created:
             {
                 var unavailability = RaiseEventToChildEntity(isReconstituting, created, idFactory =>
                     UnavailabilityEntity.Create(Recorder, idFactory, RaiseChangeEvent), e => e.UnavailabilityId!);
@@ -163,7 +162,7 @@ public sealed class CarRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Car.UnavailabilitySlotRemoved deleted:
+            case Events.UnavailabilitySlotRemoved deleted:
             {
                 Unavailabilities.Remove(deleted.UnavailabilityId.ToId());
                 Recorder.TraceDebug(null, "Car {Id} has had unavailability {UnavailabilityId} removed", Id,
@@ -178,7 +177,7 @@ public sealed class CarRoot : AggregateRootBase
 
     public Result<Error> ChangeRegistration(LicensePlate plate)
     {
-        return RaiseChangeEvent(Car.RegistrationChanged.Create(Id, OrganizationId, plate));
+        return RaiseChangeEvent(CarsDomain.Events.RegistrationChanged.Create(Id, OrganizationId, plate));
     }
 
     public Result<Error> Delete(Identifier deleterId)
@@ -202,7 +201,7 @@ public sealed class CarRoot : AggregateRootBase
         if (unavailability.Exists())
         {
             return RaiseChangeEvent(
-                Car.UnavailabilitySlotRemoved.Create(Id, OrganizationId, unavailability.Id));
+                CarsDomain.Events.UnavailabilitySlotRemoved.Create(Id, OrganizationId, unavailability.Id));
         }
 
         return Result.Ok;
@@ -227,7 +226,9 @@ public sealed class CarRoot : AggregateRootBase
             return causedBy.Error;
         }
 
-        var raiseEvent = RaiseChangeEvent(Car.UnavailabilitySlotAdded.Create(Id, OrganizationId, slot, causedBy.Value));
+        var raiseEvent =
+            RaiseChangeEvent(
+                CarsDomain.Events.UnavailabilitySlotAdded.Create(Id, OrganizationId, slot, causedBy.Value));
         if (!raiseEvent.IsSuccessful)
         {
             return raiseEvent.Error;
@@ -257,18 +258,18 @@ public sealed class CarRoot : AggregateRootBase
             return causedBy.Error;
         }
 
-        return RaiseChangeEvent(Car.UnavailabilitySlotAdded.Create(Id, OrganizationId, slot,
+        return RaiseChangeEvent(CarsDomain.Events.UnavailabilitySlotAdded.Create(Id, OrganizationId, slot,
             causedBy.Value));
     }
 
     public Result<Error> SetManufacturer(Manufacturer manufacturer)
     {
-        return RaiseChangeEvent(Car.ManufacturerChanged.Create(Id, OrganizationId, manufacturer));
+        return RaiseChangeEvent(CarsDomain.Events.ManufacturerChanged.Create(Id, OrganizationId, manufacturer));
     }
 
     public Result<Error> SetOwnership(VehicleOwner owner)
     {
-        return RaiseChangeEvent(Car.OwnershipChanged.Create(Id, OrganizationId, owner));
+        return RaiseChangeEvent(CarsDomain.Events.OwnershipChanged.Create(Id, OrganizationId, owner));
     }
 
     public Result<Error> TakeOffline(TimeSlot slot)
@@ -290,7 +291,8 @@ public sealed class CarRoot : AggregateRootBase
             return causedBy.Error;
         }
 
-        return RaiseChangeEvent(Car.UnavailabilitySlotAdded.Create(Id, OrganizationId, slot, causedBy.Value));
+        return RaiseChangeEvent(
+            CarsDomain.Events.UnavailabilitySlotAdded.Create(Id, OrganizationId, slot, causedBy.Value));
     }
 
     private bool IsAvailable(TimeSlot slot)
@@ -301,7 +303,7 @@ public sealed class CarRoot : AggregateRootBase
 #if TESTINGONLY
     public Result<Error> TestingOnly_AddUnavailability(TimeSlot slot, CausedBy causedBy)
     {
-        return RaiseChangeEvent(Car.UnavailabilitySlotAdded.Create(Id, OrganizationId, slot,
+        return RaiseChangeEvent(CarsDomain.Events.UnavailabilitySlotAdded.Create(Id, OrganizationId, slot,
             causedBy));
     }
 

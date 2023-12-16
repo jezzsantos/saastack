@@ -9,6 +9,7 @@
   "name": "SaaStack Class Library",
   "description": "",
   "shortName": "saastackany",
+  "defaultName": "SubDomainProject",
   "sourceName": "ProjectName",
   "tags": {
     "language": "C#",

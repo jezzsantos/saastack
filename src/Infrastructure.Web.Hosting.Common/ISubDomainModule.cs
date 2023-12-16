@@ -23,7 +23,7 @@ public interface ISubDomainModule
     /// <summary>
     ///     Returns the assembly containing the DDD domain types
     /// </summary>
-    Assembly DomainAssembly { get; }
+    Assembly? DomainAssembly { get; }
 
     /// <summary>
     ///     Returns a function that handles the minimal API registration

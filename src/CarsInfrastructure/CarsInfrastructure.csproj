@@ -5,8 +5,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
         <ProjectReference Include="..\CarsApplication\CarsApplication.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.Common\Infrastructure.Persistence.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Operations.Shared\Infrastructure.Web.Api.Operations.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Hosting.Common\Infrastructure.Web.Hosting.Common.csproj" />
     </ItemGroup>
 

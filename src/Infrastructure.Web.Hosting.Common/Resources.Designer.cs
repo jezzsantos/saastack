@@ -116,18 +116,9 @@ namespace Infrastructure.Web.Hosting.Common {
         /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; cannot be found in appsettings.json for this host.
         /// </summary>
-        internal static string WebApiHostSettings_ApiHostBaseUrlMissing {
+        internal static string WebApiHostSettings_MissingSetting {
             get {
-                return ResourceManager.GetString("WebApiHostSettings_ApiHostBaseUrlMissing", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; cannot be found in appsettings.json for this host.
-        /// </summary>
-        internal static string WebApiHostSettings_WebHostBaseUrlMissing {
-            get {
-                return ResourceManager.GetString("WebApiHostSettings_WebHostBaseUrlMissing", resourceCulture);
+                return ResourceManager.GetString("WebApiHostSettings_MissingSetting", resourceCulture);
             }
         }
     }

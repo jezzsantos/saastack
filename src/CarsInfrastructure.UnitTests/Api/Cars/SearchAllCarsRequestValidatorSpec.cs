@@ -1,7 +1,7 @@
 using CarsInfrastructure.Api.Cars;
 using FluentValidation;
 using Infrastructure.Web.Api.Common.Validation;
-using Infrastructure.Web.Api.Interfaces.Operations.Cars;
+using Infrastructure.Web.Api.Operations.Shared.Cars;
 using Xunit;
 
 namespace CarsInfrastructure.UnitTests.Api.Cars;

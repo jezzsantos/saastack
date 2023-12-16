@@ -107,6 +107,51 @@ namespace CarsInfrastructure {
         /// <summary>
         ///   Looks up a localized string similar to The &apos;FromUtc&apos; is either missing or in the past.
         /// </summary>
+        internal static string ReleaseCarAvailabilityRequestValidator_InvalidFromUtc {
+            get {
+                return ResourceManager.GetString("ReleaseCarAvailabilityRequestValidator_InvalidFromUtc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;ToUtc&apos; is either missing, or is before the &apos;FromUtc&apos;.
+        /// </summary>
+        internal static string ReleaseCarAvailabilityRequestValidator_InvalidToUtc {
+            get {
+                return ResourceManager.GetString("ReleaseCarAvailabilityRequestValidator_InvalidToUtc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;FromUtc&apos; is either missing or in the past.
+        /// </summary>
+        internal static string ReserveCarIfAvailableRequestValidator_InvalidFromUtc {
+            get {
+                return ResourceManager.GetString("ReserveCarIfAvailableRequestValidator_InvalidFromUtc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;ReferenceId&apos; is either missing or invalid.
+        /// </summary>
+        internal static string ReserveCarIfAvailableRequestValidator_InvalidReferenceId {
+            get {
+                return ResourceManager.GetString("ReserveCarIfAvailableRequestValidator_InvalidReferenceId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;ToUtc&apos; is either missing, or is before the &apos;FromUtc&apos;.
+        /// </summary>
+        internal static string ReserveCarIfAvailableRequestValidator_InvalidToUtc {
+            get {
+                return ResourceManager.GetString("ReserveCarIfAvailableRequestValidator_InvalidToUtc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;FromUtc&apos; is either missing or in the past.
+        /// </summary>
         internal static string ScheduleMaintenanceCarRequestValidator_InvalidFromUtc {
             get {
                 return ResourceManager.GetString("ScheduleMaintenanceCarRequestValidator_InvalidFromUtc", resourceCulture);

@@ -1,11 +1,11 @@
 using ApiHost1;
-using Application.Interfaces.Resources;
+using Application.Resources.Shared;
 using CarsDomain;
 using Common.Extensions;
 using Domain.Interfaces;
 using FluentAssertions;
-using Infrastructure.Web.Api.Interfaces.Operations.Bookings;
-using Infrastructure.Web.Api.Interfaces.Operations.Cars;
+using Infrastructure.Web.Api.Operations.Shared.Bookings;
+using Infrastructure.Web.Api.Operations.Shared.Cars;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
 using Task = System.Threading.Tasks.Task;

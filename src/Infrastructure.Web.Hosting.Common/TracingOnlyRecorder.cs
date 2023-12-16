@@ -11,7 +11,7 @@ namespace Infrastructure.Web.Hosting.Common;
 /// <summary>
 ///     Provides a <see cref="IRecorder" /> that only supports tracing
 /// </summary>
-public sealed class TracingOnlyRecorder : IRecorder
+public class TracingOnlyRecorder : IRecorder
 {
     private readonly ILogger _logger;
 
@@ -21,7 +21,8 @@ public sealed class TracingOnlyRecorder : IRecorder
         _logger.Log(LogLevel.Debug, Resources.TracingOnlyRecorder_Started);
     }
 
-    public void Audit(ICallContext? context, string auditCode, [StructuredMessageTemplate] string messageTemplate,
+    public virtual void Audit(ICallContext? context, string auditCode,
+        [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
@@ -29,7 +30,7 @@ public sealed class TracingOnlyRecorder : IRecorder
         TraceInformation(context, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void AuditAgainst(ICallContext? context, string againstId, string auditCode,
+    public virtual void AuditAgainst(ICallContext? context, string againstId, string auditCode,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
@@ -38,12 +39,12 @@ public sealed class TracingOnlyRecorder : IRecorder
         TraceInformation(context, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void Crash(ICallContext? context, CrashLevel level, Exception exception)
+    public virtual void Crash(ICallContext? context, CrashLevel level, Exception exception)
     {
         TraceError(context, exception, "Crash");
     }
 
-    public void Crash(ICallContext? context, CrashLevel level, Exception exception,
+    public virtual void Crash(ICallContext? context, CrashLevel level, Exception exception,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
@@ -52,7 +53,7 @@ public sealed class TracingOnlyRecorder : IRecorder
         TraceError(context, exception, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
+    public virtual void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
     {
         var additionalAsJson = additional.Exists()
             ? additional.ToJson()!
@@ -62,7 +63,7 @@ public sealed class TracingOnlyRecorder : IRecorder
         TraceInformation(context, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceDebug(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+    public virtual void TraceDebug(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
@@ -70,7 +71,7 @@ public sealed class TracingOnlyRecorder : IRecorder
         _logger.LogDebug(augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceError(ICallContext? context, Exception exception,
+    public virtual void TraceError(ICallContext? context, Exception exception,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
@@ -79,7 +80,7 @@ public sealed class TracingOnlyRecorder : IRecorder
         _logger.LogError(exception, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceError(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+    public virtual void TraceError(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
@@ -87,7 +88,7 @@ public sealed class TracingOnlyRecorder : IRecorder
         _logger.LogError(augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceInformation(ICallContext? context, Exception exception,
+    public virtual void TraceInformation(ICallContext? context, Exception exception,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
@@ -96,7 +97,7 @@ public sealed class TracingOnlyRecorder : IRecorder
         _logger.LogInformation(exception, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceInformation(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+    public virtual void TraceInformation(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
@@ -104,7 +105,7 @@ public sealed class TracingOnlyRecorder : IRecorder
         _logger.LogInformation(augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceWarning(ICallContext? context, Exception exception,
+    public virtual void TraceWarning(ICallContext? context, Exception exception,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
@@ -113,7 +114,7 @@ public sealed class TracingOnlyRecorder : IRecorder
         _logger.LogWarning(exception, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceWarning(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+    public virtual void TraceWarning(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
         var (augmentedMessageTemplate, augmentedArguments) =
@@ -121,7 +122,8 @@ public sealed class TracingOnlyRecorder : IRecorder
         _logger.LogWarning(augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TrackUsage(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
+    public virtual void TrackUsage(ICallContext? context, string eventName,
+        Dictionary<string, object>? additional = null)
     {
         var additionalAsJson = additional.Exists()
             ? additional.ToJson()!
@@ -131,7 +133,7 @@ public sealed class TracingOnlyRecorder : IRecorder
         TraceInformation(context, augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TrackUsageFor(ICallContext? context, string forId, string eventName,
+    public virtual void TrackUsageFor(ICallContext? context, string forId, string eventName,
         Dictionary<string, object>? additional = null)
     {
         var additionalAsJson = additional.Exists()

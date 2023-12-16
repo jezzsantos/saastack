@@ -24,6 +24,7 @@ public static class HttpHeaders
 {
     public const string Accept = "Accept";
     public const string Authorization = "Authorization";
+    public const string HmacSignature = "X-Hub-Signature";
     public const string RequestId = "Request-ID";
 }
 
@@ -42,4 +43,19 @@ public static class HttpContentTypeFormatters
 {
     public const string Json = "json";
     public const string Xml = "xml";
+}
+
+/// <summary>
+///     HTTP responses
+/// </summary>
+public static class HttpResponses
+{
+    public static class ProblemDetails
+    {
+        public static class Extensions
+        {
+            public const string ExceptionPropertyName = "exception";
+            public const string ValidationErrorPropertyName = "errors";
+        }
+    }
 }

@@ -8,6 +8,7 @@
   "name": "SaaStack Infrastructure Project",
   "description": "",
   "shortName": "saastackinfrastructure",
+  "defaultName": "SubDomainInfrastructure",
   "sourceName": "ProjectName",
   "tags": {
     "language": "C#",

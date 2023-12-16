@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Common.Extensions;
 using FluentValidation;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Common.Validation;

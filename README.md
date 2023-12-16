@@ -6,34 +6,36 @@
 
 Are you about to build a new SaaS product from scratch and do that on .NET?
 
-Then, start with SaaStack. 
+Then, start with SaaStack.
 
 It is a complete "codebase template" for building real-world, fully featured SaaS web products.
 
 Ready to build, test, and deploy into a cloud provider of your choice (e.g., Azure, AWS, Google Cloud, etc.)
 
 > Don't spend months building all this stuff from scratch. You and your team don't need to. We've done all that for you already; just take a look, see hat is there and take it from here. You can always change it the way you like it as you proceed, you are not locked into anyone else framework.
-> 
+>
 > This is not some code sample like those you would download to learn a new technology or see in demos online. This is way more comprehensive, way more contextualized, and way more realistic about the complexities you are going to encounter in reality.
 > This template contains a partial (but fully functional) SaaS product that you can deploy from day one and start building your product on. But it is not yet complete. That part is up to you.
 
 The codebase demonstrates common architectural styles that you are going to need in your product in the long run, such as:
+
 * [A Modular-Monolith](https://www.thoughtworks.com/insights/blog/microservices/modular-monolith-better-way-build-software) - always build a monolith first, then separate out to micro-services later
 * [Clean Architecture, Onion Architecture, and Hexagonal Architecture](https://medium.com/@edamtoft/onion-vs-clean-vs-hexagonal-architecture-9ad94a27da91) all the same principles - low-coupling, high-cohesion, a shareable and protected domain at the center
-* Hosted behind a distributed REST API, or in a CLI, (or in another executable). 
+* Hosted behind a distributed REST API, or in a CLI, (or in another executable).
 * [Domain Driven Design](https://martinfowler.com/bliki/DomainDrivenDesign.html) (with Aggregates and Domain Events) - modeling actual real-world behaviors, not modeling just anemic data
 * [Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) - because you cannot predict upfront when you will need historical data later, and when you do, will be stuck, also makes domain events a cinch
 * [Event-Driven Architecture](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/event-driven) - to keep your modules de-coupled and asynchronous from each other, on focused on meaningful events in your product
 * [Polyglot Persistence](https://martinfowler.com/bliki/PolyglotPersistence.html) - decouples you from infrastructure, makes your entire system easy to test, and then upgrade as your business scales later
 * Extensive Test Automation (e.g., Unit, Integration, and E2E) so you can keep moving years into the future
 * B2B or B2C Multitenancy, you choose
-* Extensibility for all integrations with any 3rd party provider (e.g., Stripe, Twilio, LaunchDarkly, etc.) - because you want to start cheaply, and change over time as your new business changes and grows. 
+* Extensibility for all integrations with any 3rd party provider (e.g., Stripe, Twilio, LaunchDarkly, etc.) - because you want to start cheaply, and change over time as your new business changes and grows.
 
 > The fundamental design principle behind this particular combination of architectural styles is to maximize change since it is change that you need to make efficient to succeed in SaaS startups. It is the cost of change in software that determines the cost of designing and building software in the long run.
 
-This starter template gives you most of the things all SaaS products will need from day one while maximizing your ability to evolve the specific behaviors and infrastructure components of your specific product - for the long run (i.e., over the course of the next 1-5 years).  
+This starter template gives you most of the things all SaaS products will need from day one while maximizing your ability to evolve the specific behaviors and infrastructure components of your specific product - for the long run (i.e., over the course of the next 1-5 years).
 
 ## What is in the box?
+
 ![Azure](docs/images/Physical-Architecture-Azure.png)
 or if you prefer AWS:
 ![AWS](docs/images/Physical-Architecture-AWS.png)
@@ -51,14 +53,17 @@ This starter template is NOT for everyone, nor for EVERY software project, nor f
   3. Where many hands will touch the codebase (i.e., over the course of its entire life)
 
 The kinds of '*known scenarios*' that this template is designed specifically for:
+
 * Tech SaaS startups building their product from scratch
 * or experienced developers who are very familiar with these patterns and concepts and wish to adapt them to their context
 
 Can you use this template if your context is different?
+
 * Yes, you can, but you need to be aware of why the trade-offs have been made in the way they have been made, then adapt them to your needs
 
 Are these trade-offs suitable for any kind of software project?
-* No, they are not. 
+
+* No, they are not.
   * However, some of them may fit your specific context well.
 
 > Want to know what the initial design constraints, assumptions, and trade-offs are, then see our [Decisions Log](docs/decisions/README.md) and [Design Principles](docs/design-principles/README.md) for more details on that.
@@ -75,12 +80,11 @@ It is a starter "template," not a 3rd party library or a fancy 3rd party framewo
 * Read the [documentation](docs/README.md) to figure out what it already has and how things work.
   * So that you either don't need to worry about those specific things yet (and can focus on more valuable things), or you can modify them to suit your specific needs. It is your code, so you do as you please to it.
 
-
 Since this starter "template" is NOT a framework (of the type you usually depend on from others downloaded from [nuget.org](https://nuget.org)), you are free from being trapped inside other people's abstractions and regimes and then waiting on them to accommodate your specific needs. With this template, all you need to do is understand the code, change the code to fit your needs, update the tests that cover it, and move on. Just like you do with all the code you write.
 
 ## Want it to scale?
 
-What happens when the performance of this modular monolith requires that you must scale it out? 
+What happens when the performance of this modular monolith requires that you must scale it out?
 
 > Remember: No business can afford the expense for you to re-write your product, - so forget that idea!
 
@@ -118,7 +122,7 @@ The starter template also takes care of these specific kinds of things:
   * It implements polyglot persistence, so you can use whatever persistence technology is appropriate for each module per data load (e.g., SQLServer, Postgres, Redis, DynamoDB, Amazon RDS, LocalFile, In-Memory, etc.)
   * It integrated 3rd party identity providers for authentication, 2FA, SSO, and credential management (e.g., Auth0, Microsoft Graph, Google, Amazon Cognito, etc.).
   * It integrates billing subscription management providers so that you can charge for your product use and determine feature sets based on subscription levels (e.g., Stripe, ChargeBee, Chargify, etc.).
-  * It integrates feature flagging providers to control how to access your features and roll them out safely (e.g., LaunchDarkly, GitLab, Unleased, etc.)
+  * It integrates feature flagging providers to control how to access your features and roll them out safely (e.g., LaunchDarkly, GitLab, Unleashed, etc.)
   * It integrates product usage metrics to monitor and measure the actual usage of your product (e.g., MixPanel, Google Analytics, Application Insights, Amazon XRay, etc.)
   * It integrates crash analytics and structured logging so you can plug in your own preferred monitoring (e.g., Application Insights, CloudWatch, Sentry.io, etc.).
   * It uses dependency injection extensively so that all modules and components remain testable and configurable.

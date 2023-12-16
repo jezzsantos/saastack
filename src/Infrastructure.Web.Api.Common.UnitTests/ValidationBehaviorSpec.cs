@@ -1,7 +1,7 @@
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
-using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Api.Common.Extensions;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
@@ -70,18 +70,4 @@ public class ValidationBehaviorSpec
         result.Should()
             .BeEquivalentTo(TypedResults.Problem(errors.ToRfc7807("ascheme://ahost/abasepath/apath?aquerystring")));
     }
-}
-
-[Route("/aroute", ServiceOperation.Get)]
-public class TestRequest : IWebRequest<TestResponse>
-{
-    public int ANumberProperty { get; set; }
-
-    public string? AStringProperty { get; set; }
-
-    public string? Id { get; set; }
-}
-
-public class TestResponse : IWebResponse
-{
 }

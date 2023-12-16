@@ -67,9 +67,15 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
 
     public async Task<Result<Error>> PushAsync(ICallContext call, TMessage message, CancellationToken cancellationToken)
     {
-        message.TenantId = call.TenantId;
-        message.CallId = call.CallId;
-        message.CallerId = call.CallerId;
+        message.TenantId = message.TenantId.HasValue()
+            ? message.TenantId
+            : call.TenantId;
+        message.CallId = message.CallId.HasValue()
+            ? message.CallId
+            : call.CallId;
+        message.CallerId = message.CallerId.HasValue()
+            ? message.CallerId
+            : call.CallerId;
         message.MessageId = message.MessageId ?? CreateMessageId();
         var messageJson = message.ToJson()!;
 
@@ -85,8 +91,8 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
         return Result.Ok;
     }
 
-    private static string CreateMessageId()
+    private string CreateMessageId()
     {
-        return Guid.NewGuid().ToString("N");
+        return $"{_queueName}_{Guid.NewGuid():N}";
     }
 }

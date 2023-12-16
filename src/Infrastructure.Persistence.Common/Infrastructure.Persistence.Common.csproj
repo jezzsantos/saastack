@@ -20,7 +20,7 @@
             <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
         </AssemblyAttribute>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>Infrastructure.Persistence.Common.IntegrationTests</_Parameter1>
+            <_Parameter1>Infrastructure.Persistence.Shared.IntegrationTests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
 

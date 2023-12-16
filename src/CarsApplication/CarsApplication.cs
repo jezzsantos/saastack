@@ -1,6 +1,6 @@
 using Application.Common;
 using Application.Interfaces;
-using Application.Interfaces.Resources;
+using Application.Resources.Shared;
 using CarsApplication.Persistence;
 using CarsDomain;
 using Common;
@@ -26,63 +26,66 @@ public class CarsApplication : ICarsApplication
     public async Task<Result<Error>> DeleteCarAsync(ICallerContext caller, string organizationId, string id,
         CancellationToken cancellationToken)
     {
-        var car = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!car.IsSuccessful)
+        var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
         {
-            return car.Error;
+            return retrieved.Error;
         }
 
-        var deleted = car.Value.Delete(caller.ToCallerId());
+        var car = retrieved.Value;
+        var deleted = car.Delete(caller.ToCallerId());
         if (!deleted.IsSuccessful)
         {
             return deleted.Error;
         }
 
-        _recorder.TraceInformation(caller.ToCall(), "Car {Id} was deleted", car.Value.Id);
+        _recorder.TraceInformation(caller.ToCall(), "Car {Id} was deleted", car.Id);
         return Result.Ok;
     }
 
     public async Task<Result<Car, Error>> GetCarAsync(ICallerContext caller, string organizationId, string id,
         CancellationToken cancellationToken)
     {
-        var car = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!car.IsSuccessful)
+        var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
         {
-            return car.Error;
+            return retrieved.Error;
         }
 
-        _recorder.TraceInformation(caller.ToCall(), "Car {Id} was fetched", car.Value.Id);
+        var car = retrieved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Car {Id} was fetched", car.Id);
 
-        return car.Value.ToCar();
+        return car.ToCar();
     }
 
     public async Task<Result<Car, Error>> ScheduleMaintenanceCarAsync(ICallerContext caller, string organizationId,
         string id,
         DateTime fromUtc, DateTime toUtc, CancellationToken cancellationToken)
     {
-        var car = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!car.Exists)
+        var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
+        if (!retrieved.Exists)
         {
-            return car.Error;
+            return retrieved.Error;
         }
 
+        var car = retrieved.Value;
         var timeSlot = TimeSlot.Create(fromUtc, toUtc);
         if (!timeSlot.IsSuccessful)
         {
             return timeSlot.Error;
         }
 
-        var changed = car.Value.ScheduleMaintenance(timeSlot.Value);
+        var changed = car.ScheduleMaintenance(timeSlot.Value);
         if (!changed.IsSuccessful)
         {
             return changed.Error;
         }
 
-        var updated = await _repository.SaveAsync(car.Value, cancellationToken);
+        var updated = await _repository.SaveAsync(car, cancellationToken);
         return updated.Match<Result<Car, Error>>(c =>
         {
             _recorder.TraceInformation(caller.ToCall(), "Car {Id} was scheduled for maintenance from {From} until {To}",
-                car.Value.Id, fromUtc, toUtc);
+                car.Id, fromUtc, toUtc);
             return c.Value.ToCar();
         }, error => error);
     }
@@ -90,19 +93,20 @@ public class CarsApplication : ICarsApplication
     public async Task<Result<Car, Error>> RegisterCarAsync(ICallerContext caller, string organizationId, string make,
         string model, int year, string location, string plate, CancellationToken cancellationToken)
     {
-        var car = CarRoot.Create(_recorder, _idFactory, Identifier.Create(organizationId));
-        if (!car.IsSuccessful)
+        var retrieved = CarRoot.Create(_recorder, _idFactory, Identifier.Create(organizationId));
+        if (!retrieved.IsSuccessful)
         {
-            return car.Error;
+            return retrieved.Error;
         }
 
+        var car = retrieved.Value;
         var manufacturer = Manufacturer.Create(year, make, model);
         if (!manufacturer.IsSuccessful)
         {
             return manufacturer.Error;
         }
 
-        var manufactured = car.Value.SetManufacturer(manufacturer.Value);
+        var manufactured = car.SetManufacturer(manufacturer.Value);
         if (!manufactured.IsSuccessful)
         {
             return manufactured.Error;
@@ -114,7 +118,7 @@ public class CarsApplication : ICarsApplication
             return ownerId.Error;
         }
 
-        var ownership = car.Value.SetOwnership(ownerId.Value);
+        var ownership = car.SetOwnership(ownerId.Value);
         if (!ownership.IsSuccessful)
         {
             return ownership.Error;
@@ -138,13 +142,13 @@ public class CarsApplication : ICarsApplication
             return license.Error;
         }
 
-        var registration = car.Value.ChangeRegistration(license.Value);
+        var registration = car.ChangeRegistration(license.Value);
         if (!registration.IsSuccessful)
         {
             return registration.Error;
         }
 
-        var updated = await _repository.SaveAsync(car.Value, cancellationToken);
+        var updated = await _repository.SaveAsync(car, cancellationToken);
         return updated.Match<Result<Car, Error>>(c =>
         {
             _recorder.TraceInformation(caller.ToCall(), "Car {Id} was registered", c.Value.Id);
@@ -155,29 +159,30 @@ public class CarsApplication : ICarsApplication
     public async Task<Result<Car, Error>> ReleaseCarAvailabilityAsync(ICallerContext caller, string organizationId,
         string id, DateTime fromUtc, DateTime toUtc, CancellationToken cancellationToken)
     {
-        var car = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!car.Exists)
+        var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
+        if (!retrieved.Exists)
         {
-            return car.Error;
+            return retrieved.Error;
         }
 
+        var car = retrieved.Value;
         var slot = TimeSlot.Create(fromUtc, toUtc);
         if (!slot.IsSuccessful)
         {
             return slot.Error;
         }
 
-        var release = car.Value.ReleaseUnavailability(slot.Value);
-        if (!release.IsSuccessful)
+        var released = car.ReleaseUnavailability(slot.Value);
+        if (!released.IsSuccessful)
         {
-            return release.Error;
+            return released.Error;
         }
 
-        var updated = await _repository.SaveAsync(car.Value, cancellationToken);
+        var updated = await _repository.SaveAsync(car, cancellationToken);
         return updated.Match<Result<Car, Error>>(c =>
         {
             _recorder.TraceInformation(caller.ToCall(), "Car {Id} was made available from {From} until {To}",
-                car.Value.Id, fromUtc, toUtc);
+                car.Id, fromUtc, toUtc);
             return c.Value.ToCar();
         }, error => error);
     }
@@ -185,19 +190,20 @@ public class CarsApplication : ICarsApplication
     public async Task<Result<bool, Error>> ReserveCarIfAvailableAsync(ICallerContext caller, string organizationId,
         string id, DateTime fromUtc, DateTime toUtc, string referenceId, CancellationToken cancellationToken)
     {
-        var car = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!car.Exists)
+        var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
+        if (!retrieved.Exists)
         {
-            return car.Error;
+            return retrieved.Error;
         }
 
+        var car = retrieved.Value;
         var slot = TimeSlot.Create(fromUtc, toUtc);
         if (!slot.IsSuccessful)
         {
             return slot.Error;
         }
 
-        var available = car.Value.ReserveIfAvailable(slot.Value, referenceId);
+        var available = car.ReserveIfAvailable(slot.Value, referenceId);
         if (!available.IsSuccessful)
         {
             return available.Error;
@@ -205,11 +211,11 @@ public class CarsApplication : ICarsApplication
 
         if (available.Value)
         {
-            var updated = await _repository.SaveAsync(car.Value, cancellationToken);
+            var updated = await _repository.SaveAsync(car, cancellationToken);
             return updated.Match<Result<bool, Error>>(_ =>
             {
                 _recorder.TraceInformation(caller.ToCall(), "Car {Id} was made reserved from {From} until {To}",
-                    car.Value.Id, fromUtc, toUtc);
+                    car.Id, fromUtc, toUtc);
                 return available.Value;
             }, error => error);
         }
@@ -221,32 +227,34 @@ public class CarsApplication : ICarsApplication
         string organizationId, DateTime? fromUtc, DateTime? toUtc, SearchOptions searchOptions, GetOptions getOptions,
         CancellationToken cancellationToken)
     {
-        var cars = await _repository.SearchAllAvailableCarsAsync(organizationId.ToId(),
+        var searched = await _repository.SearchAllAvailableCarsAsync(organizationId.ToId(),
             fromUtc ?? DateTime.MinValue,
             toUtc ?? DateTime.MaxValue, searchOptions,
             cancellationToken);
-        if (!cars.IsSuccessful)
+        if (!searched.IsSuccessful)
         {
-            return cars.Error;
+            return searched.Error;
         }
 
+        var cars = searched.Value;
         _recorder.TraceInformation(caller.ToCall(), "All available cars were fetched");
 
-        return searchOptions.ApplyWithMetadata(cars.Value.Select(car => car.ToCar()));
+        return searchOptions.ApplyWithMetadata(cars.Select(car => car.ToCar()));
     }
 
     public async Task<Result<SearchResults<Car>, Error>> SearchAllCarsAsync(ICallerContext caller,
         string organizationId, SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken)
     {
-        var cars = await _repository.SearchAllCarsAsync(organizationId.ToId(), searchOptions, cancellationToken);
-        if (!cars.IsSuccessful)
+        var searched = await _repository.SearchAllCarsAsync(organizationId.ToId(), searchOptions, cancellationToken);
+        if (!searched.IsSuccessful)
         {
-            return cars.Error;
+            return searched.Error;
         }
 
+        var cars = searched.Value;
         _recorder.TraceInformation(caller.ToCall(), "All cars were fetched");
 
-        return searchOptions.ApplyWithMetadata(cars.Value.Select(car => car.ToCar()));
+        return searchOptions.ApplyWithMetadata(cars.Select(car => car.ToCar()));
     }
 
 #if TESTINGONLY
@@ -255,46 +263,48 @@ public class CarsApplication : ICarsApplication
         GetOptions getOptions,
         CancellationToken cancellationToken)
     {
-        var unavailabilities =
-            await _repository.SearchAllCarUnavailabilitiesAsync(organizationId.ToId(), carId.ToId(), searchOptions,
-                cancellationToken);
-        if (!unavailabilities.IsSuccessful)
+        var searched = await _repository.SearchAllCarUnavailabilitiesAsync(organizationId.ToId(), carId.ToId(),
+            searchOptions,
+            cancellationToken);
+        if (!searched.IsSuccessful)
         {
-            return unavailabilities.Error;
+            return searched.Error;
         }
 
+        var unavailabilities = searched.Value;
         _recorder.TraceInformation(caller.ToCall(), "All unavailabilities for car {Id} were fetched", carId);
 
         return searchOptions.ApplyWithMetadata(
-            unavailabilities.Value.Select(unavailability => unavailability.ToUnavailability()));
+            unavailabilities.Select(unavailability => unavailability.ToUnavailability()));
     }
 #endif
 
     public async Task<Result<Car, Error>> TakeOfflineCarAsync(ICallerContext caller, string organizationId, string id,
         DateTime? fromUtc, DateTime? toUtc, CancellationToken cancellationToken)
     {
-        var car = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!car.Exists)
+        var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
+        if (!retrieved.Exists)
         {
             return Error.EntityNotFound();
         }
 
+        var car = retrieved.Value;
         var timeSlot = TimeSlot.Create(fromUtc.GetValueOrDefault(), toUtc.GetValueOrDefault());
         if (!timeSlot.IsSuccessful)
         {
             return timeSlot.Error;
         }
 
-        var changed = car.Value.TakeOffline(timeSlot.Value);
+        var changed = car.TakeOffline(timeSlot.Value);
         if (!changed.IsSuccessful)
         {
             return changed.Error;
         }
 
-        var updated = await _repository.SaveAsync(car.Value, cancellationToken);
+        var updated = await _repository.SaveAsync(car, cancellationToken);
         return updated.Match<Result<Car, Error>>(c =>
         {
-            _recorder.TraceInformation(caller.ToCall(), "Car {Id} was taken offline", car.Value.Id);
+            _recorder.TraceInformation(caller.ToCall(), "Car {Id} was taken offline", car.Id);
             return c.Value.ToCar();
         }, error => error);
     }

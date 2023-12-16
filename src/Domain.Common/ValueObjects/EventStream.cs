@@ -57,7 +57,7 @@ public sealed class EventStream : ValueObjectBase<EventStream>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new EventStream(parts[0].ToInt(), parts[1].ToInt());
+            return new EventStream(parts[0]!.ToInt(), parts[1]!.ToInt());
         };
     }
 

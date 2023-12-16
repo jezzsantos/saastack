@@ -1,5 +1,5 @@
-using System.Net;
 using ProjectName;
+using ApiHost1;
 using FluentAssertions;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
@@ -9,9 +9,16 @@ namespace ProjectName;
 [Trait("Category", "Integration.Web")]
 public class Api1Spec : WebApiSpec<Program>
 {
-    public Api1Spec(WebApiSetup<Program> setup) : base(setup)
+    public Api1Spec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
+        EmptyAllRepositories(setup);
     }
-    
-    //TODO: type testm or testma to create a new test method
+
+    private static void OverrideDependencies(IServiceCollection services)
+    {
+        //TODO: remove this is method if you are not overriding any dependencies with any stubs
+        throw new NotImplementedException();
+    }
+
+    //TIP: type testm or testma to create a new test method
 }

@@ -5,9 +5,9 @@ namespace Infrastructure.Interfaces;
 /// </summary>
 public enum DependencyScope
 {
-    Platform =
-        0, //Shared services that would have an instance in the container exclusively for the platform, and another for tenants
+    UnTenanted =
+        0, //Shared services that would have an instance in the container for untenanted use
 
-    PerTenant =
-        1, //Shared services that would have an instance in the container exclusively for a tenant, and another for the platform
+    Tenanted =
+        1 //Shared services that would have an instance in the container exclusively for each tenants use, and another for untenanted use
 }

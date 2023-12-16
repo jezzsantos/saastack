@@ -1,4 +1,3 @@
-using BookingsDomain.Events;
 using Common;
 using Domain.Common.Entities;
 using Domain.Common.Extensions;
@@ -70,14 +69,14 @@ public sealed class TripEntity : EntityBase
     {
         switch (@event)
         {
-            case Booking.TripAdded added:
+            case Events.TripAdded added:
             {
                 RootId = added.RootId.ToId();
                 OrganizationId = added.OrganizationId.ToId();
                 return Result.Ok;
             }
 
-            case Booking.TripBegan changed:
+            case Events.TripBegan changed:
             {
                 var from = Location.Create(changed.BeganFrom);
                 if (!from.IsSuccessful)
@@ -90,7 +89,7 @@ public sealed class TripEntity : EntityBase
                 return Result.Ok;
             }
 
-            case Booking.TripEnded changed:
+            case Events.TripEnded changed:
             {
                 var to = Location.Create(changed.EndedTo);
                 if (!to.IsSuccessful)
@@ -142,7 +141,7 @@ public sealed class TripEntity : EntityBase
         }
 
         var starts = DateTime.UtcNow;
-        return RaiseChangeEvent(Booking.TripBegan.Create(RootId.Value, OrganizationId.Value, Id, starts, from));
+        return RaiseChangeEvent(Events.TripBegan.Create(RootId.Value, OrganizationId.Value, Id, starts, from));
     }
 
     public Result<Error> End(Location to)
@@ -158,7 +157,7 @@ public sealed class TripEntity : EntityBase
         }
 
         var ends = DateTime.UtcNow;
-        return RaiseChangeEvent(Booking.TripEnded.Create(RootId.Value, OrganizationId.Value, Id, BeganAt.Value,
+        return RaiseChangeEvent(Events.TripEnded.Create(RootId.Value, OrganizationId.Value, Id, BeganAt.Value,
             From.Value, ends, to));
     }
 

@@ -18,5 +18,5 @@ public class TestQueuedMessage : IQueuedMessage
 
     public string? TenantId { get; set; }
 
-    public string? MessageId { get; set; }
+    public string? MessageId { get; set; } = "amessageid";
 }

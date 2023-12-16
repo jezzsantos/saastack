@@ -7,6 +7,9 @@ using QueryAny;
 
 namespace Infrastructure.Eventing.Common.Projections.ReadModels;
 
+/// <summary>
+///     Provides a checkpoint for event relaying
+/// </summary>
 [EntityName("ProjectionCheckpoints")]
 public class Checkpoint : ReadModelEntity, IIdentifiableEntity
 {
