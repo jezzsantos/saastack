@@ -1,6 +1,6 @@
 #if TESTINGONLY
 using System.Reflection;
-using ApiHost1.Apis.TestingOnly;
+using ApiHost1.Api.TestingOnly;
 using Infrastructure.Web.Hosting.Common;
 
 namespace ApiHost1;

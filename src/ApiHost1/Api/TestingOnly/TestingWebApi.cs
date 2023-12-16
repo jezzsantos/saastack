@@ -3,9 +3,9 @@ using Common;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Interfaces.Operations.TestingOnly;
 
-namespace ApiHost1.Apis.TestingOnly;
+namespace ApiHost1.Api.TestingOnly;
 
-public class TestingWebApi : IWebApiService
+public sealed class TestingWebApi : IWebApiService
 {
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ContentNegotiationGet(
         ContentNegotiationsTestingOnlyRequest request, CancellationToken cancellationToken)

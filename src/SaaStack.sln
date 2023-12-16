@@ -180,6 +180,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4FE6D8D7
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Eventing.Common.UnitTests", "Infrastructure.Eventing.Common.UnitTests\Infrastructure.Eventing.Common.UnitTests.csproj", "{372A37E9-57D1-4519-8F8E-168BDD58B013}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestingStubApiHost", "TestingStubApiHost\TestingStubApiHost.csproj", "{8A592213-C9BE-4400-B58D-315A1D5F1446}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -499,6 +501,12 @@ Global
 		{372A37E9-57D1-4519-8F8E-168BDD58B013}.Release|Any CPU.Build.0 = Release|Any CPU
 		{372A37E9-57D1-4519-8F8E-168BDD58B013}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
 		{372A37E9-57D1-4519-8F8E-168BDD58B013}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
+		{8A592213-C9BE-4400-B58D-315A1D5F1446}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A592213-C9BE-4400-B58D-315A1D5F1446}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A592213-C9BE-4400-B58D-315A1D5F1446}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A592213-C9BE-4400-B58D-315A1D5F1446}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A592213-C9BE-4400-B58D-315A1D5F1446}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
+		{8A592213-C9BE-4400-B58D-315A1D5F1446}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F5C77A86-38AF-40E4-82FC-617E624B2754} = {508E7DA4-4DF2-4201-955D-CCF70C41AD05}
@@ -583,5 +591,6 @@ Global
 		{9BFD47BB-CE30-4720-8C70-C71D614B56D5} = {B7F0BFB3-AC0B-499F-91FC-E5375BE0E415}
 		{4FE6D8D7-E59B-4667-B6C6-BBF6E87DE351} = {B7F0BFB3-AC0B-499F-91FC-E5375BE0E415}
 		{372A37E9-57D1-4519-8F8E-168BDD58B013} = {4FE6D8D7-E59B-4667-B6C6-BBF6E87DE351}
+		{8A592213-C9BE-4400-B58D-315A1D5F1446} = {4B1A213C-36A7-41A7-BFC7-B3CFF5795912}
 	EndGlobalSection
 EndGlobal

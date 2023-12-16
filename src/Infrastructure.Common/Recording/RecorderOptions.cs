@@ -50,7 +50,7 @@ public class RecorderOptions
     public static readonly RecorderOptions TestingStubsHost = new()
     {
         TrackUsageOfAllApis = false,
-        UsageComponentName = "StubsServices",
+        UsageComponentName = "TestingStubApiHost",
         Testing = new RecordingEnvironmentOptions
         {
             CrashReporting = CrashReporterOption.None,

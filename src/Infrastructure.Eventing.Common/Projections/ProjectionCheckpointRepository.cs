@@ -36,6 +36,7 @@ public sealed class ProjectionCheckpointRepository : IProjectionCheckpointReposi
 #if TESTINGONLY
         return await _store.DestroyAllAsync(ContainerName, cancellationToken);
 #else
+        await System.Threading.Tasks.Task.CompletedTask;
         return Result.Ok;
 #endif
     }

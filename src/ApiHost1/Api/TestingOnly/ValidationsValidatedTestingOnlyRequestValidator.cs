@@ -3,7 +3,7 @@ using FluentValidation;
 using Infrastructure.Web.Api.Interfaces.Operations.TestingOnly;
 using JetBrains.Annotations;
 
-namespace ApiHost1.Apis.TestingOnly;
+namespace ApiHost1.Api.TestingOnly;
 
 [UsedImplicitly]
 public class ValidationsValidatedTestingOnlyRequestValidator : AbstractValidator<ValidationsValidatedTestingOnlyRequest>

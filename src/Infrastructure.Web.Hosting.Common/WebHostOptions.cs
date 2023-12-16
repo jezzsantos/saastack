@@ -12,6 +12,8 @@ public class WebHostOptions
         DefaultApiPath = string.Empty,
         AllowCors = true,
         IsMultiTenanted = false, //TODO: change for multi-tenanted
+        UsesQueues = true,
+        UsesEventing = true,
         Recording = RecorderOptions.BackEndApiHost
     };
 
@@ -20,6 +22,8 @@ public class WebHostOptions
         DefaultApiPath = "api",
         AllowCors = true,
         IsMultiTenanted = false, //TODO: change for multi-tenanted
+        UsesQueues = true,
+        UsesEventing = false,
         Recording = RecorderOptions.BackEndForFrontEndWebHost
     };
 
@@ -28,6 +32,8 @@ public class WebHostOptions
         DefaultApiPath = string.Empty,
         AllowCors = true,
         IsMultiTenanted = false, //TODO: change for multi-tenanted
+        UsesQueues = false,
+        UsesEventing = false,
         Recording = RecorderOptions.TestingStubsHost
     };
 
@@ -37,6 +43,8 @@ public class WebHostOptions
         DefaultApiPath = string.Empty;
         AllowCors = true;
         IsMultiTenanted = false;
+        UsesQueues = false;
+        UsesEventing = false;
         Recording = new RecorderOptions();
     }
 
@@ -49,4 +57,8 @@ public class WebHostOptions
     public bool IsMultiTenanted { get; private init; }
 
     public RecorderOptions Recording { get; private init; }
+
+    public bool UsesEventing { get; private init; }
+
+    public bool UsesQueues { get; private init; }
 }

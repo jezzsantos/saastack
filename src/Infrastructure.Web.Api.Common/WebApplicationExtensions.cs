@@ -16,8 +16,13 @@ public static class WebApplicationExtensions
     /// <summary>
     ///     Starts the relays for eventing projections and notifications
     /// </summary>
-    public static IApplicationBuilder AddEventingListeners(this WebApplication app)
+    public static IApplicationBuilder AddEventingListeners(this WebApplication app, bool usesEventing)
     {
+        if (!usesEventing)
+        {
+            return app;
+        }
+
         return app.Use(async (context, next) =>
         {
             var readModelRelay = context.RequestServices.GetRequiredService<IEventNotifyingStoreProjectionRelay>();

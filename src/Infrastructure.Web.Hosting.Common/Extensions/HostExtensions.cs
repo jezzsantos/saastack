@@ -45,14 +45,14 @@ public static class HostExtensions
         ConfigureWireFormats();
         ConfigureApiRequests();
         ConfigureApplicationServices();
-        ConfigurePersistence();
+        ConfigurePersistence(options.UsesQueues);
 
         var app = builder.Build();
 
         app.EnableRequestRewind();
         app.AddExceptionShielding();
         //TODO: app.AddMultiTenancyDetection(); we need a TenantDetective
-        app.AddEventingListeners();
+        app.AddEventingListeners(options.UsesEventing);
 
         modules.ConfigureHost(app);
 
@@ -145,7 +145,7 @@ public static class HostExtensions
             builder.Services.RegisterTenanted<ICallerContext, AnonymousCallerContext>();
         }
 
-        void ConfigurePersistence()
+        void ConfigurePersistence(bool usesQueues)
         {
             var domainAssemblies = modules.DomainAssemblies
                 .Concat(new[] { typeof(DomainCommonMarker).Assembly })
@@ -156,7 +156,7 @@ public static class HostExtensions
             builder.Services.RegisterUnshared<IEventSourcedChangeEventMigrator, ChangeEventTypeMigrator>();
 
 #if TESTINGONLY
-            RegisterStoreForTestingOnly(builder);
+            RegisterStoreForTestingOnly(builder, usesQueues);
 #else
             //HACK: we need a reasonable value for production here like SQLServerDataStore
             builder.Services.RegisterPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(_ => NullStore.Instance);
@@ -165,7 +165,7 @@ public static class HostExtensions
         }
 
 #if TESTINGONLY
-        static void RegisterStoreForTestingOnly(WebApplicationBuilder builder)
+        static void RegisterStoreForTestingOnly(WebApplicationBuilder builder, bool usesQueues)
         {
             builder.Services
                 .RegisterPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
@@ -180,7 +180,10 @@ public static class HostExtensions
                     LocalMachineJsonFileStore.Create(c.ResolveForUnshared<IConfigurationSettings>().Platform,
                         c.ResolveForUnshared<IQueueStoreNotificationHandler>()
                             .ToOptional()));
-            RegisterStubMessageQueueDrainingService(builder);
+            if (usesQueues)
+            {
+                RegisterStubMessageQueueDrainingService(builder);
+            }
         }
 
         static void RegisterStubMessageQueueDrainingService(WebApplicationBuilder builder)
