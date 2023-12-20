@@ -75,7 +75,7 @@ The days of caring about these kinds of database optimizations early in the deve
 
 Real-world SaaS products today are \[necessarily\] more complex than the CRUD systems of the 1990s. As such CRUD, whilst having its *niche* place in software development (i.e. for very simple systems centered on a database), is not a very useful pattern for defining web-based APIs anymore.
 
-Creates and updates in CRUD are far too generalized. To ben generalized, they must assume that their clients (the consumers of the API) must have more knowledge of the details of the underlying constraints of the system - than they reasonably should have. It is essentially a usability problem.
+Creates and updates in CRUD are far too generalized. To be generalized, they must assume that their clients (the consumers of the API) must have more knowledge of the details of the underlying constraints of the system - than they reasonably should have. It is essentially a usability problem.
 
 > More generalized -> increased scope of reuse -> less usable/optimal/specific in any given context
 
