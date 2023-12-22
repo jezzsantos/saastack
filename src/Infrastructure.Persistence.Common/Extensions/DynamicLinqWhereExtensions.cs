@@ -11,6 +11,9 @@ namespace Infrastructure.Persistence.Common.Extensions;
 /// </summary>
 public static class DynamicLinqWhereExtensions
 {
+    /// <summary>
+    ///     Converts the specified <see cref="query" /> expression into a dynamic LINQ search statement
+    /// </summary>
     public static string ToDynamicLinqOrderByClause<TQueryableEntity>(this QueryClause<TQueryableEntity> query)
         where TQueryableEntity : IQueryableEntity
 
@@ -21,6 +24,9 @@ public static class DynamicLinqWhereExtensions
         return orderBy;
     }
 
+    /// <summary>
+    ///     Converts the specified <see cref="wheres" /> expression into a dynamic LINQ search statement
+    /// </summary>
     public static string ToDynamicLinqWhereClause(this IEnumerable<WhereExpression> wheres)
     {
         var builder = new StringBuilder();
@@ -195,6 +201,9 @@ public static class DynamicLinqWhereExtensions
 [UsedImplicitly]
 public static class DynamicLinqUtils
 {
+    /// <summary>
+    ///     Converts the specified <see cref="values" /> expression into a byte array
+    /// </summary>
     // ReSharper disable once UnusedMember.Global
     public static byte[] ToByteArray(object values)
     {

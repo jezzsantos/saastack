@@ -1,4 +1,4 @@
-namespace Tools.Analyzers.Platform;
+namespace Tools.Analyzers.Common;
 
 public static class AnalyzerConstants
 {

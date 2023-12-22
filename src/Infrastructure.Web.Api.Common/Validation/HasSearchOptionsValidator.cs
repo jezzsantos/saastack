@@ -5,6 +5,9 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Common.Validation;
 
+/// <summary>
+///     Defines a validator for <see cref="IHasSearchOptions" />
+/// </summary>
 public interface IHasSearchOptionsValidator : IValidator<IHasSearchOptions>
 {
 }

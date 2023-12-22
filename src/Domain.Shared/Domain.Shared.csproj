@@ -5,13 +5,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
-        </AssemblyAttribute>
+        <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 
 </Project>

@@ -26,7 +26,7 @@ public static class HostExtensions
     {
         services.AddHttpClient();
         services.AddSingleton<IConfigurationSettings>(new AspNetConfigurationSettings(context.Configuration));
-        services.AddSingleton<IApiHostSetting, WebApiHostSettings>();
+        services.AddSingleton<IApiHostSetting, ApiHostSettings>();
 
 #if TESTINGONLY
         services.AddSingleton<ICrashReporter>(new NullCrashReporter());

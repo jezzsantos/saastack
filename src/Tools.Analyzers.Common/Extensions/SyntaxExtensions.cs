@@ -1,9 +1,9 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Tools.Analyzers.Platform.Extensions;
+namespace Tools.Analyzers.Common.Extensions;
 
-internal static class SyntaxExtensions
+public static class SyntaxExtensions
 {
     public static DocumentationCommentTriviaSyntax? GetDocumentationCommentTriviaSyntax(this SyntaxNode node)
     {
@@ -20,7 +20,7 @@ internal static class SyntaxExtensions
 
     public static XmlNodeSyntax? GetFirstXmlElement(this SyntaxList<XmlNodeSyntax> content, string elementName)
     {
-        return content.GetXmlElements(elementName)
+        return GetXmlElements(content, elementName)
             .FirstOrDefault();
     }
 

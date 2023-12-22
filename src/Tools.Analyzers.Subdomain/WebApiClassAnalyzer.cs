@@ -6,11 +6,13 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Tools.Analyzers.Platform.Extensions;
+using Tools.Analyzers.Common;
+using Tools.Analyzers.Common.Extensions;
+using Tools.Analyzers.Subdomain.Extensions;
 
 // ReSharper disable InvalidXmlDocComment
 
-namespace Tools.Analyzers.Platform;
+namespace Tools.Analyzers.Subdomain;
 
 /// <summary>
 ///     An analyzer to ensure that WebAPI classes are configured correctly.

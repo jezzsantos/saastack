@@ -14,10 +14,10 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
 using QueryAny;
-using Tools.Analyzers.Platform.Extensions;
+using SyntaxExtensions = Tools.Analyzers.Common.Extensions.SyntaxExtensions;
 using Task = System.Threading.Tasks.Task;
 
-namespace Tools.Analyzers.Platform;
+namespace Tools.Analyzers.Subdomain;
 
 [Shared]
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DomainDrivenDesignCodeFix))]
@@ -213,7 +213,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
                 { "organizationId", nameof(Identifier) }
             },
             $"var root = new {className}(recorder, idFactory);\nroot.RaiseCreateEvent(Created.Create(root.Id, organizationId));\nreturn root;");
-        var modifiedClassDeclaration = classDeclarationSyntax.InsertMember(0, newMethod);
+        var modifiedClassDeclaration = SyntaxExtensions.InsertMember(classDeclarationSyntax, 0, newMethod);
         var newRoot = root.ReplaceNode(classDeclarationSyntax, modifiedClassDeclaration);
         var newDocument = document.WithSyntaxRoot(newRoot);
 
@@ -264,7 +264,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
                 { "rootEventHandler", nameof(RootEventHandler) }
             },
             $"return new {className}(recorder, idFactory, rootEventHandler);");
-        var modifiedClassDeclaration = classDeclarationSyntax.InsertMember(0, newMethod);
+        var modifiedClassDeclaration = SyntaxExtensions.InsertMember(classDeclarationSyntax, 0, newMethod);
         var newRoot = root.ReplaceNode(classDeclarationSyntax, modifiedClassDeclaration);
         var newDocument = document.WithSyntaxRoot(newRoot);
 
@@ -334,7 +334,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
             isSingleValueObject
                 ? $"if (value.IsNotValuedParameter(nameof(value), out var error))\n{{\nreturn error;\n}}\n\nreturn new {className}(value);"
                 : $"if (value1.IsNotValuedParameter(nameof(value1), out var error1))\n{{\nreturn error1;\n}}\n\nreturn new {className}(value1, value2, value3);");
-        var modifiedClassDeclaration = classDeclarationSyntax.InsertMember(0, newMethod);
+        var modifiedClassDeclaration = SyntaxExtensions.InsertMember(classDeclarationSyntax, 0, newMethod);
         if (!isSingleValueObject)
         {
             var newConstructor = GenerateConstructor(
@@ -347,7 +347,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
                     { "value3", nameof(String).ToLowerInvariant() }
                 },
                 null);
-            modifiedClassDeclaration = modifiedClassDeclaration.InsertMember(1, newConstructor);
+            modifiedClassDeclaration = SyntaxExtensions.InsertMember(modifiedClassDeclaration, 1, newConstructor);
         }
 
         var newRoot = root.ReplaceNode(classDeclarationSyntax, modifiedClassDeclaration);

@@ -1,12 +1,11 @@
-using Common.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Tools.Analyzers.Platform.Extensions;
+namespace Tools.Analyzers.Common.Extensions;
 
-internal static class SyntaxFilterExtensions
+public static class SyntaxFilterExtensions
 {
     public static AttributeData? GetAttributeOfType<TAttribute>(this MemberDeclarationSyntax memberDeclarationSyntax,
         SyntaxNodeAnalysisContext context)
@@ -63,19 +62,19 @@ internal static class SyntaxFilterExtensions
         var isPublicProperty = propertyAccessibility.IsPublic;
 
         var accessors = propertyDeclarationSyntax.AccessorList;
-        if (accessors.NotExists())
+        if (accessors is null)
         {
             return false;
         }
 
         var setter = accessors.Accessors.FirstOrDefault(accessor =>
             accessor.IsKind(SyntaxKind.SetAccessorDeclaration));
-        if (setter.NotExists())
+        if (setter is null)
         {
             return false;
         }
 
-        if (setter.Modifiers.HasNone())
+        if (!setter.Modifiers.Any())
         {
             return isPublicProperty;
         }
@@ -134,7 +133,7 @@ internal static class SyntaxFilterExtensions
     public static bool IsNamed(this MethodDeclarationSyntax methodDeclarationSyntax, string name)
     {
         var methodName = methodDeclarationSyntax.Identifier.Text;
-        return name.EqualsIgnoreCase(methodName);
+        return string.Equals(name, methodName, StringComparison.OrdinalIgnoreCase);
     }
 
     public static bool IsNestedAndNotPublicType(this MemberDeclarationSyntax memberDeclaration)
@@ -244,6 +243,23 @@ internal static class SyntaxFilterExtensions
         }
 
         return true;
+    }
+
+    public static bool IsParentTypeNotStatic(this MemberDeclarationSyntax memberDeclaration)
+    {
+        var parent = memberDeclaration.Parent;
+        if (parent is not BaseTypeDeclarationSyntax classDeclaration)
+        {
+            return false;
+        }
+
+        var accessibility = new Accessibility(classDeclaration.Modifiers);
+        if (!accessibility.IsStatic)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public static bool IsPrivateInstanceConstructor(this ConstructorDeclarationSyntax constructorDeclarationSyntax)

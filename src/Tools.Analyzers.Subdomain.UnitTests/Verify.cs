@@ -1,15 +1,22 @@
 extern alias CommonAnalyzers;
 using System.Reflection;
+using Common;
 using Common.Extensions;
+using Domain.Common;
+using Domain.Interfaces;
+using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Interfaces;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using NuGet.Frameworks;
+using QueryAny;
 using AnalyzerConstants = CommonAnalyzers::Tools.Analyzers.Common.AnalyzerConstants;
 using Task = System.Threading.Tasks.Task;
 
-namespace Tools.Analyzers.Platform.UnitTests;
+namespace Tools.Analyzers.Subdomain.UnitTests;
 
 public static class Verify
 {
@@ -19,7 +26,13 @@ public static class Verify
     private static readonly Assembly[] AdditionalReferences =
     {
         typeof(Verify).Assembly,
-        typeof(AnalyzerConstants).Assembly
+        typeof(AnalyzerConstants).Assembly,
+        typeof(Query).Assembly,
+        typeof(CommonMarker).Assembly,
+        typeof(DomainInterfacesMarker).Assembly,
+        typeof(DomainCommonMarker).Assembly,
+        typeof(InfrastructureWebApiInterfacesMarker).Assembly,
+        typeof(InfrastructureWebApiCommonMarker).Assembly
     };
 
     // HACK: we have to define the .NET 7.0 framework here,
@@ -40,11 +53,64 @@ public static class Verify
 
     private static ReferenceAssemblies Net70 => LazyNet70.Value;
 
+    public static async Task CodeFixed<TAnalyzer, TCodeFix>(DiagnosticDescriptor descriptor, string problem, string fix,
+        int locationX, int locationY, string argument)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+        where TCodeFix : CodeFixProvider, new()
+    {
+        var codeFixTest = new CSharpCodeFixTest<TAnalyzer, TCodeFix, DefaultVerifier>();
+        foreach (var assembly in AdditionalReferences)
+        {
+            codeFixTest.TestState.AdditionalReferences.Add(assembly);
+        }
+
+        codeFixTest.ReferenceAssemblies = Net70;
+        codeFixTest.TestCode = problem;
+        codeFixTest.FixedCode = fix;
+
+        var expected = CSharpCodeFixVerifier<TAnalyzer, TCodeFix, DefaultVerifier>.Diagnostic(descriptor)
+            .WithLocation(locationX, locationY)
+            .WithArguments(argument);
+        codeFixTest.ExpectedDiagnostics.Add(expected);
+
+        await codeFixTest.RunAsync(CancellationToken.None);
+    }
+
     public static async Task DiagnosticExists<TAnalyzer>(DiagnosticDescriptor descriptor, string inputSnippet,
         int locationX, int locationY, string argument, params object?[]? messageArgs)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {
         await DiagnosticExists<TAnalyzer>(descriptor, inputSnippet, (locationX, locationY, argument), messageArgs);
+    }
+
+    public static async Task DiagnosticExists<TAnalyzer>(DiagnosticDescriptor descriptor, string inputSnippet,
+        (int locationX, int locationY, string argument) expected1,
+        (int locationX, int locationY, string argument) expected2)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+    {
+        var expectation1 = CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>.Diagnostic(descriptor)
+            .WithLocation(expected1.locationX, expected1.locationY)
+            .WithArguments(expected1.argument);
+        var expectation2 = CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>.Diagnostic(descriptor)
+            .WithLocation(expected2.locationX, expected2.locationY)
+            .WithArguments(expected2.argument);
+
+        await RunAnalyzerTest<TAnalyzer>(inputSnippet, new[] { expectation1, expectation2 });
+    }
+
+    public static async Task DiagnosticExists<TAnalyzer>(string inputSnippet,
+        (DiagnosticDescriptor descriptor, int locationX, int locationY, string argument) expected1,
+        (DiagnosticDescriptor descriptor, int locationX, int locationY, string argument) expected2)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+    {
+        var expectation1 = CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>.Diagnostic(expected1.descriptor)
+            .WithLocation(expected1.locationX, expected1.locationY)
+            .WithArguments(expected1.argument);
+        var expectation2 = CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>.Diagnostic(expected2.descriptor)
+            .WithLocation(expected2.locationX, expected2.locationY)
+            .WithArguments(expected2.argument);
+
+        await RunAnalyzerTest<TAnalyzer>(inputSnippet, new[] { expectation1, expectation2 });
     }
 
     public static async Task NoDiagnosticExists<TAnalyzer>(string inputSnippet)

@@ -3,6 +3,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Tools.Analyzers.Common;
+using Tools.Analyzers.Common.Extensions;
 using Tools.Analyzers.Platform.Extensions;
 
 namespace Tools.Analyzers.Platform;
@@ -16,6 +18,7 @@ namespace Tools.Analyzers.Platform;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class MissingDocsAnalyzer : DiagnosticAnalyzer
 {
+    private const string InheritDocXmlElementName = "inheritdoc";
     private const string SummaryXmlElementName = "summary";
 
     internal static readonly DiagnosticDescriptor Sas001 = "SAS001".GetDescriptor(DiagnosticSeverity.Warning,
@@ -76,6 +79,12 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
         }
 
         var xmlContent = docs.Content;
+        var inheritdoc = xmlContent.GetFirstXmlElement(InheritDocXmlElementName);
+        if (inheritdoc is not null)
+        {
+            return;
+        }
+
         var summary = xmlContent.GetFirstXmlElement(SummaryXmlElementName);
         if (summary is null)
         {
@@ -107,6 +116,11 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        if (methodDeclarationSyntax.IsParentTypeNotStatic())
+        {
+            return;
+        }
+
         if (methodDeclarationSyntax.IsNotPublicOrInternalStaticMethod())
         {
             return;
@@ -126,6 +140,12 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
         }
 
         var xmlContent = docs.Content;
+        var inheritdoc = xmlContent.GetFirstXmlElement(InheritDocXmlElementName);
+        if (inheritdoc is not null)
+        {
+            return;
+        }
+
         var summary = xmlContent.GetFirstXmlElement(SummaryXmlElementName);
         if (summary is null)
         {

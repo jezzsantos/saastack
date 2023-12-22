@@ -1,7 +1,7 @@
-extern alias Analyzers;
+extern alias PlatformAnalyzers;
 using JetBrains.Annotations;
 using Xunit;
-using MissingDocsAnalyzer = Analyzers::Tools.Analyzers.Platform.MissingDocsAnalyzer;
+using MissingDocsAnalyzer = PlatformAnalyzers::Tools.Analyzers.Platform.MissingDocsAnalyzer;
 
 namespace Tools.Analyzers.Platform.UnitTests;
 
@@ -40,7 +40,8 @@ public class AClass
         {
             const string input = @"public delegate void ADelegate();";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1, 22, "ADelegate");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1,
+                22, "ADelegate");
         }
 
         [Fact]
@@ -48,7 +49,8 @@ public class AClass
         {
             const string input = @"internal delegate void ADelegate();";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1, 24, "ADelegate");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1,
+                24, "ADelegate");
         }
 
         [Fact]
@@ -59,7 +61,8 @@ public interface AnInterface
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 18, "AnInterface");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
+                18, "AnInterface");
         }
 
         [Fact]
@@ -70,7 +73,8 @@ internal interface AnInterface
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 20, "AnInterface");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
+                20, "AnInterface");
         }
 
         [Fact]
@@ -81,7 +85,8 @@ public enum AnEnum
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 13, "AnEnum");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
+                13, "AnEnum");
         }
 
         [Fact]
@@ -92,7 +97,8 @@ internal enum AnEnum
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 15, "AnEnum");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
+                15, "AnEnum");
         }
 
         [Fact]
@@ -103,7 +109,8 @@ public struct AStruct
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 15, "AStruct");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
+                15, "AStruct");
         }
 
         [Fact]
@@ -114,7 +121,8 @@ internal struct AStruct
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 17, "AStruct");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
+                17, "AStruct");
         }
 
         [Fact]
@@ -125,7 +133,8 @@ public readonly struct AStruct
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 24, "AStruct");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
+                24, "AStruct");
         }
 
         [Fact]
@@ -136,7 +145,8 @@ internal readonly struct AStruct
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 26, "AStruct");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
+                26, "AStruct");
         }
 
         [Fact]
@@ -147,7 +157,8 @@ public record ARecord()
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 15, "ARecord");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
+                15, "ARecord");
         }
 
         [Fact]
@@ -158,7 +169,8 @@ internal record ARecord
 {
 }";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 17, "ARecord");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
+                17, "ARecord");
         }
 
         [Fact]
@@ -233,7 +245,8 @@ public class AClass1
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 7, 18, "AClass2");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 7,
+                18, "AClass2");
         }
 
         [Fact]
@@ -263,7 +276,8 @@ public class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 14, "AClass");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
+                14, "AClass");
         }
 
         [Fact]
@@ -275,7 +289,8 @@ internal class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 16, "AClass");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
+                16, "AClass");
         }
 
         [Fact]
@@ -287,7 +302,8 @@ public class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2, 14, "AClass");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
+                14, "AClass");
         }
 
         [Fact]
@@ -300,7 +316,8 @@ public class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 3, 14, "AClass");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 3,
+                14, "AClass");
         }
 
         [Fact]
@@ -315,7 +332,8 @@ public class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 5, 14, "AClass");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 5,
+                14, "AClass");
         }
 
         [Fact]
@@ -330,7 +348,8 @@ public class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 5, 14, "AClass");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 5,
+                14, "AClass");
         }
 
         [Fact]
@@ -345,11 +364,12 @@ public class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 5, 14, "AClass");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 5,
+                14, "AClass");
         }
 
         [Fact]
-        public async Task WhenPublicClassHasWhitespaceSummary_ThenAlerts()
+        public async Task WhenPublicClassHasWhitespaceSummaryComment_ThenAlerts()
         {
             const string input = @"
 /// <summary>
@@ -360,11 +380,25 @@ public class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 5, 14, "AClass");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 5,
+                14, "AClass");
         }
 
         [Fact]
-        public async Task WhenPublicClassHasASummary_ThenNoAlert()
+        public async Task WhenPublicClassHasAnInheritDocComment_ThenNoAlert()
+        {
+            const string input = @"
+/// <inheritdoc/>
+public class AClass
+{
+}
+";
+
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
+        }
+
+        [Fact]
+        public async Task WhenPublicClassHasASummaryComment_ThenNoAlert()
         {
             const string input = @"
 /// <summary>
@@ -419,7 +453,7 @@ public static class AClass
         }
 
         [Fact]
-        public async Task WhenPublicStaticMethod_ThenAlerts()
+        public async Task WhenPublicStaticMethodOfStaticClass_ThenAlerts()
         {
             const string input = @"
 public static class AClass
@@ -428,7 +462,24 @@ public static class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4, 24, "AMethod");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4,
+                24, "AMethod");
+        }
+
+        [Fact]
+        public async Task WhenPublicStaticMethodOfInstanceClass_ThenNoAlert()
+        {
+            const string input = @"
+/// <summary>
+/// avalue
+/// <summary>
+public class AClass
+{
+    public static void AMethod(){}
+}
+";
+
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -441,7 +492,8 @@ public static class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4, 26, "AMethod");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4,
+                26, "AMethod");
         }
 
         [Fact]
@@ -454,7 +506,8 @@ public static class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4, 24, "AMethod");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4,
+                24, "AMethod");
         }
 
         [Fact]
@@ -467,7 +520,8 @@ public static class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4, 26, "AMethod");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4,
+                26, "AMethod");
         }
 
         [Fact]
@@ -480,7 +534,8 @@ public static class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4, 26, "AMethod");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4,
+                26, "AMethod");
         }
 
         [Fact]
@@ -506,11 +561,29 @@ public static class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4, 24, "AMethod");
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4,
+                24, "AMethod");
         }
 
         [Fact]
-        public async Task WhenPublicExtensionHasASummary_ThenNoAlert()
+        public async Task WhenPublicExtensionHasEmptySummary_ThenAlerts()
+        {
+            const string input = @"
+public static class AClass
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    public static void AMethod(this string value){}
+}
+";
+
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 7,
+                24, "AMethod");
+        }
+
+        [Fact]
+        public async Task WhenPublicExtensionHasASummaryComment_ThenNoAlert()
         {
             const string input = @"
 public static class AClass
@@ -518,6 +591,20 @@ public static class AClass
     /// <summary>
     /// avalue
     /// </summary>
+    public static void AMethod(this string value){}
+}
+";
+
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
+        }
+
+        [Fact]
+        public async Task WhenPublicExtensionHasAnInheritDocComment_ThenNoAlert()
+        {
+            const string input = @"
+public static class AClass
+{
+    /// <inheritdoc/>
     public static void AMethod(this string value){}
 }
 ";

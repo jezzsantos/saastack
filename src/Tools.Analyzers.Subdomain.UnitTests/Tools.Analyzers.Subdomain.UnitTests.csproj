@@ -14,7 +14,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Tools.Analyzers.Platform\Tools.Analyzers.Platform.csproj" Aliases="PlatformAnalyzers" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Common\Infrastructure.Web.Api.Common.csproj" />
+        <ProjectReference Include="..\Tools.Analyzers.Subdomain\Tools.Analyzers.Subdomain.csproj" Aliases="SubdomainAnalyzers" />
         <ProjectReference Include="..\Tools.Analyzers.Common\Tools.Analyzers.Common.csproj" Aliases="CommonAnalyzers" />
         <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
     </ItemGroup>

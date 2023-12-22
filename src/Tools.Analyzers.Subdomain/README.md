@@ -1,6 +1,6 @@
 # Analyzers
 
-This analyzer project is meant to be included by every project in the solution. It contains several analyzers.
+This analyzer project is meant to be included by every subdomain project in the solution. It contains several analyzers.
 
 The individual analyzers will filter the individual projects their analyzers apply to.
 
@@ -20,7 +20,7 @@ If any dependencies are taken, special workarounds (in the project file of this 
 
 You can debug the analyzers easily from the unit tests.
 
-You can debug your analyzers by setting a breakpoint in the code, and then running the `Tools-Analyzers-Platform-Development` run configuration from the `Tools.Analyzers.Platform` project with the debugger. (found in the `launchSettings.json` file in any executable project).
+You can debug your analyzers by setting a breakpoint in the code, and then running the `Tools-Analyzers-Subdomain-Development` run configuration from the `Tools.Analyzers.Subdomain` project with the debugger. (found in the `launchSettings.json` file in any executable project).
 
 # Updating Analyzers
 

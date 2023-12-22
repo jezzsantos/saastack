@@ -1,14 +1,12 @@
-extern alias Analyzers;
+extern alias SubdomainAnalyzers;
 using Application.Interfaces;
 using Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
 using Xunit;
-using TypeExtensions = Analyzers::Tools.Analyzers.Platform.TypeExtensions;
-using WebApiClassAnalyzer = Analyzers::Tools.Analyzers.Platform.WebApiClassAnalyzer;
+using TypeExtensions = SubdomainAnalyzers::Tools.Analyzers.Subdomain.TypeExtensions;
+using WebApiClassAnalyzer = SubdomainAnalyzers::Tools.Analyzers.Subdomain.WebApiClassAnalyzer;
 
-namespace Tools.Analyzers.Platform.UnitTests;
-
-extern alias Analyzers;
+namespace Tools.Analyzers.Subdomain.UnitTests;
 
 [UsedImplicitly]
 public class WebApiClassAnalyzerSpec
@@ -97,8 +95,10 @@ public class AClass : IWebApiService
     public void AMethod(){}
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas010, input, 6, 17, "AMethod",
-                TypeExtensions.Stringify(WebApiClassAnalyzer.AllowableReturnTypes));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas010, input, 6,
+                17, "AMethod",
+                TypeExtensions.Stringify(WebApiClassAnalyzer
+                    .AllowableReturnTypes));
         }
 
         [Fact]
@@ -113,8 +113,10 @@ public class AClass : IWebApiService
     public Task AMethod(){ return Task.CompletedTask; }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas010, input, 7, 17, "AMethod",
-                TypeExtensions.Stringify(WebApiClassAnalyzer.AllowableReturnTypes));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas010, input, 7,
+                17, "AMethod",
+                TypeExtensions.Stringify(WebApiClassAnalyzer
+                    .AllowableReturnTypes));
         }
 
         [Fact]
@@ -129,8 +131,10 @@ public class AClass : IWebApiService
     public Task<string> AMethod(){ return Task.FromResult(string.Empty); }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas010, input, 7, 25, "AMethod",
-                TypeExtensions.Stringify(WebApiClassAnalyzer.AllowableReturnTypes));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas010, input, 7,
+                25, "AMethod",
+                TypeExtensions.Stringify(WebApiClassAnalyzer
+                    .AllowableReturnTypes));
         }
 
         [Fact]
@@ -140,7 +144,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -160,7 +164,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -180,7 +184,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -200,7 +204,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -220,7 +224,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -240,7 +244,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -260,7 +264,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -284,8 +288,10 @@ public class AClass : IWebApiService
     public string AMethod(){ return string.Empty; }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas010, input, 6, 19, "AMethod",
-                TypeExtensions.Stringify(WebApiClassAnalyzer.AllowableReturnTypes));
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas010, input, 6,
+                19, "AMethod",
+                TypeExtensions.Stringify(WebApiClassAnalyzer
+                    .AllowableReturnTypes));
         }
 
         [Fact]
@@ -295,7 +301,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -315,7 +321,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -335,7 +341,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -355,7 +361,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -375,7 +381,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -395,7 +401,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -415,7 +421,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -448,7 +454,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas011, input, 8, 27, "AMethod");
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas011, input, 8,
+                27, "AMethod");
         }
 
         [Fact]
@@ -459,7 +466,7 @@ using Infrastructure.Web.Api.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -469,7 +476,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas011, input, 10, 27, "AMethod");
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas011, input,
+                10, 27, "AMethod");
         }
 
         [Fact]
@@ -488,7 +496,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas011, input, 8, 27, "AMethod");
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas011, input, 8,
+                27, "AMethod");
         }
 
         [Fact]
@@ -498,7 +507,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -508,7 +517,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas012, input, 9, 27, "AMethod");
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas012, input, 9,
+                27, "AMethod");
         }
 
         [Fact]
@@ -519,7 +529,7 @@ using Infrastructure.Web.Api.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -540,7 +550,7 @@ using Infrastructure.Web.Api.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -564,7 +574,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -574,7 +584,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(input, (WebApiClassAnalyzer.Sas013, 9, 27, "AMethod"),
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(input,
+                (WebApiClassAnalyzer.Sas013, 9, 27, "AMethod"),
                 (WebApiClassAnalyzer.Sas017, 9, 35, "TestNoneRequest"));
         }
 
@@ -585,7 +596,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -596,7 +607,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(input, (WebApiClassAnalyzer.Sas013, 10, 27, "AMethod"),
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(input,
+                (WebApiClassAnalyzer.Sas013, 10, 27, "AMethod"),
                 (WebApiClassAnalyzer.Sas017, 10, 35, "TestNoneRequest"));
         }
 
@@ -607,7 +619,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -631,7 +643,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -651,7 +663,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -675,7 +687,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -703,7 +715,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -721,7 +733,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas014, input, 17, 27, "AMethod4");
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas014, input,
+                17, 27, "AMethod4");
         }
     }
 
@@ -735,7 +748,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -755,7 +768,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -773,7 +786,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas015, input, (9, 27, "AMethod1"),
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas015, input,
+                (9, 27, "AMethod1"),
                 (13, 27, "AMethod2"));
         }
     }
@@ -788,7 +802,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -808,7 +822,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -828,7 +842,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -848,7 +862,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -868,7 +882,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -888,7 +902,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -898,7 +912,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 44, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                44, "AMethod",
                 ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
         }
 
@@ -909,7 +924,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -929,7 +944,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -949,7 +964,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -969,7 +984,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -989,7 +1004,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1009,7 +1024,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1019,7 +1034,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 54, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                54, "AMethod",
                 ServiceOperation.Get, ExpectedAllowedResultTypes(ServiceOperation.Get));
         }
 
@@ -1030,7 +1046,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1040,7 +1056,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 54, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                54, "AMethod",
                 ServiceOperation.Search, ExpectedAllowedResultTypes(ServiceOperation.Search));
         }
 
@@ -1051,7 +1068,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1061,7 +1078,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 54, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                54, "AMethod",
                 ServiceOperation.PutPatch, ExpectedAllowedResultTypes(ServiceOperation.PutPatch));
         }
 
@@ -1072,7 +1090,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1082,7 +1100,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 54, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                54, "AMethod",
                 ServiceOperation.Delete, ExpectedAllowedResultTypes(ServiceOperation.Delete));
         }
 
@@ -1093,7 +1112,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1103,7 +1122,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 47, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                47, "AMethod",
                 ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
         }
 
@@ -1114,7 +1134,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1134,7 +1154,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1154,7 +1174,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1164,7 +1184,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 47, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                47, "AMethod",
                 ServiceOperation.PutPatch, ExpectedAllowedResultTypes(ServiceOperation.PutPatch));
         }
 
@@ -1175,7 +1196,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1185,7 +1206,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 47, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                47, "AMethod",
                 ServiceOperation.Delete, ExpectedAllowedResultTypes(ServiceOperation.Delete));
         }
 
@@ -1196,7 +1218,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1206,7 +1228,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 56, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                56, "AMethod",
                 ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
         }
 
@@ -1217,7 +1240,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1227,7 +1250,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 56, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                56, "AMethod",
                 ServiceOperation.Get, ExpectedAllowedResultTypes(ServiceOperation.Get));
         }
 
@@ -1238,7 +1262,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1258,7 +1282,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1268,7 +1292,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 56, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                56, "AMethod",
                 ServiceOperation.PutPatch, ExpectedAllowedResultTypes(ServiceOperation.PutPatch));
         }
 
@@ -1279,7 +1304,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1289,7 +1314,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 56, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                56, "AMethod",
                 ServiceOperation.Delete, ExpectedAllowedResultTypes(ServiceOperation.Delete));
         }
 
@@ -1300,7 +1326,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1310,7 +1336,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 52, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                52, "AMethod",
                 ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
         }
 
@@ -1321,7 +1348,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1331,7 +1358,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 52, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                52, "AMethod",
                 ServiceOperation.Get, ExpectedAllowedResultTypes(ServiceOperation.Get));
         }
 
@@ -1342,7 +1370,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1352,7 +1380,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 52, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                52, "AMethod",
                 ServiceOperation.Search, ExpectedAllowedResultTypes(ServiceOperation.Search));
         }
 
@@ -1363,7 +1392,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1383,7 +1412,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1393,7 +1422,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 52, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                52, "AMethod",
                 ServiceOperation.Delete, ExpectedAllowedResultTypes(ServiceOperation.Delete));
         }
 
@@ -1404,7 +1434,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1414,7 +1444,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 28, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                28, "AMethod",
                 ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
         }
 
@@ -1425,7 +1456,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1435,7 +1466,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 28, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                28, "AMethod",
                 ServiceOperation.Get, ExpectedAllowedResultTypes(ServiceOperation.Get));
         }
 
@@ -1446,7 +1478,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1456,7 +1488,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 28, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                28, "AMethod",
                 ServiceOperation.Search, ExpectedAllowedResultTypes(ServiceOperation.Search));
         }
 
@@ -1467,7 +1500,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1477,7 +1510,8 @@ public class AClass : IWebApiService
     }
 }";
 
-            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9, 28, "AMethod",
+            await Verify.DiagnosticExists<WebApiClassAnalyzer>(WebApiClassAnalyzer.Sas016, input, 9,
+                28, "AMethod",
                 ServiceOperation.PutPatch, ExpectedAllowedResultTypes(ServiceOperation.PutPatch));
         }
 
@@ -1488,7 +1522,7 @@ public class AClass : IWebApiService
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
-using Tools.Analyzers.Platform.UnitTests;
+using Tools.Analyzers.Subdomain.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
 {
@@ -1503,7 +1537,8 @@ public class AClass : IWebApiService
 
         private static string ExpectedAllowedResultTypes(ServiceOperation operation)
         {
-            return TypeExtensions.Stringify(WebApiClassAnalyzer.AllowableOperationReturnTypes[operation].ToArray());
+            return TypeExtensions.Stringify(WebApiClassAnalyzer
+                .AllowableOperationReturnTypes[operation].ToArray());
         }
     }
 }

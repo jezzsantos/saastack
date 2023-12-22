@@ -6,21 +6,21 @@ using Xunit;
 namespace Infrastructure.Web.Hosting.Common.UnitTests.ApplicationServices;
 
 [Trait("Category", "Unit")]
-public class WebApiHostSettingsSpec
+public class ApiHostSettingsSpec
 {
-    private readonly WebApiHostSettings _service;
+    private readonly ApiHostSettings _service;
     private readonly Mock<IConfigurationSettings> _settings;
 
-    public WebApiHostSettingsSpec()
+    public ApiHostSettingsSpec()
     {
         _settings = new Mock<IConfigurationSettings>();
-        _service = new WebApiHostSettings(_settings.Object);
+        _service = new ApiHostSettings(_settings.Object);
     }
 
     [Fact]
     public void WhenGetWebsiteHostBaseUrl_ThenReturnsBaseUrl()
     {
-        _settings.Setup(s => s.Platform.GetString(WebApiHostSettings.WebsiteHostBaseUrlSettingName))
+        _settings.Setup(s => s.Platform.GetString(ApiHostSettings.WebsiteHostBaseUrlSettingName))
             .Returns("http://localhost/api/");
 
         var result = _service.GetWebsiteHostBaseUrl();
@@ -31,7 +31,7 @@ public class WebApiHostSettingsSpec
     [Fact]
     public void WhenGetAncillaryApiHostBaseUrl_ThenReturnsBaseUrl()
     {
-        _settings.Setup(s => s.Platform.GetString(WebApiHostSettings.AncillaryApiHostBaseUrlSettingName))
+        _settings.Setup(s => s.Platform.GetString(ApiHostSettings.AncillaryApiHostBaseUrlSettingName))
             .Returns("http://localhost/api/");
 
         var result = _service.GetAncillaryApiHostBaseUrl();
@@ -42,7 +42,7 @@ public class WebApiHostSettingsSpec
     [Fact]
     public void WhenGetAncillaryApiHostHmacAuthSecret_ThenReturnsBaseUrl()
     {
-        _settings.Setup(s => s.Platform.GetString(WebApiHostSettings.AncillaryApiHmacSecretSettingName))
+        _settings.Setup(s => s.Platform.GetString(ApiHostSettings.AncillaryApiHmacSecretSettingName))
             .Returns("asecret");
 
         var result = _service.GetAncillaryApiHostHmacAuthSecret();

@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace Tools.Analyzers.Platform.Extensions;
+namespace Tools.Analyzers.Subdomain.Extensions;
 
 public static class DiagnosticExtensions
 {

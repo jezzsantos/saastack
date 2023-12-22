@@ -9,9 +9,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using QueryAny;
-using Tools.Analyzers.Platform.Extensions;
+using Tools.Analyzers.Common;
+using Tools.Analyzers.Common.Extensions;
+using Tools.Analyzers.Subdomain.Extensions;
 
-namespace Tools.Analyzers.Platform;
+namespace Tools.Analyzers.Subdomain;
 
 /// <summary>
 ///     An analyzer to the correct implementation of root aggregates, entities and value objects:

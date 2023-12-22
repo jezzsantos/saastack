@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>.net7.0</TargetFramework>
+        <IsPlatformProject>true</IsPlatformProject>
         <IsRoslynComponent>true</IsRoslynComponent>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     </PropertyGroup>
@@ -11,12 +12,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Web.Api.Interfaces\Infrastructure.Web.Api.Interfaces.csproj" />
+        <ProjectReference Include="..\Tools.Analyzers.Common\Tools.Analyzers.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -24,10 +20,6 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" />
-        <PackageReference Include="QueryAny" Version="1.1.1" GeneratePathProperty="true" PrivateAssets="all" />
-        <PackageReference Include="MediatR.Contracts" Version="2.0.1" GeneratePathProperty="true" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>
@@ -58,62 +50,8 @@
     <Target Name="GetDependencyTargetPaths">
         <ItemGroup>
             <!-- We have to manually identify the assemblies here to include in this package. These will certainly change over time -->
-            <TargetPathWithTargetPlatformMoniker Include="$(PKGQueryAny)\lib\net6.0\QueryAny.dll" IncludeRuntimeDependency="false" />
-            <TargetPathWithTargetPlatformMoniker Include="$(PKGMediatR_Contracts)\lib\netstandard2.0\MediatR.Contracts.dll" IncludeRuntimeDependency="false" />
-            <TargetPathWithTargetPlatformMoniker Include="$(TargetDir)Common.dll" IncludeRuntimeDependency="false" />
-            <TargetPathWithTargetPlatformMoniker Include="$(TargetDir)Domain.Common.dll" IncludeRuntimeDependency="false" />
-            <TargetPathWithTargetPlatformMoniker Include="$(TargetDir)Domain.Interfaces.dll" IncludeRuntimeDependency="false" />
-            <TargetPathWithTargetPlatformMoniker Include="$(TargetDir)Application.Interfaces.dll" IncludeRuntimeDependency="false" />
-            <TargetPathWithTargetPlatformMoniker Include="$(TargetDir)Infrastructure.Web.Api.Interfaces.dll" IncludeRuntimeDependency="false" />
-            <!-- HACK: until we can find a better way to reference these assemblies -->
-            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.14\Microsoft.AspNetCore.Http.Abstractions.dll" IncludeRuntimeDependency="false" />
-            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.14\Microsoft.AspNetCore.Http.Features.dll" IncludeRuntimeDependency="false" />
-            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.14\Microsoft.Extensions.Primitives.dll" IncludeRuntimeDependency="false" />
-            <TargetPathWithTargetPlatformMoniker Include="C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.14\System.IO.Pipelines.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="$(TargetDir)Tools.Analyzers.Common.dll" IncludeRuntimeDependency="false" />
         </ItemGroup>
     </Target>
-
-    <!-- To Support Nuget Packaging as an alternative way to use the analyzers -->
-    <!--    <PropertyGroup>-->
-    <!--        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>-->
-    <!--        <IsPackable>true</IsPackable>-->
-    <!--        <IncludeBuildOutput>true</IncludeBuildOutput>-->
-    <!--        <PackageId>SaaStack.Tools.Analyzers.Platform</PackageId>-->
-    <!--        <Description>Roslyn analyzers for writing SaaStack codebases</Description>-->
-    <!--        <PackageReleaseNotes>https://github.com/jezzsantos/saastack/blob/main/src/Tools.Analyzers.Platform/README.md</PackageReleaseNotes>-->
-    <!--        <PackageReadmeFile>README.md</PackageReadmeFile>-->
-    <!--        <PackageVersion>1.0.0</PackageVersion>-->
-    <!--        <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>-->
-    <!--    </PropertyGroup>-->
-
-    <!--    <ItemGroup>-->
-    <!--        <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" PrivateAssets="All" />-->
-    <!--        <ProjectReference Include="..\Infrastructure.Web.Api.Interfaces\Infrastructure.Web.Api.Interfaces.csproj" PrivateAssets="All" />-->
-    <!--    </ItemGroup>-->
-
-    <!--    <ItemGroup>-->
-    <!--        <AdditionalFiles Remove="AnalyzerReleases.Shipped.md" />-->
-    <!--        <AdditionalFiles Remove="AnalyzerReleases.Unshipped.md" />-->
-    <!--    </ItemGroup>-->
-
-    <!--    <ItemGroup>-->
-    <!--        <None Include="README.md" Pack="true" PackagePath="\" />-->
-    <!--    </ItemGroup>-->
-
-    <!--    <ItemGroup>-->
-    <!--        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />-->
-    <!--    </ItemGroup>-->
-
-    <!--    <Target Name="CopyPackage" AfterTargets="Pack">-->
-    <!--        <Copy-->
-    <!--                SourceFiles="$(OutputPath)../$(PackageId).$(PackageVersion).nupkg"-->
-    <!--                DestinationFolder="../../tools/nuget" />-->
-    <!--    </Target>-->
-
-    <!--    <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">-->
-    <!--        <ItemGroup>-->
-    <!--            <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />-->
-    <!--        </ItemGroup>-->
-    <!--    </Target>-->
 
 </Project>

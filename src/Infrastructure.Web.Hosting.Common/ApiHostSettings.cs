@@ -4,7 +4,10 @@ using Common.Extensions;
 
 namespace Infrastructure.Web.Hosting.Common;
 
-public class WebApiHostSettings : IApiHostSetting
+/// <summary>
+///     Provides settings for any API host
+/// </summary>
+public class ApiHostSettings : IApiHostSetting
 {
     internal const string AncillaryApiHmacSecretSettingName = "Hosts:AncillaryApi:HmacAuthNSecret";
     internal const string AncillaryApiHostBaseUrlSettingName = "Hosts:AncillaryApi:BaseUrl";
@@ -12,7 +15,7 @@ public class WebApiHostSettings : IApiHostSetting
 
     private readonly IConfigurationSettings _settings;
 
-    public WebApiHostSettings(IConfigurationSettings settings)
+    public ApiHostSettings(IConfigurationSettings settings)
     {
         _settings = settings;
     }

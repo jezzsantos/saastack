@@ -65,8 +65,11 @@
     </PropertyGroup>
 
     <!-- Runs the analyzers (in memory) on build -->
-    <ItemGroup Condition="'$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true' AND '$(IsPlatformProject)'!='true'">
+    <ItemGroup Condition="'$(IsPlatformProject)'=='true' AND '$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true' AND '$(ExcludeFromPlatformAnalyzers)'!='true'">
         <ProjectReference Include="$(MSBuildThisFileDirectory)\Tools.Analyzers.Platform\Tools.Analyzers.Platform.csproj" PrivateAssets="all" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(IsPlatformProject)'!='true' AND '$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true'">
+        <ProjectReference Include="$(MSBuildThisFileDirectory)\Tools.Analyzers.Subdomain\Tools.Analyzers.Subdomain.csproj" PrivateAssets="all" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <!-- Build configurations -->

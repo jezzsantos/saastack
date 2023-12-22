@@ -1,12 +1,10 @@
-extern alias Analyzers;
+extern alias SubdomainAnalyzers;
 using JetBrains.Annotations;
 using Xunit;
-using DomainDrivenDesignAnalyzer = Analyzers::Tools.Analyzers.Platform.DomainDrivenDesignAnalyzer;
-using DomainDrivenDesignCodeFix = Analyzers::Tools.Analyzers.Platform.DomainDrivenDesignCodeFix;
+using DomainDrivenDesignAnalyzer = SubdomainAnalyzers::Tools.Analyzers.Subdomain.DomainDrivenDesignAnalyzer;
+using DomainDrivenDesignCodeFix = SubdomainAnalyzers::Tools.Analyzers.Subdomain.DomainDrivenDesignCodeFix;
 
-namespace Tools.Analyzers.Platform.UnitTests;
-
-extern alias Analyzers;
+namespace Tools.Analyzers.Subdomain.UnitTests;
 
 [UsedImplicitly]
 public class DomainDrivenDesignCodeFixSpec

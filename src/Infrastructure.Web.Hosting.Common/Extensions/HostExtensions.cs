@@ -101,7 +101,7 @@ public static class HostExtensions
             }
 
             builder.Services.RegisterUnshared<IApiHostSetting>(c =>
-                new WebApiHostSettings(new AspNetConfigurationSettings(c.GetRequiredService<IConfiguration>())));
+                new ApiHostSettings(new AspNetConfigurationSettings(c.GetRequiredService<IConfiguration>())));
         }
 
         void ConfigureAuthenticationAuthorization()

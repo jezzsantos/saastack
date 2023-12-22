@@ -2,10 +2,13 @@
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
+        <IsPlatformProject>true</IsPlatformProject>
+        <IsRoslynComponent>true</IsRoslynComponent>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Domain.Shared\Domain.Shared.csproj" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.7.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
     </ItemGroup>
 
     <ItemGroup>

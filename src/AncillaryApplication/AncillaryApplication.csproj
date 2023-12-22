@@ -5,17 +5,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
-        </AssemblyAttribute>
+        <ProjectReference Include="..\AncillaryDomain\AncillaryDomain.csproj" />
+        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
+        <ProjectReference Include="..\Application.Persistence.Common\Application.Persistence.Common.csproj" />
+        <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AncillaryDomain\AncillaryDomain.csproj" />
-        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
-        <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
-        <ProjectReference Include="..\Application.Persistence.Common\Application.Persistence.Common.csproj" />
-        <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 
     <ItemGroup>

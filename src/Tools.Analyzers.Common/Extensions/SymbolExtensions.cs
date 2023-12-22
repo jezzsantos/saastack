@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Tools.Analyzers.Platform.Extensions;
+namespace Tools.Analyzers.Common.Extensions;
 
 public static class SymbolExtensions
 {
@@ -32,12 +32,12 @@ public static class SymbolExtensions
     public static bool IsVoid(this ITypeSymbol returnType, Compilation compilation)
     {
         var voidSymbol = compilation.GetTypeByMetadataName(typeof(void).FullName!)!;
-        return returnType.IsOfType(voidSymbol);
+        return IsOfType(returnType, voidSymbol);
     }
 
     public static bool IsVoidTask(this ITypeSymbol returnType, SyntaxNodeAnalysisContext context)
     {
         var taskSymbol = context.Compilation.GetTypeByMetadataName(typeof(Task).FullName!)!;
-        return returnType.IsOfType(taskSymbol);
+        return IsOfType(returnType, taskSymbol);
     }
 }

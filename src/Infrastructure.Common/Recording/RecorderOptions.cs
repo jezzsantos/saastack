@@ -88,6 +88,9 @@ public class RecorderOptions
     public string UsageComponentName { get; private set; } = string.Empty;
 }
 
+/// <summary>
+///     Defines recording options for a specific environment
+/// </summary>
 public class RecordingEnvironmentOptions
 {
     public AuditReporterOption AuditReporting { get; set; } = AuditReporterOption.None;
@@ -99,18 +102,27 @@ public class RecordingEnvironmentOptions
     public UsageReporterOption UsageReporting { get; set; } = UsageReporterOption.None;
 }
 
+/// <summary>
+///     Defines types of Crash Reporters
+/// </summary>
 public enum CrashReporterOption
 {
     None = 0,
     Cloud = 1
 }
 
+/// <summary>
+///     Defines types of Audit Reporters
+/// </summary>
 public enum AuditReporterOption
 {
     None = 0,
     ReliableQueue = 1
 }
 
+/// <summary>
+///     Defines types of Metric Reporters
+/// </summary>
 public enum MetricReporterOption
 {
     None = 0,
@@ -118,6 +130,9 @@ public enum MetricReporterOption
     ForwardToBackEnd = 3
 }
 
+/// <summary>
+///     Defines types of Usage Reporters
+/// </summary>
 public enum UsageReporterOption
 {
     None = 0,
