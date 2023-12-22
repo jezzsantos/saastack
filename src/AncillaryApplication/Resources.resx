@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="AncillaryApplication_InvalidQueuedMessage" xml:space="preserve">
+        <value>The queued message was not valid JSON for its type: '{0}', message was: {1}</value>
+    </data>
+    <data name="AncillaryApplication_MissingUsageForId" xml:space="preserve">
+        <value>The usage message is missing a 'ForId'</value>
+    </data>
+    <data name="AncillaryApplication_MissingUsageEventName" xml:space="preserve">
+        <value>The usage message is missing a 'EventName'</value>
+    </data>
+    <data name="AncillaryApplication_MissingAuditCode" xml:space="preserve">
+        <value>The audit message is missing a 'AuditCode'</value>
+    </data>
+    <data name="AncillaryApplication_MissingTenantId" xml:space="preserve">
+        <value>The audit message is missing a 'TenantId'</value>
+    </data>
+</root>

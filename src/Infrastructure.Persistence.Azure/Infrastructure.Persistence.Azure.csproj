@@ -2,22 +2,22 @@
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
-        <IsPlatformProject>true</IsPlatformProject>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Interfaces\Infrastructure.Interfaces.csproj" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Interfaces\Infrastructure.Persistence.Interfaces.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" Condition="'$(HostingPlatform)' == 'HOSTEDONAZURE'" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+        <PackageReference Include="Azure.Storage.Queues" Version="12.17.1" />
     </ItemGroup>
 
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>Infrastructure.Persistence.Shared.IntegrationTests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
 

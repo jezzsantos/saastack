@@ -14,7 +14,6 @@ using Infrastructure.Common.DomainServices;
 using Infrastructure.Eventing.Common.Projections.ReadModels;
 using Infrastructure.Interfaces;
 using Infrastructure.Persistence.Interfaces;
-using Infrastructure.Persistence.Shared.ApplicationServices;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Common.Validation;
@@ -26,6 +25,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 #if TESTINGONLY
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
+using Infrastructure.Persistence.Shared.ApplicationServices;
+#else
+using Infrastructure.Persistence.Common.ApplicationServices;
 #endif
 
 namespace Infrastructure.Web.Hosting.Common.Extensions;

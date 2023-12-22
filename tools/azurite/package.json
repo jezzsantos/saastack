@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "azurite": "^3.29.0"
+  }
+}

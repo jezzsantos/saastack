@@ -11,6 +11,11 @@ public interface IApiHostSetting
     string GetAncillaryApiHostBaseUrl();
 
     /// <summary>
+    ///     Returns the HMAC auth secret
+    /// </summary>
+    string GetAncillaryApiHostHmacAuthSecret();
+
+    /// <summary>
     ///     Returns the URL of the Website host
     /// </summary>
     string GetWebsiteHostBaseUrl();
