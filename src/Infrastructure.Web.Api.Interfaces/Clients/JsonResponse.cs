@@ -18,6 +18,9 @@ public class JsonResponse
     public required HttpStatusCode StatusCode { get; init; }
 }
 
+/// <summary>
+/// Defines a JSON response of the specified <see cref="TResponse"/>
+/// </summary>
 public class JsonResponse<TResponse> : JsonResponse
     where TResponse : IWebResponse
 {

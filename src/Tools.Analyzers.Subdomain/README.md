@@ -14,7 +14,7 @@ This is especially problematic when those referenced projects have transient dep
 
 If any dependencies are taken, special workarounds (in the project file of this project) are required in order for these analyzers to work properly.
 
-> None of this is ideal. But until we can figure the magic needed to build and run this Analyzer if it uses these types, we can only exclude those projects using the `<ExcludeFromPlatformAnalyzers>true</ExcludeFromPlatformAnalyzers>` MSBUILD property.
+> None of this is ideal. But until we can figure the magic needed to build and run this Analyzer if it uses these types, we can only exclude those projects using the `<ExcludeFromSubdomainAnalyzers>true</ExcludeFromSubdomainAnalyzers>` MSBUILD property.
 
 # Debugging Analyzers
 

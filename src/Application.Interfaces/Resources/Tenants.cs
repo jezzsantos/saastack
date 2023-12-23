@@ -1,5 +1,8 @@
 namespace Application.Interfaces.Resources;
 
+/// <summary>
+/// Defines a setting for a specific tenant
+/// </summary>
 public class TenantSetting
 {
     public bool IsEncrypted { get; set; }

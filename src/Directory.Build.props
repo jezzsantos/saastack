@@ -68,7 +68,7 @@
     <ItemGroup Condition="'$(IsPlatformProject)'=='true' AND '$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true' AND '$(ExcludeFromPlatformAnalyzers)'!='true'">
         <ProjectReference Include="$(MSBuildThisFileDirectory)\Tools.Analyzers.Platform\Tools.Analyzers.Platform.csproj" PrivateAssets="all" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
-    <ItemGroup Condition="'$(IsPlatformProject)'!='true' AND '$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true'">
+    <ItemGroup Condition="'$(IsPlatformProject)'!='true' AND '$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true' AND '$(ExcludeFromSubdomainAnalyzers)'!='true'">
         <ProjectReference Include="$(MSBuildThisFileDirectory)\Tools.Analyzers.Subdomain\Tools.Analyzers.Subdomain.csproj" PrivateAssets="all" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 

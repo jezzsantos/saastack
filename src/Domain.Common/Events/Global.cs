@@ -5,6 +5,9 @@ namespace Domain.Common.Events;
 
 public static class Global
 {
+    /// <summary>
+    /// Defines an event raised when a stream is deleted
+    /// </summary>
     public class StreamDeleted : ITombstoneEvent
     {
         public static StreamDeleted Create(Identifier id, Identifier deletedById)

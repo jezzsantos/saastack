@@ -9,6 +9,9 @@ namespace Common.Extensions;
 [UsedImplicitly]
 public static class StringExtensions
 {
+    /// <summary>
+    /// Defines the casing used in JSON serialization
+    /// </summary>
     public enum JsonCasing
     {
         Pascal,

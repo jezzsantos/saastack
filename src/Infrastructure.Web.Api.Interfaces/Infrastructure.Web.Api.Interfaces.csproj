@@ -3,7 +3,6 @@
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <IsPlatformProject>true</IsPlatformProject>
-        <ExcludeFromPlatformAnalyzers>true</ExcludeFromPlatformAnalyzers>
     </PropertyGroup>
 
     <ItemGroup>

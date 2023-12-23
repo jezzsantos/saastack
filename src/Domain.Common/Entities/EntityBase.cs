@@ -12,6 +12,9 @@ using Domain.Interfaces.ValueObjects;
 
 namespace Domain.Common.Entities;
 
+/// <summary>
+/// Defines a handler for a specific <see cref="IDomainEvent"/>
+/// </summary>
 public delegate Result<Error> RootEventHandler(IDomainEvent @event);
 
 /// <summary>
