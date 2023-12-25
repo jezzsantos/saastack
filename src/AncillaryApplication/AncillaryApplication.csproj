@@ -8,6 +8,7 @@
         <ProjectReference Include="..\AncillaryDomain\AncillaryDomain.csproj" />
         <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
         <ProjectReference Include="..\Application.Persistence.Common\Application.Persistence.Common.csproj" />
+        <ProjectReference Include="..\Application.Persistence.Shared\Application.Persistence.Shared.csproj" />
         <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
     </ItemGroup>
 

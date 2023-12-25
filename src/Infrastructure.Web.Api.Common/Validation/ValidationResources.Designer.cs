@@ -8,6 +8,9 @@
 //------------------------------------------------------------------------------
 
 namespace Infrastructure.Web.Api.Common.Validation {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -53,6 +56,24 @@ namespace Infrastructure.Web.Api.Common.Validation {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Name&apos; of an item in the &apos;Additional&apos; is either missing or invalid.
+        /// </summary>
+        internal static string AdditionalValidator_InvalidName {
+            get {
+                return ResourceManager.GetString("AdditionalValidator_InvalidName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A string &apos;Value&apos; of an item in the &apos;Additional&apos; is invalid.
+        /// </summary>
+        internal static string AdditionalValidator_InvalidStringValue {
+            get {
+                return ResourceManager.GetString("AdditionalValidator_InvalidStringValue", resourceCulture);
             }
         }
         

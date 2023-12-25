@@ -6,6 +6,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\AncillaryApplication\AncillaryApplication.csproj" />
+        <ProjectReference Include="..\Application.Persistence.Shared\Application.Persistence.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Api.Common\Infrastructure.Web.Api.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Api.Interfaces\Infrastructure.Web.Api.Interfaces.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Api.Operations.Shared\Infrastructure.Web.Api.Operations.Shared.csproj" />

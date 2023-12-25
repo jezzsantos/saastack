@@ -62,9 +62,18 @@ namespace AncillaryInfrastructure {
         /// <summary>
         ///   Looks up a localized string similar to The &apos;Message&apos; is either missing or invalid.
         /// </summary>
-        internal static string AnyMessageValidator_InvalidMessage {
+        internal static string AnyQueueMessageValidator_InvalidMessage {
             get {
-                return ResourceManager.GetString("AnyMessageValidator_InvalidMessage", resourceCulture);
+                return ResourceManager.GetString("AnyQueueMessageValidator_InvalidMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;EventName&apos; is either missing or invalid.
+        /// </summary>
+        internal static string AnyRecordingEventNameValidator_InvalidEventName {
+            get {
+                return ResourceManager.GetString("AnyRecordingEventNameValidator_InvalidEventName", resourceCulture);
             }
         }
     }

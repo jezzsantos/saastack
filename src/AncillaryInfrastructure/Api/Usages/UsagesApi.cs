@@ -28,12 +28,13 @@ public class UsagesApi : IWebApiService
     }
 
 #if TESTINGONLY
-         public async Task<ApiEmptyResult> DrainAll(DrainAllUsagesRequest request,
+    public async Task<ApiEmptyResult> DrainAll(DrainAllUsagesRequest request,
         CancellationToken cancellationToken)
     {
-        await _ancillaryApplication.DrainAllUsagesAsync(_context, cancellationToken);
+        var result = await _ancillaryApplication.DrainAllUsagesAsync(_context, cancellationToken);
 
-        return () => new Result<EmptyResponse, Error>();
+        return () => result.Match(() => new Result<EmptyResponse, Error>(),
+            error => new Result<EmptyResponse, Error>(error));
     }
 #endif
 }

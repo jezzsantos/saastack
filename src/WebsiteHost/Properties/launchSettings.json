@@ -1,0 +1,31 @@
+﻿{
+  "profiles": {
+    "WebsiteHost-Development": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "https://localhost:5101",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "WebsiteHost-CI": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "https://localhost:5101",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "CI"
+      }
+    },
+    "WebsiteHost-Production": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "https://app.saastack.io",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      }
+    }
+  }
+}

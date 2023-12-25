@@ -1,5 +1,5 @@
 using Common.Configuration;
-using Infrastructure.Web.Hosting.Common.ApplicationServices;
+using Infrastructure.Hosting.Common;
 using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure.Persistence.Shared.IntegrationTests;

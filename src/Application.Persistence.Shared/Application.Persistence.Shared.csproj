@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
         <ProjectReference Include="..\Application.Persistence.Interfaces\Application.Persistence.Interfaces.csproj" />
     </ItemGroup>
 
@@ -12,6 +13,10 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
         </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="ReadModels\" />
     </ItemGroup>
 
 </Project>

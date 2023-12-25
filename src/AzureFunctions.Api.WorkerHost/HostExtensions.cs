@@ -4,11 +4,10 @@ using Common;
 using Common.Configuration;
 using Common.Recording;
 using Infrastructure.Common.Recording;
-using Infrastructure.Web.Api.Common.Clients;
-using Infrastructure.Web.Api.Interfaces.Clients;
-using Infrastructure.Web.Hosting.Common;
-using Infrastructure.Web.Hosting.Common.ApplicationServices;
-using Infrastructure.Web.Hosting.Common.Extensions;
+using Infrastructure.Hosting.Common;
+using Infrastructure.Hosting.Common.Extensions;
+using Infrastructure.Web.Common.Clients;
+using Infrastructure.Web.Interfaces.Clients;
 using Infrastructure.Workers.Api;
 using Infrastructure.Workers.Api.Workers;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +25,7 @@ public static class HostExtensions
     {
         services.AddHttpClient();
         services.AddSingleton<IConfigurationSettings>(new AspNetConfigurationSettings(context.Configuration));
-        services.AddSingleton<IApiHostSetting, ApiHostSettings>();
+        services.AddSingleton<IHostSettings, HostSettings>();
 
 #if TESTINGONLY
         services.AddSingleton<ICrashReporter>(new NullCrashReporter());
@@ -44,7 +43,7 @@ public static class HostExtensions
                 c.Resolve<ICrashReporter>()));
         services.AddSingleton<IServiceClient>(c =>
             new InterHostServiceClient(c.Resolve<IHttpClientFactory>(),
-                c.Resolve<IApiHostSetting>().GetAncillaryApiHostBaseUrl()));
+                c.Resolve<IHostSettings>().GetAncillaryApiHostBaseUrl()));
         services.AddSingleton<IQueueMonitoringApiRelayWorker<UsageMessage>, DeliverUsageRelayWorker>();
         services.AddSingleton<IQueueMonitoringApiRelayWorker<AuditMessage>, DeliverAuditRelayWorker>();
     }

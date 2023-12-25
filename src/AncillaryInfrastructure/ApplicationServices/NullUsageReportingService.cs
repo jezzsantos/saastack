@@ -1,6 +1,6 @@
 using Application.Common;
 using Application.Interfaces;
-using Application.Services.Shared;
+using Application.Persistence.Shared;
 using Common;
 using Common.Extensions;
 using Task = System.Threading.Tasks.Task;

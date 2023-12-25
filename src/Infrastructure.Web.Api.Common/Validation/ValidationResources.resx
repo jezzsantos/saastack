@@ -54,5 +54,10 @@
     <data name="UrlValidator_ErrorMessage" xml:space="preserve">
       <value>'{PropertyName}' is not a valid URL</value>
     </data>
-
+    <data name="AdditionalValidator_InvalidName" xml:space="preserve">
+        <value>The 'Name' of an item in the 'Additional' is either missing or invalid</value>
+    </data>
+    <data name="AdditionalValidator_InvalidStringValue" xml:space="preserve">
+        <value>A string 'Value' of an item in the 'Additional' is invalid</value>
+    </data>
 </root>

@@ -6,15 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+        <ProjectReference Include="..\BookingsApplication\BookingsApplication.csproj" />
+        <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
-        <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
-        <ProjectReference Include="..\BookingsApplication\BookingsApplication.csproj" />
-        <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
-        <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     </ItemGroup>
 
 </Project>

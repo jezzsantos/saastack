@@ -5,9 +5,4 @@
         <IsPlatformProject>true</IsPlatformProject>
     </PropertyGroup>
 
-
-    <ItemGroup>
-        <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
-    </ItemGroup>
-
 </Project>

@@ -1,7 +1,12 @@
 using System.Net;
+using Application.Common;
+using Application.Interfaces;
+using Application.Interfaces.Resources;
+using Common;
 using Common.Extensions;
 using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Eventing.Interfaces.Projections;
+using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +18,23 @@ namespace Infrastructure.Web.Api.Common.Extensions;
 
 public static class WebApplicationExtensions
 {
+    public static readonly Type[] IgnoredTrackedRequestTypes =
+    {
+        // Exclude these as they are not API's called by users
+#if TESTINGONLY
+        typeof(DrainAllAuditsRequest),
+        typeof(DrainAllUsagesRequest),
+        typeof(SearchAllAuditsRequest),
+#endif
+        //typeof(GetHealthCheckRequest),
+        typeof(DeliverUsageRequest),
+        typeof(DeliverAuditRequest),
+
+        // Exclude these or we will get a Stackoverflow!
+        typeof(RecordUseRequest),
+        typeof(RecordMeasureRequest)
+    };
+
     /// <summary>
     ///     Starts the relays for eventing projections and notifications
     /// </summary>
@@ -82,6 +104,29 @@ public static class WebApplicationExtensions
     }
 
     /// <summary>
+    ///     Enables the tracking of all inbound API calls
+    /// </summary>
+    /// <param name="app"></param>
+    public static WebApplication EnableApiUsageTracking(this WebApplication app, bool tracksUsage)
+    {
+        if (!tracksUsage)
+        {
+            return app;
+        }
+
+        app.Use(async (context, next) =>
+        {
+            var recorder = context.RequestServices.GetRequiredService<IRecorder>();
+            var caller = context.RequestServices.GetRequiredService<ICallerContext>();
+
+            TrackUsage(context, recorder, caller);
+            await next();
+        });
+
+        return app;
+    }
+
+    /// <summary>
     ///     Enables request buffering, so that request bodies can be read in filters
     /// </summary>
     public static void EnableRequestRewind(this WebApplication app)
@@ -91,5 +136,38 @@ public static class WebApplicationExtensions
             context.Request.EnableBuffering();
             await next();
         });
+    }
+
+    private static void TrackUsage(HttpContext httpContext, IRecorder recorder, ICallerContext caller)
+    {
+        var request = httpContext.ToWebRequest();
+        var requestType = request?.GetType();
+        if (requestType.NotExists())
+        {
+            return;
+        }
+
+        if (IgnoredTrackedRequestTypes.Contains(requestType))
+        {
+            return;
+        }
+
+        var requestName = requestType.Name.ToLowerInvariant();
+        var additional = new Dictionary<string, object>
+        {
+            { UsageConstants.Properties.EndPoint, requestName }
+        };
+        var requestAsProperties = request
+            .ToObjectDictionary()
+            .ToDictionary(pair => pair.Key, pair => pair.Value?.ToString());
+        if (requestAsProperties.TryGetValue(nameof(IIdentifiableResource.Id), out var id))
+        {
+            if (id.Exists())
+            {
+                additional.Add(nameof(IIdentifiableResource.Id), id);
+            }
+        }
+
+        recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.Api.ApiEndpointRequested, additional);
     }
 }

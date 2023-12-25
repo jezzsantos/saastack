@@ -2,7 +2,6 @@ using AncillaryApplication.Persistence;
 using AncillaryDomain;
 using Application.Interfaces;
 using Application.Persistence.Shared;
-using Application.Services.Shared;
 using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
@@ -98,7 +97,7 @@ public class AncillaryApplicationSpec
         {
             ForId = "aforid",
             EventName = "aneventname",
-            Context = new Dictionary<string, string>
+            Additional = new Dictionary<string, string>
             {
                 { "aname", "avalue" }
             }

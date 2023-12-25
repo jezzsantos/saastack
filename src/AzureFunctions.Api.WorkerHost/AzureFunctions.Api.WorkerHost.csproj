@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Infrastructure.Web.Hosting.Common\Infrastructure.Web.Hosting.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Hosting.Common\Infrastructure.Hosting.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Workers.Api\Infrastructure.Workers.Api.csproj" />
     </ItemGroup>
 

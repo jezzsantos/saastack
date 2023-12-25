@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 var modules = HostedModules.Get();
 
 var app = WebApplication.CreateBuilder(args)
-    .ConfigureApiHost(modules, WebHostOptions.BackEndApiHost);
+    .ConfigureApiHost(modules, WebHostOptions.BackEndAncillaryApiHost);
 app.Run();
 
 namespace ApiHost1

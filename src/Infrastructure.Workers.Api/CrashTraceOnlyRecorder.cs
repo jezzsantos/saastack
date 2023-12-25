@@ -1,6 +1,6 @@
 ﻿using Common;
 using Common.Recording;
-using Infrastructure.Web.Hosting.Common;
+using Infrastructure.Hosting.Common.Recording;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Workers.Api;

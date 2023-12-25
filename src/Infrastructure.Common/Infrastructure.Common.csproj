@@ -7,7 +7,12 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
+        <ProjectReference Include="..\Application.Persistence.Shared\Application.Persistence.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Interfaces\Infrastructure.Interfaces.csproj" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Azure\Infrastructure.Persistence.Azure.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONAZURE'" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Shared\Infrastructure.Persistence.Shared.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Common\Infrastructure.Web.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Operations.Shared\Infrastructure.Web.Api.Operations.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

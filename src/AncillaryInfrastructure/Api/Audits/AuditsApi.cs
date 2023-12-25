@@ -29,17 +29,18 @@ public class AuditsApi : IWebApiService
     }
 
 #if TESTINGONLY
-         public async Task<ApiEmptyResult> DrainAll(DrainAllAuditsRequest request,
+    public async Task<ApiEmptyResult> DrainAll(DrainAllAuditsRequest request,
         CancellationToken cancellationToken)
     {
-        await _ancillaryApplication.DrainAllAuditsAsync(_context, cancellationToken);
+        var result = await _ancillaryApplication.DrainAllAuditsAsync(_context, cancellationToken);
 
-        return () => new Result<EmptyResponse, Error>();
+        return () => result.Match(() => new Result<EmptyResponse, Error>(),
+            error => new Result<EmptyResponse, Error>(error));
     }
 #endif
 
 #if TESTINGONLY
-         public async Task<ApiSearchResult<Audit, SearchAllAuditsResponse>> SearchAll(
+    public async Task<ApiSearchResult<Audit, SearchAllAuditsResponse>> SearchAll(
         SearchAllAuditsRequest request, CancellationToken cancellationToken)
     {
         var audits = await _ancillaryApplication.SearchAllAuditsAsync(_context,

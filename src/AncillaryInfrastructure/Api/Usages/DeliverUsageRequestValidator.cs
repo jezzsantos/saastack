@@ -11,6 +11,6 @@ public class DeliverUsageRequestValidator : AbstractValidator<DeliverUsageReques
     {
         RuleFor(req => req.Message)
             .NotEmpty()
-            .WithMessage(Resources.AnyMessageValidator_InvalidMessage);
+            .WithMessage(Resources.AnyQueueMessageValidator_InvalidMessage);
     }
 }

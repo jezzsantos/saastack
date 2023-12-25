@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
-using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Web.Api.Common.Extensions;
 
@@ -38,17 +37,6 @@ public static class RequestExtensions
             Operation = attribute.Operation,
             IsTestingOnly = attribute.IsTestingOnly
         };
-    }
-
-    /// <summary>
-    ///     Rewinds the <see cref="HttpRequest.Body" /> back to the start
-    /// </summary>
-    public static void RewindBody(this HttpRequest httpRequest)
-    {
-        if (httpRequest.Body.CanSeek)
-        {
-            httpRequest.Body.Seek(0, SeekOrigin.Begin);
-        }
     }
 
     /// <summary>

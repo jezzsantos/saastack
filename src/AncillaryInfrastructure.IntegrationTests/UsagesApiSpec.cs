@@ -1,7 +1,6 @@
 using AncillaryInfrastructure.IntegrationTests.Stubs;
 using ApiHost1;
 using Application.Persistence.Shared;
-using Application.Services.Shared;
 using Common;
 using Common.Extensions;
 using FluentAssertions;

@@ -6,9 +6,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
+        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Eventing.Interfaces\Infrastructure.Eventing.Interfaces.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Api.Interfaces\Infrastructure.Web.Api.Interfaces.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Operations.Shared\Infrastructure.Web.Api.Operations.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -30,7 +31,7 @@
     <ItemGroup>
         <EmbeddedResource Update="Validation\ValidationResources.resx">
             <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+            <LastGenOutput>ValidationResources.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources.resx">
             <Generator>ResXFileCodeGenerator</Generator>

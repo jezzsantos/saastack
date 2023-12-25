@@ -16,3 +16,11 @@ public class Audit : IIdentifiableResource
 
     public required string Id { get; set; }
 }
+
+public enum RecorderTraceLevel
+{
+    Debug,
+    Information,
+    Warning,
+    Error
+}

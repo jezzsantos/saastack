@@ -1,8 +1,8 @@
 using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
-using Infrastructure.Web.Api.Common.Clients;
-using Infrastructure.Web.Api.Interfaces.Clients;
+using Infrastructure.Web.Common.Clients;
+using Infrastructure.Web.Interfaces.Clients;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;

@@ -12,12 +12,17 @@ using Domain.Interfaces.Services;
 using Infrastructure.Common;
 using Infrastructure.Common.DomainServices;
 using Infrastructure.Eventing.Common.Projections.ReadModels;
+using Infrastructure.Hosting.Common;
+using Infrastructure.Hosting.Common.Extensions;
+using Infrastructure.Hosting.Common.Recording;
 using Infrastructure.Interfaces;
+using Infrastructure.Persistence.Common.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Common.Validation;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 using Infrastructure.Web.Hosting.Common.ApplicationServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -25,7 +30,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 #if TESTINGONLY
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
-using Infrastructure.Persistence.Shared.ApplicationServices;
+
 #else
 using Infrastructure.Persistence.Common.ApplicationServices;
 #endif
@@ -48,14 +53,17 @@ public static class HostExtensions
         ConfigureWireFormats();
         ConfigureApiRequests();
         ConfigureApplicationServices();
-        ConfigurePersistence(options.UsesQueues);
+        ConfigurePersistence(options.Persistence.UsesQueues);
 
         var app = builder.Build();
 
         app.EnableRequestRewind();
         app.AddExceptionShielding();
         //TODO: app.AddMultiTenancyDetection(); we need a TenantDetective
-        app.AddEventingListeners(options.UsesEventing);
+        app.AddEventingListeners(options.Persistence.UsesEventing);
+        app.EnableApiUsageTracking(options.TrackApiUsage);
+        //TODO: add the Healthcheck endpoint
+        //TODO: enable CORS
 
         modules.ConfigureHost(app);
 
@@ -69,8 +77,8 @@ public static class HostExtensions
         void ConfigureRecording()
         {
             builder.Services.RegisterUnshared<IRecorder>(c =>
-                new TracingOnlyRecorder(options.HostName,
-                    c.ResolveForUnshared<ILoggerFactory>())); // TODO: we need a more comprehensive HostRecorder using Azure or AWS or GC
+                new HostRecorder(c.ResolveForUnshared<IDependencyContainer>(), c.ResolveForUnshared<ILoggerFactory>(),
+                    options));
         }
 
         void ConfigureMultiTenancy(bool isMultiTenanted)
@@ -100,8 +108,8 @@ public static class HostExtensions
                     new AspNetConfigurationSettings(c.GetRequiredService<IConfiguration>()));
             }
 
-            builder.Services.RegisterUnshared<IApiHostSetting>(c =>
-                new ApiHostSettings(new AspNetConfigurationSettings(c.GetRequiredService<IConfiguration>())));
+            builder.Services.RegisterUnshared<IHostSettings>(c =>
+                new HostSettings(new AspNetConfigurationSettings(c.GetRequiredService<IConfiguration>())));
         }
 
         void ConfigureAuthenticationAuthorization()
@@ -193,17 +201,16 @@ public static class HostExtensions
         {
             builder.Services.RegisterUnshared<IMonitoredMessageQueues, MonitoredMessageQueues>();
             builder.Services.RegisterUnshared<IQueueStoreNotificationHandler, StubQueueStoreNotificationHandler>();
-            var drainApiMappings = new Dictionary<string, IWebRequest>();
-            // TODO: add these requests for testing locally
-            // {
-            //     { "emails", new DrainAllEmailsRequest() },
-            //     { "audits", new DrainAllAuditsRequest() },
-            //     { "usages", new DrainAllUsagesRequest() },
-            //     { "events", new DrainAllEventsRequest() },
-            // };
+            var drainApiMappings = new Dictionary<string, IWebRequest>
+            {
+                { "audits", new DrainAllAuditsRequest() },
+                { "usages", new DrainAllUsagesRequest() }
+                //     { "emails", new DrainAllEmailsRequest() },
+                //     { "events", new DrainAllEventsRequest() },
+            };
             builder.Services.AddHostedService(services =>
                 new StubQueueDrainingService(services.GetRequiredService<IHttpClientFactory>(),
-                    services.ResolveForUnshared<IApiHostSetting>(),
+                    services.ResolveForUnshared<IHostSettings>(),
                     services.GetRequiredService<ILogger<StubQueueDrainingService>>(),
                     services.ResolveForUnshared<IMonitoredMessageQueues>(), drainApiMappings));
         }

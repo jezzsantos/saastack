@@ -23,7 +23,7 @@ public static class CommonValidations
         @"\d\w\`\~\!\@\#\$\%\:\&\*\(\)\-\+\=\[\]\{{\}}\:\;\'\""\<\,\>\.\?\|\/ \r\n";
 
     /// <summary>
-    /// Validation for any text
+    ///     Validation for any text
     /// </summary>
     public static Validation Anything(int min = 1, int max = 100)
     {
@@ -31,7 +31,7 @@ public static class CommonValidations
     }
 
     /// <summary>
-    /// Validation for any written descriptive name
+    ///     Validation for any written descriptive name
     /// </summary>
     public static Validation DescriptiveName(int min = 1, int max = 100)
     {
@@ -39,7 +39,7 @@ public static class CommonValidations
     }
 
     /// <summary>
-    /// Validation for any freeform text (almost any character)
+    ///     Validation for any freeform text (almost any character)
     /// </summary>
     public static Validation FreeformText(int min = 1, int max = 1000)
     {
@@ -47,7 +47,7 @@ public static class CommonValidations
     }
 
     /// <summary>
-    /// Validation for any Markdown editor text
+    ///     Validation for any Markdown editor text
     /// </summary>
     public static Validation Markdown(int min = 1, int max = 1000)
     {
@@ -55,7 +55,7 @@ public static class CommonValidations
     }
 
     /// <summary>
-    /// Whether the specified  <see cref="value"/> matches the specified <see cref="validation"/>
+    ///     Whether the specified  <see cref="value" /> matches the specified <see cref="validation" />
     /// </summary>
     public static bool Matches<TValue>(this Validation<TValue> validation, TValue value)
     {
@@ -97,5 +97,10 @@ public static class CommonValidations
         }
 
         return false;
+    }
+
+    public static class Recording
+    {
+        public static readonly Validation AdditionalStringValue = DescriptiveName(1, 300);
     }
 }

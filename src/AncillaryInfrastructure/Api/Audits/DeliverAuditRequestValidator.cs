@@ -11,6 +11,6 @@ public class DeliverAuditRequestValidator : AbstractValidator<DeliverAuditReques
     {
         RuleFor(req => req.Message)
             .NotEmpty()
-            .WithMessage(Resources.AnyMessageValidator_InvalidMessage);
+            .WithMessage(Resources.AnyQueueMessageValidator_InvalidMessage);
     }
 }

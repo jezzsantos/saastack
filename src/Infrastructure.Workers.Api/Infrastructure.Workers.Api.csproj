@@ -8,9 +8,8 @@
     <ItemGroup>
         <ProjectReference Include="..\Application.Persistence.Interfaces\Application.Persistence.Interfaces.csproj" />
         <ProjectReference Include="..\Application.Persistence.Shared\Application.Persistence.Shared.csproj" />
-        <ProjectReference Include="..\Infrastructure.Web.Api.Common\Infrastructure.Web.Api.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Hosting.Common\Infrastructure.Hosting.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Api.Operations.Shared\Infrastructure.Web.Api.Operations.Shared.csproj" />
-        <ProjectReference Include="..\Infrastructure.Web.Hosting.Common\Infrastructure.Web.Hosting.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>

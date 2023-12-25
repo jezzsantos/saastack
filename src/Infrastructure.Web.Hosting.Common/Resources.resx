@@ -24,25 +24,4 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="AspNetConfigurationSettings_KeyNotFound" xml:space="preserve">
-        <value>The setting '{0}' cannot be found in any configuration</value>
-    </data>
-    <data name="AspNetConfigurationSettings_ValueNotBoolean" xml:space="preserve">
-        <value>The setting '{0}' exists, but is not a recognizable boolean value</value>
-    </data>
-    <data name="AspNetConfigurationSettings_ValueNotNumber" xml:space="preserve">
-        <value>The setting '{0}' exists, but is not a recognizable number value</value>
-    </data>
-    <data name="TracingOnlyRecorder_Started" xml:space="preserve">
-        <value>Recorder is ready to record</value>
-    </data>
-    <data name="WebApiHostSettings_MissingSetting" xml:space="preserve">
-        <value>'{0}' cannot be found in appsettings.json for this host</value>
-    </data>
-    <data name="EventStreamHandlerBase_OutOfOrderEvents" xml:space="preserve">
-        <value>The event stream {0} contains events with out of order versions.</value>
-    </data>
-    <data name="EventStreamHandlerBase_OnEventStreamStateChanged_FailedToProject" xml:space="preserve">
-        <value>Failed to relay new events to read model for: {0}</value>
-    </data>
 </root>

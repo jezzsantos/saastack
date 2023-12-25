@@ -2,9 +2,9 @@
 using Application.Interfaces.Services;
 using Common.Extensions;
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
-using Infrastructure.Web.Api.Common.Clients;
 using Infrastructure.Web.Api.Interfaces;
-using Infrastructure.Web.Api.Interfaces.Clients;
+using Infrastructure.Web.Common.Clients;
+using Infrastructure.Web.Interfaces.Clients;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Task = System.Threading.Tasks.Task;
@@ -27,7 +27,7 @@ public class StubQueueDrainingService : BackgroundService
     private readonly IMonitoredMessageQueues _monitoredMessageQueues;
     private readonly Dictionary<string, IWebRequest> _monitorQueueMappings;
 
-    public StubQueueDrainingService(IHttpClientFactory httpClientFactory, IApiHostSetting settings,
+    public StubQueueDrainingService(IHttpClientFactory httpClientFactory, IHostSettings settings,
         ILogger<StubQueueDrainingService> logger, IMonitoredMessageQueues monitoredMessageQueues,
         Dictionary<string, IWebRequest> monitoredQueueApiMappings) : this(httpClientFactory, logger,
         monitoredMessageQueues, monitoredQueueApiMappings, settings.GetAncillaryApiHostBaseUrl())

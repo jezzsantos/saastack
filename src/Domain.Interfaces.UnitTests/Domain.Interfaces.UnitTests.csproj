@@ -6,13 +6,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
         <ProjectReference Include="..\Domain.Interfaces\Domain.Interfaces.csproj" />
         <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     </ItemGroup>
 
 </Project>

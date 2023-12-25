@@ -3,13 +3,40 @@ using Application.Interfaces;
 namespace Infrastructure.Common.Recording;
 
 /// <summary>
+///     Defines the options for persistence in different environments
+/// </summary>
+public class PersistenceOptions
+{
+    public required bool UsesEventing { get; set; }
+
+    public required bool UsesQueues { get; set; }
+}
+
+/// <summary>
 ///     Defines the options for recording in the different environments
 /// </summary>
 public class RecorderOptions
 {
+    public static readonly RecorderOptions BackEndAncillaryApiHost = new()
+    {
+        UsageComponentName = UsageConstants.Components.BackEndApiHost,
+        Testing = new RecordingEnvironmentOptions
+        {
+            CrashReporting = CrashReporterOption.None,
+            AuditReporting = AuditReporterOption.ReliableQueue,
+            MetricReporting = MetricReporterOption.None,
+            UsageReporting = UsageReporterOption.ReliableQueue
+        },
+        Production = new RecordingEnvironmentOptions
+        {
+            CrashReporting = CrashReporterOption.Cloud,
+            AuditReporting = AuditReporterOption.ReliableQueue,
+            MetricReporting = MetricReporterOption.Cloud,
+            UsageReporting = UsageReporterOption.ReliableQueue
+        }
+    };
     public static readonly RecorderOptions BackEndApiHost = new()
     {
-        TrackUsageOfAllApis = true,
         UsageComponentName = UsageConstants.Components.BackEndApiHost,
         Testing = new RecordingEnvironmentOptions
         {
@@ -29,27 +56,25 @@ public class RecorderOptions
 
     public static readonly RecorderOptions BackEndForFrontEndWebHost = new()
     {
-        TrackUsageOfAllApis = false,
         UsageComponentName = UsageConstants.Components.BackEndForFrontEndWebHost,
         Testing = new RecordingEnvironmentOptions
         {
             CrashReporting = CrashReporterOption.None,
-            AuditReporting = AuditReporterOption.None,
-            MetricReporting = MetricReporterOption.ForwardToBackEnd,
-            UsageReporting = UsageReporterOption.ForwardToBackEnd
+            AuditReporting = AuditReporterOption.ReliableQueue,
+            MetricReporting = MetricReporterOption.None,
+            UsageReporting = UsageReporterOption.ReliableQueue
         },
         Production = new RecordingEnvironmentOptions
         {
             CrashReporting = CrashReporterOption.Cloud,
-            AuditReporting = AuditReporterOption.None,
-            MetricReporting = MetricReporterOption.ForwardToBackEnd,
-            UsageReporting = UsageReporterOption.ForwardToBackEnd
+            AuditReporting = AuditReporterOption.ReliableQueue,
+            MetricReporting = MetricReporterOption.Cloud,
+            UsageReporting = UsageReporterOption.ReliableQueue
         }
     };
 
     public static readonly RecorderOptions TestingStubsHost = new()
     {
-        TrackUsageOfAllApis = false,
         UsageComponentName = "TestingStubApiHost",
         Testing = new RecordingEnvironmentOptions
         {
@@ -82,8 +107,6 @@ public class RecorderOptions
     public RecordingEnvironmentOptions Production { get; private set; } = new();
 
     public RecordingEnvironmentOptions Testing { get; private set; } = new();
-
-    public bool TrackUsageOfAllApis { get; private set; }
 
     public string UsageComponentName { get; private set; } = string.Empty;
 }
@@ -127,7 +150,7 @@ public enum MetricReporterOption
 {
     None = 0,
     Cloud = 1,
-    ForwardToBackEnd = 3
+    ForwardToAncillaryApi = 3
 }
 
 /// <summary>
@@ -137,5 +160,5 @@ public enum UsageReporterOption
 {
     None = 0,
     ReliableQueue = 1,
-    ForwardToBackEnd = 2
+    ForwardToAncillaryApi = 2
 }

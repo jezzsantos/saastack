@@ -5,7 +5,6 @@ using Application.Interfaces;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Resources.Shared;
-using Application.Services.Shared;
 using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
@@ -126,7 +125,7 @@ public class AncillaryApplication : IAncillaryApplication
             return Error.RuleViolation(Resources.AncillaryApplication_MissingUsageEventName);
         }
 
-        await _usageReportingService.TrackAsync(context, message.ForId!, message.EventName!, message.Context,
+        await _usageReportingService.TrackAsync(context, message.ForId!, message.EventName!, message.Additional,
             cancellationToken);
 
         _recorder.TraceInformation(context.ToCall(), "Delivered usage for {For}", message.ForId!);

@@ -2,11 +2,24 @@ using Application.Interfaces;
 using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Web.Api.Common.Extensions;
 
 public static class HttpRequestExtensions
 {
+    
+    /// <summary>
+    ///     Rewinds the <see cref="HttpRequest.Body" /> back to the start
+    /// </summary>
+    public static void RewindBody(this HttpRequest httpRequest)
+    {
+        if (httpRequest.Body.CanSeek)
+        {
+            httpRequest.Body.Seek(0, SeekOrigin.Begin);
+        }
+    }
+
     /// <summary>
     ///     Sets the <see cref="HttpHeaders.Authorization" /> header of the specified <see cref="message" />
     ///     to the <see cref="ICallerContext.Authorization" />

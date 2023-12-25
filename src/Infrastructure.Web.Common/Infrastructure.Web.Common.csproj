@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <IsPlatformProject>true</IsPlatformProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Common\Infrastructure.Web.Api.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Interfaces\Infrastructure.Web.Interfaces.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+</Project>

@@ -14,12 +14,10 @@ public class ApplicationInsightsCrashReporter : ICrashReporter
 {
     private readonly TelemetryClient _telemetryClient;
 
-#if !TESTINGONLY
     public ApplicationInsightsCrashReporter(TelemetryClient telemetryClient)
     {
         _telemetryClient = telemetryClient;
     }
-#endif
 
     public ApplicationInsightsCrashReporter(IDependencyContainer container)
     {

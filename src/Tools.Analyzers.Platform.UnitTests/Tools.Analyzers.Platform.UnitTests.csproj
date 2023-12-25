@@ -6,17 +6,17 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Tools.Analyzers.Platform\Tools.Analyzers.Platform.csproj" Aliases="PlatformAnalyzers" />
+        <ProjectReference Include="..\Tools.Analyzers.Common\Tools.Analyzers.Common.csproj" Aliases="CommonAnalyzers" />
+        <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.1" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.1.1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Tools.Analyzers.Platform\Tools.Analyzers.Platform.csproj" Aliases="PlatformAnalyzers" />
-        <ProjectReference Include="..\Tools.Analyzers.Common\Tools.Analyzers.Common.csproj" Aliases="CommonAnalyzers" />
-        <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
     </ItemGroup>
 
 </Project>

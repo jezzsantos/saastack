@@ -35,6 +35,6 @@ public class DeliverUsageRequestValidatorSpec
 
         _validator.Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.AnyMessageValidator_InvalidMessage);
+            .WithMessageLike(Resources.AnyQueueMessageValidator_InvalidMessage);
     }
 }

@@ -15,7 +15,9 @@ public static class HandlerExtensions
     public static IResult HandleApiResult(this ApiEmptyResult result, ServiceOperation operation)
     {
         return result()
-            .Match(response => ((PostResult<EmptyResponse>)response.Value).ToResult(operation),
+            .Match(response => (response.HasValue
+                    ? response.Value
+                    : new PostResult<EmptyResponse>(new EmptyResponse())).ToResult(operation),
                 error => error.ToResult());
     }
 

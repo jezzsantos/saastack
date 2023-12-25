@@ -6,10 +6,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Eventing.Common\Infrastructure.Eventing.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Persistence.Common\Infrastructure.Persistence.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Persistence.Shared\Infrastructure.Persistence.Shared.csproj" />
-        <ProjectReference Include="..\Infrastructure.Web.Api.Common\Infrastructure.Web.Api.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Hosting.Common\Infrastructure.Hosting.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Common\Infrastructure.Web.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>

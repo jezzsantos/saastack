@@ -1,64 +1,49 @@
-using Infrastructure.Common.Recording;
+using Infrastructure.Hosting.Common;
 
 namespace Infrastructure.Web.Hosting.Common;
 
 /// <summary>
 ///     Defines options for different web hosts
 /// </summary>
-public class WebHostOptions
+public class WebHostOptions : HostOptions
 {
-    public static readonly WebHostOptions BackEndApiHost = new("BackendAPI")
+    public new static readonly WebHostOptions BackEndAncillaryApiHost = new(HostOptions.BackEndAncillaryApiHost)
     {
         DefaultApiPath = string.Empty,
         AllowCors = true,
-        IsMultiTenanted = false, //TODO: change for multi-tenanted
-        UsesQueues = true,
-        UsesEventing = true,
-        Recording = RecorderOptions.BackEndApiHost
+        TrackApiUsage = true,
+    };
+    public new static readonly WebHostOptions BackEndApiHost = new(HostOptions.BackEndApiHost)
+    {
+        DefaultApiPath = string.Empty,
+        AllowCors = true,
+        TrackApiUsage = true
     };
 
-    public static readonly WebHostOptions BackEndForFrontEndWebHost = new("FrontendSite")
+    public new static readonly WebHostOptions BackEndForFrontEndWebHost = new(HostOptions.BackEndForFrontEndWebHost)
     {
         DefaultApiPath = "api",
         AllowCors = true,
-        IsMultiTenanted = false, //TODO: change for multi-tenanted
-        UsesQueues = true,
-        UsesEventing = false,
-        Recording = RecorderOptions.BackEndForFrontEndWebHost
+        TrackApiUsage = false
     };
 
-    public static readonly WebHostOptions TestingStubsHost = new("TestingStubs")
+    public new static readonly WebHostOptions TestingStubsHost = new(HostOptions.TestingStubsHost)
     {
         DefaultApiPath = string.Empty,
         AllowCors = true,
-        IsMultiTenanted = false, //TODO: change for multi-tenanted
-        UsesQueues = false,
-        UsesEventing = false,
-        Recording = RecorderOptions.TestingStubsHost
+        TrackApiUsage = false
     };
 
-    private WebHostOptions(string hostName)
+    private WebHostOptions(HostOptions options) : base(options)
     {
-        HostName = hostName;
         DefaultApiPath = string.Empty;
         AllowCors = true;
-        IsMultiTenanted = false;
-        UsesQueues = false;
-        UsesEventing = false;
-        Recording = new RecorderOptions();
+        TrackApiUsage = false;
     }
+    
+    public bool TrackApiUsage { get; private set; }
 
     public bool AllowCors { get; private init; }
 
     public string DefaultApiPath { get; private init; }
-
-    public string HostName { get; private init; }
-
-    public bool IsMultiTenanted { get; private init; }
-
-    public RecorderOptions Recording { get; private init; }
-
-    public bool UsesEventing { get; private init; }
-
-    public bool UsesQueues { get; private init; }
 }

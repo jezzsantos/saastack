@@ -7,12 +7,13 @@ using AncillaryInfrastructure.ApplicationServices;
 using AncillaryInfrastructure.Persistence;
 using AncillaryInfrastructure.Persistence.ReadModels;
 using Application.Persistence.Interfaces;
-using Application.Services.Shared;
+using Application.Persistence.Shared;
 using Common;
 using Domain.Interfaces;
+using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
+using Infrastructure.Persistence.Shared.ApplicationServices;
 using Infrastructure.Web.Hosting.Common;
-using Infrastructure.Web.Hosting.Common.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,6 +42,7 @@ public class AncillaryModule : ISubDomainModule
         {
             return (_, services) =>
             {
+                services.RegisterUnshared<IRecordingApplication, RecordingApplication>();
                 services.RegisterUnshared<IAncillaryApplication, AncillaryApplication.AncillaryApplication>();
                 services.RegisterUnshared<IUsageMessageQueueRepository>(c =>
                     new UsageMessageQueueRepository(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));

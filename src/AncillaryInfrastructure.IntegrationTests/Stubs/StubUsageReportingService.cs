@@ -1,5 +1,5 @@
 using Application.Interfaces;
-using Application.Services.Shared;
+using Application.Persistence.Shared;
 using Common;
 
 namespace AncillaryInfrastructure.IntegrationTests.Stubs;

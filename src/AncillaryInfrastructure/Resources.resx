@@ -24,7 +24,10 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="AnyMessageValidator_InvalidMessage" xml:space="preserve">
+    <data name="AnyQueueMessageValidator_InvalidMessage" xml:space="preserve">
         <value>The 'Message' is either missing or invalid</value>
+    </data>
+    <data name="AnyRecordingEventNameValidator_InvalidEventName" xml:space="preserve">
+        <value>The 'EventName' is either missing or invalid</value>
     </data>
 </root>
