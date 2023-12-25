@@ -46,7 +46,21 @@ public static class Verify
     {
         await DiagnosticExists<TAnalyzer>(descriptor, inputSnippet, (locationX, locationY, argument), messageArgs);
     }
+    public static async Task DiagnosticExists<TAnalyzer>(string inputSnippet,
+        (DiagnosticDescriptor descriptor, int locationX, int locationY, string argument) expected1,
+        (DiagnosticDescriptor descriptor, int locationX, int locationY, string argument) expected2)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+    {
+        var expectation1 = CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>.Diagnostic(expected1.descriptor)
+            .WithLocation(expected1.locationX, expected1.locationY)
+            .WithArguments(expected1.argument);
+        var expectation2 = CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>.Diagnostic(expected2.descriptor)
+            .WithLocation(expected2.locationX, expected2.locationY)
+            .WithArguments(expected2.argument);
 
+        await RunAnalyzerTest<TAnalyzer>(inputSnippet, new[] { expectation1, expectation2 });
+    }
+    
     public static async Task NoDiagnosticExists<TAnalyzer>(string inputSnippet)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {

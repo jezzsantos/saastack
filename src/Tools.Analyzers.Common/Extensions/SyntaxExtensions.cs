@@ -1,21 +1,36 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Tools.Analyzers.Common.Extensions;
 
 public static class SyntaxExtensions
 {
-    public static DocumentationCommentTriviaSyntax? GetDocumentationCommentTriviaSyntax(this SyntaxNode node)
+    public static DocumentationCommentTriviaSyntax? GetDocumentationCommentTriviaSyntax(this SyntaxNode node,
+        SyntaxNodeAnalysisContext context)
     {
-        foreach (var leadingTrivia in node.GetLeadingTrivia())
+        var symbol = context.SemanticModel.GetDeclaredSymbol(node);
+        if (symbol is null)
         {
-            if (leadingTrivia.GetStructure() is DocumentationCommentTriviaSyntax structure)
+            return null;
+        }
+
+        IEnumerable<SyntaxNode> syntaxes = new List<SyntaxNode> { node };
+        if (node is ClassDeclarationSyntax classDeclarationSyntax)
+        {
+            if (classDeclarationSyntax.IsPartialClass())
             {
-                return structure;
+                syntaxes = symbol.DeclaringSyntaxReferences.Select(x => x.GetSyntax());
             }
         }
 
-        return null;
+        var trivia = syntaxes
+            .SelectMany(syntax => syntax.GetLeadingTrivia())
+            .Select(leadingTrivia => leadingTrivia.GetStructure())
+            .OfType<DocumentationCommentTriviaSyntax>()
+            .FirstOrDefault();
+
+        return trivia;
     }
 
     public static XmlNodeSyntax? GetFirstXmlElement(this SyntaxList<XmlNodeSyntax> content, string elementName)

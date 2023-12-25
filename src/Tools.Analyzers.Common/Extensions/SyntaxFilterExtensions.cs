@@ -174,6 +174,16 @@ public static class SyntaxFilterExtensions
 
         return false;
     }
+    public static bool IsPartialClass(this ClassDeclarationSyntax classDeclaration)
+    {
+        var accessibility = new Accessibility(classDeclaration.Modifiers);
+        if (accessibility.IsPartial)
+        {
+            return true;
+        }
+
+        return false;
+    }
 
     public static bool IsNotPublicOrInternalStaticMethod(this MethodDeclarationSyntax methodDeclarationSyntax)
     {
@@ -344,6 +354,7 @@ public class Accessibility
         IsPublic = modifiers.Any(mod => mod.IsKind(SyntaxKind.PublicKeyword));
         IsInternal = modifiers.Any(mod => mod.IsKind(SyntaxKind.InternalKeyword));
         IsStatic = modifiers.Any(mod => mod.IsKind(SyntaxKind.StaticKeyword));
+        IsPartial = modifiers.Any(mod => mod.IsKind(SyntaxKind.PartialKeyword));
     }
 
     public bool IsInternal { get; }
@@ -353,4 +364,5 @@ public class Accessibility
     public bool IsPublic { get; }
 
     public bool IsStatic { get; }
+    public bool IsPartial { get; }
 }

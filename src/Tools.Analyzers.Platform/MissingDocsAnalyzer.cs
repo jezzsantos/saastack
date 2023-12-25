@@ -64,8 +64,8 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
         {
             return;
         }
-
-        var docs = memberDeclarationSyntax.GetDocumentationCommentTriviaSyntax();
+        
+        var docs = memberDeclarationSyntax.GetDocumentationCommentTriviaSyntax(context);
         if (docs is null)
         {
             context.ReportDiagnostic(Sas001, memberDeclarationSyntax);
@@ -126,7 +126,7 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var docs = methodDeclarationSyntax.GetDocumentationCommentTriviaSyntax();
+        var docs = methodDeclarationSyntax.GetDocumentationCommentTriviaSyntax(context);
         if (docs is null)
         {
             context.ReportDiagnostic(Sas002, methodDeclarationSyntax);
