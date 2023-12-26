@@ -6,7 +6,7 @@ using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 
 namespace AncillaryInfrastructure.Api.Recording;
 
-public class RecordingApi : IWebApiService
+public sealed class RecordingApi : IWebApiService
 {
     private readonly ICallerContext _context;
     private readonly IRecordingApplication _recordingApplication;

@@ -7,7 +7,7 @@ using Infrastructure.Web.Api.Operations.Shared.Bookings;
 
 namespace BookingsInfrastructure.Api.Bookings;
 
-public class BookingsApi : IWebApiService
+public sealed class BookingsApi : IWebApiService
 {
     private const string OrganizationId = "org_01234567890123456789012"; //TODO: get this from tenancy
     private readonly IBookingsApplication _bookingsApplication;

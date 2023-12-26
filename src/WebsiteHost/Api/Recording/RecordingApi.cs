@@ -9,7 +9,7 @@ using WebsiteHost.Application;
 
 namespace WebsiteHost.Api.Recording;
 
-public class RecordingApi : IWebApiService
+public sealed class RecordingApi : IWebApiService
 {
     private readonly ICallerContext _context;
     private readonly IRecordingApplication _recordingApplication;

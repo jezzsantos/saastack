@@ -26,7 +26,7 @@
 This is an example of the declarative way we prefer to define our endpoints, in a way that relates them to a specific resource (e.g., a `Car`):
 
 ```c#
-public class CarsApi : IWebApiService
+public sealed class CarsApi : IWebApiService
 {
     private readonly ICarsApplication _carsApplication;
     private readonly ICallerContext _context;
@@ -233,7 +233,7 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
    - For example, in the project and folder: `CarsApi/Apis/Cars/CarsApi.cs`
 
    ```c#
-     public class CarsApi : IWebApiService
+     public sealed class CarsApi : IWebApiService
      {
          private readonly ICarsApplication _carsApplication;
          private readonly ICallerContext _context;

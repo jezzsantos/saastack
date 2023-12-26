@@ -7,7 +7,7 @@ using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 
 namespace AncillaryInfrastructure.Api.Usages;
 
-public class UsagesApi : IWebApiService
+public sealed class UsagesApi : IWebApiService
 {
     private readonly IAncillaryApplication _ancillaryApplication;
     private readonly ICallerContext _context;

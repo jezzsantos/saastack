@@ -8,7 +8,7 @@ using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 
 namespace AncillaryInfrastructure.Api.Audits;
 
-public class AuditsApi : IWebApiService
+public sealed class AuditsApi : IWebApiService
 {
     private readonly IAncillaryApplication _ancillaryApplication;
     private readonly ICallerContext _context;

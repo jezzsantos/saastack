@@ -7,7 +7,7 @@ using Infrastructure.Web.Api.Operations.Shared.Cars;
 
 namespace CarsInfrastructure.Api.Cars;
 
-public class CarsApi : IWebApiService
+public sealed class CarsApi : IWebApiService
 {
     private const string OrganizationId = "org_01234567890123456789012"; //TODO: get this from tenancy
     private readonly ICarsApplication _carsApplication;
