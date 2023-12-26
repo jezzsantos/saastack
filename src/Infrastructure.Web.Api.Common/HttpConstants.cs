@@ -24,6 +24,7 @@ public static class HttpHeaders
 {
     public const string Accept = "Accept";
     public const string Authorization = "Authorization";
+    public const string ContentType = "Content-Type";
     public const string HmacSignature = "X-Hub-Signature";
     public const string RequestId = "Request-ID";
 }

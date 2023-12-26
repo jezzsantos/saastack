@@ -1,6 +1,6 @@
 ﻿#if TESTINGONLY
 using System.Diagnostics.CodeAnalysis;
-using Common;
+using Common.Extensions;
 using Domain.Interfaces;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
@@ -13,13 +13,18 @@ namespace Infrastructure.Persistence.Common.ApplicationServices;
 [ExcludeFromCodeCoverage]
 public sealed partial class InProcessInMemStore
 {
-    public InProcessInMemStore(Optional<IQueueStoreNotificationHandler> handler = default)
+    public static InProcessInMemStore Create(IQueueStoreNotificationHandler? handler = default)
     {
-        if (handler.HasValue)
+        return new InProcessInMemStore(handler);
+    }
+
+    private InProcessInMemStore(IQueueStoreNotificationHandler? handler = default)
+    {
+        if (handler.Exists())
         {
             FireMessageQueueUpdated += (_, args) =>
             {
-                handler.Value.HandleMessagesQueueUpdated(args.QueueName, args.MessageCount);
+                handler.HandleMessagesQueueUpdated(args.QueueName, args.MessageCount);
             };
             NotifyAllQueuedMessages();
         }

@@ -9,41 +9,50 @@ public class WebHostOptions : HostOptions
 {
     public new static readonly WebHostOptions BackEndAncillaryApiHost = new(HostOptions.BackEndAncillaryApiHost)
     {
-        DefaultApiPath = string.Empty,
-        AllowCors = true,
+        CORS = CORSOption.AnyOrigin,
         TrackApiUsage = true,
+        UsesAuth = true
     };
     public new static readonly WebHostOptions BackEndApiHost = new(HostOptions.BackEndApiHost)
     {
-        DefaultApiPath = string.Empty,
-        AllowCors = true,
-        TrackApiUsage = true
+        CORS = CORSOption.AnyOrigin,
+        TrackApiUsage = true,
+        UsesAuth = true
     };
 
     public new static readonly WebHostOptions BackEndForFrontEndWebHost = new(HostOptions.BackEndForFrontEndWebHost)
     {
-        DefaultApiPath = "api",
-        AllowCors = true,
-        TrackApiUsage = false
+        CORS = CORSOption.SameOrigin,
+        TrackApiUsage = false,
+        UsesAuth = false
     };
 
     public new static readonly WebHostOptions TestingStubsHost = new(HostOptions.TestingStubsHost)
     {
-        DefaultApiPath = string.Empty,
-        AllowCors = true,
-        TrackApiUsage = false
+        CORS = CORSOption.AnyOrigin,
+        TrackApiUsage = false,
+        UsesAuth = false
     };
 
     private WebHostOptions(HostOptions options) : base(options)
     {
-        DefaultApiPath = string.Empty;
-        AllowCors = true;
+        CORS = CORSOption.None;
         TrackApiUsage = false;
     }
-    
+
+    public CORSOption CORS { get; private init; }
+
     public bool TrackApiUsage { get; private set; }
 
-    public bool AllowCors { get; private init; }
+    public bool UsesAuth { get; private init; }
+}
 
-    public string DefaultApiPath { get; private init; }
+/// <summary>
+///     Defines a CORS option
+/// </summary>
+public enum CORSOption
+{
+    None = 0,
+    SameOrigin = 1,
+    AnyOrigin = 2
 }

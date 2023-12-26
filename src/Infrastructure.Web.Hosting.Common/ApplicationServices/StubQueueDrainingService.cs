@@ -56,6 +56,8 @@ public class StubQueueDrainingService : BackgroundService
         GC.SuppressFinalize(this);
     }
 
+    public IEnumerable<string> MonitoredQueues => _monitorQueueMappings.Select(mqm => mqm.Key);
+
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         await Task.Delay(StartInterval, cancellationToken);

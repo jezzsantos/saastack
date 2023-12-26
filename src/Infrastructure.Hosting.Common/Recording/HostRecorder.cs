@@ -67,7 +67,21 @@ public sealed class HostRecorder : IRecorder, IDisposable
             (_crashReporter as IDisposable)?.Dispose();
             // ReSharper disable once SuspiciousTypeConversion.Global
             (_metricsReporter as IDisposable)?.Dispose();
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            (_usageReporter as IDisposable)?.Dispose();
         }
+    }
+
+    public override string ToString()
+    {
+        var builder = new StringBuilder();
+        builder.AppendFormat("{0}: ", GetType().Name);
+        builder.AppendFormat("Crashes-> {0}, ", _crashReporter.GetType().Name);
+        builder.AppendFormat("Audits -> {0}, ", _auditReporter.GetType().Name);
+        builder.AppendFormat("Usages -> {0}, ", _usageReporter.GetType().Name);
+        builder.AppendFormat("Metrics -> {0}", _metricsReporter.GetType().Name);
+
+        return builder.ToString();
     }
 
     public void TraceDebug(ICallContext? context, string messageTemplate, params object[] templateArgs)
@@ -243,7 +257,6 @@ public sealed class HostRecorder : IRecorder, IDisposable
 #elif HOSTEDONAWS
                     new NullMetricReporter(),
 #endif
-            MetricReporterOption.ForwardToAncillaryApi => new ForwardToAncillaryApiMetrics(container),
             _ => throw new ArgumentOutOfRangeException(nameof(options.MetricReporting))
         };
     }
@@ -256,7 +269,6 @@ public sealed class HostRecorder : IRecorder, IDisposable
             UsageReporterOption.None => new NullUsageReporter(),
             UsageReporterOption.ReliableQueue => new QueuedUsageReporter(container,
                 container.Resolve<IConfigurationSettings>().Platform),
-            UsageReporterOption.ForwardToAncillaryApi => new ForwardToAncillaryApiUsages(container),
             _ => throw new ArgumentOutOfRangeException(nameof(options.MetricReporting))
         };
     }

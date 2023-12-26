@@ -27,7 +27,4 @@
     <data name="RequestExtensions_MissingRouteAttribute" xml:space="preserve">
         <value>The request DTO type '{0}' is missing a '{1}' declared on the class</value>
     </data>
-    <data name="WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage" xml:space="preserve">
-        <value>An unexpected error occurred</value>
-    </data>
 </root>

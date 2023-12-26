@@ -34,6 +34,9 @@
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\ServiceOperation.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\ServiceOperation.cs</Link>
         </Compile>
+        <Compile Include="..\Infrastructure.Web.Hosting.Common\WebHostingConstants.cs">
+            <Link>Reference\Infrastructure.Web.Hosting.Common\WebHostingConstants.cs</Link>
+        </Compile>
     </ItemGroup>
 
 </Project>

@@ -24,4 +24,10 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
+    <data name="WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage" xml:space="preserve">
+        <value>An unexpected error occurred</value>
+    </data>
+    <data name="CORS_MissingSameOrigins" xml:space="preserve">
+        <value>Host is misconfigured: Missing a valid value for the setting {0}</value>
+    </data>
 </root>

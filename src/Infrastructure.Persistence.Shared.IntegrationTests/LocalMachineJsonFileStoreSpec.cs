@@ -14,21 +14,20 @@ public class AllLocalMachineJsonFileStoreSpecs : ICollectionFixture<LocalMachine
 [UsedImplicitly]
 public class LocalMachineJsonFileStoreSpecSetup : StoreSpecSetupBase
 {
+    private readonly LocalMachineJsonFileStore _store;
+
     public LocalMachineJsonFileStoreSpecSetup()
     {
-        DataStore = LocalMachineJsonFileStore.Create(Settings);
-        BlobStore = LocalMachineJsonFileStore.Create(Settings);
-        QueueStore = LocalMachineJsonFileStore.Create(Settings);
-        EventStore = LocalMachineJsonFileStore.Create(Settings);
+        _store = LocalMachineJsonFileStore.Create(Settings);
     }
 
-    public IBlobStore BlobStore { get; }
+    public IBlobStore BlobStore => _store;
 
-    public IDataStore DataStore { get; }
+    public IDataStore DataStore => _store;
 
-    public IEventStore EventStore { get; }
+    public IEventStore EventStore => _store;
 
-    public IQueueStore QueueStore { get; }
+    public IQueueStore QueueStore => _store;
 }
 
 [Trait("Category", "Integration.Storage")]

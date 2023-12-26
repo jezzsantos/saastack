@@ -14,13 +14,15 @@ public class AllInProcessInMemStoreSpecs : ICollectionFixture<InProcessInMemStor
 [UsedImplicitly]
 public class InProcessInMemStoreSpecSetup : StoreSpecSetupBase
 {
-    public IBlobStore BlobStore { get; } = new InProcessInMemStore();
+    private readonly InProcessInMemStore _store = InProcessInMemStore.Create();
 
-    public IDataStore DataStore { get; } = new InProcessInMemStore();
+    public IBlobStore BlobStore => _store;
 
-    public IEventStore EventStore { get; } = new InProcessInMemStore();
+    public IDataStore DataStore => _store;
 
-    public IQueueStore QueueStore { get; } = new InProcessInMemStore();
+    public IEventStore EventStore => _store;
+
+    public IQueueStore QueueStore => _store;
 }
 
 [Trait("Category", "Integration.Storage")]

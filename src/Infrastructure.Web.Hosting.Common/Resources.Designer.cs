@@ -58,5 +58,23 @@ namespace Infrastructure.Web.Hosting.Common {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Host is misconfigured: Missing a valid value for the setting {0}.
+        /// </summary>
+        internal static string CORS_MissingSameOrigins {
+            get {
+                return ResourceManager.GetString("CORS_MissingSameOrigins", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unexpected error occurred.
+        /// </summary>
+        internal static string WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage {
+            get {
+                return ResourceManager.GetString("WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage", resourceCulture);
+            }
+        }
     }
 }

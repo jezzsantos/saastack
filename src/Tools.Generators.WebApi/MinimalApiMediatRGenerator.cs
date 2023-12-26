@@ -1,5 +1,6 @@
 using System.Text;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Hosting.Common;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Tools.Generators.WebApi.Extensions;
@@ -96,8 +97,10 @@ namespace {assemblyNamespace}
     {
         var serviceClassName = serviceRegistrations.Key.Name;
         var groupName = $"{serviceClassName.ToLowerInvariant()}Group";
+        var corsPolicyName = WebHostingConstants.DefaultCORSPolicyName;
         endpointRegistrations.AppendLine($@"        var {groupName} = app.MapGroup(string.Empty)
                 .WithGroupName(""{serviceClassName}"")
+                .RequireCors(""{corsPolicyName}"")
                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();");
 

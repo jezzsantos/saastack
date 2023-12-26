@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using WebApi_MinimalApiMediatRGenerator = Generators::Tools.Generators.WebApi.MinimalApiMediatRGenerator;
+using MinimalApiMediatRGenerator = Generators::Tools.Generators.WebApi.MinimalApiMediatRGenerator;
 
 namespace Tools.Generators.WebApi.UnitTests;
 
@@ -23,7 +23,7 @@ public class MinimalApiMediatRGeneratorSpec
             },
             new[]
             {
-                MetadataReference.CreateFromFile(typeof(WebApi_MinimalApiMediatRGenerator).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(MinimalApiMediatRGenerator).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location),
                 MetadataReference.CreateFromFile(Path.Combine(assemblyPath,
                     "System.Runtime.dll")) //HACK: this is required to make custom attributes work
@@ -40,7 +40,7 @@ public class MinimalApiMediatRGeneratorSpec
 
         public GivenAServiceCLass()
         {
-            var generator = new WebApi_MinimalApiMediatRGenerator();
+            var generator = new MinimalApiMediatRGenerator();
             _driver = CSharpGeneratorDriver.Create(generator);
         }
 
@@ -133,6 +133,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
+                                .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
@@ -206,6 +207,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
+                                .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
@@ -280,6 +282,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
+                                .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
@@ -354,6 +357,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
+                                .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                 #if TESTINGONLY
@@ -442,6 +446,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
+                                .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",

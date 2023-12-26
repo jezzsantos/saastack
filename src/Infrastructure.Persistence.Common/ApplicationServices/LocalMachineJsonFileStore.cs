@@ -22,7 +22,7 @@ public partial class LocalMachineJsonFileStore
     private readonly string _rootPath;
 
     public static LocalMachineJsonFileStore Create(ISettings settings,
-        Optional<IQueueStoreNotificationHandler> handler = default)
+        IQueueStoreNotificationHandler? handler = default)
     {
         var configPath = settings.GetString(PathSettingName);
         var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -32,7 +32,7 @@ public partial class LocalMachineJsonFileStore
         return new LocalMachineJsonFileStore(path, handler);
     }
 
-    private LocalMachineJsonFileStore(string rootPath, Optional<IQueueStoreNotificationHandler> handler = default)
+    private LocalMachineJsonFileStore(string rootPath, IQueueStoreNotificationHandler? handler = default)
     {
         rootPath.ThrowIfNotValuedParameter(nameof(rootPath));
         if (rootPath.IsInvalidParameter(ValidateRootPath, nameof(rootPath),
@@ -43,11 +43,11 @@ public partial class LocalMachineJsonFileStore
 
         _rootPath = rootPath;
 
-        if (handler.HasValue)
+        if (handler.Exists())
         {
             FireMessageQueueUpdated += (_, args) =>
             {
-                handler.Value.HandleMessagesQueueUpdated(args.QueueName, args.MessageCount);
+                handler.HandleMessagesQueueUpdated(args.QueueName, args.MessageCount);
             };
             NotifyAllQueuedMessages();
         }

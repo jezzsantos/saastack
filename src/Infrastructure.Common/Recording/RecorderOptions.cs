@@ -150,7 +150,6 @@ public enum MetricReporterOption
 {
     None = 0,
     Cloud = 1,
-    ForwardToAncillaryApi = 3
 }
 
 /// <summary>
@@ -160,5 +159,4 @@ public enum UsageReporterOption
 {
     None = 0,
     ReliableQueue = 1,
-    ForwardToAncillaryApi = 2
 }

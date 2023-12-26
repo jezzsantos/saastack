@@ -4,7 +4,9 @@ using Application.Interfaces;
 using Application.Interfaces.Services;
 using Common;
 using Common.Configuration;
+using Common.Extensions;
 using Domain.Common;
+using Domain.Common.Authorization;
 using Domain.Common.Identity;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
@@ -21,15 +23,17 @@ using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Common.Validation;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.ApplicationServices;
+using Infrastructure.Web.Hosting.Common.Auth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 #if TESTINGONLY
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
-using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
+
 #else
 #if HOSTEDONAZURE
 using Microsoft.ApplicationInsights.Extensibility;
@@ -43,31 +47,47 @@ namespace Infrastructure.Web.Hosting.Common.Extensions;
 
 public static class HostExtensions
 {
+    private const string AllowedCORSOriginsSettingName = "Hosts:AllowedCORSOrigins";
+    private const string CheckPointAggregatePrefix = "check";
+    private const string LoggingSettingName = "Logging";
+    private static readonly char[] AllowedCORSOriginsDelimiters = { ',', ';', ' ' };
+    private static readonly Dictionary<string, IWebRequest> StubQueueDrainingServiceQueuedApiMappings = new()
+    {
+#if TESTINGONLY
+        { "audits", new DrainAllAuditsRequest() },
+        { "usages", new DrainAllUsagesRequest() }
+        //     { "emails", new DrainAllEmailsRequest() },
+        //     { "events", new DrainAllEventsRequest() }, 
+#endif
+    };
+
     /// <summary>
     ///     Configures a WebHost
     /// </summary>
     public static WebApplication ConfigureApiHost(this WebApplicationBuilder appBuilder, SubDomainModules modules,
-        WebHostOptions options)
+        WebHostOptions hostOptions)
     {
         ConfigureSharedServices();
-        ConfigureConfiguration(options.IsMultiTenanted);
+        ConfigureConfiguration(hostOptions.IsMultiTenanted);
         ConfigureRecording();
-        ConfigureMultiTenancy(options.IsMultiTenanted);
-        ConfigureAuthenticationAuthorization();
+        ConfigureMultiTenancy(hostOptions.IsMultiTenanted);
+        ConfigureAuthenticationAuthorization(hostOptions.UsesAuth);
         ConfigureWireFormats();
         ConfigureApiRequests();
         ConfigureApplicationServices();
-        ConfigurePersistence(options.Persistence.UsesQueues);
+        ConfigurePersistence(hostOptions.Persistence.UsesQueues);
+        ConfigureCors(hostOptions.UsesCORS);
 
         var app = appBuilder.Build();
 
-        app.EnableRequestRewind();
+        app.EnableRequestRewind(); // Required by XMLHttpResult and HMACAuth
+        app.EnableOtherOptions(hostOptions);
         app.AddExceptionShielding();
         //TODO: app.AddMultiTenancyDetection(); we need a TenantDetective
-        app.AddEventingListeners(options.Persistence.UsesEventing);
-        app.EnableApiUsageTracking(options.TrackApiUsage);
-        //TODO: add the HealthCheck endpoint
-        //TODO: enable CORS
+        app.EnableEventingListeners(hostOptions.Persistence.UsesEventing);
+        app.EnableApiUsageTracking(hostOptions.TrackApiUsage);
+        app.EnableCORS(hostOptions.CORS);
+        app.EnableSecureAccess(hostOptions.UsesAuth); //Note: AuthN must be registered after CORS
 
         modules.ConfigureHost(app);
 
@@ -80,13 +100,11 @@ public static class HostExtensions
 
         void ConfigureConfiguration(bool isMultiTenanted)
         {
-#if !TESTINGONLY
 #if HOSTEDONAZURE
             appBuilder.Configuration.AddJsonFile("appsettings.Azure.json", true);
 #endif
 #if HOSTEDONAWS
             appBuilder.Configuration.AddJsonFile("appsettings.AWS.json", true);
-#endif
 #endif
 
             if (isMultiTenanted)
@@ -123,13 +141,13 @@ public static class HostExtensions
             appBuilder.Services.AddLogging(loggingBuilder =>
             {
                 loggingBuilder.ClearProviders();
-                loggingBuilder.AddConfiguration(appBuilder.Configuration.GetSection("Logging"));
+                loggingBuilder.AddConfiguration(appBuilder.Configuration.GetSection(LoggingSettingName));
 #if TESTINGONLY
-                loggingBuilder.AddSimpleConsole(opts =>
+                loggingBuilder.AddSimpleConsole(options =>
                 {
-                    opts.TimestampFormat = "hh:mm:ss ";
-                    opts.SingleLine = true;
-                    opts.IncludeScopes = false;
+                    options.TimestampFormat = "hh:mm:ss ";
+                    options.SingleLine = true;
+                    options.IncludeScopes = false;
                 });
                 loggingBuilder.AddDebug();
 #else
@@ -146,7 +164,7 @@ public static class HostExtensions
 
             appBuilder.Services.RegisterUnshared<IRecorder>(c =>
                 new HostRecorder(c.ResolveForUnshared<IDependencyContainer>(), c.ResolveForUnshared<ILoggerFactory>(),
-                    options));
+                    hostOptions));
         }
 
         void ConfigureMultiTenancy(bool isMultiTenanted)
@@ -178,25 +196,28 @@ public static class HostExtensions
 
         void ConfigureWireFormats()
         {
-            appBuilder.Services.ConfigureHttpJsonOptions(opts =>
+            appBuilder.Services.ConfigureHttpJsonOptions(options =>
             {
-                opts.SerializerOptions.PropertyNameCaseInsensitive = true;
-                opts.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                opts.SerializerOptions.WriteIndented = false;
-                opts.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
-                opts.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase,
+                options.SerializerOptions.PropertyNameCaseInsensitive = true;
+                options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                options.SerializerOptions.WriteIndented = false;
+                options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
+                options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase,
                     false));
-                opts.SerializerOptions.Converters.Add(new JsonDateTimeConverter(DateFormat.Iso8601));
+                options.SerializerOptions.Converters.Add(new JsonDateTimeConverter(DateFormat.Iso8601));
             });
 
-            appBuilder.Services.ConfigureHttpXmlOptions(opts => { opts.SerializerOptions.WriteIndented = false; });
+            appBuilder.Services.ConfigureHttpXmlOptions(options =>
+            {
+                options.SerializerOptions.WriteIndented = false;
+            });
         }
 
         void ConfigureApplicationServices()
         {
             appBuilder.Services.AddHttpClient();
             var prefixes = modules.AggregatePrefixes;
-            prefixes.Add(typeof(Checkpoint), "check");
+            prefixes.Add(typeof(Checkpoint), CheckPointAggregatePrefix);
             appBuilder.Services.RegisterUnshared<IIdentifierFactory>(_ => new HostIdentifierFactory(prefixes));
             appBuilder.Services.RegisterTenanted<ICallerContext, AnonymousCallerContext>();
         }
@@ -222,22 +243,68 @@ public static class HostExtensions
 #endif
         }
 
+        void ConfigureCors(CORSOption cors)
+        {
+            if (cors == CORSOption.None)
+            {
+                return;
+            }
+
+            appBuilder.Services.AddCors(options =>
+            {
+                if (cors == CORSOption.SameOrigin)
+                {
+                    var allowedOrigins = appBuilder.Configuration.GetValue<string>(AllowedCORSOriginsSettingName)
+                                         ?? string.Empty;
+                    if (allowedOrigins.HasNoValue())
+                    {
+                        throw new InvalidOperationException(
+                            Resources.CORS_MissingSameOrigins.Format(AllowedCORSOriginsSettingName));
+                    }
+
+                    var origins = allowedOrigins.Split(AllowedCORSOriginsDelimiters);
+                    options.AddDefaultPolicy(corsBuilder =>
+                    {
+                        corsBuilder.WithOrigins(origins);
+                        corsBuilder.AllowAnyMethod();
+                        corsBuilder.WithHeaders(HttpHeaders.ContentType, HttpHeaders.Authorization);
+                        corsBuilder.DisallowCredentials();
+                        corsBuilder.SetPreflightMaxAge(TimeSpan.FromSeconds(600));
+                    });
+                }
+
+                if (cors == CORSOption.AnyOrigin)
+                {
+                    options.AddDefaultPolicy(corsBuilder =>
+                    {
+                        corsBuilder.AllowAnyOrigin();
+                        corsBuilder.AllowAnyMethod();
+                        corsBuilder.WithHeaders(HttpHeaders.ContentType, HttpHeaders.Authorization);
+                        corsBuilder.DisallowCredentials();
+                        corsBuilder.SetPreflightMaxAge(TimeSpan.FromSeconds(600));
+                    });
+                }
+            });
+        }
+
 #if TESTINGONLY
         static void RegisterStoreForTestingOnly(WebApplicationBuilder appBuilder, bool usesQueues)
         {
             appBuilder.Services
                 .RegisterPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
                     LocalMachineJsonFileStore.Create(c.ResolveForUnshared<IConfigurationSettings>().Platform,
-                        c.ResolveForUnshared<IQueueStoreNotificationHandler>()
-                            .ToOptional()));
+                        usesQueues
+                            ? c.ResolveForUnshared<IQueueStoreNotificationHandler>()
+                            : null));
             //HACK: In TESTINGONLY there won't be any physical partitioning of data for different tenants,
             // even if the host is multi-tenanted. So we can register a singleton for this specific store,
             // as we only ever want to resolve one instance for this store for all its uses (tenanted or unshared, except for platform use)
             appBuilder.Services
                 .RegisterUnshared<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
                     LocalMachineJsonFileStore.Create(c.ResolveForUnshared<IConfigurationSettings>().Platform,
-                        c.ResolveForUnshared<IQueueStoreNotificationHandler>()
-                            .ToOptional()));
+                        usesQueues
+                            ? c.ResolveForUnshared<IQueueStoreNotificationHandler>()
+                            : null));
             if (usesQueues)
             {
                 RegisterStubMessageQueueDrainingService(appBuilder);
@@ -248,18 +315,11 @@ public static class HostExtensions
         {
             appBuilder.Services.RegisterUnshared<IMonitoredMessageQueues, MonitoredMessageQueues>();
             appBuilder.Services.RegisterUnshared<IQueueStoreNotificationHandler, StubQueueStoreNotificationHandler>();
-            var drainApiMappings = new Dictionary<string, IWebRequest>
-            {
-                { "audits", new DrainAllAuditsRequest() },
-                { "usages", new DrainAllUsagesRequest() }
-                //     { "emails", new DrainAllEmailsRequest() },
-                //     { "events", new DrainAllEventsRequest() },
-            };
             appBuilder.Services.AddHostedService(services =>
                 new StubQueueDrainingService(services.GetRequiredService<IHttpClientFactory>(),
                     services.ResolveForUnshared<IHostSettings>(),
                     services.GetRequiredService<ILogger<StubQueueDrainingService>>(),
-                    services.ResolveForUnshared<IMonitoredMessageQueues>(), drainApiMappings));
+                    services.ResolveForUnshared<IMonitoredMessageQueues>(), StubQueueDrainingServiceQueuedApiMappings));
         }
 #endif
     }
