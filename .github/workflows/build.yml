@@ -25,10 +25,12 @@ jobs:
           dotnet-version: 7.0.x
       - name: Restore dependencies
         run: dotnet restore "${{env.SOLUTION_PATH}}"
-      - name: Build for Deploy
-        run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}"
-      - name: Build for Testing
-        run: dotnet build --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}"
+      - name: Build for Azure Deploy
+        run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAZURE
+      - name: Build for AWS Deploy
+        run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAWS
+      - name: Build for CI Testing
+        run: dotnet build --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAZURE
       - name: Unit Test
         continue-on-error: false
         run: >

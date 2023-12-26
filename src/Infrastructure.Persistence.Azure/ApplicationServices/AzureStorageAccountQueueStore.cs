@@ -69,6 +69,8 @@ public class AzureStorageAccountQueueStore : IQueueStore
         await queue.DeleteAsync(cancellationToken);
 
         _queueExistenceChecks.Remove(queueName);
+#else
+        await Task.CompletedTask;
 #endif
 
         return Result.Ok;

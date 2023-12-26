@@ -202,6 +202,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
         _metricsReporter.Measure(eventName, additional ?? new Dictionary<string, object>());
     }
 
+    // ReSharper disable once UnusedParameter.Local
     private static ICrashReporter GetCrashReporter(IDependencyContainer container,
         RecordingEnvironmentOptions options)
     {

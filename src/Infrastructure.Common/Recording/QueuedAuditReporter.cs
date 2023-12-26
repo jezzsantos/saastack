@@ -1,11 +1,5 @@
-﻿using Application.Persistence.Shared;
-using Common;
-using Common.Configuration;
-using Common.Extensions;
-using Common.Recording;
-using Domain.Interfaces.Services;
-using Infrastructure.Persistence.Shared.ApplicationServices;
-#if !TESTINGONLY
+﻿#if !TESTINGONLY
+using Infrastructure.Persistence.Common.ApplicationServices;
 #if HOSTEDONAZURE
 using Infrastructure.Persistence.Azure.ApplicationServices;
 #elif HOSTEDONAWS
@@ -13,6 +7,13 @@ using Infrastructure.Persistence.Azure.ApplicationServices;
 #else
 using Infrastructure.Persistence.Interfaces;
 #endif
+using Application.Persistence.Shared;
+using Common;
+using Common.Configuration;
+using Common.Extensions;
+using Common.Recording;
+using Domain.Interfaces.Services;
+using Infrastructure.Persistence.Shared.ApplicationServices;
 
 namespace Infrastructure.Common.Recording;
 
@@ -31,7 +32,7 @@ public class QueuedAuditReporter : IAuditReporter
 #if HOSTEDONAZURE
                 AzureStorageAccountQueueStore.Create(NullRecorder.Instance, settings)
 #elif HOSTEDONAWS
-                NullStore.Instance()
+                NullStore.Instance
 #endif
 #else
             container.Resolve<IQueueStore>()
