@@ -33,6 +33,7 @@ using Microsoft.Extensions.Logging;
 #if TESTINGONLY
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
+
 #else
 #if HOSTEDONAZURE
 using Microsoft.ApplicationInsights.Extensibility;
@@ -75,12 +76,12 @@ public static class HostExtensions
         ConfigureApiRequests();
         ConfigureApplicationServices();
         ConfigurePersistence(hostOptions.Persistence.UsesQueues);
-        ConfigureCors(hostOptions.UsesCORS);
+        ConfigureCors(hostOptions.CORS);
 
         var app = appBuilder.Build();
 
-        app.EnableRequestRewind(); // Required by XMLHttpResult and HMACAuth
         app.EnableOtherOptions(hostOptions);
+        app.EnableRequestRewind();
         app.AddExceptionShielding();
         //TODO: app.AddMultiTenancyDetection(); we need a TenantDetective
         app.EnableEventingListeners(hostOptions.Persistence.UsesEventing);
@@ -174,9 +175,26 @@ public static class HostExtensions
             }
         }
 
-        void ConfigureAuthenticationAuthorization()
+        void ConfigureAuthenticationAuthorization(bool usesAuth)
         {
-            //TODO: need to add authentication/authorization (https://www.youtube.com/watch?v=XKN0084p7WQ)
+            if (!usesAuth)
+            {
+                return;
+            }
+
+            AppContext.SetSwitch("Microsoft.AspNetCore.Authentication.SuppressAutoDefaultScheme", true);
+            appBuilder.Services.AddAuthentication()
+                .AddScheme<HMACOptions, HMACAuthenticationHandler>(HMACAuthenticationHandler.AuthenticationScheme,
+                    _ => { });
+            appBuilder.Services.AddAuthorization(configure =>
+            {
+                configure.AddPolicy(AuthenticationConstants.HMACPolicyName, builder =>
+                {
+                    builder.AddAuthenticationSchemes(HMACAuthenticationHandler.AuthenticationScheme);
+                    builder.RequireAuthenticatedUser();
+                    builder.RequireRole(UserRoles.ServiceAccount);
+                });
+            });
         }
 
         void ConfigureApiRequests()
@@ -285,7 +303,6 @@ public static class HostExtensions
                 }
             });
         }
-
 #if TESTINGONLY
         static void RegisterStoreForTestingOnly(WebApplicationBuilder appBuilder, bool usesQueues)
         {

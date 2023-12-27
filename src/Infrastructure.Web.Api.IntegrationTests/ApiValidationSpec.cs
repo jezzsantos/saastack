@@ -35,7 +35,7 @@ public class ApiValidationSpec : WebApiSpec<Program>
         result.Content.Error.Title.Should().Be("Validation Error");
         result.Content.Error.Status.Should().Be(400);
         result.Content.Error.Detail.Should().Be("'Field1' must not be empty.");
-        result.Content.Error.Instance.Should().Be("http://localhost/testingonly/validations/validated/1234");
+        result.Content.Error.Instance.Should().Match(@"https://localhost:?????/testingonly/validations/validated/1234");
         result.Content.Error.Exception.Should().BeNull();
         result.Content.Error.Errors.Should().BeEquivalentTo(new ValidatorProblem[]
         {
@@ -54,7 +54,8 @@ public class ApiValidationSpec : WebApiSpec<Program>
         result.Content.Error.Title.Should().Be("Validation Error");
         result.Content.Error.Status.Should().Be(400);
         result.Content.Error.Detail.Should().Be("'Field2' must not be empty.");
-        result.Content.Error.Instance.Should().Be("http://localhost/testingonly/validations/validated/1234?field1=123");
+        result.Content.Error.Instance.Should()
+            .Match("https://localhost:?????/testingonly/validations/validated/1234?field1=123");
         result.Content.Error.Exception.Should().BeNull();
         result.Content.Error.Errors.Should().BeEquivalentTo(new ValidatorProblem[]
         {

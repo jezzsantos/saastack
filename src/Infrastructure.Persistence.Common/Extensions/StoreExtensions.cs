@@ -65,7 +65,7 @@ public static class StoreExtensions
         }
 
         return new Optional<string>(
-            propertyValue.ValueOrDefault?.ToJson(false, StringExtensions.JsonCasing.Pascal));
+            propertyValue.ValueOrDefault?.ToJson(false));
     }
 
     /// <summary>

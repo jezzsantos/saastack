@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Sockets;
 using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
@@ -65,23 +67,21 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureAppConfiguration(config =>
-        {
-            Configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.Testing.json", true)
-                .Build();
-            config.AddConfiguration(Configuration);
-        });
-
-        base.ConfigureWebHost(builder);
-
-        builder.ConfigureTestServices(services =>
-        {
-            if (_overridenTestingDependencies.Exists())
+        builder
+            .ConfigureAppConfiguration(config =>
             {
-                _overridenTestingDependencies.Invoke(services);
-            }
-        });
+                Configuration = new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.Testing.json", true)
+                    .Build();
+                config.AddConfiguration(Configuration);
+            })
+            .ConfigureTestServices(services =>
+            {
+                if (_overridenTestingDependencies.Exists())
+                {
+                    _overridenTestingDependencies.Invoke(services);
+                }
+            });
     }
 }
 
@@ -91,6 +91,7 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
 public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDisposable
     where THost : class
 {
+    private const string WebServerBaseUrlFormat = "https://localhost:{0}/";
     // ReSharper disable once StaticMemberInGenericType
     private static IReadOnlyList<Type>? _allRepositories;
 
@@ -109,7 +110,10 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 
         Setup = setup.WithWebHostBuilder(_ => { });
 
-        HttpApi = setup.CreateClient();
+        HttpApi = setup.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            BaseAddress = new Uri(WebServerBaseUrlFormat.Format(GetNextAvailablePort()))
+        });
         Api = new JsonClient(HttpApi);
     }
 
@@ -171,5 +175,15 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         {
             repository.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
         }
+    }
+
+    private static int GetNextAvailablePort()
+    {
+        var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start();
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+        listener.Stop();
+
+        return port;
     }
 }

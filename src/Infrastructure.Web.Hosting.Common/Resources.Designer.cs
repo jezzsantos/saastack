@@ -69,6 +69,42 @@ namespace Infrastructure.Web.Hosting.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed HMAC authentication.
+        /// </summary>
+        internal static string HMACAuthenticationHandler_FailedAuthentication {
+            get {
+                return ResourceManager.GetString("HMACAuthenticationHandler_FailedAuthentication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Requires a value in the &apos;{0}&apos; header of the request.
+        /// </summary>
+        internal static string HMACAuthenticationHandler_MissingHeader {
+            get {
+                return ResourceManager.GetString("HMACAuthenticationHandler_MissingHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Requires HTTPS.
+        /// </summary>
+        internal static string HMACAuthenticationHandler_NotHttps {
+            get {
+                return ResourceManager.GetString("HMACAuthenticationHandler_NotHttps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authentication failed.
+        /// </summary>
+        internal static string HMACAuthenticationHandler_WrongSignature {
+            get {
+                return ResourceManager.GetString("HMACAuthenticationHandler_WrongSignature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An unexpected error occurred.
         /// </summary>
         internal static string WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage {

@@ -33,7 +33,7 @@ public class ApiErrorSpec : WebApiSpec<Program>
         result.Content.Error.Title.Should().Be("An unexpected error occurred");
         result.Content.Error.Status.Should().Be(500);
         result.Content.Error.Detail.Should().Be("amessage");
-        result.Content.Error.Instance.Should().Be("http://localhost/testingonly/errors/throws");
+        result.Content.Error.Instance.Should().Match("https://localhost:?????/testingonly/errors/throws");
         result.Content.Error.Exception.Should().StartWith("System.InvalidOperationException: amessage");
         result.Content.Error.Errors.Should().BeNull();
     }

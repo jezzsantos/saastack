@@ -3,7 +3,6 @@ using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
-using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 using Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 using WebsiteHost.Application;
 
@@ -53,7 +52,8 @@ public sealed class RecordingApi : IWebApiService
     public async Task<ApiEmptyResult> RecordTrace(RecordTraceRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await _recordingApplication.RecordTraceAsync(_context, request.Level.ToEnum<RecorderTraceLevel>(), request.MessageTemplate,
+        var result = await _recordingApplication.RecordTraceAsync(_context, request.Level.ToEnum<RecorderTraceLevel>(),
+            request.MessageTemplate,
             request.Arguments,
             cancellationToken);
 

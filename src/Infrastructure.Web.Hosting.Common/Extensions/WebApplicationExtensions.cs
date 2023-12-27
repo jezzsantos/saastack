@@ -211,6 +211,22 @@ public static class WebApplicationExtensions
         });
     }
 
+    /// <summary>
+    ///     Enables authentication and authorization
+    /// </summary>
+    public static IApplicationBuilder EnableSecureAccess(this WebApplication app, bool usesAuth)
+    {
+        if (!usesAuth)
+        {
+            return app;
+        }
+
+        app.Logger.LogInformation("Authentication is enabled");
+        app.Logger.LogInformation("RBAC Authorization is enabled");
+        return app.UseAuthentication()
+            .UseAuthorization();
+    }
+
     private static void TrackUsage(HttpContext httpContext, IRecorder recorder, ICallerContext caller)
     {
         var request = httpContext.ToWebRequest();

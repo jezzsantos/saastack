@@ -37,6 +37,9 @@
         <Compile Include="..\Infrastructure.Web.Hosting.Common\WebHostingConstants.cs">
             <Link>Reference\Infrastructure.Web.Hosting.Common\WebHostingConstants.cs</Link>
         </Compile>
+        <Compile Include="..\Infrastructure.Web.Hosting.Common\Auth\AuthenticationConstants.cs">
+            <Link>Reference\Infrastructure.Web.Hosting.Common\Auth\AuthenticationConstants.cs</Link>
+        </Compile>
     </ItemGroup>
 
 </Project>

@@ -9,14 +9,15 @@ namespace Infrastructure.Web.Api.Common.Extensions;
 
 public static class RequestExtensions
 {
+    private const string EmptyRequestJson = "{}";
     private const char RouteSegmentDelimiter = '/';
 
     /// <summary>
     ///     Creates a HMAC signature for the specified <see cref="request" />
     /// </summary>
-    public static string CreateHmacSignature(this IWebRequest request, string secret)
+    public static string CreateHMACSignature(this IWebRequest request, string secret)
     {
-        var signer = new HmacSigner(request, secret);
+        var signer = new HMACSigner(request, secret);
 
         return signer.Sign();
     }
@@ -37,6 +38,19 @@ public static class RequestExtensions
             Operation = attribute.Operation,
             IsTestingOnly = attribute.IsTestingOnly
         };
+    }
+
+    /// <summary>
+    ///     Returns the JSON representation of the specified <see cref="request" />
+    /// </summary>
+    public static string SerializeToJson(this IWebRequest? request)
+    {
+        if (request.NotExists())
+        {
+            return EmptyRequestJson;
+        }
+
+        return request.ToJson()!;
     }
 
     /// <summary>

@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 #if TESTINGONLY
 namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 
-[Route("/testingonly/errors/throws", ServiceOperation.Get, true)]
+[Route("/testingonly/errors/throws", ServiceOperation.Get, isTestingOnly: true)]
 [UsedImplicitly]
 public class ErrorsThrowTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>
 {

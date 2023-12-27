@@ -32,7 +32,7 @@ public class UsagesApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenDeliverUsage_ThenDelivers()
     {
-        var result = await Api.PostAsync(new DeliverUsageRequest
+        var request = new DeliverUsageRequest
         {
             Message = new UsageMessage
             {
@@ -42,7 +42,8 @@ public class UsagesApiSpec : WebApiSpec<Program>
                 ForId = "aforid",
                 MessageId = "amessageid"
             }.ToJson()!
-        });
+        };
+        var result = await Api.PostAsync(request, req => req.SetHmacAuth(request, "asecret"));
 
         result.Content.Value.IsDelivered.Should().BeTrue();
         _usageReportingService.LastEventName.Should().Be("aneventname");

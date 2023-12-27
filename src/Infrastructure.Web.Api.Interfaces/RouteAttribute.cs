@@ -10,7 +10,7 @@ namespace Infrastructure.Web.Api.Interfaces;
 public class RouteAttribute : Attribute
 {
     public RouteAttribute([StringSyntax("Route")] string routeTemplate, ServiceOperation operation,
-        bool isTestingOnly = false)
+        AccessType access = AccessType.Anonymous, bool isTestingOnly = false)
     {
         if (!Enum.IsDefined(typeof(ServiceOperation), operation))
         {
@@ -19,12 +19,25 @@ public class RouteAttribute : Attribute
 
         RouteTemplate = routeTemplate;
         Operation = operation;
+        Access = access;
         IsTestingOnly = isTestingOnly;
     }
 
     public bool IsTestingOnly { get; }
 
+    public AccessType Access { get; }
+
     public ServiceOperation Operation { get; }
 
     public string RouteTemplate { get; }
+}
+
+/// <summary>
+///     Defines the access level of the operation
+/// </summary>
+public enum AccessType
+{
+    Anonymous = 0,
+    Token = 1,
+    HMAC = 2
 }

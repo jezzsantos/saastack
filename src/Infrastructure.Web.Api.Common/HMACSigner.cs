@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Common.Extensions;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Common;
@@ -8,20 +9,25 @@ namespace Infrastructure.Web.Api.Common;
 /// <summary>
 ///     Provides a signer of HMAC signatures
 /// </summary>
-public class HmacSigner
+public class HMACSigner
 {
-    private const string EmptyRequestJson = "{}";
     private const string SignatureFormat = @"sha1={0}";
     internal static readonly Encoding SignatureEncoding = Encoding.UTF8;
     private readonly byte[] _data;
     private readonly string _secret;
 
-    public HmacSigner(IWebRequest request, string secret)
+    public HMACSigner(IWebRequest request, string secret) : this(GetRequestData(request), secret)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentException.ThrowIfNullOrEmpty(secret);
+    }
+
+    public HMACSigner(byte[] request, string secret)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentException.ThrowIfNullOrEmpty(secret);
 
-        _data = GetRequestData(request);
+        _data = request;
         _secret = secret;
     }
 
@@ -35,12 +41,7 @@ public class HmacSigner
 
     private static byte[] GetRequestData(IWebRequest request)
     {
-        var json = request.ToJson(false, StringExtensions.JsonCasing.Pascal) ?? EmptyRequestJson;
-        if (json == EmptyRequestJson)
-        {
-            return Array.Empty<byte>();
-        }
-
+        var json = request.SerializeToJson();
         return SignatureEncoding.GetBytes(json);
     }
 
@@ -66,11 +67,11 @@ public class HmacSigner
 /// <summary>
 ///     Provides a verifier of HMAC signatures
 /// </summary>
-public class HmacVerifier
+public class HMACVerifier
 {
-    private readonly HmacSigner _signer;
+    private readonly HMACSigner _signer;
 
-    public HmacVerifier(HmacSigner signer)
+    public HMACVerifier(HMACSigner signer)
     {
         ArgumentNullException.ThrowIfNull(signer);
 

@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 #if TESTINGONLY
 namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 
-[Route("/testingonly/statuses/putpatch", ServiceOperation.PutPatch, true)]
+[Route("/testingonly/statuses/putpatch", ServiceOperation.PutPatch, isTestingOnly: true)]
 [UsedImplicitly]
 public class StatusesPutPatchTestingOnlyRequest : IWebRequest<StatusesTestingOnlyResponse>
 {

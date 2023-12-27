@@ -164,7 +164,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         Action<HttpRequestMessage>? requestFilter, CancellationToken? cancellationToken = default)
     {
         var requestUri = request.GetRequestInfo().Route;
-        var content = new StringContent(request.ToJson()!, new MediaTypeHeaderValue(HttpContentTypes.Json));
+        var content = new StringContent(request.SerializeToJson(), new MediaTypeHeaderValue(HttpContentTypes.Json));
 
         return await SendRequestAsync(method, requestUri, content, requestFilter, cancellationToken);
     }

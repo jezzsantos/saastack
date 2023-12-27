@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using MinimalApiMediatRGenerator = Generators::Tools.Generators.WebApi.MinimalApiMediatRGenerator;
+using WebApi_MinimalApiMediatRGenerator = Generators::Tools.Generators.WebApi.MinimalApiMediatRGenerator;
 
 namespace Tools.Generators.WebApi.UnitTests;
 
@@ -23,7 +23,7 @@ public class MinimalApiMediatRGeneratorSpec
             },
             new[]
             {
-                MetadataReference.CreateFromFile(typeof(MinimalApiMediatRGenerator).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(WebApi_MinimalApiMediatRGenerator).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location),
                 MetadataReference.CreateFromFile(Path.Combine(assemblyPath,
                     "System.Runtime.dll")) //HACK: this is required to make custom attributes work
@@ -40,7 +40,7 @@ public class MinimalApiMediatRGeneratorSpec
 
         public GivenAServiceCLass()
         {
-            var generator = new MinimalApiMediatRGenerator();
+            var generator = new WebApi_MinimalApiMediatRGenerator();
             _driver = CSharpGeneratorDriver.Create(generator);
         }
 
@@ -324,7 +324,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                [Route("aroute", ServiceOperation.Get, true)]
+                                                [Route("aroute", ServiceOperation.Get, isTestingOnly:true)]
                                                 public class ARequest : IWebRequest<AResponse>
                                                 {
                                                 }
@@ -364,6 +364,86 @@ public class MinimalApiMediatRGeneratorSpec
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None));
+                #endif
+                
+                        }
+                    }
+                }
+
+                namespace ANamespace.AServiceClassMediatRHandlers
+                {
+                #if TESTINGONLY
+                    public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
+                    {
+                        public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                        {
+                            var api = new global::ANamespace.AServiceClass();
+                            var result = await api.AMethod(request, cancellationToken);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
+                        }
+                    }
+                #endif
+
+                }
+
+
+                """);
+        }
+
+        [Fact]
+        public void WhenDefinesAMethodAndHMACAuth_ThenGenerates()
+        {
+            var compilation = CreateCompilation("""
+                                                using System;
+                                                using System.Threading;
+                                                using Infrastructure.Web.Api.Interfaces;
+
+                                                namespace ANamespace;
+
+                                                public class AResponse : IWebResponse
+                                                {
+                                                }
+                                                [Route("aroute", ServiceOperation.Get, access:AccessType.HMAC, isTestingOnly:true)]
+                                                public class ARequest : IWebRequest<AResponse>
+                                                {
+                                                }
+                                                public class AServiceClass : IWebApiService
+                                                {
+                                                    public async Task<string> AMethod(ARequest request, CancellationToken cancellationToken)
+                                                    {
+                                                         return "";
+                                                    }
+                                                }
+                                                """);
+
+            var result = Generate(compilation);
+
+            result.Should().Be(
+                """
+                // <auto-generated/>
+                using System.Threading;
+                using System;
+                using Microsoft.AspNetCore.Http;
+                using Microsoft.AspNetCore.Builder;
+                using Infrastructure.Web.Api.Interfaces;
+                using Infrastructure.Web.Api.Common.Extensions;
+
+                namespace compilation
+                {
+                    public static class MinimalApiRegistration
+                    {
+                        public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
+                        {
+                            var aserviceclassGroup = app.MapGroup(string.Empty)
+                                .WithGroupName("AServiceClass")
+                                .RequireCors("__DefaultCorsPolicy")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
+                #if TESTINGONLY
+                            aserviceclassGroup.MapGet("aroute",
+                                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                .RequireAuthorization("HMAC");
                 #endif
                 
                         }

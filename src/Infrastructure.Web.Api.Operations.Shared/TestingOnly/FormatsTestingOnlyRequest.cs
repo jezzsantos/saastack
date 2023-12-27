@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 #if TESTINGONLY
 namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 
-[Route("/testingonly/formats/roundtrip", ServiceOperation.Post, true)]
+[Route("/testingonly/formats/roundtrip", ServiceOperation.Post, isTestingOnly: true)]
 [UsedImplicitly]
 public class FormatsTestingOnlyRequest : IWebRequest<FormatsTestingOnlyResponse>
 {

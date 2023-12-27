@@ -208,7 +208,7 @@ public static class StringExtensions
     /// <summary>
     ///     Converts the object to a json format
     /// </summary>
-    public static string? ToJson(this object? value, bool prettyPrint = true, JsonCasing? casing = null,
+    public static string? ToJson(this object? value, bool prettyPrint = true, JsonCasing casing = JsonCasing.Pascal,
         bool includeNulls = false)
     {
         if (value is null)
@@ -216,7 +216,7 @@ public static class StringExtensions
             return null;
         }
 
-        JsonNamingPolicy namingPolicy = null!; // PascalCase
+        JsonNamingPolicy namingPolicy = null!; // null implies PascalCase
         if (casing == JsonCasing.Camel)
         {
             namingPolicy = JsonNamingPolicy.CamelCase;

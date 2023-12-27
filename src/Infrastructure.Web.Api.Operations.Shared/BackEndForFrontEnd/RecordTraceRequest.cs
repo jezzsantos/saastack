@@ -1,6 +1,6 @@
 using Infrastructure.Web.Api.Interfaces;
 
-namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
+namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 
 [Route("/record/trace", ServiceOperation.Post)]
 public class RecordTraceRequest : UnTenantedEmptyRequest

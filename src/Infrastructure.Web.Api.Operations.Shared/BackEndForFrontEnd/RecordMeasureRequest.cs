@@ -1,8 +1,8 @@
 using Infrastructure.Web.Api.Interfaces;
 
-namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
+namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 
-[Route("/record/measure", ServiceOperation.Post, AccessType.HMAC)]
+[Route("/record/measure", ServiceOperation.Post)]
 public class RecordMeasureRequest : UnTenantedEmptyRequest
 {
     public Dictionary<string, object?>? Additional { get; set; }

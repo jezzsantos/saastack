@@ -168,12 +168,9 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
             var attributeParameters = routeAttribute!.ConstructorArguments;
             var routePath = attributeParameters[0].Value!.ToString()!;
-            var operationType = attributeParameters.Length >= 2
-                ? FromOperationVerb(attributeParameters[1].Value!.ToString()!)
-                : ServiceOperation.Get;
-            var isTestingOnly = attributeParameters.Length >= 3
-                ? bool.Parse(attributeParameters[2].Value!.ToString()!)
-                : false;
+            var operationType = FromOperationVerb(attributeParameters[1].Value!.ToString()!);
+            var operationAccess = FromAccessType(attributeParameters[2].Value!.ToString()!);
+            var isTestingOnly = bool.Parse(attributeParameters[3].Value!.ToString()!);
             var requestType = method.Parameters[0].Type;
             var requestTypeName = requestType.Name;
             var requestTypeNamespace = requestType.ContainingNamespace.ToDisplayString();
@@ -191,6 +188,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                 RequestDtoType = new TypeName(requestTypeNamespace, requestTypeName),
                 ResponseDtoType = new TypeName(responseTypeNamespace, responseTypeName),
                 OperationType = operationType,
+                OperationAccess = operationAccess,
                 IsTestingOnly = isTestingOnly,
                 IsAsync = isAsync,
                 HasCancellationToken = hasCancellationToken,
@@ -215,6 +213,16 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             }
 
             return Enum.Parse<ServiceOperation>(operation, true);
+        }
+
+        static AccessType FromAccessType(string? access)
+        {
+            if (access is null)
+            {
+                return AccessType.Anonymous;
+            }
+
+            return Enum.Parse<AccessType>(access, true);
         }
 
         // We assume that the request type derives from IWebRequest<TResponse>
@@ -357,6 +365,8 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
         public required string MethodName { get; init; }
 
+        public required AccessType OperationAccess { get; init; }
+
         public required ServiceOperation OperationType { get; init; }
 
         public required TypeName RequestDtoType { get; init; }
@@ -376,6 +386,12 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             Name = name;
         }
 
+        public string FullName => $"{Namespace}.{Name}";
+
+        public string Name { get; }
+
+        public string Namespace { get; }
+
         public virtual bool Equals(TypeName? other)
         {
             if (ReferenceEquals(null, other))
@@ -390,12 +406,6 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
             return Name == other.Name && Namespace == other.Namespace;
         }
-
-        public string FullName => $"{Namespace}.{Name}";
-
-        public string Name { get; }
-
-        public string Namespace { get; }
 
         public override int GetHashCode()
         {

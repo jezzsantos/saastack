@@ -22,7 +22,7 @@ public static class DomainEventExtensions
     /// </summary>
     public static string ToEventJson(this IDomainEvent domainEvent)
     {
-        return domainEvent.ToJson(false, StringExtensions.JsonCasing.Pascal) ?? "{}";
+        return domainEvent.ToJson(false) ?? "{}";
     }
 
     /// <summary>

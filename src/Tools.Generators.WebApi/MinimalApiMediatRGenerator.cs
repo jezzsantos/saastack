@@ -1,6 +1,7 @@
 using System.Text;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common;
+using Infrastructure.Web.Hosting.Common.Auth;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Tools.Generators.WebApi.Extensions;
@@ -97,10 +98,9 @@ namespace {assemblyNamespace}
     {
         var serviceClassName = serviceRegistrations.Key.Name;
         var groupName = $"{serviceClassName.ToLowerInvariant()}Group";
-        var corsPolicyName = WebHostingConstants.DefaultCORSPolicyName;
         endpointRegistrations.AppendLine($@"        var {groupName} = app.MapGroup(string.Empty)
                 .WithGroupName(""{serviceClassName}"")
-                .RequireCors(""{corsPolicyName}"")
+                .RequireCors(""{WebHostingConstants.DefaultCORSPolicyName}"")
                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();");
 
@@ -129,8 +129,16 @@ namespace {assemblyNamespace}
                         $"                async (global::MediatR.IMediator mediator, global::{registration.RequestDtoType.FullName} request) =>");
                 }
 
-                endpointRegistrations.AppendLine(
-                    "                     await mediator.Send(request, global::System.Threading.CancellationToken.None));");
+                endpointRegistrations.Append(
+                    "                     await mediator.Send(request, global::System.Threading.CancellationToken.None))");
+                if (registration.OperationAccess == AccessType.HMAC)
+                {
+                    endpointRegistrations.AppendLine();
+                    endpointRegistrations.Append(
+                        $@"                .RequireAuthorization(""{AuthenticationConstants.HMACPolicyName}"")");
+                }
+
+                endpointRegistrations.AppendLine(";");
             }
 
             if (registration.IsTestingOnly)

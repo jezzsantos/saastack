@@ -8,7 +8,6 @@ namespace Infrastructure.Web.Api.Common.Extensions;
 
 public static class HttpRequestExtensions
 {
-    
     /// <summary>
     ///     Rewinds the <see cref="HttpRequest.Body" /> back to the start
     /// </summary>
@@ -41,7 +40,7 @@ public static class HttpRequestExtensions
     /// </summary>
     public static void SetHmacAuth(this HttpRequestMessage message, IWebRequest request, string secret)
     {
-        var signature = request.CreateHmacSignature(secret);
+        var signature = request.CreateHMACSignature(secret);
 
         message.Headers.Add(HttpHeaders.HmacSignature, signature);
     }
@@ -64,5 +63,20 @@ public static class HttpRequestExtensions
         }
 
         message.Headers.Add(HttpHeaders.RequestId, context.CallId);
+    }
+
+    /// <summary>
+    ///     Whether the specified HMAC signature represents the inbound request
+    /// </summary>
+    public static async Task<bool> VerifyHMACSignatureAsync(this HttpRequest request, string signature, string secret,
+        CancellationToken cancellationToken)
+    {
+        var body = await request.Body.ReadFullyAsync(cancellationToken);
+        request.RewindBody(); // need to do this for later middleware
+
+        var signer = new HMACSigner(body, secret);
+        var verifier = new HMACVerifier(signer);
+
+        return verifier.Verify(signature);
     }
 }

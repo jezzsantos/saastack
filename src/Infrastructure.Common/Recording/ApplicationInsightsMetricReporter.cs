@@ -1,4 +1,5 @@
 ﻿#if HOSTEDONAZURE
+using Common;
 using Common.Extensions;
 using Common.Recording;
 using Domain.Interfaces.Services;
@@ -18,7 +19,7 @@ public class ApplicationInsightsMetricReporter : IMetricReporter
         _telemetryClient = container.Resolve<TelemetryClient>();
     }
 
-    public void Measure(string eventName, Dictionary<string, object>? additional = null)
+    public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
     {
         if (_telemetryClient.Exists())
         {

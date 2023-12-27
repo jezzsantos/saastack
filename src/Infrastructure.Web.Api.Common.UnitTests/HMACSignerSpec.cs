@@ -6,7 +6,7 @@ using Xunit;
 namespace Infrastructure.Web.Api.Common.UnitTests;
 
 [UsedImplicitly]
-public class HmacSignerSpec
+public class HMACSignerSpec
 {
     [Trait("Category", "Unit")]
     public class GivenARequest
@@ -14,41 +14,41 @@ public class HmacSignerSpec
         [Fact]
         public void WhenConstructedWithEmptySecret_ThenThrows()
         {
-            FluentActions.Invoking(() => new HmacSigner(new TestHmacRequest(), string.Empty))
+            FluentActions.Invoking(() => new HMACSigner(new TestHmacRequest(), string.Empty))
                 .Should().Throw<ArgumentException>();
         }
 
         [Fact]
         public void WhenSignAndRequestIsHollow_ThenReturnsSignature()
         {
-            var signer = new HmacSigner(new TestHmacRequest(), "asecret");
+            var signer = new HMACSigner(new TestHmacRequest(), "asecret");
 
             var result = signer.Sign();
 
-            result.Should().Be("sha1=a0619224b43c173b0bb02e163534fccf7e16060e2347a0e514416451a0923cdb");
+            result.Should().Be("sha1=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
         }
 
         [Fact]
         public void WhenSignAndRequestIsPopulated_ThenReturnsSignature()
         {
-            var signer = new HmacSigner(new TestHmacRequest
+            var signer = new HMACSigner(new TestHmacRequest
             {
                 Id = "anid"
             }, "asecret");
 
             var result = signer.Sign();
 
-            result.Should().Be("sha1=110e558fb8c4f34f199808e0fd020a835af949f4dea2a898d6185ebcb10d4d92");
+            result.Should().Be("sha1=5ac3c7a7378d5f293359720f1bf64cfcbfbf672b61640121a11526638a57a2c5");
         }
 
         [Fact]
         public void WhenSignAndRequestsAreSame_ThenReturnsSameSignatures()
         {
-            var signer1 = new HmacSigner(new TestHmacRequest
+            var signer1 = new HMACSigner(new TestHmacRequest
             {
                 Id = "anid"
             }, "asecret");
-            var signer2 = new HmacSigner(new TestHmacRequest
+            var signer2 = new HMACSigner(new TestHmacRequest
             {
                 Id = "anid"
             }, "asecret");
@@ -62,11 +62,11 @@ public class HmacSignerSpec
         [Fact]
         public void WhenSignAndRequestsAreDifferent_ThenReturnsDifferentSignatures()
         {
-            var signer1 = new HmacSigner(new TestHmacRequest
+            var signer1 = new HMACSigner(new TestHmacRequest
             {
                 Id = "anid1"
             }, "asecret");
-            var signer2 = new HmacSigner(new TestHmacRequest
+            var signer2 = new HMACSigner(new TestHmacRequest
             {
                 Id = "anid2"
             }, "asecret");
@@ -84,8 +84,8 @@ public class HmacSignerSpec
         [Fact]
         public void WhenVerifyWithEmptySignature_ThenThrows()
         {
-            var signer = new HmacSigner(new TestHmacRequest(), "asecret");
-            var verifier = new HmacVerifier(signer);
+            var signer = new HMACSigner(new TestHmacRequest(), "asecret");
+            var verifier = new HMACVerifier(signer);
             FluentActions.Invoking(() => verifier.Verify(string.Empty))
                 .Should().Throw<ArgumentException>();
         }
@@ -93,8 +93,8 @@ public class HmacSignerSpec
         [Fact]
         public void WhenVerifyWithWrongSignature_ThenReturnsFalse()
         {
-            var signer = new HmacSigner(new TestHmacRequest(), "asecret");
-            var verifier = new HmacVerifier(signer);
+            var signer = new HMACSigner(new TestHmacRequest(), "asecret");
+            var verifier = new HMACVerifier(signer);
 
             var result = verifier.Verify("awrongsignature");
 
@@ -104,9 +104,9 @@ public class HmacSignerSpec
         [Fact]
         public void WhenVerifyWithCorrectSignature_ThenReturnsTrue()
         {
-            var signer = new HmacSigner(new TestHmacRequest(), "asecret");
+            var signer = new HMACSigner(new TestHmacRequest(), "asecret");
             var signature = signer.Sign();
-            var verifier = new HmacVerifier(signer);
+            var verifier = new HMACVerifier(signer);
 
             var result = verifier.Verify(signature);
 
