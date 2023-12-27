@@ -27,6 +27,9 @@
     <data name="AzureStorageAccountQueueStore_MissingQueueName" xml:space="preserve">
         <value>QueueName cannot be empty</value>
     </data>
+    <data name="AzureStorageAccountQueueStore_MissingMessage" xml:space="preserve">
+        <value>Message cannot be empty</value>
+    </data>
     <data name="ValidationExtensions_InvalidStorageAccountResourceName" xml:space="preserve">
         <value>The Azure Storage Table/Blob/Queue name: '{0}' contains illegal characters or is not the correct length</value>
     </data>

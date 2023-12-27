@@ -33,7 +33,6 @@ using Microsoft.Extensions.Logging;
 #if TESTINGONLY
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
-
 #else
 #if HOSTEDONAZURE
 using Microsoft.ApplicationInsights.Extensibility;

@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Common;
 using Common.Recording;
 
 namespace Infrastructure.Common.Recording;
@@ -9,7 +10,7 @@ namespace Infrastructure.Common.Recording;
 [ExcludeFromCodeCoverage]
 public class NullMetricReporter : IMetricReporter
 {
-    public void Measure(string eventName, Dictionary<string, object>? context = null)
+    public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
     {
     }
 }

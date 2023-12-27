@@ -14,6 +14,9 @@ public interface IApiWorkerSpec
     void Start();
 
     void WaitForQueueProcessingToComplete();
+
+    public TService GetRequiredService<TService>()
+        where TService : notnull;
 }
 
 public abstract class ApiWorkerSpec<TSetup> : IClassFixture<TSetup>, IDisposable

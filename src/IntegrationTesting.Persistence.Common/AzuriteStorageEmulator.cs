@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Common;
 using Common.Extensions;
 using UnitTesting.Common;
 using OperatingSystem = System.OperatingSystem;
@@ -30,7 +31,7 @@ public static class AzuriteStorageEmulator
 
             return OperatingSystem.IsLinux()
                 ? "node"
-                : throw new InvalidOperationException("Unsupported Platform");
+                : throw new InvalidOperationException(Resources.UnSupportedPlatform);
         }
     }
 
@@ -47,6 +48,11 @@ public static class AzuriteStorageEmulator
 
     private static void StartEmulator()
     {
+        if (!OperatingSystem.IsWindows() && !OperatingSystem.IsLinux())
+        {
+            throw new InvalidOperationException(Resources.UnSupportedPlatform);
+        }
+
         if (!Directory.Exists(AzuriteLocalStorageFolder))
         {
             Directory.CreateDirectory(AzuriteLocalStorageFolder);
@@ -60,14 +66,14 @@ public static class AzuriteStorageEmulator
         });
         if (process.NotExists())
         {
-            throw new InvalidOperationException("Failed to launch Azurite");
+            throw new InvalidOperationException(
+                Resources.AzuriteStorageEmulator_StartEmulator_FailedStartup.Format(CommandLine, CommandLineArguments));
         }
 
         if (process.HasExited)
         {
             var error = process.StandardError.ReadToEnd();
-            throw new InvalidOperationException(
-                $"Failed to launch Azurite, failed to startup: {error}");
+            throw new InvalidOperationException(Resources.AzuriteStorageEmulator_StartEmulator_Exited.Format(error));
         }
     }
 
@@ -89,14 +95,7 @@ public static class AzuriteStorageEmulator
         var processes = GetRunningProcesses().ToList();
         foreach (var process in processes)
         {
-            try
-            {
-                process.Kill();
-            }
-            catch (Exception)
-            {
-                //Ignore
-            }
+            Try.Safely(() => process.Kill());
         }
     }
 }

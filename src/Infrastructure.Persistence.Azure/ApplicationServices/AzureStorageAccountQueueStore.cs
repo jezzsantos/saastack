@@ -122,7 +122,7 @@ public class AzureStorageAccountQueueStore : IQueueStore
         queueName.ThrowIfNotValuedParameter(nameof(queueName),
             Resources.AzureStorageAccountQueueStore_MissingQueueName);
         message.ThrowIfNotValuedParameter(nameof(message),
-            Resources.AzureStorageAccountQueueStore_MissingQueueName);
+            Resources.AzureStorageAccountQueueStore_MissingMessage);
 
         var queue = await ConnectToQueueAsync(queueName, cancellationToken);
 
@@ -138,11 +138,13 @@ public class AzureStorageAccountQueueStore : IQueueStore
             _recorder.Crash(null, CrashLevel.NonCritical,
                 ex, "Failed to push message: {Message} to queue: {Queue}. Error was: {ErrorCode}", message,
                 queue.Name, ex.ErrorCode ?? "none");
+            return ex.ToError(ErrorCode.Unexpected);
         }
         catch (Exception ex)
         {
             _recorder.Crash(null, CrashLevel.NonCritical,
                 ex, "Failed to push message: {Message} to queue: {Queue}", message, queue.Name);
+            return ex.ToError(ErrorCode.Unexpected);
         }
 
         return Result.Ok;
@@ -228,13 +230,13 @@ public class AzureStorageAccountQueueStore : IQueueStore
 
     private async Task<QueueClient> ConnectToQueueAsync(string queueName, CancellationToken cancellationToken)
     {
-        var sanitisedQueueName = queueName.SanitiseAndValidateStorageAccountResourceName();
-        var queue = new QueueClient(_connectionString, sanitisedQueueName, new QueueClientOptions
+        var sanitizedQueueName = queueName.SanitizeAndValidateStorageAccountResourceName();
+        var queue = new QueueClient(_connectionString, sanitizedQueueName, new QueueClientOptions
         {
             MessageEncoding = QueueMessageEncoding.Base64
         });
 
-        if (IsQueueExistenceCheckPerformed(sanitisedQueueName))
+        if (IsQueueExistenceCheckPerformed(sanitizedQueueName))
         {
             return queue;
         }

@@ -10,12 +10,15 @@
         <ProjectReference Include="..\Application.Persistence.Shared\Application.Persistence.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Interfaces\Infrastructure.Interfaces.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.Azure\Infrastructure.Persistence.Azure.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONAZURE'" />
+        <ProjectReference Include="..\Infrastructure.Persistence.AWS\Infrastructure.Persistence.AWS.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
         <ProjectReference Include="..\Infrastructure.Persistence.Shared\Infrastructure.Persistence.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Common\Infrastructure.Web.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Api.Operations.Shared\Infrastructure.Web.Api.Operations.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="AWSSDK.CloudWatch" Version="3.7.301.10" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
+        <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.302.9" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
         <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" Condition="'$(HostingPlatform)' == 'HOSTEDONAZURE'" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     </ItemGroup>
@@ -39,6 +42,10 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Extensions\" />
     </ItemGroup>
 
 </Project>

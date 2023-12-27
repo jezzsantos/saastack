@@ -252,6 +252,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Web.Website.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Web.Website.UnitTests", "Infrastructure.Web.Website.UnitTests\Infrastructure.Web.Website.UnitTests.csproj", "{11F60901-1E1C-4B1B-83E8-261269D2681B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Persistence.AWS", "Infrastructure.Persistence.AWS\Infrastructure.Persistence.AWS.csproj", "{5DD98C48-F081-4CD1-9F01-1FF19323FC1E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWSLambdas.Api.WorkerHost", "AWSLambdas.Api.WorkerHost\AWSLambdas.Api.WorkerHost.csproj", "{1734A5D1-B2C8-4107-9DAA-E3F99F49ABEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -757,6 +761,18 @@ Global
 		{11F60901-1E1C-4B1B-83E8-261269D2681B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{11F60901-1E1C-4B1B-83E8-261269D2681B}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
 		{11F60901-1E1C-4B1B-83E8-261269D2681B}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
+		{5DD98C48-F081-4CD1-9F01-1FF19323FC1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DD98C48-F081-4CD1-9F01-1FF19323FC1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DD98C48-F081-4CD1-9F01-1FF19323FC1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DD98C48-F081-4CD1-9F01-1FF19323FC1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DD98C48-F081-4CD1-9F01-1FF19323FC1E}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
+		{5DD98C48-F081-4CD1-9F01-1FF19323FC1E}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
+		{1734A5D1-B2C8-4107-9DAA-E3F99F49ABEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1734A5D1-B2C8-4107-9DAA-E3F99F49ABEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1734A5D1-B2C8-4107-9DAA-E3F99F49ABEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1734A5D1-B2C8-4107-9DAA-E3F99F49ABEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1734A5D1-B2C8-4107-9DAA-E3F99F49ABEC}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
+		{1734A5D1-B2C8-4107-9DAA-E3F99F49ABEC}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F5C77A86-38AF-40E4-82FC-617E624B2754} = {508E7DA4-4DF2-4201-955D-CCF70C41AD05}
@@ -877,5 +893,7 @@ Global
 		{9B420F01-63A5-4EEE-B6AC-09717BE179E9} = {4B1A213C-36A7-41A7-BFC7-B3CFF5795912}
 		{BC14CDD1-E127-4DF7-A1B3-55164CA8D1A4} = {19ADDB2F-B589-49EF-9BDA-BD9908057D60}
 		{11F60901-1E1C-4B1B-83E8-261269D2681B} = {19ADDB2F-B589-49EF-9BDA-BD9908057D60}
+		{5DD98C48-F081-4CD1-9F01-1FF19323FC1E} = {3782A767-2274-4F44-80C6-D6C6EEB9C9A5}
+		{1734A5D1-B2C8-4107-9DAA-E3F99F49ABEC} = {4B1A213C-36A7-41A7-BFC7-B3CFF5795912}
 	EndGlobalSection
 EndGlobal

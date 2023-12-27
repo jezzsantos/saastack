@@ -3,6 +3,7 @@ using Infrastructure.Persistence.Common.ApplicationServices;
 #if HOSTEDONAZURE
 using Infrastructure.Persistence.Azure.ApplicationServices;
 #elif HOSTEDONAWS
+using Infrastructure.Persistence.AWS.ApplicationServices;
 #endif
 #else
 using Infrastructure.Persistence.Interfaces;
@@ -32,7 +33,7 @@ public class QueuedAuditReporter : IAuditReporter
 #if HOSTEDONAZURE
                 AzureStorageAccountQueueStore.Create(NullRecorder.Instance, settings)
 #elif HOSTEDONAWS
-                NullStore.Instance
+                AWSSQSQueueStore.Create(NullRecorder.Instance, settings)
 #endif
 #else
             container.Resolve<IQueueStore>()

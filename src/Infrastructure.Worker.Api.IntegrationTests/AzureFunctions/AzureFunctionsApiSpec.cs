@@ -3,7 +3,6 @@ using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 using Infrastructure.Web.Interfaces.Clients;
-using Infrastructure.Worker.Api.IntegrationTests.AzureFunctions;
 using Infrastructure.Worker.Api.IntegrationTests.Stubs;
 using Infrastructure.Workers.Api.Workers;
 using JetBrains.Annotations;
@@ -12,7 +11,7 @@ using UnitTesting.Common;
 using Xunit;
 using Task = System.Threading.Tasks.Task;
 
-namespace Infrastructure.Worker.Api.IntegrationTests;
+namespace Infrastructure.Worker.Api.IntegrationTests.AzureFunctions;
 
 [UsedImplicitly]
 public class AzureFunctionsApiSpec

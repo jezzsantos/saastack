@@ -39,7 +39,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
     }
 
     private HostRecorder(IDependencyContainer container, ILogger logger, RecorderOptions options) : this(logger,
-        options, GetCrashReporter(container, options.CurrentEnvironment),
+        options, GetCrashReporter(container, logger, options.CurrentEnvironment),
         GetAuditReporter(container, options.CurrentEnvironment),
         GetMetricReporter(container, options.CurrentEnvironment),
         GetUsageReporter(container, options.CurrentEnvironment))
@@ -70,18 +70,6 @@ public sealed class HostRecorder : IRecorder, IDisposable
             // ReSharper disable once SuspiciousTypeConversion.Global
             (_usageReporter as IDisposable)?.Dispose();
         }
-    }
-
-    public override string ToString()
-    {
-        var builder = new StringBuilder();
-        builder.AppendFormat("{0}: ", GetType().Name);
-        builder.AppendFormat("Crashes-> {0}, ", _crashReporter.GetType().Name);
-        builder.AppendFormat("Audits -> {0}, ", _auditReporter.GetType().Name);
-        builder.AppendFormat("Usages -> {0}, ", _usageReporter.GetType().Name);
-        builder.AppendFormat("Metrics -> {0}", _metricsReporter.GetType().Name);
-
-        return builder.ToString();
     }
 
     public void TraceDebug(ICallContext? context, string messageTemplate, params object[] templateArgs)
@@ -144,6 +132,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
     public void Crash(ICallContext? context, CrashLevel level, Exception exception, string messageTemplate,
         params object[] templateArgs)
     {
+        var safeContext = context ?? CallContext.CreateUnknown();
         var logLevel = level == CrashLevel.Critical
             ? LogLevel.Critical
             : LogLevel.Error;
@@ -154,41 +143,41 @@ public sealed class HostRecorder : IRecorder, IDisposable
         var errorSourceId = exception.GetBaseException().TargetSite?.ToString();
         if (errorSourceId.Exists())
         {
-            _metricsReporter.Measure($"Exceptions: {errorSourceId}");
+            _metricsReporter.Measure(safeContext, $"Exceptions: {errorSourceId}");
         }
 
-        _crashReporter.Crash(context ?? CallContext.CreateUnknown(), level, exception, messageTemplate, templateArgs);
+        _crashReporter.Crash(safeContext, level, exception, messageTemplate, templateArgs);
     }
 
     public void Audit(ICallContext? context, string auditCode, string messageTemplate, params object[] templateArgs)
     {
-        var safeCall = context ?? CallContext.CreateUnknown();
-        var againstId = safeCall.CallerId;
-        AuditAgainst(safeCall, againstId, auditCode, messageTemplate, templateArgs);
+        var safeContext = context ?? CallContext.CreateUnknown();
+        var againstId = safeContext.CallerId;
+        AuditAgainst(safeContext, againstId, auditCode, messageTemplate, templateArgs);
     }
 
     public void AuditAgainst(ICallContext? context, string againstId, string auditCode, string messageTemplate,
         params object[] templateArgs)
     {
-        var safeCall = context ?? CallContext.CreateUnknown();
+        var safeContext = context ?? CallContext.CreateUnknown();
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, $"Audit: {auditCode}, against {againstId}, {messageTemplate}",
                 templateArgs);
-        TraceInformation(safeCall, augmentedMessageTemplate, augmentedArguments);
-        TrackUsageFor(safeCall, againstId, UsageConstants.Events.UsageScenarios.Audit,
+        TraceInformation(safeContext, augmentedMessageTemplate, augmentedArguments);
+        TrackUsageFor(safeContext, againstId, UsageConstants.Events.UsageScenarios.Audit,
             new Dictionary<string, object>
             {
                 { UsageConstants.Properties.UsedById, againstId },
                 { UsageConstants.Properties.AuditCode, auditCode.ToLowerInvariant() }
             });
-        _auditReporter.Audit(safeCall, againstId, auditCode, messageTemplate, templateArgs);
+        _auditReporter.Audit(safeContext, againstId, auditCode, messageTemplate, templateArgs);
     }
 
     public void TrackUsage(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
     {
-        var safeCall = context ?? CallContext.CreateUnknown();
-        var forId = safeCall.CallerId;
-        TrackUsageFor(safeCall, forId, eventName, additional);
+        var safeContext = context ?? CallContext.CreateUnknown();
+        var forId = safeContext.CallerId;
+        TrackUsageFor(safeContext, forId, eventName, additional);
     }
 
     public void TrackUsageFor(ICallContext? context, string forId, string eventName,
@@ -197,27 +186,41 @@ public sealed class HostRecorder : IRecorder, IDisposable
         ArgumentException.ThrowIfNullOrEmpty(eventName);
         ArgumentException.ThrowIfNullOrEmpty(forId);
 
-        var safeCall = context ?? CallContext.CreateUnknown();
+        var safeContext = context ?? CallContext.CreateUnknown();
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, $"Usage: {eventName}, for {forId}");
         TraceInformation(context, augmentedMessageTemplate, augmentedArguments);
 
         var properties = additional ?? new Dictionary<string, object>();
         properties.TryAdd(UsageConstants.Properties.Component, _usageComponentName);
-        _usageReporter.Track(safeCall, forId, eventName, properties);
+        _usageReporter.Track(safeContext, forId, eventName, properties);
     }
 
     public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
     {
-        TraceInformation(context, $"Measure: {eventName}");
+        var safeContext = context ?? CallContext.CreateUnknown();
+        TraceInformation(safeContext, $"Measure: {eventName}");
         var usageContext = additional ?? new Dictionary<string, object>();
         usageContext.Add(UsageConstants.Properties.MetricEventName, eventName.ToLowerInvariant());
-        TrackUsage(context, UsageConstants.Events.UsageScenarios.Measurement, usageContext);
-        _metricsReporter.Measure(eventName, additional ?? new Dictionary<string, object>());
+        TrackUsage(safeContext, UsageConstants.Events.UsageScenarios.Measurement, usageContext);
+        _metricsReporter.Measure(safeContext, eventName, additional ?? new Dictionary<string, object>());
+    }
+
+    public override string ToString()
+    {
+        var builder = new StringBuilder();
+        builder.AppendFormat("{0}: ", GetType().Name);
+        builder.AppendFormat("Crashes-> {0}, ", _crashReporter.GetType().Name);
+        builder.AppendFormat("Audits -> {0}, ", _auditReporter.GetType().Name);
+        builder.AppendFormat("Usages -> {0}, ", _usageReporter.GetType().Name);
+        builder.AppendFormat("Metrics -> {0}", _metricsReporter.GetType().Name);
+
+        return builder.ToString();
     }
 
     // ReSharper disable once UnusedParameter.Local
     private static ICrashReporter GetCrashReporter(IDependencyContainer container,
+        ILogger logger,
         RecordingEnvironmentOptions options)
     {
         return options.CrashReporting switch
@@ -227,7 +230,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
 #if HOSTEDONAZURE
                 new ApplicationInsightsCrashReporter(container),
 #elif HOSTEDONAWS
-                    new NullCrashReporter(),
+                new AWSCloudWatchCrashReporter(logger),
 #endif
             _ => throw new ArgumentOutOfRangeException(nameof(options.MetricReporting))
         };
@@ -245,6 +248,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
         };
     }
 
+    // ReSharper disable once UnusedParameter.Local
     private static IMetricReporter GetMetricReporter(IDependencyContainer container,
         RecordingEnvironmentOptions options)
     {
@@ -255,7 +259,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
 #if HOSTEDONAZURE
                 new ApplicationInsightsMetricReporter(container),
 #elif HOSTEDONAWS
-                    new NullMetricReporter(),
+                new AWSCloudWatchMetricReporter(container),
 #endif
             _ => throw new ArgumentOutOfRangeException(nameof(options.MetricReporting))
         };

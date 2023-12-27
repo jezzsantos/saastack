@@ -60,6 +60,15 @@ namespace Infrastructure.Persistence.Azure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Message cannot be empty.
+        /// </summary>
+        internal static string AzureStorageAccountQueueStore_MissingMessage {
+            get {
+                return ResourceManager.GetString("AzureStorageAccountQueueStore_MissingMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to QueueName cannot be empty.
         /// </summary>
         internal static string AzureStorageAccountQueueStore_MissingQueueName {

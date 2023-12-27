@@ -25,7 +25,7 @@ public class InProcessInMemStoreSpecSetup : StoreSpecSetupBase
     public IQueueStore QueueStore => _store;
 }
 
-[Trait("Category", "Integration.Storage")]
+[Trait("Category", "Integration.Persistence")]
 [Collection("InProcessInMemStore")]
 [UsedImplicitly]
 public class InProcessInMemDataStoreSpec : AnyDataStoreBaseSpec
@@ -35,7 +35,7 @@ public class InProcessInMemDataStoreSpec : AnyDataStoreBaseSpec
     }
 }
 
-[Trait("Category", "Integration.Storage")]
+[Trait("Category", "Integration.Persistence")]
 [Collection("InProcessInMemStore")]
 [UsedImplicitly]
 public class InProcessInMemBlobStoreSpec : AnyBlobStoreBaseSpec
@@ -45,7 +45,7 @@ public class InProcessInMemBlobStoreSpec : AnyBlobStoreBaseSpec
     }
 }
 
-[Trait("Category", "Integration.Storage")]
+[Trait("Category", "Integration.Persistence")]
 [Collection("InProcessInMemStore")]
 [UsedImplicitly]
 public class InProcessInMemQueueStoreSpec : AnyQueueStoreBaseSpec
@@ -55,7 +55,7 @@ public class InProcessInMemQueueStoreSpec : AnyQueueStoreBaseSpec
     }
 }
 
-[Trait("Category", "Integration.Storage")]
+[Trait("Category", "Integration.Persistence")]
 [Collection("InProcessInMemStore")]
 [UsedImplicitly]
 public class InProcessInMemEventStoreSpec : AnyEventStoreBaseSpec

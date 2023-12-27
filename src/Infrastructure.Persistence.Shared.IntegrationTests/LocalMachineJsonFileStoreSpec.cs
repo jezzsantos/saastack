@@ -30,7 +30,7 @@ public class LocalMachineJsonFileStoreSpecSetup : StoreSpecSetupBase
     public IQueueStore QueueStore => _store;
 }
 
-[Trait("Category", "Integration.Storage")]
+[Trait("Category", "Integration.Persistence")]
 [Collection("LocalMachineJsonFileStore")]
 [UsedImplicitly]
 public class LocalMachineJsonFileDataStoreSpec : AnyDataStoreBaseSpec
@@ -40,7 +40,7 @@ public class LocalMachineJsonFileDataStoreSpec : AnyDataStoreBaseSpec
     }
 }
 
-[Trait("Category", "Integration.Storage")]
+[Trait("Category", "Integration.Persistence")]
 [Collection("LocalMachineJsonFileStore")]
 [UsedImplicitly]
 public class LocalMachineJsonFileBlobStoreSpec : AnyBlobStoreBaseSpec
@@ -50,7 +50,7 @@ public class LocalMachineJsonFileBlobStoreSpec : AnyBlobStoreBaseSpec
     }
 }
 
-[Trait("Category", "Integration.Storage")]
+[Trait("Category", "Integration.Persistence")]
 [Collection("LocalMachineJsonFileStore")]
 [UsedImplicitly]
 public class LocalMachineJsonFileQueueStoreSpec : AnyQueueStoreBaseSpec
@@ -60,7 +60,7 @@ public class LocalMachineJsonFileQueueStoreSpec : AnyQueueStoreBaseSpec
     }
 }
 
-[Trait("Category", "Integration.Storage")]
+[Trait("Category", "Integration.Persistence")]
 [Collection("LocalMachineJsonFileStore")]
 [UsedImplicitly]
 public class LocalMachineJsonFileEventStoreSpec : AnyEventStoreBaseSpec

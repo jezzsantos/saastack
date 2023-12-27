@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Infrastructure.Persistence.Shared.IntegrationTests.Azure;
 
-[Trait("Category", "Integration.Storage")]
+[Trait("Category", "Integration.Persistence")]
 [Collection("AzureStorageAccount")]
 public class AzureStorageAccountQueueStoreSpec : AnyQueueStoreBaseSpec
 {

@@ -31,17 +31,18 @@ Open a terminal and run: `dotnet dev-certs https --trust`
 
 ## Optional Local Infrastructure
 
-You only need the tools below installed if you are going to run specific `Integration.Storage` tests, for the storage adapters you need to use in your codebase.
+You only need the tools below installed if you are going to run specific `Integration.Persistence` tests, for the persistence technology adapters you need to use in your codebase.
 
 * If using the `SqlServerDataStore`, install `SQL Server 2019 Developer`. Available for [download here](https://go.microsoft.com/fwlink/?linkid=866662)
-* If using the `RedisInMemRepository`, install `Redis Server` locally to run the tests. Available for [download here](https://redis.io/download)
+* If using the `RedisDataStore`, install `Redis Server` locally to run the tests. Available for [download here](https://redis.io/download)
 * If using the `EventStoreEventStore`, install `EventStore` locally to run the tests. Install using the Chocolatey command: `choco install eventstore-oss`
 
 > We would normally run these storage integration tests in CI periodically.
 
 ## Azure Local Development
 
-Only if you are deploying to Azure
+Only if you are deploying your product to Azure.
+(Delete this section otherwise)
 
 ### Azure Functions Host
 
@@ -69,7 +70,7 @@ In the `AzureFunctions.Api.WorkersHost` project:
 
 ### Azurite (Azure Storage Emulator)
 
-> You only need to perform this step once, prior to running the `Integration.Storage` tests against Azure Storage infrastructure (e.g, Queues, Blobs, and Tables)
+> You only need to perform this step once, prior to running any of the `Integration.Persistence` tests against Azure infrastructure (e.g., Azure Queue Storage, Azure Blob Storage, and Azure Table Storage)
 
 In a Terminal window:
 
@@ -78,6 +79,28 @@ In a Terminal window:
    2. `cd /tools/azurite`
 
 2. Run: `npm install`
+
+## AWS Local Development
+
+Only if you are deploying your product to AWS
+(Delete this section otherwise)
+
+### LocalStack (AWS Emulator)
+
+> You only need to perform this step once, prior to running any of the `Integration.Persistence` tests against AWS infrastructure (e.g., CloudWatch, SQS queues, S3 Buckets, RDS/Dynamo databases, etc)
+
+In a Terminal window:
+
+1. [Install python](https://www.python.org/downloads/)
+2. [Install Python package manager](https://pip.pypa.io/en/stable/installation/)
+3. [Install docker](https://docs.docker.com/get-docker/)
+4. Install localstack: `python -m pip install localstack`
+
+> See: [LocalStack CLI setup instructions](https://docs.localstack.cloud/getting-started/installation/#localstack-cli)
+
+Now, test that LocalStack works by running: `localstack start`
+
+> When testing, Docker will need to be running for LocalStack to be used
 
 # Build & Deploy
 
@@ -243,21 +266,23 @@ OR, in a terminal:
 
 > Note: All tests will be run in parallel in `Rider` or in `dotnet test`.
 
-### Storage Integration tests
+### Persistence Integration tests
 
 These tests ensure that 3rd party persistence technology adapters that are used in production environments work correctly.
 
-Only run these kinds of tests when the code in the persistence technology adapters changes. These tests should not be run frequently and can be scheduled to run as part of a nightly/weekly build.
+Only run these kinds of tests when the code in the persistence technology adapters changes.
+
+These tests should NOT be run frequently and can be scheduled to run as part of a nightly/weekly build.
 
 > Warning: These tests connect to and test real 3rd party systems in the cloud (usually across HTTP or some other protocol). Some of these tests require that you have the respective technology installed on your local machine (e.g., SQL Server Database).
 >
 > Warning: They may incur charges, or they may trigger rate-limiting policies on the accounts they are run against.
 
-`dotnet test --filter Category=Integration.Storage src\SaaStack.sln` (requires installing the server storage components listed at the top of this page)
+`dotnet test --filter Category=Integration.Persistence src\SaaStack.sln` (requires installing the server persistence components listed at the top of this page)
 
-> Note: If any of the `Integration.Storage` category of tests fail, it is likely due to the fact that you don't have that technology installed on your local machine, or that you are not running your IDE as Administrator, and therefore cannot start/stop those local services without elevated permissions.
+> Note: If any of the `Integration.Persistence` category of tests fail, it is likely due to the fact that you don't have that technology installed on your local machine, or that you are not running your IDE as Administrator, and therefore cannot start/stop those local services without elevated permissions.
 
-> Note: Amazon infrastructure components require LocalStack to be running on your computer in order to work. After installing LocalStack, run `localstack start` in a terminal.
+> Note: AWS infrastructure adapters require LocalStack to be running (in Docker) on your computer in order to work. (Run `localstack start`).
 
 ### External Integration tests
 

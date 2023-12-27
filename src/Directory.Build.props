@@ -11,7 +11,7 @@
 
     <!-- Hosting platform (`HOSTEDONAZURE` or `HOSTEDONAWS` or `HOSTEDONGC`) -->
     <PropertyGroup>
-        <HostingPlatform>HOSTEDONAZURE</HostingPlatform>
+        <HostingPlatform>HOSTEDONAWS</HostingPlatform>
     </PropertyGroup>
 
     <!-- NuGet package information -->

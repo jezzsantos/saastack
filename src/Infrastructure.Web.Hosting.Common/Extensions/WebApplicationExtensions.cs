@@ -184,6 +184,7 @@ public static class WebApplicationExtensions
         app.Logger.LogInformation(
             "Platform Persistence stores: DataStore -> {DataStore} EventStore -> {EventStore} QueueStore -> {QueueStore} BlobStore -> {BlobStore}",
             dataStore, eventStore, queueStore, blobStore);
+#if TESTINGONLY
         var stubDrainingServices = app.Services.GetServices<IHostedService>()
             .OfType<StubQueueDrainingService>()
             .ToList();
@@ -193,6 +194,7 @@ public static class WebApplicationExtensions
             var queues = stubDrainingService.MonitoredQueues.Join(", ");
             app.Logger.LogInformation("Background queue draining on queues -> {Queues}", queues);
         }
+#endif
 
         return app;
     }
