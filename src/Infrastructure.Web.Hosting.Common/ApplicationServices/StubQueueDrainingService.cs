@@ -1,4 +1,5 @@
 #if TESTINGONLY
+using System.Text.Json;
 using Application.Interfaces.Services;
 using Common.Extensions;
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
@@ -27,14 +28,16 @@ public class StubQueueDrainingService : BackgroundService
     private readonly IMonitoredMessageQueues _monitoredMessageQueues;
     private readonly Dictionary<string, IWebRequest> _monitorQueueMappings;
 
-    public StubQueueDrainingService(IHttpClientFactory httpClientFactory, IHostSettings settings,
+    public StubQueueDrainingService(IHttpClientFactory httpClientFactory, JsonSerializerOptions jsonOptions,
+        IHostSettings settings,
         ILogger<StubQueueDrainingService> logger, IMonitoredMessageQueues monitoredMessageQueues,
-        Dictionary<string, IWebRequest> monitoredQueueApiMappings) : this(httpClientFactory, logger,
+        Dictionary<string, IWebRequest> monitoredQueueApiMappings) : this(httpClientFactory, jsonOptions, logger,
         monitoredMessageQueues, monitoredQueueApiMappings, settings.GetAncillaryApiHostBaseUrl())
     {
     }
 
-    private StubQueueDrainingService(IHttpClientFactory httpClientFactory, ILogger<StubQueueDrainingService> logger,
+    private StubQueueDrainingService(IHttpClientFactory httpClientFactory, JsonSerializerOptions jsonOptions,
+        ILogger<StubQueueDrainingService> logger,
         IMonitoredMessageQueues monitoredMessageQueues, Dictionary<string, IWebRequest> monitorQueueMappings,
         string baseUrl)
     {
@@ -42,7 +45,7 @@ public class StubQueueDrainingService : BackgroundService
         _logger = logger;
         _monitoredMessageQueues = monitoredMessageQueues;
         _monitorQueueMappings = monitorQueueMappings;
-        _apiClient = CreateApiClient(httpClientFactory, baseUrl);
+        _apiClient = CreateApiClient(httpClientFactory, jsonOptions, baseUrl);
     }
 
     public override void Dispose()
@@ -64,11 +67,12 @@ public class StubQueueDrainingService : BackgroundService
         await DrainQueuesAsync(cancellationToken);
     }
 
-    private static IHttpJsonClient CreateApiClient(IHttpClientFactory httpClientFactory, string baseUrl)
+    private static IHttpJsonClient CreateApiClient(IHttpClientFactory httpClientFactory,
+        JsonSerializerOptions jsonOptions, string baseUrl)
     {
         var httpClient = httpClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri(baseUrl);
-        return new JsonClient(httpClient);
+        return new JsonClient(httpClient, jsonOptions);
     }
 
     private async Task DrainQueuesAsync(CancellationToken cancellationToken)

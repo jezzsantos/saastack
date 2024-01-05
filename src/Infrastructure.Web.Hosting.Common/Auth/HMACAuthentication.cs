@@ -5,8 +5,8 @@ using Application.Interfaces;
 using Application.Interfaces.Services;
 using Common;
 using Common.Extensions;
-using Domain.Common.Authorization;
 using Domain.Interfaces;
+using Domain.Interfaces.Authorization;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
@@ -67,14 +67,7 @@ public class HMACAuthenticationHandler : AuthenticationHandler<HMACOptions>
 
         AuthenticationTicket IssueTicket()
         {
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, CallerConstants.MaintenanceAccountUserId),
-                new Claim(ClaimTypes.Role, UserRoles.ServiceAccount),
-                new Claim(ClaimTypes.UserData, UserFeatureSets.Basic),
-                new Claim(ClaimTypes.UserData, UserFeatureSets.Pro)
-            };
-            var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, Scheme.Name));
+            var principal = new ClaimsPrincipal(new ClaimsIdentity(GetClaimsForServiceAccount(), Scheme.Name));
             return new AuthenticationTicket(principal, Scheme.Name)
             {
                 Properties =
@@ -84,6 +77,16 @@ public class HMACAuthenticationHandler : AuthenticationHandler<HMACOptions>
                 }
             };
         }
+    }
+
+    private static Claim[] GetClaimsForServiceAccount()
+    {
+        return new[]
+        {
+            new Claim(AuthenticationConstants.ClaimForId, CallerConstants.MaintenanceAccountUserId),
+            new Claim(AuthenticationConstants.ClaimForRole, PlatformRoles.ServiceAccount),
+            new Claim(AuthenticationConstants.ClaimForFeatureLevel, PlatformFeatureLevels.Basic.Name)
+        };
     }
 }
 

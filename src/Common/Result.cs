@@ -152,7 +152,10 @@ public readonly struct Result<TValue, TError>
     /// <summary>
     ///     Whether the contained result has a value
     /// </summary>
-    public bool IsSuccessful => !_error.HasValue;
+    public bool IsSuccessful
+    {
+        [DebuggerStepThrough] get => !_error.HasValue;
+    }
 
     /// <summary>
     ///     Returns the contained <see cref="Value" /> if there is one
@@ -200,12 +203,18 @@ public readonly struct Result<TValue, TError>
     /// <summary>
     ///     Returns whether the contained <see cref="Value" /> has a value
     /// </summary>
-    public bool HasValue => IsSuccessful && _value.HasValue;
+    public bool HasValue
+    {
+        [DebuggerStepThrough] get => IsSuccessful && _value.HasValue;
+    }
 
     /// <summary>
     ///     Returns whether the contained <see cref="Value" /> has a value
     /// </summary>
-    public bool Exists => HasValue;
+    public bool Exists
+    {
+        [DebuggerStepThrough] get => HasValue;
+    }
 
     /// <summary>
     ///     Creates a new <see cref="Result{TReturn, TError}" /> in its faulted state, with the <see cref="error" />

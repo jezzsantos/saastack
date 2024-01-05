@@ -141,4 +141,36 @@ public class ObjectExtensionsSpec
         FluentActions.Invoking(() => "avalue".ThrowIfNotValuedParameter("aparametername", "amessage"))
             .Should().NotThrow();
     }
+
+    [Fact]
+    public void WhenThrowIfInvalidParameterAndNullButValidates_ThenThrows()
+    {
+        FluentActions.Invoking(() => ((string?)null).ThrowIfInvalidParameter(_ => true, "aparametername", "amessage"))
+            .Should().Throw<ArgumentOutOfRangeException>()
+            .WithMessage("amessage (Parameter 'aparametername')")
+            .And.ParamName.Should().Be("aparametername");
+    }
+
+    [Fact]
+    public void WhenThrowIfInvalidParameterAndEmptyButValidates_ThenReturns()
+    {
+        FluentActions.Invoking(() => string.Empty.ThrowIfInvalidParameter(_ => true, "aparametername", "amessage"))
+            .Should().NotThrow();
+    }
+
+    [Fact]
+    public void WhenThrowIfInvalidParameterAndInvalid_ThenReturns()
+    {
+        FluentActions.Invoking(() => "avalue".ThrowIfInvalidParameter(_ => false, "aparametername", "amessage"))
+            .Should().Throw<ArgumentOutOfRangeException>()
+            .WithMessage("amessage (Parameter 'aparametername')")
+            .And.ParamName.Should().Be("aparametername");
+    }
+
+    [Fact]
+    public void WhenThrowIfInvalidParameterAndValid_ThenReturns()
+    {
+        FluentActions.Invoking(() => "avalue".ThrowIfInvalidParameter(_ => true, "aparametername", "amessage"))
+            .Should().NotThrow();
+    }
 }

@@ -15,8 +15,4 @@
         </AssemblyAttribute>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="ReadModels\" />
-    </ItemGroup>
-
 </Project>

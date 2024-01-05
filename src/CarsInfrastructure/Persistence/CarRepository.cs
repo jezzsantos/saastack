@@ -5,12 +5,12 @@ using CarsApplication.Persistence;
 using CarsApplication.Persistence.ReadModels;
 using CarsDomain;
 using Common;
+using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
-using Task = Common.Extensions.Task;
 
 namespace CarsInfrastructure.Persistence;
 
@@ -30,7 +30,7 @@ public class CarRepository : ICarRepository
 
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
-        return await Task.WhenAllAsync(
+        return await Tasks.WhenAllAsync(
             _carQueries.DestroyAllAsync(cancellationToken),
             _cars.DestroyAllAsync(cancellationToken),
             _unavailabilitiesQueries.DestroyAllAsync(cancellationToken));
@@ -67,31 +67,33 @@ public class CarRepository : ICarRepository
     public async Task<Result<IReadOnlyList<Car>, Error>> SearchAllAvailableCarsAsync(Identifier organizationId,
         DateTime from, DateTime to, SearchOptions searchOptions, CancellationToken cancellationToken)
     {
-        var unavailabilities = await _unavailabilitiesQueries.QueryAsync(Query.From<Unavailability>()
+        var queriedUnavailabilities = await _unavailabilitiesQueries.QueryAsync(Query.From<Unavailability>()
                 .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
                 .AndWhere<DateTime>(u => u.From, ConditionOperator.LessThanEqualTo, from)
                 .AndWhere<DateTime>(u => u.To, ConditionOperator.GreaterThanEqualTo, to),
             cancellationToken: cancellationToken);
-        if (!unavailabilities.IsSuccessful)
+        if (!queriedUnavailabilities.IsSuccessful)
         {
-            return unavailabilities.Error;
+            return queriedUnavailabilities.Error;
         }
 
+        var unavailabilities = queriedUnavailabilities.Value.Results;
         var limit = searchOptions.Limit;
         var offset = searchOptions.Offset;
         searchOptions.ClearLimitAndOffset();
 
-        var cars = await _carQueries.QueryAsync(Query.From<Car>()
+        var queriedCars = await _carQueries.QueryAsync(Query.From<Car>()
             .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
             .AndWhere<string>(c => c.Status, ConditionOperator.EqualTo, CarStatus.Registered.ToString())
             .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
-        if (!cars.IsSuccessful)
+        if (!queriedCars.IsSuccessful)
         {
-            return cars.Error;
+            return queriedCars.Error;
         }
 
-        return cars.Value.Results
-            .Where(car => unavailabilities.Value.Results.All(unavailability => unavailability.CarId != car.Id))
+        var cars = queriedCars.Value.Results;
+        return cars
+            .Where(car => unavailabilities.All(unavailability => unavailability.CarId != car.Id))
             .Skip(offset)
             .Take(limit)
             .ToList();
@@ -100,29 +102,31 @@ public class CarRepository : ICarRepository
     public async Task<Result<IReadOnlyList<Car>, Error>> SearchAllCarsAsync(Identifier organizationId,
         SearchOptions searchOptions, CancellationToken cancellationToken)
     {
-        var cars = await _carQueries.QueryAsync(Query.From<Car>()
+        var queried = await _carQueries.QueryAsync(Query.From<Car>()
             .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
             .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
-        if (!cars.IsSuccessful)
+        if (!queried.IsSuccessful)
         {
-            return cars.Error;
+            return queried.Error;
         }
 
-        return cars.Value.Results;
+        var cars = queried.Value.Results;
+        return cars;
     }
 
     public async Task<Result<IReadOnlyList<Unavailability>, Error>> SearchAllCarUnavailabilitiesAsync(
         Identifier organizationId, Identifier id, SearchOptions searchOptions, CancellationToken cancellationToken)
     {
-        var unavailabilities = await _unavailabilitiesQueries.QueryAsync(Query.From<Unavailability>()
+        var queried = await _unavailabilitiesQueries.QueryAsync(Query.From<Unavailability>()
             .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
             .AndWhere<string>(u => u.CarId, ConditionOperator.EqualTo, id)
             .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
-        if (!unavailabilities.IsSuccessful)
+        if (!queried.IsSuccessful)
         {
-            return unavailabilities.Error;
+            return queried.Error;
         }
 
-        return unavailabilities.Value.Results;
+        var unavailabilities = queried.Value.Results;
+        return unavailabilities;
     }
 }

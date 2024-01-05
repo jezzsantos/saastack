@@ -19,10 +19,8 @@ public class NameSpec
     [Fact]
     public void WhenText_ThenReturnsValue()
     {
-        var name = Name.Create("aname").Value;
+        var result = Name.Create("aname").Value;
 
-        var result = name.Text;
-
-        result.Should().Be("aname");
+        result.Text.Should().Be("aname");
     }
 }

@@ -1,6 +1,8 @@
 using AncillaryInfrastructure;
 using BookingsInfrastructure;
 using CarsInfrastructure;
+using EndUsersInfrastructure;
+using IdentityInfrastructure;
 using Infrastructure.Web.Hosting.Common;
 
 namespace ApiHost1;
@@ -10,6 +12,9 @@ public static class HostedModules
     public static SubDomainModules Get()
     {
         var modules = new SubDomainModules();
+        modules.Register(new ApiHostModule());
+        modules.Register(new EndUsersModule());
+        modules.Register(new IdentityModule());
         modules.Register(new AncillaryModule());
 #if TESTINGONLY
         modules.Register(new TestingOnlyApiModule());

@@ -61,7 +61,7 @@ public class SubDomainModulesSpec
                 AggregatePrefixes = new Dictionary<Type, string>(),
                 ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
                 DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
-                RegisterServicesFunction = (_, _) => { }
+                RegisterServices = (_, _) => { }
             }))
             .Should().Throw<ArgumentNullException>();
     }
@@ -74,8 +74,8 @@ public class SubDomainModulesSpec
             AggregatePrefixes = new Dictionary<Type, string>(),
             ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
             DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
-            MinimalApiRegistrationFunction = _ => { },
-            RegisterServicesFunction = null!
+            ConfigureMiddleware = _ => { },
+            RegisterServices = null!
         });
 
         _modules.ApiAssemblies.Should().ContainSingle();
@@ -101,8 +101,8 @@ public class SubDomainModulesSpec
             ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
             DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
             AggregatePrefixes = new Dictionary<Type, string>(),
-            MinimalApiRegistrationFunction = _ => { },
-            RegisterServicesFunction = (_, _) => { wasCalled = true; }
+            ConfigureMiddleware = _ => { },
+            RegisterServices = (_, _) => { wasCalled = true; }
         });
 
         _modules.RegisterServices(configuration, services);
@@ -128,8 +128,8 @@ public class SubDomainModulesSpec
             ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
             DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
             AggregatePrefixes = new Dictionary<Type, string>(),
-            MinimalApiRegistrationFunction = _ => { wasCalled = true; },
-            RegisterServicesFunction = (_, _) => { }
+            ConfigureMiddleware = _ => { wasCalled = true; },
+            RegisterServices = (_, _) => { }
         });
 
         _modules.ConfigureHost(app);
@@ -146,7 +146,7 @@ public class TestModule : ISubDomainModule
 
     public Dictionary<Type, string> AggregatePrefixes { get; init; } = null!;
 
-    public Action<WebApplication> MinimalApiRegistrationFunction { get; init; } = null!;
+    public Action<WebApplication> ConfigureMiddleware { get; init; } = null!;
 
-    public Action<ConfigurationManager, IServiceCollection>? RegisterServicesFunction { get; init; }
+    public Action<ConfigurationManager, IServiceCollection>? RegisterServices { get; init; }
 }

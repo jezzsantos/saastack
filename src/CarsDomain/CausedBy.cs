@@ -10,7 +10,7 @@ public sealed class CausedBy : ValueObjectBase<CausedBy>
 {
     public static Result<CausedBy, Error> Create(UnavailabilityCausedBy reason, string? reference)
     {
-        if (reference.HasValue())
+        if (reference.Exists())
         {
             if (reference.IsInvalidParameter(Validations.Unavailability.Reference, nameof(reference),
                     Resources.CausedBy_InvalidReference, out var error1))
@@ -20,11 +20,12 @@ public sealed class CausedBy : ValueObjectBase<CausedBy>
         }
         else
         {
-            if (reference.IsInvalidParameter(_ => reason != UnavailabilityCausedBy.Reservation,
+            if (reason.IsInvalidParameter(r => r != UnavailabilityCausedBy.Reservation,
                     nameof(reference), Resources.CausedBy_ReservationWithoutReference, out var error2))
             {
                 return error2;
             }
+
         }
 
         return new CausedBy(reason, reference);

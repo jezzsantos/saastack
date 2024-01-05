@@ -23,12 +23,7 @@ public class BookingsModule : ISubDomainModule
         { typeof(BookingRoot), "booking" }
     };
 
-    public Action<WebApplication> MinimalApiRegistrationFunction
-    {
-        get { return app => app.RegisterRoutes(); }
-    }
-
-    public Action<ConfigurationManager, IServiceCollection> RegisterServicesFunction
+    public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
         get
         {
@@ -39,5 +34,10 @@ public class BookingsModule : ISubDomainModule
                 services.RegisterTenantedEventing<BookingRoot>();
             };
         }
+    }
+
+    public Action<WebApplication> ConfigureMiddleware
+    {
+        get { return app => app.RegisterRoutes(); }
     }
 }

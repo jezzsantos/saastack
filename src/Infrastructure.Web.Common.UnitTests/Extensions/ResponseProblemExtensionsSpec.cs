@@ -240,4 +240,22 @@ public class ResponseProblemExtensionsSpec
 
         result.Should().BeError(ErrorCode.EntityExists, "atitle");
     }
+
+    [Fact]
+    public void WhenToResponseProblemAndReasonIsNull_ThenReturnsProblem()
+    {
+        var result = HttpStatusCode.InternalServerError.ToResponseProblem(null);
+
+        result.Title.Should().Be(nameof(HttpStatusCode.InternalServerError));
+        result.Status.Should().Be((int)HttpStatusCode.InternalServerError);
+    }
+
+    [Fact]
+    public void WhenToResponseProblemAndHasReason_ThenReturnsProblem()
+    {
+        var result = HttpStatusCode.InternalServerError.ToResponseProblem("areason");
+
+        result.Title.Should().Be("areason");
+        result.Status.Should().Be((int)HttpStatusCode.InternalServerError);
+    }
 }

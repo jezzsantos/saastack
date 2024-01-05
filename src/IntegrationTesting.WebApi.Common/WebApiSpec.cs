@@ -1,10 +1,13 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Text.Json;
 using Application.Persistence.Interfaces;
+using Application.Services.Shared;
 using Common;
 using Common.Extensions;
 using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Interfaces.Clients;
+using IntegrationTesting.WebApi.Common.Stubs;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -77,6 +80,7 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
             })
             .ConfigureTestServices(services =>
             {
+                services.AddSingleton<INotificationsService, StubNotificationsService>();
                 if (_overridenTestingDependencies.Exists())
                 {
                     _overridenTestingDependencies.Invoke(services);
@@ -110,11 +114,12 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 
         Setup = setup.WithWebHostBuilder(_ => { });
 
+        var jsonOptions = setup.GetRequiredService<JsonSerializerOptions>();
         HttpApi = setup.CreateClient(new WebApplicationFactoryClientOptions
         {
             BaseAddress = new Uri(WebServerBaseUrlFormat.Format(GetNextAvailablePort()))
         });
-        Api = new JsonClient(HttpApi);
+        Api = new JsonClient(HttpApi, jsonOptions);
     }
 
     public void Dispose()

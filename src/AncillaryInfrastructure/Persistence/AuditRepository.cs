@@ -5,12 +5,12 @@ using Application.Interfaces;
 using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
+using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
-using Task = Common.Extensions.Task;
 
 namespace AncillaryInfrastructure.Persistence;
 
@@ -28,7 +28,7 @@ public class AuditRepository : IAuditRepository
 
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
-        return await Task.WhenAllAsync(
+        return await Tasks.WhenAllAsync(
             _auditQueries.DestroyAllAsync(cancellationToken),
             _audits.DestroyAllAsync(cancellationToken));
     }
@@ -51,15 +51,16 @@ public class AuditRepository : IAuditRepository
     public async Task<Result<IReadOnlyList<Audit>, Error>> SearchAllAsync(Identifier organizationId,
         SearchOptions searchOptions, CancellationToken cancellationToken)
     {
-        var audits = await _auditQueries.QueryAsync(Query.From<Audit>()
+        var queried = await _auditQueries.QueryAsync(Query.From<Audit>()
             .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
             .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
-        if (!audits.IsSuccessful)
+        if (!queried.IsSuccessful)
         {
-            return audits.Error;
+            return queried.Error;
         }
 
-        return audits.Value.Results;
+        var audits = queried.Value.Results;
+        return audits;
     }
 
     public async Task<Result<AuditRoot, Error>> LoadAsync(Identifier organizationId, Identifier id,

@@ -31,7 +31,21 @@ public static class HttpRequestExtensions
             return;
         }
 
-        message.Headers.Add(HttpHeaders.Authorization, $"Bearer: {token}");
+        SetBearerToken(message, token);
+    }
+
+    /// <summary>
+    ///     Sets the <see cref="HttpHeaders.Authorization" /> header of the specified <see cref="message" />
+    ///     to the <see cref="token" />
+    /// </summary>
+    public static void SetBearerToken(this HttpRequestMessage message, string token)
+    {
+        if (token.HasNoValue())
+        {
+            return;
+        }
+
+        message.Headers.Add(HttpHeaders.Authorization, $"Bearer {token}");
     }
 
     /// <summary>

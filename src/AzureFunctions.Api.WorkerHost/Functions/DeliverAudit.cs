@@ -1,4 +1,4 @@
-﻿using Application.Persistence.Shared;
+﻿using Application.Persistence.Shared.ReadModels;
 using Infrastructure.Workers.Api;
 using Infrastructure.Workers.Api.Workers;
 using Microsoft.Azure.Functions.Worker;

@@ -1,7 +1,7 @@
 using Application.Interfaces;
 using Common;
-using Domain.Common.Authorization;
 using Domain.Interfaces;
+using Domain.Interfaces.Authorization;
 
 namespace Application.Common;
 
@@ -100,12 +100,12 @@ public static class Caller
         {
             TenantId = tenantId;
             Roles = new ICallerContext.CallerRoles();
-            FeatureSets = new ICallerContext.CallerFeatureSets(new[] { UserFeatureSets.Basic }, null);
+            FeatureLevels = new ICallerContext.CallerFeatureLevels(new[] { PlatformFeatureLevels.Basic }, null);
         }
 
         public ICallerContext.CallerRoles Roles { get; }
 
-        public ICallerContext.CallerFeatureSets FeatureSets { get; }
+        public ICallerContext.CallerFeatureLevels FeatureLevels { get; }
 
         public string? Authorization => null;
 
@@ -129,15 +129,15 @@ public static class Caller
         {
             CallId = callId ?? GenerateCallId();
             TenantId = tenantId;
-            Roles = new ICallerContext.CallerRoles(new[] { UserRoles.ServiceAccount }, null);
-            FeatureSets =
-                new ICallerContext.CallerFeatureSets(
-                    new[] { UserFeatureSets.Basic, UserFeatureSets.Pro, UserFeatureSets.Premium }, null);
+            Roles = new ICallerContext.CallerRoles(new[] { PlatformRoles.ServiceAccount }, null);
+            FeatureLevels =
+                new ICallerContext.CallerFeatureLevels(
+                    new[] { PlatformFeatureLevels.Premium }, null);
         }
 
         public ICallerContext.CallerRoles Roles { get; }
 
-        public ICallerContext.CallerFeatureSets FeatureSets { get; }
+        public ICallerContext.CallerFeatureLevels FeatureLevels { get; }
 
         public string? Authorization => null;
 
@@ -157,10 +157,10 @@ public static class Caller
     /// </summary>
     private sealed class ServiceClientAccountCaller : ICallerContext
     {
-        public ICallerContext.CallerRoles Roles { get; } = new(new[] { UserRoles.ServiceAccount }, null);
+        public ICallerContext.CallerRoles Roles { get; } = new(new[] { PlatformRoles.ServiceAccount }, null);
 
-        public ICallerContext.CallerFeatureSets FeatureSets { get; } = new(
-            new[] { UserFeatureSets.Basic, UserFeatureSets.Pro, UserFeatureSets.Premium }, null);
+        public ICallerContext.CallerFeatureLevels FeatureLevels { get; } = new(
+            new[] { PlatformFeatureLevels.Premium }, null);
 
         public string? Authorization => null;
 
@@ -183,13 +183,13 @@ public static class Caller
         public ExternalWebHookAccountCaller(string? callId = null)
         {
             CallId = callId ?? GenerateCallId();
-            Roles = new ICallerContext.CallerRoles(new[] { UserRoles.ServiceAccount }, null);
-            FeatureSets = new ICallerContext.CallerFeatureSets(new[] { UserFeatureSets.Basic }, null);
+            Roles = new ICallerContext.CallerRoles(new[] { PlatformRoles.ServiceAccount }, null);
+            FeatureLevels = new ICallerContext.CallerFeatureLevels(new[] { PlatformFeatureLevels.Basic }, null);
         }
 
         public ICallerContext.CallerRoles Roles { get; }
 
-        public ICallerContext.CallerFeatureSets FeatureSets { get; }
+        public ICallerContext.CallerFeatureLevels FeatureLevels { get; }
 
         public string? Authorization => null;
 
@@ -215,12 +215,12 @@ public static class Caller
             CallId = call.CallId;
             TenantId = call.TenantId;
             Roles = new ICallerContext.CallerRoles();
-            FeatureSets = new ICallerContext.CallerFeatureSets(new[] { UserFeatureSets.Basic }, null);
+            FeatureLevels = new ICallerContext.CallerFeatureLevels(new[] { PlatformFeatureLevels.Basic }, null);
         }
 
         public ICallerContext.CallerRoles Roles { get; }
 
-        public ICallerContext.CallerFeatureSets FeatureSets { get; }
+        public ICallerContext.CallerFeatureLevels FeatureLevels { get; }
 
         public string? Authorization => null;
 

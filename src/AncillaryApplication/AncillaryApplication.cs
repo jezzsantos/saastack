@@ -4,6 +4,7 @@ using Application.Common;
 using Application.Interfaces;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
+using Application.Persistence.Shared.ReadModels;
 using Application.Resources.Shared;
 using Common;
 using Common.Extensions;

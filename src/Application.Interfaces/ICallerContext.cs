@@ -1,3 +1,5 @@
+using Domain.Interfaces.Authorization;
+
 namespace Application.Interfaces;
 
 /// <summary>
@@ -23,7 +25,7 @@ public interface ICallerContext
     /// <summary>
     ///     The feature sets belonging to the caller
     /// </summary>
-    CallerFeatureSets FeatureSets { get; }
+    CallerFeatureLevels FeatureLevels { get; }
 
     /// <summary>
     ///     Whether the called is authenticated or not
@@ -75,27 +77,27 @@ public interface ICallerContext
     /// <summary>
     ///     Defines the sets of features that a caller can have
     /// </summary>
-    public class CallerFeatureSets
+    public class CallerFeatureLevels
     {
-        public CallerFeatureSets()
+        public CallerFeatureLevels()
         {
-            All = Array.Empty<string>();
-            User = Array.Empty<string>();
-            Organization = Array.Empty<string>();
+            All = Array.Empty<FeatureLevel>();
+            Platform = Array.Empty<FeatureLevel>();
+            Organization = Array.Empty<FeatureLevel>();
         }
 
-        public CallerFeatureSets(string[]? user, string[]? organization)
+        public CallerFeatureLevels(FeatureLevel[]? platform, FeatureLevel[]? organization)
         {
-            User = user ?? Array.Empty<string>();
-            Organization = organization ?? Array.Empty<string>();
-            All = User.Concat(Organization)
+            Platform = platform ?? Array.Empty<FeatureLevel>();
+            Organization = organization ?? Array.Empty<FeatureLevel>();
+            All = Platform.Concat(Organization)
                 .ToArray();
         }
 
-        public string[] All { get; }
+        public FeatureLevel[] All { get; }
 
-        public string[] Organization { get; }
+        public FeatureLevel[] Organization { get; }
 
-        public string[] User { get; }
+        public FeatureLevel[] Platform { get; }
     }
 }

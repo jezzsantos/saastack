@@ -131,11 +131,20 @@ namespace {assemblyNamespace}
 
                 endpointRegistrations.Append(
                     "                     await mediator.Send(request, global::System.Threading.CancellationToken.None))");
-                if (registration.OperationAccess == AccessType.HMAC)
+                if (registration.OperationAccess != AccessType.Anonymous)
                 {
                     endpointRegistrations.AppendLine();
-                    endpointRegistrations.Append(
-                        $@"                .RequireAuthorization(""{AuthenticationConstants.HMACPolicyName}"")");
+                    var policyName = registration.OperationAccess switch
+                    {
+                        AccessType.Token => AuthenticationConstants.TokenPolicyName,
+                        AccessType.HMAC => AuthenticationConstants.HMACPolicyName,
+                        _ => string.Empty
+                    };
+                    if (policyName.HasValue())
+                    {
+                        endpointRegistrations.Append(
+                            $@"                .RequireAuthorization(""{policyName}"")");
+                    }
                 }
 
                 endpointRegistrations.AppendLine(";");

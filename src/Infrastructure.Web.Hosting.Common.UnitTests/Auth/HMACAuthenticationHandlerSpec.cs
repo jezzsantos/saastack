@@ -1,11 +1,10 @@
-using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Application.Interfaces;
 using Application.Interfaces.Services;
 using Common;
 using Common.Extensions;
-using Domain.Common.Authorization;
 using Domain.Interfaces;
+using Domain.Interfaces.Authorization;
 using FluentAssertions;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common;
@@ -87,7 +86,7 @@ public class HMACAuthenticationHandlerSpec
     [Fact]
     public async Task WhenHandleAuthenticateAsyncAndNoSecret_ThenReturnsAuthenticated()
     {
-        _httpContext.Request.Headers.Add(HttpHeaders.HmacSignature, "asignature");
+        _httpContext.Request.Headers[HttpHeaders.HmacSignature] = "asignature";
         _hostSettings.Setup(hs => hs.GetAncillaryApiHostHmacAuthSecret()).Returns(string.Empty);
         _httpContext.RequestServices = _serviceCollection.BuildServiceProvider();
         await _handler.InitializeAsync(new AuthenticationScheme(HMACAuthenticationHandler.AuthenticationScheme, null,
@@ -97,19 +96,19 @@ public class HMACAuthenticationHandlerSpec
 
         result.Succeeded.Should().BeTrue();
         result.Ticket!.Principal.Claims.Should().Contain(claim =>
-            claim.Type == ClaimTypes.NameIdentifier && claim.Value == CallerConstants.MaintenanceAccountUserId);
+            claim.Type == AuthenticationConstants.ClaimForId
+            && claim.Value == CallerConstants.MaintenanceAccountUserId);
         result.Ticket.Principal.Claims.Should().Contain(claim =>
-            claim.Type == ClaimTypes.Role && claim.Value == UserRoles.ServiceAccount);
+            claim.Type == AuthenticationConstants.ClaimForRole && claim.Value == PlatformRoles.ServiceAccount);
         result.Ticket.Principal.Claims.Should().Contain(claim =>
-            claim.Type == ClaimTypes.UserData && claim.Value == UserFeatureSets.Basic);
-        result.Ticket.Principal.Claims.Should().Contain(claim =>
-            claim.Type == ClaimTypes.UserData && claim.Value == UserFeatureSets.Pro);
+            claim.Type == AuthenticationConstants.ClaimForFeatureLevel
+            && claim.Value == PlatformFeatureLevels.Basic.Name);
     }
 
     [Fact]
     public async Task WhenHandleAuthenticateAsyncAndWrongSignature_ThenReturnsFailure()
     {
-        _httpContext.Request.Headers.Add(HttpHeaders.HmacSignature, "asignature");
+        _httpContext.Request.Headers[HttpHeaders.HmacSignature] = "asignature";
         await _handler.InitializeAsync(new AuthenticationScheme(HMACAuthenticationHandler.AuthenticationScheme, null,
             typeof(HMACAuthenticationHandler)), _httpContext);
 
@@ -128,7 +127,7 @@ public class HMACAuthenticationHandlerSpec
     {
         var body = new byte[] { 0x01 };
         var signature = new HMACSigner(body, "asecret").Sign();
-        _httpContext.Request.Headers.Add(HttpHeaders.HmacSignature, signature);
+        _httpContext.Request.Headers[HttpHeaders.HmacSignature] = signature;
         _httpContext.Request.Body = new MemoryStream(body);
         await _handler.InitializeAsync(new AuthenticationScheme(HMACAuthenticationHandler.AuthenticationScheme, null,
             typeof(HMACAuthenticationHandler)), _httpContext);
@@ -137,13 +136,13 @@ public class HMACAuthenticationHandlerSpec
 
         result.Succeeded.Should().BeTrue();
         result.Ticket!.Principal.Claims.Should().Contain(claim =>
-            claim.Type == ClaimTypes.NameIdentifier && claim.Value == CallerConstants.MaintenanceAccountUserId);
+            claim.Type == AuthenticationConstants.ClaimForId
+            && claim.Value == CallerConstants.MaintenanceAccountUserId);
         result.Ticket.Principal.Claims.Should().Contain(claim =>
-            claim.Type == ClaimTypes.Role && claim.Value == UserRoles.ServiceAccount);
+            claim.Type == AuthenticationConstants.ClaimForRole && claim.Value == PlatformRoles.ServiceAccount);
         result.Ticket.Principal.Claims.Should().Contain(claim =>
-            claim.Type == ClaimTypes.UserData && claim.Value == UserFeatureSets.Basic);
-        result.Ticket.Principal.Claims.Should().Contain(claim =>
-            claim.Type == ClaimTypes.UserData && claim.Value == UserFeatureSets.Pro);
+            claim.Type == AuthenticationConstants.ClaimForFeatureLevel
+            && claim.Value == PlatformFeatureLevels.Basic.Name);
         _recorder.Verify(rec => rec.Audit(It.IsAny<ICallContext>(), It.IsAny<string>(), It.IsAny<string>()),
             Times.Never);
     }

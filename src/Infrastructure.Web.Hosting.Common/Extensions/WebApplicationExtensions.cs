@@ -156,6 +156,17 @@ public static class WebApplicationExtensions
     }
 
     /// <summary>
+    ///     Enables tenant detection
+    /// </summary>
+    public static IApplicationBuilder EnableMultiTenancy(this WebApplication app, bool isEnabled)
+    {
+        app.Logger.LogInformation("");
+        //TODO: app.AddMultiTenancyDetection(); we need a TenantDetective
+
+        return app;
+    }
+
+    /// <summary>
     ///     Enables other options
     /// </summary>
     public static IApplicationBuilder EnableOtherOptions(this WebApplication app, WebHostOptions hostOptions)
@@ -214,17 +225,35 @@ public static class WebApplicationExtensions
     /// <summary>
     ///     Enables authentication and authorization
     /// </summary>
-    public static IApplicationBuilder EnableSecureAccess(this WebApplication app, bool usesAuth)
+    public static IApplicationBuilder EnableSecureAccess(this WebApplication app, AuthenticationOptions authentication)
     {
-        if (!usesAuth)
+        if (authentication is { VerifiesHMAC: false, UsesCookies: false, UsesTokens: AuthTokenOptions.None })
         {
             return app;
         }
 
-        app.Logger.LogInformation("Authentication is enabled");
-        app.Logger.LogInformation("RBAC Authorization is enabled");
-        return app.UseAuthentication()
-            .UseAuthorization();
+        if (authentication.UsesCookies)
+        {
+            app.Logger.LogInformation("Authentication using Cookies is enabled");
+        }
+
+        if (authentication.VerifiesHMAC)
+        {
+            app.Logger.LogInformation("Authentication using HMAC signatures is enabled");
+        }
+
+        if (authentication.UsesTokens != AuthTokenOptions.None)
+        {
+            app.Logger.LogInformation("Authentication using JWT tokens is enabled");
+        }
+
+        app.UseAuthentication();
+
+        app.Logger.LogInformation("Authorization using RoleBasedAccessControl is enabled");
+        app.Logger.LogInformation("Authorization using FeatureLevelAccessControl is enabled");
+        app.UseAuthorization();
+
+        return app;
     }
 
     private static void TrackUsage(HttpContext httpContext, IRecorder recorder, ICallerContext caller)

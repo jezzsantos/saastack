@@ -56,7 +56,7 @@ public class RequestCorrelationFilterSpec
     {
         var acceptedHeader = RequestCorrelationFilter.AcceptedRequestHeaderNames[0];
         var httpContext = new DefaultHttpContext();
-        httpContext.Request.Headers.Add(acceptedHeader, "acorrelationid");
+        httpContext.Request.Headers[acceptedHeader] = "acorrelationid";
         var context = new DefaultEndpointFilterInvocationContext(httpContext);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>());
 

@@ -1,7 +1,7 @@
 using Amazon.Lambda.Annotations;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
-using Application.Persistence.Shared;
+using Application.Persistence.Shared.ReadModels;
 using AWSLambdas.Api.WorkerHost.Extensions;
 using Infrastructure.Workers.Api;
 

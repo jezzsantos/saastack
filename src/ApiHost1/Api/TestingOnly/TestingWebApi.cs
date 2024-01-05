@@ -7,6 +7,23 @@ namespace ApiHost1.Api.TestingOnly;
 
 public sealed class TestingWebApi : IWebApiService
 {
+    // ReSharper disable once InconsistentNaming
+    public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> AuthNHMAC(
+        AuthNHMACTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () => new Result<StringMessageTestingOnlyResponse, Error>(new StringMessageTestingOnlyResponse
+            { Message = "amessage" });
+    }
+
+    public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> AuthNToken(
+        AuthNTokenTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () => new Result<StringMessageTestingOnlyResponse, Error>(new StringMessageTestingOnlyResponse
+            { Message = "amessage" });
+    }
+
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ContentNegotiationGet(
         ContentNegotiationsTestingOnlyRequest request, CancellationToken cancellationToken)
     {

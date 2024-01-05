@@ -107,6 +107,22 @@ public static class DateTimeExtensions
     }
 
     /// <summary>
+    ///     Whether the <see cref="value" /> is after the <see cref="other" />
+    /// </summary>
+    public static bool IsAfter(this DateTime value, DateTime other)
+    {
+        return value > other;
+    }
+
+    /// <summary>
+    ///     Whether the <see cref="value" /> is before the <see cref="other" />
+    /// </summary>
+    public static bool IsBefore(this DateTime value, DateTime other)
+    {
+        return value < other;
+    }
+
+    /// <summary>
     ///     Subtracts the <see cref="days" /> from the <see cref="value" />
     /// </summary>
     public static DateTime SubtractDays(this DateTime value, int days)
@@ -168,7 +184,7 @@ public static class DateTimeExtensions
 
         return utcDateTime.ToString("O");
     }
-    
+
     /// <summary>
     ///     Truncates the <see cref="value" /> to the nearest second.
     /// </summary>

@@ -38,6 +38,7 @@ public static class UsageConstants
             public const string BookingCancelled = "Booking Cancelled";
             public const string BookingCreated = "Booking Created";
             public const string Measurement = "Measured";
+            public const string PasswordCredentialPersonRegistrationConfirmed = "User Registered";
         }
 
         public static class Web

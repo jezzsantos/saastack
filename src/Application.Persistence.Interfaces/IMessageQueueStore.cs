@@ -30,5 +30,5 @@ public interface IMessageQueueStore<TMessage>
     /// <summary>
     ///     Adds a new message to the queue
     /// </summary>
-    Task<Result<Error>> PushAsync(ICallContext call, TMessage message, CancellationToken cancellationToken);
+    Task<Result<TMessage, Error>> PushAsync(ICallContext call, TMessage message, CancellationToken cancellationToken);
 }

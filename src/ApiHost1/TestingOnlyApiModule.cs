@@ -9,18 +9,18 @@ public class TestingOnlyApiModule : ISubDomainModule
 {
     public Assembly ApiAssembly => typeof(TestingWebApi).Assembly;
 
-    public Assembly DomainAssembly => typeof(TestingWebApi).Assembly;
+    public Assembly DomainAssembly => null!;
 
     public Dictionary<Type, string> AggregatePrefixes => new();
 
-    public Action<WebApplication> MinimalApiRegistrationFunction
-    {
-        get { return app => app.RegisterRoutes(); }
-    }
-
-    public Action<ConfigurationManager, IServiceCollection> RegisterServicesFunction
+    public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
         get { return (_, _) => { }; }
+    }
+
+    public Action<WebApplication> ConfigureMiddleware
+    {
+        get { return app => app.RegisterRoutes(); }
     }
 }
 #endif
