@@ -33,8 +33,8 @@ public class SubDomainModules
         ArgumentNullException.ThrowIfNull(module);
         ArgumentNullException.ThrowIfNull(module.ApiAssembly, nameof(module.ApiAssembly));
         ArgumentNullException.ThrowIfNull(module.ApiAssembly, nameof(module.AggregatePrefixes));
-        ArgumentNullException.ThrowIfNull(module.MinimalApiRegistrationFunction,
-            nameof(module.MinimalApiRegistrationFunction));
+        ArgumentNullException.ThrowIfNull(module.ConfigureMiddleware,
+            nameof(module.ConfigureMiddleware));
 
         _apiAssemblies.Add(module.ApiAssembly);
         if (module.DomainAssembly.Exists())
@@ -43,10 +43,10 @@ public class SubDomainModules
         }
 
         _aggregatePrefixes.Merge(module.AggregatePrefixes);
-        _minimalApiRegistrationFunctions.Add(module.MinimalApiRegistrationFunction);
-        if (module.RegisterServicesFunction is not null)
+        _minimalApiRegistrationFunctions.Add(module.ConfigureMiddleware);
+        if (module.RegisterServices is not null)
         {
-            _serviceCollectionFunctions.Add(module.RegisterServicesFunction);
+            _serviceCollectionFunctions.Add(module.RegisterServices);
         }
     }
 

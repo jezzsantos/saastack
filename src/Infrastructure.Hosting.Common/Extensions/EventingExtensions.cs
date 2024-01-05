@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Application.Persistence.Interfaces;
 using Common;
 using Domain.Common.Identity;
@@ -219,9 +220,9 @@ public static class EventingExtensions
 
     private sealed class EventingConfiguration
     {
-        private readonly Dictionary<Type, List<Type>> _eventingStorageTypes = new();
-        private readonly Dictionary<Type, List<Type>> _notificationFactories = new();
-        private readonly Dictionary<Type, List<Type>> _projectionFactories = new();
+        private readonly ConcurrentDictionary<Type, List<Type>> _eventingStorageTypes = new();
+        private readonly ConcurrentDictionary<Type, List<Type>> _notificationFactories = new();
+        private readonly ConcurrentDictionary<Type, List<Type>> _projectionFactories = new();
 
         public void AddEventingStorageTypes<TAggregateRoot>()
             where TAggregateRoot : IEventingAggregateRoot, IDehydratableEntity
@@ -239,11 +240,7 @@ public static class EventingExtensions
             where TNotificationRegistration : IEventNotificationRegistration
         {
             var storageType = typeof(TAggregateRoot);
-            if (!_notificationFactories.ContainsKey(storageType))
-            {
-                _notificationFactories.Add(storageType,
-                    new List<Type>());
-            }
+            _notificationFactories.TryAdd(storageType, new List<Type>());
 
             var pubSubPairType = typeof(TNotificationRegistration);
             var aggregateFactories = _notificationFactories[storageType];
@@ -258,11 +255,7 @@ public static class EventingExtensions
             where TReadModelProjection : IReadModelProjection
         {
             var storageType = typeof(TAggregateRoot);
-            if (!_projectionFactories.ContainsKey(storageType))
-            {
-                _projectionFactories.Add(storageType,
-                    new List<Type>());
-            }
+            _projectionFactories.TryAdd(storageType, new List<Type>());
 
             var projectionType = typeof(TReadModelProjection);
             var aggregateFactories = _projectionFactories[storageType];

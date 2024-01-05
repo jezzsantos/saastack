@@ -411,6 +411,38 @@ public class StringExtensionsSpec
         result.Should().Be("apath");
     }
 
+    [Fact]
+    public void WhenTrimNonAlphaAndContainsNumbers_ThenReturnsOnlyAlphas()
+    {
+        var result = "a1b2c3".TrimNonAlpha();
+
+        result.Should().Be("abc");
+    }
+
+    [Fact]
+    public void WhenTrimNonAlphaAndContainsWhitespaceAndPunctuations_ThenReturnsOnlyAlphas()
+    {
+        var result = "a b\"c'".TrimNonAlpha();
+
+        result.Should().Be("abc");
+    }
+
+    [Fact]
+    public void WhenToTitleCaseWithSingleWord_ThenCases()
+    {
+        var result = "aword".ToTitleCase();
+
+        result.Should().Be("Aword");
+    }
+
+    [Fact]
+    public void WhenToTitleCaseWithWords_ThenCases()
+    {
+        var result = "aword1 aword2 aword3".ToTitleCase();
+
+        result.Should().Be("Aword1 Aword2 Aword3");
+    }
+
     private class SerializableClass
     {
         public string? AProperty { get; set; }

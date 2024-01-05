@@ -9,13 +9,12 @@ public sealed class Name : SingleValueObjectBase<Name, string>
 {
     public static Result<Name, Error> Create(string name)
     {
-        var value = new Name(name);
         if (name.IsNotValuedParameter(nameof(name), out var error))
         {
             return error;
         }
 
-        return value;
+        return new Name(name);
     }
 
     private Name(string name) : base(name)

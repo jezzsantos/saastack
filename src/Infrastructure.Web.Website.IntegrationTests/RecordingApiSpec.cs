@@ -16,6 +16,7 @@ using Task = System.Threading.Tasks.Task;
 namespace Infrastructure.Web.Website.IntegrationTests;
 
 [Trait("Category", "Integration.Web")]
+[Collection("API")]
 public class RecordingApiSpec : WebApiSpec<Program>
 {
     private readonly StubRecorder _recorder;

@@ -1,5 +1,6 @@
 #if TESTINGONLY
 using Common;
+using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 
@@ -7,6 +8,30 @@ namespace ApiHost1.Api.TestingOnly;
 
 public sealed class TestingWebApi : IWebApiService
 {
+    private readonly ICallerContextFactory _contextFactory;
+
+    public TestingWebApi(ICallerContextFactory contextFactory)
+    {
+        _contextFactory = contextFactory;
+    }
+
+    // ReSharper disable once InconsistentNaming
+    public async Task<ApiResult<string, GetCallerTestingOnlyResponse>> AuthNHMAC(
+        GetCallerWithHMACTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () => new Result<GetCallerTestingOnlyResponse, Error>(new GetCallerTestingOnlyResponse
+            { CallerId = _contextFactory.Create().CallerId });
+    }
+
+    public async Task<ApiResult<string, GetCallerTestingOnlyResponse>> AuthNToken(
+        GetCallerWithTokenOrAPIKeyTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () => new Result<GetCallerTestingOnlyResponse, Error>(new GetCallerTestingOnlyResponse
+            { CallerId = _contextFactory.Create().CallerId });
+    }
+
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ContentNegotiationGet(
         ContentNegotiationsTestingOnlyRequest request, CancellationToken cancellationToken)
     {

@@ -7,6 +7,7 @@ using Common.Extensions;
 using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Eventing.Interfaces.Projections;
 using Infrastructure.Hosting.Common.Extensions;
+using Infrastructure.Interfaces;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
@@ -102,7 +103,7 @@ public static class WebApplicationExtensions
         return app.Use(async (context, next) =>
         {
             var recorder = context.RequestServices.GetRequiredService<IRecorder>();
-            var caller = context.RequestServices.GetRequiredService<ICallerContext>();
+            var caller = context.RequestServices.GetRequiredService<ICallerContextFactory>().Create();
 
             TrackUsage(context, recorder, caller);
             await next();
@@ -153,6 +154,17 @@ public static class WebApplicationExtensions
 
             await next();
         });
+    }
+
+    /// <summary>
+    ///     Enables tenant detection
+    /// </summary>
+    public static IApplicationBuilder EnableMultiTenancy(this WebApplication app, bool isEnabled)
+    {
+        //app.Logger.LogInformation("MultiTenancy is enabled");
+        //TODO: app.AddMultiTenancyDetection(); we need a TenantDetective
+
+        return app;
     }
 
     /// <summary>
@@ -214,17 +226,40 @@ public static class WebApplicationExtensions
     /// <summary>
     ///     Enables authentication and authorization
     /// </summary>
-    public static IApplicationBuilder EnableSecureAccess(this WebApplication app, bool usesAuth)
+    public static IApplicationBuilder EnableSecureAccess(this WebApplication app, AuthorizationOptions authorization)
     {
-        if (!usesAuth)
+        if (authorization.HasNone)
         {
             return app;
         }
 
-        app.Logger.LogInformation("Authentication is enabled");
-        app.Logger.LogInformation("RBAC Authorization is enabled");
-        return app.UseAuthentication()
-            .UseAuthorization();
+        if (authorization.UsesCookies)
+        {
+            app.Logger.LogInformation("Authentication using Cookies is enabled");
+        }
+
+        if (authorization.UsesHMAC)
+        {
+            app.Logger.LogInformation("Authentication using HMAC signatures is enabled");
+        }
+
+        if (authorization.UsesTokens)
+        {
+            app.Logger.LogInformation("Authentication using JWT tokens is enabled");
+        }
+
+        if (authorization.UsesApiKeys)
+        {
+            app.Logger.LogInformation("Authentication using API Keys is enabled");
+        }
+
+        app.UseAuthentication();
+
+        app.Logger.LogInformation("Authorization using RoleBasedAccessControl is enabled");
+        app.Logger.LogInformation("Authorization using FeatureLevelAccessControl is enabled");
+        app.UseAuthorization();
+
+        return app;
     }
 
     private static void TrackUsage(HttpContext httpContext, IRecorder recorder, ICallerContext caller)

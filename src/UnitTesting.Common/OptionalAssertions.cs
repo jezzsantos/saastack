@@ -39,4 +39,19 @@ public class OptionalAssertions<TValue> : ObjectAssertions<Optional<TValue>, Opt
 
         return new AndConstraint<OptionalAssertions<TValue>>(this);
     }
+
+    public AndConstraint<OptionalAssertions<TValue>> BeSome(Predicate<TValue> some, string because = "",
+        params object[] becauseArgs)
+    {
+        Execute.Assertion
+            .BecauseOf(because, becauseArgs)
+            .Given(() => Subject)
+            .ForCondition(optional => optional.HasValue && some(optional))
+            .FailWith(
+                "Expected {context:optional} to be value {0}{reason}, but it was {1} instead.",
+                optional => some(optional),
+                optional => optional.ValueOrDefault);
+
+        return new AndConstraint<OptionalAssertions<TValue>>(this);
+    }
 }

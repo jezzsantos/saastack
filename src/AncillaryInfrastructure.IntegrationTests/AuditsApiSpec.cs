@@ -1,6 +1,7 @@
 using AncillaryInfrastructure.IntegrationTests.Stubs;
 using ApiHost1;
 using Application.Persistence.Shared;
+using Application.Persistence.Shared.ReadModels;
 using Common;
 using Common.Extensions;
 using FluentAssertions;
@@ -14,6 +15,7 @@ using Task = System.Threading.Tasks.Task;
 namespace AncillaryInfrastructure.IntegrationTests;
 
 [Trait("Category", "Integration.Web")]
+[Collection("API")]
 public class AuditsApiSpec : WebApiSpec<Program>
 {
     private readonly IAuditMessageQueueRepository _auditMessageQueue;
@@ -42,7 +44,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
                 Arguments = new List<string> { "anarg1", "anarg2" }
             }.ToJson()!
         };
-        var result = await Api.PostAsync(request, req => req.SetHmacAuth(request, "asecret"));
+        var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         result.Content.Value.IsDelivered.Should().BeTrue();
 
@@ -66,7 +68,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
     public async Task WhenDrainAllAuditsAndNone_ThenDoesNotDrainAny()
     {
         var request = new DrainAllAuditsRequest();
-        await Api.PostAsync(request, req => req.SetHmacAuth(request, "asecret"));
+        await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         var audits = await Api.GetAsync(new SearchAllAuditsRequest());
 
@@ -105,7 +107,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
         }, CancellationToken.None);
 
         var request = new DrainAllAuditsRequest();
-        await Api.PostAsync(request, req => req.SetHmacAuth(request, "asecret"));
+        await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         var audits = await Api.GetAsync(new SearchAllAuditsRequest
         {

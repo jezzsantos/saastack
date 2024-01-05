@@ -21,17 +21,17 @@ public interface ISubDomainModule
     Assembly ApiAssembly { get; }
 
     /// <summary>
+    ///     Returns a function that handles the minimal API registration
+    /// </summary>
+    Action<WebApplication> ConfigureMiddleware { get; }
+
+    /// <summary>
     ///     Returns the assembly containing the DDD domain types
     /// </summary>
     Assembly? DomainAssembly { get; }
 
     /// <summary>
-    ///     Returns a function that handles the minimal API registration
-    /// </summary>
-    Action<WebApplication> MinimalApiRegistrationFunction { get; }
-
-    /// <summary>
     ///     Returns a function for using to register additional dependencies for this module
     /// </summary>
-    Action<ConfigurationManager, IServiceCollection>? RegisterServicesFunction { get; }
+    Action<ConfigurationManager, IServiceCollection>? RegisterServices { get; }
 }

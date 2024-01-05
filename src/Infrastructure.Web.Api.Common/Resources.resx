@@ -27,4 +27,7 @@
     <data name="RequestExtensions_MissingRouteAttribute" xml:space="preserve">
         <value>The request DTO type '{0}' is missing a '{1}' declared on the class</value>
     </data>
+    <data name="HttpRequestExtensions_HMACAuthorizationNotSupported" xml:space="preserve">
+        <value>HMAC authorization cannot be relayed as an authorization method</value>
+    </data>
 </root>

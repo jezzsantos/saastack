@@ -7,6 +7,17 @@ namespace Common.Extensions;
 public static class ObjectExtensions
 {
     /// <summary>
+    ///     Auto-maps the <see cref="source" /> to a new instance of the <see cref="TTarget" /> instance
+    /// </summary>
+    public static TTarget Convert<TSource, TTarget>(this TSource source)
+    {
+        var configuration = new MapperConfiguration(cfg => cfg.CreateMap<TSource, TTarget>());
+        var mapper = configuration.CreateMapper();
+
+        return mapper.Map<TTarget>(source);
+    }
+
+    /// <summary>
     ///     Whether the object does exist
     /// </summary>
     [ContractAnnotation("null => false; notnull => true")]
@@ -17,27 +28,41 @@ public static class ObjectExtensions
 
     /// <summary>
     ///     Whether the parameter <see cref="value" /> from being invalid according to the <see cref="validation" />,
-    ///     and if invalid, returns a <see cref="PreconditionViolation" />
+    ///     and if invalid, returns a <see cref="ErrorCode.Validation" /> error
     /// </summary>
-    public static bool IsInvalidParameter<TValue>(this TValue value, Func<TValue, bool> validator,
+    public static bool IsInvalidParameter<TValue>(this TValue? value, Func<TValue, bool> validator,
         string parameterName, string? errorMessage, out Error error)
     {
+        if (value.NotExists())
+        {
+            error = errorMessage.HasValue()
+                ? Error.Validation(errorMessage)
+                : Error.Validation(parameterName);
+            return true;
+        }
+
         return IsInvalidParameter(() => validator(value), parameterName, errorMessage, out error);
     }
 
     /// <summary>
     ///     Whether the parameter <see cref="value" /> from being invalid according to the <see cref="validation" />,
-    ///     and if invalid, returns a <see cref="PreconditionViolation" />
+    ///     and if invalid, returns a <see cref="ErrorCode.Validation" /> error
     /// </summary>
-    public static bool IsInvalidParameter<TValue>(this TValue value, Func<TValue, bool> validator,
+    public static bool IsInvalidParameter<TValue>(this TValue? value, Func<TValue, bool> validator,
         string parameterName, out Error error)
     {
+        if (value.NotExists())
+        {
+            error = Error.Validation(parameterName);
+            return true;
+        }
+
         return IsInvalidParameter(() => validator(value), parameterName, null, out error);
     }
 
     /// <summary>
     ///     Whether the parameter <see cref="value" /> has any value,
-    ///     and if invalid, returns a <see cref="PreconditionViolation" />
+    ///     and if invalid, returns a <see cref="ErrorCode.Validation" /> error
     /// </summary>
     public static bool IsNotValuedParameter(this string? value, string parameterName, string? errorMessage,
         out Error error)
@@ -47,7 +72,7 @@ public static class ObjectExtensions
 
     /// <summary>
     ///     Whether the parameter <see cref="value" /> has any value,
-    ///     and if invalid, returns a <see cref="PreconditionViolation" />
+    ///     and if invalid, returns a <see cref="ErrorCode.Validation" /> error
     /// </summary>
     public static bool IsNotValuedParameter(this string? value, string parameterName, out Error error)
     {
@@ -83,6 +108,18 @@ public static class ObjectExtensions
         var mapper = configuration.CreateMapper();
 
         mapper.Map(source, target);
+    }
+
+    /// <summary>
+    ///     Throws an <see cref="ArgumentOutOfRangeException" /> if the specified <see cref="value" /> is invalid
+    /// </summary>
+    public static void ThrowIfInvalidParameter<TValue>(this TValue? value, Func<TValue?, bool> validator,
+        string parameterName, string? errorMessage = null)
+    {
+        if (value.IsInvalidParameter(validator, parameterName, errorMessage, out _))
+        {
+            throw new ArgumentOutOfRangeException(parameterName, errorMessage);
+        }
     }
 
     /// <summary>

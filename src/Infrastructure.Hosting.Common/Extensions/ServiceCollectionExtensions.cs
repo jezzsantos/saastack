@@ -199,6 +199,18 @@ public static class ServiceCollectionExtensions
     ///     Registers an instance of the <see cref="TService" /> as a singleton.
     ///     Only for services that are neither tenanted nor platform
     /// </summary>
+    public static IServiceCollection RegisterUnshared<TService>(this IServiceCollection services,
+        TService implementationFactory)
+        where TService : class
+    {
+        services.AddSingleton(implementationFactory);
+        return services;
+    }
+
+    /// <summary>
+    ///     Registers an instance of the <see cref="TService" /> as a singleton.
+    ///     Only for services that are neither tenanted nor platform
+    /// </summary>
     public static IServiceCollection RegisterUnshared<TService,
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
         TImplementation>(

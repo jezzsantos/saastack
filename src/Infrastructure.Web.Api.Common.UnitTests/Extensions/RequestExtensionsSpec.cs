@@ -178,7 +178,7 @@ public class RequestExtensionsSpec
 
         result.Route.Should()
             .Be(
-                "/aroute/anid/apath1/xxx999yyy/apath2/avalue1avalue2/apath3?adatetimeproperty=2023-10-29T12%3a30%3a00Z&astringproperty3=avalue3");
+                "/aroute/anid/apath1/xxx999yyy/apath2/avalue1/avalue2/apath3?adatetimeproperty=2023-10-29T12%3a30%3a00Z&astringproperty3=avalue3");
         result.Operation.Should().Be(ServiceOperation.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
@@ -241,7 +241,7 @@ public class RequestExtensionsSpec
 
         var result = request.GetRequestInfo();
 
-        result.Route.Should().Be("/aroute/anid/apath1/xxx999yyy/apath2/avalue1avalue2/apath3");
+        result.Route.Should().Be("/aroute/anid/apath1/xxx999yyy/apath2/avalue1/avalue2/apath3");
         result.Operation.Should().Be(ServiceOperation.Post);
         result.IsTestingOnly.Should().BeFalse();
     }
@@ -343,7 +343,7 @@ public class RequestExtensionsSpec
         public string? Id { get; set; }
     }
 
-    [Route("/aroute/{id}/apath1/xxx{anumberproperty}yyy/apath2/{astringproperty1}{astringproperty2}/apath3",
+    [Route("/aroute/{id}/apath1/xxx{anumberproperty}yyy/apath2/{astringproperty1}/{astringproperty2}/apath3",
         ServiceOperation.Get)]
     private class HasPlaceholdersGetRequest : IWebRequest<TestResponse>
     {
@@ -360,7 +360,7 @@ public class RequestExtensionsSpec
         public string? Id { get; set; }
     }
 
-    [Route("/aroute/{id}/apath1/xxx{anumberproperty}yyy/apath2/{astringproperty1}{astringproperty2}/apath3",
+    [Route("/aroute/{id}/apath1/xxx{anumberproperty}yyy/apath2/{astringproperty1}/{astringproperty2}/apath3",
         ServiceOperation.Post)]
     private class HasPlaceholdersPostRequest : IWebRequest<TestResponse>
     {

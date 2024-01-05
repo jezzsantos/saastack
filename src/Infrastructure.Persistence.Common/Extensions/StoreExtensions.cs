@@ -148,7 +148,7 @@ public static class StoreExtensions
     /// <summary>
     ///     Returns the default ordering field for the specified <see cref="query" />.
     ///     Order of precedence:
-    ///     1. <see cref="QueryClause{TPrimaryEntity}.ResultOptions.OrderBy" />
+    ///     1. <see cref="ResultOptions.OrderBy" />
     ///     2. If selected in query, <see cref="QueryEntity.LastPersistedAtUtc" />
     ///     3. If selected in query, <see cref="QueryEntity.Id" />
     ///     4. First of the <see cref="QueryClause{TPrimaryEntity}.Select{TValue}" />

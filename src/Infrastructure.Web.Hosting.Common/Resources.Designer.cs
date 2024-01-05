@@ -60,6 +60,42 @@ namespace Infrastructure.Web.Hosting.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed APIKEY authentication.
+        /// </summary>
+        internal static string APIKeyAuthenticationHandler_FailedAuthentication {
+            get {
+                return ResourceManager.GetString("APIKeyAuthenticationHandler_FailedAuthentication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Requires a value in the &apos;{0}&apos; parameter of the request.
+        /// </summary>
+        internal static string APIKeyAuthenticationHandler_MissingParameter {
+            get {
+                return ResourceManager.GetString("APIKeyAuthenticationHandler_MissingParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authentication failed.
+        /// </summary>
+        internal static string AuthenticationHandler_Failed {
+            get {
+                return ResourceManager.GetString("AuthenticationHandler_Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Requires HTTPS.
+        /// </summary>
+        internal static string AuthenticationHandler_NotHttps {
+            get {
+                return ResourceManager.GetString("AuthenticationHandler_NotHttps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Host is misconfigured: Missing a valid value for the setting {0}.
         /// </summary>
         internal static string CORS_MissingSameOrigins {
@@ -83,24 +119,6 @@ namespace Infrastructure.Web.Hosting.Common {
         internal static string HMACAuthenticationHandler_MissingHeader {
             get {
                 return ResourceManager.GetString("HMACAuthenticationHandler_MissingHeader", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Requires HTTPS.
-        /// </summary>
-        internal static string HMACAuthenticationHandler_NotHttps {
-            get {
-                return ResourceManager.GetString("HMACAuthenticationHandler_NotHttps", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Authentication failed.
-        /// </summary>
-        internal static string HMACAuthenticationHandler_WrongSignature {
-            get {
-                return ResourceManager.GetString("HMACAuthenticationHandler_WrongSignature", resourceCulture);
             }
         }
         

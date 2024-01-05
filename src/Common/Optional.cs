@@ -87,6 +87,17 @@ public static class Optional
     }
 
     /// <summary>
+    ///     Converts the <see cref="value" /> to an <see cref="Optional{TValue}" />
+    /// </summary>
+    public static Optional<TValue> ToOptional<TValue>(this TValue? value)
+        where TValue : struct
+    {
+        return value.HasValue
+            ? Some(value.Value)
+            : None<TValue>();
+    }
+
+    /// <summary>
     ///     Returns the type of the contained optional type.
     ///     For example this would return <see cref="TValue" /> if <see cref="type" /> was <see cref="Optional{TValue}" />
     /// </summary>
@@ -182,17 +193,25 @@ public readonly struct Optional<TValue> : IEquatable<Optional<TValue>>
     /// <summary>
     ///     Casts the specified <see cref="value" /> to an optional of the same type
     /// </summary>
-    public static implicit operator Optional<TValue>(TValue value)
+    [DebuggerStepThrough]
+    public static implicit operator Optional<TValue>(TValue? value)
     {
-        return new Optional<TValue>(value);
+        return value.Exists()
+            ? new Optional<TValue>(value)
+            : None;
     }
 
     /// <summary>
     ///     Casts the specified optional <see cref="value" /> to its contained value
     /// </summary>
+    [DebuggerStepThrough]
     public static implicit operator TValue(Optional<TValue> value)
     {
-        return value.Value;
+#pragma warning disable CS8603 // Possible null reference return.
+        return value.HasValue
+            ? value.ValueOrDefault
+            : default;
+#pragma warning restore CS8603 // Possible null reference return.
     }
 
     /// <summary>

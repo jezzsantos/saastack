@@ -20,7 +20,7 @@ public class HostSettingsSpec
     [Fact]
     public void WhenGetWebsiteHostBaseUrl_ThenReturnsBaseUrl()
     {
-        _settings.Setup(s => s.Platform.GetString(HostSettings.WebsiteHostBaseUrlSettingName))
+        _settings.Setup(s => s.Platform.GetString(HostSettings.WebsiteHostBaseUrlSettingName, It.IsAny<string>()))
             .Returns("http://localhost/api/");
 
         var result = _service.GetWebsiteHostBaseUrl();
@@ -31,7 +31,7 @@ public class HostSettingsSpec
     [Fact]
     public void WhenGetAncillaryApiHostBaseUrl_ThenReturnsBaseUrl()
     {
-        _settings.Setup(s => s.Platform.GetString(HostSettings.AncillaryApiHostBaseUrlSettingName))
+        _settings.Setup(s => s.Platform.GetString(HostSettings.AncillaryApiHostBaseUrlSettingName, It.IsAny<string>()))
             .Returns("http://localhost/api/");
 
         var result = _service.GetAncillaryApiHostBaseUrl();
@@ -42,7 +42,7 @@ public class HostSettingsSpec
     [Fact]
     public void WhenGetAncillaryApiHostHmacAuthSecret_ThenReturnsBaseUrl()
     {
-        _settings.Setup(s => s.Platform.GetString(HostSettings.AncillaryApiHmacSecretSettingName))
+        _settings.Setup(s => s.Platform.GetString(HostSettings.AncillaryApiHmacSecretSettingName, It.IsAny<string>()))
             .Returns("asecret");
 
         var result = _service.GetAncillaryApiHostHmacAuthSecret();

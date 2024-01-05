@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -10,7 +11,7 @@ namespace Common.Extensions;
 public static class StringExtensions
 {
     /// <summary>
-    /// Defines the casing used in JSON serialization
+    ///     Defines the casing used in JSON serialization
     /// </summary>
     public enum JsonCasing
     {
@@ -144,7 +145,7 @@ public static class StringExtensions
     /// <summary>
     ///     Converts the <see cref="value" /> to a boolean value
     /// </summary>
-    public static bool ToBool(this string value)
+    public static bool ToBool(this string? value)
     {
         if (value.HasNoValue())
         {
@@ -176,7 +177,7 @@ public static class StringExtensions
     /// <summary>
     ///     Converts the <see cref="value" /> to a integer value
     /// </summary>
-    public static int ToInt(this string value)
+    public static int ToInt(this string? value)
     {
         if (value.HasNoValue())
         {
@@ -188,9 +189,9 @@ public static class StringExtensions
 
     /// <summary>
     ///     Converts the <see cref="value" /> to a integer value,
-    ///     and in the case where the value cannot be converted, uses the <see cref="defaultValue" />;
+    ///     and in the case where the value cannot be converted, uses the <see cref="defaultValue" />
     /// </summary>
-    public static int ToIntOrDefault(this string value, int defaultValue)
+    public static int ToIntOrDefault(this string? value, int defaultValue)
     {
         if (value.HasNoValue())
         {
@@ -230,6 +231,27 @@ public static class StringExtensions
                 ? JsonIgnoreCondition.Never
                 : JsonIgnoreCondition.WhenWritingNull
         });
+    }
+
+    /// <summary>
+    ///     Returns the specified <see cref="value" /> in title-case. i.e. first letter of words are capitalized
+    /// </summary>
+    public static string ToTitleCase(this string value)
+    {
+        return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(value).Replace("_", string.Empty);
+    }
+
+    /// <summary>
+    ///     Returns the specified <see cref="value" /> including only letters (no numbers, or whitespace)
+    /// </summary>
+    public static string TrimNonAlpha(this string value)
+    {
+        if (value.HasNoValue())
+        {
+            return value;
+        }
+
+        return value.ReplaceWith(@"[^\p{L}]", string.Empty);
     }
 
     /// <summary>

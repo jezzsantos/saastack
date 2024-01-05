@@ -1,5 +1,4 @@
 ﻿using Common;
-using Task = Common.Extensions.Task;
 
 namespace Application.Persistence.Interfaces;
 
@@ -36,15 +35,15 @@ public sealed class EventStreamChangedArgs : EventArgs
     /// </summary>
     public IReadOnlyList<EventStreamChangeEvent> Events { get; }
 
+    public IReadOnlyList<Task<Result<Error>>> Tasks => _tasks;
+
     /// <summary>
     ///     Completes all the tasks
     /// </summary>
     public async Task<Result<Error>> CompleteAsync()
     {
-        return await Task.WhenAllAsync(_tasks.ToArray());
+        return await Common.Extensions.Tasks.WhenAllAsync(_tasks.ToArray());
     }
-
-    public IReadOnlyList<Task<Result<Error>>> Tasks => _tasks;
 
     /// <summary>
     ///     Creates a list of tasks to perform

@@ -64,6 +64,6 @@ public class RequestCorrelationFilter : IEndpointFilter
 
     private static void SetOnResponse(HttpContext httpContext, object? correlationId)
     {
-        httpContext.Response.Headers.Add(ResponseHeaderName, new StringValues(correlationId!.ToString()));
+        httpContext.Response.Headers[ResponseHeaderName] = new StringValues(correlationId!.ToString());
     }
 }

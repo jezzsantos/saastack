@@ -6,7 +6,7 @@ using Xunit;
 
 namespace ProjectName;
 
-[Trait("Category", "Integration.Web")]
+[Trait("Category", "Integration.Web")] [Collection("API")]
 public class Api1Spec : WebApiSpec<Program>
 {
     public Api1Spec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)

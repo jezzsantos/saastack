@@ -55,11 +55,16 @@ public class AspNetConfigurationSettings : IConfigurationSettings
             _configuration = configuration;
         }
 
-        public bool GetBool(string key)
+        public bool GetBool(string key, bool? defaultValue = null)
         {
             var value = _configuration.GetValue<string>(key);
             if (value.HasNoValue())
             {
+                if (defaultValue.HasValue)
+                {
+                    return defaultValue.Value;
+                }
+
                 throw new InvalidOperationException(Resources.AspNetConfigurationSettings_KeyNotFound.Format(key));
             }
 
@@ -71,11 +76,16 @@ public class AspNetConfigurationSettings : IConfigurationSettings
             return boolean;
         }
 
-        public double GetNumber(string key)
+        public double GetNumber(string key, double? defaultValue = null)
         {
             var value = _configuration.GetValue<string>(key);
             if (value.HasNoValue())
             {
+                if (defaultValue.HasValue)
+                {
+                    return defaultValue.Value;
+                }
+
                 throw new InvalidOperationException(Resources.AspNetConfigurationSettings_KeyNotFound.Format(key));
             }
 
@@ -87,11 +97,16 @@ public class AspNetConfigurationSettings : IConfigurationSettings
             return number;
         }
 
-        public string GetString(string key)
+        public string GetString(string key, string? defaultValue = null)
         {
             var value = _configuration.GetValue<string>(key);
             if (value.NotExists())
             {
+                if (defaultValue.Exists())
+                {
+                    return defaultValue;
+                }
+
                 throw new InvalidOperationException(Resources.AspNetConfigurationSettings_KeyNotFound.Format(key));
             }
 
@@ -110,11 +125,16 @@ public class AspNetConfigurationSettings : IConfigurationSettings
             _tenancy = tenancy;
         }
 
-        public bool GetBool(string key)
+        public bool GetBool(string key, bool? defaultValue = null)
         {
             var settings = _tenancy.Settings;
             if (!settings.TryGetValue(key, out var value))
             {
+                if (defaultValue.HasValue)
+                {
+                    return defaultValue.Value;
+                }
+
                 throw new InvalidOperationException(Resources.AspNetConfigurationSettings_KeyNotFound.Format(key));
             }
 
@@ -126,11 +146,16 @@ public class AspNetConfigurationSettings : IConfigurationSettings
             return boolean;
         }
 
-        public double GetNumber(string key)
+        public double GetNumber(string key, double? defaultValue = null)
         {
             var settings = _tenancy.Settings;
             if (!settings.TryGetValue(key, out var value))
             {
+                if (defaultValue.HasValue)
+                {
+                    return defaultValue.Value;
+                }
+
                 throw new InvalidOperationException(Resources.AspNetConfigurationSettings_KeyNotFound.Format(key));
             }
 
@@ -142,11 +167,16 @@ public class AspNetConfigurationSettings : IConfigurationSettings
             return number;
         }
 
-        public string GetString(string key)
+        public string GetString(string key, string? defaultValue = null)
         {
             var settings = _tenancy.Settings;
             if (!settings.TryGetValue(key, out var value))
             {
+                if (defaultValue.Exists())
+                {
+                    return defaultValue;
+                }
+
                 throw new InvalidOperationException(Resources.AspNetConfigurationSettings_KeyNotFound.Format(key));
             }
 

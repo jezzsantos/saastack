@@ -1,5 +1,6 @@
+using System.Text.Json;
 using Application.Interfaces.Services;
-using Application.Persistence.Shared;
+using Application.Persistence.Shared.ReadModels;
 using Common;
 using Common.Configuration;
 using Common.Recording;
@@ -38,6 +39,7 @@ public static class HostExtensions
                 c.Resolve<ICrashReporter>()));
         services.AddSingleton<IServiceClient>(c =>
             new InterHostServiceClient(c.Resolve<IHttpClientFactory>(),
+                c.Resolve<JsonSerializerOptions>(),
                 c.Resolve<IHostSettings>().GetAncillaryApiHostBaseUrl()));
         services.AddSingleton<IQueueMonitoringApiRelayWorker<UsageMessage>, DeliverUsageRelayWorker>();
         services.AddSingleton<IQueueMonitoringApiRelayWorker<AuditMessage>, DeliverAuditRelayWorker>();

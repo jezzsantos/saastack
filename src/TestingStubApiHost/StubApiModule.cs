@@ -13,12 +13,7 @@ public class StubApiModule : ISubDomainModule
 
     public Dictionary<Type, string> AggregatePrefixes => new();
 
-    public Action<WebApplication> MinimalApiRegistrationFunction
-    {
-        get { return app => app.RegisterRoutes(); }
-    }
-
-    public Action<ConfigurationManager, IServiceCollection> RegisterServicesFunction
+    public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
         get
         {
@@ -39,6 +34,11 @@ public class StubApiModule : ISubDomainModule
                 });
             };
         }
+    }
+
+    public Action<WebApplication> ConfigureMiddleware
+    {
+        get { return app => app.RegisterRoutes(); }
     }
 }
 #endif

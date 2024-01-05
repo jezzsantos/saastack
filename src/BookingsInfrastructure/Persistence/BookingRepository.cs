@@ -83,16 +83,17 @@ public class BookingRepository : IBookingRepository
         DateTime from, DateTime to, SearchOptions searchOptions,
         CancellationToken cancellationToken)
     {
-        var bookings = await _bookingQueries.QueryAsync(Query.From<Booking>()
+        var queried = await _bookingQueries.QueryAsync(Query.From<Booking>()
             .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
             .AndWhere<DateTime>(u => u.Start, ConditionOperator.GreaterThanEqualTo, from)
             .AndWhere<DateTime>(u => u.End, ConditionOperator.LessThanEqualTo, to)
             .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
-        if (!bookings.IsSuccessful)
+        if (!queried.IsSuccessful)
         {
-            return bookings.Error;
+            return queried.Error;
         }
 
-        return bookings.Value.Results;
+        var bookings = queried.Value.Results;
+        return bookings;
     }
 }

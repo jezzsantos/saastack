@@ -301,4 +301,70 @@ public class DateTimeExtensionsSpec
 
         result.Should().BeTrue();
     }
+
+    [Fact]
+    public void WhenIsBeforeAndAfter_ThenReturnsFalse()
+    {
+        var datum = DateTime.UtcNow;
+        var other = datum.SubtractSeconds(1);
+
+        var result = datum.IsBefore(other);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenIsBeforeAndSame_ThenReturnsFalse()
+    {
+        var datum = DateTime.UtcNow;
+        var other = datum;
+
+        var result = datum.IsBefore(other);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenIsBeforeAndBefore_ThenReturnsTrue()
+    {
+        var datum = DateTime.UtcNow;
+        var other = datum.AddSeconds(1);
+
+        var result = datum.IsBefore(other);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenIsAfterAndBefore_ThenReturnsFalse()
+    {
+        var datum = DateTime.UtcNow;
+        var other = datum.AddSeconds(1);
+
+        var result = datum.IsAfter(other);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenIsAfterAndSame_ThenReturnsFalse()
+    {
+        var datum = DateTime.UtcNow;
+        var other = datum;
+
+        var result = datum.IsAfter(other);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenIsAfterAndAfter_ThenReturnsTrue()
+    {
+        var datum = DateTime.UtcNow;
+        var other = datum.SubtractSeconds(1);
+
+        var result = datum.IsAfter(other);
+
+        result.Should().BeTrue();
+    }
 }

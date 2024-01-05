@@ -6,11 +6,26 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Common\Common.csproj" />
+        <ProjectReference Include="..\Domain.Interfaces\Domain.Interfaces.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.3.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Update="Audits.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+            <LastGenOutput>Audits.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Audits.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Audits.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
 
 </Project>

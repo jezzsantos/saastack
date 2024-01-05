@@ -29,11 +29,11 @@ This is an example of the declarative way we prefer to define our endpoints, in 
 public sealed class CarsApi : IWebApiService
 {
     private readonly ICarsApplication _carsApplication;
-    private readonly ICallerContext _context;
+    private readonly ICallerContextFactory _contextFactory;
 
-    public CarsApi(ICallerContext context, ICarsApplication carsApplication)
+    public CarsApi(ICallerContextFactory contextFactory, ICarsApplication carsApplication)
     {
-        _context = context;
+        _contextFactory = contextFactory;
         _carsApplication = carsApplication;
     }
 
@@ -41,14 +41,14 @@ public sealed class CarsApi : IWebApiService
     public async Task<ApiDeleteResult> Delete(DeleteCarRequest request,
         CancellationToken cancellationToken)
     {
-        var car = await _carsApplication.DeleteCarAsync(_context, request.Id, cancellationToken);
+        var car = await _carsApplication.DeleteCarAsync(_contextFactory.Create(), request.Id, cancellationToken);
         return () => car.HandleApplicationResult();
     }
 
     [AuthorizeForAnyRole(OrganizationRoles.Reserver, OrganizationRoles.Manager)]
     public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
-        var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
+        var car = await _carsApplication.GetCarAsync(_contextFactory.Create(), request.Id, cancellationToken);
 
         return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }
@@ -57,7 +57,7 @@ public sealed class CarsApi : IWebApiService
     public async Task<ApiPostResult<Car, GetCarResponse>> Register(RegisterCarRequest request,
         CancellationToken cancellationToken)
     {
-        var car = await _carsApplication.RegisterCarAsync(_context, request.Make, request.Model, request.Year,
+        var car = await _carsApplication.RegisterCarAsync(_contextFactory.Create(), request.Make, request.Model, request.Year,
             cancellationToken);
 
         return () => car.HandleApplicationResult<GetCarResponse, Car>(c =>
@@ -68,7 +68,7 @@ public sealed class CarsApi : IWebApiService
     public async Task<ApiSearchResult<Car, SearchAllCarsResponse>> SearchAll(SearchAllCarsRequest request,
         CancellationToken cancellationToken)
     {
-        var cars = await _carsApplication.SearchAllCarsAsync(_context, request.ToSearchOptions(),
+        var cars = await _carsApplication.SearchAllCarsAsync(_contextFactory.Create(), request.ToSearchOptions(),
             request.ToGetOptions(), cancellationToken);
 
         return () =>
@@ -79,7 +79,7 @@ public sealed class CarsApi : IWebApiService
     public async Task<ApiPutPatchResult<Car, GetCarResponse>> TakeOffline(TakeOfflineCarRequest request,
         CancellationToken cancellationToken)
     {
-        var car = await _carsApplication.TakeOfflineCarAsync(_context, request.Id!, request.Reason, request.StartAtUtc,
+        var car = await _carsApplication.TakeOfflineCarAsync(_contextFactory.Create(), request.Id!, request.Reason, request.StartAtUtc,
             request.EndAtUtc, cancellationToken);
         return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }
@@ -101,12 +101,12 @@ AND, we prefer NOT to have to create MediatR class like this, for every single o
 ```c#
     public class GetCarRequestHandler : IRequestHandler<GetCarRequest, IResult>
     {
-        private readonly ICallerContext _context;
+        private readonly ICallerContextFactory _contextFactory;
         private readonly ICarsApplication _carsApplication;
 
-        public GetCarRequestHandler(ICallerContext context, ICarsApplication carsApplication)
+        public GetCarRequestHandler(ICallerContextFactory contextFactory, ICarsApplication carsApplication)
         {
-            this._context = context;
+            this._contextFactory = contextFactory;
             this._carsApplication = carsApplication;
         }
 
@@ -236,18 +236,18 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
      public sealed class CarsApi : IWebApiService
      {
          private readonly ICarsApplication _carsApplication;
-         private readonly ICallerContext _context;
+         private readonly ICallerContextFactory _contextFactory;
          
-         public CarsApi(ICallerContext context, ICarsApplication carsApplication)
+         public CarsApi(ICallerContextFactory contextFactory, ICarsApplication carsApplication)
          {
-             _context = context;
+             _contextFactory = contextFactory;
              _carsApplication = carsApplication;
          }
      
          [AuthorizeForAnyRole(OrganizationRoles.Reserver, OrganizationRoles.Manager)]
          public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
          {
-             var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
+             var car = await _carsApplication.GetCarAsync(_contextFactory.Create(), request.Id, cancellationToken);
 
              return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
          }
@@ -306,9 +306,9 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
 
    1. For example:
    ```c#
-   public CarsApi(ICallerContext context, ICarsApplication carsApplication)
+   public CarsApi(ICallerContextFactory contextFactory, ICarsApplication carsApplication)
    {
-       _context = context;
+       _contextFactory = contextFactory;
        _carsApplication = carsApplication;
    }
    ```
@@ -321,7 +321,7 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
    - For example, in the project and folder: `CarsApi.IntegrationTests/CarsApiSpec.cs`
 
    ```c#
-   [Trait("Category", "Integration.Web")]
+   [Trait("Category", "Integration.Web")] [Collection("API")]
    public class CarsApiSpec : WebApiSpecSetup<Program>
    {
        public CarsApiSpec(WebApplicationFactory<Program> factory) : base(factory)
@@ -354,7 +354,7 @@ From that Application layer, a resource (DTO) will be returned, and this functio
     [AuthorizeForAnyRole(OrganizationRoles.Reserver, OrganizationRoles.Manager)]
     public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
-        var car = await _carsApplication.GetCarAsync(_context, request.Id, cancellationToken);
+        var car = await _carsApplication.GetCarAsync(_contextFactory.Create(), request.Id, cancellationToken);
 
         return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }

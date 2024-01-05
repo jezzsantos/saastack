@@ -1,16 +1,17 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Application.Interfaces;
 using Application.Interfaces.Services;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
 using Domain.Common;
-using Domain.Common.Authorization;
 using Domain.Common.Identity;
 using Domain.Interfaces;
+using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Shared;
 using Infrastructure.Common;
 using Infrastructure.Common.DomainServices;
 using Infrastructure.Eventing.Common.Projections.ReadModels;
@@ -26,10 +27,13 @@ using Infrastructure.Web.Api.Common.Validation;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.ApplicationServices;
 using Infrastructure.Web.Hosting.Common.Auth;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 #if TESTINGONLY
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
@@ -71,7 +75,7 @@ public static class HostExtensions
         ConfigureConfiguration(hostOptions.IsMultiTenanted);
         ConfigureRecording();
         ConfigureMultiTenancy(hostOptions.IsMultiTenanted);
-        ConfigureAuthenticationAuthorization(hostOptions.UsesAuth);
+        ConfigureAuthenticationAuthorization(hostOptions.Authorization);
         ConfigureWireFormats();
         ConfigureApiRequests();
         ConfigureApplicationServices();
@@ -80,14 +84,15 @@ public static class HostExtensions
 
         var app = appBuilder.Build();
 
-        app.EnableOtherOptions(hostOptions);
-        app.EnableRequestRewind();
+        // Note: The order of the middleware matters
+        app.EnableRequestRewind(); // Required by ContentNegotiationFilter and by HMACVerification
+        app.EnableCORS(hostOptions.CORS);
+        app.EnableSecureAccess(hostOptions.Authorization); //Note: AuthN must be registered after CORS
         app.AddExceptionShielding();
-        //TODO: app.AddMultiTenancyDetection(); we need a TenantDetective
+        app.EnableMultiTenancy(hostOptions.IsMultiTenanted);
         app.EnableEventingListeners(hostOptions.Persistence.UsesEventing);
         app.EnableApiUsageTracking(hostOptions.TrackApiUsage);
-        app.EnableCORS(hostOptions.CORS);
-        app.EnableSecureAccess(hostOptions.UsesAuth); //Note: AuthN must be registered after CORS
+        app.EnableOtherOptions(hostOptions);
 
         modules.ConfigureHost(app);
 
@@ -175,26 +180,111 @@ public static class HostExtensions
             }
         }
 
-        void ConfigureAuthenticationAuthorization(bool usesAuth)
+        void ConfigureAuthenticationAuthorization(AuthorizationOptions authentication)
         {
-            if (!usesAuth)
+            if (authentication.HasNone)
             {
                 return;
             }
 
-            AppContext.SetSwitch("Microsoft.AspNetCore.Authentication.SuppressAutoDefaultScheme", true);
-            appBuilder.Services.AddAuthentication()
-                .AddScheme<HMACOptions, HMACAuthenticationHandler>(HMACAuthenticationHandler.AuthenticationScheme,
-                    _ => { });
-            appBuilder.Services.AddAuthorization(configure =>
+            var defaultScheme = string.Empty;
+            if (authentication.UsesCookies)
             {
-                configure.AddPolicy(AuthenticationConstants.HMACPolicyName, builder =>
+                defaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }
+
+            if (authentication.UsesTokens)
+            {
+                defaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }
+
+            var onlyHMAC = authentication is
+                { UsesHMAC: true, UsesCookies: false, UsesTokens: false, UsesApiKeys: false };
+            var onlyApiKey = authentication is
+                { UsesApiKeys: true, UsesCookies: false, UsesTokens: false, UsesHMAC: false };
+            if (onlyHMAC || onlyApiKey)
+            {
+                // This is necessary in some versions of dotnet so that the only scheme is not applied to all endpoints by default
+                AppContext.SetSwitch("Microsoft.AspNetCore.Authentication.SuppressAutoDefaultScheme", true);
+            }
+
+            var authBuilder = defaultScheme.HasValue()
+                ? appBuilder.Services.AddAuthentication(defaultScheme)
+                : appBuilder.Services.AddAuthentication();
+
+            if (authentication.UsesHMAC)
+            {
+                authBuilder.AddScheme<HMACOptions, HMACAuthenticationHandler>(
+                    HMACAuthenticationHandler.AuthenticationScheme,
+                    _ => { });
+                appBuilder.Services.AddAuthorization(configure =>
                 {
-                    builder.AddAuthenticationSchemes(HMACAuthenticationHandler.AuthenticationScheme);
-                    builder.RequireAuthenticatedUser();
-                    builder.RequireRole(UserRoles.ServiceAccount);
+                    configure.AddPolicy(AuthenticationConstants.HMACPolicyName, builder =>
+                    {
+                        builder.AddAuthenticationSchemes(HMACAuthenticationHandler.AuthenticationScheme);
+                        builder.RequireAuthenticatedUser();
+                        builder.RequireRole(PlatformRoles.ServiceAccount);
+                    });
                 });
-            });
+            }
+
+            if (authentication.UsesApiKeys)
+            {
+                authBuilder.AddScheme<APIKeyOptions, APIKeyAuthenticationHandler>(
+                    APIKeyAuthenticationHandler.AuthenticationScheme,
+                    _ => { });
+            }
+
+            if (authentication.UsesTokens)
+            {
+                var configuration = appBuilder.Configuration;
+                authBuilder.AddJwtBearer(jwtOptions =>
+                {
+                    jwtOptions.MapInboundClaims = false;
+                    jwtOptions.RequireHttpsMetadata = true;
+                    jwtOptions.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        RoleClaimType = AuthenticationConstants.ClaimForRole,
+                        NameClaimType = AuthenticationConstants.ClaimForId,
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidAudience = configuration["Hosts:IdentityApi:BaseUrl"],
+                        ValidIssuer = configuration["Hosts:IdentityApi:BaseUrl"],
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey =
+                            new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(configuration["Hosts:IdentityApi:JWT:SigningSecret"]!))
+                    };
+                });
+            }
+
+            if (authentication.UsesApiKeys || authentication.UsesTokens)
+            {
+                appBuilder.Services.AddAuthorization(configure =>
+                {
+                    configure.AddPolicy(AuthenticationConstants.TokenPolicyName, builder =>
+                    {
+                        builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme,
+                            APIKeyAuthenticationHandler.AuthenticationScheme);
+                        builder.RequireAuthenticatedUser();
+                    });
+                });
+            }
+
+            if (authentication.UsesCookies)
+            {
+                //TODO: Is this how we are going to reverse proxy the cookie?
+                //TODO: What about the API to relay logins requests to the backend, and manage refresh etc?
+                // https://auth0.com/blog/building-a-reverse-proxy-in-dot-net-core/
+                authBuilder.AddCookie(cookieOptions =>
+                {
+                    cookieOptions.LoginPath = "/api/user/login";
+                    cookieOptions.LogoutPath = "/api/user/logout";
+                });
+            }
+
+            appBuilder.Services.AddAuthorization();
         }
 
         void ConfigureApiRequests()
@@ -213,15 +303,27 @@ public static class HostExtensions
 
         void ConfigureWireFormats()
         {
+            var serializerOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = false,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
+            };
+            serializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, false));
+            serializerOptions.Converters.Add(new JsonDateTimeConverter(DateFormat.Iso8601));
+
+            appBuilder.Services.RegisterUnshared(serializerOptions);
             appBuilder.Services.ConfigureHttpJsonOptions(options =>
             {
-                options.SerializerOptions.PropertyNameCaseInsensitive = true;
-                options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.SerializerOptions.WriteIndented = false;
-                options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
-                options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase,
-                    false));
-                options.SerializerOptions.Converters.Add(new JsonDateTimeConverter(DateFormat.Iso8601));
+                options.SerializerOptions.PropertyNameCaseInsensitive = serializerOptions.PropertyNameCaseInsensitive;
+                options.SerializerOptions.PropertyNamingPolicy = serializerOptions.PropertyNamingPolicy;
+                options.SerializerOptions.WriteIndented = serializerOptions.WriteIndented;
+                options.SerializerOptions.DefaultIgnoreCondition = serializerOptions.DefaultIgnoreCondition;
+                foreach (var converter in serializerOptions.Converters)
+                {
+                    options.SerializerOptions.Converters.Add(converter);
+                }
             });
 
             appBuilder.Services.ConfigureHttpXmlOptions(options =>
@@ -236,13 +338,13 @@ public static class HostExtensions
             var prefixes = modules.AggregatePrefixes;
             prefixes.Add(typeof(Checkpoint), CheckPointAggregatePrefix);
             appBuilder.Services.RegisterUnshared<IIdentifierFactory>(_ => new HostIdentifierFactory(prefixes));
-            appBuilder.Services.RegisterTenanted<ICallerContext, AnonymousCallerContext>();
+            appBuilder.Services.AddSingleton<ICallerContextFactory, AspNetCallerContextFactory>();
         }
 
         void ConfigurePersistence(bool usesQueues)
         {
             var domainAssemblies = modules.DomainAssemblies
-                .Concat(new[] { typeof(DomainCommonMarker).Assembly })
+                .Concat(new[] { typeof(DomainCommonMarker).Assembly, typeof(DomainSharedMarker).Assembly })
                 .ToArray();
             appBuilder.Services.RegisterUnshared<IDependencyContainer>(c => new DotNetDependencyContainer(c));
             appBuilder.Services.RegisterUnshared<IDomainFactory>(c => DomainFactory.CreateRegistered(
@@ -331,11 +433,12 @@ public static class HostExtensions
         {
             appBuilder.Services.RegisterUnshared<IMonitoredMessageQueues, MonitoredMessageQueues>();
             appBuilder.Services.RegisterUnshared<IQueueStoreNotificationHandler, StubQueueStoreNotificationHandler>();
-            appBuilder.Services.AddHostedService(services =>
-                new StubQueueDrainingService(services.GetRequiredService<IHttpClientFactory>(),
-                    services.ResolveForUnshared<IHostSettings>(),
-                    services.GetRequiredService<ILogger<StubQueueDrainingService>>(),
-                    services.ResolveForUnshared<IMonitoredMessageQueues>(), StubQueueDrainingServiceQueuedApiMappings));
+            appBuilder.Services.AddHostedService(c =>
+                new StubQueueDrainingService(c.GetRequiredService<IHttpClientFactory>(),
+                    c.GetRequiredService<JsonSerializerOptions>(),
+                    c.ResolveForUnshared<IHostSettings>(),
+                    c.GetRequiredService<ILogger<StubQueueDrainingService>>(),
+                    c.ResolveForUnshared<IMonitoredMessageQueues>(), StubQueueDrainingServiceQueuedApiMappings));
         }
 #endif
     }

@@ -1,4 +1,4 @@
-using Application.Persistence.Shared;
+using Application.Persistence.Shared.ReadModels;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 using Infrastructure.Web.Interfaces.Clients;

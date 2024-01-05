@@ -60,7 +60,16 @@ namespace Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The value is null.
+        ///   Looks up a localized string similar to The Numeric &apos;{0}&apos; must be a 3 decimal number between 1 and 1000.
+        /// </summary>
+        internal static string CountryCodeIso3166_InvalidNumeric {
+            get {
+                return ResourceManager.GetString("CountryCodeIso3166_InvalidNumeric", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value of the optional variable is null.
         /// </summary>
         internal static string Optional_NullValue {
             get {
@@ -105,11 +114,38 @@ namespace Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An unexpected error occurred.
+        ///   Looks up a localized string similar to The DaylightSavingsCode &apos;{0}&apos; must be a three or four letter code, or the offset in hrs.
         /// </summary>
-        internal static string WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage {
+        internal static string TimezoneIana_InvalidDaylightSavingsCode {
             get {
-                return ResourceManager.GetString("WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage", resourceCulture);
+                return ResourceManager.GetString("TimezoneIana_InvalidDaylightSavingsCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The DaylightSavingsOffset &apos;{0}&apos; must be between +14hrs and -14hrs.
+        /// </summary>
+        internal static string TimezoneIana_InvalidDaylightSavingsOffset {
+            get {
+                return ResourceManager.GetString("TimezoneIana_InvalidDaylightSavingsOffset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The StandardCode &apos;{0}&apos; must be a three or four letter code, or the offset in hrs.
+        /// </summary>
+        internal static string TimezoneIana_InvalidStandardCode {
+            get {
+                return ResourceManager.GetString("TimezoneIana_InvalidStandardCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The StandardOffset &apos;{0}&apos; must be between +14hrs and -14hrs.
+        /// </summary>
+        internal static string TimezoneIana_InvalidStandardOffset {
+            get {
+                return ResourceManager.GetString("TimezoneIana_InvalidStandardOffset", resourceCulture);
             }
         }
     }

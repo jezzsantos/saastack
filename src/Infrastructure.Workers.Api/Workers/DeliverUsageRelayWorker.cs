@@ -1,5 +1,5 @@
 using Application.Interfaces.Services;
-using Application.Persistence.Shared;
+using Application.Persistence.Shared.ReadModels;
 using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;

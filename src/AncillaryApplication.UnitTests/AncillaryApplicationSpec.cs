@@ -2,6 +2,7 @@ using AncillaryApplication.Persistence;
 using AncillaryDomain;
 using Application.Interfaces;
 using Application.Persistence.Shared;
+using Application.Persistence.Shared.ReadModels;
 using Common;
 using Common.Extensions;
 using Domain.Common.Identity;

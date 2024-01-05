@@ -13,6 +13,7 @@ using Task = System.Threading.Tasks.Task;
 namespace BookingsInfrastructure.IntegrationTests;
 
 [Trait("Category", "Integration.Web")]
+[Collection("API")]
 public class BookingsApiSpec : WebApiSpec<Program>
 {
     public BookingsApiSpec(WebApiSetup<Program> setup) : base(setup)

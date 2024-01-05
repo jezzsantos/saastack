@@ -12,6 +12,7 @@ using Xunit;
 namespace CarsInfrastructure.IntegrationTests;
 
 [Trait("Category", "Integration.Web")]
+[Collection("API")]
 public class CarsApiSpec : WebApiSpec<Program>
 {
     public CarsApiSpec(WebApiSetup<Program> setup) : base(setup)

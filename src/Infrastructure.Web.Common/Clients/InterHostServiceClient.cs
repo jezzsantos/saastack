@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using Application.Common;
 using Application.Interfaces;
 using Common;
@@ -20,11 +21,13 @@ public class InterHostServiceClient : IServiceClient
     private const int RetryCount = 2;
     private readonly string _baseUrl;
     private readonly IHttpClientFactory _clientFactory;
+    private readonly JsonSerializerOptions _jsonOptions;
     private readonly AsyncRetryPolicy _retryPolicy;
 
-    public InterHostServiceClient(IHttpClientFactory clientFactory, string baseUrl)
+    public InterHostServiceClient(IHttpClientFactory clientFactory, JsonSerializerOptions jsonOptions, string baseUrl)
     {
         _clientFactory = clientFactory;
+        _jsonOptions = jsonOptions;
         _baseUrl = baseUrl;
         _retryPolicy = ApiClientRetryPolicies.CreateRetryWithExponentialBackoffAndJitter(RetryCount);
     }
@@ -105,7 +108,7 @@ public class InterHostServiceClient : IServiceClient
     private JsonClient CreateJsonClient(ICallerContext context, Action<HttpRequestMessage>? inboundRequestFilter,
         out Action<HttpRequestMessage> modifiedRequestFilter)
     {
-        var client = new JsonClient(_clientFactory);
+        var client = new JsonClient(_clientFactory, _jsonOptions);
         client.SetBaseUrl(_baseUrl);
         if (inboundRequestFilter.Exists())
         {
@@ -113,7 +116,7 @@ public class InterHostServiceClient : IServiceClient
             {
                 inboundRequestFilter(req);
                 AddCorrelationId(req, context);
-                AddBearerToken(req, context);
+                AddCallerAuthorization(req, context);
             };
         }
         else
@@ -121,7 +124,7 @@ public class InterHostServiceClient : IServiceClient
             modifiedRequestFilter = req =>
             {
                 AddCorrelationId(req, context);
-                AddBearerToken(req, context);
+                AddCallerAuthorization(req, context);
             };
         }
 
@@ -133,8 +136,8 @@ public class InterHostServiceClient : IServiceClient
         message.SetRequestId(context.ToCall());
     }
 
-    private static void AddBearerToken(HttpRequestMessage message, ICallerContext context)
+    private static void AddCallerAuthorization(HttpRequestMessage message, ICallerContext context)
     {
-        message.SetBearerToken(context);
+        message.SetAuthorization(context);
     }
 }

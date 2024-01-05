@@ -65,7 +65,8 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
         }, cancellationToken);
     }
 
-    public async Task<Result<Error>> PushAsync(ICallContext call, TMessage message, CancellationToken cancellationToken)
+    public async Task<Result<TMessage, Error>> PushAsync(ICallContext call, TMessage message,
+        CancellationToken cancellationToken)
     {
         message.TenantId = message.TenantId.HasValue()
             ? message.TenantId
@@ -88,7 +89,7 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
         _recorder.TraceDebug(null, "Message {Message} was added to the queue {Queue} in the {Store} store", messageJson,
             _queueName, _queueStore.GetType().Name);
 
-        return Result.Ok;
+        return message;
     }
 
     private string CreateMessageId()

@@ -28,7 +28,7 @@ public static class ServiceClientExtensions
         {
             var posted = await serviceClient.PostAsync(caller, request, req =>
             {
-                req.SetHmacAuth(request, hmacSecret);
+                req.SetHMACAuth(request, hmacSecret);
                 req.SetRequestId(caller.ToCall());
             }, cancellationToken);
             if (!posted.IsSuccessful)

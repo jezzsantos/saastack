@@ -31,12 +31,7 @@ public class AncillaryModule : ISubDomainModule
         { typeof(AuditRoot), "audit" }
     };
 
-    public Action<WebApplication> MinimalApiRegistrationFunction
-    {
-        get { return app => app.RegisterRoutes(); }
-    }
-
-    public Action<ConfigurationManager, IServiceCollection> RegisterServicesFunction
+    public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
         get
         {
@@ -48,6 +43,8 @@ public class AncillaryModule : ISubDomainModule
                     new UsageMessageQueueRepository(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));
                 services.RegisterUnshared<IAuditMessageQueueRepository>(c =>
                     new AuditMessageQueueRepository(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));
+                services.RegisterUnshared<IEmailMessageQueueRepository>(c =>
+                    new EmailMessageQueueRepository(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));
                 services.RegisterUnshared<IAuditRepository>(c => new AuditRepository(c.ResolveForUnshared<IRecorder>(),
                     c.ResolveForUnshared<IDomainFactory>(),
                     c.ResolveForUnshared<IEventSourcingDddCommandStore<AuditRoot>>(),
@@ -59,5 +56,10 @@ public class AncillaryModule : ISubDomainModule
                 services.RegisterUnshared<IUsageReportingService, NullUsageReportingService>();
             };
         }
+    }
+
+    public Action<WebApplication> ConfigureMiddleware
+    {
+        get { return app => app.RegisterRoutes(); }
     }
 }

@@ -1,3 +1,6 @@
+using Common;
+using Domain.Interfaces.Authorization;
+
 namespace Application.Interfaces;
 
 /// <summary>
@@ -6,9 +9,19 @@ namespace Application.Interfaces;
 public interface ICallerContext
 {
     /// <summary>
+    ///     Defines the scheme of the authorization
+    /// </summary>
+    public enum AuthorizationMethod
+    {
+        Token = 0,
+        APIKey = 1,
+        HMAC = 2
+    }
+
+    /// <summary>
     ///     The authorization token of the call. Passed to downstream clients
     /// </summary>
-    string? Authorization { get; }
+    Optional<CallerAuthorization> Authorization { get; }
 
     /// <summary>
     ///     The ID of the identified caller
@@ -23,7 +36,7 @@ public interface ICallerContext
     /// <summary>
     ///     The feature sets belonging to the caller
     /// </summary>
-    CallerFeatureSets FeatureSets { get; }
+    CallerFeatureLevels FeatureLevels { get; }
 
     /// <summary>
     ///     Whether the called is authenticated or not
@@ -46,6 +59,22 @@ public interface ICallerContext
     string? TenantId { get; }
 
     /// <summary>
+    ///     Defines the authorization details of the caller
+    /// </summary>
+    public class CallerAuthorization
+    {
+        public CallerAuthorization(AuthorizationMethod method, string value)
+        {
+            Method = method;
+            Value = value;
+        }
+
+        public AuthorizationMethod Method { get; }
+
+        public string Value { get; }
+    }
+
+    /// <summary>
     ///     Defines the authorization roles that a caller can have
     /// </summary>
     public class CallerRoles
@@ -57,10 +86,10 @@ public interface ICallerContext
             Organization = Array.Empty<string>();
         }
 
-        public CallerRoles(string[]? user, string[]? organization)
+        public CallerRoles(string[]? user, string[]? member)
         {
             User = user ?? Array.Empty<string>();
-            Organization = organization ?? Array.Empty<string>();
+            Organization = member ?? Array.Empty<string>();
             All = User.Concat(Organization)
                 .ToArray();
         }
@@ -75,27 +104,27 @@ public interface ICallerContext
     /// <summary>
     ///     Defines the sets of features that a caller can have
     /// </summary>
-    public class CallerFeatureSets
+    public class CallerFeatureLevels
     {
-        public CallerFeatureSets()
+        public CallerFeatureLevels()
         {
-            All = Array.Empty<string>();
-            User = Array.Empty<string>();
-            Organization = Array.Empty<string>();
+            All = Array.Empty<FeatureLevel>();
+            Platform = Array.Empty<FeatureLevel>();
+            Organization = Array.Empty<FeatureLevel>();
         }
 
-        public CallerFeatureSets(string[]? user, string[]? organization)
+        public CallerFeatureLevels(FeatureLevel[]? platform, FeatureLevel[]? member)
         {
-            User = user ?? Array.Empty<string>();
-            Organization = organization ?? Array.Empty<string>();
-            All = User.Concat(Organization)
+            Platform = platform ?? Array.Empty<FeatureLevel>();
+            Organization = member ?? Array.Empty<FeatureLevel>();
+            All = Platform.Concat(Organization)
                 .ToArray();
         }
 
-        public string[] All { get; }
+        public FeatureLevel[] All { get; }
 
-        public string[] Organization { get; }
+        public FeatureLevel[] Organization { get; }
 
-        public string[] User { get; }
+        public FeatureLevel[] Platform { get; }
     }
 }

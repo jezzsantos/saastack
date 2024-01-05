@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Common;
@@ -21,15 +22,17 @@ namespace Infrastructure.Web.Common.Clients;
 public class JsonClient : IHttpJsonClient, IDisposable
 {
     private readonly HttpClient _client;
+    private readonly JsonSerializerOptions _jsonOptions;
 
-    public JsonClient(IHttpClientFactory clientFactory)
+    public JsonClient(IHttpClientFactory clientFactory, JsonSerializerOptions jsonOptions) : this(
+        clientFactory.CreateClient(), jsonOptions)
     {
-        _client = clientFactory.CreateClient();
     }
 
-    public JsonClient(HttpClient client)
+    public JsonClient(HttpClient client, JsonSerializerOptions jsonOptions)
     {
         _client = client;
+        _jsonOptions = jsonOptions;
     }
 
     public void Dispose()
@@ -51,7 +54,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         where TResponse : IWebResponse, new()
     {
         var response = await SendRequestAsync(HttpMethod.Delete, request, requestFilter, cancellationToken);
-        var content = await GetContentAsync(response, cancellationToken);
+        var content = await GetContentAsync(response, cancellationToken, _jsonOptions);
 
         return CreateResponse(response, content);
     }
@@ -60,7 +63,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default)
     {
         var response = await SendRequestAsync(HttpMethod.Delete, request, requestFilter, cancellationToken);
-        var content = await GetContentAsync(response, cancellationToken);
+        var content = await GetContentAsync(response, cancellationToken, _jsonOptions);
 
         return CreateResponse(response, content);
     }
@@ -71,7 +74,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         where TResponse : IWebResponse, new()
     {
         var response = await SendRequestAsync(HttpMethod.Get, request, requestFilter, cancellationToken);
-        var content = await GetContentAsync<TResponse>(response, cancellationToken);
+        var content = await GetContentAsync<TResponse>(response, cancellationToken, _jsonOptions);
 
         return CreateResponse(response, content);
     }
@@ -81,7 +84,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         CancellationToken? cancellationToken = default)
     {
         var response = await SendRequestAsync(HttpMethod.Get, request, requestFilter, cancellationToken);
-        var content = await GetContentAsync(response, cancellationToken);
+        var content = await GetContentAsync(response, cancellationToken, _jsonOptions);
 
         return CreateResponse(response, content);
     }
@@ -92,7 +95,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         where TResponse : IWebResponse, new()
     {
         var response = await SendRequestAsync(HttpMethod.Patch, request, requestFilter, cancellationToken);
-        var content = await GetContentAsync<TResponse>(response, cancellationToken);
+        var content = await GetContentAsync<TResponse>(response, cancellationToken, _jsonOptions);
 
         return CreateResponse(response, content);
     }
@@ -102,7 +105,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         CancellationToken? cancellationToken = default)
     {
         var response = await SendRequestAsync(HttpMethod.Patch, request, requestFilter, cancellationToken);
-        var content = await GetContentAsync(response, cancellationToken);
+        var content = await GetContentAsync(response, cancellationToken, _jsonOptions);
 
         return CreateResponse(response, content);
     }
@@ -113,7 +116,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         where TResponse : IWebResponse, new()
     {
         var response = await SendRequestAsync(HttpMethod.Post, request, requestFilter, cancellationToken);
-        var content = await GetContentAsync<TResponse>(response, cancellationToken);
+        var content = await GetContentAsync<TResponse>(response, cancellationToken, _jsonOptions);
 
         return CreateResponse(response, content);
     }
@@ -123,7 +126,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         CancellationToken? cancellationToken = default)
     {
         var response = await SendRequestAsync(HttpMethod.Post, request, requestFilter, cancellationToken);
-        var content = await GetContentAsync(response, cancellationToken);
+        var content = await GetContentAsync(response, cancellationToken, _jsonOptions);
 
         return CreateResponse(response, content);
     }
@@ -134,7 +137,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         where TResponse : IWebResponse, new()
     {
         var response = await SendRequestAsync(HttpMethod.Put, request, requestFilter, cancellationToken);
-        var content = await GetContentAsync<TResponse>(response, cancellationToken);
+        var content = await GetContentAsync<TResponse>(response, cancellationToken, _jsonOptions);
 
         return CreateResponse(response, content);
     }
@@ -144,7 +147,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         CancellationToken? cancellationToken = default)
     {
         var response = await SendRequestAsync(HttpMethod.Put, request, requestFilter, cancellationToken);
-        var content = await GetContentAsync(response, cancellationToken);
+        var content = await GetContentAsync(response, cancellationToken, _jsonOptions);
 
         return CreateResponse(response, content);
     }
@@ -189,44 +192,54 @@ public class JsonClient : IHttpJsonClient, IDisposable
     }
 
     private static async Task<Result<TResponse, ResponseProblem>> GetContentAsync<TResponse>(
-        HttpResponseMessage response, CancellationToken? cancellationToken = null)
+        HttpResponseMessage response, CancellationToken? cancellationToken, JsonSerializerOptions? jsonOptions)
         where TResponse : IWebResponse, new()
     {
         var contentType = response.Content.Headers.ContentType;
         if (contentType.NotExists())
         {
-            return new TResponse();
+            if (response.IsSuccessStatusCode)
+            {
+                return new TResponse();
+            }
+
+            return response.StatusCode.ToResponseProblem(response.ReasonPhrase);
         }
 
         if (contentType.MediaType == HttpContentTypes.JsonProblem)
         {
-            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(
-                cancellationToken: cancellationToken ?? CancellationToken.None);
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonOptions,
+                cancellationToken ?? CancellationToken.None);
             return problem.ToResponseProblem();
         }
 
         if (contentType.MediaType == HttpContentTypes.Json)
         {
-            return await response.Content.ReadFromJsonAsync<TResponse>(
-                cancellationToken: cancellationToken ?? CancellationToken.None) ?? new TResponse();
+            return await response.Content.ReadFromJsonAsync<TResponse>(jsonOptions,
+                cancellationToken ?? CancellationToken.None) ?? new TResponse();
         }
 
         return new TResponse();
     }
 
     private static async Task<Result<string?, ResponseProblem>> GetContentAsync(HttpResponseMessage response,
-        CancellationToken? cancellationToken)
+        CancellationToken? cancellationToken, JsonSerializerOptions? jsonOptions)
     {
         var contentType = response.Content.Headers.ContentType;
         if (contentType.NotExists())
         {
-            return default;
+            if (response.IsSuccessStatusCode)
+            {
+                return default;
+            }
+
+            return response.StatusCode.ToResponseProblem(response.ReasonPhrase);
         }
 
         if (contentType.MediaType == HttpContentTypes.JsonProblem)
         {
-            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(
-                cancellationToken: cancellationToken ?? CancellationToken.None);
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonOptions,
+                cancellationToken ?? CancellationToken.None);
             return problem.ToResponseProblem();
         }
 

@@ -153,6 +153,33 @@ public class OptionalSpec
 public class OptionalOfTSpec
 {
     [Fact]
+    public void WhenSomeWithNull_ThenReturnsNone()
+    {
+        var result = Optional<string>.Some(null!);
+
+        result.Should().BeNone();
+    }
+
+    [Fact]
+    public void WhenSomeWithOptional_ThenReturnsOptional()
+    {
+        var optional = new Optional<string>("avalue");
+
+        var result = Optional<string>.Some(optional);
+
+        result.Should().Be(optional);
+        result.Should().BeSome("avalue");
+    }
+
+    [Fact]
+    public void WhenSomeWithValue_ThenReturnsOptional()
+    {
+        var result = Optional<string>.Some("avalue");
+
+        result.Should().BeSome("avalue");
+    }
+
+    [Fact]
     public void WhenConstructedWithoutAnyValue_ThenHasNoValue()
     {
         var result = new Optional<TestClass>();
@@ -534,30 +561,107 @@ public class OptionalOfTSpec
     }
 
     [Fact]
-    public void WhenSomeWithNull_ThenReturnsNone()
+    public void WhenImplicitCastFromNullableReferenceTypeWithNull_ThenReturnsNone()
     {
-        var result = Optional<string>.Some(null!);
+        var result = (Optional<string>)(string?)null;
 
         result.Should().BeNone();
     }
 
     [Fact]
-    public void WhenSomeWithOptional_ThenReturnsOptional()
+    public void WhenImplicitCastFromNullableReferenceTypeWithValue_ThenReturnsSome()
     {
-        var optional = new Optional<string>("avalue");
+        var result = (Optional<string>)"avalue";
 
-        var result = Optional<string>.Some(optional);
-
-        result.Should().Be(optional);
         result.Should().BeSome("avalue");
     }
 
     [Fact]
-    public void WhenSomeWithValue_ThenReturnsOptional()
+    public void WhenImplicitCastFromNullableValueTypeWithNull_ThenReturnsNone()
     {
-        var result = Optional<string>.Some("avalue");
+        DateTime? datum = null;
 
-        result.Should().BeSome("avalue");
+        var result = (Optional<DateTime?>)datum;
+
+        result.Should().BeNone();
+    }
+
+    [Fact]
+    public void WhenImplicitCastFromNullableValueTypeWithValue_ThenReturnsSome()
+    {
+        var datum = DateTime.UtcNow;
+
+        var result = (Optional<DateTime>)datum;
+
+        result.Should().BeSome(datum);
+    }
+
+    [Fact]
+    public void WhenImplicitCastFromOptionalNoneToNullableReferenceType_ThenReturnsNull()
+    {
+        var result = (string?)Optional<string>.None;
+
+        result.Should().Be(null);
+    }
+
+    [Fact]
+    public void WhenImplicitCastFromOptionalNoneToReferenceType_ThenReturnsDefault()
+    {
+        var result = (string)Optional<string>.None;
+
+        result.Should().Be(default);
+    }
+
+    [Fact]
+    public void WhenImplicitCastFromOptionalSomeToNullableReferenceType_ThenReturnsValue()
+    {
+        var result = (string?)new Optional<string>("avalue");
+
+        result.Should().Be("avalue");
+    }
+
+    [Fact]
+    public void WhenImplicitCastFromOptionalSomeToReferenceType_ThenReturnsValue()
+    {
+        var result = (string)new Optional<string>("avalue");
+
+        result.Should().Be("avalue");
+    }
+
+    [Fact]
+    public void WhenImplicitCastFromOptionalNullableNoneToNullableValueType_ThenReturnsNull()
+    {
+        var result = (DateTime?)Optional<DateTime?>.None;
+
+        result.Should().Be(null);
+    }
+
+    [Fact]
+    public void WhenImplicitCastFromOptionalNoneToValueType_ThenReturnsDefault()
+    {
+        var result = (DateTime)Optional<DateTime>.None;
+
+        result.Should().Be(default);
+    }
+
+    [Fact]
+    public void WhenImplicitCastFromOptionalSomeToNullableValueType_ThenReturnsValue()
+    {
+        var datum = DateTime.UtcNow;
+
+        var result = (DateTime?)new Optional<DateTime>(datum);
+
+        result.Should().Be(datum);
+    }
+
+    [Fact]
+    public void WhenImplicitCastFromOptionalSomeToValueType_ThenReturnsValue()
+    {
+        var datum = DateTime.UtcNow;
+
+        var result = (DateTime)new Optional<DateTime>(datum);
+
+        result.Should().Be(datum);
     }
 }
 

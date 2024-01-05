@@ -1,10 +1,16 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Text.Json;
 using Application.Persistence.Interfaces;
+using Application.Resources.Shared;
+using Application.Services.Shared;
 using Common;
 using Common.Extensions;
+using FluentAssertions;
+using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Interfaces.Clients;
+using IntegrationTesting.WebApi.Common.Stubs;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -77,6 +83,7 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
             })
             .ConfigureTestServices(services =>
             {
+                services.AddSingleton<INotificationsService, StubNotificationsService>();
                 if (_overridenTestingDependencies.Exists())
                 {
                     _overridenTestingDependencies.Invoke(services);
@@ -99,7 +106,8 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
     private static IReadOnlyList<IApplicationRepository>? _repositories;
     protected readonly IHttpJsonClient Api;
     protected readonly HttpClient HttpApi;
-    protected readonly WebApplicationFactory<THost> Setup;
+    protected StubNotificationsService NotificationsService;
+    private readonly WebApplicationFactory<THost> _setup;
 
     protected WebApiSpec(WebApiSetup<THost> setup, Action<IServiceCollection>? overrideDependencies = null)
     {
@@ -108,13 +116,15 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
             setup.OverrideTestingDependencies(overrideDependencies);
         }
 
-        Setup = setup.WithWebHostBuilder(_ => { });
+        _setup = setup.WithWebHostBuilder(_ => { });
 
+        var jsonOptions = setup.GetRequiredService<JsonSerializerOptions>();
         HttpApi = setup.CreateClient(new WebApplicationFactoryClientOptions
         {
             BaseAddress = new Uri(WebServerBaseUrlFormat.Format(GetNextAvailablePort()))
         });
-        Api = new JsonClient(HttpApi);
+        Api = new JsonClient(HttpApi, jsonOptions);
+        NotificationsService = setup.GetRequiredService<INotificationsService>().As<StubNotificationsService>();
     }
 
     public void Dispose()
@@ -128,7 +138,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         if (disposing)
         {
             HttpApi.Dispose();
-            Setup.Dispose();
+            _setup.Dispose();
         }
     }
 
@@ -138,6 +148,34 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         var platformRepositories = GetRepositories(setup, repositoryTypes);
 
         DestroyAllRepositories(platformRepositories);
+    }
+
+    protected async Task<LoginUser> LoginUserAsync()
+    {
+        const string emailAddress = "aperson1@company.com";
+        const string password = "1Password!";
+        var person = await Api.PostAsync(new RegisterPersonPasswordRequest
+        {
+            EmailAddress = emailAddress,
+            FirstName = "aperson1",
+            LastName = "alastname",
+            Password = password,
+            TermsAndConditionsAccepted = true
+        });
+
+        var token = NotificationsService.LastRegistrationConfirmationToken;
+        await Api.PostAsync(new ConfirmRegistrationPersonPasswordRequest
+        {
+            Token = token!
+        });
+
+        var login = await Api.PostAsync(new AuthenticatePasswordRequest
+        {
+            Username = emailAddress,
+            Password = password
+        });
+
+        return new LoginUser(login.Content.Value.AccessToken!, person.Content.Value.Credential!.User);
     }
 
     private static IReadOnlyList<IApplicationRepository> GetRepositories(WebApiSetup<THost> setup,
@@ -185,5 +223,18 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         listener.Stop();
 
         return port;
+    }
+
+    protected class LoginUser
+    {
+        public LoginUser(string accessToken, RegisteredEndUser user)
+        {
+            AccessToken = accessToken;
+            User = user;
+        }
+
+        public string AccessToken { get; }
+
+        public RegisteredEndUser User { get; }
     }
 }

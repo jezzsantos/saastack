@@ -14,13 +14,13 @@ public class BackEndForFrontEndModule : ISubDomainModule
 
     public Dictionary<Type, string> AggregatePrefixes => new();
 
-    public Action<WebApplication> MinimalApiRegistrationFunction
-    {
-        get { return app => app.RegisterRoutes(); }
-    }
-
-    public Action<ConfigurationManager, IServiceCollection> RegisterServicesFunction
+    public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
         get { return (_, services) => { services.RegisterUnshared<IRecordingApplication, RecordingApplication>(); }; }
+    }
+
+    public Action<WebApplication> ConfigureMiddleware
+    {
+        get { return app => app.RegisterRoutes(); }
     }
 }

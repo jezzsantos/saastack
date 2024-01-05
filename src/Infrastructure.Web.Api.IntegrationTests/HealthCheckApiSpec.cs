@@ -6,7 +6,8 @@ using Xunit;
 
 namespace Infrastructure.Web.Api.IntegrationTests;
 
-[Trait("Category", "Unit")]
+[Trait("Category", "Integration.Web")]
+[Collection("API")]
 public class HealthCheckApiSpec : WebApiSpec<Program>
 {
     public HealthCheckApiSpec(WebApiSetup<Program> setup) : base(setup)

@@ -9,6 +9,7 @@ using Infrastructure.Persistence.AWS.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 #endif
 using Application.Persistence.Shared;
+using Application.Persistence.Shared.ReadModels;
 using Common;
 using Common.Configuration;
 using Common.Extensions;

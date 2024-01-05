@@ -7,9 +7,9 @@ public interface ISettings
 {
     public bool IsConfigured { get; }
 
-    public bool GetBool(string key);
+    public bool GetBool(string key, bool? defaultValue = null);
 
-    public double GetNumber(string key);
+    public double GetNumber(string key, double? defaultValue = null);
 
-    public string GetString(string key);
+    public string GetString(string key, string? defaultValue = null);
 }

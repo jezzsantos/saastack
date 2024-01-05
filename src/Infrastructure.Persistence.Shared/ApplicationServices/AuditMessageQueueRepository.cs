@@ -1,5 +1,6 @@
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
+using Application.Persistence.Shared.ReadModels;
 using Common;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
@@ -32,7 +33,8 @@ public class AuditMessageQueueRepository : IAuditMessageQueueRepository
         return _messageQueue.PopSingleAsync(onMessageReceivedAsync, cancellationToken);
     }
 
-    public Task<Result<Error>> PushAsync(ICallContext call, AuditMessage message, CancellationToken cancellationToken)
+    public Task<Result<AuditMessage, Error>> PushAsync(ICallContext call, AuditMessage message,
+        CancellationToken cancellationToken)
     {
         return _messageQueue.PushAsync(call, message, cancellationToken);
     }

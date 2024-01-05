@@ -11,40 +11,65 @@ public class WebHostOptions : HostOptions
     {
         CORS = CORSOption.AnyOrigin,
         TrackApiUsage = true,
-        UsesAuth = true
+        Authorization = new AuthorizationOptions
+        {
+            UsesCookies = false,
+            UsesTokens = true,
+            UsesApiKeys = true,
+            UsesHMAC = true
+        }
     };
     public new static readonly WebHostOptions BackEndApiHost = new(HostOptions.BackEndApiHost)
     {
         CORS = CORSOption.AnyOrigin,
         TrackApiUsage = true,
-        UsesAuth = true
+        Authorization = new AuthorizationOptions
+        {
+            UsesCookies = false,
+            UsesTokens = true,
+            UsesApiKeys = true,
+            UsesHMAC = true
+        }
     };
 
     public new static readonly WebHostOptions BackEndForFrontEndWebHost = new(HostOptions.BackEndForFrontEndWebHost)
     {
         CORS = CORSOption.SameOrigin,
         TrackApiUsage = false,
-        UsesAuth = false
+        Authorization = new AuthorizationOptions
+        {
+            UsesCookies = true,
+            UsesTokens = false,
+            UsesApiKeys = false,
+            UsesHMAC = false
+        }
     };
 
     public new static readonly WebHostOptions TestingStubsHost = new(HostOptions.TestingStubsHost)
     {
         CORS = CORSOption.AnyOrigin,
         TrackApiUsage = false,
-        UsesAuth = false
+        Authorization = new AuthorizationOptions
+        {
+            UsesCookies = false,
+            UsesTokens = false,
+            UsesApiKeys = false,
+            UsesHMAC = false
+        }
     };
 
     private WebHostOptions(HostOptions options) : base(options)
     {
         CORS = CORSOption.None;
         TrackApiUsage = false;
+        Authorization = new AuthorizationOptions();
     }
+
+    public AuthorizationOptions Authorization { get; private init; }
 
     public CORSOption CORS { get; private init; }
 
     public bool TrackApiUsage { get; private set; }
-
-    public bool UsesAuth { get; private init; }
 }
 
 /// <summary>
@@ -55,4 +80,20 @@ public enum CORSOption
     None = 0,
     SameOrigin = 1,
     AnyOrigin = 2
+}
+
+/// <summary>
+///     Defines options for handling authorization in a host
+/// </summary>
+public class AuthorizationOptions
+{
+    public bool HasNone => !UsesApiKeys && !UsesCookies && !UsesTokens && !UsesHMAC;
+
+    public bool UsesApiKeys { get; set; }
+
+    public bool UsesCookies { get; set; }
+
+    public bool UsesHMAC { get; set; }
+
+    public bool UsesTokens { get; set; }
 }

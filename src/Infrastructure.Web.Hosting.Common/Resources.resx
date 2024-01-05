@@ -30,7 +30,7 @@
     <data name="CORS_MissingSameOrigins" xml:space="preserve">
         <value>Host is misconfigured: Missing a valid value for the setting {0}</value>
     </data>
-    <data name="HMACAuthenticationHandler_NotHttps" xml:space="preserve">
+    <data name="AuthenticationHandler_NotHttps" xml:space="preserve">
         <value>Requires HTTPS</value>
     </data>
     <data name="HMACAuthenticationHandler_MissingHeader" xml:space="preserve">
@@ -39,7 +39,13 @@
     <data name="HMACAuthenticationHandler_FailedAuthentication" xml:space="preserve">
         <value>Failed HMAC authentication</value>
     </data>
-    <data name="HMACAuthenticationHandler_WrongSignature" xml:space="preserve">
+    <data name="AuthenticationHandler_Failed" xml:space="preserve">
         <value>Authentication failed</value>
+    </data>
+    <data name="APIKeyAuthenticationHandler_MissingParameter" xml:space="preserve">
+        <value>Requires a value in the '{0}' parameter of the request</value>
+    </data>
+    <data name="APIKeyAuthenticationHandler_FailedAuthentication" xml:space="preserve">
+        <value>Failed APIKEY authentication</value>
     </data>
 </root>

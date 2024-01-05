@@ -31,7 +31,7 @@
       <value>Member is not a property</value>
     </data>
     <data name="Optional_NullValue" xml:space="preserve">
-        <value>The value is null</value>
+        <value>The value of the optional variable is null</value>
     </data>
     <data name="Result_FetchValueWhenFaulted" xml:space="preserve">
         <value>The result is in a faulted state, with error: `{0}`</value>
@@ -39,7 +39,20 @@
     <data name="Result_FetchErrorWhenNotFaulted" xml:space="preserve">
         <value>The result is not faulted, but has a value: `{0}`</value>
     </data>
-    <data name="WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage" xml:space="preserve">
-        <value>An unexpected error occurred</value>
+    <data name="CountryCodeIso3166_InvalidNumeric" xml:space="preserve">
+        <value>The Numeric '{0}' must be a 3 decimal number between 1 and 1000</value>
     </data>
+    <data name="TimezoneIana_InvalidStandardOffset" xml:space="preserve">
+        <value>The StandardOffset '{0}' must be between +14hrs and -14hrs</value>
+    </data>
+    <data name="TimezoneIana_InvalidStandardCode" xml:space="preserve">
+        <value>The StandardCode '{0}' must be a three or four letter code, or the offset in hrs</value>
+    </data>
+    <data name="TimezoneIana_InvalidDaylightSavingsOffset" xml:space="preserve">
+        <value>The DaylightSavingsOffset '{0}' must be between +14hrs and -14hrs</value>
+    </data>
+    <data name="TimezoneIana_InvalidDaylightSavingsCode" xml:space="preserve">
+        <value>The DaylightSavingsCode '{0}' must be a three or four letter code, or the offset in hrs</value>
+    </data>
+
 </root>

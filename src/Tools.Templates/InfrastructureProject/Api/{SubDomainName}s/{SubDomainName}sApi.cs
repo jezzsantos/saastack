@@ -3,11 +3,11 @@ namespace ProjectName.Api.{SubDomainName}s;
 public class {SubDomainName}sApi : IwebApiService
 {
     private readonly I{SubDomainName}sApplication _{SubDomainNameLower}sApplication;
-    private readonly ICallerContext _context;
+    private readonly ICallerContextFactory _contextFactory;
 
-    public CarsApi(ICallerContext context, I{SubDomainName}sApplication {SubDomainNameLower}sApplication)
+    public CarsApi(ICallerContextFactory contextFactory, I{SubDomainName}sApplication {SubDomainNameLower}sApplication)
     {
-        _context = context;
+        _contextFactory = contextFactory;
         _{SubDomainNameLower}sApplication = {SubDomainNameLower}sApplication;
     }
     

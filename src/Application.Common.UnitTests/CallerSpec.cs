@@ -1,8 +1,9 @@
 using Common;
-using Domain.Common.Authorization;
 using Domain.Interfaces;
+using Domain.Interfaces.Authorization;
 using FluentAssertions;
 using Moq;
+using UnitTesting.Common;
 using Xunit;
 
 namespace Application.Common.UnitTests;
@@ -16,10 +17,10 @@ public class CallerSpec
         var result = Caller.CreateAsAnonymous();
 
         result.IsServiceAccount.Should().BeFalse();
-        result.Authorization.Should().BeNull();
+        result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeFalse();
         result.Roles.All.Should().BeEmpty();
-        result.FeatureSets.All.Should().ContainSingle(UserFeatureSets.Basic);
+        result.FeatureLevels.All.Should().ContainSingle(PlatformFeatureLevels.Basic.Name);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.AnonymousUserId);
         result.CallId.Should().NotBeNull();
@@ -31,10 +32,10 @@ public class CallerSpec
         var result = Caller.CreateAsAnonymousTenant("atenantid");
 
         result.IsServiceAccount.Should().BeFalse();
-        result.Authorization.Should().BeNull();
+        result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeFalse();
         result.Roles.All.Should().BeEmpty();
-        result.FeatureSets.All.Should().ContainSingle(UserFeatureSets.Basic);
+        result.FeatureLevels.All.Should().ContainSingle(PlatformFeatureLevels.Basic.Name);
         result.TenantId.Should().Be("atenantid");
         result.CallerId.Should().Be(CallerConstants.AnonymousUserId);
         result.CallId.Should().NotBeNullOrEmpty();
@@ -51,10 +52,10 @@ public class CallerSpec
         var result = Caller.CreateAsCallerFromCall(call.Object);
 
         result.IsServiceAccount.Should().BeFalse();
-        result.Authorization.Should().BeNull();
+        result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeFalse();
         result.Roles.All.Should().BeEmpty();
-        result.FeatureSets.All.Should().ContainSingle(UserFeatureSets.Basic);
+        result.FeatureLevels.All.Should().ContainSingle(PlatformFeatureLevels.Basic.Name);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be("acallerid");
         result.CallId.Should().Be("acallid");
@@ -66,10 +67,10 @@ public class CallerSpec
         var result = Caller.CreateAsExternalWebHook("acallid");
 
         result.IsServiceAccount.Should().BeTrue();
-        result.Authorization.Should().BeNull();
+        result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeTrue();
-        result.Roles.All.Should().ContainSingle(UserRoles.ServiceAccount);
-        result.FeatureSets.All.Should().ContainSingle(UserFeatureSets.Basic);
+        result.Roles.All.Should().ContainSingle(PlatformRoles.ServiceAccount);
+        result.FeatureLevels.All.Should().ContainSingle(PlatformFeatureLevels.Basic.Name);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.ExternalWebhookAccountUserId);
         result.CallId.Should().Be("acallid");
@@ -81,10 +82,10 @@ public class CallerSpec
         var result = Caller.CreateAsMaintenance();
 
         result.IsServiceAccount.Should().BeTrue();
-        result.Authorization.Should().BeNull();
+        result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeTrue();
-        result.Roles.All.Should().ContainSingle(UserRoles.ServiceAccount);
-        result.FeatureSets.All.Should().Contain(UserFeatureSets.Basic, UserFeatureSets.Pro, UserFeatureSets.Premium);
+        result.Roles.All.Should().ContainSingle(PlatformRoles.ServiceAccount);
+        result.FeatureLevels.All.Should().ContainSingle(PlatformFeatureLevels.Premium.Name);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.MaintenanceAccountUserId);
         result.CallId.Should().NotBeNullOrEmpty();
@@ -96,10 +97,10 @@ public class CallerSpec
         var result = Caller.CreateAsMaintenance("acallid");
 
         result.IsServiceAccount.Should().BeTrue();
-        result.Authorization.Should().BeNull();
+        result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeTrue();
-        result.Roles.All.Should().ContainSingle(UserRoles.ServiceAccount);
-        result.FeatureSets.All.Should().Contain(UserFeatureSets.Basic, UserFeatureSets.Pro, UserFeatureSets.Premium);
+        result.Roles.All.Should().ContainSingle(PlatformRoles.ServiceAccount);
+        result.FeatureLevels.All.Should().ContainSingle(PlatformFeatureLevels.Premium.Name);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.MaintenanceAccountUserId);
         result.CallId.Should().Be("acallid");
@@ -111,10 +112,10 @@ public class CallerSpec
         var result = Caller.CreateAsMaintenanceTenant("atenantid");
 
         result.IsServiceAccount.Should().BeTrue();
-        result.Authorization.Should().BeNull();
+        result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeTrue();
-        result.Roles.All.Should().ContainSingle(UserRoles.ServiceAccount);
-        result.FeatureSets.All.Should().Contain(UserFeatureSets.Basic, UserFeatureSets.Pro, UserFeatureSets.Premium);
+        result.Roles.All.Should().ContainSingle(PlatformRoles.ServiceAccount);
+        result.FeatureLevels.All.Should().ContainSingle(PlatformFeatureLevels.Premium.Name);
         result.TenantId.Should().Be("atenantid");
         result.CallerId.Should().Be(CallerConstants.MaintenanceAccountUserId);
         result.CallId.Should().NotBeNullOrEmpty();
@@ -126,10 +127,10 @@ public class CallerSpec
         var result = Caller.CreateAsServiceClient();
 
         result.IsServiceAccount.Should().BeTrue();
-        result.Authorization.Should().BeNull();
+        result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeTrue();
-        result.Roles.All.Should().ContainSingle(UserRoles.ServiceAccount);
-        result.FeatureSets.All.Should().Contain(UserFeatureSets.Basic, UserFeatureSets.Pro, UserFeatureSets.Premium);
+        result.Roles.All.Should().ContainSingle(PlatformRoles.ServiceAccount);
+        result.FeatureLevels.All.Should().ContainSingle(PlatformFeatureLevels.Premium.Name);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.ServiceClientAccountUserId);
         result.CallId.Should().NotBeNullOrEmpty();

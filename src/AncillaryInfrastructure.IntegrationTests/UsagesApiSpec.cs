@@ -1,6 +1,7 @@
 using AncillaryInfrastructure.IntegrationTests.Stubs;
 using ApiHost1;
 using Application.Persistence.Shared;
+using Application.Persistence.Shared.ReadModels;
 using Common;
 using Common.Extensions;
 using FluentAssertions;
@@ -15,6 +16,7 @@ using Task = System.Threading.Tasks.Task;
 namespace AncillaryInfrastructure.IntegrationTests;
 
 [Trait("Category", "Integration.Web")]
+[Collection("API")]
 public class UsagesApiSpec : WebApiSpec<Program>
 {
     private readonly IUsageMessageQueueRepository _usageMessageQueue;
@@ -43,7 +45,7 @@ public class UsagesApiSpec : WebApiSpec<Program>
                 MessageId = "amessageid"
             }.ToJson()!
         };
-        var result = await Api.PostAsync(request, req => req.SetHmacAuth(request, "asecret"));
+        var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         result.Content.Value.IsDelivered.Should().BeTrue();
         _usageReportingService.LastEventName.Should().Be("aneventname");
@@ -54,7 +56,7 @@ public class UsagesApiSpec : WebApiSpec<Program>
     public async Task WhenDrainAllUsagesAndNone_ThenDoesNotDrainAny()
     {
         var request = new DrainAllUsagesRequest();
-        await Api.PostAsync(request, req => req.SetHmacAuth(request, "asecret"));
+        await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         _usageReportingService.LastEventName.Should().BeNone();
     }
@@ -85,7 +87,7 @@ public class UsagesApiSpec : WebApiSpec<Program>
         }, CancellationToken.None);
 
         var request = new DrainAllUsagesRequest();
-        await Api.PostAsync(request, req => req.SetHmacAuth(request, "asecret"));
+        await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         _usageReportingService.AllEventNames.Count.Should().Be(3);
         _usageReportingService.AllEventNames.Should().ContainInOrder("aneventname1", "aneventname2", "aneventname3");

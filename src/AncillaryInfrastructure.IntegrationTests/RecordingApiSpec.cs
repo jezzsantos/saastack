@@ -13,6 +13,7 @@ using Task = System.Threading.Tasks.Task;
 namespace AncillaryInfrastructure.IntegrationTests;
 
 [Trait("Category", "Integration.Web")]
+[Collection("API")]
 public class RecordingApiSpec : WebApiSpec<Program>
 {
     private readonly StubRecorder _recorder;
@@ -32,7 +33,7 @@ public class RecordingApiSpec : WebApiSpec<Program>
             EventName = "aneventname",
             Additional = null
         };
-        await Api.PostAsync(request, req => req.SetHmacAuth(request, "asecret"));
+        await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         _recorder.LastUsageEventName.Should().Be("aneventname");
         _recorder.LastUsageAdditional.Should().BeNull();
@@ -51,7 +52,7 @@ public class RecordingApiSpec : WebApiSpec<Program>
                 { "aname3", true }
             }
         };
-        await Api.PostAsync(request, req => req.SetHmacAuth(request, "asecret"));
+        await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         _recorder.LastUsageEventName.Should().Be("aneventname");
         _recorder.LastUsageAdditional!.Count.Should().Be(3);
@@ -73,7 +74,7 @@ public class RecordingApiSpec : WebApiSpec<Program>
                 { "aname3", true }
             }
         };
-        await Api.PostAsync(request, req => req.SetHmacAuth(request, "asecret"));
+        await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         _recorder.LastMeasureEventName.Should().Be("aneventname");
         _recorder.LastMeasureAdditional!.Count.Should().Be(3);

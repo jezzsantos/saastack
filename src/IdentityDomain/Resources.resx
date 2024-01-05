@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="LoginMonitor_InvalidMaxFailedLogins" xml:space="preserve">
+        <value>The max failed logins is either too large or negative</value>
+    </data>
+    <data name="LoginMonitor_InvalidCooldownPeriod" xml:space="preserve">
+        <value>The cooldown period is either zero or too large</value>
+    </data>
+    <data name="PasswordKeep_InvalidPassword" xml:space="preserve">
+        <value>The password is not valid</value>
+    </data>
+    <data name="PasswordKeep_NoPasswordHash" xml:space="preserve">
+        <value>No password has yet been set for this user</value>
+    </data>
+    <data name="PasswordKeep_InvalidPasswordHash" xml:space="preserve">
+        <value>The password hash is not valid</value>
+    </data>
+    <data name="PasswordKeep_TokensNotMatch" xml:space="preserve">
+        <value>The password reset token is invalid</value>
+    </data>
+    <data name="PasswordKeep_TokenExpired" xml:space="preserve">
+        <value>The password reset token has expired</value>
+    </data>
+    <data name="PasswordKeep_InvalidToken" xml:space="preserve">
+        <value>The password reset token is either missing or invalid</value>
+    </data>
+    <data name="PasswordCredentialsRoot_EmailNotUnique" xml:space="preserve">
+        <value>The email is already in use by another user</value>
+    </data>
+    <data name="PasswordCredentialsRoot_PasswordInitiatedWithoutRegistration" xml:space="preserve">
+        <value>Cannot initiate password reset before the user is registered</value>
+    </data>
+    <data name="PasswordCredentialsRoot_InvalidPassword" xml:space="preserve">
+        <value>The password is not valid</value>
+    </data>
+    <data name="PasswordCredentialsRoot_RegistrationVerified" xml:space="preserve">
+        <value>The user's registration is already verified</value>
+    </data>
+    <data name="PasswordCredentialsRoot_RegistrationNotVerifying" xml:space="preserve">
+        <value>The user's registration confirmation cannot be confirmed</value>
+    </data>
+    <data name="PasswordCredentialsRoot_RegistrationVerifyingExpired" xml:space="preserve">
+        <value>The user's registration confirmation window has expired</value>
+    </data>
+    <data name="PasswordCredentialsRoot_RegistrationUnverified" xml:space="preserve">
+        <value>The user's registration has not been verified yet</value>
+    </data>
+    <data name="PasswordCredentialsRoot_DuplicatePassword" xml:space="preserve">
+        <value>New password cannot be the same as old password</value>
+    </data>
+    <data name="PasswordCredentialsRoot_PasswordResetTokenExpired" xml:space="preserve">
+        <value>The password reset confirmation has expired</value>
+    </data>
+    <data name="PasswordCredentialsRoot_NoPassword" xml:space="preserve">
+        <value>No password has yet been set for this user</value>
+    </data>
+    <data name="AuthTokensRoot_TokensExpired" xml:space="preserve">
+        <value>These tokens have already expired</value>
+    </data>
+    <data name="AuthTokensRoot_RefreshTokenNotMatched" xml:space="preserve">
+        <value>This refresh token is unknown or for another user</value>
+    </data>
+    <data name="AuthTokensRoot_TokensRevoked" xml:space="preserve">
+        <value>This refresh token has been revoked</value>
+    </data>
+    <data name="AuthTokensRoot_RefreshTokenExpired" xml:space="preserve">
+        <value>This refresh token has expired</value>
+    </data>
+    <data name="APIKeyRoot_ExpiresOnNotFuture" xml:space="preserve">
+        <value>The expiry date cannot be less than one hour into the future</value>
+    </data>
+    <data name="ApiKeyKeep_InvalidDescription" xml:space="preserve">
+        <value>The Description is not valid</value>
+    </data>
+    <data name="ApiKeyKeep_InvalidKey" xml:space="preserve">
+        <value>The API key is not valid</value>
+    </data>
+    <data name="ApiKeyKeep_InvalidKeyHash" xml:space="preserve">
+        <value>The hash of the API key is not valid</value>
+    </data>
+    <data name="ApiKeyKeep_NoApiKeyHash" xml:space="preserve">
+        <value>No API key has been set for this user yet</value>
+    </data>
+    <data name="ApiKeyRoot_NotOwner" xml:space="preserve">
+        <value>You must be an owner of this API key to perform this action</value>
+    </data>
+    <data name="APIKeyRoot_Verify_NoApiKey" xml:space="preserve">
+        <value>The is no API key to verify yet</value>
+    </data>
+</root>

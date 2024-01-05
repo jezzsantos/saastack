@@ -1,7 +1,8 @@
 using Application.Common;
 using Application.Interfaces;
-using Domain.Common.Authorization;
+using Common;
 using Domain.Interfaces;
+using Domain.Interfaces.Authorization;
 using Infrastructure.Web.Api.Common;
 using Microsoft.AspNetCore.Http;
 
@@ -28,9 +29,10 @@ public class AnonymousCallerContext : ICallerContext
 
     public ICallerContext.CallerRoles Roles => new();
 
-    public ICallerContext.CallerFeatureSets FeatureSets => new(new[] { UserFeatureSets.Basic }, null);
+    public ICallerContext.CallerFeatureLevels FeatureLevels => new(new[] { PlatformFeatureLevels.Basic }, null);
 
-    public string? Authorization => null;
+    public Optional<ICallerContext.CallerAuthorization> Authorization =>
+        Optional<ICallerContext.CallerAuthorization>.None;
 
     public bool IsAuthenticated => false;
 
