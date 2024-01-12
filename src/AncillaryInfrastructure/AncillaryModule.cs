@@ -39,12 +39,12 @@ public class AncillaryModule : ISubDomainModule
             {
                 services.RegisterUnshared<IRecordingApplication, RecordingApplication>();
                 services.RegisterUnshared<IAncillaryApplication, AncillaryApplication.AncillaryApplication>();
-                services.RegisterUnshared<IUsageMessageQueueRepository>(c =>
-                    new UsageMessageQueueRepository(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));
+                services.RegisterUnshared<IUsageMessageQueue>(c =>
+                    new UsageMessageQueue(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));
                 services.RegisterUnshared<IAuditMessageQueueRepository>(c =>
                     new AuditMessageQueueRepository(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));
-                services.RegisterUnshared<IEmailMessageQueueRepository>(c =>
-                    new EmailMessageQueueRepository(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));
+                services.RegisterUnshared<IEmailMessageQueue>(c =>
+                    new EmailMessageQueue(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));
                 services.RegisterUnshared<IAuditRepository>(c => new AuditRepository(c.ResolveForUnshared<IRecorder>(),
                     c.ResolveForUnshared<IDomainFactory>(),
                     c.ResolveForUnshared<IEventSourcingDddCommandStore<AuditRoot>>(),
@@ -53,7 +53,8 @@ public class AncillaryModule : ISubDomainModule
                     c => new AuditProjection(c.ResolveForUnshared<IRecorder>(), c.ResolveForUnshared<IDomainFactory>(),
                         c.ResolveForPlatform<IDataStore>()));
 
-                services.RegisterUnshared<IUsageReportingService, NullUsageReportingService>();
+                services.RegisterUnshared<IUsageDeliveryService, NullUsageDeliveryService>();
+                services.RegisterUnshared<IEmailDeliveryService, NullEmailDeliveryService>();
             };
         }
     }

@@ -4,13 +4,13 @@ using Common;
 namespace Application.Persistence.Shared;
 
 /// <summary>
-///     Defines a service to which we can report usages events
+///     Defines a service to which we can deliver usages events
 /// </summary>
-public interface IUsageReportingService
+public interface IUsageDeliveryService
 {
     /// <summary>
-    ///     Tracks the usage event
+    ///     Delivers the usage event
     /// </summary>
-    Task<Result<Error>> TrackAsync(ICallerContext context, string forId, string eventName,
+    Task<Result<Error>> DeliverAsync(ICallerContext context, string forId, string eventName,
         Dictionary<string, string>? additional = null, CancellationToken cancellationToken = default);
 }

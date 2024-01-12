@@ -35,7 +35,7 @@ public static class HostExtensions
 #endif
 
         services.AddSingleton<IRecorder>(c =>
-            new CrashTraceOnlyRecorder("Azure API Lambdas", c.Resolve<ILoggerFactory>(),
+            new CrashTraceOnlyRecorder("AWS API Lambdas", c.Resolve<ILoggerFactory>(),
                 c.Resolve<ICrashReporter>()));
         services.AddSingleton<IServiceClient>(c =>
             new InterHostServiceClient(c.Resolve<IHttpClientFactory>(),
@@ -43,5 +43,6 @@ public static class HostExtensions
                 c.Resolve<IHostSettings>().GetAncillaryApiHostBaseUrl()));
         services.AddSingleton<IQueueMonitoringApiRelayWorker<UsageMessage>, DeliverUsageRelayWorker>();
         services.AddSingleton<IQueueMonitoringApiRelayWorker<AuditMessage>, DeliverAuditRelayWorker>();
+        services.AddSingleton<IQueueMonitoringApiRelayWorker<EmailMessage>, DeliverEmailRelayWorker>();
     }
 }

@@ -12,7 +12,7 @@ public class QueuedEmailHtmlMessage
 {
     public string? FromDisplayName { get; set; }
 
-    public string? FromEmail { get; set; }
+    public string? FromEmailAddress { get; set; }
 
     public string? HtmlBody { get; set; }
 
@@ -20,5 +20,5 @@ public class QueuedEmailHtmlMessage
 
     public string? ToDisplayName { get; set; }
 
-    public string? ToEmail { get; set; }
+    public string? ToEmailAddress { get; set; }
 }

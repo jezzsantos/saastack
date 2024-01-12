@@ -7,11 +7,11 @@ using Infrastructure.Persistence.Interfaces;
 
 namespace Infrastructure.Persistence.Shared.ApplicationServices;
 
-public class EmailMessageQueueRepository : IEmailMessageQueueRepository
+public class EmailMessageQueue : IEmailMessageQueue
 {
     private readonly MessageQueueStore<EmailMessage> _messageQueue;
 
-    public EmailMessageQueueRepository(IRecorder recorder, IQueueStore store)
+    public EmailMessageQueue(IRecorder recorder, IQueueStore store)
     {
         _messageQueue = new MessageQueueStore<EmailMessage>(recorder, store);
     }

@@ -59,8 +59,8 @@ public static class HostExtensions
     {
 #if TESTINGONLY
         { "audits", new DrainAllAuditsRequest() },
-        { "usages", new DrainAllUsagesRequest() }
-        //     { "emails", new DrainAllEmailsRequest() },
+        { "usages", new DrainAllUsagesRequest() },
+        { "emails", new DrainAllEmailsRequest() },
         //     { "events", new DrainAllEventsRequest() }, 
 #endif
     };

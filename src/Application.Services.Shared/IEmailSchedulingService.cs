@@ -4,11 +4,12 @@ using Common;
 namespace Application.Services.Shared;
 
 /// <summary>
-///     Defines an asynchronous email sending service, that will queue messages for asynchronous and deferred delivery
+///     Defines an email scheduling service, that will schedule messages for asynchronous and deferred delivery
 /// </summary>
-public interface IEmailSendingService
+public interface IEmailSchedulingService
 {
-    Task<Result<Error>> SendHtmlEmail(ICallerContext caller, HtmlEmail htmlEmail, CancellationToken cancellationToken);
+    Task<Result<Error>> ScheduleHtmlEmail(ICallerContext caller, HtmlEmail htmlEmail,
+        CancellationToken cancellationToken);
 }
 
 /// <summary>

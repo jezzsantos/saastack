@@ -78,6 +78,51 @@ namespace AncillaryApplication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The email message is missing a &apos;HtmlBody&apos;.
+        /// </summary>
+        internal static string AncillaryApplication_MissingEmailBody {
+            get {
+                return ResourceManager.GetString("AncillaryApplication_MissingEmailBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email message is missing the &apos;HTML&apos; email.
+        /// </summary>
+        internal static string AncillaryApplication_MissingEmailHtml {
+            get {
+                return ResourceManager.GetString("AncillaryApplication_MissingEmailHtml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email message is missing a &apos;ToEmailAddress&apos; recipient.
+        /// </summary>
+        internal static string AncillaryApplication_MissingEmailRecipient {
+            get {
+                return ResourceManager.GetString("AncillaryApplication_MissingEmailRecipient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email message is missing a &apos;FromEmailAddress&apos; sender.
+        /// </summary>
+        internal static string AncillaryApplication_MissingEmailSender {
+            get {
+                return ResourceManager.GetString("AncillaryApplication_MissingEmailSender", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email message is missing a &apos;Subject&apos;.
+        /// </summary>
+        internal static string AncillaryApplication_MissingEmailSubject {
+            get {
+                return ResourceManager.GetString("AncillaryApplication_MissingEmailSubject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The audit message is missing a &apos;TenantId&apos;.
         /// </summary>
         internal static string AncillaryApplication_MissingTenantId {

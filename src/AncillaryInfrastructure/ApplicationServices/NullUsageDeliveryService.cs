@@ -8,18 +8,18 @@ using Task = System.Threading.Tasks.Task;
 namespace AncillaryInfrastructure.ApplicationServices;
 
 /// <summary>
-///     Provides a <see cref="IUsageReportingService" /> that does nothing
+///     Provides a <see cref="IUsageDeliveryService" /> that does nothing
 /// </summary>
-public class NullUsageReportingService : IUsageReportingService
+public class NullUsageDeliveryService : IUsageDeliveryService
 {
     private readonly IRecorder _recorder;
 
-    public NullUsageReportingService(IRecorder recorder)
+    public NullUsageDeliveryService(IRecorder recorder)
     {
         _recorder = recorder;
     }
 
-    public Task<Result<Error>> TrackAsync(ICallerContext context, string forId, string eventName,
+    public Task<Result<Error>> DeliverAsync(ICallerContext context, string forId, string eventName,
         Dictionary<string, string>? additional = null,
         CancellationToken cancellationToken = default)
     {
@@ -27,7 +27,7 @@ public class NullUsageReportingService : IUsageReportingService
             ? additional.ToJson()!
             : "none";
         _recorder.TraceInformation(context.ToCall(),
-            $"{nameof(NullUsageReportingService)} tracks usage event {{Event}} for {{For}} with properties: {{Properties}}",
+            $"{nameof(NullUsageDeliveryService)} delivers usage event {{Event}} for {{For}} with properties: {{Properties}}",
             eventName, forId, properties);
 
         return Task.FromResult(Result.Ok);

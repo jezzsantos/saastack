@@ -34,12 +34,12 @@ public class AuditsApiSpec : WebApiSpec<Program>
         {
             Message = new AuditMessage
             {
+                MessageId = "amessageid",
+                TenantId = "atenantid",
                 CallId = "acallid",
                 CallerId = "acallerid",
-                TenantId = "atenantid",
                 AuditCode = "anauditcode",
                 AgainstId = "anagainstid",
-                MessageId = "amessageid",
                 MessageTemplate = "amessagetemplate",
                 Arguments = new List<string> { "anarg1", "anarg2" }
             }.ToJson()!
@@ -128,6 +128,6 @@ public class AuditsApiSpec : WebApiSpec<Program>
 
     private static void OverrideDependencies(IServiceCollection services)
     {
-        services.AddSingleton<IUsageReportingService, StubUsageReportingService>();
+        services.AddSingleton<IUsageDeliveryService, StubUsageDeliveryService>();
     }
 }

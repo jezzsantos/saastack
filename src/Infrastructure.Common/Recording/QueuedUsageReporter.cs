@@ -26,11 +26,11 @@ namespace Infrastructure.Common.Recording;
 /// </summary>
 public class QueuedUsageReporter : IUsageReporter
 {
-    private readonly IUsageMessageQueueRepository _repository;
+    private readonly IUsageMessageQueue _queue;
 
     // ReSharper disable once UnusedParameter.Local
     public QueuedUsageReporter(IDependencyContainer container, ISettings settings)
-        : this(new UsageMessageQueueRepository(NullRecorder.Instance,
+        : this(new UsageMessageQueue(NullRecorder.Instance,
 #if !TESTINGONLY
 #if HOSTEDONAZURE
                 AzureStorageAccountQueueStore.Create(NullRecorder.Instance, settings)
@@ -44,9 +44,9 @@ public class QueuedUsageReporter : IUsageReporter
     {
     }
 
-    internal QueuedUsageReporter(IUsageMessageQueueRepository repository)
+    internal QueuedUsageReporter(IUsageMessageQueue queue)
     {
-        _repository = repository;
+        _queue = queue;
     }
 
     public void Track(ICallContext? context, string forId, string eventName,
@@ -70,6 +70,6 @@ public class QueuedUsageReporter : IUsageReporter
                 : string.Empty)
         };
 
-        _repository.PushAsync(call, message, CancellationToken.None).GetAwaiter().GetResult();
+        _queue.PushAsync(call, message, CancellationToken.None).GetAwaiter().GetResult();
     }
 }

@@ -19,15 +19,15 @@ namespace AncillaryInfrastructure.IntegrationTests;
 [Collection("API")]
 public class UsagesApiSpec : WebApiSpec<Program>
 {
-    private readonly IUsageMessageQueueRepository _usageMessageQueue;
-    private readonly StubUsageReportingService _usageReportingService;
+    private readonly StubUsageDeliveryService _usageDeliveryService;
+    private readonly IUsageMessageQueue _usageMessageQueue;
 
     public UsagesApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
         EmptyAllRepositories(setup);
-        _usageReportingService = setup.GetRequiredService<IUsageReportingService>().As<StubUsageReportingService>();
-        _usageReportingService.Reset();
-        _usageMessageQueue = setup.GetRequiredService<IUsageMessageQueueRepository>();
+        _usageDeliveryService = setup.GetRequiredService<IUsageDeliveryService>().As<StubUsageDeliveryService>();
+        _usageDeliveryService.Reset();
+        _usageMessageQueue = setup.GetRequiredService<IUsageMessageQueue>();
         _usageMessageQueue.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
 
@@ -38,17 +38,17 @@ public class UsagesApiSpec : WebApiSpec<Program>
         {
             Message = new UsageMessage
             {
+                MessageId = "amessageid",
                 CallId = "acallid",
                 CallerId = "acallerid",
                 EventName = "aneventname",
-                ForId = "aforid",
-                MessageId = "amessageid"
+                ForId = "aforid"
             }.ToJson()!
         };
         var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         result.Content.Value.IsDelivered.Should().BeTrue();
-        _usageReportingService.LastEventName.Should().Be("aneventname");
+        _usageDeliveryService.LastEventName.Should().Be("aneventname");
     }
 
 #if TESTINGONLY
@@ -58,7 +58,7 @@ public class UsagesApiSpec : WebApiSpec<Program>
         var request = new DrainAllUsagesRequest();
         await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
-        _usageReportingService.LastEventName.Should().BeNone();
+        _usageDeliveryService.LastEventName.Should().BeNone();
     }
 #endif
 
@@ -89,13 +89,13 @@ public class UsagesApiSpec : WebApiSpec<Program>
         var request = new DrainAllUsagesRequest();
         await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
-        _usageReportingService.AllEventNames.Count.Should().Be(3);
-        _usageReportingService.AllEventNames.Should().ContainInOrder("aneventname1", "aneventname2", "aneventname3");
+        _usageDeliveryService.AllEventNames.Count.Should().Be(3);
+        _usageDeliveryService.AllEventNames.Should().ContainInOrder("aneventname1", "aneventname2", "aneventname3");
     }
 #endif
 
     private static void OverrideDependencies(IServiceCollection services)
     {
-        services.AddSingleton<IUsageReportingService, StubUsageReportingService>();
+        services.AddSingleton<IUsageDeliveryService, StubUsageDeliveryService>();
     }
 }

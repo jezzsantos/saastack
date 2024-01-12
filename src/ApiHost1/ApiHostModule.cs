@@ -29,13 +29,13 @@ public class ApiHostModule : ISubDomainModule
         {
             return (_, services) =>
             {
-                services.RegisterUnshared<IEmailMessageQueueRepository>(c =>
-                    new EmailMessageQueueRepository(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));
+                services.RegisterUnshared<IEmailMessageQueue>(c =>
+                    new EmailMessageQueue(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));
 
                 services.RegisterUnshared<ITokensService, TokensService>();
                 services.RegisterUnshared<INotificationsService, EmailNotificationsService>();
                 services.RegisterUnshared<IWebsiteUiService, WebsiteUiService>();
-                services.RegisterUnshared<IEmailSendingService, EmailSendingService>();
+                services.RegisterUnshared<IEmailSchedulingService, QueuingEmailSchedulingService>();
             };
         }
     }

@@ -18,21 +18,45 @@ public class AncillaryApplication : IAncillaryApplication
 {
     private readonly IAuditMessageQueueRepository _auditMessageQueueRepository;
     private readonly IAuditRepository _auditRepository;
+    private readonly IEmailDeliveryService _emailDeliveryService;
+    private readonly IEmailMessageQueue _emailMessageQueue;
     private readonly IIdentifierFactory _idFactory;
     private readonly IRecorder _recorder;
-    private readonly IUsageMessageQueueRepository _usageMessageQueueRepository;
-    private readonly IUsageReportingService _usageReportingService;
+    private readonly IUsageDeliveryService _usageDeliveryService;
+    private readonly IUsageMessageQueue _usageMessageQueue;
 
     public AncillaryApplication(IRecorder recorder, IIdentifierFactory idFactory,
-        IUsageMessageQueueRepository usageMessageQueueRepository, IUsageReportingService usageReportingService,
-        IAuditMessageQueueRepository auditMessageQueueRepository, IAuditRepository auditRepository)
+        IUsageMessageQueue usageMessageQueue, IUsageDeliveryService usageDeliveryService,
+        IAuditMessageQueueRepository auditMessageQueueRepository, IAuditRepository auditRepository,
+        IEmailMessageQueue emailMessageQueue, IEmailDeliveryService emailDeliveryService)
     {
         _recorder = recorder;
         _idFactory = idFactory;
-        _usageMessageQueueRepository = usageMessageQueueRepository;
-        _usageReportingService = usageReportingService;
+        _usageMessageQueue = usageMessageQueue;
+        _usageDeliveryService = usageDeliveryService;
         _auditMessageQueueRepository = auditMessageQueueRepository;
         _auditRepository = auditRepository;
+        _emailMessageQueue = emailMessageQueue;
+        _emailDeliveryService = emailDeliveryService;
+    }
+
+    public async Task<Result<bool, Error>> DeliverEmailAsync(ICallerContext context, string messageAsJson,
+        CancellationToken cancellationToken)
+    {
+        var rehydrated = RehydrateMessage<EmailMessage>(messageAsJson);
+        if (!rehydrated.IsSuccessful)
+        {
+            return rehydrated.Error;
+        }
+
+        var delivered = await DeliverEmailAsync(context, rehydrated.Value, cancellationToken);
+        if (!delivered.IsSuccessful)
+        {
+            return delivered.Error;
+        }
+
+        _recorder.TraceInformation(context.ToCall(), "Delivered email message: {Message}", messageAsJson);
+        return true;
     }
 
     public async Task<Result<bool, Error>> DeliverUsageAsync(ICallerContext context, string messageAsJson,
@@ -90,12 +114,24 @@ public class AncillaryApplication : IAncillaryApplication
     }
 
 #if TESTINGONLY
+    public async Task<Result<Error>> DrainAllEmailsAsync(ICallerContext context, CancellationToken cancellationToken)
+    {
+        await DrainAllAsync(_emailMessageQueue,
+            message => DeliverEmailAsync(context, message, cancellationToken), cancellationToken);
+
+        _recorder.TraceInformation(context.ToCall(), "Drained all email messages");
+
+        return Result.Ok;
+    }
+#endif
+
+#if TESTINGONLY
     public async Task<Result<Error>> DrainAllUsagesAsync(ICallerContext context, CancellationToken cancellationToken)
     {
-        await DrainAllAsync(_usageMessageQueueRepository,
+        await DrainAllAsync(_usageMessageQueue,
             message => DeliverUsageAsync(context, message, cancellationToken), cancellationToken);
 
-        _recorder.TraceInformation(context.ToCall(), "Drained all usages");
+        _recorder.TraceInformation(context.ToCall(), "Drained all usage messages");
 
         return Result.Ok;
     }
@@ -107,11 +143,51 @@ public class AncillaryApplication : IAncillaryApplication
         await DrainAllAsync(_auditMessageQueueRepository,
             message => DeliverAuditAsync(context, message, cancellationToken), cancellationToken);
 
-        _recorder.TraceInformation(context.ToCall(), "Drained all audits");
+        _recorder.TraceInformation(context.ToCall(), "Drained all audit messages");
 
         return Result.Ok;
     }
 #endif
+
+    private async Task<Result<bool, Error>> DeliverEmailAsync(ICallerContext context, EmailMessage message,
+        CancellationToken cancellationToken)
+    {
+        if (message.Html.IsInvalidParameter(x => x.Exists(), nameof(EmailMessage.Html), out _))
+        {
+            return Error.RuleViolation(Resources.AncillaryApplication_MissingEmailHtml);
+        }
+
+        if (message.Html!.Subject.IsInvalidParameter(x => x.HasValue(), nameof(EmailMessage.Html.Subject), out _))
+        {
+            return Error.RuleViolation(Resources.AncillaryApplication_MissingEmailSubject);
+        }
+
+        if (message.Html.HtmlBody.IsInvalidParameter(x => x.HasValue(), nameof(EmailMessage.Html.HtmlBody), out _))
+        {
+            return Error.RuleViolation(Resources.AncillaryApplication_MissingEmailBody);
+        }
+
+        if (message.Html.ToEmailAddress.IsInvalidParameter(x => x.HasValue(), nameof(EmailMessage.Html.ToEmailAddress),
+                out _))
+        {
+            return Error.RuleViolation(Resources.AncillaryApplication_MissingEmailRecipient);
+        }
+
+        if (message.Html.FromEmailAddress.IsInvalidParameter(x => x.HasValue(),
+                nameof(EmailMessage.Html.FromEmailAddress), out _))
+        {
+            return Error.RuleViolation(Resources.AncillaryApplication_MissingEmailSender);
+        }
+
+        await _emailDeliveryService.DeliverAsync(context, message.Html.Subject!, message.Html.HtmlBody!,
+            message.Html.ToEmailAddress!, message.Html.ToDisplayName, message.Html.FromEmailAddress!,
+            message.Html.FromDisplayName,
+            cancellationToken);
+
+        _recorder.TraceInformation(context.ToCall(), "Delivered email to {For}", message.Html.ToEmailAddress!);
+
+        return true;
+    }
 
     private async Task<Result<bool, Error>> DeliverUsageAsync(ICallerContext context, UsageMessage message,
         CancellationToken cancellationToken)
@@ -126,7 +202,7 @@ public class AncillaryApplication : IAncillaryApplication
             return Error.RuleViolation(Resources.AncillaryApplication_MissingUsageEventName);
         }
 
-        await _usageReportingService.TrackAsync(context, message.ForId!, message.EventName!, message.Additional,
+        await _usageDeliveryService.DeliverAsync(context, message.ForId!, message.EventName!, message.Additional,
             cancellationToken);
 
         _recorder.TraceInformation(context.ToCall(), "Delivered usage for {For}", message.ForId!);

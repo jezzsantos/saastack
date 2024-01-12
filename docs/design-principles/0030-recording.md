@@ -131,33 +131,37 @@ These are generally non-technical or system performance-related events but more 
 
 This is simply achieved by leveraging the infrastructure of the `ILoggerFactory` of .NET.
 
-## Recorder
+## The Recorder
 
 The `HostRecorder` is used in all running hosts (e.g., ApiHosts, WebsiteHost, FunctionHosts and TestingHosts).
 
-The adapters that are used by the `HostRecorder` to send telemetry to its various infrastructure components are configurable via `RecordingOptions,` which are tailored for each host and to the specific cloud environment the `HostRecorder` is running in.
+The adapters that are used by the `HostRecorder` to send telemetry to its various infrastructure components are configurable via `RecordingOptions,` which are tailored for each host and to the specific cloud environment the `HostRecorder` is running in (i.e. Azure or AWS).
 
 For example, this is the default infrastructure that is used by the `HostRecorder` when deployed to Azure.
 
-> Similar components are used, by default, when deployed to AWS, except that Application Insights is replaced by Cloud Watch, the queues are replaced by SQS queues, and the Audits are stored in an RDS store. 
+![Azure Recording](../images/Recorder-Azure.png)
 
-![](../images/Recorder-Azure.png)
+When deployed to AWS, Application Insights is replaced by Cloud Watch, the queues are replaced by SQS queues, and the Audits are stored in an RDS database.
+
+![AWS Recording](../images/Recorder-AWS.png)
 
 No matter what the host actually is, there are two main flows of data that are handled by the `HostRecorder`. Both are high in reliability and both are asynchronous.
 
 ### Traces, Crashes, Measures
 
-By default, all Traces, Crashes, and Measures are offloaded to Application Insights directly using the Application Insights `TelemetryClient` SDK.
+When deployed to Azure, all Traces, Crashes, and Measures are offloaded to Application Insights directly using the Application Insights `TelemetryClient` SDK.
 
-> This SDK manages buffering and store-and-forward of this data asynchronously so that individual HTTP requests can return immediately without paying the tax of uploading the data to the cloud. The SDK supports buffering, retries, and other strategies to deliver the data reliably (using the `ServerTelemetryChannel`). See https://learn.microsoft.com/en-us/azure/azure-monitor/app/telemetry-channels for more details.
+> The client SDK for Application Insights manages buffering and store-and-forward of this data asynchronously so that individual HTTP requests can return immediately without paying the tax of uploading the data to the cloud. The SDK supports buffering, retries, and other strategies to deliver the data reliably (using the `ServerTelemetryChannel`). See https://learn.microsoft.com/en-us/azure/azure-monitor/app/telemetry-channels for more details.
+
+When deployed to AWS, all Traces, Crashes and Measures are offloaded to CloudWatch X-Ray using the client SDK.
 
 ### Audits and Usages
 
-Audits are ultimately destined to be stored permanently in a database. Usages are typically relayed to a remote 3rd party system.
+Audits are ultimately destined to be stored permanently in a database. Usages are typically relayed to a remote 3rd party system (i.e. Google Analytics, MixPanel, Amplitude etc).
 
-In both cases, to avoid tying up the client's HTTP request, the telemetry for these types is first stored on a reliable queue, and then later, an API call to the Ancillary API is issued that delivers the telemetry to its respective destination.
+In both cases, to avoid tying up the client's HTTP request, the telemetry for these types is first "scheduled" on a reliable queue, and then later, an API call to the Ancillary API is issued that "delivers" the telemetry to its final destination.
 
-> In Azure, an Azure Function is triggered when the telemetry arrives on a queue, and the Azure Function simply calls an API in the Ancillary API to deliver the telemetry to its destination. The Azure Function Trigger is a reliable means to handle this process, since if the API call fails, the message will return to the queue, and subsequent failures will result in the message moving to the poison queue, to be dealt with manually.
+> On Azure, an Azure Function is triggered when the telemetry arrives on a queue, and the Azure Function simply calls an API in the Ancillary API to deliver the telemetry to its destination. The Azure Function Trigger is a reliable means to handle this process, since if the API call fails, the message will return to the queue, and subsequent failures will result in the message moving to the poison queue, to be dealt with manually.
 
 > In AWS, a Lambda does the same job as the Azure Function above, and the SQS adapter is configured with poison queues (a.k.a a dead-letter queue) to operate in exactly the same way.
 

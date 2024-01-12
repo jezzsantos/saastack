@@ -22,8 +22,10 @@ public class AncillaryApplicationSpec
     private readonly Mock<IAuditMessageQueueRepository> _auditMessageRepository;
     private readonly Mock<IAuditRepository> _auditRepository;
     private readonly Mock<ICallerContext> _caller;
-    private readonly Mock<IUsageMessageQueueRepository> _usageMessageRepository;
-    private readonly Mock<IUsageReportingService> _usageReportingService;
+    private readonly Mock<IEmailDeliveryService> _emailDeliveryService;
+    private readonly Mock<IEmailMessageQueue> _emailMessageQueue;
+    private readonly Mock<IUsageDeliveryService> _usageDeliveryService;
+    private readonly Mock<IUsageMessageQueue> _usageMessageQueue;
 
     public AncillaryApplicationSpec()
     {
@@ -32,15 +34,18 @@ public class AncillaryApplicationSpec
         idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns(new Result<Identifier, Error>("anid".ToId()));
         _caller = new Mock<ICallerContext>();
-        _usageMessageRepository = new Mock<IUsageMessageQueueRepository>();
-        _usageReportingService = new Mock<IUsageReportingService>();
+        _usageMessageQueue = new Mock<IUsageMessageQueue>();
+        _usageDeliveryService = new Mock<IUsageDeliveryService>();
         _auditMessageRepository = new Mock<IAuditMessageQueueRepository>();
         _auditRepository = new Mock<IAuditRepository>();
         _auditRepository.Setup(ar => ar.SaveAsync(It.IsAny<AuditRoot>(), It.IsAny<CancellationToken>()))
             .Returns((AuditRoot root, CancellationToken _) => Task.FromResult<Result<AuditRoot, Error>>(root));
+        _emailMessageQueue = new Mock<IEmailMessageQueue>();
+        _emailDeliveryService = new Mock<IEmailDeliveryService>();
 
-        _application = new AncillaryApplication(recorder.Object, idFactory.Object, _usageMessageRepository.Object,
-            _usageReportingService.Object, _auditMessageRepository.Object, _auditRepository.Object);
+        _application = new AncillaryApplication(recorder.Object, idFactory.Object, _usageMessageQueue.Object,
+            _usageDeliveryService.Object, _auditMessageRepository.Object, _auditRepository.Object,
+            _emailMessageQueue.Object, _emailDeliveryService.Object);
     }
 
     [Fact]
@@ -50,8 +55,8 @@ public class AncillaryApplicationSpec
 
         result.Should().BeError(ErrorCode.RuleViolation,
             Resources.AncillaryApplication_InvalidQueuedMessage.Format(nameof(UsageMessage), "anunknownmessage"));
-        _usageReportingService.Verify(
-            urs => urs.TrackAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+        _usageDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -68,8 +73,8 @@ public class AncillaryApplicationSpec
 
         result.Should().BeError(ErrorCode.RuleViolation,
             Resources.AncillaryApplication_MissingUsageForId);
-        _usageReportingService.Verify(
-            urs => urs.TrackAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+        _usageDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -86,8 +91,8 @@ public class AncillaryApplicationSpec
 
         result.Should().BeError(ErrorCode.RuleViolation,
             Resources.AncillaryApplication_MissingUsageEventName);
-        _usageReportingService.Verify(
-            urs => urs.TrackAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+        _usageDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -107,8 +112,8 @@ public class AncillaryApplicationSpec
         var result = await _application.DeliverUsageAsync(_caller.Object, messageAsJson, CancellationToken.None);
 
         result.Should().BeSuccess();
-        _usageReportingService.Verify(
-            urs => urs.TrackAsync(It.IsAny<ICallerContext>(), "aforid", "aneventname",
+        _usageDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "aforid", "aneventname",
                 It.Is<Dictionary<string, string>>(dic =>
                     dic.Count == 1
                     && dic["aname"] == "avalue"
@@ -169,11 +174,157 @@ public class AncillaryApplicationSpec
             ), It.IsAny<CancellationToken>()));
     }
 
+    [Fact]
+    public async Task WhenDeliverEmailAsyncAndMessageIsNotRehydratable_ThenReturnsError()
+    {
+        var result = await _application.DeliverEmailAsync(_caller.Object, "anunknownmessage", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.RuleViolation,
+            Resources.AncillaryApplication_InvalidQueuedMessage.Format(nameof(EmailMessage), "anunknownmessage"));
+        _emailDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenDeliverEmailAsyncAndMessageHasNoHtml_ThenReturnsError()
+    {
+        var messageAsJson = new EmailMessage
+        {
+            Html = null
+        }.ToJson()!;
+
+        var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.RuleViolation,
+            Resources.AncillaryApplication_MissingEmailHtml);
+        _emailDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenDeliverEmailAsyncAndMessageHasNoSubject_ThenReturnsError()
+    {
+        var messageAsJson = new EmailMessage
+        {
+            Html = new QueuedEmailHtmlMessage
+            {
+                Subject = null
+            }
+        }.ToJson()!;
+
+        var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.RuleViolation,
+            Resources.AncillaryApplication_MissingEmailSubject);
+        _emailDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenDeliverEmailAsyncAndMessageHasNoBody_ThenReturnsError()
+    {
+        var messageAsJson = new EmailMessage
+        {
+            Html = new QueuedEmailHtmlMessage
+            {
+                Subject = "asubject",
+                HtmlBody = null
+            }
+        }.ToJson()!;
+
+        var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.RuleViolation,
+            Resources.AncillaryApplication_MissingEmailBody);
+        _emailDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenDeliverEmailAsyncAndMessageHasNoRecipient_ThenReturnsError()
+    {
+        var messageAsJson = new EmailMessage
+        {
+            Html = new QueuedEmailHtmlMessage
+            {
+                Subject = "asubject",
+                HtmlBody = "abody",
+                ToEmailAddress = null
+            }
+        }.ToJson()!;
+
+        var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.RuleViolation,
+            Resources.AncillaryApplication_MissingEmailRecipient);
+        _emailDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenDeliverEmailAsyncAndMessageHasNoSender_ThenReturnsError()
+    {
+        var messageAsJson = new EmailMessage
+        {
+            Html = new QueuedEmailHtmlMessage
+            {
+                Subject = "asubject",
+                HtmlBody = "abody",
+                ToEmailAddress = "arecipientemailaddress",
+                FromEmailAddress = null
+            }
+        }.ToJson()!;
+
+        var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.RuleViolation,
+            Resources.AncillaryApplication_MissingEmailSender);
+        _emailDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenDeliverEmailAsync_ThenDelivers()
+    {
+        var messageAsJson = new EmailMessage
+        {
+            Html = new QueuedEmailHtmlMessage
+            {
+                Subject = "asubject",
+                HtmlBody = "abody",
+                ToEmailAddress = "arecipientemailaddress",
+                ToDisplayName = "arecipient",
+                FromEmailAddress = "asenderemailaddress",
+                FromDisplayName = "asender"
+            }
+        }.ToJson()!;
+
+        var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _emailDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "asubject", "abody", "arecipientemailaddress",
+                "arecipient", "asenderemailaddress", "asender",
+                It.IsAny<CancellationToken>()));
+    }
+
 #if TESTINGONLY
     [Fact]
     public async Task WhenDrainAllUsagesAsyncAndNoneOnQueue_ThenDoesNotDeliver()
     {
-        _usageMessageRepository.Setup(umr =>
+        _usageMessageQueue.Setup(umr =>
                 umr.PopSingleAsync(It.IsAny<Func<UsageMessage, CancellationToken, Task<Result<Error>>>>(),
                     It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<bool, Error>>(false));
@@ -181,11 +332,11 @@ public class AncillaryApplicationSpec
         var result = await _application.DrainAllUsagesAsync(_caller.Object, CancellationToken.None);
 
         result.Should().BeSuccess();
-        _usageMessageRepository.Verify(
+        _usageMessageQueue.Verify(
             urs => urs.PopSingleAsync(It.IsAny<Func<UsageMessage, CancellationToken, Task<Result<Error>>>>(),
                 It.IsAny<CancellationToken>()));
-        _usageReportingService.Verify(
-            urs => urs.TrackAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+        _usageDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -203,7 +354,7 @@ public class AncillaryApplicationSpec
             EventName = "aneventname2"
         };
         var callbackCount = 1;
-        _usageMessageRepository.Setup(umr =>
+        _usageMessageQueue.Setup(umr =>
                 umr.PopSingleAsync(It.IsAny<Func<UsageMessage, CancellationToken, Task<Result<Error>>>>(),
                     It.IsAny<CancellationToken>()))
             .Callback((Func<UsageMessage, CancellationToken, Task<Result<Error>>> action, CancellationToken _) =>
@@ -227,17 +378,17 @@ public class AncillaryApplicationSpec
         var result = await _application.DrainAllUsagesAsync(_caller.Object, CancellationToken.None);
 
         result.Should().BeSuccess();
-        _usageMessageRepository.Verify(
+        _usageMessageQueue.Verify(
             urs => urs.PopSingleAsync(It.IsAny<Func<UsageMessage, CancellationToken, Task<Result<Error>>>>(),
                 It.IsAny<CancellationToken>()), Times.Exactly(2));
-        _usageReportingService.Verify(
-            urs => urs.TrackAsync(It.IsAny<ICallerContext>(), "aforid1", "aneventname1",
+        _usageDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "aforid1", "aneventname1",
                 It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()));
-        _usageReportingService.Verify(
-            urs => urs.TrackAsync(It.IsAny<ICallerContext>(), "aforid2", "aneventname2",
+        _usageDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "aforid2", "aneventname2",
                 It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()));
-        _usageReportingService.Verify(
-            urs => urs.TrackAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+        _usageDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
     }
 
@@ -306,6 +457,96 @@ public class AncillaryApplicationSpec
             aud.AuditCode == "anauditcode2"
         ), It.IsAny<CancellationToken>()));
         _auditRepository.Verify(ar => ar.SaveAsync(It.IsAny<AuditRoot>(), It.IsAny<CancellationToken>()),
+            Times.Exactly(2));
+    }
+
+    [Fact]
+    public async Task WhenDrainAllEmailsAsyncAndNoneOnQueue_ThenDoesNotDeliver()
+    {
+        _emailMessageQueue.Setup(umr =>
+                umr.PopSingleAsync(It.IsAny<Func<EmailMessage, CancellationToken, Task<Result<Error>>>>(),
+                    It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<bool, Error>>(false));
+
+        var result = await _application.DrainAllEmailsAsync(_caller.Object, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _emailMessageQueue.Verify(
+            urs => urs.PopSingleAsync(It.IsAny<Func<EmailMessage, CancellationToken, Task<Result<Error>>>>(),
+                It.IsAny<CancellationToken>()));
+        _emailDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenDrainAllEmailsAsyncAndSomeOnQueue_ThenDeliversAll()
+    {
+        var message1 = new EmailMessage
+        {
+            Html = new QueuedEmailHtmlMessage
+            {
+                Subject = "asubject1",
+                HtmlBody = "abody1",
+                ToEmailAddress = "arecipientemailaddress1",
+                ToDisplayName = "arecipient1",
+                FromEmailAddress = "asenderemailaddress1",
+                FromDisplayName = "asender1"
+            }
+        };
+        var message2 = new EmailMessage
+        {
+            Html = new QueuedEmailHtmlMessage
+            {
+                Subject = "asubject2",
+                HtmlBody = "abody2",
+                ToEmailAddress = "arecipientemailaddress2",
+                ToDisplayName = "arecipient2",
+                FromEmailAddress = "asenderemailaddress2",
+                FromDisplayName = "asender2"
+            }
+        };
+        var callbackCount = 1;
+        _emailMessageQueue.Setup(umr =>
+                umr.PopSingleAsync(It.IsAny<Func<EmailMessage, CancellationToken, Task<Result<Error>>>>(),
+                    It.IsAny<CancellationToken>()))
+            .Callback((Func<EmailMessage, CancellationToken, Task<Result<Error>>> action, CancellationToken _) =>
+            {
+                if (callbackCount == 1)
+                {
+                    action(message1, CancellationToken.None);
+                }
+
+                if (callbackCount == 2)
+                {
+                    action(message2, CancellationToken.None);
+                }
+            })
+            .Returns((Func<EmailMessage, CancellationToken, Task<Result<Error>>> _, CancellationToken _) =>
+            {
+                callbackCount++;
+                return Task.FromResult<Result<bool, Error>>(callbackCount is 1 or 2);
+            });
+
+        var result = await _application.DrainAllEmailsAsync(_caller.Object, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _emailMessageQueue.Verify(
+            urs => urs.PopSingleAsync(It.IsAny<Func<EmailMessage, CancellationToken, Task<Result<Error>>>>(),
+                It.IsAny<CancellationToken>()), Times.Exactly(2));
+        _emailDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "asubject1", "abody1", "arecipientemailaddress1",
+                "arecipient1", "asenderemailaddress1", "asender1",
+                It.IsAny<CancellationToken>()));
+        _emailDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "asubject2", "abody2", "arecipientemailaddress2",
+                "arecipient2", "asenderemailaddress2", "asender2",
+                It.IsAny<CancellationToken>()));
+        _emailDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
             Times.Exactly(2));
     }
 #endif

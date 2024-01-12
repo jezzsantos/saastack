@@ -8,31 +8,31 @@ using Common;
 namespace Infrastructure.Shared.ApplicationServices;
 
 /// <summary>
-///     Provides a queueing service for asynchronous delivery of emails
+///     Provides an queue scheduling service, that will schedule messages for asynchronous and deferred delivery
 /// </summary>
-public class EmailSendingService : IEmailSendingService
+public class QueuingEmailSchedulingService : IEmailSchedulingService
 {
     private readonly IRecorder _recorder;
-    private readonly IEmailMessageQueueRepository _repository;
+    private readonly IEmailMessageQueue _queue;
 
-    public EmailSendingService(IRecorder recorder, IEmailMessageQueueRepository repository)
+    public QueuingEmailSchedulingService(IRecorder recorder, IEmailMessageQueue queue)
     {
         _recorder = recorder;
-        _repository = repository;
+        _queue = queue;
     }
 
-    public async Task<Result<Error>> SendHtmlEmail(ICallerContext caller, HtmlEmail htmlEmail,
+    public async Task<Result<Error>> ScheduleHtmlEmail(ICallerContext caller, HtmlEmail htmlEmail,
         CancellationToken cancellationToken)
     {
-        var queued = await _repository.PushAsync(caller.ToCall(), new EmailMessage
+        var queued = await _queue.PushAsync(caller.ToCall(), new EmailMessage
         {
             Html = new QueuedEmailHtmlMessage
             {
                 Subject = htmlEmail.Subject,
-                FromEmail = htmlEmail.FromEmailAddress,
+                FromEmailAddress = htmlEmail.FromEmailAddress,
                 FromDisplayName = htmlEmail.FromDisplayName,
                 HtmlBody = htmlEmail.Body,
-                ToEmail = htmlEmail.ToEmailAddress,
+                ToEmailAddress = htmlEmail.ToEmailAddress,
                 ToDisplayName = htmlEmail.ToDisplayName
             }
         }, cancellationToken);

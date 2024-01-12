@@ -9,14 +9,14 @@ namespace Infrastructure.Shared.ApplicationServices;
 
 /// <summary>
 ///     Provides a <see cref="INotificationsService" /> that delivers notifications via asynchronous email delivery using
-///     <see cref="IEmailSendingService" />
+///     <see cref="IEmailSchedulingService" />
 /// </summary>
 public class EmailNotificationsService : INotificationsService
 {
     public const string ProductNameSettingName = "ApplicationServices:Notifications:SenderProductName";
     public const string SenderDisplayNameSettingName = "ApplicationServices:Notifications:SenderDisplayName";
     public const string SenderEmailAddressSettingName = "ApplicationServices:Notifications:SenderEmailAddress";
-    private readonly IEmailSendingService _emailSendingService;
+    private readonly IEmailSchedulingService _emailSchedulingService;
     private readonly IHostSettings _hostSettings;
     private readonly string _productName;
     private readonly string _senderEmailAddress;
@@ -24,11 +24,11 @@ public class EmailNotificationsService : INotificationsService
     private readonly IWebsiteUiService _websiteUiService;
 
     public EmailNotificationsService(IConfigurationSettings settings, IHostSettings hostSettings,
-        IWebsiteUiService websiteUiService, IEmailSendingService emailSendingService)
+        IWebsiteUiService websiteUiService, IEmailSchedulingService emailSchedulingService)
     {
         _hostSettings = hostSettings;
         _websiteUiService = websiteUiService;
-        _emailSendingService = emailSendingService;
+        _emailSchedulingService = emailSchedulingService;
         _productName = settings.Platform.GetString(ProductNameSettingName, nameof(EmailNotificationsService));
         _senderEmailAddress =
             settings.Platform.GetString(SenderEmailAddressSettingName, nameof(EmailNotificationsService));
@@ -48,7 +48,7 @@ public class EmailNotificationsService : INotificationsService
             $"<p>Please click this link to <a href=\"{link}\">confirm your email address</a></p>" +
             $"<p>This is an automated email from the support team at {_productName}</p>";
 
-        return await _emailSendingService.SendHtmlEmail(caller, new HtmlEmail
+        return await _emailSchedulingService.ScheduleHtmlEmail(caller, new HtmlEmail
         {
             Subject = $"Welcome to {_productName}",
             Body = htmlBody,

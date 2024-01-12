@@ -48,5 +48,6 @@ public static class HostExtensions
                 c.Resolve<IHostSettings>().GetAncillaryApiHostBaseUrl()));
         services.AddSingleton<IQueueMonitoringApiRelayWorker<UsageMessage>, DeliverUsageRelayWorker>();
         services.AddSingleton<IQueueMonitoringApiRelayWorker<AuditMessage>, DeliverAuditRelayWorker>();
+        services.AddSingleton<IQueueMonitoringApiRelayWorker<EmailMessage>, DeliverEmailRelayWorker>();
     }
 }

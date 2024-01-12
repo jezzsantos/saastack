@@ -7,11 +7,11 @@ using Infrastructure.Persistence.Interfaces;
 
 namespace Infrastructure.Persistence.Shared.ApplicationServices;
 
-public class UsageMessageQueueRepository : IUsageMessageQueueRepository
+public class UsageMessageQueue : IUsageMessageQueue
 {
     private readonly MessageQueueStore<UsageMessage> _messageQueue;
 
-    public UsageMessageQueueRepository(IRecorder recorder, IQueueStore store)
+    public UsageMessageQueue(IRecorder recorder, IQueueStore store)
     {
         _messageQueue = new MessageQueueStore<UsageMessage>(recorder, store);
     }
