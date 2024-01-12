@@ -5,42 +5,47 @@ using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using WebApi_MinimalApiMediatRGenerator = Generators::Tools.Generators.WebApi.MinimalApiMediatRGenerator;
+using MinimalApiMediatRGenerator = Generators::Tools.Generators.WebApi.MinimalApiMediatRGenerator;
 
 namespace Tools.Generators.WebApi.UnitTests;
 
 [UsedImplicitly]
 public class MinimalApiMediatRGeneratorSpec
 {
+    private static readonly string[]
+        AdditionalCompilationAssemblies =
+            { "System.Runtime.dll", "netstandard.dll" }; //HACK: required to analyze custom attributes
+
     private static CSharpCompilation CreateCompilation(string sourceCode)
     {
         var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
 
+        var references = new List<MetadataReference>
+        {
+            MetadataReference.CreateFromFile(typeof(MinimalApiMediatRGenerator).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location)
+        };
+        AdditionalCompilationAssemblies.ToList()
+            .ForEach(item => references.Add(MetadataReference.CreateFromFile(Path.Combine(assemblyPath, item))));
         var compilation = CSharpCompilation.Create("compilation",
             new[]
             {
                 CSharpSyntaxTree.ParseText(sourceCode)
             },
-            new[]
-            {
-                MetadataReference.CreateFromFile(typeof(WebApi_MinimalApiMediatRGenerator).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location),
-                MetadataReference.CreateFromFile(Path.Combine(assemblyPath,
-                    "System.Runtime.dll")) //HACK: this is required to make custom attributes work
-            },
+            references,
             new CSharpCompilationOptions(OutputKind.ConsoleApplication));
 
         return compilation;
     }
 
     [Trait("Category", "Unit")]
-    public class GivenAServiceCLass
+    public class GivenAServiceClass
     {
         private GeneratorDriver _driver;
 
-        public GivenAServiceCLass()
+        public GivenAServiceClass()
         {
-            var generator = new WebApi_MinimalApiMediatRGenerator();
+            var generator = new MinimalApiMediatRGenerator();
             _driver = CSharpGeneratorDriver.Create(generator);
         }
 

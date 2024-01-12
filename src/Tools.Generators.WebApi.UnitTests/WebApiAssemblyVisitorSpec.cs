@@ -16,23 +16,26 @@ namespace Tools.Generators.WebApi.UnitTests;
 public class WebApiAssemblyVisitorSpec
 {
     private const string CompilationSourceCode = "";
+    private static readonly string[]
+        AdditionalCompilationAssemblies =
+            { "System.Runtime.dll", "netstandard.dll" }; //HACK: required to analyze use custom attributes
 
     private static CSharpCompilation CreateCompilation(string sourceCode)
     {
         var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
-
+        var references = new List<MetadataReference>
+        {
+            MetadataReference.CreateFromFile(typeof(WebApiAssemblyVisitor).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location)
+        };
+        AdditionalCompilationAssemblies.ToList()
+            .ForEach(item => references.Add(MetadataReference.CreateFromFile(Path.Combine(assemblyPath, item))));
         var compilation = CSharpCompilation.Create("compilation",
             new[]
             {
                 CSharpSyntaxTree.ParseText(sourceCode)
             },
-            new[]
-            {
-                MetadataReference.CreateFromFile(typeof(WebApiAssemblyVisitor).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location),
-                MetadataReference.CreateFromFile(Path.Combine(assemblyPath,
-                    "System.Runtime.dll")) //HACK: this is required to make custom attributes work
-            },
+            references,
             new CSharpCompilationOptions(OutputKind.ConsoleApplication));
 
         return compilation;
@@ -371,7 +374,7 @@ public class WebApiAssemblyVisitorSpec
                                                     public class AResponse : IWebResponse
                                                     {
                                                     }
-                                                    [Route("aroute", ServiceOperation.Get)]
+                                                    [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", ServiceOperation.Get)]
                                                     public class ARequest : IWebRequest<AResponse>
                                                     {
                                                     }

@@ -21,7 +21,7 @@ namespace Tools.Generators.WebApi;
 public class WebApiAssemblyVisitor : SymbolVisitor
 {
     internal static readonly string[] IgnoredNamespaces =
-        { "System", "Microsoft", "MediatR", "MessagePack", "NerdBank*" };
+        ["System", "Microsoft", "MediatR", "MessagePack", "NerdBank*"];
 
     private readonly CancellationToken _cancellationToken;
     private readonly INamedTypeSymbol _cancellationTokenSymbol;
@@ -205,24 +205,24 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             return new TypeName(symbol.ContainingNamespace.ToDisplayString(), symbol.Name);
         }
 
-        static ServiceOperation FromOperationVerb(string? operation)
+        static ServiceOperation FromOperationVerb(string operation)
         {
             if (operation is null)
             {
                 return ServiceOperation.Get;
             }
 
-            return Enum.Parse<ServiceOperation>(operation, true);
+            return (ServiceOperation)Enum.Parse(typeof(ServiceOperation), operation, true);
         }
 
-        static AccessType FromAccessType(string? access)
+        static AccessType FromAccessType(string access)
         {
             if (access is null)
             {
                 return AccessType.Anonymous;
             }
 
-            return Enum.Parse<AccessType>(access, true);
+            return (AccessType)Enum.Parse(typeof(AccessType), access, true);
         }
 
         // We assume that the request type derives from IWebRequest<TResponse>
@@ -336,7 +336,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         }
 
         // We assume that the request DTO it is decorated with a RouteAttribute
-        bool HasRouteAttribute(IMethodSymbol method, out AttributeData? routeAttribute)
+        bool HasRouteAttribute(IMethodSymbol method, out AttributeData routeAttribute)
         {
             var parameters = method.Parameters;
             if (parameters.Length == 0)
@@ -353,35 +353,33 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
     public record ServiceOperationRegistration
     {
-        public required ApiServiceClassRegistration Class { get; init; }
+        public ApiServiceClassRegistration Class { get; set; }
 
-        public required bool HasCancellationToken { get; init; }
+        public bool HasCancellationToken { get; set; }
 
-        public required bool IsAsync { get; init; }
+        public bool IsAsync { get; set; }
 
-        public required bool IsTestingOnly { get; init; }
+        public bool IsTestingOnly { get; set; }
 
-        public string? MethodBody { get; set; }
+        public string MethodBody { get; set; }
 
-        public required string MethodName { get; init; }
+        public string MethodName { get; set; }
 
-        public required AccessType OperationAccess { get; init; }
+        public AccessType OperationAccess { get; set; }
 
-        public required ServiceOperation OperationType { get; init; }
+        public ServiceOperation OperationType { get; set; }
 
-        public required TypeName RequestDtoType { get; init; }
+        public TypeName RequestDtoType { get; set; }
 
-        public required TypeName ResponseDtoType { get; init; }
+        public TypeName ResponseDtoType { get; set; }
 
-        public required string RoutePath { get; init; }
+        public string RoutePath { get; set; }
     }
 
     public record TypeName
     {
         public TypeName(string @namespace, string name)
         {
-            ArgumentException.ThrowIfNullOrEmpty(@namespace);
-            ArgumentException.ThrowIfNullOrEmpty(name);
             Namespace = @namespace;
             Name = name;
         }
@@ -392,7 +390,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
         public string Namespace { get; }
 
-        public virtual bool Equals(TypeName? other)
+        public virtual bool Equals(TypeName other)
         {
             if (ReferenceEquals(null, other))
             {
@@ -409,32 +407,39 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
         public override int GetHashCode()
         {
+#if NETSTANDARD2_0
+            var hash = 17;
+            hash = hash * 23 + Namespace.GetHashCode();
+            hash = hash * 23 + Name.GetHashCode();
+            return hash;
+#else
             return HashCode.Combine(Namespace, Name);
+#endif
         }
     }
 
     public record ApiServiceClassRegistration
     {
-        public IEnumerable<Constructor> Constructors { get; init; } = new List<Constructor>();
+        public IEnumerable<Constructor> Constructors { get; set; } = new List<Constructor>();
 
-        public required TypeName TypeName { get; init; }
+        public TypeName TypeName { get; set; }
 
-        public IEnumerable<string> UsingNamespaces { get; init; } = new List<string>();
+        public IEnumerable<string> UsingNamespaces { get; set; } = new List<string>();
     }
 
     public record Constructor
     {
-        public IEnumerable<ConstructorParameter> CtorParameters { get; init; } = new List<ConstructorParameter>();
+        public IEnumerable<ConstructorParameter> CtorParameters { get; set; } = new List<ConstructorParameter>();
 
-        public required bool IsInjectionCtor { get; init; }
+        public bool IsInjectionCtor { get; set; }
 
-        public string? MethodBody { get; set; }
+        public string MethodBody { get; set; }
     }
 
     public record ConstructorParameter
     {
-        public required TypeName TypeName { get; init; }
+        public TypeName TypeName { get; set; }
 
-        public required string VariableName { get; init; }
+        public string VariableName { get; set; }
     }
 }

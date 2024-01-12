@@ -5,7 +5,7 @@ public static class StringExtensions
     /// <summary>
     ///     Whether the string value contains no value: it is either: null, empty or only whitespaces
     /// </summary>
-    public static bool HasNoValue(this string? value)
+    public static bool HasNoValue(this string value)
     {
         return string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value);
     }
@@ -13,7 +13,7 @@ public static class StringExtensions
     /// <summary>
     ///     Whether the string value contains any value except: null, empty or only whitespaces
     /// </summary>
-    public static bool HasValue(this string? value)
+    public static bool HasValue(this string value)
     {
         return !string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value);
     }

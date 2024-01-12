@@ -1,14 +1,19 @@
 # Source Generator
 
-This source generator project is meant to be included by every Api Project for every subdomain.
+This source generator project is meant to be included by every API Project for every module/subdomain.
 
 It's job is to convert any `IWebApiService` class definitions (found in the assembly) into Minimal API registrations and MediatR handlers.
 
 # Development Workarounds
 
-C# Source Generators have difficulties running in the IDE if the code used in them has dependencies on other projects in the solution (and other nugets).
+Source Generators are required to run to build the rest of the codebase.
 
-This is especially problematic when those referenced projects have transient dependencies to types in AspNet.
+Source Generators have to be built in NETSTANDARD2.0 for them to run in Visual Studio, but this is not the case to run in JetBrains Rider.
+> This constraint exists to support source generators working in older versions of the .NET Framework, and will exist until Microsoft fix the issue Visual Studio. This is another reason to use JetBrains Rider as the preferred IDE for working with this codebase.
+
+C# Source Generators have difficulties running in any IDE if the code used in them references code in other projects in the solution, and they also suffer problems if they reference any nuget packages.
+
+This is especially problematic when those referenced projects have transient dependencies to types in ASP.NET
 
 If any dependencies are taken, special workarounds (in the project file of this project) are required in order for this source generators to work properly.
 

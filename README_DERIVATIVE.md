@@ -9,10 +9,14 @@
 You will need the following development tools to build, run, and test this project:
 
 * Windows or MacOS.
-* Jetbrains Rider or Visual Studio (There is most support for JetBrains dotUltimate)
+* JetBrains Rider (recommended) or Visual Studio
+   * Note: Using JetBrains Rider is recommended since the codebase includes more comprehensive customized tooling (coding standards, live templates, etc.)
+   * Note: If using Visual Studio, you will need to install the additional component `.NET Compiler Platform SDK` in order to run the built-in Roslyn source generators.
+   * Note: if using Visual Studio, the built-in Roslyn analyzers will not work (due to .netstandard2.0 [restrictions between Visual Studio and Roslyn](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview))
+
 * Install the .NET7.0 SDK (specifically version 7.0.14). Available for [download here](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
 
-> We have ensured that you wont need any other infrastructure running on your local machine (i.e. SQLServer database), unless you want to run infrastructure specific integration tests.
+> We have ensured that you won't need any other infrastructure running on your local machine (i.e., a Microsoft SQLServer database) unless you want to run infrastructure-specific integration tests.
 
 # Setup Environment
 

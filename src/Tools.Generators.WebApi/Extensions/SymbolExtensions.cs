@@ -5,13 +5,13 @@ namespace Tools.Generators.WebApi.Extensions;
 
 public static class SymbolExtensions
 {
-    public static AttributeData? GetAttribute(this ISymbol symbol, INamedTypeSymbol attributeType)
+    public static AttributeData GetAttribute(this ISymbol symbol, INamedTypeSymbol attributeType)
     {
         return symbol.GetAttributes()
             .FirstOrDefault(attribute => attribute.AttributeClass!.IsOfType(attributeType));
     }
 
-    public static INamedTypeSymbol? GetBaseType(this ITypeSymbol symbol, INamedTypeSymbol baseType)
+    public static INamedTypeSymbol GetBaseType(this ITypeSymbol symbol, INamedTypeSymbol baseType)
     {
         return symbol.AllInterfaces.FirstOrDefault(@interface => @interface.IsOfType(baseType));
     }
@@ -45,7 +45,7 @@ public static class SymbolExtensions
 
         return usingSyntaxes.Select(us => us.Name!.ToString())
             .Distinct()
-            .OrderDescending()
+            .OrderByDescending(s => s)
             .ToList();
     }
 
@@ -61,7 +61,6 @@ public static class SymbolExtensions
 
     public static bool IsDerivedFrom(this ITypeSymbol symbol, INamedTypeSymbol baseType)
     {
-        ArgumentNullException.ThrowIfNull(baseType);
         return symbol.AllInterfaces.Any(@interface => @interface.IsOfType(baseType));
     }
 
