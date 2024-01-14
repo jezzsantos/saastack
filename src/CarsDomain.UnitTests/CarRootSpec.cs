@@ -205,6 +205,18 @@ public class CarRootSpec
         result.Should().BeError(ErrorCode.Validation, Resources.CarRoot_ReserveInPast);
     }
 
+    [Fact]
+    public void WhenReserveIfAvailableWithoutAReference_ThenReturnsError()
+    {
+        var start = DateTime.UtcNow.AddSeconds(1);
+        var end = start.AddHours(1);
+        SetupCar();
+
+        var result = _car.ReserveIfAvailable(TimeSlot.Create(start, end).Value, Optional<string>.None);
+
+        result.Should().BeError(ErrorCode.Validation, Resources.CarRoot_ReferenceMissing);
+    }
+
 #if TESTINGONLY
     [Fact]
     public void WhenReserveIfAvailableAndUnavailable_ThenReturnsFalse()

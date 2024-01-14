@@ -224,6 +224,51 @@ public class BookingsApplicationSpec
     }
 
     [Fact]
+    public async Task WhenMakeBookingAsyncAndHasNoEndDateAndHasAvailability_ThenReturnsBooking()
+    {
+        _carsService.Setup(cs => cs.GetCarAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<Car, Error>>(new Car
+            {
+                Id = "acarid",
+                Managers = null,
+                Manufacturer = null,
+                Owner = null,
+                Plate = null,
+                Status = "astatus"
+            }));
+        var start = DateTime.UtcNow;
+        _carsService.Setup(
+                cs => cs.ReserveCarIfAvailableAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<bool, Error>>(true));
+
+        var result =
+            await _application.MakeBookingAsync(_caller.Object, "anorganizationid", "acarid", start, null,
+                CancellationToken.None);
+
+        var expectedEnd = start.Add(BookingsApplication.DefaultBookingDuration);
+        result.Should().BeSuccess();
+        result.Value.Id.Should().Be("anid");
+        result.Value.CarId.Should().Be("acarid");
+        result.Value.BorrowerId.Should().Be("acallerid");
+        result.Value.EndUtc.Should().Be(expectedEnd);
+        result.Value.StartUtc.Should().Be(start);
+        _carsService.Verify(
+            cs => cs.ReserveCarIfAvailableAsync(_caller.Object
+                , "anorganizationid", "acarid",
+                start, expectedEnd, "anid", It.IsAny<CancellationToken>()));
+        _repository.Verify(rep => rep.SaveAsync(It.Is<BookingRoot>(booking =>
+            booking.Id == "anid"
+            && booking.OrganizationId == "anorganizationid"
+            && booking.CarId == "acarid".ToId()
+            && booking.BorrowerId == "acallerid".ToId()
+            && booking.Start == start
+            && booking.End == expectedEnd
+        ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
     public async Task WhenSearchAllBookingsAsync_ThenReturnsBookings()
     {
         var start = DateTime.UtcNow;

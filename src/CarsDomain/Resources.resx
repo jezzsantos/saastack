@@ -54,6 +54,9 @@
     <data name="CarRoot_ReserveInPast" xml:space="preserve">
         <value>The car cannot be reserved in the past</value>
     </data>
+    <data name="CarRoot_ReferenceMissing" xml:space="preserve">
+        <value>The car cannot be reserved without a reference</value>
+    </data>
     <data name="CarRoot_Unavailable" xml:space="preserve">
         <value>The car is not available for this time slot</value>
     </data>

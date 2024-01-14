@@ -359,10 +359,10 @@ For example, these two use-cases. The first use case is as simple as it gets. Th
         }
 
         // Note: Raises a new domain event called UnavailabilitySlotAdded, this can also fail if the invariants of the aggregate fail, which is run after immediately the event is raised.
-        var raiseEvent = RaiseChangeEvent(Car.UnavailabilitySlotAdded.Create(Id, OrganizationId, slot, causedBy.Value));
-        if (!raiseEvent.IsSuccessful)
+        var raised = RaiseChangeEvent(Car.UnavailabilitySlotAdded.Create(Id, OrganizationId, slot, causedBy.Value));
+        if (!raised.IsSuccessful)
         {
-            return raiseEvent.Error;
+            return raised.Error;
         }
 
         // Note: This use case returns a result, which the caller can use to decide what to do

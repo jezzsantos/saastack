@@ -363,11 +363,11 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
     /// </summary>
     protected Result<Error> RaisePermanentDeleteEvent(Identifier deletedById)
     {
-        var raiseEvent = RaiseEvent(Global.StreamDeleted.Create(Identifier.Create(Id), deletedById), false,
+        var raised = RaiseEvent(Global.StreamDeleted.Create(Identifier.Create(Id), deletedById), false,
             false);
-        if (!raiseEvent.IsSuccessful)
+        if (!raised.IsSuccessful)
         {
-            return raiseEvent;
+            return raised;
         }
 
         IsDeleted = true;

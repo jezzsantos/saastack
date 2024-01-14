@@ -12,7 +12,7 @@ namespace BookingsApplication;
 
 public class BookingsApplication : IBookingsApplication
 {
-    private static readonly TimeSpan DefaultBookingDuration = TimeSpan.FromHours(1);
+    public static readonly TimeSpan DefaultBookingDuration = TimeSpan.FromHours(1);
     private readonly ICarsService _carsService;
     private readonly IIdentifierFactory _idFactory;
     private readonly IRecorder _recorder;

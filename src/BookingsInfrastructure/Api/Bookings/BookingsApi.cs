@@ -31,8 +31,7 @@ public sealed class BookingsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var booking = await _bookingsApplication.MakeBookingAsync(_contextFactory.Create(), OrganizationId,
-            request.CarId,
-            request.StartUtc, request.EndUtc, cancellationToken);
+            request.CarId, request.StartUtc, request.EndUtc, cancellationToken);
 
         return () => booking.HandleApplicationResult<MakeBookingResponse, Booking>(c =>
             new PostResult<MakeBookingResponse>(new MakeBookingResponse { Booking = c }));

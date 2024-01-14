@@ -207,12 +207,18 @@ public sealed class CarRoot : AggregateRootBase
         return Result.Ok;
     }
 
-    public Result<bool, Error> ReserveIfAvailable(TimeSlot slot, string referenceId)
+    public Result<bool, Error> ReserveIfAvailable(TimeSlot slot, Optional<string> referenceId)
     {
         if (slot.IsInvalidParameter(s => s.StartsAfter(DateTime.UtcNow), nameof(slot),
-                Resources.CarRoot_ReserveInPast, out var error))
+                Resources.CarRoot_ReserveInPast, out var error1))
         {
-            return error;
+            return error1;
+        }
+
+        if (referenceId.IsInvalidParameter(r => r.HasValue, nameof(referenceId),
+                Resources.CarRoot_ReferenceMissing, out var error2))
+        {
+            return error2;
         }
 
         if (!IsAvailable(slot))
@@ -226,12 +232,12 @@ public sealed class CarRoot : AggregateRootBase
             return causedBy.Error;
         }
 
-        var raiseEvent =
+        var raised =
             RaiseChangeEvent(
                 CarsDomain.Events.UnavailabilitySlotAdded.Create(Id, OrganizationId, slot, causedBy.Value));
-        if (!raiseEvent.IsSuccessful)
+        if (!raised.IsSuccessful)
         {
-            return raiseEvent.Error;
+            return raised.Error;
         }
 
         return true;

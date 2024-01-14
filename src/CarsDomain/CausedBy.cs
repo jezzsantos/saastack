@@ -8,11 +8,11 @@ namespace CarsDomain;
 
 public sealed class CausedBy : ValueObjectBase<CausedBy>
 {
-    public static Result<CausedBy, Error> Create(UnavailabilityCausedBy reason, string? reference)
+    public static Result<CausedBy, Error> Create(UnavailabilityCausedBy reason, Optional<string> reference)
     {
-        if (reference.Exists())
+        if (reference.HasValue)
         {
-            if (reference.IsInvalidParameter(Validations.Unavailability.Reference, nameof(reference),
+            if (reference.Value.IsInvalidParameter(Validations.Unavailability.Reference, nameof(reference),
                     Resources.CausedBy_InvalidReference, out var error1))
             {
                 return error1;
@@ -31,10 +31,10 @@ public sealed class CausedBy : ValueObjectBase<CausedBy>
         return new CausedBy(reason, reference);
     }
 
-    private CausedBy(UnavailabilityCausedBy reason, string? reference)
+    private CausedBy(UnavailabilityCausedBy reason, Optional<string> reference)
     {
         Reason = reason;
-        Reference = reference;
+        Reference = reference.ValueOrDefault;
     }
 
     public UnavailabilityCausedBy Reason { get; }

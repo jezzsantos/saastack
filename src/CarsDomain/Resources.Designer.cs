@@ -105,6 +105,15 @@ namespace CarsDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The car cannot be reserved without a reference.
+        /// </summary>
+        internal static string CarRoot_ReferenceMissing {
+            get {
+                return ResourceManager.GetString("CarRoot_ReferenceMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The car cannot be reserved in the past.
         /// </summary>
         internal static string CarRoot_ReserveInPast {

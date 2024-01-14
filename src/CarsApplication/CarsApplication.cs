@@ -203,24 +203,25 @@ public class CarsApplication : ICarsApplication
             return slot.Error;
         }
 
-        var available = car.ReserveIfAvailable(slot.Value, referenceId);
-        if (!available.IsSuccessful)
+        var availability = car.ReserveIfAvailable(slot.Value, referenceId);
+        if (!availability.IsSuccessful)
         {
-            return available.Error;
+            return availability.Error;
         }
 
-        if (available.Value)
+        var isAvailable = availability.Value;
+        if (!isAvailable)
         {
-            var updated = await _repository.SaveAsync(car, cancellationToken);
-            return updated.Match<Result<bool, Error>>(_ =>
-            {
-                _recorder.TraceInformation(caller.ToCall(), "Car {Id} was made reserved from {From} until {To}",
-                    car.Id, fromUtc, toUtc);
-                return available.Value;
-            }, error => error);
+            return false;
         }
 
-        return available.Value;
+        var updated = await _repository.SaveAsync(car, cancellationToken);
+        return updated.Match<Result<bool, Error>>(_ =>
+        {
+            _recorder.TraceInformation(caller.ToCall(), "Car {Id} was reserved from {From} until {To}",
+                car.Id, fromUtc, toUtc);
+            return true;
+        }, error => error);
     }
 
     public async Task<Result<SearchResults<Car>, Error>> SearchAllAvailableCarsAsync(ICallerContext caller,

@@ -30,7 +30,7 @@ public static class ObjectExtensions
     ///     Whether the parameter <see cref="value" /> from being invalid according to the <see cref="validation" />,
     ///     and if invalid, returns a <see cref="ErrorCode.Validation" /> error
     /// </summary>
-    public static bool IsInvalidParameter<TValue>(this TValue? value, Func<TValue, bool> validator,
+    public static bool IsInvalidParameter<TValue>(this TValue? value, Predicate<TValue> predicate,
         string parameterName, string? errorMessage, out Error error)
     {
         if (value.NotExists())
@@ -41,14 +41,14 @@ public static class ObjectExtensions
             return true;
         }
 
-        return IsInvalidParameter(() => validator(value), parameterName, errorMessage, out error);
+        return IsInvalidParameter(() => predicate(value), parameterName, errorMessage, out error);
     }
 
     /// <summary>
     ///     Whether the parameter <see cref="value" /> from being invalid according to the <see cref="validation" />,
     ///     and if invalid, returns a <see cref="ErrorCode.Validation" /> error
     /// </summary>
-    public static bool IsInvalidParameter<TValue>(this TValue? value, Func<TValue, bool> validator,
+    public static bool IsInvalidParameter<TValue>(this TValue? value, Predicate<TValue> predicate,
         string parameterName, out Error error)
     {
         if (value.NotExists())
@@ -57,7 +57,7 @@ public static class ObjectExtensions
             return true;
         }
 
-        return IsInvalidParameter(() => validator(value), parameterName, null, out error);
+        return IsInvalidParameter(() => predicate(value), parameterName, null, out error);
     }
 
     /// <summary>
@@ -113,10 +113,10 @@ public static class ObjectExtensions
     /// <summary>
     ///     Throws an <see cref="ArgumentOutOfRangeException" /> if the specified <see cref="value" /> is invalid
     /// </summary>
-    public static void ThrowIfInvalidParameter<TValue>(this TValue? value, Func<TValue?, bool> validator,
+    public static void ThrowIfInvalidParameter<TValue>(this TValue? value, Predicate<TValue?> predicate,
         string parameterName, string? errorMessage = null)
     {
-        if (value.IsInvalidParameter(validator, parameterName, errorMessage, out _))
+        if (value.IsInvalidParameter(predicate, parameterName, errorMessage, out _))
         {
             throw new ArgumentOutOfRangeException(parameterName, errorMessage);
         }
@@ -133,10 +133,10 @@ public static class ObjectExtensions
         }
     }
 
-    private static bool IsInvalidParameter(Func<bool> validationFunc, string parameterName, string? errorMessage,
+    private static bool IsInvalidParameter(Func<bool> predicate, string parameterName, string? errorMessage,
         out Error error)
     {
-        var isValid = validationFunc();
+        var isValid = predicate();
         if (!isValid)
         {
             error = errorMessage.HasValue()
