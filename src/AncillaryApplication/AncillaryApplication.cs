@@ -179,12 +179,16 @@ public class AncillaryApplication : IAncillaryApplication
             return Error.RuleViolation(Resources.AncillaryApplication_MissingEmailSender);
         }
 
-        await _emailDeliveryService.DeliverAsync(context, message.Html.Subject!, message.Html.HtmlBody!,
+        var delivered = await _emailDeliveryService.DeliverAsync(context, message.Html.Subject!, message.Html.HtmlBody!,
             message.Html.ToEmailAddress!, message.Html.ToDisplayName, message.Html.FromEmailAddress!,
             message.Html.FromDisplayName,
             cancellationToken);
+        if (!delivered.IsSuccessful)
+        {
+            return delivered.Error;
+        }
 
-        _recorder.TraceInformation(context.ToCall(), "Delivered email to {For}", message.Html.ToEmailAddress!);
+        _recorder.TraceInformation(context.ToCall(), "Delivered email for {For}", message.Html.ToEmailAddress!);
 
         return true;
     }

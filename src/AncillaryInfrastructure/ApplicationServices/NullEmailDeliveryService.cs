@@ -19,7 +19,8 @@ public class NullEmailDeliveryService : IEmailDeliveryService
         _recorder = recorder;
     }
 
-    public Task<Result<Error>> DeliverAsync(ICallerContext context, string subject, string htmlBody,
+    public Task<Result<EmailDeliveryReceipt, Error>> DeliverAsync(ICallerContext context, string subject,
+        string htmlBody,
         string toEmailAddress, string? toDisplayName,
         string fromEmailAddress, string? fromDisplayName, CancellationToken cancellationToken = default)
     {
@@ -34,6 +35,6 @@ public class NullEmailDeliveryService : IEmailDeliveryService
                 Body = htmlBody
             }.ToJson()!);
 
-        return Task.FromResult(Result.Ok);
+        return Task.FromResult<Result<EmailDeliveryReceipt, Error>>(new EmailDeliveryReceipt());
     }
 }
