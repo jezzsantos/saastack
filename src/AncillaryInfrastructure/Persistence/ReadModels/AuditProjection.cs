@@ -27,7 +27,7 @@ public class AuditProjection : IReadModelProjection
     {
         switch (changeEvent)
         {
-            case Events.Created e:
+            case Events.Audits.Created e:
                 return await _audits.HandleCreateAsync(e.RootId.ToId(), dto =>
                 {
                     dto.OrganizationId = e.OrganizationId;
