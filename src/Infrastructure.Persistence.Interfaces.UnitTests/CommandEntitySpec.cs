@@ -284,6 +284,8 @@ public class CommandEntitySpec
             ADateTimeValue = datum,
             AnOptionalString = "anoptionalvalue",
             AnOptionalDateTime = datum,
+            AnOptionalNullableString = "anoptionalvalue",
+            AnOptionalNullableDateTime = datum,
             AValueObject = TestValueObject.Create("avalueobject").Value,
             AnOptionalValueObject = TestValueObject.Create("avalueobject").Value
         };
@@ -306,6 +308,8 @@ public class CommandEntitySpec
             ADateTimeValue = datum,
             AnOptionalString = "anoptionalvalue",
             AnOptionalDateTime = datum,
+            AnOptionalNullableString = "anoptionalvalue",
+            AnOptionalNullableDateTime = datum,
             AValueObject = TestValueObject.Create("avalueobject").Value,
             AnOptionalValueObject = TestValueObject.Create("anoptionalvalueobject").Value
         };
@@ -315,7 +319,7 @@ public class CommandEntitySpec
         result.Id.Should().Be("anid");
         result.IsDeleted.Should().BeNone();
         result.LastPersistedAtUtc.Should().BeNone();
-        result.Metadata.Types.Count.Should().Be(11);
+        result.Metadata.Types.Count.Should().Be(13);
         result.Metadata.Types[nameof(PersistedEntity.Id)].Should().Be(typeof(string));
         result.Metadata.Types[nameof(PersistedEntity.IsDeleted)].Should().Be(typeof(bool?));
         result.Metadata.Types[nameof(PersistedEntity.LastPersistedAtUtc)].Should().Be(typeof(DateTime?));
@@ -326,10 +330,14 @@ public class CommandEntitySpec
         result.Metadata.Types[nameof(TestCommandDomainEntity.AnOptionalString)].Should().Be(typeof(Optional<string>));
         result.Metadata.Types[nameof(TestCommandDomainEntity.AnOptionalDateTime)].Should()
             .Be(typeof(Optional<DateTime>));
+        result.Metadata.Types[nameof(TestCommandDomainEntity.AnOptionalNullableString)].Should()
+            .Be(typeof(Optional<string?>));
+        result.Metadata.Types[nameof(TestCommandDomainEntity.AnOptionalNullableDateTime)].Should()
+            .Be(typeof(Optional<DateTime?>));
         result.Metadata.Types[nameof(TestCommandDomainEntity.AValueObject)].Should().Be(typeof(TestValueObject));
         result.Metadata.Types[nameof(TestCommandDomainEntity.AnOptionalValueObject)].Should()
             .Be(typeof(Optional<TestValueObject>));
-        result.Properties.Count.Should().Be(11);
+        result.Properties.Count.Should().Be(13);
         result.Properties[nameof(PersistedEntity.Id)].Should().BeSome("anid");
         result.Properties[nameof(PersistedEntity.IsDeleted)].Should().BeNone();
         result.Properties[nameof(PersistedEntity.LastPersistedAtUtc)].Should().BeNone();
@@ -339,6 +347,8 @@ public class CommandEntitySpec
         result.Properties[nameof(TestCommandDomainEntity.ADateTimeValue)].Should().BeSome(datum);
         result.Properties[nameof(TestCommandDomainEntity.AnOptionalString)].Should().BeSome("anoptionalvalue");
         result.Properties[nameof(TestCommandDomainEntity.AnOptionalDateTime)].Should().BeSome(datum);
+        result.Properties[nameof(TestCommandDomainEntity.AnOptionalNullableString)].Should().BeSome("anoptionalvalue");
+        result.Properties[nameof(TestCommandDomainEntity.AnOptionalNullableDateTime)].Should().BeSome(datum);
         result.Properties[nameof(TestCommandDomainEntity.AValueObject)].Should().BeSome("avalueobject");
         result.Properties[nameof(TestCommandDomainEntity.AnOptionalValueObject)].Should()
             .BeSome("anoptionalvalueobject");
@@ -483,6 +493,47 @@ public class CommandEntitySpec
     }
 
     [Fact]
+    public void WhenToToReadModelDtoWithDefaultValues_ThenReturnsInstance()
+    {
+        var entity = CommandEntity.FromDomainEntity(new TestCommandDomainEntity
+        {
+            Id = "anid",
+            AStringValue = null!,
+            AnIntegerValue = 0,
+            ABooleanValue = false,
+            ADateTimeValue = DateTime.MinValue,
+            AnOptionalString = null,
+            AnOptionalDateTime = DateTime.MinValue,
+            AnOptionalNullableString = null,
+            AnOptionalNullableDateTime = null,
+            AValueObject = null!,
+            AnOptionalValueObject = null
+        });
+        var domainFactory = new Mock<IDomainFactory>();
+
+        var result = entity.ToReadModelDto<TestReadModel>(domainFactory.Object);
+
+        result.Id.Should().Be("anid");
+        result.AStringValue.Should().BeNull();
+        result.AnIntegerValue.Should().Be(0);
+        result.ABooleanValue.Should().Be(false);
+        result.ADateTimeValue.Should().Be(DateTime.MinValue);
+        result.ANullableString.Should().BeNull();
+        result.ANullableInteger.Should().BeNull();
+        result.ANullableBoolean.Should().BeNull();
+        result.ANullableDateTime.Should().BeNull();
+        result.AnOptionalString.Should().BeNone();
+        result.AnOptionalDateTime.Should().BeSome(DateTime.MinValue);
+        result.AnOptionalNullableString.Should().BeNone();
+        result.AnOptionalNullableDateTime.Should().BeNone();
+        result.AValueObject.Should().BeNull();
+        result.AnOptionalValueObject.Should().BeNone();
+        domainFactory.Verify(df => df.RehydrateValueObject(typeof(TestValueObject), It.IsAny<string>()), Times.Never);
+        domainFactory.Verify(df => df.RehydrateValueObject(typeof(Optional<TestValueObject>), It.IsAny<string>()),
+            Times.Never);
+    }
+
+    [Fact]
     public void WhenToToReadModelDto_ThenReturnsInstance()
     {
         var datum = DateTime.UtcNow;
@@ -497,6 +548,8 @@ public class CommandEntitySpec
             ADateTimeValue = datum,
             AnOptionalString = "anoptionalvalue",
             AnOptionalDateTime = datum,
+            AnOptionalNullableString = "anoptionalvalue",
+            AnOptionalNullableDateTime = datum,
             AValueObject = valueObject,
             AnOptionalValueObject = optionalValueObject
         });
@@ -519,6 +572,8 @@ public class CommandEntitySpec
         result.ANullableDateTime.Should().BeNull();
         result.AnOptionalString.Should().BeSome("anoptionalvalue");
         result.AnOptionalDateTime.Should().BeSome(datum);
+        result.AnOptionalNullableString.Should().BeSome("anoptionalvalue");
+        result.AnOptionalNullableDateTime.Should().BeSome(datum);
         result.AValueObject.Should().Be(valueObject);
         result.AnOptionalValueObject.Should().Be(optionalValueObject);
         domainFactory.Verify(df => df.RehydrateValueObject(typeof(TestValueObject), "avalueobject"));
@@ -540,6 +595,8 @@ public class CommandEntitySpec
             ADateTimeValue = datum,
             AnOptionalString = "anoptionalvalue",
             AnOptionalDateTime = datum,
+            AnOptionalNullableString = "anoptionalvalue",
+            AnOptionalNullableDateTime = datum,
             AValueObject = valueObject,
             AnOptionalValueObject = optionalValueObject
         });
@@ -576,6 +633,8 @@ public class CommandEntitySpec
             ADateTimeValue = datum,
             AnOptionalString = "anoptionalvalue",
             AnOptionalDateTime = datum,
+            AnOptionalNullableString = "anoptionalvalue",
+            AnOptionalNullableDateTime = datum,
             AValueObject = valueObject,
             AnOptionalValueObject = optionalValueObject
         });
@@ -588,6 +647,8 @@ public class CommandEntitySpec
             ADateTimeValue = datum,
             AnOptionalString = "anoptionalvalue",
             AnOptionalDateTime = datum,
+            AnOptionalNullableString = "anoptionalvalue",
+            AnOptionalNullableDateTime = datum,
             AValueObject = valueObject,
             AnOptionalValueObject = optionalValueObject
         };
@@ -608,7 +669,7 @@ public class CommandEntitySpec
         domainFactory.Verify(df => df.RehydrateAggregateRoot(typeof(TestCommandDomainAggregateRoot),
             It.Is<HydrationProperties>(
                 dic =>
-                    dic.Count == 11
+                    dic.Count == 13
                     && (string)dic[nameof(PersistedEntity.Id)].As<Optional<object>>().ValueOrDefault! == "anid"
                     && dic[nameof(PersistedEntity.IsDeleted)].As<Optional<object>>().ValueOrDefault == null
                     && dic[nameof(PersistedEntity.LastPersistedAtUtc)].As<Optional<object>>().ValueOrDefault == null
@@ -620,13 +681,20 @@ public class CommandEntitySpec
                     == true
                     && (DateTime)dic[nameof(TestCommandDomainEntity.ADateTimeValue)].As<Optional<object>>()
                         .ValueOrDefault! == datum
-                    && (string)dic[nameof(TestCommandDomainEntity.AnOptionalString)].As<Optional<object>>()
+                    && (Optional<string>)dic[nameof(TestCommandDomainEntity.AnOptionalString)].As<Optional<object>>()
                         .ValueOrDefault! == "anoptionalvalue"
-                    && (DateTime)dic[nameof(TestCommandDomainEntity.AnOptionalDateTime)].As<Optional<object>>()
+                    && (Optional<DateTime>)dic[nameof(TestCommandDomainEntity.AnOptionalDateTime)]
+                        .As<Optional<object>>()
                         .ValueOrDefault! == datum
+                    && (Optional<string?>)dic[nameof(TestCommandDomainEntity.AnOptionalNullableString)]
+                        .As<Optional<object>>()
+                        .ValueOrDefault! == "anoptionalvalue"
+                    && (Optional<DateTime?>)dic[nameof(TestCommandDomainEntity.AnOptionalNullableDateTime)]
+                        .As<Optional<object>>()
+                        .ValueOrDefault! == (DateTime?)datum
                     && (TestValueObject)dic[nameof(TestCommandDomainEntity.AValueObject)].As<Optional<object>>()
                         .ValueOrDefault! == valueObject
-                    && (TestValueObject)dic[nameof(TestCommandDomainEntity.AnOptionalValueObject)]
+                    && (Optional<TestValueObject>)dic[nameof(TestCommandDomainEntity.AnOptionalValueObject)]
                         .As<Optional<object>>().ValueOrDefault! == optionalValueObject
             )));
         domainFactory.Verify(df => df.RehydrateEntity(It.IsAny<Type>(), It.IsAny<HydrationProperties>()), Times.Never);
@@ -647,6 +715,8 @@ public class CommandEntitySpec
             ADateTimeValue = datum,
             AnOptionalString = "anoptionalvalue",
             AnOptionalDateTime = datum,
+            AnOptionalNullableString = "anoptionalvalue",
+            AnOptionalNullableDateTime = datum,
             AValueObject = valueObject,
             AnOptionalValueObject = optionalValueObject
         });
@@ -659,6 +729,8 @@ public class CommandEntitySpec
             ADateTimeValue = datum,
             AnOptionalString = "anoptionalvalue",
             AnOptionalDateTime = datum,
+            AnOptionalNullableString = "anoptionalvalue",
+            AnOptionalNullableDateTime = datum,
             AValueObject = valueObject,
             AnOptionalValueObject = optionalValueObject
         };
@@ -678,7 +750,7 @@ public class CommandEntitySpec
         domainFactory.Verify(df => df.RehydrateValueObject(typeof(Optional<TestValueObject>), "anoptionalvalueobject"));
         domainFactory.Verify(df => df.RehydrateEntity(typeof(TestCommandDomainEntity), It.Is<HydrationProperties>(
             dic =>
-                dic.Count == 11
+                dic.Count == 13
                 && (string)dic[nameof(PersistedEntity.Id)].As<Optional<object>>().ValueOrDefault! == "anid"
                 && dic[nameof(PersistedEntity.IsDeleted)].As<Optional<object>>().ValueOrDefault == null
                 && dic[nameof(PersistedEntity.LastPersistedAtUtc)].As<Optional<object>>().ValueOrDefault == null
@@ -689,16 +761,68 @@ public class CommandEntitySpec
                 == true
                 && (DateTime)dic[nameof(TestCommandDomainEntity.ADateTimeValue)].As<Optional<object>>().ValueOrDefault!
                 == datum
-                && (string)dic[nameof(TestCommandDomainEntity.AnOptionalString)].As<Optional<object>>()
+                && (Optional<string>)dic[nameof(TestCommandDomainEntity.AnOptionalString)].As<Optional<object>>()
                     .ValueOrDefault! == "anoptionalvalue"
-                && (DateTime)dic[nameof(TestCommandDomainEntity.AnOptionalDateTime)].As<Optional<object>>()
+                && (Optional<DateTime>)dic[nameof(TestCommandDomainEntity.AnOptionalDateTime)].As<Optional<object>>()
                     .ValueOrDefault! == datum
+                && (Optional<string?>)dic[nameof(TestCommandDomainEntity.AnOptionalNullableString)]
+                    .As<Optional<object>>()
+                    .ValueOrDefault! == "anoptionalvalue"
+                && (Optional<DateTime?>)dic[nameof(TestCommandDomainEntity.AnOptionalNullableDateTime)]
+                    .As<Optional<object>>()
+                    .ValueOrDefault! == (DateTime?)datum
                 && (TestValueObject)dic[nameof(TestCommandDomainEntity.AValueObject)].As<Optional<object>>()
                     .ValueOrDefault! == valueObject
-                && (TestValueObject)dic[nameof(TestCommandDomainEntity.AnOptionalValueObject)].As<Optional<object>>()
+                && (Optional<TestValueObject>)dic[nameof(TestCommandDomainEntity.AnOptionalValueObject)]
+                    .As<Optional<object>>()
                     .ValueOrDefault! == optionalValueObject
         )));
         domainFactory.Verify(df => df.RehydrateAggregateRoot(It.IsAny<Type>(), It.IsAny<HydrationProperties>()),
             Times.Never);
+    }
+
+    [Fact]
+    public void WhenGetValueOrDefaultForValues_ThenReturnsValues()
+    {
+        var datum = DateTime.UtcNow;
+        var valueObject = TestValueObject.Create("avalueobject").Value;
+        var optionalValueObject = TestValueObject.Create("anoptionalvalueobject").Value;
+        var entity = CommandEntity.FromDomainEntity(new TestCommandDomainEntity
+        {
+            Id = "anid",
+            AStringValue = "avalue",
+            AnIntegerValue = 1,
+            ABooleanValue = true,
+            ADateTimeValue = datum,
+            AnOptionalString = "anoptionalvalue",
+            AnOptionalDateTime = datum,
+            AnOptionalNullableString = "anoptionalvalue",
+            AnOptionalNullableDateTime = datum,
+            AValueObject = valueObject,
+            AnOptionalValueObject = optionalValueObject
+        });
+        var domainFactory = new Mock<IDomainFactory>();
+        domainFactory.Setup(df => df.RehydrateValueObject(typeof(TestValueObject), It.IsAny<string>()))
+            .Returns(valueObject);
+        domainFactory.Setup(df => df.RehydrateValueObject(typeof(Optional<TestValueObject>), It.IsAny<string>()))
+            .Returns(optionalValueObject);
+
+        entity.GetValueOrDefault<string>(nameof(TestCommandDomainEntity.Id)).Should().Be("anid");
+        entity.GetValueOrDefault<string>(nameof(TestCommandDomainEntity.AStringValue)).Should().Be("avalue");
+        entity.GetValueOrDefault<int>(nameof(TestCommandDomainEntity.AnIntegerValue)).Should().Be(1);
+        entity.GetValueOrDefault<bool>(nameof(TestCommandDomainEntity.ABooleanValue)).Should().Be(true);
+        entity.GetValueOrDefault<DateTime>(nameof(TestCommandDomainEntity.ADateTimeValue)).Should().Be(datum);
+        entity.GetValueOrDefault<Optional<string>>(nameof(TestCommandDomainEntity.AnOptionalString)).Should()
+            .BeSome("anoptionalvalue");
+        entity.GetValueOrDefault<Optional<DateTime>>(nameof(TestCommandDomainEntity.AnOptionalDateTime)).Should()
+            .BeSome(datum);
+        entity.GetValueOrDefault<Optional<string?>>(nameof(TestCommandDomainEntity.AnOptionalNullableString)).Should()
+            .BeSome("anoptionalvalue");
+        entity.GetValueOrDefault<Optional<DateTime?>>(nameof(TestCommandDomainEntity.AnOptionalNullableDateTime))
+            .Should().BeSome(datum);
+        entity.GetValueOrDefault<TestValueObject>(nameof(TestCommandDomainEntity.AValueObject), domainFactory.Object)
+            .Should().Be(valueObject);
+        entity.GetValueOrDefault<Optional<TestValueObject>>(nameof(TestCommandDomainEntity.AnOptionalValueObject),
+            domainFactory.Object).Should().Be(optionalValueObject);
     }
 }

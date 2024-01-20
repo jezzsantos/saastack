@@ -383,11 +383,11 @@ public abstract class AnyDataStoreBaseSpec
     public async Task WhenQueryForAnEnumValue_ThenReturnsResult()
     {
         await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AnEnumValue = AnEnum.AValue1 }), CancellationToken.None);
+            CommandEntity.FromType(new TestDataStoreEntity { EnumValue = TestEnum.AValue1 }), CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AnEnumValue = AnEnum.AValue2 }), CancellationToken.None);
+            CommandEntity.FromType(new TestDataStoreEntity { EnumValue = TestEnum.AValue2 }), CancellationToken.None);
         var query = Query.From<TestDataStoreEntity>()
-            .Where(e => e.AnEnumValue, ConditionOperator.EqualTo, AnEnum.AValue2);
+            .Where(e => e.EnumValue, ConditionOperator.EqualTo, TestEnum.AValue2);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
@@ -400,7 +400,7 @@ public abstract class AnyDataStoreBaseSpec
     public async Task WhenQueryForANullableAnEnumValue_ThenReturnsResult()
     {
         await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AnNullableEnumValue = AnEnum.AValue1 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AnNullableEnumValue = TestEnum.AValue1 }),
             CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { AnNullableEnumValue = null }), CancellationToken.None);
@@ -1539,16 +1539,16 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForComplexNonValueObjectValue_ThenReturnsResult()
     {
-        var complex1 = new ComplexNonValueObject { APropertyValue = "avalue1" };
-        var complex2 = new ComplexNonValueObject { APropertyValue = "avalue2" };
+        var complex1 = new TestComplexObject { APropertyValue = "avalue1" };
+        var complex2 = new TestComplexObject { APropertyValue = "avalue2" };
         await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AComplexNonValueObjectValue = complex1 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AComplexObjectValue = complex1 }),
             CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AComplexNonValueObjectValue = complex2 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AComplexObjectValue = complex2 }),
             CancellationToken.None);
         var query = Query.From<TestDataStoreEntity>()
-            .Where(e => e.AComplexNonValueObjectValue, ConditionOperator.EqualTo, complex2);
+            .Where(e => e.AComplexObjectValue, ConditionOperator.EqualTo, complex2);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
@@ -1556,22 +1556,22 @@ public abstract class AnyDataStoreBaseSpec
         results.Value.Count.Should().Be(1);
         results.Value[0].Id.Should().Be(entity2.Value.Id);
         results.Value[0]
-            .GetValueOrDefault<ComplexNonValueObject>(nameof(TestDataStoreEntity.AComplexNonValueObjectValue))
-            .Should().BeSome(complex2);
+            .GetValueOrDefault<TestComplexObject>(nameof(TestDataStoreEntity.AComplexObjectValue))
+            .Should().Be(complex2);
     }
 
     [Fact]
     public async Task WhenQueryForNullComplexNonValueObjectValue_ThenReturnsResult()
     {
-        var complex1 = new ComplexNonValueObject { APropertyValue = "avalue1" };
+        var complex1 = new TestComplexObject { APropertyValue = "avalue1" };
         await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AComplexNonValueObjectValue = complex1 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AComplexObjectValue = complex1 }),
             CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AComplexNonValueObjectValue = null! }),
+            CommandEntity.FromType(new TestDataStoreEntity { AComplexObjectValue = null! }),
             CancellationToken.None);
         var query = Query.From<TestDataStoreEntity>()
-            .Where(e => e.AComplexNonValueObjectValue, ConditionOperator.EqualTo, null);
+            .Where(e => e.AComplexObjectValue, ConditionOperator.EqualTo, null);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
@@ -1579,22 +1579,22 @@ public abstract class AnyDataStoreBaseSpec
         results.Value.Count.Should().Be(1);
         results.Value[0].Id.Should().Be(entity2.Value.Id);
         results.Value[0]
-            .GetValueOrDefault<ComplexNonValueObject>(nameof(TestDataStoreEntity.AComplexNonValueObjectValue)).Should()
-            .BeNone();
+            .GetValueOrDefault<TestComplexObject>(nameof(TestDataStoreEntity.AComplexObjectValue)).Should()
+            .BeNull();
     }
 
     [Fact]
     public async Task WhenQueryForNotEqualNullComplexNonValueObjectValue_ThenReturnsResult()
     {
-        var complex1 = new ComplexNonValueObject { APropertyValue = "avalue1" };
+        var complex1 = new TestComplexObject { APropertyValue = "avalue1" };
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AComplexNonValueObjectValue = complex1 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AComplexObjectValue = complex1 }),
             CancellationToken.None);
         await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AComplexNonValueObjectValue = null! }),
+            CommandEntity.FromType(new TestDataStoreEntity { AComplexObjectValue = null! }),
             CancellationToken.None);
         var query = Query.From<TestDataStoreEntity>()
-            .Where(e => e.AComplexNonValueObjectValue, ConditionOperator.NotEqualTo, null);
+            .Where(e => e.AComplexObjectValue, ConditionOperator.NotEqualTo, null);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
@@ -1602,74 +1602,74 @@ public abstract class AnyDataStoreBaseSpec
         results.Value.Count.Should().Be(1);
         results.Value[0].Id.Should().Be(entity1.Value.Id);
         results.Value[0]
-            .GetValueOrDefault<ComplexNonValueObject>(nameof(TestDataStoreEntity.AComplexNonValueObjectValue))
-            .Should().BeSome(complex1);
+            .GetValueOrDefault<TestComplexObject>(nameof(TestDataStoreEntity.AComplexObjectValue))
+            .Should().Be(complex1);
     }
 
     [Fact]
     public async Task WhenQueryForComplexValueObjectValue_ThenReturnsResult()
     {
-        var complex1 = ComplexValueObject.Create("avalue1", 25, true);
-        var complex2 = ComplexValueObject.Create("avalue2", 50, false);
+        var complex1 = TestValueObject.Create("avalue1", 25, true);
+        var complex2 = TestValueObject.Create("avalue2", 50, false);
         await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AComplexValueObjectValue = complex1 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AValueObjectValue = complex1 }),
             CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AComplexValueObjectValue = complex2 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AValueObjectValue = complex2 }),
             CancellationToken.None);
         var query = Query.From<TestDataStoreEntity>()
-            .Where(e => e.AComplexValueObjectValue, ConditionOperator.EqualTo, complex2);
+            .Where(e => e.AValueObjectValue, ConditionOperator.EqualTo, complex2);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
         results.Value.Count.Should().Be(1);
         results.Value[0].Id.Should().Be(entity2.Value.Id);
-        results.Value[0].GetValueOrDefault<ComplexValueObject>(nameof(TestDataStoreEntity.AComplexValueObjectValue),
+        results.Value[0].GetValueOrDefault<TestValueObject>(nameof(TestDataStoreEntity.AValueObjectValue),
             DomainFactory).Should().BeEquivalentTo(complex2);
     }
 
     [Fact]
     public async Task WhenQueryForNullComplexValueObjectValue_ThenReturnsResult()
     {
-        var complex1 = ComplexValueObject.Create("avalue1", 25, true);
+        var complex1 = TestValueObject.Create("avalue1", 25, true);
         await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AComplexValueObjectValue = complex1 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AValueObjectValue = complex1 }),
             CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AComplexValueObjectValue = null! }),
+            CommandEntity.FromType(new TestDataStoreEntity { AValueObjectValue = null! }),
             CancellationToken.None);
         var query = Query.From<TestDataStoreEntity>()
-            .Where(e => e.AComplexValueObjectValue, ConditionOperator.EqualTo, null);
+            .Where(e => e.AValueObjectValue, ConditionOperator.EqualTo, null);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
         results.Value.Count.Should().Be(1);
         results.Value[0].Id.Should().Be(entity2.Value.Id);
-        results.Value[0].GetValueOrDefault<ComplexValueObject>(nameof(TestDataStoreEntity.AComplexValueObjectValue),
-            DomainFactory).Should().BeNone();
+        results.Value[0].GetValueOrDefault<TestValueObject>(nameof(TestDataStoreEntity.AValueObjectValue),
+            DomainFactory).Should().BeNull();
     }
 
     [Fact]
     public async Task WhenQueryForNotEqualNullComplexValueObjectValue_ThenReturnsResult()
     {
-        var complex1 = ComplexValueObject.Create("avalue1", 25, true);
+        var complex1 = TestValueObject.Create("avalue1", 25, true);
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AComplexValueObjectValue = complex1 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AValueObjectValue = complex1 }),
             CancellationToken.None);
         await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AComplexValueObjectValue = null! }),
+            CommandEntity.FromType(new TestDataStoreEntity { AValueObjectValue = null! }),
             CancellationToken.None);
         var query = Query.From<TestDataStoreEntity>()
-            .Where(e => e.AComplexValueObjectValue, ConditionOperator.NotEqualTo, null);
+            .Where(e => e.AValueObjectValue, ConditionOperator.NotEqualTo, null);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
         results.Value.Count.Should().Be(1);
         results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<ComplexValueObject>(nameof(TestDataStoreEntity.AComplexValueObjectValue),
+        results.Value[0].GetValueOrDefault<TestValueObject>(nameof(TestDataStoreEntity.AValueObjectValue),
             DomainFactory).Should().BeEquivalentTo(complex1);
     }
 
@@ -1678,15 +1678,21 @@ public abstract class AnyDataStoreBaseSpec
     {
         var entity = CommandEntity.FromType(new TestDataStoreEntity
         {
-            ABinaryValue = new byte[] { 0x01 }, ABooleanValue = true, ADoubleValue = 0.1, AGuidValue = Guid.Empty,
-            AIntValue = 1, ALongValue = 2, AStringValue = "astringvalue",
+            ABinaryValue = new byte[] { 0x01 },
+            ABooleanValue = true,
+            ADoubleValue = 0.1,
+            AGuidValue = Guid.Empty,
+            AIntValue = 1,
+            ALongValue = 2,
+            AStringValue = "astringvalue",
             ADateTimeUtcValue = DateTime.Today.ToUniversalTime(),
-            ADateTimeOffsetValue = DateTimeOffset.UnixEpoch.ToUniversalTime(), AComplexNonValueObjectValue =
-                new ComplexNonValueObject
+            ADateTimeOffsetValue = DateTimeOffset.UnixEpoch.ToUniversalTime(),
+            AComplexObjectValue =
+                new TestComplexObject
                 {
                     APropertyValue = "avalue"
                 },
-            AComplexValueObjectValue = ComplexValueObject.Create("avalue", 25, true)
+            AValueObjectValue = TestValueObject.Create("avalue", 25, true)
         });
 
         await Setup.Store.AddAsync(Setup.ContainerName, entity, CancellationToken.None);
@@ -1698,22 +1704,22 @@ public abstract class AnyDataStoreBaseSpec
         results.Value.Count.Should().Be(1);
         var result = results.Value[0];
         result.Id.Should().Be(entity.Id);
-        result.GetValueOrDefault<byte[]>(nameof(TestDataStoreEntity.ABinaryValue)).Value
-            .SequenceEqual(new byte[] { 0x01 }).Should().BeTrue();
-        result.GetValueOrDefault<bool>(nameof(TestDataStoreEntity.ABooleanValue)).Should().BeSome(true);
-        result.GetValueOrDefault<Guid>(nameof(TestDataStoreEntity.AGuidValue)).Should().BeSome(Guid.Empty);
-        result.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AIntValue)).Should().BeSome(1);
-        result.GetValueOrDefault<long>(nameof(TestDataStoreEntity.ALongValue)).Should().BeSome(2);
-        result.GetValueOrDefault<double>(nameof(TestDataStoreEntity.ADoubleValue)).Should().BeSome(0.1);
-        result.GetValueOrDefault<string>(nameof(TestDataStoreEntity.AStringValue)).Should().BeSome("astringvalue");
+        result.GetValueOrDefault<byte[]>(nameof(TestDataStoreEntity.ABinaryValue))!.SequenceEqual(new byte[] { 0x01 })
+            .Should().BeTrue();
+        result.GetValueOrDefault<bool>(nameof(TestDataStoreEntity.ABooleanValue)).Should().Be(true);
+        result.GetValueOrDefault<Guid>(nameof(TestDataStoreEntity.AGuidValue)).Should().Be(Guid.Empty);
+        result.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AIntValue)).Should().Be(1);
+        result.GetValueOrDefault<long>(nameof(TestDataStoreEntity.ALongValue)).Should().Be(2);
+        result.GetValueOrDefault<double>(nameof(TestDataStoreEntity.ADoubleValue)).Should().Be(0.1);
+        result.GetValueOrDefault<string>(nameof(TestDataStoreEntity.AStringValue)).Should().Be("astringvalue");
         result.GetValueOrDefault<DateTime>(nameof(TestDataStoreEntity.ADateTimeUtcValue)).Should()
-            .BeSome(DateTime.Today.ToUniversalTime());
+            .Be(DateTime.Today.ToUniversalTime());
         result.GetValueOrDefault<DateTimeOffset>(nameof(TestDataStoreEntity.ADateTimeOffsetValue)).Should()
-            .BeSome(DateTimeOffset.UnixEpoch.ToUniversalTime());
-        result.GetValueOrDefault<ComplexNonValueObject>(nameof(TestDataStoreEntity.AComplexNonValueObjectValue))
-            .Should().BeSome(new ComplexNonValueObject { APropertyValue = "avalue" });
-        result.GetValueOrDefault<ComplexValueObject>(nameof(TestDataStoreEntity.AComplexValueObjectValue),
-            DomainFactory).Should().BeSome(ComplexValueObject.Create("avalue", 25, true));
+            .Be(DateTimeOffset.UnixEpoch.ToUniversalTime());
+        result.GetValueOrDefault<TestComplexObject>(nameof(TestDataStoreEntity.AComplexObjectValue))
+            .Should().Be(new TestComplexObject { APropertyValue = "avalue" });
+        result.GetValueOrDefault<TestValueObject>(nameof(TestDataStoreEntity.AValueObjectValue),
+            DomainFactory).Should().Be(TestValueObject.Create("avalue", 25, true));
     }
 
     [Fact]
@@ -1721,15 +1727,21 @@ public abstract class AnyDataStoreBaseSpec
     {
         var entity = CommandEntity.FromType(new TestDataStoreEntity
         {
-            ABinaryValue = new byte[] { 0x01 }, ABooleanValue = true, ADoubleValue = 0.1, AGuidValue = Guid.Empty,
-            AIntValue = 1, ALongValue = 2, AStringValue = "astringvalue",
+            ABinaryValue = new byte[] { 0x01 },
+            ABooleanValue = true,
+            ADoubleValue = 0.1,
+            AGuidValue = Guid.Empty,
+            AIntValue = 1,
+            ALongValue = 2,
+            AStringValue = "astringvalue",
             ADateTimeUtcValue = DateTime.Today.ToUniversalTime(),
-            ADateTimeOffsetValue = DateTimeOffset.UnixEpoch.ToUniversalTime(), AComplexNonValueObjectValue =
-                new ComplexNonValueObject
+            ADateTimeOffsetValue = DateTimeOffset.UnixEpoch.ToUniversalTime(),
+            AComplexObjectValue =
+                new TestComplexObject
                 {
                     APropertyValue = "avalue"
                 },
-            AComplexValueObjectValue = ComplexValueObject.Create("avalue", 25, true)
+            AValueObjectValue = TestValueObject.Create("avalue", 25, true)
         });
 
         await Setup.Store.AddAsync(Setup.ContainerName, entity, CancellationToken.None);
@@ -1742,22 +1754,22 @@ public abstract class AnyDataStoreBaseSpec
         results.Value.Count.Should().Be(1);
         var result = results.Value[0];
         result.Id.Should().Be(entity.Id);
-        result.GetValueOrDefault<byte[]>(nameof(TestDataStoreEntity.ABinaryValue)).Value
-            .SequenceEqual(new byte[] { 0x01 }).Should().BeTrue();
-        result.GetValueOrDefault<bool>(nameof(TestDataStoreEntity.ABooleanValue)).Should().BeSome(false);
-        result.GetValueOrDefault<Guid>(nameof(TestDataStoreEntity.AGuidValue)).Should().BeSome(Guid.Empty);
-        result.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AIntValue)).Should().BeSome(0);
-        result.GetValueOrDefault<long>(nameof(TestDataStoreEntity.ALongValue)).Should().BeSome(0);
-        result.GetValueOrDefault<double>(nameof(TestDataStoreEntity.ADoubleValue)).Should().BeSome(0);
-        result.GetValueOrDefault<string>(nameof(TestDataStoreEntity.AStringValue)).Should().BeNone();
+        result.GetValueOrDefault<byte[]>(nameof(TestDataStoreEntity.ABinaryValue))!.SequenceEqual(new byte[] { 0x01 })
+            .Should().BeTrue();
+        result.GetValueOrDefault<bool>(nameof(TestDataStoreEntity.ABooleanValue)).Should().Be(false);
+        result.GetValueOrDefault<Guid>(nameof(TestDataStoreEntity.AGuidValue)).Should().Be(Guid.Empty);
+        result.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AIntValue)).Should().Be(0);
+        result.GetValueOrDefault<long>(nameof(TestDataStoreEntity.ALongValue)).Should().Be(0);
+        result.GetValueOrDefault<double>(nameof(TestDataStoreEntity.ADoubleValue)).Should().Be(0);
+        result.GetValueOrDefault<string>(nameof(TestDataStoreEntity.AStringValue)).Should().BeNull();
         result.GetValueOrDefault<DateTime>(nameof(TestDataStoreEntity.ADateTimeUtcValue)).Should()
-            .BeSome(DateTime.MinValue);
+            .Be(DateTime.MinValue);
         result.GetValueOrDefault<DateTimeOffset>(nameof(TestDataStoreEntity.ADateTimeOffsetValue)).Should()
-            .BeSome(DateTimeOffset.MinValue);
-        result.GetValueOrDefault<ComplexNonValueObject>(nameof(TestDataStoreEntity.AComplexNonValueObjectValue))
-            .Should().BeNone();
-        result.GetValueOrDefault<ComplexValueObject>(nameof(TestDataStoreEntity.AComplexValueObjectValue),
-            DomainFactory).Should().BeNone();
+            .Be(DateTimeOffset.MinValue);
+        result.GetValueOrDefault<TestComplexObject>(nameof(TestDataStoreEntity.AComplexObjectValue))
+            .Should().BeNull();
+        result.GetValueOrDefault<TestValueObject>(nameof(TestDataStoreEntity.AValueObjectValue),
+            DomainFactory).Should().BeNull();
     }
 
     [Fact]
@@ -2064,9 +2076,8 @@ public abstract class AnyDataStoreBaseSpec
 
         results.Value.Count.Should().Be(1);
         results.Value[0].Id.Should().BeSome(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AIntValue)).Should().BeSome(9);
-        results.Value[0].GetValueOrDefault<bool>(nameof(TestJoinedDataStoreEntity.ABooleanValue)).Should()
-            .BeSome(false);
+        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AIntValue)).Should().Be(9);
+        results.Value[0].GetValueOrDefault<bool>(nameof(TestJoinedDataStoreEntity.ABooleanValue)).Should().Be(false);
     }
 
     [Fact]
@@ -2409,7 +2420,9 @@ public abstract class AnyDataStoreBaseSpec
         var entity = CommandEntity.FromType(new TestDataStoreEntity
         {
             AStringValue = "astringvalue",
-            AnEnumValue = AnEnum.AValue1,
+            AnOptionalStringValue = "astringvalue",
+            AnOptionalNullableStringValue = "astringvalue",
+            EnumValue = TestEnum.AValue1,
             ABinaryValue = new byte[] { 0x01 },
             ABooleanValue = true,
             ANullableBooleanValue = true,
@@ -2423,14 +2436,22 @@ public abstract class AnyDataStoreBaseSpec
             ANullableLongValue = 2,
             ADateTimeUtcValue = DateTime.Today.ToUniversalTime(),
             ANullableDateTimeUtcValue = DateTime.Today.ToUniversalTime(),
+            AnOptionalDateTimeUtcValue = DateTime.Today.ToUniversalTime(),
+            AnOptionalNullableDateTimeUtcValue = DateTime.Today.ToUniversalTime(),
             ADateTimeOffsetValue = DateTimeOffset.UnixEpoch.ToUniversalTime(),
             ANullableDateTimeOffsetValue = DateTimeOffset.UnixEpoch.ToUniversalTime(),
-            AComplexNonValueObjectValue =
-                new ComplexNonValueObject
+            AComplexObjectValue =
+                new TestComplexObject
                 {
                     APropertyValue = "avalue"
                 },
-            AComplexValueObjectValue = ComplexValueObject.Create("avalue", 25, true)
+            AnOptionalComplexObjectValue =
+                new TestComplexObject
+                {
+                    APropertyValue = "avalue"
+                },
+            AValueObjectValue = TestValueObject.Create("avalue", 25, true),
+            AnOptionalValueObjectValue = TestValueObject.Create("avalue", 25, true)
         });
 
         await Setup.Store.AddAsync(Setup.ContainerName, entity, CancellationToken.None);
@@ -2443,43 +2464,64 @@ public abstract class AnyDataStoreBaseSpec
         result.Value.Value.LastPersistedAtUtc.Should().BeNear(DateTime.UtcNow);
         result.Value.Value.LastPersistedAtUtc.Value.Kind.Should().Be(DateTimeKind.Utc);
         result.Value.Value.GetValueOrDefault<string>(nameof(TestDataStoreEntity.AStringValue)).Should()
+            .Be("astringvalue");
+        result.Value.Value.GetValueOrDefault<Optional<string>>(nameof(TestDataStoreEntity.AnOptionalStringValue))
+            .Should()
             .BeSome("astringvalue");
-        result.Value.Value.GetValueOrDefault<AnEnum>(nameof(TestDataStoreEntity.AnEnumValue)).Should()
-            .BeSome(AnEnum.AValue1);
-        result.Value.Value.GetValueOrDefault<byte[]>(nameof(TestDataStoreEntity.ABinaryValue)).Value
+        result.Value.Value
+            .GetValueOrDefault<Optional<string?>>(nameof(TestDataStoreEntity.AnOptionalNullableStringValue)).Should()
+            .BeSome("astringvalue");
+        result.Value.Value.GetValueOrDefault<TestEnum>(nameof(TestDataStoreEntity.EnumValue)).Should()
+            .Be(TestEnum.AValue1);
+        result.Value.Value.GetValueOrDefault<byte[]>(nameof(TestDataStoreEntity.ABinaryValue))!
             .SequenceEqual(new byte[] { 0x01 }).Should().BeTrue();
-        result.Value.Value.GetValueOrDefault<bool>(nameof(TestDataStoreEntity.ABooleanValue)).Should().BeSome(true);
+        result.Value.Value.GetValueOrDefault<bool>(nameof(TestDataStoreEntity.ABooleanValue)).Should().Be(true);
         result.Value.Value.GetValueOrDefault<bool?>(nameof(TestDataStoreEntity.ANullableBooleanValue)).Should()
-            .BeSome(true);
+            .Be(true);
         result.Value.Value.GetValueOrDefault<Guid>(nameof(TestDataStoreEntity.AGuidValue)).Should()
-            .BeSome(new Guid("12345678-1111-2222-3333-123456789012"));
+            .Be(new Guid("12345678-1111-2222-3333-123456789012"));
         result.Value.Value.GetValueOrDefault<Guid?>(nameof(TestDataStoreEntity.ANullableGuidValue)).Should()
-            .BeSome(new Guid("12345678-1111-2222-3333-123456789012"));
-        result.Value.Value.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AIntValue)).Should().BeSome(1);
-        result.Value.Value.GetValueOrDefault<int?>(nameof(TestDataStoreEntity.ANullableIntValue)).Should().BeSome(1);
-        result.Value.Value.GetValueOrDefault<long>(nameof(TestDataStoreEntity.ALongValue)).Should().BeSome(2);
-        result.Value.Value.GetValueOrDefault<long?>(nameof(TestDataStoreEntity.ANullableLongValue)).Should().BeSome(2);
-        result.Value.Value.GetValueOrDefault<double>(nameof(TestDataStoreEntity.ADoubleValue)).Should().BeSome(0.1);
+            .Be(new Guid("12345678-1111-2222-3333-123456789012"));
+        result.Value.Value.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AIntValue)).Should().Be(1);
+        result.Value.Value.GetValueOrDefault<int?>(nameof(TestDataStoreEntity.ANullableIntValue)).Should().Be(1);
+        result.Value.Value.GetValueOrDefault<long>(nameof(TestDataStoreEntity.ALongValue)).Should().Be(2);
+        result.Value.Value.GetValueOrDefault<long?>(nameof(TestDataStoreEntity.ANullableLongValue)).Should().Be(2);
+        result.Value.Value.GetValueOrDefault<double>(nameof(TestDataStoreEntity.ADoubleValue)).Should().Be(0.1);
         result.Value.Value.GetValueOrDefault<double?>(nameof(TestDataStoreEntity.ANullableDoubleValue)).Should()
-            .BeSome(0.1);
+            .Be(0.1);
         result.Value.Value.GetValueOrDefault<DateTime>(nameof(TestDataStoreEntity.ADateTimeUtcValue)).Should()
-            .BeSome(DateTime.Today.ToUniversalTime());
-        result.Value.Value.GetValueOrDefault<DateTime>(nameof(TestDataStoreEntity.ADateTimeUtcValue)).Value.Kind
+            .Be(DateTime.Today.ToUniversalTime());
+        result.Value.Value.GetValueOrDefault<DateTime>(nameof(TestDataStoreEntity.ADateTimeUtcValue)).Kind
             .Should().Be(DateTimeKind.Utc);
         result.Value.Value.GetValueOrDefault<DateTime?>(nameof(TestDataStoreEntity.ANullableDateTimeUtcValue)).Should()
-            .BeSome(DateTime.Today.ToUniversalTime());
-        result.Value.Value.GetValueOrDefault<DateTime?>(nameof(TestDataStoreEntity.ANullableDateTimeUtcValue)).Value!
+            .Be(DateTime.Today.ToUniversalTime());
+        result.Value.Value.GetValueOrDefault<DateTime?>(nameof(TestDataStoreEntity.ANullableDateTimeUtcValue))!.Value
+            .Kind.Should().Be(DateTimeKind.Utc);
+        result.Value.Value.GetValueOrDefault<Optional<DateTime>>(nameof(TestDataStoreEntity.AnOptionalDateTimeUtcValue))
+            .Value
+            .Kind.Should().Be(DateTimeKind.Utc);
+        result.Value.Value
+            .GetValueOrDefault<Optional<DateTime?>>(nameof(TestDataStoreEntity.AnOptionalNullableDateTimeUtcValue))
+            .Value!
             .Value.Kind.Should().Be(DateTimeKind.Utc);
         result.Value.Value.GetValueOrDefault<DateTimeOffset>(nameof(TestDataStoreEntity.ADateTimeOffsetValue)).Should()
-            .BeSome(DateTimeOffset.UnixEpoch.ToUniversalTime());
+            .Be(DateTimeOffset.UnixEpoch.ToUniversalTime());
         result.Value.Value.GetValueOrDefault<DateTimeOffset?>(nameof(TestDataStoreEntity.ANullableDateTimeOffsetValue))
-            .Should().BeSome(DateTimeOffset.UnixEpoch.ToUniversalTime());
+            .Should().Be(DateTimeOffset.UnixEpoch.ToUniversalTime());
         result.Value.Value
-            .GetValueOrDefault<ComplexNonValueObject>(nameof(TestDataStoreEntity.AComplexNonValueObjectValue)).Should()
-            .BeSome(new ComplexNonValueObject { APropertyValue = "avalue" });
+            .GetValueOrDefault<TestComplexObject>(nameof(TestDataStoreEntity.AComplexObjectValue)).Should()
+            .Be(new TestComplexObject { APropertyValue = "avalue" });
         result.Value.Value
-            .GetValueOrDefault<ComplexValueObject>(nameof(TestDataStoreEntity.AComplexValueObjectValue), DomainFactory)
-            .Should().BeSome(ComplexValueObject.Create("avalue", 25, true));
+            .GetValueOrDefault<Optional<TestComplexObject>>(nameof(TestDataStoreEntity.AnOptionalComplexObjectValue))
+            .Should()
+            .BeSome(new TestComplexObject { APropertyValue = "avalue" });
+        result.Value.Value
+            .GetValueOrDefault<TestValueObject>(nameof(TestDataStoreEntity.AValueObjectValue), DomainFactory)
+            .Should().Be(TestValueObject.Create("avalue", 25, true));
+        result.Value.Value
+            .GetValueOrDefault<Optional<TestValueObject>>(nameof(TestDataStoreEntity.AnOptionalValueObjectValue),
+                DomainFactory)
+            .Should().BeSome(TestValueObject.Create("avalue", 25, true));
     }
 
     [Fact]
@@ -2487,7 +2529,7 @@ public abstract class AnyDataStoreBaseSpec
     {
         var entity = CommandEntity.FromType(new TestDataStoreEntity
         {
-            AnEnumValue = default,
+            EnumValue = default,
             ABinaryValue = default!,
             ABooleanValue = default,
             ANullableBooleanValue = default,
@@ -2500,12 +2542,18 @@ public abstract class AnyDataStoreBaseSpec
             ALongValue = default,
             ANullableLongValue = default,
             AStringValue = default!,
+            AnOptionalStringValue = default,
+            AnOptionalNullableStringValue = default,
             ADateTimeUtcValue = default,
             ANullableDateTimeUtcValue = default,
+            AnOptionalDateTimeUtcValue = default,
+            AnOptionalNullableDateTimeUtcValue = default,
             ADateTimeOffsetValue = default,
             ANullableDateTimeOffsetValue = default,
-            AComplexNonValueObjectValue = default!,
-            AComplexValueObjectValue = default!
+            AComplexObjectValue = default!,
+            AnOptionalComplexObjectValue = default,
+            AValueObjectValue = default!,
+            AnOptionalValueObjectValue = default
         });
 
         await Setup.Store.AddAsync(Setup.ContainerName, entity, CancellationToken.None);
@@ -2517,39 +2565,58 @@ public abstract class AnyDataStoreBaseSpec
         result.Value.Value.Id.Should().Be(entity.Id);
         result.Value.Value.LastPersistedAtUtc.Should().BeNear(DateTime.UtcNow);
         result.Value.Value.LastPersistedAtUtc.Value.Kind.Should().Be(DateTimeKind.Utc);
-        result.Value.Value.GetValueOrDefault<string>(nameof(TestDataStoreEntity.AStringValue)).Should().BeNone();
-        result.Value.Value.GetValueOrDefault<AnEnum>(nameof(TestDataStoreEntity.AnEnumValue)).Should()
-            .BeSome(AnEnum.None);
-        result.Value.Value.GetValueOrDefault<byte[]>(nameof(TestDataStoreEntity.ABinaryValue)).Should().BeNone();
-        result.Value.Value.GetValueOrDefault<bool>(nameof(TestDataStoreEntity.ABooleanValue)).Should().BeSome(false);
+        result.Value.Value.GetValueOrDefault<string>(nameof(TestDataStoreEntity.AStringValue)).Should().BeNull();
+        result.Value.Value.GetValueOrDefault<Optional<string>>(nameof(TestDataStoreEntity.AnOptionalStringValue))
+            .Should().BeNone();
+        result.Value.Value
+            .GetValueOrDefault<Optional<string?>>(nameof(TestDataStoreEntity.AnOptionalNullableStringValue)).Should()
+            .BeNone();
+        result.Value.Value.GetValueOrDefault<TestEnum>(nameof(TestDataStoreEntity.EnumValue)).Should()
+            .Be(TestEnum.None);
+        result.Value.Value.GetValueOrDefault<byte[]>(nameof(TestDataStoreEntity.ABinaryValue)).Should().BeNull();
+        result.Value.Value.GetValueOrDefault<bool>(nameof(TestDataStoreEntity.ABooleanValue)).Should().Be(false);
         result.Value.Value.GetValueOrDefault<bool?>(nameof(TestDataStoreEntity.ANullableBooleanValue)).Should()
-            .BeNone();
-        result.Value.Value.GetValueOrDefault<Guid>(nameof(TestDataStoreEntity.AGuidValue)).Should().BeSome(Guid.Empty);
-        result.Value.Value.GetValueOrDefault<Guid?>(nameof(TestDataStoreEntity.ANullableGuidValue)).Should().BeNone();
-        result.Value.Value.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AIntValue)).Should().BeSome(0);
-        result.Value.Value.GetValueOrDefault<int?>(nameof(TestDataStoreEntity.ANullableIntValue)).Should().BeNone();
-        result.Value.Value.GetValueOrDefault<long>(nameof(TestDataStoreEntity.ALongValue)).Should().BeSome(0L);
-        result.Value.Value.GetValueOrDefault<long?>(nameof(TestDataStoreEntity.ANullableLongValue)).Should().BeNone();
-        result.Value.Value.GetValueOrDefault<double>(nameof(TestDataStoreEntity.ADoubleValue)).Should().BeSome(0.0D);
+            .BeNull();
+        result.Value.Value.GetValueOrDefault<Guid>(nameof(TestDataStoreEntity.AGuidValue)).Should().Be(Guid.Empty);
+        result.Value.Value.GetValueOrDefault<Guid?>(nameof(TestDataStoreEntity.ANullableGuidValue)).Should().BeNull();
+        result.Value.Value.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AIntValue)).Should().Be(0);
+        result.Value.Value.GetValueOrDefault<int?>(nameof(TestDataStoreEntity.ANullableIntValue)).Should().BeNull();
+        result.Value.Value.GetValueOrDefault<long>(nameof(TestDataStoreEntity.ALongValue)).Should().Be(0L);
+        result.Value.Value.GetValueOrDefault<long?>(nameof(TestDataStoreEntity.ANullableLongValue)).Should().BeNull();
+        result.Value.Value.GetValueOrDefault<double>(nameof(TestDataStoreEntity.ADoubleValue)).Should().Be(0.0D);
         result.Value.Value.GetValueOrDefault<double?>(nameof(TestDataStoreEntity.ANullableDoubleValue)).Should()
-            .BeNone();
+            .BeNull();
         result.Value.Value.GetValueOrDefault<DateTime>(nameof(TestDataStoreEntity.ADateTimeUtcValue)).Should()
-            .BeSome(DateTime.MinValue);
-        result.Value.Value.GetValueOrDefault<DateTime>(nameof(TestDataStoreEntity.ADateTimeUtcValue)).Value.Kind
-            .Should().Be(DateTimeKind.Unspecified);
+            .Be(DateTime.MinValue);
+        result.Value.Value.GetValueOrDefault<DateTime>(nameof(TestDataStoreEntity.ADateTimeUtcValue)).Kind.Should()
+            .Be(DateTimeKind.Utc);
         result.Value.Value.GetValueOrDefault<DateTime?>(nameof(TestDataStoreEntity.ANullableDateTimeUtcValue)).Should()
+            .BeNull();
+        result.Value.Value.GetValueOrDefault<Optional<DateTime>>(nameof(TestDataStoreEntity.AnOptionalDateTimeUtcValue))
+            .Should()
+            .BeSome(DateTime.MinValue);
+        result.Value.Value
+            .GetValueOrDefault<Optional<DateTime?>>(nameof(TestDataStoreEntity.AnOptionalNullableDateTimeUtcValue))
+            .Should()
             .BeNone();
         result.Value.Value.GetValueOrDefault<DateTimeOffset>(nameof(TestDataStoreEntity.ADateTimeOffsetValue)).Should()
             .Be(DateTimeOffset.MinValue);
-        result.Value.Value.GetValueOrDefault<DateTimeOffset>(nameof(TestDataStoreEntity.ADateTimeOffsetValue)).Value
-            .Date.Kind.Should().Be(DateTimeKind.Unspecified);
+        result.Value.Value.GetValueOrDefault<DateTimeOffset>(nameof(TestDataStoreEntity.ADateTimeOffsetValue)).Date.Kind
+            .Should().Be(DateTimeKind.Unspecified);
         result.Value.Value.GetValueOrDefault<DateTimeOffset?>(nameof(TestDataStoreEntity.ANullableDateTimeOffsetValue))
-            .Should().BeNone();
+            .Should().BeNull();
+        result.Value.Value.GetValueOrDefault<TestComplexObject>(nameof(TestDataStoreEntity.AComplexObjectValue))
+            .Should().BeNull();
         result.Value.Value
-            .GetValueOrDefault<ComplexNonValueObject>(nameof(TestDataStoreEntity.AComplexNonValueObjectValue)).Should()
+            .GetValueOrDefault<Optional<TestComplexObject>>(nameof(TestDataStoreEntity.AnOptionalComplexObjectValue))
+            .Should()
             .BeNone();
         result.Value.Value
-            .GetValueOrDefault<ComplexValueObject>(nameof(TestDataStoreEntity.AComplexValueObjectValue), DomainFactory)
+            .GetValueOrDefault<TestValueObject>(nameof(TestDataStoreEntity.AValueObjectValue), DomainFactory)
+            .Should().BeNull();
+        result.Value.Value
+            .GetValueOrDefault<Optional<TestValueObject>>(nameof(TestDataStoreEntity.AnOptionalValueObjectValue),
+                DomainFactory)
             .Should().BeNone();
     }
 

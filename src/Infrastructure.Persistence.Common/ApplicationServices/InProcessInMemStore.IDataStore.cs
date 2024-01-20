@@ -20,15 +20,16 @@ public partial class InProcessInMemStore : IDataStore
             Resources.AnyStore_MissingContainerName);
         ArgumentNullException.ThrowIfNull(entity);
 
-        if (!_documents.ContainsKey(containerName))
+        if (!_documents.TryGetValue(containerName, out var document))
         {
-            _documents.Add(containerName, new Dictionary<string, HydrationProperties>());
+            document = new Dictionary<string, HydrationProperties>();
+            _documents.Add(containerName, document);
         }
 
-        _documents[containerName].Add(entity.Id, entity.ToHydrationProperties());
+        document.Add(entity.Id, entity.ToHydrationProperties());
 
         return Task.FromResult<Result<CommandEntity, Error>>(
-            CommandEntity.FromCommandEntity(_documents[containerName][entity.Id], entity));
+            CommandEntity.FromCommandEntity(document[entity.Id], entity));
     }
 
     public Task<Result<long, Error>> CountAsync(string containerName, CancellationToken cancellationToken)
@@ -36,12 +37,9 @@ public partial class InProcessInMemStore : IDataStore
         containerName.ThrowIfNotValuedParameter(nameof(containerName),
             Resources.AnyStore_MissingContainerName);
 
-        if (_documents.TryGetValue(containerName, out var value))
-        {
-            return Task.FromResult<Result<long, Error>>(value.Count);
-        }
-
-        return Task.FromResult<Result<long, Error>>(0);
+        return Task.FromResult<Result<long, Error>>(_documents.TryGetValue(containerName, out var value)
+            ? value.Count
+            : 0);
     }
 
     public int MaxQueryResults => 1000;
@@ -78,10 +76,10 @@ public partial class InProcessInMemStore : IDataStore
             Resources.AnyStore_MissingContainerName);
         id.ThrowIfNotValuedParameter(nameof(id), Resources.AnyStore_MissingId);
 
-        if (_documents.ContainsKey(containerName)
-            && _documents[containerName].ContainsKey(id))
+        if (_documents.TryGetValue(containerName, out var document)
+            && document.ContainsKey(id))
         {
-            _documents[containerName].Remove(id);
+            document.Remove(id);
         }
 
         return Task.FromResult(Result.Ok);
@@ -110,11 +108,11 @@ public partial class InProcessInMemStore : IDataStore
         id.ThrowIfNotValuedParameter(nameof(id), Resources.AnyStore_MissingId);
         ArgumentNullException.ThrowIfNull(metadata);
 
-        if (_documents.ContainsKey(containerName)
-            && _documents[containerName].ContainsKey(id))
+        if (_documents.TryGetValue(containerName, out var document)
+            && document.TryGetValue(id, out var properties))
         {
             return Task.FromResult<Result<Optional<CommandEntity>, Error>>(CommandEntity
-                .FromCommandEntity(_documents[containerName][id], metadata).ToOptional());
+                .FromCommandEntity(properties, metadata).ToOptional());
         }
 
         return Task.FromResult<Result<Optional<CommandEntity>, Error>>(Optional<CommandEntity>.None);
@@ -125,10 +123,7 @@ public partial class InProcessInMemStore : IDataStore
         containerName.ThrowIfNotValuedParameter(nameof(containerName),
             Resources.AnyStore_MissingContainerName);
 
-        if (_documents.ContainsKey(containerName))
-        {
-            _documents.Remove(containerName);
-        }
+        _documents.Remove(containerName);
 
         return Task.FromResult(Result.Ok);
     }

@@ -4,6 +4,7 @@ using Common;
 using Common.Configuration;
 using Common.Extensions;
 using Domain.Interfaces;
+using Domain.Interfaces.ValueObjects;
 using Infrastructure.Persistence.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
@@ -381,50 +382,68 @@ internal static class LocalMachineFileStoreExtensions
 
     private static Optional<object> FromFileProperty(this Optional<string> propertyValue, Type targetPropertyType)
     {
-        if (!propertyValue.HasValue
-            || propertyValue.Value == LocalMachineJsonFileStore.NullToken)
+        if (!propertyValue.HasValue)
         {
             return Optional<object>.None;
         }
 
+        if (propertyValue.Value == LocalMachineJsonFileStore.NullToken)
+        {
+            return Optional<object>.None;
+        }
+
+        if (targetPropertyType == typeof(string)
+            || targetPropertyType == typeof(Optional<string>)
+            || targetPropertyType == typeof(Optional<string?>))
+        {
+            return propertyValue.Value;
+        }
+
         if (targetPropertyType == typeof(bool) || targetPropertyType == typeof(bool?)
-                                               || targetPropertyType == typeof(Optional<bool>))
+                                               || targetPropertyType == typeof(Optional<bool>)
+                                               || targetPropertyType == typeof(Optional<bool?>))
         {
             return bool.Parse(propertyValue.Value);
         }
 
         if (targetPropertyType == typeof(DateTime) || targetPropertyType == typeof(DateTime?)
-                                                   || targetPropertyType == typeof(Optional<DateTime>))
+                                                   || targetPropertyType == typeof(Optional<DateTime>)
+                                                   || targetPropertyType == typeof(Optional<DateTime?>))
         {
             return propertyValue.Value.FromIso8601();
         }
 
         if (targetPropertyType == typeof(DateTimeOffset) || targetPropertyType == typeof(DateTimeOffset?)
-                                                         || targetPropertyType == typeof(Optional<DateTimeOffset>))
+                                                         || targetPropertyType == typeof(Optional<DateTimeOffset>)
+                                                         || targetPropertyType == typeof(Optional<DateTimeOffset?>))
         {
             return DateTimeOffset.ParseExact(propertyValue.Value, "O", null).ToUniversalTime();
         }
 
         if (targetPropertyType == typeof(Guid) || targetPropertyType == typeof(Guid?)
-                                               || targetPropertyType == typeof(Optional<Guid>))
+                                               || targetPropertyType == typeof(Optional<Guid>)
+                                               || targetPropertyType == typeof(Optional<Guid?>))
         {
             return Guid.Parse(propertyValue.Value);
         }
 
         if (targetPropertyType == typeof(double) || targetPropertyType == typeof(double?)
-                                                 || targetPropertyType == typeof(Optional<double>))
+                                                 || targetPropertyType == typeof(Optional<double>)
+                                                 || targetPropertyType == typeof(Optional<double?>))
         {
             return double.Parse(propertyValue.Value);
         }
 
         if (targetPropertyType == typeof(long) || targetPropertyType == typeof(long?)
-                                               || targetPropertyType == typeof(Optional<long>))
+                                               || targetPropertyType == typeof(Optional<long>)
+                                               || targetPropertyType == typeof(Optional<long?>))
         {
             return long.Parse(propertyValue.Value);
         }
 
         if (targetPropertyType == typeof(int) || targetPropertyType == typeof(int?)
-                                              || targetPropertyType == typeof(Optional<int>))
+                                              || targetPropertyType == typeof(Optional<int>)
+                                              || targetPropertyType == typeof(Optional<int?>))
         {
             return int.Parse(propertyValue.Value);
         }
@@ -446,14 +465,14 @@ internal static class LocalMachineFileStoreExtensions
                 : Optional<object>.None;
         }
 
-        if (Optional.IsOptionalType(targetPropertyType))
-        {
-            return propertyValue.Value;
-        }
-
         if (targetPropertyType.IsComplexStorageType())
         {
             return propertyValue.ComplexTypeFromContainerProperty(targetPropertyType);
+        }
+
+        if (typeof(IDehydratableValueObject).IsAssignableFrom(targetPropertyType))
+        {
+            return propertyValue.Value;
         }
 
         return propertyValue.Value;

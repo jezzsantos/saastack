@@ -13,6 +13,10 @@ public class TestReadModel : IReadModelEntity
 
     public Optional<DateTime> AnOptionalDateTime { get; set; }
 
+    public Optional<DateTime?> AnOptionalNullableDateTime { get; set; }
+
+    public Optional<string?> AnOptionalNullableString { get; set; }
+
     public Optional<string> AnOptionalString { get; set; }
 
     public Optional<TestValueObject> AnOptionalValueObject { get; set; } = null!;

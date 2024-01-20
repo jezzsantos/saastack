@@ -64,8 +64,8 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
         container.Resolve<IIdentifierFactory>(), identifier)
     {
         Id = rehydratingProperties.GetValueOrDefault(nameof(Id), Identifier.Empty());
-        LastPersistedAtUtc = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(LastPersistedAtUtc));
-        IsDeleted = rehydratingProperties.GetValueOrDefault<bool>(nameof(IsDeleted));
+        LastPersistedAtUtc = rehydratingProperties.GetValueOrDefault<Optional<DateTime>>(nameof(LastPersistedAtUtc));
+        IsDeleted = rehydratingProperties.GetValueOrDefault<Optional<bool>>(nameof(IsDeleted));
         CreatedAtUtc = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(CreatedAtUtc));
         LastModifiedAtUtc = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(LastModifiedAtUtc));
     }

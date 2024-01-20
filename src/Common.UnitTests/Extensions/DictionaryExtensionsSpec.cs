@@ -96,6 +96,10 @@ public class DictionaryExtensionsSpec
         result.AnIntProperty.Should().Be(1);
         result.AnBoolProperty.Should().Be(true);
         result.ADateTimeProperty.Should().BeNear(DateTime.UtcNow);
+        result.AnOptionalStringProperty.Should().Be(Optional<string>.None);
+        result.AnOptionalNullableStringProperty.Should().Be(Optional<string?>.None);
+        result.AnOptionalDateTimeProperty.Should().Be(Optional<DateTime>.None);
+        result.AnOptionalNullableDateTimeProperty.Should().Be(Optional<DateTime?>.None);
     }
 
     [Fact]
@@ -111,6 +115,10 @@ public class DictionaryExtensionsSpec
         result.AnIntProperty.Should().Be(1);
         result.AnBoolProperty.Should().Be(true);
         result.ADateTimeProperty.Should().BeNear(DateTime.UtcNow);
+        result.AnOptionalStringProperty.Should().Be(Optional<string>.None);
+        result.AnOptionalNullableStringProperty.Should().Be(Optional<string?>.None);
+        result.AnOptionalDateTimeProperty.Should().Be(Optional<DateTime>.None);
+        result.AnOptionalNullableDateTimeProperty.Should().Be(Optional<DateTime?>.None);
     }
 
     [Fact]
@@ -122,7 +130,11 @@ public class DictionaryExtensionsSpec
                 { nameof(TestMappingClass.AStringProperty), "avalue" },
                 { nameof(TestMappingClass.AnIntProperty), 99 },
                 { nameof(TestMappingClass.AnBoolProperty), false },
-                { nameof(TestMappingClass.ADateTimeProperty), datum }
+                { nameof(TestMappingClass.ADateTimeProperty), datum },
+                { nameof(TestMappingClass.AnOptionalStringProperty), "avalue" },
+                { nameof(TestMappingClass.AnOptionalNullableStringProperty), "avalue" },
+                { nameof(TestMappingClass.AnOptionalDateTimeProperty), datum },
+                { nameof(TestMappingClass.AnOptionalNullableDateTimeProperty), datum }
             }.AsReadOnly()
             .FromObjectDictionary<TestMappingClass>();
 
@@ -130,17 +142,25 @@ public class DictionaryExtensionsSpec
         result.AnIntProperty.Should().Be(99);
         result.AnBoolProperty.Should().Be(false);
         result.ADateTimeProperty.Should().Be(datum);
+        result.AnOptionalStringProperty.Should().Be("avalue");
+        result.AnOptionalNullableStringProperty.Should().Be("avalue");
+        result.AnOptionalDateTimeProperty.Should().Be(datum);
+        result.AnOptionalNullableDateTimeProperty.Should().Be(datum);
     }
 
     [Fact]
-    public void WhenFromObjectDictionaryWithMatchingDefaultProperties_ThenReturnsUpdatedInstanceWithDefaultValues()
+    public void WhenFromObjectDictionaryWithMatchingNullProperties_ThenReturnsUpdatedInstanceWithDefaultValues()
     {
         var result = new Dictionary<string, object?>
             {
                 { nameof(TestMappingClass.AStringProperty), null },
                 { nameof(TestMappingClass.AnIntProperty), null },
                 { nameof(TestMappingClass.AnBoolProperty), null },
-                { nameof(TestMappingClass.ADateTimeProperty), null }
+                { nameof(TestMappingClass.ADateTimeProperty), null },
+                { nameof(TestMappingClass.AnOptionalStringProperty), null },
+                { nameof(TestMappingClass.AnOptionalNullableStringProperty), null },
+                { nameof(TestMappingClass.AnOptionalDateTimeProperty), null },
+                { nameof(TestMappingClass.AnOptionalNullableDateTimeProperty), null }
             }.AsReadOnly()
             .FromObjectDictionary<TestMappingClass>();
 
@@ -148,6 +168,10 @@ public class DictionaryExtensionsSpec
         result.AnIntProperty.Should().Be(default);
         result.AnBoolProperty.Should().Be(default);
         result.ADateTimeProperty.Should().Be(default);
+        result.AnOptionalStringProperty.Should().Be(Optional<string>.None);
+        result.AnOptionalNullableStringProperty.Should().Be(Optional<string?>.None);
+        result.AnOptionalDateTimeProperty.Should().Be(Optional<DateTime>.None);
+        result.AnOptionalNullableDateTimeProperty.Should().Be(Optional<DateTime?>.None);
     }
 
     [Fact]
@@ -163,11 +187,15 @@ public class DictionaryExtensionsSpec
     {
         var result = new TestMappingClass().ToObjectDictionary();
 
-        result.Count.Should().Be(4);
+        result.Count.Should().Be(8);
         result[nameof(TestMappingClass.AStringProperty)].Should().Be("adefaultvalue");
         result[nameof(TestMappingClass.AnIntProperty)].Should().Be(1);
         result[nameof(TestMappingClass.AnBoolProperty)].Should().Be(true);
         result[nameof(TestMappingClass.ADateTimeProperty)].As<DateTime>().Should().BeNear(DateTime.UtcNow);
+        result[nameof(TestMappingClass.AnOptionalStringProperty)].Should().Be(Optional<string>.None);
+        result[nameof(TestMappingClass.AnOptionalNullableStringProperty)].Should().Be(Optional<string?>.None);
+        result[nameof(TestMappingClass.AnOptionalDateTimeProperty)].Should().Be(Optional<DateTime>.None);
+        result[nameof(TestMappingClass.AnOptionalNullableDateTimeProperty)].Should().Be(Optional<DateTime?>.None);
     }
 
     [Fact]
@@ -178,14 +206,22 @@ public class DictionaryExtensionsSpec
             AStringProperty = default!,
             AnIntProperty = default,
             AnBoolProperty = default,
-            ADateTimeProperty = default
+            ADateTimeProperty = default,
+            AnOptionalStringProperty = default,
+            AnOptionalNullableStringProperty = default,
+            AnOptionalDateTimeProperty = default,
+            AnOptionalNullableDateTimeProperty = default
         }.ToObjectDictionary();
 
-        result.Count.Should().Be(4);
+        result.Count.Should().Be(8);
         result[nameof(TestMappingClass.AStringProperty)].Should().BeNull();
         result[nameof(TestMappingClass.AnIntProperty)].Should().Be(default(int));
         result[nameof(TestMappingClass.AnBoolProperty)].Should().Be(default(bool));
         result[nameof(TestMappingClass.ADateTimeProperty)].Should().Be(default(DateTime));
+        result[nameof(TestMappingClass.AnOptionalStringProperty)].Should().Be(Optional<string>.None);
+        result[nameof(TestMappingClass.AnOptionalNullableStringProperty)].Should().Be(Optional<string?>.None);
+        result[nameof(TestMappingClass.AnOptionalDateTimeProperty)].Should().Be(Optional<DateTime>.None);
+        result[nameof(TestMappingClass.AnOptionalNullableDateTimeProperty)].Should().Be(Optional<DateTime?>.None);
     }
 }
 
@@ -197,6 +233,14 @@ public class TestMappingClass
     public bool AnBoolProperty { get; set; } = true;
 
     public int AnIntProperty { get; set; } = 1;
+
+    public Optional<DateTime> AnOptionalDateTimeProperty { get; set; }
+
+    public Optional<DateTime?> AnOptionalNullableDateTimeProperty { get; set; }
+
+    public Optional<string?> AnOptionalNullableStringProperty { get; set; }
+
+    public Optional<string> AnOptionalStringProperty { get; set; }
 
     public string AStringProperty { get; set; } = "adefaultvalue";
 }

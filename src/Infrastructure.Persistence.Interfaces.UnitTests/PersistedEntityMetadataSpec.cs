@@ -50,7 +50,7 @@ public class PersistedEntityMetadataSpec
     {
         var result = PersistedEntityMetadata.FromType<TestCommandDomainEntity>();
 
-        result.Types.Count.Should().Be(15);
+        result.Types.Count.Should().Be(17);
         result.Types[nameof(TestCommandDomainEntity.Id)].Should().Be(typeof(string));
         result.Types[nameof(TestCommandDomainEntity.IsDeleted)].Should().Be(typeof(Optional<bool>));
         result.Types[nameof(TestCommandDomainEntity.LastPersistedAtUtc)].Should().Be(typeof(Optional<DateTime>));
@@ -64,6 +64,9 @@ public class PersistedEntityMetadataSpec
         result.Types[nameof(TestCommandDomainEntity.ANullableDateTime)].Should().Be(typeof(DateTime?));
         result.Types[nameof(TestCommandDomainEntity.AnOptionalString)].Should().Be(typeof(Optional<string>));
         result.Types[nameof(TestCommandDomainEntity.AnOptionalDateTime)].Should().Be(typeof(Optional<DateTime>));
+        result.Types[nameof(TestCommandDomainEntity.AnOptionalNullableString)].Should().Be(typeof(Optional<string?>));
+        result.Types[nameof(TestCommandDomainEntity.AnOptionalNullableDateTime)].Should()
+            .Be(typeof(Optional<DateTime?>));
         result.Types[nameof(TestCommandDomainEntity.AValueObject)].Should().Be(typeof(TestValueObject));
         result.Types[nameof(TestCommandDomainEntity.AnOptionalValueObject)].Should()
             .Be(typeof(Optional<TestValueObject>));
@@ -74,7 +77,7 @@ public class PersistedEntityMetadataSpec
     {
         var result = PersistedEntityMetadata.FromType(typeof(TestCommandDomainEntity));
 
-        result.Types.Count.Should().Be(15);
+        result.Types.Count.Should().Be(17);
         result.Types[nameof(TestCommandDomainEntity.Id)].Should().Be(typeof(string));
         result.Types[nameof(TestCommandDomainEntity.IsDeleted)].Should().Be(typeof(Optional<bool>));
         result.Types[nameof(TestCommandDomainEntity.LastPersistedAtUtc)].Should().Be(typeof(Optional<DateTime>));
@@ -88,6 +91,9 @@ public class PersistedEntityMetadataSpec
         result.Types[nameof(TestCommandDomainEntity.ANullableDateTime)].Should().Be(typeof(DateTime?));
         result.Types[nameof(TestCommandDomainEntity.AnOptionalString)].Should().Be(typeof(Optional<string>));
         result.Types[nameof(TestCommandDomainEntity.AnOptionalDateTime)].Should().Be(typeof(Optional<DateTime>));
+        result.Types[nameof(TestCommandDomainEntity.AnOptionalNullableString)].Should().Be(typeof(Optional<string?>));
+        result.Types[nameof(TestCommandDomainEntity.AnOptionalNullableDateTime)].Should()
+            .Be(typeof(Optional<DateTime?>));
         result.Types[nameof(TestCommandDomainEntity.AValueObject)].Should().Be(typeof(TestValueObject));
         result.Types[nameof(TestCommandDomainEntity.AnOptionalValueObject)].Should()
             .Be(typeof(Optional<TestValueObject>));

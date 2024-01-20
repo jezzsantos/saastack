@@ -22,9 +22,7 @@ public class TestDataStoreEntity : IHasIdentity, IQueryableEntity
 
     public bool ABooleanValue { get; set; }
 
-    public ComplexNonValueObject AComplexNonValueObjectValue { get; set; } = null!;
-
-    public ComplexValueObject AComplexValueObjectValue { get; set; } = null!;
+    public TestComplexObject AComplexObjectValue { get; set; } = null!;
 
     public DateTimeOffset ADateTimeOffsetValue { get; set; }
 
@@ -38,9 +36,19 @@ public class TestDataStoreEntity : IHasIdentity, IQueryableEntity
 
     public long ALongValue { get; set; }
 
-    public AnEnum AnEnumValue { get; set; }
+    public TestEnum? AnNullableEnumValue { get; set; }
 
-    public AnEnum? AnNullableEnumValue { get; set; }
+    public Optional<TestComplexObject> AnOptionalComplexObjectValue { get; set; } = null!;
+
+    public Optional<DateTime> AnOptionalDateTimeUtcValue { get; set; }
+
+    public Optional<DateTime?> AnOptionalNullableDateTimeUtcValue { get; set; }
+
+    public Optional<string?> AnOptionalNullableStringValue { get; set; }
+
+    public Optional<string> AnOptionalStringValue { get; set; }
+
+    public Optional<TestValueObject> AnOptionalValueObjectValue { get; set; } = null!;
 
     public bool? ANullableBooleanValue { get; set; }
 
@@ -57,6 +65,10 @@ public class TestDataStoreEntity : IHasIdentity, IQueryableEntity
     public long? ANullableLongValue { get; set; }
 
     public string AStringValue { get; set; } = null!;
+
+    public TestValueObject AValueObjectValue { get; set; } = null!;
+
+    public TestEnum EnumValue { get; set; }
 
     public DateTime? LastPersistedAtUtc { get; set; }
 
@@ -108,13 +120,13 @@ public class SecondJoiningTestQueryStoreEntity : IHasIdentity, IQueryableEntity
     public Optional<string> Id { get; set; }
 }
 
-public class ComplexNonValueObject
+public class TestComplexObject
 {
     public string APropertyValue { get; set; } = null!;
 
     public override bool Equals(object? obj)
     {
-        if (obj is not ComplexNonValueObject other)
+        if (obj is not TestComplexObject other)
         {
             return false;
         }
@@ -131,12 +143,12 @@ public class ComplexNonValueObject
             : 0;
     }
 
-    public static bool operator ==(ComplexNonValueObject? left, ComplexNonValueObject? right)
+    public static bool operator ==(TestComplexObject? left, TestComplexObject? right)
     {
         return Equals(left, right);
     }
 
-    public static bool operator !=(ComplexNonValueObject? left, ComplexNonValueObject? right)
+    public static bool operator !=(TestComplexObject? left, TestComplexObject? right)
     {
         return !Equals(left, right);
     }
@@ -146,20 +158,20 @@ public class ComplexNonValueObject
         return this.ToJson()!;
     }
 
-    protected bool Equals(ComplexNonValueObject other)
+    protected bool Equals(TestComplexObject other)
     {
         return APropertyValue == other.APropertyValue;
     }
 }
 
-public class ComplexValueObject : ValueObjectBase<ComplexValueObject>
+public class TestValueObject : ValueObjectBase<TestValueObject>
 {
-    public static ComplexValueObject Create(string @string, int integer, bool boolean)
+    public static TestValueObject Create(string @string, int integer, bool boolean)
     {
-        return new ComplexValueObject(@string, integer, boolean);
+        return new TestValueObject(@string, integer, boolean);
     }
 
-    private ComplexValueObject(string @string, int integer, bool boolean)
+    private TestValueObject(string @string, int integer, bool boolean)
     {
         AStringProperty = @string;
         AnIntName = integer;
@@ -177,12 +189,12 @@ public class ComplexValueObject : ValueObjectBase<ComplexValueObject>
         return $"{AStringProperty}::{AnIntName}::{ABooleanPropertyName}";
     }
 
-    public static ValueObjectFactory<ComplexValueObject> Rehydrate()
+    public static ValueObjectFactory<TestValueObject> Rehydrate()
     {
         return (value, _) =>
         {
             var parts = RehydrateToList(value);
-            return new ComplexValueObject(parts[0], parts[1].ToInt(), parts[2].ToBool());
+            return new TestValueObject(parts[0], parts[1].ToInt(), parts[2].ToBool());
         };
     }
 
@@ -204,9 +216,7 @@ public class ComplexValueObject : ValueObjectBase<ComplexValueObject>
     }
 }
 
-#pragma warning disable S2344
-public enum AnEnum
-#pragma warning restore S2344
+public enum TestEnum
 {
     None = 0,
     AValue1 = 1,

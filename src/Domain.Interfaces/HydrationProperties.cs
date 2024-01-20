@@ -26,7 +26,7 @@ public class HydrationProperties : ReadOnlyDictionary<string, Optional<object>>
                 return Optional<object>.None;
             }
 
-            if (value.IsOptional(out var contained))
+            if (value.TryGetContainedValue(out var contained))
             {
                 return contained.ToOptional();
             }

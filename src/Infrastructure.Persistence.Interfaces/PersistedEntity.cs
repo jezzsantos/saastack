@@ -1,7 +1,6 @@
 ﻿using Common;
 using Common.Extensions;
 using Domain.Common.Extensions;
-using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.ValueObjects;
 
@@ -71,39 +70,40 @@ public abstract class PersistedEntity
         }
     }
 
-    public Optional<TValue> GetValueOrDefault<TValue>(string propertyName, TValue? defaultValue = default)
+    public TValue? GetValueOrDefault<TValue>(string propertyName, TValue? defaultValue = default)
     {
         if (!PropertyValues.ContainsKey(propertyName))
         {
-            return new Optional<TValue>(defaultValue);
+            return defaultValue;
         }
 
         var propertyValue = ConvertToDomainProperty(PropertyValues[propertyName], typeof(TValue));
         if (!propertyValue.HasValue)
         {
-            return Optional<TValue>.None;
+            return defaultValue;
         }
 
         return propertyValue.Value is TValue value
             ? value
-            : Optional<TValue>.None;
+            : defaultValue;
     }
 
-    public Optional<TValueObject> GetValueOrDefault<TValueObject>(string propertyName, IDomainFactory domainFactory)
-        where TValueObject : ValueObjectBase<TValueObject>
+    public TValue? GetValueOrDefault<TValue>(string propertyName, IDomainFactory domainFactory)
     {
         if (!PropertyValues.ContainsKey(propertyName))
         {
-            return Optional<TValueObject>.None;
+            return default;
         }
 
-        var propertyValue = ConvertToDomainProperty(PropertyValues[propertyName], typeof(TValueObject), domainFactory);
+        var propertyValue = ConvertToDomainProperty(PropertyValues[propertyName], typeof(TValue), domainFactory);
         if (!propertyValue.HasValue)
         {
-            return Optional<TValueObject>.None;
+            return default;
         }
 
-        return new Optional<TValueObject>((TValueObject)propertyValue.Value);
+        return propertyValue.Value is TValue value
+            ? value
+            : default;
     }
 
     protected void Add<TValue>(string name, Optional<TValue> value, Type type)
@@ -171,20 +171,26 @@ public abstract class PersistedEntity
         IDomainFactory? domainFactory = null)
     {
         if (Optional.IsOptionalType(propertyType)
-            && Optional.TryGetContainedType(propertyType, out var containedType)
-            && containedType!.IsAssignableTo(typeof(IDehydratableValueObject)))
+            && Optional.TryGetContainedType(propertyType, out var containedType))
         {
-            if (!rawValue.HasValue)
+            if (containedType!.IsAssignableTo(typeof(IDehydratableValueObject)))
             {
-                return Optional<object>.None;
+                if (!rawValue.HasValue)
+                {
+                    return Optional<object>.None;
+                }
+
+                if (domainFactory.NotExists())
+                {
+                    return Optional<object>.None;
+                }
+
+                var valueObject = domainFactory.RehydrateValueObject(propertyType, (string)rawValue.Value);
+                return new Optional<object>(valueObject.ToOptional(containedType));
             }
 
-            if (domainFactory.NotExists())
-            {
-                return Optional<object>.None;
-            }
-
-            return new Optional<object>(domainFactory.RehydrateValueObject(propertyType, (string)rawValue.Value));
+            var optional = Optional.ChangeType(rawValue, containedType);
+            return new Optional<object>(optional);
         }
 
         if (typeof(IDehydratableValueObject).IsAssignableFrom(propertyType))

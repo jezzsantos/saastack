@@ -10,28 +10,22 @@ namespace Common;
 public static class Optional
 {
     /// <summary>
+    ///     Changes the type of the specified <see cref="optional" /> to an <see cref="Optional" />
+    ///     of the specified <see cref="targetType" />
+    /// </summary>
+    public static object ChangeType(Optional<object> optional, Type targetType)
+    {
+        optional.TryGetContainedValue(out var containedValue);
+
+        return ChangeOptionalType(containedValue, targetType);
+    }
+
+    /// <summary>
     ///     Whether the <see cref="value" /> is of type <see cref="Optional{T}" />, and if so returns the contained value
     /// </summary>
     public static bool IsOptional(this object? value, out object? contained)
     {
-        contained = default;
-        if (value is null)
-        {
-            return false;
-        }
-
-        var typeOfValue = value.GetType();
-        if (IsOptionalType(typeOfValue))
-        {
-            var containedType = typeof(Optional<>).MakeGenericType(typeOfValue.GenericTypeArguments[0]);
-            var valueOrDefault = containedType.InvokeMember(nameof(Optional<object>.ValueOrDefault),
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty, null, value, null);
-
-            contained = valueOrDefault;
-            return true;
-        }
-
-        return false;
+        return value.TryGetContainedValue(out contained);
     }
 
     /// <summary>
@@ -40,6 +34,22 @@ public static class Optional
     public static bool IsOptionalType(Type type)
     {
         return type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(Optional<>);
+    }
+
+    /// <summary>
+    ///     Whether the <see cref="type" /> is an optional type, and if so return the <see cref="containedType" />
+    /// </summary>
+    public static bool IsOptionalType(Type type, out Type? containedType)
+    {
+        var isOptional = IsOptionalType(type);
+        if (!isOptional)
+        {
+            containedType = null;
+            return false;
+        }
+
+        containedType = containedType = type.GetGenericArguments()[0];
+        return true;
     }
 
     /// <summary>
@@ -57,7 +67,7 @@ public static class Optional
     {
         ArgumentNullException.ThrowIfNull(value);
 
-        if (value.IsOptional(out var contained))
+        if (value.TryGetContainedValue(out var contained))
         {
             if (contained is null)
             {
@@ -87,6 +97,14 @@ public static class Optional
     }
 
     /// <summary>
+    ///     Converts the <see cref="value" /> to an <see cref="Optional" /> opf the specified <see cref="targetType" />
+    /// </summary>
+    public static object ToOptional<TValue>(this TValue? value, Type targetType)
+    {
+        return ChangeOptionalType(value, targetType);
+    }
+
+    /// <summary>
     ///     Converts the <see cref="value" /> to an <see cref="Optional{TValue}" />
     /// </summary>
     public static Optional<TValue> ToOptional<TValue>(this TValue? value)
@@ -104,13 +122,41 @@ public static class Optional
     public static bool TryGetContainedType(Type type, out Type? containedType)
     {
         containedType = null;
-        if (!IsOptionalType(type))
+        return IsOptionalType(type, out containedType);
+    }
+
+    /// <summary>
+    ///     Whether the <see cref="value" /> is of type <see cref="Optional{T}" />, and if so returns the contained value
+    /// </summary>
+    public static bool TryGetContainedValue(this object? value, out object? contained)
+    {
+        contained = default;
+        if (value is null)
         {
             return false;
         }
 
-        containedType = type.GetGenericArguments()[0];
+        var typeOfOldOptional = value.GetType();
+        if (!IsOptionalType(typeOfOldOptional))
+        {
+            return false;
+        }
+
+        var typeOfContainedValue = typeOfOldOptional.GenericTypeArguments[0];
+        var typeOfNewOptional = typeof(Optional<>).MakeGenericType(typeOfContainedValue);
+        var valueOrDefault = typeOfNewOptional.InvokeMember(nameof(Optional<object>.ValueOrDefault),
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty, null, value, null);
+
+        contained = valueOrDefault;
         return true;
+    }
+
+    private static object ChangeOptionalType(object? value, Type targetType)
+    {
+        var targetOptionalType = typeof(Optional<>).MakeGenericType(targetType);
+        var ctor = targetOptionalType.GetConstructor(new[] { targetType });
+        var instance = ctor!.Invoke(new[] { value });
+        return instance;
     }
 }
 
@@ -120,7 +166,7 @@ public static class Optional
 /// </summary>
 public readonly struct Optional<TValue> : IEquatable<Optional<TValue>>
 {
-    public const string NoValueStringValue = "unspecified";
+    public const string NoValueStringValue = nameof(None);
     private const string NullValueStringValue = "null";
 
     /// <summary>

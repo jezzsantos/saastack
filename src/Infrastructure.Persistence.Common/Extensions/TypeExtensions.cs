@@ -6,25 +6,43 @@ namespace Infrastructure.Persistence.Common.Extensions;
 
 public static class TypeExtensions
 {
+    private static readonly List<Type> NonComplexTypes = new()
+    {
+        typeof(string), typeof(Optional<string>), typeof(Optional<string?>), typeof(DateTime), typeof(DateTime?),
+        typeof(Optional<DateTime>), typeof(Optional<DateTime?>), typeof(DateTimeOffset), typeof(DateTimeOffset?),
+        typeof(Optional<DateTimeOffset>), typeof(Optional<DateTimeOffset?>), typeof(bool), typeof(bool?),
+        typeof(Optional<bool>), typeof(Optional<bool?>), typeof(int), typeof(int?), typeof(Optional<int>),
+        typeof(Optional<int?>), typeof(long), typeof(long?), typeof(Optional<long>), typeof(Optional<long?>),
+        typeof(double), typeof(double?), typeof(Optional<double>), typeof(Optional<double?>), typeof(byte[]),
+        typeof(Guid), typeof(Guid?), typeof(Optional<Guid>), typeof(Optional<Guid?>)
+    };
+
     /// <summary>
     ///     Whether the <see cref="type" /> is considered a complex type
     /// </summary>
     public static bool IsComplexStorageType(this Type type)
     {
-        if (type == typeof(string)
-            || type.IsEnum || type.IsNullableEnum()
-            || type == typeof(DateTime) || type == typeof(DateTime?)
-            || type == typeof(DateTimeOffset) || type == typeof(DateTimeOffset?)
-            || type == typeof(bool) || type == typeof(bool?)
-            || type == typeof(int) || type == typeof(int?)
-            || type == typeof(long) || type == typeof(long?)
-            || type == typeof(double) || type == typeof(double?)
-            || type == typeof(byte[])
-            || type == typeof(Guid) || type == typeof(Guid?)
-            || typeof(IDehydratableValueObject).IsAssignableFrom(type)
-           )
+        if (NonComplexTypes.Contains(type))
         {
             return false;
+        }
+
+        if (type.IsEnum || type.IsNullableEnum() || type.IsOptionalEnum())
+        {
+            return false;
+        }
+
+        if (typeof(IDehydratableValueObject).IsAssignableFrom(type))
+        {
+            return false;
+        }
+
+        if (Optional.IsOptionalType(type, out var containedType))
+        {
+            if (typeof(IDehydratableValueObject).IsAssignableFrom(containedType))
+            {
+                return false;
+            }
         }
 
         return true;

@@ -35,7 +35,40 @@ internal static class InProcessInMemDataStoreExtensions
 {
     public static HydrationProperties ToHydrationProperties(this CommandEntity entity)
     {
+        foreach (var (propertyName, propertyValue) in entity.Properties)
+        {
+            if (!propertyValue.HasValue)
+            {
+                continue;
+            }
+
+            var value = propertyValue.Value;
+            switch (value)
+            {
+                case DateTime dateTime:
+                {
+                    if (dateTime == DateTime.MinValue)
+                    {
+                        entity.Add(propertyName, DateTime.MinValue.ToUniversalTime());
+                    }
+
+                    break;
+                }
+
+                case DateTimeOffset dateTimeOffset:
+                {
+                    if (dateTimeOffset == DateTimeOffset.MinValue)
+                    {
+                        entity.Add(propertyName, DateTimeOffset.MinValue.ToUniversalTime());
+                    }
+
+                    break;
+                }
+            }
+        }
+
         entity.LastPersistedAtUtc = DateTime.UtcNow;
+
         return entity.Properties;
     }
 }

@@ -20,6 +20,10 @@ public class TestCommandDomainEntity : IDehydratableEntity
 
     public required Optional<DateTime> AnOptionalDateTime { get; set; }
 
+    public required Optional<DateTime?> AnOptionalNullableDateTime { get; set; }
+
+    public required Optional<string?> AnOptionalNullableString { get; set; }
+
     public required Optional<string> AnOptionalString { get; set; }
 
     public required Optional<TestValueObject> AnOptionalValueObject { get; set; } = null!;
@@ -55,6 +59,8 @@ public class TestCommandDomainEntity : IDehydratableEntity
             { nameof(ADateTimeValue), ADateTimeValue },
             { nameof(AnOptionalString), AnOptionalString },
             { nameof(AnOptionalDateTime), AnOptionalDateTime },
+            { nameof(AnOptionalNullableString), AnOptionalNullableString },
+            { nameof(AnOptionalNullableDateTime), AnOptionalNullableDateTime },
             { nameof(AValueObject), AValueObject },
             { nameof(AnOptionalValueObject), AnOptionalValueObject }
         };
