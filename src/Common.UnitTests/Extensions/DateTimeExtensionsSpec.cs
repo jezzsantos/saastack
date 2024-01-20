@@ -367,4 +367,36 @@ public class DateTimeExtensionsSpec
 
         result.Should().BeTrue();
     }
+
+    [Fact]
+    public void WhenIsNearAndSameTime_ThenReturnsTrue()
+    {
+        var datum = DateTime.UtcNow;
+
+        var result = datum.IsNear(datum);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenIsNearAndNearToDefault_ThenReturnsTrue()
+    {
+        var datum = DateTime.UtcNow;
+        var other = datum.AddMilliseconds(100);
+
+        var result = datum.IsNear(other);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenIsNearAndTooFarAwayFromDefault_ThenReturnsFalse()
+    {
+        var datum = DateTime.UtcNow;
+        var other = datum.AddMinutes(1);
+
+        var result = datum.IsNear(other);
+
+        result.Should().BeFalse();
+    }
 }

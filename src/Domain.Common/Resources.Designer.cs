@@ -130,5 +130,14 @@ namespace Domain.Common {
                 return ResourceManager.GetString("EventStream_ZeroLastVersion", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The name of the queue is invalid.
+        /// </summary>
+        internal static string MessageQueueFactory_InvalidQueueName {
+            get {
+                return ResourceManager.GetString("MessageQueueFactory_InvalidQueueName", resourceCulture);
+            }
+        }
     }
 }

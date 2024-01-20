@@ -24,3 +24,20 @@ public enum RecorderTraceLevel
     Warning,
     Error
 }
+
+public class DeliveredEmail : IIdentifiableResource
+{
+    public List<DateTime> Attempts { get; set; } = new();
+
+    public required string Body { get; set; }
+
+    public bool IsDelivered { get; set; }
+
+    public required string Subject { get; set; }
+
+    public required string ToDisplayName { get; set; }
+
+    public required string ToEmailAddress { get; set; }
+
+    public required string Id { get; set; }
+}

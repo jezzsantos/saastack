@@ -55,15 +55,15 @@ public static class HostExtensions
     private const string CheckPointAggregatePrefix = "check";
     private const string LoggingSettingName = "Logging";
     private static readonly char[] AllowedCORSOriginsDelimiters = { ',', ';', ' ' };
+#if TESTINGONLY
     private static readonly Dictionary<string, IWebRequest> StubQueueDrainingServiceQueuedApiMappings = new()
     {
-#if TESTINGONLY
         { "audits", new DrainAllAuditsRequest() },
         { "usages", new DrainAllUsagesRequest() },
         { "emails", new DrainAllEmailsRequest() },
         //     { "events", new DrainAllEventsRequest() }, 
-#endif
     };
+#endif
 
     /// <summary>
     ///     Configures a WebHost
@@ -343,6 +343,11 @@ public static class HostExtensions
 
         void ConfigurePersistence(bool usesQueues)
         {
+            if (usesQueues)
+            {
+                appBuilder.Services.RegisterUnshared<IMessageQueueIdFactory, MessageQueueIdFactory>();
+            }
+
             var domainAssemblies = modules.DomainAssemblies
                 .Concat(new[] { typeof(DomainCommonMarker).Assembly, typeof(DomainSharedMarker).Assembly })
                 .ToArray();

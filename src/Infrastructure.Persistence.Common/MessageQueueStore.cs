@@ -1,6 +1,7 @@
 using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
+using Domain.Interfaces;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
 
@@ -12,13 +13,15 @@ namespace Infrastructure.Persistence.Common;
 public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
     where TMessage : IQueuedMessage, new()
 {
+    private readonly IMessageQueueIdFactory _messageQueueIdFactory;
     private readonly string _queueName;
     private readonly IQueueStore _queueStore;
     private readonly IRecorder _recorder;
 
-    public MessageQueueStore(IRecorder recorder, IQueueStore queueStore)
+    public MessageQueueStore(IRecorder recorder, IMessageQueueIdFactory messageQueueIdFactory, IQueueStore queueStore)
     {
         _recorder = recorder;
+        _messageQueueIdFactory = messageQueueIdFactory;
         _queueStore = queueStore;
         _queueName = typeof(TMessage).GetEntityNameSafe();
     }
@@ -94,6 +97,6 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
 
     private string CreateMessageId()
     {
-        return $"{_queueName}_{Guid.NewGuid():N}";
+        return _messageQueueIdFactory.Create(_queueName);
     }
 }

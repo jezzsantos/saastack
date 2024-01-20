@@ -25,4 +25,14 @@ public static class ObjectExtensions
         error = default;
         return false;
     }
+
+    /// <summary>
+    ///     Guards the parameter <see cref="value" /> from being invalid according to the <see cref="validation" />,
+    ///     and if invalid, returns a <see cref="PreconditionViolation" />
+    /// </summary>
+    public static void ThrowIfInvalidParameter<TValue>(this TValue value, Validation<TValue> validation,
+        string parameterName, string? errorMessage)
+    {
+        value.ThrowIfInvalidParameter(validation!.Matches, parameterName, errorMessage);
+    }
 }

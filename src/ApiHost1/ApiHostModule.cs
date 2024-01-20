@@ -3,6 +3,7 @@ using AncillaryInfrastructure.Api.Usages;
 using Application.Persistence.Shared;
 using Application.Services.Shared;
 using Common;
+using Domain.Interfaces;
 using Domain.Services.Shared.DomainServices;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
@@ -30,7 +31,8 @@ public class ApiHostModule : ISubDomainModule
             return (_, services) =>
             {
                 services.RegisterUnshared<IEmailMessageQueue>(c =>
-                    new EmailMessageQueue(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));
+                    new EmailMessageQueue(c.Resolve<IRecorder>(), c.Resolve<IMessageQueueIdFactory>(),
+                        c.ResolveForPlatform<IQueueStore>()));
 
                 services.RegisterUnshared<ITokensService, TokensService>();
                 services.RegisterUnshared<INotificationsService, EmailNotificationsService>();

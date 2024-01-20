@@ -2,6 +2,7 @@ using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
 using Common;
+using Domain.Interfaces;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
 
@@ -11,9 +12,9 @@ public class UsageMessageQueue : IUsageMessageQueue
 {
     private readonly MessageQueueStore<UsageMessage> _messageQueue;
 
-    public UsageMessageQueue(IRecorder recorder, IQueueStore store)
+    public UsageMessageQueue(IRecorder recorder, IMessageQueueIdFactory messageQueueIdFactory, IQueueStore store)
     {
-        _messageQueue = new MessageQueueStore<UsageMessage>(recorder, store);
+        _messageQueue = new MessageQueueStore<UsageMessage>(recorder, messageQueueIdFactory, store);
     }
 
     public Task<Result<long, Error>> CountAsync(CancellationToken cancellationToken)

@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AncillaryApplication {
+namespace AncillaryDomain {
     using System;
     
     
@@ -38,7 +38,7 @@ namespace AncillaryApplication {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("AncillaryApplication.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("AncillaryDomain.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,56 +60,65 @@ namespace AncillaryApplication {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The queued message was not valid JSON for its type: &apos;{0}&apos;, message was: {1}.
+        ///   Looks up a localized string similar to The latest attempt must be after the last attempt.
         /// </summary>
-        internal static string AncillaryApplication_InvalidQueuedMessage {
+        internal static string DeliveryAttempts_LatestAttemptNotAfterLastAttempt {
             get {
-                return ResourceManager.GetString("AncillaryApplication_InvalidQueuedMessage", resourceCulture);
+                return ResourceManager.GetString("DeliveryAttempts_LatestAttemptNotAfterLastAttempt", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The audit message is missing a &apos;AuditCode&apos;.
+        ///   Looks up a localized string similar to All attempts must in chronological order.
         /// </summary>
-        internal static string AncillaryApplication_MissingAuditCode {
+        internal static string DeliveryAttempts_PreviousAttemptsNotInOrder {
             get {
-                return ResourceManager.GetString("AncillaryApplication_MissingAuditCode", resourceCulture);
+                return ResourceManager.GetString("DeliveryAttempts_PreviousAttemptsNotInOrder", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email message is missing the &apos;HTML&apos; email.
+        ///   Looks up a localized string similar to The email has already been delivered.
         /// </summary>
-        internal static string AncillaryApplication_MissingEmailHtml {
+        internal static string EmailDeliveryRoot_AlreadyDelivered {
             get {
-                return ResourceManager.GetString("AncillaryApplication_MissingEmailHtml", resourceCulture);
+                return ResourceManager.GetString("EmailDeliveryRoot_AlreadyDelivered", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The audit message is missing a &apos;TenantId&apos;.
+        ///   Looks up a localized string similar to The email message is missing a &apos;HtmlBody&apos;.
         /// </summary>
-        internal static string AncillaryApplication_MissingTenantId {
+        internal static string EmailDeliveryRoot_MissingEmailBody {
             get {
-                return ResourceManager.GetString("AncillaryApplication_MissingTenantId", resourceCulture);
+                return ResourceManager.GetString("EmailDeliveryRoot_MissingEmailBody", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The usage message is missing a &apos;EventName&apos;.
+        ///   Looks up a localized string similar to The email message is missing a &apos;Subject&apos;.
         /// </summary>
-        internal static string AncillaryApplication_MissingUsageEventName {
+        internal static string EmailDeliveryRoot_MissingEmailSubject {
             get {
-                return ResourceManager.GetString("AncillaryApplication_MissingUsageEventName", resourceCulture);
+                return ResourceManager.GetString("EmailDeliveryRoot_MissingEmailSubject", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The usage message is missing a &apos;ForId&apos;.
+        ///   Looks up a localized string similar to The email delivery has not yet been attempted.
         /// </summary>
-        internal static string AncillaryApplication_MissingUsageForId {
+        internal static string EmailDeliveryRoot_NotAttempted {
             get {
-                return ResourceManager.GetString("AncillaryApplication_MissingUsageForId", resourceCulture);
+                return ResourceManager.GetString("EmailDeliveryRoot_NotAttempted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ID of the message is invalid.
+        /// </summary>
+        internal static string QueuedMessageId_InvalidId {
+            get {
+                return ResourceManager.GetString("QueuedMessageId_InvalidId", resourceCulture);
             }
         }
     }

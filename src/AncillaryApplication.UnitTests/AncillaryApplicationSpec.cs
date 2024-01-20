@@ -1,13 +1,17 @@
 using AncillaryApplication.Persistence;
+using AncillaryApplication.Persistence.ReadModels;
 using AncillaryDomain;
 using Application.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
 using Common;
 using Common.Extensions;
+using Domain.Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
+using Domain.Shared;
+using FluentAssertions;
 using Moq;
 using UnitTesting.Common;
 using Xunit;
@@ -22,16 +26,19 @@ public class AncillaryApplicationSpec
     private readonly Mock<IAuditMessageQueueRepository> _auditMessageRepository;
     private readonly Mock<IAuditRepository> _auditRepository;
     private readonly Mock<ICallerContext> _caller;
+    private readonly Mock<IEmailDeliveryRepository> _emailDeliveryRepository;
     private readonly Mock<IEmailDeliveryService> _emailDeliveryService;
     private readonly Mock<IEmailMessageQueue> _emailMessageQueue;
+    private readonly Mock<IIdentifierFactory> _idFactory;
+    private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IUsageDeliveryService> _usageDeliveryService;
     private readonly Mock<IUsageMessageQueue> _usageMessageQueue;
 
     public AncillaryApplicationSpec()
     {
-        var recorder = new Mock<IRecorder>();
-        var idFactory = new Mock<IIdentifierFactory>();
-        idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
+        _recorder = new Mock<IRecorder>();
+        _idFactory = new Mock<IIdentifierFactory>();
+        _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns(new Result<Identifier, Error>("anid".ToId()));
         _caller = new Mock<ICallerContext>();
         _usageMessageQueue = new Mock<IUsageMessageQueue>();
@@ -42,10 +49,22 @@ public class AncillaryApplicationSpec
             .Returns((AuditRoot root, CancellationToken _) => Task.FromResult<Result<AuditRoot, Error>>(root));
         _emailMessageQueue = new Mock<IEmailMessageQueue>();
         _emailDeliveryService = new Mock<IEmailDeliveryService>();
+        _emailDeliveryService.Setup(eds => eds.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<EmailDeliveryReceipt, Error>>(new EmailDeliveryReceipt()));
+        _emailDeliveryRepository = new Mock<IEmailDeliveryRepository>();
+        _emailDeliveryRepository.Setup(ar =>
+                ar.SaveAsync(It.IsAny<EmailDeliveryRoot>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .Returns((EmailDeliveryRoot root, bool _, CancellationToken _) =>
+                Task.FromResult<Result<EmailDeliveryRoot, Error>>(root));
+        _emailDeliveryRepository.Setup(edr =>
+                edr.FindDeliveryByMessageIdAsync(It.IsAny<QueuedMessageId>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<Optional<EmailDeliveryRoot>, Error>>(Optional<EmailDeliveryRoot>.None));
 
-        _application = new AncillaryApplication(recorder.Object, idFactory.Object, _usageMessageQueue.Object,
+        _application = new AncillaryApplication(_recorder.Object, _idFactory.Object, _usageMessageQueue.Object,
             _usageDeliveryService.Object, _auditMessageRepository.Object, _auditRepository.Object,
-            _emailMessageQueue.Object, _emailDeliveryService.Object);
+            _emailMessageQueue.Object, _emailDeliveryService.Object, _emailDeliveryRepository.Object);
     }
 
     [Fact]
@@ -206,118 +225,165 @@ public class AncillaryApplicationSpec
     }
 
     [Fact]
-    public async Task WhenDeliverEmailAsyncAndMessageHasNoSubject_ThenReturnsError()
+    public async Task WhenDeliverEmailAsyncAndDelivered_ThenDeliversSuccessfully()
     {
+        var messageId = CreateMessageId();
         var messageAsJson = new EmailMessage
         {
-            Html = new QueuedEmailHtmlMessage
-            {
-                Subject = null
-            }
-        }.ToJson()!;
-
-        var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_MissingEmailSubject);
-        _emailDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenDeliverEmailAsyncAndMessageHasNoBody_ThenReturnsError()
-    {
-        var messageAsJson = new EmailMessage
-        {
-            Html = new QueuedEmailHtmlMessage
-            {
-                Subject = "asubject",
-                HtmlBody = null
-            }
-        }.ToJson()!;
-
-        var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_MissingEmailBody);
-        _emailDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenDeliverEmailAsyncAndMessageHasNoRecipient_ThenReturnsError()
-    {
-        var messageAsJson = new EmailMessage
-        {
+            MessageId = messageId,
             Html = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject",
                 HtmlBody = "abody",
-                ToEmailAddress = null
-            }
-        }.ToJson()!;
-
-        var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_MissingEmailRecipient);
-        _emailDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenDeliverEmailAsyncAndMessageHasNoSender_ThenReturnsError()
-    {
-        var messageAsJson = new EmailMessage
-        {
-            Html = new QueuedEmailHtmlMessage
-            {
-                Subject = "asubject",
-                HtmlBody = "abody",
-                ToEmailAddress = "arecipientemailaddress",
-                FromEmailAddress = null
-            }
-        }.ToJson()!;
-
-        var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_MissingEmailSender);
-        _emailDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenDeliverEmailAsync_ThenDelivers()
-    {
-        var messageAsJson = new EmailMessage
-        {
-            Html = new QueuedEmailHtmlMessage
-            {
-                Subject = "asubject",
-                HtmlBody = "abody",
-                ToEmailAddress = "arecipientemailaddress",
+                ToEmailAddress = "arecipient@company.com",
                 ToDisplayName = "arecipient",
-                FromEmailAddress = "asenderemailaddress",
+                FromEmailAddress = "asender@company.com",
                 FromDisplayName = "asender"
             }
         }.ToJson()!;
+        var root = EmailDeliveryRoot
+            .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
+        root.SetEmailDetails("asubject", "abody",
+            EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value);
+        root.AttemptDelivery();
+        root.SucceededDelivery("atransactionid");
+        _emailDeliveryRepository.Setup(edr =>
+                edr.FindDeliveryByMessageIdAsync(It.IsAny<QueuedMessageId>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<Optional<EmailDeliveryRoot>, Error>>(root.ToOptional()));
+        _emailDeliveryService.Setup(eds => eds.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<EmailDeliveryReceipt, Error>>(new EmailDeliveryReceipt()));
 
         var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
 
         result.Should().BeSuccess();
         _emailDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "asubject", "abody", "arecipientemailaddress",
-                "arecipient", "asenderemailaddress", "asender",
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+        _emailDeliveryRepository.Verify(
+            edr => edr.SaveAsync(It.IsAny<EmailDeliveryRoot>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenDeliverEmailAsyncAndNotDelivered_ThenFailsDelivery()
+    {
+        var messageId = CreateMessageId();
+        var messageAsJson = new EmailMessage
+        {
+            MessageId = messageId,
+            Html = new QueuedEmailHtmlMessage
+            {
+                Subject = "asubject",
+                HtmlBody = "abody",
+                ToEmailAddress = "arecipient@company.com",
+                ToDisplayName = "arecipient",
+                FromEmailAddress = "asender@company.com",
+                FromDisplayName = "asender"
+            }
+        }.ToJson()!;
+        _emailDeliveryService.Setup(eds => eds.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<EmailDeliveryReceipt, Error>>(Error.Unexpected()));
+
+        var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.Unexpected);
+        _emailDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "asubject", "abody", "arecipient@company.com",
+                "arecipient", "asender@company.com", "asender",
                 It.IsAny<CancellationToken>()));
+        _emailDeliveryRepository.Verify(edr => edr.SaveAsync(It.Is<EmailDeliveryRoot>(root =>
+            root.MessageId == messageId
+            && root.Recipient.Value.EmailAddress == "arecipient@company.com"
+            && root.Recipient.Value.DisplayName == "arecipient"
+            && root.Attempts.Attempts.Count == 1
+            && root.Attempts.Attempts[0].IsNear(DateTime.UtcNow)
+            && root.IsDelivered == false
+        ), true, It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenDeliverEmailAsyncAndAlreadyDelivered_ThenDoesNotRedeliver()
+    {
+        var messageId = CreateMessageId();
+        var messageAsJson = new EmailMessage
+        {
+            MessageId = messageId,
+            Html = new QueuedEmailHtmlMessage
+            {
+                Subject = "asubject",
+                HtmlBody = "abody",
+                ToEmailAddress = "arecipient@company.com",
+                ToDisplayName = "arecipient",
+                FromEmailAddress = "asender@company.com",
+                FromDisplayName = "asender"
+            }
+        }.ToJson()!;
+        _emailDeliveryService.Setup(eds => eds.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<EmailDeliveryReceipt, Error>>(new EmailDeliveryReceipt()));
+
+        var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _emailDeliveryService.Verify(
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "asubject", "abody", "arecipient@company.com",
+                "arecipient", "asender@company.com", "asender",
+                It.IsAny<CancellationToken>()));
+        _emailDeliveryRepository.Verify(edr => edr.SaveAsync(It.Is<EmailDeliveryRoot>(root =>
+            root.MessageId == messageId
+            && root.Recipient.Value.EmailAddress == "arecipient@company.com"
+            && root.Recipient.Value.DisplayName == "arecipient"
+            && root.Attempts.Attempts.Count == 1
+            && root.Attempts.Attempts[0].IsNear(DateTime.UtcNow)
+            && root.IsDelivered == true
+        ), true, It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenSearchAllDeliveredEmails_ThenReturnsEmails()
+    {
+        var datum = DateTime.UtcNow;
+        var delivery = new EmailDelivery
+        {
+            Id = "anid",
+            Body = "abody",
+            Delivered = datum,
+            Failed = Optional<DateTime?>.None,
+            Attempts = DeliveryAttempts.Create(new List<DateTime> { datum }).Value,
+            MessageId = "amessageid",
+            Subject = "asubject",
+            ToDisplayName = "arecipient",
+            ToEmailAddress = "arecipient@company.com",
+            LastAttempted = datum
+        };
+        _emailDeliveryRepository.Setup(edr =>
+                edr.SearchAllDeliveriesAsync(It.IsAny<DateTime>(), It.IsAny<SearchOptions>(),
+                    It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<List<EmailDelivery>, Error>>(new List<EmailDelivery> { delivery }));
+
+        var result = await _application.SearchAllEmailDeliveriesAsync(_caller.Object, null, new SearchOptions(),
+            new GetOptions(), CancellationToken.None);
+
+        result.Value.Results.Count.Should().Be(1);
+        result.Value.Results[0].Id.Should().Be("anid");
+        result.Value.Results[0].Attempts.Should().ContainSingle(x => x.IsNear(datum));
+        result.Value.Results[0].Subject.Should().Be("asubject");
+        result.Value.Results[0].Body.Should().Be("abody");
+        result.Value.Results[0].ToEmailAddress.Should().Be("arecipient@company.com");
+        result.Value.Results[0].ToDisplayName.Should().Be("arecipient");
+        result.Value.Results[0].IsDelivered.Should().BeTrue();
+    }
+
+    private static string CreateMessageId()
+    {
+        return new MessageQueueIdFactory().Create("aqueuename");
     }
 
 #if TESTINGONLY
@@ -483,27 +549,31 @@ public class AncillaryApplicationSpec
     [Fact]
     public async Task WhenDrainAllEmailsAsyncAndSomeOnQueue_ThenDeliversAll()
     {
+        var message1Id = CreateMessageId();
         var message1 = new EmailMessage
         {
+            MessageId = message1Id,
             Html = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject1",
                 HtmlBody = "abody1",
-                ToEmailAddress = "arecipientemailaddress1",
+                ToEmailAddress = "arecipient1@company.com",
                 ToDisplayName = "arecipient1",
-                FromEmailAddress = "asenderemailaddress1",
+                FromEmailAddress = "asender1@company.com",
                 FromDisplayName = "asender1"
             }
         };
+        var message2Id = CreateMessageId();
         var message2 = new EmailMessage
         {
+            MessageId = message2Id,
             Html = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject2",
                 HtmlBody = "abody2",
-                ToEmailAddress = "arecipientemailaddress2",
+                ToEmailAddress = "arecipient2@company.com",
                 ToDisplayName = "arecipient2",
-                FromEmailAddress = "asenderemailaddress2",
+                FromEmailAddress = "asender2@company.com",
                 FromDisplayName = "asender2"
             }
         };
@@ -536,12 +606,12 @@ public class AncillaryApplicationSpec
             urs => urs.PopSingleAsync(It.IsAny<Func<EmailMessage, CancellationToken, Task<Result<Error>>>>(),
                 It.IsAny<CancellationToken>()), Times.Exactly(2));
         _emailDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "asubject1", "abody1", "arecipientemailaddress1",
-                "arecipient1", "asenderemailaddress1", "asender1",
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "asubject1", "abody1", "arecipient1@company.com",
+                "arecipient1", "asender1@company.com", "asender1",
                 It.IsAny<CancellationToken>()));
         _emailDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "asubject2", "abody2", "arecipientemailaddress2",
-                "arecipient2", "asenderemailaddress2", "asender2",
+            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "asubject2", "abody2", "arecipient2@company.com",
+                "arecipient2", "asender2@company.com", "asender2",
                 It.IsAny<CancellationToken>()));
         _emailDeliveryService.Verify(
             urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),

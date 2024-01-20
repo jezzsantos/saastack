@@ -1,4 +1,5 @@
 using AncillaryApplication;
+using Application.Resources.Shared;
 using Common;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common.Extensions;
@@ -38,4 +39,18 @@ public sealed class EmailsApi : IWebApiService
             error => new Result<EmptyResponse, Error>(error));
     }
 #endif
+
+    public async Task<ApiSearchResult<DeliveredEmail, SearchEmailDeliveriesResponse>> SearchAll(
+        SearchEmailDeliveriesRequest request,
+        CancellationToken cancellationToken)
+    {
+        var deliveries = await _ancillaryApplication.SearchAllEmailDeliveriesAsync(_contextFactory.Create(),
+            request.SinceUtc,
+            request.ToSearchOptions(),
+            request.ToGetOptions(), cancellationToken);
+
+        return () =>
+            deliveries.HandleApplicationResult(c => new SearchEmailDeliveriesResponse
+                { Emails = c.Results, Metadata = c.Metadata });
+    }
 }

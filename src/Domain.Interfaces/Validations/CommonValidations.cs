@@ -107,6 +107,22 @@ public static class CommonValidations
         return false;
     }
 
+    public static class MessageQueues
+    {
+        public static class Ids
+        {
+            public const int MaxPrefixLength = 20;
+            public const int MinPrefixLength = 2;
+            public const int RandomLength = 32;
+            public static readonly Validation Id =
+                new($@"^[\w]{{{MinPrefixLength},{MaxPrefixLength}}}_[0-9a-f]{{{RandomLength}}}$",
+                    MinPrefixLength + 1 + RandomLength, MaxPrefixLength + 1 + RandomLength);
+
+            public static readonly Validation Prefix = new($@"^[\w]{{{MinPrefixLength},{MaxPrefixLength}}}$",
+                MinPrefixLength, MaxPrefixLength);
+        }
+    }
+
     public static class Recording
     {
         public static readonly Validation AdditionalStringValue = DescriptiveName(1, 300);

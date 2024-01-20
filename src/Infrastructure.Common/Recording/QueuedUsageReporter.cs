@@ -15,6 +15,7 @@ using Common;
 using Common.Configuration;
 using Common.Extensions;
 using Common.Recording;
+using Domain.Interfaces;
 using Domain.Interfaces.Services;
 using Infrastructure.Persistence.Shared.ApplicationServices;
 
@@ -30,7 +31,7 @@ public class QueuedUsageReporter : IUsageReporter
 
     // ReSharper disable once UnusedParameter.Local
     public QueuedUsageReporter(IDependencyContainer container, ISettings settings)
-        : this(new UsageMessageQueue(NullRecorder.Instance,
+        : this(new UsageMessageQueue(NullRecorder.Instance, container.Resolve<IMessageQueueIdFactory>(),
 #if !TESTINGONLY
 #if HOSTEDONAZURE
                 AzureStorageAccountQueueStore.Create(NullRecorder.Instance, settings)

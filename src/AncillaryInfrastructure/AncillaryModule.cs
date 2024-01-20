@@ -28,7 +28,8 @@ public class AncillaryModule : ISubDomainModule
 
     public Dictionary<Type, string> AggregatePrefixes => new()
     {
-        { typeof(AuditRoot), "audit" }
+        { typeof(AuditRoot), "audit" },
+        { typeof(EmailDeliveryRoot), "emaildelivery" }
     };
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
@@ -40,17 +41,29 @@ public class AncillaryModule : ISubDomainModule
                 services.RegisterUnshared<IRecordingApplication, RecordingApplication>();
                 services.RegisterUnshared<IAncillaryApplication, AncillaryApplication.AncillaryApplication>();
                 services.RegisterUnshared<IUsageMessageQueue>(c =>
-                    new UsageMessageQueue(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));
+                    new UsageMessageQueue(c.Resolve<IRecorder>(), c.Resolve<IMessageQueueIdFactory>(),
+                        c.ResolveForPlatform<IQueueStore>()));
                 services.RegisterUnshared<IAuditMessageQueueRepository>(c =>
-                    new AuditMessageQueueRepository(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));
+                    new AuditMessageQueueRepository(c.Resolve<IRecorder>(), c.Resolve<IMessageQueueIdFactory>(),
+                        c.ResolveForPlatform<IQueueStore>()));
                 services.RegisterUnshared<IEmailMessageQueue>(c =>
-                    new EmailMessageQueue(c.Resolve<IRecorder>(), c.ResolveForPlatform<IQueueStore>()));
+                    new EmailMessageQueue(c.Resolve<IRecorder>(), c.Resolve<IMessageQueueIdFactory>(),
+                        c.ResolveForPlatform<IQueueStore>()));
                 services.RegisterUnshared<IAuditRepository>(c => new AuditRepository(c.ResolveForUnshared<IRecorder>(),
                     c.ResolveForUnshared<IDomainFactory>(),
                     c.ResolveForUnshared<IEventSourcingDddCommandStore<AuditRoot>>(),
                     c.ResolveForPlatform<IDataStore>()));
                 services.RegisterUnTenantedEventing<AuditRoot, AuditProjection>(
                     c => new AuditProjection(c.ResolveForUnshared<IRecorder>(), c.ResolveForUnshared<IDomainFactory>(),
+                        c.ResolveForPlatform<IDataStore>()));
+                services.RegisterUnshared<IEmailDeliveryRepository>(c => new EmailDeliveryRepository(
+                    c.ResolveForUnshared<IRecorder>(),
+                    c.ResolveForUnshared<IDomainFactory>(),
+                    c.ResolveForUnshared<IEventSourcingDddCommandStore<EmailDeliveryRoot>>(),
+                    c.ResolveForPlatform<IDataStore>()));
+                services.RegisterUnTenantedEventing<EmailDeliveryRoot, EmailDeliveryProjection>(
+                    c => new EmailDeliveryProjection(c.ResolveForUnshared<IRecorder>(),
+                        c.ResolveForUnshared<IDomainFactory>(),
                         c.ResolveForPlatform<IDataStore>()));
 
                 services.RegisterUnshared<IUsageDeliveryService, NullUsageDeliveryService>();

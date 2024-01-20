@@ -63,7 +63,7 @@ public class AuditRepository : IAuditRepository
         return audits;
     }
 
-    public async Task<Result<AuditRoot, Error>> LoadAsync(Identifier organizationId, Identifier id,
+    private async Task<Result<AuditRoot, Error>> LoadAsync(Identifier organizationId, Identifier id,
         CancellationToken cancellationToken)
     {
         var audit = await _audits.LoadAsync(id, cancellationToken);

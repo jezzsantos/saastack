@@ -2,6 +2,7 @@ using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
 using Common;
+using Domain.Interfaces;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
 
@@ -11,9 +12,10 @@ public class AuditMessageQueueRepository : IAuditMessageQueueRepository
 {
     private readonly MessageQueueStore<AuditMessage> _messageQueue;
 
-    public AuditMessageQueueRepository(IRecorder recorder, IQueueStore store)
+    public AuditMessageQueueRepository(IRecorder recorder, IMessageQueueIdFactory messageQueueIdFactory,
+        IQueueStore store)
     {
-        _messageQueue = new MessageQueueStore<AuditMessage>(recorder, store);
+        _messageQueue = new MessageQueueStore<AuditMessage>(recorder, messageQueueIdFactory, store);
     }
 
     public Task<Result<long, Error>> CountAsync(CancellationToken cancellationToken)

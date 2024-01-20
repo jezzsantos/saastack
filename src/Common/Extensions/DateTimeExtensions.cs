@@ -4,6 +4,8 @@ namespace Common.Extensions;
 
 public static class DateTimeExtensions
 {
+    private static readonly TimeSpan DefaultIsNearRange = TimeSpan.FromMilliseconds(500);
+
     /// <summary>
     ///     Converts the <see cref="value" /> to a UTC date,
     ///     but only if the <see cref="value" /> is in the
@@ -120,6 +122,43 @@ public static class DateTimeExtensions
     public static bool IsBefore(this DateTime value, DateTime other)
     {
         return value < other;
+    }
+
+    /// <summary>
+    ///     Whether the <see cref="value" /> is near enough to the <see cref="other" />
+    /// </summary>
+    public static bool IsNear(this DateTime value, DateTime other)
+    {
+        if (value.Equals(other))
+        {
+            return true;
+        }
+
+        return value.IsNear(other, DefaultIsNearRange);
+    }
+
+    /// <summary>
+    ///     Whether the <see cref="value" /> is near enough to the <see cref="other" />
+    ///     within the specified <see cref="rangeInMilliseconds" />
+    /// </summary>
+    public static bool IsNear(this DateTime value, DateTime other, int rangeInMilliseconds)
+    {
+        if (value.Equals(other))
+        {
+            return true;
+        }
+
+        return value.AddMilliseconds(rangeInMilliseconds) >= other
+               && value.AddMilliseconds(-rangeInMilliseconds) <= other;
+    }
+
+    /// <summary>
+    ///     Whether the <see cref="value" /> is near enough to the <see cref="other" />
+    ///     within the specified <see cref="range" />
+    /// </summary>
+    public static bool IsNear(this DateTime value, DateTime other, TimeSpan range)
+    {
+        return value.IsNear(other, (int)range.TotalMilliseconds);
     }
 
     /// <summary>

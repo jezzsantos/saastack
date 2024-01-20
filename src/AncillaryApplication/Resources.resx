@@ -42,16 +42,4 @@
     <data name="AncillaryApplication_MissingEmailHtml" xml:space="preserve">
         <value>The email message is missing the 'HTML' email</value>
     </data>
-    <data name="AncillaryApplication_MissingEmailSubject" xml:space="preserve">
-        <value>The email message is missing a 'Subject'</value>
-    </data>
-    <data name="AncillaryApplication_MissingEmailBody" xml:space="preserve">
-        <value>The email message is missing a 'HtmlBody'</value>
-    </data>
-    <data name="AncillaryApplication_MissingEmailRecipient" xml:space="preserve">
-        <value>The email message is missing a 'ToEmailAddress' recipient</value>
-    </data>
-    <data name="AncillaryApplication_MissingEmailSender" xml:space="preserve">
-        <value>The email message is missing a 'FromEmailAddress' sender</value>
-    </data>
 </root>

@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Resources.Shared;
 using Common;
 using Audit = Application.Resources.Shared.Audit;
 
@@ -31,4 +32,6 @@ public interface IAncillaryApplication
     Task<Result<SearchResults<Audit>, Error>> SearchAllAuditsAsync(ICallerContext context, string organizationId,
         SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken);
 #endif
+    Task<Result<SearchResults<DeliveredEmail>, Error>> SearchAllEmailDeliveriesAsync(ICallerContext context,
+        DateTime? sinceUtc, SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken);
 }

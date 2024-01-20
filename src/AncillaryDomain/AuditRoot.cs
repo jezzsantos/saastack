@@ -15,7 +15,8 @@ public sealed class AuditRoot : AggregateRootBase
         TemplateArguments templateArguments)
     {
         var root = new AuditRoot(recorder, idFactory);
-        root.RaiseCreateEvent(AncillaryDomain.Events.Created.Create(root.Id, againstId, organizationId, auditCode,
+        root.RaiseCreateEvent(AncillaryDomain.Events.Audits.Created.Create(root.Id, againstId, organizationId,
+            auditCode,
             messageTemplate, templateArguments));
         return root;
     }
@@ -35,9 +36,9 @@ public sealed class AuditRoot : AggregateRootBase
 
     public Optional<string> MessageTemplate { get; private set; }
 
-    public Optional<TemplateArguments> TemplateArguments { get; private set; }
-
     public Optional<Identifier> OrganizationId { get; private set; }
+
+    public Optional<TemplateArguments> TemplateArguments { get; private set; }
 
     public static AggregateRootFactory<AuditRoot> Rehydrate()
     {
@@ -60,7 +61,7 @@ public sealed class AuditRoot : AggregateRootBase
     {
         switch (@event)
         {
-            case Events.Created created:
+            case Events.Audits.Created created:
             {
                 OrganizationId = created.OrganizationId.ToId();
                 AgainstId = created.AgainstId.ToId();

@@ -14,6 +14,7 @@ using Common;
 using Common.Configuration;
 using Common.Extensions;
 using Common.Recording;
+using Domain.Interfaces;
 using Domain.Interfaces.Services;
 using Infrastructure.Persistence.Shared.ApplicationServices;
 
@@ -29,7 +30,7 @@ public class QueuedAuditReporter : IAuditReporter
 
     // ReSharper disable once UnusedParameter.Local
     public QueuedAuditReporter(IDependencyContainer container, ISettings settings)
-        : this(new AuditMessageQueueRepository(NullRecorder.Instance,
+        : this(new AuditMessageQueueRepository(NullRecorder.Instance, container.Resolve<IMessageQueueIdFactory>(),
 #if !TESTINGONLY
 #if HOSTEDONAZURE
                 AzureStorageAccountQueueStore.Create(NullRecorder.Instance, settings)

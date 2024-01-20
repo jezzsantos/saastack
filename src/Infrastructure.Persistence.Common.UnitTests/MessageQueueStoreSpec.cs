@@ -1,6 +1,7 @@
 ﻿using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
+using Domain.Interfaces;
 using FluentAssertions;
 using Infrastructure.Persistence.Interfaces;
 using Moq;
@@ -19,7 +20,12 @@ public class MessageQueueStoreSpec
     {
         var recorder = new Mock<IRecorder>();
         _queueStore = new Mock<IQueueStore>();
-        _store = new MessageQueueStore<TestQueuedMessage>(recorder.Object, _queueStore.Object);
+        var messageQueueIdFactory = new Mock<IMessageQueueIdFactory>();
+        messageQueueIdFactory.Setup(mqif => mqif.Create(It.IsAny<string>()))
+            .Returns("anid");
+
+        _store = new MessageQueueStore<TestQueuedMessage>(recorder.Object, messageQueueIdFactory.Object,
+            _queueStore.Object);
     }
 
     [Fact]

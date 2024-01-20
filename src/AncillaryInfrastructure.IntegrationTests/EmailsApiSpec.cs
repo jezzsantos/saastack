@@ -1,9 +1,11 @@
+using System.Net;
 using AncillaryInfrastructure.IntegrationTests.Stubs;
 using ApiHost1;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
 using Common;
 using Common.Extensions;
+using Domain.Common;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
@@ -32,23 +34,24 @@ public class EmailsApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenDeliverEmail_ThenDelivers()
+    public async Task WhenDeliverEmailAndDeliverySucceeds_ThenDelivered()
     {
+        _emailDeliveryService.DeliverySucceeds = true;
         var request = new DeliverEmailRequest
         {
             Message = new EmailMessage
             {
-                MessageId = "amessageid",
+                MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
                 Html = new QueuedEmailHtmlMessage
                 {
-                    FromDisplayName = "afromdisplayname",
-                    FromEmailAddress = "afromemail",
-                    HtmlBody = "anhtmlbody",
                     Subject = "asubject",
+                    HtmlBody = "anhtmlbody",
+                    ToEmailAddress = "arecipient@company.com",
                     ToDisplayName = "atodisplayname",
-                    ToEmailAddress = "atoemail"
+                    FromEmailAddress = "asender@company.com",
+                    FromDisplayName = "afromdisplayname"
                 }
             }.ToJson()!
         };
@@ -56,6 +59,104 @@ public class EmailsApiSpec : WebApiSpec<Program>
 
         result.Content.Value.IsDelivered.Should().BeTrue();
         _emailDeliveryService.LastSubject.Should().Be("asubject");
+
+        var user = await LoginUserAsync();
+        var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
+            req => req.SetJWTBearerToken(user.AccessToken));
+
+        deliveries.Content.Value.Emails!.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
+        deliveries.Content.Value.Emails[0].Body.Should().Be("anhtmlbody");
+        deliveries.Content.Value.Emails[0].ToEmailAddress.Should().Be("arecipient@company.com");
+        deliveries.Content.Value.Emails[0].ToDisplayName.Should().Be("atodisplayname");
+        deliveries.Content.Value.Emails[0].Attempts.Should()
+            .ContainSingle(x => x.IsNear(DateTime.UtcNow, TimeSpan.FromMinutes(1)));
+        deliveries.Content.Value.Emails[0].IsDelivered.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task WhenDeliverEmailAndDeliveryFails_ThenNotDelivered()
+    {
+        _emailDeliveryService.DeliverySucceeds = false;
+        var request = new DeliverEmailRequest
+        {
+            Message = new EmailMessage
+            {
+                MessageId = CreateMessageId(),
+                CallId = "acallid",
+                CallerId = "acallerid",
+                Html = new QueuedEmailHtmlMessage
+                {
+                    Subject = "asubject",
+                    HtmlBody = "anhtmlbody",
+                    ToEmailAddress = "arecipient@company.com",
+                    ToDisplayName = "atodisplayname",
+                    FromEmailAddress = "asender@company.com",
+                    FromDisplayName = "afromdisplayname"
+                }
+            }.ToJson()!
+        };
+        var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
+
+        result.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        _emailDeliveryService.LastSubject.Should().Be("asubject");
+
+        var user = await LoginUserAsync();
+        var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
+            req => req.SetJWTBearerToken(user.AccessToken));
+
+        deliveries.Content.Value.Emails!.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
+        deliveries.Content.Value.Emails[0].Body.Should().Be("anhtmlbody");
+        deliveries.Content.Value.Emails[0].ToEmailAddress.Should().Be("arecipient@company.com");
+        deliveries.Content.Value.Emails[0].ToDisplayName.Should().Be("atodisplayname");
+        deliveries.Content.Value.Emails[0].Attempts.Should()
+            .ContainSingle(x => x.IsNear(DateTime.UtcNow, TimeSpan.FromMinutes(1)));
+        deliveries.Content.Value.Emails[0].IsDelivered.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task WhenDeliverEmailAndDeliveryFailsFirstTimeAndSucceedsSecondTime_ThenDelivered()
+    {
+        _emailDeliveryService.DeliverySucceeds = false;
+        var request = new DeliverEmailRequest
+        {
+            Message = new EmailMessage
+            {
+                MessageId = CreateMessageId(),
+                CallId = "acallid",
+                CallerId = "acallerid",
+                Html = new QueuedEmailHtmlMessage
+                {
+                    Subject = "asubject",
+                    HtmlBody = "anhtmlbody",
+                    ToEmailAddress = "arecipient@company.com",
+                    ToDisplayName = "atodisplayname",
+                    FromEmailAddress = "asender@company.com",
+                    FromDisplayName = "afromdisplayname"
+                }
+            }.ToJson()!
+        };
+        var firstAttempt = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
+
+        firstAttempt.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+
+        _emailDeliveryService.DeliverySucceeds = true;
+        var secondAttempt = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
+
+        secondAttempt.Content.Value.IsDelivered.Should().BeTrue();
+
+        var user = await LoginUserAsync();
+        var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
+            req => req.SetJWTBearerToken(user.AccessToken));
+
+        deliveries.Content.Value.Emails!.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
+        deliveries.Content.Value.Emails[0].Body.Should().Be("anhtmlbody");
+        deliveries.Content.Value.Emails[0].ToEmailAddress.Should().Be("arecipient@company.com");
+        deliveries.Content.Value.Emails[0].ToDisplayName.Should().Be("atodisplayname");
+        deliveries.Content.Value.Emails[0].Attempts.Should().HaveCount(2);
+        deliveries.Content.Value.Emails[0].IsDelivered.Should().BeTrue();
     }
 
 #if TESTINGONLY
@@ -74,43 +175,52 @@ public class EmailsApiSpec : WebApiSpec<Program>
     public async Task WhenDrainAllEmailsAndSome_ThenDrains()
     {
         var call = CallContext.CreateCustom("acallid", "acallerid", "atenantid");
+        var messageId1 = CreateMessageId();
+        var messageId2 = CreateMessageId();
+        var messageId3 = CreateMessageId();
         await _emailMessageQueue.PushAsync(call, new EmailMessage
         {
-            MessageId = "amessageid1",
+            MessageId = messageId1,
+            CallId = "acallid",
+            CallerId = "acallerid",
             Html = new QueuedEmailHtmlMessage
             {
-                FromDisplayName = "afromdisplayname",
-                FromEmailAddress = "afromemail",
-                HtmlBody = "anhtmlbody",
                 Subject = "asubject1",
+                HtmlBody = "anhtmlbody",
+                ToEmailAddress = "arecipient@company.com",
                 ToDisplayName = "atodisplayname",
-                ToEmailAddress = "atoemail"
+                FromEmailAddress = "asender@company.com",
+                FromDisplayName = "afromdisplayname"
             }
         }, CancellationToken.None);
         await _emailMessageQueue.PushAsync(call, new EmailMessage
         {
-            MessageId = "amessageid2",
+            MessageId = messageId2,
+            CallId = "acallid",
+            CallerId = "acallerid",
             Html = new QueuedEmailHtmlMessage
             {
-                FromDisplayName = "afromdisplayname",
-                FromEmailAddress = "afromemail",
-                HtmlBody = "anhtmlbody",
                 Subject = "asubject2",
+                HtmlBody = "anhtmlbody",
+                ToEmailAddress = "arecipient@company.com",
                 ToDisplayName = "atodisplayname",
-                ToEmailAddress = "atoemail"
+                FromEmailAddress = "asender@company.com",
+                FromDisplayName = "afromdisplayname"
             }
         }, CancellationToken.None);
         await _emailMessageQueue.PushAsync(call, new EmailMessage
         {
-            MessageId = "amessageid3",
+            MessageId = messageId3,
+            CallId = "acallid",
+            CallerId = "acallerid",
             Html = new QueuedEmailHtmlMessage
             {
-                FromDisplayName = "afromdisplayname",
-                FromEmailAddress = "afromemail",
-                HtmlBody = "anhtmlbody",
                 Subject = "asubject3",
+                HtmlBody = "anhtmlbody",
+                ToEmailAddress = "arecipient@company.com",
                 ToDisplayName = "atodisplayname",
-                ToEmailAddress = "atoemail"
+                FromEmailAddress = "asender@company.com",
+                FromDisplayName = "afromdisplayname"
             }
         }, CancellationToken.None);
 
@@ -121,6 +231,11 @@ public class EmailsApiSpec : WebApiSpec<Program>
         _emailDeliveryService.AllSubjects.Should().ContainInOrder("asubject1", "asubject2", "asubject3");
     }
 #endif
+
+    private static string CreateMessageId()
+    {
+        return new MessageQueueIdFactory().Create("email");
+    }
 
     private static void OverrideDependencies(IServiceCollection services)
     {
