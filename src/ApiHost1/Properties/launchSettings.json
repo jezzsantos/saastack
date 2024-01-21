@@ -27,7 +27,7 @@
         "ASPNETCORE_ENVIRONMENT": "Production"
       }
     },
-    "ApiHandler-SourceGenerator-Development": {
+    "ApiHandler-SourceGenerators-Development-Development": {
       "commandName": "DebugRoslynComponent",
       "targetProject": "../ApiHost1/ApiHost1.csproj"
     }

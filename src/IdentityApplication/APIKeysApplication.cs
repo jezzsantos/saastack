@@ -31,7 +31,8 @@ public class APIKeysApplication : IAPIKeysApplication
         _repository = repository;
     }
 
-    public async Task<Result<Optional<EndUser>, Error>> FindUserForAPIKeyAsync(ICallerContext context, string apiKey,
+    public async Task<Result<Optional<EndUserWithMemberships>, Error>> FindMembershipsForAPIKeyAsync(
+        ICallerContext context, string apiKey,
         CancellationToken cancellationToken)
     {
         var keyToken = _tokensService.ParseApiKey(apiKey);
@@ -48,15 +49,14 @@ public class APIKeysApplication : IAPIKeysApplication
 
         if (!retrievedApiKey.Value.HasValue)
         {
-            return Optional<EndUser>.None;
+            return Optional<EndUserWithMemberships>.None;
         }
 
-        //What happens when the UserID is the anonymous user ID?
         var retrievedUser =
-            await _endUsersService.GetPersonAsync(context, retrievedApiKey.Value.Value.UserId, cancellationToken);
+            await _endUsersService.GetMembershipsAsync(context, retrievedApiKey.Value.Value.UserId, cancellationToken);
         if (!retrievedUser.IsSuccessful)
         {
-            return Optional<EndUser>.None;
+            return Optional<EndUserWithMemberships>.None;
         }
 
         var user = retrievedUser.Value;

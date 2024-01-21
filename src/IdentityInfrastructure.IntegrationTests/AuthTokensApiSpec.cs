@@ -45,7 +45,7 @@ public class AuthTokensSpec : WebApiSpec<Program>
         oldTokens.Content.Value.AccessToken.Should().NotBeNull();
         oldTokens.Content.Value.RefreshToken.Should().NotBeNull();
         oldTokens.Content.Value.ExpiresOnUtc.Should()
-            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.DefaultAccessTokenExpiry));
+            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.DefaultTokenExpiry));
 
         await Task.Delay(TimeSpan
             .FromSeconds(1)); //HACK: to ensure that the new token is not the same (in time) as the old token
@@ -60,7 +60,7 @@ public class AuthTokensSpec : WebApiSpec<Program>
         newTokens.Content.Value.AccessToken.Should().NotBeNull().And.NotBe(oldAccessToken);
         newTokens.Content.Value.RefreshToken.Should().NotBeNull().And.NotBe(oldRefreshToken);
         newTokens.Content.Value.ExpiresOnUtc.Should()
-            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.DefaultAccessTokenExpiry));
+            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.DefaultTokenExpiry));
     }
 
     private static void OverrideDependencies(IServiceCollection services)

@@ -32,6 +32,30 @@ public sealed class TestingWebApi : IWebApiService
             { CallerId = _contextFactory.Create().CallerId });
     }
 
+    public async Task<ApiResult<string, GetCallerTestingOnlyResponse>> AuthZAnonymous(
+        AuthorizeByNothingTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () => new Result<GetCallerTestingOnlyResponse, Error>(new GetCallerTestingOnlyResponse
+            { CallerId = _contextFactory.Create().CallerId });
+    }
+
+    public async Task<ApiResult<string, GetCallerTestingOnlyResponse>> AuthZByRole(
+        AuthorizeByRoleTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () => new Result<GetCallerTestingOnlyResponse, Error>(new GetCallerTestingOnlyResponse
+            { CallerId = _contextFactory.Create().CallerId });
+    }
+
+    public async Task<ApiResult<string, GetCallerTestingOnlyResponse>> AuthZByFeature(
+        AuthorizeByFeatureTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () => new Result<GetCallerTestingOnlyResponse, Error>(new GetCallerTestingOnlyResponse
+            { CallerId = _contextFactory.Create().CallerId });
+    }
+    
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ContentNegotiationGet(
         ContentNegotiationsTestingOnlyRequest request, CancellationToken cancellationToken)
     {

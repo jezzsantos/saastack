@@ -22,13 +22,13 @@ public class HasGetOptionsValidator : AbstractValidator<IHasGetOptions>, IHasGet
 
     public HasGetOptionsValidator()
     {
-        When(dto => dto.Embed.HasValue(), () =>
+        When(req => req.Embed.HasValue(), () =>
         {
-            RuleForEach(dto => dto.ToGetOptions(null, null)
+            RuleForEach(req => req.ToGetOptions(null, null)
                     .ResourceReferences)
                 .Matches(ResourceReferenceExpression)
                 .WithMessage(ValidationResources.HasGetOptionsValidator_InvalidEmbed);
-            RuleFor(dto => dto.ToGetOptions(null, null)
+            RuleFor(req => req.ToGetOptions(null, null)
                     .ResourceReferences.Count())
                 .LessThanOrEqualTo(GetOptions.MaxResourceReferences)
                 .WithMessage(

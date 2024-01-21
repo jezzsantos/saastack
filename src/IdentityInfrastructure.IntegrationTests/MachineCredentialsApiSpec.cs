@@ -38,17 +38,17 @@ public class MachineCredentialsApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenRegisterMachineByUser_ThenRegisters()
     {
-        var user = await LoginUserAsync();
+        var login = await LoginUserAsync();
 
         var result = await Api.PostAsync(new RegisterMachineRequest
         {
             Name = "amachinename"
-        }, req => req.SetJWTBearerToken(user.AccessToken));
+        }, req => req.SetJWTBearerToken(login.AccessToken));
 
         result.Content.Value.Machine!.Id.Should().NotBeEmpty();
         result.Content.Value.Machine.Description.Should().Be("amachinename");
         result.Content.Value.Machine.ApiKey.Should().StartWith("apk_");
-        result.Content.Value.Machine.CreatedById.Should().Be(user.User.Id);
+        result.Content.Value.Machine.CreatedById.Should().Be(login.User.Id);
         result.Content.Value.Machine.ExpiresOnUtc.Should().BeNull();
     }
 

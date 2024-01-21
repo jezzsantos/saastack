@@ -2,7 +2,8 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 
-[Route("/cars/{id}/reserve", ServiceOperation.PutPatch)]
+[Route("/cars/{id}/reserve", ServiceOperation.PutPatch, AccessType.Token)]
+[Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class ReserveCarIfAvailableRequest : TenantedRequest<ReserveCarIfAvailableResponse>
 {
     public required DateTime FromUtc { get; set; }

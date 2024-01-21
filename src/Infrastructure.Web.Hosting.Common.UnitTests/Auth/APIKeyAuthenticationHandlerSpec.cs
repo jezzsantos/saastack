@@ -87,9 +87,10 @@ public class APIKeyAuthenticationHandlerSpec
     public async Task WhenHandleAuthenticateAsyncAndUnknownApiKey_ThenReturnsFailure()
     {
         _identityService.Setup(ids =>
-                ids.FindUserForAPIKeyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                ids.FindMembershipsForAPIKeyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<EndUser>, Error>>(Optional<EndUser>.None));
+            .Returns(Task.FromResult<Result<Optional<EndUserWithMemberships>, Error>>(Optional<EndUserWithMemberships>
+                .None));
         _httpContext.Request.QueryString = QueryString.Create(HttpQueryParams.APIKey, "anapikey");
         await _handler.InitializeAsync(new AuthenticationScheme(APIKeyAuthenticationHandler.AuthenticationScheme, null,
             typeof(APIKeyAuthenticationHandler)), _httpContext);
@@ -103,20 +104,20 @@ public class APIKeyAuthenticationHandlerSpec
             .Which.Message.Should()
             .Be(Resources.AuthenticationHandler_Failed);
         _identityService.Verify(ids =>
-            ids.FindUserForAPIKeyAsync(It.IsAny<ICallerContext>(), "anapikey", It.IsAny<CancellationToken>()));
+            ids.FindMembershipsForAPIKeyAsync(It.IsAny<ICallerContext>(), "anapikey", It.IsAny<CancellationToken>()));
     }
 
     [Fact]
     public async Task WhenHandleAuthenticateAsyncAndKnownUserFromApiKeyInQueryString_ThenReturnsAuthenticated()
     {
-        var user = new EndUser
+        var user = new EndUserWithMemberships
         {
             Id = "anid"
         };
         _identityService.Setup(ids =>
-                ids.FindUserForAPIKeyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                ids.FindMembershipsForAPIKeyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<EndUser>, Error>>(user.ToOptional()));
+            .Returns(Task.FromResult<Result<Optional<EndUserWithMemberships>, Error>>(user.ToOptional()));
         _httpContext.Request.QueryString = QueryString.Create(HttpQueryParams.APIKey, "anapikey");
         await _handler.InitializeAsync(new AuthenticationScheme(APIKeyAuthenticationHandler.AuthenticationScheme, null,
             typeof(APIKeyAuthenticationHandler)), _httpContext);
@@ -125,25 +126,25 @@ public class APIKeyAuthenticationHandlerSpec
 
         result.Succeeded.Should().BeTrue();
         result.Ticket!.Principal.Claims.Should().Contain(claim =>
-            claim.Type == AuthenticationConstants.ClaimForId
+            claim.Type == AuthenticationConstants.Claims.ForId
             && claim.Value == "anid");
         _recorder.Verify(rec => rec.Audit(It.IsAny<ICallContext>(), It.IsAny<string>(), It.IsAny<string>()),
             Times.Never);
         _identityService.Verify(ids =>
-            ids.FindUserForAPIKeyAsync(It.IsAny<ICallerContext>(), "anapikey", It.IsAny<CancellationToken>()));
+            ids.FindMembershipsForAPIKeyAsync(It.IsAny<ICallerContext>(), "anapikey", It.IsAny<CancellationToken>()));
     }
 
     [Fact]
     public async Task WhenHandleAuthenticateAsyncAndKnownUserFromApiKeyInBasicAuth_ThenReturnsAuthenticated()
     {
-        var user = new EndUser
+        var user = new EndUserWithMemberships
         {
             Id = "anid"
         };
         _identityService.Setup(ids =>
-                ids.FindUserForAPIKeyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                ids.FindMembershipsForAPIKeyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<EndUser>, Error>>(user.ToOptional()));
+            .Returns(Task.FromResult<Result<Optional<EndUserWithMemberships>, Error>>(user.ToOptional()));
         _httpContext.Request.Headers[HttpHeaders.Authorization] =
             $"Basic {Convert.ToBase64String("anapikey:"u8.ToArray())}";
         await _handler.InitializeAsync(new AuthenticationScheme(APIKeyAuthenticationHandler.AuthenticationScheme, null,
@@ -153,11 +154,11 @@ public class APIKeyAuthenticationHandlerSpec
 
         result.Succeeded.Should().BeTrue();
         result.Ticket!.Principal.Claims.Should().Contain(claim =>
-            claim.Type == AuthenticationConstants.ClaimForId
+            claim.Type == AuthenticationConstants.Claims.ForId
             && claim.Value == "anid");
         _recorder.Verify(rec => rec.Audit(It.IsAny<ICallContext>(), It.IsAny<string>(), It.IsAny<string>()),
             Times.Never);
         _identityService.Verify(ids =>
-            ids.FindUserForAPIKeyAsync(It.IsAny<ICallerContext>(), "anapikey", It.IsAny<CancellationToken>()));
+            ids.FindMembershipsForAPIKeyAsync(It.IsAny<ICallerContext>(), "anapikey", It.IsAny<CancellationToken>()));
     }
 }

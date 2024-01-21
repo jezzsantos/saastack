@@ -1,0 +1,90 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework> <!-- Source Generators must be netstandard2.0 to work in Visual Studio -->
+        <DefineConstants>GENERATORS_WEB_API_PROJECT</DefineConstants>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <IsPlatformProject>true</IsPlatformProject>
+        <IsRoslynComponent>true</IsRoslynComponent>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\Common\Extensions\StringExtensions.cs">
+            <Link>Reference\Common\Extensions\StringExtensions.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Extensions\CollectionExtensions.cs">
+            <Link>Reference\Common\Extensions\CollectionExtensions.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Extensions\ObjectExtensions.cs">
+            <Link>Reference\Common\Extensions\ObjectExtensions.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebApiService.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebApiService.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebRequest.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebRequest.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebResponse.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebResponse.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\RouteAttribute.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\RouteAttribute.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\AuthorizeAttribute.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\AuthorizeAttribute.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\Generated\Tools.Generators.Web.Api.Authorization\Tools.Generators.Web.Api.Authorization.AuthorizationAttributeGenerator\AuthorizeAttribute.g.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\AuthorizeAttribute.g.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\ServiceOperation.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\ServiceOperation.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.Web.Hosting.Common\WebHostingConstants.cs">
+            <Link>Reference\Infrastructure.Web.Hosting.Common\WebHostingConstants.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.Interfaces\AuthenticationConstants.cs">
+            <Link>Reference\Infrastructure.Interfaces\AuthenticationConstants.cs</Link>
+        </Compile>
+        <Compile Include="..\Application.Interfaces\ICallerContext.RolesAndFeatures.cs">
+            <Link>Reference\Application.Interfaces\ICallerContext.RolesAndFeatures.cs</Link>
+        </Compile>
+        <Compile Include="..\Domain.Interfaces\Authorization\IHierarchicalLevel.cs">
+            <Link>Reference\Domain.Interfaces\Authorization\IHierarchicalLevel.cs</Link>
+        </Compile>
+        <Compile Include="..\Domain.Interfaces\Authorization\HierarchicalLevelBase.cs">
+            <Link>Reference\Domain.Interfaces\Authorization\HierarchicalLevelBase.cs</Link>
+        </Compile>
+        <Compile Include="..\Domain.Interfaces\Authorization\FeatureLevel.cs">
+            <Link>Reference\Domain.Interfaces\Authorization\FeatureLevel.cs</Link>
+        </Compile>
+        <Compile Include="..\Domain.Interfaces\Authorization\RoleLevel.cs">
+            <Link>Reference\Domain.Interfaces\Authorization\RoleLevel.cs</Link>
+        </Compile>
+        <Compile Include="..\Domain.Interfaces\Authorization\PlatformRoles.cs">
+            <Link>Reference\Domain.Interfaces\Authorization\PlatformRoles.cs</Link>
+        </Compile>
+        <Compile Include="..\Domain.Interfaces\Authorization\TenantRoles.cs">
+            <Link>Reference\Domain.Interfaces\Authorization\TenantRoles.cs</Link>
+        </Compile>
+        <Compile Include="..\Domain.Interfaces\Authorization\PlatformFeatures.cs">
+            <Link>Reference\Domain.Interfaces\Authorization\PlatformFeatures.cs</Link>
+        </Compile>
+        <Compile Include="..\Domain.Interfaces\Authorization\TenantFeatures.cs">
+            <Link>Reference\Domain.Interfaces\Authorization\TenantFeatures.cs</Link>
+        </Compile>
+    </ItemGroup>
+
+</Project>

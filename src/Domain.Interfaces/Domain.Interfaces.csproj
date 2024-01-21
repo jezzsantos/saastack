@@ -14,6 +14,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
         <EmbeddedResource Update="Validations\CommonValidationResources.resx">
             <Generator>PublicResXFileCodeGenerator</Generator>
             <LastGenOutput>CommonValidationResources.Designer.cs</LastGenOutput>

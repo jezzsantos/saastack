@@ -14,7 +14,7 @@ public static class CommonValidations
     public static readonly Validation FeatureLevel = new(@"^[\w\d]{4,30}$", 4, 30);
     public static readonly Validation Identifier = new(@"^[\w]{1,20}_[\d\w]{10,22}$", 12, 43);
     public static readonly Validation IdentifierPrefix = new(@"^[^\W_]*$", 1, 20);
-    public static readonly Validation Role = new(@"^[\w\d]{4,30}$", 4, 30);
+    public static readonly Validation RoleLevel = new(@"^[\w\d]{4,30}$", 4, 30);
     public static readonly Validation Timezone = new(Timezones.Exists);
     public static readonly Validation Url = new(s => Uri.IsWellFormedUriString(s, UriKind.Absolute));
     private static readonly string Emojis =

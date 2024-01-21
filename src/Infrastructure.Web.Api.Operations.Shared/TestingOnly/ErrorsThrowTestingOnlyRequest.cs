@@ -1,11 +1,9 @@
-using Infrastructure.Web.Api.Interfaces;
-using JetBrains.Annotations;
-
 #if TESTINGONLY
+using Infrastructure.Web.Api.Interfaces;
+
 namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 
 [Route("/testingonly/errors/throws", ServiceOperation.Get, isTestingOnly: true)]
-[UsedImplicitly]
 public class ErrorsThrowTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>
 {
 }

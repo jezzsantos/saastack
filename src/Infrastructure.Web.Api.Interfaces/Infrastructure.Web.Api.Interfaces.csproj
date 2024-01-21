@@ -3,10 +3,14 @@
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <IsPlatformProject>true</IsPlatformProject>
+        <!-- Outputs the source generated files locally -->
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
+        <ProjectReference Include="..\Infrastructure.Interfaces\Infrastructure.Interfaces.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -15,6 +19,13 @@
 
     <ItemGroup>
         <PackageReference Include="MediatR" Version="12.1.1" />
+    </ItemGroup>
+
+    <!-- Runs the source generator (in memory) on build -->
+    <ItemGroup>
+        <ProjectReference Include="..\Tools.Generators.Web.Api.Authorization\Tools.Generators.Web.Api.Authorization.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <!-- Exclude the output of source generators from the compilation -->
+        <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
     </ItemGroup>
 
 </Project>

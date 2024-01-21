@@ -4,34 +4,62 @@ namespace Domain.Interfaces.Authorization;
 
 /// <summary>
 ///     Defines the available platform scoped roles
-///     (i.e. access to un-tenanted resources by end users)
+///     (i.e. access to untenanted resources by any end-user)
 /// </summary>
 public static class PlatformRoles
 {
-    public const string ExternalWebhookService = "external_webhook_service";
-    public const string ServiceAccount = "service";
-
-    // EXTEND: Add other roles that EndUsers can be assigned to control un-tenanted resources
-    public const string Standard = "standard";
-
-#if TESTINGONLY
-    public const string TestingOnlyUser = "testingonly_user";
-#endif
-    private static readonly IReadOnlyList<string> PlatformAssignableRoles = new List<string>
+    public static readonly RoleLevel ExternalWebhookService = new("external_webhook_service");
+    public static readonly RoleLevel Operations = new("operations");
+    public static readonly RoleLevel ServiceAccount = new("service");
+    public static readonly RoleLevel Standard = new("standard");
+    public static readonly RoleLevel TestingOnly = new("testingonly_platform");
+    public static readonly RoleLevel TestingOnlySuperUser = new("testingonly_platform_super", TestingOnly);
+    public static readonly Dictionary<string, RoleLevel> AllRoles = new()
     {
-        // EXTEND: Add roles above that can be assigned by other endusers, to control access to un-tenanted resources  
+        { Standard.Name, Standard },
+        { Operations.Name, Operations },
+        { ServiceAccount.Name, ServiceAccount },
+        { ExternalWebhookService.Name, ExternalWebhookService },
+#if TESTINGONLY
+        { TestingOnly.Name, TestingOnly },
+        { TestingOnlySuperUser.Name, TestingOnlySuperUser }
+#endif
+    };
+    // EXTEND: Add other roles to control access to untenanted resources (e.g. untenanted APIs)
+
+    private static readonly IReadOnlyList<RoleLevel> PlatformAssignableRoles = new List<RoleLevel>
+    {
+        // EXTEND: Add new roles that can be assigned/unassigned to EndUsers
         Standard,
+        Operations,
 
 #if TESTINGONLY
-        TestingOnlyUser
+        TestingOnly,
+        TestingOnlySuperUser
 #endif
     };
 
     /// <summary>
-    ///     Whether the <see cref="role" /> is an assignable role
+    ///     Returns the <see cref="RoleLevel" /> for the specified <see cref="name" /> of the role
+    /// </summary>
+    public static RoleLevel? FindRoleByName(string name)
+    {
+#if NETSTANDARD2_0
+        return AllRoles.TryGetValue(name, out var role)
+            ? role
+            : null;
+#else
+        return AllRoles.GetValueOrDefault(name);
+#endif
+    }
+
+    /// <summary>
+    ///     Whether the <see cref="role" /> is assignable
     /// </summary>
     public static bool IsPlatformAssignableRole(string role)
     {
-        return PlatformAssignableRoles.ContainsIgnoreCase(role);
+        return PlatformAssignableRoles
+            .Select(rol => rol.Name)
+            .ContainsIgnoreCase(role);
     }
 }

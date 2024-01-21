@@ -58,5 +58,23 @@ namespace EndUsersInfrastructure {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A Role is either missing or invalid.
+        /// </summary>
+        internal static string AssignPlatformRolesRequestValidator_InvalidRole {
+            get {
+                return ResourceManager.GetString("AssignPlatformRolesRequestValidator_InvalidRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Roles are either missing or invalid.
+        /// </summary>
+        internal static string AssignPlatformRolesRequestValidator_InvalidRoles {
+            get {
+                return ResourceManager.GetString("AssignPlatformRolesRequestValidator_InvalidRoles", resourceCulture);
+            }
+        }
     }
 }

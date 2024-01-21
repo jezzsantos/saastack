@@ -1,11 +1,17 @@
+#if COMMON_PROJECT
 using System.Text;
 using JetBrains.Annotations;
+#endif
 
 namespace Common.Extensions;
 
+#if COMMON_PROJECT
 [UsedImplicitly]
+#endif
+
 public static class CollectionExtensions
 {
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT
     /// <summary>
     ///     Whether the <see cref="target" /> string exists in the <see cref="collection" />
     /// </summary>
@@ -18,7 +24,8 @@ public static class CollectionExtensions
 
         return collection.Any(item => item.EqualsIgnoreCase(target));
     }
-
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Returns the first item in the collection
     /// </summary>
@@ -26,7 +33,8 @@ public static class CollectionExtensions
     {
         return list[0];
     }
-
+#endif
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT
     /// <summary>
     ///     Whether the collection contains any items
     /// </summary>
@@ -36,8 +44,11 @@ public static class CollectionExtensions
         {
             return false;
         }
-
+#if COMMON_PROJECT
         return !collection.HasNone();
+#elif GENERATORS_WEB_API_PROJECT
+        return !collection!.HasNone();
+#endif
     }
 
     /// <summary>
@@ -47,7 +58,8 @@ public static class CollectionExtensions
     {
         return !collection.Any();
     }
-
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Joins all values separated by the <see cref="separator" />
     /// </summary>
@@ -68,6 +80,14 @@ public static class CollectionExtensions
     }
 
     /// <summary>
+    ///     Returns a string value for all the items in the list, separated by the specified <see cref="orKeyword" />
+    /// </summary>
+    public static string JoinAsOredChoices(this IEnumerable<string> list, string orKeyword = ",")
+    {
+        return list.Join($"{orKeyword} ");
+    }
+
+    /// <summary>
     ///     Returns the last item in the collection
     /// </summary>
     public static TResult Last<TResult>(this IReadOnlyList<TResult> list)
@@ -82,4 +102,5 @@ public static class CollectionExtensions
     {
         return !collection.ContainsIgnoreCase(target);
     }
+#endif
 }

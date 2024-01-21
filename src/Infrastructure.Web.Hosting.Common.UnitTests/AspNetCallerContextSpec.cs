@@ -1,7 +1,9 @@
 using System.Security.Claims;
 using Application.Interfaces;
 using Domain.Interfaces;
+using Domain.Interfaces.Authorization;
 using FluentAssertions;
+using Infrastructure.Common.Extensions;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Hosting.Common.Auth;
@@ -64,7 +66,7 @@ public class AspNetCallerContextSpec
     {
         _httpContext.Setup(hc => hc.HttpContext!.User.Claims).Returns(new List<Claim>
         {
-            new(AuthenticationConstants.ClaimForId, "auserid")
+            new(AuthenticationConstants.Claims.ForId, "auserid")
         });
 
         var result = new AspNetCallerContext(_httpContext.Object);
@@ -81,43 +83,79 @@ public class AspNetCallerContextSpec
     }
 
     [Fact]
+    public void WhenConstructedAndNoFeaturesClaim_ThenSetsEmptyFeatures()
+    {
+        var result = new AspNetCallerContext(_httpContext.Object);
+
+        result.Features.All.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenConstructedAndUnknownRolesClaim_ThenSetsEmptyRoles()
+    {
+        _httpContext.Setup(hc => hc.HttpContext!.User.Claims).Returns(new List<Claim>
+        {
+            new(AuthenticationConstants.Claims.ForRole, "arole1"),
+            new(AuthenticationConstants.Claims.ForRole, "arole2"),
+            new(AuthenticationConstants.Claims.ForRole, "arole3")
+        });
+
+        var result = new AspNetCallerContext(_httpContext.Object);
+
+        result.Roles.All.Should().BeEmpty();
+    }
+
+    [Fact]
     public void WhenConstructedAndContainsRolesClaims_ThenSetsRoles()
     {
         _httpContext.Setup(hc => hc.HttpContext!.User.Claims).Returns(new List<Claim>
         {
-            new(AuthenticationConstants.ClaimForRole, "arole1"),
-            new(AuthenticationConstants.ClaimForRole, "arole2"),
-            new(AuthenticationConstants.ClaimForRole, "arole3")
+            new(AuthenticationConstants.Claims.ForRole,
+                ClaimExtensions.ToPlatformClaimValue(PlatformRoles.Standard)),
+            new(AuthenticationConstants.Claims.ForRole,
+                ClaimExtensions.ToTenantClaimValue(TenantRoles.Member,
+                    MultiTenancyConstants.DefaultOrganizationId))
         });
 
         var result = new AspNetCallerContext(_httpContext.Object);
 
-        result.Roles.All.Should().ContainInOrder("arole1", "arole2", "arole3");
+        result.Roles.All.Should().ContainInOrder(PlatformRoles.Standard, TenantRoles.Member);
+        result.Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
+        result.Roles.Tenant.Should().ContainSingle(rol => rol == TenantRoles.Member);
     }
 
     [Fact]
-    public void WhenConstructedAndNoFeatureLevelsClaim_ThenSetsEmptyFeatureLevels()
-    {
-        var result = new AspNetCallerContext(_httpContext.Object);
-
-        result.FeatureLevels.All.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void WhenConstructedAndContainsFeatureLevelsClaims_ThenSetsFeatureLevels()
+    public void WhenConstructedAndUnknownFeaturesClaim_ThenSetsEmptyFeatures()
     {
         _httpContext.Setup(hc => hc.HttpContext!.User.Claims).Returns(new List<Claim>
         {
-            new(AuthenticationConstants.ClaimForFeatureLevel, "alevel1"),
-            new(AuthenticationConstants.ClaimForFeatureLevel, "alevel2"),
-            new(AuthenticationConstants.ClaimForFeatureLevel, "alevel3")
+            new(AuthenticationConstants.Claims.ForFeature, "afeature1"),
+            new(AuthenticationConstants.Claims.ForFeature, "afeature2"),
+            new(AuthenticationConstants.Claims.ForFeature, "afeature3")
         });
 
         var result = new AspNetCallerContext(_httpContext.Object);
 
-        result.FeatureLevels.All.Should().Contain(x => x.Name == "alevel1");
-        result.FeatureLevels.All.Should().Contain(x => x.Name == "alevel2");
-        result.FeatureLevels.All.Should().Contain(x => x.Name == "alevel3");
+        result.Features.All.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenConstructedAndContainsFeaturesClaims_ThenSetsFeatures()
+    {
+        _httpContext.Setup(hc => hc.HttpContext!.User.Claims).Returns(new List<Claim>
+        {
+            new(AuthenticationConstants.Claims.ForFeature,
+                ClaimExtensions.ToPlatformClaimValue(PlatformFeatures.Basic)),
+            new(AuthenticationConstants.Claims.ForFeature,
+                ClaimExtensions.ToTenantClaimValue(TenantFeatures.Basic,
+                    MultiTenancyConstants.DefaultOrganizationId))
+        });
+
+        var result = new AspNetCallerContext(_httpContext.Object);
+
+        result.Features.All.Should().ContainInOrder(PlatformFeatures.Basic);
+        result.Features.Platform.Should().ContainSingle(feat => feat == PlatformFeatures.Basic);
+        result.Features.Tenant.Should().ContainSingle(feat => feat == TenantFeatures.Basic);
     }
 
     [Fact]
@@ -252,7 +290,7 @@ public class AspNetCallerContextSpec
         });
         _httpContext.Setup(hc => hc.HttpContext!.User.Claims).Returns(new List<Claim>
         {
-            new(AuthenticationConstants.ClaimForId, "auserid")
+            new(AuthenticationConstants.Claims.ForId, "auserid")
         });
 
         var result = new AspNetCallerContext(_httpContext.Object);
@@ -265,7 +303,7 @@ public class AspNetCallerContextSpec
     {
         _httpContext.Setup(hc => hc.HttpContext!.User.Claims).Returns(new List<Claim>
         {
-            new(AuthenticationConstants.ClaimForId, CallerConstants.ServiceClientAccountUserId)
+            new(AuthenticationConstants.Claims.ForId, CallerConstants.ServiceClientAccountUserId)
         });
 
         var result = new AspNetCallerContext(_httpContext.Object);

@@ -226,7 +226,7 @@ public abstract class EntityBase : IEntity, IEventingEntity, IDehydratableEntity
         }
 
         return Error.RuleViolation(
-            Resources.EventingEntityBase_HandleUnKnownStateChangedEvent_UnknownEvent.Format(@event.GetType()));
+            Resources.EventingEntityBase_HandleUnKnownStateChangedEvent_UnhandledEvent.Format(@event.GetType()));
     }
 
     private bool Equals(EntityBase entity)

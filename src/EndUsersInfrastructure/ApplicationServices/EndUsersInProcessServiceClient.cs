@@ -25,6 +25,12 @@ public class EndUsersInProcessServiceClient : IEndUsersService
         return await _endUsersApplication.GetPersonAsync(caller, id, cancellationToken);
     }
 
+    public async Task<Result<EndUserWithMemberships, Error>> GetMembershipsAsync(ICallerContext context, string id,
+        CancellationToken cancellationToken)
+    {
+        return await _endUsersApplication.GetMembershipsAsync(context, id, cancellationToken);
+    }
+
     public async Task<Result<RegisteredEndUser, Error>> RegisterPersonAsync(ICallerContext caller, string emailAddress,
         string firstName, string lastName,
         string? timezone, string? countryCode, bool termsAndConditionsAccepted, CancellationToken cancellationToken)

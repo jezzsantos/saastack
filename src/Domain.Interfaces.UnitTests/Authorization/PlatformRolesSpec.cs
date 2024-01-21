@@ -19,7 +19,7 @@ public class PlatformRolesSpec
     [Fact]
     public void WhenIsUserAssignableRoleForAssignableRole_ThenReturnsTrue()
     {
-        var result = PlatformRoles.IsPlatformAssignableRole(PlatformRoles.TestingOnlyUser);
+        var result = PlatformRoles.IsPlatformAssignableRole(PlatformRoles.TestingOnly.Name);
 
         result.Should().BeTrue();
     }

@@ -28,17 +28,17 @@ public class JWTTokensService : IJWTTokensService
         _baseUrl = settings.Platform.GetString(BaseUrlSettingName);
         _expiresAfter =
             TimeSpan.FromMinutes(settings.Platform.GetNumber(DefaultExpirySettingName,
-                AuthenticationConstants.DefaultAccessTokenExpiry.TotalMinutes));
+                AuthenticationConstants.DefaultTokenExpiry.TotalMinutes));
     }
 
-    public Task<Result<AccessTokens, Error>> IssueTokensAsync(EndUser user)
+    public Task<Result<AccessTokens, Error>> IssueTokensAsync(EndUserWithMemberships user)
     {
         var tokens = IssueTokens(user);
 
         return Task.FromResult(tokens);
     }
 
-    private Result<AccessTokens, Error> IssueTokens(EndUser user)
+    private Result<AccessTokens, Error> IssueTokens(EndUserWithMemberships user)
     {
         var expiresOn = DateTime.UtcNow.Add(_expiresAfter);
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_signingSecret));

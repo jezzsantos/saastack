@@ -100,12 +100,12 @@ public static class Caller
         {
             TenantId = tenantId;
             Roles = new ICallerContext.CallerRoles();
-            FeatureLevels = new ICallerContext.CallerFeatureLevels(new[] { PlatformFeatureLevels.Basic }, null);
+            Features = new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Basic }, null);
         }
 
         public ICallerContext.CallerRoles Roles { get; }
 
-        public ICallerContext.CallerFeatureLevels FeatureLevels { get; }
+        public ICallerContext.CallerFeatures Features { get; }
 
         public Optional<ICallerContext.CallerAuthorization> Authorization =>
             Optional<ICallerContext.CallerAuthorization>.None;
@@ -131,14 +131,14 @@ public static class Caller
             CallId = callId ?? GenerateCallId();
             TenantId = tenantId;
             Roles = new ICallerContext.CallerRoles(new[] { PlatformRoles.ServiceAccount }, null);
-            FeatureLevels =
-                new ICallerContext.CallerFeatureLevels(
-                    new[] { PlatformFeatureLevels.Premium }, null);
+            Features =
+                new ICallerContext.CallerFeatures(
+                    new[] { PlatformFeatures.Paid2 }, null);
         }
 
         public ICallerContext.CallerRoles Roles { get; }
 
-        public ICallerContext.CallerFeatureLevels FeatureLevels { get; }
+        public ICallerContext.CallerFeatures Features { get; }
 
         public Optional<ICallerContext.CallerAuthorization> Authorization =>
             Optional<ICallerContext.CallerAuthorization>.None;
@@ -161,8 +161,8 @@ public static class Caller
     {
         public ICallerContext.CallerRoles Roles { get; } = new(new[] { PlatformRoles.ServiceAccount }, null);
 
-        public ICallerContext.CallerFeatureLevels FeatureLevels { get; } = new(
-            new[] { PlatformFeatureLevels.Premium }, null);
+        public ICallerContext.CallerFeatures Features { get; } = new(
+            new[] { PlatformFeatures.Paid2 }, null);
 
         public Optional<ICallerContext.CallerAuthorization> Authorization =>
             Optional<ICallerContext.CallerAuthorization>.None;
@@ -187,12 +187,12 @@ public static class Caller
         {
             CallId = callId ?? GenerateCallId();
             Roles = new ICallerContext.CallerRoles(new[] { PlatformRoles.ServiceAccount }, null);
-            FeatureLevels = new ICallerContext.CallerFeatureLevels(new[] { PlatformFeatureLevels.Basic }, null);
+            Features = new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Basic }, null);
         }
 
         public ICallerContext.CallerRoles Roles { get; }
 
-        public ICallerContext.CallerFeatureLevels FeatureLevels { get; }
+        public ICallerContext.CallerFeatures Features { get; }
 
         public Optional<ICallerContext.CallerAuthorization> Authorization =>
             Optional<ICallerContext.CallerAuthorization>.None;
@@ -219,12 +219,12 @@ public static class Caller
             CallId = call.CallId;
             TenantId = call.TenantId;
             Roles = new ICallerContext.CallerRoles();
-            FeatureLevels = new ICallerContext.CallerFeatureLevels(new[] { PlatformFeatureLevels.Basic }, null);
+            Features = new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Basic }, null);
         }
 
         public ICallerContext.CallerRoles Roles { get; }
 
-        public ICallerContext.CallerFeatureLevels FeatureLevels { get; }
+        public ICallerContext.CallerFeatures Features { get; }
 
         public Optional<ICallerContext.CallerAuthorization> Authorization =>
             Optional<ICallerContext.CallerAuthorization>.None;

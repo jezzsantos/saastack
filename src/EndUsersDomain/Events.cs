@@ -38,7 +38,7 @@ public static class Events
             UserClassification classification,
             UserAccess access, UserStatus status,
             Roles roles,
-            FeatureLevels featureLevels)
+            Features features)
         {
             return new Registered
             {
@@ -49,7 +49,7 @@ public static class Events
                 Access = access.ToString(),
                 Status = status.ToString(),
                 Roles = roles.ToList(),
-                FeatureLevels = featureLevels.ToList()
+                Features = features.ToList()
             };
         }
 
@@ -57,13 +57,158 @@ public static class Events
 
         public required string Classification { get; set; }
 
-        public required List<string> FeatureLevels { get; set; }
+        public required List<string> Features { get; set; }
 
         public required List<string> Roles { get; set; }
 
         public required string Status { get; set; }
 
         public string? Username { get; set; }
+
+        public required string RootId { get; set; }
+
+        public DateTime OccurredUtc { get; set; }
+    }
+
+    public class MembershipAdded : IDomainEvent
+    {
+        public static MembershipAdded Create(Identifier id, Identifier organizationId, bool isDefault, Roles roles,
+            Features features)
+        {
+            return new MembershipAdded
+            {
+                RootId = id,
+                OccurredUtc = DateTime.UtcNow,
+                MembershipId = null,
+                IsDefault = isDefault,
+                OrganizationId = organizationId,
+                Roles = roles.ToList(),
+                Features = features.ToList()
+            };
+        }
+
+        public required List<string> Features { get; set; }
+
+        public bool IsDefault { get; set; }
+
+        public string? MembershipId { get; set; }
+
+        public required string OrganizationId { get; set; }
+
+        public required List<string> Roles { get; set; }
+
+        public required string RootId { get; set; }
+
+        public DateTime OccurredUtc { get; set; }
+    }
+
+    public class MembershipDefaultChanged : IDomainEvent
+    {
+        public static MembershipDefaultChanged Create(Identifier id, Identifier fromMembershipId,
+            Identifier toMembershipId)
+        {
+            return new MembershipDefaultChanged
+            {
+                RootId = id,
+                OccurredUtc = DateTime.UtcNow,
+                FromMembershipId = fromMembershipId,
+                ToMembershipId = toMembershipId
+            };
+        }
+
+        public required string FromMembershipId { get; set; }
+
+        public required string ToMembershipId { get; set; }
+
+        public required string RootId { get; set; }
+
+        public DateTime OccurredUtc { get; set; }
+    }
+
+    public class MembershipRoleAssigned : IDomainEvent
+    {
+        public static MembershipRoleAssigned Create(Identifier id, Identifier organizationId, Identifier membershipId,
+            Role role)
+        {
+            return new MembershipRoleAssigned
+            {
+                RootId = id,
+                OccurredUtc = DateTime.UtcNow,
+                OrganizationId = organizationId,
+                MembershipId = membershipId,
+                Role = role.Identifier
+            };
+        }
+
+        public required string MembershipId { get; set; }
+
+        public required string OrganizationId { get; set; }
+
+        public required string Role { get; set; }
+
+        public required string RootId { get; set; }
+
+        public DateTime OccurredUtc { get; set; }
+    }
+
+    public class MembershipFeatureAssigned : IDomainEvent
+    {
+        public static MembershipFeatureAssigned Create(Identifier id, Identifier organizationId,
+            Identifier membershipId, Feature feature)
+        {
+            return new MembershipFeatureAssigned
+            {
+                RootId = id,
+                OccurredUtc = DateTime.UtcNow,
+                OrganizationId = organizationId,
+                MembershipId = membershipId,
+                Feature = feature.Identifier
+            };
+        }
+
+        public required string Feature { get; set; }
+
+        public required string MembershipId { get; set; }
+
+        public required string OrganizationId { get; set; }
+
+        public required string RootId { get; set; }
+
+        public DateTime OccurredUtc { get; set; }
+    }
+
+    public class PlatformRoleAssigned : IDomainEvent
+    {
+        public static PlatformRoleAssigned Create(Identifier id, Role role)
+        {
+            return new PlatformRoleAssigned
+            {
+                RootId = id,
+                OccurredUtc = DateTime.UtcNow,
+                Role = role.Identifier
+            };
+        }
+
+        public required string Role { get; set; }
+
+        public required string RootId { get; set; }
+
+        public DateTime OccurredUtc { get; set; }
+    }
+
+    public class PlatformFeatureAssigned : IDomainEvent
+    {
+        public static PlatformFeatureAssigned Create(Identifier id, Feature feature)
+        {
+            return new PlatformFeatureAssigned
+            {
+                RootId = id,
+                OccurredUtc = DateTime.UtcNow,
+                Feature = feature.Identifier
+            };
+        }
+
+        public required string Feature { get; set; }
 
         public required string RootId { get; set; }
 

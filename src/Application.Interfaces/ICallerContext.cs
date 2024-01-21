@@ -1,12 +1,11 @@
 using Common;
-using Domain.Interfaces.Authorization;
 
 namespace Application.Interfaces;
 
 /// <summary>
 ///     The context of the currently identified caller
 /// </summary>
-public interface ICallerContext
+public partial interface ICallerContext
 {
     /// <summary>
     ///     Defines the scheme of the authorization
@@ -34,9 +33,9 @@ public interface ICallerContext
     string CallId { get; }
 
     /// <summary>
-    ///     The feature sets belonging to the caller
+    ///     The authorization features belonging to the caller
     /// </summary>
-    CallerFeatureLevels FeatureLevels { get; }
+    CallerFeatures Features { get; }
 
     /// <summary>
     ///     Whether the called is authenticated or not
@@ -72,59 +71,5 @@ public interface ICallerContext
         public AuthorizationMethod Method { get; }
 
         public string Value { get; }
-    }
-
-    /// <summary>
-    ///     Defines the authorization roles that a caller can have
-    /// </summary>
-    public class CallerRoles
-    {
-        public CallerRoles()
-        {
-            All = Array.Empty<string>();
-            User = Array.Empty<string>();
-            Organization = Array.Empty<string>();
-        }
-
-        public CallerRoles(string[]? user, string[]? member)
-        {
-            User = user ?? Array.Empty<string>();
-            Organization = member ?? Array.Empty<string>();
-            All = User.Concat(Organization)
-                .ToArray();
-        }
-
-        public string[] All { get; }
-
-        public string[] Organization { get; }
-
-        public string[] User { get; }
-    }
-
-    /// <summary>
-    ///     Defines the sets of features that a caller can have
-    /// </summary>
-    public class CallerFeatureLevels
-    {
-        public CallerFeatureLevels()
-        {
-            All = Array.Empty<FeatureLevel>();
-            Platform = Array.Empty<FeatureLevel>();
-            Organization = Array.Empty<FeatureLevel>();
-        }
-
-        public CallerFeatureLevels(FeatureLevel[]? platform, FeatureLevel[]? member)
-        {
-            Platform = platform ?? Array.Empty<FeatureLevel>();
-            Organization = member ?? Array.Empty<FeatureLevel>();
-            All = Platform.Concat(Organization)
-                .ToArray();
-        }
-
-        public FeatureLevel[] All { get; }
-
-        public FeatureLevel[] Organization { get; }
-
-        public FeatureLevel[] Platform { get; }
     }
 }

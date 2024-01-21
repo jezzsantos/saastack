@@ -29,7 +29,7 @@ public class AuthTokensApplication : IAuthTokensApplication
         _repository = repository;
     }
 
-    public async Task<Result<AccessTokens, Error>> IssueTokensAsync(ICallerContext context, EndUser user,
+    public async Task<Result<AccessTokens, Error>> IssueTokensAsync(ICallerContext context, EndUserWithMemberships user,
         CancellationToken cancellationToken)
     {
         var issued = await _jwtTokensService.IssueTokensAsync(user);
@@ -93,7 +93,7 @@ public class AuthTokensApplication : IAuthTokensApplication
         }
 
         var authTokens = retrieved.Value.Value;
-        var retrievedUser = await _endUsersService.GetPersonAsync(context, authTokens.UserId, cancellationToken);
+        var retrievedUser = await _endUsersService.GetMembershipsAsync(context, authTokens.UserId, cancellationToken);
         if (!retrievedUser.IsSuccessful)
         {
             return retrievedUser.Error;

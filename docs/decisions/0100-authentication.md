@@ -55,7 +55,7 @@ The options are:
 `Custom Implementation`
 
 - Can support many authorization protocols, like: HMAC, Basic, APIKey, Claims, Cookies, etc. as prescribed by 3rd party integrations and web hooks.
-- Can support many authorization assertions, like: Roles (RBAC), FeatureLevel access, etc.
+- Can support many authorization assertions, like: Roles (RBAC), Features access, etc.
 - Can support SSO authentication from 3rd parties, like: Microsoft, Google, Facebook etc.
 - Would not be OIDC authentication compliant at first, but could be made to be OIDC compliant later, by either integrating with an external provider or implementing the endpoints and flows.
 - No additional operational costs, (unlike IdentityServer, Auth0 require etc)

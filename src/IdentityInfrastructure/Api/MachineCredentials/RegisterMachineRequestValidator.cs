@@ -11,19 +11,19 @@ public class RegisterMachineRequestValidator : AbstractValidator<RegisterMachine
 {
     public RegisterMachineRequestValidator()
     {
-        RuleFor(dto => dto.Name)
+        RuleFor(req => req.Name)
             .NotEmpty()
             .Matches(Validations.Machine.Name)
             .WithMessage(Resources.RegisterMachineRequestValidator_InvalidName);
-        RuleFor(dto => dto.Timezone)
+        RuleFor(req => req.Timezone)
             .NotEmpty()
             .Matches(CommonValidations.Timezone)
             .WithMessage(Resources.RegisterAnyRequestValidator_InvalidTimezone)
-            .When(dto => dto.Timezone.HasValue());
-        RuleFor(dto => dto.CountryCode)
+            .When(req => req.Timezone.HasValue());
+        RuleFor(req => req.CountryCode)
             .NotEmpty()
             .Matches(CommonValidations.CountryCode)
             .WithMessage(Resources.RegisterAnyRequestValidator_InvalidCountryCode)
-            .When(dto => dto.CountryCode.HasValue());
+            .When(req => req.CountryCode.HasValue());
     }
 }

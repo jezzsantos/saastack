@@ -60,6 +60,24 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to EndUser.PlatformRolesAssigned.
+        /// </summary>
+        public static string EndUserApplication_PlatformRolesAssigned {
+            get {
+                return ResourceManager.GetString("EndUserApplication_PlatformRolesAssigned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EndUser.TenantRolesAssigned.
+        /// </summary>
+        public static string EndUserApplication_TenantRolesAssigned {
+            get {
+                return ResourceManager.GetString("EndUserApplication_TenantRolesAssigned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to EndUser.Registered.TermsAccepted.
         /// </summary>
         public static string EndUsersApplication_User_Registered_TermsAccepted {

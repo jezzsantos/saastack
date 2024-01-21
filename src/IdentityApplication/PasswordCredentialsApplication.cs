@@ -86,7 +86,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         }
 
         var credentials = fetched.Value.Value;
-        var retrieved = await _endUsersService.GetPersonAsync(context, credentials.UserId, cancellationToken);
+        var retrieved = await _endUsersService.GetMembershipsAsync(context, credentials.UserId, cancellationToken);
         if (!retrieved.IsSuccessful)
         {
             return Error.NotAuthenticated();

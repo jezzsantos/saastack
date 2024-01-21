@@ -60,11 +60,155 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All person users must have at least one feature.
+        /// </summary>
+        internal static string EndUserRoot_AllPersonsMustHaveDefaultFeature {
+            get {
+                return ResourceManager.GetString("EndUserRoot_AllPersonsMustHaveDefaultFeature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All person users must have at least one role.
+        /// </summary>
+        internal static string EndUserRoot_AllPersonsMustHaveDefaultRole {
+            get {
+                return ResourceManager.GetString("EndUserRoot_AllPersonsMustHaveDefaultRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This user is already registered.
         /// </summary>
         internal static string EndUserRoot_AlreadyRegistered {
             get {
                 return ResourceManager.GetString("EndUserRoot_AlreadyRegistered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The machine user cannot be unregistered.
+        /// </summary>
+        internal static string EndUserRoot_MachineNotRegistered {
+            get {
+                return ResourceManager.GetString("EndUserRoot_MachineNotRegistered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The membership does not exist.
+        /// </summary>
+        internal static string EndUserRoot_MissingMembership {
+            get {
+                return ResourceManager.GetString("EndUserRoot_MissingMembership", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No membership exists for the organization &apos;{0}&apos;.
+        /// </summary>
+        internal static string EndUserRoot_NoMembership {
+            get {
+                return ResourceManager.GetString("EndUserRoot_NoMembership", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The assigner is not a member of the operations team.
+        /// </summary>
+        internal static string EndUserRoot_NotOperator {
+            get {
+                return ResourceManager.GetString("EndUserRoot_NotOperator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The assigner is not an owner of the organization.
+        /// </summary>
+        internal static string EndUserRoot_NotOrganizationOwner {
+            get {
+                return ResourceManager.GetString("EndUserRoot_NotOrganizationOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This user is not yet registered.
+        /// </summary>
+        internal static string EndUserRoot_NotRegistered {
+            get {
+                return ResourceManager.GetString("EndUserRoot_NotRegistered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The feature &apos;{0}&apos; is not a supported platform feature.
+        /// </summary>
+        internal static string EndUserRoot_UnassignablePlatformFeature {
+            get {
+                return ResourceManager.GetString("EndUserRoot_UnassignablePlatformFeature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The role &apos;{0}&apos; is not a supported platform role.
+        /// </summary>
+        internal static string EndUserRoot_UnassignablePlatformRole {
+            get {
+                return ResourceManager.GetString("EndUserRoot_UnassignablePlatformRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The feature &apos;{0}&apos; is not a supported tenant feature.
+        /// </summary>
+        internal static string EndUserRoot_UnassignableTenantFeature {
+            get {
+                return ResourceManager.GetString("EndUserRoot_UnassignableTenantFeature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The role &apos;{0}&apos; is not a supported tenant role.
+        /// </summary>
+        internal static string EndUserRoot_UnassignableTenantRole {
+            get {
+                return ResourceManager.GetString("EndUserRoot_UnassignableTenantRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A membership must always have the default feature set.
+        /// </summary>
+        internal static string Membership_MissingDefaultFeature {
+            get {
+                return ResourceManager.GetString("Membership_MissingDefaultFeature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot have multiple memberships for the same organization.
+        /// </summary>
+        internal static string Memberships_DuplicateMemberships {
+            get {
+                return ResourceManager.GetString("Memberships_DuplicateMemberships", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only one membership can be the default membership.
+        /// </summary>
+        internal static string Memberships_MultipleDefaults {
+            get {
+                return ResourceManager.GetString("Memberships_MultipleDefaults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to At least one of the memberships must be the default membership.
+        /// </summary>
+        internal static string Memberships_NoDefault {
+            get {
+                return ResourceManager.GetString("Memberships_NoDefault", resourceCulture);
             }
         }
     }

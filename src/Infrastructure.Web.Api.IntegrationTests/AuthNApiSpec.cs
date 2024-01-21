@@ -4,6 +4,7 @@ using ApiHost1;
 using Application.Resources.Shared;
 using Common.Configuration;
 using Domain.Interfaces;
+using Domain.Interfaces.Authorization;
 using Domain.Services.Shared.DomainServices;
 using FluentAssertions;
 using IdentityInfrastructure.ApplicationServices;
@@ -59,7 +60,7 @@ public class AuthNApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenGetTokenRequestWithNoBearer_ThenReturns401()
+    public async Task WhenGetTokenRequestWithNoToken_ThenReturns401()
     {
         var result = await Api.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest());
 
@@ -102,22 +103,24 @@ public class AuthNApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenGetApiKeyRequestWithAPIKey_ThenReturnsSuccess()
     {
-        var user = await LoginUserAsync();
-        var apiKey = await Api.PostAsync(new CreateAPIKeyRequest(), req => req.SetJWTBearerToken(user.AccessToken));
+        var login = await LoginUserAsync();
+        var apiKey = await Api.PostAsync(new CreateAPIKeyRequest(), req => req.SetJWTBearerToken(login.AccessToken));
 
         var result = await Api.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest(),
             req => req.SetAPIKey(apiKey.Content.Value.ApiKey!));
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Content.Value.CallerId.Should().Be(user.User.Id);
+        result.Content.Value.CallerId.Should().Be(login.User.Id);
     }
 
     private static string CreateJwtToken(IConfigurationSettings settings, ITokensService tokensService)
     {
         return new JWTTokensService(settings, tokensService)
-            .IssueTokensAsync(new EndUser
+            .IssueTokensAsync(new EndUserWithMemberships
             {
-                Id = "auserid"
+                Id = "auserid",
+                Roles = new List<string> { PlatformRoles.Standard.Name },
+                Features = new List<string> { PlatformFeatures.Basic.Name }
             }).GetAwaiter().GetResult().Value.AccessToken;
     }
 }

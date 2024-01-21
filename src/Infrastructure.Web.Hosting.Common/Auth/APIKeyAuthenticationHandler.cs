@@ -44,7 +44,7 @@ public class APIKeyAuthenticationHandler : AuthenticationHandler<APIKeyOptions>
 
         var caller = Context.RequestServices.GetRequiredService<ICallerContextFactory>().Create();
         var identityService = Context.RequestServices.GetRequiredService<IIdentityService>();
-        var lookup = await identityService.FindUserForAPIKeyAsync(caller, apiKey, CancellationToken.None);
+        var lookup = await identityService.FindMembershipsForAPIKeyAsync(caller, apiKey, CancellationToken.None);
         if (!lookup.IsSuccessful)
         {
             return AuthenticateResult.Fail(Resources.AuthenticationHandler_Failed);

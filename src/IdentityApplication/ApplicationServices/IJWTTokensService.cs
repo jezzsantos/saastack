@@ -5,7 +5,7 @@ namespace IdentityApplication.ApplicationServices;
 
 public interface IJWTTokensService
 {
-    Task<Result<AccessTokens, Error>> IssueTokensAsync(EndUser user);
+    Task<Result<AccessTokens, Error>> IssueTokensAsync(EndUserWithMemberships user);
 }
 
 public struct AccessTokens

@@ -1,15 +1,25 @@
+using System.Diagnostics;
+#if COMMON_PROJECT
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
+#elif GENERATORS_WEB_API_PROJECT
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.Text;
+#endif
 
 namespace Common.Extensions;
 
+#if COMMON_PROJECT
 [UsedImplicitly]
+#endif
 public static class StringExtensions
 {
+#if COMMON_PROJECT
     /// <summary>
     ///     Defines the casing used in JSON serialization
     /// </summary>
@@ -20,7 +30,8 @@ public static class StringExtensions
     }
 
     private static readonly TimeSpan DefaultRegexTimeout = TimeSpan.FromSeconds(10);
-
+#endif
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT
     /// <summary>
     ///     Whether the <see cref="other" /> is the same as the value (case-insensitive)
     /// </summary>
@@ -28,7 +39,8 @@ public static class StringExtensions
     {
         return string.Equals(value, other, StringComparison.OrdinalIgnoreCase);
     }
-
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Whether the <see cref="other" /> is precisely the same as the value (case-sensitive)
     /// </summary>
@@ -44,7 +56,8 @@ public static class StringExtensions
     {
         return string.Format(value, arguments);
     }
-
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Converts the <see cref="json" /> to an object of the specified <see cref="TResult" />
     /// </summary>
@@ -60,7 +73,24 @@ public static class StringExtensions
             PropertyNameCaseInsensitive = true
         });
     }
+#elif GENERATORS_WEB_API_PROJECT
+    public static TObject FromJson<TObject>(this string json)
+        where TObject : new()
+    {
+        if (json.HasNoValue())
+        {
+            return new TObject();
+        }
 
+        var serializer = new DataContractJsonSerializer(typeof(TObject), new DataContractJsonSerializerSettings());
+
+        using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(json)))
+        {
+            return (TObject)serializer.ReadObject(ms);
+        }
+    }
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Converts the <see cref="json" /> to an object of the specified <see cref="type" />
     /// </summary>
@@ -76,11 +106,13 @@ public static class StringExtensions
             PropertyNameCaseInsensitive = true
         });
     }
-
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Whether the string value contains no value: it is either: null, empty or only whitespaces
     /// </summary>
     [ContractAnnotation("null => true; notnull => false")]
+    [DebuggerStepThrough]
     public static bool HasNoValue([NotNullWhen(false)] this string? value)
     {
         return string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value);
@@ -90,11 +122,29 @@ public static class StringExtensions
     ///     Whether the string value contains any value except: null, empty or only whitespaces
     /// </summary>
     [ContractAnnotation("null => false; notnull => true")]
+    [DebuggerStepThrough]
     public static bool HasValue([NotNullWhen(true)] this string? value)
     {
         return !string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value);
     }
+#elif GENERATORS_WEB_API_PROJECT
+    /// <summary>
+    ///     Whether the string value contains no value: it is either: null, empty or only whitespaces
+    /// </summary>
+    public static bool HasNoValue(this string? value)
+    {
+        return string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value);
+    }
 
+    /// <summary>
+    ///     Whether the string value contains any value except: null, empty or only whitespaces
+    /// </summary>
+    public static bool HasValue(this string? value)
+    {
+        return !string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value);
+    }
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Whether the <see cref="value" /> matches the <see cref="pattern" />
     ///     Avoid potential DOS attacks where the regex may timeout if too complex
@@ -205,7 +255,8 @@ public static class StringExtensions
 
         return defaultValue;
     }
-
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Converts the object to a json format
     /// </summary>
@@ -232,7 +283,31 @@ public static class StringExtensions
                 : JsonIgnoreCondition.WhenWritingNull
         });
     }
+#elif GENERATORS_WEB_API_PROJECT
+    public static string? ToJson<TObject>(this TObject? value, bool? prettyPrint = false)
+    {
+        if (value is null)
+        {
+            return null;
+        }
 
+        using var stream = new MemoryStream();
+        var serializer = new DataContractJsonSerializer(typeof(TObject), new DataContractJsonSerializerSettings
+        {
+            UseSimpleDictionaryFormat = !(prettyPrint ?? false),
+            EmitTypeInformation = EmitTypeInformation.Never,
+            
+        });
+        serializer.WriteObject(stream, value);
+        stream.Seek(0, SeekOrigin.Begin);
+        using var reader = new StreamReader(stream);
+
+        var result = reader.ReadToEnd();
+
+        return result;
+    }
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Returns the specified <see cref="value" /> in title-case. i.e. first letter of words are capitalized
     /// </summary>
@@ -261,4 +336,5 @@ public static class StringExtensions
     {
         return path.TrimEnd('/');
     }
+#endif
 }

@@ -14,6 +14,7 @@ using Domain.Interfaces.Services;
 using Domain.Shared;
 using Infrastructure.Common;
 using Infrastructure.Common.DomainServices;
+using Infrastructure.Common.Extensions;
 using Infrastructure.Eventing.Common.Projections.ReadModels;
 using Infrastructure.Hosting.Common;
 using Infrastructure.Hosting.Common.Extensions;
@@ -29,6 +30,7 @@ using Infrastructure.Web.Hosting.Common.ApplicationServices;
 using Infrastructure.Web.Hosting.Common.Auth;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,7 +62,7 @@ public static class HostExtensions
     {
         { "audits", new DrainAllAuditsRequest() },
         { "usages", new DrainAllUsagesRequest() },
-        { "emails", new DrainAllEmailsRequest() },
+        { "emails", new DrainAllEmailsRequest() }
         //     { "events", new DrainAllEventsRequest() }, 
     };
 #endif
@@ -219,11 +221,11 @@ public static class HostExtensions
                     _ => { });
                 appBuilder.Services.AddAuthorization(configure =>
                 {
-                    configure.AddPolicy(AuthenticationConstants.HMACPolicyName, builder =>
+                    configure.AddPolicy(AuthenticationConstants.Authorization.HMACPolicyName, builder =>
                     {
                         builder.AddAuthenticationSchemes(HMACAuthenticationHandler.AuthenticationScheme);
                         builder.RequireAuthenticatedUser();
-                        builder.RequireRole(PlatformRoles.ServiceAccount);
+                        builder.RequireRole(ClaimExtensions.ToPlatformClaimValue(PlatformRoles.ServiceAccount));
                     });
                 });
             }
@@ -244,8 +246,8 @@ public static class HostExtensions
                     jwtOptions.RequireHttpsMetadata = true;
                     jwtOptions.TokenValidationParameters = new TokenValidationParameters
                     {
-                        RoleClaimType = AuthenticationConstants.ClaimForRole,
-                        NameClaimType = AuthenticationConstants.ClaimForId,
+                        RoleClaimType = AuthenticationConstants.Claims.ForRole,
+                        NameClaimType = AuthenticationConstants.Claims.ForId,
                         ValidateIssuer = true,
                         ValidateAudience = true,
                         ValidateLifetime = true,
@@ -256,19 +258,6 @@ public static class HostExtensions
                             new SymmetricSecurityKey(
                                 Encoding.UTF8.GetBytes(configuration["Hosts:IdentityApi:JWT:SigningSecret"]!))
                     };
-                });
-            }
-
-            if (authentication.UsesApiKeys || authentication.UsesTokens)
-            {
-                appBuilder.Services.AddAuthorization(configure =>
-                {
-                    configure.AddPolicy(AuthenticationConstants.TokenPolicyName, builder =>
-                    {
-                        builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme,
-                            APIKeyAuthenticationHandler.AuthenticationScheme);
-                        builder.RequireAuthenticatedUser();
-                    });
                 });
             }
 
@@ -285,6 +274,22 @@ public static class HostExtensions
             }
 
             appBuilder.Services.AddAuthorization();
+            appBuilder.Services.AddSingleton<IAuthorizationHandler, RolesAndFeaturesAuthorizationHandler>();
+            appBuilder.Services
+                .AddSingleton<IAuthorizationPolicyProvider, RolesAndFeaturesAuthorizationPolicyProvider>();
+
+            if (authentication.UsesApiKeys || authentication.UsesTokens)
+            {
+                appBuilder.Services.AddAuthorization(configure =>
+                {
+                    configure.AddPolicy(AuthenticationConstants.Authorization.TokenPolicyName, builder =>
+                    {
+                        builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme,
+                            APIKeyAuthenticationHandler.AuthenticationScheme);
+                        builder.RequireAuthenticatedUser();
+                    });
+                });
+            }
         }
 
         void ConfigureApiRequests()

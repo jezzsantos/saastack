@@ -2,7 +2,6 @@ using System.Net;
 using ApiHost1;
 using Application.Resources.Shared;
 using CarsDomain;
-using Domain.Interfaces;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Cars;
@@ -23,9 +22,11 @@ public class CarsApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenDeleteCar_ThenDeletes()
     {
-        var car = await RegisterNewCarAsync();
+        var login = await LoginUserAsync();
+        var car = await RegisterNewCarAsync(login);
 
-        var result = await Api.DeleteAsync(new DeleteCarRequest { Id = car.Id });
+        var result = await Api.DeleteAsync(new DeleteCarRequest { Id = car.Id },
+            req => req.SetJWTBearerToken(login.AccessToken));
 
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
@@ -33,9 +34,12 @@ public class CarsApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenGetCar_ThenReturnsCar()
     {
-        var car = await RegisterNewCarAsync();
+        var login = await LoginUserAsync();
+        var car = await RegisterNewCarAsync(login);
 
-        var result = (await Api.GetAsync(new GetCarRequest { Id = car.Id })).Content.Value.Car!;
+        var result = (await Api.GetAsync(new GetCarRequest { Id = car.Id },
+                req => req.SetJWTBearerToken(login.AccessToken)))
+            .Content.Value.Car!;
 
         result.Id.Should().Be(car.Id);
         result.Manufacturer!.Make.Should().Be(Manufacturer.AllowedMakes[0]);
@@ -43,14 +47,16 @@ public class CarsApiSpec : WebApiSpec<Program>
         result.Manufacturer!.Year.Should().Be(2023);
         result.Plate!.Jurisdiction.Should().Be(Jurisdiction.AllowedCountries[0]);
         result.Plate!.Number.Should().Be("aplate");
-        result.Owner!.Id.Should().Be(CallerConstants.AnonymousUserId);
-        result.Managers![0].Id.Should().Be(CallerConstants.AnonymousUserId);
+        result.Owner!.Id.Should().Be(login.User.Id);
+        result.Managers![0].Id.Should().Be(login.User.Id);
         result.Status.Should().Be(CarStatus.Registered.ToString());
     }
 
     [Fact]
     public async Task WhenRegisterCar_ThenReturnsCar()
     {
+        var login = await LoginUserAsync();
+
         var result = await Api.PostAsync(new RegisterCarRequest
         {
             Make = Manufacturer.AllowedMakes[0],
@@ -58,7 +64,7 @@ public class CarsApiSpec : WebApiSpec<Program>
             Year = 2023,
             Jurisdiction = Jurisdiction.AllowedCountries[0],
             NumberPlate = "aplate"
-        });
+        }, req => req.SetJWTBearerToken(login.AccessToken));
 
         var car = result.Content.Value.Car!;
         var location = result.Headers.Location?.ToString();
@@ -69,17 +75,20 @@ public class CarsApiSpec : WebApiSpec<Program>
         car.Manufacturer!.Year.Should().Be(2023);
         car.Plate!.Jurisdiction.Should().Be(Jurisdiction.AllowedCountries[0]);
         car.Plate!.Number.Should().Be("aplate");
-        car.Owner!.Id.Should().Be(CallerConstants.AnonymousUserId);
-        car.Managers![0].Id.Should().Be(CallerConstants.AnonymousUserId);
+        car.Owner!.Id.Should().Be(login.User.Id);
+        car.Managers![0].Id.Should().Be(login.User.Id);
         car.Status.Should().Be(CarStatus.Registered.ToString());
     }
 
     [Fact]
     public async Task WhenSearchAllCars_ThenReturnsCars()
     {
-        var car = await RegisterNewCarAsync();
+        var login = await LoginUserAsync();
+        var car = await RegisterNewCarAsync(login);
 
-        var result = (await Api.GetAsync(new SearchAllCarsRequest())).Content.Value.Cars!;
+        var result = (await Api.GetAsync(new SearchAllCarsRequest(),
+                req => req.SetJWTBearerToken(login.AccessToken)))
+            .Content.Value.Cars!;
 
         result.Count.Should().Be(1);
         result[0].Id.Should().Be(car.Id);
@@ -88,21 +97,22 @@ public class CarsApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenSearchAvailableAndCarIsOffline_ThenReturnsAvailable()
     {
-        var car1 = await RegisterNewCarAsync();
-        var car2 = await RegisterNewCarAsync();
+        var login = await LoginUserAsync();
+        var car1 = await RegisterNewCarAsync(login);
+        var car2 = await RegisterNewCarAsync(login);
         var datum = DateTime.UtcNow.AddDays(2);
         await Api.PutAsync(new TakeOfflineCarRequest
         {
             Id = car1.Id,
             FromUtc = datum,
             ToUtc = datum.AddDays(1)
-        });
+        }, req => req.SetJWTBearerToken(login.AccessToken));
 
         var cars = (await Api.GetAsync(new SearchAllAvailableCarsRequest
         {
             FromUtc = datum,
             ToUtc = datum.AddDays(1)
-        })).Content.Value.Cars!;
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Cars!;
 
         cars.Count.Should().Be(1);
         cars[0].Id.Should().Be(car2.Id);
@@ -111,7 +121,8 @@ public class CarsApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenTakeCarOffline_ThenReturnsCar()
     {
-        var car = await RegisterNewCarAsync();
+        var login = await LoginUserAsync();
+        var car = await RegisterNewCarAsync(login);
         var datum = DateTime.UtcNow.AddDays(2);
 
         var result = (await Api.PutAsync(new TakeOfflineCarRequest
@@ -119,7 +130,7 @@ public class CarsApiSpec : WebApiSpec<Program>
             Id = car.Id,
             FromUtc = datum,
             ToUtc = datum.AddHours(1)
-        })).Content.Value.Car!;
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Car!;
 
         result.Id.Should().Be(car.Id);
 
@@ -139,7 +150,8 @@ public class CarsApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenScheduleMaintenance_ThenReturnsCar()
     {
-        var car = await RegisterNewCarAsync();
+        var login = await LoginUserAsync();
+        var car = await RegisterNewCarAsync(login);
         var datum = DateTime.UtcNow.AddDays(2);
 
         var result = (await Api.PutAsync(new ScheduleMaintenanceCarRequest
@@ -147,7 +159,7 @@ public class CarsApiSpec : WebApiSpec<Program>
             Id = car.Id,
             FromUtc = datum,
             ToUtc = datum.AddHours(1)
-        })).Content.Value.Car!;
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Car!;
 
         result.Id.Should().Be(car.Id);
 
@@ -164,7 +176,7 @@ public class CarsApiSpec : WebApiSpec<Program>
 #endif
     }
 
-    private async Task<Car> RegisterNewCarAsync()
+    private async Task<Car> RegisterNewCarAsync(LoginDetails login)
     {
         var car = await Api.PostAsync(new RegisterCarRequest
         {
@@ -173,7 +185,7 @@ public class CarsApiSpec : WebApiSpec<Program>
             Year = 2023,
             Jurisdiction = Jurisdiction.AllowedCountries[0],
             NumberPlate = "aplate"
-        });
+        }, req => req.SetJWTBearerToken(login.AccessToken));
 
         return car.Content.Value.Car!;
     }

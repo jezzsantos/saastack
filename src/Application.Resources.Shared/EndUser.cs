@@ -8,7 +8,7 @@ public class EndUser : IIdentifiableResource
 
     public EndUserClassification Classification { get; set; }
 
-    public List<string> FeatureLevels { get; set; } = new();
+    public List<string> Features { get; set; } = new();
 
     public List<string> Roles { get; set; } = new();
 
@@ -37,10 +37,21 @@ public enum EndUserClassification
 
 public class RegisteredEndUser : EndUser
 {
-    public DefaultMembershipProfile? Profile { get; set; }
+    public ProfileWithDefaultMembership? Profile { get; set; }
 }
 
-public class DefaultMembershipProfile : Profile
+public class EndUserWithMemberships : EndUser
 {
-    public string? DefaultOrganisationId { get; set; }
+    public List<Membership> Memberships { get; set; } = new();
+}
+
+public class Membership : IIdentifiableResource
+{
+    public List<string> Features { get; set; } = new();
+
+    public required string OrganizationId { get; set; }
+
+    public List<string> Roles { get; set; } = new();
+
+    public required string Id { get; set; }
 }

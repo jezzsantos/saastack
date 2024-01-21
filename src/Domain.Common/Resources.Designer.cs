@@ -87,11 +87,11 @@ namespace Domain.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unknown event {0}.
+        ///   Looks up a localized string similar to Unhandled event {0}.
         /// </summary>
-        internal static string EventingEntityBase_HandleUnKnownStateChangedEvent_UnknownEvent {
+        internal static string EventingEntityBase_HandleUnKnownStateChangedEvent_UnhandledEvent {
             get {
-                return ResourceManager.GetString("EventingEntityBase_HandleUnKnownStateChangedEvent_UnknownEvent", resourceCulture);
+                return ResourceManager.GetString("EventingEntityBase_HandleUnKnownStateChangedEvent_UnhandledEvent", resourceCulture);
             }
         }
         

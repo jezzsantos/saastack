@@ -20,11 +20,11 @@ public class RegisterCarRequestValidator : AbstractValidator<RegisterCarRequest>
         RuleFor(req => req.Year)
             .InclusiveBetween(Validations.Car.Year.Min, Validations.Car.Year.Max)
             .WithMessage(Resources.RegisterCarRequestValidator_InvalidYear);
-        RuleFor(dto => dto.Jurisdiction)
+        RuleFor(req => req.Jurisdiction)
             .Matches(Validations.Car.Jurisdiction)
-            .Must(dto => Jurisdiction.AllowedCountries.Contains(dto))
+            .Must(req => Jurisdiction.AllowedCountries.Contains(req))
             .WithMessage(Resources.RegisterCarRequestValidator_InvalidJurisdiction);
-        RuleFor(dto => dto.NumberPlate)
+        RuleFor(req => req.NumberPlate)
             .Matches(Validations.Car.NumberPlate)
             .WithMessage(Resources.RegisterCarRequestValidator_InvalidNumberPlate);
     }

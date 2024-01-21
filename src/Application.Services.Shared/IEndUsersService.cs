@@ -8,6 +8,9 @@ public interface IEndUsersService
 {
     Task<Result<EndUser, Error>> GetPersonAsync(ICallerContext caller, string id, CancellationToken cancellationToken);
 
+    Task<Result<EndUserWithMemberships, Error>> GetMembershipsAsync(ICallerContext context, string id,
+        CancellationToken cancellationToken);
+
     Task<Result<RegisteredEndUser, Error>> RegisterMachineAsync(ICallerContext context, string name, string? timezone,
         string? countryCode, CancellationToken cancellationToken);
 

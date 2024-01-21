@@ -123,6 +123,24 @@ namespace Infrastructure.Web.Hosting.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid subscription level.
+        /// </summary>
+        internal static string RolesAndFeaturesAuthorizationHandler_HandleRequirementAsync_MissingFeature {
+            get {
+                return ResourceManager.GetString("RolesAndFeaturesAuthorizationHandler_HandleRequirementAsync_MissingFeature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid role.
+        /// </summary>
+        internal static string RolesAndFeaturesAuthorizationHandler_HandleRequirementAsync_MissingRole {
+            get {
+                return ResourceManager.GetString("RolesAndFeaturesAuthorizationHandler_HandleRequirementAsync_MissingRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An unexpected error occurred.
         /// </summary>
         internal static string WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage {

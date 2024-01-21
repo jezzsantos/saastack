@@ -100,8 +100,8 @@ public class PasswordCredentialsApplicationSpec
         _repository.Setup(rep => rep.FindCredentialsByUsernameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<PasswordCredentialRoot>, Error>>(credential.ToOptional()));
         _endUsersService.Setup(eus =>
-                eus.GetPersonAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUser, Error>>(Error.EntityNotFound()));
+                eus.GetMembershipsAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<EndUserWithMemberships, Error>>(Error.EntityNotFound()));
 
         var result =
             await _application.AuthenticateAsync(_caller.Object, "ausername", "apassword", CancellationToken.None);
@@ -116,8 +116,8 @@ public class PasswordCredentialsApplicationSpec
         _repository.Setup(rep => rep.FindCredentialsByUsernameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<PasswordCredentialRoot>, Error>>(credential.ToOptional()));
         _endUsersService.Setup(eus =>
-                eus.GetPersonAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUser, Error>>(new EndUser
+                eus.GetMembershipsAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<EndUserWithMemberships, Error>>(new EndUserWithMemberships
             {
                 Id = "anid",
                 Status = EndUserStatus.Unregistered
@@ -136,8 +136,8 @@ public class PasswordCredentialsApplicationSpec
         _repository.Setup(rep => rep.FindCredentialsByUsernameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<PasswordCredentialRoot>, Error>>(credential.ToOptional()));
         _endUsersService.Setup(eus =>
-                eus.GetPersonAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUser, Error>>(new EndUser
+                eus.GetMembershipsAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<EndUserWithMemberships, Error>>(new EndUserWithMemberships
             {
                 Id = "auserid",
                 Status = EndUserStatus.Registered,
@@ -167,8 +167,8 @@ public class PasswordCredentialsApplicationSpec
         _repository.Setup(rep => rep.FindCredentialsByUsernameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<PasswordCredentialRoot>, Error>>(credential.ToOptional()));
         _endUsersService.Setup(eus =>
-                eus.GetPersonAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUser, Error>>(new EndUser
+                eus.GetMembershipsAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<EndUserWithMemberships, Error>>(new EndUserWithMemberships
             {
                 Id = "auserid",
                 Status = EndUserStatus.Registered,
@@ -193,8 +193,8 @@ public class PasswordCredentialsApplicationSpec
         _repository.Setup(rep => rep.FindCredentialsByUsernameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<PasswordCredentialRoot>, Error>>(credential.ToOptional()));
         _endUsersService.Setup(eus =>
-                eus.GetPersonAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUser, Error>>(new EndUser
+                eus.GetMembershipsAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<EndUserWithMemberships, Error>>(new EndUserWithMemberships
             {
                 Id = "auserid",
                 Status = EndUserStatus.Registered,
@@ -220,8 +220,8 @@ public class PasswordCredentialsApplicationSpec
         _repository.Setup(rep => rep.FindCredentialsByUsernameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<PasswordCredentialRoot>, Error>>(credential.ToOptional()));
         _endUsersService.Setup(eus =>
-                eus.GetPersonAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUser, Error>>(new EndUser
+                eus.GetMembershipsAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<EndUserWithMemberships, Error>>(new EndUserWithMemberships
             {
                 Id = "auserid",
                 Status = EndUserStatus.Registered,
@@ -245,18 +245,19 @@ public class PasswordCredentialsApplicationSpec
         var credential = CreateVerifiedCredential();
         _repository.Setup(rep => rep.FindCredentialsByUsernameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<PasswordCredentialRoot>, Error>>(credential.ToOptional()));
-        var user = new EndUser
+        var user = new EndUserWithMemberships
         {
             Id = "auserid",
             Status = EndUserStatus.Registered,
             Access = EndUserAccess.Enabled
         };
         _endUsersService.Setup(eus =>
-                eus.GetPersonAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUser, Error>>(user));
+                eus.GetMembershipsAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<EndUserWithMemberships, Error>>(user));
         var expiresOn = DateTime.UtcNow;
         _authTokensService.Setup(jts =>
-                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUser>(), It.IsAny<CancellationToken>()))
+                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+                    It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<AccessTokens, Error>>(new AccessTokens("anaccesstoken", "arefreshtoken",
                 expiresOn)));
 
@@ -307,7 +308,7 @@ public class PasswordCredentialsApplicationSpec
         var registeredAccount = new RegisteredEndUser
         {
             Id = "auserid",
-            Profile = new DefaultMembershipProfile
+            Profile = new ProfileWithDefaultMembership
             {
                 Id = "anid",
                 Name = new PersonName

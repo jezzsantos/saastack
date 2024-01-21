@@ -22,29 +22,29 @@ public class HasSearchOptionsValidator : AbstractValidator<IHasSearchOptions>, I
 
     public HasSearchOptionsValidator(IHasGetOptionsValidator hasGetOptionsValidator)
     {
-        RuleFor(dto => dto.Limit!.Value)
+        RuleFor(req => req.Limit!.Value)
             .InclusiveBetween(SearchOptions.NoLimit, SearchOptions.MaxLimit)
-            .When(dto => dto.Limit.HasValue)
+            .When(req => req.Limit.HasValue)
             .WithMessage(
                 ValidationResources.HasSearchOptionsValidator_InvalidLimit.Format(SearchOptions.NoLimit,
                     SearchOptions.DefaultLimit));
-        RuleFor(dto => dto.Offset!.Value)
+        RuleFor(req => req.Offset!.Value)
             .InclusiveBetween(SearchOptions.NoOffset, SearchOptions.MaxLimit)
-            .When(dto => dto.Offset.HasValue)
+            .When(req => req.Offset.HasValue)
             .WithMessage(
                 ValidationResources.HasSearchOptionsValidator_InvalidOffset.Format(SearchOptions.NoOffset,
                     SearchOptions.MaxLimit));
-        RuleFor(dto => dto.Sort!)
+        RuleFor(req => req.Sort!)
             .Matches(SortExpression)
-            .When(dto => dto.Sort.HasValue())
+            .When(req => req.Sort.HasValue())
             .WithMessage(ValidationResources.HasSearchOptionsValidator_InvalidSort);
-        RuleFor(dto => dto.Filter!)
+        RuleFor(req => req.Filter!)
             .Matches(FilterExpression)
-            .When(dto => dto.Filter.HasValue())
+            .When(req => req.Filter.HasValue())
             .WithMessage(ValidationResources.HasSearchOptionsValidator_InvalidFilter);
-        When(dto => dto.Embed.HasValue(), () =>
+        When(req => req.Embed.HasValue(), () =>
         {
-            RuleFor(dto => dto)
+            RuleFor(req => req)
                 .SetValidator(hasGetOptionsValidator);
         });
     }

@@ -46,7 +46,7 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
     public TInterface GetRequiredService<TInterface>()
         where TInterface : notnull
     {
-        if (_scope is null)
+        if (_scope.NotExists())
         {
             _scope = Services.GetRequiredService<IServiceScopeFactory>()
                 .CreateScope();
@@ -62,7 +62,7 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
 
     public TInterface? TryGetService<TInterface>(Type serviceType)
     {
-        if (_scope is null)
+        if (_scope.NotExists())
         {
             _scope = Services.GetRequiredService<IServiceScopeFactory>()
                 .CreateScope();
@@ -106,7 +106,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
     private static IReadOnlyList<IApplicationRepository>? _repositories;
     protected readonly IHttpJsonClient Api;
     protected readonly HttpClient HttpApi;
-    protected StubNotificationsService NotificationsService;
+    protected readonly StubNotificationsService NotificationsService;
     private readonly WebApplicationFactory<THost> _setup;
 
     protected WebApiSpec(WebApiSetup<THost> setup, Action<IServiceCollection>? overrideDependencies = null)
@@ -150,14 +150,28 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         DestroyAllRepositories(platformRepositories);
     }
 
-    protected async Task<LoginUser> LoginUserAsync()
+    protected async Task<LoginDetails> LoginUserAsync(LoginUser who = LoginUser.PersonA)
     {
-        const string emailAddress = "aperson1@company.com";
+        var emailAddress = who switch
+        {
+            LoginUser.PersonA => "person.a@company.com",
+            LoginUser.PersonB => "person.b@company.com",
+            LoginUser.Operator => "operator@company.com",
+            _ => throw new ArgumentOutOfRangeException(nameof(who), who, null)
+        };
+        var firstName = who switch
+        {
+            LoginUser.PersonA => "aperson",
+            LoginUser.PersonB => "bperson",
+            LoginUser.Operator => "operator",
+            _ => throw new ArgumentOutOfRangeException(nameof(who), who, null)
+        };
+
         const string password = "1Password!";
         var person = await Api.PostAsync(new RegisterPersonPasswordRequest
         {
             EmailAddress = emailAddress,
-            FirstName = "aperson1",
+            FirstName = firstName,
             LastName = "alastname",
             Password = password,
             TermsAndConditionsAccepted = true
@@ -175,13 +189,16 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
             Password = password
         });
 
-        return new LoginUser(login.Content.Value.AccessToken!, person.Content.Value.Credential!.User);
+        var accessToken = login.Content.Value.AccessToken!;
+        var user = person.Content.Value.Credential!.User;
+
+        return new LoginDetails(accessToken, user);
     }
 
     private static IReadOnlyList<IApplicationRepository> GetRepositories(WebApiSetup<THost> setup,
         IReadOnlyList<Type> repositoryTypes)
     {
-        if (_repositories is null)
+        if (_repositories.NotExists())
         {
             _repositories = repositoryTypes
                 .Select(type => Try.Safely(() => setup.TryGetService<IApplicationRepository>(type)))
@@ -194,7 +211,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 
     private static IReadOnlyList<Type> GetAllRepositoryTypes()
     {
-        if (_allRepositories is null)
+        if (_allRepositories.NotExists())
         {
             _allRepositories = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(assembly => assembly.GetTypes().Where(type =>
@@ -225,9 +242,9 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         return port;
     }
 
-    protected class LoginUser
+    protected class LoginDetails
     {
-        public LoginUser(string accessToken, RegisteredEndUser user)
+        public LoginDetails(string accessToken, RegisteredEndUser user)
         {
             AccessToken = accessToken;
             User = user;
@@ -236,5 +253,12 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         public string AccessToken { get; }
 
         public RegisteredEndUser User { get; }
+    }
+
+    protected enum LoginUser
+    {
+        PersonA = 0,
+        PersonB = 1,
+        Operator = 2
     }
 }

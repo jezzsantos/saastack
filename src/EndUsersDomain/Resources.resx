@@ -24,7 +24,55 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
+    <data name="EndUserRoot_NotRegistered" xml:space="preserve">
+        <value>This user is not yet registered</value>
+    </data>
     <data name="EndUserRoot_AlreadyRegistered" xml:space="preserve">
         <value>This user is already registered</value>
+    </data>
+    <data name="EndUserRoot_NoMembership" xml:space="preserve">
+        <value>No membership exists for the organization '{0}'</value>
+    </data>
+    <data name="EndUserRoot_MissingMembership" xml:space="preserve">
+        <value>The membership does not exist</value>
+    </data>
+    <data name="EndUserRoot_UnassignableTenantRole" xml:space="preserve">
+        <value>The role '{0}' is not a supported tenant role</value>
+    </data>
+    <data name="EndUserRoot_UnassignablePlatformRole" xml:space="preserve">
+        <value>The role '{0}' is not a supported platform role</value>
+    </data>
+    <data name="EndUserRoot_UnassignablePlatformFeature" xml:space="preserve">
+        <value>The feature '{0}' is not a supported platform feature</value>
+    </data>
+    <data name="EndUserRoot_UnassignableTenantFeature" xml:space="preserve">
+        <value>The feature '{0}' is not a supported tenant feature</value>
+    </data>
+    <data name="Memberships_NoDefault" xml:space="preserve">
+        <value>At least one of the memberships must be the default membership</value>
+    </data>
+    <data name="Memberships_MultipleDefaults" xml:space="preserve">
+        <value>Only one membership can be the default membership</value>
+    </data>
+    <data name="Memberships_DuplicateMemberships" xml:space="preserve">
+        <value>Cannot have multiple memberships for the same organization</value>
+    </data>
+    <data name="EndUserRoot_MachineNotRegistered" xml:space="preserve">
+        <value>The machine user cannot be unregistered</value>
+    </data>
+    <data name="EndUserRoot_AllPersonsMustHaveDefaultRole" xml:space="preserve">
+        <value>All person users must have at least one role</value>
+    </data>
+    <data name="EndUserRoot_AllPersonsMustHaveDefaultFeature" xml:space="preserve">
+        <value>All person users must have at least one feature</value>
+    </data>
+    <data name="EndUserRoot_NotOrganizationOwner" xml:space="preserve">
+        <value>The assigner is not an owner of the organization</value>
+    </data>
+    <data name="Membership_MissingDefaultFeature" xml:space="preserve">
+        <value>A membership must always have the default feature set</value>
+    </data>
+    <data name="EndUserRoot_NotOperator" xml:space="preserve">
+        <value>The assigner is not a member of the operations team</value>
     </data>
 </root>

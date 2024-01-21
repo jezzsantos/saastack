@@ -24,7 +24,7 @@
 
     <!-- Runs the source generator (in memory) on build -->
     <ItemGroup>
-        <ProjectReference Include="..\Tools.Generators.WebApi\Tools.Generators.WebApi.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\Tools.Generators.Web.Api\Tools.Generators.Web.Api.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup>

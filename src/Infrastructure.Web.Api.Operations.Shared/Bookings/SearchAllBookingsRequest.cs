@@ -2,7 +2,8 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Bookings;
 
-[Route("/bookings", ServiceOperation.Search)]
+[Route("/bookings", ServiceOperation.Search, AccessType.Token)]
+[Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class SearchAllBookingsRequest : TenantedSearchRequest<SearchAllBookingsResponse>
 {
     public DateTime? FromUtc { get; set; }

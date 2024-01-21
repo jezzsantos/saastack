@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <IsPlatformProject>true</IsPlatformProject>
+        <DefineConstants>COMMON_PROJECT</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>

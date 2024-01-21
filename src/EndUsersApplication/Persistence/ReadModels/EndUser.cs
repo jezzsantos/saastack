@@ -12,7 +12,7 @@ public class EndUser : ReadModelEntity
 
     public Optional<string> Classification { get; set; }
 
-    public Optional<FeatureLevels> FeatureLevels { get; set; }
+    public Optional<Features> Features { get; set; }
 
     public Optional<Roles> Roles { get; set; }
 

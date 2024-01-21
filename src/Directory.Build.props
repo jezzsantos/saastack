@@ -68,8 +68,8 @@
     <ItemGroup Condition="'$(IsPlatformProject)'=='true' AND '$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true' AND '$(ExcludeFromPlatformAnalyzers)'!='true'">
         <ProjectReference Include="$(MSBuildThisFileDirectory)\Tools.Analyzers.Platform\Tools.Analyzers.Platform.csproj" PrivateAssets="all" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
-    <ItemGroup Condition="'$(IsPlatformProject)'!='true' AND '$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true' AND '$(ExcludeFromSubdomainAnalyzers)'!='true'">
-        <ProjectReference Include="$(MSBuildThisFileDirectory)\Tools.Analyzers.Subdomain\Tools.Analyzers.Subdomain.csproj" PrivateAssets="all" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ItemGroup Condition="'$(IsPlatformProject)'!='true' AND '$(IsTestProject)'!='true' AND '$(IsRoslynComponent)'!='true' AND '$(ExcludeFromNonPlatformAnalyzers)'!='true'">
+        <ProjectReference Include="$(MSBuildThisFileDirectory)\Tools.Analyzers.NonPlatform\Tools.Analyzers.NonPlatform.csproj" PrivateAssets="all" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <!-- Build configurations -->
@@ -86,7 +86,7 @@
         <DebugType>full</DebugType>
         <Optimize>false</Optimize>
         <OutputPath>bin\$(Configuration)\</OutputPath>
-        <DefineConstants>DEBUG;TRACE;TESTINGONLY;$(HostingPlatform)</DefineConstants>
+        <DefineConstants>$(DefineConstants);DEBUG;TRACE;TESTINGONLY;$(HostingPlatform)</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>

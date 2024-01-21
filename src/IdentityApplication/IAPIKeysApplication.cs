@@ -12,6 +12,8 @@ public interface IAPIKeysApplication
 #if TESTINGONLY
     Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext context, CancellationToken cancellationToken);
 #endif
-    Task<Result<Optional<EndUser>, Error>> FindUserForAPIKeyAsync(ICallerContext context, string apiKey,
+
+    Task<Result<Optional<EndUserWithMemberships>, Error>> FindMembershipsForAPIKeyAsync(ICallerContext context,
+        string apiKey,
         CancellationToken cancellationToken);
 }

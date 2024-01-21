@@ -24,4 +24,10 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
+    <data name="AssignPlatformRolesRequestValidator_InvalidRoles" xml:space="preserve">
+        <value>The Roles are either missing or invalid</value>
+    </data>
+    <data name="AssignPlatformRolesRequestValidator_InvalidRole" xml:space="preserve">
+        <value>A Role is either missing or invalid</value>
+    </data>
 </root>

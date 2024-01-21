@@ -63,7 +63,7 @@ public class HMACAuthenticationHandler : AuthenticationHandler<HMACOptions>
         AuthenticationTicket IssueTicket()
         {
             var principal =
-                new ClaimsPrincipal(new ClaimsIdentity(EndUserExtensions.ToClaimsForServiceAccount(), Scheme.Name));
+                new ClaimsPrincipal(new ClaimsIdentity(ClaimExtensions.ToClaimsForServiceAccount(), Scheme.Name));
             return new AuthenticationTicket(principal, Scheme.Name)
             {
                 Properties =

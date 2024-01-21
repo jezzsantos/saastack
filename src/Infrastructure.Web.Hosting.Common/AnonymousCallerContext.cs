@@ -29,7 +29,7 @@ public class AnonymousCallerContext : ICallerContext
 
     public ICallerContext.CallerRoles Roles => new();
 
-    public ICallerContext.CallerFeatureLevels FeatureLevels => new(new[] { PlatformFeatureLevels.Basic }, null);
+    public ICallerContext.CallerFeatures Features => new(new[] { PlatformFeatures.Basic }, null);
 
     public Optional<ICallerContext.CallerAuthorization> Authorization =>
         Optional<ICallerContext.CallerAuthorization>.None;

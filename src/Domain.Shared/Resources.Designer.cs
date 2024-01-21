@@ -78,11 +78,11 @@ namespace Domain.Shared {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The FeatureLevel value is invalid.
+        ///   Looks up a localized string similar to The Feature value is invalid.
         /// </summary>
-        internal static string FeatureLevels_InvalidFeatureLevel {
+        internal static string Features_InvalidFeature {
             get {
-                return ResourceManager.GetString("FeatureLevels_InvalidFeatureLevel", resourceCulture);
+                return ResourceManager.GetString("Features_InvalidFeature", resourceCulture);
             }
         }
         

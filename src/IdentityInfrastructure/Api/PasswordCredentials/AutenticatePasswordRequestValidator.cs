@@ -9,11 +9,11 @@ public class AuthenticatePasswordRequestValidator : AbstractValidator<Authentica
 {
     public AuthenticatePasswordRequestValidator()
     {
-        RuleFor(dto => dto.Username)
+        RuleFor(req => req.Username)
             .NotEmpty()
             .IsEmailAddress()
             .WithMessage(Resources.AuthenticatePasswordRequestValidator_InvalidUsername);
-        RuleFor(dto => dto.Password)
+        RuleFor(req => req.Password)
             .NotEmpty()
             .Matches(CommonValidations.Passwords.Password.Strict)
             .WithMessage(Resources.AuthenticatePasswordRequestValidator_InvalidPassword);

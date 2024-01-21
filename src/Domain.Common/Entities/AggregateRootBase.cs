@@ -287,7 +287,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
         }
 
         return Error.Unexpected(
-            Resources.EventingEntityBase_HandleUnKnownStateChangedEvent_UnknownEvent.Format(@event.GetType()));
+            Resources.EventingEntityBase_HandleUnKnownStateChangedEvent_UnhandledEvent.Format(@event.GetType()));
     }
 
     /// <summary>
@@ -317,7 +317,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
     protected Result<TEntity, Error> RaiseEventToChildEntity<TEntity, TChangeEvent>(bool isReconstituting,
         TChangeEvent @event,
         Func<IIdentifierFactory, Result<TEntity, Error>> childEntityFactory,
-        Expression<Func<TChangeEvent, string>> eventChildId)
+        Expression<Func<TChangeEvent, string?>> eventChildId)
         where TEntity : IEventingEntity
         where TChangeEvent : IDomainEvent
     {

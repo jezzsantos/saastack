@@ -60,9 +60,9 @@ public class EmailsApiSpec : WebApiSpec<Program>
         result.Content.Value.IsDelivered.Should().BeTrue();
         _emailDeliveryService.LastSubject.Should().Be("asubject");
 
-        var user = await LoginUserAsync();
+        var login = await LoginUserAsync(LoginUser.Operator);
         var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
-            req => req.SetJWTBearerToken(user.AccessToken));
+            req => req.SetJWTBearerToken(login.AccessToken));
 
         deliveries.Content.Value.Emails!.Count.Should().Be(1);
         deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
@@ -101,9 +101,9 @@ public class EmailsApiSpec : WebApiSpec<Program>
         result.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
         _emailDeliveryService.LastSubject.Should().Be("asubject");
 
-        var user = await LoginUserAsync();
+        var login = await LoginUserAsync(LoginUser.Operator);
         var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
-            req => req.SetJWTBearerToken(user.AccessToken));
+            req => req.SetJWTBearerToken(login.AccessToken));
 
         deliveries.Content.Value.Emails!.Count.Should().Be(1);
         deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
@@ -146,9 +146,9 @@ public class EmailsApiSpec : WebApiSpec<Program>
 
         secondAttempt.Content.Value.IsDelivered.Should().BeTrue();
 
-        var user = await LoginUserAsync();
+        var login = await LoginUserAsync(LoginUser.Operator);
         var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
-            req => req.SetJWTBearerToken(user.AccessToken));
+            req => req.SetJWTBearerToken(login.AccessToken));
 
         deliveries.Content.Value.Emails!.Count.Should().Be(1);
         deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");

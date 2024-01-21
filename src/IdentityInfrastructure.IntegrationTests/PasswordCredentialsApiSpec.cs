@@ -2,6 +2,7 @@ using System.Net;
 using ApiHost1;
 using Application.Resources.Shared;
 using Common;
+using Domain.Interfaces.Authorization;
 using FluentAssertions;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common.Extensions;
@@ -40,8 +41,9 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
         result.Content.Value.Credential.User.Access.Should().Be(EndUserAccess.Enabled);
         result.Content.Value.Credential.User.Status.Should().Be(EndUserStatus.Registered);
         result.Content.Value.Credential.User.Classification.Should().Be(EndUserClassification.Person);
-        result.Content.Value.Credential.User.Roles.Should().BeEmpty();
-        result.Content.Value.Credential.User.FeatureLevels.Should().BeEmpty();
+        result.Content.Value.Credential.User.Roles.Should().ContainSingle(rol => rol == PlatformRoles.Standard.Name);
+        result.Content.Value.Credential.User.Features.Should()
+            .ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
         result.Content.Value.Credential.User.Profile!.Id.Should().Be(result.Content.Value.Credential.User.Id);
         result.Content.Value.Credential.User.Profile!.DefaultOrganisationId.Should().BeNull();
         result.Content.Value.Credential.User.Profile!.Name.FirstName.Should().Be("afirstname");
@@ -91,7 +93,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
         result.Content.Value.AccessToken.Should().NotBeNull();
         result.Content.Value.RefreshToken.Should().NotBeNull();
         result.Content.Value.ExpiresOnUtc.Should()
-            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.DefaultAccessTokenExpiry));
+            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.DefaultTokenExpiry));
     }
 
     [Fact]

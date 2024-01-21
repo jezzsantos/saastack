@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Infrastructure.Web.Api.Common\Infrastructure.Web.Api.Common.csproj" />
+        <ProjectReference Include="..\Tools.Analyzers.NonPlatform\Tools.Analyzers.NonPlatform.csproj" Aliases="NonPlatformAnalyzers" />
+        <ProjectReference Include="..\Tools.Analyzers.Common\Tools.Analyzers.Common.csproj" Aliases="CommonAnalyzers" />
+        <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.1" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.1.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    </ItemGroup>
+
+</Project>

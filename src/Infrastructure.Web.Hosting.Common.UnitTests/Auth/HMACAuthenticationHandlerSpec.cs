@@ -4,7 +4,6 @@ using Application.Interfaces.Services;
 using Common;
 using Common.Extensions;
 using Domain.Interfaces;
-using Domain.Interfaces.Authorization;
 using FluentAssertions;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common;
@@ -98,13 +97,13 @@ public class HMACAuthenticationHandlerSpec
 
         result.Succeeded.Should().BeTrue();
         result.Ticket!.Principal.Claims.Should().Contain(claim =>
-            claim.Type == AuthenticationConstants.ClaimForId
+            claim.Type == AuthenticationConstants.Claims.ForId
             && claim.Value == CallerConstants.MaintenanceAccountUserId);
         result.Ticket.Principal.Claims.Should().Contain(claim =>
-            claim.Type == AuthenticationConstants.ClaimForRole && claim.Value == PlatformRoles.ServiceAccount);
+            claim.Type == AuthenticationConstants.Claims.ForRole && claim.Value == "Platform_service");
         result.Ticket.Principal.Claims.Should().Contain(claim =>
-            claim.Type == AuthenticationConstants.ClaimForFeatureLevel
-            && claim.Value == PlatformFeatureLevels.Basic.Name);
+            claim.Type == AuthenticationConstants.Claims.ForFeature
+            && claim.Value == "Platform_basic_features");
     }
 
     [Fact]
@@ -138,13 +137,13 @@ public class HMACAuthenticationHandlerSpec
 
         result.Succeeded.Should().BeTrue();
         result.Ticket!.Principal.Claims.Should().Contain(claim =>
-            claim.Type == AuthenticationConstants.ClaimForId
+            claim.Type == AuthenticationConstants.Claims.ForId
             && claim.Value == CallerConstants.MaintenanceAccountUserId);
         result.Ticket.Principal.Claims.Should().Contain(claim =>
-            claim.Type == AuthenticationConstants.ClaimForRole && claim.Value == PlatformRoles.ServiceAccount);
+            claim.Type == AuthenticationConstants.Claims.ForRole && claim.Value == "Platform_service");
         result.Ticket.Principal.Claims.Should().Contain(claim =>
-            claim.Type == AuthenticationConstants.ClaimForFeatureLevel
-            && claim.Value == PlatformFeatureLevels.Basic.Name);
+            claim.Type == AuthenticationConstants.Claims.ForFeature
+            && claim.Value == "Platform_basic_features");
         _recorder.Verify(rec => rec.Audit(It.IsAny<ICallContext>(), It.IsAny<string>(), It.IsAny<string>()),
             Times.Never);
     }

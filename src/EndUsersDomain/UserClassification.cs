@@ -2,6 +2,6 @@ namespace EndUsersDomain;
 
 public enum UserClassification
 {
-    Person = 0,
-    Machine = 1
+    Person = 0, // A human end-user
+    Machine = 1 // An machine end-user (used for API automation)
 }

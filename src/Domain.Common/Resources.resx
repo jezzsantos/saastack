@@ -42,8 +42,8 @@
     <data name="EventingAggregateRootBase_HasNoIdentifier" xml:space="preserve">
         <value>The entity has no identifier</value>
     </data>
-    <data name="EventingEntityBase_HandleUnKnownStateChangedEvent_UnknownEvent" xml:space="preserve">
-        <value>Unknown event {0}</value>
+    <data name="EventingEntityBase_HandleUnKnownStateChangedEvent_UnhandledEvent" xml:space="preserve">
+        <value>Unhandled event {0}</value>
     </data>
     <data name="ChangeEventMigrator_UnknownType" xml:space="preserve">
         <value>Failed to deserialize event '{0}'. The serialized type: '{1}' cannot be found in the current AppDomain. Perhaps the type '{1}' has been renamed or no longer exists in the codebase?</value>

@@ -6,6 +6,6 @@ namespace IdentityApplication.ApplicationServices;
 
 public interface IAuthTokensService
 {
-    Task<Result<AccessTokens, Error>> IssueTokensAsync(ICallerContext context, EndUser user,
+    Task<Result<AccessTokens, Error>> IssueTokensAsync(ICallerContext context, EndUserWithMemberships user,
         CancellationToken cancellationToken);
 }

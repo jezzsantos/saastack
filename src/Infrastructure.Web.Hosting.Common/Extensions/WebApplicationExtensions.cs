@@ -256,7 +256,7 @@ public static class WebApplicationExtensions
         app.UseAuthentication();
 
         app.Logger.LogInformation("Authorization using RoleBasedAccessControl is enabled");
-        app.Logger.LogInformation("Authorization using FeatureLevelAccessControl is enabled");
+        app.Logger.LogInformation("Authorization using FeatureBasedAccessControl is enabled");
         app.UseAuthorization();
 
         return app;

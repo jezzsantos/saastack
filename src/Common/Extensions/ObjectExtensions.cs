@@ -1,11 +1,14 @@
+#if COMMON_PROJECT
 using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using JetBrains.Annotations;
+#endif
 
 namespace Common.Extensions;
 
 public static class ObjectExtensions
 {
+#if COMMON_PROJECT
     /// <summary>
     ///     Auto-maps the <see cref="source" /> to a new instance of the <see cref="TTarget" /> instance
     /// </summary>
@@ -16,7 +19,8 @@ public static class ObjectExtensions
 
         return mapper.Map<TTarget>(source);
     }
-
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Whether the object does exist
     /// </summary>
@@ -25,7 +29,17 @@ public static class ObjectExtensions
     {
         return instance is not null;
     }
+#elif GENERATORS_WEB_API_PROJECT
+    /// <summary>
+    ///     Whether the object does exist
+    /// </summary>
+    public static bool Exists(this object? instance)
+    {
+        return instance is not null;
+    }
 
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Whether the parameter <see cref="value" /> from being invalid according to the <see cref="validation" />,
     ///     and if invalid, returns a <see cref="ErrorCode.Validation" /> error
@@ -78,7 +92,8 @@ public static class ObjectExtensions
     {
         return IsInvalidParameter(value.HasValue, parameterName, null, out error);
     }
-
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Whether the object does not exist
     /// </summary>
@@ -87,7 +102,16 @@ public static class ObjectExtensions
     {
         return instance is null;
     }
-
+#elif GENERATORS_WEB_API_PROJECT
+    /// <summary>
+    ///     Whether the object does not exist
+    /// </summary>
+    public static bool NotExists(this object? instance)
+    {
+        return instance is null;
+    }
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Populates the public properties of the <see cref="target" /> instance with the values of matching public properties
     ///     of the
@@ -148,4 +172,5 @@ public static class ObjectExtensions
         error = Error.NoError;
         return false;
     }
+#endif
 }

@@ -1,3 +1,4 @@
+using Application.Interfaces;
 using Application.Resources.Shared;
 using BookingsApplication;
 using Infrastructure.Interfaces;
@@ -9,7 +10,6 @@ namespace BookingsInfrastructure.Api.Bookings;
 
 public sealed class BookingsApi : IWebApiService
 {
-    private const string OrganizationId = "org_01234567890123456789012"; //TODO: get this from tenancy
     private readonly IBookingsApplication _bookingsApplication;
     private readonly ICallerContextFactory _contextFactory;
 
@@ -22,7 +22,8 @@ public sealed class BookingsApi : IWebApiService
     public async Task<ApiDeleteResult> Cancel(CancelBookingRequest request, CancellationToken cancellationToken)
     {
         var booking =
-            await _bookingsApplication.CancelBookingAsync(_contextFactory.Create(), OrganizationId, request.Id,
+            await _bookingsApplication.CancelBookingAsync(_contextFactory.Create(),
+                MultiTenancyConstants.DefaultOrganizationId, request.Id,
                 cancellationToken);
         return () => booking.HandleApplicationResult();
     }
@@ -30,7 +31,8 @@ public sealed class BookingsApi : IWebApiService
     public async Task<ApiPostResult<Booking, MakeBookingResponse>> Make(MakeBookingRequest request,
         CancellationToken cancellationToken)
     {
-        var booking = await _bookingsApplication.MakeBookingAsync(_contextFactory.Create(), OrganizationId,
+        var booking = await _bookingsApplication.MakeBookingAsync(_contextFactory.Create(),
+            MultiTenancyConstants.DefaultOrganizationId,
             request.CarId, request.StartUtc, request.EndUtc, cancellationToken);
 
         return () => booking.HandleApplicationResult<MakeBookingResponse, Booking>(c =>
@@ -40,7 +42,8 @@ public sealed class BookingsApi : IWebApiService
     public async Task<ApiSearchResult<Booking, SearchAllBookingsResponse>> SearchAll(SearchAllBookingsRequest request,
         CancellationToken cancellationToken)
     {
-        var bookings = await _bookingsApplication.SearchAllBookingsAsync(_contextFactory.Create(), OrganizationId,
+        var bookings = await _bookingsApplication.SearchAllBookingsAsync(_contextFactory.Create(),
+            MultiTenancyConstants.DefaultOrganizationId,
             request.FromUtc,
             request.ToUtc, request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
 

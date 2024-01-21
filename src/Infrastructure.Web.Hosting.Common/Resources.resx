@@ -48,4 +48,10 @@
     <data name="APIKeyAuthenticationHandler_FailedAuthentication" xml:space="preserve">
         <value>Failed APIKEY authentication</value>
     </data>
+    <data name="RolesAndFeaturesAuthorizationHandler_HandleRequirementAsync_MissingRole" xml:space="preserve">
+        <value>Invalid role</value>
+    </data>
+    <data name="RolesAndFeaturesAuthorizationHandler_HandleRequirementAsync_MissingFeature" xml:space="preserve">
+        <value>Invalid subscription level</value>
+    </data>
 </root>

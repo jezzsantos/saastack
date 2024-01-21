@@ -44,3 +44,8 @@ public class ProfileAddress
 
     public string? Zip { get; set; }
 }
+
+public class ProfileWithDefaultMembership : Profile
+{
+    public string? DefaultOrganisationId { get; set; }
+}
