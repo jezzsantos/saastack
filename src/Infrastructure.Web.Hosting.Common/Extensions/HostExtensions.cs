@@ -93,7 +93,6 @@ public static class HostExtensions
         app.AddExceptionShielding();
         app.EnableMultiTenancy(hostOptions.IsMultiTenanted);
         app.EnableEventingListeners(hostOptions.Persistence.UsesEventing);
-        app.EnableApiUsageTracking(hostOptions.TrackApiUsage);
         app.EnableOtherOptions(hostOptions);
 
         modules.ConfigureHost(app);

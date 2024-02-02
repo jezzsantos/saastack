@@ -101,6 +101,7 @@ namespace {assemblyNamespace}
         endpointRegistrations.AppendLine($@"        var {groupName} = app.MapGroup(string.Empty)
                 .WithGroupName(""{serviceClassName}"")
                 .RequireCors(""{WebHostingConstants.DefaultCORSPolicyName}"")
+                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ApiUsageFilter>()
                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();");
 

@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using MinimalApiMediatRGenerator = Generators::Tools.Generators.Web.Api.MinimalApiMediatRGenerator;
+using Api_MinimalApiMediatRGenerator = Generators::Tools.Generators.Web.Api.MinimalApiMediatRGenerator;
 
 namespace Tools.Generators.Web.Api.UnitTests;
 
@@ -22,7 +22,7 @@ public class MinimalApiMediatRGeneratorSpec
 
         var references = new List<MetadataReference>
         {
-            MetadataReference.CreateFromFile(typeof(MinimalApiMediatRGenerator).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(Api_MinimalApiMediatRGenerator).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location)
         };
         AdditionalCompilationAssemblies.ToList()
@@ -45,7 +45,7 @@ public class MinimalApiMediatRGeneratorSpec
 
         public GivenAServiceClass()
         {
-            var generator = new MinimalApiMediatRGenerator();
+            var generator = new Api_MinimalApiMediatRGenerator();
             _driver = CSharpGeneratorDriver.Create(generator);
         }
 
@@ -139,6 +139,7 @@ public class MinimalApiMediatRGeneratorSpec
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
@@ -213,6 +214,7 @@ public class MinimalApiMediatRGeneratorSpec
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
@@ -288,6 +290,7 @@ public class MinimalApiMediatRGeneratorSpec
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
@@ -363,6 +366,7 @@ public class MinimalApiMediatRGeneratorSpec
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                 #if TESTINGONLY
@@ -442,6 +446,7 @@ public class MinimalApiMediatRGeneratorSpec
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                 #if TESTINGONLY
@@ -522,6 +527,7 @@ public class MinimalApiMediatRGeneratorSpec
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                 #if TESTINGONLY
@@ -612,6 +618,7 @@ public class MinimalApiMediatRGeneratorSpec
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
@@ -696,6 +703,7 @@ public class MinimalApiMediatRGeneratorSpec
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                 #if TESTINGONLY
@@ -778,6 +786,7 @@ public class MinimalApiMediatRGeneratorSpec
                             var aserviceclassGroup = app.MapGroup(string.Empty)
                                 .WithGroupName("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();
                 #if TESTINGONLY

@@ -1,17 +1,12 @@
 using System.Net;
-using Application.Common;
-using Application.Interfaces;
-using Application.Interfaces.Resources;
 using Common;
 using Common.Extensions;
 using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Eventing.Interfaces.Projections;
 using Infrastructure.Hosting.Common.Extensions;
-using Infrastructure.Interfaces;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
-using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 using Infrastructure.Web.Hosting.Common.ApplicationServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -30,23 +25,6 @@ namespace Infrastructure.Web.Hosting.Common.Extensions;
 
 public static class WebApplicationExtensions
 {
-    public static readonly Type[] IgnoredTrackedRequestTypes =
-    {
-        // Exclude these as they are not API's called by users
-#if TESTINGONLY
-        typeof(DrainAllAuditsRequest),
-        typeof(DrainAllUsagesRequest),
-        typeof(SearchAllAuditsRequest),
-#endif
-        //typeof(GetHealthCheckRequest),
-        typeof(DeliverUsageRequest),
-        typeof(DeliverAuditRequest),
-
-        // Exclude these or we will get a Stackoverflow!
-        typeof(RecordUseRequest),
-        typeof(RecordMeasureRequest)
-    };
-
     /// <summary>
     ///     Provides a global handler when an exception is encountered, and converts the exception
     ///     to an <see href="https://datatracker.ietf.org/doc/html/rfc7807">RFC7807</see> error.
@@ -86,28 +64,6 @@ public static class WebApplicationExtensions
             await Results.Problem(details)
                 .ExecuteAsync(context);
         }));
-    }
-
-    /// <summary>
-    ///     Enables the tracking of all inbound API calls
-    /// </summary>
-    /// <param name="app"></param>
-    public static IApplicationBuilder EnableApiUsageTracking(this WebApplication app, bool tracksUsage)
-    {
-        if (!tracksUsage)
-        {
-            return app;
-        }
-
-        app.Logger.LogInformation("API Usage Tracking is enabled");
-        return app.Use(async (context, next) =>
-        {
-            var recorder = context.RequestServices.GetRequiredService<IRecorder>();
-            var caller = context.RequestServices.GetRequiredService<ICallerContextFactory>().Create();
-
-            TrackUsage(context, recorder, caller);
-            await next();
-        });
     }
 
     /// <summary>
@@ -260,38 +216,5 @@ public static class WebApplicationExtensions
         app.UseAuthorization();
 
         return app;
-    }
-
-    private static void TrackUsage(HttpContext httpContext, IRecorder recorder, ICallerContext caller)
-    {
-        var request = httpContext.ToWebRequest();
-        var requestType = request?.GetType();
-        if (requestType.NotExists())
-        {
-            return;
-        }
-
-        if (IgnoredTrackedRequestTypes.Contains(requestType))
-        {
-            return;
-        }
-
-        var requestName = requestType.Name.ToLowerInvariant();
-        var additional = new Dictionary<string, object>
-        {
-            { UsageConstants.Properties.EndPoint, requestName }
-        };
-        var requestAsProperties = request
-            .ToObjectDictionary()
-            .ToDictionary(pair => pair.Key, pair => pair.Value?.ToString());
-        if (requestAsProperties.TryGetValue(nameof(IIdentifiableResource.Id), out var id))
-        {
-            if (id.Exists())
-            {
-                additional.Add(nameof(IIdentifiableResource.Id), id);
-            }
-        }
-
-        recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.Api.ApiEndpointRequested, additional);
     }
 }

@@ -10,7 +10,6 @@ public class WebHostOptions : HostOptions
     public new static readonly WebHostOptions BackEndAncillaryApiHost = new(HostOptions.BackEndAncillaryApiHost)
     {
         CORS = CORSOption.AnyOrigin,
-        TrackApiUsage = true,
         Authorization = new AuthorizationOptions
         {
             UsesCookies = false,
@@ -22,7 +21,6 @@ public class WebHostOptions : HostOptions
     public new static readonly WebHostOptions BackEndApiHost = new(HostOptions.BackEndApiHost)
     {
         CORS = CORSOption.AnyOrigin,
-        TrackApiUsage = true,
         Authorization = new AuthorizationOptions
         {
             UsesCookies = false,
@@ -35,7 +33,6 @@ public class WebHostOptions : HostOptions
     public new static readonly WebHostOptions BackEndForFrontEndWebHost = new(HostOptions.BackEndForFrontEndWebHost)
     {
         CORS = CORSOption.SameOrigin,
-        TrackApiUsage = false,
         Authorization = new AuthorizationOptions
         {
             UsesCookies = true,
@@ -48,7 +45,6 @@ public class WebHostOptions : HostOptions
     public new static readonly WebHostOptions TestingStubsHost = new(HostOptions.TestingStubsHost)
     {
         CORS = CORSOption.AnyOrigin,
-        TrackApiUsage = false,
         Authorization = new AuthorizationOptions
         {
             UsesCookies = false,
@@ -61,15 +57,12 @@ public class WebHostOptions : HostOptions
     private WebHostOptions(HostOptions options) : base(options)
     {
         CORS = CORSOption.None;
-        TrackApiUsage = false;
         Authorization = new AuthorizationOptions();
     }
 
     public AuthorizationOptions Authorization { get; private init; }
 
     public CORSOption CORS { get; private init; }
-
-    public bool TrackApiUsage { get; private set; }
 }
 
 /// <summary>

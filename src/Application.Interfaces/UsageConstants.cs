@@ -27,7 +27,12 @@ public static class UsageConstants
         public const string TenantId = "TenantId";
         public const string Timestamp = "Timestamp";
         public const string UsedById = "UserId";
+        public const string ResourceId = "ResourceId";
         public const string UserAgent = "UserAgent";
+        public const string HttpRoute = "Route";
+        public const string HttpMethod = "Method";
+        public const string HttpPath = "Path";
+        public const string HttpStatusCode = "Status";
     }
 
     public static class Events
@@ -50,7 +55,8 @@ public static class UsageConstants
 
         public static class Api
         {
-            public const string ApiEndpointRequested = "api.request";
+            public const string HttpRequestRequested = "http.request";
+            public const string HttpRequestResponded = "http.response";
         }
     }
 }
