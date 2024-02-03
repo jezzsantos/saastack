@@ -4,6 +4,7 @@ using Application.Interfaces.Services;
 using Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Interfaces.Clients;
@@ -28,25 +29,29 @@ public class StubQueueDrainingService : BackgroundService
     private readonly ILogger _logger;
     private readonly IMonitoredMessageQueues _monitoredMessageQueues;
     private readonly Dictionary<string, IWebRequest> _monitorQueueMappings;
+    private readonly string _hmacSecret;
 
     public StubQueueDrainingService(IHttpClientFactory httpClientFactory, JsonSerializerOptions jsonOptions,
-        IHostSettings settings,
-        ILogger<StubQueueDrainingService> logger, IMonitoredMessageQueues monitoredMessageQueues,
+        IHostSettings settings, ILogger<StubQueueDrainingService> logger,
+        IMonitoredMessageQueues monitoredMessageQueues,
         Dictionary<string, IWebRequest> monitoredQueueApiMappings) : this(httpClientFactory, jsonOptions, logger,
-        monitoredMessageQueues, monitoredQueueApiMappings, settings.GetAncillaryApiHostBaseUrl())
+        monitoredMessageQueues, monitoredQueueApiMappings, settings.GetAncillaryApiHostBaseUrl(),
+        settings.GetAncillaryApiHostHmacAuthSecret())
     {
     }
 
     private StubQueueDrainingService(IHttpClientFactory httpClientFactory, JsonSerializerOptions jsonOptions,
         ILogger<StubQueueDrainingService> logger,
         IMonitoredMessageQueues monitoredMessageQueues, Dictionary<string, IWebRequest> monitorQueueMappings,
-        string baseUrl)
+        string baseUrl, string hmacSecret)
     {
         baseUrl.ThrowIfNotValuedParameter(nameof(baseUrl));
         _logger = logger;
         _monitoredMessageQueues = monitoredMessageQueues;
         _monitorQueueMappings = monitorQueueMappings;
+        _hmacSecret = hmacSecret;
         _apiClient = CreateApiClient(httpClientFactory, jsonOptions, baseUrl);
+        
     }
 
     public override void Dispose()
@@ -87,7 +92,8 @@ public class StubQueueDrainingService : BackgroundService
                 {
                     if (_monitorQueueMappings.TryGetValue(queueName, out var webRequest))
                     {
-                        await _apiClient.PostAsync(webRequest, null, cancellationToken);
+                        await _apiClient.PostAsync(webRequest, req => req.SetHMACAuth(webRequest, _hmacSecret),
+                            cancellationToken);
                     }
                 }
                 catch (Exception ex)

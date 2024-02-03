@@ -24,7 +24,7 @@ public class NullUsageDeliveryService : IUsageDeliveryService
         CancellationToken cancellationToken = default)
     {
         var properties = additional.Exists()
-            ? additional.ToJson()!
+            ? additional.ToJson(false)!
             : "none";
         _recorder.TraceInformation(context.ToCall(),
             $"{nameof(NullUsageDeliveryService)} delivers usage event {{Event}} for {{For}} with properties: {{Properties}}",
