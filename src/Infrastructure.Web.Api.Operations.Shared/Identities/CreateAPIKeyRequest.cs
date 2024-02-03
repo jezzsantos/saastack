@@ -7,6 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 [Authorize(Roles.Platform_Standard)]
 public class CreateAPIKeyRequest : UnTenantedRequest<CreateAPIKeyResponse>
 {
+    public DateTime? ExpiresOnUtc { get; set; }
 }
 
 #endif

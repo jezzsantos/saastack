@@ -19,6 +19,16 @@ public class AuthTokensApi : IWebApiService
         _authTokensApplication = authTokensApplication;
     }
 
+    public async Task<ApiDeleteResult> Revoke(RevokeRefreshTokenRequest request,
+        CancellationToken cancellationToken)
+    {
+        var tokens =
+            await _authTokensApplication.RevokeRefreshTokenAsync(_contextFactory.Create(), request.RefreshToken,
+                cancellationToken);
+
+        return () => tokens.HandleApplicationResult();
+    }
+
     public async Task<ApiPostResult<AccessTokens, RefreshTokenResponse>> Refresh(RefreshTokenRequest request,
         CancellationToken cancellationToken)
     {

@@ -12,4 +12,7 @@ public interface IAuthTokensApplication
 
     Task<Result<AccessTokens, Error>> RefreshTokenAsync(ICallerContext context, string refreshToken,
         CancellationToken cancellationToken);
+
+    Task<Result<Error>> RevokeRefreshTokenAsync(ICallerContext context, string refreshToken,
+        CancellationToken cancellationToken);
 }

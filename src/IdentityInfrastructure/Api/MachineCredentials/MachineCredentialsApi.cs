@@ -24,7 +24,7 @@ public class MachineCredentialsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var machine = await _machineCredentialsApplication.RegisterMachineAsync(_contextFactory.Create(), request.Name,
-            request.Timezone, request.CountryCode, cancellationToken);
+            request.Timezone, request.CountryCode, request.ApiKeyExpiresOnUtc, cancellationToken);
 
         return () => machine.HandleApplicationResult<RegisterMachineResponse, MachineCredential>(x =>
             new PostResult<RegisterMachineResponse>(new RegisterMachineResponse { Machine = x }));

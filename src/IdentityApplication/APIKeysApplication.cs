@@ -2,6 +2,7 @@ using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
+using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Services.Shared.DomainServices;
@@ -13,6 +14,7 @@ namespace IdentityApplication;
 
 public class APIKeysApplication : IAPIKeysApplication
 {
+    public static readonly TimeSpan DefaultAPIKeyExpiry = TimeSpan.FromHours(1);
     private readonly IAPIKeyHasherService _apiKeyHasherService;
     private readonly IEndUsersService _endUsersService;
     private readonly IIdentifierFactory _identifierFactory;
@@ -83,7 +85,8 @@ public class APIKeysApplication : IAPIKeysApplication
         }
 
         var apiKey = created.Value;
-        var parameterized = apiKey.SetParameters(description, expiresOn);
+        var parameterized = apiKey.SetParameters(description,
+            expiresOn ?? DateTime.UtcNow.ToNearestMinute().Add(DefaultAPIKeyExpiry));
         if (!parameterized.IsSuccessful)
         {
             return parameterized.Error;

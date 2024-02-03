@@ -10,4 +10,6 @@ public class RegisterMachineRequest : UnTenantedRequest<RegisterMachineResponse>
     public required string Name { get; set; }
 
     public string? Timezone { get; set; }
+
+    public DateTime? ApiKeyExpiresOnUtc { get; set; }
 }

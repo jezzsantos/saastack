@@ -23,7 +23,7 @@ public class MachineCredentialsApplication : IMachineCredentialsApplication
     }
 
     public async Task<Result<MachineCredential, Error>> RegisterMachineAsync(ICallerContext context, string name,
-        string? timezone, string? countryCode, CancellationToken cancellationToken)
+        string? timezone, string? countryCode, DateTime? apiKeyExpiresOn, CancellationToken cancellationToken)
     {
         var registered =
             await _endUsersService.RegisterMachineAsync(context, name, timezone, countryCode, cancellationToken);
@@ -36,7 +36,8 @@ public class MachineCredentialsApplication : IMachineCredentialsApplication
         var description = (machine.Profile.Exists()
             ? machine.Profile?.DisplayName
             : machine.Id) ?? machine.Id;
-        var keys = await _apiKeyService.CreateApiKeyAsync(context, machine.Id, description, null, cancellationToken);
+        var keys = await _apiKeyService.CreateApiKeyAsync(context, machine.Id, description, apiKeyExpiresOn,
+            cancellationToken);
         if (!keys.IsSuccessful)
         {
             return keys.Error;

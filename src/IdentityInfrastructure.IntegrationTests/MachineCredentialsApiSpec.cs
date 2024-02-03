@@ -1,12 +1,15 @@
 using System.Net;
 using ApiHost1;
+using Common.Extensions;
 using Domain.Interfaces;
 using FluentAssertions;
+using IdentityApplication;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.Extensions.DependencyInjection;
+using UnitTesting.Common.Validation;
 using Xunit;
 
 namespace IdentityInfrastructure.IntegrationTests;
@@ -32,7 +35,8 @@ public class MachineCredentialsApiSpec : WebApiSpec<Program>
         result.Content.Value.Machine.Description.Should().Be("amachinename");
         result.Content.Value.Machine.ApiKey.Should().StartWith("apk_");
         result.Content.Value.Machine.CreatedById.Should().Be(CallerConstants.AnonymousUserId);
-        result.Content.Value.Machine.ExpiresOnUtc.Should().BeNull();
+        result.Content.Value.Machine.ExpiresOnUtc!.Value.Should().BeNear(
+            DateTime.UtcNow.ToNearestMinute().Add(APIKeysApplication.DefaultAPIKeyExpiry), TimeSpan.FromMinutes(1));
     }
 
     [Fact]
@@ -49,7 +53,8 @@ public class MachineCredentialsApiSpec : WebApiSpec<Program>
         result.Content.Value.Machine.Description.Should().Be("amachinename");
         result.Content.Value.Machine.ApiKey.Should().StartWith("apk_");
         result.Content.Value.Machine.CreatedById.Should().Be(login.User.Id);
-        result.Content.Value.Machine.ExpiresOnUtc.Should().BeNull();
+        result.Content.Value.Machine.ExpiresOnUtc!.Value.Should().BeNear(
+            DateTime.UtcNow.ToNearestMinute().Add(APIKeysApplication.DefaultAPIKeyExpiry), TimeSpan.FromMinutes(1));
     }
 
     [Fact]

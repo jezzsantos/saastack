@@ -64,7 +64,7 @@ public class RequestExtensionsSpec
 
         result.Route.Should()
             .Be(
-                "/aroute?adatetimeproperty=2023-10-29T12%3a30%3a00Z&anumberproperty=999&astringproperty=avalue&id=anid");
+                "/aroute?adatetimeproperty=2023-10-29T12%3a30%3a15Z&anumberproperty=999&astringproperty=avalue&id=anid");
         result.Operation.Should().Be(ServiceOperation.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
@@ -116,7 +116,7 @@ public class RequestExtensionsSpec
 
         result.Route.Should()
             .Be(
-                "/aroute/{unknown}?adatetimeproperty=2023-10-29T12%3a30%3a00Z&anumberproperty=999&astringproperty=avalue&id=anid");
+                "/aroute/{unknown}?adatetimeproperty=2023-10-29T12%3a30%3a15Z&anumberproperty=999&astringproperty=avalue&id=anid");
         result.Operation.Should().Be(ServiceOperation.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
@@ -178,7 +178,7 @@ public class RequestExtensionsSpec
 
         result.Route.Should()
             .Be(
-                "/aroute/anid/apath1/xxx999yyy/apath2/avalue1/avalue2/apath3?adatetimeproperty=2023-10-29T12%3a30%3a00Z&astringproperty3=avalue3");
+                "/aroute/anid/apath1/xxx999yyy/apath2/avalue1/avalue2/apath3?adatetimeproperty=2023-10-29T12%3a30%3a15Z&astringproperty3=avalue3");
         result.Operation.Should().Be(ServiceOperation.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
@@ -200,7 +200,7 @@ public class RequestExtensionsSpec
         var result = request.GetRequestInfo();
 
         result.Route.Should()
-            .Be("/aroute/anid/apath1/xxxyyy/apath2/avalue1/apath3?adatetimeproperty=2023-10-29T12%3a30%3a00Z");
+            .Be("/aroute/anid/apath1/xxxyyy/apath2/avalue1/apath3?adatetimeproperty=2023-10-29T12%3a30%3a15Z");
         result.Operation.Should().Be(ServiceOperation.Get);
         result.IsTestingOnly.Should().BeFalse();
     }

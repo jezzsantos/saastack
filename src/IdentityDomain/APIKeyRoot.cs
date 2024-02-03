@@ -112,7 +112,7 @@ public sealed class APIKeyRoot : AggregateRootBase
         return RaisePermanentDeleteEvent(deleterId);
     }
 
-    public Result<Error> SetParameters(string description, Optional<DateTime?> expiresOn)
+    public Result<Error> SetParameters(string description, DateTime expiresOn)
     {
         if (description.IsInvalidParameter(Validations.ApiKey.Description, nameof(description),
                 Resources.ApiKeyKeep_InvalidDescription, out var error1))
@@ -120,14 +120,19 @@ public sealed class APIKeyRoot : AggregateRootBase
             return error1;
         }
 
-        if (expiresOn.HasValue)
+        var lowerLimit = DateTime.UtcNow.ToNearestMinute().Add(Validations.ApiKey.MinimumExpiryPeriod);
+        if (expiresOn.IsInvalidParameter(
+                exp => exp == lowerLimit || exp.IsAfter(lowerLimit),
+                nameof(expiresOn), Resources.APIKeyRoot_ExpiresOnTooSoon, out var error2))
         {
-            if (expiresOn.IsInvalidParameter(
-                    exp => exp.Value!.Value.IsAfter(DateTime.UtcNow.Add(Validations.ApiKey.MinimumExpiryPeriod)),
-                    nameof(expiresOn), Resources.APIKeyRoot_ExpiresOnNotFuture, out var error2))
-            {
-                return error2;
-            }
+            return error2;
+        }
+
+        if (expiresOn.IsInvalidParameter(
+                exp => exp.IsBefore(DateTime.UtcNow.ToNearestMinute().Add(Validations.ApiKey.MaximumExpiryPeriod)),
+                nameof(expiresOn), Resources.APIKeyRoot_ExpiresOnTooLate, out var error3))
+        {
+            return error3;
         }
 
         return RaiseChangeEvent(IdentityDomain.Events.APIKeys.ParametersChanged.Create(Id, description, expiresOn));

@@ -25,5 +25,11 @@ public class RegisterMachineRequestValidator : AbstractValidator<RegisterMachine
             .Matches(CommonValidations.CountryCode)
             .WithMessage(Resources.RegisterAnyRequestValidator_InvalidCountryCode)
             .When(req => req.CountryCode.HasValue());
+        RuleFor(req => req.ApiKeyExpiresOnUtc)
+            .InclusiveBetween(DateTime.UtcNow.Add(Validations.ApiKey.MinimumExpiryPeriod),
+                DateTime.UtcNow.Add(Validations.ApiKey.MaximumExpiryPeriod))
+            .When(req => req.ApiKeyExpiresOnUtc.HasValue)
+            .WithMessage(Resources.RegisterMachineRequestValidator_InvalidExpiresOn.Format(
+                Validations.ApiKey.MinimumExpiryPeriod.TotalHours, Validations.ApiKey.MaximumExpiryPeriod.TotalHours));
     }
 }

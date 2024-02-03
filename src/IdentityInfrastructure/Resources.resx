@@ -57,4 +57,16 @@
     <data name="ConfirmPersonRegistrationRequestValidator_InvalidToken" xml:space="preserve">
       <value>The 'Token' is either missing or invalid</value>
     </data>
+    <data name="CreateAPIKeyRequestValidator_InvalidExpiresOn" xml:space="preserve">
+      <value>The 'ExpiresOnUtc' must be between '{0}hr' and '{1}hrs'</value>
+    </data>
+    <data name="RegisterMachineRequestValidator_InvalidExpiresOn" xml:space="preserve">
+      <value>The 'ApiKeyExpiresOnUtc' must be between '{0}hr' and '{1}hrs'</value>
+    </data>
+    <data name="RefreshTokenRequestValidator_InvalidToken" xml:space="preserve">
+      <value>The 'RefreshToken' is invalid or missing</value>
+    </data>
+    <data name="RevokeRefreshTokenRequestValidator_InvalidToken" xml:space="preserve">
+      <value>The 'RefreshToken' is invalid or missing</value>
+    </data>
 </root>

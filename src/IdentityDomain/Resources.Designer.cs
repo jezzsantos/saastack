@@ -96,11 +96,20 @@ namespace IdentityDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The expiry date cannot be more than 30 days into the future.
+        /// </summary>
+        internal static string APIKeyRoot_ExpiresOnTooLate {
+            get {
+                return ResourceManager.GetString("APIKeyRoot_ExpiresOnTooLate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The expiry date cannot be less than one hour into the future.
         /// </summary>
-        internal static string APIKeyRoot_ExpiresOnNotFuture {
+        internal static string APIKeyRoot_ExpiresOnTooSoon {
             get {
-                return ResourceManager.GetString("APIKeyRoot_ExpiresOnNotFuture", resourceCulture);
+                return ResourceManager.GetString("APIKeyRoot_ExpiresOnTooSoon", resourceCulture);
             }
         }
         

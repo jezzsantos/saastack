@@ -21,7 +21,4 @@ public static class AuthenticationConstants
         public const string TokenPolicyName = "Token";
         
     }
-
-    public static readonly TimeSpan DefaultTokenExpiry = TimeSpan.FromMinutes(15);
-    public static readonly TimeSpan DefaultAPIKeyExpiry = TimeSpan.FromMinutes(60);
 }

@@ -1,6 +1,8 @@
 using Common;
+using Common.Extensions;
 using FluentAssertions;
 using FluentValidation;
+using IdentityDomain;
 using IdentityInfrastructure.Api.MachineCredentials;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using UnitTesting.Common.Validation;
@@ -78,5 +80,35 @@ public class RegisterMachineRequestValidatorSpec
             .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(Resources.RegisterAnyRequestValidator_InvalidCountryCode);
+    }
+
+    [Fact]
+    public void WhenApiKeyExpiresOnUtcIsLessThanMinimum_ThenThrows()
+    {
+        _dto.ApiKeyExpiresOnUtc = DateTime.UtcNow;
+
+        _validator
+            .Invoking(x => x.ValidateAndThrow(_dto))
+            .Should().Throw<ValidationException>()
+            .WithMessageLike(Resources.RegisterMachineRequestValidator_InvalidExpiresOn);
+    }
+
+    [Fact]
+    public void WhenApiKeyExpiresOnUtcIsMoreThanMaximum_ThenThrows()
+    {
+        _dto.ApiKeyExpiresOnUtc = DateTime.UtcNow.Add(Validations.ApiKey.MaximumExpiryPeriod).AddMinutes(1);
+
+        _validator
+            .Invoking(x => x.ValidateAndThrow(_dto))
+            .Should().Throw<ValidationException>()
+            .WithMessageLike(Resources.RegisterMachineRequestValidator_InvalidExpiresOn);
+    }
+
+    [Fact]
+    public void WhenApiKeyExpiresOnUtc_ThenSucceeds()
+    {
+        _dto.ApiKeyExpiresOnUtc = DateTime.UtcNow.Add(Validations.ApiKey.MaximumExpiryPeriod).SubtractHours(1);
+
+        _validator.ValidateAndThrow(_dto);
     }
 }

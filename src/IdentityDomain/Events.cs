@@ -1,4 +1,3 @@
-using Common;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Shared;
@@ -330,7 +329,7 @@ public static class Events
         public class ParametersChanged : IDomainEvent
         {
             public static ParametersChanged Create(Identifier id, string description,
-                Optional<DateTime?> expiresOn)
+                DateTime expiresOn)
             {
                 return new ParametersChanged
                 {
@@ -343,7 +342,7 @@ public static class Events
 
             public required string Description { get; set; }
 
-            public DateTime? ExpiresOn { get; set; }
+            public DateTime ExpiresOn { get; set; }
 
             public required string RootId { get; set; }
 

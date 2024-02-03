@@ -69,18 +69,19 @@ public class APIKeyRootSpec
         var expiresOn = DateTime.UtcNow;
         var result = _apiKey.SetParameters("adescription", expiresOn);
 
-        result.Should().BeError(ErrorCode.Validation, Resources.APIKeyRoot_ExpiresOnNotFuture);
+        result.Should().BeError(ErrorCode.Validation, Resources.APIKeyRoot_ExpiresOnTooSoon);
     }
 
     [Fact]
     public void WhenSetParametersWithNoExpiresOn_ThenAssigns()
     {
-        _apiKey.SetParameters("adescription", Optional<DateTime?>.None);
+        var expires = DateTime.UtcNow.AddDays(1);
+        _apiKey.SetParameters("adescription", expires);
 
         _apiKey.ApiKey.Value.Token.Should().Be("atoken");
         _apiKey.ApiKey.Value.KeyHash.Should().Be("akeyhash");
         _apiKey.Description.Should().BeSome("adescription");
-        _apiKey.ExpiresOn.Should().BeNone();
+        _apiKey.ExpiresOn.Should().BeSome(expires);
         _apiKey.UserId.Should().Be("auserid".ToId());
         _apiKey.Events.Last().Should().BeOfType<Events.APIKeys.ParametersChanged>();
     }

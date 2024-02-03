@@ -123,4 +123,36 @@ public class AuthTokensApplication : IAuthTokensApplication
 
         return tokens;
     }
+
+    public async Task<Result<Error>> RevokeRefreshTokenAsync(ICallerContext context, string refreshToken,
+        CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.FindByRefreshTokenAsync(refreshToken, cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        if (!retrieved.Value.HasValue)
+        {
+            return Error.NotAuthenticated();
+        }
+
+        var authTokens = retrieved.Value.Value;
+        var invalidated = authTokens.Revoke(refreshToken);
+        if (!invalidated.IsSuccessful)
+        {
+            return invalidated.Error;
+        }
+
+        var updated = await _repository.SaveAsync(authTokens, cancellationToken);
+        if (!updated.IsSuccessful)
+        {
+            return updated.Error;
+        }
+
+        _recorder.TraceInformation(context.ToCall(), "AuthTokens were revoked for {Id}", updated.Value.Id);
+
+        return Result.Ok;
+    }
 }

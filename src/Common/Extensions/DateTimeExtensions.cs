@@ -225,12 +225,25 @@ public static class DateTimeExtensions
     }
 
     /// <summary>
+    ///     Truncates the <see cref="value" /> to the nearest minute.
+    /// </summary>
+    public static DateTime ToNearestMinute(this DateTime value)
+    {
+        var microsecondOffset = TimeSpan.FromSeconds(value.Second)
+            .Add(TimeSpan.FromMilliseconds(value.Millisecond))
+            .Add(TimeSpan.FromMicroseconds(value.Microsecond));
+        var nanosecondsInTicks = value.Nanosecond != 0
+            ? value.Nanosecond / 100
+            : 0;
+        return value.Subtract(microsecondOffset).AddTicks(-nanosecondsInTicks);
+    }
+
+    /// <summary>
     ///     Truncates the <see cref="value" /> to the nearest second.
     /// </summary>
     public static DateTime ToNearestSecond(this DateTime value)
     {
-        var microsecondOffset = TimeSpan.FromSeconds(value.Second)
-            .Add(TimeSpan.FromMilliseconds(value.Millisecond))
+        var microsecondOffset = TimeSpan.FromMilliseconds(value.Millisecond)
             .Add(TimeSpan.FromMicroseconds(value.Microsecond));
         var nanosecondsInTicks = value.Nanosecond != 0
             ? value.Nanosecond / 100

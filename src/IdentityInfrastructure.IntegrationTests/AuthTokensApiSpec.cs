@@ -1,6 +1,7 @@
+using System.Net;
 using ApiHost1;
 using FluentAssertions;
-using Infrastructure.Interfaces;
+using IdentityInfrastructure.ApplicationServices;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,7 +46,7 @@ public class AuthTokensSpec : WebApiSpec<Program>
         oldTokens.Content.Value.AccessToken.Should().NotBeNull();
         oldTokens.Content.Value.RefreshToken.Should().NotBeNull();
         oldTokens.Content.Value.ExpiresOnUtc.Should()
-            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.DefaultTokenExpiry));
+            .BeNear(DateTime.UtcNow.Add(JWTTokensService.DefaultTokenExpiry));
 
         await Task.Delay(TimeSpan
             .FromSeconds(1)); //HACK: to ensure that the new token is not the same (in time) as the old token
@@ -60,7 +61,26 @@ public class AuthTokensSpec : WebApiSpec<Program>
         newTokens.Content.Value.AccessToken.Should().NotBeNull().And.NotBe(oldAccessToken);
         newTokens.Content.Value.RefreshToken.Should().NotBeNull().And.NotBe(oldRefreshToken);
         newTokens.Content.Value.ExpiresOnUtc.Should()
-            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.DefaultTokenExpiry));
+            .BeNear(DateTime.UtcNow.Add(JWTTokensService.DefaultTokenExpiry));
+    }
+
+    [Fact]
+    public async Task WhenRevokeRefreshToken_ThenRevokes()
+    {
+        var user = await LoginUserAsync();
+
+        var oldRefreshToken = user.RefreshToken;
+        await Api.DeleteAsync(new RevokeRefreshTokenRequest
+        {
+            RefreshToken = oldRefreshToken
+        });
+
+        var refreshed = await Api.PostAsync(new RefreshTokenRequest
+        {
+            RefreshToken = oldRefreshToken
+        });
+
+        refreshed.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     private static void OverrideDependencies(IServiceCollection services)

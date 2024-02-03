@@ -72,6 +72,7 @@ public class ApiUsageFilterSpec
     [Fact]
     public async Task WhenInvokeAndRequestTypeIsNotIgnored_ThenTracksUsage()
     {
+#if TESTINGONLY
         var args = new object[] { "anarg1", new GetCallerWithTokenOrAPIKeyTestingOnlyRequest() };
         var httpContext = new DefaultHttpContext
         {
@@ -108,6 +109,7 @@ public class ApiUsageFilterSpec
                     && dic[UsageConstants.Properties.HttpStatusCode].As<int>() == 0
                     && dic[UsageConstants.Properties.Duration].As<double>() > 0
                 )));
+#endif
     }
 
     [Fact]

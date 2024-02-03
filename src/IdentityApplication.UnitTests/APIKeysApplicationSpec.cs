@@ -2,6 +2,7 @@ using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
+using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
@@ -11,9 +12,9 @@ using FluentAssertions;
 using IdentityApplication.Persistence;
 using IdentityDomain;
 using IdentityDomain.DomainServices;
-using Infrastructure.Interfaces;
 using Moq;
 using UnitTesting.Common;
+using UnitTesting.Common.Validation;
 using Xunit;
 
 namespace IdentityApplication.UnitTests;
@@ -145,21 +146,24 @@ public class APIKeysApplicationSpec
         result.Value.Key.Should().Be("anapikey");
         result.Value.UserId.Should().Be("acallerid");
         result.Value.Description.Should().Be("acallerid");
-        result.Value.ExpiresOnUtc.Should().BeNull();
+        result.Value.ExpiresOnUtc.Should()
+            .BeNear(DateTime.UtcNow.ToNearestMinute().Add(APIKeysApplication.DefaultAPIKeyExpiry),
+                TimeSpan.FromMinutes(1));
         _tokensService.Verify(ts => ts.CreateApiKey());
         _repository.Verify(rep => rep.SaveAsync(It.Is<APIKeyRoot>(ak =>
             ak.ApiKey.Value.Token == "atoken"
             && ak.ApiKey.Value.KeyHash == "akeyhash"
             && ak.Description == "acallerid"
             && ak.UserId == "acallerid"
-            && ak.ExpiresOn == Optional<DateTime?>.None
+            && ak.ExpiresOn.Value!.Value.IsNear(
+                DateTime.UtcNow.ToNearestMinute().Add(APIKeysApplication.DefaultAPIKeyExpiry), TimeSpan.FromMinutes(1))
         ), It.IsAny<CancellationToken>()));
     }
 #endif
     [Fact]
     public async Task WhenCreateApiKeyAsync_ThenCreates()
     {
-        var expiresOn = DateTime.UtcNow.Add(AuthenticationConstants.DefaultAPIKeyExpiry).AddMinutes(1);
+        var expiresOn = DateTime.UtcNow.Add(APIKeysApplication.DefaultAPIKeyExpiry).AddMinutes(1);
 
         var result =
             await _application.CreateAPIKeyAsync(_caller.Object, "auserid", "adescription", expiresOn,

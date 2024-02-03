@@ -190,9 +190,10 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         });
 
         var accessToken = login.Content.Value.AccessToken!;
+        var refreshToken = login.Content.Value.RefreshToken!;
         var user = person.Content.Value.Credential!.User;
 
-        return new LoginDetails(accessToken, user);
+        return new LoginDetails(accessToken, refreshToken, user);
     }
 
     private static IReadOnlyList<IApplicationRepository> GetRepositories(WebApiSetup<THost> setup,
@@ -244,15 +245,18 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 
     protected class LoginDetails
     {
-        public LoginDetails(string accessToken, RegisteredEndUser user)
+        public LoginDetails(string accessToken, string refreshToken, RegisteredEndUser user)
         {
             AccessToken = accessToken;
+            RefreshToken = refreshToken;
             User = user;
         }
 
         public string AccessToken { get; }
 
         public RegisteredEndUser User { get; }
+
+        public string RefreshToken { get; set; }
     }
 
     protected enum LoginUser

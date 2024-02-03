@@ -87,6 +87,24 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;ExpiresOnUtc&apos; must be between &apos;{0}hr&apos; and &apos;{1}hrs&apos;.
+        /// </summary>
+        internal static string CreateAPIKeyRequestValidator_InvalidExpiresOn {
+            get {
+                return ResourceManager.GetString("CreateAPIKeyRequestValidator_InvalidExpiresOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;RefreshToken&apos; is invalid or missing.
+        /// </summary>
+        internal static string RefreshTokenRequestValidator_InvalidToken {
+            get {
+                return ResourceManager.GetString("RefreshTokenRequestValidator_InvalidToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;CountryCode&apos; is not a valid ISO3166 alpha-2 or alpha-3 code or numeric.
         /// </summary>
         internal static string RegisterAnyRequestValidator_InvalidCountryCode {
@@ -101,6 +119,15 @@ namespace IdentityInfrastructure {
         internal static string RegisterAnyRequestValidator_InvalidTimezone {
             get {
                 return ResourceManager.GetString("RegisterAnyRequestValidator_InvalidTimezone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;ApiKeyExpiresOnUtc&apos; must be between &apos;{0}hr&apos; and &apos;{1}hrs&apos;.
+        /// </summary>
+        internal static string RegisterMachineRequestValidator_InvalidExpiresOn {
+            get {
+                return ResourceManager.GetString("RegisterMachineRequestValidator_InvalidExpiresOn", resourceCulture);
             }
         }
         
@@ -155,6 +182,15 @@ namespace IdentityInfrastructure {
         internal static string RegisterPersonRequestValidator_InvalidTermsAndConditionsAccepted {
             get {
                 return ResourceManager.GetString("RegisterPersonRequestValidator_InvalidTermsAndConditionsAccepted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;RefreshToken&apos; is invalid or missing.
+        /// </summary>
+        internal static string RevokeRefreshTokenRequestValidator_InvalidToken {
+            get {
+                return ResourceManager.GetString("RevokeRefreshTokenRequestValidator_InvalidToken", resourceCulture);
             }
         }
     }

@@ -90,8 +90,11 @@
     <data name="AuthTokensRoot_RefreshTokenExpired" xml:space="preserve">
         <value>This refresh token has expired</value>
     </data>
-    <data name="APIKeyRoot_ExpiresOnNotFuture" xml:space="preserve">
+    <data name="APIKeyRoot_ExpiresOnTooSoon" xml:space="preserve">
         <value>The expiry date cannot be less than one hour into the future</value>
+    </data>
+    <data name="APIKeyRoot_ExpiresOnTooLate" xml:space="preserve">
+        <value>The expiry date cannot be more than 30 days into the future</value>
     </data>
     <data name="ApiKeyKeep_InvalidDescription" xml:space="preserve">
         <value>The Description is not valid</value>

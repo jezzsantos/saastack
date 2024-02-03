@@ -90,7 +90,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
                 AccessToken = Optional<string>.None;
                 RefreshToken = Optional<string>.None;
                 ExpiresOn = Optional<DateTime>.None;
-                Recorder.TraceDebug(null, "AuthTokens {Id} were deleted for {UserId}", Id, changed.UserId);
+                Recorder.TraceDebug(null, "AuthTokens {Id} were revoked for {UserId}", Id, changed.UserId);
                 return Result.Ok;
             }
 
@@ -121,8 +121,18 @@ public sealed class AuthTokensRoot : AggregateRootBase
             IdentityDomain.Events.AuthTokens.TokensRefreshed.Create(Id, UserId, accessToken, refreshToken, expiresOn));
     }
 
-    public Result<Error> Revoke()
+    public Result<Error> Revoke(string refreshToken)
     {
+        if (IsRevoked)
+        {
+            return Error.RuleViolation(Resources.AuthTokensRoot_TokensRevoked);
+        }
+
+        if (RefreshToken != refreshToken)
+        {
+            return Error.RuleViolation(Resources.AuthTokensRoot_RefreshTokenNotMatched);
+        }
+
         return RaiseChangeEvent(
             IdentityDomain.Events.AuthTokens.TokensRevoked.Create(Id, UserId));
     }

@@ -150,4 +150,37 @@ public class AuthTokensApplicationSpec
             && at.ExpiresOn == expiresOn2
         ), It.IsAny<CancellationToken>()));
     }
+
+    [Fact]
+    public async Task WhenRevokeTokenAsyncAndTokensNotExist_ThenReturnsError()
+    {
+        _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<Optional<AuthTokensRoot>, Error>>(Optional<AuthTokensRoot>.None));
+
+        var result =
+            await _application.RevokeRefreshTokenAsync(_caller.Object, "arefreshtoken", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.NotAuthenticated);
+        _repository.Verify(rep => rep.SaveAsync(It.IsAny<AuthTokensRoot>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenRevokeRefreshTokenAsync_ThenRevokes()
+    {
+        var expiresOn = DateTime.UtcNow.AddMinutes(1);
+        var authTokens = AuthTokensRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId()).Value;
+        authTokens.SetTokens("anaccesstoken", "arefreshtoken", expiresOn);
+        _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult<Result<Optional<AuthTokensRoot>, Error>>(authTokens.ToOptional()));
+
+        await _application.RevokeRefreshTokenAsync(_caller.Object, "arefreshtoken", CancellationToken.None);
+
+        _repository.Verify(rep => rep.SaveAsync(It.Is<AuthTokensRoot>(at =>
+            at.Id == "anid"
+            && at.AccessToken == Optional<string>.None
+            && at.RefreshToken == Optional<string>.None
+            && at.ExpiresOn == Optional<DateTime>.None
+        ), It.IsAny<CancellationToken>()));
+    }
 }

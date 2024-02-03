@@ -64,7 +64,7 @@ public class AuthTokensRootSpec
         var expiresOn1 = DateTime.UtcNow.AddMinutes(1);
         var expiresOn2 = expiresOn1.AddMinutes(2);
         _authTokens.SetTokens("anaccesstoken1", "arefreshtoken1", expiresOn1);
-        _authTokens.Revoke();
+        _authTokens.Revoke("arefreshtoken1");
 
         var result = _authTokens.RenewTokens("arefreshtoken1", "anaccesstoken2", "arefreshtoken2", expiresOn2);
 
@@ -100,12 +100,35 @@ public class AuthTokensRootSpec
     }
 
     [Fact]
+    public void WhenRevokeAndRevoked_ThenReturnsError()
+    {
+        var expiresOn = DateTime.UtcNow.AddMinutes(1);
+        _authTokens.SetTokens("anaccesstoken1", "arefreshtoken1", expiresOn);
+        _authTokens.Revoke("arefreshtoken1");
+
+        var result = _authTokens.Revoke("arefreshtoken1");
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.AuthTokensRoot_TokensRevoked);
+    }
+
+    [Fact]
+    public void WhenRevokeAndOldTokenNotMatched_ThenReturnsError()
+    {
+        var expiresOn1 = DateTime.UtcNow.AddMinutes(1);
+        _authTokens.SetTokens("anaccesstoken1", "arefreshtoken1", expiresOn1);
+
+        var result = _authTokens.Revoke("anotherrefreshtoken");
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.AuthTokensRoot_RefreshTokenNotMatched);
+    }
+
+    [Fact]
     public void WhenRevoke_ThenDeletesTokens()
     {
         var expiresOn = DateTime.UtcNow.AddMinutes(1);
         _authTokens.SetTokens("anaccesstoken", "arefreshtoken", expiresOn);
 
-        _authTokens.Revoke();
+        _authTokens.Revoke("arefreshtoken");
 
         _authTokens.AccessToken.Should().BeNone();
         _authTokens.RefreshToken.Should().BeNone();

@@ -6,7 +6,6 @@ using Common.Configuration;
 using Domain.Services.Shared.DomainServices;
 using IdentityApplication.ApplicationServices;
 using Infrastructure.Common.Extensions;
-using Infrastructure.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 
 namespace IdentityInfrastructure.ApplicationServices;
@@ -16,6 +15,7 @@ public class JWTTokensService : IJWTTokensService
     public const string BaseUrlSettingName = "Hosts:IdentityApi:BaseUrl";
     public const string DefaultExpirySettingName = "Hosts:IdentityApi:JWT:DefaultExpiryInMinutes";
     public const string SecretSettingName = "Hosts:IdentityApi:JWT:SigningSecret";
+    public static readonly TimeSpan DefaultTokenExpiry = TimeSpan.FromMinutes(15);
     private readonly string _baseUrl;
     private readonly TimeSpan _expiresAfter;
     private readonly string _signingSecret;
@@ -28,7 +28,7 @@ public class JWTTokensService : IJWTTokensService
         _baseUrl = settings.Platform.GetString(BaseUrlSettingName);
         _expiresAfter =
             TimeSpan.FromMinutes(settings.Platform.GetNumber(DefaultExpirySettingName,
-                AuthenticationConstants.DefaultTokenExpiry.TotalMinutes));
+                DefaultTokenExpiry.TotalMinutes));
     }
 
     public Task<Result<AccessTokens, Error>> IssueTokensAsync(EndUserWithMemberships user)
