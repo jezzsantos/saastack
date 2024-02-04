@@ -471,6 +471,24 @@ public class ContentNegotiationFilterSpec
             .Value.Should().Be(payload);
     }
 
+    [Fact]
+    public async Task WhenInvokeAsyncWithIResultResponseAndNoJsonBody_ThenReturnsJson()
+    {
+        var payload = new TestResponse();
+        var response = Results.Ok(payload);
+        var httpContext = SetupHttpContext(FormatMechanism.None());
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<JsonHttpResult<object>>();
+        result.As<JsonHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<JsonHttpResult<object>>()
+            .Value.Should().Be(payload);
+    }
+
     private static Mock<HttpContext> SetupHttpContext(FormatMechanism? mechanism = null)
     {
         var jsonOptions = new Mock<IOptions<JsonOptions>>();
@@ -492,20 +510,29 @@ public class ContentNegotiationFilterSpec
                 {
                     { HttpQueryParams.Format, new StringValues(mechanism.QueryStringFormat) }
                 }));
-        if (mechanism is not null && mechanism.FormBodyFormat.HasValue())
+        if (mechanism is not null)
         {
-            httpRequest.Setup(hr => hr.HasFormContentType).Returns(true);
-            httpRequest.Setup(hr => hr.Form).Returns(new FormCollection(new Dictionary<string, StringValues>
+            if (mechanism.FormBodyFormat.HasValue())
             {
-                { "format", new StringValues(mechanism.FormBodyFormat) }
-            }));
-        }
-
-        if (mechanism is not null && mechanism.JsonBodyFormat.HasValue())
-        {
-            httpRequest.Setup(hr => hr.ContentType).Returns(HttpContentTypes.Json);
-            httpRequest.Setup(hr => hr.Body)
-                .Returns(new MemoryStream(Encoding.UTF8.GetBytes($"{{\"format\":\"{mechanism.JsonBodyFormat}\"}}")));
+                httpRequest.Setup(hr => hr.HasFormContentType).Returns(true);
+                httpRequest.Setup(hr => hr.Form).Returns(new FormCollection(new Dictionary<string, StringValues>
+                {
+                    { "format", new StringValues(mechanism.FormBodyFormat) }
+                }));
+            }
+            else if (mechanism.JsonBodyFormat.HasValue())
+            {
+                httpRequest.Setup(hr => hr.ContentType).Returns(HttpContentTypes.Json);
+                httpRequest.Setup(hr => hr.Body)
+                    .Returns(new MemoryStream(
+                        Encoding.UTF8.GetBytes($"{{\"format\":\"{mechanism.JsonBodyFormat}\"}}")));
+            }
+            else
+            {
+                httpRequest.Setup(hr => hr.ContentType).Returns(HttpContentTypes.Json);
+                httpRequest.Setup(hr => hr.Body)
+                    .Returns(new MemoryStream(Array.Empty<byte>()));
+            }
         }
 
         var httpContext = new Mock<HttpContext>();
@@ -549,6 +576,11 @@ public class ContentNegotiationFilterSpec
         public static FormatMechanism JsonBody(string value)
         {
             return new FormatMechanism(null, null, null, value);
+        }
+
+        public static FormatMechanism None()
+        {
+            return new FormatMechanism(null, null, null, null);
         }
 
         public static FormatMechanism QueryString(string value)

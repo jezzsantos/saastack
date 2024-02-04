@@ -12,6 +12,11 @@ public interface IPasswordCredentialsApplication
     Task<Result<Error>> ConfirmPersonRegistrationAsync(ICallerContext context, string token,
         CancellationToken cancellationToken);
 
+#if TESTINGONLY
+    Task<Result<PasswordCredentialConfirmation, Error>> GetPersonRegistrationConfirmationAsync(ICallerContext context,
+        string userId, CancellationToken cancellationToken);
+#endif
+
     Task<Result<PasswordCredential, Error>> RegisterPersonAsync(ICallerContext context, string firstName,
         string lastName,
         string emailAddress, string password, string? timezone, string? countryCode, bool termsAndConditionsAccepted,

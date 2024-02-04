@@ -8,3 +8,10 @@ public class PasswordCredential : IIdentifiableResource
 
     public required string Id { get; set; }
 }
+
+public class PasswordCredentialConfirmation
+{
+    public required string Token { get; set; }
+
+    public required string Url { get; set; }
+}

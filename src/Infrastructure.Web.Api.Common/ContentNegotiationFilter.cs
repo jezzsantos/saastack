@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using Common.Extensions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -79,6 +80,7 @@ public class ContentNegotiationFilter : IEndpointFilter
                     : null;
                 return Results.Json(responseValue, statusCode: responseStatusCode, contentType: contentType);
             }
+
             case NegotiatedMimeType.Xml:
             {
                 var contentType = isProblemValue
@@ -86,6 +88,7 @@ public class ContentNegotiationFilter : IEndpointFilter
                     : null;
                 return new XmlHttpResult<object>(responseValue, responseStatusCode, contentType);
             }
+
             default:
             {
                 return Results.StatusCode((int)HttpStatusCode.UnsupportedMediaType);
@@ -167,11 +170,18 @@ public class ContentNegotiationFilter : IEndpointFilter
         CancellationToken cancellationToken)
     {
         httpRequest.RewindBody();
-        var requestWithFormat =
-            (RequestWithFormat?)await httpRequest.ReadFromJsonAsync(typeof(RequestWithFormat), cancellationToken);
-        if (requestWithFormat is not null && requestWithFormat.Format.HasValue())
+        try
         {
-            return new StringValues(requestWithFormat.Format);
+            var requestWithFormat =
+                (RequestWithFormat?)await httpRequest.ReadFromJsonAsync(typeof(RequestWithFormat), cancellationToken);
+            if (requestWithFormat is not null && requestWithFormat.Format.HasValue())
+            {
+                return new StringValues(requestWithFormat.Format);
+            }
+        }
+        catch (JsonException)
+        {
+            return StringValues.Empty;
         }
 
         return StringValues.Empty;

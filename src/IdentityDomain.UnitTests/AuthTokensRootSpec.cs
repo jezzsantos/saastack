@@ -30,7 +30,7 @@ public class AuthTokensRootSpec
     {
         _authTokens.AccessToken.Should().BeNone();
         _authTokens.RefreshToken.Should().BeNone();
-        _authTokens.ExpiresOn.Should().BeNone();
+        _authTokens.AccessTokenExpiresOn.Should().BeNone();
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class AuthTokensRootSpec
 
         _authTokens.AccessToken.Should().BeSome("anaccesstoken");
         _authTokens.RefreshToken.Should().BeSome("arefreshtoken");
-        _authTokens.ExpiresOn.Should().BeSome(expiresOn);
+        _authTokens.AccessTokenExpiresOn.Should().BeSome(expiresOn);
         _authTokens.Events.Last().Should().BeOfType<Events.AuthTokens.TokensChanged>();
     }
 
@@ -95,7 +95,7 @@ public class AuthTokensRootSpec
 
         _authTokens.AccessToken.Should().BeSome("anaccesstoken2");
         _authTokens.RefreshToken.Should().BeSome("arefreshtoken2");
-        _authTokens.ExpiresOn.Should().BeSome(expiresOn2);
+        _authTokens.AccessTokenExpiresOn.Should().BeSome(expiresOn2);
         _authTokens.Events.Last().Should().BeOfType<Events.AuthTokens.TokensRefreshed>();
     }
 
@@ -132,7 +132,7 @@ public class AuthTokensRootSpec
 
         _authTokens.AccessToken.Should().BeNone();
         _authTokens.RefreshToken.Should().BeNone();
-        _authTokens.ExpiresOn.Should().BeNone();
+        _authTokens.AccessTokenExpiresOn.Should().BeNone();
         _authTokens.Events.Last().Should().BeOfType<Events.AuthTokens.TokensRevoked>();
     }
 }

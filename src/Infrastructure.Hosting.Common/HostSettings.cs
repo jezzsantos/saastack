@@ -11,6 +11,7 @@ public class HostSettings : IHostSettings
 {
     internal const string AncillaryApiHmacSecretSettingName = "Hosts:AncillaryApi:HmacAuthNSecret";
     internal const string AncillaryApiHostBaseUrlSettingName = "Hosts:AncillaryApi:BaseUrl";
+    internal const string AnyApiBaseUrlSettingName = "Hosts:AnyApi:BaseUrl";
     internal const string WebsiteHostBaseUrlSettingName = "Hosts:WebsiteHost:BaseUrl";
 
     private readonly IConfigurationSettings _settings;
@@ -42,6 +43,18 @@ public class HostSettings : IHostSettings
 
         throw new InvalidOperationException(
             Resources.HostSettings_MissingSetting.Format(WebsiteHostBaseUrlSettingName));
+    }
+
+    public string GetApiHost1BaseUrl()
+    {
+        var baseUrl = _settings.Platform.GetString(AnyApiBaseUrlSettingName);
+        if (baseUrl.HasValue())
+        {
+            return baseUrl.WithoutTrailingSlash();
+        }
+
+        throw new InvalidOperationException(
+            Resources.HostSettings_MissingSetting.Format(AnyApiBaseUrlSettingName));
     }
 
     public string GetAncillaryApiHostHmacAuthSecret()

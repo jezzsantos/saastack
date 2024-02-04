@@ -69,4 +69,10 @@
     <data name="RevokeRefreshTokenRequestValidator_InvalidToken" xml:space="preserve">
       <value>The 'RefreshToken' is invalid or missing</value>
     </data>
+    <data name="AuthenticateSingleSignOnRequestValidator_InvalidProvider" xml:space="preserve">
+      <value>The 'Provider' is invalid or missing</value>
+    </data>
+    <data name="AuthenticateSingleSignOnRequestValidator_InvalidAuthCode" xml:space="preserve">
+      <value>The 'AuthCode' is invalid or missing</value>
+    </data>
 </root>

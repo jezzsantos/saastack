@@ -26,7 +26,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
 
     public EmailsApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
-        EmptyAllRepositories(setup);
+        EmptyAllRepositories();
         _emailDeliveryService = setup.GetRequiredService<IEmailDeliveryService>().As<StubEmailDeliveryService>();
         _emailDeliveryService.Reset();
         _emailMessageQueue = setup.GetRequiredService<IEmailMessageQueue>();

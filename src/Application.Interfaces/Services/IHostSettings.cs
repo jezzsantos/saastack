@@ -16,6 +16,12 @@ public interface IHostSettings
     string GetAncillaryApiHostHmacAuthSecret();
 
     /// <summary>
+    ///     Returns the URL of the ApiHost1
+    /// </summary>
+    /// <returns></returns>
+    string GetApiHost1BaseUrl();
+
+    /// <summary>
     ///     Returns the URL of the Website host
     /// </summary>
     string GetWebsiteHostBaseUrl();

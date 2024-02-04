@@ -31,6 +31,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
     private readonly ITokensService _tokensService;
     private readonly IPasswordHasherService _passwordHasherService;
     private readonly IAuthTokensService _authTokensService;
+    private readonly IWebsiteUiService _websiteUiService;
     private readonly IRecorder _recorder;
     private readonly IIdentifierFactory _identifierFactory;
     private readonly IPasswordCredentialsRepository _repository;
@@ -40,9 +41,10 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         IEndUsersService endUsersService, INotificationsService notificationsService, IConfigurationSettings settings,
         IEmailAddressService emailAddressService, ITokensService tokensService,
         IPasswordHasherService passwordHasherService, IAuthTokensService authTokensService,
+        IWebsiteUiService websiteUiService,
         IPasswordCredentialsRepository repository) : this(recorder,
         identifierFactory, endUsersService, notificationsService, settings, emailAddressService, tokensService,
-        passwordHasherService, authTokensService, repository, new DelayGenerator())
+        passwordHasherService, authTokensService, websiteUiService, repository, new DelayGenerator())
     {
         _recorder = recorder;
         _endUsersService = endUsersService;
@@ -53,6 +55,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         IEndUsersService endUsersService, INotificationsService notificationsService, IConfigurationSettings settings,
         IEmailAddressService emailAddressService, ITokensService tokensService,
         IPasswordHasherService passwordHasherService, IAuthTokensService authTokensService,
+        IWebsiteUiService websiteUiService,
         IPasswordCredentialsRepository repository,
         IDelayGenerator delayGenerator)
     {
@@ -65,6 +68,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         _tokensService = tokensService;
         _passwordHasherService = passwordHasherService;
         _authTokensService = authTokensService;
+        _websiteUiService = websiteUiService;
         _repository = repository;
         _delayGenerator = delayGenerator;
     }
@@ -152,7 +156,8 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         {
             AccessToken = tokens.AccessToken,
             RefreshToken = tokens.RefreshToken,
-            ExpiresOn = tokens.ExpiresOn
+            ExpiresOn = tokens.ExpiresOn,
+            UserId = user.Id
         });
 
         async Task<Result<bool, Error>> VerifyPasswordAsync()
@@ -189,6 +194,31 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
 
         return await RegisterPersonInternalAsync(context, password, registered.Value, cancellationToken);
     }
+
+#if TESTINGONLY
+    public async Task<Result<PasswordCredentialConfirmation, Error>> GetPersonRegistrationConfirmationAsync(
+        ICallerContext context, string userId,
+        CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.FindCredentialsByUserIdAsync(userId.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        if (!retrieved.Value.HasValue)
+        {
+            return Error.EntityNotFound();
+        }
+
+        var credential = retrieved.Value.Value;
+        return new PasswordCredentialConfirmation
+        {
+            Token = credential.Verification.Token,
+            Url = _websiteUiService.ConstructPasswordRegistrationConfirmationPageUrl(credential.Verification.Token)
+        };
+    }
+#endif
 
     public async Task<Result<Error>> ConfirmPersonRegistrationAsync(ICallerContext context, string token,
         CancellationToken cancellationToken)

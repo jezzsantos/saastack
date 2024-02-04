@@ -24,7 +24,7 @@ public class AuthZApiSpec : WebApiSpec<Program>
 
     public AuthZApiSpec(WebApiSetup<Program> setup) : base(setup)
     {
-        EmptyAllRepositories(setup);
+        EmptyAllRepositories();
         _settings = setup.GetRequiredService<IConfigurationSettings>();
         _tokensService = setup.GetRequiredService<ITokensService>();
     }

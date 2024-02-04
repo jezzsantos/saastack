@@ -20,7 +20,7 @@ public class MachineCredentialsApiSpec : WebApiSpec<Program>
 {
     public MachineCredentialsApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
-        EmptyAllRepositories(setup);
+        EmptyAllRepositories();
     }
 
     [Fact]

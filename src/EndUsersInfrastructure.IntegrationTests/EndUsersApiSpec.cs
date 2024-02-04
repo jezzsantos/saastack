@@ -15,7 +15,7 @@ public class EndUsersApiSpec : WebApiSpec<Program>
 {
     public EndUsersApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
-        EmptyAllRepositories(setup);
+        EmptyAllRepositories();
     }
 
     [Fact]

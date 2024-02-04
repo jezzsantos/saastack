@@ -1,7 +1,7 @@
 using System.Net;
 using ApiHost1;
 using FluentAssertions;
-using IdentityInfrastructure.ApplicationServices;
+using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +16,7 @@ public class AuthTokensSpec : WebApiSpec<Program>
 {
     public AuthTokensSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
-        EmptyAllRepositories(setup);
+        EmptyAllRepositories();
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class AuthTokensSpec : WebApiSpec<Program>
         oldTokens.Content.Value.AccessToken.Should().NotBeNull();
         oldTokens.Content.Value.RefreshToken.Should().NotBeNull();
         oldTokens.Content.Value.ExpiresOnUtc.Should()
-            .BeNear(DateTime.UtcNow.Add(JWTTokensService.DefaultTokenExpiry));
+            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultTokenExpiry));
 
         await Task.Delay(TimeSpan
             .FromSeconds(1)); //HACK: to ensure that the new token is not the same (in time) as the old token
@@ -61,7 +61,7 @@ public class AuthTokensSpec : WebApiSpec<Program>
         newTokens.Content.Value.AccessToken.Should().NotBeNull().And.NotBe(oldAccessToken);
         newTokens.Content.Value.RefreshToken.Should().NotBeNull().And.NotBe(oldRefreshToken);
         newTokens.Content.Value.ExpiresOnUtc.Should()
-            .BeNear(DateTime.UtcNow.Add(JWTTokensService.DefaultTokenExpiry));
+            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultTokenExpiry));
     }
 
     [Fact]

@@ -23,7 +23,7 @@ public class RecordingApiSpec : WebApiSpec<Program>
 
     public RecordingApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
-        EmptyAllRepositories(setup);
+        EmptyAllRepositories();
         _recorder = setup.GetRequiredService<IRecorder>().As<StubRecorder>();
         _recorder.Reset();
     }

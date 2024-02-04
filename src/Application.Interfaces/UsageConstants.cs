@@ -18,21 +18,21 @@ public static class UsageConstants
         public const string Component = "Component";
         public const string Duration = "Duration";
         public const string EndPoint = "EndPoint";
+        public const string HttpMethod = "Method";
+        public const string HttpPath = "Path";
+        public const string HttpRoute = "Route";
+        public const string HttpStatusCode = "Status";
         public const string Id = "ResourceId";
         public const string IpAddress = "IpAddress";
         public const string MetricEventName = "Metric";
         public const string Path = "Path";
         public const string ReferredBy = "ReferredBy";
+        public const string ResourceId = "ResourceId";
         public const string Started = "Started";
         public const string TenantId = "TenantId";
         public const string Timestamp = "Timestamp";
         public const string UsedById = "UserId";
-        public const string ResourceId = "ResourceId";
         public const string UserAgent = "UserAgent";
-        public const string HttpRoute = "Route";
-        public const string HttpMethod = "Method";
-        public const string HttpPath = "Path";
-        public const string HttpStatusCode = "Status";
     }
 
     public static class Events
@@ -46,6 +46,9 @@ public static class UsageConstants
             public const string Measurement = "Measured";
             public const string PersonRegistrationConfirmed = "User Registered";
             public const string PersonRegistrationCreated = "User Registration Created";
+            public const string UserExtendedLogin = "User Extended Login";
+            public const string UserLogin = "User Login";
+            public const string UserLogout = "User Logout";
         }
 
         public static class Web

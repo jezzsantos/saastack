@@ -45,4 +45,16 @@
     <data name="RecordingApplication_RecordCrash_ExceptionMessage" xml:space="preserve">
         <value>Javascript application crashed, with message: {0}</value>
     </data>
+    <data name="AuthenticateRequestValidator_InvalidProvider" xml:space="preserve">
+        <value>The 'Provider' is either missing or invalid</value>
+    </data>
+    <data name="AuthenticateRequestValidator_InvalidAuthCode" xml:space="preserve">
+        <value>The 'AuthCode' is either missing or invalid</value>
+    </data>
+    <data name="AuthenticateRequestValidator_InvalidUsername" xml:space="preserve">
+        <value>The 'Username' is either missing or invalid</value>
+    </data>
+    <data name="AuthenticateRequestValidator_InvalidPassword" xml:space="preserve">
+        <value>The 'Password' is either missing or invalid</value>
+    </data>
 </root>

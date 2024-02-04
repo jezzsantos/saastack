@@ -30,11 +30,11 @@ public sealed class AuthTokensRoot : AggregateRootBase
 
     public Optional<string> AccessToken { get; private set; }
 
-    public Optional<DateTime> ExpiresOn { get; private set; }
+    public Optional<DateTime> AccessTokenExpiresOn { get; private set; }
 
-    public bool IsExpired => !IsRevoked && DateTime.UtcNow > ExpiresOn.Value;
+    public bool IsAccessTokenExpired => !IsRevoked && DateTime.UtcNow > AccessTokenExpiresOn.Value;
 
-    public bool IsRevoked => !RefreshToken.HasValue && !AccessToken.HasValue && !ExpiresOn.HasValue;
+    public bool IsRevoked => !RefreshToken.HasValue && !AccessToken.HasValue && !AccessTokenExpiresOn.HasValue;
 
     public Optional<string> RefreshToken { get; private set; }
 
@@ -71,7 +71,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
             {
                 AccessToken = changed.AccessToken;
                 RefreshToken = changed.RefreshToken;
-                ExpiresOn = changed.ExpiresOn;
+                AccessTokenExpiresOn = changed.ExpiresOn;
                 Recorder.TraceDebug(null, "AuthTokens {Id} were changed for {UserId}", Id, changed.UserId);
                 return Result.Ok;
             }
@@ -80,7 +80,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
             {
                 AccessToken = changed.AccessToken;
                 RefreshToken = changed.RefreshToken;
-                ExpiresOn = changed.ExpiresOn;
+                AccessTokenExpiresOn = changed.ExpiresOn;
                 Recorder.TraceDebug(null, "AuthTokens {Id} were refreshed for {UserId}", Id, changed.UserId);
                 return Result.Ok;
             }
@@ -89,7 +89,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
             {
                 AccessToken = Optional<string>.None;
                 RefreshToken = Optional<string>.None;
-                ExpiresOn = Optional<DateTime>.None;
+                AccessTokenExpiresOn = Optional<DateTime>.None;
                 Recorder.TraceDebug(null, "AuthTokens {Id} were revoked for {UserId}", Id, changed.UserId);
                 return Result.Ok;
             }
@@ -112,7 +112,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
             return Error.RuleViolation(Resources.AuthTokensRoot_RefreshTokenNotMatched);
         }
 
-        if (IsExpired)
+        if (IsAccessTokenExpired)
         {
             return Error.RuleViolation(Resources.AuthTokensRoot_RefreshTokenExpired);
         }

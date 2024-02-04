@@ -20,7 +20,7 @@ public class PasswordCredentialsApi : IWebApiService
         _passwordCredentialsApplication = passwordCredentialsApplication;
     }
 
-    public async Task<ApiPostResult<AuthenticateTokens, AuthenticatePasswordResponse>> Authenticate(
+    public async Task<ApiPostResult<AuthenticateTokens, AuthenticateResponse>> Authenticate(
         AuthenticatePasswordRequest request,
         CancellationToken cancellationToken)
     {
@@ -29,12 +29,13 @@ public class PasswordCredentialsApi : IWebApiService
                 request.Password,
                 cancellationToken);
 
-        return () => authenticated.HandleApplicationResult<AuthenticatePasswordResponse, AuthenticateTokens>(x =>
-            new PostResult<AuthenticatePasswordResponse>(new AuthenticatePasswordResponse
+        return () => authenticated.HandleApplicationResult<AuthenticateResponse, AuthenticateTokens>(tok =>
+            new PostResult<AuthenticateResponse>(new AuthenticateResponse
             {
-                AccessToken = x.AccessToken,
-                RefreshToken = x.RefreshToken,
-                ExpiresOnUtc = x.ExpiresOn
+                AccessToken = tok.AccessToken,
+                RefreshToken = tok.RefreshToken,
+                ExpiresOnUtc = tok.ExpiresOn,
+                UserId = tok.UserId
             }));
     }
 
@@ -50,6 +51,22 @@ public class PasswordCredentialsApi : IWebApiService
             error => new Result<EmptyResponse, Error>(error));
     }
 
+#if TESTINGONLY
+    public async Task<ApiGetResult<PasswordCredentialConfirmation, GetRegistrationPersonConfirmationResponse>>
+        GetConfirmationToken(
+            GetRegistrationPersonConfirmationRequest request, CancellationToken cancellationToken)
+    {
+        var token = await _passwordCredentialsApplication.GetPersonRegistrationConfirmationAsync(
+            _contextFactory.Create(),
+            request.UserId, cancellationToken);
+
+        return () =>
+            token.HandleApplicationResult<GetRegistrationPersonConfirmationResponse, PasswordCredentialConfirmation>(
+                con =>
+                    new GetRegistrationPersonConfirmationResponse { Token = con.Token });
+    }
+#endif
+
     public async Task<ApiPostResult<PasswordCredential, RegisterPersonPasswordResponse>> RegisterPerson(
         RegisterPersonPasswordRequest request, CancellationToken cancellationToken)
     {
@@ -58,7 +75,7 @@ public class PasswordCredentialsApi : IWebApiService
             request.LastName, request.EmailAddress, request.Password, request.Timezone, request.CountryCode,
             request.TermsAndConditionsAccepted, cancellationToken);
 
-        return () => credential.HandleApplicationResult<RegisterPersonPasswordResponse, PasswordCredential>(x =>
-            new PostResult<RegisterPersonPasswordResponse>(new RegisterPersonPasswordResponse { Credential = x }));
+        return () => credential.HandleApplicationResult<RegisterPersonPasswordResponse, PasswordCredential>(creds =>
+            new PostResult<RegisterPersonPasswordResponse>(new RegisterPersonPasswordResponse { Credential = creds }));
     }
 }

@@ -69,6 +69,42 @@ namespace WebsiteHost {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;AuthCode&apos; is either missing or invalid.
+        /// </summary>
+        internal static string AuthenticateRequestValidator_InvalidAuthCode {
+            get {
+                return ResourceManager.GetString("AuthenticateRequestValidator_InvalidAuthCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Password&apos; is either missing or invalid.
+        /// </summary>
+        internal static string AuthenticateRequestValidator_InvalidPassword {
+            get {
+                return ResourceManager.GetString("AuthenticateRequestValidator_InvalidPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Provider&apos; is either missing or invalid.
+        /// </summary>
+        internal static string AuthenticateRequestValidator_InvalidProvider {
+            get {
+                return ResourceManager.GetString("AuthenticateRequestValidator_InvalidProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Username&apos; is either missing or invalid.
+        /// </summary>
+        internal static string AuthenticateRequestValidator_InvalidUsername {
+            get {
+                return ResourceManager.GetString("AuthenticateRequestValidator_InvalidUsername", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;Message&apos; was either missing or invalid.
         /// </summary>
         internal static string RecordCrashRequestValidator_InvalidMessage {

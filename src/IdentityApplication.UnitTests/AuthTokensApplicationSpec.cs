@@ -70,7 +70,7 @@ public class AuthTokensApplicationSpec
             at.Id == "anid"
             && at.AccessToken == "anaccesstoken"
             && at.RefreshToken == "arefreshtoken"
-            && at.ExpiresOn == expiresOn
+            && at.AccessTokenExpiresOn == expiresOn
         ), It.IsAny<CancellationToken>()));
     }
 
@@ -99,7 +99,7 @@ public class AuthTokensApplicationSpec
             at.Id == "anid"
             && at.AccessToken == "anaccesstoken"
             && at.RefreshToken == "arefreshtoken"
-            && at.ExpiresOn == expiresOn
+            && at.AccessTokenExpiresOn == expiresOn
         ), It.IsAny<CancellationToken>()));
     }
 
@@ -147,7 +147,7 @@ public class AuthTokensApplicationSpec
             at.Id == "anid"
             && at.AccessToken == "anaccesstoken2"
             && at.RefreshToken == "arefreshtoken2"
-            && at.ExpiresOn == expiresOn2
+            && at.AccessTokenExpiresOn == expiresOn2
         ), It.IsAny<CancellationToken>()));
     }
 
@@ -180,7 +180,7 @@ public class AuthTokensApplicationSpec
             at.Id == "anid"
             && at.AccessToken == Optional<string>.None
             && at.RefreshToken == Optional<string>.None
-            && at.ExpiresOn == Optional<DateTime>.None
+            && at.AccessTokenExpiresOn == Optional<DateTime>.None
         ), It.IsAny<CancellationToken>()));
     }
 }

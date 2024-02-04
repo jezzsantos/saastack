@@ -25,7 +25,7 @@ public class AuthNApiSpec : WebApiSpec<Program>
 
     public AuthNApiSpec(WebApiSetup<Program> setup) : base(setup)
     {
-        EmptyAllRepositories(setup);
+        EmptyAllRepositories();
         _settings = setup.GetRequiredService<IConfigurationSettings>();
         _tokensService = setup.GetRequiredService<ITokensService>();
     }

@@ -49,4 +49,15 @@ public class HostSettingsSpec
 
         result.Should().Be("asecret");
     }
+
+    [Fact]
+    public void WhenGetApiHost1BaseUrl_ThenReturnsBaseUrl()
+    {
+        _settings.Setup(s => s.Platform.GetString(HostSettings.AnyApiBaseUrlSettingName, It.IsAny<string>()))
+            .Returns("http://localhost/api/");
+
+        var result = _service.GetApiHost1BaseUrl();
+
+        result.Should().Be("http://localhost/api");
+    }
 }

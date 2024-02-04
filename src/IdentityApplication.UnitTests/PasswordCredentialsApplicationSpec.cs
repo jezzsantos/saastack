@@ -70,6 +70,7 @@ public class PasswordCredentialsApplicationSpec
         _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(true);
         _authTokensService = new Mock<IAuthTokensService>();
+        var websiteUiService = new Mock<IWebsiteUiService>();
         _repository = new Mock<IPasswordCredentialsRepository>();
         _repository.Setup(rep => rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()))
             .Returns((PasswordCredentialRoot root, CancellationToken _) =>
@@ -77,7 +78,7 @@ public class PasswordCredentialsApplicationSpec
 
         _application = new PasswordCredentialsApplication(_recorder.Object, _idFactory.Object, _endUsersService.Object,
             _notificationsService.Object, _settings.Object, _emailAddressService.Object, _tokensService.Object,
-            _passwordHasherService.Object, _authTokensService.Object, _repository.Object);
+            _passwordHasherService.Object, _authTokensService.Object, websiteUiService.Object, _repository.Object);
     }
 
     [Fact]

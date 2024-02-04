@@ -18,7 +18,7 @@ public class BookingsApiSpec : WebApiSpec<Program>
 {
     public BookingsApiSpec(WebApiSetup<Program> setup) : base(setup)
     {
-        EmptyAllRepositories(setup);
+        EmptyAllRepositories();
     }
 
     [Fact]

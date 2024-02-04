@@ -7,6 +7,7 @@ using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Common;
 using Infrastructure.Web.Hosting.Common.ApplicationServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -25,6 +26,26 @@ namespace Infrastructure.Web.Hosting.Common.Extensions;
 
 public static class WebApplicationExtensions
 {
+    /// <summary>
+    ///     Provides request handling for a BEFFE
+    /// </summary>
+    public static IApplicationBuilder AddBEFFE(this WebApplication app, bool isBEFFE)
+    {
+        if (!isBEFFE)
+        {
+            return app;
+        }
+
+        app.Logger.LogInformation("BEFFE request processing is enabled");
+        app.UsePathBase(new PathString(WebConstants.BackEndForFrontEndBasePath));
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
+        app.UseMiddleware<CSRFMiddleware>();
+        app.UseMiddleware<ReverseProxyMiddleware>();
+
+        return app;
+    }
+
     /// <summary>
     ///     Provides a global handler when an exception is encountered, and converts the exception
     ///     to an <see href="https://datatracker.ietf.org/doc/html/rfc7807">RFC7807</see> error.
@@ -117,7 +138,15 @@ public static class WebApplicationExtensions
     /// </summary>
     public static IApplicationBuilder EnableMultiTenancy(this WebApplication app, bool isEnabled)
     {
-        //app.Logger.LogInformation("MultiTenancy is enabled");
+        app.Logger.LogInformation("Multi-Tenancy request detection is {Status}", isEnabled
+            ? "enabled"
+            : "disabled");
+
+        if (!isEnabled)
+        {
+            return app;
+        }
+
         //TODO: app.AddMultiTenancyDetection(); we need a TenantDetective
 
         return app;
@@ -141,10 +170,6 @@ public static class WebApplicationExtensions
         var recorder = app.Services.GetRequiredService<IRecorder>();
         app.Logger.LogInformation("Recording with -> {Recorder}", recorder.ToString());
 
-        app.Logger.LogInformation("Multi-Tenancy request detection is {Status}", hostOptions.IsMultiTenanted
-            ? "disabled"
-            : "enabled");
-
         var dataStore = app.Services.ResolveForPlatform<IDataStore>().GetType().Name;
         var eventStore = app.Services.ResolveForPlatform<IEventStore>().GetType().Name;
         var queueStore = app.Services.ResolveForPlatform<IQueueStore>().GetType().Name;
@@ -153,14 +178,17 @@ public static class WebApplicationExtensions
             "Platform Persistence stores: DataStore -> {DataStore} EventStore -> {EventStore} QueueStore -> {QueueStore} BlobStore -> {BlobStore}",
             dataStore, eventStore, queueStore, blobStore);
 #if TESTINGONLY
-        var stubDrainingServices = app.Services.GetServices<IHostedService>()
-            .OfType<StubQueueDrainingService>()
-            .ToList();
-        if (stubDrainingServices.HasAny())
+        if (hostOptions.Persistence.UsesQueues)
         {
-            var stubDrainingService = stubDrainingServices[0];
-            var queues = stubDrainingService.MonitoredQueues.Join(", ");
-            app.Logger.LogInformation("Background queue draining on queues -> {Queues}", queues);
+            var stubDrainingServices = app.Services.GetServices<IHostedService>()
+                .OfType<StubQueueDrainingService>()
+                .ToList();
+            if (stubDrainingServices.HasAny())
+            {
+                var stubDrainingService = stubDrainingServices[0];
+                var queues = stubDrainingService.MonitoredQueues.Join(", ");
+                app.Logger.LogInformation("Background queue draining on queues -> {Queues}", queues);
+            }
         }
 #endif
 
@@ -187,11 +215,6 @@ public static class WebApplicationExtensions
         if (authorization.HasNone)
         {
             return app;
-        }
-
-        if (authorization.UsesCookies)
-        {
-            app.Logger.LogInformation("Authentication using Cookies is enabled");
         }
 
         if (authorization.UsesHMAC)

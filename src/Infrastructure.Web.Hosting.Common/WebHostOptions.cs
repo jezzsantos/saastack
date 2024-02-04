@@ -12,22 +12,22 @@ public class WebHostOptions : HostOptions
         CORS = CORSOption.AnyOrigin,
         Authorization = new AuthorizationOptions
         {
-            UsesCookies = false,
             UsesTokens = true,
             UsesApiKeys = true,
             UsesHMAC = true
-        }
+        },
+        IsBackendForFrontEnd = false
     };
     public new static readonly WebHostOptions BackEndApiHost = new(HostOptions.BackEndApiHost)
     {
         CORS = CORSOption.AnyOrigin,
         Authorization = new AuthorizationOptions
         {
-            UsesCookies = false,
             UsesTokens = true,
             UsesApiKeys = true,
             UsesHMAC = true
-        }
+        },
+        IsBackendForFrontEnd = false
     };
 
     public new static readonly WebHostOptions BackEndForFrontEndWebHost = new(HostOptions.BackEndForFrontEndWebHost)
@@ -35,11 +35,11 @@ public class WebHostOptions : HostOptions
         CORS = CORSOption.SameOrigin,
         Authorization = new AuthorizationOptions
         {
-            UsesCookies = true,
             UsesTokens = false,
             UsesApiKeys = false,
             UsesHMAC = false
-        }
+        },
+        IsBackendForFrontEnd = true
     };
 
     public new static readonly WebHostOptions TestingStubsHost = new(HostOptions.TestingStubsHost)
@@ -47,22 +47,25 @@ public class WebHostOptions : HostOptions
         CORS = CORSOption.AnyOrigin,
         Authorization = new AuthorizationOptions
         {
-            UsesCookies = false,
             UsesTokens = false,
             UsesApiKeys = false,
             UsesHMAC = false
-        }
+        },
+        IsBackendForFrontEnd = false
     };
 
     private WebHostOptions(HostOptions options) : base(options)
     {
         CORS = CORSOption.None;
         Authorization = new AuthorizationOptions();
+        IsBackendForFrontEnd = false;
     }
 
     public AuthorizationOptions Authorization { get; private init; }
 
     public CORSOption CORS { get; private init; }
+
+    public bool IsBackendForFrontEnd { get; set; }
 }
 
 /// <summary>
@@ -80,11 +83,9 @@ public enum CORSOption
 /// </summary>
 public class AuthorizationOptions
 {
-    public bool HasNone => !UsesApiKeys && !UsesCookies && !UsesTokens && !UsesHMAC;
+    public bool HasNone => !UsesApiKeys && !UsesTokens && !UsesHMAC;
 
     public bool UsesApiKeys { get; set; }
-
-    public bool UsesCookies { get; set; }
 
     public bool UsesHMAC { get; set; }
 

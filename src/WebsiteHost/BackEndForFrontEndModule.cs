@@ -1,6 +1,10 @@
 using System.Reflection;
+using System.Text.Json;
+using Application.Interfaces.Services;
 using Infrastructure.Hosting.Common.Extensions;
+using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Hosting.Common;
+using Infrastructure.Web.Interfaces.Clients;
 using WebsiteHost.Api.Recording;
 using WebsiteHost.Application;
 
@@ -16,7 +20,18 @@ public class BackEndForFrontEndModule : ISubDomainModule
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
-        get { return (_, services) => { services.RegisterUnshared<IRecordingApplication, RecordingApplication>(); }; }
+        get
+        {
+            return (_, services) =>
+            {
+                services.RegisterUnshared<IRecordingApplication, RecordingApplication>();
+                services.RegisterUnshared<IAuthenticationApplication, AuthenticationApplication>();
+                services.RegisterUnshared<IServiceClient>(c =>
+                    new InterHostServiceClient(c.Resolve<IHttpClientFactory>(),
+                        c.Resolve<JsonSerializerOptions>(),
+                        c.Resolve<IHostSettings>().GetApiHost1BaseUrl()));
+            };
+        }
     }
 
     public Action<WebApplication> ConfigureMiddleware

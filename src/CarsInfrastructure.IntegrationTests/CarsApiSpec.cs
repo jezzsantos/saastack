@@ -16,7 +16,7 @@ public class CarsApiSpec : WebApiSpec<Program>
 {
     public CarsApiSpec(WebApiSetup<Program> setup) : base(setup)
     {
-        EmptyAllRepositories(setup);
+        EmptyAllRepositories();
     }
 
     [Fact]

@@ -78,6 +78,24 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;AuthCode&apos; is invalid or missing.
+        /// </summary>
+        internal static string AuthenticateSingleSignOnRequestValidator_InvalidAuthCode {
+            get {
+                return ResourceManager.GetString("AuthenticateSingleSignOnRequestValidator_InvalidAuthCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Provider&apos; is invalid or missing.
+        /// </summary>
+        internal static string AuthenticateSingleSignOnRequestValidator_InvalidProvider {
+            get {
+                return ResourceManager.GetString("AuthenticateSingleSignOnRequestValidator_InvalidProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;Token&apos; is either missing or invalid.
         /// </summary>
         internal static string ConfirmPersonRegistrationRequestValidator_InvalidToken {

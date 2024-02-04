@@ -22,7 +22,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
 
     public AuditsApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
-        EmptyAllRepositories(setup);
+        EmptyAllRepositories();
         _auditMessageQueue = setup.GetRequiredService<IAuditMessageQueueRepository>();
         _auditMessageQueue.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
     }

@@ -1,13 +1,13 @@
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
-using Application.Persistence.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
-using Common;
 using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
+using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Interfaces.Clients;
 using IntegrationTesting.WebApi.Common.Stubs;
@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using UnitTesting.Common;
 using Xunit;
 
 namespace IntegrationTesting.WebApi.Common;
@@ -98,15 +99,14 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
 public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDisposable
     where THost : class
 {
+    private const string DotNetCommandLineWithLaunchProfileArgumentsFormat =
+        "run --no-build --configuration {0} --launch-profile {1} --project {2}";
     private const string WebServerBaseUrlFormat = "https://localhost:{0}/";
-    // ReSharper disable once StaticMemberInGenericType
-    private static IReadOnlyList<Type>? _allRepositories;
-
-    // ReSharper disable once StaticMemberInGenericType
-    private static IReadOnlyList<IApplicationRepository>? _repositories;
     protected readonly IHttpJsonClient Api;
     protected readonly HttpClient HttpApi;
     protected readonly StubNotificationsService NotificationsService;
+
+    private readonly List<int> _additionalServerProcesses = new();
     private readonly WebApplicationFactory<THost> _setup;
 
     protected WebApiSpec(WebApiSetup<THost> setup, Action<IServiceCollection>? overrideDependencies = null)
@@ -117,13 +117,9 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         }
 
         _setup = setup.WithWebHostBuilder(_ => { });
-
-        var jsonOptions = setup.GetRequiredService<JsonSerializerOptions>();
-        HttpApi = setup.CreateClient(new WebApplicationFactoryClientOptions
-        {
-            BaseAddress = new Uri(WebServerBaseUrlFormat.Format(GetNextAvailablePort()))
-        });
-        Api = new JsonClient(HttpApi, jsonOptions);
+        var clients = CreateClients(setup);
+        HttpApi = clients.HttpApi;
+        Api = clients.Api;
         NotificationsService = setup.GetRequiredService<INotificationsService>().As<StubNotificationsService>();
     }
 
@@ -139,15 +135,38 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         {
             HttpApi.Dispose();
             _setup.Dispose();
+            _additionalServerProcesses.ForEach(ShutdownProcess);
         }
     }
 
-    protected void EmptyAllRepositories(WebApiSetup<THost> setup)
+    private static string DotNetExe
     {
-        var repositoryTypes = GetAllRepositoryTypes();
-        var platformRepositories = GetRepositories(setup, repositoryTypes);
+        get
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                return @"%ProgramFiles%\dotnet\dotnet.exe";
+            }
 
-        DestroyAllRepositories(platformRepositories);
+            if (OperatingSystem.IsLinux())
+            {
+                return @"/usr/share/dotnet/dotnet";
+            }
+
+            if (OperatingSystem.IsMacOS())
+            {
+                return @"/usr/local/share/dotnet/dotnet";
+            }
+
+            throw new InvalidOperationException("Unsupported Platform");
+        }
+    }
+
+    protected void EmptyAllRepositories()
+    {
+#if TESTINGONLY
+        Api.PostAsync(new DestroyAllRepositoriesRequest()).GetAwaiter().GetResult();
+#endif
     }
 
     protected async Task<LoginDetails> LoginUserAsync(LoginUser who = LoginUser.PersonA)
@@ -196,41 +215,70 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         return new LoginDetails(accessToken, refreshToken, user);
     }
 
-    private static IReadOnlyList<IApplicationRepository> GetRepositories(WebApiSetup<THost> setup,
-        IReadOnlyList<Type> repositoryTypes)
+    protected void StartupServer<TAnotherHost>()
+        where TAnotherHost : class
     {
-        if (_repositories.NotExists())
+        var assembly = typeof(TAnotherHost).Assembly;
+        var projectName = assembly.GetName().Name!;
+        var projectPath = Path.Combine(Solution.NavigateUpToSolutionDirectoryPath(), projectName);
+
+        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+        var launchProfileName = $"{projectName}-{env}";
+        const string configuration = "Debug";
+        var arguments =
+            DotNetCommandLineWithLaunchProfileArgumentsFormat.Format(configuration, launchProfileName, projectPath);
+        var executable = Environment.ExpandEnvironmentVariables(DotNetExe);
+        var process = Process.Start(new ProcessStartInfo
         {
-            _repositories = repositoryTypes
-                .Select(type => Try.Safely(() => setup.TryGetService<IApplicationRepository>(type)))
-                .OfType<IApplicationRepository>()
-                .ToList();
+            Arguments = arguments,
+            FileName = executable,
+            RedirectStandardError = false,
+            RedirectStandardOutput = false,
+            WindowStyle = ProcessWindowStyle.Hidden,
+            UseShellExecute = true
+        });
+        if (process.NotExists())
+        {
+            throw new InvalidOperationException($"Failed to launch Server {projectName}");
         }
 
-        return _repositories;
+        if (process.HasExited)
+        {
+            throw new InvalidOperationException($"Failed to launch Server {projectName}, failed to startup");
+        }
+
+        _additionalServerProcesses.Add(process.Id);
     }
 
-    private static IReadOnlyList<Type> GetAllRepositoryTypes()
+    private static void ShutdownProcess(int processId)
     {
-        if (_allRepositories.NotExists())
+        if (processId != 0)
         {
-            _allRepositories = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(assembly => assembly.GetTypes().Where(type =>
-                    typeof(IApplicationRepository).IsAssignableFrom(type)
-                    && type.IsInterface
-                    && type != typeof(IApplicationRepository)))
-                .ToList();
+            try
+            {
+                var process = Process.GetProcessById(processId);
+                process.Kill();
+            }
+            catch (ArgumentException)
+            {
+                //Ignore, the process does not exist
+            }
         }
-
-        return _allRepositories;
     }
 
-    private static void DestroyAllRepositories(IEnumerable<IApplicationRepository> repositories)
+    private static (IHttpJsonClient Api, HttpClient HttpApi) CreateClients<TAnotherHost>(WebApiSetup<TAnotherHost> host)
+        where TAnotherHost : class
     {
-        foreach (var repository in repositories)
+        var httpApi = host.CreateClient(new WebApplicationFactoryClientOptions
         {
-            repository.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
-        }
+            HandleCookies = true,
+            BaseAddress = new Uri(WebServerBaseUrlFormat.Format(GetNextAvailablePort()))
+        });
+
+        var jsonOptions = host.GetRequiredService<JsonSerializerOptions>();
+        var api = new JsonClient(httpApi, jsonOptions);
+
+        return (api, httpApi);
     }
 
     private static int GetNextAvailablePort()
@@ -254,9 +302,9 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 
         public string AccessToken { get; }
 
-        public RegisteredEndUser User { get; }
-
         public string RefreshToken { get; set; }
+
+        public RegisteredEndUser User { get; }
     }
 
     protected enum LoginUser

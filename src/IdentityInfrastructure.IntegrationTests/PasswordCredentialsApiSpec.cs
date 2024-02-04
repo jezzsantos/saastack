@@ -4,7 +4,7 @@ using Application.Resources.Shared;
 using Common;
 using Domain.Interfaces.Authorization;
 using FluentAssertions;
-using IdentityInfrastructure.ApplicationServices;
+using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
@@ -21,7 +21,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
 {
     public PasswordCredentialsApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
-        EmptyAllRepositories(setup);
+        EmptyAllRepositories();
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
         result.Content.Value.AccessToken.Should().NotBeNull();
         result.Content.Value.RefreshToken.Should().NotBeNull();
         result.Content.Value.ExpiresOnUtc.Should()
-            .BeNear(DateTime.UtcNow.Add(JWTTokensService.DefaultTokenExpiry));
+            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultTokenExpiry));
     }
 
     [Fact]

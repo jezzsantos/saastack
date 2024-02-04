@@ -1,5 +1,7 @@
 #if TESTINGONLY
+using Application.Persistence.Interfaces;
 using Common;
+using Common.Extensions;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
@@ -8,11 +10,15 @@ namespace ApiHost1.Api.TestingOnly;
 
 public sealed class TestingWebApi : IWebApiService
 {
+    private static List<Type>? _allRepositories;
+    private static IReadOnlyList<IApplicationRepository>? _repositories;
     private readonly ICallerContextFactory _contextFactory;
+    private readonly IServiceProvider _serviceProvider;
 
-    public TestingWebApi(ICallerContextFactory contextFactory)
+    public TestingWebApi(ICallerContextFactory contextFactory, IServiceProvider serviceProvider)
     {
         _contextFactory = contextFactory;
+        _serviceProvider = serviceProvider;
     }
 
     // ReSharper disable once InconsistentNaming
@@ -40,6 +46,14 @@ public sealed class TestingWebApi : IWebApiService
             { CallerId = _contextFactory.Create().CallerId });
     }
 
+    public async Task<ApiResult<string, GetCallerTestingOnlyResponse>> AuthZByFeature(
+        AuthorizeByFeatureTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () => new Result<GetCallerTestingOnlyResponse, Error>(new GetCallerTestingOnlyResponse
+            { CallerId = _contextFactory.Create().CallerId });
+    }
+
     public async Task<ApiResult<string, GetCallerTestingOnlyResponse>> AuthZByRole(
         AuthorizeByRoleTestingOnlyRequest request, CancellationToken cancellationToken)
     {
@@ -48,20 +62,24 @@ public sealed class TestingWebApi : IWebApiService
             { CallerId = _contextFactory.Create().CallerId });
     }
 
-    public async Task<ApiResult<string, GetCallerTestingOnlyResponse>> AuthZByFeature(
-        AuthorizeByFeatureTestingOnlyRequest request, CancellationToken cancellationToken)
-    {
-        await Task.CompletedTask;
-        return () => new Result<GetCallerTestingOnlyResponse, Error>(new GetCallerTestingOnlyResponse
-            { CallerId = _contextFactory.Create().CallerId });
-    }
-    
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ContentNegotiationGet(
         ContentNegotiationsTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         return () => new Result<StringMessageTestingOnlyResponse, Error>(new StringMessageTestingOnlyResponse
             { Message = "amessage" });
+    }
+
+    public async Task<ApiEmptyResult> DestroyAllRepositories(DestroyAllRepositoriesRequest request,
+        CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        var repositoryTypes = GetAllRepositoryTypes();
+        var platformRepositories = GetRepositories(_serviceProvider, repositoryTypes);
+
+        DestroyAllRepositories(platformRepositories);
+
+        return () => new Result<EmptyResponse, Error>();
     }
 
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ErrorsError(
@@ -172,6 +190,43 @@ public sealed class TestingWebApi : IWebApiService
         await Task.CompletedTask;
         return () => new Result<StringMessageTestingOnlyResponse, Error>(new StringMessageTestingOnlyResponse
             { Message = $"amessage{request.Field1}" });
+    }
+
+    private static IReadOnlyList<IApplicationRepository> GetRepositories(IServiceProvider services,
+        IReadOnlyList<Type> repositoryTypes)
+    {
+        if (_repositories.NotExists())
+        {
+            _repositories = repositoryTypes
+                .Select(type => Try.Safely(() => services.GetService(type)))
+                .OfType<IApplicationRepository>()
+                .ToList();
+        }
+
+        return _repositories;
+    }
+
+    private static IReadOnlyList<Type> GetAllRepositoryTypes()
+    {
+        if (_allRepositories.NotExists())
+        {
+            _allRepositories = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(assembly => assembly.GetTypes().Where(type =>
+                    typeof(IApplicationRepository).IsAssignableFrom(type)
+                    && type.IsInterface
+                    && type != typeof(IApplicationRepository)))
+                .ToList();
+        }
+
+        return _allRepositories;
+    }
+
+    private static void DestroyAllRepositories(IEnumerable<IApplicationRepository> repositories)
+    {
+        foreach (var repository in repositories)
+        {
+            repository.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
     }
 }
 #endif

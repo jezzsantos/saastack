@@ -28,7 +28,6 @@ using Infrastructure.Web.Api.Common.Validation;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.ApplicationServices;
 using Infrastructure.Web.Hosting.Common.Auth;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -86,11 +85,13 @@ public static class HostExtensions
 
         var app = appBuilder.Build();
 
-        // Note: The order of the middleware matters
+        // Note: The order of the middleware matters! https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-8.0#middleware-order
         app.EnableRequestRewind(); // Required by ContentNegotiationFilter and by HMACVerification
+        app.AddExceptionShielding();
+        app.AddBEFFE(hostOptions
+            .IsBackendForFrontEnd); // Note: must be registered before CORS since it calls app.UsesRouting()
         app.EnableCORS(hostOptions.CORS);
         app.EnableSecureAccess(hostOptions.Authorization); //Note: AuthN must be registered after CORS
-        app.AddExceptionShielding();
         app.EnableMultiTenancy(hostOptions.IsMultiTenanted);
         app.EnableEventingListeners(hostOptions.Persistence.UsesEventing);
         app.EnableOtherOptions(hostOptions);
@@ -189,23 +190,18 @@ public static class HostExtensions
             }
 
             var defaultScheme = string.Empty;
-            if (authentication.UsesCookies)
-            {
-                defaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }
-
             if (authentication.UsesTokens)
             {
                 defaultScheme = JwtBearerDefaults.AuthenticationScheme;
             }
 
             var onlyHMAC = authentication is
-                { UsesHMAC: true, UsesCookies: false, UsesTokens: false, UsesApiKeys: false };
+                { UsesHMAC: true, UsesTokens: false, UsesApiKeys: false };
             var onlyApiKey = authentication is
-                { UsesApiKeys: true, UsesCookies: false, UsesTokens: false, UsesHMAC: false };
+                { UsesApiKeys: true, UsesTokens: false, UsesHMAC: false };
             if (onlyHMAC || onlyApiKey)
             {
-                // This is necessary in some versions of dotnet so that the only scheme is not applied to all endpoints by default
+                // Note: This is necessary in some versions of dotnet so that the only scheme is not applied to all endpoints by default
                 AppContext.SetSwitch("Microsoft.AspNetCore.Authentication.SuppressAutoDefaultScheme", true);
             }
 
@@ -257,18 +253,6 @@ public static class HostExtensions
                             new SymmetricSecurityKey(
                                 Encoding.UTF8.GetBytes(configuration["Hosts:IdentityApi:JWT:SigningSecret"]!))
                     };
-                });
-            }
-
-            if (authentication.UsesCookies)
-            {
-                //TODO: Is this how we are going to reverse proxy the cookie?
-                //TODO: What about the API to relay logins requests to the backend, and manage refresh etc?
-                // https://auth0.com/blog/building-a-reverse-proxy-in-dot-net-core/
-                authBuilder.AddCookie(cookieOptions =>
-                {
-                    cookieOptions.LoginPath = "/api/user/login";
-                    cookieOptions.LogoutPath = "/api/user/logout";
                 });
             }
 
@@ -347,10 +331,7 @@ public static class HostExtensions
 
         void ConfigurePersistence(bool usesQueues)
         {
-            if (usesQueues)
-            {
-                appBuilder.Services.RegisterUnshared<IMessageQueueIdFactory, MessageQueueIdFactory>();
-            }
+            appBuilder.Services.RegisterUnshared<IMessageQueueIdFactory, MessageQueueIdFactory>();
 
             var domainAssemblies = modules.DomainAssemblies
                 .Concat(new[] { typeof(DomainCommonMarker).Assembly, typeof(DomainSharedMarker).Assembly })

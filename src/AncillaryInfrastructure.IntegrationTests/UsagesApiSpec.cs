@@ -24,7 +24,7 @@ public class UsagesApiSpec : WebApiSpec<Program>
 
     public UsagesApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
-        EmptyAllRepositories(setup);
+        EmptyAllRepositories();
         _usageDeliveryService = setup.GetRequiredService<IUsageDeliveryService>().As<StubUsageDeliveryService>();
         _usageDeliveryService.Reset();
         _usageMessageQueue = setup.GetRequiredService<IUsageMessageQueue>();

@@ -9,6 +9,8 @@ public class AuthenticateTokens
     public required DateTime ExpiresOn { get; set; }
 
     public required string RefreshToken { get; set; }
+
+    public required string UserId { get; set; }
 }
 
 public class APIKey : IIdentifiableResource

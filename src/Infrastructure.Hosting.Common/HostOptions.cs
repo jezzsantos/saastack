@@ -30,7 +30,7 @@ public class HostOptions
         IsMultiTenanted = false, //TODO: change for multi-tenanted
         Persistence = new PersistenceOptions
         {
-            UsesQueues = true,
+            UsesQueues = false,
             UsesEventing = false
         },
         Recording = RecorderOptions.BackEndForFrontEndWebHost
