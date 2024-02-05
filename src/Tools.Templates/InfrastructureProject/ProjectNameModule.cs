@@ -23,12 +23,12 @@ public class {SubDomainName}sModule : ISubDomainModule
         { typeof({SubDomainName}Root), "{SubDomainNameLower}" }
     };
 
-    public Action<WebApplication> MinimalApiRegistrationFunction
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
     {
-        get { return app => app.RegisterRoutes(); }
+        get { return (app, _) => app.RegisterRoutes(); }
     }
 
-    public Action<ConfigurationManager, IServiceCollection> RegisterServicesFunction
+    public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
         get
         {

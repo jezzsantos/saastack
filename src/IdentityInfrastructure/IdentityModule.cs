@@ -35,6 +35,11 @@ public class IdentityModule : ISubDomainModule
         { typeof(APIKeyRoot), "apikey" }
     };
 
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
+
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
         get
@@ -83,10 +88,5 @@ public class IdentityModule : ISubDomainModule
                 services.RegisterUnshared<IIdentityService, IdentityInProcessServiceClient>();
             };
         }
-    }
-
-    public Action<WebApplication> ConfigureMiddleware
-    {
-        get { return app => { app.RegisterRoutes(); }; }
     }
 }

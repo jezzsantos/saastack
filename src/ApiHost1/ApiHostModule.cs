@@ -24,6 +24,11 @@ public class ApiHostModule : ISubDomainModule
 
     public Dictionary<Type, string> AggregatePrefixes => new();
 
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (_, _) => { }; }
+    }
+
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
         get
@@ -40,10 +45,5 @@ public class ApiHostModule : ISubDomainModule
                 services.RegisterUnshared<IEmailSchedulingService, QueuingEmailSchedulingService>();
             };
         }
-    }
-
-    public Action<WebApplication> ConfigureMiddleware
-    {
-        get { return _ => { }; }
     }
 }

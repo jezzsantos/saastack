@@ -72,40 +72,47 @@ public static class HostExtensions
     public static WebApplication ConfigureApiHost(this WebApplicationBuilder appBuilder, SubDomainModules modules,
         WebHostOptions hostOptions)
     {
-        ConfigureSharedServices();
-        ConfigureConfiguration(hostOptions.IsMultiTenanted);
-        ConfigureRecording();
-        ConfigureMultiTenancy(hostOptions.IsMultiTenanted);
-        ConfigureAuthenticationAuthorization(hostOptions.Authorization);
-        ConfigureWireFormats();
-        ConfigureApiRequests();
-        ConfigureApplicationServices();
-        ConfigurePersistence(hostOptions.Persistence.UsesQueues);
-        ConfigureCors(hostOptions.CORS);
+        RegisterSharedServices();
+        RegisterConfiguration(hostOptions.IsMultiTenanted);
+        RegisterRecording();
+        RegisterMultiTenancy(hostOptions.IsMultiTenanted);
+        RegisterAuthenticationAuthorization(hostOptions.Authorization);
+        RegisterWireFormats();
+        RegisterApiRequests();
+        RegisterApplicationServices();
+        RegisterPersistence(hostOptions.Persistence.UsesQueues);
+        RegisterCors(hostOptions.CORS);
 
         var app = appBuilder.Build();
 
-        // Note: The order of the middleware matters! https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-8.0#middleware-order
-        app.EnableRequestRewind(); // Required by ContentNegotiationFilter and by HMACVerification
-        app.AddExceptionShielding();
-        app.AddBEFFE(hostOptions
-            .IsBackendForFrontEnd); // Note: must be registered before CORS since it calls app.UsesRouting()
-        app.EnableCORS(hostOptions.CORS);
-        app.EnableSecureAccess(hostOptions.Authorization); //Note: AuthN must be registered after CORS
-        app.EnableMultiTenancy(hostOptions.IsMultiTenanted);
-        app.EnableEventingListeners(hostOptions.Persistence.UsesEventing);
-        app.EnableOtherOptions(hostOptions);
+        // Note: The order of the middleware matters!
+        // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-8.0#middleware-order
+        var middlewares = new List<MiddlewareRegistration>();
+        app.EnableRequestRewind(middlewares);
+        app.AddExceptionShielding(middlewares);
+        app.AddBEFFE(middlewares,
+            hostOptions.IsBackendForFrontEnd);
+        app.EnableCORS(middlewares, hostOptions.CORS);
+        app.EnableSecureAccess(middlewares, hostOptions.Authorization);
+        app.EnableMultiTenancy(middlewares, hostOptions.IsMultiTenanted);
+        app.EnableEventingPropagation(middlewares, hostOptions.Persistence.UsesEventing);
+        app.EnableOtherFeatures(middlewares, hostOptions);
 
-        modules.ConfigureHost(app);
+        modules.ConfigureMiddleware(app, middlewares);
+
+        middlewares
+            .OrderBy(mw => mw.Priority)
+            .ToList()
+            .ForEach(mw => mw.Register(app));
 
         return app;
 
-        void ConfigureSharedServices()
+        void RegisterSharedServices()
         {
             appBuilder.Services.AddHttpContextAccessor();
         }
 
-        void ConfigureConfiguration(bool isMultiTenanted)
+        void RegisterConfiguration(bool isMultiTenanted)
         {
 #if HOSTEDONAZURE
             appBuilder.Configuration.AddJsonFile("appsettings.Azure.json", true);
@@ -136,7 +143,7 @@ public static class HostExtensions
                 new HostSettings(new AspNetConfigurationSettings(c.GetRequiredService<IConfiguration>())));
         }
 
-        void ConfigureRecording()
+        void RegisterRecording()
         {
 #if HOSTEDONAWS
 #if !TESTINGONLY
@@ -174,7 +181,7 @@ public static class HostExtensions
                     hostOptions));
         }
 
-        void ConfigureMultiTenancy(bool isMultiTenanted)
+        void RegisterMultiTenancy(bool isMultiTenanted)
         {
             if (isMultiTenanted)
             {
@@ -182,7 +189,7 @@ public static class HostExtensions
             }
         }
 
-        void ConfigureAuthenticationAuthorization(AuthorizationOptions authentication)
+        void RegisterAuthenticationAuthorization(AuthorizationOptions authentication)
         {
             if (authentication.HasNone)
             {
@@ -275,7 +282,7 @@ public static class HostExtensions
             }
         }
 
-        void ConfigureApiRequests()
+        void RegisterApiRequests()
         {
             appBuilder.Services.RegisterUnshared<IHasSearchOptionsValidator, HasSearchOptionsValidator>();
             appBuilder.Services.RegisterUnshared<IHasGetOptionsValidator, HasGetOptionsValidator>();
@@ -289,7 +296,7 @@ public static class HostExtensions
             modules.RegisterServices(appBuilder.Configuration, appBuilder.Services);
         }
 
-        void ConfigureWireFormats()
+        void RegisterWireFormats()
         {
             var serializerOptions = new JsonSerializerOptions
             {
@@ -320,7 +327,7 @@ public static class HostExtensions
             });
         }
 
-        void ConfigureApplicationServices()
+        void RegisterApplicationServices()
         {
             appBuilder.Services.AddHttpClient();
             var prefixes = modules.AggregatePrefixes;
@@ -329,7 +336,7 @@ public static class HostExtensions
             appBuilder.Services.AddSingleton<ICallerContextFactory, AspNetCallerContextFactory>();
         }
 
-        void ConfigurePersistence(bool usesQueues)
+        void RegisterPersistence(bool usesQueues)
         {
             appBuilder.Services.RegisterUnshared<IMessageQueueIdFactory, MessageQueueIdFactory>();
 
@@ -352,7 +359,7 @@ public static class HostExtensions
 #endif
         }
 
-        void ConfigureCors(CORSOption cors)
+        void RegisterCors(CORSOption cors)
         {
             if (cors == CORSOption.None)
             {

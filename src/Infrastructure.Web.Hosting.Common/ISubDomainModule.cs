@@ -21,9 +21,9 @@ public interface ISubDomainModule
     Assembly ApiAssembly { get; }
 
     /// <summary>
-    ///     Returns a function that handles the minimal API registration
+    ///     Returns a function that handles the middleware configuration for this module
     /// </summary>
-    Action<WebApplication> ConfigureMiddleware { get; }
+    Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware { get; }
 
     /// <summary>
     ///     Returns the assembly containing the DDD domain types

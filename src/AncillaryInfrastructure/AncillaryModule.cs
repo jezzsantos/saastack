@@ -32,6 +32,11 @@ public class AncillaryModule : ISubDomainModule
         { typeof(EmailDeliveryRoot), "emaildelivery" }
     };
 
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
+
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
         get
@@ -70,10 +75,5 @@ public class AncillaryModule : ISubDomainModule
                 services.RegisterUnshared<IEmailDeliveryService, NullEmailDeliveryService>();
             };
         }
-    }
-
-    public Action<WebApplication> ConfigureMiddleware
-    {
-        get { return app => app.RegisterRoutes(); }
     }
 }

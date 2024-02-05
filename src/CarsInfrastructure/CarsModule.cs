@@ -30,6 +30,11 @@ public class CarsModule : ISubDomainModule
         { typeof(UnavailabilityEntity), "unavail" }
     };
 
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
+
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
         get
@@ -46,10 +51,5 @@ public class CarsModule : ISubDomainModule
                 services.RegisterTenanted<ICarsService, CarsInProcessServiceClient>();
             };
         }
-    }
-
-    public Action<WebApplication> ConfigureMiddleware
-    {
-        get { return app => app.RegisterRoutes(); }
     }
 }

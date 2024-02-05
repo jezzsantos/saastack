@@ -30,6 +30,11 @@ public class EndUsersModule : ISubDomainModule
         { typeof(EndUserRoot), "user" }
     };
 
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
+
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
         get
@@ -50,10 +55,5 @@ public class EndUsersModule : ISubDomainModule
                 services.RegisterUnshared<IEndUsersService, EndUsersInProcessServiceClient>();
             };
         }
-    }
-
-    public Action<WebApplication> ConfigureMiddleware
-    {
-        get { return app => { app.RegisterRoutes(); }; }
     }
 }

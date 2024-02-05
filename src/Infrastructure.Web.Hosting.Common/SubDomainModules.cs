@@ -14,7 +14,8 @@ public class SubDomainModules
     private readonly Dictionary<Type, string> _aggregatePrefixes = new();
     private readonly List<Assembly> _apiAssemblies = new();
     private readonly List<Assembly> _domainAssemblies = new();
-    private readonly List<Action<WebApplication>> _minimalApiRegistrationFunctions = new();
+    private readonly List<Action<WebApplication, List<MiddlewareRegistration>>>
+        _minimalApiRegistrationFunctions = new();
     private readonly List<Action<ConfigurationManager, IServiceCollection>> _serviceCollectionFunctions = new();
 
     public IDictionary<Type, string> AggregatePrefixes => _aggregatePrefixes;
@@ -23,9 +24,12 @@ public class SubDomainModules
 
     public IReadOnlyList<Assembly> DomainAssemblies => _domainAssemblies;
 
-    public void ConfigureHost(WebApplication app)
+    /// <summary>
+    ///     Configure middleware in the pipeline
+    /// </summary>
+    public void ConfigureMiddleware(WebApplication app, List<MiddlewareRegistration> middlewares)
     {
-        _minimalApiRegistrationFunctions.ForEach(func => func(app));
+        _minimalApiRegistrationFunctions.ForEach(func => func(app, middlewares));
     }
 
     public void Register(ISubDomainModule module)

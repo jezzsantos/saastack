@@ -26,24 +26,33 @@ namespace Infrastructure.Web.Hosting.Common.Extensions;
 
 public static class WebApplicationExtensions
 {
+    private const int CustomMiddlewareIndex = 300;
+
     /// <summary>
     ///     Provides request handling for a BEFFE
     /// </summary>
-    public static IApplicationBuilder AddBEFFE(this WebApplication app, bool isBEFFE)
+    public static void AddBEFFE(this WebApplication builder,
+        List<MiddlewareRegistration> middlewares, bool isBEFFE)
     {
         if (!isBEFFE)
         {
-            return app;
+            return;
         }
 
-        app.Logger.LogInformation("BEFFE request processing is enabled");
-        app.UsePathBase(new PathString(WebConstants.BackEndForFrontEndBasePath));
-        app.UseDefaultFiles();
-        app.UseStaticFiles();
-        app.UseMiddleware<CSRFMiddleware>();
-        app.UseMiddleware<ReverseProxyMiddleware>();
-
-        return app;
+        // Note: must be registered before CORS since it calls app.UsesRouting()
+        middlewares.Add(new MiddlewareRegistration(30,
+            app => { app.UsePathBase(new PathString(WebConstants.BackEndForFrontEndBasePath)); },
+            "Pipeline: Website API is enabled: Route -> {Route}", WebConstants.BackEndForFrontEndBasePath));
+        middlewares.Add(new MiddlewareRegistration(31, app =>
+        {
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+        }, "Pipeline: Serving static HTML/CSS/JS is enabled"));
+        middlewares.Add(new MiddlewareRegistration(CustomMiddlewareIndex + 100, app =>
+        {
+            app.UseMiddleware<CSRFMiddleware>();
+            app.UseMiddleware<ReverseProxyMiddleware>();
+        }, "Pipeline: BEFFE reverse proxy with CSRF protection is enabled"));
     }
 
     /// <summary>
@@ -51,193 +60,208 @@ public static class WebApplicationExtensions
     ///     to an <see href="https://datatracker.ietf.org/doc/html/rfc7807">RFC7807</see> error.
     ///     Note: Shows the exception stack trace if in development mode
     /// </summary>
-    public static IApplicationBuilder AddExceptionShielding(this WebApplication app)
+    public static void AddExceptionShielding(this WebApplication builder,
+        List<MiddlewareRegistration> middlewares)
     {
-        app.Logger.LogInformation("Exception Shielding is enabled");
-        return app.UseExceptionHandler(configure => configure.Run(async context =>
+        middlewares.Add(new MiddlewareRegistration(20, app =>
         {
-            var exceptionMessage = string.Empty;
-            var exceptionStackTrace = string.Empty;
-            if (app.Environment.IsTestingOnly())
+            app.UseExceptionHandler(configure => configure.Run(async context =>
             {
-                var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
-                if (contextFeature is not null)
+                var exceptionMessage = string.Empty;
+                var exceptionStackTrace = string.Empty;
+                if (app.Environment.IsTestingOnly())
                 {
-                    exceptionMessage = contextFeature.Error.Message;
-                    exceptionStackTrace = contextFeature.Error.ToString();
+                    var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+                    if (contextFeature is not null)
+                    {
+                        exceptionMessage = contextFeature.Error.Message;
+                        exceptionStackTrace = contextFeature.Error.ToString();
+                    }
                 }
-            }
 
-            var details = new ProblemDetails
-            {
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
-                Title = Resources.WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage,
-                Status = (int)HttpStatusCode.InternalServerError,
-                Instance = context.Request.GetDisplayUrl(),
-                Detail = exceptionMessage
-            };
-            if (exceptionStackTrace.HasValue())
-            {
-                details.Extensions.Add(HttpResponses.ProblemDetails.Extensions.ExceptionPropertyName,
-                    exceptionStackTrace);
-            }
+                var details = new ProblemDetails
+                {
+                    Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+                    Title = Resources.WebApplicationExtensions_AddExceptionShielding_UnexpectedExceptionMessage,
+                    Status = (int)HttpStatusCode.InternalServerError,
+                    Instance = context.Request.GetDisplayUrl(),
+                    Detail = exceptionMessage
+                };
+                if (exceptionStackTrace.HasValue())
+                {
+                    details.Extensions.Add(HttpResponses.ProblemDetails.Extensions.ExceptionPropertyName,
+                        exceptionStackTrace);
+                }
 
-            await Results.Problem(details)
-                .ExecuteAsync(context);
-        }));
+                await Results.Problem(details)
+                    .ExecuteAsync(context);
+            }));
+        }, "Pipeline: Exception Shielding is enabled"));
     }
 
     /// <summary>
     ///     Enables CORS for the host
     /// </summary>
-    public static IApplicationBuilder EnableCORS(this WebApplication app, CORSOption cors)
+    public static void EnableCORS(this WebApplication builder,
+        List<MiddlewareRegistration> middlewares, CORSOption cors)
     {
         if (cors == CORSOption.None)
         {
-            return app;
+            return;
         }
 
-        var httpContext = app.Services.GetRequiredService<IHttpContextFactory>().Create(new FeatureCollection());
-        var policy = app.Services.GetRequiredService<ICorsPolicyProvider>()
-            .GetPolicyAsync(httpContext, WebHostingConstants.DefaultCORSPolicyName).GetAwaiter().GetResult();
-        app.Logger.LogInformation("CORS is enabled: Policy -> {Policy}", policy!.ToString());
-        return app.UseCors();
+        var httpContext = builder.Services.GetRequiredService<IHttpContextFactory>().Create(new FeatureCollection());
+        var policy = builder.Services.GetRequiredService<ICorsPolicyProvider>()
+            .GetPolicyAsync(httpContext, WebHostingConstants.DefaultCORSPolicyName).GetAwaiter().GetResult()!
+            .ToString();
+
+        middlewares.Add(new MiddlewareRegistration(40, app => { app.UseCors(); },
+            "Pipeline: CORS is enabled: Policy -> {Policy}",
+            policy));
     }
 
     /// <summary>
     ///     Starts the relays for eventing projections and notifications
     /// </summary>
-    public static IApplicationBuilder EnableEventingListeners(this WebApplication app, bool usesEventing)
+    public static void EnableEventingPropagation(this WebApplication builder,
+        List<MiddlewareRegistration> middlewares, bool usesEventing)
     {
         if (!usesEventing)
         {
-            return app;
+            return;
         }
 
-        app.Logger.LogInformation("Eventing Projections/Notifications is enabled");
-        return app.Use(async (context, next) =>
+        middlewares.Add(new MiddlewareRegistration(CustomMiddlewareIndex + 40, app =>
         {
-            var readModelRelay = context.RequestServices.GetRequiredService<IEventNotifyingStoreProjectionRelay>();
-            if (!readModelRelay.IsStarted)
+            app.Use(async (context, next) =>
             {
-                readModelRelay.Start();
-            }
+                var readModelRelay = context.RequestServices.GetRequiredService<IEventNotifyingStoreProjectionRelay>();
+                if (!readModelRelay.IsStarted)
+                {
+                    readModelRelay.Start();
+                }
 
-            var notificationRelay = context.RequestServices.GetRequiredService<IEventNotifyingStoreNotificationRelay>();
-            if (!notificationRelay.IsStarted)
-            {
-                notificationRelay.Start();
-            }
+                var notificationRelay =
+                    context.RequestServices.GetRequiredService<IEventNotifyingStoreNotificationRelay>();
+                if (!notificationRelay.IsStarted)
+                {
+                    notificationRelay.Start();
+                }
 
-            await next();
-        });
+                await next();
+            });
+        }, "Pipeline: Event Projections/Notifications is enabled"));
     }
 
     /// <summary>
     ///     Enables tenant detection
     /// </summary>
-    public static IApplicationBuilder EnableMultiTenancy(this WebApplication app, bool isEnabled)
+    public static void EnableMultiTenancy(this WebApplication builder,
+        List<MiddlewareRegistration> middlewares, bool isEnabled)
     {
-        app.Logger.LogInformation("Multi-Tenancy request detection is {Status}", isEnabled
-            ? "enabled"
-            : "disabled");
-
         if (!isEnabled)
         {
-            return app;
+            return;
         }
 
-        //TODO: app.AddMultiTenancyDetection(); we need a TenantDetective
-
-        return app;
+        middlewares.Add(new MiddlewareRegistration(CustomMiddlewareIndex + 10,
+            app => { app.UseMiddleware<MultiTenancyMiddleware>(); },
+            "Pipeline: Multi-Tenancy detection is enabled"));
     }
 
     /// <summary>
     ///     Enables other options
     /// </summary>
-    public static IApplicationBuilder EnableOtherOptions(this WebApplication app, WebHostOptions hostOptions)
+    public static void EnableOtherFeatures(this WebApplication builder,
+        List<MiddlewareRegistration> middlewares, WebHostOptions hostOptions)
     {
-        var loggers = app.Services.GetServices<ILoggerProvider>()
+        var loggers = builder.Services.GetServices<ILoggerProvider>()
             .Select(logger => logger.GetType().Name).Join(", ");
-        app.Logger.LogInformation("Logging to -> {Providers}", loggers);
+        middlewares.Add(new MiddlewareRegistration(-80, _ =>
+        {
+            //Nothing to register
+        }, "Feature: Logging to -> {Providers}", loggers));
 
-        var appSettings = ((ConfigurationManager)app.Configuration).Sources
+        var appSettings = ((ConfigurationManager)builder.Configuration).Sources
             .OfType<JsonConfigurationSource>()
             .Select(jsonSource => jsonSource.Path)
             .Join(", ");
-        app.Logger.LogInformation("Configuration loaded from -> {Sources}", appSettings);
+        middlewares.Add(new MiddlewareRegistration(-70, _ =>
+        {
+            //Nothing to register
+        }, "Feature: Configuration loaded from -> {Sources}", appSettings));
 
-        var recorder = app.Services.GetRequiredService<IRecorder>();
-        app.Logger.LogInformation("Recording with -> {Recorder}", recorder.ToString());
+        var recorder = builder.Services.GetRequiredService<IRecorder>()
+            .ToString()!;
+        middlewares.Add(new MiddlewareRegistration(-60, _ =>
+        {
+            //Nothing to register
+        }, "Feature: Recording with -> {Recorder}", recorder));
 
-        var dataStore = app.Services.ResolveForPlatform<IDataStore>().GetType().Name;
-        var eventStore = app.Services.ResolveForPlatform<IEventStore>().GetType().Name;
-        var queueStore = app.Services.ResolveForPlatform<IQueueStore>().GetType().Name;
-        var blobStore = app.Services.ResolveForPlatform<IBlobStore>().GetType().Name;
-        app.Logger.LogInformation(
-            "Platform Persistence stores: DataStore -> {DataStore} EventStore -> {EventStore} QueueStore -> {QueueStore} BlobStore -> {BlobStore}",
-            dataStore, eventStore, queueStore, blobStore);
+        var dataStore = builder.Services.ResolveForPlatform<IDataStore>().GetType().Name;
+        var eventStore = builder.Services.ResolveForPlatform<IEventStore>().GetType().Name;
+        var queueStore = builder.Services.ResolveForPlatform<IQueueStore>().GetType().Name;
+        var blobStore = builder.Services.ResolveForPlatform<IBlobStore>().GetType().Name;
+        middlewares.Add(new MiddlewareRegistration(-50, _ =>
+            {
+                //Nothing to register
+            },
+            "Feature: Platform Persistence stores: DataStore -> {DataStore} EventStore -> {EventStore} QueueStore -> {QueueStore} BlobStore -> {BlobStore}",
+            dataStore, eventStore, queueStore, blobStore));
+
 #if TESTINGONLY
         if (hostOptions.Persistence.UsesQueues)
         {
-            var stubDrainingServices = app.Services.GetServices<IHostedService>()
+            var stubDrainingServices = builder.Services.GetServices<IHostedService>()
                 .OfType<StubQueueDrainingService>()
                 .ToList();
             if (stubDrainingServices.HasAny())
             {
                 var stubDrainingService = stubDrainingServices[0];
                 var queues = stubDrainingService.MonitoredQueues.Join(", ");
-                app.Logger.LogInformation("Background queue draining on queues -> {Queues}", queues);
+                middlewares.Add(new MiddlewareRegistration(-40, _ =>
+                {
+                    //Nothing to register
+                }, "Feature: Background queue draining on queues -> {Queues}", queues));
             }
         }
 #endif
-
-        return app;
     }
 
     /// <summary>
-    ///     Enables request buffering, so that request bodies can be read in filters
+    ///     Enables request buffering, so that request bodies can be read in filters.
+    ///     Note: Required to read the request by <see cref="ContentNegotiationFilter" /> and by
+    ///     <see cref="HttpRequestExtensions.VerifyHMACSignatureAsync" /> during HMAC signature verification
     /// </summary>
-    public static IApplicationBuilder EnableRequestRewind(this WebApplication app)
+    public static void EnableRequestRewind(this WebApplication builder,
+        List<MiddlewareRegistration> middlewares)
     {
-        return app.Use(async (context, next) =>
+        middlewares.Add(new MiddlewareRegistration(10, app =>
         {
-            context.Request.EnableBuffering();
-            await next();
-        });
+            app.Use(async (context, next) =>
+            {
+                context.Request.EnableBuffering();
+                await next();
+            });
+        }, "Pipeline: Rewinding of requests is enabled"));
     }
 
     /// <summary>
     ///     Enables authentication and authorization
     /// </summary>
-    public static IApplicationBuilder EnableSecureAccess(this WebApplication app, AuthorizationOptions authorization)
+    public static void EnableSecureAccess(this WebApplication builder,
+        List<MiddlewareRegistration> middlewares, AuthorizationOptions authorization)
     {
         if (authorization.HasNone)
         {
-            return app;
+            return;
         }
 
-        if (authorization.UsesHMAC)
-        {
-            app.Logger.LogInformation("Authentication using HMAC signatures is enabled");
-        }
-
-        if (authorization.UsesTokens)
-        {
-            app.Logger.LogInformation("Authentication using JWT tokens is enabled");
-        }
-
-        if (authorization.UsesApiKeys)
-        {
-            app.Logger.LogInformation("Authentication using API Keys is enabled");
-        }
-
-        app.UseAuthentication();
-
-        app.Logger.LogInformation("Authorization using RoleBasedAccessControl is enabled");
-        app.Logger.LogInformation("Authorization using FeatureBasedAccessControl is enabled");
-        app.UseAuthorization();
-
-        return app;
+        middlewares.Add(new MiddlewareRegistration(50, app => { app.UseAuthentication(); },
+            "Pipeline: Authentication is enabled: HMAC -> {HMAC}, APIKeys -> {APIKeys}, Tokens -> {Tokens}",
+            authorization.UsesHMAC, authorization.UsesApiKeys, authorization.UsesTokens));
+        middlewares.Add(
+            new MiddlewareRegistration(52, app => { app.UseAuthorization(); },
+                "Pipeline: Authorization is enabled: Roles -> Enabled, Features -> Enabled"));
     }
 }

@@ -74,7 +74,7 @@ public class SubDomainModulesSpec
             AggregatePrefixes = new Dictionary<Type, string>(),
             ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
             DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
-            ConfigureMiddleware = _ => { },
+            ConfigureMiddleware = (_, _) => { },
             RegisterServices = null!
         });
 
@@ -101,7 +101,7 @@ public class SubDomainModulesSpec
             ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
             DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
             AggregatePrefixes = new Dictionary<Type, string>(),
-            ConfigureMiddleware = _ => { },
+            ConfigureMiddleware = (_, _) => { },
             RegisterServices = (_, _) => { wasCalled = true; }
         });
 
@@ -115,7 +115,7 @@ public class SubDomainModulesSpec
     {
         var app = WebApplication.Create();
 
-        _modules.ConfigureHost(app);
+        _modules.ConfigureMiddleware(app, new List<MiddlewareRegistration>());
     }
 
     [Fact]
@@ -128,11 +128,11 @@ public class SubDomainModulesSpec
             ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
             DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
             AggregatePrefixes = new Dictionary<Type, string>(),
-            ConfigureMiddleware = _ => { wasCalled = true; },
+            ConfigureMiddleware = (_, _) => { wasCalled = true; },
             RegisterServices = (_, _) => { }
         });
 
-        _modules.ConfigureHost(app);
+        _modules.ConfigureMiddleware(app, new List<MiddlewareRegistration>());
 
         wasCalled.Should().BeTrue();
     }
@@ -146,7 +146,7 @@ public class TestModule : ISubDomainModule
 
     public Dictionary<Type, string> AggregatePrefixes { get; init; } = null!;
 
-    public Action<WebApplication> ConfigureMiddleware { get; init; } = null!;
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware { get; init; } = null!;
 
     public Action<ConfigurationManager, IServiceCollection>? RegisterServices { get; init; }
 }

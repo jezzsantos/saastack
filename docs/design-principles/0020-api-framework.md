@@ -170,12 +170,12 @@ public class CarsApiModule : ISubDomainModule
         { typeof(Car), "car" }
     };
     
-    public Action<WebApplication> MinimalApiRegistrationFunction
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
     {
-        get { return app => app.RegisterRoutes(); }
+        get { return (app, _) => app.RegisterRoutes(); }
     }
     
-    public Action<ConfigurationManager, IServiceCollection> RegisterServicesFunction
+    public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
         get { return (_, services) => { services.AddScoped<ICarsApplication, CarsApplication.CarsApplication>(); }; }
     }

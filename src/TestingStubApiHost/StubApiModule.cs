@@ -13,6 +13,11 @@ public class StubApiModule : ISubDomainModule
 
     public Dictionary<Type, string> AggregatePrefixes => new();
 
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
+
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
         get
@@ -34,11 +39,6 @@ public class StubApiModule : ISubDomainModule
                 });
             };
         }
-    }
-
-    public Action<WebApplication> ConfigureMiddleware
-    {
-        get { return app => app.RegisterRoutes(); }
     }
 }
 #endif
