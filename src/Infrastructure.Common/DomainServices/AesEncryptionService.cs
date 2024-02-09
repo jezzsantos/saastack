@@ -1,11 +1,12 @@
 using System.Security.Cryptography;
+using Domain.Services.Shared.DomainServices;
 
 namespace Infrastructure.Common.DomainServices;
 
 /// <summary>
 ///     Provides a domain service for encrypting values, using AES encryption
 /// </summary>
-public class AesEncryptionService
+public class AesEncryptionService : IEncryptionService
 {
     private const string SecretKeyDelimiter = "::";
     private readonly string _aesSecret;
@@ -18,9 +19,8 @@ public class AesEncryptionService
     public string Decrypt(string cipherText)
     {
         using var aes = CreateAes();
-        var (cryptKey, iv) = GetAesKeysFromSecret(_aesSecret);
-        using var decryptor = aes.CreateDecryptor(cryptKey, iv);
-
+        var (key, iv) = GetAesKeysFromSecret(_aesSecret);
+        using var decryptor = aes.CreateDecryptor(key, iv);
         var cipher = Convert.FromBase64String(cipherText);
         using var ms = new MemoryStream(cipher);
         using var cryptoStream = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
@@ -31,8 +31,8 @@ public class AesEncryptionService
     public string Encrypt(string plainText)
     {
         using var aes = CreateAes();
-        var (cryptKey, iv) = GetAesKeysFromSecret(_aesSecret);
-        using var encryptor = aes.CreateEncryptor(cryptKey, iv);
+        var (key, iv) = GetAesKeysFromSecret(_aesSecret);
+        using var encryptor = aes.CreateEncryptor(key, iv);
 
         byte[] cipher;
         using (var ms = new MemoryStream())
@@ -56,10 +56,10 @@ public class AesEncryptionService
         var rightSide = aesSecret.Substring(0, aesSecret.IndexOf(SecretKeyDelimiter, StringComparison.Ordinal));
         var leftSide = aesSecret.Substring(aesSecret.IndexOf(SecretKeyDelimiter, StringComparison.Ordinal)
                                            + SecretKeyDelimiter.Length);
-        var cryptKey = Convert.FromBase64String(rightSide);
+        var key = Convert.FromBase64String(rightSide);
         var iv = Convert.FromBase64String(leftSide);
 
-        return (cryptKey, iv);
+        return (key, iv);
     }
 
     private static SymmetricAlgorithm CreateAes()
@@ -75,14 +75,14 @@ public class AesEncryptionService
 #if TESTINGONLY
     public static string CreateAesSecret()
     {
-        CreateKeyAndIv(out var cryptKey, out var iv);
-        return $"{Convert.ToBase64String(cryptKey)}{SecretKeyDelimiter}{Convert.ToBase64String(iv)}";
+        CreateKeyAndIv(out var key, out var iv);
+        return $"{Convert.ToBase64String(key)}{SecretKeyDelimiter}{Convert.ToBase64String(iv)}";
     }
 
-    private static void CreateKeyAndIv(out byte[] cryptKey, out byte[] iv)
+    private static void CreateKeyAndIv(out byte[] key, out byte[] iv)
     {
         using var aes = CreateAes();
-        cryptKey = aes.Key;
+        key = aes.Key;
         iv = aes.IV;
     }
 #endif

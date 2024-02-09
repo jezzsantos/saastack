@@ -21,7 +21,7 @@ For Authorization, we are utilizing the minimal API "authorization policies" mec
 
 In web clients, we will use (HTTPOnly) cookies to store JWT tokens (between the browser and the BEFFE), and will relay those JWTs to backend APIs via a reverse proxy.
 
-​ We will prevent those JWT tokens ever being seen by any JavaScript running in a browser, and go to extra lengths to guard against CSRF attacks.
+We will prevent those JWT tokens ever being seen by any JavaScript running in a browser, and go to extra lengths to guard against CSRF attacks.
 
 ![Credential Authentication](../images/Authentication-Credentials.png)
 
@@ -53,7 +53,9 @@ Since password credentials include email addresses, these emails addresses, and 
 
 We will offer SSO authentication via the `ISingleSignOnApplication`
 
-SSO authentication is typically achieved by authenticating with a 3rd party provider (e.g. Google Microsoft, Facebook, etc) using the [OAuth2](https://oauth.net/2/) "Authorization Code Flow", and once authenticated the user gains access to the whole system. Regardless of where the user is authenticated, access to this system is still governed by using a centralized JWT token.
+SSO authentication is typically achieved by authenticating with a 3rd party provider (e.g. Google Microsoft, Facebook, etc) using the [OAuth2](https://oauth.net/2/) "Authorization Code Flow" in the Frontend JS app, and once authenticated and authorized, the user gains access to the whole system.
+
+> Regardless of whether the user is authenticated by the built-in credentials mechanism, or by a SSO integration, access to this system is still governed by the centralized JWT token that this codebase produces. Any tokens obtained from an SSO integration can be stored and used in integrations later, but those tokens are not used to maintain access to this codebase.
 
 The OAuth2 "Authorization Code Flow" is usually performed in a browser, that can be redirected to a 3rd party website and back. The flow has several steps where the user signs in and authorizes access to their data provided by the 3rd party.
 
@@ -61,13 +63,13 @@ The final step of this specific flow ([Authorization Code Flow](https://aaronpar
 
 Managing the first few steps of this flow is typically done by a 3rd party JavaScript library in the browser. However, the last step (exchange code for tokens) can be performed either in the front end browser or in the back end web server.
 
-There are two reasons that this step is performed in the backend API (in the "Identities" subdomain).
+There are two reasons that this step is performed in the backend API (in the `Identities` subdomain).
 
-1. The `client_secret` (if any) cannot be accessible to any JavaScript, nor stored anywhere in the browser where it is possible to be accessed by any XSS vulenrability.
-2. The backend can trust and verify the "code", as being from a trusted 3rd party by performing the exchange itself. The returned tokens are proof of that.
-3. The returned tokens (i.e. `access_token` and `refresh_token`) can be used to identify the user in the 3rd party system, and link them to a user in this system. (e.g. find the `EndUser` with the same email address as found int eh claims of the 3rd party tokens)
-4. Furthermore, the tokens that are made available by the 3rd party service (i.e. `access_token` and `refresh_token`), can be stored for future use in the API repositories, and can be used to perform activities with the 3rd party system when necessary.
-5. The API has full encapsulated control of what the user can and cannot do with 3rd party systems, as opposed to having that code deployed or duplicated to the front-end JavaScript.
+1. The `client_secret` (if any) cannot be accessible to any JavaScript, nor stored anywhere in the browser where it is possible to be accessed by any XSS vulnerability.
+2. The backend can trust and verify the OAuth2 "code", as being from a trusted 3rd party by performing the exchange itself. The returned tokens are proof of that.
+3. The returned tokens (i.e., `access_token`,  `refresh_token` and possibly `id_token`) can be used to identify the user in the 3rd party system, and link them to a user in this system. (e.g., find the `EndUser` with the same email address as found in the claims of the 3rd party tokens)
+4. Furthermore, the tokens that are made available by the 3rd party service (i.e. `access_token` , `refresh_token` and possibly `id_token`), can be stored for future use, and can be used to perform activities with the 3rd party system when necessary.
+5. The API has full encapsulated control of what the user can and cannot do with 3rd party systems, as opposed to having that code deployed or duplicated to the Frontend JavaScript application.
 
 ### HMAC Authentication/Authorization
 
@@ -181,11 +183,6 @@ When the system is split into individual services each containing one or more su
 
 API keys do not support refreshing issued API keys. When issuing the API key the client gets to define the expiry date, and should acquire a new API key before that expiry date themselves.
 
-### Cookie Authorization
-
-* TBD
-* Performed by a BackendForFrontend (BEFFE) component, reverse-proxies the token hidden in the cookie, into a token passed to the backend
-
 ### Declarative Authorization Syntax
 
 Authorization is both declarative (at the API layer), and enforced programmatically downstream in other layers.
@@ -237,8 +234,18 @@ Just like the roles above, there are two sets of "features" that apply separatel
 
 All `End-Users` should have, at least, a minimum level of access to all untenanted API's based on a specific feature set, otherwise they literally have no access to do anything in the system. By default, every end-user in the system should have the `PlatformFeatures.Basic` feature set, used for accessing all untenanted APIs, and some Tenanted APIs, no matter what subscription plan they have.
 
-In most SaaS products there are one or more pricing tiers. These are analog to "features".
+In most SaaS products, there are one or more pricing tiers. These are analog to "features".
 
 It is likely that every product will define its own custom tiers and features as a result.
 
-By default, we've defined `Basic` to represent a free set of features, that every user should have at a bear minimum. This "feature set" needs to be made available even when the end-user loses their access to the rest of the system. For example, their free-trial expired. We've also defined `PaidTrial` to be used for a free-trial notion, and other tiers for paid pricing tiers. These are expected to be renamed for each product.
+By default, we've defined `Basic` to represent a free set of features that every user should have at a bare minimum. This "feature set" needs to be made available even when the end-user loses their access to the rest of the system. For example, their free-trial expired. We've also defined `PaidTrial` to be used for a free-trial notion, and other tiers for paid pricing tiers. These are expected to be renamed for each product.
+
+### Web Application Authentication/Authorization
+
+Web applications are typically implemented in a browser using JavaScript. A browser application (or JS app) operates in a very hostile environment, where the running code is more open to attack than many other kinds of applications.
+
+In this kind of environment, web browsers must collaborate with web applications to provide stateless and secure environments to run. Unlike other platforms, standard measures like encrypted storage of secrets are not 100% achievable, and stateless are harder to achieve.
+
+There are few reliable measures that can be utilized, like Http-Only cookies, and even then, additional measures need to be taken (i.e., CSRF measures) to ensure that those are not compromised either.
+
+See [BEFFE](0110-back-end-for-front-end.md) for more details on how Authentication and Authorization are implemented in the web application. 

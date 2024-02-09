@@ -9,10 +9,12 @@ namespace Infrastructure.Hosting.Common;
 /// </summary>
 public class HostSettings : IHostSettings
 {
-    internal const string AncillaryApiHmacSecretSettingName = "Hosts:AncillaryApi:HmacAuthNSecret";
+    internal const string AncillaryApiHmacSecretSettingName = "Hosts:AncillaryApi:HMACAuthNSecret";
     internal const string AncillaryApiHostBaseUrlSettingName = "Hosts:AncillaryApi:BaseUrl";
     internal const string AnyApiBaseUrlSettingName = "Hosts:AnyApi:BaseUrl";
     internal const string WebsiteHostBaseUrlSettingName = "Hosts:WebsiteHost:BaseUrl";
+    internal const string WebsiteHostCSRFEncryptionSettingName = "Hosts:WebsiteHost:CSRFAESSecret";
+    internal const string WebsiteHostCSRFSigningSettingName = "Hosts:WebsiteHost:CSRFHMACSecret";
 
     private readonly IConfigurationSettings _settings;
 
@@ -45,6 +47,18 @@ public class HostSettings : IHostSettings
             Resources.HostSettings_MissingSetting.Format(WebsiteHostBaseUrlSettingName));
     }
 
+    public string GetWebsiteHostCSRFSigningSecret()
+    {
+        var secret = _settings.Platform.GetString(WebsiteHostCSRFSigningSettingName);
+        if (secret.HasValue())
+        {
+            return secret;
+        }
+
+        throw new InvalidOperationException(
+            Resources.HostSettings_MissingSetting.Format(WebsiteHostCSRFSigningSettingName));
+    }
+
     public string GetApiHost1BaseUrl()
     {
         var baseUrl = _settings.Platform.GetString(AnyApiBaseUrlSettingName);
@@ -67,5 +81,17 @@ public class HostSettings : IHostSettings
 
         throw new InvalidOperationException(
             Resources.HostSettings_MissingSetting.Format(AncillaryApiHmacSecretSettingName));
+    }
+
+    public string GetWebsiteHostCSRFEncryptionSecret()
+    {
+        var secret = _settings.Platform.GetString(WebsiteHostCSRFEncryptionSettingName);
+        if (secret.HasValue())
+        {
+            return secret;
+        }
+
+        throw new InvalidOperationException(
+            Resources.HostSettings_MissingSetting.Format(WebsiteHostCSRFEncryptionSettingName));
     }
 }

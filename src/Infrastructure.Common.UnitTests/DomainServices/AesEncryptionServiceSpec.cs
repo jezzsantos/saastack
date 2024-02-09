@@ -1,4 +1,3 @@
-#if TESTINGONLY
 using FluentAssertions;
 using Infrastructure.Common.DomainServices;
 using Xunit;
@@ -8,13 +7,24 @@ namespace Infrastructure.Common.UnitTests.DomainServices;
 [Trait("Category", "Unit")]
 public class AesEncryptionServiceSpec
 {
+    private readonly string _secret;
     private readonly AesEncryptionService _service;
 
     public AesEncryptionServiceSpec()
     {
-        var secret = AesEncryptionService.CreateAesSecret();
+#if TESTINGONLY
+        _secret = AesEncryptionService.CreateAesSecret();
+#else
+        _secret = string.Empty;
+#endif
 
-        _service = new AesEncryptionService(secret);
+        _service = new AesEncryptionService(_secret);
+    }
+
+    [Fact]
+    public void WhenCreateAesSecret_ThenReturnsSecret()
+    {
+        _secret.Should().NotBeEmpty();
     }
 
     [Fact]
@@ -28,4 +38,3 @@ public class AesEncryptionServiceSpec
         plainText.Should().Be("avalue");
     }
 }
-#endif

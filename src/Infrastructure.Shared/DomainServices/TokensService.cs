@@ -4,7 +4,7 @@ using Domain.Interfaces.Validations;
 using Domain.Services.Shared.DomainServices;
 using Domain.Shared;
 
-namespace Infrastructure.Shared.ApplicationServices;
+namespace Infrastructure.Shared.DomainServices;
 
 public sealed class TokensService : ITokensService
 {

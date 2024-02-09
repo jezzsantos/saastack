@@ -25,4 +25,14 @@ public interface IHostSettings
     ///     Returns the URL of the Website host
     /// </summary>
     string GetWebsiteHostBaseUrl();
+
+    /// <summary>
+    ///     Returns the CSRF encryption secret
+    /// </summary>
+    string GetWebsiteHostCSRFEncryptionSecret();
+
+    /// <summary>
+    ///     Returns the CSRF signature secret
+    /// </summary>
+    string GetWebsiteHostCSRFSigningSecret();
 }

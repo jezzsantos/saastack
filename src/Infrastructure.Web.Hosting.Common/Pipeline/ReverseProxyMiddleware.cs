@@ -2,10 +2,11 @@ using Application.Interfaces.Services;
 using Common.Extensions;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 
-namespace Infrastructure.Web.Common;
+namespace Infrastructure.Web.Hosting.Common.Pipeline;
 
 /// <summary>
 ///     Provides middleware to reverse proxy all (non-hosted) API requests to the Backend API.

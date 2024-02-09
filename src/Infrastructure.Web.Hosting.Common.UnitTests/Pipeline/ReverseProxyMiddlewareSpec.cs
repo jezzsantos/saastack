@@ -1,11 +1,12 @@
 using System.Net;
 using Application.Interfaces.Services;
+using Infrastructure.Web.Hosting.Common.Pipeline;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Moq.Protected;
 using Xunit;
 
-namespace Infrastructure.Web.Common.UnitTests;
+namespace Infrastructure.Web.Hosting.Common.UnitTests.Pipeline;
 
 [Trait("Category", "Unit")]
 public class ReverseProxyMiddlewareSpec

@@ -12,22 +12,26 @@ namespace Infrastructure.Web.Api.Common;
 public class HMACSigner
 {
     private const string SignatureFormat = @"sha1={0}";
-    internal static readonly Encoding SignatureEncoding = Encoding.UTF8;
+    private static readonly Encoding SignatureEncoding = Encoding.UTF8;
     private readonly byte[] _data;
     private readonly string _secret;
 
     public HMACSigner(IWebRequest request, string secret) : this(GetRequestData(request), secret)
     {
         ArgumentNullException.ThrowIfNull(request);
-        ArgumentException.ThrowIfNullOrEmpty(secret);
     }
 
-    public HMACSigner(byte[] request, string secret)
+    public HMACSigner(string text, string secret) : this(SignatureEncoding.GetBytes(text), secret)
     {
-        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(text);
+    }
+
+    public HMACSigner(byte[] data, string secret)
+    {
+        ArgumentNullException.ThrowIfNull(data);
         ArgumentException.ThrowIfNullOrEmpty(secret);
 
-        _data = request;
+        _data = data;
         _secret = secret;
     }
 

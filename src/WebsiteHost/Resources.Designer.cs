@@ -105,6 +105,15 @@ namespace WebsiteHost {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The file &apos;{0}&apos; cannot be found in the directory {rootPath}.  Please make sure you have pre-built the JS application by running `npm run build`.
+        /// </summary>
+        internal static string HomeController_IndexPageNotBuilt {
+            get {
+                return ResourceManager.GetString("HomeController_IndexPageNotBuilt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;Message&apos; was either missing or invalid.
         /// </summary>
         internal static string RecordCrashRequestValidator_InvalidMessage {

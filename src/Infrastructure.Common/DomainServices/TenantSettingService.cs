@@ -1,4 +1,5 @@
 using Domain.Interfaces.Services;
+using Domain.Services.Shared.DomainServices;
 
 namespace Infrastructure.Common.DomainServices;
 
@@ -9,9 +10,9 @@ public class TenantSettingService : ITenantSettingService
 {
     public const string EncryptionServiceSecretSettingName = "DomainServices:TenantSettingService:AesSecret";
 
-    private readonly AesEncryptionService _encryptionService;
+    private readonly IEncryptionService _encryptionService;
 
-    public TenantSettingService(AesEncryptionService encryptionService)
+    public TenantSettingService(IEncryptionService encryptionService)
     {
         _encryptionService = encryptionService;
     }

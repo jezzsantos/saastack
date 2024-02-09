@@ -12,15 +12,12 @@ namespace WebsiteHost.Application;
 
 public class AuthenticationApplication : IAuthenticationApplication
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRecorder _recorder;
     private readonly IServiceClient _serviceClient;
 
-    public AuthenticationApplication(IRecorder recorder, IHttpContextAccessor httpContextAccessor,
-        IServiceClient serviceClient)
+    public AuthenticationApplication(IRecorder recorder, IServiceClient serviceClient)
     {
         _recorder = recorder;
-        _httpContextAccessor = httpContextAccessor;
         _serviceClient = serviceClient;
     }
 
@@ -53,31 +50,24 @@ public class AuthenticationApplication : IAuthenticationApplication
             return authenticated.Error.ToError();
         }
 
-        var tokens = authenticated.Value.Convert<AuthenticateResponse, AuthenticateTokens>();
-        var response = _httpContextAccessor.HttpContext!.Response;
-        PopulateCookies(response, tokens);
         _recorder.TrackUsage(context.ToCall(), UsageConstants.Events.UsageScenarios.UserLogin);
 
-        return new Result<AuthenticateTokens, Error>(tokens);
+        return authenticated.Value.ToTokens();
     }
 
     public Task<Result<Error>> LogoutAsync(ICallerContext context, CancellationToken cancellationToken)
     {
-        var response = _httpContextAccessor.HttpContext!.Response;
-        DeleteAuthenticationCookies(response);
-
         _recorder.TrackUsage(context.ToCall(), UsageConstants.Events.UsageScenarios.UserLogout);
 
         return Task.FromResult(Result.Ok);
     }
 
-    public async Task<Result<Error>> RefreshTokenAsync(ICallerContext context, CancellationToken cancellationToken)
+    public async Task<Result<AuthenticateTokens, Error>> RefreshTokenAsync(ICallerContext context, string? refreshToken,
+        CancellationToken cancellationToken)
     {
-        var request = _httpContextAccessor.HttpContext!.Request;
-        var refreshToken = GetRefreshTokenCookie(request);
-        if (!refreshToken.HasValue)
+        if (!refreshToken.HasValue())
         {
-            return Error.EntityNotFound();
+            return Error.NotAuthenticated();
         }
 
         var refreshed = await _serviceClient.PostAsync(context, new RefreshTokenRequest
@@ -89,51 +79,27 @@ public class AuthenticationApplication : IAuthenticationApplication
             return refreshed.Error.ToError();
         }
 
-        var tokens = refreshed.Value.Convert<RefreshTokenResponse, AuthenticateTokens>();
-        var response = _httpContextAccessor.HttpContext!.Response;
-        PopulateCookies(response, tokens);
         _recorder.TrackUsage(context.ToCall(), UsageConstants.Events.UsageScenarios.UserExtendedLogin);
 
-        return Result.Ok;
+        return refreshed.Value.ToTokens();
+    }
+}
+
+internal static class AuthenticationConversionExtensions
+{
+    public static AuthenticateTokens ToTokens(this AuthenticateResponse response)
+    {
+        var tokens = response.Convert<AuthenticateResponse, AuthenticateTokens>();
+        tokens.ExpiresOn = response.ExpiresOnUtc ?? DateTime.UtcNow;
+
+        return tokens;
     }
 
-    private static void PopulateCookies(HttpResponse response, AuthenticateTokens tokens)
+    public static AuthenticateTokens ToTokens(this RefreshTokenResponse response)
     {
-        response.Cookies.Append(AuthenticationConstants.Cookies.Token, tokens.AccessToken,
-            GetCookieOptions(tokens.ExpiresOn));
-        response.Cookies.Append(AuthenticationConstants.Cookies.RefreshToken, tokens.RefreshToken, GetCookieOptions());
-    }
+        var tokens = response.Convert<RefreshTokenResponse, AuthenticateTokens>();
+        tokens.ExpiresOn = response.ExpiresOnUtc ?? DateTime.UtcNow;
 
-    private static void DeleteAuthenticationCookies(HttpResponse response)
-    {
-        response.Cookies.Delete(AuthenticationConstants.Cookies.Token);
-        response.Cookies.Delete(AuthenticationConstants.Cookies.RefreshToken);
-    }
-
-    private static Optional<string> GetRefreshTokenCookie(HttpRequest request)
-    {
-        if (request.Cookies.TryGetValue(AuthenticationConstants.Cookies.RefreshToken, out var cookie))
-        {
-            return cookie;
-        }
-
-        return Optional<string>.None;
-    }
-
-    private static CookieOptions GetCookieOptions(DateTime? expires = null)
-    {
-        var options = new CookieOptions
-        {
-            Path = "/",
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Lax
-        };
-        if (expires.HasValue && expires.HasValue())
-        {
-            options.Expires = new DateTimeOffset(expires.Value);
-        }
-
-        return options;
+        return tokens;
     }
 }

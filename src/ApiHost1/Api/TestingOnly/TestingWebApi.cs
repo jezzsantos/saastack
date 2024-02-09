@@ -119,6 +119,22 @@ public sealed class TestingWebApi : IWebApiService
         });
     }
 
+    public async Task<ApiEmptyResult> GetInsecure(
+        GetInsecureTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+
+        return () => new Result<EmptyResponse, Error>();
+    }
+
+    public async Task<ApiEmptyResult> PostInsecure(
+        PostInsecureTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+
+        return () => new Result<EmptyResponse, Error>();
+    }
+
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> RequestCorrelationGet(
         RequestCorrelationsTestingOnlyRequest request, CancellationToken cancellationToken)
     {

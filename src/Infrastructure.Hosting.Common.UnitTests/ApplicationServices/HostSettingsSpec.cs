@@ -60,4 +60,27 @@ public class HostSettingsSpec
 
         result.Should().Be("http://localhost/api");
     }
+
+    [Fact]
+    public void WhenGetWebsiteHostCSRFSigningSecret_ThenReturnsBaseUrl()
+    {
+        _settings.Setup(s => s.Platform.GetString(HostSettings.WebsiteHostCSRFSigningSettingName, It.IsAny<string>()))
+            .Returns("asecret");
+
+        var result = _service.GetWebsiteHostCSRFSigningSecret();
+
+        result.Should().Be("asecret");
+    }
+
+    [Fact]
+    public void WhenGetWebsiteHostCSRFEncryptionSecret_ThenReturnsBaseUrl()
+    {
+        _settings.Setup(
+                s => s.Platform.GetString(HostSettings.WebsiteHostCSRFEncryptionSettingName, It.IsAny<string>()))
+            .Returns("asecret");
+
+        var result = _service.GetWebsiteHostCSRFEncryptionSecret();
+
+        result.Should().Be("asecret");
+    }
 }

@@ -1,10 +1,10 @@
 using Domain.Interfaces.Validations;
 using FluentAssertions;
-using Infrastructure.Shared.ApplicationServices;
+using Infrastructure.Shared.DomainServices;
 using UnitTesting.Common;
 using Xunit;
 
-namespace Infrastructure.Shared.UnitTests.ApplicationServices;
+namespace Infrastructure.Shared.UnitTests.DomainServices;
 
 [Trait("Category", "Unit")]
 public class TokensServiceSpec

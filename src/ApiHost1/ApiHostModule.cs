@@ -9,6 +9,7 @@ using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Shared.ApplicationServices;
 using Infrastructure.Shared.ApplicationServices;
+using Infrastructure.Shared.DomainServices;
 using Infrastructure.Web.Hosting.Common;
 
 namespace ApiHost1;

@@ -5,6 +5,7 @@ using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.Health;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using Infrastructure.Web.Common;
+using Infrastructure.Web.Hosting.Common.Pipeline;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.Extensions.DependencyInjection;
 using WebsiteHost;
@@ -16,13 +17,16 @@ namespace Infrastructure.Web.Website.IntegrationTests;
 [Collection("API")]
 public class ReverseProxyApiSpec : WebApiSpec<Program>
 {
+    private readonly CSRFMiddleware.ICSRFService _csrfService;
     private readonly JsonSerializerOptions _jsonOptions;
 
     public ReverseProxyApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
         StartupServer<ApiHost1.Program>();
+        _csrfService = setup.GetRequiredService<CSRFMiddleware.ICSRFService>();
 #if TESTINGONLY
-        HttpApi.PostAsync(new DestroyAllRepositoriesRequest().MakeApiRoute(), JsonContent.Create(new { })).GetAwaiter()
+        HttpApi.PostEmptyJsonAsync(new DestroyAllRepositoriesRequest().MakeApiRoute(),
+                (msg, cookies) => msg.WithCSRF(cookies, _csrfService)).GetAwaiter()
             .GetResult();
 #endif
         _jsonOptions = setup.GetRequiredService<JsonSerializerOptions>();
@@ -66,7 +70,7 @@ public class ReverseProxyApiSpec : WebApiSpec<Program>
     public async Task WhenRequestAnAnonymousRemoteWebApi_ThenReverseProxies()
     {
 #if TESTINGONLY
-        var result = await HttpApi.GetAsync(new AuthorizeByNothingTestingOnlyRequest().MakeApiRoute());
+        var result = await HttpApi.GetAsync(new GetInsecureTestingOnlyRequest().MakeApiRoute());
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
 #endif
@@ -85,7 +89,7 @@ public class ReverseProxyApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenRequestASecureRemoteWebApiAndAuthenticated_ThenReturnsResponse()
     {
-        var (userId, _) = await HttpApi.LoginUserFromBrowserAsync(_jsonOptions);
+        var (userId, _) = await HttpApi.LoginUserFromBrowserAsync(_jsonOptions, _csrfService);
 
 #if TESTINGONLY
         var result = await HttpApi.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest().MakeApiRoute());

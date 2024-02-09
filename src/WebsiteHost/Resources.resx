@@ -57,4 +57,7 @@
     <data name="AuthenticateRequestValidator_InvalidPassword" xml:space="preserve">
         <value>The 'Password' is either missing or invalid</value>
     </data>
+    <data name="HomeController_IndexPageNotBuilt" xml:space="preserve">
+        <value>The file '{0}' cannot be found in the directory {rootPath}.  Please make sure you have pre-built the JS application by running `npm run build`</value>
+    </data>
 </root>

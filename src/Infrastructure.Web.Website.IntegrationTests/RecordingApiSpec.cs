@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using System.Text.Json;
 using Application.Interfaces;
 using Application.Resources.Shared;
@@ -6,6 +7,8 @@ using Common.Recording;
 using FluentAssertions;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
+using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
+using Infrastructure.Web.Hosting.Common.Pipeline;
 using IntegrationTesting.WebApi.Common;
 using IntegrationTesting.WebApi.Common.Stubs;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,11 +22,18 @@ namespace Infrastructure.Web.Website.IntegrationTests;
 [Collection("API")]
 public class RecordingApiSpec : WebApiSpec<Program>
 {
+    private readonly CSRFMiddleware.ICSRFService _csrfService;
     private readonly StubRecorder _recorder;
 
     public RecordingApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
-        EmptyAllRepositories();
+        StartupServer<ApiHost1.Program>();
+        _csrfService = setup.GetRequiredService<CSRFMiddleware.ICSRFService>();
+#if TESTINGONLY
+        HttpApi.PostEmptyJsonAsync(new DestroyAllRepositoriesRequest().MakeApiRoute(),
+                (msg, cookies) => msg.WithCSRF(cookies, _csrfService)).GetAwaiter()
+            .GetResult();
+#endif
         _recorder = setup.GetRequiredService<IRecorder>().As<StubRecorder>();
         _recorder.Reset();
     }
@@ -31,10 +41,12 @@ public class RecordingApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenRecordPageView_ThenRecordsUsage()
     {
-        await Api.PostAsync(new RecordPageViewRequest
+        var request = new RecordPageViewRequest
         {
             Path = "apath"
-        });
+        };
+        await HttpApi.PostAsync(request.MakeApiRoute(), JsonContent.Create(request),
+            (msg, cookies) => msg.WithCSRF(cookies, _csrfService));
 
         _recorder.LastUsageEventName.Should().Be(UsageConstants.Events.Web.WebPageVisit);
         _recorder.LastUsageAdditional!.Count.Should().Be(6);
@@ -51,14 +63,16 @@ public class RecordingApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenRecordUsage_ThenRecordsUsage()
     {
-        await Api.PostAsync(new RecordUseRequest
+        var request = new RecordUseRequest
         {
             EventName = "aneventname",
             Additional = new Dictionary<string, object?>
             {
                 { "aname", "avalue" }
             }
-        });
+        };
+        await HttpApi.PostAsync(request.MakeApiRoute(), JsonContent.Create(request),
+            (msg, cookies) => msg.WithCSRF(cookies, _csrfService));
 
         _recorder.LastUsageEventName.Should().Be("aneventname");
         _recorder.LastUsageAdditional!.Count.Should().Be(6);
@@ -75,10 +89,12 @@ public class RecordingApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenRecordCrash_ThenRecordsCrash()
     {
-        await Api.PostAsync(new RecordCrashRequest
+        var request = new RecordCrashRequest
         {
             Message = "amessage"
-        });
+        };
+        await HttpApi.PostAsync(request.MakeApiRoute(), JsonContent.Create(request),
+            (msg, cookies) => msg.WithCSRF(cookies, _csrfService));
 
         _recorder.LastCrashLevel.Should().Be(CrashLevel.Critical);
         _recorder.LastCrashException.Should().BeOfType<Exception>();
@@ -88,7 +104,7 @@ public class RecordingApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenRecordTrace_ThenRecordsTrace()
     {
-        await Api.PostAsync(new RecordTraceRequest
+        var request = new RecordTraceRequest
         {
             Level = RecorderTraceLevel.Warning.ToString(),
             MessageTemplate = "amessage {aparam}",
@@ -96,7 +112,9 @@ public class RecordingApiSpec : WebApiSpec<Program>
             {
                 "avalue"
             }
-        });
+        };
+        await HttpApi.PostAsync(request.MakeApiRoute(), JsonContent.Create(request),
+            (msg, cookies) => msg.WithCSRF(cookies, _csrfService));
 
         _recorder.LastTraceLevel.Should().Be(StubRecorderTraceLevel.Warning);
         _recorder.LastTraceMessageTemplate.Should().Be("amessage {aparam}");
@@ -106,14 +124,16 @@ public class RecordingApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenRecordMeasurement_ThenRecordsMeasurement()
     {
-        await Api.PostAsync(new RecordMeasureRequest
+        var request = new RecordMeasureRequest
         {
             EventName = "aneventname",
             Additional = new Dictionary<string, object?>
             {
                 { "aname", "avalue" }
             }
-        });
+        };
+        await HttpApi.PostAsync(request.MakeApiRoute(), JsonContent.Create(request),
+            (msg, cookies) => msg.WithCSRF(cookies, _csrfService));
 
         _recorder.LastMeasureEventName.Should().Be("aneventname");
         _recorder.LastMeasureAdditional!.Count.Should().Be(6);

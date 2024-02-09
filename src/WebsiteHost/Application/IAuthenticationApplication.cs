@@ -11,5 +11,6 @@ public interface IAuthenticationApplication
 
     Task<Result<Error>> LogoutAsync(ICallerContext context, CancellationToken cancellationToken);
 
-    Task<Result<Error>> RefreshTokenAsync(ICallerContext context, CancellationToken cancellationToken);
+    Task<Result<AuthenticateTokens, Error>> RefreshTokenAsync(ICallerContext context, string? refreshToken,
+        CancellationToken cancellationToken);
 }

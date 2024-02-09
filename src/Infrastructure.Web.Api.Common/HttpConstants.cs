@@ -15,6 +15,7 @@ public static class HttpContentTypes
     public const string Xml = "application/xml";
     public const string XmlProblem = "application/problem+xml";
     public const string XmlWithCharset = "application/xml; charset=utf-8";
+    public const string Html = "text/html";
 }
 
 /// <summary>
@@ -27,6 +28,10 @@ public static class HttpHeaders
     public const string ContentType = "Content-Type";
     public const string HMACSignature = "X-Hub-Signature";
     public const string RequestId = "Request-ID";
+    public const string AntiCSRF = "anti-csrf-tok";
+    public const string Origin = "Origin";
+    public const string Referer = "Referer";
+    public const string SetCookie = "Set-Cookie";
 }
 
 /// <summary>

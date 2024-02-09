@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Text.Json;
 using Application.Resources.Shared;
 using Application.Services.Shared;
+using Common;
 using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
@@ -14,6 +15,7 @@ using IntegrationTesting.WebApi.Common.Stubs;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Mvc.Testing.Handlers;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -103,7 +105,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         "run --no-build --configuration {0} --launch-profile {1} --project {2}";
     private const string WebServerBaseUrlFormat = "https://localhost:{0}/";
     protected readonly IHttpJsonClient Api;
-    protected readonly HttpClient HttpApi;
+    protected readonly IHttpClient HttpApi;
     protected readonly StubNotificationsService NotificationsService;
 
     private readonly List<int> _additionalServerProcesses = new();
@@ -133,7 +135,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
     {
         if (disposing)
         {
-            HttpApi.Dispose();
+            (HttpApi as IDisposable)?.Dispose();
             _setup.Dispose();
             _additionalServerProcesses.ForEach(ShutdownProcess);
         }
@@ -254,29 +256,22 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
     {
         if (processId != 0)
         {
-            try
-            {
-                var process = Process.GetProcessById(processId);
-                process.Kill();
-            }
-            catch (ArgumentException)
-            {
-                //Ignore, the process does not exist
-            }
+            var process = Process.GetProcessById(processId);
+            Try.Safely(() => process.Kill());
         }
     }
 
-    private static (IHttpJsonClient Api, HttpClient HttpApi) CreateClients<TAnotherHost>(WebApiSetup<TAnotherHost> host)
+    private static (IHttpJsonClient Api, IHttpClient HttpApi) CreateClients<TAnotherHost>(
+        WebApiSetup<TAnotherHost> host)
         where TAnotherHost : class
     {
-        var httpApi = host.CreateClient(new WebApplicationFactoryClientOptions
-        {
-            HandleCookies = true,
-            BaseAddress = new Uri(WebServerBaseUrlFormat.Format(GetNextAvailablePort()))
-        });
+        var requestUri = new Uri(WebServerBaseUrlFormat.Format(GetNextAvailablePort()));
+        var handler = new CookieContainerHandler();
+        var client = host.CreateDefaultClient(requestUri, handler);
 
         var jsonOptions = host.GetRequiredService<JsonSerializerOptions>();
-        var api = new JsonClient(httpApi, jsonOptions);
+        var httpApi = new TestingClient(client, jsonOptions, handler);
+        var api = new JsonClient(client, jsonOptions);
 
         return (api, httpApi);
     }

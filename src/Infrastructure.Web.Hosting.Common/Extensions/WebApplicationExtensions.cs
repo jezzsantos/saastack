@@ -9,6 +9,7 @@ using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Common;
 using Infrastructure.Web.Hosting.Common.ApplicationServices;
+using Infrastructure.Web.Hosting.Common.Pipeline;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Diagnostics;
@@ -43,9 +44,14 @@ public static class WebApplicationExtensions
         middlewares.Add(new MiddlewareRegistration(30,
             app => { app.UsePathBase(new PathString(WebConstants.BackEndForFrontEndBasePath)); },
             "Pipeline: Website API is enabled: Route -> {Route}", WebConstants.BackEndForFrontEndBasePath));
-        middlewares.Add(new MiddlewareRegistration(31, app =>
+        middlewares.Add(new MiddlewareRegistration(35, app =>
         {
-            app.UseDefaultFiles();
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
         }, "Pipeline: Serving static HTML/CSS/JS is enabled"));
         middlewares.Add(new MiddlewareRegistration(CustomMiddlewareIndex + 100, app =>

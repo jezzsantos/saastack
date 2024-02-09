@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace Infrastructure.Web.Common;
+namespace Infrastructure.Web.Hosting.Common.Pipeline;
 
 /// <summary>
 ///     Provides middleware to detect the tenant of incoming requests

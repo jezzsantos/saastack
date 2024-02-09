@@ -105,6 +105,105 @@ namespace Infrastructure.Web.Hosting.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to AES encrypt the user ID.
+        /// </summary>
+        internal static string CSFRTokenPair_FailedEncryptUserId {
+            get {
+                return ResourceManager.GetString("CSFRTokenPair_FailedEncryptUserId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Host of the base URL could not be determined from: &apos;{0}&apos;.
+        /// </summary>
+        internal static string CSRFMiddleware_InvalidHostName {
+            get {
+                return ResourceManager.GetString("CSRFMiddleware_InvalidHostName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The CSRF cookie and/or header are invalid for the current user: &apos;{0}&apos;.
+        /// </summary>
+        internal static string CSRFMiddleware_InvalidSignature {
+            get {
+                return ResourceManager.GetString("CSRFMiddleware_InvalidSignature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The JWT access_token is invalid in the request.
+        /// </summary>
+        internal static string CSRFMiddleware_InvalidToken {
+            get {
+                return ResourceManager.GetString("CSRFMiddleware_InvalidToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The CSRF cookie is missing from the request.
+        /// </summary>
+        internal static string CSRFMiddleware_MissingCSRFCookieValue {
+            get {
+                return ResourceManager.GetString("CSRFMiddleware_MissingCSRFCookieValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The CSRF cookie and/or the CSRF header are invalid in the request.
+        /// </summary>
+        internal static string CSRFMiddleware_MissingCSRFCredentials {
+            get {
+                return ResourceManager.GetString("CSRFMiddleware_MissingCSRFCredentials", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The CSRF header is missing from the request.
+        /// </summary>
+        internal static string CSRFMiddleware_MissingCSRFHeaderValue {
+            get {
+                return ResourceManager.GetString("CSRFMiddleware_MissingCSRFHeaderValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Origin and Referer headers are missing from the request.
+        /// </summary>
+        internal static string CSRFMiddleware_MissingOriginAndReferer {
+            get {
+                return ResourceManager.GetString("CSRFMiddleware_MissingOriginAndReferer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Origin of the request does not match the server.
+        /// </summary>
+        internal static string CSRFMiddleware_OriginMismatched {
+            get {
+                return ResourceManager.GetString("CSRFMiddleware_OriginMismatched", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Referer of the request does not match the server.
+        /// </summary>
+        internal static string CSRFMiddleware_RefererMismatched {
+            get {
+                return ResourceManager.GetString("CSRFMiddleware_RefererMismatched", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to AES decrypt the user ID.
+        /// </summary>
+        internal static string CSRFTokenPair_FailedDecryptUserId {
+            get {
+                return ResourceManager.GetString("CSRFTokenPair_FailedDecryptUserId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed HMAC authentication.
         /// </summary>
         internal static string HMACAuthenticationHandler_FailedAuthentication {

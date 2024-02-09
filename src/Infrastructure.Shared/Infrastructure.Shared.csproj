@@ -26,10 +26,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="DomainServices\" />
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
         <ProjectReference Include="..\Application.Persistence.Shared\Application.Persistence.Shared.csproj" />
         <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />

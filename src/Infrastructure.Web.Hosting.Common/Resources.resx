@@ -54,4 +54,37 @@
     <data name="RolesAndFeaturesAuthorizationHandler_HandleRequirementAsync_MissingFeature" xml:space="preserve">
         <value>Invalid subscription level</value>
     </data>
+    <data name="CSFRTokenPair_FailedEncryptUserId" xml:space="preserve">
+        <value>Failed to AES encrypt the user ID</value>
+    </data>
+    <data name="CSRFTokenPair_FailedDecryptUserId" xml:space="preserve">
+        <value>Failed to AES decrypt the user ID</value>
+    </data>
+    <data name="CSRFMiddleware_InvalidHostName" xml:space="preserve">
+        <value>The Host of the base URL could not be determined from: '{0}'</value>
+    </data>
+    <data name="CSRFMiddleware_MissingCSRFCookieValue" xml:space="preserve">
+        <value>The CSRF cookie is missing from the request</value>
+    </data>
+    <data name="CSRFMiddleware_MissingCSRFHeaderValue" xml:space="preserve">
+        <value>The CSRF header is missing from the request</value>
+    </data>
+    <data name="CSRFMiddleware_InvalidToken" xml:space="preserve">
+        <value>The JWT access_token is invalid in the request</value>
+    </data>
+    <data name="CSRFMiddleware_MissingCSRFCredentials" xml:space="preserve">
+        <value>The CSRF cookie and/or the CSRF header are invalid in the request</value>
+    </data>
+    <data name="CSRFMiddleware_InvalidSignature" xml:space="preserve">
+        <value>The CSRF cookie and/or header are invalid for the current user: '{0}'</value>
+    </data>
+    <data name="CSRFMiddleware_MissingOriginAndReferer" xml:space="preserve">
+        <value>The Origin and Referer headers are missing from the request</value>
+    </data>
+    <data name="CSRFMiddleware_OriginMismatched" xml:space="preserve">
+        <value>The Origin of the request does not match the server</value>
+    </data>
+    <data name="CSRFMiddleware_RefererMismatched" xml:space="preserve">
+        <value>The Referer of the request does not match the server</value>
+    </data>
 </root>
