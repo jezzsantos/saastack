@@ -61,7 +61,8 @@ public class AuthTokensApplication : IAuthTokensApplication
             authTokens = root.Value;
         }
 
-        var set = authTokens.SetTokens(tokens.AccessToken, tokens.RefreshToken, tokens.ExpiresOn);
+        var set = authTokens.SetTokens(tokens.AccessToken, tokens.RefreshToken, tokens.AccessTokenExpiresOn,
+            tokens.RefreshTokenExpiresOn);
         if (!set.IsSuccessful)
         {
             return set.Error;
@@ -107,7 +108,8 @@ public class AuthTokensApplication : IAuthTokensApplication
         }
 
         var tokens = issued.Value;
-        var renewed = authTokens.RenewTokens(refreshToken, tokens.AccessToken, tokens.RefreshToken, tokens.ExpiresOn);
+        var renewed = authTokens.RenewTokens(refreshToken, tokens.AccessToken, tokens.RefreshToken,
+            tokens.AccessTokenExpiresOn, tokens.RefreshTokenExpiresOn);
         if (!renewed.IsSuccessful)
         {
             return Error.NotAuthenticated();

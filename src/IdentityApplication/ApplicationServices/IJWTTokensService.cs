@@ -10,16 +10,20 @@ public interface IJWTTokensService
 
 public struct AccessTokens
 {
-    public AccessTokens(string accessToken, string refreshToken, DateTime expiresOn)
+    public AccessTokens(string accessToken, DateTime accessTokenExpiresOn, string refreshToken,
+        DateTime refreshTokenExpiresOn)
     {
         AccessToken = accessToken;
         RefreshToken = refreshToken;
-        ExpiresOn = expiresOn;
+        AccessTokenExpiresOn = accessTokenExpiresOn;
+        RefreshTokenExpiresOn = refreshTokenExpiresOn;
     }
 
     public string AccessToken { get; }
 
     public string RefreshToken { get; }
 
-    public DateTime ExpiresOn { get; }
+    public DateTime AccessTokenExpiresOn { get; }
+
+    public DateTime RefreshTokenExpiresOn { get; }
 }

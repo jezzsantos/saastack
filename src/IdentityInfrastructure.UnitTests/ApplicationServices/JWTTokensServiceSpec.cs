@@ -60,13 +60,14 @@ public class JWTTokensServiceSpec
 
         result.Value.AccessToken.Should().NotBeEmpty();
         result.Value.RefreshToken.Should().Be("arefreshtoken");
-        result.Value.ExpiresOn.Should().BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultTokenExpiry));
+        result.Value.AccessTokenExpiresOn.Should()
+            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry));
 
         var token = new JwtSecurityTokenHandler().ReadJwtToken(result.Value.AccessToken);
 
         token.Issuer.Should().Be("https://localhost");
         token.Audiences.Should().ContainSingle(aud => aud == "https://localhost");
-        token.ValidTo.Should().BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultTokenExpiry),
+        token.ValidTo.Should().BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry),
             TimeSpan.FromMinutes(1));
         token.Claims.Count().Should().Be(8);
         token.Claims.Should()

@@ -92,8 +92,10 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
 
         result.Content.Value.AccessToken.Should().NotBeNull();
         result.Content.Value.RefreshToken.Should().NotBeNull();
-        result.Content.Value.ExpiresOnUtc.Should()
-            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultTokenExpiry));
+        result.Content.Value.AccessTokenExpiresOnUtc.Should()
+            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry));
+        result.Content.Value.RefreshTokenExpiresOnUtc.Should()
+            .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultRefreshTokenExpiry));
     }
 
     [Fact]

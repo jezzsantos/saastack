@@ -32,11 +32,14 @@ public sealed class AuthTokensRoot : AggregateRootBase
 
     public Optional<DateTime> AccessTokenExpiresOn { get; private set; }
 
-    public bool IsAccessTokenExpired => !IsRevoked && DateTime.UtcNow > AccessTokenExpiresOn.Value;
+    public bool IsRefreshTokenExpired => !IsRevoked && DateTime.UtcNow > RefreshTokenExpiresOn.Value;
 
-    public bool IsRevoked => !RefreshToken.HasValue && !AccessToken.HasValue && !AccessTokenExpiresOn.HasValue;
+    public bool IsRevoked => !RefreshToken.HasValue && !AccessToken.HasValue && !AccessTokenExpiresOn.HasValue
+                             && !RefreshTokenExpiresOn.HasValue;
 
     public Optional<string> RefreshToken { get; private set; }
+
+    public Optional<DateTime> RefreshTokenExpiresOn { get; private set; }
 
     public Identifier UserId { get; private set; } = Identifier.Empty();
 
@@ -71,7 +74,8 @@ public sealed class AuthTokensRoot : AggregateRootBase
             {
                 AccessToken = changed.AccessToken;
                 RefreshToken = changed.RefreshToken;
-                AccessTokenExpiresOn = changed.ExpiresOn;
+                AccessTokenExpiresOn = changed.AccessTokenExpiresOn;
+                RefreshTokenExpiresOn = changed.RefreshTokenExpiresOn;
                 Recorder.TraceDebug(null, "AuthTokens {Id} were changed for {UserId}", Id, changed.UserId);
                 return Result.Ok;
             }
@@ -80,7 +84,8 @@ public sealed class AuthTokensRoot : AggregateRootBase
             {
                 AccessToken = changed.AccessToken;
                 RefreshToken = changed.RefreshToken;
-                AccessTokenExpiresOn = changed.ExpiresOn;
+                AccessTokenExpiresOn = changed.AccessTokenExpiresOn;
+                RefreshTokenExpiresOn = changed.RefreshTokenExpiresOn;
                 Recorder.TraceDebug(null, "AuthTokens {Id} were refreshed for {UserId}", Id, changed.UserId);
                 return Result.Ok;
             }
@@ -90,6 +95,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
                 AccessToken = Optional<string>.None;
                 RefreshToken = Optional<string>.None;
                 AccessTokenExpiresOn = Optional<DateTime>.None;
+                RefreshTokenExpiresOn = Optional<DateTime>.None;
                 Recorder.TraceDebug(null, "AuthTokens {Id} were revoked for {UserId}", Id, changed.UserId);
                 return Result.Ok;
             }
@@ -100,7 +106,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
     }
 
     public Result<Error> RenewTokens(string refreshTokenToRenew, string accessToken, string refreshToken,
-        DateTime expiresOn)
+        DateTime accessTokenExpiresOn, DateTime refreshTokenExpiresOn)
     {
         if (IsRevoked)
         {
@@ -112,15 +118,16 @@ public sealed class AuthTokensRoot : AggregateRootBase
             return Error.RuleViolation(Resources.AuthTokensRoot_RefreshTokenNotMatched);
         }
 
-        if (IsAccessTokenExpired)
+        if (IsRefreshTokenExpired)
         {
             return Error.RuleViolation(Resources.AuthTokensRoot_RefreshTokenExpired);
         }
 
         return RaiseChangeEvent(
-            IdentityDomain.Events.AuthTokens.TokensRefreshed.Create(Id, UserId, accessToken, refreshToken, expiresOn));
+            IdentityDomain.Events.AuthTokens.TokensRefreshed.Create(Id, UserId, accessToken, accessTokenExpiresOn,
+                refreshToken, refreshTokenExpiresOn));
     }
-
+    
     public Result<Error> Revoke(string refreshToken)
     {
         if (IsRevoked)
@@ -137,23 +144,27 @@ public sealed class AuthTokensRoot : AggregateRootBase
             IdentityDomain.Events.AuthTokens.TokensRevoked.Create(Id, UserId));
     }
 
-    public Result<Error> SetTokens(string accessToken, string refreshToken, DateTime expiresOn)
+    public Result<Error> SetTokens(string accessToken, string refreshToken, DateTime accessTokenExpiresOn,
+        DateTime refreshTokenExpiresOn)
     {
         var threshold = DateTime.UtcNow.AddSeconds(5);
-        if (expiresOn < threshold)
+        if (accessTokenExpiresOn < threshold)
         {
             return Error.RuleViolation(Resources.AuthTokensRoot_TokensExpired);
         }
 
         return RaiseChangeEvent(
-            IdentityDomain.Events.AuthTokens.TokensChanged.Create(Id, UserId, accessToken, refreshToken, expiresOn));
+            IdentityDomain.Events.AuthTokens.TokensChanged.Create(Id, UserId, accessToken, accessTokenExpiresOn,
+                refreshToken, refreshTokenExpiresOn));
     }
 
 #if TESTINGONLY
-    public Result<Error> TestingOnly_SetTokens(string accessToken, string refreshToken, DateTime expiresOn)
+    public Result<Error> TestingOnly_SetTokens(string accessToken, string refreshToken, DateTime accessTokenExpiresOn,
+        DateTime refreshTokenExpiresOn)
     {
         return RaiseChangeEvent(
-            IdentityDomain.Events.AuthTokens.TokensChanged.Create(Id, UserId, accessToken, refreshToken, expiresOn));
+            IdentityDomain.Events.AuthTokens.TokensChanged.Create(Id, UserId, accessToken, accessTokenExpiresOn,
+                refreshToken, refreshTokenExpiresOn));
     }
 #endif
 }

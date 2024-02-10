@@ -259,8 +259,8 @@ public class PasswordCredentialsApplicationSpec
         _authTokensService.Setup(jts =>
                 jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<AccessTokens, Error>>(new AccessTokens("anaccesstoken", "arefreshtoken",
-                expiresOn)));
+            .Returns(Task.FromResult<Result<AccessTokens, Error>>(new AccessTokens("anaccesstoken", expiresOn,
+                "arefreshtoken", expiresOn)));
 
         var result =
             await _application.AuthenticateAsync(_caller.Object, "ausername", "apassword", CancellationToken.None);
@@ -268,7 +268,8 @@ public class PasswordCredentialsApplicationSpec
         result.Should().BeSuccess();
         result.Value.AccessToken.Should().Be("anaccesstoken");
         result.Value.RefreshToken.Should().Be("arefreshtoken");
-        result.Value.ExpiresOn.Should().Be(expiresOn);
+        result.Value.AccessTokenExpiresOn.Should().Be(expiresOn);
+        result.Value.RefreshTokenExpiresOn.Should().Be(expiresOn);
         _repository.Verify(rep => rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()));
         _recorder.Verify(rec => rec.AuditAgainst(It.IsAny<ICallContext>(), "auserid",
             Audits.PasswordCredentialsApplication_Authenticate_Succeeded, It.IsAny<string>(),

@@ -42,7 +42,8 @@ public class AuthenticationApplicationSpec
     [Fact]
     public async Task WhenAuthenticateWithCredentials_ThenAuthenticates()
     {
-        var expires = DateTime.UtcNow;
+        var accessTokenExpiresOn = DateTime.UtcNow;
+        var refreshTokenExpiresOn = DateTime.UtcNow.AddMinutes(1);
         _serviceClient.Setup(sc => sc.PostAsync(It.IsAny<ICallerContext>(), It.IsAny<AuthenticatePasswordRequest>(),
                 null, It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<AuthenticateResponse, ResponseProblem>>(new AuthenticateResponse
@@ -50,7 +51,8 @@ public class AuthenticationApplicationSpec
                 UserId = "auserid",
                 AccessToken = "anaccesstoken",
                 RefreshToken = "arefreshtoken",
-                ExpiresOnUtc = expires
+                AccessTokenExpiresOnUtc = accessTokenExpiresOn,
+                RefreshTokenExpiresOnUtc = refreshTokenExpiresOn
             }));
 
         var result = await _application.AuthenticateAsync(_caller.Object, AuthenticationConstants.Providers.Credentials,
@@ -58,7 +60,8 @@ public class AuthenticationApplicationSpec
 
         result.Value.AccessToken.Should().Be("anaccesstoken");
         result.Value.RefreshToken.Should().Be("arefreshtoken");
-        result.Value.ExpiresOn.Should().Be(expires);
+        result.Value.AccessTokenExpiresOn.Should().Be(accessTokenExpiresOn);
+        result.Value.RefreshTokenExpiresOn.Should().Be(refreshTokenExpiresOn);
         result.Value.UserId.Should().Be("auserid");
         _serviceClient.Verify(sc => sc.PostAsync(_caller.Object, It.Is<AuthenticatePasswordRequest>(req =>
             req.Username == "ausername"
@@ -71,7 +74,8 @@ public class AuthenticationApplicationSpec
     [Fact]
     public async Task WhenAuthenticateWithSingleSignOn_ThenAuthenticates()
     {
-        var expires = DateTime.UtcNow;
+        var accessTokenExpiresOn = DateTime.UtcNow;
+        var refreshTokenExpiresOn = DateTime.UtcNow.AddMinutes(1);
         _serviceClient.Setup(sc => sc.PostAsync(It.IsAny<ICallerContext>(), It.IsAny<AuthenticateSingleSignOnRequest>(),
                 null, It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<AuthenticateResponse, ResponseProblem>>(new AuthenticateResponse
@@ -79,7 +83,8 @@ public class AuthenticationApplicationSpec
                 UserId = "auserid",
                 AccessToken = "anaccesstoken",
                 RefreshToken = "arefreshtoken",
-                ExpiresOnUtc = expires
+                AccessTokenExpiresOnUtc = accessTokenExpiresOn,
+                RefreshTokenExpiresOnUtc = refreshTokenExpiresOn
             }));
 
         var result = await _application.AuthenticateAsync(_caller.Object,
@@ -88,7 +93,8 @@ public class AuthenticationApplicationSpec
 
         result.Value.AccessToken.Should().Be("anaccesstoken");
         result.Value.RefreshToken.Should().Be("arefreshtoken");
-        result.Value.ExpiresOn.Should().Be(expires);
+        result.Value.AccessTokenExpiresOn.Should().Be(accessTokenExpiresOn);
+        result.Value.RefreshTokenExpiresOn.Should().Be(refreshTokenExpiresOn);
         result.Value.UserId.Should().Be("auserid");
         _serviceClient.Verify(sc => sc.PostAsync(_caller.Object, It.Is<AuthenticateSingleSignOnRequest>(req =>
             req.AuthCode == "anauthcode"
@@ -113,14 +119,16 @@ public class AuthenticationApplicationSpec
     [Fact]
     public async Task WhenRefreshTokenCookieExists_ThenRefreshesAndSetsCookie()
     {
-        var expires = DateTime.UtcNow;
+        var accessTokenExpiresOn = DateTime.UtcNow;
+        var refreshTokenExpiresOn = DateTime.UtcNow.AddMinutes(1);
         _serviceClient.Setup(sc => sc.PostAsync(It.IsAny<ICallerContext>(), It.IsAny<RefreshTokenRequest>(),
                 null, It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<RefreshTokenResponse, ResponseProblem>>(new RefreshTokenResponse
             {
                 AccessToken = "anaccesstoken",
                 RefreshToken = "arefreshtoken",
-                ExpiresOnUtc = expires
+                AccessTokenExpiresOnUtc = accessTokenExpiresOn,
+                RefreshTokenExpiresOnUtc = refreshTokenExpiresOn
             }));
 
         var result = await _application.RefreshTokenAsync(_caller.Object, "arefreshtoken", CancellationToken.None);
@@ -128,7 +136,8 @@ public class AuthenticationApplicationSpec
         result.Should().BeSuccess();
         result.Value.AccessToken.Should().Be("anaccesstoken");
         result.Value.RefreshToken.Should().Be("arefreshtoken");
-        result.Value.ExpiresOn.Should().Be(expires);
+        result.Value.AccessTokenExpiresOn.Should().Be(accessTokenExpiresOn);
+        result.Value.RefreshTokenExpiresOn.Should().Be(refreshTokenExpiresOn);
         result.Value.UserId.Should().BeNull();
         _serviceClient.Verify(
             sc => sc.PostAsync(_caller.Object, It.Is<RefreshTokenRequest>(req =>

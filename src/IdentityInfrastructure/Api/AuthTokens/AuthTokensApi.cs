@@ -41,7 +41,8 @@ public class AuthTokensApi : IWebApiService
             {
                 AccessToken = x.AccessToken,
                 RefreshToken = x.RefreshToken,
-                ExpiresOnUtc = x.ExpiresOn
+                AccessTokenExpiresOnUtc = x.AccessTokenExpiresOn,
+                RefreshTokenExpiresOnUtc = x.RefreshTokenExpiresOn
             }));
     }
 }

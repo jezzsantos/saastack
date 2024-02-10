@@ -1,6 +1,5 @@
 using Application.Resources.Shared;
 using Common;
-using Common.Extensions;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
@@ -71,8 +70,9 @@ public class AuthenticationApi : IWebApiService
     private static void PopulateCookies(HttpResponse response, AuthenticateTokens tokens)
     {
         response.Cookies.Append(AuthenticationConstants.Cookies.Token, tokens.AccessToken,
-            GetCookieOptions(tokens.ExpiresOn));
-        response.Cookies.Append(AuthenticationConstants.Cookies.RefreshToken, tokens.RefreshToken, GetCookieOptions());
+            GetCookieOptions(tokens.AccessTokenExpiresOn));
+        response.Cookies.Append(AuthenticationConstants.Cookies.RefreshToken, tokens.RefreshToken,
+            GetCookieOptions(tokens.RefreshTokenExpiresOn));
     }
 
     private static void DeleteAuthenticationCookies(HttpResponse response)
@@ -91,19 +91,16 @@ public class AuthenticationApi : IWebApiService
         return Optional<string>.None;
     }
 
-    private static CookieOptions GetCookieOptions(DateTime? expires = null)
+    private static CookieOptions GetCookieOptions(DateTime expires)
     {
         var options = new CookieOptions
         {
             Path = "/",
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Lax
+            SameSite = SameSiteMode.Lax,
+            Expires = new DateTimeOffset(expires)
         };
-        if (expires.HasValue && expires.HasValue())
-        {
-            options.Expires = new DateTimeOffset(expires.Value);
-        }
 
         return options;
     }

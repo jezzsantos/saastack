@@ -36,7 +36,8 @@ public class AuthTokensProjection : IReadModelProjection
                 {
                     dto.AccessToken = e.AccessToken;
                     dto.RefreshToken = e.RefreshToken;
-                    dto.ExpiresOn = e.ExpiresOn;
+                    dto.AccessTokenExpiresOn = e.AccessTokenExpiresOn;
+                    dto.RefreshTokenExpiresOn = e.RefreshTokenExpiresOn;
                 }, cancellationToken);
 
             case Events.AuthTokens.TokensRefreshed e:
@@ -44,7 +45,8 @@ public class AuthTokensProjection : IReadModelProjection
                 {
                     dto.AccessToken = e.AccessToken;
                     dto.RefreshToken = e.RefreshToken;
-                    dto.ExpiresOn = e.ExpiresOn;
+                    dto.AccessTokenExpiresOn = e.AccessTokenExpiresOn;
+                    dto.RefreshTokenExpiresOn = e.RefreshTokenExpiresOn;
                 }, cancellationToken);
 
             case Events.AuthTokens.TokensRevoked e:
@@ -52,7 +54,8 @@ public class AuthTokensProjection : IReadModelProjection
                 {
                     dto.AccessToken = Optional<string>.None;
                     dto.RefreshToken = Optional<string>.None;
-                    dto.ExpiresOn = Optional<DateTime>.None;
+                    dto.AccessTokenExpiresOn = Optional<DateTime>.None;
+                    dto.RefreshTokenExpiresOn = Optional<DateTime>.None;
                 }, cancellationToken);
 
             default:

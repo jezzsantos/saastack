@@ -224,7 +224,8 @@ public static class Events
         public class TokensChanged : IDomainEvent
         {
             public static TokensChanged Create(Identifier id, Identifier userId, string accessToken,
-                string refreshToken, DateTime expiresOn)
+                DateTime accessTokenExpiresOn,
+                string refreshToken, DateTime refreshTokenExpiresOn)
             {
                 return new TokensChanged
                 {
@@ -232,16 +233,19 @@ public static class Events
                     UserId = userId,
                     AccessToken = accessToken,
                     RefreshToken = refreshToken,
-                    ExpiresOn = expiresOn,
+                    AccessTokenExpiresOn = accessTokenExpiresOn,
+                    RefreshTokenExpiresOn = refreshTokenExpiresOn,
                     OccurredUtc = DateTime.UtcNow
                 };
             }
 
             public required string AccessToken { get; set; }
 
-            public required DateTime ExpiresOn { get; set; }
+            public required DateTime AccessTokenExpiresOn { get; set; }
 
             public required string RefreshToken { get; set; }
+
+            public required DateTime RefreshTokenExpiresOn { get; set; }
 
             public required string UserId { get; set; }
 
@@ -253,7 +257,8 @@ public static class Events
         public class TokensRefreshed : IDomainEvent
         {
             public static TokensRefreshed Create(Identifier id, Identifier userId, string accessToken,
-                string refreshToken, DateTime expiresOn)
+                DateTime accessTokenExpiresOn,
+                string refreshToken, DateTime refreshTokenExpiresOn)
             {
                 return new TokensRefreshed
                 {
@@ -261,14 +266,17 @@ public static class Events
                     UserId = userId,
                     AccessToken = accessToken,
                     RefreshToken = refreshToken,
-                    ExpiresOn = expiresOn,
+                    AccessTokenExpiresOn = accessTokenExpiresOn,
+                    RefreshTokenExpiresOn = refreshTokenExpiresOn,
                     OccurredUtc = DateTime.UtcNow
                 };
             }
 
             public required string AccessToken { get; set; }
 
-            public required DateTime ExpiresOn { get; set; }
+            public required DateTime AccessTokenExpiresOn { get; set; }
+
+            public required DateTime RefreshTokenExpiresOn { get; set; }
 
             public required string RefreshToken { get; set; }
 

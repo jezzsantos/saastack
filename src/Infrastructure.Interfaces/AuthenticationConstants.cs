@@ -35,6 +35,7 @@ public static class AuthenticationConstants
 
     public static class Tokens
     {
-        public static readonly TimeSpan DefaultTokenExpiry = TimeSpan.FromMinutes(15);
+        public static readonly TimeSpan DefaultAccessTokenExpiry = TimeSpan.FromMinutes(15);
+        public static readonly TimeSpan DefaultRefreshTokenExpiry = TimeSpan.FromDays(14);
     }
 }

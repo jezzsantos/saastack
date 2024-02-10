@@ -56,7 +56,7 @@ public class AuthTokensApplicationSpec
         var expiresOn = DateTime.UtcNow.AddMinutes(1);
         _jwtTokensService.Setup(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()))
             .Returns(Task.FromResult<Result<AccessTokens, Error>>(
-                new AccessTokens("anaccesstoken", "arefreshtoken", expiresOn)));
+                new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn)));
         _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<AuthTokensRoot>, Error>>(Optional<AuthTokensRoot>.None));
 
@@ -64,13 +64,14 @@ public class AuthTokensApplicationSpec
 
         result.Value.AccessToken.Should().Be("anaccesstoken");
         result.Value.RefreshToken.Should().Be("arefreshtoken");
-        result.Value.ExpiresOn.Should().Be(expiresOn);
+        result.Value.AccessTokenExpiresOn.Should().Be(expiresOn);
         _jwtTokensService.Verify(jts => jts.IssueTokensAsync(user));
         _repository.Verify(rep => rep.SaveAsync(It.Is<AuthTokensRoot>(at =>
             at.Id == "anid"
             && at.AccessToken == "anaccesstoken"
             && at.RefreshToken == "arefreshtoken"
             && at.AccessTokenExpiresOn == expiresOn
+            && at.RefreshTokenExpiresOn == expiresOn
         ), It.IsAny<CancellationToken>()));
     }
 
@@ -85,7 +86,7 @@ public class AuthTokensApplicationSpec
         var expiresOn = DateTime.UtcNow.AddMinutes(1);
         _jwtTokensService.Setup(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()))
             .Returns(Task.FromResult<Result<AccessTokens, Error>>(
-                new AccessTokens("anaccesstoken", "arefreshtoken", expiresOn)));
+                new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn)));
         _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<AuthTokensRoot>, Error>>(authTokens.ToOptional()));
 
@@ -93,13 +94,14 @@ public class AuthTokensApplicationSpec
 
         result.Value.AccessToken.Should().Be("anaccesstoken");
         result.Value.RefreshToken.Should().Be("arefreshtoken");
-        result.Value.ExpiresOn.Should().Be(expiresOn);
+        result.Value.AccessTokenExpiresOn.Should().Be(expiresOn);
         _jwtTokensService.Verify(jts => jts.IssueTokensAsync(user));
         _repository.Verify(rep => rep.SaveAsync(It.Is<AuthTokensRoot>(at =>
             at.Id == "anid"
             && at.AccessToken == "anaccesstoken"
             && at.RefreshToken == "arefreshtoken"
             && at.AccessTokenExpiresOn == expiresOn
+            && at.RefreshTokenExpiresOn == expiresOn
         ), It.IsAny<CancellationToken>()));
     }
 
@@ -127,7 +129,7 @@ public class AuthTokensApplicationSpec
         var expiresOn1 = DateTime.UtcNow.AddMinutes(1);
         var expiresOn2 = DateTime.UtcNow.AddMinutes(2);
         var authTokens = AuthTokensRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId()).Value;
-        authTokens.SetTokens("anaccesstoken1", "arefreshtoken1", expiresOn1);
+        authTokens.SetTokens("anaccesstoken1", "arefreshtoken1", expiresOn1, expiresOn1);
         _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<AuthTokensRoot>, Error>>(authTokens.ToOptional()));
         _endUsersService.Setup(eus =>
@@ -135,19 +137,20 @@ public class AuthTokensApplicationSpec
             .Returns(Task.FromResult<Result<EndUserWithMemberships, Error>>(user));
         _jwtTokensService.Setup(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()))
             .Returns(Task.FromResult<Result<AccessTokens, Error>>(
-                new AccessTokens("anaccesstoken2", "arefreshtoken2", expiresOn2)));
+                new AccessTokens("anaccesstoken2", expiresOn2, "arefreshtoken2", expiresOn2)));
 
         var result = await _application.RefreshTokenAsync(_caller.Object, "arefreshtoken1", CancellationToken.None);
 
         result.Value.AccessToken.Should().Be("anaccesstoken2");
         result.Value.RefreshToken.Should().Be("arefreshtoken2");
-        result.Value.ExpiresOn.Should().Be(expiresOn2);
+        result.Value.AccessTokenExpiresOn.Should().Be(expiresOn2);
         _jwtTokensService.Verify(jts => jts.IssueTokensAsync(user));
         _repository.Verify(rep => rep.SaveAsync(It.Is<AuthTokensRoot>(at =>
             at.Id == "anid"
             && at.AccessToken == "anaccesstoken2"
             && at.RefreshToken == "arefreshtoken2"
             && at.AccessTokenExpiresOn == expiresOn2
+            && at.RefreshTokenExpiresOn == expiresOn2
         ), It.IsAny<CancellationToken>()));
     }
 
@@ -170,7 +173,7 @@ public class AuthTokensApplicationSpec
     {
         var expiresOn = DateTime.UtcNow.AddMinutes(1);
         var authTokens = AuthTokensRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId()).Value;
-        authTokens.SetTokens("anaccesstoken", "arefreshtoken", expiresOn);
+        authTokens.SetTokens("anaccesstoken", "arefreshtoken", expiresOn, expiresOn);
         _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<AuthTokensRoot>, Error>>(authTokens.ToOptional()));
 
@@ -181,6 +184,7 @@ public class AuthTokensApplicationSpec
             && at.AccessToken == Optional<string>.None
             && at.RefreshToken == Optional<string>.None
             && at.AccessTokenExpiresOn == Optional<DateTime>.None
+            && at.RefreshTokenExpiresOn == Optional<DateTime>.None
         ), It.IsAny<CancellationToken>()));
     }
 }

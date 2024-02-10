@@ -156,7 +156,8 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         {
             AccessToken = tokens.AccessToken,
             RefreshToken = tokens.RefreshToken,
-            ExpiresOn = tokens.ExpiresOn,
+            AccessTokenExpiresOn = tokens.AccessTokenExpiresOn,
+            RefreshTokenExpiresOn = tokens.RefreshTokenExpiresOn,
             UserId = user.Id
         });
 

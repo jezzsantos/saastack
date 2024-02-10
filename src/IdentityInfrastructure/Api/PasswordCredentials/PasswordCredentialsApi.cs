@@ -34,7 +34,8 @@ public class PasswordCredentialsApi : IWebApiService
             {
                 AccessToken = tok.AccessToken,
                 RefreshToken = tok.RefreshToken,
-                ExpiresOnUtc = tok.ExpiresOn,
+                AccessTokenExpiresOnUtc = tok.AccessTokenExpiresOn,
+                RefreshTokenExpiresOnUtc = tok.RefreshTokenExpiresOn,
                 UserId = tok.UserId
             }));
     }
