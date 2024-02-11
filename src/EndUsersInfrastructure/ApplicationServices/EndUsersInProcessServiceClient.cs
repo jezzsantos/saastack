@@ -25,24 +25,30 @@ public class EndUsersInProcessServiceClient : IEndUsersService
         return await _endUsersApplication.GetPersonAsync(caller, id, cancellationToken);
     }
 
-    public async Task<Result<EndUserWithMemberships, Error>> GetMembershipsAsync(ICallerContext context, string id,
+    public async Task<Result<Optional<EndUser>, Error>> FindPersonByEmailAsync(ICallerContext caller,
+        string emailAddress, CancellationToken cancellationToken)
+    {
+        return await _endUsersApplication.FindPersonByEmailAsync(caller, emailAddress, cancellationToken);
+    }
+
+    public async Task<Result<EndUserWithMemberships, Error>> GetMembershipsAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken)
     {
-        return await _endUsersApplication.GetMembershipsAsync(context, id, cancellationToken);
+        return await _endUsersApplication.GetMembershipsAsync(caller, id, cancellationToken);
     }
 
     public async Task<Result<RegisteredEndUser, Error>> RegisterPersonAsync(ICallerContext caller, string emailAddress,
-        string firstName, string lastName,
-        string? timezone, string? countryCode, bool termsAndConditionsAccepted, CancellationToken cancellationToken)
+        string firstName, string? lastName, string? timezone, string? countryCode, bool termsAndConditionsAccepted,
+        CancellationToken cancellationToken)
     {
         return await _endUsersApplication.RegisterPersonAsync(caller, emailAddress, firstName, lastName, timezone,
             countryCode, termsAndConditionsAccepted, cancellationToken);
     }
 
-    public async Task<Result<RegisteredEndUser, Error>> RegisterMachineAsync(ICallerContext context, string name,
+    public async Task<Result<RegisteredEndUser, Error>> RegisterMachineAsync(ICallerContext caller, string name,
         string? timezone, string? countryCode,
         CancellationToken cancellationToken)
     {
-        return await _endUsersApplication.RegisterMachineAsync(context, name, timezone, countryCode, cancellationToken);
+        return await _endUsersApplication.RegisterMachineAsync(caller, name, timezone, countryCode, cancellationToken);
     }
 }

@@ -69,10 +69,10 @@ public class AuthenticationApi : IWebApiService
 
     private static void PopulateCookies(HttpResponse response, AuthenticateTokens tokens)
     {
-        response.Cookies.Append(AuthenticationConstants.Cookies.Token, tokens.AccessToken,
-            GetCookieOptions(tokens.AccessTokenExpiresOn));
-        response.Cookies.Append(AuthenticationConstants.Cookies.RefreshToken, tokens.RefreshToken,
-            GetCookieOptions(tokens.RefreshTokenExpiresOn));
+        response.Cookies.Append(AuthenticationConstants.Cookies.Token, tokens.AccessToken.Value,
+            GetCookieOptions(tokens.AccessToken.ExpiresOn));
+        response.Cookies.Append(AuthenticationConstants.Cookies.RefreshToken, tokens.RefreshToken.Value,
+            GetCookieOptions(tokens.RefreshToken.ExpiresOn));
     }
 
     private static void DeleteAuthenticationCookies(HttpResponse response)

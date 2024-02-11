@@ -79,7 +79,7 @@ public class AuthTokensApplication : IAuthTokensApplication
         return tokens;
     }
 
-    public async Task<Result<AccessTokens, Error>> RefreshTokenAsync(ICallerContext context, string refreshToken,
+    public async Task<Result<AuthenticateTokens, Error>> RefreshTokenAsync(ICallerContext context, string refreshToken,
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.FindByRefreshTokenAsync(refreshToken, cancellationToken);
@@ -123,7 +123,20 @@ public class AuthTokensApplication : IAuthTokensApplication
 
         _recorder.TraceInformation(context.ToCall(), "AuthTokens were refreshed for {Id}", updated.Value.Id);
 
-        return tokens;
+        return new AuthenticateTokens
+        {
+            UserId = user.Id,
+            AccessToken = new AuthenticateToken
+            {
+                Value = tokens.AccessToken,
+                ExpiresOn = tokens.AccessTokenExpiresOn
+            },
+            RefreshToken = new AuthenticateToken
+            {
+                Value = tokens.RefreshToken,
+                ExpiresOn = tokens.RefreshTokenExpiresOn
+            }
+        };
     }
 
     public async Task<Result<Error>> RevokeRefreshTokenAsync(ICallerContext context, string refreshToken,

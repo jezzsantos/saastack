@@ -19,7 +19,8 @@ public class AuthenticateSingleSignOnRequestValidatorSpec
         _dto = new AuthenticateSingleSignOnRequest
         {
             Provider = "aprovider",
-            AuthCode = "anauthcode"
+            AuthCode = "anauthcode",
+            Username = null
         };
     }
 
@@ -49,5 +50,32 @@ public class AuthenticateSingleSignOnRequestValidatorSpec
             .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
             .WithMessageLike(Resources.AuthenticateSingleSignOnRequestValidator_InvalidAuthCode);
+    }
+
+    [Fact]
+    public void WhenUsernameIsNull_ThenSucceeds()
+    {
+        _dto.Username = null;
+
+        _validator.ValidateAndThrow(_dto);
+    }
+
+    [Fact]
+    public void WhenUsernameIsValid_ThenSucceeds()
+    {
+        _dto.Username = "auser@company.com";
+
+        _validator.ValidateAndThrow(_dto);
+    }
+
+    [Fact]
+    public void WhenUsernameIsInvalid_ThenThrows()
+    {
+        _dto.Username = "notanemail";
+
+        _validator
+            .Invoking(x => x.ValidateAndThrow(_dto))
+            .Should().Throw<ValidationException>()
+            .WithMessageLike(Resources.AuthenticateSingleSignOnRequestValidator_InvalidUsername);
     }
 }

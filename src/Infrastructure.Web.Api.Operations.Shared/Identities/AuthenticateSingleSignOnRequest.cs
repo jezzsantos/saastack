@@ -8,4 +8,6 @@ public class AuthenticateSingleSignOnRequest : UnTenantedRequest<AuthenticateRes
     public required string AuthCode { get; set; }
 
     public required string Provider { get; set; }
+
+    public string? Username { get; set; }
 }

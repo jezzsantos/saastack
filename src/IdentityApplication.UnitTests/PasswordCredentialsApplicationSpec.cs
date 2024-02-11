@@ -266,10 +266,10 @@ public class PasswordCredentialsApplicationSpec
             await _application.AuthenticateAsync(_caller.Object, "ausername", "apassword", CancellationToken.None);
 
         result.Should().BeSuccess();
-        result.Value.AccessToken.Should().Be("anaccesstoken");
-        result.Value.RefreshToken.Should().Be("arefreshtoken");
-        result.Value.AccessTokenExpiresOn.Should().Be(expiresOn);
-        result.Value.RefreshTokenExpiresOn.Should().Be(expiresOn);
+        result.Value.AccessToken.Value.Should().Be("anaccesstoken");
+        result.Value.RefreshToken.Value.Should().Be("arefreshtoken");
+        result.Value.AccessToken.ExpiresOn.Should().Be(expiresOn);
+        result.Value.RefreshToken.ExpiresOn.Should().Be(expiresOn);
         _repository.Verify(rep => rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()));
         _recorder.Verify(rec => rec.AuditAgainst(It.IsAny<ICallContext>(), "auserid",
             Audits.PasswordCredentialsApplication_Authenticate_Succeeded, It.IsAny<string>(),

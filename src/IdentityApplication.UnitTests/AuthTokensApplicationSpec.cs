@@ -141,9 +141,10 @@ public class AuthTokensApplicationSpec
 
         var result = await _application.RefreshTokenAsync(_caller.Object, "arefreshtoken1", CancellationToken.None);
 
-        result.Value.AccessToken.Should().Be("anaccesstoken2");
-        result.Value.RefreshToken.Should().Be("arefreshtoken2");
-        result.Value.AccessTokenExpiresOn.Should().Be(expiresOn2);
+        result.Value.AccessToken.Value.Should().Be("anaccesstoken2");
+        result.Value.AccessToken.ExpiresOn.Should().Be(expiresOn2);
+        result.Value.RefreshToken.Value.Should().Be("arefreshtoken2");
+        result.Value.RefreshToken.ExpiresOn.Should().Be(expiresOn2);
         _jwtTokensService.Verify(jts => jts.IssueTokensAsync(user));
         _repository.Verify(rep => rep.SaveAsync(It.Is<AuthTokensRoot>(at =>
             at.Id == "anid"

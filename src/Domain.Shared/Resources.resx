@@ -36,4 +36,10 @@
     <data name="Features_InvalidFeature" xml:space="preserve">
         <value>The Feature value is invalid</value>
     </data>
+    <data name="Timezone_InvalidTimezone" xml:space="preserve">
+        <value>The Timezone value is invalid</value>
+    </data>
+    <data name="PhoneNumber_InvalidPhoneNumber" xml:space="preserve">
+        <value>The PhoneNumber value is not a valid international phone number</value>
+    </data>
 </root>

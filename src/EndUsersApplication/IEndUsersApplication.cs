@@ -22,6 +22,9 @@ public interface IEndUsersApplication
         string? countryCode, CancellationToken cancellationToken);
 
     Task<Result<RegisteredEndUser, Error>> RegisterPersonAsync(ICallerContext context, string emailAddress,
-        string firstName, string lastName, string? timezone, string? countryCode, bool termsAndConditionsAccepted,
+        string firstName, string? lastName, string? timezone, string? countryCode, bool termsAndConditionsAccepted,
+        CancellationToken cancellationToken);
+
+    Task<Result<Optional<EndUser>, Error>> FindPersonByEmailAsync(ICallerContext context, string emailAddress,
         CancellationToken cancellationToken);
 }

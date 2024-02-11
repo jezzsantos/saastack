@@ -210,8 +210,8 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
             Password = password
         });
 
-        var accessToken = login.Content.Value.AccessToken!;
-        var refreshToken = login.Content.Value.RefreshToken!;
+        var accessToken = login.Content.Value.Tokens!.AccessToken.Value;
+        var refreshToken = login.Content.Value.Tokens.RefreshToken.Value;
         var user = person.Content.Value.Credential!.User;
 
         return new LoginDetails(accessToken, refreshToken, user);

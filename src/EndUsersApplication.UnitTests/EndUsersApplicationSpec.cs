@@ -48,7 +48,7 @@ public class EndUsersApplicationSpec
     {
         var user = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUserRoot, Error>>(user));
+            .ReturnsAsync(user);
 
         var result = await _application.GetPersonAsync(_caller.Object, "anid", CancellationToken.None);
 
@@ -156,11 +156,11 @@ public class EndUsersApplicationSpec
         assignee.Register(Roles.Create(PlatformRoles.Standard).Value, Features.Create(PlatformFeatures.Basic).Value,
             Optional<EmailAddress>.None);
         _repository.Setup(rep => rep.LoadAsync("anassigneeid".ToId(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUserRoot, Error>>(assignee));
+            .ReturnsAsync(assignee);
         var assigner = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
         assigner.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Create(), Optional<EmailAddress>.None);
         _repository.Setup(rep => rep.LoadAsync("anassignerid".ToId(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUserRoot, Error>>(assigner));
+            .ReturnsAsync(assigner);
 
         var result = await _application.AssignPlatformRolesAsync(_caller.Object, "anassigneeid",
             new List<string> { PlatformRoles.TestingOnly.Name },
@@ -183,13 +183,13 @@ public class EndUsersApplicationSpec
         assignee.AddMembership("anorganizationid".ToId(), Roles.Create(TenantRoles.Member).Value,
             Features.Create(TenantFeatures.Basic).Value);
         _repository.Setup(rep => rep.LoadAsync("anassigneeid".ToId(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUserRoot, Error>>(assignee));
+            .ReturnsAsync(assignee);
         var assigner = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
         assigner.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Create(), Optional<EmailAddress>.None);
         assigner.AddMembership("anorganizationid".ToId(), Roles.Create(TenantRoles.Owner).Value,
             Features.Create(TenantFeatures.Basic).Value);
         _repository.Setup(rep => rep.LoadAsync("anassignerid".ToId(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUserRoot, Error>>(assigner));
+            .ReturnsAsync(assigner);
 
         var result = await _application.AssignTenantRolesAsync(_caller.Object, "anorganizationid", "anassigneeid",
             new List<string> { TenantRoles.TestingOnly.Name },
@@ -201,4 +201,31 @@ public class EndUsersApplicationSpec
             .ContainInOrder(TenantRoles.Member.Name, TenantRoles.TestingOnly.Name);
     }
 #endif
+
+    [Fact]
+    public async Task WhenFindPersonByEmailAsyncAndNotExists_ThenReturnsNone()
+    {
+        _repository.Setup(rep => rep.FindByEmailAddressAsync(It.IsAny<EmailAddress>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Optional.None<EndUserRoot>());
+
+        var result =
+            await _application.FindPersonByEmailAsync(_caller.Object, "auser@company.com", CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.Should().BeNone();
+    }
+
+    [Fact]
+    public async Task WhenFindPersonByEmailAsyncAndExists_ThenReturns()
+    {
+        var endUser = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        _repository.Setup(rep => rep.FindByEmailAddressAsync(It.IsAny<EmailAddress>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(endUser.ToOptional());
+
+        var result =
+            await _application.FindPersonByEmailAsync(_caller.Object, "auser@company.com", CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.Value.Id.Should().Be("anid");
+    }
 }

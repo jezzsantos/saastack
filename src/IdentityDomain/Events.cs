@@ -276,9 +276,9 @@ public static class Events
 
             public required DateTime AccessTokenExpiresOn { get; set; }
 
-            public required DateTime RefreshTokenExpiresOn { get; set; }
-
             public required string RefreshToken { get; set; }
+
+            public required DateTime RefreshTokenExpiresOn { get; set; }
 
             public required string UserId { get; set; }
 
@@ -370,6 +370,66 @@ public static class Events
             }
 
             public bool IsVerified { get; set; }
+
+            public required string RootId { get; set; }
+
+            public DateTime OccurredUtc { get; set; }
+        }
+    }
+
+    public static class SSOUsers
+    {
+        public class Created : IDomainEvent
+        {
+            public static Created Create(Identifier id, string providerName, Identifier userId)
+            {
+                return new Created
+                {
+                    RootId = id,
+                    ProviderName = providerName,
+                    UserId = userId,
+                    OccurredUtc = DateTime.UtcNow
+                };
+            }
+
+            public required string ProviderName { get; set; }
+
+            public required string UserId { get; set; }
+
+            public required string RootId { get; set; }
+
+            public DateTime OccurredUtc { get; set; }
+        }
+
+        public class TokensUpdated : IDomainEvent
+        {
+            public static TokensUpdated Create(Identifier id, string tokens, EmailAddress emailAddress,
+                PersonName name, Timezone timezone, Address address)
+            {
+                return new TokensUpdated
+                {
+                    RootId = id,
+                    Tokens = tokens,
+                    EmailAddress = emailAddress,
+                    FirstName = name.FirstName,
+                    LastName = name.LastName.ValueOrDefault?.Text,
+                    Timezone = timezone.Code.ToString(),
+                    CountryCode = address.CountryCode.ToString(),
+                    OccurredUtc = DateTime.UtcNow
+                };
+            }
+
+            public required string CountryCode { get; set; }
+
+            public required string EmailAddress { get; set; }
+
+            public required string FirstName { get; set; }
+
+            public string? LastName { get; set; }
+
+            public required string Timezone { get; set; }
+
+            public required string Tokens { get; set; }
 
             public required string RootId { get; set; }
 

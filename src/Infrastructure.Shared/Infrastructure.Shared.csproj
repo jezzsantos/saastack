@@ -30,6 +30,8 @@
         <ProjectReference Include="..\Application.Persistence.Shared\Application.Persistence.Shared.csproj" />
         <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
         <ProjectReference Include="..\Domain.Services.Shared\Domain.Services.Shared.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Operations.Shared\Infrastructure.Web.Api.Operations.Shared.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Interfaces\Infrastructure.Web.Interfaces.csproj" />
     </ItemGroup>
 
 </Project>

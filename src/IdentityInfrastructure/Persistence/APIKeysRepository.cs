@@ -12,12 +12,12 @@ using QueryAny;
 
 namespace IdentityInfrastructure.Persistence;
 
-public class APIKeyRepository : IAPIKeyRepository
+public class APIKeysRepository : IAPIKeysRepository
 {
     private readonly SnapshottingQueryStore<APIKey> _apiKeyQueries;
     private readonly IEventSourcingDddCommandStore<APIKeyRoot> _apiKeys;
 
-    public APIKeyRepository(IRecorder recorder, IDomainFactory domainFactory,
+    public APIKeysRepository(IRecorder recorder, IDomainFactory domainFactory,
         IEventSourcingDddCommandStore<APIKeyRoot> apiKeyStore, IDataStore store)
     {
         _apiKeyQueries = new SnapshottingQueryStore<APIKey>(recorder, domainFactory, store);

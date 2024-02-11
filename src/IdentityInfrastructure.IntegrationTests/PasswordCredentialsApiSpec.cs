@@ -90,11 +90,11 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
             Password = "1Password!"
         });
 
-        result.Content.Value.AccessToken.Should().NotBeNull();
-        result.Content.Value.RefreshToken.Should().NotBeNull();
-        result.Content.Value.AccessTokenExpiresOnUtc.Should()
+        result.Content.Value.Tokens!.AccessToken.Value.Should().NotBeNull();
+        result.Content.Value.Tokens.AccessToken.ExpiresOn.Should()
             .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry));
-        result.Content.Value.RefreshTokenExpiresOnUtc.Should()
+        result.Content.Value.Tokens.RefreshToken.Value.Should().NotBeNull();
+        result.Content.Value.Tokens.RefreshToken.ExpiresOn.Should()
             .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultRefreshTokenExpiry));
     }
 
@@ -122,7 +122,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
             Password = "1Password!"
         });
 
-        var accessToken = authenticate.Content.Value.AccessToken!;
+        var accessToken = authenticate.Content.Value.Tokens!.AccessToken.Value;
 
 #if TESTINGONLY
         var result = await Api.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest(),

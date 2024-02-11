@@ -39,4 +39,10 @@
     <data name="PasswordCredentialsApplication_InvalidUserAccountId" xml:space="preserve">
         <value>The user account ID is not a valid identifier</value>
     </data>
+    <data name="SingleSignOnApplication_AccountSuspended" xml:space="preserve">
+      <value>The user account is suspended</value>
+    </data>
+    <data name="SSOProvidersService_UnknownProvider" xml:space="preserve">
+      <value>The '{0}' is not registered</value>
+    </data>
 </root>

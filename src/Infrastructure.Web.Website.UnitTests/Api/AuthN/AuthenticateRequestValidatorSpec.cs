@@ -2,6 +2,7 @@ using FluentAssertions;
 using FluentValidation;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
+using JetBrains.Annotations;
 using UnitTesting.Common.Validation;
 using WebsiteHost;
 using WebsiteHost.Api.AuthN;
@@ -9,100 +10,169 @@ using Xunit;
 
 namespace Infrastructure.Web.Website.UnitTests.Api.AuthN;
 
-[Trait("Category", "Unit")]
+[UsedImplicitly]
 public class AuthenticateRequestValidatorSpec
 {
-    private readonly AuthenticateRequest _dto;
-    private readonly AuthenticateRequestValidator _validator;
-
-    public AuthenticateRequestValidatorSpec()
+    [Trait("Category", "Unit")]
+    public class GivenCredentialsProvider
     {
-        _validator = new AuthenticateRequestValidator();
-        _dto = new AuthenticateRequest
+        private readonly AuthenticateRequest _dto;
+        private readonly AuthenticateRequestValidator _validator;
+
+        public GivenCredentialsProvider()
         {
-            Provider = AuthenticationConstants.Providers.Credentials,
-            Username = "auser@company.com",
-            Password = "1Password!"
-        };
+            _validator = new AuthenticateRequestValidator();
+            _dto = new AuthenticateRequest
+            {
+                Provider = AuthenticationConstants.Providers.Credentials,
+                Username = "auser@company.com",
+                Password = "1Password!"
+            };
+        }
+
+        [Fact]
+        public void WhenAllProperties_ThenSucceeds()
+        {
+            _validator.ValidateAndThrow(_dto);
+        }
+
+        [Fact]
+        public void WhenProviderIsEmpty_ThenThrows()
+        {
+            _dto.Provider = string.Empty;
+
+            _validator.Invoking(x => x.ValidateAndThrow(_dto))
+                .Should().Throw<ValidationException>()
+                .WithMessageLike(Resources.AuthenticateRequestValidator_InvalidProvider);
+        }
+
+        [Fact]
+        public void WhenUsernameIsEmpty_ThenThrows()
+        {
+            _dto.Provider = AuthenticationConstants.Providers.Credentials;
+            _dto.Username = string.Empty;
+
+            _validator.Invoking(x => x.ValidateAndThrow(_dto))
+                .Should().Throw<ValidationException>()
+                .WithMessageLike(Resources.AuthenticateRequestValidator_InvalidUsername);
+        }
+
+        [Fact]
+        public void WhenUsernameIsNotValid_ThenThrows()
+        {
+            _dto.Provider = AuthenticationConstants.Providers.Credentials;
+            _dto.Username = "notanemail";
+
+            _validator.Invoking(x => x.ValidateAndThrow(_dto))
+                .Should().Throw<ValidationException>()
+                .WithMessageLike(Resources.AuthenticateRequestValidator_InvalidUsername);
+        }
+
+        [Fact]
+        public void WhenPasswordIsEmpty_ThenThrows()
+        {
+            _dto.Provider = AuthenticationConstants.Providers.Credentials;
+            _dto.Password = string.Empty;
+
+            _validator.Invoking(x => x.ValidateAndThrow(_dto))
+                .Should().Throw<ValidationException>()
+                .WithMessageLike(Resources.AuthenticateRequestValidator_InvalidPassword);
+        }
+
+        [Fact]
+        public void WhenPasswordIsNotValid_ThenThrows()
+        {
+            _dto.Provider = AuthenticationConstants.Providers.Credentials;
+            _dto.Password = "notapassword";
+
+            _validator.Invoking(x => x.ValidateAndThrow(_dto))
+                .Should().Throw<ValidationException>()
+                .WithMessageLike(Resources.AuthenticateRequestValidator_InvalidPassword);
+        }
     }
 
-    [Fact]
-    public void WhenAllProperties_ThenSucceeds()
+    [Trait("Category", "Unit")]
+    public class GivenAnotherProvider
     {
-        _validator.ValidateAndThrow(_dto);
-    }
+        private readonly AuthenticateRequest _dto;
+        private readonly AuthenticateRequestValidator _validator;
 
-    [Fact]
-    public void WhenProviderIsEmpty_TheThrows()
-    {
-        _dto.Provider = string.Empty;
+        public GivenAnotherProvider()
+        {
+            _validator = new AuthenticateRequestValidator();
+            _dto = new AuthenticateRequest
+            {
+                Provider = "aprovider",
+                AuthCode = "anauthcode"
+            };
+        }
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.AuthenticateRequestValidator_InvalidProvider);
-    }
+        [Fact]
+        public void WhenAllProperties_ThenSucceeds()
+        {
+            _validator.ValidateAndThrow(_dto);
+        }
 
-    [Fact]
-    public void WhenProviderIsCredentialsAndUsernameIsEmpty_TheThrows()
-    {
-        _dto.Provider = AuthenticationConstants.Providers.Credentials;
-        _dto.Username = string.Empty;
+        [Fact]
+        public void WhenProviderIsEmpty_ThenThrows()
+        {
+            _dto.Provider = string.Empty;
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.AuthenticateRequestValidator_InvalidUsername);
-    }
+            _validator.Invoking(x => x.ValidateAndThrow(_dto))
+                .Should().Throw<ValidationException>()
+                .WithMessageLike(Resources.AuthenticateRequestValidator_InvalidProvider);
+        }
 
-    [Fact]
-    public void WhenProviderIsCredentialsAndUsernameIsNotValid_TheThrows()
-    {
-        _dto.Provider = AuthenticationConstants.Providers.Credentials;
-        _dto.Username = "notanemail";
+        [Fact]
+        public void WhenAuthCodeIsEmpty_ThenThrows()
+        {
+            _dto.Provider = "aprovider";
+            _dto.AuthCode = string.Empty;
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.AuthenticateRequestValidator_InvalidUsername);
-    }
+            _validator.Invoking(x => x.ValidateAndThrow(_dto))
+                .Should().Throw<ValidationException>()
+                .WithMessageLike(Resources.AuthenticateRequestValidator_InvalidAuthCode);
+        }
 
-    [Fact]
-    public void WhenProviderIsCredentialsAndPasswordIsEmpty_TheThrows()
-    {
-        _dto.Provider = AuthenticationConstants.Providers.Credentials;
-        _dto.Password = string.Empty;
+        [Fact]
+        public void WhenAuthCodeIsNotEmpty_ThenSucceeds()
+        {
+            _dto.Provider = "aprovider";
+            _dto.AuthCode = "anauthcode";
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.AuthenticateRequestValidator_InvalidPassword);
-    }
+            _validator.ValidateAndThrow(_dto);
+        }
 
-    [Fact]
-    public void WhenProviderIsCredentialsAndPasswordIsNotValid_TheThrows()
-    {
-        _dto.Provider = AuthenticationConstants.Providers.Credentials;
-        _dto.Password = "notapassword";
+        [Fact]
+        public void WhenUsernameIsNotValid_ThenThrows()
+        {
+            _dto.Provider = "aprovider";
+            _dto.AuthCode = "anauthcode";
+            _dto.Username = "notanemail";
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.AuthenticateRequestValidator_InvalidPassword);
-    }
+            _validator.Invoking(x => x.ValidateAndThrow(_dto))
+                .Should().Throw<ValidationException>()
+                .WithMessageLike(Resources.AuthenticateRequestValidator_InvalidUsername);
+        }
 
-    [Fact]
-    public void WhenProviderIsSingleSignOnAndAuthCodeIsEmpty_TheThrows()
-    {
-        _dto.Provider = AuthenticationConstants.Providers.SingleSignOn;
-        _dto.AuthCode = string.Empty;
+        [Fact]
+        public void WhenUsernameIsNull_ThenSucceeds()
+        {
+            _dto.Provider = "aprovider";
+            _dto.AuthCode = "anauthcode";
+            _dto.Username = null;
 
-        _validator.Invoking(x => x.ValidateAndThrow(_dto))
-            .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.AuthenticateRequestValidator_InvalidAuthCode);
-    }
+            _validator.ValidateAndThrow(_dto);
+        }
 
-    [Fact]
-    public void WhenProviderIsSingleSignOnAndAuthCodeIsNotEmpty_TheSucceeds()
-    {
-        _dto.Provider = AuthenticationConstants.Providers.SingleSignOn;
-        _dto.AuthCode = "anauthcode";
+        [Fact]
+        public void WhenUsernameIsValid_ThenSucceeds()
+        {
+            _dto.Provider = "aprovider";
+            _dto.AuthCode = "anauthcode";
+            _dto.Username = "auser@company.com";
 
-        _validator.ValidateAndThrow(_dto);
+            _validator.ValidateAndThrow(_dto);
+        }
     }
 }

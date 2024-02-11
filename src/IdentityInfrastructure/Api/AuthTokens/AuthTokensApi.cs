@@ -1,5 +1,5 @@
+using Application.Resources.Shared;
 using IdentityApplication;
-using IdentityApplication.ApplicationServices;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
@@ -19,6 +19,20 @@ public class AuthTokensApi : IWebApiService
         _authTokensApplication = authTokensApplication;
     }
 
+    public async Task<ApiPostResult<AuthenticateTokens, RefreshTokenResponse>> Refresh(RefreshTokenRequest request,
+        CancellationToken cancellationToken)
+    {
+        var tokens =
+            await _authTokensApplication.RefreshTokenAsync(_contextFactory.Create(), request.RefreshToken,
+                cancellationToken);
+
+        return () => tokens.HandleApplicationResult<RefreshTokenResponse, AuthenticateTokens>(tok =>
+            new PostResult<RefreshTokenResponse>(new RefreshTokenResponse
+            {
+                Tokens = tok
+            }));
+    }
+
     public async Task<ApiDeleteResult> Revoke(RevokeRefreshTokenRequest request,
         CancellationToken cancellationToken)
     {
@@ -27,22 +41,5 @@ public class AuthTokensApi : IWebApiService
                 cancellationToken);
 
         return () => tokens.HandleApplicationResult();
-    }
-
-    public async Task<ApiPostResult<AccessTokens, RefreshTokenResponse>> Refresh(RefreshTokenRequest request,
-        CancellationToken cancellationToken)
-    {
-        var tokens =
-            await _authTokensApplication.RefreshTokenAsync(_contextFactory.Create(), request.RefreshToken,
-                cancellationToken);
-
-        return () => tokens.HandleApplicationResult<RefreshTokenResponse, AccessTokens>(x =>
-            new PostResult<RefreshTokenResponse>(new RefreshTokenResponse
-            {
-                AccessToken = x.AccessToken,
-                RefreshToken = x.RefreshToken,
-                AccessTokenExpiresOnUtc = x.AccessTokenExpiresOn,
-                RefreshTokenExpiresOnUtc = x.RefreshTokenExpiresOn
-            }));
     }
 }

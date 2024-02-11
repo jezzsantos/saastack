@@ -78,25 +78,25 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
     {
         await DelayForRandomPeriodAsync(MinAuthenticateDelayInSecs, MaxAuthenticateDelayInSecs, cancellationToken);
 
-        var fetched = await _repository.FindCredentialsByUsernameAsync(username, cancellationToken);
-        if (!fetched.IsSuccessful)
-        {
-            return Error.NotAuthenticated();
-        }
-
-        if (!fetched.Value.HasValue)
-        {
-            return Error.NotAuthenticated();
-        }
-
-        var credentials = fetched.Value.Value;
-        var retrieved = await _endUsersService.GetMembershipsAsync(context, credentials.UserId, cancellationToken);
+        var retrieved = await _repository.FindCredentialsByUsernameAsync(username, cancellationToken);
         if (!retrieved.IsSuccessful)
         {
             return Error.NotAuthenticated();
         }
 
-        var user = retrieved.Value;
+        if (!retrieved.Value.HasValue)
+        {
+            return Error.NotAuthenticated();
+        }
+
+        var credentials = retrieved.Value.Value;
+        var registered = await _endUsersService.GetMembershipsAsync(context, credentials.UserId, cancellationToken);
+        if (!registered.IsSuccessful)
+        {
+            return Error.NotAuthenticated();
+        }
+
+        var user = registered.Value;
         if (user.Status != EndUserStatus.Registered)
         {
             return Error.NotAuthenticated();
@@ -154,10 +154,16 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         var tokens = issued.Value;
         return new Result<AuthenticateTokens, Error>(new AuthenticateTokens
         {
-            AccessToken = tokens.AccessToken,
-            RefreshToken = tokens.RefreshToken,
-            AccessTokenExpiresOn = tokens.AccessTokenExpiresOn,
-            RefreshTokenExpiresOn = tokens.RefreshTokenExpiresOn,
+            AccessToken = new AuthenticateToken
+            {
+                Value = tokens.AccessToken,
+                ExpiresOn = tokens.AccessTokenExpiresOn
+            },
+            RefreshToken = new AuthenticateToken
+            {
+                Value = tokens.RefreshToken,
+                ExpiresOn = tokens.RefreshTokenExpiresOn
+            },
             UserId = user.Id
         });
 

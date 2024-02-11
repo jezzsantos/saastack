@@ -24,7 +24,7 @@ public static class EnumExtensions
     ///     Converts the <see cref="value" /> to an value of the <see cref="TTargetEnum" />,
     ///     and in the case where no value can be found, uses the <see cref="defaultValue" />
     /// </summary>
-    public static TTargetEnum ToEnumOrDefault<TTargetEnum>(this string value, TTargetEnum defaultValue)
+    public static TTargetEnum ToEnumOrDefault<TTargetEnum>(this string? value, TTargetEnum defaultValue)
     {
         if (value.HasNoValue())
         {

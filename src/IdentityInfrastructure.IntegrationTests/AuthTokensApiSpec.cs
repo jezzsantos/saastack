@@ -43,28 +43,28 @@ public class AuthTokensSpec : WebApiSpec<Program>
             Password = "1Password!"
         });
 
-        oldTokens.Content.Value.AccessToken.Should().NotBeNull();
-        oldTokens.Content.Value.RefreshToken.Should().NotBeNull();
-        oldTokens.Content.Value.AccessTokenExpiresOnUtc.Should()
+        oldTokens.Content.Value.Tokens!.AccessToken.Value.Should().NotBeNull();
+        oldTokens.Content.Value.Tokens.AccessToken.ExpiresOn.Should()
             .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry));
-        oldTokens.Content.Value.RefreshTokenExpiresOnUtc.Should()
+        oldTokens.Content.Value.Tokens.RefreshToken.Value.Should().NotBeNull();
+        oldTokens.Content.Value.Tokens.RefreshToken.ExpiresOn.Should()
             .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultRefreshTokenExpiry));
 
         await Task.Delay(TimeSpan
             .FromSeconds(1)); //HACK: to ensure that the new token is not the same (in time) as the old token
 
-        var oldAccessToken = oldTokens.Content.Value.AccessToken;
-        var oldRefreshToken = oldTokens.Content.Value.RefreshToken;
+        var oldAccessToken = oldTokens.Content.Value.Tokens.AccessToken.Value;
+        var oldRefreshToken = oldTokens.Content.Value.Tokens.RefreshToken.Value;
         var newTokens = await Api.PostAsync(new RefreshTokenRequest
         {
-            RefreshToken = oldRefreshToken!
+            RefreshToken = oldRefreshToken
         });
 
-        newTokens.Content.Value.AccessToken.Should().NotBeNull().And.NotBe(oldAccessToken);
-        newTokens.Content.Value.RefreshToken.Should().NotBeNull().And.NotBe(oldRefreshToken);
-        newTokens.Content.Value.AccessTokenExpiresOnUtc.Should()
+        newTokens.Content.Value.Tokens!.AccessToken.Value.Should().NotBeNull().And.NotBe(oldAccessToken);
+        newTokens.Content.Value.Tokens.AccessToken.ExpiresOn.Should()
             .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry));
-        newTokens.Content.Value.RefreshTokenExpiresOnUtc.Should()
+        newTokens.Content.Value.Tokens.RefreshToken.Value.Should().NotBeNull().And.NotBe(oldRefreshToken);
+        newTokens.Content.Value.Tokens.RefreshToken.ExpiresOn.Should()
             .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultRefreshTokenExpiry));
     }
 
@@ -74,10 +74,12 @@ public class AuthTokensSpec : WebApiSpec<Program>
         var user = await LoginUserAsync();
 
         var oldRefreshToken = user.RefreshToken;
-        await Api.DeleteAsync(new RevokeRefreshTokenRequest
+        var revoked = await Api.DeleteAsync(new RevokeRefreshTokenRequest
         {
             RefreshToken = oldRefreshToken
         });
+
+        revoked.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
         var refreshed = await Api.PostAsync(new RefreshTokenRequest
         {

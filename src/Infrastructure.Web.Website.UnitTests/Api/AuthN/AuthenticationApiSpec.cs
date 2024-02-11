@@ -66,11 +66,17 @@ public class AuthenticationApiSpec
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AuthenticateTokens
             {
-                AccessToken = "anaccesstoken",
-                RefreshToken = "arefreshtoken",
                 UserId = "auserid",
-                AccessTokenExpiresOn = accessTokenExpiresOn,
-                RefreshTokenExpiresOn = refreshTokenExpiresOn
+                AccessToken = new AuthenticateToken
+                {
+                    Value = "anaccesstoken",
+                    ExpiresOn = accessTokenExpiresOn
+                },
+                RefreshToken = new AuthenticateToken
+                {
+                    Value = "arefreshtoken",
+                    ExpiresOn = refreshTokenExpiresOn
+                }
             });
 
         await _api.Authenticate(new AuthenticateRequest
@@ -126,11 +132,17 @@ public class AuthenticationApiSpec
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AuthenticateTokens
             {
-                AccessToken = "anaccesstoken",
-                RefreshToken = "arefreshtoken",
                 UserId = "auserid",
-                AccessTokenExpiresOn = accessTokenExpiresOn,
-                RefreshTokenExpiresOn = refreshTokenExpiresOn
+                AccessToken = new AuthenticateToken
+                {
+                    Value = "anaccesstoken",
+                    ExpiresOn = accessTokenExpiresOn
+                },
+                RefreshToken = new AuthenticateToken
+                {
+                    Value = "arefreshtoken",
+                    ExpiresOn = refreshTokenExpiresOn
+                }
             });
 
         await _api.RefreshToken(new RefreshTokenRequest(), CancellationToken.None);
@@ -145,6 +157,5 @@ public class AuthenticationApiSpec
             c.Append(AuthenticationConstants.Cookies.RefreshToken, "arefreshtoken", It.Is<CookieOptions>(opt =>
                 opt.Expires!.Value.DateTime == refreshTokenExpiresOn
             )));
-
     }
 }

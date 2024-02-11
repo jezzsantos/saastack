@@ -28,7 +28,7 @@ public class APIKeysApplicationSpec
     private readonly Mock<IEndUsersService> _endUsersService;
     private readonly Mock<IIdentifierFactory> _idFactory;
     private readonly Mock<IRecorder> _recorder;
-    private readonly Mock<IAPIKeyRepository> _repository;
+    private readonly Mock<IAPIKeysRepository> _repository;
     private readonly Mock<ITokensService> _tokensService;
 
     public APIKeysApplicationSpec()
@@ -61,7 +61,7 @@ public class APIKeysApplicationSpec
         _apiKeyHasherService.Setup(khs => khs.ValidateAPIKeyHash(It.IsAny<string>()))
             .Returns(true);
         _endUsersService = new Mock<IEndUsersService>();
-        _repository = new Mock<IAPIKeyRepository>();
+        _repository = new Mock<IAPIKeysRepository>();
         _repository.Setup(rep => rep.SaveAsync(It.IsAny<APIKeyRoot>(), It.IsAny<CancellationToken>()))
             .Returns((APIKeyRoot root, CancellationToken _) => Task.FromResult<Result<APIKeyRoot, Error>>(root));
 

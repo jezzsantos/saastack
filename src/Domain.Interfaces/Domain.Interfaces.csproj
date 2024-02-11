@@ -11,6 +11,7 @@
 
     <ItemGroup>
         <PackageReference Include="QueryAny" Version="1.1.1" />
+        <PackageReference Include="libphonenumber-csharp" Version="8.12.52" />
     </ItemGroup>
 
     <ItemGroup>

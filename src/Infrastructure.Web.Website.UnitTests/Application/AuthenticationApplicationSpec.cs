@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Resources.Shared;
 using Common;
 using FluentAssertions;
 using Infrastructure.Interfaces;
@@ -48,21 +49,30 @@ public class AuthenticationApplicationSpec
                 null, It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<AuthenticateResponse, ResponseProblem>>(new AuthenticateResponse
             {
-                UserId = "auserid",
-                AccessToken = "anaccesstoken",
-                RefreshToken = "arefreshtoken",
-                AccessTokenExpiresOnUtc = accessTokenExpiresOn,
-                RefreshTokenExpiresOnUtc = refreshTokenExpiresOn
+                Tokens = new AuthenticateTokens
+                {
+                    UserId = "auserid",
+                    AccessToken = new AuthenticateToken
+                    {
+                        Value = "anaccesstoken",
+                        ExpiresOn = accessTokenExpiresOn
+                    },
+                    RefreshToken = new AuthenticateToken
+                    {
+                        Value = "arefreshtoken",
+                        ExpiresOn = refreshTokenExpiresOn
+                    }
+                }
             }));
 
         var result = await _application.AuthenticateAsync(_caller.Object, AuthenticationConstants.Providers.Credentials,
             null, "ausername", "apassword", CancellationToken.None);
 
-        result.Value.AccessToken.Should().Be("anaccesstoken");
-        result.Value.RefreshToken.Should().Be("arefreshtoken");
-        result.Value.AccessTokenExpiresOn.Should().Be(accessTokenExpiresOn);
-        result.Value.RefreshTokenExpiresOn.Should().Be(refreshTokenExpiresOn);
         result.Value.UserId.Should().Be("auserid");
+        result.Value.AccessToken.Value.Should().Be("anaccesstoken");
+        result.Value.AccessToken.ExpiresOn.Should().Be(accessTokenExpiresOn);
+        result.Value.RefreshToken.Value.Should().Be("arefreshtoken");
+        result.Value.RefreshToken.ExpiresOn.Should().Be(refreshTokenExpiresOn);
         _serviceClient.Verify(sc => sc.PostAsync(_caller.Object, It.Is<AuthenticatePasswordRequest>(req =>
             req.Username == "ausername"
             && req.Password == "apassword"
@@ -80,22 +90,31 @@ public class AuthenticationApplicationSpec
                 null, It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<AuthenticateResponse, ResponseProblem>>(new AuthenticateResponse
             {
-                UserId = "auserid",
-                AccessToken = "anaccesstoken",
-                RefreshToken = "arefreshtoken",
-                AccessTokenExpiresOnUtc = accessTokenExpiresOn,
-                RefreshTokenExpiresOnUtc = refreshTokenExpiresOn
+                Tokens = new AuthenticateTokens
+                {
+                    UserId = "auserid",
+                    AccessToken = new AuthenticateToken
+                    {
+                        Value = "anaccesstoken",
+                        ExpiresOn = accessTokenExpiresOn
+                    },
+                    RefreshToken = new AuthenticateToken
+                    {
+                        Value = "arefreshtoken",
+                        ExpiresOn = refreshTokenExpiresOn
+                    }
+                }
+
             }));
 
-        var result = await _application.AuthenticateAsync(_caller.Object,
-            AuthenticationConstants.Providers.SingleSignOn,
-            "anauthcode", null, null, CancellationToken.None);
+        var result = await _application.AuthenticateAsync(_caller.Object, "aprovider", "anauthcode", null, null,
+            CancellationToken.None);
 
-        result.Value.AccessToken.Should().Be("anaccesstoken");
-        result.Value.RefreshToken.Should().Be("arefreshtoken");
-        result.Value.AccessTokenExpiresOn.Should().Be(accessTokenExpiresOn);
-        result.Value.RefreshTokenExpiresOn.Should().Be(refreshTokenExpiresOn);
         result.Value.UserId.Should().Be("auserid");
+        result.Value.AccessToken.Value.Should().Be("anaccesstoken");
+        result.Value.AccessToken.ExpiresOn.Should().Be(accessTokenExpiresOn);
+        result.Value.RefreshToken.Value.Should().Be("arefreshtoken");
+        result.Value.RefreshToken.ExpiresOn.Should().Be(refreshTokenExpiresOn);
         _serviceClient.Verify(sc => sc.PostAsync(_caller.Object, It.Is<AuthenticateSingleSignOnRequest>(req =>
             req.AuthCode == "anauthcode"
         ), null, It.IsAny<CancellationToken>()));
@@ -125,20 +144,30 @@ public class AuthenticationApplicationSpec
                 null, It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<RefreshTokenResponse, ResponseProblem>>(new RefreshTokenResponse
             {
-                AccessToken = "anaccesstoken",
-                RefreshToken = "arefreshtoken",
-                AccessTokenExpiresOnUtc = accessTokenExpiresOn,
-                RefreshTokenExpiresOnUtc = refreshTokenExpiresOn
+                Tokens = new AuthenticateTokens
+                {
+                    UserId = "auserid",
+                    AccessToken = new AuthenticateToken
+                    {
+                        Value = "anaccesstoken",
+                        ExpiresOn = accessTokenExpiresOn
+                    },
+                    RefreshToken = new AuthenticateToken
+                    {
+                        Value = "arefreshtoken",
+                        ExpiresOn = refreshTokenExpiresOn
+                    }
+                }
             }));
 
         var result = await _application.RefreshTokenAsync(_caller.Object, "arefreshtoken", CancellationToken.None);
 
         result.Should().BeSuccess();
-        result.Value.AccessToken.Should().Be("anaccesstoken");
-        result.Value.RefreshToken.Should().Be("arefreshtoken");
-        result.Value.AccessTokenExpiresOn.Should().Be(accessTokenExpiresOn);
-        result.Value.RefreshTokenExpiresOn.Should().Be(refreshTokenExpiresOn);
-        result.Value.UserId.Should().BeNull();
+        result.Value.UserId.Should().Be("auserid");
+        result.Value.AccessToken.Value.Should().Be("anaccesstoken");
+        result.Value.AccessToken.ExpiresOn.Should().Be(accessTokenExpiresOn);
+        result.Value.RefreshToken.Value.Should().Be("arefreshtoken");
+        result.Value.RefreshToken.ExpiresOn.Should().Be(refreshTokenExpiresOn);
         _serviceClient.Verify(
             sc => sc.PostAsync(_caller.Object, It.Is<RefreshTokenRequest>(req =>
                 req.RefreshToken == "arefreshtoken"

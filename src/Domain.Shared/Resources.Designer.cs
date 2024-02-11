@@ -87,11 +87,29 @@ namespace Domain.Shared {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The PhoneNumber value is not a valid international phone number.
+        /// </summary>
+        internal static string PhoneNumber_InvalidPhoneNumber {
+            get {
+                return ResourceManager.GetString("PhoneNumber_InvalidPhoneNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Role value is invalid.
         /// </summary>
         internal static string Roles_InvalidRole {
             get {
                 return ResourceManager.GetString("Roles_InvalidRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Timezone value is invalid.
+        /// </summary>
+        internal static string Timezone_InvalidTimezone {
+            get {
+                return ResourceManager.GetString("Timezone_InvalidTimezone", resourceCulture);
             }
         }
     }

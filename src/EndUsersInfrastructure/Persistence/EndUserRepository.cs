@@ -3,11 +3,13 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using Domain.Shared;
 using EndUsersApplication.Persistence;
 using EndUsersApplication.Persistence.ReadModels;
 using EndUsersDomain;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
+using QueryAny;
 
 namespace EndUsersInfrastructure.Persistence;
 
@@ -46,5 +48,37 @@ public class EndUserRepository : IEndUserRepository
         await _users.SaveAsync(endUser, cancellationToken);
 
         return endUser;
+    }
+
+    public async Task<Result<Optional<EndUserRoot>, Error>> FindByEmailAddressAsync(EmailAddress emailAddress,
+        CancellationToken cancellationToken)
+    {
+        var query = Query.From<EndUser>()
+            .Where<string>(at => at.Username, ConditionOperator.EqualTo, emailAddress.Address);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
+    private async Task<Result<Optional<EndUserRoot>, Error>> FindFirstByQueryAsync(QueryClause<EndUser> query,
+        CancellationToken cancellationToken)
+    {
+        var queried = await _userQueries.QueryAsync(query, false, cancellationToken);
+        if (!queried.IsSuccessful)
+        {
+            return queried.Error;
+        }
+
+        var matching = queried.Value.Results.FirstOrDefault();
+        if (matching.NotExists())
+        {
+            return Optional<EndUserRoot>.None;
+        }
+
+        var users = await _users.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
+        if (!users.IsSuccessful)
+        {
+            return users.Error;
+        }
+
+        return users.Value.ToOptional();
     }
 }

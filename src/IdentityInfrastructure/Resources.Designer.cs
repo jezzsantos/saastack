@@ -96,6 +96,15 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;Username&apos; is invalid.
+        /// </summary>
+        internal static string AuthenticateSingleSignOnRequestValidator_InvalidUsername {
+            get {
+                return ResourceManager.GetString("AuthenticateSingleSignOnRequestValidator_InvalidUsername", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;Token&apos; is either missing or invalid.
         /// </summary>
         internal static string ConfirmPersonRegistrationRequestValidator_InvalidToken {
@@ -209,6 +218,15 @@ namespace IdentityInfrastructure {
         internal static string RevokeRefreshTokenRequestValidator_InvalidToken {
             get {
                 return ResourceManager.GetString("RevokeRefreshTokenRequestValidator_InvalidToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Username&apos; must be provided for this authentication attempt.
+        /// </summary>
+        internal static string TestSSOAuthenticationProvider_MissingUsername {
+            get {
+                return ResourceManager.GetString("TestSSOAuthenticationProvider_MissingUsername", resourceCulture);
             }
         }
     }

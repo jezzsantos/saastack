@@ -89,19 +89,11 @@ internal static class AuthenticationConversionExtensions
 {
     public static AuthenticateTokens ToTokens(this AuthenticateResponse response)
     {
-        var tokens = response.Convert<AuthenticateResponse, AuthenticateTokens>();
-        tokens.AccessTokenExpiresOn = response.AccessTokenExpiresOnUtc ?? DateTime.UtcNow;
-        tokens.RefreshTokenExpiresOn = response.RefreshTokenExpiresOnUtc ?? DateTime.UtcNow;
-
-        return tokens;
+        return response.Tokens!;
     }
 
     public static AuthenticateTokens ToTokens(this RefreshTokenResponse response)
     {
-        var tokens = response.Convert<RefreshTokenResponse, AuthenticateTokens>();
-        tokens.AccessTokenExpiresOn = response.AccessTokenExpiresOnUtc ?? DateTime.UtcNow;
-        tokens.RefreshTokenExpiresOn = response.RefreshTokenExpiresOnUtc ?? DateTime.UtcNow;
-
-        return tokens;
+        return response.Tokens!;
     }
 }

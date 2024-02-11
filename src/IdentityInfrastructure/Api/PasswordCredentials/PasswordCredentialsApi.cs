@@ -32,11 +32,7 @@ public class PasswordCredentialsApi : IWebApiService
         return () => authenticated.HandleApplicationResult<AuthenticateResponse, AuthenticateTokens>(tok =>
             new PostResult<AuthenticateResponse>(new AuthenticateResponse
             {
-                AccessToken = tok.AccessToken,
-                RefreshToken = tok.RefreshToken,
-                AccessTokenExpiresOnUtc = tok.AccessTokenExpiresOn,
-                RefreshTokenExpiresOnUtc = tok.RefreshTokenExpiresOn,
-                UserId = tok.UserId
+                Tokens = tok
             }));
     }
 

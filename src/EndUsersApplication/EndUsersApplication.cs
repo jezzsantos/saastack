@@ -110,7 +110,7 @@ public class EndUsersApplication : IEndUsersApplication
     }
 
     public async Task<Result<RegisteredEndUser, Error>> RegisterPersonAsync(ICallerContext context, string emailAddress,
-        string firstName, string lastName, string? timezone, string? countryCode, bool termsAndConditionsAccepted,
+        string firstName, string? lastName, string? timezone, string? countryCode, bool termsAndConditionsAccepted,
         CancellationToken cancellationToken)
     {
         if (!termsAndConditionsAccepted)
@@ -167,6 +167,33 @@ public class EndUsersApplication : IEndUsersApplication
 
         return user.ToRegisteredUser(emailAddress, firstName, lastName, Timezones.FindOrDefault(timezone),
             CountryCodes.FindOrDefault(countryCode));
+    }
+
+    public async Task<Result<Optional<EndUser>, Error>> FindPersonByEmailAsync(ICallerContext context,
+        string emailAddress, CancellationToken cancellationToken)
+    {
+        //TODO: find the profile of this person by email address from the profilesService
+        //And then, if not, lookup a endUser that has the email address as an invited guest
+
+        var match = EmailAddress.Create(emailAddress);
+        if (!match.IsSuccessful)
+        {
+            return match.Error;
+        }
+
+        var retrieved = await _repository.FindByEmailAddressAsync(match.Value, cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        if (retrieved.Value.HasValue)
+        {
+            var endUser = retrieved.Value.Value;
+            return endUser.ToUser().ToOptional();
+        }
+
+        return Optional<EndUser>.None;
     }
 
     public async Task<Result<EndUser, Error>> AssignPlatformRolesAsync(ICallerContext context, string id,

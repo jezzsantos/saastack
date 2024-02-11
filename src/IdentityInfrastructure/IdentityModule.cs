@@ -2,7 +2,9 @@ using System.Reflection;
 using Application.Persistence.Interfaces;
 using Application.Services.Shared;
 using Common;
+using Common.Configuration;
 using Domain.Interfaces;
+using Domain.Services.Shared.DomainServices;
 using IdentityApplication;
 using IdentityApplication.ApplicationServices;
 using IdentityApplication.Persistence;
@@ -13,6 +15,7 @@ using IdentityInfrastructure.ApplicationServices;
 using IdentityInfrastructure.DomainServices;
 using IdentityInfrastructure.Persistence;
 using IdentityInfrastructure.Persistence.ReadModels;
+using Infrastructure.Common.DomainServices;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Web.Hosting.Common;
@@ -51,11 +54,15 @@ public class IdentityModule : ISubDomainModule
                 services.RegisterUnshared<IAPIKeyHasherService, APIKeyHasherService>();
                 services.RegisterUnshared<IJWTTokensService, JWTTokensService>();
                 services.RegisterUnshared<IAuthTokensService, AuthTokensService>();
+                services.RegisterUnshared<IEncryptionService>(c => new AesEncryptionService(c
+                    .ResolveForUnshared<IConfigurationSettings>().Platform
+                    .GetString("ApplicationServices:SSOProvidersService:SSOUserTokens:AesSecret")));
 
                 services.RegisterUnshared<IAPIKeysApplication, APIKeysApplication>();
                 services.RegisterUnshared<IAuthTokensApplication, AuthTokensApplication>();
                 services.RegisterUnshared<IPasswordCredentialsApplication, PasswordCredentialsApplication>();
                 services.RegisterUnshared<IMachineCredentialsApplication, MachineCredentialsApplication>();
+                services.RegisterUnshared<ISingleSignOnApplication, SingleSignOnApplication>();
                 services.RegisterUnshared<IPasswordCredentialsRepository>(c => new PasswordCredentialsRepository(
                     c.ResolveForUnshared<IRecorder>(),
                     c.ResolveForUnshared<IDomainFactory>(),
@@ -74,7 +81,7 @@ public class IdentityModule : ISubDomainModule
                     c => new AuthTokensProjection(c.ResolveForUnshared<IRecorder>(),
                         c.ResolveForUnshared<IDomainFactory>(),
                         c.ResolveForPlatform<IDataStore>()));
-                services.RegisterUnshared<IAPIKeyRepository>(c => new APIKeyRepository(
+                services.RegisterUnshared<IAPIKeysRepository>(c => new APIKeysRepository(
                     c.ResolveForUnshared<IRecorder>(),
                     c.ResolveForUnshared<IDomainFactory>(),
                     c.ResolveForUnshared<IEventSourcingDddCommandStore<APIKeyRoot>>(),
@@ -83,9 +90,23 @@ public class IdentityModule : ISubDomainModule
                     c => new APIKeyProjection(c.ResolveForUnshared<IRecorder>(),
                         c.ResolveForUnshared<IDomainFactory>(),
                         c.ResolveForPlatform<IDataStore>()));
+                services.RegisterUnshared<ISSOUsersRepository>(c => new SSOUsersRepository(
+                    c.ResolveForUnshared<IRecorder>(),
+                    c.ResolveForUnshared<IDomainFactory>(),
+                    c.ResolveForUnshared<IEventSourcingDddCommandStore<SSOUserRoot>>(),
+                    c.ResolveForPlatform<IDataStore>()));
+                services.RegisterUnTenantedEventing<SSOUserRoot, SSOUserProjection>(
+                    c => new SSOUserProjection(c.ResolveForUnshared<IRecorder>(),
+                        c.ResolveForUnshared<IDomainFactory>(),
+                        c.ResolveForPlatform<IDataStore>()));
 
                 services.RegisterUnshared<IAPIKeysService, APIKeysService>();
                 services.RegisterUnshared<IIdentityService, IdentityInProcessServiceClient>();
+                services.RegisterUnshared<ISSOProvidersService, SSOProvidersService>();
+#if TESTINGONLY
+                // EXTEND: replace these registrations with your own OAuth2 implementations
+                services.RegisterUnshared<ISSOAuthenticationProvider, FakeSSOAuthenticationProvider>();
+#endif
             };
         }
     }

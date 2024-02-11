@@ -19,11 +19,11 @@ public class APIKeysApplication : IAPIKeysApplication
     private readonly IEndUsersService _endUsersService;
     private readonly IIdentifierFactory _identifierFactory;
     private readonly IRecorder _recorder;
-    private readonly IAPIKeyRepository _repository;
+    private readonly IAPIKeysRepository _repository;
     private readonly ITokensService _tokensService;
 
     public APIKeysApplication(IRecorder recorder, IIdentifierFactory identifierFactory, ITokensService tokensService,
-        IAPIKeyHasherService apiKeyHasherService, IEndUsersService endUsersService, IAPIKeyRepository repository)
+        IAPIKeyHasherService apiKeyHasherService, IEndUsersService endUsersService, IAPIKeysRepository repository)
     {
         _recorder = recorder;
         _identifierFactory = identifierFactory;

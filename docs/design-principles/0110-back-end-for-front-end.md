@@ -81,8 +81,6 @@ If the attempt to authenticate is successful, the authentication response from t
 
 These "auth tokens" are then added to [HTTPOnly, secure] cookies that are then returned to the browser to be used between the browser and BEFFE for subsequent requests/responses.
 
-![Authentication](../images/Authentication-Credentials.png)
-
 At some point in time, either of those auth tokens will expire, at which point either the `access_token` can be refreshed (using the `refresh_token`), or the `refresh_tokesn` expires, and the end user will need to re-authenticate again.
 
 #### Login
@@ -99,20 +97,26 @@ For example,
 }
 ```
 
+![Credentials Authentication](../images/Authentication-Credentials.png)
+
 or with a body containing an SSO authentication code,
 
 For example,
 
 ```json
 {
-    "AuthCode": "anauthocde",
-    "Provider": "sso"
+    "AuthCode": "anauthcode",
+    "Provider": "google"
 }
 ```
 
+> Note: The Backend API call to authenticate this "OAuth2 identity" will receive some tokens (from the 3rd party provider) that should include an email address \[claim\] that identifies the actual person to the system. However, some OAuth2 providers today do not include that email address claim in the returned tokens, and in those cases the parson cannot be identified. Instead, their email address can be included in the above request (as `Username`) which can be available in the first steps of the "OAuth Authorization Flow".
+
+![SSO Authentication](../images/Authentication-SSO.png)
+
 > Note: you will also need to include CSRF protection in these requests, like all others coming from a JS app.
 
-A successful response from this request will yield the following body,
+A successful response from either of these requests will yield the following body,
 
 For example,
 
@@ -122,7 +126,7 @@ For example,
 }
 ```
 
-But it will also include these cookies (for the current domain):
+But, the response will also include these cookies (for the current domain):
 
 `auth-tok=anaccesstoken`
 

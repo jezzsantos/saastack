@@ -75,4 +75,10 @@
     <data name="AuthenticateSingleSignOnRequestValidator_InvalidAuthCode" xml:space="preserve">
       <value>The 'AuthCode' is invalid or missing</value>
     </data>
+    <data name="AuthenticateSingleSignOnRequestValidator_InvalidUsername" xml:space="preserve">
+      <value>The 'Username' is invalid</value>
+    </data>
+    <data name="TestSSOAuthenticationProvider_MissingUsername" xml:space="preserve">
+      <value>The 'Username' must be provided for this authentication attempt</value>
+    </data>
 </root>

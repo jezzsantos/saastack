@@ -4,7 +4,7 @@ using IdentityDomain;
 
 namespace IdentityApplication.Persistence;
 
-public interface IAPIKeyRepository : IApplicationRepository
+public interface IAPIKeysRepository : IApplicationRepository
 {
     Task<Result<Optional<APIKeyRoot>, Error>> FindByAPIKeyTokenAsync(string keyToken,
         CancellationToken cancellationToken);

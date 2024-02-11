@@ -11,6 +11,7 @@ public static class AuthenticationConstants
         public const string ForRole = ClaimTypes.Role;
         public const string PlatformPrefix = "Platform";
         public const string TenantPrefix = "Tenant";
+        public const string ForTimezone = "zoneinfo";
     }
 
     public static class Authorization
@@ -30,7 +31,6 @@ public static class AuthenticationConstants
     public static class Providers
     {
         public const string Credentials = "credentials";
-        public const string SingleSignOn = "sso";
     }
 
     public static class Tokens

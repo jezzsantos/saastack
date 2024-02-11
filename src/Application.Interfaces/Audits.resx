@@ -48,4 +48,13 @@
     <data name="EndUserApplication_PlatformRolesAssigned" xml:space="preserve">
         <value>EndUser.PlatformRolesAssigned</value>
     </data>
+    <data name="SingleSignOnApplication_Authenticate_AccountOnboarded" xml:space="preserve">
+        <value>SingleSignOn.AutoRegistered</value>
+    </data>
+    <data name="SingleSignOnApplication_Authenticate_AccountSuspended" xml:space="preserve">
+        <value>Authentication.Failed.AccountSuspended</value>
+    </data>
+    <data name="SingleSignOnApplication_Authenticate_Succeeded" xml:space="preserve">
+        <value>Authentication.Passed</value>
+    </data>
 </root>

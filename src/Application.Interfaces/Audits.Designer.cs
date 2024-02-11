@@ -130,5 +130,32 @@ namespace Application.Interfaces {
                 return ResourceManager.GetString("PasswordCredentialsApplication_Authenticate_Succeeded", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SingleSignOn.AutoRegistered.
+        /// </summary>
+        public static string SingleSignOnApplication_Authenticate_AccountOnboarded {
+            get {
+                return ResourceManager.GetString("SingleSignOnApplication_Authenticate_AccountOnboarded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authentication.Failed.AccountSuspended.
+        /// </summary>
+        public static string SingleSignOnApplication_Authenticate_AccountSuspended {
+            get {
+                return ResourceManager.GetString("SingleSignOnApplication_Authenticate_AccountSuspended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authentication.Passed.
+        /// </summary>
+        public static string SingleSignOnApplication_Authenticate_Succeeded {
+            get {
+                return ResourceManager.GetString("SingleSignOnApplication_Authenticate_Succeeded", resourceCulture);
+            }
+        }
     }
 }

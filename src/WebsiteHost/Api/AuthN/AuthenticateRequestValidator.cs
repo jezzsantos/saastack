@@ -1,3 +1,4 @@
+using Common.Extensions;
 using Domain.Interfaces.Validations;
 using FluentValidation;
 using Infrastructure.Interfaces;
@@ -13,19 +14,27 @@ public class AuthenticateRequestValidator : AbstractValidator<AuthenticateReques
         RuleFor(req => req.Provider)
             .NotEmpty()
             .WithMessage(Resources.AuthenticateRequestValidator_InvalidProvider);
-        RuleFor(req => req.Username)
-            .NotEmpty()
-            .IsEmailAddress()
-            .When(req => req.Provider == AuthenticationConstants.Providers.Credentials)
-            .WithMessage(Resources.AuthenticateRequestValidator_InvalidUsername);
-        RuleFor(req => req.Password)
-            .NotEmpty()
-            .Matches(CommonValidations.Passwords.Password.Strict)
-            .When(req => req.Provider == AuthenticationConstants.Providers.Credentials)
-            .WithMessage(Resources.AuthenticateRequestValidator_InvalidPassword);
-        RuleFor(req => req.AuthCode)
-            .NotEmpty()
-            .When(req => req.Provider != AuthenticationConstants.Providers.Credentials)
-            .WithMessage(Resources.AuthenticateRequestValidator_InvalidAuthCode);
+        When(req => req.Provider == AuthenticationConstants.Providers.Credentials, () =>
+        {
+            RuleFor(req => req.Username)
+                .NotEmpty()
+                .IsEmailAddress()
+                .WithMessage(Resources.AuthenticateRequestValidator_InvalidUsername);
+            RuleFor(req => req.Password)
+                .NotEmpty()
+                .Matches(CommonValidations.Passwords.Password.Strict)
+                .WithMessage(Resources.AuthenticateRequestValidator_InvalidPassword);
+        });
+        When(req => req.Provider != AuthenticationConstants.Providers.Credentials, () =>
+        {
+            RuleFor(req => req.AuthCode)
+                .NotEmpty()
+                .WithMessage(Resources.AuthenticateRequestValidator_InvalidAuthCode);
+            RuleFor(req => req.Username)
+                .NotEmpty()
+                .IsEmailAddress()
+                .When(req => req.Username.HasValue())
+                .WithMessage(Resources.AuthenticateRequestValidator_InvalidUsername);
+        });
     }
 }

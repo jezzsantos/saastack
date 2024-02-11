@@ -103,5 +103,23 @@ namespace IdentityApplication {
                 return ResourceManager.GetString("PasswordCredentialsApplication_RegistrationNotVerified", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user account is suspended.
+        /// </summary>
+        internal static string SingleSignOnApplication_AccountSuspended {
+            get {
+                return ResourceManager.GetString("SingleSignOnApplication_AccountSuspended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; is not registered.
+        /// </summary>
+        internal static string SSOProvidersService_UnknownProvider {
+            get {
+                return ResourceManager.GetString("SSOProvidersService_UnknownProvider", resourceCulture);
+            }
+        }
     }
 }
