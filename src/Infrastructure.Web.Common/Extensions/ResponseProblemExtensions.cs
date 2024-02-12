@@ -3,6 +3,7 @@ using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Interfaces.Clients;
 using Microsoft.AspNetCore.Mvc;
 
@@ -103,6 +104,30 @@ public static class ResponseProblemExtensions
                 response.Errors = errors;
             }
         }
+
+        return response;
+    }
+
+    public static ResponseProblem ToResponseProblem(this OAuth2Rfc6749ProblemDetails? details, int statusCode)
+    {
+        if (details.NotExists())
+        {
+            return new ResponseProblem
+            {
+                Title = nameof(HttpStatusCode.InternalServerError),
+                Status = (int)HttpStatusCode.InternalServerError
+            };
+        }
+
+        var response = new ResponseProblem
+        {
+            Type = OAuth2Rfc6749ProblemDetails.Reference,
+            Title = details.Error,
+            Status = statusCode,
+            Detail = details.ErrorDescription,
+            Instance = details.ErrorUri
+        };
+
 
         return response;
     }
