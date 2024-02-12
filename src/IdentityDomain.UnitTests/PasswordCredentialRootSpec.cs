@@ -20,6 +20,7 @@ public class PasswordCredentialRootSpec
     private readonly Mock<IEmailAddressService> _emailAddressService;
     private readonly Mock<IPasswordHasherService> _passwordHasherService;
     private readonly Mock<ITokensService> _tokensService;
+    private const string Token = "5n6nA42SQrsO1UIgc7lIVebR6_3CmZwcthUEx3nF2sM";
 
     public PasswordCredentialRootSpec()
     {
@@ -36,7 +37,7 @@ public class PasswordCredentialRootSpec
         _passwordHasherService.Setup(phs => phs.ValidatePasswordHash(It.IsAny<string>()))
             .Returns(true);
         _tokensService = new Mock<ITokensService>();
-        _tokensService.Setup(ts => ts.CreateTokenForVerification())
+        _tokensService.Setup(ts => ts.CreateRegistrationVerificationToken())
             .Returns("averificationtoken");
         var settings = new Mock<IConfigurationSettings>();
         settings.Setup(s => s.Platform.GetString(It.IsAny<string>(), It.IsAny<string>()))
@@ -246,9 +247,8 @@ public class PasswordCredentialRootSpec
     [Fact]
     public void WhenInitiatePasswordResetAndPasswordNotSet_ThenReturnsError()
     {
-        var token = Convert.ToBase64String(Enumerable.Repeat((byte)0x01, 32).ToArray());
-        _tokensService.Setup(ts => ts.CreateTokenForPasswordReset())
-            .Returns(token);
+        _tokensService.Setup(ts => ts.CreatePasswordResetToken())
+            .Returns(Token);
         _credential.InitiateRegistrationVerification();
         _credential.VerifyRegistration();
 
@@ -260,11 +260,10 @@ public class PasswordCredentialRootSpec
     [Fact]
     public void WhenInitiatePasswordResetAndNotVerified_ThenReturnsError()
     {
-        var token = Convert.ToBase64String(Enumerable.Repeat((byte)0x01, 32).ToArray());
-        _tokensService.Setup(ts => ts.CreateTokenForPasswordReset())
-            .Returns(token);
+        _tokensService.Setup(ts => ts.CreatePasswordResetToken())
+            .Returns(Token);
 #if TESTINGONLY
-        _credential.TestingOnly_RenewVerification(token);
+        _credential.TestingOnly_RenewVerification(Token);
 #endif
         var result = _credential.InitiatePasswordReset();
 
@@ -275,9 +274,8 @@ public class PasswordCredentialRootSpec
     [Fact]
     public void WhenInitiatePasswordReset_ThenInitiated()
     {
-        var token = Convert.ToBase64String(Enumerable.Repeat((byte)0x01, 32).ToArray());
-        _tokensService.Setup(ts => ts.CreateTokenForPasswordReset())
-            .Returns(token);
+        _tokensService.Setup(ts => ts.CreatePasswordResetToken())
+            .Returns(Token);
         _credential.SetCredential("apassword");
         _credential.SetRegistrationDetails(EmailAddress.Create("auser@company.com").Value,
             PersonDisplayName.Create("aname").Value);
@@ -295,11 +293,11 @@ public class PasswordCredentialRootSpec
     [Fact]
     public void WhenResetPasswordWithInvalidPassword_ThenReturnsError()
     {
-        var token = Convert.ToBase64String(Enumerable.Repeat((byte)0x01, 32).ToArray());
+        
         _passwordHasherService.Setup(phs => phs.ValidatePassword(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns(false);
 
-        var result = _credential.ResetPassword(token, "apassword");
+        var result = _credential.ResetPassword(Token, "apassword");
 
         result.Should().BeError(ErrorCode.Validation, Resources.PasswordCredentialsRoot_InvalidPassword);
 
@@ -309,11 +307,11 @@ public class PasswordCredentialRootSpec
     [Fact]
     public void WhenResetPasswordAndNoExistingPassword_ThenReturnsError()
     {
-        var token = Convert.ToBase64String(Enumerable.Repeat((byte)0x01, 32).ToArray());
+        
         _passwordHasherService.Setup(phs => phs.ValidatePassword(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns(true);
 
-        var result = _credential.ResetPassword(token, "apassword");
+        var result = _credential.ResetPassword(Token, "apassword");
 
         result.Should().BeError(ErrorCode.PreconditionViolation, Resources.PasswordCredentialsRoot_NoPassword);
 
@@ -323,14 +321,14 @@ public class PasswordCredentialRootSpec
     [Fact]
     public void WhenResetPasswordAndSamePassword_ThenReturnsError()
     {
-        var token = Convert.ToBase64String(Enumerable.Repeat((byte)0x01, 32).ToArray());
+        
         _passwordHasherService.Setup(phs => phs.ValidatePassword(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns(true);
         _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(false);
         _credential.SetCredential("apassword");
 
-        var result = _credential.ResetPassword(token, "apassword");
+        var result = _credential.ResetPassword(Token, "apassword");
 
         result.Should().BeError(ErrorCode.Validation, Resources.PasswordCredentialsRoot_DuplicatePassword);
 
@@ -359,9 +357,8 @@ public class PasswordCredentialRootSpec
     [Fact]
     public void WhenResetPasswordAndCredentialsLocked_ThenResetsPasswordAndUnlocks()
     {
-        var token = Convert.ToBase64String(Enumerable.Repeat((byte)0x01, 32).ToArray());
-        _tokensService.Setup(ts => ts.CreateTokenForPasswordReset())
-            .Returns(token);
+        _tokensService.Setup(ts => ts.CreatePasswordResetToken())
+            .Returns(Token);
         _credential.SetCredential("apassword");
         _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(false);
@@ -389,9 +386,8 @@ public class PasswordCredentialRootSpec
     [Fact]
     public void WhenResetPassword_ThenResetsPassword()
     {
-        var token = Convert.ToBase64String(Enumerable.Repeat((byte)0x01, 32).ToArray());
-        _tokensService.Setup(ts => ts.CreateTokenForPasswordReset())
-            .Returns(token);
+        _tokensService.Setup(ts => ts.CreatePasswordResetToken())
+            .Returns(Token);
         _passwordHasherService.Setup(phs => phs.ValidatePassword(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns(true);
         _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
@@ -425,9 +421,8 @@ public class PasswordCredentialRootSpec
     [Fact]
     public void WhenEnsureInvariantsAndInitiatingPasswordResetButUnRegistered_ThenReturnsErrors()
     {
-        var token = Convert.ToBase64String(Enumerable.Repeat((byte)0x01, 32).ToArray());
-        _tokensService.Setup(ts => ts.CreateTokenForPasswordReset())
-            .Returns(token);
+        _tokensService.Setup(ts => ts.CreatePasswordResetToken())
+            .Returns(Token);
         _credential.SetCredential("apassword");
         _credential.InitiateRegistrationVerification();
         _credential.VerifyRegistration();

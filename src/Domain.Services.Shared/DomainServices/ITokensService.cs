@@ -5,13 +5,13 @@ namespace Domain.Services.Shared.DomainServices;
 
 public interface ITokensService
 {
-    APIKeyToken CreateApiKey();
+    APIKeyToken CreateAPIKey();
 
-    string CreateTokenForJwtRefresh();
+    string CreateJWTRefreshToken();
 
-    string CreateTokenForPasswordReset();
+    string CreatePasswordResetToken();
 
-    string CreateTokenForVerification();
+    string CreateRegistrationVerificationToken();
 
     Optional<APIKeyToken> ParseApiKey(string apiKey);
 }

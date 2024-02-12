@@ -1,6 +1,7 @@
 using FluentAssertions;
 using FluentValidation;
 using IdentityInfrastructure.Api.AuthTokens;
+using Infrastructure.Shared.DomainServices;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using UnitTesting.Common.Validation;
 using Xunit;
@@ -18,7 +19,7 @@ public class RefreshTokenRequestValidatorSpec
         _validator = new RefreshTokenRequestValidator();
         _dto = new RefreshTokenRequest
         {
-            RefreshToken = "arefreshtoken"
+            RefreshToken = new TokensService().CreateJWTRefreshToken()
         };
     }
 

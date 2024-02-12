@@ -4,6 +4,11 @@ namespace IdentityDomain;
 
 public static class Validations
 {
+    public static class AuthTokens
+    {
+        public static readonly Validation RefreshToken = CommonValidations.RandomToken();
+    }
+
     public static class Machine
     {
         public static readonly Validation Name = CommonValidations.DescriptiveName(1, 200);

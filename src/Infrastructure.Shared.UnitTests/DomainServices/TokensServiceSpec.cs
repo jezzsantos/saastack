@@ -14,9 +14,9 @@ public class TokensServiceSpec
     [Fact]
     public void WhenCreateTokenForVerification_ThenReturnsRandomValue()
     {
-        var result1 = _service.CreateTokenForVerification();
-        var result2 = _service.CreateTokenForVerification();
-        var result3 = _service.CreateTokenForVerification();
+        var result1 = _service.CreateRegistrationVerificationToken();
+        var result2 = _service.CreateRegistrationVerificationToken();
+        var result3 = _service.CreateRegistrationVerificationToken();
 
         result1.Should().MatchRegex(CommonValidations.RandomToken().Expression);
         result1.Should().NotBe(result2);
@@ -27,9 +27,9 @@ public class TokensServiceSpec
     [Fact]
     public void WhenCreateTokenForPasswordReset_ThenReturnsRandomValue()
     {
-        var result1 = _service.CreateTokenForPasswordReset();
-        var result2 = _service.CreateTokenForPasswordReset();
-        var result3 = _service.CreateTokenForPasswordReset();
+        var result1 = _service.CreatePasswordResetToken();
+        var result2 = _service.CreatePasswordResetToken();
+        var result3 = _service.CreatePasswordResetToken();
 
         result1.Should().MatchRegex(CommonValidations.RandomToken().Expression);
         result1.Should().NotBe(result2);
@@ -40,9 +40,9 @@ public class TokensServiceSpec
     [Fact]
     public void WhenCreateTokenForJwtRefresh_ThenReturnsRandomValue()
     {
-        var result1 = _service.CreateTokenForJwtRefresh();
-        var result2 = _service.CreateTokenForJwtRefresh();
-        var result3 = _service.CreateTokenForJwtRefresh();
+        var result1 = _service.CreateJWTRefreshToken();
+        var result2 = _service.CreateJWTRefreshToken();
+        var result3 = _service.CreateJWTRefreshToken();
 
         result1.Should().MatchRegex(CommonValidations.RandomToken().Expression);
         result1.Should().NotBe(result2);
@@ -53,11 +53,11 @@ public class TokensServiceSpec
     [Fact]
     public void WhenCreateApiKey_ThenReturnsNewRandomApiKey()
     {
-        var result = _service.CreateApiKey();
+        var result = _service.CreateAPIKey();
 
         result.Prefix.Should().Be(CommonValidations.APIKeys.ApiKeyPrefix);
-        result.Token.Should().MatchRegex(CommonValidations.RandomToken(24).Expression);
-        result.Key.Should().MatchRegex(CommonValidations.RandomToken().Expression);
+        result.Token.Should().MatchRegex(CommonValidations.APIKeys.RandomToken(24).Expression);
+        result.Key.Should().MatchRegex(CommonValidations.APIKeys.RandomToken().Expression);
         result.ApiKey.Should().StartWith(CommonValidations.APIKeys.ApiKeyPrefix)
             .And.Contain(CommonValidations.APIKeys.ApiKeyDelimiter);
     }
@@ -73,7 +73,7 @@ public class TokensServiceSpec
     [Fact]
     public void WhenParseApiKey_ThenReturnsKey()
     {
-        var keyToken = _service.CreateApiKey();
+        var keyToken = _service.CreateAPIKey();
 
         var result = _service.ParseApiKey(keyToken.ApiKey);
 

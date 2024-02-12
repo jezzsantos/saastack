@@ -58,7 +58,7 @@ public class PasswordCredentialsApplicationSpec
         _emailAddressService.Setup(eas => eas.EnsureUniqueAsync(It.IsAny<EmailAddress>(), It.IsAny<Identifier>()))
             .Returns(Task.FromResult(true));
         _tokensService = new Mock<ITokensService>();
-        _tokensService.Setup(ts => ts.CreateTokenForVerification())
+        _tokensService.Setup(ts => ts.CreateRegistrationVerificationToken())
             .Returns("averificationtoken");
         _passwordHasherService = new Mock<IPasswordHasherService>();
         _passwordHasherService.Setup(phs => phs.ValidatePassword(It.IsAny<string>(), It.IsAny<bool>()))

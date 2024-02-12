@@ -15,7 +15,7 @@ using Xunit;
 namespace Infrastructure.Web.Website.IntegrationTests;
 
 [UsedImplicitly]
-public class CSRFSpec
+public class CSRFApiSpec
 {
     [Trait("Category", "Integration.Web")]
     [Collection("API")]

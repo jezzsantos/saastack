@@ -56,7 +56,7 @@ public class JWTTokensService : IJWTTokensService
         );
 
         var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
-        var refreshToken = _tokensService.CreateTokenForJwtRefresh();
+        var refreshToken = _tokensService.CreateJWTRefreshToken();
 
         return new AccessTokens(accessToken, accessTokenExpiresOn, refreshToken, refreshTokenExpiresOn);
     }

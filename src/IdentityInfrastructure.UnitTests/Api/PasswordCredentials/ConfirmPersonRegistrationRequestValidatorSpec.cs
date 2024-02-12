@@ -1,6 +1,7 @@
 using FluentAssertions;
 using FluentValidation;
 using IdentityInfrastructure.Api.PasswordCredentials;
+using Infrastructure.Shared.DomainServices;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using UnitTesting.Common.Validation;
 using Xunit;
@@ -18,7 +19,7 @@ public class ConfirmPersonRegistrationRequestValidatorSpec
         _validator = new ConfirmPersonRegistrationRequestValidator();
         _dto = new ConfirmRegistrationPersonPasswordRequest
         {
-            Token = Convert.ToBase64String(Enumerable.Repeat((byte)0x01, 32).ToArray())
+            Token = new TokensService().CreateRegistrationVerificationToken()
         };
     }
 

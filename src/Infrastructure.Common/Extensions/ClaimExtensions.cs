@@ -9,7 +9,7 @@ namespace Infrastructure.Common.Extensions;
 
 public static class ClaimExtensions
 {
-    private const string TenantIdDelimiter = "##";
+    public const string TenantIdDelimiter = "#|#";
 
     /// <summary>
     ///     Returns the set of <see cref="FeatureLevel" /> found in the specified <see cref="claims" />

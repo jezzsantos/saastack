@@ -245,7 +245,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
             return Error.PreconditionViolation(Resources.PasswordCredentialsRoot_RegistrationUnverified);
         }
 
-        var token = _tokensService.CreateTokenForPasswordReset();
+        var token = _tokensService.CreatePasswordResetToken();
         return RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.PasswordResetInitiated.Create(Id, token));
     }
 
@@ -256,7 +256,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
             return Error.PreconditionViolation(Resources.PasswordCredentialsRoot_RegistrationVerified);
         }
 
-        var token = _tokensService.CreateTokenForVerification();
+        var token = _tokensService.CreateRegistrationVerificationToken();
         return RaiseChangeEvent(
             IdentityDomain.Events.PasswordCredentials.RegistrationVerificationCreated.Create(Id, token));
     }

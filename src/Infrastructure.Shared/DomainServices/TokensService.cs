@@ -10,16 +10,17 @@ public sealed class TokensService : ITokensService
 {
     private const int DefaultTokenSizeInBytes = 32;
 
-    public string CreateTokenForPasswordReset()
+    public string CreatePasswordResetToken()
     {
-        return GenerateRandomToken();
+        return GenerateRandomTokenSafeForUrl();
     }
 
-    public APIKeyToken CreateApiKey()
+    public APIKeyToken CreateAPIKey()
     {
-        var token = GenerateRandomToken(CommonValidations.APIKeys.ApiKeyTokenSize);
-        // ReSharper disable once RedundantArgumentDefaultValue
-        var key = GenerateRandomToken(CommonValidations.APIKeys.ApiKeySize);
+        var token = GenerateRandomTokenSafeForUrl(CommonValidations.APIKeys.ApiKeyTokenSize,
+            CommonValidations.APIKeys.ApiKeyPaddingReplacement);
+        var key = GenerateRandomTokenSafeForUrl(CommonValidations.APIKeys.ApiKeySize,
+            CommonValidations.APIKeys.ApiKeyPaddingReplacement);
 
         return new APIKeyToken
         {
@@ -30,16 +31,19 @@ public sealed class TokensService : ITokensService
         };
     }
 
-    public string CreateTokenForJwtRefresh()
+    public string CreateJWTRefreshToken()
     {
-        return GenerateRandomToken();
+        return GenerateRandomTokenSafeForUrl();
     }
 
-    public string CreateTokenForVerification()
+    public string CreateRegistrationVerificationToken()
     {
-        return GenerateRandomToken();
+        return GenerateRandomTokenSafeForUrl();
     }
 
+    /// <summary>
+    ///     Should look like this: {ApiKeyPrefix}{token}{ApiKeyDelimiter}{key}
+    /// </summary>
     public Optional<APIKeyToken> ParseApiKey(string apiKey)
     {
         if (!CommonValidations.APIKeys.ApiKey.Matches(apiKey))
@@ -62,6 +66,12 @@ public sealed class TokensService : ITokensService
         };
     }
 
+    private static string GenerateRandomTokenSafeForUrl(int keySize = DefaultTokenSizeInBytes,
+        string paddingReplacement = "")
+    {
+        return MakeSafeForUrls(GenerateRandomToken(keySize), paddingReplacement);
+    }
+
     private static string GenerateRandomToken(int keySize = DefaultTokenSizeInBytes)
     {
         using (var random = RandomNumberGenerator.Create())
@@ -70,5 +80,13 @@ public sealed class TokensService : ITokensService
             random.GetNonZeroBytes(bytes);
             return Convert.ToBase64String(bytes);
         }
+    }
+
+    private static string MakeSafeForUrls(string value, string paddingReplacement = "")
+    {
+        return value
+            .Replace('+', '-')
+            .Replace('/', '_')
+            .Replace("=", paddingReplacement);
     }
 }

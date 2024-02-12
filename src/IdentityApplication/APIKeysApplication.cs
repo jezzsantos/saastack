@@ -76,7 +76,7 @@ public class APIKeysApplication : IAPIKeysApplication
     public async Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext context, string userId,
         string description, DateTime? expiresOn, CancellationToken cancellationToken)
     {
-        var keyToken = _tokensService.CreateApiKey();
+        var keyToken = _tokensService.CreateAPIKey();
 
         var created = APIKeyRoot.Create(_recorder, _identifierFactory, _apiKeyHasherService, userId.ToId(), keyToken);
         if (!created.IsSuccessful)

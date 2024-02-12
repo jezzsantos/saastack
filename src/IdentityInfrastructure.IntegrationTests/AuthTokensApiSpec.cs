@@ -12,9 +12,9 @@ namespace IdentityInfrastructure.IntegrationTests;
 
 [Trait("Category", "Integration.Web")]
 [Collection("API")]
-public class AuthTokensSpec : WebApiSpec<Program>
+public class AuthTokensApiSpec : WebApiSpec<Program>
 {
-    public AuthTokensSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
+    public AuthTokensApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
         EmptyAllRepositories();
     }

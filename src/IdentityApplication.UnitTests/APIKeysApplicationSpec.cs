@@ -39,7 +39,7 @@ public class APIKeysApplicationSpec
         _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
         _tokensService = new Mock<ITokensService>();
-        _tokensService.Setup(ts => ts.CreateApiKey())
+        _tokensService.Setup(ts => ts.CreateAPIKey())
             .Returns(new APIKeyToken
             {
                 Key = "akey",
@@ -149,7 +149,7 @@ public class APIKeysApplicationSpec
         result.Value.ExpiresOnUtc.Should()
             .BeNear(DateTime.UtcNow.ToNearestMinute().Add(APIKeysApplication.DefaultAPIKeyExpiry),
                 TimeSpan.FromMinutes(1));
-        _tokensService.Verify(ts => ts.CreateApiKey());
+        _tokensService.Verify(ts => ts.CreateAPIKey());
         _repository.Verify(rep => rep.SaveAsync(It.Is<APIKeyRoot>(ak =>
             ak.ApiKey.Value.Token == "atoken"
             && ak.ApiKey.Value.KeyHash == "akeyhash"
@@ -174,7 +174,7 @@ public class APIKeysApplicationSpec
         result.Value.UserId.Should().Be("auserid");
         result.Value.Description.Should().Be("adescription");
         result.Value.ExpiresOnUtc.Should().Be(expiresOn);
-        _tokensService.Verify(ts => ts.CreateApiKey());
+        _tokensService.Verify(ts => ts.CreateAPIKey());
         _repository.Verify(rep => rep.SaveAsync(It.Is<APIKeyRoot>(ak =>
             ak.ApiKey.Value.Token == "atoken"
             && ak.ApiKey.Value.KeyHash == "akeyhash"

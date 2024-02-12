@@ -113,7 +113,7 @@ public static class CommonValidations
     /// </summary>
     public static Validation RandomToken(int keySize = 41)
     {
-        return new Validation($"^[a-zA-Z0-9+/]{{{keySize},{keySize + 3}}}[=]{{0,3}}$");
+        return new Validation($"^[a-zA-Z0-9_+-]{{{keySize},{keySize + 3}}}$");
     }
 
     private static bool IsInvalidLength<TValue>(Validation<TValue> format, TValue value)
@@ -228,6 +228,7 @@ public static class CommonValidations
     public static class APIKeys
     {
         public const string ApiKeyDelimiter = "||";
+        public const string ApiKeyPaddingReplacement = "#";
         public const string ApiKeyPrefix = "apk_";
         public const int ApiKeySize = 32;
         public const int ApiKeyTokenSize = 18;
@@ -276,6 +277,15 @@ public static class CommonValidations
 
             return true;
         });
+
+        /// <summary>
+        ///     Validation for a random token (as created by the TokensService)
+        /// </summary>
+        public static Validation RandomToken(int keySize = 41,
+            string paddingReplacement = ApiKeyPaddingReplacement)
+        {
+            return new Validation($"^[a-zA-Z0-9_+-]{{{keySize},{keySize + 3}}}[{paddingReplacement}]{{0,3}}$");
+        }
 
         private static int CalculateBase64EncodingLength(int sizeInBytes)
         {

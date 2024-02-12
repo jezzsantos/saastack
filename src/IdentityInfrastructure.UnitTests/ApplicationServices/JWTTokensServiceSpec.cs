@@ -5,6 +5,7 @@ using Domain.Interfaces.Authorization;
 using Domain.Services.Shared.DomainServices;
 using FluentAssertions;
 using IdentityInfrastructure.ApplicationServices;
+using Infrastructure.Common.Extensions;
 using Infrastructure.Interfaces;
 using Moq;
 using UnitTesting.Common.Validation;
@@ -28,7 +29,7 @@ public class JWTTokensServiceSpec
         settings.Setup(s => s.Platform.GetNumber(It.IsAny<string>(), It.IsAny<double>()))
             .Returns((string _, double defaultValue) => defaultValue);
         _tokensService = new Mock<ITokensService>();
-        _tokensService.Setup(ts => ts.CreateTokenForJwtRefresh())
+        _tokensService.Setup(ts => ts.CreateJWTRefreshToken())
             .Returns("arefreshtoken");
 
         _service = new JWTTokensService(settings.Object, _tokensService.Object);
@@ -77,13 +78,14 @@ public class JWTTokensServiceSpec
                 claim => claim.Type == AuthenticationConstants.Claims.ForRole && claim.Value == "Platform_standard");
         token.Claims.Should()
             .Contain(claim => claim.Type == AuthenticationConstants.Claims.ForRole
-                              && claim.Value == "Tenant_member##anorganizationid");
+                              && claim.Value == $"Tenant_member{ClaimExtensions.TenantIdDelimiter}anorganizationid");
         token.Claims.Should()
             .Contain(claim => claim.Type == AuthenticationConstants.Claims.ForFeature
                               && claim.Value == "Platform_basic_features");
         token.Claims.Should()
             .Contain(claim => claim.Type == AuthenticationConstants.Claims.ForFeature
-                              && claim.Value == "Tenant_basic_features##anorganizationid");
-        _tokensService.Verify(ts => ts.CreateTokenForJwtRefresh());
+                              && claim.Value
+                              == $"Tenant_basic_features{ClaimExtensions.TenantIdDelimiter}anorganizationid");
+        _tokensService.Verify(ts => ts.CreateJWTRefreshToken());
     }
 }
