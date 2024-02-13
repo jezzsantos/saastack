@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Infrastructure.Web.Api.Interfaces;
 
-namespace Infrastructure.Web.Api.Operations.Shared._3rdParties;
+namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.OAuth2;
 
 public class ExchangeOAuth2CodeForTokensResponse : IWebResponse
 {

@@ -44,6 +44,7 @@ public class AncillaryModule : ISubDomainModule
             return (_, services) =>
             {
                 services.RegisterUnshared<IRecordingApplication, RecordingApplication>();
+                services.RegisterUnshared<IFeatureFlagsApplication, FeatureFlagsApplication>();
                 services.RegisterUnshared<IAncillaryApplication, AncillaryApplication.AncillaryApplication>();
                 services.RegisterUnshared<IUsageMessageQueue>(c =>
                     new UsageMessageQueue(c.Resolve<IRecorder>(), c.Resolve<IMessageQueueIdFactory>(),

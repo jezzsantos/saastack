@@ -30,4 +30,13 @@
     <data name="AnyRecordingEventNameValidator_InvalidEventName" xml:space="preserve">
         <value>The 'EventName' is either missing or invalid</value>
     </data>
+    <data name="GetFeatureFlagRequestValidator_InvalidName" xml:space="preserve">
+        <value>The 'Name' is either missing or invalid</value>
+    </data>
+    <data name="GetFeatureFlagRequestValidator_InvalidTenantId" xml:space="preserve">
+        <value>The 'TenantId' is not a valid identifier</value>
+    </data>
+    <data name="GetFeatureFlagRequestValidator_InvalidUserId" xml:space="preserve">
+        <value>The 'UserId' is not a valid identifier</value>
+    </data>
 </root>

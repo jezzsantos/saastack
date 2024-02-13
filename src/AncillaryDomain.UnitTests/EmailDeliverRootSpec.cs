@@ -183,7 +183,7 @@ public class EmailDeliverRootSpec
         root.Delivered.Should().BeNear(DateTime.UtcNow);
         root.Events.Last().Should().BeOfType<Events.EmailDelivery.DeliverySucceeded>();
     }
-
+    
     private static QueuedMessageId CreateMessageId()
     {
         var messageId = new MessageQueueIdFactory().Create("aqueuename");

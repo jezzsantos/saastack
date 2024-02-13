@@ -51,6 +51,7 @@ public class BackEndForFrontEndModule : ISubDomainModule
             return (_, services) =>
             {
                 services.AddControllers();
+                services.RegisterUnshared<IFeatureFlagsApplication, FeatureFlagsApplication>();
                 services.RegisterUnshared<IRecordingApplication, RecordingApplication>();
                 services.RegisterUnshared<IAuthenticationApplication, AuthenticationApplication>();
                 services.RegisterUnshared<IServiceClient>(c =>

@@ -24,4 +24,7 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
+    <data name="FlagsmithHttpServiceClient_UnknownFeature" xml:space="preserve">
+        <value>The feature '{0}' has not be defined in Flagsmith</value>
+    </data>
 </root>

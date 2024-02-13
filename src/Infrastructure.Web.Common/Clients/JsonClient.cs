@@ -249,14 +249,17 @@ public class JsonClient : IHttpJsonClient, IDisposable
 
     public void SetBaseUrl(string baseUrl)
     {
-        _client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
+        _client.BaseAddress = new Uri(baseUrl.WithTrailingSlash(), UriKind.Absolute);
     }
 
     private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod method, IWebRequest request,
         Action<HttpRequestMessage>? requestFilter, CancellationToken? cancellationToken = default)
     {
         var requestUri = request.GetRequestInfo().Route;
-        var content = new StringContent(request.SerializeToJson(), new MediaTypeHeaderValue(HttpContentTypes.Json));
+
+        var content = method == HttpMethod.Post || method == HttpMethod.Put || method == HttpMethod.Patch
+            ? new StringContent(request.SerializeToJson(), new MediaTypeHeaderValue(HttpContentTypes.Json))
+            : null;
 
         return await SendRequestAsync(method, requestUri, content, requestFilter, cancellationToken);
     }
@@ -268,7 +271,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         var request = new HttpRequestMessage
         {
             Method = method,
-            RequestUri = new Uri(_client.BaseAddress!, requestUri),
+            RequestUri = new Uri(_client.BaseAddress!, requestUri.WithoutLeadingSlash()),
             Content = requestContent,
             Headers = { { HttpHeaders.Accept, HttpContentTypes.Json } }
         };

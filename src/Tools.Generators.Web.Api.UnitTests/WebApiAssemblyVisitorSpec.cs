@@ -217,7 +217,7 @@ public class WebApiAssemblyVisitorSpec
         }
 
         [Fact]
-        public void WhenVisitNamedTypeAndNoMethods_ThenCreatesNoRegistrations()
+        public void WhenVisitNamedTypeAndHasNoMethods_ThenCreatesNoRegistrations()
         {
             var type = SetupServiceClass(_compilation);
 
@@ -272,7 +272,7 @@ public class WebApiAssemblyVisitorSpec
         }
 
         [Fact]
-        public void WhenVisitNamedTypeAndHasNoParameters_ThenCreatesNoRegistrations()
+        public void WhenVisitNamedTypeAndOperationHasNoParameters_ThenCreatesNoRegistrations()
         {
             var taskMetadata = _compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
             var type = SetupServiceClass(_compilation);
@@ -290,7 +290,7 @@ public class WebApiAssemblyVisitorSpec
         }
 
         [Fact]
-        public void WhenVisitNamedTypeAndHasWrongFirstParameter_ThenCreatesNoRegistrations()
+        public void WhenVisitNamedTypeAndOperationHasWrongFirstParameter_ThenCreatesNoRegistrations()
         {
             var taskMetadata = _compilation.GetTypeByMetadataName(typeof(Task<>).FullName!)!;
             var type = SetupServiceClass(_compilation);
@@ -311,7 +311,7 @@ public class WebApiAssemblyVisitorSpec
         }
 
         [Fact]
-        public void WhenVisitNamedTypeAndHasWrongSecondParameter_ThenCreatesNoRegistrations()
+        public void WhenVisitNamedTypeAndOperationHasWrongSecondParameter_ThenCreatesNoRegistrations()
         {
             var requestMetadata = _compilation.GetTypeByMetadataName(typeof(IWebRequest).FullName!)!;
             var stringMetadata = _compilation.GetTypeByMetadataName(typeof(string).FullName!)!;
@@ -336,7 +336,7 @@ public class WebApiAssemblyVisitorSpec
         }
 
         [Fact]
-        public void WhenVisitNamedTypeAndHasNoAttributes_ThenCreatesNoRegistrations()
+        public void WhenVisitNamedTypeAndRequestDtoHasNoAttributes_ThenCreatesNoRegistrations()
         {
             var requestMetadata = _compilation.GetTypeByMetadataName(typeof(IWebRequest).FullName!)!;
             var cancellationTokenMetadata = _compilation.GetTypeByMetadataName(typeof(CancellationToken).FullName!)!;
@@ -361,11 +361,12 @@ public class WebApiAssemblyVisitorSpec
             _visitor.OperationRegistrations.Should().BeEmpty();
         }
 
+        
         [Trait("Category", "Unit")]
         public class GivenAServiceOperation
         {
             [Fact]
-            public void WhenVisitNamedTypeAndHasRouteAttribute_ThenCreatesRegistration()
+            public void WhenVisitNamedTypeAndRequestDtoHasRouteAttribute_ThenCreatesRegistration()
             {
                 var compilation = CreateCompilation("""
                                                     using System;
@@ -419,7 +420,7 @@ public class WebApiAssemblyVisitorSpec
             }
 
             [Fact]
-            public void WhenVisitNamedTypeAndHasASingleAuthorizeAttribute_ThenCreatesRegistration()
+            public void WhenVisitNamedTypeAndRequestDtoHasASingleAuthorizeAttribute_ThenCreatesRegistration()
             {
                 var compilation = CreateCompilation("""
                                                     using System;
@@ -474,7 +475,7 @@ public class WebApiAssemblyVisitorSpec
             }
 
             [Fact]
-            public void WhenVisitNamedTypeAndHasManyAuthorizeAttributes_ThenCreatesRegistration()
+            public void WhenVisitNamedTypeAndRequestDtoHasManyAuthorizeAttributes_ThenCreatesRegistration()
             {
                 var compilation = CreateCompilation("""
                                                     using System;
@@ -530,6 +531,42 @@ public class WebApiAssemblyVisitorSpec
                 registration.ResponseDtoType.Name.Should().Be("AResponse");
                 registration.ResponseDtoType.Namespace.Should().Be("ANamespace");
             }
+
+            [Fact]
+            public void WhenVisitNamedTypeAndClassHasRouteAttribute_ThenCreatesRegistration()
+            {
+                var compilation = CreateCompilation("""
+                                                    using System;
+                                                    using Infrastructure.Web.Api.Interfaces;
+
+                                                    namespace ANamespace;
+
+                                                    public class AResponse : IWebResponse
+                                                    {
+                                                    }
+                                                    [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", ServiceOperation.Get)]
+                                                    public class ARequest : IWebRequest<AResponse>
+                                                    {
+                                                    }
+                                                    [Infrastructure.Web.Api.Interfaces.WebServiceAttribute("aprefix")]
+                                                    public class AServiceClass : Infrastructure.Web.Api.Interfaces.IWebApiService
+                                                    {
+                                                        public string AMethod(ARequest request)
+                                                        {
+                                                             return "";
+                                                        }
+                                                    }
+                                                    """);
+
+                var serviceClass = compilation.GetTypeByMetadataName("ANamespace.AServiceClass")!;
+                var visitor = new WebApiAssemblyVisitor(CancellationToken.None, compilation);
+
+                visitor.VisitNamedType(serviceClass);
+
+                visitor.OperationRegistrations.Count.Should().Be(1);
+                var registration = visitor.OperationRegistrations.First();
+                registration.Class.BasePath.Should().Be("aprefix");
+            }
         }
 
         private static Mock<INamedTypeSymbol> SetupServiceClass(CSharpCompilation compilation)
@@ -547,6 +584,7 @@ public class WebApiAssemblyVisitorSpec
                 .Returns("adisplaystring");
             type.Setup(t => t.ContainingNamespace).Returns(@namespace.Object);
             type.Setup(t => t.Name).Returns("aname");
+            type.Setup(t => t.GetAttributes()).Returns(ImmutableArray<AttributeData>.Empty);
 
             return type;
         }

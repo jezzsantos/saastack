@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework> <!-- Source Generators must be netstandard2.0 to work in Visual Studio -->
-        <DefineConstants>GENERATORS_WEB_API_PROJECT</DefineConstants>
+        <DefineConstants>$(DefineConstants);GENERATORS_WEB_API_PROJECT</DefineConstants>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <IsPlatformProject>true</IsPlatformProject>
@@ -39,6 +39,9 @@
         </Compile>
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebResponse.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebResponse.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\WebServiceAttribute.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\WebServiceAttribute.cs</Link>
         </Compile>
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\RouteAttribute.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\RouteAttribute.cs</Link>

@@ -29,6 +29,20 @@ public class HttpRequestExtensionsSpec
     }
 
     [Fact]
+    public async Task WhenVerifyHMACSignatureAsyncAndEmptyJson_ThenReturnsTrue()
+    {
+        var body = Encoding.UTF8.GetBytes(RequestExtensions.EmptyRequestJson);
+        var signature = new HMACSigner(body, "asecret").Sign();
+        var httpRequest = new Mock<HttpRequest>();
+        httpRequest.Setup(hr => hr.Body)
+            .Returns(new MemoryStream(body));
+
+        var result = await httpRequest.Object.VerifyHMACSignatureAsync(signature, "asecret", CancellationToken.None);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
     public async Task WhenVerifyHMACSignatureAsyncAndCorrectSignature_ThenReturnsTrue()
     {
         var body = Encoding.UTF8.GetBytes("abody");

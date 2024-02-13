@@ -38,6 +38,7 @@
         </None>
         <None Update="appsettings.local.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
         </None>
     </ItemGroup>
 

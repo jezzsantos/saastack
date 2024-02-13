@@ -1,14 +1,19 @@
-using System.Diagnostics;
 #if COMMON_PROJECT
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
+
 #elif GENERATORS_WEB_API_PROJECT
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
+using System.Text;
+#elif GENERATORS_COMMON_PROJECT
+using System.Globalization;
 using System.Text;
 #endif
 
@@ -127,7 +132,7 @@ public static class StringExtensions
     {
         return !string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value);
     }
-#elif GENERATORS_WEB_API_PROJECT
+#elif GENERATORS_WEB_API_PROJECT || GENERATORS_COMMON_PROJECT
     /// <summary>
     ///     Whether the string value contains no value: it is either: null, empty or only whitespaces
     /// </summary>
@@ -223,7 +228,40 @@ public static class StringExtensions
 
         return defaultValue;
     }
+#endif
+#if COMMON_PROJECT
+    /// <summary>
+    ///     Returns the specified <see cref="stringValue" /> in camelCase. i.e. first letter is lower case
+    /// </summary>
+    public static string ToCamelCase(this string value)
+    {
+        if (value.HasNoValue())
+        {
+            return value;
+        }
 
+        return JsonNamingPolicy.CamelCase
+            .ConvertName(value)
+            .Replace(" ", string.Empty);
+    }
+#elif GENERATORS_COMMON_PROJECT
+    /// <summary>
+    ///     Returns the specified <see cref="stringValue" /> in camelCase. i.e. first letter is lower case
+    /// </summary>
+    public static string ToCamelCase(this string value)
+    {
+        if (value.HasNoValue())
+        {
+            return value;
+        }
+
+        var titleCase = value.ToTitleCase()
+            .Replace(" ", string.Empty);
+
+        return char.ToLowerInvariant(titleCase[0]) + titleCase.Substring(1);
+    }
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Converts the <see cref="value" /> to a integer value
     /// </summary>
@@ -307,15 +345,79 @@ public static class StringExtensions
         return result;
     }
 #endif
-#if COMMON_PROJECT
+#if COMMON_PROJECT || GENERATORS_COMMON_PROJECT
+    /// <summary>
+    ///     Returns the specified <see cref="value" /> in snake_case. i.e. lower case with underscores for upper cased
+    ///     letters
+    /// </summary>
+    public static string ToSnakeCase(this string value)
+    {
+        if (value.HasNoValue())
+        {
+            return value;
+        }
+
+        value = value
+            .Replace(" ", "_")
+            .ToCamelCase();
+
+        var builder = new StringBuilder();
+        var isFirstCharacter = true;
+        var lastCharWasUnderscore = false;
+        foreach (var charValue in value)
+        {
+            if (isFirstCharacter)
+            {
+                isFirstCharacter = false;
+                builder.Append(char.ToLower(charValue));
+                continue;
+            }
+
+            if (IsIgnoredCharacter(charValue))
+            {
+                builder.Append(charValue);
+                if (charValue == '_')
+                {
+                    lastCharWasUnderscore = true;
+                }
+            }
+            else
+            {
+                if (lastCharWasUnderscore)
+                {
+                    builder.Append(char.ToLower(charValue));
+                    lastCharWasUnderscore = false;
+                }
+                else
+                {
+                    builder.Append('_');
+                    builder.Append(char.ToLower(charValue));
+                }
+            }
+        }
+
+        return builder.ToString();
+
+        static bool IsIgnoredCharacter(char charValue)
+        {
+            return char.IsDigit(charValue)
+                   || (char.IsLetter(charValue) && char.IsLower(charValue))
+                   || charValue == '_';
+        }
+    }
+#endif
+#if COMMON_PROJECT || GENERATORS_COMMON_PROJECT
     /// <summary>
     ///     Returns the specified <see cref="value" /> in title-case. i.e. first letter of words are capitalized
     /// </summary>
     public static string ToTitleCase(this string value)
     {
-        return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(value).Replace("_", string.Empty);
+        return CultureInfo.InvariantCulture.TextInfo
+            .ToTitleCase(value)
+            .Replace("_", string.Empty);
     }
-
+#endif
+# if COMMON_PROJECT
     /// <summary>
     ///     Returns the specified <see cref="value" /> including only letters (no numbers, or whitespace)
     /// </summary>
@@ -330,11 +432,27 @@ public static class StringExtensions
     }
 
     /// <summary>
+    ///     Returns the specified <see cref="path" /> without any leading slashes
+    /// </summary>
+    public static string WithoutLeadingSlash(this string path)
+    {
+        return path.TrimStart('/');
+    }
+
+    /// <summary>
     ///     Returns the specified <see cref="path" /> without any trailing slashes
     /// </summary>
     public static string WithoutTrailingSlash(this string path)
     {
         return path.TrimEnd('/');
+    }
+
+    /// <summary>
+    ///     Returns the specified <see cref="path" /> including a trailing slash
+    /// </summary>
+    public static string WithTrailingSlash(this string path)
+    {
+        return path.TrimEnd('/') + '/';
     }
 #endif
 }

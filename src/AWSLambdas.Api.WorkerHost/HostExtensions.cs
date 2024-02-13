@@ -3,6 +3,7 @@ using Application.Interfaces.Services;
 using Application.Persistence.Shared.ReadModels;
 using Common;
 using Common.Configuration;
+using Common.FeatureFlags;
 using Common.Recording;
 using Infrastructure.Common.Recording;
 using Infrastructure.Hosting.Common;
@@ -24,6 +25,7 @@ public static class HostExtensions
         services.AddHttpClient();
         services.AddSingleton<IConfigurationSettings>(new AspNetConfigurationSettings(configuration));
         services.AddSingleton<IHostSettings, HostSettings>();
+        services.AddSingleton<IFeatureFlags, EmptyFeatureFlags>();
 
 #if TESTINGONLY
         services.AddSingleton<ICrashReporter>(new NullCrashReporter());

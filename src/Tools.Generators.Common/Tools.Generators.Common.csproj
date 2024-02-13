@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework> <!-- Source Generators must be netstandard2.0 to work in Visual Studio -->
+        <DefineConstants>$(DefineConstants);GENERATORS_COMMON_PROJECT</DefineConstants>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <IsPlatformProject>true</IsPlatformProject>
+        <IsRoslynComponent>true</IsRoslynComponent>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\Common\FeatureFlags\Flag.cs">
+            <Link>Reference\Common\FeatureFlags\Flag.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Extensions\StringExtensions.cs">
+            <Link>Reference\Common\Extensions\StringExtensions.cs</Link>
+        </Compile>
+    </ItemGroup>
+</Project>

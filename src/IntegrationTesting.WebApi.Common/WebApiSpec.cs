@@ -6,6 +6,7 @@ using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
 using Common.Extensions;
+using Common.FeatureFlags;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
@@ -87,6 +88,7 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
             .ConfigureTestServices(services =>
             {
                 services.AddSingleton<INotificationsService, StubNotificationsService>();
+                services.AddSingleton<IFeatureFlags, StubFeatureFlags>();
                 if (_overridenTestingDependencies.Exists())
                 {
                     _overridenTestingDependencies.Invoke(services);

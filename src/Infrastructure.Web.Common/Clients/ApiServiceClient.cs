@@ -35,7 +35,7 @@ public class ApiServiceClient : IServiceClient
         _retryPolicy = ApiClientRetryPolicies.CreateRetryWithExponentialBackoffAndJitter(retryCount);
     }
 
-    public async Task<Result<string?, ResponseProblem>> DeleteAsync<TResponse>(ICallerContext context,
+    public async Task<Result<string?, ResponseProblem>> DeleteAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)
         where TResponse : IWebResponse, new()
@@ -46,7 +46,7 @@ public class ApiServiceClient : IServiceClient
             cancellationToken ?? CancellationToken.None);
     }
 
-    public async Task<Result<TResponse, ResponseProblem>> GetAsync<TResponse>(ICallerContext context,
+    public async Task<Result<TResponse, ResponseProblem>> GetAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = null)
         where TResponse : IWebResponse, new()
@@ -57,7 +57,7 @@ public class ApiServiceClient : IServiceClient
             cancellationToken ?? CancellationToken.None);
     }
 
-    public async Task<Result<TResponse, ResponseProblem>> PatchAsync<TResponse>(ICallerContext context,
+    public async Task<Result<TResponse, ResponseProblem>> PatchAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)
         where TResponse : IWebResponse, new()
@@ -68,7 +68,7 @@ public class ApiServiceClient : IServiceClient
             cancellationToken ?? CancellationToken.None);
     }
 
-    public async Task<Result<TResponse, ResponseProblem>> PostAsync<TResponse>(ICallerContext context,
+    public async Task<Result<TResponse, ResponseProblem>> PostAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)
         where TResponse : IWebResponse, new()
@@ -79,7 +79,7 @@ public class ApiServiceClient : IServiceClient
             cancellationToken ?? CancellationToken.None);
     }
 
-    public async Task<Result<TResponse, ResponseProblem>> PutAsync<TResponse>(ICallerContext context,
+    public async Task<Result<TResponse, ResponseProblem>> PutAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)
         where TResponse : IWebResponse, new()
@@ -90,7 +90,7 @@ public class ApiServiceClient : IServiceClient
             cancellationToken ?? CancellationToken.None);
     }
 
-    public async Task FireAsync(ICallerContext context, IWebRequestVoid request,
+    public async Task FireAsync(ICallerContext? context, IWebRequestVoid request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = null)
     {
         using var client = CreateJsonClient(context, requestFilter, out var modifiedRequestFilter);
@@ -98,7 +98,7 @@ public class ApiServiceClient : IServiceClient
             cancellationToken ?? CancellationToken.None);
     }
 
-    public async Task FireAsync<TResponse>(ICallerContext context, IWebRequest<TResponse> request,
+    public async Task FireAsync<TResponse>(ICallerContext? context, IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter, CancellationToken? cancellationToken = null)
         where TResponse : IWebResponse
     {
@@ -108,7 +108,7 @@ public class ApiServiceClient : IServiceClient
             cancellationToken ?? CancellationToken.None);
     }
 
-    protected virtual JsonClient CreateJsonClient(ICallerContext context,
+    protected virtual JsonClient CreateJsonClient(ICallerContext? context,
         Action<HttpRequestMessage>? inboundRequestFilter,
         out Action<HttpRequestMessage> modifiedRequestFilter)
     {

@@ -3,7 +3,7 @@ using Application.Interfaces;
 using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
-using Infrastructure.Web.Api.Operations.Shared._3rdParties;
+using Infrastructure.Web.Api.Operations.Shared._3rdParties.OAuth2;
 using Infrastructure.Web.Interfaces.Clients;
 
 namespace Infrastructure.Shared.ApplicationServices;

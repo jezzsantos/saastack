@@ -105,6 +105,15 @@ namespace WebsiteHost {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;Name&apos; is either missing or invalid.
+        /// </summary>
+        internal static string GetFeatureFlagForCallerRequestValidator_InvalidName {
+            get {
+                return ResourceManager.GetString("GetFeatureFlagForCallerRequestValidator_InvalidName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The file &apos;{0}&apos; cannot be found in the directory {rootPath}.  Please make sure you have pre-built the JS application by running `npm run build`.
         /// </summary>
         internal static string HomeController_IndexPageNotBuilt {

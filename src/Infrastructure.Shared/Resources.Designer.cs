@@ -58,5 +58,14 @@ namespace Infrastructure.Shared {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The feature &apos;{0}&apos; has not be defined in Flagsmith.
+        /// </summary>
+        internal static string FlagsmithHttpServiceClient_UnknownFeature {
+            get {
+                return ResourceManager.GetString("FlagsmithHttpServiceClient_UnknownFeature", resourceCulture);
+            }
+        }
     }
 }

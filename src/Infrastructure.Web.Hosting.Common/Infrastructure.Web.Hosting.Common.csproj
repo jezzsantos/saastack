@@ -11,6 +11,7 @@
         <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Eventing.Common\Infrastructure.Eventing.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Hosting.Common\Infrastructure.Hosting.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Shared\Infrastructure.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Common\Infrastructure.Web.Common.csproj" />
     </ItemGroup>
 

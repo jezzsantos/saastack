@@ -98,7 +98,11 @@ namespace {assemblyNamespace}
     {
         var serviceClassName = serviceRegistrations.Key.Name;
         var groupName = $"{serviceClassName.ToLowerInvariant()}Group";
-        endpointRegistrations.AppendLine($@"        var {groupName} = app.MapGroup(string.Empty)
+        var basePath = serviceRegistrations.FirstOrDefault()?.Class.BasePath;
+        var prefix = basePath.HasValue()
+            ? $"\"{basePath}\""
+            : "string.Empty";
+        endpointRegistrations.AppendLine($@"        var {groupName} = app.MapGroup({prefix})
                 .WithGroupName(""{serviceClassName}"")
                 .RequireCors(""{WebHostingConstants.DefaultCORSPolicyName}"")
                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ApiUsageFilter>()

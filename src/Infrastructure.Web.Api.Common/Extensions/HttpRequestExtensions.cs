@@ -228,13 +228,20 @@ public static class HttpRequestExtensions
     }
 
     /// <summary>
-    ///     Whether the specified HMAC signature represents the signature of the contents of the inbound request
+    ///     Whether the specified HMAC signature represents the signature of the contents of the inbound request,
+    /// signed by the method <see cref="RequestExtensions.SerializeToJson"/>
     /// </summary>
     public static async Task<bool> VerifyHMACSignatureAsync(this HttpRequest request, string signature, string secret,
         CancellationToken cancellationToken)
     {
         var body = await request.Body.ReadFullyAsync(cancellationToken);
-        request.RewindBody(); // need to do this for later middleware
+        request.RewindBody(); // HACK: need to do this for later middleware
+
+        if (body.Length == 0)
+        {
+            body = Encoding.UTF8.GetBytes(RequestExtensions
+                .EmptyRequestJson); //HACK: we assume that an empty JSON request was signed
+        }
 
         var signer = new HMACSigner(body, secret);
         var verifier = new HMACVerifier(signer);

@@ -4,18 +4,18 @@
 
 # SaaStack
 
-Are you about to build a new SaaS product from scratch and do that on .NET?
+Are you about to build a new SaaS product from scratch? On .NET?
 
-Then, start with SaaStack.
+Then, try starting with SaaStack codebase template.
 
-It is a complete "codebase template" for building real-world, fully featured SaaS web products.
+It is a complete template for building real-world, fully featured SaaS web products.
 
 Ready to build, test, and deploy into a cloud provider of your choice (e.g., Azure, AWS, Google Cloud, etc.)
 
-> Don't spend months building all this stuff from scratch. You and your team don't need to. We've done all that for you already; just take a look, see hat is there and take it from here. You can always change it the way you like it as you proceed, you are not locked into anyone else framework.
+> Don't spend months building all this stuff from scratch. You and your team don't need to. We've done all that for you already; just take a look, see what is already there and take it from here. You can always change it the way you like it as you proceed, you are not locked into anyone else's framework.
 >
 > This is not some code sample like those you would download to learn a new technology or see in demos online. This is way more comprehensive, way more contextualized, and way more realistic about the complexities you are going to encounter in reality.
-> This template contains a partial (but fully functional) SaaS product that you can deploy from day one and start building your product on. But it is not yet complete. That part is up to you.
+> This template contains a partial (but fully functional) SaaS product that you can deploy from day one and start building your product on. But it is not yet complete. That next part is up to you.
 
 The codebase demonstrates common architectural styles that you are going to need in your product in the long run, such as:
 
@@ -42,7 +42,7 @@ or if you prefer AWS:
 
 ## Who is it for?
 
-This starter template is NOT for everyone, nor for EVERY software project, nor for EVERY skill level.
+This starter template is NOT for everyone, nor for EVERY software project, nor for EVERY skill level. We need to say that because all software products are different, there is not one silver bullet for all of them.
 
 * The people using this template must have some experience applying "first principles" of building new software products from scratch because it is a starter template that can (and should) be modified to suit your context. It is a far better starting point than building everything from scratch again.
 
@@ -126,7 +126,7 @@ The starter template also takes care of these specific kinds of things:
   * It integrates product usage metrics to monitor and measure the actual usage of your product (e.g., MixPanel, Google Analytics, Application Insights, Amazon XRay, etc.)
   * It integrates crash analytics and structured logging so you can plug in your own preferred monitoring (e.g., Application Insights, CloudWatch, Sentry.io, etc.).
   * It uses dependency injection extensively so that all modules and components remain testable and configurable.
-  * It defines standard and unified configuration patterns (e.g., using appsettings.json) to load tenanted or non-tenanted runtime settings.
+  * It defines standard and unified configuration patterns (e.g., using `appsettings.json`) to load tenanted or non-tenanted runtime settings.
 * Application
   * Supports one or more applications, agnostic to infrastructure interop (i.e., allows you to expose each application as a REST API (default) or as a reliable Queue, or any other kind of infrastructure)
   * Supports transaction scripts + anemic domain model or Domain Driven Design

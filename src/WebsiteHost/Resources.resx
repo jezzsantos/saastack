@@ -60,4 +60,7 @@
     <data name="HomeController_IndexPageNotBuilt" xml:space="preserve">
         <value>The file '{0}' cannot be found in the directory {rootPath}.  Please make sure you have pre-built the JS application by running `npm run build`</value>
     </data>
+    <data name="GetFeatureFlagForCallerRequestValidator_InvalidName" xml:space="preserve">
+        <value>The 'Name' is either missing or invalid</value>
+    </data>
 </root>

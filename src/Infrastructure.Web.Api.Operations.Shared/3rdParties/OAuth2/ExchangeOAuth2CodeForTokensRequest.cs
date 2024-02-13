@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Infrastructure.Web.Api.Interfaces;
 
-namespace Infrastructure.Web.Api.Operations.Shared._3rdParties;
+namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.OAuth2;
 
 [Route("/auth/token", ServiceOperation.Post)]
 public class ExchangeOAuth2CodeForTokensRequest : UnTenantedRequest<ExchangeOAuth2CodeForTokensResponse>

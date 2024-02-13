@@ -29,7 +29,7 @@ We have had to hardcode certain other types to avoid referencing AspNet, and the
 
 You can debug the analyzers easily from the unit tests.
 
-You can debug your source generator by setting a breakpoint in the code, and then running the `SourceGenerators-Development-Development` run configuration from the `ApiHost1` project with the debugger. (found in the `launchSettings.json` file in any executable project).
+You can debug your source generator by setting a breakpoint in the code, and then running the `Api-SourceGenerators-Development` run configuration from the `ApiHost1` project with the debugger. (found in the `launchSettings.json` file in any executable project).
 
 
 > Warning: C# source generators are heavily cached. If you try to debug new code that you've added you may need to clear the caches from the old code being used. Otherwise you breakpoints may not hit.
@@ -40,4 +40,4 @@ The most reliable way to reset the generators:
 2. Kill any remaining `.Net Host (dotnet.exe)` processes on your machine, and any remaining `Jetbrains Rider` processes on your machine
 3. Restart Rider
 4. Set your breakpoints
-5. Start debugging the `SourceGenerators-Development-Development` run configuration
+5. Start debugging the `Api-SourceGenerators-Development` run configuration

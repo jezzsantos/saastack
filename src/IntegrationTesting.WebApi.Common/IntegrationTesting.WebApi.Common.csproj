@@ -7,6 +7,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
+        <ProjectReference Include="..\Infrastructure.Hosting.Common\Infrastructure.Hosting.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Common\Infrastructure.Web.Common.csproj" />
         <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
     </ItemGroup>

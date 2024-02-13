@@ -36,8 +36,4 @@
         </Compile>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="ApplicationServices\" />
-    </ItemGroup>
-
 </Project>

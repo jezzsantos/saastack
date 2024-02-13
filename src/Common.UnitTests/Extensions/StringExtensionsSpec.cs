@@ -443,6 +443,118 @@ public class StringExtensionsSpec
         result.Should().Be("Aword1 Aword2 Aword3");
     }
 
+    [Fact]
+    public void WhenToTitleCaseWithConcatenatedWords_ThenCases()
+    {
+        var result = "AwordAword2Aword3".ToTitleCase();
+
+        result.Should().Be("Awordaword2aword3");
+    }
+
+    [Fact]
+    public void WhenToTitleCaseWithTitleCased_ThenCases()
+    {
+        var result = "Awordaword2aword3".ToTitleCase();
+
+        result.Should().Be("Awordaword2aword3");
+    }
+
+    [Fact]
+    public void WhenToCamelCaseWithSingleLowercasedWord_ThenCases()
+    {
+        var result = "aword".ToCamelCase();
+
+        result.Should().Be("aword");
+    }
+
+    [Fact]
+    public void WhenToCamelCaseWithSingleTitleCasedWord_ThenCases()
+    {
+        var result = "Aword".ToCamelCase();
+
+        result.Should().Be("aword");
+    }
+
+    [Fact]
+    public void WhenToCamelCaseWithLowercasedWords_ThenCases()
+    {
+        var result = "aword aword2 aword3".ToCamelCase();
+
+        result.Should().Be("awordaword2aword3");
+    }
+
+    [Fact]
+    public void WhenToCamelCaseWithTitleCasedWords_ThenCases()
+    {
+        var result = "Aword Aword2 Aword3".ToCamelCase();
+
+        result.Should().Be("awordAword2Aword3");
+    }
+
+    [Fact]
+    public void WhenToCamelCaseWithConcatenatedWords_ThenCases()
+    {
+        var result = "AwordAword2Aword3".ToCamelCase();
+
+        result.Should().Be("awordAword2Aword3");
+    }
+
+    [Fact]
+    public void WhenToCamelCaseWithCamelcased_ThenCases()
+    {
+        var result = "awordAword2Aword3".ToCamelCase();
+
+        result.Should().Be("awordAword2Aword3");
+    }
+
+    [Fact]
+    public void WhenToSnakeCaseWithSingleLowercasedWord_ThenCases()
+    {
+        var result = "aword".ToSnakeCase();
+
+        result.Should().Be("aword");
+    }
+
+    [Fact]
+    public void WhenToSnakeCaseWithSingleTitleCasedWord_ThenCases()
+    {
+        var result = "Aword".ToSnakeCase();
+
+        result.Should().Be("aword");
+    }
+
+    [Fact]
+    public void WhenToSnakeCaseWithLowercasedWords_ThenCases()
+    {
+        var result = "aword aword2 aword3".ToSnakeCase();
+
+        result.Should().Be("aword_aword2_aword3");
+    }
+
+    [Fact]
+    public void WhenToSnakeCaseWithTitleCasedWords_ThenCases()
+    {
+        var result = "Aword Aword2 Aword3".ToSnakeCase();
+
+        result.Should().Be("aword_aword2_aword3");
+    }
+
+    [Fact]
+    public void WhenToSnakeCaseWithConcatenatedWords_ThenCases()
+    {
+        var result = "AwordAword2Aword3".ToSnakeCase();
+
+        result.Should().Be("aword_aword2_aword3");
+    }
+
+    [Fact]
+    public void WhenToSnakeCaseWithSnakeCased_ThenCases()
+    {
+        var result = "aword_aword2_aword3".ToSnakeCase();
+
+        result.Should().Be("aword_aword2_aword3");
+    }
+
     private class SerializableClass
     {
         public string? AProperty { get; set; }

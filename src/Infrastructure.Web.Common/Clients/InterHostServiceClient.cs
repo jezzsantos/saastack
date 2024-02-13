@@ -23,7 +23,7 @@ public sealed class InterHostServiceClient : ApiServiceClient
     {
     }
 
-    protected override JsonClient CreateJsonClient(ICallerContext context,
+    protected override JsonClient CreateJsonClient(ICallerContext? context,
         Action<HttpRequestMessage>? inboundRequestFilter,
         out Action<HttpRequestMessage> modifiedRequestFilter)
     {
@@ -50,13 +50,19 @@ public sealed class InterHostServiceClient : ApiServiceClient
         return client;
     }
 
-    private static void AddCorrelationId(HttpRequestMessage message, ICallerContext context)
+    private static void AddCorrelationId(HttpRequestMessage message, ICallerContext? context)
     {
-        message.SetRequestId(context.ToCall());
+        if (context.Exists())
+        {
+            message.SetRequestId(context.ToCall());
+        }
     }
 
-    private static void AddCallerAuthorization(HttpRequestMessage message, ICallerContext context)
+    private static void AddCallerAuthorization(HttpRequestMessage message, ICallerContext? context)
     {
-        message.SetAuthorization(context);
+        if (context.Exists())
+        {
+            message.SetAuthorization(context);
+        }
     }
 }

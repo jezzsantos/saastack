@@ -9,7 +9,7 @@ namespace Infrastructure.Web.Api.Common.Extensions;
 
 public static class RequestExtensions
 {
-    private const string EmptyRequestJson = "{}";
+    public const string EmptyRequestJson = "{}";
     private const char RouteSegmentDelimiter = '/';
 
     /// <summary>

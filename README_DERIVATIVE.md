@@ -106,6 +106,14 @@ Now, test that LocalStack works by running: `localstack start`
 
 > When testing, Docker will need to be running for LocalStack to be used
 
+### External Adapter Testing
+
+> You only need to perform this step once, prior to running any of the `Integration.External` tests against 3rd party adapters (e.g., Flagsmith, Twillio, etc)
+
+In the `Infrastructure.Shared.IntegrationTests` project, create a new file called `appsettings.Testing.local.json` and fill out the empty placeholders you see in `appsettings.TestingOnly.json` with values from service accounts that you have created for testing those 3rd party services.
+
+> DO NOT add this file to source control!
+
 # Build & Deploy
 
 When pushed, all branches will be built and tested with GitHub actions

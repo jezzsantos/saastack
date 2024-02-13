@@ -8,4 +8,7 @@
 * [Dependency Injection](0060-dependency-injection.md) how you implement DI
 * [Persistence](0070-persistence.md) how you design your repository layer, and promote domain events
 * [Ports and Adapters](0080-ports-and-adapters.md) how we keep infrastructure components at arms length, and testable, and how we integrate with any 3rd party system
-* [Backend for Frontend](0900-back-end-for-front-end.md) the web server that is tailored for a web UI, and brokers the backend
+* [Authentication and Authorization](0090-authentication-authorization.md) how we authenticate and authorize users
+* [Email Delivery](0100-email-delivery.md) how we send emails and deliver them asynchronously and reliably
+* [Backend for Frontend](0110-back-end-for-front-end.md) the BEFFE web server that is tailored for a web UI, and brokers secure access to the backend
+* [Feature Flagging](0120-feature-flagging.md) how we enable and disable features at runtime

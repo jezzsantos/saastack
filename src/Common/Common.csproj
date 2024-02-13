@@ -3,7 +3,10 @@
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <IsPlatformProject>true</IsPlatformProject>
-        <DefineConstants>COMMON_PROJECT</DefineConstants>
+        <DefineConstants>$(DefineConstants);COMMON_PROJECT</DefineConstants>
+        <!-- Outputs the source generated files locally -->
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
     </PropertyGroup>
 
     <ItemGroup>
@@ -19,10 +22,22 @@
         </AssemblyAttribute>
     </ItemGroup>
 
+    <!-- Runs the source generator (in memory) on build -->
+    <ItemGroup>
+        <ProjectReference Include="..\Tools.Generators.Common\Tools.Generators.Common.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <!-- Exclude the output of source generators from the compilation -->
+        <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+        <AdditionalFiles Include="FeatureFlags\FeatureFlags.resx" />
+    </ItemGroup>
+
     <ItemGroup>
         <EmbeddedResource Update="Resources.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="FeatureFlags\FeatureFlags.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>FeatureFlags.Designer.cs</LastGenOutput>
         </EmbeddedResource>
     </ItemGroup>
     <ItemGroup>
@@ -30,6 +45,11 @@
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+        <Compile Update="FeatureFlags\FeatureFlags.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>FeatureFlags.resx</DependentUpon>
         </Compile>
     </ItemGroup>
 

@@ -76,5 +76,32 @@ namespace AncillaryInfrastructure {
                 return ResourceManager.GetString("AnyRecordingEventNameValidator_InvalidEventName", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Name&apos; is either missing or invalid.
+        /// </summary>
+        internal static string GetFeatureFlagRequestValidator_InvalidName {
+            get {
+                return ResourceManager.GetString("GetFeatureFlagRequestValidator_InvalidName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;TenantId&apos; is not a valid identifier.
+        /// </summary>
+        internal static string GetFeatureFlagRequestValidator_InvalidTenantId {
+            get {
+                return ResourceManager.GetString("GetFeatureFlagRequestValidator_InvalidTenantId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;UserId&apos; is not a valid identifier.
+        /// </summary>
+        internal static string GetFeatureFlagRequestValidator_InvalidUserId {
+            get {
+                return ResourceManager.GetString("GetFeatureFlagRequestValidator_InvalidUserId", resourceCulture);
+            }
+        }
     }
 }

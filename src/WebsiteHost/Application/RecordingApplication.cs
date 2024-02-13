@@ -10,13 +10,11 @@ namespace WebsiteHost.Application;
 
 public class RecordingApplication : IRecordingApplication
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRecorder _recorder;
 
-    public RecordingApplication(IRecorder recorder, IHttpContextAccessor httpContextAccessor)
+    public RecordingApplication(IRecorder recorder)
     {
         _recorder = recorder;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     public Task<Result<Error>> RecordCrashAsync(ICallerContext context, string message,
@@ -29,10 +27,10 @@ public class RecordingApplication : IRecordingApplication
     }
 
     public Task<Result<Error>> RecordMeasurementAsync(ICallerContext context, string eventName,
-        Dictionary<string, object?>? additional,
+        Dictionary<string, object?>? additional, ClientDetails clientDetails,
         CancellationToken cancellationToken)
     {
-        var more = AddClientContext((additional.Exists()
+        var more = AddClientContext(clientDetails, (additional.Exists()
             ? additional
                 .Where(pair => pair.Value.Exists())
                 .ToDictionary(pair => pair.Key, pair => pair.Value)
@@ -42,12 +40,12 @@ public class RecordingApplication : IRecordingApplication
         return Task.FromResult(Result.Ok);
     }
 
-    public Task<Result<Error>> RecordPageViewAsync(ICallerContext context, string path,
+    public Task<Result<Error>> RecordPageViewAsync(ICallerContext context, string path, ClientDetails clientDetails,
         CancellationToken cancellationToken)
     {
         const string eventName = UsageConstants.Events.Web.WebPageVisit;
 
-        var additional = AddClientContext(new Dictionary<string, object>
+        var additional = AddClientContext(clientDetails, new Dictionary<string, object>
         {
             { UsageConstants.Properties.Path, path }
         });
@@ -58,10 +56,10 @@ public class RecordingApplication : IRecordingApplication
     }
 
     public Task<Result<Error>> RecordUsageAsync(ICallerContext context, string eventName,
-        Dictionary<string, object?>? additional,
+        Dictionary<string, object?>? additional, ClientDetails clientDetails,
         CancellationToken cancellationToken)
     {
-        var more = AddClientContext((additional.Exists()
+        var more = AddClientContext(clientDetails, (additional.Exists()
             ? additional
                 .Where(pair => pair.Value.Exists())
                 .ToDictionary(pair => pair.Key, pair => pair.Value)
@@ -84,37 +82,38 @@ public class RecordingApplication : IRecordingApplication
             case RecorderTraceLevel.Debug:
                 _recorder.TraceDebug(context.ToCall(), messageTemplate, args);
                 return Task.FromResult(Result.Ok);
+
             case RecorderTraceLevel.Information:
                 _recorder.TraceInformation(context.ToCall(), messageTemplate, args);
                 return Task.FromResult(Result.Ok);
+
             case RecorderTraceLevel.Warning:
                 _recorder.TraceWarning(context.ToCall(), messageTemplate, args);
                 return Task.FromResult(Result.Ok);
+
             case RecorderTraceLevel.Error:
                 _recorder.TraceError(context.ToCall(), messageTemplate, args);
                 return Task.FromResult(Result.Ok);
+
             default:
                 _recorder.TraceInformation(context.ToCall(), messageTemplate, args);
                 return Task.FromResult(Result.Ok);
         }
     }
 
-    private Dictionary<string, object> AddClientContext(IDictionary<string, object> additional)
+    private static Dictionary<string, object> AddClientContext(ClientDetails clientDetails,
+        IDictionary<string, object> additional)
     {
-        var ipAddress = _httpContextAccessor.HttpContext!.Connection.RemoteIpAddress?.ToString();
-        var userAgent = _httpContextAccessor.HttpContext.Request.Headers.UserAgent.ToString();
-        var referredBy = _httpContextAccessor.HttpContext.Request.Headers.Referer.ToString();
-
         var more = new Dictionary<string, object>(additional);
         more.TryAdd(UsageConstants.Properties.Timestamp, DateTime.UtcNow);
-        more.TryAdd(UsageConstants.Properties.IpAddress, ipAddress.HasValue()
-            ? ipAddress
+        more.TryAdd(UsageConstants.Properties.IpAddress, clientDetails.IpAddress.HasValue()
+            ? clientDetails.IpAddress
             : "unknown");
-        more.TryAdd(UsageConstants.Properties.UserAgent, userAgent.HasValue()
-            ? userAgent
+        more.TryAdd(UsageConstants.Properties.UserAgent, clientDetails.UserAgent.HasValue()
+            ? clientDetails.UserAgent
             : "unknown");
-        more.TryAdd(UsageConstants.Properties.ReferredBy, referredBy.HasValue()
-            ? referredBy
+        more.TryAdd(UsageConstants.Properties.ReferredBy, clientDetails.Referer.HasValue()
+            ? clientDetails.Referer
             : "unknown");
         more.TryAdd(UsageConstants.Properties.Component, UsageConstants.Components.BackEndForFrontEndWebHost);
 

@@ -5,6 +5,7 @@ using Application.Interfaces.Services;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
+using Common.FeatureFlags;
 using Domain.Common;
 using Domain.Common.Identity;
 using Domain.Interfaces;
@@ -22,6 +23,7 @@ using Infrastructure.Hosting.Common.Recording;
 using Infrastructure.Interfaces;
 using Infrastructure.Persistence.Common.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
+using Infrastructure.Shared.ApplicationServices.External;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Common.Validation;
@@ -110,6 +112,7 @@ public static class HostExtensions
         void RegisterSharedServices()
         {
             appBuilder.Services.AddHttpContextAccessor();
+            appBuilder.Services.AddSingleton<IFeatureFlags, FlagsmithHttpServiceClient>();
         }
 
         void RegisterConfiguration(bool isMultiTenanted)

@@ -6,7 +6,7 @@ using FluentAssertions;
 using Moq;
 using Xunit;
 
-namespace Application.Common.UnitTests;
+namespace Application.Common.UnitTests.Extensions;
 
 [Trait("Category", "Unit")]
 public class CallerContextExtensionsSpec

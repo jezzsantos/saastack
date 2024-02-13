@@ -5,8 +5,26 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
+        <ProjectReference Include="..\Application.Persistence.Shared\Application.Persistence.Shared.csproj" />
+        <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
+        <ProjectReference Include="..\Domain.Services.Shared\Domain.Services.Shared.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Common\Infrastructure.Web.Api.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Operations.Shared\Infrastructure.Web.Api.Operations.Shared.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Common\Infrastructure.Web.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Interfaces\Infrastructure.Web.Interfaces.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Flagsmith" Version="5.2.2" />
+    </ItemGroup>
+
+    <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>Infrastructure.Shared.IntegrationTests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
 
@@ -23,15 +41,6 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
-        <ProjectReference Include="..\Application.Persistence.Shared\Application.Persistence.Shared.csproj" />
-        <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
-        <ProjectReference Include="..\Domain.Services.Shared\Domain.Services.Shared.csproj" />
-        <ProjectReference Include="..\Infrastructure.Web.Api.Operations.Shared\Infrastructure.Web.Api.Operations.Shared.csproj" />
-        <ProjectReference Include="..\Infrastructure.Web.Interfaces\Infrastructure.Web.Interfaces.csproj" />
     </ItemGroup>
 
 </Project>

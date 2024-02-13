@@ -35,6 +35,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
     private readonly INamedTypeSymbol _voidSymbol;
     private readonly INamedTypeSymbol _webRequestInterfaceSymbol;
     private readonly INamedTypeSymbol _webRequestResponseInterfaceSymbol;
+    private readonly INamedTypeSymbol _webserviceAttributeSymbol;
 
     public WebApiAssemblyVisitor(CancellationToken cancellationToken, Compilation compilation)
     {
@@ -42,6 +43,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         _serviceInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebApiService).FullName!)!;
         _webRequestInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebRequest).FullName!)!;
         _webRequestResponseInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebRequest<>).FullName!)!;
+        _webserviceAttributeSymbol = compilation.GetTypeByMetadataName(typeof(WebServiceAttribute).FullName!)!;
         _routeAttributeSymbol = compilation.GetTypeByMetadataName(typeof(RouteAttribute).FullName!)!;
         _authorizeAttributeSymbol = compilation.GetTypeByMetadataName(typeof(AuthorizeAttribute).FullName!)!;
         _authorizeAttributeRolesSymbol = compilation.GetTypeByMetadataName(typeof(Roles).FullName!)!;
@@ -159,11 +161,13 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         var usingNamespaces = symbol.GetUsingNamespaces();
         var constructors = GetConstructors();
         var serviceName = GetServiceName();
+        var basePath = GetBasePath();
         var classRegistration = new ApiServiceClassRegistration
         {
             TypeName = serviceName,
             Constructors = constructors,
-            UsingNamespaces = usingNamespaces
+            UsingNamespaces = usingNamespaces,
+            BasePath = basePath
         };
 
         var methods = GetServiceOperationMethods();
@@ -211,6 +215,16 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         }
 
         return;
+
+        string? GetBasePath()
+        {
+            if (!HasWebServiceAttribute(symbol, out var attributeData))
+            {
+                return null;
+            }
+
+            return attributeData!.ConstructorArguments[0].Value!.ToString()!;
+        }
 
         TypeName GetServiceName()
         {
@@ -400,6 +414,13 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             return false;
         }
 
+        // We assume that the class can be decorated with an optional WebServiceAttribute
+        bool HasWebServiceAttribute(ITypeSymbol classSymbol, out AttributeData? webServiceAttribute)
+        {
+            webServiceAttribute = classSymbol.GetAttribute(_webserviceAttributeSymbol);
+            return webServiceAttribute is not null;
+        }
+
         // We assume that the request DTO it is decorated with one RouteAttribute
         bool HasRouteAttribute(IMethodSymbol method, out AttributeData? routeAttribute)
         {
@@ -513,6 +534,8 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
     public record ApiServiceClassRegistration
     {
+        public string? BasePath { get; set; }
+
         public IEnumerable<Constructor> Constructors { get; set; } = new List<Constructor>();
 
         public TypeName TypeName { get; set; } = null!;
