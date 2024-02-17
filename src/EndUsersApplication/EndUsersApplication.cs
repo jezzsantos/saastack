@@ -1,4 +1,4 @@
-using Application.Common;
+using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Resources.Shared;
 using Common;

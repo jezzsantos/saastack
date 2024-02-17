@@ -1,4 +1,5 @@
 using Application.Common;
+using Application.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
 using Common.Recording;

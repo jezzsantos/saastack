@@ -3,7 +3,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 
-namespace Application.Common;
+namespace Application.Common.Extensions;
 
 public static class CallerContextExtensions
 {

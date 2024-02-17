@@ -1,7 +1,7 @@
 using AncillaryApplication.Persistence;
 using AncillaryApplication.Persistence.ReadModels;
 using AncillaryDomain;
-using Application.Common;
+using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
@@ -63,7 +63,7 @@ public class AncillaryApplication : IAncillaryApplication
         _emailDeliveryRepository = emailDeliveryRepository;
     }
 #endif
-    
+
     public async Task<Result<bool, Error>> DeliverEmailAsync(ICallerContext context, string messageAsJson,
         CancellationToken cancellationToken)
     {

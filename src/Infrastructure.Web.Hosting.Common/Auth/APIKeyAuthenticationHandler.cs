@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using Application.Common;
+using Application.Common.Extensions;
 using Application.Services.Shared;
 using Common;
 using Common.Extensions;

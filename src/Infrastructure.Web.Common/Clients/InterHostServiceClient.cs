@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using Application.Common;
+using Application.Common.Extensions;
 using Application.Interfaces;
 using Common.Extensions;
 using Infrastructure.Web.Api.Common;

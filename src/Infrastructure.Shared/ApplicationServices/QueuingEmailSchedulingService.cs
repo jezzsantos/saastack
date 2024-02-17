@@ -1,4 +1,4 @@
-using Application.Common;
+using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
@@ -12,8 +12,8 @@ namespace Infrastructure.Shared.ApplicationServices;
 /// </summary>
 public class QueuingEmailSchedulingService : IEmailSchedulingService
 {
-    private readonly IRecorder _recorder;
     private readonly IEmailMessageQueue _queue;
+    private readonly IRecorder _recorder;
 
     public QueuingEmailSchedulingService(IRecorder recorder, IEmailMessageQueue queue)
     {
