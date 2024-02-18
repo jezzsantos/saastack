@@ -15,7 +15,7 @@ public sealed class AuditRoot : AggregateRootBase
         TemplateArguments templateArguments)
     {
         var root = new AuditRoot(recorder, idFactory);
-        root.RaiseCreateEvent(AncillaryDomain.Events.Audits.Created.Create(root.Id, againstId, organizationId, auditCode,
+        root.RaiseCreateEvent(AncillaryDomain.Events.Created.Create(root.Id, againstId, organizationId, auditCode,
             messageTemplate, templateArguments));
         return root;
     }
@@ -60,7 +60,7 @@ public sealed class AuditRoot : AggregateRootBase
     {
         switch (@event)
         {
-            case Events.Audits.Created created:
+            case Events.Created created:
             {
                 OrganizationId = created.OrganizationId.ToId();
                 AgainstId = created.AgainstId.ToId();

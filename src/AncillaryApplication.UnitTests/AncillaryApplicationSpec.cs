@@ -23,10 +23,9 @@ public class AncillaryApplicationSpec
     private readonly Mock<IAuditRepository> _auditRepository;
     private readonly Mock<ICallerContext> _caller;
     private readonly Mock<IEmailDeliveryService> _emailDeliveryService;
-    private readonly Mock<IEmailMessageQueue> _emailMessageQueue = new();
+    private readonly Mock<IEmailMessageQueue> _emailMessageQueue;
     private readonly Mock<IUsageDeliveryService> _usageDeliveryService;
     private readonly Mock<IUsageMessageQueue> _usageMessageQueue;
-    private readonly Mock<IEmailDeliveryRepository> _emailDeliveryRepository;
 
     public AncillaryApplicationSpec()
     {
@@ -41,12 +40,12 @@ public class AncillaryApplicationSpec
         _auditRepository = new Mock<IAuditRepository>();
         _auditRepository.Setup(ar => ar.SaveAsync(It.IsAny<AuditRoot>(), It.IsAny<CancellationToken>()))
             .Returns((AuditRoot root, CancellationToken _) => Task.FromResult<Result<AuditRoot, Error>>(root));
+        _emailMessageQueue = new Mock<IEmailMessageQueue>();
         _emailDeliveryService = new Mock<IEmailDeliveryService>();
-        _emailDeliveryRepository = new Mock<IEmailDeliveryRepository>();
 
         _application = new AncillaryApplication(recorder.Object, idFactory.Object, _usageMessageQueue.Object,
             _usageDeliveryService.Object, _auditMessageRepository.Object, _auditRepository.Object,
-            _emailMessageQueue.Object, _emailDeliveryService.Object, _emailDeliveryRepository.Object);
+            _emailMessageQueue.Object, _emailDeliveryService.Object);
     }
 
     [Fact]

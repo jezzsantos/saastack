@@ -10,7 +10,6 @@ using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
-using Domain.Shared;
 using Task = System.Threading.Tasks.Task;
 
 namespace AncillaryApplication;
@@ -25,13 +24,11 @@ public class AncillaryApplication : IAncillaryApplication
     private readonly IRecorder _recorder;
     private readonly IUsageDeliveryService _usageDeliveryService;
     private readonly IUsageMessageQueue _usageMessageQueue;
-    private readonly IEmailDeliveryRepository _emailDeliveryRepository;
 
     public AncillaryApplication(IRecorder recorder, IIdentifierFactory idFactory,
         IUsageMessageQueue usageMessageQueue, IUsageDeliveryService usageDeliveryService,
         IAuditMessageQueueRepository auditMessageQueueRepository, IAuditRepository auditRepository,
-        IEmailMessageQueue emailMessageQueue, IEmailDeliveryService emailDeliveryService,
-        IEmailDeliveryRepository emailDeliveryRepository)
+        IEmailMessageQueue emailMessageQueue, IEmailDeliveryService emailDeliveryService)
     {
         _recorder = recorder;
         _idFactory = idFactory;
@@ -41,7 +38,6 @@ public class AncillaryApplication : IAncillaryApplication
         _auditRepository = auditRepository;
         _emailMessageQueue = emailMessageQueue;
         _emailDeliveryService = emailDeliveryService;
-        _emailDeliveryRepository = emailDeliveryRepository;
     }
 
     public async Task<Result<bool, Error>> DeliverEmailAsync(ICallerContext context, string messageAsJson,
@@ -161,49 +157,26 @@ public class AncillaryApplication : IAncillaryApplication
             return Error.RuleViolation(Resources.AncillaryApplication_MissingEmailHtml);
         }
 
-        var retrieved = await _emailDeliveryRepository.FindDeliveryByMessageIdAsync(message.MessageId!);
-        if (!retrieved.IsSuccessful)
+        if (message.Html!.Subject.IsInvalidParameter(x => x.HasValue(), nameof(EmailMessage.Html.Subject), out _))
         {
-            return retrieved.Error;
+            return Error.RuleViolation(Resources.AncillaryApplication_MissingEmailSubject);
         }
 
-        EmailDeliveryRoot delivery;
-        var found = retrieved.Value.HasValue;
-        if (found)
+        if (message.Html.HtmlBody.IsInvalidParameter(x => x.HasValue(), nameof(EmailMessage.Html.HtmlBody), out _))
         {
-            delivery = retrieved.Value.Value;
-        }
-        else
-        {
-            var created = EmailDeliveryRoot.Create(_recorder, _idFactory, message.MessageId!);
-            if (!created.IsSuccessful)
-            {
-                return created.Error;
-            }
-
-            delivery = created.Value;
-            var emailAddress = EmailAddress.Create(message.Html.ToEmailAddress!);
-            if (!emailAddress.IsSuccessful)
-            {
-                return emailAddress.Error;
-            }
-
-            var recipientsSetup = delivery.SetupRecipients(emailAddress.Value);
-            if (!recipientsSetup.IsSuccessful)
-            {
-                return recipientsSetup.Error;
-            }
+            return Error.RuleViolation(Resources.AncillaryApplication_MissingEmailBody);
         }
 
-        if (delivery.IsDelivered)
+        if (message.Html.ToEmailAddress.IsInvalidParameter(x => x.HasValue(), nameof(EmailMessage.Html.ToEmailAddress),
+                out _))
         {
-            return true;
+            return Error.RuleViolation(Resources.AncillaryApplication_MissingEmailRecipient);
         }
 
-        var attemptedDelivery = delivery.AttemptDelivery();
-        if (!attemptedDelivery.IsSuccessful)
+        if (message.Html.FromEmailAddress.IsInvalidParameter(x => x.HasValue(),
+                nameof(EmailMessage.Html.FromEmailAddress), out _))
         {
-            return attemptedDelivery.Error;
+            return Error.RuleViolation(Resources.AncillaryApplication_MissingEmailSender);
         }
 
         var delivered = await _emailDeliveryService.DeliverAsync(context, message.Html.Subject!, message.Html.HtmlBody!,
@@ -215,19 +188,6 @@ public class AncillaryApplication : IAncillaryApplication
             return delivered.Error;
         }
 
-        
-        var completeDelivery = delivery.CompleteDelivery(delivered.Value.TransactionId.ToOptional());
-        if (!completeDelivery.IsSuccessful)
-        {
-            return completeDelivery.Error;
-        }
-        
-        var saved = await _emailDeliveryRepository.SaveAsync(delivery, cancellationToken);
-        if (!saved.IsSuccessful)
-        {
-            return retrieved.Error;
-        }
-        
         _recorder.TraceInformation(context.ToCall(), "Delivered email for {For}", message.Html.ToEmailAddress!);
 
         return true;
