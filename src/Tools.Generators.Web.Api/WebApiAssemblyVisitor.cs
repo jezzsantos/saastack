@@ -34,6 +34,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
     private readonly INamedTypeSymbol _serviceInterfaceSymbol;
     private readonly INamedTypeSymbol _voidSymbol;
     private readonly INamedTypeSymbol _webRequestInterfaceSymbol;
+    private readonly INamedTypeSymbol _tenantedWebRequestInterfaceSymbol;
     private readonly INamedTypeSymbol _webRequestResponseInterfaceSymbol;
     private readonly INamedTypeSymbol _webserviceAttributeSymbol;
 
@@ -42,6 +43,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         _cancellationToken = cancellationToken;
         _serviceInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebApiService).FullName!)!;
         _webRequestInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebRequest).FullName!)!;
+        _tenantedWebRequestInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(ITenantedRequest).FullName!)!;
         _webRequestResponseInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebRequest<>).FullName!)!;
         _webserviceAttributeSymbol = compilation.GetTypeByMetadataName(typeof(WebServiceAttribute).FullName!)!;
         _routeAttributeSymbol = compilation.GetTypeByMetadataName(typeof(RouteAttribute).FullName!)!;
@@ -189,6 +191,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             var requestType = method.Parameters[0].Type;
             var requestTypeName = requestType.Name;
             var requestTypeNamespace = requestType.ContainingNamespace.ToDisplayString();
+            var requestTypeIsMultiTenanted = requestType.IsDerivedFrom(_tenantedWebRequestInterfaceSymbol);
             var responseType = GetResponseType(method.Parameters[0].Type);
             var responseTypeName = responseType.Name;
             var responseTypeNamespace = responseType.ContainingNamespace.ToDisplayString();
@@ -200,8 +203,9 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             OperationRegistrations.Add(new ServiceOperationRegistration
             {
                 Class = classRegistration,
-                RequestDtoType = new TypeName(requestTypeNamespace, requestTypeName),
-                ResponseDtoType = new TypeName(responseTypeNamespace, responseTypeName),
+                RequestDtoName = new TypeName(requestTypeNamespace, requestTypeName),
+                IsRequestDtoTenanted = requestTypeIsMultiTenanted,
+                ResponseDtoName = new TypeName(responseTypeNamespace, responseTypeName),
                 OperationType = operationType,
                 OperationAccess = operationAccess,
                 OperationAuthorization = operationAuthorization,
@@ -473,9 +477,11 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
         public ServiceOperation OperationType { get; set; }
 
-        public TypeName RequestDtoType { get; set; } = null!;
+        public TypeName RequestDtoName { get; set; } = null!;
 
-        public TypeName ResponseDtoType { get; set; } = null!;
+        public bool IsRequestDtoTenanted { get; set; }
+
+        public TypeName ResponseDtoName { get; set; } = null!;
 
         public string? RoutePath { get; set; }
     }

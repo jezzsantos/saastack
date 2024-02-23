@@ -6,4 +6,6 @@ namespace Domain.Interfaces.Services;
 public interface ITenantSettingService
 {
     string Decrypt(string encryptedValue);
+
+    string Encrypt(string plainText);
 }

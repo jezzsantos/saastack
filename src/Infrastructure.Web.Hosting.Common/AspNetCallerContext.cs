@@ -6,12 +6,13 @@ using Common.Extensions;
 using Domain.Interfaces;
 using Infrastructure.Common.Extensions;
 using Infrastructure.Interfaces;
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Common.Endpoints;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Hosting.Common.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Web.Hosting.Common;
 
@@ -20,12 +21,13 @@ namespace Infrastructure.Web.Hosting.Common;
 /// </summary>
 internal sealed class AspNetCallerContext : ICallerContext
 {
-    public AspNetCallerContext(IHttpContextAccessor httpContext)
+    public AspNetCallerContext(IHttpContextAccessor httpContextAccessor)
     {
-        var context = httpContext.HttpContext!;
-        var claims = context.User.Claims.ToArray();
-        TenantId = GetTenantId(context);
-        CallId = context.Items.TryGetValue(RequestCorrelationFilter.CorrelationIdItemName,
+        var httpContext = httpContextAccessor.HttpContext!;
+        var claims = httpContext.User.Claims.ToArray();
+        var tenancyContext = httpContext.RequestServices.GetService<ITenancyContext>();
+        TenantId = GetTenantId(tenancyContext);
+        CallId = httpContext.Items.TryGetValue(RequestCorrelationFilter.CorrelationIdItemName,
             out var callId)
             ? callId!.ToString()!
             : Caller.GenerateCallId();
@@ -33,7 +35,7 @@ internal sealed class AspNetCallerContext : ICallerContext
         IsServiceAccount = CallerConstants.IsServiceAccount(CallerId);
         Roles = GetRoles(claims, TenantId);
         Features = GetFeatures(claims, TenantId);
-        Authorization = GetAuthorization(context);
+        Authorization = GetAuthorization(httpContext);
         IsAuthenticated = IsServiceAccount
                           || (Authorization.HasValue && !CallerConstants.IsAnonymousUser(CallerId));
     }
@@ -54,13 +56,11 @@ internal sealed class AspNetCallerContext : ICallerContext
 
     public bool IsServiceAccount { get; }
 
-    // ReSharper disable once ReturnTypeCanBeNotNullable
-    // ReSharper disable once UnusedParameter.Local
-    private static string? GetTenantId(HttpContext context)
+    private static string? GetTenantId(ITenancyContext? tenancyContext)
     {
-        //HACK: if the request does not come in with an OrganizationId, then no tenant possible
-        return MultiTenancyConstants
-            .DefaultOrganizationId; //HACK: until we finish multi-tenancy , and fetch this from context.Items
+        return tenancyContext.Exists()
+            ? tenancyContext.Current
+            : null;
     }
 
     private static ICallerContext.CallerAuthorization GetAuthorization(HttpContext context)

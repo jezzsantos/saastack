@@ -1,15 +1,5 @@
 using System.Reflection;
-using AncillaryInfrastructure.Api.Usages;
-using Application.Persistence.Shared;
-using Application.Services.Shared;
-using Common;
-using Domain.Interfaces;
-using Domain.Services.Shared.DomainServices;
-using Infrastructure.Hosting.Common.Extensions;
-using Infrastructure.Persistence.Interfaces;
-using Infrastructure.Persistence.Shared.ApplicationServices;
-using Infrastructure.Shared.ApplicationServices;
-using Infrastructure.Shared.DomainServices;
+using ApiHost1.Api.Health;
 using Infrastructure.Web.Hosting.Common;
 
 namespace ApiHost1;
@@ -19,7 +9,7 @@ namespace ApiHost1;
 /// </summary>
 public class ApiHostModule : ISubDomainModule
 {
-    public Assembly ApiAssembly => typeof(UsagesApi).Assembly;
+    public Assembly ApiAssembly => typeof(HealthApi).Assembly;
 
     public Assembly DomainAssembly => null!;
 
@@ -27,23 +17,22 @@ public class ApiHostModule : ISubDomainModule
 
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
     {
-        get { return (_, _) => { }; }
+        get
+        {
+            return (_, _) =>
+            {
+                // Add you host specific middleware here
+            };
+        }
     }
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
         get
         {
-            return (_, services) =>
+            return (_, _) =>
             {
-                services.RegisterUnshared<IEmailMessageQueue>(c =>
-                    new EmailMessageQueue(c.Resolve<IRecorder>(), c.Resolve<IMessageQueueIdFactory>(),
-                        c.ResolveForPlatform<IQueueStore>()));
-
-                services.RegisterUnshared<ITokensService, TokensService>();
-                services.RegisterUnshared<INotificationsService, EmailNotificationsService>();
-                services.RegisterUnshared<IWebsiteUiService, WebsiteUiService>();
-                services.RegisterUnshared<IEmailSchedulingService, QueuingEmailSchedulingService>();
+                // Add your host specific dependencies here
             };
         }
     }

@@ -3,7 +3,7 @@ using Common.Recording;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using FluentAssertions;
-using Infrastructure.Common;
+using Infrastructure.Hosting.Common;
 using Infrastructure.Persistence.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using QueryAny;

@@ -6,6 +6,7 @@ using FluentAssertions;
 using Infrastructure.Common.Extensions;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Common.Endpoints;
 using Infrastructure.Web.Hosting.Common.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -22,14 +23,53 @@ namespace Infrastructure.Web.Hosting.Common.UnitTests;
 public class AspNetCallerContextSpec
 {
     private readonly Mock<IHttpContextAccessor> _httpContext;
+    private readonly Mock<IServiceProvider> _serviceProvider;
+    private readonly Mock<ITenancyContext> _tenancyContext;
 
     public AspNetCallerContextSpec()
     {
+        _tenancyContext = new Mock<ITenancyContext>();
+        _tenancyContext.Setup(tc => tc.Current)
+            .Returns("atenantid");
+        _serviceProvider = new Mock<IServiceProvider>();
+        _serviceProvider.Setup(sp => sp.GetService(typeof(ITenancyContext)))
+            .Returns(_tenancyContext.Object);
         _httpContext = new Mock<IHttpContextAccessor>();
         _httpContext.Setup(hc => hc.HttpContext!.Items).Returns(new Dictionary<object, object?>());
         _httpContext.Setup(hc => hc.HttpContext!.User.Claims).Returns(new List<Claim>());
         _httpContext.Setup(hc => hc.HttpContext!.Request.Headers).Returns(new HeaderDictionary());
         _httpContext.Setup(hc => hc.HttpContext!.Features).Returns(new FeatureCollection());
+        _httpContext.Setup(hc => hc.HttpContext!.RequestServices).Returns(_serviceProvider.Object);
+    }
+
+    [Fact]
+    public void WhenConstructedAndNoTenancyContext_ThenNoTenant()
+    {
+        _serviceProvider.Setup(sp => sp.GetService(typeof(ITenancyContext)))
+            .Returns((ITenancyContext?)null);
+
+        var result = new AspNetCallerContext(_httpContext.Object);
+
+        result.TenantId.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenConstructedAndNoTenantInTenancyContext_ThenNoTenant()
+    {
+        _tenancyContext.Setup(tc => tc.Current)
+            .Returns((string?)null);
+
+        var result = new AspNetCallerContext(_httpContext.Object);
+
+        result.TenantId.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenConstructed_ThenTenantId()
+    {
+        var result = new AspNetCallerContext(_httpContext.Object);
+
+        result.TenantId.Should().Be("atenantid");
     }
 
     [Fact]
@@ -114,7 +154,7 @@ public class AspNetCallerContextSpec
                 ClaimExtensions.ToPlatformClaimValue(PlatformRoles.Standard)),
             new(AuthenticationConstants.Claims.ForRole,
                 ClaimExtensions.ToTenantClaimValue(TenantRoles.Member,
-                    MultiTenancyConstants.DefaultOrganizationId))
+                    "atenantid"))
         });
 
         var result = new AspNetCallerContext(_httpContext.Object);
@@ -148,7 +188,7 @@ public class AspNetCallerContextSpec
                 ClaimExtensions.ToPlatformClaimValue(PlatformFeatures.Basic)),
             new(AuthenticationConstants.Claims.ForFeature,
                 ClaimExtensions.ToTenantClaimValue(TenantFeatures.Basic,
-                    MultiTenancyConstants.DefaultOrganizationId))
+                    "atenantid"))
         });
 
         var result = new AspNetCallerContext(_httpContext.Object);

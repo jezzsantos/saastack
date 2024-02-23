@@ -1,5 +1,5 @@
 using Application.Common;
-using Application.Interfaces.Resources;
+using Application.Interfaces.Services;
 using FluentAssertions;
 using Infrastructure.Web.Hosting.Common.ApplicationServices;
 using JetBrains.Annotations;
@@ -35,13 +35,14 @@ public class AspNetHostLocalFileTenantSettingsServiceSpec
         }
 
         [Fact]
-        public void WhenCreateForNewTenant_ThenReturnsSettings()
+        public async Task WhenCreateForNewTenant_ThenReturnsSettings()
         {
             var result =
-                _service.CreateForNewTenant(Caller.CreateAsAnonymousTenant("atenantid"), "atenantid");
+                await _service.CreateForTenantAsync(Caller.CreateAsAnonymousTenant("atenantid"), "atenantid",
+                    CancellationToken.None);
 
-            result.Count.Should().Be(1);
-            result["AGroup:ASubGroup:ASetting"].Should()
+            result.Value.Count.Should().Be(1);
+            result.Value["AGroup:ASubGroup:ASetting"].Should()
                 .BeEquivalentTo(new TenantSetting { Value = "avalue", IsEncrypted = false });
         }
     }
@@ -61,17 +62,18 @@ public class AspNetHostLocalFileTenantSettingsServiceSpec
         }
 
         [Fact]
-        public void WhenCreateForNewTenant_ThenReturnsSettings()
+        public async Task WhenCreateForNewTenant_ThenReturnsSettings()
         {
             var result =
-                _service.CreateForNewTenant(Caller.CreateAsAnonymousTenant("atenantid"), "atenantid");
+                await _service.CreateForTenantAsync(Caller.CreateAsAnonymousTenant("atenantid"), "atenantid",
+                    CancellationToken.None);
 
-            result.Count.Should().Be(3);
-            result["AGroup:ASubGroup:ASetting1"].Should()
+            result.Value.Count.Should().Be(3);
+            result.Value["AGroup:ASubGroup:ASetting1"].Should()
                 .BeEquivalentTo(new TenantSetting { Value = "avalue1", IsEncrypted = true });
-            result["AGroup:ASubGroup:ASetting2"].Should()
+            result.Value["AGroup:ASubGroup:ASetting2"].Should()
                 .BeEquivalentTo(new TenantSetting { Value = "avalue2", IsEncrypted = false });
-            result["AGroup:ASubGroup:ASetting3"].Should()
+            result.Value["AGroup:ASubGroup:ASetting3"].Should()
                 .BeEquivalentTo(new TenantSetting { Value = "avalue3", IsEncrypted = true });
         }
     }

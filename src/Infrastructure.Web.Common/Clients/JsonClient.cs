@@ -257,7 +257,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
     {
         var requestUri = request.GetRequestInfo().Route;
 
-        var content = method == HttpMethod.Post || method == HttpMethod.Put || method == HttpMethod.Patch
+        var content = method.CanHaveBody()
             ? new StringContent(request.SerializeToJson(), new MediaTypeHeaderValue(HttpContentTypes.Json))
             : null;
 

@@ -1,6 +1,7 @@
 using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Resources.Shared;
+using Application.Services.Shared;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
@@ -19,16 +20,18 @@ public class EndUsersApplication : IEndUsersApplication
     internal const string PermittedOperatorsSettingName = "Hosts:EndUsersApi:Authorization:OperatorWhitelist";
     private static readonly char[] PermittedOperatorsDelimiters = { ';', ',', ' ' };
     private readonly IIdentifierFactory _idFactory;
+    private readonly IOrganizationsService _organizationsService;
     private readonly IRecorder _recorder;
     private readonly IEndUserRepository _repository;
     private readonly IConfigurationSettings _settings;
 
     public EndUsersApplication(IRecorder recorder, IIdentifierFactory idFactory, IConfigurationSettings settings,
-        IEndUserRepository repository)
+        IOrganizationsService organizationsService, IEndUserRepository repository)
     {
         _recorder = recorder;
         _idFactory = idFactory;
         _settings = settings;
+        _organizationsService = organizationsService;
         _repository = repository;
     }
 
@@ -73,39 +76,62 @@ public class EndUsersApplication : IEndUsersApplication
             return created.Error;
         }
 
-        var user = created.Value;
+        var machine = created.Value;
 
         //TODO: get/create the profile for this machine (with first,tz,cc) - it may already be existent or not
 
-        var (platformRoles, platformFeatures, organizationRoles, organizationFeatures) =
-            user.GetInitialRolesAndFeatures(UserClassification.Machine, context.IsAuthenticated,
+        var (platformRoles, platformFeatures, tenantRoles, tenantFeatures) =
+            EndUserRoot.GetInitialRolesAndFeatures(UserClassification.Machine, context.IsAuthenticated,
                 Optional<EmailAddress>.None, Optional<List<EmailAddress>>.None);
-        var registered = user.Register(platformRoles, platformFeatures, Optional<EmailAddress>.None);
+        var registered = machine.Register(platformRoles, platformFeatures, Optional<EmailAddress>.None);
         if (!registered.IsSuccessful)
         {
             return registered.Error;
         }
 
+        var defaultOrganization =
+            await _organizationsService.CreateOrganizationPrivateAsync(context, machine.Id, name,
+                OrganizationOwnership.Personal, cancellationToken);
+        if (!defaultOrganization.IsSuccessful)
+        {
+            return defaultOrganization.Error;
+        }
+
+        var defaultOrganizationId = defaultOrganization.Value.Id.ToId();
+        var selfEnrolled = machine.AddMembership(defaultOrganizationId, tenantRoles,
+            tenantFeatures);
+        if (!selfEnrolled.IsSuccessful)
+        {
+            return selfEnrolled.Error;
+        }
+
         if (context.IsAuthenticated)
         {
-            var enrolled = user.AddMembership(MultiTenancyConstants.DefaultOrganizationId.ToId(), organizationRoles,
-                organizationFeatures);
-            if (!enrolled.IsSuccessful)
+            var adder = await _repository.LoadAsync(context.ToCallerId(), cancellationToken);
+            if (!adder.IsSuccessful)
             {
-                return enrolled.Error;
+                return adder.Error;
+            }
+
+            var adderDefaultOrganizationId = adder.Value.Memberships.DefaultMembership.OrganizationId;
+            var adderEnrolled = machine.AddMembership(adderDefaultOrganizationId, tenantRoles,
+                tenantFeatures);
+            if (!adderEnrolled.IsSuccessful)
+            {
+                return adderEnrolled.Error;
             }
         }
 
-        var saved = await _repository.SaveAsync(user, cancellationToken);
+        var saved = await _repository.SaveAsync(machine, cancellationToken);
         if (!saved.IsSuccessful)
         {
             return saved.Error;
         }
 
-        _recorder.TraceInformation(context.ToCall(), "Registered machine: {Id}", user.Id);
+        _recorder.TraceInformation(context.ToCall(), "Registered machine: {Id}", machine.Id);
         _recorder.TrackUsage(context.ToCall(), UsageConstants.Events.UsageScenarios.MachineRegistered);
 
-        return user.ToRegisteredUser(null, name, null, Timezones.FindOrDefault(timezone),
+        return machine.ToRegisteredUser(defaultOrganizationId, null, name, null, Timezones.FindOrDefault(timezone),
             CountryCodes.FindOrDefault(countryCode));
     }
 
@@ -137,8 +163,8 @@ public class EndUsersApplication : IEndUsersApplication
         }
 
         var permittedOperators = GetPermittedOperators();
-        var (platformRoles, platformFeatures, organizationRoles, organizationFeatures) =
-            user.GetInitialRolesAndFeatures(UserClassification.Person, context.IsAuthenticated, username.Value,
+        var (platformRoles, platformFeatures, tenantRoles, tenantFeatures) =
+            EndUserRoot.GetInitialRolesAndFeatures(UserClassification.Person, context.IsAuthenticated, username.Value,
                 permittedOperators);
         var registered = user.Register(platformRoles, platformFeatures, username.Value);
         if (!registered.IsSuccessful)
@@ -146,8 +172,24 @@ public class EndUsersApplication : IEndUsersApplication
             return registered.Error;
         }
 
-        var enrolled = user.AddMembership(MultiTenancyConstants.DefaultOrganizationId.ToId(), organizationRoles,
-            organizationFeatures);
+        var organizationName = Domain.Shared.PersonName.Create(firstName, lastName);
+        if (!organizationName.IsSuccessful)
+        {
+            return organizationName.Error;
+        }
+
+        var defaultOrganization =
+            await _organizationsService.CreateOrganizationPrivateAsync(context, user.Id,
+                organizationName.Value.FullName, OrganizationOwnership.Personal,
+                cancellationToken);
+        if (!defaultOrganization.IsSuccessful)
+        {
+            return defaultOrganization.Error;
+        }
+
+        var defaultOrganizationId = defaultOrganization.Value.Id.ToId();
+        var enrolled = user.AddMembership(defaultOrganizationId, tenantRoles,
+            tenantFeatures);
         if (!enrolled.IsSuccessful)
         {
             return enrolled.Error;
@@ -162,11 +204,50 @@ public class EndUsersApplication : IEndUsersApplication
         _recorder.TraceInformation(context.ToCall(), "Registered user: {Id}", user.Id);
         _recorder.AuditAgainst(context.ToCall(), user.Id,
             Audits.EndUsersApplication_User_Registered_TermsAccepted,
-            "UserAccount {Id} accepted their terms and conditions", user.Id);
+            "EndUser {Id} accepted their terms and conditions", user.Id);
         _recorder.TrackUsage(context.ToCall(), UsageConstants.Events.UsageScenarios.PersonRegistrationCreated);
 
-        return user.ToRegisteredUser(emailAddress, firstName, lastName, Timezones.FindOrDefault(timezone),
+        return user.ToRegisteredUser(defaultOrganizationId, emailAddress, firstName, lastName,
+            Timezones.FindOrDefault(timezone),
             CountryCodes.FindOrDefault(countryCode));
+    }
+
+    public async Task<Result<Membership, Error>> CreateMembershipForCallerAsync(ICallerContext context,
+        string organizationId, CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(context.ToCallerId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var user = retrieved.Value;
+        var (_, _, tenantRoles, tenantFeatures) =
+            EndUserRoot.GetInitialRolesAndFeatures(UserClassification.Person, context.IsAuthenticated,
+                Optional<EmailAddress>.None,
+                Optional<List<EmailAddress>>.None);
+        var membered = user.AddMembership(organizationId.ToId(), tenantRoles, tenantFeatures);
+        if (!membered.IsSuccessful)
+        {
+            return membered.Error;
+        }
+
+        var saved = await _repository.SaveAsync(user, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
+
+        _recorder.TraceInformation(context.ToCall(), "EndUser {Id} has become a member of organisation {Organisation}",
+            user.Id, organizationId);
+
+        var membership = saved.Value.FindMembership(organizationId.ToId());
+        if (!membership.HasValue)
+        {
+            return Error.EntityNotFound(Resources.EndUsersApplication_MembershipNotFound);
+        }
+
+        return membership.Value.ToMembership();
     }
 
     public async Task<Result<Optional<EndUser>, Error>> FindPersonByEmailAsync(ICallerContext context,
@@ -311,7 +392,20 @@ public class EndUsersApplication : IEndUsersApplication
 
 internal static class EndUserConversionExtensions
 {
-    public static RegisteredEndUser ToRegisteredUser(this EndUserRoot user, string? emailAddress, string firstName,
+    public static Membership ToMembership(this EndUsersDomain.Membership ms)
+    {
+        return new Membership
+        {
+            Id = ms.Id,
+            IsDefault = ms.IsDefault,
+            OrganizationId = ms.OrganizationId.Value,
+            Features = ms.Features.ToList(),
+            Roles = ms.Roles.ToList()
+        };
+    }
+
+    public static RegisteredEndUser ToRegisteredUser(this EndUserRoot user, Identifier defaultOrganizationId,
+        string? emailAddress, string firstName,
         string? lastName, TimezoneIANA timezone, CountryCodeIso3166 countryCode)
     {
         var endUser = ToUser(user);
@@ -329,7 +423,7 @@ internal static class EndUserConversionExtensions
             PhoneNumber = null,
             Timezone = timezone.ToString(),
             Id = user.Id,
-            DefaultOrganisationId = null
+            DefaultOrganizationId = defaultOrganizationId
         };
 
         return registeredUser;
@@ -352,13 +446,7 @@ internal static class EndUserConversionExtensions
     {
         var endUser = ToUser(user);
         var withMemberships = endUser.Convert<EndUser, EndUserWithMemberships>();
-        withMemberships.Memberships = user.Memberships.Select(ms => new Membership
-        {
-            Id = ms.Id,
-            OrganizationId = ms.OrganizationId.Value,
-            Features = ms.Features.ToList(),
-            Roles = ms.Roles.ToList()
-        }).ToList();
+        withMemberships.Memberships = user.Memberships.Select(ms => ms.ToMembership()).ToList();
 
         return withMemberships;
     }

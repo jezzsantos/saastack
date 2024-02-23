@@ -51,7 +51,7 @@ public class EndUserProjection : IReadModelProjection
                 }, cancellationToken);
 
             case Events.MembershipAdded e:
-                return await _memberships.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _memberships.HandleCreateAsync(e.MembershipId.ToId(), dto =>
                 {
                     dto.IsDefault = e.IsDefault;
                     dto.UserId = e.RootId;

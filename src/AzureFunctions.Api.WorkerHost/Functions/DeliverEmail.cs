@@ -1,6 +1,6 @@
-﻿using Application.Persistence.Shared.ReadModels;
+﻿using Application.Interfaces;
+using Application.Persistence.Shared.ReadModels;
 using Infrastructure.Workers.Api;
-using Infrastructure.Workers.Api.Workers;
 using Microsoft.Azure.Functions.Worker;
 
 namespace AzureFunctions.Api.WorkerHost.Functions;
@@ -15,7 +15,7 @@ public sealed class DeliverEmail
     }
 
     [Function(nameof(DeliverEmail))]
-    public Task Run([QueueTrigger(DeliverEmailRelayWorker.QueueName)] EmailMessage message,
+    public Task Run([QueueTrigger(WorkerConstants.Queues.Emails)] EmailMessage message,
         FunctionContext context)
     {
         return _worker.RelayMessageOrThrowAsync(message, context.CancellationToken);

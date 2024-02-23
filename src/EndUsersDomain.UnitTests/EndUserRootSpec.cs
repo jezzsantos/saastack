@@ -118,7 +118,7 @@ public class EndUserRootSpec
     }
 
     [Fact]
-    public void WhenAddMembership_ThenAddsMembershipRolesAndFeatures()
+    public void WhenAddMembership_ThenAddsMembershipAsDefaultWithRolesAndFeatures()
     {
         _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
             Features.Create(PlatformFeatures.Basic.Name).Value,
@@ -130,13 +130,15 @@ public class EndUserRootSpec
 
         result.Should().BeSuccess();
         _user.Memberships.Should().ContainSingle(ms =>
-            ms.OrganizationId.Value == "anorganizationid" && ms.IsDefault && ms.Roles == roles
+            ms.OrganizationId.Value == "anorganizationid"
+            && ms.IsDefault
+            && ms.Roles == roles
             && ms.Features == features);
         _user.Events.Last().Should().BeOfType<Events.MembershipAdded>();
     }
 
     [Fact]
-    public void WhenAddMembershipAndNextMembership_ThenChangesNextToDefaultMembership()
+    public void WhenAddMembershipAndHasMembership_ThenChangesNextToDefaultMembership()
     {
         _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
             Features.Create(PlatformFeatures.Basic.Name).Value,
@@ -149,10 +151,14 @@ public class EndUserRootSpec
 
         result.Should().BeSuccess();
         _user.Memberships.Should().Contain(ms =>
-            ms.OrganizationId.Value == "anorganizationid1" && !ms.IsDefault && ms.Roles == roles
+            ms.OrganizationId.Value == "anorganizationid1"
+            && !ms.IsDefault
+            && ms.Roles == roles
             && ms.Features == features);
         _user.Memberships.Should().Contain(ms =>
-            ms.OrganizationId.Value == "anorganizationid2" && ms.IsDefault && ms.Roles == roles
+            ms.OrganizationId.Value == "anorganizationid2"
+            && ms.IsDefault
+            && ms.Roles == roles
             && ms.Features == features);
         _user.Events.Last().Should().BeOfType<Events.MembershipDefaultChanged>();
     }

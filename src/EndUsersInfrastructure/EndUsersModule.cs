@@ -2,6 +2,8 @@ using System.Reflection;
 using Application.Persistence.Interfaces;
 using Application.Services.Shared;
 using Common;
+using Common.Configuration;
+using Domain.Common.Identity;
 using Domain.Interfaces;
 using EndUsersApplication;
 using EndUsersApplication.Persistence;
@@ -27,7 +29,8 @@ public class EndUsersModule : ISubDomainModule
 
     public Dictionary<Type, string> AggregatePrefixes => new()
     {
-        { typeof(EndUserRoot), "user" }
+        { typeof(EndUserRoot), "user" },
+        { typeof(Membership), "mship" }
     };
 
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
@@ -41,7 +44,11 @@ public class EndUsersModule : ISubDomainModule
         {
             return (_, services) =>
             {
-                services.RegisterUnshared<IEndUsersApplication, EndUsersApplication.EndUsersApplication>();
+                services.RegisterUnshared<IEndUsersApplication>(c =>
+                    new EndUsersApplication.EndUsersApplication(c.ResolveForUnshared<IRecorder>(),
+                        c.ResolveForUnshared<IIdentifierFactory>(), c.ResolveForPlatform<IConfigurationSettings>(),
+                        c.ResolveForUnshared<IOrganizationsService>(),
+                        c.ResolveForUnshared<IEndUserRepository>()));
                 services.RegisterUnshared<IEndUserRepository>(c => new EndUserRepository(
                     c.ResolveForUnshared<IRecorder>(),
                     c.ResolveForUnshared<IDomainFactory>(),

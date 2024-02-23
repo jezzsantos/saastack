@@ -94,7 +94,8 @@ public class AuthTokensApplication : IAuthTokensApplication
         }
 
         var authTokens = retrieved.Value.Value;
-        var retrievedUser = await _endUsersService.GetMembershipsAsync(context, authTokens.UserId, cancellationToken);
+        var retrievedUser =
+            await _endUsersService.GetMembershipsPrivateAsync(context, authTokens.UserId, cancellationToken);
         if (!retrievedUser.IsSuccessful)
         {
             return retrievedUser.Error;

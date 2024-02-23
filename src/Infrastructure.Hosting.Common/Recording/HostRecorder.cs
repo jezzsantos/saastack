@@ -219,8 +219,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
     }
 
     // ReSharper disable once UnusedParameter.Local
-    private static ICrashReporter GetCrashReporter(IDependencyContainer container,
-        ILogger logger,
+    private static ICrashReporter GetCrashReporter(IDependencyContainer container, ILogger logger,
         RecordingEnvironmentOptions options)
     {
         return options.CrashReporting switch
@@ -236,14 +235,13 @@ public sealed class HostRecorder : IRecorder, IDisposable
         };
     }
 
-    private static IAuditReporter GetAuditReporter(IDependencyContainer container,
-        RecordingEnvironmentOptions options)
+    private static IAuditReporter GetAuditReporter(IDependencyContainer container, RecordingEnvironmentOptions options)
     {
         return options.AuditReporting switch
         {
             AuditReporterOption.None => new NullAuditReporter(),
             AuditReporterOption.ReliableQueue => new QueuedAuditReporter(container,
-                container.Resolve<IConfigurationSettings>().Platform),
+                container.ResolveForPlatform<IConfigurationSettings>()),
             _ => throw new ArgumentOutOfRangeException(nameof(options.MetricReporting))
         };
     }
@@ -265,14 +263,13 @@ public sealed class HostRecorder : IRecorder, IDisposable
         };
     }
 
-    private static IUsageReporter GetUsageReporter(IDependencyContainer container,
-        RecordingEnvironmentOptions options)
+    private static IUsageReporter GetUsageReporter(IDependencyContainer container, RecordingEnvironmentOptions options)
     {
         return options.UsageReporting switch
         {
             UsageReporterOption.None => new NullUsageReporter(),
             UsageReporterOption.ReliableQueue => new QueuedUsageReporter(container,
-                container.Resolve<IConfigurationSettings>().Platform),
+                container.ResolveForPlatform<IConfigurationSettings>()),
             _ => throw new ArgumentOutOfRangeException(nameof(options.MetricReporting))
         };
     }

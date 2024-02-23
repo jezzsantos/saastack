@@ -1,11 +1,12 @@
-using Application.Interfaces.Resources;
+using Common;
 
 namespace Application.Interfaces.Services;
 
 /// <summary>
-///     Defines an application service for working with tenant-specific settings
+///     Defines a service for creating tenant-specific settings
 /// </summary>
 public interface ITenantSettingsService
 {
-    IReadOnlyDictionary<string, TenantSetting> CreateForNewTenant(ICallerContext context, string tenantId);
+    Task<Result<TenantSettings, Error>> CreateForTenantAsync(ICallerContext context, string tenantId,
+        CancellationToken cancellationToken);
 }

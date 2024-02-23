@@ -55,7 +55,8 @@ public class APIKeysApplication : IAPIKeysApplication
         }
 
         var retrievedUser =
-            await _endUsersService.GetMembershipsAsync(context, retrievedApiKey.Value.Value.UserId, cancellationToken);
+            await _endUsersService.GetMembershipsPrivateAsync(context, retrievedApiKey.Value.Value.UserId,
+                cancellationToken);
         if (!retrievedUser.IsSuccessful)
         {
             return Optional<EndUserWithMemberships>.None;

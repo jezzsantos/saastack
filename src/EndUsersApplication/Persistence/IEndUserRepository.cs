@@ -10,7 +10,7 @@ public interface IEndUserRepository : IApplicationRepository
 {
     Task<Result<EndUserRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken);
 
-    Task<Result<EndUserRoot, Error>> SaveAsync(EndUserRoot endUser, CancellationToken cancellationToken);
+    Task<Result<EndUserRoot, Error>> SaveAsync(EndUserRoot user, CancellationToken cancellationToken);
 
     Task<Result<Optional<EndUserRoot>, Error>> FindByEmailAddressAsync(EmailAddress emailAddress,
         CancellationToken cancellationToken);

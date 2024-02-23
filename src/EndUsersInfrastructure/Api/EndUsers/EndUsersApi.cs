@@ -18,7 +18,8 @@ public class EndUsersApi : IWebApiService
         _endUsersApplication = endUsersApplication;
     }
 
-    public async Task<ApiPostResult<EndUser, AssignPlatformRolesResponse>> Deliver(AssignPlatformRolesRequest request,
+    public async Task<ApiPostResult<EndUser, AssignPlatformRolesResponse>> AssignPlatformRoles(
+        AssignPlatformRolesRequest request,
         CancellationToken cancellationToken)
     {
         var user =

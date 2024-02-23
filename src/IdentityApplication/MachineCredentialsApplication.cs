@@ -26,7 +26,7 @@ public class MachineCredentialsApplication : IMachineCredentialsApplication
         string? timezone, string? countryCode, DateTime? apiKeyExpiresOn, CancellationToken cancellationToken)
     {
         var registered =
-            await _endUsersService.RegisterMachineAsync(context, name, timezone, countryCode, cancellationToken);
+            await _endUsersService.RegisterMachinePrivateAsync(context, name, timezone, countryCode, cancellationToken);
         if (!registered.IsSuccessful)
         {
             return registered.Error;

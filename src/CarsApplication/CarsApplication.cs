@@ -93,7 +93,7 @@ public class CarsApplication : ICarsApplication
     public async Task<Result<Car, Error>> RegisterCarAsync(ICallerContext caller, string organizationId, string make,
         string model, int year, string location, string plate, CancellationToken cancellationToken)
     {
-        var retrieved = CarRoot.Create(_recorder, _idFactory, Identifier.Create(organizationId));
+        var retrieved = CarRoot.Create(_recorder, _idFactory, organizationId.ToId());
         if (!retrieved.IsSuccessful)
         {
             return retrieved.Error;

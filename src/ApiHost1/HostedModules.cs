@@ -4,6 +4,7 @@ using CarsInfrastructure;
 using EndUsersInfrastructure;
 using IdentityInfrastructure;
 using Infrastructure.Web.Hosting.Common;
+using OrganizationsInfrastructure;
 
 namespace ApiHost1;
 
@@ -14,6 +15,7 @@ public static class HostedModules
         var modules = new SubDomainModules();
         modules.Register(new ApiHostModule());
         modules.Register(new EndUsersModule());
+        modules.Register(new OrganizationsModule());
         modules.Register(new IdentityModule());
         modules.Register(new AncillaryModule());
 #if TESTINGONLY

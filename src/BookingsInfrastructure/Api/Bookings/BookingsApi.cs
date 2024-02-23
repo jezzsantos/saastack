@@ -1,4 +1,3 @@
-using Application.Interfaces;
 using Application.Resources.Shared;
 using BookingsApplication;
 using Infrastructure.Interfaces;
@@ -22,8 +21,7 @@ public sealed class BookingsApi : IWebApiService
     public async Task<ApiDeleteResult> Cancel(CancelBookingRequest request, CancellationToken cancellationToken)
     {
         var booking =
-            await _bookingsApplication.CancelBookingAsync(_contextFactory.Create(),
-                MultiTenancyConstants.DefaultOrganizationId, request.Id,
+            await _bookingsApplication.CancelBookingAsync(_contextFactory.Create(), request.OrganizationId!, request.Id,
                 cancellationToken);
         return () => booking.HandleApplicationResult();
     }
@@ -31,8 +29,7 @@ public sealed class BookingsApi : IWebApiService
     public async Task<ApiPostResult<Booking, MakeBookingResponse>> Make(MakeBookingRequest request,
         CancellationToken cancellationToken)
     {
-        var booking = await _bookingsApplication.MakeBookingAsync(_contextFactory.Create(),
-            MultiTenancyConstants.DefaultOrganizationId,
+        var booking = await _bookingsApplication.MakeBookingAsync(_contextFactory.Create(), request.OrganizationId!,
             request.CarId, request.StartUtc, request.EndUtc, cancellationToken);
 
         return () => booking.HandleApplicationResult<MakeBookingResponse, Booking>(c =>
@@ -43,9 +40,8 @@ public sealed class BookingsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var bookings = await _bookingsApplication.SearchAllBookingsAsync(_contextFactory.Create(),
-            MultiTenancyConstants.DefaultOrganizationId,
-            request.FromUtc,
-            request.ToUtc, request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
+            request.OrganizationId!, request.FromUtc, request.ToUtc, request.ToSearchOptions(), request.ToGetOptions(),
+            cancellationToken);
 
         return () =>
             bookings.HandleApplicationResult(c => new SearchAllBookingsResponse

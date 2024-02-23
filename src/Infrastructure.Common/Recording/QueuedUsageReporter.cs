@@ -30,7 +30,7 @@ public class QueuedUsageReporter : IUsageReporter
     private readonly IUsageMessageQueue _queue;
 
     // ReSharper disable once UnusedParameter.Local
-    public QueuedUsageReporter(IDependencyContainer container, ISettings settings)
+    public QueuedUsageReporter(IDependencyContainer container, IConfigurationSettings settings)
         : this(new UsageMessageQueue(NullRecorder.Instance, container.Resolve<IMessageQueueIdFactory>(),
 #if !TESTINGONLY
 #if HOSTEDONAZURE
@@ -39,7 +39,7 @@ public class QueuedUsageReporter : IUsageReporter
                 AWSSQSQueueStore.Create(NullRecorder.Instance, settings)
 #endif
 #else
-            container.Resolve<IQueueStore>()
+            container.ResolveForPlatform<IQueueStore>()
 #endif
         ))
     {

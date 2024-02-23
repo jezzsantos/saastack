@@ -13,6 +13,14 @@ public static class HttpRequestExtensions
     public const string BearerTokenPrefix = "Bearer";
 
     /// <summary>
+    ///     Whether the specified <see cref="method" /> could have a content body.
+    /// </summary>
+    public static bool CanHaveBody(this HttpMethod method)
+    {
+        return method == HttpMethod.Post || method == HttpMethod.Put || method == HttpMethod.Patch;
+    }
+
+    /// <summary>
     ///     Returns the value of the APIKEY authorization from the request (if any)
     /// </summary>
     public static Optional<string> GetAPIKeyAuth(this HttpRequest request)
@@ -229,11 +237,16 @@ public static class HttpRequestExtensions
 
     /// <summary>
     ///     Whether the specified HMAC signature represents the signature of the contents of the inbound request,
-    /// signed by the method <see cref="RequestExtensions.SerializeToJson"/>
+    ///     signed by the method <see cref="RequestExtensions.SerializeToJson" />
     /// </summary>
     public static async Task<bool> VerifyHMACSignatureAsync(this HttpRequest request, string signature, string secret,
         CancellationToken cancellationToken)
     {
+        if (request.Body.Position != 0)
+        {
+            request.RewindBody();
+        }
+
         var body = await request.Body.ReadFullyAsync(cancellationToken);
         request.RewindBody(); // HACK: need to do this for later middleware
 

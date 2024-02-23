@@ -20,7 +20,7 @@ public class AWSCloudWatchMetricReporter : IMetricReporter
 
     public AWSCloudWatchMetricReporter(IDependencyContainer container)
     {
-        var settings = container.Resolve<IConfigurationSettings>().Platform;
+        var settings = container.ResolveForPlatform<IConfigurationSettings>();
         var (credentials, regionEndpoint) = settings.GetConnection();
         if (regionEndpoint.Exists())
         {

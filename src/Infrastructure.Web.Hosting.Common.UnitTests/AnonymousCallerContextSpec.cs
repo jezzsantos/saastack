@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Common.Endpoints;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;

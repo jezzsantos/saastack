@@ -1,8 +1,10 @@
+using System.Text.Json;
 using AncillaryApplication.Persistence;
 using AncillaryApplication.Persistence.ReadModels;
 using AncillaryDomain;
 using Application.Common.Extensions;
 using Application.Interfaces;
+using Application.Interfaces.Services;
 using Application.Persistence.Interfaces;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
@@ -24,16 +26,19 @@ public class AncillaryApplication : IAncillaryApplication
     private readonly IIdentifierFactory _idFactory;
     private readonly IRecorder _recorder;
     private readonly IUsageDeliveryService _usageDeliveryService;
+    private readonly IProvisioningDeliveryService _provisioningDeliveryService;
 #if TESTINGONLY
     private readonly IAuditMessageQueueRepository _auditMessageQueueRepository;
     private readonly IEmailMessageQueue _emailMessageQueue;
     private readonly IUsageMessageQueue _usageMessageQueue;
+    private readonly IProvisioningMessageQueue _provisioningMessageQueue;
 
     public AncillaryApplication(IRecorder recorder, IIdentifierFactory idFactory,
         IUsageMessageQueue usageMessageQueue, IUsageDeliveryService usageDeliveryService,
         IAuditMessageQueueRepository auditMessageQueueRepository, IAuditRepository auditRepository,
         IEmailMessageQueue emailMessageQueue, IEmailDeliveryService emailDeliveryService,
-        IEmailDeliveryRepository emailDeliveryRepository)
+        IEmailDeliveryRepository emailDeliveryRepository,
+        IProvisioningMessageQueue provisioningMessageQueue, IProvisioningDeliveryService provisioningDeliveryService)
     {
         _recorder = recorder;
         _idFactory = idFactory;
@@ -44,6 +49,8 @@ public class AncillaryApplication : IAncillaryApplication
         _emailMessageQueue = emailMessageQueue;
         _emailDeliveryService = emailDeliveryService;
         _emailDeliveryRepository = emailDeliveryRepository;
+        _provisioningMessageQueue = provisioningMessageQueue;
+        _provisioningDeliveryService = provisioningDeliveryService;
     }
 #else
     public AncillaryApplication(IRecorder recorder, IIdentifierFactory idFactory,
@@ -53,7 +60,9 @@ public class AncillaryApplication : IAncillaryApplication
         IAuditMessageQueueRepository auditMessageQueueRepository, IAuditRepository auditRepository,
         // ReSharper disable once UnusedParameter.Local
         IEmailMessageQueue emailMessageQueue, IEmailDeliveryService emailDeliveryService,
-        IEmailDeliveryRepository emailDeliveryRepository)
+        IEmailDeliveryRepository emailDeliveryRepository,
+        // ReSharper disable once UnusedParameter.Local
+        IProvisioningMessageQueue provisioningMessageQueue, IProvisioningDeliveryService provisioningDeliveryService)
     {
         _recorder = recorder;
         _idFactory = idFactory;
@@ -61,6 +70,7 @@ public class AncillaryApplication : IAncillaryApplication
         _auditRepository = auditRepository;
         _emailDeliveryService = emailDeliveryService;
         _emailDeliveryRepository = emailDeliveryRepository;
+        _provisioningDeliveryService = provisioningDeliveryService;
     }
 #endif
 
@@ -73,13 +83,32 @@ public class AncillaryApplication : IAncillaryApplication
             return rehydrated.Error;
         }
 
-        var delivered = await DeliverEmailAsync(context, rehydrated.Value, cancellationToken);
+        var delivered = await DeliverEmailInternalAsync(context, rehydrated.Value, cancellationToken);
         if (!delivered.IsSuccessful)
         {
             return delivered.Error;
         }
 
         _recorder.TraceInformation(context.ToCall(), "Delivered email message: {Message}", messageAsJson);
+        return true;
+    }
+
+    public async Task<Result<bool, Error>> DeliverProvisioningAsync(ICallerContext context, string messageAsJson,
+        CancellationToken cancellationToken)
+    {
+        var rehydrated = RehydrateMessage<ProvisioningMessage>(messageAsJson);
+        if (!rehydrated.IsSuccessful)
+        {
+            return rehydrated.Error;
+        }
+
+        var delivered = await DeliverProvisioningInternalAsync(context, rehydrated.Value, cancellationToken);
+        if (!delivered.IsSuccessful)
+        {
+            return delivered.Error;
+        }
+
+        _recorder.TraceInformation(context.ToCall(), "Delivered provisioning message: {Message}", messageAsJson);
         return true;
     }
 
@@ -92,7 +121,7 @@ public class AncillaryApplication : IAncillaryApplication
             return rehydrated.Error;
         }
 
-        var delivered = await DeliverUsageAsync(context, rehydrated.Value, cancellationToken);
+        var delivered = await DeliverUsageInternalAsync(context, rehydrated.Value, cancellationToken);
         if (!delivered.IsSuccessful)
         {
             return delivered.Error;
@@ -111,7 +140,7 @@ public class AncillaryApplication : IAncillaryApplication
             return rehydrated.Error;
         }
 
-        var delivered = await DeliverAuditAsync(context, rehydrated.Value, cancellationToken);
+        var delivered = await DeliverAuditInternalAsync(context, rehydrated.Value, cancellationToken);
         if (!delivered.IsSuccessful)
         {
             return delivered.Error;
@@ -125,9 +154,22 @@ public class AncillaryApplication : IAncillaryApplication
     public async Task<Result<Error>> DrainAllEmailsAsync(ICallerContext context, CancellationToken cancellationToken)
     {
         await DrainAllAsync(_emailMessageQueue,
-            message => DeliverEmailAsync(context, message, cancellationToken), cancellationToken);
+            message => DeliverEmailInternalAsync(context, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(context.ToCall(), "Drained all email messages");
+
+        return Result.Ok;
+    }
+#endif
+
+#if TESTINGONLY
+    public async Task<Result<Error>> DrainAllProvisioningsAsync(ICallerContext context,
+        CancellationToken cancellationToken)
+    {
+        await DrainAllAsync(_provisioningMessageQueue,
+            message => DeliverProvisioningInternalAsync(context, message, cancellationToken), cancellationToken);
+
+        _recorder.TraceInformation(context.ToCall(), "Drained all provisioning messages");
 
         return Result.Ok;
     }
@@ -137,7 +179,7 @@ public class AncillaryApplication : IAncillaryApplication
     public async Task<Result<Error>> DrainAllUsagesAsync(ICallerContext context, CancellationToken cancellationToken)
     {
         await DrainAllAsync(_usageMessageQueue,
-            message => DeliverUsageAsync(context, message, cancellationToken), cancellationToken);
+            message => DeliverUsageInternalAsync(context, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(context.ToCall(), "Drained all usage messages");
 
@@ -149,7 +191,7 @@ public class AncillaryApplication : IAncillaryApplication
     public async Task<Result<Error>> DrainAllAuditsAsync(ICallerContext context, CancellationToken cancellationToken)
     {
         await DrainAllAsync(_auditMessageQueueRepository,
-            message => DeliverAuditAsync(context, message, cancellationToken), cancellationToken);
+            message => DeliverAuditInternalAsync(context, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(context.ToCall(), "Drained all audit messages");
 
@@ -193,12 +235,12 @@ public class AncillaryApplication : IAncillaryApplication
             deliveries.Select(delivery => delivery.ToDeliveredEmail()));
     }
 
-    private async Task<Result<bool, Error>> DeliverEmailAsync(ICallerContext context, EmailMessage message,
+    private async Task<Result<bool, Error>> DeliverEmailInternalAsync(ICallerContext context, EmailMessage message,
         CancellationToken cancellationToken)
     {
         if (message.Html.IsInvalidParameter(x => x.Exists(), nameof(EmailMessage.Html), out _))
         {
-            return Error.RuleViolation(Resources.AncillaryApplication_MissingEmailHtml);
+            return Error.RuleViolation(Resources.AncillaryApplication_Email_MissingHtml);
         }
 
         var messageId = QueuedMessageId.Create(message.MessageId!);
@@ -327,38 +369,38 @@ public class AncillaryApplication : IAncillaryApplication
         return true;
     }
 
-    private async Task<Result<bool, Error>> DeliverUsageAsync(ICallerContext context, UsageMessage message,
+    private async Task<Result<bool, Error>> DeliverUsageInternalAsync(ICallerContext context, UsageMessage message,
         CancellationToken cancellationToken)
     {
         if (message.ForId.IsInvalidParameter(x => x.HasValue(), nameof(UsageMessage.ForId), out _))
         {
-            return Error.RuleViolation(Resources.AncillaryApplication_MissingUsageForId);
+            return Error.RuleViolation(Resources.AncillaryApplication_Usage_MissingForId);
         }
 
         if (message.EventName.IsInvalidParameter(x => x.HasValue(), nameof(UsageMessage.EventName), out _))
         {
-            return Error.RuleViolation(Resources.AncillaryApplication_MissingUsageEventName);
+            return Error.RuleViolation(Resources.AncillaryApplication_Usage_MissingEventName);
         }
 
-        await _usageDeliveryService.DeliverAsync(context, message.ForId!, message.EventName!, message.Additional,
+        var delivered = await _usageDeliveryService.DeliverAsync(context, message.ForId!, message.EventName!,
+            message.Additional,
             cancellationToken);
+        if (!delivered.IsSuccessful)
+        {
+            return delivered.Error;
+        }
 
         _recorder.TraceInformation(context.ToCall(), "Delivered usage for {For}", message.ForId!);
 
         return true;
     }
 
-    private async Task<Result<bool, Error>> DeliverAuditAsync(ICallerContext context, AuditMessage message,
+    private async Task<Result<bool, Error>> DeliverAuditInternalAsync(ICallerContext context, AuditMessage message,
         CancellationToken cancellationToken)
     {
         if (message.AuditCode.IsInvalidParameter(x => x.HasValue(), nameof(AuditMessage.AuditCode), out _))
         {
-            return Error.RuleViolation(Resources.AncillaryApplication_MissingAuditCode);
-        }
-
-        if (message.TenantId.IsInvalidParameter(x => x.HasValue(), nameof(AuditMessage.TenantId), out _))
-        {
-            return Error.RuleViolation(Resources.AncillaryApplication_MissingTenantId);
+            return Error.RuleViolation(Resources.AncillaryApplication_Audit_MissingCode);
         }
 
         var templateArguments = TemplateArguments.Create(message.Arguments ?? new List<string>());
@@ -382,6 +424,45 @@ public class AncillaryApplication : IAncillaryApplication
         }
 
         _recorder.TraceInformation(context.ToCall(), "Audit {Id} was created", updated.Value.Id);
+
+        return true;
+    }
+
+    private async Task<Result<bool, Error>> DeliverProvisioningInternalAsync(ICallerContext context,
+        ProvisioningMessage message, CancellationToken cancellationToken)
+    {
+        if (message.TenantId.IsInvalidParameter(x => x.HasValue(), nameof(ProvisioningMessage.TenantId), out _))
+        {
+            return Error.RuleViolation(Resources.AncillaryApplication_Provisioning_MissingTenantId);
+        }
+
+        var tenantSettings = new TenantSettings(message.Settings.ToDictionary(pair => pair.Key,
+            pair =>
+            {
+                var value = pair.Value.Value;
+                if (value is JsonElement jsonElement)
+                {
+                    value = jsonElement.ValueKind switch
+                    {
+                        JsonValueKind.String => jsonElement.GetString(),
+                        JsonValueKind.Number => jsonElement.GetDouble(),
+                        JsonValueKind.True => true,
+                        JsonValueKind.False => false,
+                        _ => null
+                    };
+                }
+
+                return new TenantSetting(value);
+            }));
+        var delivered =
+            await _provisioningDeliveryService.DeliverAsync(context, message.TenantId!, tenantSettings,
+                cancellationToken);
+        if (!delivered.IsSuccessful)
+        {
+            return delivered.Error;
+        }
+
+        _recorder.TraceInformation(context.ToCall(), "Delivered provisioning for {Tenant}", message.TenantId!);
 
         return true;
     }

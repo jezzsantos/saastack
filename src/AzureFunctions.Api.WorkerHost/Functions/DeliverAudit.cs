@@ -1,6 +1,6 @@
-﻿using Application.Persistence.Shared.ReadModels;
+﻿using Application.Interfaces;
+using Application.Persistence.Shared.ReadModels;
 using Infrastructure.Workers.Api;
-using Infrastructure.Workers.Api.Workers;
 using Microsoft.Azure.Functions.Worker;
 
 namespace AzureFunctions.Api.WorkerHost.Functions;
@@ -15,7 +15,7 @@ public sealed class DeliverAudit
     }
 
     [Function(nameof(DeliverAudit))]
-    public Task Run([QueueTrigger(DeliverAuditRelayWorker.QueueName)] AuditMessage message,
+    public Task Run([QueueTrigger(WorkerConstants.Queues.Audits)] AuditMessage message,
         FunctionContext context)
     {
         return _worker.RelayMessageOrThrowAsync(message, context.CancellationToken);

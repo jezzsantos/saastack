@@ -27,19 +27,19 @@
     <data name="AncillaryApplication_InvalidQueuedMessage" xml:space="preserve">
         <value>The queued message was not valid JSON for its type: '{0}', message was: {1}</value>
     </data>
-    <data name="AncillaryApplication_MissingUsageForId" xml:space="preserve">
+    <data name="AncillaryApplication_Usage_MissingForId" xml:space="preserve">
         <value>The usage message is missing a 'ForId'</value>
     </data>
-    <data name="AncillaryApplication_MissingUsageEventName" xml:space="preserve">
+    <data name="AncillaryApplication_Usage_MissingEventName" xml:space="preserve">
         <value>The usage message is missing a 'EventName'</value>
     </data>
-    <data name="AncillaryApplication_MissingAuditCode" xml:space="preserve">
+    <data name="AncillaryApplication_Audit_MissingCode" xml:space="preserve">
         <value>The audit message is missing a 'AuditCode'</value>
     </data>
-    <data name="AncillaryApplication_MissingTenantId" xml:space="preserve">
-        <value>The audit message is missing a 'TenantId'</value>
-    </data>
-    <data name="AncillaryApplication_MissingEmailHtml" xml:space="preserve">
+    <data name="AncillaryApplication_Email_MissingHtml" xml:space="preserve">
         <value>The email message is missing the 'HTML' email</value>
+    </data>
+    <data name="AncillaryApplication_Provisioning_MissingTenantId" xml:space="preserve">
+        <value>The provisioning message is missing the 'TenantId' identifier</value>
     </data>
 </root>

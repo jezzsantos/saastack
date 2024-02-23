@@ -3,6 +3,7 @@ using Application.Persistence.Interfaces;
 using Application.Services.Shared;
 using Common;
 using Common.Configuration;
+using Domain.Common.Identity;
 using Domain.Interfaces;
 using Domain.Services.Shared.DomainServices;
 using IdentityApplication;
@@ -18,6 +19,7 @@ using IdentityInfrastructure.Persistence.ReadModels;
 using Infrastructure.Common.DomainServices;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
+using Infrastructure.Shared.DomainServices;
 using Infrastructure.Web.Hosting.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -49,18 +51,32 @@ public class IdentityModule : ISubDomainModule
         {
             return (_, services) =>
             {
+                services.RegisterUnshared<ITokensService, TokensService>();
                 services.RegisterUnshared<IEmailAddressService, EmailAddressService>();
                 services.RegisterUnshared<IPasswordHasherService, PasswordHasherService>();
                 services.RegisterUnshared<IAPIKeyHasherService, APIKeyHasherService>();
-                services.RegisterUnshared<IJWTTokensService, JWTTokensService>();
+                services.RegisterUnshared<IJWTTokensService>(c =>
+                    new JWTTokensService(c.ResolveForPlatform<IConfigurationSettings>(),
+                        c.ResolveForUnshared<ITokensService>()));
                 services.RegisterUnshared<IAuthTokensService, AuthTokensService>();
                 services.RegisterUnshared<IEncryptionService>(c => new AesEncryptionService(c
-                    .ResolveForUnshared<IConfigurationSettings>().Platform
+                    .ResolveForPlatform<IConfigurationSettings>()
                     .GetString("ApplicationServices:SSOProvidersService:SSOUserTokens:AesSecret")));
 
                 services.RegisterUnshared<IAPIKeysApplication, APIKeysApplication>();
                 services.RegisterUnshared<IAuthTokensApplication, AuthTokensApplication>();
-                services.RegisterUnshared<IPasswordCredentialsApplication, PasswordCredentialsApplication>();
+                services.RegisterUnshared<IPasswordCredentialsApplication>(c => new PasswordCredentialsApplication(
+                    c.ResolveForUnshared<IRecorder>(),
+                    c.ResolveForUnshared<IIdentifierFactory>(),
+                    c.ResolveForUnshared<IEndUsersService>(),
+                    c.ResolveForUnshared<INotificationsService>(),
+                    c.ResolveForPlatform<IConfigurationSettings>(),
+                    c.ResolveForUnshared<IEmailAddressService>(),
+                    c.ResolveForUnshared<ITokensService>(),
+                    c.ResolveForUnshared<IPasswordHasherService>(),
+                    c.ResolveForUnshared<IAuthTokensService>(),
+                    c.ResolveForUnshared<IWebsiteUiService>(),
+                    c.ResolveForUnshared<IPasswordCredentialsRepository>()));
                 services.RegisterUnshared<IMachineCredentialsApplication, MachineCredentialsApplication>();
                 services.RegisterUnshared<ISingleSignOnApplication, SingleSignOnApplication>();
                 services.RegisterUnshared<IPasswordCredentialsRepository>(c => new PasswordCredentialsRepository(

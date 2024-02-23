@@ -95,7 +95,6 @@ public sealed class Membership : EntityBase
                 }
 
                 Features = feature.Value;
-
                 return Result.Ok;
             }
 

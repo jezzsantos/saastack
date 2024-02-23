@@ -47,7 +47,7 @@ public class SingleSignOnApplication : ISingleSignOnApplication
 
         var userInfo = authenticated.Value;
         var userExists =
-            await _endUsersService.FindPersonByEmailAsync(context, userInfo.EmailAddress, cancellationToken);
+            await _endUsersService.FindPersonByEmailPrivateAsync(context, userInfo.EmailAddress, cancellationToken);
         if (!userExists.IsSuccessful)
         {
             return userExists.Error;
@@ -56,7 +56,7 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         string registeredUserId;
         if (!userExists.Value.HasValue)
         {
-            var autoRegistered = await _endUsersService.RegisterPersonAsync(context, userInfo.EmailAddress,
+            var autoRegistered = await _endUsersService.RegisterPersonPrivateAsync(context, userInfo.EmailAddress,
                 userInfo.FirstName, userInfo.LastName, userInfo.Timezone.ToString(), userInfo.CountryCode.ToString(),
                 true,
                 cancellationToken);
@@ -76,7 +76,8 @@ public class SingleSignOnApplication : ISingleSignOnApplication
             registeredUserId = userExists.Value.Value.Id;
         }
 
-        var registered = await _endUsersService.GetMembershipsAsync(context, registeredUserId, cancellationToken);
+        var registered =
+            await _endUsersService.GetMembershipsPrivateAsync(context, registeredUserId, cancellationToken);
         if (!registered.IsSuccessful)
         {
             return Error.NotAuthenticated();

@@ -222,6 +222,33 @@ namespace Infrastructure.Web.Hosting.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;OrganizationId&apos; of the request is invalid.
+        /// </summary>
+        internal static string MultiTenancyMiddleware_InvalidTenantId {
+            get {
+                return ResourceManager.GetString("MultiTenancyMiddleware_InvalidTenantId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;OrganizationId&apos; is missing from this request.
+        /// </summary>
+        internal static string MultiTenancyMiddleware_MissingTenantId {
+            get {
+                return ResourceManager.GetString("MultiTenancyMiddleware_MissingTenantId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The authenticated user is not a member of organization &apos;{0}&apos;.
+        /// </summary>
+        internal static string MultiTenancyMiddleware_UserNotAMember {
+            get {
+                return ResourceManager.GetString("MultiTenancyMiddleware_UserNotAMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid subscription level.
         /// </summary>
         internal static string RolesAndFeaturesAuthorizationHandler_HandleRequirementAsync_MissingFeature {

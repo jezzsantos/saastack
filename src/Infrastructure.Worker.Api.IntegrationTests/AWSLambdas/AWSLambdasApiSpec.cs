@@ -32,4 +32,13 @@ public class AWSLambdasApiSpec
         {
         }
     }
+
+    [Trait("Category", "Integration.External")]
+    [Collection("AWSLambdas")]
+    public class DeliverProvisioningSpec : DeliverProvisioningSpecBase<AWSLambdaHostSetup>
+    {
+        public DeliverProvisioningSpec(AWSLambdaHostSetup setup) : base(setup)
+        {
+        }
+    }
 }

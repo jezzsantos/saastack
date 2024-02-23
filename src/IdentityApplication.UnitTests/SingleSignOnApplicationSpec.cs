@@ -48,7 +48,7 @@ public class SingleSignOnApplicationSpec
 
         result.Should().BeError(ErrorCode.NotAuthenticated);
         _endUsersService.Verify(
-            eus => eus.FindPersonByEmailAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+            eus => eus.FindPersonByEmailPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -65,7 +65,7 @@ public class SingleSignOnApplicationSpec
 
         result.Should().BeError(ErrorCode.Unexpected, "amessage");
         _endUsersService.Verify(
-            eus => eus.FindPersonByEmailAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+            eus => eus.FindPersonByEmailPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -84,11 +84,12 @@ public class SingleSignOnApplicationSpec
             Id = "anexistinguserid"
         };
         _endUsersService.Setup(eus =>
-                eus.FindPersonByEmailAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                eus.FindPersonByEmailPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(endUser.ToOptional());
         _endUsersService.Setup(eus =>
-                eus.GetMembershipsAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
             .ReturnsAsync(new EndUserWithMemberships
             {
                 Id = "amembershipsuserid",
@@ -105,15 +106,15 @@ public class SingleSignOnApplicationSpec
 
         result.Should().BeError(ErrorCode.NotAuthenticated);
         _endUsersService.Verify(eus =>
-            eus.FindPersonByEmailAsync(_caller.Object, "auser@company.com", It.IsAny<CancellationToken>()));
-        _endUsersService.Verify(eus => eus.RegisterPersonAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+            eus.FindPersonByEmailPrivateAsync(_caller.Object, "auser@company.com", It.IsAny<CancellationToken>()));
+        _endUsersService.Verify(eus => eus.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
             It.IsAny<string>(), It.IsAny<string>(),
             It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()), Times.Never);
         _ssoProvidersService.Verify(
             sps => sps.SaveUserInfoAsync(It.IsAny<string>(), It.IsAny<Identifier>(), It.IsAny<SSOUserInfo>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _endUsersService.Verify(eus =>
-            eus.GetMembershipsAsync(_caller.Object, "anexistinguserid", It.IsAny<CancellationToken>()));
+            eus.GetMembershipsPrivateAsync(_caller.Object, "anexistinguserid", It.IsAny<CancellationToken>()));
         _authTokensService.Verify(
             ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
                 It.IsAny<CancellationToken>()), Times.Never);
@@ -134,11 +135,12 @@ public class SingleSignOnApplicationSpec
             Id = "anexistinguserid"
         };
         _endUsersService.Setup(eus =>
-                eus.FindPersonByEmailAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                eus.FindPersonByEmailPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(endUser.ToOptional());
         _endUsersService.Setup(eus =>
-                eus.GetMembershipsAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
             .ReturnsAsync(new EndUserWithMemberships
             {
                 Id = "amembershipsuserid",
@@ -155,15 +157,15 @@ public class SingleSignOnApplicationSpec
 
         result.Should().BeError(ErrorCode.EntityExists, Resources.SingleSignOnApplication_AccountSuspended);
         _endUsersService.Verify(eus =>
-            eus.FindPersonByEmailAsync(_caller.Object, "auser@company.com", It.IsAny<CancellationToken>()));
-        _endUsersService.Verify(eus => eus.RegisterPersonAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+            eus.FindPersonByEmailPrivateAsync(_caller.Object, "auser@company.com", It.IsAny<CancellationToken>()));
+        _endUsersService.Verify(eus => eus.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
             It.IsAny<string>(), It.IsAny<string>(),
             It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()), Times.Never);
         _ssoProvidersService.Verify(
             sps => sps.SaveUserInfoAsync(It.IsAny<string>(), It.IsAny<Identifier>(), It.IsAny<SSOUserInfo>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _endUsersService.Verify(eus =>
-            eus.GetMembershipsAsync(_caller.Object, "anexistinguserid", It.IsAny<CancellationToken>()));
+            eus.GetMembershipsPrivateAsync(_caller.Object, "anexistinguserid", It.IsAny<CancellationToken>()));
         _authTokensService.Verify(
             ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
                 It.IsAny<CancellationToken>()), Times.Never);
@@ -180,10 +182,10 @@ public class SingleSignOnApplicationSpec
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(userInfo);
         _endUsersService.Setup(eus =>
-                eus.FindPersonByEmailAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                eus.FindPersonByEmailPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(Optional.None<EndUser>());
-        _endUsersService.Setup(eus => eus.RegisterPersonAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+        _endUsersService.Setup(eus => eus.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new RegisteredEndUser
@@ -191,7 +193,8 @@ public class SingleSignOnApplicationSpec
                 Id = "aregistereduserid"
             });
         _endUsersService.Setup(eus =>
-                eus.GetMembershipsAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
             .ReturnsAsync(new EndUserWithMemberships
             {
                 Id = "amembershipsuserid",
@@ -212,13 +215,14 @@ public class SingleSignOnApplicationSpec
         result.Value.RefreshToken.Value.Should().Be("arefreshtoken");
         result.Value.RefreshToken.ExpiresOn.Should().Be(expiresOn);
         _endUsersService.Verify(eus =>
-            eus.FindPersonByEmailAsync(_caller.Object, "auser@company.com", It.IsAny<CancellationToken>()));
-        _endUsersService.Verify(eus => eus.RegisterPersonAsync(_caller.Object, "auser@company.com", "afirstname", null,
+            eus.FindPersonByEmailPrivateAsync(_caller.Object, "auser@company.com", It.IsAny<CancellationToken>()));
+        _endUsersService.Verify(eus => eus.RegisterPersonPrivateAsync(_caller.Object, "auser@company.com", "afirstname",
+            null,
             Timezones.Default.ToString(), CountryCodes.Default.ToString(), true, It.IsAny<CancellationToken>()));
         _ssoProvidersService.Verify(sps => sps.SaveUserInfoAsync("aprovidername", "aregistereduserid".ToId(),
             It.Is<SSOUserInfo>(ui => ui == userInfo), It.IsAny<CancellationToken>()));
         _endUsersService.Verify(eus =>
-            eus.GetMembershipsAsync(_caller.Object, "aregistereduserid", It.IsAny<CancellationToken>()));
+            eus.GetMembershipsPrivateAsync(_caller.Object, "aregistereduserid", It.IsAny<CancellationToken>()));
         _authTokensService.Verify(ats => ats.IssueTokensAsync(_caller.Object, It.Is<EndUserWithMemberships>(eu =>
             eu.Id == "amembershipsuserid"
         ), It.IsAny<CancellationToken>()));
@@ -239,11 +243,12 @@ public class SingleSignOnApplicationSpec
             Id = "anexistinguserid"
         };
         _endUsersService.Setup(eus =>
-                eus.FindPersonByEmailAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                eus.FindPersonByEmailPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(endUser.ToOptional());
         _endUsersService.Setup(eus =>
-                eus.GetMembershipsAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
             .ReturnsAsync(new EndUserWithMemberships
             {
                 Id = "amembershipsuserid",
@@ -264,14 +269,14 @@ public class SingleSignOnApplicationSpec
         result.Value.RefreshToken.Value.Should().Be("arefreshtoken");
         result.Value.RefreshToken.ExpiresOn.Should().Be(expiresOn);
         _endUsersService.Verify(eus =>
-            eus.FindPersonByEmailAsync(_caller.Object, "auser@company.com", It.IsAny<CancellationToken>()));
-        _endUsersService.Verify(eus => eus.RegisterPersonAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+            eus.FindPersonByEmailPrivateAsync(_caller.Object, "auser@company.com", It.IsAny<CancellationToken>()));
+        _endUsersService.Verify(eus => eus.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
             It.IsAny<string>(), It.IsAny<string>(),
             It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()), Times.Never);
         _ssoProvidersService.Verify(sps => sps.SaveUserInfoAsync("aprovidername", "anexistinguserid".ToId(),
             It.Is<SSOUserInfo>(ui => ui == userInfo), It.IsAny<CancellationToken>()));
         _endUsersService.Verify(eus =>
-            eus.GetMembershipsAsync(_caller.Object, "anexistinguserid", It.IsAny<CancellationToken>()));
+            eus.GetMembershipsPrivateAsync(_caller.Object, "anexistinguserid", It.IsAny<CancellationToken>()));
         _authTokensService.Verify(ats => ats.IssueTokensAsync(_caller.Object, It.Is<EndUserWithMemberships>(eu =>
             eu.Id == "amembershipsuserid"
         ), It.IsAny<CancellationToken>()));

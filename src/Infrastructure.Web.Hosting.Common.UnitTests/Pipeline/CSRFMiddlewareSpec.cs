@@ -61,7 +61,7 @@ public class CSRFMiddlewareSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAsyncAndMissingHostName_ThenReturnsError()
+    public async Task WhenInvokeAsyncAndMissingHostName_ThenRespondsWithAProblem()
     {
         var context = SetupContext();
         _hostSettings.Setup(s => s.GetWebsiteHostBaseUrl()).Returns("notauri");
@@ -74,7 +74,7 @@ public class CSRFMiddlewareSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAsyncAndMissingCookie_ThenReturnsError()
+    public async Task WhenInvokeAsyncAndMissingCookie_ThenRespondsWithAProblem()
     {
         var context = SetupContext();
 
@@ -86,7 +86,7 @@ public class CSRFMiddlewareSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAsyncAndMissingHeader_ThenReturnsError()
+    public async Task WhenInvokeAsyncAndMissingHeader_ThenRespondsWithAProblem()
     {
         var context = SetupContext();
         context.Request.Cookies = SetupCookies(new Dictionary<string, string>
@@ -100,7 +100,7 @@ public class CSRFMiddlewareSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAsyncAndAuthTokenIsInvalid_ThenReturnsError()
+    public async Task WhenInvokeAsyncAndAuthTokenIsInvalid_ThenRespondsWithAProblem()
     {
         var context = SetupContext();
         context.Request.Cookies = SetupCookies(new Dictionary<string, string>
@@ -118,7 +118,7 @@ public class CSRFMiddlewareSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAsyncAndTokenNotContainUserIdClaim_ThenReturnsError()
+    public async Task WhenInvokeAsyncAndTokenNotContainUserIdClaim_ThenRespondsWithAProblem()
     {
         var tokenWithoutUserClaim = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
             claims: new Claim[] { }
@@ -139,7 +139,7 @@ public class CSRFMiddlewareSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAsyncAndTokensNotVerifiedForNoUser_ThenReturnsError()
+    public async Task WhenInvokeAsyncAndTokensNotVerifiedForNoUser_ThenRespondsWithAProblem()
     {
         var context = SetupContext();
         context.Request.Cookies = SetupCookies(new Dictionary<string, string>
@@ -162,7 +162,7 @@ public class CSRFMiddlewareSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAsyncAndTokensNotVerifiedForUser_ThenReturnsError()
+    public async Task WhenInvokeAsyncAndTokensNotVerifiedForUser_ThenRespondsWithAProblem()
     {
         var tokenForUser = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
             claims: new Claim[]
@@ -191,7 +191,7 @@ public class CSRFMiddlewareSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAsyncAndTokensIsVerifiedButNoOriginAndNoReferer_ThenReturnsError()
+    public async Task WhenInvokeAsyncAndTokensIsVerifiedButNoOriginAndNoReferer_ThenRespondsWithAProblem()
     {
         var tokenForUser = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
             claims: new Claim[]
@@ -222,7 +222,7 @@ public class CSRFMiddlewareSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAsyncAndTokensIsVerifiedButOriginNotHost_ThenReturnsError()
+    public async Task WhenInvokeAsyncAndTokensIsVerifiedButOriginNotHost_ThenRespondsWithAProblem()
     {
         var tokenForUser = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
             claims: new Claim[]
@@ -253,7 +253,7 @@ public class CSRFMiddlewareSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAsyncAndTokensIsVerifiedButRefererNotHost_ThenReturnsError()
+    public async Task WhenInvokeAsyncAndTokensIsVerifiedButRefererNotHost_ThenRespondsWithAProblem()
     {
         var tokenForUser = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
             claims: new Claim[]

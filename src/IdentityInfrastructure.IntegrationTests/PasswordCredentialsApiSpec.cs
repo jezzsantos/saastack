@@ -45,7 +45,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
         result.Content.Value.Credential.User.Features.Should()
             .ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
         result.Content.Value.Credential.User.Profile!.Id.Should().Be(result.Content.Value.Credential.User.Id);
-        result.Content.Value.Credential.User.Profile!.DefaultOrganisationId.Should().BeNull();
+        result.Content.Value.Credential.User.Profile!.DefaultOrganizationId.Should().NotBeNullOrEmpty();
         result.Content.Value.Credential.User.Profile!.Name.FirstName.Should().Be("afirstname");
         result.Content.Value.Credential.User.Profile!.Name.LastName.Should().Be("alastname");
         result.Content.Value.Credential.User.Profile!.DisplayName.Should().Be("afirstname");

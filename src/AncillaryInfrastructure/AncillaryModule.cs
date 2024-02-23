@@ -71,9 +71,13 @@ public class AncillaryModule : ISubDomainModule
                     c => new EmailDeliveryProjection(c.ResolveForUnshared<IRecorder>(),
                         c.ResolveForUnshared<IDomainFactory>(),
                         c.ResolveForPlatform<IDataStore>()));
+                services.RegisterUnshared<IProvisioningMessageQueue>(c =>
+                    new ProvisioningMessageQueue(c.Resolve<IRecorder>(), c.Resolve<IMessageQueueIdFactory>(),
+                        c.ResolveForPlatform<IQueueStore>()));
 
                 services.RegisterUnshared<IUsageDeliveryService, NullUsageDeliveryService>();
                 services.RegisterUnshared<IEmailDeliveryService, NullEmailDeliveryService>();
+                services.RegisterUnshared<IProvisioningDeliveryService, OrganizationProvisioningDeliveryService>();
             };
         }
     }

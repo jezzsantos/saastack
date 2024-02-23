@@ -102,14 +102,16 @@ public class APIKeysApplicationSpec
         _repository.Setup(rep => rep.FindByAPIKeyTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<APIKeyRoot>, Error>>(apiKey.ToOptional()));
         _endUsersService.Setup(eus =>
-                eus.GetMembershipsAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<EndUserWithMemberships, Error>>(Error.EntityNotFound()));
 
         var result =
             await _application.FindMembershipsForAPIKeyAsync(_caller.Object, "anapikey", CancellationToken.None);
 
         result.Value.Should().BeNone();
-        _endUsersService.Verify(eus => eus.GetMembershipsAsync(_caller.Object, "auserid", CancellationToken.None));
+        _endUsersService.Verify(
+            eus => eus.GetMembershipsPrivateAsync(_caller.Object, "auserid", CancellationToken.None));
     }
 
     [Fact]
@@ -123,14 +125,16 @@ public class APIKeysApplicationSpec
             Id = "auserid"
         };
         _endUsersService.Setup(eus =>
-                eus.GetMembershipsAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<EndUserWithMemberships, Error>>(user));
 
         var result =
             await _application.FindMembershipsForAPIKeyAsync(_caller.Object, "anapikey", CancellationToken.None);
 
         result.Value.Value.Id.Should().Be("auserid");
-        _endUsersService.Verify(eus => eus.GetMembershipsAsync(_caller.Object, "auserid", CancellationToken.None));
+        _endUsersService.Verify(
+            eus => eus.GetMembershipsPrivateAsync(_caller.Object, "auserid", CancellationToken.None));
     }
 
 #if TESTINGONLY

@@ -26,9 +26,9 @@ public class AWSLambdaHostSetup : IApiWorkerSpec, IDisposable
 
     public AWSLambdaHostSetup()
     {
-        var settings = new AspNetConfigurationSettings(new ConfigurationBuilder()
+        var settings = new AspNetDynamicConfigurationSettings(new ConfigurationBuilder()
             .AddJsonFile("appsettings.Testing.json", true)
-            .Build()).Platform;
+            .Build());
         var recorder = NullRecorder.Instance;
         QueueStore = AWSSQSQueueStore.Create(recorder, settings);
         AWSAccountBase.InitializeAllTests();

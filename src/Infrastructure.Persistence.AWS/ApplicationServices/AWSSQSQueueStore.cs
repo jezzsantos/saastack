@@ -19,7 +19,7 @@ public class AWSSQSQueueStore : IQueueStore
     private readonly IRecorder _recorder;
     private readonly IAmazonSQS _serviceClient;
 
-    public static AWSSQSQueueStore Create(IRecorder recorder, ISettings settings)
+    public static AWSSQSQueueStore Create(IRecorder recorder, IConfigurationSettings settings)
     {
         var (credentials, regionEndpoint) = settings.GetConnection();
         if (regionEndpoint.Exists())

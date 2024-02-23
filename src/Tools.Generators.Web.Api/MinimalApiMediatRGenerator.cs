@@ -19,10 +19,11 @@ public class MinimalApiMediatRGenerator : ISourceGenerator
     private const string RegistrationClassName = "MinimalApiRegistration";
     private const string TestingOnlyDirective = "TESTINGONLY";
 
+    // ReSharper disable once UseCollectionExpression
     private static readonly string[] RequiredUsingNamespaces =
     {
         "System", "Microsoft.AspNetCore.Builder", "Microsoft.AspNetCore.Http",
-        "Infrastructure.Web.Api.Common.Extensions"
+        "Microsoft.Extensions.DependencyInjection", "Infrastructure.Web.Api.Common.Extensions"
     };
 
     public void Initialize(GeneratorInitializationContext context)
@@ -102,12 +103,11 @@ namespace {assemblyNamespace}
         var prefix = basePath.HasValue()
             ? $"\"{basePath}\""
             : "string.Empty";
+
+        var endpointFilters = BuildEndpointFilters(serviceRegistrations);
         endpointRegistrations.AppendLine($@"        var {groupName} = app.MapGroup({prefix})
                 .WithGroupName(""{serviceClassName}"")
-                .RequireCors(""{WebHostingConstants.DefaultCORSPolicyName}"")
-                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ApiUsageFilter>()
-                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.RequestCorrelationFilter>()
-                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.ContentNegotiationFilter>();");
+                .RequireCors(""{WebHostingConstants.DefaultCORSPolicyName}""){endpointFilters};");
 
         foreach (var registration in serviceRegistrations)
         {
@@ -126,12 +126,12 @@ namespace {assemblyNamespace}
                     || registration.OperationType == ServiceOperation.Delete)
                 {
                     endpointRegistrations.AppendLine(
-                        $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDtoType.FullName} request) =>");
+                        $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDtoName.FullName} request) =>");
                 }
                 else
                 {
                     endpointRegistrations.AppendLine(
-                        $"                async (global::MediatR.IMediator mediator, global::{registration.RequestDtoType.FullName} request) =>");
+                        $"                async (global::MediatR.IMediator mediator, global::{registration.RequestDtoName.FullName} request) =>");
                 }
 
                 endpointRegistrations.Append(
@@ -170,6 +170,45 @@ namespace {assemblyNamespace}
         }
     }
 
+    private static string BuildEndpointFilters(
+        IGrouping<WebApiAssemblyVisitor.TypeName, WebApiAssemblyVisitor.ServiceOperationRegistration>
+            serviceRegistrations)
+    {
+        var filterSet = new List<string>
+        {
+            "global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter",
+            "global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter",
+            "global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter"
+        };
+        var isMultiTenanted = serviceRegistrations.Any(registration => registration.IsRequestDtoTenanted);
+        if (isMultiTenanted)
+        {
+            filterSet.Insert(0, "global::Infrastructure.Web.Api.Common.Endpoints.MultiTenancyFilter");
+        }
+
+        var builder = new StringBuilder();
+        var counter = filterSet.Count;
+        if (filterSet.HasAny())
+        {
+            builder.AppendLine();
+            filterSet.ForEach(filter =>
+            {
+                counter--;
+                var value = $"                .AddEndpointFilter<{filter}>()";
+                if (counter == 0)
+                {
+                    builder.Append(value);
+                }
+                else
+                {
+                    builder.AppendLine(value);
+                }
+            });
+        }
+
+        return builder.ToString();
+    }
+
     private static void BuildHandlerClasses(
         IGrouping<WebApiAssemblyVisitor.TypeName, WebApiAssemblyVisitor.ServiceOperationRegistration>
             serviceRegistrations, StringBuilder handlerClasses)
@@ -180,7 +219,7 @@ namespace {assemblyNamespace}
 
         foreach (var registration in serviceRegistrations)
         {
-            var handlerClassName = $"{registration.MethodName}_{registration.RequestDtoType.Name}_Handler";
+            var handlerClassName = $"{registration.MethodName}_{registration.RequestDtoName.Name}_Handler";
             var constructorAndFields = BuildInjectorConstructorAndFields(handlerClassName,
                 registration.Class.Constructors.ToList());
 
@@ -190,7 +229,7 @@ namespace {assemblyNamespace}
             }
 
             handlerClasses.AppendLine(
-                $"    public class {handlerClassName} : global::MediatR.IRequestHandler<global::{registration.RequestDtoType.FullName},"
+                $"    public class {handlerClassName} : global::MediatR.IRequestHandler<global::{registration.RequestDtoName.FullName},"
                 + $" global::Microsoft.AspNetCore.Http.IResult>");
             handlerClasses.AppendLine("    {");
             if (constructorAndFields.HasValue())
@@ -199,7 +238,7 @@ namespace {assemblyNamespace}
             }
 
             handlerClasses.AppendLine($"        public async Task<global::Microsoft.AspNetCore.Http.IResult>"
-                                      + $" Handle(global::{registration.RequestDtoType.FullName} request, global::System.Threading.CancellationToken cancellationToken)");
+                                      + $" Handle(global::{registration.RequestDtoName.FullName} request, global::System.Threading.CancellationToken cancellationToken)");
             handlerClasses.AppendLine("        {");
             if (!registration.IsAsync)
             {
@@ -207,7 +246,21 @@ namespace {assemblyNamespace}
                     "            await Task.CompletedTask;");
             }
 
-            var callingParameters = BuildInjectedParameters(registration.Class.Constructors.ToList());
+            var callingParameters = string.Empty;
+            var injectorCtor = registration.Class.Constructors.FirstOrDefault(ctor => ctor.IsInjectionCtor);
+            if (injectorCtor is not null)
+            {
+                var parameters = injectorCtor.CtorParameters.ToList();
+                foreach (var param in parameters)
+                {
+                    handlerClasses.AppendLine(
+                        $"            var {param.VariableName} = _serviceProvider.GetRequiredService<{param.TypeName.FullName}>();");
+                }
+
+                handlerClasses.AppendLine();
+                callingParameters = BuildInjectedParameters(registration.Class.Constructors.ToList());
+            }
+
             handlerClasses.AppendLine(
                 $"            var api = new global::{registration.Class.TypeName.FullName}({callingParameters});");
             var asyncAwait = registration.IsAsync
@@ -242,33 +295,13 @@ namespace {assemblyNamespace}
         var injectorCtor = constructors.FirstOrDefault(ctor => ctor.IsInjectionCtor);
         if (injectorCtor is not null)
         {
-            var parameters = injectorCtor.CtorParameters.ToList();
-            foreach (var param in parameters)
-            {
-                handlerClassConstructorAndFields.AppendLine(
-                    $"        private readonly global::{param.TypeName.FullName} _{param.VariableName};");
-            }
-
+            handlerClassConstructorAndFields.AppendLine(
+                "        private readonly global::System.IServiceProvider _serviceProvider;");
             handlerClassConstructorAndFields.AppendLine();
-            handlerClassConstructorAndFields.Append($"        public {handlerClassName}(");
-            var paramsRemaining = parameters.Count();
-            foreach (var param in parameters)
-            {
-                handlerClassConstructorAndFields.Append($"global::{param.TypeName.FullName} {param.VariableName}");
-                if (--paramsRemaining > 0)
-                {
-                    handlerClassConstructorAndFields.Append(", ");
-                }
-            }
-
-            handlerClassConstructorAndFields.AppendLine(")");
+            handlerClassConstructorAndFields.AppendLine(
+                $"        public {handlerClassName}(global::System.IServiceProvider serviceProvider)");
             handlerClassConstructorAndFields.AppendLine("        {");
-            foreach (var param in parameters)
-            {
-                handlerClassConstructorAndFields.AppendLine(
-                    $"            this._{param.VariableName} = {param.VariableName};");
-            }
-
+            handlerClassConstructorAndFields.AppendLine("            _serviceProvider = serviceProvider;");
             handlerClassConstructorAndFields.AppendLine("        }");
         }
 
@@ -287,7 +320,7 @@ namespace {assemblyNamespace}
             var paramsRemaining = parameters.Count();
             foreach (var param in parameters)
             {
-                methodParameters.Append($"this._{param.VariableName}");
+                methodParameters.Append($"{param.VariableName}");
                 if (--paramsRemaining > 0)
                 {
                     methodParameters.Append(", ");

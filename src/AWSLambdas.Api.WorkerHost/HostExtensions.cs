@@ -23,7 +23,7 @@ public static class HostExtensions
     public static void AddDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHttpClient();
-        services.AddSingleton<IConfigurationSettings>(new AspNetConfigurationSettings(configuration));
+        services.AddSingleton<IConfigurationSettings>(new AspNetDynamicConfigurationSettings(configuration));
         services.AddSingleton<IHostSettings, HostSettings>();
         services.AddSingleton<IFeatureFlags, EmptyFeatureFlags>();
 
@@ -46,5 +46,6 @@ public static class HostExtensions
         services.AddSingleton<IQueueMonitoringApiRelayWorker<UsageMessage>, DeliverUsageRelayWorker>();
         services.AddSingleton<IQueueMonitoringApiRelayWorker<AuditMessage>, DeliverAuditRelayWorker>();
         services.AddSingleton<IQueueMonitoringApiRelayWorker<EmailMessage>, DeliverEmailRelayWorker>();
+        services.AddSingleton<IQueueMonitoringApiRelayWorker<ProvisioningMessage>, DeliverProvisioningRelayWorker>();
     }
 }

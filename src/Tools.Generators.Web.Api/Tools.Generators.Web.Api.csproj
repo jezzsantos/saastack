@@ -40,6 +40,9 @@
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebResponse.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebResponse.cs</Link>
         </Compile>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\ITenantedRequest.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\ITenantedRequest.cs</Link>
+        </Compile>
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\WebServiceAttribute.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\WebServiceAttribute.cs</Link>
         </Compile>

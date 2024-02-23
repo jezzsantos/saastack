@@ -8,7 +8,7 @@ namespace Infrastructure.Persistence.AWS.Extensions;
 public static class SettingsExtensions
 {
     public static (BasicAWSCredentials Credentials, RegionEndpoint? RegionEndPoint) GetConnection(
-        this ISettings settings)
+        this IConfigurationSettings settings)
     {
         var accessKey = settings.GetString(AWSConstants.AccessKeySettingName);
         var secretKey = settings.GetString(AWSConstants.SecretKeySettingName);

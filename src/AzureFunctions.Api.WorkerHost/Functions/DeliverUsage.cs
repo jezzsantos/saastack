@@ -1,6 +1,6 @@
-﻿using Application.Persistence.Shared.ReadModels;
+﻿using Application.Interfaces;
+using Application.Persistence.Shared.ReadModels;
 using Infrastructure.Workers.Api;
-using Infrastructure.Workers.Api.Workers;
 using Microsoft.Azure.Functions.Worker;
 
 namespace AzureFunctions.Api.WorkerHost.Functions;
@@ -15,7 +15,7 @@ public sealed class DeliverUsage
     }
 
     [Function(nameof(DeliverUsage))]
-    public Task Run([QueueTrigger(DeliverUsageRelayWorker.QueueName)] UsageMessage message,
+    public Task Run([QueueTrigger(WorkerConstants.Queues.Usages)] UsageMessage message,
         FunctionContext context)
     {
         return _worker.RelayMessageOrThrowAsync(message, context.CancellationToken);

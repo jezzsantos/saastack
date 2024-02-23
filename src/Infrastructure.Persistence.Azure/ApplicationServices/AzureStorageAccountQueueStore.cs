@@ -27,7 +27,7 @@ public class AzureStorageAccountQueueStore : IQueueStore
     private readonly Dictionary<string, bool> _queueExistenceChecks = new();
     private readonly IRecorder _recorder;
 
-    public static AzureStorageAccountQueueStore Create(IRecorder recorder, ISettings settings)
+    public static AzureStorageAccountQueueStore Create(IRecorder recorder, IConfigurationSettings settings)
     {
         var accountKey = settings.GetString(AccountKeySettingName);
         var accountName = settings.GetString(AccountNameSettingName);

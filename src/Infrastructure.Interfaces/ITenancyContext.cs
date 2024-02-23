@@ -1,3 +1,5 @@
+using Application.Interfaces.Services;
+
 namespace Infrastructure.Interfaces;
 
 /// <summary>
@@ -7,7 +9,7 @@ public interface ITenancyContext
 {
     string? Current { get; }
 
-    public IReadOnlyDictionary<string, object> Settings { get; }
+    public TenantSettings Settings { get; }
 
-    void Set(string id, Dictionary<string, object> settings);
+    void Set(string id, TenantSettings settings);
 }

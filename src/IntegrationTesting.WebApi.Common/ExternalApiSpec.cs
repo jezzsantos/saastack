@@ -72,7 +72,8 @@ public class ExternalApiSetup : IDisposable
             })
             .ConfigureServices((context, services) =>
             {
-                services.AddSingleton<IConfigurationSettings>(new AspNetConfigurationSettings(context.Configuration));
+                services.AddSingleton<IConfigurationSettings>(
+                    new AspNetDynamicConfigurationSettings(context.Configuration));
                 if (_overridenTestingDependencies.Exists())
                 {
                     _overridenTestingDependencies.Invoke(services);

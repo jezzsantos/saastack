@@ -105,6 +105,8 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 {
     private const string DotNetCommandLineWithLaunchProfileArgumentsFormat =
         "run --no-build --configuration {0} --launch-profile {1} --project {2}";
+
+    private const string PasswordForPerson = "1Password!";
     private const string WebServerBaseUrlFormat = "https://localhost:{0}/";
     protected readonly IHttpJsonClient Api;
     protected readonly IHttpClient HttpApi;
@@ -175,28 +177,21 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 
     protected async Task<LoginDetails> LoginUserAsync(LoginUser who = LoginUser.PersonA)
     {
-        var emailAddress = who switch
-        {
-            LoginUser.PersonA => "person.a@company.com",
-            LoginUser.PersonB => "person.b@company.com",
-            LoginUser.Operator => "operator@company.com",
-            _ => throw new ArgumentOutOfRangeException(nameof(who), who, null)
-        };
+        var emailAddress = GetEmailForPerson(who);
         var firstName = who switch
         {
-            LoginUser.PersonA => "aperson",
-            LoginUser.PersonB => "bperson",
+            LoginUser.PersonA => "persona",
+            LoginUser.PersonB => "personb",
             LoginUser.Operator => "operator",
             _ => throw new ArgumentOutOfRangeException(nameof(who), who, null)
         };
 
-        const string password = "1Password!";
         var person = await Api.PostAsync(new RegisterPersonPasswordRequest
         {
             EmailAddress = emailAddress,
             FirstName = firstName,
             LastName = "alastname",
-            Password = password,
+            Password = PasswordForPerson,
             TermsAndConditionsAccepted = true
         });
 
@@ -206,15 +201,22 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
             Token = token!
         });
 
+        return await ReAuthenticateUserAsync(person.Content.Value.Credential!.User, who);
+    }
+
+    protected async Task<LoginDetails> ReAuthenticateUserAsync(RegisteredEndUser user,
+        LoginUser who = LoginUser.PersonA)
+    {
+        var emailAddress = GetEmailForPerson(who);
+
         var login = await Api.PostAsync(new AuthenticatePasswordRequest
         {
             Username = emailAddress,
-            Password = password
+            Password = PasswordForPerson
         });
 
         var accessToken = login.Content.Value.Tokens!.AccessToken.Value;
         var refreshToken = login.Content.Value.Tokens.RefreshToken.Value;
-        var user = person.Content.Value.Credential!.User;
 
         return new LoginDetails(accessToken, refreshToken, user);
     }
@@ -252,6 +254,17 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         }
 
         _additionalServerProcesses.Add(process.Id);
+    }
+
+    private static string GetEmailForPerson(LoginUser who)
+    {
+        return who switch
+        {
+            LoginUser.PersonA => "person.a@company.com",
+            LoginUser.PersonB => "person.b@company.com",
+            LoginUser.Operator => "operator@company.com",
+            _ => throw new ArgumentOutOfRangeException(nameof(who), who, null)
+        };
     }
 
     private static void ShutdownProcess(int processId)

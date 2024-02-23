@@ -90,7 +90,8 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         }
 
         var credentials = retrieved.Value.Value;
-        var registered = await _endUsersService.GetMembershipsAsync(context, credentials.UserId, cancellationToken);
+        var registered =
+            await _endUsersService.GetMembershipsPrivateAsync(context, credentials.UserId, cancellationToken);
         if (!registered.IsSuccessful)
         {
             return Error.NotAuthenticated();
@@ -192,7 +193,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         bool termsAndConditionsAccepted,
         CancellationToken cancellationToken)
     {
-        var registered = await _endUsersService.RegisterPersonAsync(context, emailAddress, firstName, lastName,
+        var registered = await _endUsersService.RegisterPersonPrivateAsync(context, emailAddress, firstName, lastName,
             timezone, countryCode, termsAndConditionsAccepted, cancellationToken);
         if (!registered.IsSuccessful)
         {

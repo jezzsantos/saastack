@@ -60,29 +60,56 @@ namespace Infrastructure.Hosting.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The setting &apos;{0}&apos; cannot be found in any configuration.
+        ///   Looks up a localized string similar to The setting &apos;{0}&apos; cannot be found in tenant settings nor in platform settings.
         /// </summary>
-        internal static string AspNetConfigurationSettings_KeyNotFound {
+        internal static string AspNetDynamicConfigurationSettings_EitherSettings_KeyNotFound {
             get {
-                return ResourceManager.GetString("AspNetConfigurationSettings_KeyNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The setting &apos;{0}&apos; exists, but is not a recognizable boolean value.
-        /// </summary>
-        internal static string AspNetConfigurationSettings_ValueNotBoolean {
-            get {
-                return ResourceManager.GetString("AspNetConfigurationSettings_ValueNotBoolean", resourceCulture);
+                return ResourceManager.GetString("AspNetDynamicConfigurationSettings_EitherSettings_KeyNotFound", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The setting &apos;{0}&apos; exists, but is not a recognizable number value.
         /// </summary>
-        internal static string AspNetConfigurationSettings_ValueNotNumber {
+        internal static string AspNetDynamicConfigurationSettings_NoTenantSettings {
             get {
-                return ResourceManager.GetString("AspNetConfigurationSettings_ValueNotNumber", resourceCulture);
+                return ResourceManager.GetString("AspNetDynamicConfigurationSettings_NoTenantSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The setting &apos;{0}&apos; cannot be found in platform settings.
+        /// </summary>
+        internal static string AspNetDynamicConfigurationSettings_PlatformSettings_KeyNotFound {
+            get {
+                return ResourceManager.GetString("AspNetDynamicConfigurationSettings_PlatformSettings_KeyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The setting &apos;{0}&apos; cannot be found in tenant settings.
+        /// </summary>
+        internal static string AspNetDynamicConfigurationSettings_TenantSettings_KeyNotFound {
+            get {
+                return ResourceManager.GetString("AspNetDynamicConfigurationSettings_TenantSettings_KeyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The setting &apos;{0}&apos; exists, but is not a recognizable boolean value.
+        /// </summary>
+        internal static string AspNetDynamicConfigurationSettings_ValueNotBoolean {
+            get {
+                return ResourceManager.GetString("AspNetDynamicConfigurationSettings_ValueNotBoolean", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The setting &apos;{0}&apos; exists, but is not a recognizable number value.
+        /// </summary>
+        internal static string AspNetDynamicConfigurationSettings_ValueNotNumber {
+            get {
+                return ResourceManager.GetString("AspNetDynamicConfigurationSettings_ValueNotNumber", resourceCulture);
             }
         }
         

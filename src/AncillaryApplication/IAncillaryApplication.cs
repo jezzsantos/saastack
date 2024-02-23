@@ -13,6 +13,9 @@ public interface IAncillaryApplication
     Task<Result<bool, Error>> DeliverEmailAsync(ICallerContext context, string messageAsJson,
         CancellationToken cancellationToken);
 
+    Task<Result<bool, Error>> DeliverProvisioningAsync(ICallerContext context, string messageAsJson,
+        CancellationToken cancellationToken);
+
     Task<Result<bool, Error>> DeliverUsageAsync(ICallerContext context, string messageAsJson,
         CancellationToken cancellationToken);
 
@@ -22,6 +25,10 @@ public interface IAncillaryApplication
 
 #if TESTINGONLY
     Task<Result<Error>> DrainAllEmailsAsync(ICallerContext context, CancellationToken cancellationToken);
+#endif
+
+#if TESTINGONLY
+    Task<Result<Error>> DrainAllProvisioningsAsync(ICallerContext context, CancellationToken cancellationToken);
 #endif
 
 #if TESTINGONLY

@@ -417,7 +417,7 @@ public sealed class EndUserRoot : AggregateRootBase
     /// <summary>
     ///     EXTEND: change this to assign initial roles and features for persons and machines
     /// </summary>
-    public (Roles PlatformRoles, Features PlatformFeatures, Roles TenantRoles, Features TenantFeatures)
+    public static (Roles PlatformRoles, Features PlatformFeatures, Roles TenantRoles, Features TenantFeatures)
         GetInitialRolesAndFeatures(UserClassification classification, bool isAuthenticated,
             Optional<EmailAddress> username, Optional<List<EmailAddress>> permittedOperators)
     {
@@ -481,5 +481,10 @@ public sealed class EndUserRoot : AggregateRootBase
         }
 
         return retrieved.Value.Roles.HasRole(TenantRoles.Owner);
+    }
+
+    public Optional<Membership> FindMembership(Identifier organizationId)
+    {
+        return Memberships.FindByOrganizationId(organizationId);
     }
 }

@@ -20,7 +20,8 @@ public class BookingsModule : ISubDomainModule
 
     public Dictionary<Type, string> AggregatePrefixes => new()
     {
-        { typeof(BookingRoot), "booking" }
+        { typeof(BookingRoot), "booking" },
+        { typeof(TripEntity), "trip" }
     };
 
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware

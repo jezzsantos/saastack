@@ -126,7 +126,7 @@ public static class ServiceCollectionExtensions
 
     /// <summary>
     ///     Registers an instance of the <see cref="TService" /> as per request (scoped),
-    ///     only for services that must be initialized for tenanted services
+    ///     only for services that must be initialized for each HTTP request
     /// </summary>
     public static IServiceCollection RegisterTenanted<TService>(this IServiceCollection services,
         Func<IServiceProvider, TService> implementationFactory)
@@ -138,7 +138,7 @@ public static class ServiceCollectionExtensions
 
     /// <summary>
     ///     Registers an instance of the <see cref="TService" /> as per request (scoped),
-    ///     only for services that must be initialized for tenanted services
+    ///     only for services that must be initialized for each HTTP request
     /// </summary>
     public static IServiceCollection RegisterTenanted<TService,
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
@@ -153,7 +153,7 @@ public static class ServiceCollectionExtensions
 
     /// <summary>
     ///     Registers an instance of the <see cref="TService" /> as per request (scoped),
-    ///     only for services that must be initialized for tenanted services
+    ///     only for services that must be initialized for each HTTP request
     /// </summary>
     public static IServiceCollection RegisterTenanted(this IServiceCollection services,
         Type serviceType, Func<IServiceProvider, object> implementationFactory)
@@ -165,7 +165,7 @@ public static class ServiceCollectionExtensions
     /// <summary>
     ///     Registers the <see cref="implementationFactory" /> for the specified interfaces:
     ///     <see cref="TService1" />, <see cref="TService2" />, <see cref="TService3" /> and <see cref="TService4" />
-    ///     as per request (scoped), only for services that must be initialized for tenanted services
+    ///     as per request (scoped), only for services that must be initialized for each HTTP request
     /// </summary>
     public static IServiceCollection RegisterTenanted<TService1, TService2, TService3, TService4, TImplementation>(
         this IServiceCollection services, Func<IServiceProvider, TImplementation> implementationFactory)

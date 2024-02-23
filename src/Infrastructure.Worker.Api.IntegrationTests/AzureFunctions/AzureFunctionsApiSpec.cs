@@ -32,4 +32,13 @@ public class AzureFunctionsApiSpec
         {
         }
     }
+
+    [Trait("Category", "Integration.External")]
+    [Collection("AzureFunctions")]
+    public class DeliverProvisioningSpec : DeliverProvisioningSpecBase<AzureFunctionHostSetup>
+    {
+        public DeliverProvisioningSpec(AzureFunctionHostSetup setup) : base(setup)
+        {
+        }
+    }
 }

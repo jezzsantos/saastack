@@ -6,7 +6,7 @@ public class HostOptions
 {
     public static readonly HostOptions BackEndAncillaryApiHost = new("BackendWithAncillaryAPI")
     {
-        IsMultiTenanted = false, //TODO: change for multi-tenanted
+        IsMultiTenanted = true,
         Persistence = new PersistenceOptions
         {
             UsesQueues = true,
@@ -16,7 +16,7 @@ public class HostOptions
     };
     public static readonly HostOptions BackEndApiHost = new("BackendAPI")
     {
-        IsMultiTenanted = false, //TODO: change for multi-tenanted
+        IsMultiTenanted = true,
         Persistence = new PersistenceOptions
         {
             UsesQueues = true,
@@ -27,7 +27,7 @@ public class HostOptions
 
     public static readonly HostOptions BackEndForFrontEndWebHost = new("FrontendSite")
     {
-        IsMultiTenanted = false, //TODO: change for multi-tenanted
+        IsMultiTenanted = false,
         Persistence = new PersistenceOptions
         {
             UsesQueues = false,
@@ -38,7 +38,7 @@ public class HostOptions
 
     public static readonly HostOptions TestingStubsHost = new("TestingStubs")
     {
-        IsMultiTenanted = false, //TODO: change for multi-tenanted
+        IsMultiTenanted = false,
         Persistence = new PersistenceOptions
         {
             UsesQueues = false,

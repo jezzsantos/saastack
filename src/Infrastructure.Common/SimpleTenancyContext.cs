@@ -1,3 +1,4 @@
+using Application.Interfaces.Services;
 using Infrastructure.Interfaces;
 
 namespace Infrastructure.Common;
@@ -9,9 +10,9 @@ public class SimpleTenancyContext : ITenancyContext
 {
     public string? Current { get; private set; }
 
-    public IReadOnlyDictionary<string, object> Settings { get; private set; } = new Dictionary<string, object>();
+    public TenantSettings Settings { get; private set; } = new();
 
-    public void Set(string id, Dictionary<string, object> settings)
+    public void Set(string id, TenantSettings settings)
     {
         Current = id;
         Settings = settings;

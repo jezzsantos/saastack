@@ -10,7 +10,9 @@ A web BEFFE is a web server designed specifically to serve a web application (i.
 
 A BEFFE is a de-coupling design strategy to avoid designing a Backend API that is directly coupled to a specific Frontend, or a Backend API that has to be all things to several Frontend applications (e.g., a web application, an admin web application, a mobile application, and a desktop application), all of which have different needs for data processing.
 
-> This frees the designer of the Backend to focus on designing REST APIs instead of RPC/CRUD APIs to only serve a single Frontend.
+> This frees the developer/designer of the Backend to focus on designing REST APIs instead of RPC/CRUD APIs to only serve a single dedicated Frontend.
+
+In many contexts of evolving SaaS products, a BEFFE can act as an [Anti-Corruption Layer (ACL)](https://learn.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer) whenever the Backend needs to be re-designed/re-engineered for legacy reasons, as a business grows and starts taking onboard direct integrations with the backend. Or when the product evolves to be more of an integration platform.
 
 ## Design Principles
 

@@ -1,9 +1,9 @@
+using Application.Interfaces;
 using Application.Persistence.Shared.ReadModels;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 using Infrastructure.Web.Interfaces.Clients;
 using Infrastructure.Worker.Api.IntegrationTests.Stubs;
-using Infrastructure.Workers.Api.Workers;
 using Microsoft.Extensions.DependencyInjection;
 using UnitTesting.Common;
 using Xunit;
@@ -18,7 +18,7 @@ public abstract class DeliverEmailSpecBase<TSetup> : ApiWorkerSpec<TSetup>
 
     protected DeliverEmailSpecBase(TSetup setup) : base(setup, OverrideDependencies)
     {
-        setup.QueueStore.DestroyAllAsync(DeliverEmailRelayWorker.QueueName, CancellationToken.None).GetAwaiter()
+        setup.QueueStore.DestroyAllAsync(WorkerConstants.Queues.Emails, CancellationToken.None).GetAwaiter()
             .GetResult();
         _serviceClient = setup.GetRequiredService<IServiceClient>().As<StubServiceClient>();
         _serviceClient.Reset();
@@ -27,18 +27,18 @@ public abstract class DeliverEmailSpecBase<TSetup> : ApiWorkerSpec<TSetup>
     [Fact]
     public async Task WhenMessageQueuedContainingInvalidContent_ThenApiNotCalled()
     {
-        await Setup.QueueStore.PushAsync(DeliverEmailRelayWorker.QueueName, "aninvalidemailmessage",
+        await Setup.QueueStore.PushAsync(WorkerConstants.Queues.Emails, "aninvalidmessage",
             CancellationToken.None);
 
         Setup.WaitForQueueProcessingToComplete();
 
-        (await Setup.QueueStore.CountAsync(DeliverEmailRelayWorker.QueueName, CancellationToken.None))
+        (await Setup.QueueStore.CountAsync(WorkerConstants.Queues.Emails, CancellationToken.None))
             .Should().Be(0);
         _serviceClient.LastPostedMessage.Should().BeNone();
     }
 
     [Fact]
-    public async Task WhenMessageQueuedContaining_ThenApiCalled()
+    public async Task WhenMessageQueued_ThenApiCalled()
     {
         var message = StringExtensions.ToJson(new EmailMessage
         {
@@ -50,11 +50,11 @@ public abstract class DeliverEmailSpecBase<TSetup> : ApiWorkerSpec<TSetup>
                 FromEmailAddress = "asenderemailaddress"
             }
         })!;
-        await Setup.QueueStore.PushAsync(DeliverEmailRelayWorker.QueueName, message, CancellationToken.None);
+        await Setup.QueueStore.PushAsync(WorkerConstants.Queues.Emails, message, CancellationToken.None);
 
         Setup.WaitForQueueProcessingToComplete();
 
-        (await Setup.QueueStore.CountAsync(DeliverEmailRelayWorker.QueueName, CancellationToken.None))
+        (await Setup.QueueStore.CountAsync(WorkerConstants.Queues.Emails, CancellationToken.None))
             .Should().Be(0);
         _serviceClient.LastPostedMessage.Value.Should()
             .BeEquivalentTo(new DeliverEmailRequest { Message = message });

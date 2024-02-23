@@ -1,0 +1,37 @@
+using Common;
+using Domain.Common.Extensions;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+
+namespace OrganizationsDomain;
+
+public class DisplayName : SingleValueObjectBase<DisplayName, string>
+{
+    public static readonly DisplayName Empty = new(string.Empty);
+
+    public static Result<DisplayName, Error> Create(string value)
+    {
+        if (value.IsInvalidParameter(Validations.Organization.DisplayName, nameof(value),
+                Resources.OrganizationDisplayName_InvalidName, out var error))
+        {
+            return error;
+        }
+
+        return new DisplayName(value);
+    }
+
+    private DisplayName(string name) : base(name)
+    {
+    }
+
+    public string Name => Value;
+
+    public static ValueObjectFactory<DisplayName> Rehydrate()
+    {
+        return (property, _) =>
+        {
+            var parts = RehydrateToList(property, true);
+            return new DisplayName(parts[0]!);
+        };
+    }
+}

@@ -36,7 +36,7 @@ public class MachineCredentialsApplicationSpec
         {
             Id = "amachineid"
         };
-        _endUsersService.Setup(eus => eus.RegisterMachineAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+        _endUsersService.Setup(eus => eus.RegisterMachinePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<RegisteredEndUser, Error>>(user));
         var expiresOn = DateTime.UtcNow.AddDays(1);

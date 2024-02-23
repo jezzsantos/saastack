@@ -413,10 +413,10 @@ public class WebApiAssemblyVisitorSpec
                 registration.OperationAuthorization.Should().BeNull();
                 registration.RoutePath.Should().Be("aroute");
                 registration.IsTestingOnly.Should().BeFalse();
-                registration.RequestDtoType.Name.Should().Be("ARequest");
-                registration.RequestDtoType.Namespace.Should().Be("ANamespace");
-                registration.ResponseDtoType.Name.Should().Be("AResponse");
-                registration.ResponseDtoType.Namespace.Should().Be("ANamespace");
+                registration.RequestDtoName.Name.Should().Be("ARequest");
+                registration.RequestDtoName.Namespace.Should().Be("ANamespace");
+                registration.ResponseDtoName.Name.Should().Be("AResponse");
+                registration.ResponseDtoName.Namespace.Should().Be("ANamespace");
             }
 
             [Fact]
@@ -468,10 +468,10 @@ public class WebApiAssemblyVisitorSpec
                 registration.OperationAuthorization!.PolicyName.Should().Be("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}");
                 registration.RoutePath.Should().Be("aroute");
                 registration.IsTestingOnly.Should().BeFalse();
-                registration.RequestDtoType.Name.Should().Be("ARequest");
-                registration.RequestDtoType.Namespace.Should().Be("ANamespace");
-                registration.ResponseDtoType.Name.Should().Be("AResponse");
-                registration.ResponseDtoType.Namespace.Should().Be("ANamespace");
+                registration.RequestDtoName.Name.Should().Be("ARequest");
+                registration.RequestDtoName.Namespace.Should().Be("ANamespace");
+                registration.ResponseDtoName.Name.Should().Be("AResponse");
+                registration.ResponseDtoName.Namespace.Should().Be("ANamespace");
             }
 
             [Fact]
@@ -526,10 +526,10 @@ public class WebApiAssemblyVisitorSpec
                     + "POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}");
                 registration.RoutePath.Should().Be("aroute");
                 registration.IsTestingOnly.Should().BeFalse();
-                registration.RequestDtoType.Name.Should().Be("ARequest");
-                registration.RequestDtoType.Namespace.Should().Be("ANamespace");
-                registration.ResponseDtoType.Name.Should().Be("AResponse");
-                registration.ResponseDtoType.Namespace.Should().Be("ANamespace");
+                registration.RequestDtoName.Name.Should().Be("ARequest");
+                registration.RequestDtoName.Namespace.Should().Be("ANamespace");
+                registration.ResponseDtoName.Name.Should().Be("AResponse");
+                registration.ResponseDtoName.Namespace.Should().Be("ANamespace");
             }
 
             [Fact]

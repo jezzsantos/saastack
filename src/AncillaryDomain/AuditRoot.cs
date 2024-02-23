@@ -1,4 +1,5 @@
 using Common;
+using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
@@ -11,7 +12,7 @@ namespace AncillaryDomain;
 public sealed class AuditRoot : AggregateRootBase
 {
     public static Result<AuditRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
-        Identifier againstId, Identifier organizationId, string auditCode, Optional<string> messageTemplate,
+        Identifier againstId, Optional<Identifier> organizationId, string auditCode, Optional<string> messageTemplate,
         TemplateArguments templateArguments)
     {
         var root = new AuditRoot(recorder, idFactory);
@@ -63,7 +64,9 @@ public sealed class AuditRoot : AggregateRootBase
         {
             case Events.Audits.Created created:
             {
-                OrganizationId = created.OrganizationId.ToId();
+                OrganizationId = created.OrganizationId.HasValue()
+                    ? created.OrganizationId.ToId()
+                    : Optional<Identifier>.None;
                 AgainstId = created.AgainstId.ToId();
                 AuditCode = created.AuditCode;
                 MessageTemplate = Optional<string>.Some(created.MessageTemplate);

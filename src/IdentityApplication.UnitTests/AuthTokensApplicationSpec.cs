@@ -133,7 +133,8 @@ public class AuthTokensApplicationSpec
         _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<AuthTokensRoot>, Error>>(authTokens.ToOptional()));
         _endUsersService.Setup(eus =>
-                eus.GetMembershipsAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<EndUserWithMemberships, Error>>(user));
         _jwtTokensService.Setup(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()))
             .Returns(Task.FromResult<Result<AccessTokens, Error>>(

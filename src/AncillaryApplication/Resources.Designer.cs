@@ -60,6 +60,24 @@ namespace AncillaryApplication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The audit message is missing a &apos;AuditCode&apos;.
+        /// </summary>
+        internal static string AncillaryApplication_Audit_MissingCode {
+            get {
+                return ResourceManager.GetString("AncillaryApplication_Audit_MissingCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email message is missing the &apos;HTML&apos; email.
+        /// </summary>
+        internal static string AncillaryApplication_Email_MissingHtml {
+            get {
+                return ResourceManager.GetString("AncillaryApplication_Email_MissingHtml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The queued message was not valid JSON for its type: &apos;{0}&apos;, message was: {1}.
         /// </summary>
         internal static string AncillaryApplication_InvalidQueuedMessage {
@@ -69,47 +87,29 @@ namespace AncillaryApplication {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The audit message is missing a &apos;AuditCode&apos;.
+        ///   Looks up a localized string similar to The provisioning message is missing the &apos;TenantId&apos; identifier.
         /// </summary>
-        internal static string AncillaryApplication_MissingAuditCode {
+        internal static string AncillaryApplication_Provisioning_MissingTenantId {
             get {
-                return ResourceManager.GetString("AncillaryApplication_MissingAuditCode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The email message is missing the &apos;HTML&apos; email.
-        /// </summary>
-        internal static string AncillaryApplication_MissingEmailHtml {
-            get {
-                return ResourceManager.GetString("AncillaryApplication_MissingEmailHtml", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The audit message is missing a &apos;TenantId&apos;.
-        /// </summary>
-        internal static string AncillaryApplication_MissingTenantId {
-            get {
-                return ResourceManager.GetString("AncillaryApplication_MissingTenantId", resourceCulture);
+                return ResourceManager.GetString("AncillaryApplication_Provisioning_MissingTenantId", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The usage message is missing a &apos;EventName&apos;.
         /// </summary>
-        internal static string AncillaryApplication_MissingUsageEventName {
+        internal static string AncillaryApplication_Usage_MissingEventName {
             get {
-                return ResourceManager.GetString("AncillaryApplication_MissingUsageEventName", resourceCulture);
+                return ResourceManager.GetString("AncillaryApplication_Usage_MissingEventName", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The usage message is missing a &apos;ForId&apos;.
         /// </summary>
-        internal static string AncillaryApplication_MissingUsageForId {
+        internal static string AncillaryApplication_Usage_MissingForId {
             get {
-                return ResourceManager.GetString("AncillaryApplication_MissingUsageForId", resourceCulture);
+                return ResourceManager.GetString("AncillaryApplication_Usage_MissingForId", resourceCulture);
             }
         }
     }

@@ -54,4 +54,6 @@ public class Membership : IIdentifiableResource
     public List<string> Roles { get; set; } = new();
 
     public required string Id { get; set; }
+
+    public bool IsDefault { get; set; }
 }

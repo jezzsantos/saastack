@@ -1,6 +1,6 @@
 using Application.Interfaces;
-using Application.Interfaces.Resources;
 using Application.Interfaces.Services;
+using Common;
 using Common.Extensions;
 using Microsoft.Extensions.Configuration;
 
@@ -16,7 +16,8 @@ public class AspNetHostLocalFileTenantSettingsService : ITenantSettingsService
 {
     private const string HostProjectFileName = "tenantsettings.json";
     private const string SettingsEncryptedAtRestSettingName = "SettingsEncryptedAtRest";
-    private static Dictionary<string, TenantSetting>? _cachedSettings;
+    private static TenantSettings? _cachedSettings;
+    private static readonly char[] EntryMultipleValueDelimiters = { ' ', ',', ';' };
     private readonly string _filename;
 
     public AspNetHostLocalFileTenantSettingsService() : this(HostProjectFileName)
@@ -28,8 +29,10 @@ public class AspNetHostLocalFileTenantSettingsService : ITenantSettingsService
         _filename = filename;
     }
 
-    public IReadOnlyDictionary<string, TenantSetting> CreateForNewTenant(ICallerContext context, string tenantId)
+    public async Task<Result<TenantSettings, Error>> CreateForTenantAsync(ICallerContext context, string tenantId,
+        CancellationToken cancellationToken)
     {
+        await Task.CompletedTask;
         if (_cachedSettings.NotExists())
         {
             var configuration = new ConfigurationBuilder()
@@ -43,14 +46,14 @@ public class AspNetHostLocalFileTenantSettingsService : ITenantSettingsService
 
             var encryptedKeys = entriesWithValues
                 .GetValueOrDefault(SettingsEncryptedAtRestSettingName, string.Empty)!
-                .Split(' ', ',', ';')
+                .Split(EntryMultipleValueDelimiters)
                 .Where(key => key.HasValue());
             entriesWithValues.Remove(SettingsEncryptedAtRestSettingName);
 
-            _cachedSettings = entriesWithValues
+            _cachedSettings = new TenantSettings(entriesWithValues
                 .ToDictionary(pair => pair.Key,
                     pair => new TenantSetting
-                        { Value = pair.Value, IsEncrypted = encryptedKeys.Contains(pair.Key) });
+                        { Value = pair.Value, IsEncrypted = encryptedKeys.Contains(pair.Key) }));
         }
 
         return _cachedSettings;

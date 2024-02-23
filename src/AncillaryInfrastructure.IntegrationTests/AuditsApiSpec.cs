@@ -1,4 +1,3 @@
-using AncillaryInfrastructure.IntegrationTests.Stubs;
 using ApiHost1;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
@@ -30,12 +29,15 @@ public class AuditsApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenDeliverAudit_ThenDelivers()
     {
+        var login = await LoginUserAsync(LoginUser.Operator);
+        var tenantId = login.User.Profile!.DefaultOrganizationId!;
+
         var request = new DeliverAuditRequest
         {
             Message = new AuditMessage
             {
                 MessageId = "amessageid",
-                TenantId = "atenantid",
+                TenantId = tenantId,
                 CallId = "acallid",
                 CallerId = "acallerid",
                 AuditCode = "anauditcode",
@@ -51,11 +53,11 @@ public class AuditsApiSpec : WebApiSpec<Program>
 #if TESTINGONLY
         var audits = await Api.GetAsync(new SearchAllAuditsRequest
         {
-            OrganizationId = "atenantid"
+            OrganizationId = tenantId
         });
 
         audits.Content.Value.Audits!.Count.Should().Be(1);
-        audits.Content.Value.Audits[0].OrganizationId.Should().Be("atenantid");
+        audits.Content.Value.Audits[0].OrganizationId.Should().Be(tenantId);
         audits.Content.Value.Audits[0].MessageTemplate.Should().Be("amessagetemplate");
         audits.Content.Value.Audits[0].TemplateArguments.Count.Should().Be(2);
         audits.Content.Value.Audits[0].TemplateArguments[0].Should().Be("anarg1");
@@ -67,10 +69,16 @@ public class AuditsApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenDrainAllAuditsAndNone_ThenDoesNotDrainAny()
     {
+        var login = await LoginUserAsync(LoginUser.Operator);
+        var tenantId = login.User.Profile!.DefaultOrganizationId!;
+
         var request = new DrainAllAuditsRequest();
         await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
-        var audits = await Api.GetAsync(new SearchAllAuditsRequest());
+        var audits = await Api.GetAsync(new SearchAllAuditsRequest
+        {
+            OrganizationId = tenantId
+        });
 
         audits.Content.Value.Audits!.Count.Should().Be(0);
     }
@@ -78,13 +86,15 @@ public class AuditsApiSpec : WebApiSpec<Program>
 
 #if TESTINGONLY
     [Fact]
-    public async Task WhenDrainAllAuditsAndSome_ThenDrains()
+    public async Task WhenDrainAllAuditsAndSomeWithUnknownTenancies_ThenDrains()
     {
-        var call = CallContext.CreateCustom("acallid", "acallerid", "atenantid");
+        var login = await LoginUserAsync();
+        var tenantId = login.User.Profile!.DefaultOrganizationId;
+        var call = CallContext.CreateCustom("acallid", "acallerid", tenantId);
         await _auditMessageQueue.PushAsync(call, new AuditMessage
         {
             MessageId = "amessageid1",
-            TenantId = "atenantid1",
+            TenantId = tenantId,
             AuditCode = "anauditcode1",
             MessageTemplate = "amessagetemplate1",
             Arguments = new List<string> { "anarg1" }
@@ -92,7 +102,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
         await _auditMessageQueue.PushAsync(call, new AuditMessage
         {
             MessageId = "amessageid2",
-            TenantId = "atenantid1",
+            TenantId = tenantId,
             AuditCode = "anauditcode2",
             MessageTemplate = "amessagetemplate2",
             Arguments = new List<string> { "anarg2" }
@@ -111,15 +121,15 @@ public class AuditsApiSpec : WebApiSpec<Program>
 
         var audits = await Api.GetAsync(new SearchAllAuditsRequest
         {
-            OrganizationId = "atenantid1"
+            OrganizationId = tenantId
         });
 
         audits.Content.Value.Audits!.Count.Should().Be(2);
-        audits.Content.Value.Audits[0].OrganizationId.Should().Be("atenantid1");
+        audits.Content.Value.Audits[0].OrganizationId.Should().Be(tenantId);
         audits.Content.Value.Audits[0].AuditCode.Should().Be("anauditcode1");
         audits.Content.Value.Audits[0].MessageTemplate.Should().Be("amessagetemplate1");
         audits.Content.Value.Audits[0].TemplateArguments[0].Should().Be("anarg1");
-        audits.Content.Value.Audits[1].OrganizationId.Should().Be("atenantid1");
+        audits.Content.Value.Audits[1].OrganizationId.Should().Be(tenantId);
         audits.Content.Value.Audits[1].AuditCode.Should().Be("anauditcode2");
         audits.Content.Value.Audits[1].MessageTemplate.Should().Be("amessagetemplate2");
         audits.Content.Value.Audits[1].TemplateArguments[0].Should().Be("anarg2");
@@ -128,6 +138,6 @@ public class AuditsApiSpec : WebApiSpec<Program>
 
     private static void OverrideDependencies(IServiceCollection services)
     {
-        services.AddSingleton<IUsageDeliveryService, StubUsageDeliveryService>();
+        // nothing here yet
     }
 }

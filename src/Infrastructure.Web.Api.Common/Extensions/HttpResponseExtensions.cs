@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Application.Common;
 using Common.Extensions;
+using Infrastructure.Web.Api.Common.Endpoints;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Infrastructure.Web.Api.Common.Extensions;

@@ -22,7 +22,7 @@ public partial class LocalMachineJsonFileStore
     public const string PathSettingName = "ApplicationServices:Persistence:LocalMachineJsonFileStore:RootPath";
     private readonly string _rootPath;
 
-    public static LocalMachineJsonFileStore Create(ISettings settings,
+    public static LocalMachineJsonFileStore Create(IConfigurationSettings settings,
         IQueueStoreNotificationHandler? handler = default)
     {
         var configPath = settings.GetString(PathSettingName);

@@ -3,7 +3,7 @@ using Application.Interfaces;
 using Common;
 using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Common.Endpoints;
 using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Web.Hosting.Common;

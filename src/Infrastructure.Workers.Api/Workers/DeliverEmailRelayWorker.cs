@@ -10,7 +10,6 @@ namespace Infrastructure.Workers.Api.Workers;
 
 public sealed class DeliverEmailRelayWorker : IQueueMonitoringApiRelayWorker<EmailMessage>
 {
-    public const string QueueName = "emails";
     private readonly IRecorder _recorder;
     private readonly IServiceClient _serviceClient;
     private readonly IHostSettings _settings;

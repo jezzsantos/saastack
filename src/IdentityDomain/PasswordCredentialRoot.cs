@@ -80,7 +80,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
     public static AggregateRootFactory<PasswordCredentialRoot> Rehydrate()
     {
         return (identifier, container, _) => new PasswordCredentialRoot(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), container.Resolve<IConfigurationSettings>(),
+            container.Resolve<IIdentifierFactory>(), container.ResolveForPlatform<IConfigurationSettings>(),
             container.Resolve<IEmailAddressService>(), container.Resolve<ITokensService>(),
             container.Resolve<IPasswordHasherService>(), identifier);
     }

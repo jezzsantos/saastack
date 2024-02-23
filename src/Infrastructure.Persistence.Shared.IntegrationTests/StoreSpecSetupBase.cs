@@ -11,8 +11,8 @@ public abstract class StoreSpecSetupBase
         var configuration = new ConfigurationBuilder()
             .AddJsonFile(@"appsettings.Testing.json")
             .Build();
-        Settings = new AspNetConfigurationSettings(configuration).Platform;
+        Settings = new AspNetDynamicConfigurationSettings(configuration);
     }
 
-    protected ISettings Settings { get; }
+    protected IConfigurationSettings Settings { get; }
 }

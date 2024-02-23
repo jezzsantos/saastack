@@ -117,14 +117,16 @@ public static class Events
     {
         public class Created : IDomainEvent
         {
-            public static Created Create(Identifier id, Identifier againstId, Identifier organizationId,
+            public static Created Create(Identifier id, Identifier againstId, Optional<Identifier> organizationId,
                 string auditCode, Optional<string> messageTemplate, TemplateArguments templateArguments)
             {
                 return new Created
                 {
                     RootId = id,
                     OccurredUtc = DateTime.UtcNow,
-                    OrganizationId = organizationId,
+                    OrganizationId = organizationId.HasValue
+                        ? organizationId.Value.Text
+                        : null,
                     AgainstId = againstId,
                     AuditCode = auditCode,
                     MessageTemplate = messageTemplate.ValueOrDefault ?? string.Empty,
@@ -138,7 +140,7 @@ public static class Events
 
             public required string MessageTemplate { get; set; }
 
-            public required string OrganizationId { get; set; }
+            public string? OrganizationId { get; set; }
 
             public required List<string> TemplateArguments { get; set; }
 

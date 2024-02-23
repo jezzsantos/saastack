@@ -10,7 +10,6 @@ namespace Infrastructure.Workers.Api.Workers;
 
 public sealed class DeliverAuditRelayWorker : IQueueMonitoringApiRelayWorker<AuditMessage>
 {
-    public const string QueueName = "audits";
     private readonly IRecorder _recorder;
     private readonly IServiceClient _serviceClient;
     private readonly IHostSettings _settings;

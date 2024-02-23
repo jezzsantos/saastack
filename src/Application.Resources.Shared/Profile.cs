@@ -47,5 +47,5 @@ public class ProfileAddress
 
 public class ProfileWithDefaultMembership : Profile
 {
-    public string? DefaultOrganisationId { get; set; }
+    public string? DefaultOrganizationId { get; set; }
 }

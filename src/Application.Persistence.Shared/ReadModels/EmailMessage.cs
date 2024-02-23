@@ -1,8 +1,9 @@
-﻿using QueryAny;
+﻿using Application.Interfaces;
+using QueryAny;
 
 namespace Application.Persistence.Shared.ReadModels;
 
-[EntityName("emails")]
+[EntityName(WorkerConstants.Queues.Emails)]
 public class EmailMessage : QueuedMessage
 {
     public QueuedEmailHtmlMessage? Html { get; set; }

@@ -138,7 +138,7 @@ public class CarsApiSpec : WebApiSpec<Program>
         var unavailabilities = (await Api.GetAsync(new SearchAllCarUnavailabilitiesRequest
         {
             Id = car.Id
-        })).Content.Value.Unavailabilities!;
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Unavailabilities!;
 
         unavailabilities.Count.Should().Be(1);
         unavailabilities[0].CarId.Should().Be(car.Id);
@@ -167,7 +167,7 @@ public class CarsApiSpec : WebApiSpec<Program>
         var unavailabilities = (await Api.GetAsync(new SearchAllCarUnavailabilitiesRequest
         {
             Id = car.Id
-        })).Content.Value.Unavailabilities!;
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Unavailabilities!;
 
         unavailabilities.Count.Should().Be(1);
         unavailabilities[0].CarId.Should().Be(car.Id);

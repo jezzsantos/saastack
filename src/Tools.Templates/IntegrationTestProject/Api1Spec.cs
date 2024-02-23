@@ -11,7 +11,7 @@ public class Api1Spec : WebApiSpec<Program>
 {
     public Api1Spec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
-        EmptyAllRepositories(setup);
+        EmptyAllRepositories();
     }
 
     private static void OverrideDependencies(IServiceCollection services)

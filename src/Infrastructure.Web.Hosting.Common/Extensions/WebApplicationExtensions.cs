@@ -6,6 +6,7 @@ using Infrastructure.Eventing.Interfaces.Projections;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Common.Endpoints;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Common;
 using Infrastructure.Web.Hosting.Common.ApplicationServices;
@@ -170,7 +171,7 @@ public static class WebApplicationExtensions
             return;
         }
 
-        middlewares.Add(new MiddlewareRegistration(CustomMiddlewareIndex + 10,
+        middlewares.Add(new MiddlewareRegistration(52, //Must be after authentication and before Authorization 
             app => { app.UseMiddleware<MultiTenancyMiddleware>(); },
             "Pipeline: Multi-Tenancy detection is enabled"));
     }
@@ -237,7 +238,8 @@ public static class WebApplicationExtensions
     /// <summary>
     ///     Enables request buffering, so that request bodies can be read in filters.
     ///     Note: Required to read the request by <see cref="ContentNegotiationFilter" /> and by
-    ///     <see cref="HttpRequestExtensions.VerifyHMACSignatureAsync" /> during HMAC signature verification
+    ///     <see cref="HttpRequestExtensions.VerifyHMACSignatureAsync" /> during HMAC signature verification, and by
+    ///     <see cref="MultiTenancyMiddleware" />
     /// </summary>
     public static void EnableRequestRewind(this WebApplication builder,
         List<MiddlewareRegistration> middlewares)
@@ -267,7 +269,7 @@ public static class WebApplicationExtensions
             "Pipeline: Authentication is enabled: HMAC -> {HMAC}, APIKeys -> {APIKeys}, Tokens -> {Tokens}",
             authorization.UsesHMAC, authorization.UsesApiKeys, authorization.UsesTokens));
         middlewares.Add(
-            new MiddlewareRegistration(52, app => { app.UseAuthorization(); },
+            new MiddlewareRegistration(54, app => { app.UseAuthorization(); },
                 "Pipeline: Authorization is enabled: Roles -> Enabled, Features -> Enabled"));
     }
 }

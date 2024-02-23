@@ -21,4 +21,9 @@ public class TenantSettingService : ITenantSettingService
     {
         return _encryptionService.Decrypt(encryptedValue);
     }
+
+    public string Encrypt(string plainText)
+    {
+        return _encryptionService.Encrypt(plainText);
+    }
 }

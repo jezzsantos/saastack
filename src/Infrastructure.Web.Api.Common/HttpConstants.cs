@@ -1,3 +1,5 @@
+using Infrastructure.Web.Api.Interfaces;
+
 namespace Infrastructure.Web.Api.Common;
 
 /// <summary>
@@ -8,15 +10,15 @@ public static class HttpContentTypes
     public const string FormData = "multipart/form-data";
     public const string FormUrlEncoded = "application/x-www-form-urlencoded";
     public const string FormUrlEncodedWithCharset = "application/x-www-form-urlencoded; charset=utf-8";
+    public const string Html = "text/html";
     public const string Json = "application/json";
     public const string JsonProblem = "application/problem+json";
     public const string JsonWithCharset = "application/json; charset=utf-8";
     public const string OctetStream = "application/octet-stream";
+    public const string Text = "text/plain";
     public const string Xml = "application/xml";
     public const string XmlProblem = "application/problem+xml";
     public const string XmlWithCharset = "application/xml; charset=utf-8";
-    public const string Html = "text/html";
-    public const string Text = "text/plain";
 }
 
 /// <summary>
@@ -25,14 +27,15 @@ public static class HttpContentTypes
 public static class HttpHeaders
 {
     public const string Accept = "Accept";
+    public const string AntiCSRF = "anti-csrf-tok";
     public const string Authorization = "Authorization";
     public const string ContentType = "Content-Type";
     public const string HMACSignature = "X-Hub-Signature";
-    public const string RequestId = "Request-ID";
-    public const string AntiCSRF = "anti-csrf-tok";
     public const string Origin = "Origin";
     public const string Referer = "Referer";
+    public const string RequestId = "Request-ID";
     public const string SetCookie = "Set-Cookie";
+    public const string Tenant = "Tenant";
 }
 
 /// <summary>
@@ -42,6 +45,7 @@ public static class HttpQueryParams
 {
     public const string APIKey = "apikey";
     public const string Format = "format";
+    public const string Tenant = nameof(ITenantedRequest.OrganizationId);
 }
 
 /// <summary>

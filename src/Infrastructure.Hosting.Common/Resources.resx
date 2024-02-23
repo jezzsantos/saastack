@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <root>
-    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root"
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
                 xmlns="">
         <xsd:element name="root" msdata:IsDataSet="true">
 
@@ -23,13 +24,22 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="AspNetConfigurationSettings_KeyNotFound" xml:space="preserve">
-        <value>The setting '{0}' cannot be found in any configuration</value>
+    <data name="AspNetDynamicConfigurationSettings_PlatformSettings_KeyNotFound" xml:space="preserve">
+        <value>The setting '{0}' cannot be found in platform settings</value>
     </data>
-    <data name="AspNetConfigurationSettings_ValueNotBoolean" xml:space="preserve">
+    <data name="AspNetDynamicConfigurationSettings_TenantSettings_KeyNotFound" xml:space="preserve">
+        <value>The setting '{0}' cannot be found in tenant settings</value>
+    </data>
+    <data name="AspNetDynamicConfigurationSettings_EitherSettings_KeyNotFound" xml:space="preserve">
+        <value>The setting '{0}' cannot be found in tenant settings nor in platform settings</value>
+    </data>
+    <data name="AspNetDynamicConfigurationSettings_ValueNotBoolean" xml:space="preserve">
         <value>The setting '{0}' exists, but is not a recognizable boolean value</value>
     </data>
-    <data name="AspNetConfigurationSettings_ValueNotNumber" xml:space="preserve">
+    <data name="AspNetDynamicConfigurationSettings_ValueNotNumber" xml:space="preserve">
+        <value>The setting '{0}' exists, but is not a recognizable number value</value>
+    </data>
+    <data name="AspNetDynamicConfigurationSettings_NoTenantSettings" xml:space="preserve">
         <value>The setting '{0}' exists, but is not a recognizable number value</value>
     </data>
     <data name="TracingOnlyRecorder_Started" xml:space="preserve">

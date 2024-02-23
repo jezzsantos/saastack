@@ -1,8 +1,9 @@
-﻿using QueryAny;
+﻿using Application.Interfaces;
+using QueryAny;
 
 namespace Application.Persistence.Shared.ReadModels;
 
-[EntityName("audits")]
+[EntityName(WorkerConstants.Queues.Audits)]
 public class AuditMessage : QueuedMessage
 {
     public string? AgainstId { get; set; }

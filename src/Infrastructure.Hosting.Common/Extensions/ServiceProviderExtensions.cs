@@ -6,6 +6,18 @@ namespace Infrastructure.Hosting.Common.Extensions;
 public static class ServiceProviderExtensions
 {
     /// <summary>
+    ///     Returns a function that returns the registered instance of the registered <see cref="TService" /> from the
+    ///     container, only for instances that were NOT registered with the
+    ///     <see cref="ServiceCollectionExtensions.RegisterPlatform{TService}" />.
+    ///     Used to resolve services that are not shared (i.e. neither Platform/Tenanted)
+    /// </summary>
+    public static Func<TService> LazyResolveForUnshared<TService>(this IServiceProvider container)
+        where TService : notnull
+    {
+        return () => container.GetRequiredService<TService>();
+    }
+
+    /// <summary>
     ///     Returns the registered instance of the registered <see cref="TService" /> from the container,
     ///     only for instances that were NOT registered with the
     ///     <see cref="ServiceCollectionExtensions.RegisterPlatform{TService}" />.
@@ -53,6 +65,6 @@ public static class ServiceProviderExtensions
     public static TService ResolveForUnshared<TService>(this IServiceProvider container)
         where TService : notnull
     {
-        return container.Resolve<TService>();
+        return container.GetRequiredService<TService>();
     }
 }

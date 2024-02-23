@@ -1,8 +1,9 @@
-﻿using QueryAny;
+﻿using Application.Interfaces;
+using QueryAny;
 
 namespace Application.Persistence.Shared.ReadModels;
 
-[EntityName("usages")]
+[EntityName(WorkerConstants.Queues.Usages)]
 public class UsageMessage : QueuedMessage
 {
     public Dictionary<string, string>? Additional { get; set; }

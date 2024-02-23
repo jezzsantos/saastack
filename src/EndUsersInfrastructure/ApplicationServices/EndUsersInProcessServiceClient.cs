@@ -25,19 +25,28 @@ public class EndUsersInProcessServiceClient : IEndUsersService
         return await _endUsersApplication.GetPersonAsync(caller, id, cancellationToken);
     }
 
-    public async Task<Result<Optional<EndUser>, Error>> FindPersonByEmailAsync(ICallerContext caller,
+    public async Task<Result<Membership, Error>> CreateMembershipForCallerPrivateAsync(ICallerContext caller,
+        string organizationId,
+        CancellationToken cancellationToken)
+    {
+        return await _endUsersApplication.CreateMembershipForCallerAsync(caller, organizationId, cancellationToken);
+    }
+
+    public async Task<Result<Optional<EndUser>, Error>> FindPersonByEmailPrivateAsync(ICallerContext caller,
         string emailAddress, CancellationToken cancellationToken)
     {
         return await _endUsersApplication.FindPersonByEmailAsync(caller, emailAddress, cancellationToken);
     }
 
-    public async Task<Result<EndUserWithMemberships, Error>> GetMembershipsAsync(ICallerContext caller, string id,
+    public async Task<Result<EndUserWithMemberships, Error>> GetMembershipsPrivateAsync(ICallerContext caller,
+        string id,
         CancellationToken cancellationToken)
     {
         return await _endUsersApplication.GetMembershipsAsync(caller, id, cancellationToken);
     }
 
-    public async Task<Result<RegisteredEndUser, Error>> RegisterPersonAsync(ICallerContext caller, string emailAddress,
+    public async Task<Result<RegisteredEndUser, Error>> RegisterPersonPrivateAsync(ICallerContext caller,
+        string emailAddress,
         string firstName, string? lastName, string? timezone, string? countryCode, bool termsAndConditionsAccepted,
         CancellationToken cancellationToken)
     {
@@ -45,7 +54,7 @@ public class EndUsersInProcessServiceClient : IEndUsersService
             countryCode, termsAndConditionsAccepted, cancellationToken);
     }
 
-    public async Task<Result<RegisteredEndUser, Error>> RegisterMachineAsync(ICallerContext caller, string name,
+    public async Task<Result<RegisteredEndUser, Error>> RegisterMachinePrivateAsync(ICallerContext caller, string name,
         string? timezone, string? countryCode,
         CancellationToken cancellationToken)
     {

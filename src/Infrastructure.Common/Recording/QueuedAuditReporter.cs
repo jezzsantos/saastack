@@ -29,7 +29,7 @@ public class QueuedAuditReporter : IAuditReporter
     private readonly IAuditMessageQueueRepository _repository;
 
     // ReSharper disable once UnusedParameter.Local
-    public QueuedAuditReporter(IDependencyContainer container, ISettings settings)
+    public QueuedAuditReporter(IDependencyContainer container, IConfigurationSettings settings)
         : this(new AuditMessageQueueRepository(NullRecorder.Instance, container.Resolve<IMessageQueueIdFactory>(),
 #if !TESTINGONLY
 #if HOSTEDONAZURE
@@ -38,7 +38,7 @@ public class QueuedAuditReporter : IAuditReporter
                 AWSSQSQueueStore.Create(NullRecorder.Instance, settings)
 #endif
 #else
-            container.Resolve<IQueueStore>()
+            container.ResolveForPlatform<IQueueStore>()
 #endif
         ))
     {
