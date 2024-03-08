@@ -1,14 +1,14 @@
 # Back-End for Front-End
 
-(a.k.a BEFFE or BFF)
+(a.k.a BEFFE or BFF) coined by [Sam Newman](https://samnewman.io/patterns/architectural/bff/) circa 2015
 
-A web BEFFE is a web server is designed specifically to serve a web application (i.e. a JavaScript application like those created with a framework like ReactJs/AngularJs/VueJs application).
+A web BEFFE is a web server designed specifically to serve a web application (i.e. a JavaScript application like those created with a framework like ReactJs/AngularJs/VueJs application).
 
-* The BEFFE is typically (but not always) the same web server that serves up the JS app that runs in the browser.
+* The BEFFE is typically (but not always) the same web server that serves up the JS app that runs in the browser. i.e. Same Origin
 * It is always the web server that the JS app sends requests to for HTML and JSON.
-* Sometimes, a BEFFE exposes its own JSON APIs; other times, it forwards those JSON requests to other Backend APIs.
+* Sometimes, a BEFFE exposes its own customized JSON APIs; other times, it forwards those JSON requests to other Backend APIs.
 
-A BEFFE is a de-coupling design strategy to avoid designing a Backend API that is directly coupled to a specific Frontend, or a Backend API that has to be all things to several Frontend applications (e.g., a web application, an admin we application, a mobile application and a desktop application), all of which have different needs for data processing.
+A BEFFE is a de-coupling design strategy to avoid designing a Backend API that is directly coupled to a specific Frontend, or a Backend API that has to be all things to several Frontend applications (e.g., a web application, an admin web application, a mobile application, and a desktop application), all of which have different needs for data processing.
 
 > This frees the designer of the Backend to focus on designing REST APIs instead of RPC/CRUD APIs to only serve a single Frontend.
 
@@ -17,7 +17,7 @@ A BEFFE is a de-coupling design strategy to avoid designing a Backend API that i
 * A BEFFE is a dedicated boundary to a specific type of client application. Typically, a web application. Its purpose is to serve assets and data to a web application just the way the web application likes it, and to abstract the visual interface from the machine interface of the Backend APIs.
 * A BEFFE should remain stateless
 * A BEFFE can offer caching of responses to make the UI more responsive and typically aggregates data from various backend sources (e.g., different APIs).
-* A BEFFE is a necessary strategy when the same development team designs both the Frontend and the Backend of a system at the same time. Without this, it is easy for the team to forget that both HTTP interfaces (HTML for Frontend and JSON for Backend) are designed for two quite different [human] audiences. A Frontend is a visual [human] interface designed for the end-users of the product, focused on performing familiar tasks easily. The Backend is a machine interface designed around business processes for [human] developers who then integrate other systems with the API of the product (regardless of what subsequent interface they are building and for whom). Thus these two interfaces are necessarily designed quite differently. Without a BEFFE, a team is likely to fall back to creating RPC/CRUD-like APIs, which does not achieve much more than making an API directly to their database. Then that simplification leads them to distribute core logic between various layers of the overall system (if they have any bounded layers at all), and that lack of structure and lack of encapsulation creates a big-ball-of-mud which slows them down in later stages, as the product onboards more [incidental complexity](https://en.wikipedia.org/wiki/No_Silver_Bullet).
+* A BEFFE is a necessary strategy when the same development team designs both the Frontend and the Backend of a system simultaneously. Without this, it is easy for the team to forget that both HTTP interfaces (HTML for Frontend and JSON for Backend) are designed for two quite different [human] audiences. A Frontend is a visual [human] interface designed for the end-users of the product, focused on performing familiar tasks easily. The Backend is a machine interface designed around business processes for [human] developers who then integrate other systems with the API of the product (regardless of what subsequent interface they are building and for whom). Thus these two interfaces are necessarily designed quite differently. Without a BEFFE, a team is likely to fall back to creating RPC/CRUD-like APIs, which does not achieve much more than making an API directly to their database. Then that simplification leads them to distribute core logic between various layers of the overall system (if they have any bounded layers at all), and that lack of structure and lack of encapsulation creates a big-ball-of-mud which slows them down in later stages, as the product onboards more [incidental complexity](https://en.wikipedia.org/wiki/No_Silver_Bullet).
 * A BEFFE typically provides a secure way to maintain stateful (but not sticky) user sessions. Typically using [HTTPOnly, Secure] cookies to avoid the need for clients to store any secrets or tokens in the browser (which is always to be avoided since XSS vulnerabilities are ever-present). The BEFFE can then store and forward tokens created by Backends when calls are forwarded from BEFFE to Backend APIs. This avoids the tendency that many developers have to project cookies or sessions (or other legacy web application authentication mechanisms) onto their Backend API, which makes them far harder for machine integration.
 * A BEFFE may provide its own API tailored to the JS app, or it may provide a reverse proxy to forward requests on to other Backend APIs.
 
@@ -44,7 +44,7 @@ BEFFEs are intended to be built specifically for a specific Web Application.
 
 They are responsible for returning data to client applications (i.e., the JS app) in the most efficient form. Thus they are tightly coupled to the JS app. To do this well, they often filter and aggregate data fetched from other Backend sources (via HTTP service clients).
 
-> In general, BEFFE do not directly access databases for application data. They use Backend APIs for that data. They may implement their own caches, and stores to enhance performance.
+> In general, a BEFFE does not directly access databases for application data. They use Backend APIs to obtain that data. However, they may implement their own caches to enhance performance.
 
 Strictly speaking, the APIs that they serve are dedicated APIs (to the JS app), and strictly speaking, that would require implementing APIs in the BEFFE as well as implementing APIs in a respective Backend. In many cases, this can be extra work with little economic value in the long run. Therefore, the BEFFE offers a simple Reverse Proxy so that API calls can simply be forwarded to the Backend, and no additional BEFFE API needs to be implemented.
 
@@ -156,7 +156,7 @@ However, If the current `refresh_token` has expired, or there is no refresh toke
 
 Since there are several cookies exchanged between the browser and BEFFE, there must be [CSRF protection to avoid forgery exploits](https://owasp.org/www-community/attacks/csrf).
 
-> Note, if there were no cookies then there would be no need for CSRF protection.
+> Note, if there were no cookies, then there would be no need for CSRF protection.
 >
 > Note: No cookies should ever be exchanged between the BEFFE and the Backend APIs.
 
@@ -187,11 +187,11 @@ Every fetch of  `index.html` will change the value of the `anti-csrf-tok` cookie
 
 The CSRF cookie (`anti-csrf-tok`) has a value that expires every 14 days (by default). When this expires, any subsequent XHR request is likely to fail and continue to fail until the `index.html` page is re-fetched.
 
-> One way to deal with this issue is to re-fetch `index.html` and thus, renew the token and cookie.
+> One way to deal with this issue is to re-fetch `index.html` and, thus, renew the token and cookie.
 
 
 
-In the BEFFE, we are using a defense-in-depth strategy to mitigate against CSRF (informed by the [OWASP guidance](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)). These are the 3 mechanisms that are used together:
+In the BEFFE, we are using a defense-in-depth strategy (informed by the OWASP guidance) to mitigate against CSRF. These are the three mechanisms that are used together:
 
 1. Double Submit Cookie (per session)
 2. Verifying Origin
@@ -205,7 +205,7 @@ In the BEFFE, we are using a defense-in-depth strategy to mitigate against CSRF 
 - The JS app is then required to send back (in any "unsafe"  XHR call to the BEFFE) the value of the `csrf-token` metadata value in a request header called `anti-csrf-tok`.
 - The two values sent to the BEFFE are paired, but not the same, and they are compared (via HMAC signatures) in the BEFFE to prove that they are paired.
 - The CSRF token corresponds to the currently authenticated user, but it is encrypted.
-- In addition, the `origin` header of the request (or the `referer` header of the request) is compared to ensure the request originated from JavaScript served from this BEFFE. Otherwise `HTTP 403 - Forbidden` is returned.
+- In addition, the `origin` header of the request (or the `referer` header of the request) is compared to ensure the request originated from JavaScript served from this BEFFE. Otherwise, `HTTP 403 - Forbidden` is returned.
 - A [same-origin CORS policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) is also enabled.
 
 ##### Defeating CSRF
@@ -259,10 +259,10 @@ The following process should be implemented in the JS app, to maintain a reasona
 
 1. In a global handler, for each XHR call, handle the case when an `HTTP 401 - Unauthorized` is received.
    - Otherwise, process the request as a normal response.
-2. When  `HTTP 401 - Unauthorized` is received, attempt to refresh the users authenti"session" by calling `POST /api/auth/refresh`.
-   - If this refresh call fails with `HTTP 401 - Unauthorized` (expired or not exists to begin with) then redirect the user to a login page to re-authenticate.
+2. When  `HTTP 401 - Unauthorized` is received, attempt to refresh the users' authentication "session" by calling `POST /api/auth/refresh`.
+   - If this refresh call fails with `HTTP 401 - Unauthorized` (either the refresh token has expired or the cookie containing it did not exist to begin with) then redirect the user to a login page to re-authenticate.
    - If this refresh call succeeds with `HTTP 200 - OK` then retry the original XHR request (as this request should now be proxied with a valid and refreshed `access_token` by the BEFFE)
-   - If the retried request fails a second time with `HTTP 401 - Unauthorized` then redirect the user to a login page to re-authenticate. This could indicate that the `refresh_token` has now expired, or the `access_token` has been revoked or is, at this point in time, invalid for some other reason.
+   - If the retried request fails a second time with `HTTP 401 - Unauthorized`, redirect the user to a login page to re-authenticate. This could indicate that the `refresh_token` has now expired, or the `access_token` has been revoked, or is, at this point in time, invalid for some other reason.
 
 > Note: responses that include `HTTP 403 - Forbidden` are likely to be from CSRF violations which are also applicable to all these XHR interactions.
 
@@ -271,13 +271,13 @@ The following process should be implemented in the JS app, to maintain a reasona
 The BEFFE also implements a number of general-purpose ancillary API endpoints for use by the JS app. These include:
 
 * Recording - recording crashes in the JS app, recording usage data, etc
-* Feature Flags - for controlling the behavior of feature sin the JS app
+* Feature Flags - for controlling the behavior of features in the JS app
 * Health check - for checking the responsiveness of the BEFFE and its deployed version
 * Other ancillary APIs.
 
 ### Custom APIs
 
-The BEFFE has been designed to be extended to include additional (domain specific) endpoints to support the JS app, when those calls special handling, such as caching, aggregation and filtering of data from Backend APIs.
+The BEFFE has been designed to be extended to include additional (domain-specific) endpoints to support the JS app when those calls special handling, such as caching, aggregation, and filtering of data from Backend APIs.
 
 These endpoints can simply be added in the same way API endpoints are added to any host. The Reverse Proxy will detect requests to these endpoints and route them directly to the BEFFE API to process first.
 
