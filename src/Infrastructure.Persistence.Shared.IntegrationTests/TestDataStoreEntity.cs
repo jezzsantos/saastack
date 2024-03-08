@@ -42,6 +42,8 @@ public class TestDataStoreEntity : IHasIdentity, IQueryableEntity
 
     public Optional<DateTime> AnOptionalDateTimeUtcValue { get; set; }
 
+    public Optional<TestEnum> AnOptionalEnumValue { get; set; }
+
     public Optional<DateTime?> AnOptionalNullableDateTimeUtcValue { get; set; }
 
     public Optional<string?> AnOptionalNullableStringValue { get; set; }
@@ -218,7 +220,7 @@ public class TestValueObject : ValueObjectBase<TestValueObject>
 
 public enum TestEnum
 {
-    None = 0,
+    NoValue = 0,
     AValue1 = 1,
     AValue2 = 2
 }

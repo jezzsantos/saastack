@@ -34,20 +34,24 @@ public class EndUserRepository : IEndUserRepository
 
     public async Task<Result<EndUserRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {
-        var audit = await _users.LoadAsync(id, cancellationToken);
-        if (!audit.IsSuccessful)
+        var user = await _users.LoadAsync(id, cancellationToken);
+        if (!user.IsSuccessful)
         {
-            return audit.Error;
+            return user.Error;
         }
 
-        return audit;
+        return user;
     }
 
-    public async Task<Result<EndUserRoot, Error>> SaveAsync(EndUserRoot endUser, CancellationToken cancellationToken)
+    public async Task<Result<EndUserRoot, Error>> SaveAsync(EndUserRoot user, CancellationToken cancellationToken)
     {
-        await _users.SaveAsync(endUser, cancellationToken);
+        var saved = await _users.SaveAsync(user, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
 
-        return endUser;
+        return user;
     }
 
     public async Task<Result<Optional<EndUserRoot>, Error>> FindByEmailAddressAsync(EmailAddress emailAddress,

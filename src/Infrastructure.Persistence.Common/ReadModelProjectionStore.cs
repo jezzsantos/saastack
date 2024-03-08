@@ -19,12 +19,15 @@ public class ReadModelProjectionStore<TReadModelEntity> : IReadModelProjectionSt
 
     public ReadModelProjectionStore(IRecorder recorder, IDomainFactory domainFactory, IDataStore dataStore)
     {
+        InstanceId = Guid.NewGuid();
         _recorder = recorder;
         _domainFactory = domainFactory;
         _dataStore = dataStore;
     }
 
     internal string ContainerName => typeof(TReadModelEntity).GetEntityNameSafe();
+
+    public Guid InstanceId { get; }
 
     public async Task<Result<TReadModelEntity, Error>> CreateAsync(string id, Action<TReadModelEntity>? action = null,
         CancellationToken cancellationToken = default)

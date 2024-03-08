@@ -21,11 +21,14 @@ public sealed class SnapshottingQueryStore<TQueryableEntity> : ISnapshottingQuer
 
     public SnapshottingQueryStore(IRecorder recorder, IDomainFactory domainFactory, IDataStore dataStore)
     {
+        InstanceId = Guid.NewGuid();
         _recorder = recorder;
         _dataStore = dataStore;
         _domainFactory = domainFactory;
         _containerName = typeof(TQueryableEntity).GetEntityNameSafe();
     }
+
+    public Guid InstanceId { get; }
 
     public async Task<Result<long, Error>> CountAsync(CancellationToken cancellationToken)
     {

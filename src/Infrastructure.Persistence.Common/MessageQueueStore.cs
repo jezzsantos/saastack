@@ -20,11 +20,14 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
 
     public MessageQueueStore(IRecorder recorder, IMessageQueueIdFactory messageQueueIdFactory, IQueueStore queueStore)
     {
+        InstanceId = Guid.NewGuid();
         _recorder = recorder;
         _messageQueueIdFactory = messageQueueIdFactory;
         _queueStore = queueStore;
         _queueName = typeof(TMessage).GetEntityNameSafe();
     }
+
+    public Guid InstanceId { get; }
 
     public async Task<Result<long, Error>> CountAsync(CancellationToken cancellationToken)
     {

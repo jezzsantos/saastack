@@ -50,7 +50,11 @@ public class AuthTokensRepository : IAuthTokensRepository
     public async Task<Result<AuthTokensRoot, Error>> SaveAsync(AuthTokensRoot tokens,
         CancellationToken cancellationToken)
     {
-        await _tokens.SaveAsync(tokens, cancellationToken);
+        var saved = await _tokens.SaveAsync(tokens, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
 
         return tokens;
     }

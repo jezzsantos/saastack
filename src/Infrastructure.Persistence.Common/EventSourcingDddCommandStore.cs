@@ -30,12 +30,15 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
     public EventSourcingDddCommandStore(IRecorder recorder, IDomainFactory domainFactory,
         IEventSourcedChangeEventMigrator migrator, IEventStore eventStore)
     {
+        InstanceId = Guid.NewGuid();
         _recorder = recorder;
         _eventStore = eventStore;
         _domainFactory = domainFactory;
         _migrator = migrator;
         _entityName = GetEntityName();
     }
+
+    public Guid InstanceId { get; }
 
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {

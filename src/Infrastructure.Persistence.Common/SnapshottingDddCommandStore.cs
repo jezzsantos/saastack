@@ -27,11 +27,14 @@ public sealed class
     public SnapshottingDddCommandStore(IRecorder recorder, IDomainFactory domainFactory,
         IDataStore dataStore)
     {
+        InstanceId = Guid.NewGuid();
         _recorder = recorder;
         _domainFactory = domainFactory;
         _dataStore = dataStore;
         _containerName = typeof(TAggregateRootOrEntity).GetEntityNameSafe();
     }
+
+    public Guid InstanceId { get; }
 
     public async Task<Result<long, Error>> CountAsync(CancellationToken cancellationToken)
     {

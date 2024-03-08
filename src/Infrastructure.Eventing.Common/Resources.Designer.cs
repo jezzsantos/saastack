@@ -87,11 +87,20 @@ namespace Infrastructure.Eventing.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The projection &apos;{0}&apos; did not handle the event &apos;{1}&apos; with event type &apos;{2}&apos;. Aborting projections.
+        ///   Looks up a localized string similar to The projection &apos;{0}&apos; failed when handling the event &apos;{1}&apos; with event type &apos;{2}&apos;. Aborting projections.
         /// </summary>
-        internal static string ReadModelProjector_ProjectionError {
+        internal static string ReadModelProjector_ProjectionError_HandlerError {
             get {
-                return ResourceManager.GetString("ReadModelProjector_ProjectionError", resourceCulture);
+                return ResourceManager.GetString("ReadModelProjector_ProjectionError_HandlerError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The projection &apos;{0}&apos; did not handle the event &apos;{1}&apos; with event type &apos;{2}&apos;, perhaps missing the specific event case in the switch statement? Aborting projections.
+        /// </summary>
+        internal static string ReadModelProjector_ProjectionError_MissingHandler {
+            get {
+                return ResourceManager.GetString("ReadModelProjector_ProjectionError_MissingHandler", resourceCulture);
             }
         }
         

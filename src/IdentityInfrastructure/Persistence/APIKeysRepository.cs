@@ -33,7 +33,11 @@ public class APIKeysRepository : IAPIKeysRepository
 
     public async Task<Result<APIKeyRoot, Error>> SaveAsync(APIKeyRoot apiKey, CancellationToken cancellationToken)
     {
-        await _apiKeys.SaveAsync(apiKey, cancellationToken);
+        var saved = await _apiKeys.SaveAsync(apiKey, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
 
         return apiKey;
     }

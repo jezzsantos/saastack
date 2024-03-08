@@ -52,7 +52,11 @@ public class CarRepository : ICarRepository
 
     public async Task<Result<CarRoot, Error>> SaveAsync(CarRoot car, bool reload, CancellationToken cancellationToken)
     {
-        await _cars.SaveAsync(car, cancellationToken);
+        var saved = await _cars.SaveAsync(car, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
 
         return reload
             ? await LoadAsync(car.OrganizationId, car.Id, cancellationToken)

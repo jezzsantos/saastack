@@ -110,12 +110,15 @@ public sealed class ReadModelProjector : IReadModelProjector, IDisposable
         var projected = await projection.ProjectEventAsync(@event, cancellationToken);
         if (!projected.IsSuccessful)
         {
-            return projected.Error;
+            return projected.Error.Wrap(Resources.ReadModelProjector_ProjectionError_HandlerError.Format(
+                projection.GetType().Name,
+                changeEvent.Id, changeEvent.Metadata.Fqn));
         }
 
         if (!projected.Value)
         {
-            return Error.Unexpected(Resources.ReadModelProjector_ProjectionError.Format(projection.GetType().Name,
+            return Error.Unexpected(Resources.ReadModelProjector_ProjectionError_MissingHandler.Format(
+                projection.GetType().Name,
                 changeEvent.Id, changeEvent.Metadata.Fqn));
         }
 

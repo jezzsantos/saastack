@@ -295,7 +295,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
         }, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.Unexpected,
-            Resources.ReadModelProjector_ProjectionError.Format("IReadModelProjectionProxy", "anid1",
+            Resources.ReadModelProjector_ProjectionError_MissingHandler.Format("IReadModelProjectionProxy", "anid1",
                 typeof(TestEvent).AssemblyQualifiedName!));
         _checkpointRepository.Verify(cs => cs.LoadCheckpointAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()));
         _projection.Verify(prj => prj.ProjectEventAsync(It.Is<TestEvent>(e =>

@@ -18,10 +18,13 @@ public sealed class BinaryBlobStore : IBinaryBlobStore
     {
         containerName.ThrowIfNotValuedParameter(nameof(containerName), Resources.AnyStore_EmptyContainerName);
 
+        InstanceId = Guid.NewGuid();
         _recorder = recorder;
         _blobStore = blobStore;
         _containerName = containerName;
     }
+
+    public Guid InstanceId { get; }
 
     public async Task<Result<Error>> DestroyAsync(string blobName, CancellationToken cancellationToken)
     {

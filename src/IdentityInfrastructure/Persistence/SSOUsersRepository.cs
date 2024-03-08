@@ -42,7 +42,11 @@ public class SSOUsersRepository : ISSOUsersRepository
 
     public async Task<Result<SSOUserRoot, Error>> SaveAsync(SSOUserRoot user, CancellationToken cancellationToken)
     {
-        await _users.SaveAsync(user, cancellationToken);
+        var saved = await _users.SaveAsync(user, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
 
         return user;
     }

@@ -36,7 +36,11 @@ public class AuditRepository : IAuditRepository
     public async Task<Result<AuditRoot, Error>> SaveAsync(AuditRoot audit, bool reload,
         CancellationToken cancellationToken)
     {
-        await _audits.SaveAsync(audit, cancellationToken);
+        var saved = await _audits.SaveAsync(audit, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
 
         return reload
             ? await LoadAsync(audit.OrganizationId, audit.Id, cancellationToken)

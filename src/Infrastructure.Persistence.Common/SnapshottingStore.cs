@@ -18,10 +18,13 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
 
     public SnapshottingStore(IRecorder recorder, IDataStore dataStore)
     {
+        InstanceId = Guid.NewGuid();
         _recorder = recorder;
         _dataStore = dataStore;
         _containerName = typeof(TDto).GetEntityNameSafe();
     }
+
+    public Guid InstanceId { get; }
 
     public async Task<Result<long, Error>> CountAsync(CancellationToken cancellationToken)
     {

@@ -19,7 +19,7 @@ namespace Infrastructure.Persistence.Common.ApplicationServices;
 [ExcludeFromCodeCoverage]
 public partial class LocalMachineJsonFileStore
 {
-    private const string PathSettingName = "ApplicationServices:Persistence:LocalMachineJsonFileStore:RootPath";
+    public const string PathSettingName = "ApplicationServices:Persistence:LocalMachineJsonFileStore:RootPath";
     private readonly string _rootPath;
 
     public static LocalMachineJsonFileStore Create(ISettings settings,
@@ -453,9 +453,15 @@ internal static class LocalMachineFileStoreExtensions
             return Convert.FromBase64String(propertyValue.Value);
         }
 
-        if (targetPropertyType.IsEnum || targetPropertyType.IsOptionalEnum())
+        if (targetPropertyType.IsEnum)
         {
             return Enum.Parse(targetPropertyType, propertyValue.Value, true);
+        }
+
+        if (targetPropertyType.IsOptionalEnum())
+        {
+            var underlyingType = targetPropertyType.GetGenericArguments().First();
+            return Enum.Parse(underlyingType, propertyValue.Value, true);
         }
 
         if (targetPropertyType.IsNullableEnum())

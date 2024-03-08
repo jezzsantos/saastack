@@ -58,7 +58,11 @@ public class PasswordCredentialsRepository : IPasswordCredentialsRepository
     public async Task<Result<PasswordCredentialRoot, Error>> SaveAsync(PasswordCredentialRoot credential,
         CancellationToken cancellationToken)
     {
-        await _credentials.SaveAsync(credential, cancellationToken);
+        var saved = await _credentials.SaveAsync(credential, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
 
         return credential;
     }

@@ -2423,6 +2423,8 @@ public abstract class AnyDataStoreBaseSpec
             AnOptionalStringValue = "astringvalue",
             AnOptionalNullableStringValue = "astringvalue",
             EnumValue = TestEnum.AValue1,
+            AnOptionalEnumValue = TestEnum.AValue1.ToOptional(),
+            AnNullableEnumValue = TestEnum.AValue1,
             ABinaryValue = new byte[] { 0x01 },
             ABooleanValue = true,
             ANullableBooleanValue = true,
@@ -2473,6 +2475,11 @@ public abstract class AnyDataStoreBaseSpec
             .BeSome("astringvalue");
         result.Value.Value.GetValueOrDefault<TestEnum>(nameof(TestDataStoreEntity.EnumValue)).Should()
             .Be(TestEnum.AValue1);
+        result.Value.Value.GetValueOrDefault<TestEnum?>(nameof(TestDataStoreEntity.AnNullableEnumValue)).Should()
+            .Be(TestEnum.AValue1);
+        result.Value.Value.GetValueOrDefault<Optional<TestEnum>>(nameof(TestDataStoreEntity.AnOptionalEnumValue))
+            .Should()
+            .Be(TestEnum.AValue1.ToOptional());
         result.Value.Value.GetValueOrDefault<byte[]>(nameof(TestDataStoreEntity.ABinaryValue))!
             .SequenceEqual(new byte[] { 0x01 }).Should().BeTrue();
         result.Value.Value.GetValueOrDefault<bool>(nameof(TestDataStoreEntity.ABooleanValue)).Should().Be(true);
@@ -2530,6 +2537,8 @@ public abstract class AnyDataStoreBaseSpec
         var entity = CommandEntity.FromType(new TestDataStoreEntity
         {
             EnumValue = default,
+            AnOptionalEnumValue = default,
+            AnNullableEnumValue = default,
             ABinaryValue = default!,
             ABooleanValue = default,
             ANullableBooleanValue = default,
@@ -2572,7 +2581,12 @@ public abstract class AnyDataStoreBaseSpec
             .GetValueOrDefault<Optional<string?>>(nameof(TestDataStoreEntity.AnOptionalNullableStringValue)).Should()
             .BeNone();
         result.Value.Value.GetValueOrDefault<TestEnum>(nameof(TestDataStoreEntity.EnumValue)).Should()
-            .Be(TestEnum.None);
+            .Be(TestEnum.NoValue);
+        result.Value.Value.GetValueOrDefault<TestEnum?>(nameof(TestDataStoreEntity.AnNullableEnumValue)).Should()
+            .BeNull();
+        result.Value.Value.GetValueOrDefault<Optional<TestEnum>>(nameof(TestDataStoreEntity.AnOptionalEnumValue))
+            .ValueOrDefault.Should()
+            .Be(Optional<TestEnum>.None);
         result.Value.Value.GetValueOrDefault<byte[]>(nameof(TestDataStoreEntity.ABinaryValue)).Should().BeNull();
         result.Value.Value.GetValueOrDefault<bool>(nameof(TestDataStoreEntity.ABooleanValue)).Should().Be(false);
         result.Value.Value.GetValueOrDefault<bool?>(nameof(TestDataStoreEntity.ANullableBooleanValue)).Should()

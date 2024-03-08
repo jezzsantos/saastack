@@ -45,7 +45,11 @@ public class EmailDeliveryRepository : IEmailDeliveryRepository
     public async Task<Result<EmailDeliveryRoot, Error>> SaveAsync(EmailDeliveryRoot delivery, bool reload,
         CancellationToken cancellationToken)
     {
-        await _deliveries.SaveAsync(delivery, cancellationToken);
+        var saved = await _deliveries.SaveAsync(delivery, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
 
         return reload
             ? await LoadAsync(delivery.Id, cancellationToken)
