@@ -11,6 +11,7 @@
         <ProjectReference Include="..\Domain.Services.Shared\Domain.Services.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Interfaces\Infrastructure.Interfaces.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.AWS\Infrastructure.Persistence.AWS.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Azure\Infrastructure.Persistence.Azure.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONAZURE'" />
         <ProjectReference Include="..\Infrastructure.Persistence.Shared\Infrastructure.Persistence.Shared.csproj" />
     </ItemGroup>
 
@@ -19,6 +20,7 @@
         <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.302.9" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
         <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" Condition="'$(HostingPlatform)' == 'HOSTEDONAZURE'" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>

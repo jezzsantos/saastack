@@ -6,9 +6,12 @@ The individual analyzers will filter the individual projects their analyzers app
 
 # Development Workarounds
 
+Roslyn Analyzers have to be built in NETSTANDARD2.0 for them to run in Visual Studio, but this is not the case to run in JetBrains Rider.
+> This constraint exists to support analyzers working in older versions of the .NET Framework, and will exist until Microsoft fix the issue Visual Studio. This is another reason to use JetBrains Rider as the preferred IDE for working with this codebase.
+
 C# Analyzers have difficulties running in the IDE if the code used in them has dependencies on other projects in the solution (and other nugets).
 
-For example, referencing: `Tools.Analyzers.Common.csproj`
+For example, referencing: `Common.csproj`
 
 This is especially problematic when those referenced projects have transient dependencies to types in AspNet (e.g., any project that has this reference: `<FrameworkReference Include="Microsoft.AspNetCore.App" />`.
 

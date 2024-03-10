@@ -6,14 +6,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Tools.Generators.Common\Tools.Generators.Common.csproj" />
-        <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
+        <ProjectReference Include="..\Tools.Generators.Common\Tools.Generators.Common.csproj" Aliases="CommonGenerator" />
+        <ProjectReference Include="..\UnitTesting.CodeAnalysis.Common\UnitTesting.CodeAnalysis.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" Version="1.1.1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     </ItemGroup>
 

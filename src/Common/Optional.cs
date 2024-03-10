@@ -65,7 +65,7 @@ public static class Optional
     /// </summary>
     public static Optional<TValue> Some<TValue>(TValue value)
     {
-        ArgumentNullException.ThrowIfNull(value);
+        value.ThrowIfNullParameter(nameof(value));
 
         if (value.TryGetContainedValue(out var contained))
         {

@@ -2,7 +2,6 @@ extern alias Generators;
 using System.Collections.Immutable;
 using System.Reflection;
 using FluentAssertions;
-using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Moq;
@@ -11,6 +10,7 @@ using IWebApiService = Generators::Infrastructure.Web.Api.Interfaces.IWebApiServ
 using IWebRequest = Generators::Infrastructure.Web.Api.Interfaces.IWebRequest;
 using ServiceOperation = Generators::Infrastructure.Web.Api.Interfaces.ServiceOperation;
 using WebApiAssemblyVisitor = Generators::Tools.Generators.Web.Api.WebApiAssemblyVisitor;
+using UsedImplicitly = Generators::JetBrains.Annotations.UsedImplicitlyAttribute;
 
 namespace Tools.Generators.Web.Api.UnitTests;
 

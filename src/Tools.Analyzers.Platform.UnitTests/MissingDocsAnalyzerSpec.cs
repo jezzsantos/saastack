@@ -1,7 +1,7 @@
 extern alias PlatformAnalyzers;
-using JetBrains.Annotations;
 using Xunit;
-using Platform_MissingDocsAnalyzer = PlatformAnalyzers::Tools.Analyzers.Platform.MissingDocsAnalyzer;
+using MissingDocsAnalyzer = PlatformAnalyzers::Tools.Analyzers.Platform.MissingDocsAnalyzer;
+using UsedImplicitly = PlatformAnalyzers::JetBrains.Annotations.UsedImplicitlyAttribute;
 
 namespace Tools.Analyzers.Platform.UnitTests;
 
@@ -20,7 +20,7 @@ public class AClass
 {
 }";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -32,7 +32,7 @@ public class AClass
 {
 }";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -40,7 +40,7 @@ public class AClass
         {
             const string input = @"public delegate void ADelegate();";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 1,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1,
                 22, "ADelegate");
         }
 
@@ -49,7 +49,7 @@ public class AClass
         {
             const string input = @"internal delegate void ADelegate();";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 1,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 1,
                 24, "ADelegate");
         }
 
@@ -61,7 +61,7 @@ public interface AnInterface
 {
 }";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 2,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
                 18, "AnInterface");
         }
 
@@ -73,7 +73,7 @@ internal interface AnInterface
 {
 }";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 2,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
                 20, "AnInterface");
         }
 
@@ -85,7 +85,7 @@ public enum AnEnum
 {
 }";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 2,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
                 13, "AnEnum");
         }
 
@@ -97,7 +97,7 @@ internal enum AnEnum
 {
 }";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 2,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
                 15, "AnEnum");
         }
 
@@ -109,7 +109,7 @@ public struct AStruct
 {
 }";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 2,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
                 15, "AStruct");
         }
 
@@ -121,7 +121,7 @@ internal struct AStruct
 {
 }";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 2,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
                 17, "AStruct");
         }
 
@@ -133,7 +133,7 @@ public readonly struct AStruct
 {
 }";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 2,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
                 24, "AStruct");
         }
 
@@ -145,7 +145,7 @@ internal readonly struct AStruct
 {
 }";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 2,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
                 26, "AStruct");
         }
 
@@ -157,7 +157,7 @@ public record ARecord()
 {
 }";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 2,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
                 15, "ARecord");
         }
 
@@ -169,7 +169,7 @@ internal record ARecord
 {
 }";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 2,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
                 17, "ARecord");
         }
 
@@ -182,7 +182,7 @@ public static class AClass
 }
 ";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -194,7 +194,7 @@ internal static class AClass
 }
 ";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -209,7 +209,7 @@ public static class AClass1
 }
 ";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -227,7 +227,7 @@ public static class AClass1
 }
 ";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -245,7 +245,7 @@ public class AClass1
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 7,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 7,
                 18, "AClass2");
         }
 
@@ -264,7 +264,7 @@ public class AClass1
 }
 ";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -276,7 +276,7 @@ public class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 2,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
                 14, "AClass");
         }
 
@@ -289,7 +289,7 @@ public partial class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 2,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
                 22, "AClass");
         }
 
@@ -305,9 +305,9 @@ public partial class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(input,
-                (Platform_MissingDocsAnalyzer.Sas001, 2, 22, "AClass"),
-                (Platform_MissingDocsAnalyzer.Sas001, 5, 22, "AClass"));
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(input,
+                (MissingDocsAnalyzer.Sas001, 2, 22, "AClass"),
+                (MissingDocsAnalyzer.Sas001, 5, 22, "AClass"));
         }
 
         [Fact]
@@ -319,7 +319,7 @@ internal class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 2,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
                 16, "AClass");
         }
 
@@ -332,7 +332,7 @@ public class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 2,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 2,
                 14, "AClass");
         }
 
@@ -346,7 +346,7 @@ public class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 3,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 3,
                 14, "AClass");
         }
 
@@ -362,7 +362,7 @@ public class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 5,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 5,
                 14, "AClass");
         }
 
@@ -378,7 +378,7 @@ public class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 5,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 5,
                 14, "AClass");
         }
 
@@ -394,7 +394,7 @@ public class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 5,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 5,
                 14, "AClass");
         }
 
@@ -410,7 +410,7 @@ public class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas001, input, 5,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas001, input, 5,
                 14, "AClass");
         }
 
@@ -424,7 +424,7 @@ public class AClass
 }
 ";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -439,7 +439,7 @@ public class AClass
 }
 ";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -454,7 +454,7 @@ public partial class AClass
 }
 ";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -472,7 +472,7 @@ public partial class AClass
 }
 ";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
     }
 
@@ -488,7 +488,7 @@ public static class AClass
     public static void AMethod(){}
 }";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -500,7 +500,7 @@ public static class AClass
     public static void AMethod(){}
 }";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -512,7 +512,7 @@ public static class AClass
     public static void AMethod2(this string value){}
 }";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -525,7 +525,7 @@ public static class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas002, input, 4,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4,
                 24, "AMethod");
         }
 
@@ -542,7 +542,7 @@ public class AClass
 }
 ";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -555,7 +555,7 @@ public static class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas002, input, 4,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4,
                 26, "AMethod");
         }
 
@@ -569,7 +569,7 @@ public static class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas002, input, 4,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4,
                 24, "AMethod");
         }
 
@@ -583,7 +583,7 @@ public static class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas002, input, 4,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4,
                 26, "AMethod");
         }
 
@@ -597,7 +597,7 @@ public static class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas002, input, 4,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4,
                 26, "AMethod");
         }
 
@@ -611,7 +611,7 @@ public static class AClass
 }
 ";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -624,7 +624,7 @@ public static class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas002, input, 4,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 4,
                 24, "AMethod");
         }
 
@@ -641,7 +641,7 @@ public static class AClass
 }
 ";
 
-            await Verify.DiagnosticExists<Platform_MissingDocsAnalyzer>(Platform_MissingDocsAnalyzer.Sas002, input, 7,
+            await Verify.DiagnosticExists<MissingDocsAnalyzer>(MissingDocsAnalyzer.Sas002, input, 7,
                 24, "AMethod");
         }
 
@@ -658,7 +658,7 @@ public static class AClass
 }
 ";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
 
         [Fact]
@@ -672,7 +672,7 @@ public static class AClass
 }
 ";
 
-            await Verify.NoDiagnosticExists<Platform_MissingDocsAnalyzer>(input);
+            await Verify.NoDiagnosticExists<MissingDocsAnalyzer>(input);
         }
     }
 }

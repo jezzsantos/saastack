@@ -1,21 +1,16 @@
 extern alias CommonAnalyzers;
+extern alias NonPlatformAnalyzers;
 using System.Reflection;
-using Common;
-using Common.Extensions;
-using Domain.Common;
-using Domain.Interfaces;
-using Infrastructure.Web.Api.Common;
-using Infrastructure.Web.Api.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
+using NonPlatformAnalyzers::QueryAny;
 using NuGet.Frameworks;
-using QueryAny;
 using AnalyzerConstants = CommonAnalyzers::Tools.Analyzers.Common.AnalyzerConstants;
 using Task = System.Threading.Tasks.Task;
-
+using ObjectExtensions = NonPlatformAnalyzers::Common.Extensions.ObjectExtensions;
 namespace Tools.Analyzers.NonPlatform.UnitTests;
 
 public static class Verify
@@ -27,12 +22,7 @@ public static class Verify
     {
         typeof(Verify).Assembly,
         typeof(AnalyzerConstants).Assembly,
-        typeof(Query).Assembly,
-        typeof(CommonMarker).Assembly,
-        typeof(DomainInterfacesMarker).Assembly,
-        typeof(DomainCommonMarker).Assembly,
-        typeof(InfrastructureWebApiInterfacesMarker).Assembly,
-        typeof(InfrastructureWebApiCommonMarker).Assembly
+        typeof(IQueryableEntity).Assembly,
     };
 
     // HACK: we have to define the .NET 8.0 framework here,
@@ -125,7 +115,7 @@ public static class Verify
         (int locationX, int locationY, string argument) expected1, params object?[]? messageArgs)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {
-        var arguments = messageArgs.Exists() && messageArgs.Any()
+        var arguments = ObjectExtensions.Exists(messageArgs) && messageArgs.Any()
             ? new object[] { expected1.argument }.Concat(messageArgs)
             : new object[] { expected1.argument };
 

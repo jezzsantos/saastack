@@ -1,3 +1,5 @@
+using Common.Extensions;
+
 namespace Application.Interfaces;
 
 /// <summary>
@@ -7,7 +9,7 @@ public class Sorting
 {
     public Sorting(string by, SortDirection direction = SortDirection.Ascending)
     {
-        ArgumentException.ThrowIfNullOrEmpty(by);
+        by.ThrowIfNotValuedParameter(nameof(by));
         By = by;
         Direction = direction;
     }

@@ -1,5 +1,8 @@
-#if COMMON_PROJECT
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
 using System.Text;
+#endif
+
+#if COMMON_PROJECT
 using JetBrains.Annotations;
 #endif
 
@@ -11,7 +14,7 @@ namespace Common.Extensions;
 
 public static class CollectionExtensions
 {
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Whether the <see cref="target" /> string exists in the <see cref="collection" />
     /// </summary>
@@ -34,7 +37,7 @@ public static class CollectionExtensions
         return list[0];
     }
 #endif
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Whether the collection contains any items
     /// </summary>
@@ -44,7 +47,7 @@ public static class CollectionExtensions
         {
             return false;
         }
-#if COMMON_PROJECT
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
         return !collection.HasNone();
 #elif GENERATORS_WEB_API_PROJECT
         return !collection!.HasNone();
@@ -59,7 +62,7 @@ public static class CollectionExtensions
         return !collection.Any();
     }
 #endif
-#if COMMON_PROJECT
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Joins all values separated by the <see cref="separator" />
     /// </summary>
@@ -78,7 +81,8 @@ public static class CollectionExtensions
 
         return stringBuilder.ToString();
     }
-
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Returns a string value for all the items in the list, separated by the specified <see cref="orKeyword" />
     /// </summary>
@@ -94,7 +98,8 @@ public static class CollectionExtensions
     {
         return list[^1];
     }
-
+#endif
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Whether the <see cref="target" /> string does not exist in the <see cref="collection" />
     /// </summary>

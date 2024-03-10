@@ -428,7 +428,7 @@ public class WebApiClassAnalyzer : DiagnosticAnalyzer
         {
             if (routePath.HasValue())
             {
-                RouteSegments = routePath.Split("/", StringSplitOptions.RemoveEmptyEntries);
+                RouteSegments = routePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             }
         }
     }

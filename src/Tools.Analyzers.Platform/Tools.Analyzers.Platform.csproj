@@ -1,14 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>netstandard2.0</TargetFramework> <!-- Source Generators must be netstandard2.0 to work in Visual Studio -->
+        <DefineConstants>$(DefineConstants);ANALYZERS_PLATFORM</DefineConstants>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
         <IsPlatformProject>true</IsPlatformProject>
         <IsRoslynComponent>true</IsRoslynComponent>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     </PropertyGroup>
 
     <PropertyGroup>
-        <NoWarn>$(NoWarn),RS2007;NU5128</NoWarn>
+        <NoWarn>$(NoWarn),RS2007,NU5128</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -29,6 +32,15 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Include="..\Common\Annotations.cs">
+            <Link>Reference\Common\Annotations.cs</Link>
+        </Compile>
+        <Compile Include="..\Common\Extensions\ObjectExtensions.cs">
+            <Link>Reference\Common\Extensions\ObjectExtensions.cs</Link>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
         <EmbeddedResource Update="Resources.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -43,9 +55,15 @@
         </Compile>
     </ItemGroup>
 
-    <!-- HACK: To Support Transitive Dependencies https://github.com/dotnet/roslyn/discussions/47517 -->
+    <!-- HACK: To Support Transitive Dependencies:
+        https://github.com/dotnet/roslyn/discussions/47517
+        https://github.com/dotnet/sdk/issues/17775
+     -->
     <PropertyGroup>
         <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+        <_TargetFramework>8.0.2</_TargetFramework>
+        <_AspNetFrameworkInstallFolder>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\$(_TargetFramework)</_AspNetFrameworkInstallFolder>
+        <_FrameworkInstallFolder>C:\Program Files\dotnet\shared\Microsoft.NETCore.App\$(_TargetFramework)</_FrameworkInstallFolder>
     </PropertyGroup>
     <Target Name="GetDependencyTargetPaths">
         <ItemGroup>

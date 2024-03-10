@@ -1,11 +1,11 @@
 extern alias Generators;
 using System.Reflection;
 using FluentAssertions;
-using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 using MinimalApiMediatRGenerator = Generators::Tools.Generators.Web.Api.MinimalApiMediatRGenerator;
+using UsedImplicitly = Generators::JetBrains.Annotations.UsedImplicitlyAttribute;
 
 namespace Tools.Generators.Web.Api.UnitTests;
 

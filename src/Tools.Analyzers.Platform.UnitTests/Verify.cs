@@ -1,6 +1,6 @@
 extern alias CommonAnalyzers;
+extern alias PlatformAnalyzers;
 using System.Reflection;
-using Common.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.Testing;
 using NuGet.Frameworks;
 using AnalyzerConstants = CommonAnalyzers::Tools.Analyzers.Common.AnalyzerConstants;
 using Task = System.Threading.Tasks.Task;
+using PlatformAnalyzers::Common.Extensions;
 
 namespace Tools.Analyzers.Platform.UnitTests;
 

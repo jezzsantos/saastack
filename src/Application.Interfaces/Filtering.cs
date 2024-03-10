@@ -1,3 +1,5 @@
+using Common.Extensions;
+
 namespace Application.Interfaces;
 
 /// <summary>
@@ -13,7 +15,7 @@ public class Filtering
 
     public Filtering(string field)
     {
-        ArgumentException.ThrowIfNullOrEmpty(field);
+        field.ThrowIfNotValuedParameter(nameof(field));
         if (!_fields.Contains(field))
         {
             _fields.Add(field);

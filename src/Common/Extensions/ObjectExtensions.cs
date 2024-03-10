@@ -1,6 +1,8 @@
 #if COMMON_PROJECT
-using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
+#endif
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_PLATFORM
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 #endif
 
@@ -20,7 +22,7 @@ public static class ObjectExtensions
         return mapper.Map<TTarget>(source);
     }
 #endif
-#if COMMON_PROJECT
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_PLATFORM
     /// <summary>
     ///     Whether the object does exist
     /// </summary>
@@ -29,17 +31,8 @@ public static class ObjectExtensions
     {
         return instance is not null;
     }
-#elif GENERATORS_WEB_API_PROJECT
-    /// <summary>
-    ///     Whether the object does exist
-    /// </summary>
-    public static bool Exists(this object? instance)
-    {
-        return instance is not null;
-    }
-
 #endif
-#if COMMON_PROJECT
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Whether the parameter <see cref="value" /> from being invalid according to the <see cref="validation" />,
     ///     and if invalid, returns a <see cref="ErrorCode.Validation" /> error
@@ -93,20 +86,12 @@ public static class ObjectExtensions
         return IsInvalidParameter(value.HasValue, parameterName, null, out error);
     }
 #endif
-#if COMMON_PROJECT
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_PLATFORM
     /// <summary>
     ///     Whether the object does not exist
     /// </summary>
     [ContractAnnotation("null => true; notnull => false")]
     public static bool NotExists([NotNullWhen(false)] this object? instance)
-    {
-        return instance is null;
-    }
-#elif GENERATORS_WEB_API_PROJECT
-    /// <summary>
-    ///     Whether the object does not exist
-    /// </summary>
-    public static bool NotExists(this object? instance)
     {
         return instance is null;
     }
@@ -145,7 +130,8 @@ public static class ObjectExtensions
             throw new ArgumentOutOfRangeException(parameterName, errorMessage);
         }
     }
-
+#endif
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Throws an <see cref="ArgumentOutOfRangeException" /> if the specified <see cref="value" /> does not have a value
     /// </summary>
@@ -171,6 +157,18 @@ public static class ObjectExtensions
 
         error = Error.NoError;
         return false;
+    }
+
+    /// <summary>
+    ///     Throws an <see cref="ArgumentNullException" /> if the specified <see cref="value" /> is null
+    /// </summary>
+    public static void ThrowIfNullParameter<TValue>(this TValue? value, string parameterName,
+        string? errorMessage = null)
+    {
+        if (value is null)
+        {
+            throw new ArgumentNullException(parameterName, errorMessage);
+        }
     }
 #endif
 }

@@ -1,18 +1,23 @@
 #if COMMON_PROJECT
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+#endif
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || GENERATORS_COMMON_PROJECT || ANALYZERS_NONPLATFORM
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
+#endif
 
-#elif GENERATORS_WEB_API_PROJECT
+#if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
-#elif GENERATORS_COMMON_PROJECT
+#endif
+
+#if GENERATORS_COMMON_PROJECT
 using System.Globalization;
 using System.Text;
 #endif
@@ -24,7 +29,7 @@ namespace Common.Extensions;
 #endif
 public static class StringExtensions
 {
-#if COMMON_PROJECT
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Defines the casing used in JSON serialization
     /// </summary>
@@ -33,10 +38,11 @@ public static class StringExtensions
         Pascal,
         Camel
     }
-
+#endif
+#if COMMON_PROJECT
     private static readonly TimeSpan DefaultRegexTimeout = TimeSpan.FromSeconds(10);
 #endif
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Whether the <see cref="other" /> is the same as the value (case-insensitive)
     /// </summary>
@@ -45,7 +51,7 @@ public static class StringExtensions
         return string.Equals(value, other, StringComparison.OrdinalIgnoreCase);
     }
 #endif
-#if COMMON_PROJECT
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Whether the <see cref="other" /> is precisely the same as the value (case-sensitive)
     /// </summary>
@@ -53,7 +59,8 @@ public static class StringExtensions
     {
         return string.Equals(value, other, StringComparison.Ordinal);
     }
-
+#endif
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Formats the <see cref="value" /> with the <see cref="arguments" />
     /// </summary>
@@ -78,7 +85,7 @@ public static class StringExtensions
             PropertyNameCaseInsensitive = true
         });
     }
-#elif GENERATORS_WEB_API_PROJECT
+#elif GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
     public static TObject FromJson<TObject>(this string json)
         where TObject : new()
     {
@@ -87,11 +94,27 @@ public static class StringExtensions
             return new TObject();
         }
 
-        var serializer = new DataContractJsonSerializer(typeof(TObject), new DataContractJsonSerializerSettings());
+        var deserialized = FromJson(json, typeof(TObject));
+        if (deserialized is not null)
+        {
+            return (TObject)deserialized;
+        }
+
+        return new TObject();
+    }
+
+    public static object? FromJson(this string json, Type type)
+    {
+        if (json.HasNoValue())
+        {
+            return null;
+        }
+
+        var serializer = new DataContractJsonSerializer(type, new DataContractJsonSerializerSettings());
 
         using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(json)))
         {
-            return (TObject)serializer.ReadObject(ms);
+            return serializer.ReadObject(ms);
         }
     }
 #endif
@@ -112,7 +135,7 @@ public static class StringExtensions
         });
     }
 #endif
-#if COMMON_PROJECT
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || GENERATORS_COMMON_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Whether the string value contains no value: it is either: null, empty or only whitespaces
     /// </summary>
@@ -129,22 +152,6 @@ public static class StringExtensions
     [ContractAnnotation("null => false; notnull => true")]
     [DebuggerStepThrough]
     public static bool HasValue([NotNullWhen(true)] this string? value)
-    {
-        return !string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value);
-    }
-#elif GENERATORS_WEB_API_PROJECT || GENERATORS_COMMON_PROJECT
-    /// <summary>
-    ///     Whether the string value contains no value: it is either: null, empty or only whitespaces
-    /// </summary>
-    public static bool HasNoValue(this string? value)
-    {
-        return string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value);
-    }
-
-    /// <summary>
-    ///     Whether the string value contains any value except: null, empty or only whitespaces
-    /// </summary>
-    public static bool HasValue(this string? value)
     {
         return !string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value);
     }
@@ -261,7 +268,7 @@ public static class StringExtensions
         return char.ToLowerInvariant(titleCase[0]) + titleCase.Substring(1);
     }
 #endif
-#if COMMON_PROJECT
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Converts the <see cref="value" /> to a integer value
     /// </summary>
@@ -321,8 +328,9 @@ public static class StringExtensions
                 : JsonIgnoreCondition.WhenWritingNull
         });
     }
-#elif GENERATORS_WEB_API_PROJECT
-    public static string? ToJson<TObject>(this TObject? value, bool? prettyPrint = false)
+#elif GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_NONPLATFORM
+    public static string? ToJson<TObject>(this TObject? value, bool? prettyPrint = true, JsonCasing casing =
+        JsonCasing.Pascal)
     {
         if (value is null)
         {

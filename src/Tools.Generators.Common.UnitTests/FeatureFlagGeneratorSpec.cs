@@ -1,11 +1,13 @@
+extern alias CommonGenerator;
 using System.Reflection;
 using System.Text;
 using FluentAssertions;
-using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using Xunit;
+using FeatureFlagGenerator = CommonGenerator::Tools.Generators.Common.FeatureFlagGenerator;
+using UsedImplicitly = CommonGenerator::JetBrains.Annotations.UsedImplicitlyAttribute;
 
 namespace Tools.Generators.Common.UnitTests;
 

@@ -22,6 +22,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Include="..\Common\Annotations.cs">
+            <Link>Reference\Common\Annotations.cs</Link>
+        </Compile>
         <Compile Include="..\Common\FeatureFlags\Flag.cs">
             <Link>Reference\Common\FeatureFlags\Flag.cs</Link>
         </Compile>

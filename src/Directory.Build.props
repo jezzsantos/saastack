@@ -9,11 +9,6 @@
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     </PropertyGroup>
 
-    <!-- Hosting platform (`HOSTEDONAZURE` or `HOSTEDONAWS` or `HOSTEDONGC`) -->
-    <PropertyGroup>
-        <HostingPlatform>HOSTEDONAZURE</HostingPlatform>
-    </PropertyGroup>
-
     <!-- NuGet package information -->
     <PropertyGroup>
         <Info>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\..\GlobalAssemblyInfo.cs'))</Info>
@@ -80,7 +75,9 @@
         <Platforms>AnyCPU</Platforms>
         <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
         <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
+        <HostingPlatform>HOSTEDONAZURE</HostingPlatform> <!-- Hosting platform (`HOSTEDONAZURE` or `HOSTEDONAWS` or `HOSTEDONGC`) -->
     </PropertyGroup>
+
     <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
         <DebugSymbols>true</DebugSymbols>
         <DebugType>full</DebugType>

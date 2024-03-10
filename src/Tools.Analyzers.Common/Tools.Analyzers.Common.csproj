@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>netstandard2.0</TargetFramework> <!-- Source Generators must be netstandard2.0 to work in Visual Studio -->
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
         <IsPlatformProject>true</IsPlatformProject>
         <IsRoslynComponent>true</IsRoslynComponent>
     </PropertyGroup>

@@ -1,10 +1,16 @@
 extern alias NonPlatformAnalyzers;
-using Application.Interfaces;
-using Infrastructure.Web.Api.Interfaces;
-using JetBrains.Annotations;
 using Xunit;
 using TypeExtensions = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.TypeExtensions;
 using WebApiClassAnalyzer = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.WebApiClassAnalyzer;
+using ServiceOperation = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.ServiceOperation;
+using IWebResponse = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebResponse;
+using IWebSearchResponse = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebSearchResponse;
+using Route = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.RouteAttribute;
+using Authorize = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.AuthorizeAttribute;
+using SearchResultMetadata = NonPlatformAnalyzers::Application.Interfaces.SearchResultMetadata;
+using AccessType = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.AccessType;
+using Roles = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.Roles;
+using UsedImplicitly = NonPlatformAnalyzers::JetBrains.Annotations.UsedImplicitlyAttribute;
 
 namespace Tools.Analyzers.NonPlatform.UnitTests;
 
@@ -1628,43 +1634,43 @@ public class TestSearchResponse : IWebSearchResponse
 }
 
 [UsedImplicitly]
-public class TestNoRouteAttributeRequest : IWebRequest<TestResponse>;
+public class TestNoRouteAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
 
 [Route("/aresource", ServiceOperation.Search)]
 [UsedImplicitly]
-public class TestSearchRouteAttributeRequest : IWebRequest<TestResponse>;
+public class TestSearchRouteAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
 
 [Route("/aresource", ServiceOperation.Post)]
 [UsedImplicitly]
-public class TestPostRouteAttributeRequest : IWebRequest<TestResponse>;
+public class TestPostRouteAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
 
 [Route("/aresource", ServiceOperation.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest : IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
 
 [Route("/aresource/1", ServiceOperation.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest1 : IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest1 : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
 
 [Route("/aresource/2", ServiceOperation.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest2 : IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest2 : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
 
 [Route("/aresource/3", ServiceOperation.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest3 : IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest3 : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
 
 [Route("/anotherresource/1", ServiceOperation.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest4 : IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest4 : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
 
 [Route("/aresource", ServiceOperation.PutPatch)]
 [UsedImplicitly]
-public class TestPutPatchRouteAttributeRequest : IWebRequest<TestResponse>;
+public class TestPutPatchRouteAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
 
 [Route("/aresource", ServiceOperation.Delete)]
 [UsedImplicitly]
-public class TestDeleteRouteAttributeRequest : IWebRequest<TestResponse>;
+public class TestDeleteRouteAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
 
 [AttributeUsage(AttributeTargets.Method)]
 [UsedImplicitly]
@@ -1672,18 +1678,18 @@ public class TestAttribute : Attribute;
 
 [Route("/aresource", ServiceOperation.Post)]
 [UsedImplicitly]
-public class TestAnonymousRouteNoAuthorizeAttributeRequest : IWebRequest<TestResponse>;
+public class TestAnonymousRouteNoAuthorizeAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
 
 [Route("/aresource", ServiceOperation.Post)]
 [Authorize(Roles.Platform_Standard)]
 [UsedImplicitly]
-public class TestAnonymousRouteAuthorizeAttributeRequest : IWebRequest<TestResponse>;
+public class TestAnonymousRouteAuthorizeAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
 
 [Route("/aresource", ServiceOperation.Post, AccessType.Token)]
 [Authorize(Roles.Platform_Standard)]
 [UsedImplicitly]
-public class TestSecureRouteAuthorizeAttributeRequest : IWebRequest<TestResponse>;
+public class TestSecureRouteAuthorizeAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
 
 [Route("/aresource", ServiceOperation.Post, AccessType.Token)]
 [UsedImplicitly]
-public class TestSecureRouteNoAuthorizeAttributeRequest : IWebRequest<TestResponse>;
+public class TestSecureRouteNoAuthorizeAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;

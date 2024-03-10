@@ -1,4 +1,6 @@
+#if !ANALYZERS_NONPLATFORM
 using Common.Extensions;
+#endif
 
 namespace Common;
 
@@ -25,6 +27,7 @@ public readonly struct Error
 
     public ErrorCode Code { get; }
 
+#if !ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Wraps the existing message within the specified message
     /// </summary>
@@ -39,7 +42,8 @@ public readonly struct Error
             ? $"{message}{Environment.NewLine}\t{Message}"
             : message);
     }
-
+#endif
+    
     /// <summary>
     ///     Creates a <see cref="ErrorCode.NoError" /> error
     /// </summary>
