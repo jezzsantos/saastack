@@ -6,14 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
         <ProjectReference Include="..\Application.Persistence.Shared\Application.Persistence.Shared.csproj" />
+        <ProjectReference Include="..\Application.Resources.Shared\Application.Resources.Shared.csproj" />
+        <ProjectReference Include="..\Domain.Services.Shared\Domain.Services.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Interfaces\Infrastructure.Interfaces.csproj" />
-        <ProjectReference Include="..\Infrastructure.Persistence.Azure\Infrastructure.Persistence.Azure.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONAZURE'" />
         <ProjectReference Include="..\Infrastructure.Persistence.AWS\Infrastructure.Persistence.AWS.csproj" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
         <ProjectReference Include="..\Infrastructure.Persistence.Shared\Infrastructure.Persistence.Shared.csproj" />
-        <ProjectReference Include="..\Infrastructure.Web.Common\Infrastructure.Web.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Web.Api.Operations.Shared\Infrastructure.Web.Api.Operations.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

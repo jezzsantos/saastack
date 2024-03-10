@@ -5,7 +5,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Application.Persistence.Shared\Application.Persistence.Shared.csproj" />
         <ProjectReference Include="..\IdentityApplication\IdentityApplication.csproj" />
         <ProjectReference Include="..\Infrastructure.Shared\Infrastructure.Shared.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Api.Common\Infrastructure.Web.Api.Common.csproj" />

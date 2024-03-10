@@ -11,11 +11,11 @@
         <ProjectReference Include="..\BookingsInfrastructure\BookingsInfrastructure.csproj" />
         <ProjectReference Include="..\CarsInfrastructure\CarsInfrastructure.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Hosting.Common\Infrastructure.Web.Hosting.Common.csproj" />
+        <ProjectReference Include="..\OrganizationsInfrastructure\OrganizationsInfrastructure.csproj" />
     </ItemGroup>
 
     <!-- Runs the source generator (in memory) on build -->
     <ItemGroup>
-        <ProjectReference Include="..\OrganizationsInfrastructure\OrganizationsInfrastructure.csproj" />
         <ProjectReference Include="..\Tools.Generators.Web.Api\Tools.Generators.Web.Api.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 

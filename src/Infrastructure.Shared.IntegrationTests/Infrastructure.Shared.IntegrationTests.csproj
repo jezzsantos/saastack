@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ApiHost1\ApiHost1.csproj" />
+        <ProjectReference Include="..\Infrastructure.Shared\Infrastructure.Shared.csproj" />
         <ProjectReference Include="..\IntegrationTesting.WebApi.Common\IntegrationTesting.WebApi.Common.csproj" />
     </ItemGroup>
 
