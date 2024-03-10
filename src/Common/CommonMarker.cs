@@ -6,6 +6,4 @@ namespace Common;
 ///     Provides an assembly marker for runtime or testing purposes
 /// </summary>
 [UsedImplicitly]
-public class CommonMarker
-{
-}
+public class CommonMarker;

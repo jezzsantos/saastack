@@ -29,7 +29,6 @@ public class APIKeyAuthenticationHandlerSpec
 
     public APIKeyAuthenticationHandlerSpec()
     {
-        var clock = new Mock<ISystemClock>();
         var options = new Mock<IOptionsMonitor<APIKeyOptions>>();
         options.Setup(x => x.Get(It.IsAny<string>()))
             .Returns(new APIKeyOptions());
@@ -51,8 +50,7 @@ public class APIKeyAuthenticationHandlerSpec
             RequestServices = serviceCollection.BuildServiceProvider()
         };
 
-        _handler = new APIKeyAuthenticationHandler(options.Object, new LoggerFactory(), UrlEncoder.Default,
-            clock.Object);
+        _handler = new APIKeyAuthenticationHandler(options.Object, new LoggerFactory(), UrlEncoder.Default);
     }
 
     [Fact]
@@ -65,7 +63,7 @@ public class APIKeyAuthenticationHandlerSpec
         var result = await _handler.AuthenticateAsync();
 
         result.Succeeded.Should().BeFalse();
-        result.Failure.Should().BeOfType<Exception>()
+        result.Failure.Should().BeOfType<AuthenticationFailureException>()
             .Which.Message.Should().Be(Resources.AuthenticationHandler_NotHttps);
     }
 
@@ -78,7 +76,7 @@ public class APIKeyAuthenticationHandlerSpec
         var result = await _handler.AuthenticateAsync();
 
         result.Succeeded.Should().BeFalse();
-        result.Failure.Should().BeOfType<Exception>()
+        result.Failure.Should().BeOfType<AuthenticationFailureException>()
             .Which.Message.Should()
             .Be(Resources.APIKeyAuthenticationHandler_MissingParameter.Format(HttpQueryParams.APIKey));
     }
@@ -100,7 +98,7 @@ public class APIKeyAuthenticationHandlerSpec
         result.Succeeded.Should().BeFalse();
         _recorder.Verify(rec => rec.Audit(It.IsAny<ICallContext>(), AuditingConstants.APIKeyAuthenticationFailed,
             Resources.APIKeyAuthenticationHandler_FailedAuthentication));
-        result.Failure.Should().BeOfType<Exception>()
+        result.Failure.Should().BeOfType<AuthenticationFailureException>()
             .Which.Message.Should()
             .Be(Resources.AuthenticationHandler_Failed);
         _identityService.Verify(ids =>

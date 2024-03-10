@@ -55,9 +55,7 @@ namespace JetBrains.Annotations;
                 | AttributeTargets.Delegate | AttributeTargets.Field | AttributeTargets.Event | AttributeTargets.Class
                 | AttributeTargets.Interface | AttributeTargets.GenericParameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class CanBeNullAttribute : Attribute
-{
-}
+public sealed class CanBeNullAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that the value of the marked element can never be <c>null</c>.
@@ -73,9 +71,7 @@ public sealed class CanBeNullAttribute : Attribute
                 | AttributeTargets.Delegate | AttributeTargets.Field | AttributeTargets.Event | AttributeTargets.Class
                 | AttributeTargets.Interface | AttributeTargets.GenericParameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class NotNullAttribute : Attribute
-{
-}
+public sealed class NotNullAttribute : Attribute;
 
 /// <summary>
 ///     Can be applied to symbols of types derived from IEnumerable as well as to symbols of Task
@@ -96,9 +92,7 @@ public sealed class NotNullAttribute : Attribute
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property
                 | AttributeTargets.Delegate | AttributeTargets.Field)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class ItemNotNullAttribute : Attribute
-{
-}
+public sealed class ItemNotNullAttribute : Attribute;
 
 /// <summary>
 ///     Can be applied to symbols of types derived from IEnumerable as well as to symbols of Task
@@ -120,9 +114,7 @@ public sealed class ItemNotNullAttribute : Attribute
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property
                 | AttributeTargets.Delegate | AttributeTargets.Field)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class ItemCanBeNullAttribute : Attribute
-{
-}
+public sealed class ItemCanBeNullAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that the marked method builds a string by the format pattern and (optional) arguments.
@@ -171,9 +163,7 @@ public sealed class StringFormatMethodAttribute : Attribute
 /// </example>
 [AttributeUsage(AttributeTargets.Parameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class StructuredMessageTemplateAttribute : Attribute
-{
-}
+public sealed class StructuredMessageTemplateAttribute : Attribute;
 
 /// <summary>
 ///     Use this annotation to specify a type that contains static or const fields
@@ -278,9 +268,7 @@ public sealed class ValueRangeAttribute : Attribute
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property
                 | AttributeTargets.Method | AttributeTargets.Delegate)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class NonNegativeValueAttribute : Attribute
-{
-}
+public sealed class NonNegativeValueAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that the function argument should be a string literal and match
@@ -297,9 +285,7 @@ public sealed class NonNegativeValueAttribute : Attribute
 /// </example>
 [AttributeUsage(AttributeTargets.Parameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class InvokerParameterNameAttribute : Attribute
-{
-}
+public sealed class InvokerParameterNameAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that the method is contained in a type that implements
@@ -500,9 +486,7 @@ public sealed class LocalizationRequiredAttribute : Attribute
 /// </example>
 [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Class | AttributeTargets.Struct)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class CannotApplyEqualityOperatorAttribute : Attribute
-{
-}
+public sealed class CannotApplyEqualityOperatorAttribute : Attribute;
 
 /// <summary>
 ///     When applied to a target attribute, specifies a requirement for any type marked
@@ -717,9 +701,7 @@ public sealed class InstantHandleAttribute : Attribute
 /// </example>
 [AttributeUsage(AttributeTargets.Method)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class PureAttribute : Attribute
-{
-}
+public sealed class PureAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that the return value of the method invocation must be used.
@@ -790,9 +772,7 @@ public sealed class RequireStaticDelegateAttribute : Attribute
                 | AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Interface
                 | AttributeTargets.Struct | AttributeTargets.GenericParameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class ProvidesContextAttribute : Attribute
-{
-}
+public sealed class ProvidesContextAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that a parameter is a path to a file or a folder within a web project.
@@ -839,9 +819,7 @@ public sealed class PathReferenceAttribute : Attribute
 /// </example>
 [AttributeUsage(AttributeTargets.Method)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class SourceTemplateAttribute : Attribute
-{
-}
+public sealed class SourceTemplateAttribute : Attribute;
 
 /// <summary>
 ///     Allows specifying a macro for a parameter of a <see cref="SourceTemplateAttribute">source template</see>.
@@ -972,9 +950,7 @@ public enum CollectionAccessType
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AssertionMethodAttribute : Attribute
-{
-}
+public sealed class AssertionMethodAttribute : Attribute;
 
 /// <summary>
 ///     Indicates the condition parameter of the assertion method. The method itself should be
@@ -1019,9 +995,7 @@ public enum AssertionConditionType
 [Obsolete("Use [ContractAnnotation('=> halt')] instead")]
 [AttributeUsage(AttributeTargets.Method)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class TerminatesProgramAttribute : Attribute
-{
-}
+public sealed class TerminatesProgramAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that the method is a pure LINQ method, with postponed enumeration (like Enumerable.Select,
@@ -1030,9 +1004,7 @@ public sealed class TerminatesProgramAttribute : Attribute
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class LinqTunnelAttribute : Attribute
-{
-}
+public sealed class LinqTunnelAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that IEnumerable passed as a parameter is not enumerated.
@@ -1054,18 +1026,14 @@ public sealed class LinqTunnelAttribute : Attribute
 /// </example>
 [AttributeUsage(AttributeTargets.Parameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class NoEnumerationAttribute : Attribute
-{
-}
+public sealed class NoEnumerationAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that the marked parameter, field, or property is a regular expression pattern.
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class RegexPatternAttribute : Attribute
-{
-}
+public sealed class RegexPatternAttribute : Attribute;
 
 /// <summary>
 ///     Language of injected code fragment inside marked by the <see cref="LanguageInjectionAttribute" /> string literal.
@@ -1136,9 +1104,7 @@ public sealed class LanguageInjectionAttribute : Attribute
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct | AttributeTargets.Enum)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class NoReorderAttribute : Attribute
-{
-}
+public sealed class NoReorderAttribute : Attribute;
 
 /// <summary>
 ///     <para>
@@ -1411,21 +1377,15 @@ public sealed class AspChildControlTypeAttribute : Attribute
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspDataFieldAttribute : Attribute
-{
-}
+public sealed class AspDataFieldAttribute : Attribute;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspDataFieldsAttribute : Attribute
-{
-}
+public sealed class AspDataFieldsAttribute : Attribute;
 
 [AttributeUsage(AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspMethodPropertyAttribute : Attribute
-{
-}
+public sealed class AspMethodPropertyAttribute : Attribute;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
@@ -1624,9 +1584,7 @@ public sealed class AspMvcControllerAttribute : Attribute
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspMvcMasterAttribute : Attribute
-{
-}
+public sealed class AspMvcMasterAttribute : Attribute;
 
 /// <summary>
 ///     ASP.NET MVC attribute. Indicates that the marked parameter is an MVC model type. Use this attribute
@@ -1634,9 +1592,7 @@ public sealed class AspMvcMasterAttribute : Attribute
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspMvcModelTypeAttribute : Attribute
-{
-}
+public sealed class AspMvcModelTypeAttribute : Attribute;
 
 /// <summary>
 ///     ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter is an MVC
@@ -1647,18 +1603,14 @@ public sealed class AspMvcModelTypeAttribute : Attribute
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method | AttributeTargets.Field
                 | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspMvcPartialViewAttribute : Attribute
-{
-}
+public sealed class AspMvcPartialViewAttribute : Attribute;
 
 /// <summary>
 ///     ASP.NET MVC attribute. Allows disabling inspections for MVC views within a class or a method.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspMvcSuppressViewErrorAttribute : Attribute
-{
-}
+public sealed class AspMvcSuppressViewErrorAttribute : Attribute;
 
 /// <summary>
 ///     ASP.NET MVC attribute. Indicates that a parameter is an MVC display template.
@@ -1667,9 +1619,7 @@ public sealed class AspMvcSuppressViewErrorAttribute : Attribute
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspMvcDisplayTemplateAttribute : Attribute
-{
-}
+public sealed class AspMvcDisplayTemplateAttribute : Attribute;
 
 /// <summary>
 ///     ASP.NET MVC attribute. Indicates that the marked parameter is an MVC editor template.
@@ -1678,9 +1628,7 @@ public sealed class AspMvcDisplayTemplateAttribute : Attribute
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspMvcEditorTemplateAttribute : Attribute
-{
-}
+public sealed class AspMvcEditorTemplateAttribute : Attribute;
 
 /// <summary>
 ///     ASP.NET MVC attribute. Indicates that the marked parameter is an MVC template.
@@ -1689,9 +1637,7 @@ public sealed class AspMvcEditorTemplateAttribute : Attribute
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspMvcTemplateAttribute : Attribute
-{
-}
+public sealed class AspMvcTemplateAttribute : Attribute;
 
 /// <summary>
 ///     ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter
@@ -1702,9 +1648,7 @@ public sealed class AspMvcTemplateAttribute : Attribute
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method | AttributeTargets.Field
                 | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspMvcViewAttribute : Attribute
-{
-}
+public sealed class AspMvcViewAttribute : Attribute;
 
 /// <summary>
 ///     ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter
@@ -1712,9 +1656,7 @@ public sealed class AspMvcViewAttribute : Attribute
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspMvcViewComponentAttribute : Attribute
-{
-}
+public sealed class AspMvcViewComponentAttribute : Attribute;
 
 /// <summary>
 ///     ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter
@@ -1723,9 +1665,7 @@ public sealed class AspMvcViewComponentAttribute : Attribute
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method | AttributeTargets.Field
                 | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspMvcViewComponentViewAttribute : Attribute
-{
-}
+public sealed class AspMvcViewComponentViewAttribute : Attribute;
 
 /// <summary>
 ///     ASP.NET MVC attribute. When applied to a parameter of an attribute,
@@ -1742,9 +1682,7 @@ public sealed class AspMvcViewComponentViewAttribute : Attribute
 /// </example>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspMvcActionSelectorAttribute : Attribute
-{
-}
+public sealed class AspMvcActionSelectorAttribute : Attribute;
 
 #endregion
 
@@ -1759,9 +1697,7 @@ public sealed class AspMvcActionSelectorAttribute : Attribute
 /// </remarks>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class RouteTemplateAttribute : Attribute
-{
-}
+public sealed class RouteTemplateAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that the marked type is custom route parameter constraint,
@@ -1838,36 +1774,28 @@ public sealed class AspRouteConventionAttribute : Attribute
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspDefaultRouteValuesAttribute : Attribute
-{
-}
+public sealed class AspDefaultRouteValuesAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that the marked method parameter contains constraints on route values of routing convention for ASP.NET.
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspRouteValuesConstraintsAttribute : Attribute
-{
-}
+public sealed class AspRouteValuesConstraintsAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that the marked parameter or property contains routing order provided by ASP.NET routing attribute.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspRouteOrderAttribute : Attribute
-{
-}
+public sealed class AspRouteOrderAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that the marked parameter or property contains HTTP verbs provided by ASP.NET routing attribute.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspRouteVerbsAttribute : Attribute
-{
-}
+public sealed class AspRouteVerbsAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that the marked attribute is used for attribute routing in ASP.NET.
@@ -1902,18 +1830,14 @@ public sealed class AspMinimalApiDeclarationAttribute : Attribute
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspMinimalApiGroupAttribute : Attribute
-{
-}
+public sealed class AspMinimalApiGroupAttribute : Attribute;
 
 /// <summary>
 ///     Indicates that the marked parameter contains an ASP.NET Minimal API endpoint handler.
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class AspMinimalApiHandlerAttribute : Attribute
-{
-}
+public sealed class AspMinimalApiHandlerAttribute : Attribute;
 
 #endregion
 
@@ -1954,9 +1878,7 @@ public sealed class HtmlAttributeValueAttribute : Attribute
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class RazorSectionAttribute : Attribute
-{
-}
+public sealed class RazorSectionAttribute : Attribute;
 
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
@@ -2019,33 +1941,23 @@ public sealed class RazorPageBaseTypeAttribute : Attribute
 
 [AttributeUsage(AttributeTargets.Method)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class RazorHelperCommonAttribute : Attribute
-{
-}
+public sealed class RazorHelperCommonAttribute : Attribute;
 
 [AttributeUsage(AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class RazorLayoutAttribute : Attribute
-{
-}
+public sealed class RazorLayoutAttribute : Attribute;
 
 [AttributeUsage(AttributeTargets.Method)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class RazorWriteLiteralMethodAttribute : Attribute
-{
-}
+public sealed class RazorWriteLiteralMethodAttribute : Attribute;
 
 [AttributeUsage(AttributeTargets.Method)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class RazorWriteMethodAttribute : Attribute
-{
-}
+public sealed class RazorWriteMethodAttribute : Attribute;
 
 [AttributeUsage(AttributeTargets.Parameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class RazorWriteMethodParameterAttribute : Attribute
-{
-}
+public sealed class RazorWriteMethodParameterAttribute : Attribute;
 
 #endregion
 
@@ -2057,9 +1969,7 @@ public sealed class RazorWriteMethodParameterAttribute : Attribute
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class XamlItemsControlAttribute : Attribute
-{
-}
+public sealed class XamlItemsControlAttribute : Attribute;
 
 /// <summary>
 ///     XAML attribute. Indicates the property of some <c>BindingBase</c>-derived type, that
@@ -2072,9 +1982,7 @@ public sealed class XamlItemsControlAttribute : Attribute
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class XamlItemBindingOfItemsControlAttribute : Attribute
-{
-}
+public sealed class XamlItemBindingOfItemsControlAttribute : Attribute;
 
 /// <summary>
 ///     XAML attribute. Indicates the property of some <c>Style</c>-derived type that
@@ -2087,9 +1995,7 @@ public sealed class XamlItemBindingOfItemsControlAttribute : Attribute
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class XamlItemStyleOfItemsControlAttribute : Attribute
-{
-}
+public sealed class XamlItemStyleOfItemsControlAttribute : Attribute;
 
 /// <summary>
 ///     XAML attribute. Indicates that DependencyProperty has <c>OneWay</c> binding mode by default.
@@ -2100,9 +2006,7 @@ public sealed class XamlItemStyleOfItemsControlAttribute : Attribute
 /// </remarks>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class XamlOneWayBindingModeByDefaultAttribute : Attribute
-{
-}
+public sealed class XamlOneWayBindingModeByDefaultAttribute : Attribute;
 
 /// <summary>
 ///     XAML attribute. Indicates that DependencyProperty has <c>TwoWay</c> binding mode by default.
@@ -2113,9 +2017,7 @@ public sealed class XamlOneWayBindingModeByDefaultAttribute : Attribute
 /// </remarks>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class XamlTwoWayBindingModeByDefaultAttribute : Attribute
-{
-}
+public sealed class XamlTwoWayBindingModeByDefaultAttribute : Attribute;
 
 #endregion
 
@@ -2179,8 +2081,6 @@ public sealed class TestSubjectAttribute : Attribute
 /// </example>
 [AttributeUsage(AttributeTargets.GenericParameter)]
 [Conditional("JETBRAINS_ANNOTATIONS")]
-public sealed class MeansTestSubjectAttribute : Attribute
-{
-}
+public sealed class MeansTestSubjectAttribute : Attribute;
 
 #endregion

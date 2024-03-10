@@ -16,9 +16,7 @@ using Xunit;
 namespace Infrastructure.Worker.Api.IntegrationTests.AzureFunctions;
 
 [CollectionDefinition("AzureFunctions", DisableParallelization = true)]
-public class AllAzureFunctionSpecs : ICollectionFixture<AzureFunctionHostSetup>
-{
-}
+public class AllAzureFunctionSpecs : ICollectionFixture<AzureFunctionHostSetup>;
 
 [UsedImplicitly]
 public class AzureFunctionHostSetup : IApiWorkerSpec, IDisposable

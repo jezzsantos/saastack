@@ -7,9 +7,7 @@ using Xunit;
 namespace Infrastructure.Persistence.Shared.IntegrationTests;
 
 [CollectionDefinition("LocalMachineJsonFileStore", DisableParallelization = true)]
-public class AllLocalMachineJsonFileStoreSpecs : ICollectionFixture<LocalMachineJsonFileStoreSpecSetup>
-{
-}
+public class AllLocalMachineJsonFileStoreSpecs : ICollectionFixture<LocalMachineJsonFileStoreSpecSetup>;
 
 [UsedImplicitly]
 public class LocalMachineJsonFileStoreSpecSetup : StoreSpecSetupBase

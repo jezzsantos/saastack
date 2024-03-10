@@ -1,7 +1,7 @@
 # DotNet version
 
 * status: accepted
-* date: 2023-09-17
+* date: 2024-03-11
 * deciders: jezzsantos
 
 # Context and Problem Statement
@@ -20,13 +20,13 @@ It should NOT be a re-release version, it should be a stable version(a.k.a not o
 
 The options are:
 
-1. .NET 7
-2. .NET 6
-3. .NET 8
+1. .NET 8
+2. .NET 7
+3. .NET 6
 
 ## Decision Outcome
 
-`.NET 7.0`
+`.NET 8.0`
 
 - .NET 6- even though it is the current LTS, does not support the minimal API features (e.g. the `[AsParamtersAttribute]`) that we need to easily build the desired [Web API Framework](0050-api-framework.md) we want to have.
-- .NET 8 - is the next LTS version, but has not released as of yet, but when it is released (Nov '23) the adjacent eco-system will need some time to catch up. Until .NET 8 has been well-adopted, we risk the chance that some organizations will not permit starting their products on STS releases. However, anytime after Nov '23, the codebase should be easily upgradable to .NET 8.
+- .NET 7 - is the current STS version, but it is not an LTS version, it does not support named dependencies in the DI.

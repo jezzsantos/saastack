@@ -614,9 +614,7 @@ public class MultiTenancyMiddlewareSpec
     }
 
     [UsedImplicitly]
-    private class TestIllegalRequest
-    {
-    }
+    private class TestIllegalRequest;
 
     [UsedImplicitly]
     private class TestTenantedRequest : IWebRequest<TestResponse>, ITenantedRequest
@@ -625,7 +623,5 @@ public class MultiTenancyMiddlewareSpec
     }
 
     [UsedImplicitly]
-    private class TestResponse : IWebResponse
-    {
-    }
+    private class TestResponse : IWebResponse;
 }

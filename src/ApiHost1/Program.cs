@@ -12,7 +12,5 @@ app.Run();
 namespace ApiHost1
 {
     [UsedImplicitly]
-    public class Program
-    {
-    }
+    public class Program;
 }

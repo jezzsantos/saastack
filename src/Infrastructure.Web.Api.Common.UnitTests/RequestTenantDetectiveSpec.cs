@@ -65,16 +65,8 @@ public class RequestTenantDetectiveSpec
         [Fact]
         public async Task WhenDetectTenantAsyncAndTenantIdInHeader_ThenReturnsTenantId()
         {
-            var httpContext = new DefaultHttpContext
-            {
-                Request =
-                {
-                    Headers =
-                    {
-                        { HttpHeaders.Tenant, "atenantid" }
-                    }
-                }
-            };
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers.Append(HttpHeaders.Tenant, "atenantid");
 
             var result =
                 await _detective.DetectTenantAsync(httpContext, typeof(TestUnTenantedRequest), CancellationToken.None);
@@ -184,12 +176,8 @@ public class RequestTenantDetectiveSpec
     }
 
     [UsedImplicitly]
-    public class TestUnTenantedRequest : UnTenantedRequest<TestResponse>
-    {
-    }
+    public class TestUnTenantedRequest : UnTenantedRequest<TestResponse>;
 
     [UsedImplicitly]
-    public class TestTenantedRequest : TenantedRequest<TestResponse>
-    {
-    }
+    public class TestTenantedRequest : TenantedRequest<TestResponse>;
 }

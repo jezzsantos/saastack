@@ -8,14 +8,10 @@ using Xunit;
 namespace Infrastructure.Web.Hosting.Common.UnitTests.ApplicationServices;
 
 [CollectionDefinition("TenantSettings", DisableParallelization = true)]
-public class AllTenantSettingsSpecs : ICollectionFixture<TenantSettingsSpecSetup>
-{
-}
+public class AllTenantSettingsSpecs : ICollectionFixture<TenantSettingsSpecSetup>;
 
 [UsedImplicitly]
-public class TenantSettingsSpecSetup
-{
-}
+public class TenantSettingsSpecSetup;
 
 [UsedImplicitly]
 public class AspNetHostLocalFileTenantSettingsServiceSpec

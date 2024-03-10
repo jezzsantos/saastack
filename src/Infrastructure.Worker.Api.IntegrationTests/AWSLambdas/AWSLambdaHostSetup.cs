@@ -13,9 +13,7 @@ using Xunit;
 namespace Infrastructure.Worker.Api.IntegrationTests.AWSLambdas;
 
 [CollectionDefinition("AWSLambdas", DisableParallelization = true)]
-public class AllAwsLambdaSpecs : ICollectionFixture<AWSLambdaHostSetup>
-{
-}
+public class AllAwsLambdaSpecs : ICollectionFixture<AWSLambdaHostSetup>;
 
 [UsedImplicitly]
 public class AWSLambdaHostSetup : IApiWorkerSpec, IDisposable

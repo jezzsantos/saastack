@@ -30,7 +30,6 @@ public class HMACAuthenticationHandlerSpec
 
     public HMACAuthenticationHandlerSpec()
     {
-        var clock = new Mock<ISystemClock>();
         var options = new Mock<IOptionsMonitor<HMACOptions>>();
         options.Setup(x => x.Get(It.IsAny<string>()))
             .Returns(new HMACOptions());
@@ -53,7 +52,7 @@ public class HMACAuthenticationHandlerSpec
             RequestServices = _serviceCollection.BuildServiceProvider()
         };
 
-        _handler = new HMACAuthenticationHandler(options.Object, new LoggerFactory(), UrlEncoder.Default, clock.Object);
+        _handler = new HMACAuthenticationHandler(options.Object, new LoggerFactory(), UrlEncoder.Default);
     }
 
     [Fact]
@@ -66,7 +65,7 @@ public class HMACAuthenticationHandlerSpec
         var result = await _handler.AuthenticateAsync();
 
         result.Succeeded.Should().BeFalse();
-        result.Failure.Should().BeOfType<Exception>()
+        result.Failure.Should().BeOfType<AuthenticationFailureException>()
             .Which.Message.Should().Be(Resources.AuthenticationHandler_NotHttps);
     }
 
@@ -79,7 +78,7 @@ public class HMACAuthenticationHandlerSpec
         var result = await _handler.AuthenticateAsync();
 
         result.Succeeded.Should().BeFalse();
-        result.Failure.Should().BeOfType<Exception>()
+        result.Failure.Should().BeOfType<AuthenticationFailureException>()
             .Which.Message.Should()
             .Be(Resources.HMACAuthenticationHandler_MissingHeader.Format(HttpHeaders.HMACSignature));
     }
@@ -118,7 +117,7 @@ public class HMACAuthenticationHandlerSpec
         result.Succeeded.Should().BeFalse();
         _recorder.Verify(rec => rec.Audit(It.IsAny<ICallContext>(), AuditingConstants.HMACAuthenticationFailed,
             Resources.HMACAuthenticationHandler_FailedAuthentication));
-        result.Failure.Should().BeOfType<Exception>()
+        result.Failure.Should().BeOfType<AuthenticationFailureException>()
             .Which.Message.Should()
             .Be(Resources.AuthenticationHandler_Failed);
     }

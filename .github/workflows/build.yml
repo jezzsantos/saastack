@@ -12,7 +12,7 @@ env:
   SOLUTION_PATH: 'src/SaaStack.sln'
   TESTINGONLY_BUILD_CONFIGURATION: 'Release'
   DEPLOY_BUILD_CONFIGURATION: 'ReleaseForDeploy'
-  DOTNET_VERSION: 7.0.404
+  DOTNET_VERSION: 8.0.200
 
 jobs:
   build:

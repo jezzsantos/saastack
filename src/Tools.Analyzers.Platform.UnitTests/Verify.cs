@@ -22,23 +22,25 @@ public static class Verify
         typeof(AnalyzerConstants).Assembly
     };
 
-    // HACK: we have to define the .NET 7.0 framework here,
+    // HACK: we have to define the .NET 8.0 framework here,
     // because the current version of Microsoft.CodeAnalysis.Testing.ReferenceAssemblies
     // does not contain a value for this framework  
-    private static readonly Lazy<ReferenceAssemblies> LazyNet70 = new(() =>
+    private static readonly Lazy<ReferenceAssemblies> LazyNet80 = new(() =>
     {
-        if (!NuGetFramework.Parse("net7.0")
+        const string version = "net8.0";
+        const string sdkVersion = "8.0.2";
+        if (!NuGetFramework.Parse(version)
                 .IsPackageBased)
         {
-            // The NuGet version provided at runtime does not recognize the 'net6.0' target framework
-            throw new NotSupportedException("The 'net6.0' target framework is not supported by this version of NuGet.");
+            // The NuGet version provided at runtime does not recognize the target framework
+            throw new NotSupportedException($"The '{version}' target framework is not supported by this version of NuGet.");
         }
 
-        return new ReferenceAssemblies("net7.0", new PackageIdentity("Microsoft.NETCore.App.Ref", "7.0.14"),
-            Path.Combine("ref", "net7.0"));
+        return new ReferenceAssemblies(version, new PackageIdentity("Microsoft.NETCore.App.Ref", sdkVersion),
+            Path.Combine("ref", version));
     });
 
-    private static ReferenceAssemblies Net70 => LazyNet70.Value;
+    private static ReferenceAssemblies Net80 => LazyNet80.Value;
 
     public static async Task DiagnosticExists<TAnalyzer>(DiagnosticDescriptor descriptor, string inputSnippet,
         int locationX, int locationY, string argument, params object?[]? messageArgs)
@@ -91,7 +93,7 @@ public static class Verify
             analyzerTest.TestState.AdditionalReferences.Add(assembly);
         }
 
-        analyzerTest.ReferenceAssemblies = Net70;
+        analyzerTest.ReferenceAssemblies = Net80;
         analyzerTest.TestCode = inputSnippet;
         if (expected is not null && expected.Any())
         {

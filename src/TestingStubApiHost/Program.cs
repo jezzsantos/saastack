@@ -12,7 +12,5 @@ app.Run();
 namespace TestingStubApiHost
 {
     [UsedImplicitly]
-    public class Program
-    {
-    }
+    public class Program;
 }

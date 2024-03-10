@@ -25,7 +25,7 @@ public class JWTTokensServiceSpec
         settings.Setup(s => s.Platform.GetString(JWTTokensService.BaseUrlSettingName, null))
             .Returns("https://localhost");
         settings.Setup(s => s.Platform.GetString(JWTTokensService.SecretSettingName, null))
-            .Returns("asecretsigningkey");
+            .Returns("asecretsigningkeyasecretsigningkeyasecretsigningkeyasecretsigningkey");
         settings.Setup(s => s.Platform.GetNumber(It.IsAny<string>(), It.IsAny<double>()))
             .Returns((string _, double defaultValue) => defaultValue);
         _tokensService = new Mock<ITokensService>();

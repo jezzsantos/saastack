@@ -22,8 +22,8 @@ public class HMACAuthenticationHandler : AuthenticationHandler<HMACOptions>
 {
     public const string AuthenticationScheme = "HMAC";
 
-    public HMACAuthenticationHandler(IOptionsMonitor<HMACOptions> options, ILoggerFactory logger, UrlEncoder encoder,
-        ISystemClock clock) : base(options, logger, encoder, clock)
+    public HMACAuthenticationHandler(IOptionsMonitor<HMACOptions> options, ILoggerFactory logger, UrlEncoder encoder) :
+        base(options, logger, encoder)
     {
     }
 
@@ -79,6 +79,4 @@ public class HMACAuthenticationHandler : AuthenticationHandler<HMACOptions>
 /// <summary>
 ///     Provides options for configuring HMAC authentication
 /// </summary>
-public class HMACOptions : AuthenticationSchemeOptions
-{
-}
+public class HMACOptions : AuthenticationSchemeOptions;

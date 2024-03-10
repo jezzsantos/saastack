@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <IsPlatformProject>true</IsPlatformProject>
     </PropertyGroup>
 
@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.11" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.2" />
     </ItemGroup>
 
 </Project>

@@ -16,6 +16,4 @@ public class
     public required string IdentityUuid { get; set; }
 }
 
-public class FlagsmithCreateEdgeIdentityFeatureStateResponse : IWebResponse
-{
-}
+public class FlagsmithCreateEdgeIdentityFeatureStateResponse : IWebResponse;

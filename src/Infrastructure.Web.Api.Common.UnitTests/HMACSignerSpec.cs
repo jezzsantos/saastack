@@ -125,7 +125,5 @@ public class HMACSignerSpec
     }
 
     [UsedImplicitly]
-    public class TestHmacResponse : IWebResponse
-    {
-    }
+    public class TestHmacResponse : IWebResponse;
 }

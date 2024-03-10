@@ -109,7 +109,7 @@ That documentation is intended to be part of the template itself that users of t
 
 * Windows or MacOS.
 * Jetbrains Rider or Visual Studio (There is most support for JetBrains dotUltimate)
-* Install the .NET7.0 SDK (specifically version 7.0.14). Available for [download here](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
+* Install the .NET8.0 SDK (specifically version 8.0.2). Available for [download here](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 *
 
 > Included in the codebase there are many formatting rules that need to be run before committing your code. These rules may not be supported by other developer tools.
@@ -119,7 +119,7 @@ That documentation is intended to be part of the template itself that users of t
 > We have ensured that you wont need any other infrastructure running on your local machine (i.e. SQLServer database), unless you want to run infrastructure specific integration tests.
 
 * Clone the repo locally
-* Ensure that you have `.NET7.0` (specifically version `7.0.14`) installed on your system. [Download](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+* Ensure that you have `.NET8.0` (specifically version `8.0.2`) installed on your system. [Download](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 * Open the `src/SaaStack.sln` solution
 
 ## Building the code

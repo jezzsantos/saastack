@@ -7,9 +7,7 @@ using Xunit;
 namespace Infrastructure.Persistence.Shared.IntegrationTests;
 
 [CollectionDefinition("InProcessInMemStore", DisableParallelization = true)]
-public class AllInProcessInMemStoreSpecs : ICollectionFixture<InProcessInMemStoreSpecSetup>
-{
-}
+public class AllInProcessInMemStoreSpecs : ICollectionFixture<InProcessInMemStoreSpecSetup>;
 
 [UsedImplicitly]
 public class InProcessInMemStoreSpecSetup : StoreSpecSetupBase

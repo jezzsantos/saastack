@@ -23,8 +23,7 @@ public class APIKeyAuthenticationHandler : AuthenticationHandler<APIKeyOptions>
     public const string AuthenticationScheme = "APIKey";
 
     public APIKeyAuthenticationHandler(IOptionsMonitor<APIKeyOptions> options, ILoggerFactory logger,
-        UrlEncoder encoder,
-        ISystemClock clock) : base(options, logger, encoder, clock)
+        UrlEncoder encoder) : base(options, logger, encoder)
     {
     }
 
@@ -80,6 +79,4 @@ public class APIKeyAuthenticationHandler : AuthenticationHandler<APIKeyOptions>
 /// <summary>
 ///     Provides options for configuring APIKey authentication
 /// </summary>
-public class APIKeyOptions : AuthenticationSchemeOptions
-{
-}
+public class APIKeyOptions : AuthenticationSchemeOptions;

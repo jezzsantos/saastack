@@ -20,7 +20,5 @@ host.Run();
 namespace AzureFunctions.Api.WorkerHost
 {
     [UsedImplicitly]
-    public class Program
-    {
-    }
+    public class Program;
 }

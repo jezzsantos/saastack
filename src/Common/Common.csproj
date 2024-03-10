@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <IsPlatformProject>true</IsPlatformProject>
         <DefineConstants>$(DefineConstants);COMMON_PROJECT</DefineConstants>
         <!-- Outputs the source generated files locally -->
@@ -12,7 +12,7 @@
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="12.0.1" />
         <PackageReference Include="ISO.3166.CountryCodes" Version="1.0.3" />
-        <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.2" />
+        <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.0" />
         <PackageReference Include="NodaTime" Version="3.1.6" />
     </ItemGroup>
 

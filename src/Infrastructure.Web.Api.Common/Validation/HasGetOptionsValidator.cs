@@ -9,9 +9,7 @@ namespace Infrastructure.Web.Api.Common.Validation;
 /// <summary>
 ///     Defines a validator for <see cref="IHasGetOptions" />
 /// </summary>
-public interface IHasGetOptionsValidator : IValidator<IHasGetOptions>
-{
-}
+public interface IHasGetOptionsValidator : IValidator<IHasGetOptions>;
 
 /// <summary>
 ///     Validates a <see cref="IHasGetOptions" />

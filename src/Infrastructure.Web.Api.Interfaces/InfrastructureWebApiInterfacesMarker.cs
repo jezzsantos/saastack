@@ -6,6 +6,4 @@ namespace Infrastructure.Web.Api.Interfaces;
 ///     Provides an assembly marker for runtime or testing purposes
 /// </summary>
 [UsedImplicitly]
-public class InfrastructureWebApiInterfacesMarker
-{
-}
+public class InfrastructureWebApiInterfacesMarker;

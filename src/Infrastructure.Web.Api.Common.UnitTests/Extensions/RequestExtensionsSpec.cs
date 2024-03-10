@@ -286,14 +286,10 @@ public class RequestExtensionsSpec
         result.Should().Be("/aroute/anid/apath1/xxxyyy/apath2/avalue1/apath3");
     }
 
-    private class NoRouteRequest : IWebRequest<TestResponse>
-    {
-    }
+    private class NoRouteRequest : IWebRequest<TestResponse>;
 
     [Route("/aroute/{unknown}", ServiceOperation.Get)]
-    private class HasNoPropertiesRequest : IWebRequest<TestResponse>
-    {
-    }
+    private class HasNoPropertiesRequest : IWebRequest<TestResponse>;
 
     [Route("/aroute", ServiceOperation.Get)]
     private class HasNoPlaceholdersGetRequest : IWebRequest<TestResponse>

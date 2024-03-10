@@ -507,6 +507,4 @@ public class TestPopulatedRequest : IWebRequest
     public string AProperty => "avalue";
 }
 
-public class TestEmptyRequest : IWebRequest
-{
-}
+public class TestEmptyRequest : IWebRequest;

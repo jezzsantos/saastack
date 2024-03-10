@@ -3,6 +3,4 @@
 /// <summary>
 ///     Defines a read model entity
 /// </summary>
-public interface IReadModelEntity : IPersistableDto
-{
-}
+public interface IReadModelEntity : IPersistableDto;

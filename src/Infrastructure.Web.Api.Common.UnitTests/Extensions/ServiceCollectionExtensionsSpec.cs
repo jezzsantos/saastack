@@ -72,17 +72,11 @@ public class ServiceCollectionExtensionsSpec
             .ContainSingle(behavior => behavior.ImplementationType == expectedBehaviorImplementationType);
     }
 
-    public class TestRequestValidator : AbstractValidator<TestRequest>
-    {
-    }
+    public class TestRequestValidator : AbstractValidator<TestRequest>;
 
-    public class TestRequestValidator2 : AbstractValidator<TestRequest2>
-    {
-    }
+    public class TestRequestValidator2 : AbstractValidator<TestRequest2>;
 
-    public class TestApiWithoutMethods : IWebApiService
-    {
-    }
+    public class TestApiWithoutMethods : IWebApiService;
 
     public class TestApi : IWebApiService
     {
@@ -94,7 +88,5 @@ public class ServiceCollectionExtensionsSpec
 
     [Route("/aroute", ServiceOperation.Get)]
     [UsedImplicitly]
-    public class TestRequest2 : IWebRequest<TestResponse>
-    {
-    }
+    public class TestRequest2 : IWebRequest<TestResponse>;
 }

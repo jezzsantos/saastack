@@ -138,9 +138,7 @@ public class MultiTenancyFilterSpec
         context.Arguments[1].As<TestTenantedRequest>().OrganizationId.Should().Be("atenantid");
     }
 
-    private class TestUnTenantedRequest : IWebRequest<TestResponse>
-    {
-    }
+    private class TestUnTenantedRequest : IWebRequest<TestResponse>;
 
     private class TestTenantedRequest : IWebRequest<TestResponse>, ITenantedRequest
     {

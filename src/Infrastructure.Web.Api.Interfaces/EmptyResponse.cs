@@ -6,6 +6,4 @@ namespace Infrastructure.Web.Api.Interfaces;
 ///     Defines an empty response, for use in empty responses
 /// </summary>
 [UsedImplicitly]
-public class EmptyResponse : IWebResponse
-{
-}
+public class EmptyResponse : IWebResponse;

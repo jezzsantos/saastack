@@ -7,9 +7,7 @@ using Xunit;
 namespace Infrastructure.Persistence.Shared.IntegrationTests.AWS;
 
 [CollectionDefinition("AWSAccount", DisableParallelization = true)]
-public class AWSAccountSpecs : ICollectionFixture<AWSAccountSpecSetup>
-{
-}
+public class AWSAccountSpecs : ICollectionFixture<AWSAccountSpecSetup>;
 
 [UsedImplicitly]
 public class AWSAccountSpecSetup : StoreSpecSetupBase, IDisposable

@@ -12,6 +12,4 @@ public class TestRequest : IWebRequest<TestResponse>
     public string? Id { get; set; }
 }
 
-public class TestResponse : IWebResponse
-{
-}
+public class TestResponse : IWebResponse;

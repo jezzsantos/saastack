@@ -137,25 +137,15 @@ public class ServiceCollectionExtensionsSpec
     }
 }
 
-public interface ITestInterface1
-{
-}
+public interface ITestInterface1;
 
-public interface ITestInterface2
-{
-}
+public interface ITestInterface2;
 
-public interface ITestInterface3
-{
-}
+public interface ITestInterface3;
 
-public interface ITestInterface4
-{
-}
+public interface ITestInterface4;
 
-public interface ITestInterface5
-{
-}
+public interface ITestInterface5;
 
 public class TestContainerClass : ITestInterface1, ITestInterface2, ITestInterface3, ITestInterface4, ITestInterface5,
     IDisposable

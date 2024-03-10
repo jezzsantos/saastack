@@ -6,6 +6,4 @@ namespace Domain.Interfaces;
 ///     Provides an assembly marker for runtime or testing purposes
 /// </summary>
 [UsedImplicitly]
-public class DomainInterfacesMarker
-{
-}
+public class DomainInterfacesMarker;

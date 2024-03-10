@@ -127,7 +127,7 @@ public class ContentNegotiationFilterSpec
         result.As<JsonHttpResult<object>>().Value.As<ProblemDetails>().Title.Should()
             .Be("An error occurred while processing your request.");
         result.As<JsonHttpResult<object>>().Value.As<ProblemDetails>().Type.Should()
-            .Be("https://tools.ietf.org/html/rfc7231#section-6.6.1");
+            .Be("https://tools.ietf.org/html/rfc9110#section-15.6.1");
     }
 
     [Fact]

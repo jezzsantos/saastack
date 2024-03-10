@@ -7,9 +7,7 @@ using Xunit;
 namespace Infrastructure.Persistence.Shared.IntegrationTests.Azure;
 
 [CollectionDefinition("AzureStorageAccount", DisableParallelization = true)]
-public class AzureStorageAccountSpecs : ICollectionFixture<AzureStorageAccountSpecSetup>
-{
-}
+public class AzureStorageAccountSpecs : ICollectionFixture<AzureStorageAccountSpecSetup>;
 
 [UsedImplicitly]
 public class AzureStorageAccountSpecSetup : StoreSpecSetupBase, IDisposable

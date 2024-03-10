@@ -8,9 +8,7 @@ namespace Infrastructure.Web.Api.Common.Validation;
 /// <summary>
 ///     Defines a validator for <see cref="IHasSearchOptions" />
 /// </summary>
-public interface IHasSearchOptionsValidator : IValidator<IHasSearchOptions>
-{
-}
+public interface IHasSearchOptionsValidator : IValidator<IHasSearchOptions>;
 
 /// <summary>
 ///     Validates a <see cref="IHasSearchOptions" /> request

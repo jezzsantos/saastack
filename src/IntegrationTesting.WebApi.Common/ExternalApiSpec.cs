@@ -14,9 +14,7 @@ namespace IntegrationTesting.WebApi.Common;
 ///     Provides an xUnit collection for running "External" tests together
 /// </summary>
 [CollectionDefinition("External", DisableParallelization = false)]
-public class AllExternalSpecs : ICollectionFixture<ExternalApiSetup>
-{
-}
+public class AllExternalSpecs : ICollectionFixture<ExternalApiSetup>;
 
 /// <summary>
 ///     Provides an xUnit class fixture for external integration testing APIs

@@ -12,7 +12,5 @@ app.Run();
 namespace WebsiteHost
 {
     [UsedImplicitly]
-    public class Program
-    {
-    }
+    public class Program;
 }

@@ -6,9 +6,7 @@ using Domain.Interfaces.ValueObjects;
 
 namespace Infrastructure.Persistence.Interfaces.UnitTests;
 
-public class TestCommandDomainAggregateRoot : TestCommandDomainEntity, IDehydratableAggregateRoot
-{
-}
+public class TestCommandDomainAggregateRoot : TestCommandDomainEntity, IDehydratableAggregateRoot;
 
 public class TestCommandDomainEntity : IDehydratableEntity
 {
