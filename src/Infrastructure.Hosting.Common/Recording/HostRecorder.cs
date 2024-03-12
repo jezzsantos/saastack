@@ -241,7 +241,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
         {
             AuditReporterOption.None => new NullAuditReporter(),
             AuditReporterOption.ReliableQueue => new QueuedAuditReporter(container,
-                container.ResolveForPlatform<IConfigurationSettings>()),
+                container.GetRequiredServiceForPlatform<IConfigurationSettings>()),
             _ => throw new ArgumentOutOfRangeException(nameof(options.MetricReporting))
         };
     }
@@ -269,7 +269,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
         {
             UsageReporterOption.None => new NullUsageReporter(),
             UsageReporterOption.ReliableQueue => new QueuedUsageReporter(container,
-                container.ResolveForPlatform<IConfigurationSettings>()),
+                container.GetRequiredServiceForPlatform<IConfigurationSettings>()),
             _ => throw new ArgumentOutOfRangeException(nameof(options.MetricReporting))
         };
     }

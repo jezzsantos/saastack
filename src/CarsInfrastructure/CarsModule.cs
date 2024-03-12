@@ -41,14 +41,14 @@ public class CarsModule : ISubDomainModule
         {
             return (_, services) =>
             {
-                services.RegisterTenanted<ICarsApplication, CarsApplication.CarsApplication>();
-                services.RegisterTenanted<ICarRepository, CarRepository>();
+                services.AddPerHttpRequest<ICarsApplication, CarsApplication.CarsApplication>();
+                services.AddPerHttpRequest<ICarRepository, CarRepository>();
                 services.RegisterTenantedEventing<CarRoot, CarProjection>(
-                    c => new CarProjection(c.ResolveForUnshared<IRecorder>(), c.ResolveForUnshared<IDomainFactory>(),
-                        c.ResolveForTenant<IDataStore>())
+                    c => new CarProjection(c.GetRequiredService<IRecorder>(), c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IDataStore>())
                 );
 
-                services.RegisterTenanted<ICarsService, CarsInProcessServiceClient>();
+                services.AddPerHttpRequest<ICarsService, CarsInProcessServiceClient>();
             };
         }
     }

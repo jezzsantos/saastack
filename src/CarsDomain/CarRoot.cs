@@ -44,8 +44,8 @@ public sealed class CarRoot : AggregateRootBase
 
     public static AggregateRootFactory<CarRoot> Rehydrate()
     {
-        return (identifier, container, _) => new CarRoot(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, _) => new CarRoot(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public override Result<Error> EnsureInvariants()

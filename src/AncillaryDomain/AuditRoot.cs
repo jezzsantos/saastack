@@ -43,8 +43,8 @@ public sealed class AuditRoot : AggregateRootBase
 
     public static AggregateRootFactory<AuditRoot> Rehydrate()
     {
-        return (identifier, container, _) => new AuditRoot(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, _) => new AuditRoot(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public override Result<Error> EnsureInvariants()

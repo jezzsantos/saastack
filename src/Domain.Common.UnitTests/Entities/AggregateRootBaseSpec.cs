@@ -31,9 +31,9 @@ public class AggregateRootBaseSpec
         _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
         _dependencyContainer = new Mock<IDependencyContainer>();
-        _dependencyContainer.Setup(dc => dc.Resolve<IRecorder>())
+        _dependencyContainer.Setup(dc => dc.GetRequiredService<IRecorder>())
             .Returns(_recorder.Object);
-        _dependencyContainer.Setup(dc => dc.Resolve<IIdentifierFactory>())
+        _dependencyContainer.Setup(dc => dc.GetRequiredService<IIdentifierFactory>())
             .Returns(_idFactory.Object);
         _typeMigrator = new ChangeEventTypeMigrator();
 
@@ -139,9 +139,9 @@ public class AggregateRootBaseSpec
     public void WhenRehydrate_ThenRaisesNoEvents()
     {
         var container = new Mock<IDependencyContainer>();
-        container.Setup(c => c.Resolve<IRecorder>())
+        container.Setup(c => c.GetRequiredService<IRecorder>())
             .Returns(NullRecorder.Instance);
-        container.Setup(c => c.Resolve<IIdentifierFactory>())
+        container.Setup(c => c.GetRequiredService<IIdentifierFactory>())
             .Returns(new NullIdentifierFactory());
 
         var created =

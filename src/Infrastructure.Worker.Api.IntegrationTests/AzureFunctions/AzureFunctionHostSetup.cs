@@ -2,7 +2,6 @@ using AzureFunctions.Api.WorkerHost;
 using Common.Extensions;
 using Common.Recording;
 using Infrastructure.Hosting.Common;
-using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.Azure.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 using JetBrains.Annotations;
@@ -96,7 +95,7 @@ public class AzureFunctionHostSetup : IApiWorkerSpec, IDisposable
             throw new InvalidOperationException("Host has not be started yet!");
         }
 
-        return _host.Services.Resolve<TService>();
+        return _host.Services.GetRequiredService<TService>();
     }
 }
 

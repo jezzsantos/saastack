@@ -60,8 +60,8 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
     ///     Should never raise any events.
     /// </summary>
     protected AggregateRootBase(ISingleValueObject<string> identifier, IDependencyContainer container,
-        HydrationProperties rehydratingProperties) : this(container.Resolve<IRecorder>(),
-        container.Resolve<IIdentifierFactory>(), identifier)
+        HydrationProperties rehydratingProperties) : this(container.GetRequiredService<IRecorder>(),
+        container.GetRequiredService<IIdentifierFactory>(), identifier)
     {
         Id = rehydratingProperties.GetValueOrDefault(nameof(Id), Identifier.Empty());
         LastPersistedAtUtc = rehydratingProperties.GetValueOrDefault<Optional<DateTime>>(nameof(LastPersistedAtUtc));

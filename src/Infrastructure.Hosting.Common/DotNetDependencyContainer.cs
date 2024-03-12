@@ -21,15 +21,15 @@ public class DotNetDependencyContainer : IDependencyContainer
         _serviceProvider = serviceProvider;
     }
 
-    public TService Resolve<TService>()
+    public TService GetRequiredService<TService>()
         where TService : notnull
     {
-        return _serviceProvider.ResolveForUnshared<TService>();
+        return _serviceProvider.GetRequiredService<TService>();
     }
 
-    public TService ResolveForPlatform<TService>()
+    public TService GetRequiredServiceForPlatform<TService>()
         where TService : notnull
     {
-        return _serviceProvider.ResolveForPlatform<TService>();
+        return _serviceProvider.GetRequiredServiceForPlatform<TService>();
     }
 }

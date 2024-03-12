@@ -7,7 +7,6 @@ using Common.FeatureFlags;
 using Common.Recording;
 using Infrastructure.Common.Recording;
 using Infrastructure.Hosting.Common;
-using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Interfaces.Clients;
 using Infrastructure.Workers.Api;
@@ -32,17 +31,17 @@ public static class HostExtensions
 #else
 #if HOSTEDONAWS
             services.AddSingleton<ICrashReporter>(c =>
-                new AWSCloudWatchCrashReporter(c.Resolve<ILoggerFactory>()));
+                new AWSCloudWatchCrashReporter(c.GetRequiredService<ILoggerFactory>()));
 #endif
 #endif
 
         services.AddSingleton<IRecorder>(c =>
-            new CrashTraceOnlyRecorder("AWS API Lambdas", c.Resolve<ILoggerFactory>(),
-                c.Resolve<ICrashReporter>()));
+            new CrashTraceOnlyRecorder("AWS API Lambdas", c.GetRequiredService<ILoggerFactory>(),
+                c.GetRequiredService<ICrashReporter>()));
         services.AddSingleton<IServiceClient>(c =>
-            new InterHostServiceClient(c.Resolve<IHttpClientFactory>(),
-                c.Resolve<JsonSerializerOptions>(),
-                c.Resolve<IHostSettings>().GetAncillaryApiHostBaseUrl()));
+            new InterHostServiceClient(c.GetRequiredService<IHttpClientFactory>(),
+                c.GetRequiredService<JsonSerializerOptions>(),
+                c.GetRequiredService<IHostSettings>().GetAncillaryApiHostBaseUrl()));
         services.AddSingleton<IQueueMonitoringApiRelayWorker<UsageMessage>, DeliverUsageRelayWorker>();
         services.AddSingleton<IQueueMonitoringApiRelayWorker<AuditMessage>, DeliverAuditRelayWorker>();
         services.AddSingleton<IQueueMonitoringApiRelayWorker<EmailMessage>, DeliverEmailRelayWorker>();

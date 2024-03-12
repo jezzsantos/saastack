@@ -1,7 +1,6 @@
 using Common.Configuration;
 using Common.Extensions;
 using Infrastructure.Hosting.Common;
-using Infrastructure.Hosting.Common.Extensions;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,7 +50,7 @@ public class ExternalApiSetup : IDisposable
             throw new InvalidOperationException("Host has not be started yet!");
         }
 
-        return _host.Services.Resolve<TService>();
+        return _host.Services.GetRequiredService<TService>();
     }
 
     public void OverrideTestingDependencies(Action<IServiceCollection> overrideDependencies)

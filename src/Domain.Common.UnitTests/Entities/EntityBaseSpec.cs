@@ -23,9 +23,9 @@ public class EntityBaseSpec
         idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
         var dependencyContainer = new Mock<IDependencyContainer>();
-        dependencyContainer.Setup(dc => dc.Resolve<IRecorder>())
+        dependencyContainer.Setup(dc => dc.GetRequiredService<IRecorder>())
             .Returns(recorder.Object);
-        dependencyContainer.Setup(dc => dc.Resolve<IIdentifierFactory>())
+        dependencyContainer.Setup(dc => dc.GetRequiredService<IIdentifierFactory>())
             .Returns(idFactory.Object);
 
         _entity = TestEntity.Create(recorder.Object, idFactory.Object, _ => Result.Ok);

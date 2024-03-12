@@ -281,8 +281,8 @@ public class CarRoot : AggregateRootBase
     // Note: This method is called by the runtime when the aggregate is loaded from a persistence store
     public static AggregateRootFactory<CarRoot> Rehydrate()
     {
-        return (identifier, container, _) => new CarRoot(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, _) => new CarRoot(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 ```
 

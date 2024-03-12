@@ -1,6 +1,6 @@
 extern alias NonPlatformAnalyzers;
 using Xunit;
-using NonPlatform_DomainDrivenDesignAnalyzer =
+using DomainDrivenDesignAnalyzer =
     NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignAnalyzer;
 using UsedImplicitly = NonPlatformAnalyzers::JetBrains.Annotations.UsedImplicitlyAttribute;
 
@@ -22,7 +22,7 @@ public class AClass : IWebApiService
 {
 }";
 
-            await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+            await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
         }
 
         [Fact]
@@ -34,7 +34,7 @@ public class AClass
 {
 }";
 
-            await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+            await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
         }
 
         [Fact]
@@ -46,7 +46,7 @@ public class AClass
 {
 }";
 
-            await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+            await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
         }
 
         [Fact]
@@ -58,7 +58,7 @@ public class AClass
 {
 }";
 
-            await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+            await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
         }
     }
 
@@ -98,13 +98,13 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas030, input, 11,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas030, input, 11,
                     14,
                     "AClass");
             }
@@ -139,8 +139,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public void Create()
@@ -148,8 +148,8 @@ public class AClass : AggregateRootBase
     }
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas030, input, 11,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas030, input, 11,
                     14,
                     "AClass");
             }
@@ -185,8 +185,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public static AClass Create()
@@ -203,7 +203,7 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -241,8 +241,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public static void Create()
@@ -258,8 +258,8 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas031, input, 33,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas031, input, 33,
                     24,
                     "Create", "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
             }
@@ -295,8 +295,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public static string Create()
@@ -313,8 +313,8 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas031, input, 33,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas031, input, 33,
                     26,
                     "Create", "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
             }
@@ -350,8 +350,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public static AClass Create()
@@ -368,7 +368,7 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -402,8 +402,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public static Result<AClass, Error> Create()
@@ -420,7 +420,7 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -457,8 +457,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public static AClass Create()
@@ -467,10 +467,10 @@ public class AClass : AggregateRootBase
     }
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas032, input, 32,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas032, input, 32,
                     26,
-                    "Create", NonPlatform_DomainDrivenDesignAnalyzer.ConstructorMethodCall);
+                    "Create", DomainDrivenDesignAnalyzer.ConstructorMethodCall);
             }
 
             [Fact]
@@ -504,8 +504,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public static AClass Create()
@@ -522,7 +522,7 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -560,8 +560,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public static AClass Create()
@@ -578,8 +578,8 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas033, input, 14,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas033, input, 14,
                     12, "AClass");
             }
 
@@ -614,8 +614,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public static AClass Create()
@@ -632,7 +632,7 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -674,8 +674,8 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas034, input, 8,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas034, input, 8,
                     14,
                     "AClass");
             }
@@ -719,8 +719,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 }
 public class CreateEvent : IDomainEvent
@@ -730,7 +730,7 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -777,8 +777,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 }
 public class CreateEvent : IDomainEvent
@@ -788,8 +788,8 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas035, input, 14,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas035, input, 14,
                     14, "AClass");
             }
 
@@ -834,8 +834,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public override HydrationProperties Dehydrate()
@@ -850,7 +850,7 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -897,8 +897,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public override HydrationProperties Dehydrate()
@@ -913,8 +913,8 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas036, input, 14,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas036, input, 14,
                     14,
                     "AClass");
             }
@@ -960,8 +960,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public override HydrationProperties Dehydrate()
@@ -976,7 +976,7 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -1021,8 +1021,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public string AProperty { get; set; }
@@ -1034,8 +1034,8 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas037, input, 40,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas037, input, 40,
                     19, "AProperty");
             }
 
@@ -1077,8 +1077,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public string AProperty { get; private set; }
@@ -1090,7 +1090,7 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -1131,8 +1131,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public string AProperty => string.Empty;
@@ -1144,7 +1144,7 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -1185,8 +1185,8 @@ public class AClass : AggregateRootBase
 
     public static AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public string AProperty { get; }
@@ -1198,7 +1198,7 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
     }
@@ -1232,8 +1232,8 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas040, input, 9,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas040, input, 9,
                     14, "AClass");
             }
 
@@ -1264,8 +1264,8 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas040, input, 9,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas040, input, 9,
                     14,
                     "AClass");
             }
@@ -1299,7 +1299,7 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -1334,8 +1334,8 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas041, input, 21,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas041, input, 21,
                     24, "Create", "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
             }
 
@@ -1368,8 +1368,8 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas041, input, 21,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas041, input, 21,
                     26, "Create", "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
             }
 
@@ -1402,7 +1402,7 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -1434,7 +1434,7 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -1470,8 +1470,8 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas042, input, 12,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas042, input, 12,
                     12, "AClass");
             }
 
@@ -1504,7 +1504,7 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -1555,8 +1555,8 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas043, input, 16,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas043, input, 16,
                     14, "AClass");
             }
 
@@ -1609,7 +1609,7 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -1660,8 +1660,8 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas044, input, 16,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas044, input, 16,
                     14, "AClass");
             }
 
@@ -1713,7 +1713,7 @@ public class AClass : EntityBase
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }";
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -1767,8 +1767,8 @@ public class AClass : EntityBase
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }";
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas045, input, 15,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas045, input, 15,
                     14,
                     "AClass");
             }
@@ -1821,7 +1821,7 @@ public class AClass : EntityBase
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }";
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -1860,8 +1860,8 @@ public class AClass : EntityBase
     public string AProperty { get;set; }
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas046, input, 27,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas046, input, 27,
                     19, "AProperty");
             }
 
@@ -1897,7 +1897,7 @@ public class AClass : EntityBase
     public string AProperty { get; private set; }
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -1932,7 +1932,7 @@ public class AClass : EntityBase
     public string AProperty => string.Empty;
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -1967,7 +1967,7 @@ public class AClass : EntityBase
     public string AProperty { get; }
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
     }
@@ -2011,8 +2011,8 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas050, input, 11,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas050, input, 11,
                     14, "AClass");
             }
 
@@ -2054,8 +2054,8 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas050, input, 11,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas050, input, 11,
                     14, "AClass");
             }
 
@@ -2098,7 +2098,7 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -2143,8 +2143,8 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas051, input, 19,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas051, input, 19,
                     24, "Create", "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
             }
 
@@ -2187,8 +2187,8 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas051, input, 19,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas051, input, 19,
                     26, "Create", "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
             }
 
@@ -2231,7 +2231,7 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -2273,7 +2273,7 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -2319,8 +2319,8 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas052, input, 14,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas052, input, 14,
                     12, "AClass");
             }
 
@@ -2363,7 +2363,7 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -2404,8 +2404,8 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas053, input, 12,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas053, input, 12,
                     14, "AClass");
             }
 
@@ -2449,7 +2449,7 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty { get;}
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -2496,8 +2496,8 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty { get;set; }
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas054, input, 35,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas054, input, 35,
                     19, "AProperty");
             }
 
@@ -2541,7 +2541,7 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty { get; private set; }
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -2583,7 +2583,7 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty => string.Empty;
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -2626,7 +2626,7 @@ public class AClass : ValueObjectBase<AClass>
     public string AProperty { get; }
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
 
@@ -2677,8 +2677,8 @@ public class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas055, input, 37,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas055, input, 37,
                     17, "AMethod",
                     "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
             }
@@ -2728,8 +2728,8 @@ public class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.DiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas055, input, 37,
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas055, input, 37,
                     19, "AMethod",
                     "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
             }
@@ -2780,7 +2780,7 @@ public class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -2830,7 +2830,7 @@ public class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -2878,7 +2878,7 @@ public class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
 
             [Fact]
@@ -2926,7 +2926,7 @@ public class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.NoDiagnosticExists<NonPlatform_DomainDrivenDesignAnalyzer>(input);
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
     }

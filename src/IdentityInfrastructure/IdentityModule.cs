@@ -51,77 +51,77 @@ public class IdentityModule : ISubDomainModule
         {
             return (_, services) =>
             {
-                services.RegisterUnshared<ITokensService, TokensService>();
-                services.RegisterUnshared<IEmailAddressService, EmailAddressService>();
-                services.RegisterUnshared<IPasswordHasherService, PasswordHasherService>();
-                services.RegisterUnshared<IAPIKeyHasherService, APIKeyHasherService>();
-                services.RegisterUnshared<IJWTTokensService>(c =>
-                    new JWTTokensService(c.ResolveForPlatform<IConfigurationSettings>(),
-                        c.ResolveForUnshared<ITokensService>()));
-                services.RegisterUnshared<IAuthTokensService, AuthTokensService>();
-                services.RegisterUnshared<IEncryptionService>(c => new AesEncryptionService(c
-                    .ResolveForPlatform<IConfigurationSettings>()
+                services.AddSingleton<ITokensService, TokensService>();
+                services.AddSingleton<IEmailAddressService, EmailAddressService>();
+                services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
+                services.AddSingleton<IAPIKeyHasherService, APIKeyHasherService>();
+                services.AddSingleton<IJWTTokensService>(c =>
+                    new JWTTokensService(c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                        c.GetRequiredService<ITokensService>()));
+                services.AddSingleton<IAuthTokensService, AuthTokensService>();
+                services.AddSingleton<IEncryptionService>(c => new AesEncryptionService(c
+                    .GetRequiredServiceForPlatform<IConfigurationSettings>()
                     .GetString("ApplicationServices:SSOProvidersService:SSOUserTokens:AesSecret")));
 
-                services.RegisterUnshared<IAPIKeysApplication, APIKeysApplication>();
-                services.RegisterUnshared<IAuthTokensApplication, AuthTokensApplication>();
-                services.RegisterUnshared<IPasswordCredentialsApplication>(c => new PasswordCredentialsApplication(
-                    c.ResolveForUnshared<IRecorder>(),
-                    c.ResolveForUnshared<IIdentifierFactory>(),
-                    c.ResolveForUnshared<IEndUsersService>(),
-                    c.ResolveForUnshared<INotificationsService>(),
-                    c.ResolveForPlatform<IConfigurationSettings>(),
-                    c.ResolveForUnshared<IEmailAddressService>(),
-                    c.ResolveForUnshared<ITokensService>(),
-                    c.ResolveForUnshared<IPasswordHasherService>(),
-                    c.ResolveForUnshared<IAuthTokensService>(),
-                    c.ResolveForUnshared<IWebsiteUiService>(),
-                    c.ResolveForUnshared<IPasswordCredentialsRepository>()));
-                services.RegisterUnshared<IMachineCredentialsApplication, MachineCredentialsApplication>();
-                services.RegisterUnshared<ISingleSignOnApplication, SingleSignOnApplication>();
-                services.RegisterUnshared<IPasswordCredentialsRepository>(c => new PasswordCredentialsRepository(
-                    c.ResolveForUnshared<IRecorder>(),
-                    c.ResolveForUnshared<IDomainFactory>(),
-                    c.ResolveForUnshared<IEventSourcingDddCommandStore<PasswordCredentialRoot>>(),
-                    c.ResolveForPlatform<IDataStore>()));
+                services.AddSingleton<IAPIKeysApplication, APIKeysApplication>();
+                services.AddSingleton<IAuthTokensApplication, AuthTokensApplication>();
+                services.AddSingleton<IPasswordCredentialsApplication>(c => new PasswordCredentialsApplication(
+                    c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredService<IIdentifierFactory>(),
+                    c.GetRequiredService<IEndUsersService>(),
+                    c.GetRequiredService<INotificationsService>(),
+                    c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                    c.GetRequiredService<IEmailAddressService>(),
+                    c.GetRequiredService<ITokensService>(),
+                    c.GetRequiredService<IPasswordHasherService>(),
+                    c.GetRequiredService<IAuthTokensService>(),
+                    c.GetRequiredService<IWebsiteUiService>(),
+                    c.GetRequiredService<IPasswordCredentialsRepository>()));
+                services.AddSingleton<IMachineCredentialsApplication, MachineCredentialsApplication>();
+                services.AddSingleton<ISingleSignOnApplication, SingleSignOnApplication>();
+                services.AddSingleton<IPasswordCredentialsRepository>(c => new PasswordCredentialsRepository(
+                    c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredService<IDomainFactory>(),
+                    c.GetRequiredService<IEventSourcingDddCommandStore<PasswordCredentialRoot>>(),
+                    c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.RegisterUnTenantedEventing<PasswordCredentialRoot, PasswordCredentialProjection>(
-                    c => new PasswordCredentialProjection(c.ResolveForUnshared<IRecorder>(),
-                        c.ResolveForUnshared<IDomainFactory>(),
-                        c.ResolveForPlatform<IDataStore>()));
-                services.RegisterUnshared<IAuthTokensRepository>(c => new AuthTokensRepository(
-                    c.ResolveForUnshared<IRecorder>(),
-                    c.ResolveForUnshared<IDomainFactory>(),
-                    c.ResolveForUnshared<IEventSourcingDddCommandStore<AuthTokensRoot>>(),
-                    c.ResolveForPlatform<IDataStore>()));
+                    c => new PasswordCredentialProjection(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.AddSingleton<IAuthTokensRepository>(c => new AuthTokensRepository(
+                    c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredService<IDomainFactory>(),
+                    c.GetRequiredService<IEventSourcingDddCommandStore<AuthTokensRoot>>(),
+                    c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.RegisterUnTenantedEventing<AuthTokensRoot, AuthTokensProjection>(
-                    c => new AuthTokensProjection(c.ResolveForUnshared<IRecorder>(),
-                        c.ResolveForUnshared<IDomainFactory>(),
-                        c.ResolveForPlatform<IDataStore>()));
-                services.RegisterUnshared<IAPIKeysRepository>(c => new APIKeysRepository(
-                    c.ResolveForUnshared<IRecorder>(),
-                    c.ResolveForUnshared<IDomainFactory>(),
-                    c.ResolveForUnshared<IEventSourcingDddCommandStore<APIKeyRoot>>(),
-                    c.ResolveForPlatform<IDataStore>()));
+                    c => new AuthTokensProjection(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.AddSingleton<IAPIKeysRepository>(c => new APIKeysRepository(
+                    c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredService<IDomainFactory>(),
+                    c.GetRequiredService<IEventSourcingDddCommandStore<APIKeyRoot>>(),
+                    c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.RegisterUnTenantedEventing<APIKeyRoot, APIKeyProjection>(
-                    c => new APIKeyProjection(c.ResolveForUnshared<IRecorder>(),
-                        c.ResolveForUnshared<IDomainFactory>(),
-                        c.ResolveForPlatform<IDataStore>()));
-                services.RegisterUnshared<ISSOUsersRepository>(c => new SSOUsersRepository(
-                    c.ResolveForUnshared<IRecorder>(),
-                    c.ResolveForUnshared<IDomainFactory>(),
-                    c.ResolveForUnshared<IEventSourcingDddCommandStore<SSOUserRoot>>(),
-                    c.ResolveForPlatform<IDataStore>()));
+                    c => new APIKeyProjection(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.AddSingleton<ISSOUsersRepository>(c => new SSOUsersRepository(
+                    c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredService<IDomainFactory>(),
+                    c.GetRequiredService<IEventSourcingDddCommandStore<SSOUserRoot>>(),
+                    c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.RegisterUnTenantedEventing<SSOUserRoot, SSOUserProjection>(
-                    c => new SSOUserProjection(c.ResolveForUnshared<IRecorder>(),
-                        c.ResolveForUnshared<IDomainFactory>(),
-                        c.ResolveForPlatform<IDataStore>()));
+                    c => new SSOUserProjection(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
 
-                services.RegisterUnshared<IAPIKeysService, APIKeysService>();
-                services.RegisterUnshared<IIdentityService, IdentityInProcessServiceClient>();
-                services.RegisterUnshared<ISSOProvidersService, SSOProvidersService>();
+                services.AddSingleton<IAPIKeysService, APIKeysService>();
+                services.AddSingleton<IIdentityService, IdentityInProcessServiceClient>();
+                services.AddSingleton<ISSOProvidersService, SSOProvidersService>();
 #if TESTINGONLY
                 // EXTEND: replace these registrations with your own OAuth2 implementations
-                services.RegisterUnshared<ISSOAuthenticationProvider, FakeSSOAuthenticationProvider>();
+                services.AddSingleton<ISSOAuthenticationProvider, FakeSSOAuthenticationProvider>();
 #endif
             };
         }

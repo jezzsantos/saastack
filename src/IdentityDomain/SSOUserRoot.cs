@@ -53,8 +53,9 @@ public sealed class SSOUserRoot : AggregateRootBase
 
     public static AggregateRootFactory<SSOUserRoot> Rehydrate()
     {
-        return (identifier, container, _) => new SSOUserRoot(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), container.Resolve<IEncryptionService>(), identifier);
+        return (identifier, container, _) => new SSOUserRoot(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), container.GetRequiredService<IEncryptionService>(),
+            identifier);
     }
 
     public override Result<Error> EnsureInvariants()

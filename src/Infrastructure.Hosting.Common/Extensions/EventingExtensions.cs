@@ -136,7 +136,7 @@ public static class EventingExtensions
     {
         AddEventing<TAggregateRoot, TProjection>(services, scope, projectionFactory);
         Eventing.AddNotificationFactory<TAggregateRoot, TNotificationRegistration>();
-        services.RegisterLifetime(scope, notificationFactory);
+        services.AddWithLifetime(scope, notificationFactory);
         return services;
     }
 
@@ -148,7 +148,7 @@ public static class EventingExtensions
     {
         AddEventing<TAggregateRoot>(services, scope);
         Eventing.AddProjectionFactory<TAggregateRoot, TProjection>();
-        services.RegisterLifetime(scope, projectionFactory);
+        services.AddWithLifetime(scope, projectionFactory);
         return services;
     }
 
@@ -158,9 +158,9 @@ public static class EventingExtensions
     {
         if (!services.IsRegistered<IProjectionCheckpointRepository>())
         {
-            services.RegisterUnshared<IProjectionCheckpointRepository>(c => new ProjectionCheckpointRepository(
-                c.ResolveForUnshared<IRecorder>(), c.ResolveForUnshared<IIdentifierFactory>(),
-                c.ResolveForUnshared<IDomainFactory>(), c.ResolveForPlatform<IDataStore>()));
+            services.AddSingleton<IProjectionCheckpointRepository>(c => new ProjectionCheckpointRepository(
+                c.GetRequiredService<IRecorder>(), c.GetRequiredService<IIdentifierFactory>(),
+                c.GetRequiredService<IDomainFactory>(), c.GetRequiredServiceForPlatform<IDataStore>()));
         }
 
         Eventing.AddEventingStorageTypes<TAggregateRoot>();
@@ -168,20 +168,20 @@ public static class EventingExtensions
         {
             if (scope == DependencyScope.UnTenanted)
             {
-                services.RegisterUnshared<IEventSourcingDddCommandStore<TAggregateRoot>>(c =>
-                    new EventSourcingDddCommandStore<TAggregateRoot>(c.ResolveForUnshared<IRecorder>(),
-                        c.ResolveForUnshared<IDomainFactory>(),
-                        c.ResolveForUnshared<IEventSourcedChangeEventMigrator>(),
-                        c.ResolveForPlatform<IEventStore>()));
+                services.AddSingleton<IEventSourcingDddCommandStore<TAggregateRoot>>(c =>
+                    new EventSourcingDddCommandStore<TAggregateRoot>(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcedChangeEventMigrator>(),
+                        c.GetRequiredServiceForPlatform<IEventStore>()));
             }
 
             if (scope == DependencyScope.Tenanted)
             {
-                services.RegisterTenanted<IEventSourcingDddCommandStore<TAggregateRoot>>(c =>
-                    new EventSourcingDddCommandStore<TAggregateRoot>(c.ResolveForUnshared<IRecorder>(),
-                        c.ResolveForUnshared<IDomainFactory>(),
-                        c.ResolveForUnshared<IEventSourcedChangeEventMigrator>(),
-                        c.ResolveForTenant<IEventStore>()));
+                services.AddPerHttpRequest<IEventSourcingDddCommandStore<TAggregateRoot>>(c =>
+                    new EventSourcingDddCommandStore<TAggregateRoot>(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcedChangeEventMigrator>(),
+                        c.GetRequiredService<IEventStore>()));
             }
         }
 
@@ -191,27 +191,27 @@ public static class EventingExtensions
             {
                 return scope switch
                 {
-                    DependencyScope.Tenanted => c.ResolveForTenant<IDataStore>(),
-                    _ => c.ResolveForPlatform<IDataStore>()
+                    DependencyScope.Tenanted => c.GetRequiredService<IDataStore>(),
+                    _ => c.GetRequiredServiceForPlatform<IDataStore>()
                 };
             }
 
-            services.RegisterLifetime<ISnapshottingDddCommandStore<TAggregateRoot>>(scope,
-                c => new SnapshottingDddCommandStore<TAggregateRoot>(c.ResolveForUnshared<IRecorder>(),
-                    c.ResolveForUnshared<IDomainFactory>(), DataStoreFactory(c)));
+            services.AddWithLifetime<ISnapshottingDddCommandStore<TAggregateRoot>>(scope,
+                c => new SnapshottingDddCommandStore<TAggregateRoot>(c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredService<IDomainFactory>(), DataStoreFactory(c)));
         }
 
-        services.RegisterTenanted<IEventNotifyingStoreProjectionRelay>(c =>
+        services.AddPerHttpRequest<IEventNotifyingStoreProjectionRelay>(c =>
             new InProcessSynchronousProjectionRelay(
-                c.ResolveForUnshared<IRecorder>(),
-                c.ResolveForUnshared<IEventSourcedChangeEventMigrator>(),
-                c.ResolveForUnshared<IProjectionCheckpointRepository>(),
+                c.GetRequiredService<IRecorder>(),
+                c.GetRequiredService<IEventSourcedChangeEventMigrator>(),
+                c.GetRequiredService<IProjectionCheckpointRepository>(),
                 Eventing.ResolveProjections(c),
                 Eventing.ResolveProjectionStores(c).ToArray()));
-        services.RegisterTenanted<IEventNotifyingStoreNotificationRelay>(c =>
+        services.AddPerHttpRequest<IEventNotifyingStoreNotificationRelay>(c =>
             new InProcessSynchronousNotificationRelay(
-                c.ResolveForUnshared<IRecorder>(),
-                c.ResolveForUnshared<IEventSourcedChangeEventMigrator>(),
+                c.GetRequiredService<IRecorder>(),
+                c.GetRequiredService<IEventSourcedChangeEventMigrator>(),
                 Eventing.ResolveNotificationRegistrations(c),
                 Eventing.ResolveNotificationStores(c).ToArray()));
 

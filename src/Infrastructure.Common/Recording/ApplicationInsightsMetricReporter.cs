@@ -16,7 +16,7 @@ public class ApplicationInsightsMetricReporter : IMetricReporter
 
     public ApplicationInsightsMetricReporter(IDependencyContainer container)
     {
-        _telemetryClient = container.Resolve<TelemetryClient>();
+        _telemetryClient = container.GetRequiredService<TelemetryClient>();
     }
 
     public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)

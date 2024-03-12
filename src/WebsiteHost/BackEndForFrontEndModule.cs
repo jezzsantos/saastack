@@ -3,7 +3,6 @@ using System.Text.Json;
 using Application.Interfaces.Services;
 using Domain.Services.Shared.DomainServices;
 using Infrastructure.Common.DomainServices;
-using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Hosting.Common;
 using Infrastructure.Web.Hosting.Common.Pipeline;
@@ -51,16 +50,17 @@ public class BackEndForFrontEndModule : ISubDomainModule
             return (_, services) =>
             {
                 services.AddControllers();
-                services.RegisterUnshared<IFeatureFlagsApplication, FeatureFlagsApplication>();
-                services.RegisterUnshared<IRecordingApplication, RecordingApplication>();
-                services.RegisterUnshared<IAuthenticationApplication, AuthenticationApplication>();
-                services.RegisterUnshared<IServiceClient>(c =>
-                    new InterHostServiceClient(c.Resolve<IHttpClientFactory>(),
-                        c.Resolve<JsonSerializerOptions>(),
-                        c.Resolve<IHostSettings>().GetApiHost1BaseUrl()));
-                services.RegisterUnshared<IEncryptionService>(c => new AesEncryptionService(c
-                    .ResolveForUnshared<IHostSettings>().GetWebsiteHostCSRFEncryptionSecret()));
-                services.RegisterUnshared<CSRFMiddleware.ICSRFService, CSRFService>();
+                services.AddSingleton<IFeatureFlagsApplication, FeatureFlagsApplication>();
+                services.AddSingleton<IRecordingApplication, RecordingApplication>();
+                services.AddSingleton<IAuthenticationApplication, AuthenticationApplication>();
+                services.AddSingleton<IServiceClient>(c =>
+                    new InterHostServiceClient(c.GetRequiredService<IHttpClientFactory>(),
+                        c.GetRequiredService<JsonSerializerOptions>(),
+                        c.GetRequiredService<IHostSettings>().GetApiHost1BaseUrl()));
+                services.AddSingleton<IEncryptionService>(c =>
+                    new AesEncryptionService(c.GetRequiredService<IHostSettings>()
+                        .GetWebsiteHostCSRFEncryptionSecret()));
+                services.AddSingleton<CSRFMiddleware.ICSRFService, CSRFService>();
             };
         }
     }

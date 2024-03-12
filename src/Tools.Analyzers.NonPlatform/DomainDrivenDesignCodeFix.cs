@@ -184,7 +184,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
             null,
             isDehydratable.IsDehydratable
                 ? $"return (identifier, container, properties) => new {className}(identifier, container, properties);"
-                : $"return (identifier, container, properties) => new {className}(container.Resolve<IRecorder>(),container.Resolve<IIdentifierFactory>(), identifier);");
+                : $"return (identifier, container, properties) => new {className}(container.GetRequiredService<IRecorder>(),container.GetRequiredService<IIdentifierFactory>(), identifier);");
         var modifiedClassDeclaration = classDeclarationSyntax.AddMembers(newMethod);
         var newRoot = root.ReplaceNode(classDeclarationSyntax, modifiedClassDeclaration);
         var newDocument = document.WithSyntaxRoot(newRoot);

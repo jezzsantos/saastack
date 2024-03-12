@@ -37,8 +37,8 @@ public class {SubDomainName}sModule : ISubDomainModule
                 services.RegisterTenanted<I{SubDomainName}sApplication, {SubDomainName}sApplication.{SubDomainName}sApplication>();
                 services.RegisterTenanted<I{SubDomainName}Repository, {SubDomainName}Repository>();
                 services.RegisterTenantedEventing<{SubDomainName}Root, {SubDomainName}Projection>(
-                    c => new {SubDomainName}Projection(c.ResolveForUnshared<IRecorder>(), c.ResolveForUnshared<IDomainFactory>(),
-                        c.ResolveForTenant<IDataStore>())
+                    c => new {SubDomainName}Projection(c.GetRequiredService<IRecorder>(), c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IDataStore>())
                 );
             };
         }

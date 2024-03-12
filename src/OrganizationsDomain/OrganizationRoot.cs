@@ -46,8 +46,9 @@ public sealed class OrganizationRoot : AggregateRootBase
 
     public static AggregateRootFactory<OrganizationRoot> Rehydrate()
     {
-        return (identifier, container, _) => new OrganizationRoot(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), container.Resolve<ITenantSettingService>(), identifier);
+        return (identifier, container, _) => new OrganizationRoot(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), container.GetRequiredService<ITenantSettingService>(),
+            identifier);
     }
 
     public override Result<Error> EnsureInvariants()

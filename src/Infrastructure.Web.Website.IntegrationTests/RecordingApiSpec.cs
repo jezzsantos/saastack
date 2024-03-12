@@ -5,7 +5,6 @@ using Application.Resources.Shared;
 using Common;
 using Common.Recording;
 using FluentAssertions;
-using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using Infrastructure.Web.Hosting.Common.Pipeline;
@@ -149,6 +148,6 @@ public class RecordingApiSpec : WebApiSpec<Program>
 
     private static void OverrideDependencies(IServiceCollection services)
     {
-        services.RegisterUnshared<IRecorder, StubRecorder>();
+        services.AddSingleton<IRecorder, StubRecorder>();
     }
 }

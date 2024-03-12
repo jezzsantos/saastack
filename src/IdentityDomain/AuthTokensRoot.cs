@@ -45,8 +45,8 @@ public sealed class AuthTokensRoot : AggregateRootBase
 
     public static AggregateRootFactory<AuthTokensRoot> Rehydrate()
     {
-        return (identifier, container, _) => new AuthTokensRoot(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, _) => new AuthTokensRoot(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public override Result<Error> EnsureInvariants()
@@ -127,7 +127,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
             IdentityDomain.Events.AuthTokens.TokensRefreshed.Create(Id, UserId, accessToken, accessTokenExpiresOn,
                 refreshToken, refreshTokenExpiresOn));
     }
-    
+
     public Result<Error> Revoke(string refreshToken)
     {
         if (IsRevoked)

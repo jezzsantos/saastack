@@ -50,8 +50,9 @@ public sealed class APIKeyRoot : AggregateRootBase
 
     public static AggregateRootFactory<APIKeyRoot> Rehydrate()
     {
-        return (identifier, container, _) => new APIKeyRoot(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), container.Resolve<IAPIKeyHasherService>(), identifier);
+        return (identifier, container, _) => new APIKeyRoot(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), container.GetRequiredService<IAPIKeyHasherService>(),
+            identifier);
     }
 
     public override Result<Error> EnsureInvariants()

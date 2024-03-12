@@ -9,131 +9,131 @@ namespace Infrastructure.Hosting.Common.UnitTests.Extensions;
 public class ServiceCollectionExtensionsSpec
 {
     [Fact]
-    public void WhenRegisterUnsharedWithTwoInterfaces_ThenRegistersTwoWithTheSameInstance()
+    public void WhenGetRequiredServiceWithTwoInterfaces_ThenRegistersTwoWithTheSameInstance()
     {
         var services = new ServiceCollection();
 
-        services.RegisterUnshared<ITestInterface1, ITestInterface2, TestContainerClass>(
+        services.AddSingleton<ITestInterface1, ITestInterface2, TestContainerClass>(
             _ => new TestContainerClass());
         using var provider = services.BuildServiceProvider();
 
-        var interface1 = provider.ResolveForUnshared<ITestInterface1>();
-        var interface2 = provider.ResolveForUnshared<ITestInterface2>();
+        var interface1 = provider.GetRequiredService<ITestInterface1>();
+        var interface2 = provider.GetRequiredService<ITestInterface2>();
 
         interface1.Should().BeOfType<TestContainerClass>();
-        interface1.Should().BeSameAs(interface2);
+        interface1.Should().Be(interface2);
     }
 
     [Fact]
-    public void WhenRegisterUnsharedWithThreeInterfaces_ThenRegistersThreeWithTheSameInstance()
+    public void WhenGetRequiredServiceWithThreeInterfaces_ThenRegistersThreeWithTheSameInstance()
     {
         var services = new ServiceCollection();
 
-        services.RegisterUnshared<ITestInterface1, ITestInterface2, ITestInterface3, TestContainerClass>(
+        services.AddSingleton<ITestInterface1, ITestInterface2, ITestInterface3, TestContainerClass>(
             _ => new TestContainerClass());
         using var provider = services.BuildServiceProvider();
 
-        var interface1 = provider.ResolveForUnshared<ITestInterface1>();
-        var interface2 = provider.ResolveForUnshared<ITestInterface2>();
-        var interface3 = provider.ResolveForUnshared<ITestInterface3>();
+        var interface1 = provider.GetRequiredService<ITestInterface1>();
+        var interface2 = provider.GetRequiredService<ITestInterface2>();
+        var interface3 = provider.GetRequiredService<ITestInterface3>();
 
         interface1.Should().BeOfType<TestContainerClass>();
-        interface1.Should().BeSameAs(interface2);
-        interface2.Should().BeSameAs(interface3);
-        interface3.Should().BeSameAs(interface1);
+        interface1.Should().Be(interface2);
+        interface2.Should().Be(interface3);
+        interface3.Should().Be(interface1);
     }
 
     [Fact]
-    public void WhenRegisterUnsharedWithFourInterfaces_ThenRegistersFourWithTheSameInstance()
+    public void WhenGetRequiredServiceWithFourInterfaces_ThenRegistersFourWithTheSameInstance()
     {
         var services = new ServiceCollection();
 
         services
-            .RegisterUnshared<ITestInterface1, ITestInterface2, ITestInterface3, ITestInterface4, TestContainerClass>(
+            .AddSingleton<ITestInterface1, ITestInterface2, ITestInterface3, ITestInterface4, TestContainerClass>(
                 _ => new TestContainerClass());
         using var provider = services.BuildServiceProvider();
 
-        var interface1 = provider.ResolveForUnshared<ITestInterface1>();
-        var interface2 = provider.ResolveForUnshared<ITestInterface2>();
-        var interface3 = provider.ResolveForUnshared<ITestInterface3>();
-        var interface4 = provider.ResolveForUnshared<ITestInterface4>();
+        var interface1 = provider.GetRequiredService<ITestInterface1>();
+        var interface2 = provider.GetRequiredService<ITestInterface2>();
+        var interface3 = provider.GetRequiredService<ITestInterface3>();
+        var interface4 = provider.GetRequiredService<ITestInterface4>();
 
         interface1.Should().BeOfType<TestContainerClass>();
-        interface1.Should().BeSameAs(interface2);
-        interface2.Should().BeSameAs(interface3);
-        interface3.Should().BeSameAs(interface4);
-        interface4.Should().BeSameAs(interface1);
+        interface1.Should().Be(interface2);
+        interface2.Should().Be(interface3);
+        interface3.Should().Be(interface4);
+        interface4.Should().Be(interface1);
     }
 
     [Fact]
-    public void WhenRegisterUnsharedWithFiveInterfaces_ThenRegistersFiveWithTheSameInstance()
+    public void WhenGetRequiredServiceWithFiveInterfaces_ThenRegistersFiveWithTheSameInstance()
     {
         var services = new ServiceCollection();
 
         services
-            .RegisterUnshared<ITestInterface1, ITestInterface2, ITestInterface3, ITestInterface4, ITestInterface5,
+            .AddSingleton<ITestInterface1, ITestInterface2, ITestInterface3, ITestInterface4, ITestInterface5,
                 TestContainerClass>(
                 _ => new TestContainerClass());
         using var provider = services.BuildServiceProvider();
 
-        var interface1 = provider.ResolveForUnshared<ITestInterface1>();
-        var interface2 = provider.ResolveForUnshared<ITestInterface2>();
-        var interface3 = provider.ResolveForUnshared<ITestInterface3>();
-        var interface4 = provider.ResolveForUnshared<ITestInterface4>();
-        var interface5 = provider.ResolveForUnshared<ITestInterface5>();
+        var interface1 = provider.GetRequiredService<ITestInterface1>();
+        var interface2 = provider.GetRequiredService<ITestInterface2>();
+        var interface3 = provider.GetRequiredService<ITestInterface3>();
+        var interface4 = provider.GetRequiredService<ITestInterface4>();
+        var interface5 = provider.GetRequiredService<ITestInterface5>();
 
         interface1.Should().BeOfType<TestContainerClass>();
-        interface1.Should().BeSameAs(interface2);
-        interface2.Should().BeSameAs(interface3);
-        interface3.Should().BeSameAs(interface4);
-        interface4.Should().BeSameAs(interface5);
-        interface5.Should().BeSameAs(interface1);
+        interface1.Should().Be(interface2);
+        interface2.Should().Be(interface3);
+        interface3.Should().Be(interface4);
+        interface4.Should().Be(interface5);
+        interface5.Should().Be(interface1);
     }
 
     [Fact]
-    public void ResolveForPlatformAndNotRegistered_ThenThrows()
+    public void WhenGetRequiredServiceForPlatformAndNotRegistered_ThenThrows()
     {
         var services = new ServiceCollection();
         var container = services.BuildServiceProvider();
 
         container
-            .Invoking(x => x.ResolveForPlatform<ITestInterface1>())
+            .Invoking(x => x.GetRequiredServiceForPlatform<ITestInterface1>())
             .Should().Throw<InvalidOperationException>();
     }
 
     [Fact]
-    public void ResolveForPlatformAndRegisteredViaFactory_ThenReturnsService()
+    public void WhenGetRequiredServiceForPlatformAndRegisteredViaFactory_ThenReturnsService()
     {
         var services = new ServiceCollection();
         var instance = new TestContainerClass();
-        services.RegisterPlatform<ITestInterface1>(_ => instance);
+        services.AddForPlatform<ITestInterface1>(_ => instance);
         var container = services.BuildServiceProvider();
 
-        var result = container.ResolveForPlatform<ITestInterface1>();
+        var result = container.GetRequiredServiceForPlatform<ITestInterface1>();
 
         result.Should().NotBeNull();
     }
 
     [Fact]
-    public void WhenRegisterPlatformWithFourInterfaces_ThenRegistersFourWithTheSameInstance()
+    public void WhenAddForPlatformWithFourInterfaces_ThenRegistersFourWithTheSameInstance()
     {
         var services = new ServiceCollection();
 
         services
-            .RegisterPlatform<ITestInterface1, ITestInterface2, ITestInterface3, ITestInterface4, TestContainerClass>(
+            .AddForPlatform<ITestInterface1, ITestInterface2, ITestInterface3, ITestInterface4, TestContainerClass>(
                 _ => new TestContainerClass());
         using var provider = services.BuildServiceProvider();
 
-        var interface1 = provider.ResolveForPlatform<ITestInterface1>();
-        var interface2 = provider.ResolveForPlatform<ITestInterface2>();
-        var interface3 = provider.ResolveForPlatform<ITestInterface3>();
-        var interface4 = provider.ResolveForPlatform<ITestInterface4>();
+        var interface1 = provider.GetRequiredServiceForPlatform<ITestInterface1>();
+        var interface2 = provider.GetRequiredServiceForPlatform<ITestInterface2>();
+        var interface3 = provider.GetRequiredServiceForPlatform<ITestInterface3>();
+        var interface4 = provider.GetRequiredServiceForPlatform<ITestInterface4>();
 
         interface1.Should().BeOfType<TestContainerClass>();
-        interface1.Should().BeSameAs(interface2);
-        interface2.Should().BeSameAs(interface3);
-        interface3.Should().BeSameAs(interface4);
-        interface4.Should().BeSameAs(interface1);
+        interface1.Should().Be(interface2);
+        interface2.Should().Be(interface3);
+        interface3.Should().Be(interface4);
+        interface4.Should().Be(interface1);
     }
 }
 

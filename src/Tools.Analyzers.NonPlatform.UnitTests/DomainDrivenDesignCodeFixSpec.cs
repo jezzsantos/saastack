@@ -1,9 +1,7 @@
 extern alias NonPlatformAnalyzers;
 using Xunit;
-using NonPlatform_DomainDrivenDesignAnalyzer =
-    NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignAnalyzer;
-using NonPlatform_DomainDrivenDesignCodeFix =
-    NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignCodeFix;
+using DomainDrivenDesignAnalyzer = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignAnalyzer;
+using DomainDrivenDesignCodeFix = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignCodeFix;
 using UsedImplicitly = NonPlatformAnalyzers::JetBrains.Annotations.UsedImplicitlyAttribute;
 
 namespace Tools.Analyzers.NonPlatform.UnitTests;
@@ -129,8 +127,8 @@ public class Created : IDomainEvent
     public DateTime OccurredUtc { get; set; }
 }";
 
-                await Verify.CodeFixed<NonPlatform_DomainDrivenDesignAnalyzer, NonPlatform_DomainDrivenDesignCodeFix>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas030,
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas030,
                     problem, fix, 14, 14, "AClass");
             }
         }
@@ -243,8 +241,8 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.CodeFixed<NonPlatform_DomainDrivenDesignAnalyzer, NonPlatform_DomainDrivenDesignCodeFix>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas034,
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas034,
                     problem, fix, 16, 14, "AClass");
             }
 
@@ -323,7 +321,7 @@ public class AClass : AggregateRootBase
 
     public static Domain.Interfaces.AggregateRootFactory<AClass> Rehydrate()
     {
-        return (identifier, container, properties) => new AClass(container.Resolve<IRecorder>(), container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(), container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 }
 public class CreateEvent : IDomainEvent
@@ -333,8 +331,8 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.CodeFixed<NonPlatform_DomainDrivenDesignAnalyzer, NonPlatform_DomainDrivenDesignCodeFix>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas034,
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas034,
                     problem, fix, 11, 14, "AClass");
             }
         }
@@ -448,8 +446,8 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.CodeFixed<NonPlatform_DomainDrivenDesignAnalyzer, NonPlatform_DomainDrivenDesignCodeFix>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas035,
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas035,
                     problem, fix, 16, 14, "AClass");
             }
         }
@@ -569,8 +567,8 @@ public class CreateEvent : IDomainEvent
     public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
 }";
 
-                await Verify.CodeFixed<NonPlatform_DomainDrivenDesignAnalyzer, NonPlatform_DomainDrivenDesignCodeFix>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas036,
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas036,
                     problem, fix, 15, 14, "AClass");
             }
         }
@@ -656,8 +654,8 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.CodeFixed<NonPlatform_DomainDrivenDesignAnalyzer, NonPlatform_DomainDrivenDesignCodeFix>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas040,
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas040,
                     problem, fix, 14, 14, "AClass");
             }
         }
@@ -754,8 +752,8 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.CodeFixed<NonPlatform_DomainDrivenDesignAnalyzer, NonPlatform_DomainDrivenDesignCodeFix>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas043,
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas043,
                     problem, fix, 16, 14, "AClass");
             }
         }
@@ -857,8 +855,8 @@ public class AClass : EntityBase
     }
 }";
 
-                await Verify.CodeFixed<NonPlatform_DomainDrivenDesignAnalyzer, NonPlatform_DomainDrivenDesignCodeFix>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas045,
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas045,
                     problem, fix, 15, 14, "AClass");
             }
         }
@@ -945,8 +943,8 @@ public class AClass : SingleValueObjectBase<AClass, string>
     }
 }";
 
-                await Verify.CodeFixed<NonPlatform_DomainDrivenDesignAnalyzer, NonPlatform_DomainDrivenDesignCodeFix>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas050,
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas050,
                     problem, fix, 14, 14, "AClass");
             }
 
@@ -1029,8 +1027,8 @@ public class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.CodeFixed<NonPlatform_DomainDrivenDesignAnalyzer, NonPlatform_DomainDrivenDesignCodeFix>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas050,
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas050,
                     problem, fix, 14, 14, "AClass");
             }
         }
@@ -1101,8 +1099,8 @@ public class AClass : SingleValueObjectBase<AClass, string>
     }
 }";
 
-                await Verify.CodeFixed<NonPlatform_DomainDrivenDesignAnalyzer, NonPlatform_DomainDrivenDesignCodeFix>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas053,
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas053,
                     problem, fix, 12, 14, "AClass");
             }
 
@@ -1179,8 +1177,8 @@ public class AClass : ValueObjectBase<AClass>
     }
 }";
 
-                await Verify.CodeFixed<NonPlatform_DomainDrivenDesignAnalyzer, NonPlatform_DomainDrivenDesignCodeFix>(
-                    NonPlatform_DomainDrivenDesignAnalyzer.Sas053,
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas053,
                     problem, fix, 12, 14, "AClass");
             }
         }

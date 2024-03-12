@@ -21,7 +21,7 @@ public class ApplicationInsightsCrashReporter : ICrashReporter
 
     public ApplicationInsightsCrashReporter(IDependencyContainer container)
     {
-        _telemetryClient = container.Resolve<TelemetryClient>();
+        _telemetryClient = container.GetRequiredService<TelemetryClient>();
     }
 
     public void Crash(ICallContext? call, CrashLevel level, Exception exception, string messageTemplate,

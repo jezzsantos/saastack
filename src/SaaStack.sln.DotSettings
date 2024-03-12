@@ -718,7 +718,7 @@ public sealed class $name$Root : AggregateRootBase
     // TODO: LEAVE this method if EventSourcing, DELETE if Snapshotting
     public static AggregateRootFactory&lt;$name$Root&gt; Rehydrate()
     {
-        return (identifier, container, properties) =&gt; new $name$Root(container.Resolve&lt;IRecorder&gt;(), container.Resolve&lt;IIdentifierFactory&gt;(), identifier);
+        return (identifier, container, properties) =&gt; new $name$Root(container.GetRequiredService&lt;IRecorder&gt;(), container.GetRequiredService&lt;IIdentifierFactory&gt;(), identifier);
     }
 
     public override Result&lt;Error&gt; EnsureInvariants()

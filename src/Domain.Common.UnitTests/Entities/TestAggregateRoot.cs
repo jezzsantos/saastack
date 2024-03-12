@@ -29,8 +29,8 @@ public class TestAggregateRoot : AggregateRootBase
     public static AggregateRootFactory<TestAggregateRoot> Rehydrate()
     {
         return (identifier, container, _) => new TestAggregateRoot(
-            container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+            container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     protected override Result<Error> OnStateChanged(IDomainEvent @event, bool isReconstituting)
@@ -82,8 +82,8 @@ public class TestAggregateRoot2 : AggregateRootBase
     public static AggregateRootFactory<TestAggregateRoot2> Rehydrate()
     {
         return (identifier, container, _) => new TestAggregateRoot2(
-            container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+            container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     protected override Result<Error> OnStateChanged(IDomainEvent @event, bool isReconstituting)

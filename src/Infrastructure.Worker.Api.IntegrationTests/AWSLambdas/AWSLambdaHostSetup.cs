@@ -1,7 +1,6 @@
 using Common.Extensions;
 using Common.Recording;
 using Infrastructure.Hosting.Common;
-using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.AWS.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 using JetBrains.Annotations;
@@ -88,6 +87,6 @@ public class AWSLambdaHostSetup : IApiWorkerSpec, IDisposable
             throw new InvalidOperationException("Host has not be started yet!");
         }
 
-        return _host.Services.Resolve<TService>();
+        return _host.Services.GetRequiredService<TService>();
     }
 }

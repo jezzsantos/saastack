@@ -50,8 +50,8 @@ public sealed class EndUserRoot : AggregateRootBase
 
     public static AggregateRootFactory<EndUserRoot> Rehydrate()
     {
-        return (identifier, container, _) => new EndUserRoot(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, _) => new EndUserRoot(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public override Result<Error> EnsureInvariants()
@@ -287,7 +287,7 @@ public sealed class EndUserRoot : AggregateRootBase
         {
             return Error.RuleViolation(Resources.EndUserRoot_NotOrganizationOwner);
         }
-        
+
         var membership = Memberships.FindByOrganizationId(organizationId);
         if (!membership.HasValue)
         {
@@ -414,6 +414,11 @@ public sealed class EndUserRoot : AggregateRootBase
         return Result.Ok;
     }
 
+    public Optional<Membership> FindMembership(Identifier organizationId)
+    {
+        return Memberships.FindByOrganizationId(organizationId);
+    }
+
     /// <summary>
     ///     EXTEND: change this to assign initial roles and features for persons and machines
     /// </summary>
@@ -481,10 +486,5 @@ public sealed class EndUserRoot : AggregateRootBase
         }
 
         return retrieved.Value.Roles.HasRole(TenantRoles.Owner);
-    }
-
-    public Optional<Membership> FindMembership(Identifier organizationId)
-    {
-        return Memberships.FindByOrganizationId(organizationId);
     }
 }

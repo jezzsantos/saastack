@@ -30,7 +30,8 @@ public class QueuedAuditReporter : IAuditReporter
 
     // ReSharper disable once UnusedParameter.Local
     public QueuedAuditReporter(IDependencyContainer container, IConfigurationSettings settings)
-        : this(new AuditMessageQueueRepository(NullRecorder.Instance, container.Resolve<IMessageQueueIdFactory>(),
+        : this(new AuditMessageQueueRepository(NullRecorder.Instance,
+            container.GetRequiredService<IMessageQueueIdFactory>(),
 #if !TESTINGONLY
 #if HOSTEDONAZURE
                 AzureStorageAccountQueueStore.Create(NullRecorder.Instance, settings)
@@ -38,7 +39,7 @@ public class QueuedAuditReporter : IAuditReporter
                 AWSSQSQueueStore.Create(NullRecorder.Instance, settings)
 #endif
 #else
-            container.ResolveForPlatform<IQueueStore>()
+            container.GetRequiredServiceForPlatform<IQueueStore>()
 #endif
         ))
     {

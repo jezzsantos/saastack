@@ -35,8 +35,8 @@ public class BookingsModule : ISubDomainModule
         {
             return (_, services) =>
             {
-                services.RegisterTenanted<IBookingsApplication, BookingsApplication.BookingsApplication>();
-                services.RegisterTenanted<IBookingRepository, BookingRepository>();
+                services.AddPerHttpRequest<IBookingsApplication, BookingsApplication.BookingsApplication>();
+                services.AddPerHttpRequest<IBookingRepository, BookingRepository>();
                 services.RegisterTenantedEventing<BookingRoot>();
             };
         }

@@ -19,6 +19,6 @@ public sealed class AspNetCallerContextFactory : ICallerContextFactory
 
     public ICallerContext Create()
     {
-        return new AspNetCallerContext(_container.Resolve<IHttpContextAccessor>());
+        return new AspNetCallerContext(_container.GetRequiredService<IHttpContextAccessor>());
     }
 }

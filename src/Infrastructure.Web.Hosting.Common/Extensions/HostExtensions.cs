@@ -79,6 +79,7 @@ public static class HostExtensions
     public static WebApplication ConfigureApiHost(this WebApplicationBuilder appBuilder, SubDomainModules modules,
         WebHostOptions hostOptions)
     {
+        var services = appBuilder.Services;
         RegisterSharedServices();
         RegisterConfiguration(hostOptions.IsMultiTenanted);
         RegisterRecording();
@@ -87,7 +88,7 @@ public static class HostExtensions
         RegisterWireFormats();
         RegisterApiRequests();
         RegisterNotifications(hostOptions.UsesNotifications);
-        modules.RegisterServices(appBuilder.Configuration, appBuilder.Services);
+        modules.RegisterServices(appBuilder.Configuration, services);
         RegisterApplicationServices(hostOptions.IsMultiTenanted);
         RegisterPersistence(hostOptions.Persistence.UsesQueues, hostOptions.IsMultiTenanted);
         RegisterCors(hostOptions.CORS);
@@ -117,10 +118,11 @@ public static class HostExtensions
 
         void RegisterSharedServices()
         {
-            appBuilder.Services.AddHttpContextAccessor();
-            appBuilder.Services.AddSingleton<IFeatureFlags>(c =>
-                new FlagsmithHttpServiceClient(c.ResolveForUnshared<IRecorder>(),
-                    c.ResolveForPlatform<IConfigurationSettings>(), c.ResolveForUnshared<IHttpClientFactory>()));
+            services.AddHttpContextAccessor();
+            services.AddSingleton<IFeatureFlags>(c =>
+                new FlagsmithHttpServiceClient(c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                    c.GetRequiredService<IHttpClientFactory>()));
         }
 
         void RegisterConfiguration(bool isMultiTenanted)
@@ -134,20 +136,20 @@ public static class HostExtensions
 
             if (isMultiTenanted)
             {
-                appBuilder.Services.RegisterTenanted<IConfigurationSettings>(c =>
+                services.AddPerHttpRequest<IConfigurationSettings>(c =>
                     new AspNetDynamicConfigurationSettings(c.GetRequiredService<IConfiguration>(),
-                        c.ResolveForTenant<ITenancyContext>()));
+                        c.GetRequiredService<ITenancyContext>()));
             }
             else
             {
-                appBuilder.Services.RegisterUnshared<IConfigurationSettings>(c =>
+                services.AddSingleton<IConfigurationSettings>(c =>
                     new AspNetDynamicConfigurationSettings(c.GetRequiredService<IConfiguration>()));
             }
 
-            appBuilder.Services.RegisterPlatform<IConfigurationSettings>(c =>
+            services.AddForPlatform<IConfigurationSettings>(c =>
                 new AspNetDynamicConfigurationSettings(c.GetRequiredService<IConfiguration>()));
-            appBuilder.Services.RegisterUnshared<IHostSettings>(c =>
-                new HostSettings(c.ResolveForPlatform<IConfigurationSettings>()));
+            services.AddSingleton<IHostSettings>(c =>
+                new HostSettings(c.GetRequiredServiceForPlatform<IConfigurationSettings>()));
         }
 
         void RegisterRecording()
@@ -157,9 +159,9 @@ public static class HostExtensions
             AWSXRayRecorder.InitializeInstance(appBuilder.Configuration);
             AWSSDKHandler.RegisterXRayForAllServices();
 #endif
-            appBuilder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
+            services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
 #endif
-            appBuilder.Services.AddLogging(loggingBuilder =>
+            services.AddLogging(loggingBuilder =>
             {
                 loggingBuilder.ClearProviders();
                 loggingBuilder.AddConfiguration(appBuilder.Configuration.GetSection(LoggingSettingName));
@@ -175,7 +177,7 @@ public static class HostExtensions
 #if HOSTEDONAZURE
                 loggingBuilder.AddApplicationInsights();
 
-                appBuilder.Services.AddApplicationInsightsTelemetry();
+                services.AddApplicationInsightsTelemetry();
 #elif HOSTEDONAWS
                 loggingBuilder.AddLambdaLogger();
 #endif
@@ -184,8 +186,9 @@ public static class HostExtensions
             });
 
             // Note: IRecorder should always be not tenanted
-            appBuilder.Services.RegisterUnshared<IRecorder>(c =>
-                new HostRecorder(c.ResolveForPlatform<IDependencyContainer>(), c.ResolveForUnshared<ILoggerFactory>(),
+            services.AddSingleton<IRecorder>(c =>
+                new HostRecorder(c.GetRequiredServiceForPlatform<IDependencyContainer>(),
+                    c.GetRequiredService<ILoggerFactory>(),
                     hostOptions));
         }
 
@@ -193,8 +196,8 @@ public static class HostExtensions
         {
             if (isMultiTenanted)
             {
-                appBuilder.Services.RegisterTenanted<ITenancyContext, SimpleTenancyContext>();
-                appBuilder.Services.RegisterTenanted<ITenantDetective, RequestTenantDetective>();
+                services.AddPerHttpRequest<ITenancyContext, SimpleTenancyContext>();
+                services.AddPerHttpRequest<ITenantDetective, RequestTenantDetective>();
             }
         }
 
@@ -222,15 +225,15 @@ public static class HostExtensions
             }
 
             var authBuilder = defaultScheme.HasValue()
-                ? appBuilder.Services.AddAuthentication(defaultScheme)
-                : appBuilder.Services.AddAuthentication();
+                ? services.AddAuthentication(defaultScheme)
+                : services.AddAuthentication();
 
             if (authentication.UsesHMAC)
             {
                 authBuilder.AddScheme<HMACOptions, HMACAuthenticationHandler>(
                     HMACAuthenticationHandler.AuthenticationScheme,
                     _ => { });
-                appBuilder.Services.AddAuthorization(configure =>
+                services.AddAuthorization(configure =>
                 {
                     configure.AddPolicy(AuthenticationConstants.Authorization.HMACPolicyName, builder =>
                     {
@@ -272,22 +275,22 @@ public static class HostExtensions
                 });
             }
 
-            appBuilder.Services.AddAuthorization();
+            services.AddAuthorization();
             if (isMultiTenanted)
             {
-                appBuilder.Services.RegisterTenanted<IAuthorizationHandler, RolesAndFeaturesAuthorizationHandler>();
+                services.AddPerHttpRequest<IAuthorizationHandler, RolesAndFeaturesAuthorizationHandler>();
             }
             else
             {
-                appBuilder.Services.RegisterUnshared<IAuthorizationHandler, RolesAndFeaturesAuthorizationHandler>();
+                services.AddSingleton<IAuthorizationHandler, RolesAndFeaturesAuthorizationHandler>();
             }
 
-            appBuilder.Services
-                .RegisterUnshared<IAuthorizationPolicyProvider, RolesAndFeaturesAuthorizationPolicyProvider>();
+            services
+                .AddSingleton<IAuthorizationPolicyProvider, RolesAndFeaturesAuthorizationPolicyProvider>();
 
             if (authentication.UsesApiKeys || authentication.UsesTokens)
             {
-                appBuilder.Services.AddAuthorization(configure =>
+                services.AddAuthorization(configure =>
                 {
                     configure.AddPolicy(AuthenticationConstants.Authorization.TokenPolicyName, builder =>
                     {
@@ -301,13 +304,13 @@ public static class HostExtensions
 
         void RegisterApiRequests()
         {
-            appBuilder.Services.RegisterUnshared<IHasSearchOptionsValidator, HasSearchOptionsValidator>();
-            appBuilder.Services.RegisterUnshared<IHasGetOptionsValidator, HasGetOptionsValidator>();
-            appBuilder.Services.RegisterValidators(modules.ApiAssemblies, out var validators);
+            services.AddSingleton<IHasSearchOptionsValidator, HasSearchOptionsValidator>();
+            services.AddSingleton<IHasGetOptionsValidator, HasGetOptionsValidator>();
+            services.RegisterValidators(modules.ApiAssemblies, out var validators);
 
-            appBuilder.Services.AddMediatR(configuration =>
+            services.AddMediatR(configuration =>
             {
-                // Here we want to register handlers in Transient lifetime, so that any services resolved within the handlers
+                // Note: Here we want to register MediatR handlers in Transient lifetime, so that any services resolved within the handlers
                 //can be singletons, scoped, or transient (and use the same scope the handler is resolved in).
                 configuration.Lifetime = ServiceLifetime.Transient;
                 configuration.RegisterServicesFromAssemblies(modules.ApiAssemblies.ToArray())
@@ -319,15 +322,16 @@ public static class HostExtensions
         {
             if (usesNotifications)
             {
-                appBuilder.Services.RegisterUnshared<IEmailMessageQueue>(c =>
-                    new EmailMessageQueue(c.Resolve<IRecorder>(), c.Resolve<IMessageQueueIdFactory>(),
-                        c.ResolveForPlatform<IQueueStore>()));
-                appBuilder.Services.RegisterUnshared<IEmailSchedulingService, QueuingEmailSchedulingService>();
-                appBuilder.Services.RegisterUnshared<IWebsiteUiService, WebsiteUiService>();
-                appBuilder.Services.RegisterUnshared<INotificationsService>(c =>
-                    new EmailNotificationsService(c.ResolveForPlatform<IConfigurationSettings>(),
-                        c.ResolveForUnshared<IHostSettings>(), c.ResolveForUnshared<IWebsiteUiService>(),
-                        c.ResolveForUnshared<IEmailSchedulingService>()));
+                services.AddSingleton<IEmailMessageQueue>(c =>
+                    new EmailMessageQueue(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IMessageQueueIdFactory>(),
+                        c.GetRequiredServiceForPlatform<IQueueStore>()));
+                services.AddSingleton<IEmailSchedulingService, QueuingEmailSchedulingService>();
+                services.AddSingleton<IWebsiteUiService, WebsiteUiService>();
+                services.AddSingleton<INotificationsService>(c =>
+                    new EmailNotificationsService(c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                        c.GetRequiredService<IHostSettings>(), c.GetRequiredService<IWebsiteUiService>(),
+                        c.GetRequiredService<IEmailSchedulingService>()));
             }
         }
 
@@ -343,8 +347,8 @@ public static class HostExtensions
             serializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, false));
             serializerOptions.Converters.Add(new JsonDateTimeConverter(DateFormat.Iso8601));
 
-            appBuilder.Services.RegisterUnshared(serializerOptions);
-            appBuilder.Services.ConfigureHttpJsonOptions(options =>
+            services.AddSingleton(serializerOptions);
+            services.ConfigureHttpJsonOptions(options =>
             {
                 options.SerializerOptions.PropertyNameCaseInsensitive = serializerOptions.PropertyNameCaseInsensitive;
                 options.SerializerOptions.PropertyNamingPolicy = serializerOptions.PropertyNamingPolicy;
@@ -356,26 +360,23 @@ public static class HostExtensions
                 }
             });
 
-            appBuilder.Services.ConfigureHttpXmlOptions(options =>
-            {
-                options.SerializerOptions.WriteIndented = false;
-            });
+            services.ConfigureHttpXmlOptions(options => { options.SerializerOptions.WriteIndented = false; });
         }
 
         void RegisterApplicationServices(bool isMultiTenanted)
         {
-            appBuilder.Services.AddHttpClient();
+            services.AddHttpClient();
             var prefixes = modules.AggregatePrefixes;
             prefixes.Add(typeof(Checkpoint), CheckPointAggregatePrefix);
-            appBuilder.Services.RegisterUnshared<IIdentifierFactory>(_ => new HostIdentifierFactory(prefixes));
+            services.AddSingleton<IIdentifierFactory>(_ => new HostIdentifierFactory(prefixes));
 
             if (isMultiTenanted)
             {
-                appBuilder.Services.RegisterTenanted<ICallerContextFactory, AspNetCallerContextFactory>();
+                services.AddPerHttpRequest<ICallerContextFactory, AspNetCallerContextFactory>();
             }
             else
             {
-                appBuilder.Services.AddSingleton<ICallerContextFactory, AspNetCallerContextFactory>();
+                services.AddSingleton<ICallerContextFactory, AspNetCallerContextFactory>();
             }
         }
 
@@ -385,35 +386,35 @@ public static class HostExtensions
                 .Concat(new[] { typeof(DomainCommonMarker).Assembly, typeof(DomainSharedMarker).Assembly })
                 .ToArray();
 
-            appBuilder.Services.RegisterPlatform<IDependencyContainer>(c => new DotNetDependencyContainer(c));
+            services.AddForPlatform<IDependencyContainer, DotNetDependencyContainer>();
             if (isMultiTenanted)
             {
-                appBuilder.Services.RegisterTenanted<IDependencyContainer>(c => new DotNetDependencyContainer(c));
+                services.AddPerHttpRequest<IDependencyContainer, DotNetDependencyContainer>();
             }
             else
             {
-                appBuilder.Services.RegisterUnshared<IDependencyContainer>(c => new DotNetDependencyContainer(c));
+                services.AddSingleton<IDependencyContainer, DotNetDependencyContainer>();
             }
 
-            appBuilder.Services.RegisterUnshared<IMessageQueueIdFactory, MessageQueueIdFactory>();
-            appBuilder.Services.RegisterUnshared<IDomainFactory>(c => DomainFactory.CreateRegistered(
-                c.ResolveForPlatform<IDependencyContainer>(), domainAssemblies));
-            appBuilder.Services.RegisterUnshared<IEventSourcedChangeEventMigrator, ChangeEventTypeMigrator>();
+            services.AddSingleton<IMessageQueueIdFactory, MessageQueueIdFactory>();
+            services.AddSingleton<IDomainFactory>(c => DomainFactory.CreateRegistered(
+                c.GetRequiredServiceForPlatform<IDependencyContainer>(), domainAssemblies));
+            services.AddSingleton<IEventSourcedChangeEventMigrator, ChangeEventTypeMigrator>();
 
 #if TESTINGONLY
-            RegisterStoreForTestingOnly(appBuilder, usesQueues, isMultiTenanted);
+            RegisterStoreForTestingOnly(services, usesQueues, isMultiTenanted);
 #else
             //HACK: we need a reasonable value for production here like SQLServerDataStore
-            appBuilder.Services.RegisterPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(_ =>
+            services.AddForPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(_ =>
                 NullStore.Instance);
             if (isMultiTenanted)
             {
-                appBuilder.Services.RegisterTenanted<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(_ =>
+                services.AddPerHttpRequest<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(_ =>
                     NullStore.Instance);
             }
             else
             {
-                appBuilder.Services.RegisterUnshared<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(_ =>
+                services.AddSingleton<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(_ =>
                     NullStore.Instance);
             }
 #endif
@@ -426,7 +427,7 @@ public static class HostExtensions
                 return;
             }
 
-            appBuilder.Services.AddCors(options =>
+            services.AddCors(options =>
             {
                 if (cors == CORSOption.SameOrigin)
                 {
@@ -463,49 +464,49 @@ public static class HostExtensions
             });
         }
 #if TESTINGONLY
-        static void RegisterStoreForTestingOnly(WebApplicationBuilder appBuilder, bool usesQueues, bool isMultiTenanted)
+        static void RegisterStoreForTestingOnly(IServiceCollection services, bool usesQueues, bool isMultiTenanted)
         {
-            appBuilder.Services
-                .RegisterPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
-                    LocalMachineJsonFileStore.Create(c.ResolveForPlatform<IConfigurationSettings>(),
+            services
+                .AddForPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
+                    LocalMachineJsonFileStore.Create(c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
                         usesQueues
-                            ? c.ResolveForUnshared<IQueueStoreNotificationHandler>()
+                            ? c.GetRequiredService<IQueueStoreNotificationHandler>()
                             : null));
             if (isMultiTenanted)
             {
-                appBuilder.Services
-                    .RegisterTenanted<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
-                        LocalMachineJsonFileStore.Create(c.ResolveForTenant<IConfigurationSettings>(),
+                services
+                    .AddPerHttpRequest<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
+                        LocalMachineJsonFileStore.Create(c.GetRequiredService<IConfigurationSettings>(),
                             usesQueues
-                                ? c.ResolveForUnshared<IQueueStoreNotificationHandler>()
+                                ? c.GetRequiredService<IQueueStoreNotificationHandler>()
                                 : null));
             }
             else
             {
-                appBuilder.Services
-                    .RegisterUnshared<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
-                        LocalMachineJsonFileStore.Create(c.ResolveForPlatform<IConfigurationSettings>(),
+                services
+                    .AddSingleton<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
+                        LocalMachineJsonFileStore.Create(c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
                             usesQueues
-                                ? c.ResolveForUnshared<IQueueStoreNotificationHandler>()
+                                ? c.GetRequiredService<IQueueStoreNotificationHandler>()
                                 : null));
             }
 
             if (usesQueues)
             {
-                RegisterStubMessageQueueDrainingService(appBuilder);
+                RegisterStubMessageQueueDrainingService(services);
             }
         }
 
-        static void RegisterStubMessageQueueDrainingService(WebApplicationBuilder appBuilder)
+        static void RegisterStubMessageQueueDrainingService(IServiceCollection services)
         {
-            appBuilder.Services.RegisterUnshared<IMonitoredMessageQueues, MonitoredMessageQueues>();
-            appBuilder.Services.RegisterUnshared<IQueueStoreNotificationHandler, StubQueueStoreNotificationHandler>();
-            appBuilder.Services.AddHostedService(c =>
+            services.AddSingleton<IMonitoredMessageQueues, MonitoredMessageQueues>();
+            services.AddSingleton<IQueueStoreNotificationHandler, StubQueueStoreNotificationHandler>();
+            services.AddHostedService(c =>
                 new StubQueueDrainingService(c.GetRequiredService<IHttpClientFactory>(),
                     c.GetRequiredService<JsonSerializerOptions>(),
-                    c.ResolveForUnshared<IHostSettings>(),
+                    c.GetRequiredService<IHostSettings>(),
                     c.GetRequiredService<ILogger<StubQueueDrainingService>>(),
-                    c.ResolveForUnshared<IMonitoredMessageQueues>(), StubQueueDrainingServiceQueuedApiMappings));
+                    c.GetRequiredService<IMonitoredMessageQueues>(), StubQueueDrainingServiceQueuedApiMappings));
         }
 #endif
     }

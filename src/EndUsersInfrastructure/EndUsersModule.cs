@@ -44,22 +44,23 @@ public class EndUsersModule : ISubDomainModule
         {
             return (_, services) =>
             {
-                services.RegisterUnshared<IEndUsersApplication>(c =>
-                    new EndUsersApplication.EndUsersApplication(c.ResolveForUnshared<IRecorder>(),
-                        c.ResolveForUnshared<IIdentifierFactory>(), c.ResolveForPlatform<IConfigurationSettings>(),
-                        c.ResolveForUnshared<IOrganizationsService>(),
-                        c.ResolveForUnshared<IEndUserRepository>()));
-                services.RegisterUnshared<IEndUserRepository>(c => new EndUserRepository(
-                    c.ResolveForUnshared<IRecorder>(),
-                    c.ResolveForUnshared<IDomainFactory>(),
-                    c.ResolveForUnshared<IEventSourcingDddCommandStore<EndUserRoot>>(),
-                    c.ResolveForPlatform<IDataStore>()));
+                services.AddSingleton<IEndUsersApplication>(c =>
+                    new EndUsersApplication.EndUsersApplication(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IIdentifierFactory>(),
+                        c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                        c.GetRequiredService<IOrganizationsService>(),
+                        c.GetRequiredService<IEndUserRepository>()));
+                services.AddSingleton<IEndUserRepository>(c => new EndUserRepository(
+                    c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredService<IDomainFactory>(),
+                    c.GetRequiredService<IEventSourcingDddCommandStore<EndUserRoot>>(),
+                    c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.RegisterUnTenantedEventing<EndUserRoot, EndUserProjection>(
-                    c => new EndUserProjection(c.ResolveForUnshared<IRecorder>(),
-                        c.ResolveForUnshared<IDomainFactory>(),
-                        c.ResolveForPlatform<IDataStore>()));
+                    c => new EndUserProjection(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
 
-                services.RegisterUnshared<IEndUsersService, EndUsersInProcessServiceClient>();
+                services.AddSingleton<IEndUsersService, EndUsersInProcessServiceClient>();
             };
         }
     }

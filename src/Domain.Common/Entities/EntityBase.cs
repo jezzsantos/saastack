@@ -13,7 +13,7 @@ using Domain.Interfaces.ValueObjects;
 namespace Domain.Common.Entities;
 
 /// <summary>
-/// Defines a handler for a specific <see cref="IDomainEvent"/>
+///     Defines a handler for a specific <see cref="IDomainEvent" />
 /// </summary>
 public delegate Result<Error> RootEventHandler(IDomainEvent @event);
 
@@ -55,7 +55,8 @@ public abstract class EntityBase : IEntity, IEventingEntity, IDehydratableEntity
     /// </summary>
     protected EntityBase(ISingleValueObject<string> identifier, IDependencyContainer container,
         HydrationProperties rehydratingProperties)
-        : this(container.Resolve<IRecorder>(), container.Resolve<IIdentifierFactory>(), identifier)
+        : this(container.GetRequiredService<IRecorder>(), container.GetRequiredService<IIdentifierFactory>(),
+            identifier)
     {
         Id = rehydratingProperties.GetValueOrDefault(nameof(Id), Identifier.Empty());
         LastPersistedAtUtc = rehydratingProperties.GetValueOrDefault<DateTime>(nameof(LastPersistedAtUtc));

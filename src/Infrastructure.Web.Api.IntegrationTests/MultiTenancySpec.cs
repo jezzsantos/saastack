@@ -142,11 +142,11 @@ public class MultiTenancySpec : WebApiSpec<Program>
     private static void OverrideDependencies(IServiceCollection services)
     {
 #if TESTINGONLY
-        services.RegisterUnshared<ITenantSettingsService, StubTenantSettingsService>();
+        services.AddSingleton<ITenantSettingsService, StubTenantSettingsService>();
         services
-            .RegisterTenanted<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
-                LocalMachineJsonFileStore.Create(c.ResolveForTenant<IConfigurationSettings>(),
-                    c.ResolveForUnshared<IQueueStoreNotificationHandler>()));
+            .AddPerHttpRequest<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
+                LocalMachineJsonFileStore.Create(c.GetRequiredService<IConfigurationSettings>(),
+                    c.GetRequiredService<IQueueStoreNotificationHandler>()));
 #endif
     }
 

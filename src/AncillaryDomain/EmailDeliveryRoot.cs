@@ -43,8 +43,8 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
 
     public static AggregateRootFactory<EmailDeliveryRoot> Rehydrate()
     {
-        return (identifier, container, _) => new EmailDeliveryRoot(container.Resolve<IRecorder>(),
-            container.Resolve<IIdentifierFactory>(), identifier);
+        return (identifier, container, _) => new EmailDeliveryRoot(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 
     public override Result<Error> EnsureInvariants()

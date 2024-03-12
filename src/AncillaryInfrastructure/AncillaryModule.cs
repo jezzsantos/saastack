@@ -43,41 +43,45 @@ public class AncillaryModule : ISubDomainModule
         {
             return (_, services) =>
             {
-                services.RegisterUnshared<IRecordingApplication, RecordingApplication>();
-                services.RegisterUnshared<IFeatureFlagsApplication, FeatureFlagsApplication>();
-                services.RegisterUnshared<IAncillaryApplication, AncillaryApplication.AncillaryApplication>();
-                services.RegisterUnshared<IUsageMessageQueue>(c =>
-                    new UsageMessageQueue(c.Resolve<IRecorder>(), c.Resolve<IMessageQueueIdFactory>(),
-                        c.ResolveForPlatform<IQueueStore>()));
-                services.RegisterUnshared<IAuditMessageQueueRepository>(c =>
-                    new AuditMessageQueueRepository(c.Resolve<IRecorder>(), c.Resolve<IMessageQueueIdFactory>(),
-                        c.ResolveForPlatform<IQueueStore>()));
-                services.RegisterUnshared<IEmailMessageQueue>(c =>
-                    new EmailMessageQueue(c.Resolve<IRecorder>(), c.Resolve<IMessageQueueIdFactory>(),
-                        c.ResolveForPlatform<IQueueStore>()));
-                services.RegisterUnshared<IAuditRepository>(c => new AuditRepository(c.ResolveForUnshared<IRecorder>(),
-                    c.ResolveForUnshared<IDomainFactory>(),
-                    c.ResolveForUnshared<IEventSourcingDddCommandStore<AuditRoot>>(),
-                    c.ResolveForPlatform<IDataStore>()));
+                services.AddSingleton<IRecordingApplication, RecordingApplication>();
+                services.AddSingleton<IFeatureFlagsApplication, FeatureFlagsApplication>();
+                services.AddSingleton<IAncillaryApplication, AncillaryApplication.AncillaryApplication>();
+                services.AddSingleton<IUsageMessageQueue>(c =>
+                    new UsageMessageQueue(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IMessageQueueIdFactory>(),
+                        c.GetRequiredServiceForPlatform<IQueueStore>()));
+                services.AddSingleton<IAuditMessageQueueRepository>(c =>
+                    new AuditMessageQueueRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IMessageQueueIdFactory>(),
+                        c.GetRequiredServiceForPlatform<IQueueStore>()));
+                services.AddSingleton<IEmailMessageQueue>(c =>
+                    new EmailMessageQueue(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IMessageQueueIdFactory>(),
+                        c.GetRequiredServiceForPlatform<IQueueStore>()));
+                services.AddSingleton<IAuditRepository>(c => new AuditRepository(c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredService<IDomainFactory>(),
+                    c.GetRequiredService<IEventSourcingDddCommandStore<AuditRoot>>(),
+                    c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.RegisterUnTenantedEventing<AuditRoot, AuditProjection>(
-                    c => new AuditProjection(c.ResolveForUnshared<IRecorder>(), c.ResolveForUnshared<IDomainFactory>(),
-                        c.ResolveForPlatform<IDataStore>()));
-                services.RegisterUnshared<IEmailDeliveryRepository>(c => new EmailDeliveryRepository(
-                    c.ResolveForUnshared<IRecorder>(),
-                    c.ResolveForUnshared<IDomainFactory>(),
-                    c.ResolveForUnshared<IEventSourcingDddCommandStore<EmailDeliveryRoot>>(),
-                    c.ResolveForPlatform<IDataStore>()));
+                    c => new AuditProjection(c.GetRequiredService<IRecorder>(), c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.AddSingleton<IEmailDeliveryRepository>(c => new EmailDeliveryRepository(
+                    c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredService<IDomainFactory>(),
+                    c.GetRequiredService<IEventSourcingDddCommandStore<EmailDeliveryRoot>>(),
+                    c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.RegisterUnTenantedEventing<EmailDeliveryRoot, EmailDeliveryProjection>(
-                    c => new EmailDeliveryProjection(c.ResolveForUnshared<IRecorder>(),
-                        c.ResolveForUnshared<IDomainFactory>(),
-                        c.ResolveForPlatform<IDataStore>()));
-                services.RegisterUnshared<IProvisioningMessageQueue>(c =>
-                    new ProvisioningMessageQueue(c.Resolve<IRecorder>(), c.Resolve<IMessageQueueIdFactory>(),
-                        c.ResolveForPlatform<IQueueStore>()));
+                    c => new EmailDeliveryProjection(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.AddSingleton<IProvisioningMessageQueue>(c =>
+                    new ProvisioningMessageQueue(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IMessageQueueIdFactory>(),
+                        c.GetRequiredServiceForPlatform<IQueueStore>()));
 
-                services.RegisterUnshared<IUsageDeliveryService, NullUsageDeliveryService>();
-                services.RegisterUnshared<IEmailDeliveryService, NullEmailDeliveryService>();
-                services.RegisterUnshared<IProvisioningDeliveryService, OrganizationProvisioningDeliveryService>();
+                services.AddSingleton<IUsageDeliveryService, NullUsageDeliveryService>();
+                services.AddSingleton<IEmailDeliveryService, NullEmailDeliveryService>();
+                services.AddSingleton<IProvisioningDeliveryService, OrganizationProvisioningDeliveryService>();
             };
         }
     }

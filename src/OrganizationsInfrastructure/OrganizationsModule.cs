@@ -46,30 +46,30 @@ public class OrganizationsModule : ISubDomainModule
         {
             return (_, services) =>
             {
-                services.RegisterUnshared<ITenantSettingsService, AspNetHostLocalFileTenantSettingsService>();
-                services.RegisterUnshared<ITenantSettingService>(c => new TenantSettingService(
+                services.AddSingleton<ITenantSettingsService, AspNetHostLocalFileTenantSettingsService>();
+                services.AddSingleton<ITenantSettingService>(c => new TenantSettingService(
                     new AesEncryptionService(c
-                        .ResolveForPlatform<IConfigurationSettings>()
+                        .GetRequiredServiceForPlatform<IConfigurationSettings>()
                         .GetString(TenantSettingService.EncryptionServiceSecretSettingName))));
-                services.RegisterUnshared<IOrganizationsApplication>(c =>
-                    new OrganizationsApplication.OrganizationsApplication(c.ResolveForUnshared<IRecorder>(),
-                        c.ResolveForUnshared<IIdentifierFactory>(),
-                        c.ResolveForUnshared<ITenantSettingsService>(),
-                        c.ResolveForUnshared<ITenantSettingService>(),
-                        c.ResolveForUnshared<IEndUsersService>(),
-                        c.ResolveForUnshared<IOrganizationRepository>()));
-                services.RegisterUnshared<IOrganizationRepository>(c => new OrganizationRepository(
-                    c.ResolveForUnshared<IRecorder>(),
-                    c.ResolveForUnshared<IDomainFactory>(),
-                    c.ResolveForUnshared<IEventSourcingDddCommandStore<OrganizationRoot>>(),
-                    c.ResolveForPlatform<IDataStore>()));
+                services.AddSingleton<IOrganizationsApplication>(c =>
+                    new OrganizationsApplication.OrganizationsApplication(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IIdentifierFactory>(),
+                        c.GetRequiredService<ITenantSettingsService>(),
+                        c.GetRequiredService<ITenantSettingService>(),
+                        c.GetRequiredService<IEndUsersService>(),
+                        c.GetRequiredService<IOrganizationRepository>()));
+                services.AddSingleton<IOrganizationRepository>(c => new OrganizationRepository(
+                    c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredService<IDomainFactory>(),
+                    c.GetRequiredService<IEventSourcingDddCommandStore<OrganizationRoot>>(),
+                    c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.RegisterUnTenantedEventing<OrganizationRoot, OrganizationProjection>(
-                    c => new OrganizationProjection(c.ResolveForUnshared<IRecorder>(),
-                        c.ResolveForUnshared<IDomainFactory>(),
-                        c.ResolveForPlatform<IDataStore>()));
+                    c => new OrganizationProjection(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
 
-                services.RegisterUnshared<IOrganizationsService>(c =>
-                    new OrganizationsInProcessServiceClient(c.LazyResolveForUnshared<IOrganizationsApplication>()));
+                services.AddSingleton<IOrganizationsService>(c =>
+                    new OrganizationsInProcessServiceClient(c.LazyGetRequiredService<IOrganizationsApplication>()));
             };
         }
     }

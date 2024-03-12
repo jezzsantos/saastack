@@ -1,4 +1,3 @@
-using Infrastructure.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Hosting.Common.Extensions;
@@ -6,65 +5,28 @@ namespace Infrastructure.Hosting.Common.Extensions;
 public static class ServiceProviderExtensions
 {
     /// <summary>
-    ///     Returns a function that returns the registered instance of the registered <see cref="TService" /> from the
-    ///     container, only for instances that were NOT registered with the
-    ///     <see cref="ServiceCollectionExtensions.RegisterPlatform{TService}" />.
-    ///     Used to resolve services that are not shared (i.e. neither Platform/Tenanted)
-    /// </summary>
-    public static Func<TService> LazyResolveForUnshared<TService>(this IServiceProvider container)
-        where TService : notnull
-    {
-        return () => container.GetRequiredService<TService>();
-    }
-
-    /// <summary>
-    ///     Returns the registered instance of the registered <see cref="TService" /> from the container,
-    ///     only for instances that were NOT registered with the
-    ///     <see cref="ServiceCollectionExtensions.RegisterPlatform{TService}" />.
-    ///     Used to resolve services that are not shared (i.e. neither Platform/Tenanted)
-    /// </summary>
-    public static TService Resolve<TService>(this IServiceProvider container)
-        where TService : notnull
-    {
-        return container.GetRequiredService<TService>();
-    }
-
-    /// <summary>
     ///     Returns the registered instance of the registered <see cref="TService" /> from the container,
     ///     only for instances that were registered with the
-    ///     <see cref="ServiceCollectionExtensions.RegisterPlatform{TService}" />.
+    ///     <see cref="ServiceCollectionExtensions.AddForPlatform{TService}" />.
     ///     For example: to support multi-tenancy. Some services are registered twice in the container,
     ///     once specifically by tenanted instances, another specifically for untenanted/platform instances
     /// </summary>
-    public static TService ResolveForPlatform<TService>(this IServiceProvider container)
+    public static TService GetRequiredServiceForPlatform<TService>(this IServiceProvider services)
         where TService : notnull
     {
-        var dependency = container.GetRequiredService<IPlatformDependency<TService>>();
-        return dependency.UnWrap();
+        return services.GetRequiredKeyedService<TService>(ServiceCollectionExtensions.PlatformKey);
     }
 
     /// <summary>
-    ///     Returns the registered instance of the registered <see cref="TService" /> from the container,
-    ///     only for instances that were NOT registered with the
-    ///     <see cref="ServiceCollectionExtensions.RegisterPlatform{TService}" />.
-    ///     For example: to support multi-tenancy. Some services are registered twice in the container,
-    ///     once specifically by tenanted instances, another specifically for untenanted/platform instances
-    /// </summary>
-    public static TService ResolveForTenant<TService>(this IServiceProvider container)
-        where TService : notnull
-    {
-        return container.GetRequiredService<TService>();
-    }
-
-    /// <summary>
-    ///     Returns the registered instance of the registered <see cref="TService" /> from the container,
-    ///     only for instances that were NOT registered with the
-    ///     <see cref="ServiceCollectionExtensions.RegisterPlatform{TService}" />.
+    ///     Returns a function that returns the registered instance of the registered <see cref="TService" /> from the
+    ///     container, only for instances that were NOT registered with the
+    ///     <see cref="ServiceCollectionExtensions.AddForPlatform{TService}" />.
     ///     Used to resolve services that are not shared (i.e. neither Platform/Tenanted)
     /// </summary>
-    public static TService ResolveForUnshared<TService>(this IServiceProvider container)
+    public static Func<TService> LazyGetRequiredService<TService>(this IServiceProvider services)
         where TService : notnull
     {
-        return container.GetRequiredService<TService>();
+        // ReSharper disable once ConvertClosureToMethodGroup
+        return () => services.GetRequiredService<TService>();
     }
 }

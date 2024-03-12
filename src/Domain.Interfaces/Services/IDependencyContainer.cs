@@ -1,13 +1,13 @@
 namespace Domain.Interfaces.Services;
 
 /// <summary>
-///     Defined a dependency injection container
+///     Defines a dependency injection container
 /// </summary>
 public interface IDependencyContainer
 {
-    TService Resolve<TService>()
+    TService GetRequiredService<TService>()
         where TService : notnull;
 
-    TService ResolveForPlatform<TService>()
+    TService GetRequiredServiceForPlatform<TService>()
         where TService : notnull;
 }

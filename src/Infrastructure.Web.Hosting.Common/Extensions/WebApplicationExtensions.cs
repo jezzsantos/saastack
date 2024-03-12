@@ -205,10 +205,10 @@ public static class WebApplicationExtensions
             //Nothing to register
         }, "Feature: Recording with -> {Recorder}", recorder));
 
-        var dataStore = builder.Services.ResolveForPlatform<IDataStore>().GetType().Name;
-        var eventStore = builder.Services.ResolveForPlatform<IEventStore>().GetType().Name;
-        var queueStore = builder.Services.ResolveForPlatform<IQueueStore>().GetType().Name;
-        var blobStore = builder.Services.ResolveForPlatform<IBlobStore>().GetType().Name;
+        var dataStore = builder.Services.GetRequiredServiceForPlatform<IDataStore>().GetType().Name;
+        var eventStore = builder.Services.GetRequiredServiceForPlatform<IEventStore>().GetType().Name;
+        var queueStore = builder.Services.GetRequiredServiceForPlatform<IQueueStore>().GetType().Name;
+        var blobStore = builder.Services.GetRequiredServiceForPlatform<IBlobStore>().GetType().Name;
         middlewares.Add(new MiddlewareRegistration(-50, _ =>
             {
                 //Nothing to register
