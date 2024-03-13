@@ -9,7 +9,7 @@ public interface IHierarchicalLevel<TLevel>
 
     public string Name { get; }
 
-    bool HasDescendant(TLevel level);
-
     IReadOnlyList<string> AllDescendantNames();
+
+    bool HasDescendant(TLevel level);
 }

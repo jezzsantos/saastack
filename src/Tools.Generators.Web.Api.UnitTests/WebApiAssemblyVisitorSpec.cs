@@ -361,7 +361,6 @@ public class WebApiAssemblyVisitorSpec
             _visitor.OperationRegistrations.Should().BeEmpty();
         }
 
-        
         [Trait("Category", "Unit")]
         public class GivenAServiceOperation
         {
@@ -465,7 +464,8 @@ public class WebApiAssemblyVisitorSpec
                                                     + $"    }}{Environment.NewLine}");
                 registration.MethodName.Should().Be("AMethod");
                 registration.OperationType.Should().Be(ServiceOperation.Get);
-                registration.OperationAuthorization!.PolicyName.Should().Be("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}");
+                registration.OperationAuthorization!.PolicyName.Should().Be(
+                    "POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}");
                 registration.RoutePath.Should().Be("aroute");
                 registration.IsTestingOnly.Should().BeFalse();
                 registration.RequestDtoName.Name.Should().Be("ARequest");

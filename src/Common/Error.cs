@@ -43,7 +43,7 @@ public readonly struct Error
             : message);
     }
 #endif
-    
+
     /// <summary>
     ///     Creates a <see cref="ErrorCode.NoError" /> error
     /// </summary>

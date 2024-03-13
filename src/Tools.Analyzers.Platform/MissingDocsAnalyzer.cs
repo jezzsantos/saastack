@@ -64,7 +64,7 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
         {
             return;
         }
-        
+
         var docs = memberDeclarationSyntax.GetDocumentationCommentTriviaSyntax(context);
         if (docs is null)
         {

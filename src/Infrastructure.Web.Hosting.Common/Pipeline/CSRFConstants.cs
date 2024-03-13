@@ -7,8 +7,8 @@ public static class CSRFConstants
     public static class Html
     {
         public const string CSRFFieldNamePlaceholder = "%%CSRFFIELDNAME%%";
-        public const string CSRFTokenPlaceholder = "%%CSRFTOKEN%%";
         public const string CSRFRequestFieldName = "csrf-token";
+        public const string CSRFTokenPlaceholder = "%%CSRFTOKEN%%";
     }
 
     public static class Cookies

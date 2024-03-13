@@ -128,7 +128,6 @@ public static class ResponseProblemExtensions
             Instance = details.ErrorUri
         };
 
-
         return response;
     }
 }

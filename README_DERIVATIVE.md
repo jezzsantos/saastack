@@ -259,10 +259,10 @@ To kill these processes:
    * Find the processes: `lsof -Pni | grep "5001\|5101\|5656"`
    * Kill the processes: `kill -9 <processid>` where `<processid>` is the ID of the process in the list
 
-  * Alternatively, in MacOS:
+   * Alternatively, in MacOS:
 
-     * Use `lsof -ti :[PORT]` and locate the PID of the process, e.g., `lsof -ti :5656`.
-     * Open "Activity Monitor", locate the process with that PID, and stop that process.
+      * Use `lsof -ti :[PORT]` and locate the PID of the process, e.g., `lsof -ti :5656`.
+      * Open "Activity Monitor", locate the process with that PID, and stop that process.
 
 ## Testing The Code
 

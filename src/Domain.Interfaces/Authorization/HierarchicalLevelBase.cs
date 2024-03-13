@@ -23,6 +23,14 @@ public abstract class HierarchicalLevelBase<TLevel> : IHierarchicalLevel<Hierarc
         return GetDescendantNames(this, false);
     }
 
+    /// <summary>
+    ///     Whether the specified <see cref="level" /> exists in this hierarchy
+    /// </summary>
+    public bool HasDescendant(HierarchicalLevelBase<TLevel> level)
+    {
+        return FindDescendant(this, lvl => lvl == level);
+    }
+
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || (obj is HierarchicalLevelBase<TLevel> other && Equals(other));
@@ -31,14 +39,6 @@ public abstract class HierarchicalLevelBase<TLevel> : IHierarchicalLevel<Hierarc
     public override int GetHashCode()
     {
         return Name.GetHashCode();
-    }
-
-    /// <summary>
-    ///     Whether the specified <see cref="level" /> exists in this hierarchy
-    /// </summary>
-    public bool HasDescendant(HierarchicalLevelBase<TLevel> level)
-    {
-        return FindDescendant(this, lvl => lvl == level);
     }
 
     public static bool operator ==(HierarchicalLevelBase<TLevel>? left, HierarchicalLevelBase<TLevel>? right)

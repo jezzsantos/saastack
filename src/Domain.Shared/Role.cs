@@ -34,7 +34,6 @@ public class Role : SingleValueObjectBase<Role, string>
             return error;
         }
 
-
         return new Role(level.Name);
     }
 

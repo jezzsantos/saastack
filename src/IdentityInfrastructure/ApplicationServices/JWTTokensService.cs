@@ -16,8 +16,8 @@ public class JWTTokensService : IJWTTokensService
     public const string BaseUrlSettingName = "Hosts:IdentityApi:BaseUrl";
     public const string DefaultExpirySettingName = "Hosts:IdentityApi:JWT:DefaultExpiryInMinutes";
     public const string SecretSettingName = "Hosts:IdentityApi:JWT:SigningSecret";
-    private readonly string _baseUrl;
     private readonly TimeSpan _accessTokenExpiresAfter;
+    private readonly string _baseUrl;
     private readonly string _signingSecret;
     private readonly ITokensService _tokensService;
 

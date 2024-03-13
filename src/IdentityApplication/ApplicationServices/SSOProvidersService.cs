@@ -16,8 +16,8 @@ namespace IdentityApplication.ApplicationServices;
 public class SSOProvidersService : ISSOProvidersService
 {
     private readonly IEnumerable<ISSOAuthenticationProvider> _authenticationProviders;
-    private readonly IIdentifierFactory _identifierFactory;
     private readonly IEncryptionService _encryptionService;
+    private readonly IIdentifierFactory _identifierFactory;
     private readonly IRecorder _recorder;
     private readonly ISSOUsersRepository _repository;
 

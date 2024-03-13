@@ -19,12 +19,6 @@ public class EndUsersInProcessServiceClient : IEndUsersService
         _endUsersApplication = endUsersApplication;
     }
 
-    public async Task<Result<EndUser, Error>> GetPersonAsync(ICallerContext caller, string id,
-        CancellationToken cancellationToken)
-    {
-        return await _endUsersApplication.GetPersonAsync(caller, id, cancellationToken);
-    }
-
     public async Task<Result<Membership, Error>> CreateMembershipForCallerPrivateAsync(ICallerContext caller,
         string organizationId,
         CancellationToken cancellationToken)
@@ -59,5 +53,11 @@ public class EndUsersInProcessServiceClient : IEndUsersService
         CancellationToken cancellationToken)
     {
         return await _endUsersApplication.RegisterMachineAsync(caller, name, timezone, countryCode, cancellationToken);
+    }
+
+    public async Task<Result<EndUser, Error>> GetPersonAsync(ICallerContext caller, string id,
+        CancellationToken cancellationToken)
+    {
+        return await _endUsersApplication.GetPersonAsync(caller, id, cancellationToken);
     }
 }

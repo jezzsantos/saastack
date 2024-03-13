@@ -25,7 +25,6 @@ public sealed class CausedBy : ValueObjectBase<CausedBy>
             {
                 return error2;
             }
-
         }
 
         return new CausedBy(reason, reference);

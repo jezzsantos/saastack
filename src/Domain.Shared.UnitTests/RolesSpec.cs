@@ -88,7 +88,7 @@ public class RolesSpec
     [Fact]
     public void WhenCreateWithListContainingInvalidItem_ThenReturnsError()
     {
-        var result = Roles.Create(new[] { PlatformRoles.Standard.Name, string.Empty });
+        var result = Roles.Create(PlatformRoles.Standard.Name, string.Empty);
 
         result.Should().BeError(ErrorCode.Validation);
     }
@@ -97,7 +97,7 @@ public class RolesSpec
     [Fact]
     public void WhenCreateWithListContainingValidItems_ThenReturnsValue()
     {
-        var result = Roles.Create(new[] { PlatformRoles.Standard.Name, PlatformRoles.TestingOnly.Name });
+        var result = Roles.Create(PlatformRoles.Standard.Name, PlatformRoles.TestingOnly.Name);
 
         result.Should().BeSuccess();
         result.Value.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Standard.Name).Value,

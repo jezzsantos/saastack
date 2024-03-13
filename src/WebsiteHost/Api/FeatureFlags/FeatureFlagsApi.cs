@@ -18,6 +18,15 @@ public class FeatureFlagsApi : IWebApiService
         _featureFlagsApplication = featureFlagsApplication;
     }
 
+    public async Task<ApiGetResult<List<FeatureFlag>, GetAllFeatureFlagsResponse>> GetAll(
+        GetAllFeatureFlagsRequest request,
+        CancellationToken cancellationToken)
+    {
+        var flags = await _featureFlagsApplication.GetAllFeatureFlagsAsync(_contextFactory.Create(), cancellationToken);
+
+        return () => flags.HandleApplicationResult(f => new GetAllFeatureFlagsResponse { Flags = f });
+    }
+
     public async Task<ApiGetResult<FeatureFlag, GetFeatureFlagResponse>> GetForCaller(
         GetFeatureFlagForCallerRequest request,
         CancellationToken cancellationToken)
@@ -26,14 +35,5 @@ public class FeatureFlagsApi : IWebApiService
             request.Name, cancellationToken);
 
         return () => flag.HandleApplicationResult(f => new GetFeatureFlagResponse { Flag = f });
-    }
-
-    public async Task<ApiGetResult<List<FeatureFlag>, GetAllFeatureFlagsResponse>> GetAll(
-        GetAllFeatureFlagsRequest request,
-        CancellationToken cancellationToken)
-    {
-        var flags = await _featureFlagsApplication.GetAllFeatureFlagsAsync(_contextFactory.Create(), cancellationToken);
-
-        return () => flags.HandleApplicationResult(f => new GetAllFeatureFlagsResponse { Flags = f });
     }
 }

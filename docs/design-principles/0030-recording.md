@@ -181,6 +181,6 @@ To work around this problem, the JavaScript application can instead relay that t
 
 Again, the `WebsiteHost` can provide the relay mechanism, but the data capture part (in the browser) still is best performed in JavaScript.
 
-> It is technically feasible to use the vendor's SDKs to capture the data in the browser, but instead of relaying it to the 3rd party cloud endpoints, direct it to the BEFFE recorder API to relay. 
+> It is technically feasible to use the vendor's SDKs to capture the data in the browser, but instead of relaying it to the 3rd party cloud endpoints, direct it to the BEFFE recorder API to relay.
 >
 > For example, when using the Application Insights JavaScript SDK, you can overwrite the `endpointUrl` to point to your own BEFFE. Then, standup a custom API (in the BEFFE) that looks like the Application Insights API in Azure, and then translate the data that the `HostRecorder` can forward onto Application Insights itself. See: https://github.com/shaneochotny/ApplicationInsights-JS-Proxy for more details.

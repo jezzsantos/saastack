@@ -8,7 +8,6 @@ namespace Domain.Interfaces.Authorization;
 /// </summary>
 public static class TenantRoles
 {
-    // EXTEND: Add other roles that end-users can be assigned to control access to tenanted resources (e.g. tenanted APIs)
     public static readonly RoleLevel BillingAdmin = new("billing_admin");
     public static readonly RoleLevel Member = new("member");
     public static readonly RoleLevel Owner = new("member_owner");
@@ -22,6 +21,9 @@ public static class TenantRoles
         { TestingOnly.Name, TestingOnly },
 #endif
     };
+
+    // EXTEND: Add other roles that end-users can be assigned to control access to tenanted resources (e.g. tenanted APIs)
+
     private static readonly IReadOnlyList<RoleLevel> TenantAssignableRoles = new List<RoleLevel>
     {
         // EXTEND: Add new roles that can be assigned/unassigned to EndUsers

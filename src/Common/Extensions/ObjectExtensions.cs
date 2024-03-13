@@ -32,6 +32,16 @@ public static class ObjectExtensions
         return instance is not null;
     }
 #endif
+#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_PLATFORM
+    /// <summary>
+    ///     Whether the object does not exist
+    /// </summary>
+    [ContractAnnotation("null => true; notnull => false")]
+    public static bool NotExists([NotNullWhen(false)] this object? instance)
+    {
+        return instance is null;
+    }
+#endif
 #if COMMON_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Whether the parameter <see cref="value" /> from being invalid according to the <see cref="validation" />,
@@ -84,16 +94,6 @@ public static class ObjectExtensions
     public static bool IsNotValuedParameter(this string? value, string parameterName, out Error error)
     {
         return IsInvalidParameter(value.HasValue, parameterName, null, out error);
-    }
-#endif
-#if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_PLATFORM
-    /// <summary>
-    ///     Whether the object does not exist
-    /// </summary>
-    [ContractAnnotation("null => true; notnull => false")]
-    public static bool NotExists([NotNullWhen(false)] this object? instance)
-    {
-        return instance is null;
     }
 #endif
 #if COMMON_PROJECT

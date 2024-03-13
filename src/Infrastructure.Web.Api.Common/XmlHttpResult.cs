@@ -34,6 +34,8 @@ public sealed class XmlHttpResult<TValue> : IResult, IStatusCodeHttpResult, IVal
         StatusCode = statusCode;
     }
 
+    public XmlSerializerOptions? XmlSerializerOptions { get; }
+
     public string? ContentType { get; }
 
     public Task ExecuteAsync(HttpContext httpContext)
@@ -58,8 +60,6 @@ public sealed class XmlHttpResult<TValue> : IResult, IStatusCodeHttpResult, IVal
     object? IValueHttpResult.Value => Value;
 
     public TValue? Value { get; }
-
-    public XmlSerializerOptions? XmlSerializerOptions { get; }
 }
 
 /// <summary>

@@ -14,7 +14,8 @@ public static class EnumExtensions
     ///     Converts the value of the <see cref="TSourceEnum" /> to a value in the <see cref="TTargetEnum" />
     /// </summary>
     public static TTargetEnum ToEnum<TSourceEnum, TTargetEnum>(this TSourceEnum source)
-        where TSourceEnum : Enum where TTargetEnum : Enum
+        where TSourceEnum : Enum
+        where TTargetEnum : Enum
     {
         return source.ToString()
             .ToEnum<TTargetEnum>();
@@ -45,7 +46,8 @@ public static class EnumExtensions
     /// </summary>
     public static TTargetEnum ToEnumOrDefault<TSourceEnum, TTargetEnum>(this TSourceEnum source,
         TTargetEnum defaultValue)
-        where TSourceEnum : Enum where TTargetEnum : Enum
+        where TSourceEnum : Enum
+        where TTargetEnum : Enum
     {
         var sourceValue = source.ToString();
         if (Enum.TryParse(typeof(TTargetEnum), sourceValue, true, out var converted))

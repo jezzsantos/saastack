@@ -141,16 +141,20 @@ public static class HandlerExtensions
             case ServiceOperation.Get:
             case ServiceOperation.Search:
                 return Results.Ok(response);
+
             case ServiceOperation.Post:
             {
                 return location.HasValue()
                     ? Results.Created(location, response)
                     : Results.Ok(response);
             }
+
             case ServiceOperation.PutPatch:
                 return Results.Accepted(null, response);
+
             case ServiceOperation.Delete:
                 return Results.NoContent();
+
             default:
                 return Results.Ok(response);
         }

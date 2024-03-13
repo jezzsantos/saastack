@@ -174,16 +174,6 @@ public static class SyntaxFilterExtensions
 
         return false;
     }
-    public static bool IsPartialClass(this ClassDeclarationSyntax classDeclaration)
-    {
-        var accessibility = new Accessibility(classDeclaration.Modifiers);
-        if (accessibility.IsPartial)
-        {
-            return true;
-        }
-
-        return false;
-    }
 
     public static bool IsNotPublicOrInternalStaticMethod(this MethodDeclarationSyntax methodDeclarationSyntax)
     {
@@ -265,6 +255,17 @@ public static class SyntaxFilterExtensions
 
         var accessibility = new Accessibility(classDeclaration.Modifiers);
         if (!accessibility.IsStatic)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static bool IsPartialClass(this ClassDeclarationSyntax classDeclaration)
+    {
+        var accessibility = new Accessibility(classDeclaration.Modifiers);
+        if (accessibility.IsPartial)
         {
             return true;
         }
@@ -359,10 +360,11 @@ public class Accessibility
 
     public bool IsInternal { get; }
 
+    public bool IsPartial { get; }
+
     public bool IsPrivate { get; }
 
     public bool IsPublic { get; }
 
     public bool IsStatic { get; }
-    public bool IsPartial { get; }
 }

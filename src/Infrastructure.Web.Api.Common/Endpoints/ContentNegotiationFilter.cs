@@ -172,6 +172,7 @@ public class ContentNegotiationFilter : IEndpointFilter
         {
             httpRequest.RewindBody();
         }
+
         try
         {
             var requestWithFormat =

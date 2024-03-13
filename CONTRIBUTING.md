@@ -82,12 +82,12 @@ Your Responsibilities are:
 
 * Ensure cross-platform compatibility for every change that's accepted. Windows, Mac, Debian & Ubuntu Linux.
 * Ensure that all functional code that goes into SaaStack meets all these requirements
-    * The change you make compiles, and a final package can still be built from the changed codebase
-    * You have unit tests and integration tests to demonstrate how the change is working correctly. They must all be run and pass.
-    * Your code is formatted using the configured formatting/linting tools.
-    * Your code is self-documenting; the intent of which is easily understandable by other contributors. Comments are not the mechanism to share what the code does, or how, only why.
-    * Dead code should be removed. Do not include unused commented-out sections of code.
-    * Your code does not break the build, and passes all checks enforced by GitHub Actions.
+   * The change you make compiles, and a final package can still be built from the changed codebase
+   * You have unit tests and integration tests to demonstrate how the change is working correctly. They must all be run and pass.
+   * Your code is formatted using the configured formatting/linting tools.
+   * Your code is self-documenting; the intent of which is easily understandable by other contributors. Comments are not the mechanism to share what the code does, or how, only why.
+   * Dead code should be removed. Do not include unused commented-out sections of code.
+   * Your code does not break the build, and passes all checks enforced by GitHub Actions.
 
 * Architectural decisions should be discussed with other contributors.
 * Create issues for any major changes and enhancements that you wish to make. Discuss things transparently and get community feedback.

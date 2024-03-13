@@ -12,8 +12,9 @@ public class StubRecorder : IRecorder
 
     public object[]? LastCrashArguments { get; private set; }
 
-    public CrashLevel? LastCrashLevel { get; private set; }
     public Exception? LastCrashException { get; private set; }
+
+    public CrashLevel? LastCrashLevel { get; private set; }
 
     public string? LastCrashMessageTemplate { get; private set; }
 
@@ -148,7 +149,7 @@ public class StubRecorder : IRecorder
 }
 
 /// <summary>
-/// Defines the trace level of the recorder
+///     Defines the trace level of the recorder
 /// </summary>
 public enum StubRecorderTraceLevel
 {

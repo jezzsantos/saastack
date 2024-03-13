@@ -25,6 +25,7 @@ public static class PlatformRoles
         { TestingOnlySuperUser.Name, TestingOnlySuperUser }
 #endif
     };
+
     // EXTEND: Add other roles to control access to untenanted resources (e.g. untenanted APIs)
 
     private static readonly IReadOnlyList<RoleLevel> PlatformAssignableRoles = new List<RoleLevel>

@@ -13,7 +13,7 @@ public class AuthToken : ReadModelEntity
 
     public Optional<string> RefreshToken { get; set; }
 
-    public Optional<string> UserId { get; set; }
-
     public Optional<DateTime> RefreshTokenExpiresOn { get; set; }
+
+    public Optional<string> UserId { get; set; }
 }

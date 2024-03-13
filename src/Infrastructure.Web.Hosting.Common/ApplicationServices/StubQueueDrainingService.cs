@@ -26,10 +26,10 @@ public class StubQueueDrainingService : BackgroundService
     private static readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(1);
     private static readonly TimeSpan StartInterval = TimeSpan.FromSeconds(5);
     private readonly IHttpJsonClient _apiClient;
+    private readonly string _hmacSecret;
     private readonly ILogger _logger;
     private readonly IMonitoredMessageQueues _monitoredMessageQueues;
     private readonly Dictionary<string, IWebRequest> _monitorQueueMappings;
-    private readonly string _hmacSecret;
 
     public StubQueueDrainingService(IHttpClientFactory httpClientFactory, JsonSerializerOptions jsonOptions,
         IHostSettings settings, ILogger<StubQueueDrainingService> logger,
@@ -51,7 +51,6 @@ public class StubQueueDrainingService : BackgroundService
         _monitorQueueMappings = monitorQueueMappings;
         _hmacSecret = hmacSecret;
         _apiClient = CreateApiClient(httpClientFactory, jsonOptions, baseUrl);
-        
     }
 
     public override void Dispose()

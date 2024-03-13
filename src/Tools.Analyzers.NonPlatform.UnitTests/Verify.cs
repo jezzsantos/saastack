@@ -11,6 +11,7 @@ using NuGet.Frameworks;
 using AnalyzerConstants = CommonAnalyzers::Tools.Analyzers.Common.AnalyzerConstants;
 using Task = System.Threading.Tasks.Task;
 using ObjectExtensions = NonPlatformAnalyzers::Common.Extensions.ObjectExtensions;
+
 namespace Tools.Analyzers.NonPlatform.UnitTests;
 
 public static class Verify
@@ -22,7 +23,7 @@ public static class Verify
     {
         typeof(Verify).Assembly,
         typeof(AnalyzerConstants).Assembly,
-        typeof(IQueryableEntity).Assembly,
+        typeof(IQueryableEntity).Assembly
     };
 
     // HACK: we have to define the .NET 8.0 framework here,
@@ -36,7 +37,8 @@ public static class Verify
                 .IsPackageBased)
         {
             // The NuGet version provided at runtime does not recognize the target framework
-            throw new NotSupportedException($"The '{version}' target framework is not supported by this version of NuGet.");
+            throw new NotSupportedException(
+                $"The '{version}' target framework is not supported by this version of NuGet.");
         }
 
         return new ReferenceAssemblies(version, new PackageIdentity("Microsoft.NETCore.App.Ref", sdkVersion),

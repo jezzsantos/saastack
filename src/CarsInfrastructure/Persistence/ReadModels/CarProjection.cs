@@ -35,6 +35,7 @@ public class CarProjection : IReadModelProjection
                     dto.OrganizationId = e.OrganizationId;
                     dto.Status = e.Status;
                 }, cancellationToken);
+
             case Events.ManufacturerChanged e:
                 return await _cars.HandleUpdateAsync(e.RootId, dto =>
                 {
@@ -42,12 +43,14 @@ public class CarProjection : IReadModelProjection
                     dto.ManufactureMake = e.Make;
                     dto.ManufactureModel = e.Model;
                 }, cancellationToken);
+
             case Events.OwnershipChanged e:
                 return await _cars.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.VehicleOwnerId = e.Owner;
                     dto.ManagerIds = VehicleManagers.Create(e.Owner).Value;
                 }, cancellationToken);
+
             case Events.RegistrationChanged e:
                 return await _cars.HandleUpdateAsync(e.RootId, dto =>
                 {
@@ -55,6 +58,7 @@ public class CarProjection : IReadModelProjection
                     dto.LicenseNumber = e.Number;
                     dto.Status = e.Status;
                 }, cancellationToken);
+
             case Events.UnavailabilitySlotAdded e:
                 return await _unavailabilities.HandleCreateAsync(e.UnavailabilityId!, dto =>
                 {
@@ -65,6 +69,7 @@ public class CarProjection : IReadModelProjection
                     dto.CausedBy = e.CausedByReason;
                     dto.CausedByReference = e.CausedByReference!;
                 }, cancellationToken);
+
             case Events.UnavailabilitySlotRemoved e:
                 return await _unavailabilities.HandleDeleteAsync(e.UnavailabilityId, cancellationToken);
 

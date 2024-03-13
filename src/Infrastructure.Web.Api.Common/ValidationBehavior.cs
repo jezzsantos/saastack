@@ -14,7 +14,8 @@ namespace Infrastructure.Web.Api.Common;
 /// </summary>
 [UsedImplicitly]
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, IResult>
-    where TRequest : IWebRequest<TResponse> where TResponse : IWebResponse
+    where TRequest : IWebRequest<TResponse>
+    where TResponse : IWebResponse
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IValidator<TRequest> _validator;

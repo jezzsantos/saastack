@@ -49,11 +49,11 @@ public class Membership : IIdentifiableResource
 {
     public List<string> Features { get; set; } = new();
 
+    public bool IsDefault { get; set; }
+
     public required string OrganizationId { get; set; }
 
     public List<string> Roles { get; set; } = new();
 
     public required string Id { get; set; }
-
-    public bool IsDefault { get; set; }
 }

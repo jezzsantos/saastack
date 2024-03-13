@@ -16,11 +16,11 @@ namespace IdentityDomain.UnitTests;
 [Trait("Category", "Unit")]
 public class PasswordCredentialRootSpec
 {
+    private const string Token = "5n6nA42SQrsO1UIgc7lIVebR6_3CmZwcthUEx3nF2sM";
     private readonly PasswordCredentialRoot _credential;
     private readonly Mock<IEmailAddressService> _emailAddressService;
     private readonly Mock<IPasswordHasherService> _passwordHasherService;
     private readonly Mock<ITokensService> _tokensService;
-    private const string Token = "5n6nA42SQrsO1UIgc7lIVebR6_3CmZwcthUEx3nF2sM";
 
     public PasswordCredentialRootSpec()
     {
@@ -293,7 +293,6 @@ public class PasswordCredentialRootSpec
     [Fact]
     public void WhenResetPasswordWithInvalidPassword_ThenReturnsError()
     {
-        
         _passwordHasherService.Setup(phs => phs.ValidatePassword(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns(false);
 
@@ -307,7 +306,6 @@ public class PasswordCredentialRootSpec
     [Fact]
     public void WhenResetPasswordAndNoExistingPassword_ThenReturnsError()
     {
-        
         _passwordHasherService.Setup(phs => phs.ValidatePassword(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns(true);
 
@@ -321,7 +319,6 @@ public class PasswordCredentialRootSpec
     [Fact]
     public void WhenResetPasswordAndSamePassword_ThenReturnsError()
     {
-        
         _passwordHasherService.Setup(phs => phs.ValidatePassword(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns(true);
         _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))

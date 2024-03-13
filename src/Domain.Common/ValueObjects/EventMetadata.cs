@@ -3,7 +3,7 @@ using Domain.Interfaces;
 namespace Domain.Common.ValueObjects;
 
 /// <summary>
-/// Provides the metadata describing an event
+///     Provides the metadata describing an event
 /// </summary>
 public sealed class EventMetadata : SingleValueObjectBase<EventMetadata, string>
 {

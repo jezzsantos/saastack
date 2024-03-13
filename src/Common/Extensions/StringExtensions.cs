@@ -341,8 +341,7 @@ public static class StringExtensions
         var serializer = new DataContractJsonSerializer(typeof(TObject), new DataContractJsonSerializerSettings
         {
             UseSimpleDictionaryFormat = !(prettyPrint ?? false),
-            EmitTypeInformation = EmitTypeInformation.Never,
-            
+            EmitTypeInformation = EmitTypeInformation.Never
         });
         serializer.WriteObject(stream, value);
         stream.Seek(0, SeekOrigin.Begin);

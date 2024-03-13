@@ -10,5 +10,4 @@ public sealed class FeatureLevel : HierarchicalLevelBase<FeatureLevel>
         children.Select(x => (HierarchicalLevelBase<FeatureLevel>)x).ToArray())
     {
     }
-
 }

@@ -9,9 +9,9 @@ public static class AuthenticationConstants
         public const string ForFeature = "Feature";
         public const string ForId = "sub";
         public const string ForRole = ClaimTypes.Role;
+        public const string ForTimezone = "zoneinfo";
         public const string PlatformPrefix = "Platform";
         public const string TenantPrefix = "Tenant";
-        public const string ForTimezone = "zoneinfo";
     }
 
     public static class Authorization

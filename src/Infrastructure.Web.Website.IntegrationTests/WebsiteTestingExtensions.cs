@@ -138,5 +138,4 @@ public static class WebsiteTestingExtensions
         var origin = $"{message.RequestUri.Scheme}{Uri.SchemeDelimiter}{message.RequestUri.Authority}";
         message.Headers.Add(HttpHeaders.Origin, origin);
     }
-
 }

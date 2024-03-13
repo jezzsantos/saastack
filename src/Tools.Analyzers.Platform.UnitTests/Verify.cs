@@ -34,7 +34,8 @@ public static class Verify
                 .IsPackageBased)
         {
             // The NuGet version provided at runtime does not recognize the target framework
-            throw new NotSupportedException($"The '{version}' target framework is not supported by this version of NuGet.");
+            throw new NotSupportedException(
+                $"The '{version}' target framework is not supported by this version of NuGet.");
         }
 
         return new ReferenceAssemblies(version, new PackageIdentity("Microsoft.NETCore.App.Ref", sdkVersion),
@@ -49,6 +50,7 @@ public static class Verify
     {
         await DiagnosticExists<TAnalyzer>(descriptor, inputSnippet, (locationX, locationY, argument), messageArgs);
     }
+
     public static async Task DiagnosticExists<TAnalyzer>(string inputSnippet,
         (DiagnosticDescriptor descriptor, int locationX, int locationY, string argument) expected1,
         (DiagnosticDescriptor descriptor, int locationX, int locationY, string argument) expected2)
@@ -63,7 +65,7 @@ public static class Verify
 
         await RunAnalyzerTest<TAnalyzer>(inputSnippet, new[] { expectation1, expectation2 });
     }
-    
+
     public static async Task NoDiagnosticExists<TAnalyzer>(string inputSnippet)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {

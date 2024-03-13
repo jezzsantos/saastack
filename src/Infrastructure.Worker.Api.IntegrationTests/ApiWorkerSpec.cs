@@ -9,14 +9,14 @@ public interface IApiWorkerSpec
 {
     IQueueStore QueueStore { get; }
 
+    public TService GetRequiredService<TService>()
+        where TService : notnull;
+
     void OverrideTestingDependencies(Action<IServiceCollection> overrideDependencies);
 
     void Start();
 
     void WaitForQueueProcessingToComplete();
-
-    public TService GetRequiredService<TService>()
-        where TService : notnull;
 }
 
 public abstract class ApiWorkerSpec<TSetup> : IClassFixture<TSetup>, IDisposable

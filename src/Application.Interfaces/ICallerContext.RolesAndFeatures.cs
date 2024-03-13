@@ -29,9 +29,9 @@ public partial interface ICallerContext
 
         public RoleLevel[] All { get; }
 
-        public RoleLevel[] Tenant { get; }
-
         public RoleLevel[] Platform { get; }
+
+        public RoleLevel[] Tenant { get; }
     }
 
     /// <summary>
@@ -58,8 +58,8 @@ public partial interface ICallerContext
 
         public FeatureLevel[] All { get; }
 
-        public FeatureLevel[] Tenant { get; }
-
         public FeatureLevel[] Platform { get; }
+
+        public FeatureLevel[] Tenant { get; }
     }
 }

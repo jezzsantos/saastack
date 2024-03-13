@@ -149,7 +149,7 @@ public enum AuditReporterOption
 public enum MetricReporterOption
 {
     None = 0,
-    Cloud = 1,
+    Cloud = 1
 }
 
 /// <summary>
@@ -158,5 +158,5 @@ public enum MetricReporterOption
 public enum UsageReporterOption
 {
     None = 0,
-    ReliableQueue = 1,
+    ReliableQueue = 1
 }

@@ -25,7 +25,7 @@ public class FeatureFlagsApplication : IFeatureFlagsApplication
     {
         var request = new GetFeatureFlagForCallerRequest
         {
-            Name = name,
+            Name = name
         };
 
         var retrieved = await _serviceClient.GetAsync(context, request, null, cancellationToken);

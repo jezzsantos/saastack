@@ -19,7 +19,7 @@ public class RecordUsageRequestValidatorSpec
         _validator = new RecordUseRequestValidator();
         _dto = new RecordUseRequest
         {
-            EventName = "aneventname",
+            EventName = "aneventname"
         };
     }
 

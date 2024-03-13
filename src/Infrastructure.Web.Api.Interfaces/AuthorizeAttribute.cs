@@ -65,7 +65,7 @@ public class AuthorizeAttribute : Attribute
             var (roles, features) = ParseRoleOrFeatureName(set);
             var setPolicyName = CreatePolicyNameForSet(roles, features);
 #if NETSTANDARD2_0
-            if ((setPolicyName?? string.Empty).HasValue())
+            if ((setPolicyName ?? string.Empty).HasValue())
             {
                 setPolicyNames.Add(setPolicyName!);
             }
@@ -373,11 +373,10 @@ public class AuthorizeAttribute : Attribute
 #if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
         [DataMember(Order = 1, EmitDefaultValue = false)]
 #endif
-        public List<string>? Tenant { get; set; }
-
+        public List<string>? Platform { get; set; }
 #if GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
         [DataMember(Order = 1, EmitDefaultValue = false)]
 #endif
-        public List<string>? Platform { get; set; }
+        public List<string>? Tenant { get; set; }
     }
 }

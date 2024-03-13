@@ -104,7 +104,6 @@ public class AuthenticationApplicationSpec
                         ExpiresOn = refreshTokenExpiresOn
                     }
                 }
-
             }));
 
         var result = await _application.AuthenticateAsync(_caller.Object, "aprovider", "anauthcode", null, null,

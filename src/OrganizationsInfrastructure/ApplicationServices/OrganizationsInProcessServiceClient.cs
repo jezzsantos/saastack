@@ -14,7 +14,8 @@ public class OrganizationsInProcessServiceClient : IOrganizationsService
     private IOrganizationsApplication? _application;
 
     /// <summary>
-    ///     HACK: LazyGetRequiredService and <see cref="Func{TResult}" /> is needed here to avoid the runtime cyclic dependency between
+    ///     HACK: LazyGetRequiredService and <see cref="Func{TResult}" /> is needed here to avoid the runtime cyclic dependency
+    ///     between
     ///     <see cref="IOrganizationsApplication" /> requiring <see cref="IEndUsersService" />, and
     ///     <see cref="IEndUsersApplication" /> requiring <see cref="IOrganizationsService" />
     /// </summary>

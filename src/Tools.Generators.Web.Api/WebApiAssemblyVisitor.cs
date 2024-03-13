@@ -32,9 +32,9 @@ public class WebApiAssemblyVisitor : SymbolVisitor
     private readonly INamedTypeSymbol _cancellationTokenSymbol;
     private readonly INamedTypeSymbol _routeAttributeSymbol;
     private readonly INamedTypeSymbol _serviceInterfaceSymbol;
+    private readonly INamedTypeSymbol _tenantedWebRequestInterfaceSymbol;
     private readonly INamedTypeSymbol _voidSymbol;
     private readonly INamedTypeSymbol _webRequestInterfaceSymbol;
-    private readonly INamedTypeSymbol _tenantedWebRequestInterfaceSymbol;
     private readonly INamedTypeSymbol _webRequestResponseInterfaceSymbol;
     private readonly INamedTypeSymbol _webserviceAttributeSymbol;
 
@@ -465,6 +465,8 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
         public bool IsAsync { get; set; }
 
+        public bool IsRequestDtoTenanted { get; set; }
+
         public bool IsTestingOnly { get; set; }
 
         public string? MethodBody { get; set; }
@@ -478,8 +480,6 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         public ServiceOperation OperationType { get; set; }
 
         public TypeName RequestDtoName { get; set; } = null!;
-
-        public bool IsRequestDtoTenanted { get; set; }
 
         public TypeName ResponseDtoName { get; set; } = null!;
 
