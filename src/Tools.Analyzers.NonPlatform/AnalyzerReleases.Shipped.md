@@ -22,6 +22,7 @@
  SAS035  | SaaStackDDD    | Error    | Dehydratable aggregate roots must override the Dehydrate method.                                          
  SAS036  | SaaStackDDD    | Error    | Dehydratable aggregate roots must declare the EntityNameAttribute.                                        
  SAS037  | SaaStackDDD    | Error    | Properties must not have public setters.                                                                  
+ SAS038  | SaaStackDDD    | Error    | Aggregate roots should be marked as sealed.                                                               
  SAS040  | SaaStackDDD    | Error    | Entities must have at least one Create() class factory method.                                            
  SAS041  | SaaStackDDD    | Error    | Create() class factory methods must return correct types.                                                 
  SAS042  | SaaStackDDD    | Error    | Entities must only have private constructors.                                                             
@@ -29,9 +30,11 @@
  SAS044  | SaaStackDDD    | Error    | Dehydratable entities must override the Dehydrate method.                                                 
  SAS045  | SaaStackDDD    | Error    | Dehydratable entities must declare the EntityNameAttribute.                                               
  SAS046  | SaaStackDDD    | Error    | Properties must not have public setters.                                                                  
+ SAS047  | SaaStackDDD    | Error    | Entities should be marked as sealed.                                                                      
  SAS050  | SaaStackDDD    | Error    | ValueObjects must have at least one Create() class factory method.                                        
  SAS051  | SaaStackDDD    | Error    | Create() class factory methods must return correct types.                                                 
  SAS052  | SaaStackDDD    | Error    | ValueObjects must only have private constructors.                                                         
  SAS053  | SaaStackDDD    | Error    | ValueObjects must have a Rehydrate method.                                                                
  SAS054  | SaaStackDDD    | Error    | Properties must not have public setters.                                                                  
  SAS055  | SaaStackDDD    | Error    | ValueObjects must only have immutable methods                                                             
+ SAS056  | SaaStackDDD    | Error    | ValueObjects should be marked as sealed.                                                                  

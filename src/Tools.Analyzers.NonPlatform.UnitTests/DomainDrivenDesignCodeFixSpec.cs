@@ -574,6 +574,129 @@ public class CreateEvent : IDomainEvent
                     problem, fix, 15, 14, "AClass");
             }
         }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas038
+        {
+            [Fact]
+            public async Task WhenFixingNotSealed_ThenAddsSealed()
+            {
+                const string problem = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
+using QueryAny;
+namespace ANamespace;
+
+[EntityNameAttribute(""AClass"")]
+public class AClass : AggregateRootBase
+{
+    private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
+    {
+    }
+
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    {
+    }
+
+    protected override Result<Error> OnStateChanged(IDomainEvent @event, bool isReconstituting)
+    {
+        return Result.Ok;
+    }
+
+    public static AClass Create()
+    {
+        var root = new AClass(null!, null!);
+        root.RaiseCreateEvent(new CreateEvent());
+        return root;
+    }
+
+    public static AggregateRootFactory<AClass> Rehydrate()
+    {
+        return (identifier, container, properties) => new AClass(identifier, container, properties);
+    }
+
+    public override HydrationProperties Dehydrate()
+    {
+        var properties = base.Dehydrate();
+        return properties;
+    }
+}
+public class CreateEvent : IDomainEvent
+{
+    public string RootId { get; set; } = ""anid"";
+
+    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+}";
+                const string fix = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
+using QueryAny;
+namespace ANamespace;
+
+[EntityNameAttribute(""AClass"")]
+public sealed class AClass : AggregateRootBase
+{
+    private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
+    {
+    }
+
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    {
+    }
+
+    protected override Result<Error> OnStateChanged(IDomainEvent @event, bool isReconstituting)
+    {
+        return Result.Ok;
+    }
+
+    public static AClass Create()
+    {
+        var root = new AClass(null!, null!);
+        root.RaiseCreateEvent(new CreateEvent());
+        return root;
+    }
+
+    public static AggregateRootFactory<AClass> Rehydrate()
+    {
+        return (identifier, container, properties) => new AClass(identifier, container, properties);
+    }
+
+    public override HydrationProperties Dehydrate()
+    {
+        var properties = base.Dehydrate();
+        return properties;
+    }
+}
+public class CreateEvent : IDomainEvent
+{
+    public string RootId { get; set; } = ""anid"";
+
+    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+}";
+
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas038,
+                    problem, fix, 17, 14, "AClass");
+            }
+        }
     }
 
     [UsedImplicitly]
@@ -860,6 +983,111 @@ public class AClass : EntityBase
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas045,
                     problem, fix, 15, 14, "AClass");
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas047
+        {
+            [Fact]
+            public async Task WhenFixingNotSealed_ThenAddsSealed()
+            {
+                const string problem = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
+using QueryAny;
+namespace ANamespace;
+
+[EntityNameAttribute(""AClass"")]
+public class AClass : EntityBase
+{
+    private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
+    {
+    }
+
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    {
+    }
+
+    protected override Result<Error> OnStateChanged(IDomainEvent @event)
+    {
+        return Result.Ok;
+    }
+
+    public static AClass Create(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler)
+    {
+        return new AClass(recorder, idFactory, rootEventHandler);
+    }
+
+    public override HydrationProperties Dehydrate()
+    {
+        return base.Dehydrate();
+    }
+
+    public static EntityFactory<AClass> Rehydrate()
+    {
+        return (identifier, container, properties) => new AClass(identifier, container, properties);
+    }
+}";
+                const string fix = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+using Domain.Interfaces.ValueObjects;
+using QueryAny;
+namespace ANamespace;
+
+[EntityNameAttribute(""AClass"")]
+public sealed class AClass : EntityBase
+{
+    private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
+    {
+    }
+
+    private AClass(ISingleValueObject<string> identifier, IDependencyContainer container, HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    {
+    }
+
+    protected override Result<Error> OnStateChanged(IDomainEvent @event)
+    {
+        return Result.Ok;
+    }
+
+    public static AClass Create(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler)
+    {
+        return new AClass(recorder, idFactory, rootEventHandler);
+    }
+
+    public override HydrationProperties Dehydrate()
+    {
+        return base.Dehydrate();
+    }
+
+    public static EntityFactory<AClass> Rehydrate()
+    {
+        return (identifier, container, properties) => new AClass(identifier, container, properties);
+    }
+}";
+
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas047,
+                    problem, fix, 17, 14, "AClass");
             }
         }
     }
@@ -1280,7 +1508,8 @@ public class AClass : ValueObjectBase<AClass>
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas055,
-                    Resources.SAS060CodeFixTitle, problem, fix, 40, 17,
+                    Resources.SAS060CodeFixTitle, problem, fix, 40,
+                    17,
                     "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
                     nameof(SkipImmutabilityCheckAttribute));
             }
@@ -1378,9 +1607,100 @@ public class AClass : ValueObjectBase<AClass>
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas055,
-                    Resources.SAS062CodeFixTitle, problem, fix, 40, 17,
+                    Resources.SAS062CodeFixTitle, problem, fix, 40,
+                    17,
                     "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
                     nameof(SkipImmutabilityCheckAttribute));
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas056
+        {
+            [Fact]
+            public async Task WhenFixingNotSealed_ThenAddsSealed()
+            {
+                const string problem = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue1, string avalue2, string avalue3)
+    {
+        AProperty = avalue1;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!, null!, null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new object[] { AProperty };
+    }
+
+    public string AProperty { get;}
+
+    public static Domain.Interfaces.ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) =>
+        {
+            var parts = RehydrateToList(property, false);
+            return new AClass(parts[0], parts[1], parts[2]);
+        };
+    }
+}";
+                const string fix = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue1, string avalue2, string avalue3)
+    {
+        AProperty = avalue1;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!, null!, null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new object[] { AProperty };
+    }
+
+    public string AProperty { get;}
+
+    public static Domain.Interfaces.ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) =>
+        {
+            var parts = RehydrateToList(property, false);
+            return new AClass(parts[0], parts[1], parts[2]);
+        };
+    }
+}";
+
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas056, problem, fix, 12, 14, "AClass");
             }
         }
     }

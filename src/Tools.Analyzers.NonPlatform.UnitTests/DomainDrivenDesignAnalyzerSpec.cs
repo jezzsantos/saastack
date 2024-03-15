@@ -1,7 +1,7 @@
 extern alias NonPlatformAnalyzers;
+using NonPlatformAnalyzers::Domain.Interfaces.ValueObjects;
 using Xunit;
-using DomainDrivenDesignAnalyzer =
-    NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignAnalyzer;
+using DomainDrivenDesignAnalyzer = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignAnalyzer;
 using UsedImplicitly = NonPlatformAnalyzers::JetBrains.Annotations.UsedImplicitlyAttribute;
 
 namespace Tools.Analyzers.NonPlatform.UnitTests;
@@ -18,7 +18,7 @@ public class DomainDrivenDesignAnalyzerSpec
             const string input = @"
 using Infrastructure.Web.Api.Interfaces;
 namespace Common;
-public class AClass : IWebApiService
+public sealed class AClass : IWebApiService
 {
 }";
 
@@ -30,7 +30,7 @@ public class AClass : IWebApiService
         {
             const string input = @"
 namespace ANamespace;
-public class AClass
+public sealed class AClass
 {
 }";
 
@@ -42,7 +42,7 @@ public class AClass
         {
             const string input = @"
 namespace ANamespace;
-public class AClass
+public sealed class AClass
 {
 }";
 
@@ -54,7 +54,7 @@ public class AClass
         {
             const string input = @"
 namespace ANamespace;
-public class AClass
+public sealed class AClass
 {
 }";
 
@@ -81,7 +81,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -105,7 +105,7 @@ public class AClass : AggregateRootBase
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas030, input, 11,
-                    14,
+                    21,
                     "AClass");
             }
 
@@ -122,7 +122,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -150,7 +150,7 @@ public class AClass : AggregateRootBase
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas030, input, 11,
-                    14,
+                    21,
                     "AClass");
             }
 
@@ -168,7 +168,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -224,7 +224,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -261,7 +261,7 @@ public class CreateEvent : IDomainEvent
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas031, input, 33,
                     24,
-                    "Create", "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
+                    "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
 
             [Fact]
@@ -278,7 +278,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -316,7 +316,7 @@ public class CreateEvent : IDomainEvent
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas031, input, 33,
                     26,
-                    "Create", "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
+                    "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
 
             [Fact]
@@ -333,7 +333,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -385,7 +385,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -440,7 +440,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -487,7 +487,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -543,7 +543,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     public AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -597,7 +597,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -649,7 +649,7 @@ using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -676,7 +676,7 @@ public class CreateEvent : IDomainEvent
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas034, input, 8,
-                    14,
+                    21,
                     "AClass");
             }
 
@@ -695,7 +695,7 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -753,7 +753,7 @@ using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -790,7 +790,7 @@ public class CreateEvent : IDomainEvent
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas035, input, 14,
-                    14, "AClass");
+                    21, "AClass");
             }
 
             [Fact]
@@ -810,7 +810,7 @@ using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -873,7 +873,7 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -915,7 +915,7 @@ public class CreateEvent : IDomainEvent
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas036, input, 14,
-                    14,
+                    21,
                     "AClass");
             }
 
@@ -936,7 +936,7 @@ using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -997,7 +997,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -1053,7 +1053,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -1107,7 +1107,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -1161,7 +1161,121 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
+public sealed class AClass : AggregateRootBase
+{
+    private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
+    {
+    }
+
+    private AClass(IRecorder recorder, IIdentifierFactory idFactory, ISingleValueObject<string> identifier) : base(recorder, idFactory, identifier)
+    {
+    }
+
+    protected override Result<Error> OnStateChanged(IDomainEvent @event, bool isReconstituting)
+    {
+        return Result.Ok;
+    }
+
+    public static AClass Create()
+    {
+        var root = new AClass(null!, null!);
+        root.RaiseCreateEvent(new CreateEvent());
+        return root;
+    }
+
+    public static AggregateRootFactory<AClass> Rehydrate()
+    {
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
+    }
+
+    public string AProperty { get; }
+}
+public class CreateEvent : IDomainEvent
+{
+    public string RootId { get; set; } = ""anid"";
+
+    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas038
+        {
+            [Fact]
+            public async Task WhenClassIsNotSealed_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.ValueObjects;
+namespace ANamespace;
 public class AClass : AggregateRootBase
+{
+    private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
+    {
+    }
+
+    private AClass(IRecorder recorder, IIdentifierFactory idFactory, ISingleValueObject<string> identifier) : base(recorder, idFactory, identifier)
+    {
+    }
+
+    protected override Result<Error> OnStateChanged(IDomainEvent @event, bool isReconstituting)
+    {
+        return Result.Ok;
+    }
+
+    public static AClass Create()
+    {
+        var root = new AClass(null!, null!);
+        root.RaiseCreateEvent(new CreateEvent());
+        return root;
+    }
+
+    public static AggregateRootFactory<AClass> Rehydrate()
+    {
+        return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(),
+            container.GetRequiredService<IIdentifierFactory>(), identifier);
+    }
+
+    public string AProperty { get; }
+}
+public class CreateEvent : IDomainEvent
+{
+    public string RootId { get; set; } = ""anid"";
+
+    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas038, input, 12,
+                    14, "AClass");
+            }
+
+            [Fact]
+            public async Task WhenClassIsSealed_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.ValueObjects;
+namespace ANamespace;
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -1220,7 +1334,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1234,7 +1348,7 @@ public class AClass : EntityBase
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas040, input, 9,
-                    14, "AClass");
+                    21, "AClass");
             }
 
             [Fact]
@@ -1248,7 +1362,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1266,7 +1380,7 @@ public class AClass : EntityBase
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas040, input, 9,
-                    14,
+                    21,
                     "AClass");
             }
 
@@ -1282,7 +1396,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1318,7 +1432,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1336,7 +1450,7 @@ public class AClass : EntityBase
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas041, input, 21,
-                    24, "Create", "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
+                    24, "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
 
             [Fact]
@@ -1351,7 +1465,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1370,7 +1484,7 @@ public class AClass : EntityBase
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas041, input, 21,
-                    26, "Create", "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
+                    26, "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
 
             [Fact]
@@ -1385,7 +1499,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1417,7 +1531,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1453,7 +1567,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     public AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1487,7 +1601,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1529,7 +1643,7 @@ using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1557,7 +1671,7 @@ public class AClass : EntityBase
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas043, input, 16,
-                    14, "AClass");
+                    21, "AClass");
             }
 
             [Fact]
@@ -1578,7 +1692,7 @@ using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1634,7 +1748,7 @@ using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1662,7 +1776,7 @@ public class AClass : EntityBase
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas044, input, 16,
-                    14, "AClass");
+                    21, "AClass");
             }
 
             [Fact]
@@ -1683,7 +1797,7 @@ using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1737,7 +1851,7 @@ using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1769,7 +1883,7 @@ public class AClass : EntityBase
 }";
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas045, input, 15,
-                    14,
+                    21,
                     "AClass");
             }
 
@@ -1791,7 +1905,7 @@ using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1841,7 +1955,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1878,7 +1992,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1913,7 +2027,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1948,7 +2062,83 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
+public sealed class AClass : EntityBase
+{
+    private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
+    {
+    }
+
+    protected override Result<Error> OnStateChanged(IDomainEvent @event)
+    {
+        return Result.Ok;
+    }
+
+    public static AClass Create(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler)
+    {
+        return new AClass(recorder, idFactory, rootEventHandler);
+    }
+
+    public string AProperty { get; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas047
+        {
+            [Fact]
+            public async Task WhenClassIsNotSealed_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
 public class AClass : EntityBase
+{
+    private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
+    {
+    }
+
+    protected override Result<Error> OnStateChanged(IDomainEvent @event)
+    {
+        return Result.Ok;
+    }
+
+    public static AClass Create(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler)
+    {
+        return new AClass(recorder, idFactory, rootEventHandler);
+    }
+
+    public string AProperty { get; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas047, input, 11,
+                    14, "AClass");
+            }
+
+            [Fact]
+            public async Task WhenClassIsSealed_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -1991,7 +2181,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2013,7 +2203,7 @@ public class AClass : ValueObjectBase<AClass>
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas050, input, 11,
-                    14, "AClass");
+                    21, "AClass");
             }
 
             [Fact]
@@ -2029,7 +2219,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2056,7 +2246,7 @@ public class AClass : ValueObjectBase<AClass>
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas050, input, 11,
-                    14, "AClass");
+                    21, "AClass");
             }
 
             [Fact]
@@ -2073,7 +2263,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2119,7 +2309,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2145,7 +2335,7 @@ public class AClass : ValueObjectBase<AClass>
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas051, input, 19,
-                    24, "Create", "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
+                    24, "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
 
             [Fact]
@@ -2162,7 +2352,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2189,7 +2379,7 @@ public class AClass : ValueObjectBase<AClass>
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas051, input, 19,
-                    26, "Create", "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
+                    26, "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
 
             [Fact]
@@ -2206,7 +2396,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2248,7 +2438,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2294,7 +2484,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     public AClass(string avalue)
     {
@@ -2338,7 +2528,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2384,7 +2574,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2406,7 +2596,7 @@ public class AClass : ValueObjectBase<AClass>
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas053, input, 12,
-                    14, "AClass");
+                    21, "AClass");
             }
 
             [Fact]
@@ -2424,7 +2614,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2471,7 +2661,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2516,7 +2706,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2559,7 +2749,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2601,7 +2791,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2648,7 +2838,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2680,7 +2870,8 @@ public class AClass : ValueObjectBase<AClass>
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas055, input, 37,
                     17, "AMethod",
-                    "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
+                    "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
+                    nameof(SkipImmutabilityCheckAttribute));
             }
 
             [Fact]
@@ -2698,7 +2889,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2730,8 +2921,8 @@ public class AClass : ValueObjectBase<AClass>
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
                     DomainDrivenDesignAnalyzer.Sas055, input, 37,
-                    19, "AMethod",
-                    "ANamespace.AClass, Common.Result<ANamespace.AClass, Common.Error>");
+                    19, "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
+                    nameof(SkipImmutabilityCheckAttribute));
             }
 
             [Fact]
@@ -2750,7 +2941,7 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2799,7 +2990,7 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2848,7 +3039,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {
@@ -2896,7 +3087,109 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue)
+    {
+        AProperty = avalue;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new object[] { AProperty };
+    }
+
+    public static ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) => new AClass(null!);
+    }
+
+    public string AProperty { get; }
+
+    public Result<AClass, Error> AMethod()
+    {
+        return null!;
+    }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas056
+        {
+            [Fact]
+            public async Task WhenIsNotSealed_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
 public class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue)
+    {
+        AProperty = avalue;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new object[] { AProperty };
+    }
+
+    public static ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) => new AClass(null!);
+    }
+
+    public string AProperty { get; }
+
+    public Result<AClass, Error> AMethod()
+    {
+        return null!;
+    }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas056, input, 13,
+                    14, "AClass");
+            }
+
+            [Fact]
+            public async Task WhenIsSealed_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue)
     {

@@ -169,6 +169,15 @@
     <data name="SAS025Title" xml:space="preserve">
         <value>Property must not be settable</value>
     </data>
+    <data name="SAS026Description" xml:space="preserve">
+        <value>Class should be marked as sealed.</value>
+    </data>
+    <data name="SAS026MessageFormat" xml:space="preserve">
+        <value>Class '{0}' should be marked as sealed</value>
+    </data>
+    <data name="SAS026Title" xml:space="preserve">
+        <value>Class should be marked as sealed</value>
+    </data>
     <data name="SAS030Description" xml:space="preserve">
         <value>Aggregate roots must have at least one Create() class factory method.</value>
     </data>
@@ -222,6 +231,9 @@
     </data>
     <data name="SAS024CodeFixTitle" xml:space="preserve">
         <value>Add missing '[EntityName]' attribute</value>
+    </data>
+    <data name="SAS025CodeFixTitle" xml:space="preserve">
+        <value>Mark this class as sealed</value>
     </data>
     <data name="SAS030CodeFixTitle" xml:space="preserve">
         <value>Add missing 'Create' method</value>

@@ -5,7 +5,7 @@ using Domain.Interfaces;
 
 namespace OrganizationsDomain;
 
-public class Setting : ValueObjectBase<Setting>
+public sealed class Setting : ValueObjectBase<Setting>
 {
     public static Result<Setting, Error> Create(string value, bool isEncrypted)
     {

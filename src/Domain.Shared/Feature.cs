@@ -8,7 +8,7 @@ using Domain.Interfaces.Validations;
 
 namespace Domain.Shared;
 
-public class Feature : SingleValueObjectBase<Feature, string>
+public sealed class Feature : SingleValueObjectBase<Feature, string>
 {
     public static Result<Feature, Error> Create(string identifier)
     {

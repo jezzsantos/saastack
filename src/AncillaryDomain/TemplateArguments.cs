@@ -5,7 +5,7 @@ using Domain.Interfaces;
 
 namespace AncillaryDomain;
 
-public class TemplateArguments : SingleValueObjectBase<TemplateArguments, List<string>>
+public sealed class TemplateArguments : SingleValueObjectBase<TemplateArguments, List<string>>
 {
     public static Result<TemplateArguments, Error> Create()
     {

@@ -273,6 +273,17 @@ public static class SyntaxFilterExtensions
         return false;
     }
 
+    public static bool IsSealed(this ClassDeclarationSyntax classDeclaration)
+    {
+        var accessibility = new Accessibility(classDeclaration.Modifiers);
+        if (accessibility.IsSealed)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public static bool IsPrivateInstanceConstructor(this ConstructorDeclarationSyntax constructorDeclarationSyntax)
     {
         var accessibility = new Accessibility(constructorDeclarationSyntax.Modifiers);
@@ -356,6 +367,7 @@ public class Accessibility
         IsInternal = modifiers.Any(mod => mod.IsKind(SyntaxKind.InternalKeyword));
         IsStatic = modifiers.Any(mod => mod.IsKind(SyntaxKind.StaticKeyword));
         IsPartial = modifiers.Any(mod => mod.IsKind(SyntaxKind.PartialKeyword));
+        IsSealed = modifiers.Any(mod => mod.IsKind(SyntaxKind.SealedKeyword));
     }
 
     public bool IsInternal { get; }
@@ -367,4 +379,6 @@ public class Accessibility
     public bool IsPublic { get; }
 
     public bool IsStatic { get; }
+
+    public bool IsSealed { get; set; }
 }

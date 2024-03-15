@@ -26,6 +26,7 @@ namespace Tools.Analyzers.NonPlatform;
 ///     SAS035: Error: Dehydratable aggregate roots must override the <see cref="IDehydratableEntity.Dehydrate" /> method
 ///     SAS036: Error: Dehydratable aggregate roots must declare the <see cref="EntityNameAttribute" />
 ///     SAS037: Error: Properties must not have public setters
+///     SAS038: Error: Aggregate roots must be marked as sealed
 ///     Entities:
 ///     SAS040: Error: Entities must have at least one Create() class factory method
 ///     SAS041: Error: Create() class factory methods must return correct types
@@ -34,6 +35,7 @@ namespace Tools.Analyzers.NonPlatform;
 ///     SAS044: Error: Dehydratable entities must override the <see cref="IDehydratableEntity.Dehydrate" /> method
 ///     SAS045: Error: Dehydratable entities must declare the <see cref="EntityNameAttribute" />
 ///     SAS046: Error: Properties must not have public setters
+///     SAS047: Error: Entities must be marked as sealed
 ///     Value Objects:
 ///     SAS050: Error: ValueObjects must have at least one Create() class factory method
 ///     SAS051: Error: Create() class factory methods must return correct types
@@ -42,6 +44,7 @@ namespace Tools.Analyzers.NonPlatform;
 ///     SAS054: Error: Properties must not have public setters
 ///     SAS055: Error: ValueObjects must only have immutable methods (or be overridden by the
 ///     <see cref="SkipImmutabilityCheckAttribute" />)
+///     SAS056: Warning: ValueObjects should be marked as sealed
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
@@ -83,6 +86,10 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
         AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS025Title), nameof(Resources.SAS025Description),
         nameof(Resources.SAS025MessageFormat));
 
+    internal static readonly DiagnosticDescriptor Sas038 = "SAS038".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS026Title), nameof(Resources.SAS026Description),
+        nameof(Resources.SAS026MessageFormat));
+
     internal static readonly DiagnosticDescriptor Sas040 = "SAS040".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS040Title), nameof(Resources.SAS040Description),
         nameof(Resources.SAS040MessageFormat));
@@ -110,6 +117,9 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
     internal static readonly DiagnosticDescriptor Sas046 = "SAS046".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS025Title), nameof(Resources.SAS025Description),
         nameof(Resources.SAS025MessageFormat));
+    internal static readonly DiagnosticDescriptor Sas047 = "SAS047".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS026Title), nameof(Resources.SAS026Description),
+        nameof(Resources.SAS026MessageFormat));
 
     internal static readonly DiagnosticDescriptor Sas050 = "SAS050".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS050Title), nameof(Resources.SAS050Description),
@@ -135,11 +145,15 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
         AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS055Title), nameof(Resources.SAS055Description),
         nameof(Resources.SAS055MessageFormat));
 
+    internal static readonly DiagnosticDescriptor Sas056 = "SAS056".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS026Title), nameof(Resources.SAS026Description),
+        nameof(Resources.SAS026MessageFormat));
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(
-            Sas030, Sas031, Sas032, Sas033, Sas034, Sas035, Sas036, Sas037,
-            Sas040, Sas041, Sas042, Sas043, Sas044, Sas045, Sas046,
-            Sas050, Sas051, Sas052, Sas053, Sas054, Sas055);
+            Sas030, Sas031, Sas032, Sas033, Sas034, Sas035, Sas036, Sas037, Sas038,
+            Sas040, Sas041, Sas042, Sas043, Sas044, Sas045, Sas046, Sas047,
+            Sas050, Sas051, Sas052, Sas053, Sas054, Sas055, Sas056);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -186,7 +200,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                 if (context.HasIncorrectReturnType(method, allowedReturnTypes))
                 {
                     var acceptableReturnTypes =
-                        allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(", ");
+                        allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(" or ");
                     context.ReportDiagnostic(Sas031, method, acceptableReturnTypes);
                 }
 
@@ -240,6 +254,11 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                 }
             }
         }
+
+        if (!classDeclarationSyntax.IsSealed())
+        {
+            context.ReportDiagnostic(Sas038, classDeclarationSyntax);
+        }
     }
 
     private static void AnalyzeEntity(SyntaxNodeAnalysisContext context)
@@ -278,7 +297,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                 if (context.HasIncorrectReturnType(method, allowedReturnTypes))
                 {
                     var acceptableReturnTypes =
-                        allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(", ");
+                        allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(" or ");
                     context.ReportDiagnostic(Sas041, method, acceptableReturnTypes);
                 }
             }
@@ -327,6 +346,11 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                 }
             }
         }
+
+        if (!classDeclarationSyntax.IsSealed())
+        {
+            context.ReportDiagnostic(Sas047, classDeclarationSyntax);
+        }
     }
 
     private static void AnalyzeValueObject(SyntaxNodeAnalysisContext context)
@@ -365,7 +389,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                 if (context.HasIncorrectReturnType(method, allowedReturnTypes))
                 {
                     var acceptableReturnTypes =
-                        allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(", ");
+                        allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(" or ");
                     context.ReportDiagnostic(Sas051, method, acceptableReturnTypes);
                 }
             }
@@ -422,6 +446,11 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                     allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(" or ");
                 context.ReportDiagnostic(Sas055, method, acceptableReturnTypes, nameof(SkipImmutabilityCheckAttribute));
             }
+        }
+
+        if (!classDeclarationSyntax.IsSealed())
+        {
+            context.ReportDiagnostic(Sas056, classDeclarationSyntax);
         }
     }
 

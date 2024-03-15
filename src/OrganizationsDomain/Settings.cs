@@ -6,7 +6,7 @@ using Domain.Interfaces.ValueObjects;
 
 namespace OrganizationsDomain;
 
-public class Settings : ValueObjectBase<Settings>
+public sealed class Settings : ValueObjectBase<Settings>
 {
     public static readonly Settings Empty = new();
 

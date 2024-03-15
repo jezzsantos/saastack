@@ -8,7 +8,7 @@ using Domain.Interfaces.Validations;
 
 namespace Domain.Shared;
 
-public class Role : SingleValueObjectBase<Role, string>
+public sealed class Role : SingleValueObjectBase<Role, string>
 {
     public static Result<Role, Error> Create(string identifier)
     {

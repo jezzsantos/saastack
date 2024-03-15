@@ -5,7 +5,7 @@ using Domain.Interfaces;
 
 namespace OrganizationsDomain;
 
-public class DisplayName : SingleValueObjectBase<DisplayName, string>
+public sealed class DisplayName : SingleValueObjectBase<DisplayName, string>
 {
     public static readonly DisplayName Empty = new(string.Empty);
 

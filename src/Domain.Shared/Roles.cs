@@ -7,7 +7,7 @@ using Domain.Interfaces.ValueObjects;
 
 namespace Domain.Shared;
 
-public class Roles : SingleValueObjectBase<Roles, List<Role>>
+public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
 {
     public static readonly Roles Empty = new();
 

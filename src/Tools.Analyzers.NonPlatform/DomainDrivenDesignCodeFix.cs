@@ -30,13 +30,16 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
             DomainDrivenDesignAnalyzer.Sas034.Id,
             DomainDrivenDesignAnalyzer.Sas035.Id,
             DomainDrivenDesignAnalyzer.Sas036.Id,
+            DomainDrivenDesignAnalyzer.Sas038.Id,
             DomainDrivenDesignAnalyzer.Sas040.Id,
             DomainDrivenDesignAnalyzer.Sas043.Id,
             DomainDrivenDesignAnalyzer.Sas044.Id,
             DomainDrivenDesignAnalyzer.Sas045.Id,
+            DomainDrivenDesignAnalyzer.Sas047.Id,
             DomainDrivenDesignAnalyzer.Sas050.Id,
             DomainDrivenDesignAnalyzer.Sas053.Id,
-            DomainDrivenDesignAnalyzer.Sas055.Id
+            DomainDrivenDesignAnalyzer.Sas055.Id,
+            DomainDrivenDesignAnalyzer.Sas056.Id
         );
 
     public override FixAllProvider GetFixAllProvider()
@@ -115,6 +118,19 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
             context.RegisterCodeFix(
                 CodeAction.Create(title,
                     token => AddDehydrateMethodToAggregateRoot(context.Document, classDeclarationSyntax, token),
+                    title),
+                diagnostic);
+        }
+        
+        if (diagnostics.Any(d =>
+                d.Id == DomainDrivenDesignAnalyzer.Sas038.Id 
+                || d.Id == DomainDrivenDesignAnalyzer.Sas047.Id
+                || d.Id == DomainDrivenDesignAnalyzer.Sas056.Id))
+        {
+            var title = Resources.SAS025CodeFixTitle;
+            context.RegisterCodeFix(
+                CodeAction.Create(title,
+                    token => AddSealedToClass(context.Document, classDeclarationSyntax, token),
                     title),
                 diagnostic);
         }
@@ -494,6 +510,22 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
                         SyntaxFactory.ParseTypeName(nameof(Error))))
                 .WithBody(SyntaxFactory.Block(body)));
 
+        var newDocument = document.WithSyntaxRoot(newRoot);
+
+        return newDocument.Project.Solution;
+    }
+
+    private static async Task<Solution> AddSealedToClass(Document document,
+        ClassDeclarationSyntax classDeclarationSyntax, CancellationToken cancellationToken)
+    {
+        var root = await document.GetSyntaxRootAsync(cancellationToken);
+        if (root.NotExists())
+        {
+            return document.Project.Solution;
+        }
+
+        var modifiedClassDeclaration = classDeclarationSyntax.AddModifiers(SyntaxFactory.Token(SyntaxKind.SealedKeyword));
+        var newRoot = root.ReplaceNode(classDeclarationSyntax, modifiedClassDeclaration);
         var newDocument = document.WithSyntaxRoot(newRoot);
 
         return newDocument.Project.Solution;

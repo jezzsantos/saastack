@@ -492,6 +492,15 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mark this class as sealed.
+        /// </summary>
+        internal static string SAS025CodeFixTitle {
+            get {
+                return ResourceManager.GetString("SAS025CodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Property must not have a public setter..
         /// </summary>
         internal static string SAS025Description {
@@ -515,6 +524,33 @@ namespace Tools.Analyzers.NonPlatform {
         internal static string SAS025Title {
             get {
                 return ResourceManager.GetString("SAS025Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class should be marked as sealed..
+        /// </summary>
+        internal static string SAS026Description {
+            get {
+                return ResourceManager.GetString("SAS026Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class &apos;{0}&apos; should be marked as sealed.
+        /// </summary>
+        internal static string SAS026MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS026MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class should be marked as sealed.
+        /// </summary>
+        internal static string SAS026Title {
+            get {
+                return ResourceManager.GetString("SAS026Title", resourceCulture);
             }
         }
         

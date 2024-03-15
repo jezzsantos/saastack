@@ -7,7 +7,7 @@ using Domain.Interfaces.ValueObjects;
 
 namespace Domain.Shared;
 
-public class Features : SingleValueObjectBase<Features, List<Feature>>
+public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
 {
     public static readonly Features Empty = new();
 
