@@ -7,6 +7,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
+using Domain.Interfaces.ValueObjects;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -34,7 +35,8 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
             DomainDrivenDesignAnalyzer.Sas044.Id,
             DomainDrivenDesignAnalyzer.Sas045.Id,
             DomainDrivenDesignAnalyzer.Sas050.Id,
-            DomainDrivenDesignAnalyzer.Sas053.Id
+            DomainDrivenDesignAnalyzer.Sas053.Id,
+            DomainDrivenDesignAnalyzer.Sas055.Id
         );
 
     public override FixAllProvider GetFixAllProvider()
@@ -59,12 +61,23 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
             return;
         }
 
-        if (syntax is not ClassDeclarationSyntax classDeclarationSyntax)
+        if (syntax is MethodDeclarationSyntax methodDeclarationSyntax)
         {
+            FixMethod(context, methodDeclarationSyntax);
             return;
         }
 
+        if (syntax is ClassDeclarationSyntax classDeclarationSyntax)
+        {
+            FixClass(context, classDeclarationSyntax);
+        }
+    }
+
+    private static void FixClass(CodeFixContext context, ClassDeclarationSyntax classDeclarationSyntax)
+    {
         var diagnostics = context.Diagnostics;
+        var diagnostic = diagnostics.First();
+
         if (diagnostics.Any(d => d.Id == DomainDrivenDesignAnalyzer.Sas034.Id))
         {
             var title = Resources.SAS022CodeFixTitle;
@@ -162,6 +175,29 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         }
     }
 
+    private static void FixMethod(CodeFixContext context, MethodDeclarationSyntax methodDeclarationSyntax)
+    {
+        var diagnostics = context.Diagnostics;
+        var diagnostic = diagnostics.First();
+
+        if (diagnostics.Any(d =>
+                d.Id == DomainDrivenDesignAnalyzer.Sas055.Id))
+        {
+            var title1 = Resources.SAS060CodeFixTitle;
+            context.RegisterCodeFix(
+                CodeAction.Create(title1,
+                    token => AddSkipImmutabilityCheckAttribute(context.Document, methodDeclarationSyntax, token),
+                    title1),
+                diagnostic);
+            var title2 = Resources.SAS062CodeFixTitle;
+            context.RegisterCodeFix(
+                CodeAction.Create(title2,
+                    token => ChangeImmutableReturnType(context.Document, methodDeclarationSyntax, token),
+                    title2),
+                diagnostic);
+        }
+    }
+
     private static async Task<Solution> AddRehydrateMethodToAggregateRoot(Document document,
         ClassDeclarationSyntax classDeclarationSyntax, CancellationToken cancellationToken)
     {
@@ -184,7 +220,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
             null,
             isDehydratable.IsDehydratable
                 ? $"return (identifier, container, properties) => new {className}(identifier, container, properties);"
-                : $"return (identifier, container, properties) => new {className}(container.GetRequiredService<IRecorder>(),container.GetRequiredService<IIdentifierFactory>(), identifier);");
+                : $"return (identifier, container, properties) => new {className}(container.GetRequiredService<{nameof(IRecorder)}>(),container.GetRequiredService<{nameof(IIdentifierFactory)}>(), identifier);");
         var modifiedClassDeclaration = classDeclarationSyntax.AddMembers(newMethod);
         var newRoot = root.ReplaceNode(classDeclarationSyntax, modifiedClassDeclaration);
         var newDocument = document.WithSyntaxRoot(newRoot);
@@ -205,7 +241,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         var newMethod = GenerateMethod(
             new[] { SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword },
             DomainDrivenDesignAnalyzer.ClassFactoryMethodName,
-            $"Result<{className}, Error>",
+            $"{nameof(Result)}<{className}, {nameof(Error)}>",
             new Dictionary<string, string>
             {
                 { "recorder", nameof(IRecorder) },
@@ -256,7 +292,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         var newMethod = GenerateMethod(
             new[] { SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword },
             DomainDrivenDesignAnalyzer.ClassFactoryMethodName,
-            $"Result<{className}, Error>",
+            $"{nameof(Result)}<{className}, {nameof(Error)}>",
             new Dictionary<string, string>
             {
                 { "recorder", nameof(IRecorder) },
@@ -319,7 +355,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         var newMethod = GenerateMethod(
             new[] { SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword },
             DomainDrivenDesignAnalyzer.ClassFactoryMethodName,
-            $"Result<{className}, Error>",
+            $"{nameof(Result)}<{className}, {nameof(Error)}>",
             isSingleValueObject
                 ? new Dictionary<string, string>
                 {
@@ -368,7 +404,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         var newMethod = GenerateMethod(
             new[] { SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword },
             nameof(IDehydratableEntity.Dehydrate),
-            "HydrationProperties",
+            $"{nameof(HydrationProperties)}",
             null,
             "var properties = base.Dehydrate();\nreturn properties;");
         var modifiedClassDeclaration = classDeclarationSyntax.AddMembers(newMethod);
@@ -390,7 +426,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         var newMethod = GenerateMethod(
             new[] { SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword },
             nameof(IDehydratableEntity.Dehydrate),
-            "HydrationProperties",
+            $"{nameof(HydrationProperties)}",
             null,
             "var properties = base.Dehydrate();\nproperties.Add(nameof(RootId), RootId);\nreturn properties;");
         var modifiedClassDeclaration = classDeclarationSyntax.AddMembers(newMethod);
@@ -418,10 +454,55 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         return newDocument.Project.Solution;
     }
 
-    private static AttributeListSyntax GenerateAttribute(string name, string? firstArgumentExpression)
+    private static async Task<Solution> AddSkipImmutabilityCheckAttribute(Document document,
+        MethodDeclarationSyntax methodDeclarationSyntax, CancellationToken cancellationToken)
+    {
+        var root = await document.GetSyntaxRootAsync(cancellationToken);
+        if (root.NotExists())
+        {
+            return document.Project.Solution;
+        }
+
+        var newAttribute = GenerateAttribute(typeof(SkipImmutabilityCheckAttribute).FullName!);
+        var modifiedMethodDeclaration = methodDeclarationSyntax.AddAttributeLists(newAttribute);
+        var newRoot = root.ReplaceNode(methodDeclarationSyntax, modifiedMethodDeclaration);
+        var newDocument = document.WithSyntaxRoot(newRoot);
+
+        return newDocument.Project.Solution;
+    }
+
+    private static async Task<Solution> ChangeImmutableReturnType(Document document,
+        MethodDeclarationSyntax methodDeclarationSyntax, CancellationToken cancellationToken)
+    {
+        var root = await document.GetSyntaxRootAsync(cancellationToken);
+        if (root.NotExists())
+        {
+            return document.Project.Solution;
+        }
+
+        var className = (ClassDeclarationSyntax)methodDeclarationSyntax.Parent!;
+        var body = methodDeclarationSyntax.Body!.Statements;
+        if (body.HasNone())
+        {
+            body = new SyntaxList<StatementSyntax>(
+                SyntaxFactory.ParseStatement($"return {DomainDrivenDesignAnalyzer.ClassFactoryMethodName}();"));
+        }
+
+        var newRoot = root.ReplaceNode(methodDeclarationSyntax,
+            methodDeclarationSyntax.WithReturnType(SyntaxFactory.GenericName(nameof(Result))
+                    .AddTypeArgumentListArguments(SyntaxFactory.ParseTypeName(className.Identifier.Text),
+                        SyntaxFactory.ParseTypeName(nameof(Error))))
+                .WithBody(SyntaxFactory.Block(body)));
+
+        var newDocument = document.WithSyntaxRoot(newRoot);
+
+        return newDocument.Project.Solution;
+    }
+
+    private static AttributeListSyntax GenerateAttribute(string name, string? firstArgumentExpression = null)
     {
         var attribute = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(name));
-        if (firstArgumentExpression.Exists())
+        if (firstArgumentExpression.HasValue())
         {
             attribute = attribute.WithArgumentList(SyntaxFactory.AttributeArgumentList(SyntaxFactory.SeparatedList(
                 new List<AttributeArgumentSyntax>

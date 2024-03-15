@@ -209,7 +209,7 @@
         <value>Method must not mutate the ValueObject.</value>
     </data>
     <data name="SAS055MessageFormat" xml:space="preserve">
-        <value>Method '{0}' must not mutate this ValueObject's state, and must return a new instance in one of these types: '{1}'</value>
+        <value>Method '{0}' must not mutate this ValueObject's state, and must return a new instance of this ValueObject using one of these return types, either: '{1}', or can be suppressed by adding the '{2}' attribute to the method</value>
     </data>
     <data name="SAS055Title" xml:space="preserve">
         <value>Method mutates ValueObject state</value>
@@ -231,5 +231,11 @@
     </data>
     <data name="SAS050CodeFixTitle" xml:space="preserve">
         <value>Add missing 'Create' method</value>
+    </data>
+    <data name="SAS060CodeFixTitle" xml:space="preserve">
+        <value>Suppress with 'SkipImmutabilityCheck' attribute</value>
+    </data>
+    <data name="SAS062CodeFixTitle" xml:space="preserve">
+        <value>Change return type of the method</value>
     </data>
 </root>

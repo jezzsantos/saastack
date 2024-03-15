@@ -419,8 +419,8 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             if (context.HasIncorrectReturnType(method, allowedReturnTypes))
             {
                 var acceptableReturnTypes =
-                    allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(", ");
-                context.ReportDiagnostic(Sas055, method, acceptableReturnTypes);
+                    allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(" or ");
+                context.ReportDiagnostic(Sas055, method, acceptableReturnTypes, nameof(SkipImmutabilityCheckAttribute));
             }
         }
     }

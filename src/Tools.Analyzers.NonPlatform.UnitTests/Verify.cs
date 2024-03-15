@@ -48,7 +48,16 @@ public static class Verify
     private static ReferenceAssemblies Net80 => LazyNet80.Value;
 
     public static async Task CodeFixed<TAnalyzer, TCodeFix>(DiagnosticDescriptor descriptor, string problem, string fix,
-        int locationX, int locationY, string argument)
+        int locationX, int locationY, params object[] arguments)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+        where TCodeFix : CodeFixProvider, new()
+    {
+        await CodeFixed<TAnalyzer, TCodeFix>(descriptor, null, problem, fix, locationX, locationY, arguments);
+    }
+
+    public static async Task CodeFixed<TAnalyzer, TCodeFix>(DiagnosticDescriptor descriptor, string? equivalenceKey,
+        string problem, string fix,
+        int locationX, int locationY, params object[] arguments)
         where TAnalyzer : DiagnosticAnalyzer, new()
         where TCodeFix : CodeFixProvider, new()
     {
@@ -64,8 +73,9 @@ public static class Verify
 
         var expected = CSharpCodeFixVerifier<TAnalyzer, TCodeFix, DefaultVerifier>.Diagnostic(descriptor)
             .WithLocation(locationX, locationY)
-            .WithArguments(argument);
+            .WithArguments(arguments);
         codeFixTest.ExpectedDiagnostics.Add(expected);
+        codeFixTest.CodeActionEquivalenceKey = equivalenceKey;
 
         await codeFixTest.RunAsync(CancellationToken.None);
     }

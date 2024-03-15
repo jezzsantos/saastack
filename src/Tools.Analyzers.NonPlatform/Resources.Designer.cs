@@ -663,7 +663,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Method &apos;{0}&apos; must not mutate this ValueObject&apos;s state, and must return a new instance in one of these types: &apos;{1}&apos;.
+        ///   Looks up a localized string similar to Method &apos;{0}&apos; must not mutate this ValueObject&apos;s state, and must return a new instance of this ValueObject using one of these return types, either: &apos;{1}&apos;, or can be suppressed by adding the &apos;{2}&apos; attribute to the method.
         /// </summary>
         internal static string SAS055MessageFormat {
             get {
@@ -677,6 +677,24 @@ namespace Tools.Analyzers.NonPlatform {
         internal static string SAS055Title {
             get {
                 return ResourceManager.GetString("SAS055Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Suppress with &apos;SkipImmutabilityCheck&apos; attribute.
+        /// </summary>
+        internal static string SAS060CodeFixTitle {
+            get {
+                return ResourceManager.GetString("SAS060CodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Change return type of the method.
+        /// </summary>
+        internal static string SAS062CodeFixTitle {
+            get {
+                return ResourceManager.GetString("SAS062CodeFixTitle", resourceCulture);
             }
         }
     }

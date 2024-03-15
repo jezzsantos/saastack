@@ -1,10 +1,10 @@
 extern alias NonPlatformAnalyzers;
+using NonPlatformAnalyzers::Domain.Interfaces.ValueObjects;
 using Xunit;
-using DomainDrivenDesignAnalyzer =
-    NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignAnalyzer;
-using DomainDrivenDesignCodeFix =
-    NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignCodeFix;
+using DomainDrivenDesignAnalyzer = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignAnalyzer;
+using DomainDrivenDesignCodeFix = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignCodeFix;
 using UsedImplicitly = NonPlatformAnalyzers::JetBrains.Annotations.UsedImplicitlyAttribute;
+using Resources = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.Resources;
 
 namespace Tools.Analyzers.NonPlatform.UnitTests;
 
@@ -1180,8 +1180,207 @@ public class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas053,
-                    problem, fix, 12, 14, "AClass");
+                    DomainDrivenDesignAnalyzer.Sas053, problem, fix, 12, 14, "AClass");
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas055
+        {
+            [Fact(Skip = "see: https://github.com/dotnet/roslyn/issues/72535")]
+            public async Task WhenFixingWrongReturnTypeWithAttribute_ThenAddsAttribute()
+            {
+                const string problem = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue1, string avalue2, string avalue3)
+    {
+        AProperty = avalue1;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!, null!, null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new object[] { AProperty };
+    }
+
+    public string AProperty { get;}
+
+    public static Domain.Interfaces.ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) =>
+        {
+            var parts = RehydrateToList(property, false);
+            return new AClass(parts[0], parts[1], parts[2]);
+        };
+    }
+
+    public void AMethod()
+    {
+    }
+}";
+                const string fix = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue1, string avalue2, string avalue3)
+    {
+        AProperty = avalue1;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!, null!, null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new object[] { AProperty };
+    }
+
+    public string AProperty { get;}
+
+    public static Domain.Interfaces.ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) =>
+        {
+            var parts = RehydrateToList(property, false);
+            return new AClass(parts[0], parts[1], parts[2]);
+        };
+    }
+
+    [Domain.Interfaces.ValueObjects.SkipImmutabilityCheckAttribute]
+    public void AMethod()
+    {
+    }
+}";
+
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas055,
+                    Resources.SAS060CodeFixTitle, problem, fix, 40, 17,
+                    "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
+                    nameof(SkipImmutabilityCheckAttribute));
+            }
+
+            [Fact]
+            public async Task WhenFixingWrongReturnTypeWithCorrectReturnType_ThenChangesReturnType()
+            {
+                const string problem = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue1, string avalue2, string avalue3)
+    {
+        AProperty = avalue1;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!, null!, null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new object[] { AProperty };
+    }
+
+    public string AProperty { get;}
+
+    public static Domain.Interfaces.ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) =>
+        {
+            var parts = RehydrateToList(property, false);
+            return new AClass(parts[0], parts[1], parts[2]);
+        };
+    }
+
+    public void AMethod()
+    {
+    }
+}";
+                const string fix = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue1, string avalue2, string avalue3)
+    {
+        AProperty = avalue1;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!, null!, null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new object[] { AProperty };
+    }
+
+    public string AProperty { get;}
+
+    public static Domain.Interfaces.ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) =>
+        {
+            var parts = RehydrateToList(property, false);
+            return new AClass(parts[0], parts[1], parts[2]);
+        };
+    }
+
+    public Result<AClass, Error> AMethod()
+    {
+        return Create();
+    }
+}";
+
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas055,
+                    Resources.SAS062CodeFixTitle, problem, fix, 40, 17,
+                    "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
+                    nameof(SkipImmutabilityCheckAttribute));
             }
         }
     }

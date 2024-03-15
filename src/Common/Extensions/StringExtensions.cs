@@ -60,7 +60,7 @@ public static class StringExtensions
         return string.Equals(value, other, StringComparison.Ordinal);
     }
 #endif
-#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Formats the <see cref="value" /> with the <see cref="arguments" />
     /// </summary>
