@@ -6,16 +6,16 @@ using Common;
 
 namespace AncillaryInfrastructure.ApplicationServices;
 
-public class OrganizationProvisioningDeliveryService : IProvisioningDeliveryService
+public class OrganizationProvisioningNotificationService : IProvisioningNotificationService
 {
     private readonly IOrganizationsService _organizationsService;
 
-    public OrganizationProvisioningDeliveryService(IOrganizationsService organizationsService)
+    public OrganizationProvisioningNotificationService(IOrganizationsService organizationsService)
     {
         _organizationsService = organizationsService;
     }
 
-    public async Task<Result<Error>> DeliverAsync(ICallerContext context, string tenantId,
+    public async Task<Result<Error>> NotifyAsync(ICallerContext context, string tenantId,
         TenantSettings settings, CancellationToken cancellationToken)
     {
         return await _organizationsService.ChangeSettingsPrivateAsync(context, tenantId, settings, cancellationToken);

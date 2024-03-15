@@ -19,7 +19,7 @@ public class APIKeysApi : IWebApiService
     }
 
 #if TESTINGONLY
-    public async Task<ApiPostResult<APIKey, CreateAPIKeyResponse>> RegisterMachine(
+    public async Task<ApiPostResult<APIKey, CreateAPIKeyResponse>> Create(
         CreateAPIKeyRequest request, CancellationToken cancellationToken)
     {
         var apiKey = await _apiKeysApplication.CreateAPIKeyAsync(_contextFactory.Create(), cancellationToken);

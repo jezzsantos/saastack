@@ -31,7 +31,7 @@ public class AncillaryApplicationSpec
     private readonly Mock<IEmailDeliveryService> _emailDeliveryService;
     private readonly Mock<IEmailMessageQueue> _emailMessageQueue;
     private readonly Mock<IIdentifierFactory> _idFactory;
-    private readonly Mock<IProvisioningDeliveryService> _provisioningDeliveryService;
+    private readonly Mock<IProvisioningNotificationService> _provisioningDeliveryService;
     private readonly Mock<IProvisioningMessageQueue> _provisioningMessageQueue;
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IUsageDeliveryService> _usageDeliveryService;
@@ -64,8 +64,8 @@ public class AncillaryApplicationSpec
                 edr.FindDeliveryByMessageIdAsync(It.IsAny<QueuedMessageId>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Optional<EmailDeliveryRoot>.None);
         _provisioningMessageQueue = new Mock<IProvisioningMessageQueue>();
-        _provisioningDeliveryService = new Mock<IProvisioningDeliveryService>();
-        _provisioningDeliveryService.Setup(pds => pds.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+        _provisioningDeliveryService = new Mock<IProvisioningNotificationService>();
+        _provisioningDeliveryService.Setup(pds => pds.NotifyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<TenantSettings>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Ok);
 
@@ -355,21 +355,21 @@ public class AncillaryApplicationSpec
     }
 
     [Fact]
-    public async Task WhenDeliverProvisioningAsyncAndMessageIsNotRehydratable_ThenReturnsError()
+    public async Task WhenNotifyProvisioningAsyncAndMessageIsNotRehydratable_ThenReturnsError()
     {
         var result =
-            await _application.DeliverProvisioningAsync(_caller.Object, "anunknownmessage", CancellationToken.None);
+            await _application.NotifyProvisioningAsync(_caller.Object, "anunknownmessage", CancellationToken.None);
 
         result.Should().BeError(ErrorCode.RuleViolation,
             Resources.AncillaryApplication_InvalidQueuedMessage.Format(nameof(ProvisioningMessage),
                 "anunknownmessage"));
         _provisioningDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<TenantSettings>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
-    public async Task WhenDeliverProvisioningAsyncAndMessageHasNoTenantId_ThenReturnsError()
+    public async Task WhenNotifyProvisioningAsyncAndMessageHasNoTenantId_ThenReturnsError()
     {
         var messageAsJson = new ProvisioningMessage
         {
@@ -380,17 +380,17 @@ public class AncillaryApplicationSpec
             }
         }.ToJson()!;
 
-        var result = await _application.DeliverProvisioningAsync(_caller.Object, messageAsJson, CancellationToken.None);
+        var result = await _application.NotifyProvisioningAsync(_caller.Object, messageAsJson, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.RuleViolation,
             Resources.AncillaryApplication_Provisioning_MissingTenantId);
         _provisioningDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<TenantSettings>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
-    public async Task WhenDeliverProvisioningAsync_ThenDelivers()
+    public async Task WhenNotifyProvisioningAsync_ThenNotifies()
     {
         var messageAsJson = new ProvisioningMessage
         {
@@ -403,11 +403,11 @@ public class AncillaryApplicationSpec
             }
         }.ToJson()!;
 
-        var result = await _application.DeliverProvisioningAsync(_caller.Object, messageAsJson, CancellationToken.None);
+        var result = await _application.NotifyProvisioningAsync(_caller.Object, messageAsJson, CancellationToken.None);
 
         result.Should().BeSuccess();
         _provisioningDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "atenantid",
+            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), "atenantid",
                 It.Is<TenantSettings>(dic =>
                     dic.Count == 3
                     && dic["aname1"].As<TenantSetting>().Value.As<string>() == "avalue"
@@ -706,7 +706,7 @@ public class AncillaryApplicationSpec
             urs => urs.PopSingleAsync(It.IsAny<Func<ProvisioningMessage, CancellationToken, Task<Result<Error>>>>(),
                 It.IsAny<CancellationToken>()));
         _provisioningDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<TenantSettings>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -758,15 +758,15 @@ public class AncillaryApplicationSpec
             urs => urs.PopSingleAsync(It.IsAny<Func<ProvisioningMessage, CancellationToken, Task<Result<Error>>>>(),
                 It.IsAny<CancellationToken>()), Times.Exactly(2));
         _provisioningDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "atenantid1",
+            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), "atenantid1",
                 It.Is<TenantSettings>(dic => dic["aname"].Value.As<string>() == "avalue1"),
                 It.IsAny<CancellationToken>()));
         _provisioningDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "atenantid2",
+            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), "atenantid2",
                 It.Is<TenantSettings>(dic => dic["aname"].Value.As<string>() == "avalue2"),
                 It.IsAny<CancellationToken>()));
         _provisioningDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<TenantSettings>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
     }
 

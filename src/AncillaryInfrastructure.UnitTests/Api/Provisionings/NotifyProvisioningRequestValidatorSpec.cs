@@ -8,15 +8,15 @@ using Xunit;
 namespace AncillaryInfrastructure.UnitTests.Api.Provisionings;
 
 [Trait("Category", "Unit")]
-public class DeliverProvisioningRequestValidatorSpec
+public class NotifyProvisioningRequestValidatorSpec
 {
-    private readonly DeliverProvisioningRequest _dto;
-    private readonly DeliverProvisioningRequestValidator _validator;
+    private readonly NotifyProvisioningRequest _dto;
+    private readonly NotifyProvisioningRequestValidator _validator;
 
-    public DeliverProvisioningRequestValidatorSpec()
+    public NotifyProvisioningRequestValidatorSpec()
     {
-        _validator = new DeliverProvisioningRequestValidator();
-        _dto = new DeliverProvisioningRequest
+        _validator = new NotifyProvisioningRequestValidator();
+        _dto = new NotifyProvisioningRequest
         {
             Message = "amessage"
         };

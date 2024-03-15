@@ -58,7 +58,7 @@ public abstract class DeliverProvisioningSpecBase<TSetup> : ApiWorkerSpec<TSetup
         (await Setup.QueueStore.CountAsync(WorkerConstants.Queues.Provisionings, CancellationToken.None))
             .Should().Be(0);
         _serviceClient.LastPostedMessage.Value.Should()
-            .BeEquivalentTo(new DeliverProvisioningRequest { Message = message });
+            .BeEquivalentTo(new NotifyProvisioningRequest { Message = message });
     }
 
     private static void OverrideDependencies(IServiceCollection services)

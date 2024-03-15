@@ -35,7 +35,7 @@ public class ProvisioningsApiSpec : WebApiSpec<Program>
         var login = await LoginUserAsync(LoginUser.Operator);
         var tenantId = login.User.Profile!.DefaultOrganizationId!;
 
-        var request = new DeliverProvisioningRequest
+        var request = new NotifyProvisioningRequest
         {
             Message = new ProvisioningMessage
             {

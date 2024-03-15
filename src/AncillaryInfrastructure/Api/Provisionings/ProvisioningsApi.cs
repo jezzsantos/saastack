@@ -18,11 +18,11 @@ public sealed class ProvisioningsApi : IWebApiService
         _ancillaryApplication = ancillaryApplication;
     }
 
-    public async Task<ApiPostResult<bool, DeliverMessageResponse>> Deliver(DeliverProvisioningRequest request,
+    public async Task<ApiPostResult<bool, DeliverMessageResponse>> Notify(NotifyProvisioningRequest request,
         CancellationToken cancellationToken)
     {
         var delivered =
-            await _ancillaryApplication.DeliverProvisioningAsync(_contextFactory.Create(), request.Message,
+            await _ancillaryApplication.NotifyProvisioningAsync(_contextFactory.Create(), request.Message,
                 cancellationToken);
 
         return () => delivered.HandleApplicationResult<DeliverMessageResponse, bool>(_ =>

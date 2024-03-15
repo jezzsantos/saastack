@@ -26,7 +26,7 @@ public class AncillaryApplication : IAncillaryApplication
     private readonly IIdentifierFactory _idFactory;
     private readonly IRecorder _recorder;
     private readonly IUsageDeliveryService _usageDeliveryService;
-    private readonly IProvisioningDeliveryService _provisioningDeliveryService;
+    private readonly IProvisioningNotificationService _provisioningNotificationService;
 #if TESTINGONLY
     private readonly IAuditMessageQueueRepository _auditMessageQueueRepository;
     private readonly IEmailMessageQueue _emailMessageQueue;
@@ -38,7 +38,7 @@ public class AncillaryApplication : IAncillaryApplication
         IAuditMessageQueueRepository auditMessageQueueRepository, IAuditRepository auditRepository,
         IEmailMessageQueue emailMessageQueue, IEmailDeliveryService emailDeliveryService,
         IEmailDeliveryRepository emailDeliveryRepository,
-        IProvisioningMessageQueue provisioningMessageQueue, IProvisioningDeliveryService provisioningDeliveryService)
+        IProvisioningMessageQueue provisioningMessageQueue, IProvisioningNotificationService provisioningNotificationService)
     {
         _recorder = recorder;
         _idFactory = idFactory;
@@ -50,7 +50,7 @@ public class AncillaryApplication : IAncillaryApplication
         _emailDeliveryService = emailDeliveryService;
         _emailDeliveryRepository = emailDeliveryRepository;
         _provisioningMessageQueue = provisioningMessageQueue;
-        _provisioningDeliveryService = provisioningDeliveryService;
+        _provisioningNotificationService = provisioningNotificationService;
     }
 #else
     public AncillaryApplication(IRecorder recorder, IIdentifierFactory idFactory,
@@ -62,7 +62,8 @@ public class AncillaryApplication : IAncillaryApplication
         IEmailMessageQueue emailMessageQueue, IEmailDeliveryService emailDeliveryService,
         IEmailDeliveryRepository emailDeliveryRepository,
         // ReSharper disable once UnusedParameter.Local
-        IProvisioningMessageQueue provisioningMessageQueue, IProvisioningDeliveryService provisioningDeliveryService)
+        IProvisioningMessageQueue provisioningMessageQueue,
+        IProvisioningNotificationService provisioningNotificationService)
     {
         _recorder = recorder;
         _idFactory = idFactory;
@@ -70,7 +71,7 @@ public class AncillaryApplication : IAncillaryApplication
         _auditRepository = auditRepository;
         _emailDeliveryService = emailDeliveryService;
         _emailDeliveryRepository = emailDeliveryRepository;
-        _provisioningDeliveryService = provisioningDeliveryService;
+        _provisioningNotificationService = provisioningNotificationService;
     }
 #endif
 
@@ -93,7 +94,7 @@ public class AncillaryApplication : IAncillaryApplication
         return true;
     }
 
-    public async Task<Result<bool, Error>> DeliverProvisioningAsync(ICallerContext context, string messageAsJson,
+    public async Task<Result<bool, Error>> NotifyProvisioningAsync(ICallerContext context, string messageAsJson,
         CancellationToken cancellationToken)
     {
         var rehydrated = RehydrateMessage<ProvisioningMessage>(messageAsJson);
@@ -102,7 +103,7 @@ public class AncillaryApplication : IAncillaryApplication
             return rehydrated.Error;
         }
 
-        var delivered = await DeliverProvisioningInternalAsync(context, rehydrated.Value, cancellationToken);
+        var delivered = await NotifyProvisioningInternalAsync(context, rehydrated.Value, cancellationToken);
         if (!delivered.IsSuccessful)
         {
             return delivered.Error;
@@ -167,7 +168,7 @@ public class AncillaryApplication : IAncillaryApplication
         CancellationToken cancellationToken)
     {
         await DrainAllAsync(_provisioningMessageQueue,
-            message => DeliverProvisioningInternalAsync(context, message, cancellationToken), cancellationToken);
+            message => NotifyProvisioningInternalAsync(context, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(context.ToCall(), "Drained all provisioning messages");
 
@@ -428,7 +429,7 @@ public class AncillaryApplication : IAncillaryApplication
         return true;
     }
 
-    private async Task<Result<bool, Error>> DeliverProvisioningInternalAsync(ICallerContext context,
+    private async Task<Result<bool, Error>> NotifyProvisioningInternalAsync(ICallerContext context,
         ProvisioningMessage message, CancellationToken cancellationToken)
     {
         if (message.TenantId.IsInvalidParameter(x => x.HasValue(), nameof(ProvisioningMessage.TenantId), out _))
@@ -455,14 +456,14 @@ public class AncillaryApplication : IAncillaryApplication
                 return new TenantSetting(value);
             }));
         var delivered =
-            await _provisioningDeliveryService.DeliverAsync(context, message.TenantId!, tenantSettings,
+            await _provisioningNotificationService.NotifyAsync(context, message.TenantId!, tenantSettings,
                 cancellationToken);
         if (!delivered.IsSuccessful)
         {
             return delivered.Error;
         }
 
-        _recorder.TraceInformation(context.ToCall(), "Delivered provisioning for {Tenant}", message.TenantId!);
+        _recorder.TraceInformation(context.ToCall(), "Notified provisioning for {Tenant}", message.TenantId!);
 
         return true;
     }

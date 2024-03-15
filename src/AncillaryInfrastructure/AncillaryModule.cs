@@ -81,7 +81,7 @@ public class AncillaryModule : ISubDomainModule
 
                 services.AddSingleton<IUsageDeliveryService, NullUsageDeliveryService>();
                 services.AddSingleton<IEmailDeliveryService, NullEmailDeliveryService>();
-                services.AddSingleton<IProvisioningDeliveryService, OrganizationProvisioningDeliveryService>();
+                services.AddSingleton<IProvisioningNotificationService, OrganizationProvisioningNotificationService>();
             };
         }
     }

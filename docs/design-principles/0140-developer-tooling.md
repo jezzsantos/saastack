@@ -32,14 +32,14 @@ There is no single set of tooling that does that in SaaStack in its entirety; in
 
 For example,
 
-	* In a Clean/Onion/Hexagonal Architecture (which SaaStack advocates), we have several well-known horizontal layers. These layers have a specific direction of dependencies. 
-	* In DDD (which SaaStack backends also advocate), subdomains mark the boundaries between aggregates and their data, and coupling between them is forbidden. Not just at the code level but also in the data repository. 
-	* And finally, in an Event Driven Architecture (which SaaStack backends advocate), domain events should be emitted from the Aggregates and brokered to other components and MUST cross boundaries (both vertical Subdomain boundaries and horizontal Layer boundaries), and so they must be behavior-less data containers (a.k.a DTOs) that are [JSON/XML] serializable. 
-	* With all these constraints, in the "heat of the moment" when time is tight, and the pressure is on, despite best intentions, developers can easily violate any one or all these rules/constraints by simply selecting the wrong type from an intelli-sense picker (or from predictive AI like GitHub Copilot) and never know they have violated any constraint at all. Often, not until months later when this discovery now costs too much to remediate - slowly cascading to disorder again.
+* In a Clean/Onion/Hexagonal Architecture (which SaaStack advocates), we have several well-known horizontal layers. These layers have a specific direction of dependencies. 
+* In DDD (which SaaStack backends also advocate), subdomains mark the boundaries between aggregates and their data, and coupling between them is forbidden. Not just at the code level but also in the data repository. 
+* And finally, in an Event Driven Architecture (which SaaStack backends advocate), domain events should be emitted from the Aggregates and brokered to other components and MUST cross boundaries (both vertical Subdomain boundaries and horizontal Layer boundaries), and so they must be behavior-less data containers (a.k.a DTOs) that are [JSON/XML] serializable. 
+* With all these constraints, in the "heat of the moment" when time is tight, and the pressure is on, despite best intentions, developers can easily violate any one or all these rules/constraints by simply selecting the wrong type from an intelli-sense picker (or from predictive AI like GitHub Copilot) and never know they have violated any constraint at all. Often, not until months later when this discovery now costs too much to remediate - slowly cascading to disorder again.
 
-What is really needed is custom tooling that will call these things out when they happen and force the developer to change their mistake to conform to the established patterns, there and then as they change the software.
+What is really needed is custom tooling that will call these things out when they happen and force the developer to change their mistake to conform to the established patterns there and then as they change the software.
 
-Furthermore, as time goes on, the codebase itself should change and evolve as the product grows. This MUST happen regardless. So, the tooling that supports the codebase MUST also evolve and move forward with the codebase. Thus, both the codebase itself and the tooling need to co-exist in the same codebase and should evolve together, so they are always in sync with each other. This is a key attribute of this class of tooling.
+Furthermore, as time passes, the codebase itself should change and evolve as the product grows. This MUST happen regardless. So, the tooling that supports the codebase MUST also evolve and move forward with the codebase. Thus, both the codebase itself and the tooling need to co-exist in the same codebase and should evolve together so they are always in sync with each other. This is a key attribute of this class of tooling.
 
 Now, let's get into all the tooling that exists in SaaStack that pulls this all together into a cohesive toolset.
 
@@ -47,13 +47,19 @@ Now, let's get into all the tooling that exists in SaaStack that pulls this all 
 
 > WARNING: This feature is only available in JetBrains Rider
 
-SaaStack utilizes a comprehensive set of code formatting rules that JetBrains Rider (Resharper) defines. These rules govern everything from how files are laid out to how variables are named and how whitespace, line breaks, and brackets are formatted.
+SaaStack utilizes a comprehensive set of code formatting rules that JetBrains Rider (ReSharper) defines. These rules govern everything from how files are laid out to how variables are named and how whitespace, line breaks, and brackets are formatted.
 
-These settings are all saved in the codebase for the whole team to use (team-. This is important for consistency across the codebase and the team.
+> We don't currently have much support for EditorConfig, a smaller subset of those rules.
 
-In general, SaaStack has complied with many of the defaults, with a few minor exceptions:
+These settings are all saved in the codebase for the whole team to use (team-settings). This is important for consistency across the codebase and the team.
 
-* Order of members, ctors, factories etc.
+In general, SaaStack is compliant with many of the defaults in JetBrains Rider, with a few minor exceptions, and these notable exceptions:
+
+* Formatting Rules:
+  * Member variables are always prefixed with an underscore (i.e., `private string _name;`)
+  * `if` statements are always enclosed in braces.
+  * Various other common formatting rules to increase readability.
+* File Ordering: We have changed the order of fields, constants, constructors, factories, methods, and other known kinds of methods to make it easier to find various common things, for specific file types.
 
 ## Project Templates
 

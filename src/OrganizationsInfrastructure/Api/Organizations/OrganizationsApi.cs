@@ -40,6 +40,7 @@ public class OrganizationsApi : IWebApiService
             organization.HandleApplicationResult<GetOrganizationResponse, Organization>(org =>
                 new GetOrganizationResponse { Organization = org });
     }
+    
 #if TESTINGONLY
     public async Task<ApiGetResult<OrganizationWithSettings, GetOrganizationSettingsResponse>> GetSettings(
         GetOrganizationSettingsRequest request, CancellationToken cancellationToken)

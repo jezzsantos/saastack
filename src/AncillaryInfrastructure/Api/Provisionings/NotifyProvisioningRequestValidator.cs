@@ -5,9 +5,9 @@ using JetBrains.Annotations;
 namespace AncillaryInfrastructure.Api.Provisionings;
 
 [UsedImplicitly]
-public class DeliverProvisioningRequestValidator : AbstractValidator<DeliverProvisioningRequest>
+public class NotifyProvisioningRequestValidator : AbstractValidator<NotifyProvisioningRequest>
 {
-    public DeliverProvisioningRequestValidator()
+    public NotifyProvisioningRequestValidator()
     {
         RuleFor(req => req.Message)
             .NotEmpty()

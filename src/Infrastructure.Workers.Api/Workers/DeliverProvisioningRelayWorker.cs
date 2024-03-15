@@ -24,7 +24,7 @@ public sealed class DeliverProvisioningRelayWorker : IQueueMonitoringApiRelayWor
     public async Task RelayMessageOrThrowAsync(ProvisioningMessage message, CancellationToken cancellationToken)
     {
         await _serviceClient.PostQueuedMessageToApiOrThrowAsync(_recorder,
-            message, new DeliverProvisioningRequest
+            message, new NotifyProvisioningRequest
             {
                 Message = message.ToJson()!
             }, _settings.GetAncillaryApiHostHmacAuthSecret(), cancellationToken);
