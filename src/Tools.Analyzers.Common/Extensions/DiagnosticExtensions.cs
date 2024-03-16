@@ -62,7 +62,7 @@ public static class DiagnosticExtensions
             ? new object[] { text }.Concat(messageArgs)
             : new object[] { text };
 
-        var diagnostic = Diagnostic.Create(descriptor, location, text, arguments.ToArray());
+        var diagnostic = Diagnostic.Create(descriptor, location, arguments.ToArray());
         context.ReportDiagnostic(diagnostic);
     }
 }

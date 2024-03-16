@@ -60,7 +60,412 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This method should return a Result type..
+        ///   Looks up a localized string similar to Add missing &apos;Create&apos; method.
+        /// </summary>
+        internal static string CodeFix_Title_AddClassFactoryMethodToAggregate {
+            get {
+                return ResourceManager.GetString("CodeFix_Title_AddClassFactoryMethodToAggregate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add missing &apos;Create&apos; method.
+        /// </summary>
+        internal static string CodeFix_Title_AddClassFactoryMethodToEntity {
+            get {
+                return ResourceManager.GetString("CodeFix_Title_AddClassFactoryMethodToEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add missing &apos;Create&apos; method.
+        /// </summary>
+        internal static string CodeFix_Title_AddClassFactoryMethodToValueObject {
+            get {
+                return ResourceManager.GetString("CodeFix_Title_AddClassFactoryMethodToValueObject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add missing &apos;Dehydrate()&apos; method.
+        /// </summary>
+        internal static string CodeFix_Title_AddDehydrateMethodToEntity {
+            get {
+                return ResourceManager.GetString("CodeFix_Title_AddDehydrateMethodToEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add missing &apos;[EntityName]&apos; attribute.
+        /// </summary>
+        internal static string CodeFix_Title_AddEntityValueAttributeToEntiyOrAggregate {
+            get {
+                return ResourceManager.GetString("CodeFix_Title_AddEntityValueAttributeToEntiyOrAggregate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add missing &apos;Rehydrate()&apos; method.
+        /// </summary>
+        internal static string CodeFix_Title_AddRehydrateMethod {
+            get {
+                return ResourceManager.GetString("CodeFix_Title_AddRehydrateMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mark this class as &apos;sealed&apos;.
+        /// </summary>
+        internal static string CodeFix_Title_AddSealedToClass {
+            get {
+                return ResourceManager.GetString("CodeFix_Title_AddSealedToClass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Suppress with &apos;[SkipImmutabilityCheck]&apos; attribute.
+        /// </summary>
+        internal static string CodeFix_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod {
+            get {
+                return ResourceManager.GetString("CodeFix_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Change return type of the method.
+        /// </summary>
+        internal static string CodeFix_Title_ChangeValueObjectMethodReturnType {
+            get {
+                return ResourceManager.GetString("CodeFix_Title_ChangeValueObjectMethodReturnType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create() class factory method must return the correct type..
+        /// </summary>
+        internal static string Diagnostic_Description_ClassFactoryWrongReturnType {
+            get {
+                return ResourceManager.GetString("Diagnostic_Description_ClassFactoryWrongReturnType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class should be &apos;public&apos;..
+        /// </summary>
+        internal static string Diagnostic_Description_ClassMustBePublic {
+            get {
+                return ResourceManager.GetString("Diagnostic_Description_ClassMustBePublic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class should be marked as &apos;sealed&apos;..
+        /// </summary>
+        internal static string Diagnostic_Description_ClassMustBeSealed {
+            get {
+                return ResourceManager.GetString("Diagnostic_Description_ClassMustBeSealed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class must have a &apos;public&apos; parameterless constructor..
+        /// </summary>
+        internal static string Diagnostic_Description_ClassMustHaveParameterlessConstructor {
+            get {
+                return ResourceManager.GetString("Diagnostic_Description_ClassMustHaveParameterlessConstructor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Constructor must be &apos;private&apos;..
+        /// </summary>
+        internal static string Diagnostic_Description_ConstructorMustBePrivate {
+            get {
+                return ResourceManager.GetString("Diagnostic_Description_ConstructorMustBePrivate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class must declare the &apos;[EntityName]&apos; attribute..
+        /// </summary>
+        internal static string Diagnostic_Description_MustDeclareEntityNameAttribute {
+            get {
+                return ResourceManager.GetString("Diagnostic_Description_MustDeclareEntityNameAttribute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class must implement the &apos;Dehydrate()&apos; method..
+        /// </summary>
+        internal static string Diagnostic_Description_MustImplementDehydrate {
+            get {
+                return ResourceManager.GetString("Diagnostic_Description_MustImplementDehydrate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class must implement the &apos;Rehydrate()&apos; method..
+        /// </summary>
+        internal static string Diagnostic_Description_MustImplementRehydrate {
+            get {
+                return ResourceManager.GetString("Diagnostic_Description_MustImplementRehydrate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must have a &apos;public&apos; getter and a &apos;public&apos; setter..
+        /// </summary>
+        internal static string Diagnostic_Description_PropertyMustBeGettableAndSettable {
+            get {
+                return ResourceManager.GetString("Diagnostic_Description_PropertyMustBeGettableAndSettable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must be nullable, and not use `Optional&lt;T&gt;`..
+        /// </summary>
+        internal static string Diagnostic_Description_PropertyMustBeNullableNotOptional {
+            get {
+                return ResourceManager.GetString("Diagnostic_Description_PropertyMustBeNullableNotOptional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must be marked as &apos;required&apos; or be marked nullable..
+        /// </summary>
+        internal static string Diagnostic_Description_PropertyMustBeRequiredOrNullable {
+            get {
+                return ResourceManager.GetString("Diagnostic_Description_PropertyMustBeRequiredOrNullable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must not have a &apos;public&apos; setter..
+        /// </summary>
+        internal static string Diagnostic_Description_PropertyMustBeSettable {
+            get {
+                return ResourceManager.GetString("Diagnostic_Description_PropertyMustBeSettable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Factory method &apos;{0}&apos; must return one of these types: &apos;{1}&apos;.
+        /// </summary>
+        internal static string Diagnostic_MessageFormat_ClassFactoryWrongReturnType {
+            get {
+                return ResourceManager.GetString("Diagnostic_MessageFormat_ClassFactoryWrongReturnType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class &apos;{0}&apos; should be &apos;public&apos;.
+        /// </summary>
+        internal static string Diagnostic_MessageFormat_ClassMustBePublic {
+            get {
+                return ResourceManager.GetString("Diagnostic_MessageFormat_ClassMustBePublic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class &apos;{0}&apos; should be marked as &apos;sealed&apos;.
+        /// </summary>
+        internal static string Diagnostic_MessageFormat_ClassMustBeSealed {
+            get {
+                return ResourceManager.GetString("Diagnostic_MessageFormat_ClassMustBeSealed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class &apos;{0}&apos; must have a public parameterless constructor, for serialization.
+        /// </summary>
+        internal static string Diagnostic_MessageFormat_ClassMustHaveParameterlessConstructor {
+            get {
+                return ResourceManager.GetString("Diagnostic_MessageFormat_ClassMustHaveParameterlessConstructor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Constructor &apos;{0}&apos; must be &apos;private&apos;.
+        /// </summary>
+        internal static string Diagnostic_MessageFormat_ConstructorMustBePrivate {
+            get {
+                return ResourceManager.GetString("Diagnostic_MessageFormat_ConstructorMustBePrivate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class &apos;{0}&apos; must use the &apos;[EntityNameAttribute]&apos;.
+        /// </summary>
+        internal static string Diagnostic_MessageFormat_MustDeclareEntityNameAttribute {
+            get {
+                return ResourceManager.GetString("Diagnostic_MessageFormat_MustDeclareEntityNameAttribute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class &apos;{0}&apos; must implement the &apos;Dehydrate()&apos; method.
+        /// </summary>
+        internal static string Diagnostic_MessageFormat_MustImplementDehydrate {
+            get {
+                return ResourceManager.GetString("Diagnostic_MessageFormat_MustImplementDehydrate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class &apos;{0}&apos; must implement the &apos;Rehydrate()&apos; method.
+        /// </summary>
+        internal static string Diagnostic_MessageFormat_MustImplementRehydrate {
+            get {
+                return ResourceManager.GetString("Diagnostic_MessageFormat_MustImplementRehydrate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must have a &apos;public&apos; getter and &apos;public&apos; setter, for serialization.
+        /// </summary>
+        internal static string Diagnostic_MessageFormat_PropertyMustBeGettableAndSettable {
+            get {
+                return ResourceManager.GetString("Diagnostic_MessageFormat_PropertyMustBeGettableAndSettable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must be nullable, and not use `Optional&lt;T&gt;` for interoperability.
+        /// </summary>
+        internal static string Diagnostic_MessageFormat_PropertyMustBeNullableNotOptional {
+            get {
+                return ResourceManager.GetString("Diagnostic_MessageFormat_PropertyMustBeNullableNotOptional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must be marked as &apos;required&apos; or be marked nullable.
+        /// </summary>
+        internal static string Diagnostic_MessageFormat_PropertyMustBeRequiredOrNullable {
+            get {
+                return ResourceManager.GetString("Diagnostic_MessageFormat_PropertyMustBeRequiredOrNullable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must not have a &apos;public&apos; setter.
+        /// </summary>
+        internal static string Diagnostic_MessageFormat_PropertyMustBeSettable {
+            get {
+                return ResourceManager.GetString("Diagnostic_MessageFormat_PropertyMustBeSettable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong return type.
+        /// </summary>
+        internal static string Diagnostic_Title_ClassFactoryWrongReturnType {
+            get {
+                return ResourceManager.GetString("Diagnostic_Title_ClassFactoryWrongReturnType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class should be &apos;public&apos;.
+        /// </summary>
+        internal static string Diagnostic_Title_ClassMustBePublic {
+            get {
+                return ResourceManager.GetString("Diagnostic_Title_ClassMustBePublic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class should be marked as &apos;sealed&apos;.
+        /// </summary>
+        internal static string Diagnostic_Title_ClassMustBeSealed {
+            get {
+                return ResourceManager.GetString("Diagnostic_Title_ClassMustBeSealed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class must have a &apos;public&apos; parameterless constructor.
+        /// </summary>
+        internal static string Diagnostic_Title_ClassMustHaveParameterlessConstructor {
+            get {
+                return ResourceManager.GetString("Diagnostic_Title_ClassMustHaveParameterlessConstructor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong accessibility.
+        /// </summary>
+        internal static string Diagnostic_Title_ConstructorMustBePrivate {
+            get {
+                return ResourceManager.GetString("Diagnostic_Title_ConstructorMustBePrivate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing &apos;[EntityName]&apos; attribute.
+        /// </summary>
+        internal static string Diagnostic_Title_MustDeclareEntityNameAttribute {
+            get {
+                return ResourceManager.GetString("Diagnostic_Title_MustDeclareEntityNameAttribute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing &apos;Dehydrate()&apos; method.
+        /// </summary>
+        internal static string Diagnostic_Title_MustImplementDehydrate {
+            get {
+                return ResourceManager.GetString("Diagnostic_Title_MustImplementDehydrate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing &apos;Rehydrate()&apos; method.
+        /// </summary>
+        internal static string Diagnostic_Title_MustImplementRehydrate {
+            get {
+                return ResourceManager.GetString("Diagnostic_Title_MustImplementRehydrate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must be both gettable and settable for serialization.
+        /// </summary>
+        internal static string Diagnostic_Title_PropertyMustBeGettableAndSettable {
+            get {
+                return ResourceManager.GetString("Diagnostic_Title_PropertyMustBeGettableAndSettable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong nullable return type.
+        /// </summary>
+        internal static string Diagnostic_Title_PropertyMustBeNullableNotOptional {
+            get {
+                return ResourceManager.GetString("Diagnostic_Title_PropertyMustBeNullableNotOptional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must be marked as &apos;required&apos; or be marked nullable.
+        /// </summary>
+        internal static string Diagnostic_Title_PropertyMustBeRequiredOrNullable {
+            get {
+                return ResourceManager.GetString("Diagnostic_Title_PropertyMustBeRequiredOrNullable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must not be settable.
+        /// </summary>
+        internal static string Diagnostic_Title_PropertyMustBeSettable {
+            get {
+                return ResourceManager.GetString("Diagnostic_Title_PropertyMustBeSettable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This method should return a &apos;Result&lt;T&gt;&apos; type..
         /// </summary>
         internal static string SAS010Description {
             get {
@@ -96,7 +501,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; should have at least one parameter of a type derived from; &apos;IWebRequest&lt;TResponse&gt;&apos;.
+        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; should have at least one parameter of a type derived from: &apos;IWebRequest&lt;TResponse&gt;&apos;.
         /// </summary>
         internal static string SAS011MessageFormat {
             get {
@@ -141,7 +546,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The request type for this service operation should be declared with a &apos;RouteAttribute&apos; on it..
+        ///   Looks up a localized string similar to The request type for this service operation should be declared with a &apos;[RouteAttribute]&apos; on it..
         /// </summary>
         internal static string SAS013Description {
             get {
@@ -150,7 +555,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; has a request type that does not have a &apos;RouteAttribute&apos; on it.
+        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; has a request type that does not have a &apos;[RouteAttribute]&apos; on it.
         /// </summary>
         internal static string SAS013MessageFormat {
             get {
@@ -159,7 +564,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Missing &apos;RouteAttribute&apos; on request type.
+        ///   Looks up a localized string similar to Missing &apos;[RouteAttribute]&apos; on request type.
         /// </summary>
         internal static string SAS013Title {
             get {
@@ -249,7 +654,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The request type should be declared with a &apos;RouteAttribute&apos; on it..
+        ///   Looks up a localized string similar to The request type should be declared with a &apos;[RouteAttribute]&apos; on it..
         /// </summary>
         internal static string SAS017Description {
             get {
@@ -258,7 +663,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Request type &apos;{0}&apos; should declare a &apos;RouteAttribute&apos;.
+        ///   Looks up a localized string similar to Request type &apos;{0}&apos; should declare a &apos;[RouteAttribute]&apos;.
         /// </summary>
         internal static string SAS017MessageFormat {
             get {
@@ -267,7 +672,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Missing &apos;RouteAttribute&apos;.
+        ///   Looks up a localized string similar to Missing &apos;[RouteAttribute]&apos;.
         /// </summary>
         internal static string SAS017Title {
             get {
@@ -276,7 +681,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The request type should be not declare a &apos;AuthorizeAttribute&apos; on it, since the &apos;RouteAttribute&apos; has been configured with &apos;Anonymous&apos; access..
+        ///   Looks up a localized string similar to The request type should be not declare a &apos;[AuthorizeAttribute]&apos; on it, since the &apos;[RouteAttribute]&apos; has been configured with &apos;Anonymous&apos; access..
         /// </summary>
         internal static string SAS018Description {
             get {
@@ -285,7 +690,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Request type &apos;{0}&apos; should not declare a &apos;AuthorizeAttribute&apos;.
+        ///   Looks up a localized string similar to Request type &apos;{0}&apos; should not declare a &apos;[AuthorizeAttribute]&apos;.
         /// </summary>
         internal static string SAS018MessageFormat {
             get {
@@ -294,7 +699,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unexpected &apos;AuthorizeAttribute&apos;.
+        ///   Looks up a localized string similar to Unexpected &apos;[AuthorizeAttribute]&apos;.
         /// </summary>
         internal static string SAS018Title {
             get {
@@ -303,7 +708,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The request type should be declared with a &apos;AuthorizeAttribute&apos; on it to constrain role/feature access to it, since the &apos;RouteAttribute&apos; has been configured with secure access..
+        ///   Looks up a localized string similar to The request type should be declared with a &apos;[AuthorizeAttribute]&apos; on it to constrain role/feature access to it, since the &apos;[RouteAttribute]&apos; has been configured with secure access..
         /// </summary>
         internal static string SAS019Description {
             get {
@@ -312,7 +717,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Request type &apos;{0}&apos; should declare a &apos;AuthorizeAttribute&apos; to constrain role/feature access.
+        ///   Looks up a localized string similar to Request type &apos;{0}&apos; should declare a &apos;[AuthorizeAttribute]&apos; to constrain role/feature access.
         /// </summary>
         internal static string SAS019MessageFormat {
             get {
@@ -321,7 +726,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Missing &apos;AuthorizeAttribute&apos;.
+        ///   Looks up a localized string similar to Missing &apos;[AuthorizeAttribute]&apos;.
         /// </summary>
         internal static string SAS019Title {
             get {
@@ -330,241 +735,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Create() class factory method must return the correct type..
-        /// </summary>
-        internal static string SAS020Description {
-            get {
-                return ResourceManager.GetString("SAS020Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Factory method &apos;{0}&apos; must return one of these types: &apos;{1}&apos;.
-        /// </summary>
-        internal static string SAS020MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS020MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Wrong return type.
-        /// </summary>
-        internal static string SAS020Title {
-            get {
-                return ResourceManager.GetString("SAS020Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Constructor must be private..
-        /// </summary>
-        internal static string SAS021Description {
-            get {
-                return ResourceManager.GetString("SAS021Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Constructor &apos;{0}&apos; must be private.
-        /// </summary>
-        internal static string SAS021MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS021MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Wrong accessibility.
-        /// </summary>
-        internal static string SAS021Title {
-            get {
-                return ResourceManager.GetString("SAS021Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Add missing &apos;Rehydrate&apos; method.
-        /// </summary>
-        internal static string SAS022CodeFixTitle {
-            get {
-                return ResourceManager.GetString("SAS022CodeFixTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Class must implement the Rehydrate() method..
-        /// </summary>
-        internal static string SAS022Description {
-            get {
-                return ResourceManager.GetString("SAS022Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Class &apos;{0}&apos; must implement the Rehydrate() method.
-        /// </summary>
-        internal static string SAS022MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS022MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Missing Rehydrate() method.
-        /// </summary>
-        internal static string SAS022Title {
-            get {
-                return ResourceManager.GetString("SAS022Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Add missing &apos;Dehydrate&apos; method.
-        /// </summary>
-        internal static string SAS023CodeFixTitle {
-            get {
-                return ResourceManager.GetString("SAS023CodeFixTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Class must implement the Dehydrate() method..
-        /// </summary>
-        internal static string SAS023Description {
-            get {
-                return ResourceManager.GetString("SAS023Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Class &apos;{0}&apos; must implement the Dehydrate() method.
-        /// </summary>
-        internal static string SAS023MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS023MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Missing Dehydrate() method.
-        /// </summary>
-        internal static string SAS023Title {
-            get {
-                return ResourceManager.GetString("SAS023Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Add missing &apos;[EntityName]&apos; attribute.
-        /// </summary>
-        internal static string SAS024CodeFixTitle {
-            get {
-                return ResourceManager.GetString("SAS024CodeFixTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Class must declare the [EntityName] attribute..
-        /// </summary>
-        internal static string SAS024Description {
-            get {
-                return ResourceManager.GetString("SAS024Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Class &apos;{0}&apos; must use the [EntityNameAttribute].
-        /// </summary>
-        internal static string SAS024MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS024MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Missing [EntityName] attribute.
-        /// </summary>
-        internal static string SAS024Title {
-            get {
-                return ResourceManager.GetString("SAS024Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Mark this class as sealed.
-        /// </summary>
-        internal static string SAS025CodeFixTitle {
-            get {
-                return ResourceManager.GetString("SAS025CodeFixTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Property must not have a public setter..
-        /// </summary>
-        internal static string SAS025Description {
-            get {
-                return ResourceManager.GetString("SAS025Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Property &apos;{0}&apos; must not have a public setter.
-        /// </summary>
-        internal static string SAS025MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS025MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Property must not be settable.
-        /// </summary>
-        internal static string SAS025Title {
-            get {
-                return ResourceManager.GetString("SAS025Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Class should be marked as sealed..
-        /// </summary>
-        internal static string SAS026Description {
-            get {
-                return ResourceManager.GetString("SAS026Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Class &apos;{0}&apos; should be marked as sealed.
-        /// </summary>
-        internal static string SAS026MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS026MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Class should be marked as sealed.
-        /// </summary>
-        internal static string SAS026Title {
-            get {
-                return ResourceManager.GetString("SAS026Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Add missing &apos;Create&apos; method.
-        /// </summary>
-        internal static string SAS030CodeFixTitle {
-            get {
-                return ResourceManager.GetString("SAS030CodeFixTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Aggregate roots must have at least one Create() class factory method..
+        ///   Looks up a localized string similar to Aggregate roots must have at least one &apos;Create()&apos; class factory method..
         /// </summary>
         internal static string SAS030Description {
             get {
@@ -573,7 +744,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Aggregate root type &apos;{0}&apos; must implement a class factory method called Create() to create new instances.
+        ///   Looks up a localized string similar to Aggregate root type &apos;{0}&apos; must implement a class factory method called &apos;Create()&apos; to create new instances.
         /// </summary>
         internal static string SAS030MessageFormat {
             get {
@@ -582,7 +753,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Missing Create() method.
+        ///   Looks up a localized string similar to Missing &apos;Create()&apos; method.
         /// </summary>
         internal static string SAS030Title {
             get {
@@ -618,16 +789,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add missing &apos;Create&apos; method.
-        /// </summary>
-        internal static string SAS040CodeFixTitle {
-            get {
-                return ResourceManager.GetString("SAS040CodeFixTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Entities must have at least one Create() class factory method..
+        ///   Looks up a localized string similar to Entities must have at least one &apos;Create()&apos; class factory method..
         /// </summary>
         internal static string SAS040Description {
             get {
@@ -636,7 +798,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Entity type &apos;{0}&apos; must implement a class factory method called Create() to create new instances.
+        ///   Looks up a localized string similar to Entity type &apos;{0}&apos; must implement a class factory method called &apos;Create()&apos; to create new instances.
         /// </summary>
         internal static string SAS040MessageFormat {
             get {
@@ -645,7 +807,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Missing Create() method.
+        ///   Looks up a localized string similar to Missing &apos;Create()&apos; method.
         /// </summary>
         internal static string SAS040Title {
             get {
@@ -654,16 +816,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add missing &apos;Create&apos; method.
-        /// </summary>
-        internal static string SAS050CodeFixTitle {
-            get {
-                return ResourceManager.GetString("SAS050CodeFixTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ValueObjects must have at least one Create() class factory method..
+        ///   Looks up a localized string similar to ValueObjects must have at least one &apos;Create()&apos; class factory method..
         /// </summary>
         internal static string SAS050Description {
             get {
@@ -672,7 +825,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ValueObject type &apos;{0}&apos; must implement a class factory method called Create() to create new instances.
+        ///   Looks up a localized string similar to ValueObject type &apos;{0}&apos; must implement a class factory method called &apos;Create()&apos; to create new instances.
         /// </summary>
         internal static string SAS050MessageFormat {
             get {
@@ -681,7 +834,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Missing Create() method.
+        ///   Looks up a localized string similar to Missing &apos;Create()&apos; method.
         /// </summary>
         internal static string SAS050Title {
             get {
@@ -717,20 +870,218 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Suppress with &apos;SkipImmutabilityCheck&apos; attribute.
+        ///   Looks up a localized string similar to Domain Event must be named in the past tense, as they occured in the past..
         /// </summary>
-        internal static string SAS060CodeFixTitle {
+        internal static string SAS063Description {
             get {
-                return ResourceManager.GetString("SAS060CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("SAS063Description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Change return type of the method.
+        ///   Looks up a localized string similar to Domain Event &apos;{0}&apos; must be named in the past tense.
         /// </summary>
-        internal static string SAS062CodeFixTitle {
+        internal static string SAS063MessageFormat {
             get {
-                return ResourceManager.GetString("SAS062CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("SAS063MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Domain Event must be named in the past tense.
+        /// </summary>
+        internal static string SAS063Title {
+            get {
+                return ResourceManager.GetString("SAS063Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DomainEvent must have at least one &apos;Create()&apos; class factory method..
+        /// </summary>
+        internal static string SAS064Description {
+            get {
+                return ResourceManager.GetString("SAS064Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DomainEvent type &apos;{0}&apos; must implement a class factory method called &apos;Create()&apos; to create new instances.
+        /// </summary>
+        internal static string SAS064MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS064MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing &apos;Create()&apos; method.
+        /// </summary>
+        internal static string SAS064Title {
+            get {
+                return ResourceManager.GetString("SAS064Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create() class factory method must return the correct type..
+        /// </summary>
+        internal static string SAS065Description {
+            get {
+                return ResourceManager.GetString("SAS065Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Factory method &apos;{0}&apos; must return this type: &apos;{1}&apos;.
+        /// </summary>
+        internal static string SAS065MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS065MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong return type.
+        /// </summary>
+        internal static string SAS065Title {
+            get {
+                return ResourceManager.GetString("SAS065Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must be marked &apos;required&apos; or be nullable or be initialized..
+        /// </summary>
+        internal static string SAS067Description {
+            get {
+                return ResourceManager.GetString("SAS067Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must be marked &apos;required&apos; or be nullable or be initialized.
+        /// </summary>
+        internal static string SAS067MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS067MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong declaration.
+        /// </summary>
+        internal static string SAS067Title {
+            get {
+                return ResourceManager.GetString("SAS067Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must have the return the correct type..
+        /// </summary>
+        internal static string SAS069Description {
+            get {
+                return ResourceManager.GetString("SAS069Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must return one of these primitive types: &apos;{1}&apos;, or any Enum, or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types.
+        /// </summary>
+        internal static string SAS069MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS069MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong return type.
+        /// </summary>
+        internal static string SAS069Title {
+            get {
+                return ResourceManager.GetString("SAS069Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must have the return the correct type.
+        /// </summary>
+        internal static string SAS074Description {
+            get {
+                return ResourceManager.GetString("SAS074Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must return one of these primitive types: &apos;{1}&apos;, or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types, or be another type in the &apos;{2}&apos; namespace.
+        /// </summary>
+        internal static string SAS074MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS074MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong return type.
+        /// </summary>
+        internal static string SAS074Title {
+            get {
+                return ResourceManager.GetString("SAS074Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property should be &apos;Optional&lt;T&gt;&apos; not nullable..
+        /// </summary>
+        internal static string SAS084Description {
+            get {
+                return ResourceManager.GetString("SAS084Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; should be &apos;Optional&lt;T&gt;&apos; not nullable.
+        /// </summary>
+        internal static string SAS084MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS084MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong declaration.
+        /// </summary>
+        internal static string SAS084Title {
+            get {
+                return ResourceManager.GetString("SAS084Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must have the return the correct type.
+        /// </summary>
+        internal static string SAS085Description {
+            get {
+                return ResourceManager.GetString("SAS085Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must return one of these primitive types: &apos;{1}&apos;, or any ValueObject, or any Enum, or an Optional&lt;T&gt;/List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types.
+        /// </summary>
+        internal static string SAS085MessageFormat {
+            get {
+                return ResourceManager.GetString("SAS085MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong return type.
+        /// </summary>
+        internal static string SAS085Title {
+            get {
+                return ResourceManager.GetString("SAS085Title", resourceCulture);
             }
         }
     }

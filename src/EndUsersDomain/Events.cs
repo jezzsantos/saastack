@@ -7,7 +7,7 @@ namespace EndUsersDomain;
 
 public static class Events
 {
-    public class Created : IDomainEvent
+    public sealed class Created : IDomainEvent
     {
         public static Created Create(Identifier id, UserClassification classification)
         {
@@ -29,10 +29,10 @@ public static class Events
 
         public required string RootId { get; set; }
 
-        public DateTime OccurredUtc { get; set; }
+        public required DateTime OccurredUtc { get; set; }
     }
 
-    public class Registered : IDomainEvent
+    public sealed class Registered : IDomainEvent
     {
         public static Registered Create(Identifier id, Optional<EmailAddress> username,
             UserClassification classification,
@@ -67,10 +67,10 @@ public static class Events
 
         public required string RootId { get; set; }
 
-        public DateTime OccurredUtc { get; set; }
+        public required DateTime OccurredUtc { get; set; }
     }
 
-    public class MembershipAdded : IDomainEvent
+    public sealed class MembershipAdded : IDomainEvent
     {
         public static MembershipAdded Create(Identifier id, Identifier organizationId, bool isDefault, Roles roles,
             Features features)
@@ -89,9 +89,9 @@ public static class Events
 
         public required List<string> Features { get; set; }
 
-        public bool IsDefault { get; set; }
+        public required bool IsDefault { get; set; }
 
-        public string? MembershipId { get; set; }
+        public required string? MembershipId { get; set; }
 
         public required string OrganizationId { get; set; }
 
@@ -99,10 +99,10 @@ public static class Events
 
         public required string RootId { get; set; }
 
-        public DateTime OccurredUtc { get; set; }
+        public required DateTime OccurredUtc { get; set; }
     }
 
-    public class MembershipDefaultChanged : IDomainEvent
+    public sealed class MembershipDefaultChanged : IDomainEvent
     {
         public static MembershipDefaultChanged Create(Identifier id, Identifier fromMembershipId,
             Identifier toMembershipId)
@@ -122,10 +122,10 @@ public static class Events
 
         public required string RootId { get; set; }
 
-        public DateTime OccurredUtc { get; set; }
+        public required DateTime OccurredUtc { get; set; }
     }
 
-    public class MembershipRoleAssigned : IDomainEvent
+    public sealed class MembershipRoleAssigned : IDomainEvent
     {
         public static MembershipRoleAssigned Create(Identifier id, Identifier organizationId, Identifier membershipId,
             Role role)
@@ -148,10 +148,10 @@ public static class Events
 
         public required string RootId { get; set; }
 
-        public DateTime OccurredUtc { get; set; }
+        public required DateTime OccurredUtc { get; set; }
     }
 
-    public class MembershipFeatureAssigned : IDomainEvent
+    public sealed class MembershipFeatureAssigned : IDomainEvent
     {
         public static MembershipFeatureAssigned Create(Identifier id, Identifier organizationId,
             Identifier membershipId, Feature feature)
@@ -174,10 +174,10 @@ public static class Events
 
         public required string RootId { get; set; }
 
-        public DateTime OccurredUtc { get; set; }
+        public required DateTime OccurredUtc { get; set; }
     }
 
-    public class PlatformRoleAssigned : IDomainEvent
+    public sealed class PlatformRoleAssigned : IDomainEvent
     {
         public static PlatformRoleAssigned Create(Identifier id, Role role)
         {
@@ -193,10 +193,10 @@ public static class Events
 
         public required string RootId { get; set; }
 
-        public DateTime OccurredUtc { get; set; }
+        public required DateTime OccurredUtc { get; set; }
     }
 
-    public class PlatformFeatureAssigned : IDomainEvent
+    public sealed class PlatformFeatureAssigned : IDomainEvent
     {
         public static PlatformFeatureAssigned Create(Identifier id, Feature feature)
         {
@@ -212,6 +212,6 @@ public static class Events
 
         public required string RootId { get; set; }
 
-        public DateTime OccurredUtc { get; set; }
+        public required DateTime OccurredUtc { get; set; }
     }
 }

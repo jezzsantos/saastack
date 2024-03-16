@@ -8,7 +8,7 @@ public static class Events
 {
     public static class EmailDelivery
     {
-        public class Created : IDomainEvent
+        public sealed class Created : IDomainEvent
         {
             public static Created Create(Identifier id, QueuedMessageId messageId)
             {
@@ -27,7 +27,7 @@ public static class Events
             public required DateTime OccurredUtc { get; set; }
         }
 
-        public class EmailDetailsChanged : IDomainEvent
+        public sealed class EmailDetailsChanged : IDomainEvent
         {
             public static EmailDetailsChanged Create(Identifier id, string subject, string body, EmailRecipient to)
             {
@@ -55,7 +55,7 @@ public static class Events
             public required DateTime OccurredUtc { get; set; }
         }
 
-        public class DeliveryAttempted : IDomainEvent
+        public sealed class DeliveryAttempted : IDomainEvent
         {
             public static DeliveryAttempted Create(Identifier id, DateTime when)
             {
@@ -74,7 +74,7 @@ public static class Events
             public required string RootId { get; set; }
         }
 
-        public class DeliveryFailed : IDomainEvent
+        public sealed class DeliveryFailed : IDomainEvent
         {
             public static DeliveryFailed Create(Identifier id, DateTime when)
             {
@@ -93,7 +93,7 @@ public static class Events
             public required string RootId { get; set; }
         }
 
-        public class DeliverySucceeded : IDomainEvent
+        public sealed class DeliverySucceeded : IDomainEvent
         {
             public static DeliverySucceeded Create(Identifier id, DateTime when)
             {
@@ -115,7 +115,7 @@ public static class Events
 
     public static class Audits
     {
-        public class Created : IDomainEvent
+        public sealed class Created : IDomainEvent
         {
             public static Created Create(Identifier id, Identifier againstId, Optional<Identifier> organizationId,
                 string auditCode, Optional<string> messageTemplate, TemplateArguments templateArguments)

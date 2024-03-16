@@ -25,8 +25,117 @@
         </value>
     </resheader>
     <!-- ReSharper disable DuplicateResource -->
+    <data name="Diagnostic_Description_ClassFactoryWrongReturnType" xml:space="preserve">
+        <value>Create() class factory method must return the correct type.</value>
+    </data>
+    <data name="Diagnostic_MessageFormat_ClassFactoryWrongReturnType" xml:space="preserve">
+        <value>Factory method '{0}' must return one of these types: '{1}'</value>
+    </data>
+    <data name="Diagnostic_Title_ClassFactoryWrongReturnType" xml:space="preserve">
+        <value>Wrong return type</value>
+    </data>
+    <data name="Diagnostic_Description_ConstructorMustBePrivate" xml:space="preserve">
+        <value>Constructor must be 'private'.</value>
+    </data>
+    <data name="Diagnostic_MessageFormat_ConstructorMustBePrivate" xml:space="preserve">
+        <value>Constructor '{0}' must be 'private'</value>
+    </data>
+    <data name="Diagnostic_Title_ConstructorMustBePrivate" xml:space="preserve">
+        <value>Wrong accessibility</value>
+    </data>
+    <data name="Diagnostic_Description_MustImplementRehydrate" xml:space="preserve">
+        <value>Class must implement the 'Rehydrate()' method.</value>
+    </data>
+    <data name="Diagnostic_MessageFormat_MustImplementRehydrate" xml:space="preserve">
+        <value>Class '{0}' must implement the 'Rehydrate()' method</value>
+    </data>
+    <data name="Diagnostic_Title_MustImplementRehydrate" xml:space="preserve">
+        <value>Missing 'Rehydrate()' method</value>
+    </data>
+    <data name="Diagnostic_Description_MustImplementDehydrate" xml:space="preserve">
+        <value>Class must implement the 'Dehydrate()' method.</value>
+    </data>
+    <data name="Diagnostic_MessageFormat_MustImplementDehydrate" xml:space="preserve">
+        <value>Class '{0}' must implement the 'Dehydrate()' method</value>
+    </data>
+    <data name="Diagnostic_Title_MustImplementDehydrate" xml:space="preserve">
+        <value>Missing 'Dehydrate()' method</value>
+    </data>
+    <data name="Diagnostic_Description_MustDeclareEntityNameAttribute" xml:space="preserve">
+        <value>Class must declare the '[EntityName]' attribute.</value>
+    </data>
+    <data name="Diagnostic_MessageFormat_MustDeclareEntityNameAttribute" xml:space="preserve">
+        <value>Class '{0}' must use the '[EntityNameAttribute]'</value>
+    </data>
+    <data name="Diagnostic_Title_MustDeclareEntityNameAttribute" xml:space="preserve">
+        <value>Missing '[EntityName]' attribute</value>
+    </data>
+    <data name="Diagnostic_Description_PropertyMustBeSettable" xml:space="preserve">
+        <value>Property must not have a 'public' setter.</value>
+    </data>
+    <data name="Diagnostic_MessageFormat_PropertyMustBeSettable" xml:space="preserve">
+        <value>Property '{0}' must not have a 'public' setter</value>
+    </data>
+    <data name="Diagnostic_Title_PropertyMustBeSettable" xml:space="preserve">
+        <value>Property must not be settable</value>
+    </data>
+    <data name="Diagnostic_Description_ClassMustBeSealed" xml:space="preserve">
+        <value>Class should be marked as 'sealed'.</value>
+    </data>
+    <data name="Diagnostic_MessageFormat_ClassMustBeSealed" xml:space="preserve">
+        <value>Class '{0}' should be marked as 'sealed'</value>
+    </data>
+    <data name="Diagnostic_Title_ClassMustBeSealed" xml:space="preserve">
+        <value>Class should be marked as 'sealed'</value>
+    </data>
+    <data name="Diagnostic_Description_ClassMustBePublic" xml:space="preserve">
+        <value>Class should be 'public'.</value>
+    </data>
+    <data name="Diagnostic_MessageFormat_ClassMustBePublic" xml:space="preserve">
+        <value>Class '{0}' should be 'public'</value>
+    </data>
+    <data name="Diagnostic_Title_ClassMustBePublic" xml:space="preserve">
+        <value>Class should be 'public'</value>
+    </data>
+    <data name="Diagnostic_Description_ClassMustHaveParameterlessConstructor" xml:space="preserve">
+        <value>Class must have a 'public' parameterless constructor.</value>
+    </data>
+    <data name="Diagnostic_MessageFormat_ClassMustHaveParameterlessConstructor" xml:space="preserve">
+        <value>Class '{0}' must have a public parameterless constructor, for serialization</value>
+    </data>
+    <data name="Diagnostic_Title_ClassMustHaveParameterlessConstructor" xml:space="preserve">
+        <value>Class must have a 'public' parameterless constructor</value>
+    </data>
+    <data name="Diagnostic_Description_PropertyMustBeGettableAndSettable" xml:space="preserve">
+        <value>Property must have a 'public' getter and a 'public' setter.</value>
+    </data>
+    <data name="Diagnostic_MessageFormat_PropertyMustBeGettableAndSettable" xml:space="preserve">
+        <value>Property '{0}' must have a 'public' getter and 'public' setter, for serialization</value>
+    </data>
+    <data name="Diagnostic_Title_PropertyMustBeGettableAndSettable" xml:space="preserve">
+        <value>Property must be both gettable and settable for serialization</value>
+    </data>
+    <data name="Diagnostic_Description_PropertyMustBeRequiredOrNullable" xml:space="preserve">
+        <value>Property must be marked as 'required' or be marked nullable.</value>
+    </data>
+    <data name="Diagnostic_MessageFormat_PropertyMustBeRequiredOrNullable" xml:space="preserve">
+        <value>Property '{0}' must be marked as 'required' or be marked nullable</value>
+    </data>
+    <data name="Diagnostic_Title_PropertyMustBeRequiredOrNullable" xml:space="preserve">
+        <value>Property must be marked as 'required' or be marked nullable</value>
+    </data>
+    <data name="Diagnostic_Description_PropertyMustBeNullableNotOptional" xml:space="preserve">
+        <value>Property must be nullable, and not use `Optional&lt;T&gt;`.</value>
+    </data>
+    <data name="Diagnostic_MessageFormat_PropertyMustBeNullableNotOptional" xml:space="preserve">
+        <value>Property '{0}' must be nullable, and not use `Optional&lt;T&gt;` for interoperability</value>
+    </data>
+    <data name="Diagnostic_Title_PropertyMustBeNullableNotOptional" xml:space="preserve">
+        <value>Wrong nullable return type</value>
+    </data>
+
     <data name="SAS010Description" xml:space="preserve">
-        <value>This method should return a Result type.</value>
+        <value>This method should return a 'Result&lt;T&gt;' type.</value>
     </data>
     <data name="SAS010MessageFormat" xml:space="preserve">
         <value>If method '{0}' is supposed to be a service operation, then it should return one of these possible types: '{1}'</value>
@@ -38,7 +147,7 @@
         <value>This service operation should have at least one parameter, and that parameter should be derived from: 'IWebRequest&lt;TResponse&gt;'.</value>
     </data>
     <data name="SAS011MessageFormat" xml:space="preserve">
-        <value>Service operation '{0}' should have at least one parameter of a type derived from; 'IWebRequest&lt;TResponse&gt;'</value>
+        <value>Service operation '{0}' should have at least one parameter of a type derived from: 'IWebRequest&lt;TResponse&gt;'</value>
     </data>
     <data name="SAS011Title" xml:space="preserve">
         <value>Missing first parameter or wrong parameter type</value>
@@ -53,13 +162,13 @@
         <value>Wrong second parameter type</value>
     </data>
     <data name="SAS013Description" xml:space="preserve">
-        <value>The request type for this service operation should be declared with a 'RouteAttribute' on it.</value>
+        <value>The request type for this service operation should be declared with a '[RouteAttribute]' on it.</value>
     </data>
     <data name="SAS013MessageFormat" xml:space="preserve">
-        <value>Service operation '{0}' has a request type that does not have a 'RouteAttribute' on it</value>
+        <value>Service operation '{0}' has a request type that does not have a '[RouteAttribute]' on it</value>
     </data>
     <data name="SAS013Title" xml:space="preserve">
-        <value>Missing 'RouteAttribute' on request type</value>
+        <value>Missing '[RouteAttribute]' on request type</value>
     </data>
     <data name="SAS014Description" xml:space="preserve">
         <value>This service operation has a route declared on its request that is different from other service operations in this class.</value>
@@ -89,103 +198,40 @@
         <value>Unexpected return type for operation</value>
     </data>
     <data name="SAS017Description" xml:space="preserve">
-        <value>The request type should be declared with a 'RouteAttribute' on it.</value>
+        <value>The request type should be declared with a '[RouteAttribute]' on it.</value>
     </data>
     <data name="SAS017MessageFormat" xml:space="preserve">
-        <value>Request type '{0}' should declare a 'RouteAttribute'</value>
+        <value>Request type '{0}' should declare a '[RouteAttribute]'</value>
     </data>
     <data name="SAS017Title" xml:space="preserve">
-        <value>Missing 'RouteAttribute'</value>
+        <value>Missing '[RouteAttribute]'</value>
     </data>
     <data name="SAS018Description" xml:space="preserve">
-        <value>The request type should be not declare a 'AuthorizeAttribute' on it, since the 'RouteAttribute' has been configured with 'Anonymous' access.</value>
+        <value>The request type should be not declare a '[AuthorizeAttribute]' on it, since the '[RouteAttribute]' has been configured with 'Anonymous' access.</value>
     </data>
     <data name="SAS018MessageFormat" xml:space="preserve">
-        <value>Request type '{0}' should not declare a 'AuthorizeAttribute'</value>
+        <value>Request type '{0}' should not declare a '[AuthorizeAttribute]'</value>
     </data>
     <data name="SAS018Title" xml:space="preserve">
-        <value>Unexpected 'AuthorizeAttribute'</value>
+        <value>Unexpected '[AuthorizeAttribute]'</value>
     </data>
     <data name="SAS019Description" xml:space="preserve">
-        <value>The request type should be declared with a 'AuthorizeAttribute' on it to constrain role/feature access to it, since the 'RouteAttribute' has been configured with secure access.</value>
+        <value>The request type should be declared with a '[AuthorizeAttribute]' on it to constrain role/feature access to it, since the '[RouteAttribute]' has been configured with secure access.</value>
     </data>
     <data name="SAS019MessageFormat" xml:space="preserve">
-        <value>Request type '{0}' should declare a 'AuthorizeAttribute' to constrain role/feature access</value>
+        <value>Request type '{0}' should declare a '[AuthorizeAttribute]' to constrain role/feature access</value>
     </data>
     <data name="SAS019Title" xml:space="preserve">
-        <value>Missing 'AuthorizeAttribute'</value>
-    </data>
-    <data name="SAS020Description" xml:space="preserve">
-        <value>Create() class factory method must return the correct type.</value>
-    </data>
-    <data name="SAS020MessageFormat" xml:space="preserve">
-        <value>Factory method '{0}' must return one of these types: '{1}'</value>
-    </data>
-    <data name="SAS020Title" xml:space="preserve">
-        <value>Wrong return type</value>
-    </data>
-    <data name="SAS021Description" xml:space="preserve">
-        <value>Constructor must be private.</value>
-    </data>
-    <data name="SAS021MessageFormat" xml:space="preserve">
-        <value>Constructor '{0}' must be private</value>
-    </data>
-    <data name="SAS021Title" xml:space="preserve">
-        <value>Wrong accessibility</value>
-    </data>
-    <data name="SAS022Description" xml:space="preserve">
-        <value>Class must implement the Rehydrate() method.</value>
-    </data>
-    <data name="SAS022MessageFormat" xml:space="preserve">
-        <value>Class '{0}' must implement the Rehydrate() method</value>
-    </data>
-    <data name="SAS022Title" xml:space="preserve">
-        <value>Missing Rehydrate() method</value>
-    </data>
-    <data name="SAS023Description" xml:space="preserve">
-        <value>Class must implement the Dehydrate() method.</value>
-    </data>
-    <data name="SAS023MessageFormat" xml:space="preserve">
-        <value>Class '{0}' must implement the Dehydrate() method</value>
-    </data>
-    <data name="SAS023Title" xml:space="preserve">
-        <value>Missing Dehydrate() method</value>
-    </data>
-    <data name="SAS024Description" xml:space="preserve">
-        <value>Class must declare the [EntityName] attribute.</value>
-    </data>
-    <data name="SAS024MessageFormat" xml:space="preserve">
-        <value>Class '{0}' must use the [EntityNameAttribute]</value>
-    </data>
-    <data name="SAS024Title" xml:space="preserve">
-        <value>Missing [EntityName] attribute</value>
-    </data>
-    <data name="SAS025Description" xml:space="preserve">
-        <value>Property must not have a public setter.</value>
-    </data>
-    <data name="SAS025MessageFormat" xml:space="preserve">
-        <value>Property '{0}' must not have a public setter</value>
-    </data>
-    <data name="SAS025Title" xml:space="preserve">
-        <value>Property must not be settable</value>
-    </data>
-    <data name="SAS026Description" xml:space="preserve">
-        <value>Class should be marked as sealed.</value>
-    </data>
-    <data name="SAS026MessageFormat" xml:space="preserve">
-        <value>Class '{0}' should be marked as sealed</value>
-    </data>
-    <data name="SAS026Title" xml:space="preserve">
-        <value>Class should be marked as sealed</value>
+        <value>Missing '[AuthorizeAttribute]'</value>
     </data>
     <data name="SAS030Description" xml:space="preserve">
-        <value>Aggregate roots must have at least one Create() class factory method.</value>
+        <value>Aggregate roots must have at least one 'Create()' class factory method.</value>
     </data>
     <data name="SAS030MessageFormat" xml:space="preserve">
-        <value>Aggregate root type '{0}' must implement a class factory method called Create() to create new instances</value>
+        <value>Aggregate root type '{0}' must implement a class factory method called 'Create()' to create new instances</value>
     </data>
     <data name="SAS030Title" xml:space="preserve">
-        <value>Missing Create() method</value>
+        <value>Missing 'Create()' method</value>
     </data>
     <data name="SAS032Description" xml:space="preserve">
         <value>Create() class factory method must call specific code.</value>
@@ -197,22 +243,22 @@
         <value>Missing required call to method</value>
     </data>
     <data name="SAS040Description" xml:space="preserve">
-        <value>Entities must have at least one Create() class factory method.</value>
+        <value>Entities must have at least one 'Create()' class factory method.</value>
     </data>
     <data name="SAS040MessageFormat" xml:space="preserve">
-        <value>Entity type '{0}' must implement a class factory method called Create() to create new instances</value>
+        <value>Entity type '{0}' must implement a class factory method called 'Create()' to create new instances</value>
     </data>
     <data name="SAS040Title" xml:space="preserve">
-        <value>Missing Create() method</value>
+        <value>Missing 'Create()' method</value>
     </data>
     <data name="SAS050Description" xml:space="preserve">
-        <value>ValueObjects must have at least one Create() class factory method.</value>
+        <value>ValueObjects must have at least one 'Create()' class factory method.</value>
     </data>
     <data name="SAS050MessageFormat" xml:space="preserve">
-        <value>ValueObject type '{0}' must implement a class factory method called Create() to create new instances</value>
+        <value>ValueObject type '{0}' must implement a class factory method called 'Create()' to create new instances</value>
     </data>
     <data name="SAS050Title" xml:space="preserve">
-        <value>Missing Create() method</value>
+        <value>Missing 'Create()' method</value>
     </data>
     <data name="SAS055Description" xml:space="preserve">
         <value>Method must not mutate the ValueObject.</value>
@@ -223,31 +269,104 @@
     <data name="SAS055Title" xml:space="preserve">
         <value>Method mutates ValueObject state</value>
     </data>
-    <data name="SAS022CodeFixTitle" xml:space="preserve">
-        <value>Add missing 'Rehydrate' method</value>
+    <data name="SAS063Description" xml:space="preserve">
+        <value>Domain Event must be named in the past tense, as they occured in the past.</value>
     </data>
-    <data name="SAS023CodeFixTitle" xml:space="preserve">
-        <value>Add missing 'Dehydrate' method</value>
+    <data name="SAS063MessageFormat" xml:space="preserve">
+        <value>Domain Event '{0}' must be named in the past tense</value>
     </data>
-    <data name="SAS024CodeFixTitle" xml:space="preserve">
+    <data name="SAS063Title" xml:space="preserve">
+        <value>Domain Event must be named in the past tense</value>
+    </data>
+    <data name="SAS064Description" xml:space="preserve">
+        <value>DomainEvent must have at least one 'Create()' class factory method.</value>
+    </data>
+    <data name="SAS064MessageFormat" xml:space="preserve">
+        <value>DomainEvent type '{0}' must implement a class factory method called 'Create()' to create new instances</value>
+    </data>
+    <data name="SAS064Title" xml:space="preserve">
+        <value>Missing 'Create()' method</value>
+    </data>
+    <data name="SAS065Description" xml:space="preserve">
+        <value>Create() class factory method must return the correct type.</value>
+    </data>
+    <data name="SAS065MessageFormat" xml:space="preserve">
+        <value>Factory method '{0}' must return this type: '{1}'</value>
+    </data>
+    <data name="SAS065Title" xml:space="preserve">
+        <value>Wrong return type</value>
+    </data>
+    <data name="SAS067Description" xml:space="preserve">
+        <value>Property must be marked 'required' or be nullable or be initialized.</value>
+    </data>
+    <data name="SAS067MessageFormat" xml:space="preserve">
+        <value>Property '{0}' must be marked 'required' or be nullable or be initialized</value>
+    </data>
+    <data name="SAS067Title" xml:space="preserve">
+        <value>Wrong declaration</value>
+    </data>
+    <data name="SAS069Description" xml:space="preserve">
+        <value>Property must have the return the correct type.</value>
+    </data>
+    <data name="SAS069MessageFormat" xml:space="preserve">
+        <value>Property '{0}' must return one of these primitive types: '{1}', or any Enum, or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types</value>
+    </data>
+    <data name="SAS069Title" xml:space="preserve">
+        <value>Wrong return type</value>
+    </data>
+    <data name="SAS074Description" xml:space="preserve">
+        <value>Property must have the return the correct type</value>
+    </data>
+    <data name="SAS074MessageFormat" xml:space="preserve">
+        <value>Property '{0}' must return one of these primitive types: '{1}', or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types, or be another type in the '{2}' namespace</value>
+    </data>
+    <data name="SAS074Title" xml:space="preserve">
+        <value>Wrong return type</value>
+    </data>
+    <data name="SAS084Description" xml:space="preserve">
+        <value>Property should be 'Optional&lt;T&gt;' not nullable.</value>
+    </data>
+    <data name="SAS084MessageFormat" xml:space="preserve">
+        <value>Property '{0}' should be 'Optional&lt;T&gt;' not nullable</value>
+    </data>
+    <data name="SAS084Title" xml:space="preserve">
+        <value>Wrong declaration</value>
+    </data>
+    <data name="SAS085Description" xml:space="preserve">
+        <value>Property must have the return the correct type</value>
+    </data>
+    <data name="SAS085MessageFormat" xml:space="preserve">
+        <value>Property '{0}' must return one of these primitive types: '{1}', or any ValueObject, or any Enum, or an Optional&lt;T&gt;/List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types</value>
+    </data>
+    <data name="SAS085Title" xml:space="preserve">
+        <value>Wrong return type</value>
+    </data>
+
+    <data name="CodeFix_Title_AddRehydrateMethod" xml:space="preserve">
+        <value>Add missing 'Rehydrate()' method</value>
+    </data>
+    <data name="CodeFix_Title_AddDehydrateMethodToEntity" xml:space="preserve">
+        <value>Add missing 'Dehydrate()' method</value>
+    </data>
+    <data name="CodeFix_Title_AddClassFactoryMethodToAggregate" xml:space="preserve">
+        <value>Add missing 'Create' method</value>
+    </data>
+    <data name="CodeFix_Title_AddClassFactoryMethodToEntity" xml:space="preserve">
+        <value>Add missing 'Create' method</value>
+    </data>
+    <data name="CodeFix_Title_AddClassFactoryMethodToValueObject" xml:space="preserve">
+        <value>Add missing 'Create' method</value>
+    </data>
+    <data name="CodeFix_Title_AddEntityValueAttributeToEntiyOrAggregate" xml:space="preserve">
         <value>Add missing '[EntityName]' attribute</value>
     </data>
-    <data name="SAS025CodeFixTitle" xml:space="preserve">
-        <value>Mark this class as sealed</value>
+    <data name="CodeFix_Title_AddSealedToClass" xml:space="preserve">
+        <value>Mark this class as 'sealed'</value>
     </data>
-    <data name="SAS030CodeFixTitle" xml:space="preserve">
-        <value>Add missing 'Create' method</value>
+    <data name="CodeFix_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod" xml:space="preserve">
+        <value>Suppress with '[SkipImmutabilityCheck]' attribute</value>
     </data>
-    <data name="SAS040CodeFixTitle" xml:space="preserve">
-        <value>Add missing 'Create' method</value>
-    </data>
-    <data name="SAS050CodeFixTitle" xml:space="preserve">
-        <value>Add missing 'Create' method</value>
-    </data>
-    <data name="SAS060CodeFixTitle" xml:space="preserve">
-        <value>Suppress with 'SkipImmutabilityCheck' attribute</value>
-    </data>
-    <data name="SAS062CodeFixTitle" xml:space="preserve">
+    <data name="CodeFix_Title_ChangeValueObjectMethodReturnType" xml:space="preserve">
         <value>Change return type of the method</value>
     </data>
 </root>

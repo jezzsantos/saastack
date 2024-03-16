@@ -33,7 +33,7 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -53,7 +53,7 @@ public class AClass : AggregateRootBase
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }
-public class Created : IDomainEvent
+public sealed class Created : IDomainEvent
 {
     public static Created Create(Identifier id, Identifier organizationId)
     {
@@ -65,11 +65,11 @@ public class Created : IDomainEvent
         };
     }
 
-    public string RootId { get; set; }
+    public required string OrganizationId { get; set; }
 
-    public string OrganizationId { get; set; }
+    public required string RootId { get; set; }
 
-    public DateTime OccurredUtc { get; set; }
+    public required DateTime OccurredUtc { get; set; }
 }";
                 const string fix = @"
 using System;
@@ -84,7 +84,7 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     public static Result<AClass, Error> Create(IRecorder recorder, IIdentifierFactory idFactory, Identifier organizationId)
     {
@@ -110,7 +110,7 @@ public class AClass : AggregateRootBase
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }
-public class Created : IDomainEvent
+public sealed class Created : IDomainEvent
 {
     public static Created Create(Identifier id, Identifier organizationId)
     {
@@ -122,16 +122,16 @@ public class Created : IDomainEvent
         };
     }
 
-    public string RootId { get; set; }
+    public required string OrganizationId { get; set; }
 
-    public string OrganizationId { get; set; }
+    public required string RootId { get; set; }
 
-    public DateTime OccurredUtc { get; set; }
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas030,
-                    problem, fix, 14, 14, "AClass");
+                    problem, fix, 14, 21, "AClass");
             }
         }
 
@@ -156,7 +156,7 @@ using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -174,7 +174,7 @@ public class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -183,11 +183,20 @@ public class AClass : AggregateRootBase
         return base.Dehydrate();
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
                 const string fix = @"
 using System;
@@ -204,7 +213,7 @@ using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -222,7 +231,7 @@ public class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -236,16 +245,25 @@ public class AClass : AggregateRootBase
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas034,
-                    problem, fix, 16, 14, "AClass");
+                    problem, fix, 16, 21, "AClass");
             }
 
             [Fact]
@@ -261,7 +279,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -279,15 +297,24 @@ public class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
                 const string fix = @"
 using System;
@@ -299,7 +326,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -317,7 +344,7 @@ public class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -326,16 +353,25 @@ public class AClass : AggregateRootBase
         return (identifier, container, properties) => new AClass(container.GetRequiredService<IRecorder>(), container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas034,
-                    problem, fix, 11, 14, "AClass");
+                    problem, fix, 11, 21, "AClass");
             }
         }
 
@@ -360,7 +396,7 @@ using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -378,7 +414,7 @@ public class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -387,11 +423,20 @@ public class AClass : AggregateRootBase
         return (identifier, container, properties) => new AClass(identifier, container, properties);
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
                 const string fix = @"
 using System;
@@ -408,7 +453,7 @@ using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -426,7 +471,7 @@ public class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -441,16 +486,25 @@ public class AClass : AggregateRootBase
         return properties;
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas035,
-                    problem, fix, 16, 14, "AClass");
+                    problem, fix, 16, 21, "AClass");
             }
         }
 
@@ -474,7 +528,7 @@ using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -492,7 +546,7 @@ public class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -507,11 +561,20 @@ public class AClass : AggregateRootBase
         return properties;
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
                 const string fix = @"
 using System;
@@ -529,7 +592,7 @@ using QueryAny;
 namespace ANamespace;
 
 [EntityNameAttribute(""AClass"")]
-public class AClass : AggregateRootBase
+public sealed class AClass : AggregateRootBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory) : base(recorder, idFactory)
     {
@@ -547,7 +610,7 @@ public class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -562,16 +625,25 @@ public class AClass : AggregateRootBase
         return properties;
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas036,
-                    problem, fix, 15, 14, "AClass");
+                    problem, fix, 15, 21, "AClass");
             }
         }
 
@@ -615,7 +687,7 @@ public class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -630,11 +702,20 @@ public class AClass : AggregateRootBase
         return properties;
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
                 const string fix = @"
 using System;
@@ -670,7 +751,7 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -685,11 +766,20 @@ public sealed class AClass : AggregateRootBase
         return properties;
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
@@ -721,7 +811,7 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -754,7 +844,7 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     public static Result<AClass, Error> Create(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler)
     {
@@ -781,7 +871,7 @@ public class AClass : EntityBase
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas040,
-                    problem, fix, 14, 14, "AClass");
+                    problem, fix, 14, 21, "AClass");
             }
         }
 
@@ -806,7 +896,7 @@ using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -846,7 +936,7 @@ using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
 [EntityName(""AClass"")]
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -879,7 +969,7 @@ public class AClass : EntityBase
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas043,
-                    problem, fix, 16, 14, "AClass");
+                    problem, fix, 16, 21, "AClass");
             }
         }
 
@@ -903,7 +993,7 @@ using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
 using QueryAny;
 namespace ANamespace;
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -949,7 +1039,7 @@ using QueryAny;
 namespace ANamespace;
 
 [EntityNameAttribute(""AClass"")]
-public class AClass : EntityBase
+public sealed class AClass : EntityBase
 {
     private AClass(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
@@ -982,7 +1072,7 @@ public class AClass : EntityBase
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas045,
-                    problem, fix, 15, 14, "AClass");
+                    problem, fix, 15, 21, "AClass");
             }
         }
 
@@ -1114,7 +1204,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : SingleValueObjectBase<AClass, string>
+public sealed class AClass : SingleValueObjectBase<AClass, string>
 {
     private AClass(string avalue1): base(avalue1)
     {
@@ -1145,7 +1235,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : SingleValueObjectBase<AClass, string>
+public sealed class AClass : SingleValueObjectBase<AClass, string>
 {
     public static Result<AClass, Error> Create(string value)
     {
@@ -1175,7 +1265,7 @@ public class AClass : SingleValueObjectBase<AClass, string>
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas050,
-                    problem, fix, 14, 14, "AClass");
+                    problem, fix, 14, 21, "AClass");
             }
 
             [Fact]
@@ -1194,7 +1284,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     protected override IEnumerable<object?> GetAtomicValues()
     {
@@ -1225,7 +1315,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     public static Result<AClass, Error> Create(string value1, string value2, string value3)
     {
@@ -1259,7 +1349,7 @@ public class AClass : ValueObjectBase<AClass>
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas050,
-                    problem, fix, 14, 14, "AClass");
+                    problem, fix, 14, 21, "AClass");
             }
         }
 
@@ -1280,7 +1370,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : SingleValueObjectBase<AClass, string>
+public sealed class AClass : SingleValueObjectBase<AClass, string>
 {
     private AClass(string avalue1): base(avalue1)
     {
@@ -1305,7 +1395,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : SingleValueObjectBase<AClass, string>
+public sealed class AClass : SingleValueObjectBase<AClass, string>
 {
     private AClass(string avalue1): base(avalue1)
     {
@@ -1331,7 +1421,7 @@ public class AClass : SingleValueObjectBase<AClass, string>
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas053,
-                    problem, fix, 12, 14, "AClass");
+                    problem, fix, 12, 21, "AClass");
             }
 
             [Fact]
@@ -1348,7 +1438,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue1, string avalue2, string avalue3)
     {
@@ -1378,7 +1468,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue1, string avalue2, string avalue3)
     {
@@ -1408,7 +1498,8 @@ public class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas053, problem, fix, 12, 14, "AClass");
+                    DomainDrivenDesignAnalyzer.Sas053,
+                    problem, fix, 12, 21, "AClass");
             }
         }
 
@@ -1416,105 +1507,6 @@ public class AClass : ValueObjectBase<AClass>
         public class GivenRuleSas055
         {
             [Fact(Skip = "see: https://github.com/dotnet/roslyn/issues/72535")]
-            public async Task WhenFixingWrongReturnTypeWithAttribute_ThenAddsAttribute()
-            {
-                const string problem = @"
-using System;
-using System.Collections.Generic;
-using Common;
-using Domain.Common;
-using Domain.Common.Entities;
-using Domain.Common.Identity;
-using Domain.Common.ValueObjects;
-using Domain.Interfaces.Entities;
-using Domain.Interfaces.Services;
-namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
-{
-    private AClass(string avalue1, string avalue2, string avalue3)
-    {
-        AProperty = avalue1;
-    }
-
-    public static AClass Create()
-    {
-        return new AClass(null!, null!, null!);
-    }
-
-    protected override IEnumerable<object?> GetAtomicValues()
-    {
-        return new object[] { AProperty };
-    }
-
-    public string AProperty { get;}
-
-    public static Domain.Interfaces.ValueObjectFactory<AClass> Rehydrate()
-    {
-        return (property, container) =>
-        {
-            var parts = RehydrateToList(property, false);
-            return new AClass(parts[0], parts[1], parts[2]);
-        };
-    }
-
-    public void AMethod()
-    {
-    }
-}";
-                const string fix = @"
-using System;
-using System.Collections.Generic;
-using Common;
-using Domain.Common;
-using Domain.Common.Entities;
-using Domain.Common.Identity;
-using Domain.Common.ValueObjects;
-using Domain.Interfaces.Entities;
-using Domain.Interfaces.Services;
-namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
-{
-    private AClass(string avalue1, string avalue2, string avalue3)
-    {
-        AProperty = avalue1;
-    }
-
-    public static AClass Create()
-    {
-        return new AClass(null!, null!, null!);
-    }
-
-    protected override IEnumerable<object?> GetAtomicValues()
-    {
-        return new object[] { AProperty };
-    }
-
-    public string AProperty { get;}
-
-    public static Domain.Interfaces.ValueObjectFactory<AClass> Rehydrate()
-    {
-        return (property, container) =>
-        {
-            var parts = RehydrateToList(property, false);
-            return new AClass(parts[0], parts[1], parts[2]);
-        };
-    }
-
-    [Domain.Interfaces.ValueObjects.SkipImmutabilityCheckAttribute]
-    public void AMethod()
-    {
-    }
-}";
-
-                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas055,
-                    Resources.SAS060CodeFixTitle, problem, fix, 40,
-                    17,
-                    "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
-                    nameof(SkipImmutabilityCheckAttribute));
-            }
-
-            [Fact]
             public async Task WhenFixingWrongReturnTypeWithCorrectReturnType_ThenChangesReturnType()
             {
                 const string problem = @"
@@ -1528,7 +1520,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue1, string avalue2, string avalue3)
     {
@@ -1571,7 +1563,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 namespace ANamespace;
-public class AClass : ValueObjectBase<AClass>
+public sealed class AClass : ValueObjectBase<AClass>
 {
     private AClass(string avalue1, string avalue2, string avalue3)
     {
@@ -1607,7 +1599,106 @@ public class AClass : ValueObjectBase<AClass>
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Sas055,
-                    Resources.SAS062CodeFixTitle, problem, fix, 40,
+                    Resources.CodeFix_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod, problem, fix, 40,
+                    17,
+                    "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
+                    nameof(SkipImmutabilityCheckAttribute));
+            }
+
+            [Fact(Skip = "see: https://github.com/dotnet/roslyn/issues/72535")]
+            public async Task WhenFixingWrongReturnTypeWithAttribute_ThenAddsAttribute()
+            {
+                const string problem = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue1, string avalue2, string avalue3)
+    {
+        AProperty = avalue1;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!, null!, null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new object[] { AProperty };
+    }
+
+    public string AProperty { get;}
+
+    public static Domain.Interfaces.ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) =>
+        {
+            var parts = RehydrateToList(property, false);
+            return new AClass(parts[0], parts[1], parts[2]);
+        };
+    }
+
+    public void AMethod()
+    {
+    }
+}";
+                const string fix = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue1, string avalue2, string avalue3)
+    {
+        AProperty = avalue1;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!, null!, null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new object[] { AProperty };
+    }
+
+    public string AProperty { get;}
+
+    public static Domain.Interfaces.ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) =>
+        {
+            var parts = RehydrateToList(property, false);
+            return new AClass(parts[0], parts[1], parts[2]);
+        };
+    }
+
+    [Domain.Interfaces.ValueObjects.SkipImmutabilityCheckAttribute]
+    public void AMethod()
+    {
+    }
+}";
+
+                await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
+                    DomainDrivenDesignAnalyzer.Sas055,
+                    Resources.CodeFix_Title_ChangeValueObjectMethodReturnType, problem, fix, 40,
                     17,
                     "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
                     nameof(SkipImmutabilityCheckAttribute));

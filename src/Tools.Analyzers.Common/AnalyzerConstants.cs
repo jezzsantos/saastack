@@ -19,10 +19,13 @@ public static class AnalyzerConstants
         "IntegrationTesting.WebApi.Common", "UnitTesting.Common"
     };
 
+    public const string ResourceTypesNamespace = "Application.Resources.Shared";
+
     public static class Categories
     {
         public const string Ddd = "SaaStackDDD";
         public const string Documentation = "SaaStackDocumentation";
         public const string WebApi = "SaaStackWebApi";
+        public const string Application = "SaaStackApplication";
     }
 }

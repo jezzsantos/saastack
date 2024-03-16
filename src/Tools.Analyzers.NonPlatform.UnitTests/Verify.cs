@@ -103,16 +103,25 @@ public static class Verify
     }
 
     public static async Task DiagnosticExists<TAnalyzer>(string inputSnippet,
-        (DiagnosticDescriptor descriptor, int locationX, int locationY, string argument) expected1,
-        (DiagnosticDescriptor descriptor, int locationX, int locationY, string argument) expected2)
+        (DiagnosticDescriptor descriptor, int locationX, int locationY, string argument, object?[]? messageArgs)
+            expected1,
+        (DiagnosticDescriptor descriptor, int locationX, int locationY, string argument, object?[]? messageArgs)
+            expected2)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {
+        var arguments1 = ObjectExtensions.Exists(expected1.messageArgs) && expected1.messageArgs.Any()
+            ? new object[] { expected1.argument }.Concat(expected1.messageArgs)
+            : new object[] { expected1.argument };
         var expectation1 = CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>.Diagnostic(expected1.descriptor)
             .WithLocation(expected1.locationX, expected1.locationY)
-            .WithArguments(expected1.argument);
+            .WithArguments(arguments1.ToArray()!);
+
+        var arguments2 = ObjectExtensions.Exists(expected2.messageArgs) && expected2.messageArgs.Any()
+            ? new object[] { expected2.argument }.Concat(expected2.messageArgs)
+            : new object[] { expected2.argument };
         var expectation2 = CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>.Diagnostic(expected2.descriptor)
             .WithLocation(expected2.locationX, expected2.locationY)
-            .WithArguments(expected2.argument);
+            .WithArguments(arguments2.ToArray()!);
 
         await RunAnalyzerTest<TAnalyzer>(inputSnippet, new[] { expectation1, expectation2 });
     }

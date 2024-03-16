@@ -119,6 +119,21 @@
         <Compile Include="..\Application.Interfaces\ICallerContext.RolesAndFeatures.cs">
             <Link>Reference\Application.Interfaces\ICallerContext.RolesAndFeatures.cs</Link>
         </Compile>
+        <Compile Include="..\Application.Interfaces\Resources\IIdentifiableResource.cs">
+            <Link>Reference\Application.Interfaces\Resources\IIdentifiableResource.cs</Link>
+        </Compile>
+        <Compile Include="..\Application.Persistence.Interfaces\IReadModelEntity.cs">
+            <Link>Reference\Application.Persistence.Interfaces\IReadModelEntity.cs</Link>
+        </Compile>
+        <Compile Include="..\Application.Persistence.Interfaces\IPersistableDto.cs">
+            <Link>Reference\Application.Persistence.Interfaces\IPersistableDto.cs</Link>
+        </Compile>
+        <Compile Include="..\Application.Persistence.Interfaces\IHasIdentity.cs">
+            <Link>Reference\Application.Persistence.Interfaces\IHasIdentity.cs</Link>
+        </Compile>
+        <Compile Include="..\Application.Persistence.Common\ReadModelEntity.cs">
+            <Link>Reference\Application.Persistence.Common\ReadModelEntity.cs</Link>
+        </Compile>
         <Compile Include="..\Domain.Interfaces\Authorization\IHierarchicalLevel.cs">
             <Link>Reference\Domain.Interfaces\Authorization\IHierarchicalLevel.cs</Link>
         </Compile>

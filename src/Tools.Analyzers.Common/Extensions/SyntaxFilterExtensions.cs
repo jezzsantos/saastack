@@ -56,6 +56,56 @@ public static class SyntaxFilterExtensions
         return null;
     }
 
+    public static bool HasPublicGetterAndSetter(this PropertyDeclarationSyntax propertyDeclarationSyntax)
+    {
+        var propertyAccessibility = new Accessibility(propertyDeclarationSyntax.Modifiers);
+        var isPublicProperty = propertyAccessibility.IsPublic;
+
+        var accessors = propertyDeclarationSyntax.AccessorList;
+        if (accessors is null)
+        {
+            return false;
+        }
+
+        var setter = accessors.Accessors.FirstOrDefault(accessor =>
+            accessor.IsKind(SyntaxKind.SetAccessorDeclaration));
+        if (setter is null)
+        {
+            return false;
+        }
+
+        if (!setter.Modifiers.Any())
+        {
+            return isPublicProperty;
+        }
+
+        var setterAccessibility = new Accessibility(setter.Modifiers);
+        if (setterAccessibility is { IsPublic: true, IsStatic: false })
+        {
+            return false;
+        }
+
+        var getter = accessors.Accessors.FirstOrDefault(accessor =>
+            accessor.IsKind(SyntaxKind.GetAccessorDeclaration));
+        if (getter is null)
+        {
+            return false;
+        }
+
+        if (!getter.Modifiers.Any())
+        {
+            return isPublicProperty;
+        }
+
+        var getterAccessibility = new Accessibility(setter.Modifiers);
+        if (getterAccessibility is { IsPublic: true, IsStatic: false })
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public static bool HasPublicSetter(this PropertyDeclarationSyntax propertyDeclarationSyntax)
     {
         var propertyAccessibility = new Accessibility(propertyDeclarationSyntax.Modifiers);
@@ -99,6 +149,30 @@ public static class SyntaxFilterExtensions
         return true;
     }
 
+    public static bool IsEnumType(this PropertyDeclarationSyntax propertyDeclarationSyntax,
+        SyntaxNodeAnalysisContext context)
+    {
+        var propertySymbol = context.SemanticModel.GetDeclaredSymbol(propertyDeclarationSyntax);
+        if (propertySymbol is null)
+        {
+            return false;
+        }
+
+        var getter = propertySymbol.GetMethod;
+        if (getter is null)
+        {
+            return false;
+        }
+
+        var returnType = propertySymbol.GetMethod!.ReturnType;
+        if (returnType.IsEnum())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public static bool IsExcludedInNamespace(this SyntaxNodeAnalysisContext context,
         MemberDeclarationSyntax memberDeclarationSyntax, string[] excludedNamespaces)
     {
@@ -123,6 +197,11 @@ public static class SyntaxFilterExtensions
 
         var memberNamespace = symbol.ContainingNamespace.ToDisplayString();
         return includedNamespaces.Any(ns => memberNamespace.StartsWith(ns));
+    }
+
+    public static bool IsInitialized(this PropertyDeclarationSyntax propertyDeclarationSyntax)
+    {
+        return propertyDeclarationSyntax.Initializer is not null;
     }
 
     public static bool IsLanguageForCSharp(this SyntaxNode docs)
@@ -202,9 +281,7 @@ public static class SyntaxFilterExtensions
 
         var parentMetadata = context.Compilation.GetTypeByMetadataName(typeof(TParent).FullName!)!;
 
-        var isOfType = symbol.AllInterfaces.Any(@interface => @interface.IsOfType(parentMetadata));
-
-        return !isOfType;
+        return !symbol.AllInterfaces.Any(@interface => @interface.IsOfType(parentMetadata));
     }
 
     public static bool IsNotType<TType>(this ParameterSyntax parameterSyntax, SyntaxNodeAnalysisContext context)
@@ -226,6 +303,51 @@ public static class SyntaxFilterExtensions
         var isDerivedFrom = symbol.Type.AllInterfaces.Any(@interface => @interface.IsOfType(parameterMetadata));
 
         return !isDerivedFrom;
+    }
+
+    public static bool IsReferenceType(this PropertyDeclarationSyntax propertyDeclarationSyntax,
+        SyntaxNodeAnalysisContext context)
+    {
+        var propertySymbol = context.SemanticModel.GetDeclaredSymbol(propertyDeclarationSyntax);
+        if (propertySymbol is null)
+        {
+            return false;
+        }
+
+        var getter = propertySymbol.GetMethod;
+        if (getter is null)
+        {
+            return false;
+        }
+
+        var returnType = getter.ReturnType;
+
+        return returnType.IsReferenceType;
+    }    
+
+    
+    public static bool IsNullableType(this PropertyDeclarationSyntax propertyDeclarationSyntax,
+        SyntaxNodeAnalysisContext context)
+    {
+        var propertySymbol = context.SemanticModel.GetDeclaredSymbol(propertyDeclarationSyntax);
+        if (propertySymbol is null)
+        {
+            return false;
+        }
+
+        var getter = propertySymbol.GetMethod;
+        if (getter is null)
+        {
+            return false;
+        }
+
+        var returnType = getter.ReturnType;
+        if (returnType.IsNullable(context))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public static bool IsParentTypeNotPublic(this MemberDeclarationSyntax memberDeclaration)
@@ -273,45 +395,21 @@ public static class SyntaxFilterExtensions
         return false;
     }
 
-    public static bool IsSealed(this ClassDeclarationSyntax classDeclaration)
-    {
-        var accessibility = new Accessibility(classDeclaration.Modifiers);
-        if (accessibility.IsSealed)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
     public static bool IsPrivateInstanceConstructor(this ConstructorDeclarationSyntax constructorDeclarationSyntax)
     {
         var accessibility = new Accessibility(constructorDeclarationSyntax.Modifiers);
         return accessibility is { IsPrivate: true, IsStatic: false };
     }
 
-    // ReSharper disable once UnusedMember.Local
-    public static bool IsPublicOrInternalExtensionMethod(this MethodDeclarationSyntax methodDeclarationSyntax)
+    public static bool IsPublic(this MemberDeclarationSyntax memberDeclarationSyntax)
     {
-        var isNotPublicOrInternal = IsNotPublicOrInternalStaticMethod(methodDeclarationSyntax);
-        if (isNotPublicOrInternal)
+        var accessibility = new Accessibility(memberDeclarationSyntax.Modifiers);
+        if (accessibility.IsPublic)
         {
-            return false;
+            return true;
         }
 
-        var firstParameter = methodDeclarationSyntax.ParameterList.Parameters.FirstOrDefault();
-        if (firstParameter is null)
-        {
-            return false;
-        }
-
-        var isExtension = firstParameter.Modifiers.Any(mod => mod.IsKind(SyntaxKind.ThisKeyword));
-        if (!isExtension)
-        {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     public static bool IsPublicOrInternalInstanceMethod(this MethodDeclarationSyntax methodDeclarationSyntax)
@@ -343,6 +441,28 @@ public static class SyntaxFilterExtensions
         return accessibility is { IsPublic: true, IsStatic: true };
     }
 
+    public static bool IsRequired(this MemberDeclarationSyntax memberDeclarationSyntax)
+    {
+        var accessibility = new Accessibility(memberDeclarationSyntax.Modifiers);
+        if (accessibility.IsRequired)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static bool IsSealed(this ClassDeclarationSyntax classDeclaration)
+    {
+        var accessibility = new Accessibility(classDeclaration.Modifiers);
+        if (accessibility.IsSealed)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     private static AttributeData? GetAttributeOfType<TAttribute>(this ISymbol? symbol,
         Compilation compilation)
     {
@@ -368,6 +488,7 @@ public class Accessibility
         IsStatic = modifiers.Any(mod => mod.IsKind(SyntaxKind.StaticKeyword));
         IsPartial = modifiers.Any(mod => mod.IsKind(SyntaxKind.PartialKeyword));
         IsSealed = modifiers.Any(mod => mod.IsKind(SyntaxKind.SealedKeyword));
+        IsRequired = modifiers.Any(mod => mod.IsKind(SyntaxKind.RequiredKeyword));
     }
 
     public bool IsInternal { get; }
@@ -378,7 +499,9 @@ public class Accessibility
 
     public bool IsPublic { get; }
 
-    public bool IsStatic { get; }
+    public bool IsRequired { get; }
 
-    public bool IsSealed { get; set; }
+    public bool IsSealed { get; }
+
+    public bool IsStatic { get; }
 }

@@ -8,7 +8,7 @@ public static class Events
 {
     public static class PasswordCredentials
     {
-        public class Created : IDomainEvent
+        public sealed class Created : IDomainEvent
         {
             public static Created Create(Identifier id, Identifier userId)
             {
@@ -24,10 +24,10 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
 
-        public class CredentialsChanged : IDomainEvent
+        public sealed class CredentialsChanged : IDomainEvent
         {
             public static CredentialsChanged Create(Identifier id, string passwordHash)
             {
@@ -43,10 +43,10 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
 
-        public class RegistrationChanged : IDomainEvent
+        public sealed class RegistrationChanged : IDomainEvent
         {
             public static RegistrationChanged Create(Identifier id, EmailAddress emailAddress, PersonDisplayName name)
             {
@@ -65,10 +65,10 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
 
-        public class PasswordVerified : IDomainEvent
+        public sealed class PasswordVerified : IDomainEvent
         {
             public static PasswordVerified Create(Identifier id, bool isVerified,
                 bool auditAttempt)
@@ -82,16 +82,16 @@ public static class Events
                 };
             }
 
-            public bool AuditAttempt { get; set; }
+            public required bool AuditAttempt { get; set; }
 
-            public bool IsVerified { get; set; }
+            public required bool IsVerified { get; set; }
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
 
-        public class AccountLocked : IDomainEvent
+        public sealed class AccountLocked : IDomainEvent
         {
             public static AccountLocked Create(Identifier id)
             {
@@ -104,10 +104,10 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
 
-        public class AccountUnlocked : IDomainEvent
+        public sealed class AccountUnlocked : IDomainEvent
         {
             public static AccountUnlocked Create(Identifier id)
             {
@@ -120,10 +120,10 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
 
-        public class RegistrationVerificationCreated : IDomainEvent
+        public sealed class RegistrationVerificationCreated : IDomainEvent
         {
             public static RegistrationVerificationCreated Create(Identifier id, string token)
             {
@@ -139,10 +139,10 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
 
-        public class RegistrationVerificationVerified : IDomainEvent
+        public sealed class RegistrationVerificationVerified : IDomainEvent
         {
             public static RegistrationVerificationVerified Create(Identifier id)
             {
@@ -155,10 +155,10 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
 
-        public class PasswordResetInitiated : IDomainEvent
+        public sealed class PasswordResetInitiated : IDomainEvent
         {
             public static PasswordResetInitiated Create(Identifier id, string token)
             {
@@ -177,7 +177,7 @@ public static class Events
             public required DateTime OccurredUtc { get; set; }
         }
 
-        public class PasswordResetCompleted : IDomainEvent
+        public sealed class PasswordResetCompleted : IDomainEvent
         {
             public static PasswordResetCompleted Create(Identifier id, string token, string passwordHash)
             {
@@ -196,13 +196,13 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
     }
 
     public static class AuthTokens
     {
-        public class Created : IDomainEvent
+        public sealed class Created : IDomainEvent
         {
             public static Created Create(Identifier id, Identifier userId)
             {
@@ -218,10 +218,10 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
 
-        public class TokensChanged : IDomainEvent
+        public sealed class TokensChanged : IDomainEvent
         {
             public static TokensChanged Create(Identifier id, Identifier userId, string accessToken,
                 DateTime accessTokenExpiresOn,
@@ -251,10 +251,10 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
 
-        public class TokensRefreshed : IDomainEvent
+        public sealed class TokensRefreshed : IDomainEvent
         {
             public static TokensRefreshed Create(Identifier id, Identifier userId, string accessToken,
                 DateTime accessTokenExpiresOn,
@@ -284,10 +284,10 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
 
-        public class TokensRevoked : IDomainEvent
+        public sealed class TokensRevoked : IDomainEvent
         {
             public static TokensRevoked Create(Identifier id, Identifier userId)
             {
@@ -303,13 +303,13 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
     }
 
     public static class APIKeys
     {
-        public class Created : IDomainEvent
+        public sealed class Created : IDomainEvent
         {
             public static Created Create(Identifier id, Identifier userId, string keyToken, string keyHash)
             {
@@ -331,10 +331,10 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
 
-        public class ParametersChanged : IDomainEvent
+        public sealed class ParametersChanged : IDomainEvent
         {
             public static ParametersChanged Create(Identifier id, string description,
                 DateTime expiresOn)
@@ -350,14 +350,14 @@ public static class Events
 
             public required string Description { get; set; }
 
-            public DateTime ExpiresOn { get; set; }
+            public required DateTime ExpiresOn { get; set; }
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
 
-        public class KeyVerified : IDomainEvent
+        public sealed class KeyVerified : IDomainEvent
         {
             public static KeyVerified Create(Identifier id, bool isVerified)
             {
@@ -369,17 +369,17 @@ public static class Events
                 };
             }
 
-            public bool IsVerified { get; set; }
+            public required bool IsVerified { get; set; }
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
     }
 
     public static class SSOUsers
     {
-        public class Created : IDomainEvent
+        public sealed class Created : IDomainEvent
         {
             public static Created Create(Identifier id, string providerName, Identifier userId)
             {
@@ -398,10 +398,10 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
 
-        public class TokensUpdated : IDomainEvent
+        public sealed class TokensUpdated : IDomainEvent
         {
             public static TokensUpdated Create(Identifier id, string tokens, EmailAddress emailAddress,
                 PersonName name, Timezone timezone, Address address)
@@ -433,7 +433,7 @@ public static class Events
 
             public required string RootId { get; set; }
 
-            public DateTime OccurredUtc { get; set; }
+            public required DateTime OccurredUtc { get; set; }
         }
     }
 }

@@ -99,7 +99,7 @@ public sealed class BookingRoot : AggregateRootBase
 
             case Events.ReservationMade changed:
             {
-                BorrowerId = changed.BorrowerId;
+                BorrowerId = changed.BorrowerId.ToId();
                 Start = changed.Start;
                 End = changed.End;
                 return Result.Ok;
@@ -128,14 +128,14 @@ public sealed class BookingRoot : AggregateRootBase
             case Events.TripBegan changed:
             {
                 Recorder.TraceDebug(null, "Booking {Id} has started trip {TripId} from {From}",
-                    Id, changed.TripId!, changed.BeganFrom);
+                    Id, changed.TripId, changed.BeganFrom);
                 return Result.Ok;
             }
 
             case Events.TripEnded changed:
             {
                 Recorder.TraceDebug(null, "Booking {Id} has ended trip {TripId} at {To}",
-                    Id, changed.TripId!, changed.EndedTo);
+                    Id, changed.TripId, changed.EndedTo);
                 return Result.Ok;
             }
 

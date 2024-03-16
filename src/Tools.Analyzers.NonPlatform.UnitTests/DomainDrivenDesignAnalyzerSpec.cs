@@ -192,15 +192,24 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -248,14 +257,23 @@ public sealed class AClass : AggregateRootBase
     public static void Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
@@ -302,15 +320,24 @@ public sealed class AClass : AggregateRootBase
     public static string Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return string.Empty;
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
@@ -357,15 +384,24 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -409,15 +445,24 @@ public sealed class AClass : AggregateRootBase
     public static Result<AClass, Error> Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -511,15 +556,24 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -567,15 +621,24 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
@@ -621,15 +684,24 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -663,15 +735,24 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
@@ -713,7 +794,7 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -723,11 +804,20 @@ public sealed class AClass : AggregateRootBase
             container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -771,7 +861,7 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -781,11 +871,20 @@ public sealed class AClass : AggregateRootBase
             container.GetRequiredService<IIdentifierFactory>(), identifier);
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
@@ -828,7 +927,7 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -843,11 +942,20 @@ public sealed class AClass : AggregateRootBase
         return base.Dehydrate();
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -891,7 +999,7 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -906,11 +1014,20 @@ public sealed class AClass : AggregateRootBase
         return base.Dehydrate();
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
@@ -954,7 +1071,7 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -969,11 +1086,20 @@ public sealed class AClass : AggregateRootBase
         return base.Dehydrate();
     }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -1015,7 +1141,7 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -1027,11 +1153,20 @@ public sealed class AClass : AggregateRootBase
 
     public string AProperty { get; set; }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
@@ -1071,7 +1206,7 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -1083,11 +1218,20 @@ public sealed class AClass : AggregateRootBase
 
     public string AProperty { get; private set; }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -1125,7 +1269,7 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -1137,11 +1281,20 @@ public sealed class AClass : AggregateRootBase
 
     public string AProperty => string.Empty;
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -1179,7 +1332,7 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -1191,11 +1344,20 @@ public sealed class AClass : AggregateRootBase
 
     public string AProperty { get; }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -1237,7 +1399,7 @@ public class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -1249,11 +1411,20 @@ public class AClass : AggregateRootBase
 
     public string AProperty { get; }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
@@ -1293,7 +1464,7 @@ public sealed class AClass : AggregateRootBase
     public static AClass Create()
     {
         var root = new AClass(null!, null!);
-        root.RaiseCreateEvent(new CreateEvent());
+        root.RaiseCreateEvent(EventOccurred.Create());
         return root;
     }
 
@@ -1305,11 +1476,20 @@ public sealed class AClass : AggregateRootBase
 
     public string AProperty { get; }
 }
-public class CreateEvent : IDomainEvent
+public sealed class EventOccurred : IDomainEvent
 {
-    public string RootId { get; set; } = ""anid"";
+    public static EventOccurred Create()
+    {
+        return new EventOccurred
+        {
+            RootId = ""anid"",
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
 
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -3217,6 +3397,1179 @@ public sealed class AClass : ValueObjectBase<AClass>
     {
         return null!;
     }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+        }
+    }
+
+    [UsedImplicitly]
+    public class GivenADomainEvent
+    {
+        [Trait("Category", "Unit")]
+        public class GivenAnyDomainEvent
+        {
+            [Fact]
+            public async Task WhenNoCtor_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas060
+        {
+            [Fact]
+            public async Task WhenIsNotPublic_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+internal sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas060, input, 5, 23, "AClassed");
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas061
+        {
+            [Fact]
+            public async Task WhenIsNotSealed_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas061, input, 5, 14, "AClassed");
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas062
+        {
+            [Fact]
+            public async Task WhenHasCtorAndNotParameterless_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public AClassed(string rootId, DateTime occurredUtc)
+    {
+        RootId = rootId;
+        OccurredUtc = occurredUtc;
+    }
+
+    public static AClassed Create()
+    {
+        return new AClassed(string.Empty, DateTime.UtcNow)
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas062, input, 5, 21, "AClassed");
+            }
+
+            [Fact]
+            public async Task WhenHasCtorAndPrivate_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    private AClassed()
+    {
+        RootId = string.Empty;
+        OccurredUtc = DateTime.UtcNow;
+    }
+
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas062, input, 5, 21, "AClassed");
+            }
+
+            [Fact]
+            public async Task WhenHasCtorAndIsParameterless_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public AClassed()
+    {
+        RootId = string.Empty;
+        OccurredUtc = DateTime.UtcNow;
+    }
+
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas063
+        {
+            [Fact]
+            public async Task WhenNotNamedInThePastTense_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClass : IDomainEvent
+{
+    public static AClass Create()
+    {
+        return new AClass
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas063, input, 5, 21, "AClass");
+            }
+
+            [Fact]
+            public async Task WhenNamedInThePastTense_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas064
+        {
+            [Fact]
+            public async Task WhenMissingCreateFactory_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas064, input, 5, 21, "AClassed");
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas065
+        {
+            [Fact]
+            public async Task WhenCreateFactoryReturnsWrongType_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static string Create()
+    {
+        return string.Empty;
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas065, input, 7, 26, "Create", "ANamespace.AClassed");
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas066
+        {
+            [Fact]
+            public async Task WhenAnyPropertyHasNoSetter_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public string? AProperty { get; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas066, input, 20, 20, "AProperty", null);
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas067
+        {
+            [Fact]
+            public async Task WhenAnyPropertyReferenceTypeIsNotRequiredAndNotInitializedAndNotNullable_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public string AProperty { get; set; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas067, input, 20, 19, "AProperty");
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyReferenceTypeIsRequiredAndNotInitializedAndNotNullable_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = string.Empty,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required string AProperty { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyReferenceTypeIsInitializedAndNotRequiredAndNotNullable_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public string AProperty { get; set; } = string.Empty;
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyReferenceTypeIsNullableAndNotRequiredAndNotInitialized_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public string? AProperty { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyReferenceTypeIsNullableAndRequiredAndNotInitialized_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = string.Empty,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required string? AProperty { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyReferenceTypeIsNullableAndInitializedAndNotRequired_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public string? AProperty { get; set; } = string.Empty;
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyReferenceTypeIsInitializedAndRequiredAndNotNullable_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = string.Empty,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required string AProperty { get; set; } = string.Empty;
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyReferenceTypeIsInitializedAndNullableAndNotRequired_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public string? AProperty { get; set; } = string.Empty;
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyReferenceTypeIsInitializedAndRequiredAndNullable_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = string.Empty,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required string? AProperty { get; set; } = string.Empty;
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyValueTypeIsNotRequiredAndNotInitializedAndNotNullable_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public DateTime AProperty { get; set; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas067, input, 20, 21, "AProperty");
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyValueTypeIsRequiredAndNotInitializedAndNotNullable_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = DateTime.UtcNow,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required DateTime AProperty { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyValueTypeIsInitializedAndNotRequiredAndNotNullable_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public DateTime AProperty { get; set; } = DateTime.UtcNow;
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyValueTypeIsNullableAndNotRequiredAndNotInitialized_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public DateTime? AProperty { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyValueTypeIsNullableAndRequiredAndNotInitialized_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = DateTime.UtcNow,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required DateTime? AProperty { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyValueTypeIsNullableAndInitializedAndNotRequired_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public DateTime? AProperty { get; set; } = DateTime.UtcNow;
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyValueTypeIsInitializedAndRequiredAndNotNullable_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = DateTime.UtcNow,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required DateTime AProperty { get; set; } = DateTime.UtcNow;
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyValueTypeIsInitializedAndNullableAndNotRequired_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public DateTime? AProperty { get; set; } = DateTime.UtcNow;
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyValueTypeIsInitializedAndRequiredAndNullable_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = DateTime.UtcNow,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required DateTime? AProperty { get; set; } = DateTime.UtcNow;
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas068
+        {
+            [Fact]
+            public async Task WhenAnyPropertyReferenceTypeIsOptional_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+using Common;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = string.Empty,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required Optional<string> AProperty { get; set; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(input,
+                    (DomainDrivenDesignAnalyzer.Sas068, 22, 38, "AProperty", null),
+                    (DomainDrivenDesignAnalyzer.Sas069, 22, 38, "AProperty", [GivenRuleSas069.AllTypes]));
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyReferenceTypeIsNullable_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = string.Empty,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required string? AProperty { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRuleSas069
+        {
+            public const string AllTypes =
+                "bool or string or ulong or int or long or double or decimal or System.DateTime or byte";
+
+            [Fact]
+            public async Task WhenAnyPropertyIsNotSupportedPrimitive_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = 'a',
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required char AProperty { get; set; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas069, input, 21, 26, "AProperty", AllTypes);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyIsNotSupportedListOfPrimitive_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = new List<char>(),
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required List<char> AProperty { get; set; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas069, input, 22, 32, "AProperty", AllTypes);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyIsNotSupportedDictionaryOfPrimitive_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = new Dictionary<string, char>(),
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required Dictionary<string, char> AProperty { get; set; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas069, input, 22, 46, "AProperty", AllTypes);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyIsNotSupportedDictionaryKeyType_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = new Dictionary<char, string>(),
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required Dictionary<char, string> AProperty { get; set; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Sas069, input, 22, 46, "AProperty", AllTypes);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyIsSupportedPrimitive_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = string.Empty,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required string AProperty { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyIsEnum_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = AnEnum.AValue,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required AnEnum AProperty { get; set; }
+}
+public enum AnEnum
+{
+    AValue
+}
+";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyIsSupportedListOfPrimitive_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = new List<string>(),
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required List<string> AProperty { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyIsSupportedDictionaryOfPrimitive_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = new Dictionary<string, int>(),
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required Dictionary<string, int> AProperty { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);

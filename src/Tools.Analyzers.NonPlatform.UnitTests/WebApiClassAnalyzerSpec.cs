@@ -593,8 +593,8 @@ public class AClass : IWebApiService
 }";
 
             await Verify.DiagnosticExists<WebApiClassAnalyzer>(input,
-                (WebApiClassAnalyzer.Sas013, 9, 27, "AMethod"),
-                (WebApiClassAnalyzer.Sas017, 9, 35, "TestNoRouteAttributeRequest"));
+                (WebApiClassAnalyzer.Sas013, 9, 27, "AMethod", null),
+                (WebApiClassAnalyzer.Sas017, 9, 35, "TestNoRouteAttributeRequest", null));
         }
 
         [Fact]
@@ -616,8 +616,8 @@ public class AClass : IWebApiService
 }";
 
             await Verify.DiagnosticExists<WebApiClassAnalyzer>(input,
-                (WebApiClassAnalyzer.Sas013, 10, 27, "AMethod"),
-                (WebApiClassAnalyzer.Sas017, 10, 35, "TestNoRouteAttributeRequest"));
+                (WebApiClassAnalyzer.Sas013, 10, 27, "AMethod", null),
+                (WebApiClassAnalyzer.Sas017, 10, 35, "TestNoRouteAttributeRequest", null));
         }
 
         [Fact]

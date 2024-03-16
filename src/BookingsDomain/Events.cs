@@ -5,7 +5,7 @@ namespace BookingsDomain;
 
 public static class Events
 {
-    public class Created : IDomainEvent
+    public sealed class Created : IDomainEvent
     {
         public static Created Create(Identifier id, Identifier organizationId)
         {
@@ -24,7 +24,9 @@ public static class Events
         public required DateTime OccurredUtc { get; set; }
     }
 
-    public class ReservationMade : IDomainEvent
+#pragma warning disable SAS063
+    public sealed class ReservationMade : IDomainEvent
+#pragma warning restore SAS063
     {
         public static ReservationMade Create(Identifier id, Identifier organizationId, Identifier borrowerId,
             DateTime start, DateTime end)
@@ -40,7 +42,7 @@ public static class Events
             };
         }
 
-        public required Identifier BorrowerId { get; set; }
+        public required string BorrowerId { get; set; }
 
         public required DateTime End { get; set; }
 
@@ -53,7 +55,7 @@ public static class Events
         public required DateTime OccurredUtc { get; set; }
     }
 
-    public class CarChanged : IDomainEvent
+    public sealed class CarChanged : IDomainEvent
     {
         public static CarChanged Create(Identifier id, Identifier organizationId, Identifier carId)
         {
@@ -75,7 +77,7 @@ public static class Events
         public required DateTime OccurredUtc { get; set; }
     }
 
-    public class TripAdded : IDomainEvent
+    public sealed class TripAdded : IDomainEvent
     {
         public static TripAdded Create(Identifier id, Identifier organizationId)
         {
@@ -97,7 +99,9 @@ public static class Events
         public required DateTime OccurredUtc { get; set; }
     }
 
-    public class TripBegan : IDomainEvent
+#pragma warning disable SAS063
+    public sealed class TripBegan : IDomainEvent
+#pragma warning restore SAS063
     {
         public static TripBegan Create(Identifier id, Identifier organizationId, Identifier tripId,
             DateTime beganAt, Location from)
@@ -119,14 +123,14 @@ public static class Events
 
         public required string OrganizationId { get; set; }
 
-        public string? TripId { get; set; }
+        public required string TripId { get; set; }
 
         public required string RootId { get; set; }
 
         public required DateTime OccurredUtc { get; set; }
     }
 
-    public class TripEnded : IDomainEvent
+    public sealed class TripEnded : IDomainEvent
     {
         public static TripEnded Create(Identifier id, Identifier organizationId, Identifier tripId, DateTime beganAt,
             Location from, DateTime endedAt, Location to)
@@ -154,7 +158,7 @@ public static class Events
 
         public required string OrganizationId { get; set; }
 
-        public string? TripId { get; set; }
+        public required string TripId { get; set; }
 
         public required string RootId { get; set; }
 

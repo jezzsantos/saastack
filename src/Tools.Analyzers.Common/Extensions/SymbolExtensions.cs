@@ -19,25 +19,55 @@ public static class SymbolExtensions
         return string.Empty;
     }
 
+    public static bool IsEnum(this ITypeSymbol symbol)
+    {
+        return symbol.TypeKind == TypeKind.Enum;
+    }
+
+    public static bool IsNullable(this ITypeSymbol symbol, SyntaxNodeAnalysisContext context)
+    {
+        return symbol.NullableAnnotation == NullableAnnotation.Annotated;
+    }
+
     public static bool IsOfType(this ISymbol symbol, INamedTypeSymbol baseType)
     {
         return SymbolEqualityComparer.Default.Equals(symbol, baseType);
     }
 
-    public static bool IsVoid(this ITypeSymbol returnType, SyntaxNodeAnalysisContext context)
+    public static bool IsVoid(this ITypeSymbol symbol, SyntaxNodeAnalysisContext context)
     {
-        return IsVoid(returnType, context.Compilation);
+        return IsVoid(symbol, context.Compilation);
     }
 
-    public static bool IsVoid(this ITypeSymbol returnType, Compilation compilation)
+    public static bool IsVoid(this ITypeSymbol symbol, Compilation compilation)
     {
         var voidSymbol = compilation.GetTypeByMetadataName(typeof(void).FullName!)!;
-        return IsOfType(returnType, voidSymbol);
+        return IsOfType(symbol, voidSymbol);
     }
 
-    public static bool IsVoidTask(this ITypeSymbol returnType, SyntaxNodeAnalysisContext context)
+    public static bool IsVoidTask(this ITypeSymbol symbol, SyntaxNodeAnalysisContext context)
     {
-        var taskSymbol = context.Compilation.GetTypeByMetadataName(typeof(Task).FullName!)!;
-        return IsOfType(returnType, taskSymbol);
+        var taskType = context.Compilation.GetTypeByMetadataName(typeof(Task).FullName!)!;
+        return IsOfType(symbol, taskType);
+    }
+
+    public static ITypeSymbol WithoutNullable(this ITypeSymbol symbol, SyntaxNodeAnalysisContext context)
+    {
+        if (symbol.IsNullable(context))
+        {
+            if (symbol.IsReferenceType)
+            {
+                if (((INamedTypeSymbol)symbol).IsGenericType) // e.g. List<T> or Dictionary<TKy, TValue>
+                {
+                    return symbol;
+                }
+
+                return symbol.OriginalDefinition;
+            }
+
+            return ((INamedTypeSymbol)symbol).TypeArguments[0]; // e.g. a ValueType like DataTime or an Enum
+        }
+
+        return symbol;
     }
 }

@@ -5,7 +5,7 @@ namespace OrganizationsDomain;
 
 public static class Events
 {
-    public class Created : IDomainEvent
+    public sealed class Created : IDomainEvent
     {
         public static Created Create(Identifier id, Ownership ownership, Identifier createdBy, DisplayName name)
         {
@@ -23,14 +23,14 @@ public static class Events
 
         public required string Name { get; set; }
 
-        public Ownership Ownership { get; set; }
+        public required Ownership Ownership { get; set; }
 
         public required string RootId { get; set; }
 
-        public DateTime OccurredUtc { get; set; }
+        public required DateTime OccurredUtc { get; set; }
     }
 
-    public class SettingCreated : IDomainEvent
+    public sealed class SettingCreated : IDomainEvent
     {
         public static SettingCreated Create(Identifier id, string name, string value, bool isEncrypted)
         {
@@ -44,7 +44,7 @@ public static class Events
             };
         }
 
-        public bool IsEncrypted { get; set; }
+        public required bool IsEncrypted { get; set; }
 
         public required string Name { get; set; }
 
@@ -52,10 +52,10 @@ public static class Events
 
         public required string RootId { get; set; }
 
-        public DateTime OccurredUtc { get; set; }
+        public required DateTime OccurredUtc { get; set; }
     }
 
-    public class SettingUpdated : IDomainEvent
+    public sealed class SettingUpdated : IDomainEvent
     {
         public static SettingUpdated Create(Identifier id, string name, string from, string to, bool isEncrypted)
         {
@@ -72,7 +72,7 @@ public static class Events
 
         public required string From { get; set; }
 
-        public bool IsEncrypted { get; set; }
+        public required bool IsEncrypted { get; set; }
 
         public required string Name { get; set; }
 
@@ -80,6 +80,6 @@ public static class Events
 
         public required string RootId { get; set; }
 
-        public DateTime OccurredUtc { get; set; }
+        public required DateTime OccurredUtc { get; set; }
     }
 }

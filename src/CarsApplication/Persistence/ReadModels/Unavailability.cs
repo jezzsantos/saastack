@@ -10,7 +10,7 @@ public class Unavailability : ReadModelEntity
 {
     public Optional<string> CarId { get; set; }
 
-    public UnavailabilityCausedBy CausedBy { get; set; }
+    public UnavailabilityCausedBy CausedBy { get; set; } = UnavailabilityCausedBy.Other;
 
     public Optional<string> CausedByReference { get; set; }
 

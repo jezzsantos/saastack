@@ -5,7 +5,7 @@ namespace CarsDomain;
 
 public static class Events
 {
-    public class Created : IDomainEvent
+    public sealed class Created : IDomainEvent
     {
         public static Created Create(Identifier id, Identifier organizationId)
         {
@@ -27,7 +27,7 @@ public static class Events
         public required DateTime OccurredUtc { get; set; }
     }
 
-    public class ManufacturerChanged : IDomainEvent
+    public sealed class ManufacturerChanged : IDomainEvent
     {
         public static ManufacturerChanged Create(Identifier id, Identifier organizationId,
             Manufacturer manufacturer)
@@ -56,7 +56,7 @@ public static class Events
         public required DateTime OccurredUtc { get; set; }
     }
 
-    public class OwnershipChanged : IDomainEvent
+    public sealed class OwnershipChanged : IDomainEvent
     {
         public static OwnershipChanged Create(Identifier id, Identifier organizationId, VehicleOwner owner)
         {
@@ -81,7 +81,7 @@ public static class Events
         public required DateTime OccurredUtc { get; set; }
     }
 
-    public class RegistrationChanged : IDomainEvent
+    public sealed class RegistrationChanged : IDomainEvent
     {
         public static RegistrationChanged Create(Identifier id, Identifier organizationId, LicensePlate plate)
         {
@@ -109,7 +109,7 @@ public static class Events
         public required DateTime OccurredUtc { get; set; }
     }
 
-    public class UnavailabilitySlotAdded : IDomainEvent
+    public sealed class UnavailabilitySlotAdded : IDomainEvent
     {
         public static UnavailabilitySlotAdded Create(Identifier id, Identifier organizationId, TimeSlot slot,
             CausedBy causedBy)
@@ -144,7 +144,7 @@ public static class Events
         public required DateTime OccurredUtc { get; set; }
     }
 
-    public class UnavailabilitySlotRemoved : IDomainEvent
+    public sealed class UnavailabilitySlotRemoved : IDomainEvent
     {
         public static UnavailabilitySlotRemoved Create(Identifier id, Identifier organizationId,
             Identifier unavailabilityId)
