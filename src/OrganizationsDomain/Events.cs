@@ -32,13 +32,15 @@ public static class Events
 
     public sealed class SettingCreated : IDomainEvent
     {
-        public static SettingCreated Create(Identifier id, string name, string value, bool isEncrypted)
+        public static SettingCreated Create(Identifier id, string name, string value, SettingValueType valueType,
+            bool isEncrypted)
         {
             return new SettingCreated
             {
                 RootId = id,
                 Name = name,
-                Value = value,
+                StringValue = value,
+                ValueType = valueType,
                 IsEncrypted = isEncrypted,
                 OccurredUtc = DateTime.UtcNow
             };
@@ -48,7 +50,9 @@ public static class Events
 
         public required string Name { get; set; }
 
-        public required string Value { get; set; }
+        public required string StringValue { get; set; }
+
+        public required SettingValueType ValueType { get; set; }
 
         public required string RootId { get; set; }
 
@@ -57,14 +61,17 @@ public static class Events
 
     public sealed class SettingUpdated : IDomainEvent
     {
-        public static SettingUpdated Create(Identifier id, string name, string from, string to, bool isEncrypted)
+        public static SettingUpdated Create(Identifier id, string name, string from, SettingValueType fromType,
+            string to, SettingValueType toType, bool isEncrypted)
         {
             return new SettingUpdated
             {
                 RootId = id,
                 Name = name,
                 From = from,
+                FromType = fromType,
                 To = to,
+                ToType = toType,
                 IsEncrypted = isEncrypted,
                 OccurredUtc = DateTime.UtcNow
             };
@@ -72,11 +79,15 @@ public static class Events
 
         public required string From { get; set; }
 
+        public required SettingValueType FromType { get; set; }
+
         public required bool IsEncrypted { get; set; }
 
         public required string Name { get; set; }
 
         public required string To { get; set; }
+
+        public required SettingValueType ToType { get; set; }
 
         public required string RootId { get; set; }
 

@@ -84,11 +84,14 @@ public sealed class OrganizationRoot : AggregateRootBase
 
             case Events.SettingCreated created:
             {
-                var value = created.IsEncrypted
-                    ? _tenantSettingService.Decrypt(created.Value)
-                    : created.Value;
+                var value = Setting.From(created.StringValue, created.ValueType, created.IsEncrypted,
+                    _tenantSettingService);
+                if (!value.IsSuccessful)
+                {
+                    return value.Error;
+                }
 
-                var settings = Settings.AddOrUpdate(created.Name, value, created.IsEncrypted);
+                var settings = Settings.AddOrUpdate(created.Name, value.Value);
                 if (!settings.IsSuccessful)
                 {
                     return settings.Error;
@@ -101,11 +104,13 @@ public sealed class OrganizationRoot : AggregateRootBase
 
             case Events.SettingUpdated updated:
             {
-                var to = updated.IsEncrypted
-                    ? _tenantSettingService.Decrypt(updated.To)
-                    : updated.To;
+                var to = Setting.From(updated.To, updated.ToType, updated.IsEncrypted, _tenantSettingService);
+                if (!to.IsSuccessful)
+                {
+                    return to.Error;
+                }
 
-                var settings = Settings.AddOrUpdate(updated.Name, to, updated.IsEncrypted);
+                var settings = Settings.AddOrUpdate(updated.Name, to.Value);
                 if (!settings.IsSuccessful)
                 {
                     return settings.Error;
@@ -126,9 +131,10 @@ public sealed class OrganizationRoot : AggregateRootBase
         foreach (var (key, value) in settings.Properties)
         {
             var valueValue = value.IsEncrypted
-                ? _tenantSettingService.Encrypt(value.Value)
-                : value.Value;
-            RaiseChangeEvent(OrganizationsDomain.Events.SettingCreated.Create(Id, key, valueValue, value.IsEncrypted));
+                ? _tenantSettingService.Encrypt(value.Value.ToString() ?? string.Empty)
+                : value.Value.ToString() ?? string.Empty;
+            RaiseChangeEvent(OrganizationsDomain.Events.SettingCreated.Create(Id, key, valueValue, value.ValueType,
+                value.IsEncrypted));
         }
 
         return Result.Ok;
@@ -141,18 +147,21 @@ public sealed class OrganizationRoot : AggregateRootBase
             if (Settings.TryGet(key, out var oldSetting))
             {
                 var valueValue = value.IsEncrypted
-                    ? _tenantSettingService.Encrypt(value.Value)
-                    : value.Value;
-                RaiseChangeEvent(OrganizationsDomain.Events.SettingUpdated.Create(Id, key, oldSetting!.Value,
-                    valueValue, value.IsEncrypted));
+                    ? _tenantSettingService.Encrypt(value.Value.ToString() ?? string.Empty)
+                    : value.Value.ToString() ?? string.Empty;
+                var oldValue = oldSetting!.Value.ToString() ?? string.Empty;
+                RaiseChangeEvent(OrganizationsDomain.Events.SettingUpdated.Create(Id, key, oldValue,
+                    oldSetting.ValueType,
+                    valueValue, value.ValueType, value.IsEncrypted));
             }
             else
             {
                 var valueValue = value.IsEncrypted
-                    ? _tenantSettingService.Encrypt(value.Value)
-                    : value.Value;
+                    ? _tenantSettingService.Encrypt(value.Value.ToString() ?? string.Empty)
+                    : value.Value.ToString() ?? string.Empty;
                 RaiseChangeEvent(
-                    OrganizationsDomain.Events.SettingCreated.Create(Id, key, valueValue, value.IsEncrypted));
+                    OrganizationsDomain.Events.SettingCreated.Create(Id, key, valueValue, value.ValueType,
+                        value.IsEncrypted));
             }
         }
 

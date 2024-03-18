@@ -67,5 +67,23 @@ namespace OrganizationsDomain {
                 return ResourceManager.GetString("OrganizationDisplayName_InvalidName", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data type of the value: &apos;{0}&apos; is unsupported.
+        /// </summary>
+        internal static string Setting_InvalidDataType {
+            get {
+                return ResourceManager.GetString("Setting_InvalidDataType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value type of the value: &apos;{0}&apos; is unsupported.
+        /// </summary>
+        internal static string Setting_InvalidValueType {
+            get {
+                return ResourceManager.GetString("Setting_InvalidValueType", resourceCulture);
+            }
+        }
     }
 }

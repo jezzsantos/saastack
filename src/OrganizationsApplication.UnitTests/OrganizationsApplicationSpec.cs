@@ -72,7 +72,7 @@ public class OrganizationsApplicationSpec
             && org.Ownership == Ownership.Personal
             && org.CreatedById == "auserid"
             && org.Settings.Properties.Count == 1
-            && org.Settings.Properties["aname"].Value == "avalue"
+            && org.Settings.Properties["aname"].Value.As<string>() == "avalue"
             && org.Settings.Properties["aname"].IsEncrypted == false
         ), It.IsAny<CancellationToken>()));
         _tenantSettingsService.Verify(tss =>
@@ -106,7 +106,7 @@ public class OrganizationsApplicationSpec
             && org.Ownership == Ownership.Shared
             && org.CreatedById == "acallerid"
             && org.Settings.Properties.Count == 1
-            && org.Settings.Properties["aname"].Value == "avalue"
+            && org.Settings.Properties["aname"].Value.As<string>() == "avalue"
             && org.Settings.Properties["aname"].IsEncrypted == false
         ), It.IsAny<CancellationToken>()));
         _tenantSettingsService.Verify(tss =>
@@ -219,10 +219,10 @@ public class OrganizationsApplicationSpec
             && o.Ownership == Ownership.Personal
             && o.CreatedById == "auserid"
             && o.Settings.Properties.Count == 4
-            && o.Settings.Properties["aname1"].Value == "anewvalue"
-            && o.Settings.Properties["aname2"].Value == "99"
-            && o.Settings.Properties["aname3"].Value == "True"
-            && o.Settings.Properties["aname4"].Value == "anoldvalue"
+            && o.Settings.Properties["aname1"].Value.As<string>() == "anewvalue"
+            && o.Settings.Properties["aname2"].Value.As<double>().Equals(99D)
+            && o.Settings.Properties["aname3"].Value.As<bool>() == true
+            && o.Settings.Properties["aname4"].Value.As<string>() == "anoldvalue"
         ), It.IsAny<CancellationToken>()));
         _tenantSettingsService.Verify(tss =>
                 tss.CreateForTenantAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),

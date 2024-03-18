@@ -1,4 +1,3 @@
-using System.Text.Json;
 using ApiHost1;
 using Application.Interfaces.Services;
 using Application.Persistence.Shared;
@@ -62,9 +61,9 @@ public class ProvisioningsApiSpec : WebApiSpec<Program>
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
         organization.Content.Value.Settings!.Count.Should().Be(3);
-        organization.Content.Value.Settings["aname1"].As<JsonElement>().GetString().Should().Be("avalue");
-        organization.Content.Value.Settings["aname2"].As<JsonElement>().GetString().Should().Be("99");
-        organization.Content.Value.Settings["aname3"].As<JsonElement>().GetString().Should().Be("True");
+        organization.Content.Value.Settings["aname1"].Should().Be("avalue");
+        organization.Content.Value.Settings["aname2"].Should().Be("99");
+        organization.Content.Value.Settings["aname3"].Should().Be("True");
 #endif
     }
 
@@ -107,9 +106,9 @@ public class ProvisioningsApiSpec : WebApiSpec<Program>
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
         organization.Content.Value.Settings!.Count.Should().Be(3);
-        organization.Content.Value.Settings["aname1"].As<JsonElement>().GetString().Should().Be("avalue1");
-        organization.Content.Value.Settings["aname2"].As<JsonElement>().GetString().Should().Be("99");
-        organization.Content.Value.Settings["aname3"].As<JsonElement>().GetString().Should().Be("True");
+        organization.Content.Value.Settings["aname1"].Should().Be("avalue1");
+        organization.Content.Value.Settings["aname2"].Should().Be("99");
+        organization.Content.Value.Settings["aname3"].Should().Be("True");
     }
 #endif
 

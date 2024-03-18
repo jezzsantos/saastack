@@ -270,6 +270,19 @@ public static class StringExtensions
 #endif
 #if COMMON_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
+    ///     Converts the <see cref="value" /> to a floating value
+    /// </summary>
+    public static double ToDouble(this string? value)
+    {
+        if (value.HasNoValue())
+        {
+            return -1;
+        }
+
+        return double.Parse(value);
+    }
+
+    /// <summary>
     ///     Converts the <see cref="value" /> to a integer value
     /// </summary>
     public static int ToInt(this string? value)

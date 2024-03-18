@@ -27,4 +27,10 @@
     <data name="OrganizationDisplayName_InvalidName" xml:space="preserve">
         <value>The name is invalid</value>
     </data>
+    <data name="Setting_InvalidDataType" xml:space="preserve">
+        <value>The data type of the value: '{0}' is unsupported</value>
+    </data>
+    <data name="Setting_InvalidValueType" xml:space="preserve">
+        <value>The value type of the value: '{0}' is unsupported</value>
+    </data>
 </root>

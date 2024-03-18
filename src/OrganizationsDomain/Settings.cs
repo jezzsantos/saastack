@@ -41,7 +41,7 @@ public sealed class Settings : ValueObjectBase<Settings>
         return new[] { Properties.ToJson()! };
     }
 
-    public Result<Settings, Error> AddOrUpdate(string name, string value, bool isEncrypted)
+    public Result<Settings, Error> AddOrUpdate(string name, object value, bool isEncrypted)
     {
         var settingValue = Setting.Create(value, isEncrypted);
         if (!settingValue.IsSuccessful)

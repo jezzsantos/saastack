@@ -372,7 +372,7 @@ public class StringExtensionsSpec
     }
 
     [Fact]
-    public void WhenToIntAndMatchesLowercase_ThenReturnsTrue()
+    public void WhenToIntAndMatches_ThenReturns()
     {
         var result = "9".ToInt();
 
@@ -395,6 +395,37 @@ public class StringExtensionsSpec
         result.Should().Be(9);
     }
 
+    [Fact]
+    public void WhenToDoubleAndEmpty_ThenReturnsMinusOne()
+    {
+        var result = "".ToDouble();
+
+        result.Should().Be(-1);
+    }
+
+    [Fact]
+    public void WhenToDoubleAndNotMatches_ThenThrows()
+    {
+        "notavalue".Invoking(x => x.ToDouble())
+            .Should().Throw<FormatException>();
+    }
+
+    [Fact]
+    public void WhenToDoubleAndMatchesInteger_ThenReturns()
+    {
+        var result = "9".ToDouble();
+
+        result.Should().Be(9D);
+    }
+
+    [Fact]
+    public void WhenToDoubleAndMatchesFloating_ThenReturns()
+    {
+        var result = "9.009".ToDouble();
+
+        result.Should().Be(9.009D);
+    }
+    
     [Fact]
     public void WhenWithoutTrailingSlashWithSlash_ThenReturnsPathWithoutSlash()
     {

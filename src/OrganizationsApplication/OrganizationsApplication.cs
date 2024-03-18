@@ -208,7 +208,8 @@ internal static class OrganizationConversionExtensions
     {
         var dto = organization.ToOrganization().Convert<Organization, OrganizationWithSettings>();
         dto.Settings =
-            organization.Settings.Properties.ToDictionary(pair => pair.Key, pair => (object?)pair.Value.Value);
+            organization.Settings.Properties.ToDictionary(pair => pair.Key,
+                pair => pair.Value.Value.ToString() ?? string.Empty);
         return dto;
     }
 
@@ -222,7 +223,7 @@ internal static class OrganizationConversionExtensions
                 continue;
             }
 
-            var value = tenantSetting.Value.ToString()!;
+            var value = tenantSetting.Value;
             var setting = Setting.Create(value, tenantSetting.IsEncrypted);
             if (!setting.IsSuccessful)
             {

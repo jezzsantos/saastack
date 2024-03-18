@@ -7,5 +7,5 @@ public class GetOrganizationSettingsResponse : IWebResponse
 {
     public Organization? Organization { get; set; }
 
-    public Dictionary<string, object?>? Settings { get; set; }
+    public Dictionary<string, string>? Settings { get; set; }
 }
