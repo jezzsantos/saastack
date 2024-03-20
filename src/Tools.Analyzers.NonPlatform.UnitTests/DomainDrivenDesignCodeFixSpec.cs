@@ -15,7 +15,7 @@ public class DomainDrivenDesignCodeFixSpec
     public class GivenARootAggregate
     {
         [Trait("Category", "Unit")]
-        public class GivenRuleSas030
+        public class GivenRuleRule010
         {
             [Fact]
             public async Task WhenFixingMissingCreateMethod_ThenAddsMethod()
@@ -130,13 +130,13 @@ public sealed class Created : IDomainEvent
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas030,
+                    DomainDrivenDesignAnalyzer.Rule010,
                     problem, fix, 14, 21, "AClass");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas034
+        public class GivenRuleRule014
         {
             [Fact]
             public async Task WhenFixingMissingRehydrateMethodAndDehydratable_ThenAddsMethod()
@@ -262,7 +262,7 @@ public sealed class EventOccurred : IDomainEvent
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas034,
+                    DomainDrivenDesignAnalyzer.Rule014,
                     problem, fix, 16, 21, "AClass");
             }
 
@@ -370,13 +370,13 @@ public sealed class EventOccurred : IDomainEvent
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas034,
+                    DomainDrivenDesignAnalyzer.Rule014,
                     problem, fix, 11, 21, "AClass");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas035
+        public class GivenRuleRule015
         {
             [Fact]
             public async Task WhenFixingMissingDehydrateMethodAndDehydratable_ThenAddsMethod()
@@ -503,13 +503,13 @@ public sealed class EventOccurred : IDomainEvent
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas035,
+                    DomainDrivenDesignAnalyzer.Rule015,
                     problem, fix, 16, 21, "AClass");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas036
+        public class GivenRuleRule016
         {
             [Fact]
             public async Task WhenFixingMissingEntityNameAttributeAndDehydratable_ThenAddsAttribute()
@@ -642,13 +642,13 @@ public sealed class EventOccurred : IDomainEvent
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas036,
+                    DomainDrivenDesignAnalyzer.Rule016,
                     problem, fix, 15, 21, "AClass");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas038
+        public class GivenRuleRule018
         {
             [Fact]
             public async Task WhenFixingNotSealed_ThenAddsSealed()
@@ -783,7 +783,7 @@ public sealed class EventOccurred : IDomainEvent
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas038,
+                    DomainDrivenDesignAnalyzer.Rule018,
                     problem, fix, 17, 14, "AClass");
             }
         }
@@ -793,7 +793,7 @@ public sealed class EventOccurred : IDomainEvent
     public class GivenAnEntity
     {
         [Trait("Category", "Unit")]
-        public class GivenRuleSas040
+        public class GivenRuleRule020
         {
             [Fact]
             public async Task WhenFixingMissingCreateMethod_ThenAddsMethod()
@@ -870,13 +870,13 @@ public sealed class AClass : EntityBase
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas040,
+                    DomainDrivenDesignAnalyzer.Rule020,
                     problem, fix, 14, 21, "AClass");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas043
+        public class GivenRuleRule023
         {
             [Fact]
             public async Task WhenFixingMissingRehydrateMethodAndDehydratable_ThenAddsMethod()
@@ -968,13 +968,13 @@ public sealed class AClass : EntityBase
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas043,
+                    DomainDrivenDesignAnalyzer.Rule023,
                     problem, fix, 16, 21, "AClass");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas045
+        public class GivenRuleRule025
         {
             [Fact]
             public async Task WhenFixingMissingEntityNameAttributeAndDehydratable_ThenAddsAttribute()
@@ -1071,13 +1071,13 @@ public sealed class AClass : EntityBase
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas045,
+                    DomainDrivenDesignAnalyzer.Rule025,
                     problem, fix, 15, 21, "AClass");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas047
+        public class GivenRuleRule027
         {
             [Fact]
             public async Task WhenFixingNotSealed_ThenAddsSealed()
@@ -1176,7 +1176,7 @@ public sealed class AClass : EntityBase
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas047,
+                    DomainDrivenDesignAnalyzer.Rule027,
                     problem, fix, 17, 14, "AClass");
             }
         }
@@ -1186,7 +1186,7 @@ public sealed class AClass : EntityBase
     public class GivenAValueObject
     {
         [Trait("Category", "Unit")]
-        public class GivenRuleSas050
+        public class GivenRuleRule030
         {
             [Fact]
             public async Task WhenFixingMissingCreateMethodAndSingleValueObject_ThenAddsMethod()
@@ -1264,7 +1264,7 @@ public sealed class AClass : SingleValueObjectBase<AClass, string>
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas050,
+                    DomainDrivenDesignAnalyzer.Rule030,
                     problem, fix, 14, 21, "AClass");
             }
 
@@ -1348,13 +1348,13 @@ public sealed class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas050,
+                    DomainDrivenDesignAnalyzer.Rule030,
                     problem, fix, 14, 21, "AClass");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas053
+        public class GivenRuleRule033
         {
             [Fact]
             public async Task WhenFixingMissingRehydrateMethodAndSingleValueObject_ThenAddsMethod()
@@ -1420,7 +1420,7 @@ public sealed class AClass : SingleValueObjectBase<AClass, string>
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas053,
+                    DomainDrivenDesignAnalyzer.Rule033,
                     problem, fix, 12, 21, "AClass");
             }
 
@@ -1498,13 +1498,13 @@ public sealed class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas053,
+                    DomainDrivenDesignAnalyzer.Rule033,
                     problem, fix, 12, 21, "AClass");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas055
+        public class GivenRuleRule035
         {
             [Fact(Skip = "see: https://github.com/dotnet/roslyn/issues/72535")]
             public async Task WhenFixingWrongReturnTypeWithCorrectReturnType_ThenChangesReturnType()
@@ -1598,7 +1598,7 @@ public sealed class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas055,
+                    DomainDrivenDesignAnalyzer.Rule035,
                     Resources.CodeFix_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod, problem, fix, 40,
                     17,
                     "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
@@ -1697,7 +1697,7 @@ public sealed class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas055,
+                    DomainDrivenDesignAnalyzer.Rule035,
                     Resources.CodeFix_Title_ChangeValueObjectMethodReturnType, problem, fix, 40,
                     17,
                     "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
@@ -1706,7 +1706,7 @@ public sealed class AClass : ValueObjectBase<AClass>
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas056
+        public class GivenRuleRule036
         {
             [Fact]
             public async Task WhenFixingNotSealed_ThenAddsSealed()
@@ -1791,7 +1791,7 @@ public sealed class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
-                    DomainDrivenDesignAnalyzer.Sas056, problem, fix, 12, 14, "AClass");
+                    DomainDrivenDesignAnalyzer.Rule036, problem, fix, 12, 14, "AClass");
             }
         }
     }

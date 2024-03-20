@@ -18,44 +18,45 @@ namespace Tools.Analyzers.NonPlatform;
 /// <summary>
 ///     An analyzer to the correct implementation of root aggregates, entities, value objects and domain events:
 ///     Aggregate Roots:
-///     SAS030: Error: Aggregate roots must have at least one Create() class factory method
-///     SAS031: Error: Create() class factory methods must return correct types
-///     SAS032: Error: Aggregate roots must raise a create event in the class factory
-///     SAS033: Error: Aggregate roots must only have private constructors
-///     SAS034: Error: Aggregate roots must have a <see cref="IRehydratableObject.Rehydrate" /> method
-///     SAS035: Error: Dehydratable aggregate roots must override the <see cref="IDehydratableEntity.Dehydrate" /> method
-///     SAS036: Error: Dehydratable aggregate roots must declare the <see cref="EntityNameAttribute" />
-///     SAS037: Error: Properties must not have public setters
-///     SAS038: Error: Aggregate roots must be marked as sealed
+///     SAASDDD010: Error: Aggregate roots must have at least one Create() class factory method
+///     SAASDDD011: Error: Create() class factory methods must return correct types
+///     SAASDDD012: Error: Aggregate roots must raise a create event in the class factory
+///     SAASDDD013: Error: Aggregate roots must only have private constructors
+///     SAASDDD014: Error: Aggregate roots must have a <see cref="IRehydratableObject.Rehydrate" /> method
+///     SAASDDD015: Error: Dehydratable aggregate roots must override the <see cref="IDehydratableEntity.Dehydrate" />
+///     method
+///     SAASDDD016: Error: Dehydratable aggregate roots must declare the <see cref="EntityNameAttribute" />
+///     SAASDDD017: Error: Properties must not have public setters
+///     SAASDDD018: Error: Aggregate roots must be marked as sealed
 ///     Entities:
-///     SAS040: Error: Entities must have at least one Create() class factory method
-///     SAS041: Error: Create() class factory methods must return correct types
-///     SAS042: Error: Entities must only have private constructors
-///     SAS043: Error: Dehydratable entities must have a <see cref="IRehydratableObject.Rehydrate" /> method
-///     SAS044: Error: Dehydratable entities must override the <see cref="IDehydratableEntity.Dehydrate" /> method
-///     SAS045: Error: Dehydratable entities must declare the <see cref="EntityNameAttribute" />
-///     SAS046: Error: Properties must not have public setters
-///     SAS047: Error: Entities must be marked as sealed
+///     SAASDDD020: Error: Entities must have at least one Create() class factory method
+///     SAASDDD021: Error: Create() class factory methods must return correct types
+///     SAASDDD022: Error: Entities must only have private constructors
+///     SAASDDD023: Error: Dehydratable entities must have a <see cref="IRehydratableObject.Rehydrate" /> method
+///     SAASDDD024: Error: Dehydratable entities must override the <see cref="IDehydratableEntity.Dehydrate" /> method
+///     SAASDDD025: Error: Dehydratable entities must declare the <see cref="EntityNameAttribute" />
+///     SAASDDD026: Error: Properties must not have public setters
+///     SAASDDD027: Error: Entities must be marked as sealed
 ///     Value Objects:
-///     SAS050: Error: ValueObjects must have at least one Create() class factory method
-///     SAS051: Error: Create() class factory methods must return correct types
-///     SAS052: Error: ValueObjects must only have private constructors
-///     SAS053: Error: ValueObjects must have a <see cref="IRehydratableObject.Rehydrate" /> method
-///     SAS054: Error: Properties must not have public setters
-///     SAS055: Error: ValueObjects must only have immutable methods (or be overridden by the
+///     SAASDDD030: Error: ValueObjects must have at least one Create() class factory method
+///     SAASDDD031: Error: Create() class factory methods must return correct types
+///     SAASDDD032: Error: ValueObjects must only have private constructors
+///     SAASDDD033: Error: ValueObjects must have a <see cref="IRehydratableObject.Rehydrate" /> method
+///     SAASDDD034: Error: Properties must not have public setters
+///     SAASDDD035: Error: ValueObjects must only have immutable methods (or be overridden by the
 ///     <see cref="SkipImmutabilityCheckAttribute" />)
-///     SAS056: Warning: ValueObjects should be marked as sealed
+///     SAASDDD036: Warning: ValueObjects should be marked as sealed
 ///     DomainEvents:
-///     SAS060: Error: DomainEvents must be public
-///     SAS061: Warning: DomainEvents must be sealed
-///     SAS062: Error: DomainEvents must have a parameterless constructor
-///     SAS063: Information: DomainEvents must be named in the past tense
-///     SAS064: Error: DomainEvents must have at least one Create() class factory method
-///     SAS065: Error: Create() class factory methods must return correct types
-///     SAS066: Error: Properties must have public getters and setters
-///     SAS067: Error: Properties must be required or nullable or initialized
-///     SAS068: Error: Properties must be nullable, not Optional{T} for interoperability
-///     SAS069: Error: Properties must have return type of primitives, List{TPrimitive}, Dictionary{string,TPrimitive},
+///     SAASDDD040: Error: DomainEvents must be public
+///     SAASDDD041: Warning: DomainEvents must be sealed
+///     SAASDDD042: Error: DomainEvents must have a parameterless constructor
+///     SAASDDD043: Information: DomainEvents must be named in the past tense
+///     SAASDDD044: Error: DomainEvents must have at least one Create() class factory method
+///     SAASDDD045: Error: Create() class factory methods must return correct types
+///     SAASDDD046: Error: Properties must have public getters and setters
+///     SAASDDD047: Error: Properties must be required or nullable or initialized
+///     SAASDDD048: Error: Properties must be nullable, not Optional{T} for interoperability
+///     SAASDDD049: Error: Properties must have return type of primitives, List{TPrimitive}, Dictionary{string,TPrimitive},
 ///     or be enums
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -75,140 +76,140 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
         SpecialType.System_DateTime,
         SpecialType.System_Byte
     };
-    internal static readonly DiagnosticDescriptor Sas030 = "SAS030".GetDescriptor(DiagnosticSeverity.Error,
-        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS030Title), nameof(Resources.SAS030Description),
-        nameof(Resources.SAS030MessageFormat));
-    internal static readonly DiagnosticDescriptor Sas031 = "SAS031".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule010 = "SAASDDD010".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD010Title), nameof(Resources.SAASDDD010Description),
+        nameof(Resources.SAASDDD010MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule011 = "SAASDDD011".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassFactoryWrongReturnType),
         nameof(Resources.Diagnostic_Description_ClassFactoryWrongReturnType),
         nameof(Resources.Diagnostic_MessageFormat_ClassFactoryWrongReturnType));
-    internal static readonly DiagnosticDescriptor Sas032 = "SAS032".GetDescriptor(DiagnosticSeverity.Error,
-        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS032Title), nameof(Resources.SAS032Description),
-        nameof(Resources.SAS032MessageFormat));
-    internal static readonly DiagnosticDescriptor Sas033 = "SAS033".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule012 = "SAASDDD012".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD012Title), nameof(Resources.SAASDDD012Description),
+        nameof(Resources.SAASDDD012MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule013 = "SAASDDD013".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ConstructorMustBePrivate),
         nameof(Resources.Diagnostic_Description_ConstructorMustBePrivate),
         nameof(Resources.Diagnostic_MessageFormat_ConstructorMustBePrivate));
-    internal static readonly DiagnosticDescriptor Sas034 = "SAS034".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule014 = "SAASDDD014".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_MustImplementRehydrate),
         nameof(Resources.Diagnostic_Description_MustImplementRehydrate),
         nameof(Resources.Diagnostic_MessageFormat_MustImplementRehydrate));
-    internal static readonly DiagnosticDescriptor Sas035 = "SAS035".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule015 = "SAASDDD015".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_MustImplementDehydrate),
         nameof(Resources.Diagnostic_Description_MustImplementDehydrate),
         nameof(Resources.Diagnostic_MessageFormat_MustImplementDehydrate));
-    internal static readonly DiagnosticDescriptor Sas036 = "SAS036".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule016 = "SAASDDD016".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_MustDeclareEntityNameAttribute),
         nameof(Resources.Diagnostic_Description_MustDeclareEntityNameAttribute),
         nameof(Resources.Diagnostic_MessageFormat_MustDeclareEntityNameAttribute));
-    internal static readonly DiagnosticDescriptor Sas037 = "SAS037".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule017 = "SAASDDD017".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_PropertyMustBeSettable),
         nameof(Resources.Diagnostic_Description_PropertyMustBeSettable),
         nameof(Resources.Diagnostic_MessageFormat_PropertyMustBeSettable));
-    internal static readonly DiagnosticDescriptor Sas038 = "SAS038".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule018 = "SAASDDD018".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassMustBeSealed),
         nameof(Resources.Diagnostic_Description_ClassMustBeSealed),
         nameof(Resources.Diagnostic_MessageFormat_ClassMustBeSealed));
-    internal static readonly DiagnosticDescriptor Sas040 = "SAS040".GetDescriptor(DiagnosticSeverity.Error,
-        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS040Title), nameof(Resources.SAS040Description),
-        nameof(Resources.SAS040MessageFormat));
-    internal static readonly DiagnosticDescriptor Sas041 = "SAS041".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule020 = "SAASDDD020".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD020Title), nameof(Resources.SAASDDD020Description),
+        nameof(Resources.SAASDDD020MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule021 = "SAASDDD021".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassFactoryWrongReturnType),
         nameof(Resources.Diagnostic_Description_ClassFactoryWrongReturnType),
         nameof(Resources.Diagnostic_MessageFormat_ClassFactoryWrongReturnType));
-    internal static readonly DiagnosticDescriptor Sas042 = "SAS042".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule022 = "SAASDDD022".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ConstructorMustBePrivate),
         nameof(Resources.Diagnostic_Description_ConstructorMustBePrivate),
         nameof(Resources.Diagnostic_MessageFormat_ConstructorMustBePrivate));
-    internal static readonly DiagnosticDescriptor Sas043 = "SAS043".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule023 = "SAASDDD023".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_MustImplementRehydrate),
         nameof(Resources.Diagnostic_Description_MustImplementRehydrate),
         nameof(Resources.Diagnostic_MessageFormat_MustImplementRehydrate));
-    internal static readonly DiagnosticDescriptor Sas044 = "SAS044".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule024 = "SAASDDD024".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_MustImplementDehydrate),
         nameof(Resources.Diagnostic_Description_MustImplementDehydrate),
         nameof(Resources.Diagnostic_MessageFormat_MustImplementDehydrate));
-    internal static readonly DiagnosticDescriptor Sas045 = "SAS045".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule025 = "SAASDDD025".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_MustDeclareEntityNameAttribute),
         nameof(Resources.Diagnostic_Description_MustDeclareEntityNameAttribute),
         nameof(Resources.Diagnostic_MessageFormat_MustDeclareEntityNameAttribute));
-    internal static readonly DiagnosticDescriptor Sas046 = "SAS046".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule026 = "SAASDDD026".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_PropertyMustBeSettable),
         nameof(Resources.Diagnostic_Description_PropertyMustBeSettable),
         nameof(Resources.Diagnostic_MessageFormat_PropertyMustBeSettable));
-    internal static readonly DiagnosticDescriptor Sas047 = "SAS047".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule027 = "SAASDDD027".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassMustBeSealed),
         nameof(Resources.Diagnostic_Description_ClassMustBeSealed),
         nameof(Resources.Diagnostic_MessageFormat_ClassMustBeSealed));
-    internal static readonly DiagnosticDescriptor Sas050 = "SAS050".GetDescriptor(DiagnosticSeverity.Error,
-        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS050Title), nameof(Resources.SAS050Description),
-        nameof(Resources.SAS050MessageFormat));
-    internal static readonly DiagnosticDescriptor Sas051 = "SAS051".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule030 = "SAASDDD030".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD030Title), nameof(Resources.SAASDDD030Description),
+        nameof(Resources.SAASDDD030MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule031 = "SAASDDD031".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassFactoryWrongReturnType),
         nameof(Resources.Diagnostic_Description_ClassFactoryWrongReturnType),
         nameof(Resources.Diagnostic_MessageFormat_ClassFactoryWrongReturnType));
-    internal static readonly DiagnosticDescriptor Sas052 = "SAS052".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule032 = "SAASDDD032".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ConstructorMustBePrivate),
         nameof(Resources.Diagnostic_Description_ConstructorMustBePrivate),
         nameof(Resources.Diagnostic_MessageFormat_ConstructorMustBePrivate));
-    internal static readonly DiagnosticDescriptor Sas053 = "SAS053".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule033 = "SAASDDD033".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_MustImplementRehydrate),
         nameof(Resources.Diagnostic_Description_MustImplementRehydrate),
         nameof(Resources.Diagnostic_MessageFormat_MustImplementRehydrate));
-    internal static readonly DiagnosticDescriptor Sas054 = "SAS054".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule034 = "SAASDDD034".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_PropertyMustBeSettable),
         nameof(Resources.Diagnostic_Description_PropertyMustBeSettable),
         nameof(Resources.Diagnostic_MessageFormat_PropertyMustBeSettable));
-    internal static readonly DiagnosticDescriptor Sas055 = "SAS055".GetDescriptor(DiagnosticSeverity.Error,
-        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS055Title), nameof(Resources.SAS055Description),
-        nameof(Resources.SAS055MessageFormat));
-    internal static readonly DiagnosticDescriptor Sas056 = "SAS056".GetDescriptor(DiagnosticSeverity.Warning,
+    internal static readonly DiagnosticDescriptor Rule035 = "SAASDDD035".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD035Title), nameof(Resources.SAASDDD035Description),
+        nameof(Resources.SAASDDD035MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule036 = "SAASDDD036".GetDescriptor(DiagnosticSeverity.Warning,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassMustBeSealed),
         nameof(Resources.Diagnostic_Description_ClassMustBeSealed),
         nameof(Resources.Diagnostic_MessageFormat_ClassMustBeSealed));
-    internal static readonly DiagnosticDescriptor Sas060 = "SAS060".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule040 = "SAASDDD040".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassMustBePublic),
         nameof(Resources.Diagnostic_Description_ClassMustBePublic),
         nameof(Resources.Diagnostic_MessageFormat_ClassMustBePublic));
-    internal static readonly DiagnosticDescriptor Sas061 = "SAS061".GetDescriptor(DiagnosticSeverity.Warning,
+    internal static readonly DiagnosticDescriptor Rule041 = "SAASDDD041".GetDescriptor(DiagnosticSeverity.Warning,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassMustBeSealed),
         nameof(Resources.Diagnostic_Description_ClassMustBeSealed),
         nameof(Resources.Diagnostic_MessageFormat_ClassMustBeSealed));
-    internal static readonly DiagnosticDescriptor Sas062 = "SAS062".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule042 = "SAASDDD042".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassMustHaveParameterlessConstructor),
         nameof(Resources.Diagnostic_Description_ClassMustHaveParameterlessConstructor),
         nameof(Resources.Diagnostic_MessageFormat_ClassMustHaveParameterlessConstructor));
-    internal static readonly DiagnosticDescriptor Sas063 = "SAS063".GetDescriptor(DiagnosticSeverity.Info,
-        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS063Title), nameof(Resources.SAS063Description),
-        nameof(Resources.SAS063MessageFormat));
-    internal static readonly DiagnosticDescriptor Sas064 = "SAS064".GetDescriptor(DiagnosticSeverity.Error,
-        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS064Title), nameof(Resources.SAS064Description),
-        nameof(Resources.SAS064MessageFormat));
-    internal static readonly DiagnosticDescriptor Sas065 = "SAS065".GetDescriptor(DiagnosticSeverity.Error,
-        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS065Title), nameof(Resources.SAS065Description),
-        nameof(Resources.SAS065MessageFormat));
-    internal static readonly DiagnosticDescriptor Sas066 = "SAS066".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule043 = "SAASDDD043".GetDescriptor(DiagnosticSeverity.Info,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD043Title), nameof(Resources.SAASDDD043Description),
+        nameof(Resources.SAASDDD043MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule044 = "SAASDDD044".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD044Title), nameof(Resources.SAASDDD044Description),
+        nameof(Resources.SAASDDD044MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule045 = "SAASDDD045".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD045Title), nameof(Resources.SAASDDD045Description),
+        nameof(Resources.SAASDDD045MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule046 = "SAASDDD046".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_PropertyMustBeGettableAndSettable),
         nameof(Resources.Diagnostic_Description_PropertyMustBeGettableAndSettable),
         nameof(Resources.Diagnostic_MessageFormat_PropertyMustBeGettableAndSettable));
-    internal static readonly DiagnosticDescriptor Sas067 = "SAS067".GetDescriptor(DiagnosticSeverity.Error,
-        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS067Title), nameof(Resources.SAS067Description),
-        nameof(Resources.SAS067MessageFormat));
-    internal static readonly DiagnosticDescriptor Sas068 = "SAS068".GetDescriptor(DiagnosticSeverity.Error,
+    internal static readonly DiagnosticDescriptor Rule047 = "SAASDDD047".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD047Title), nameof(Resources.SAASDDD047Description),
+        nameof(Resources.SAASDDD047MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule048 = "SAASDDD048".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_PropertyMustBeNullableNotOptional),
         nameof(Resources.Diagnostic_Description_PropertyMustBeNullableNotOptional),
         nameof(Resources.Diagnostic_MessageFormat_PropertyMustBeNullableNotOptional));
-    internal static readonly DiagnosticDescriptor Sas069 = "SAS069".GetDescriptor(DiagnosticSeverity.Error,
-        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAS069Title), nameof(Resources.SAS069Description),
-        nameof(Resources.SAS069MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule049 = "SAASDDD049".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD049Title), nameof(Resources.SAASDDD049Description),
+        nameof(Resources.SAASDDD049MessageFormat));
     private static readonly string[] IgnoredValueObjectMethodNames = { nameof(IDehydratableEntity.Dehydrate) };
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(
-            Sas030, Sas031, Sas032, Sas033, Sas034, Sas035, Sas036, Sas037, Sas038,
-            Sas040, Sas041, Sas042, Sas043, Sas044, Sas045, Sas046, Sas047,
-            Sas050, Sas051, Sas052, Sas053, Sas054, Sas055, Sas056,
-            Sas060, Sas061, Sas062, Sas063, Sas064, Sas065, Sas066, Sas067, Sas068, Sas069);
+            Rule010, Rule011, Rule012, Rule013, Rule014, Rule015, Rule016, Rule017, Rule018,
+            Rule020, Rule021, Rule022, Rule023, Rule024, Rule025, Rule026, Rule027,
+            Rule030, Rule031, Rule032, Rule033, Rule034, Rule035, Rule036,
+            Rule040, Rule041, Rule042, Rule043, Rule044, Rule045, Rule046, Rule047, Rule048, Rule049);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -238,6 +239,11 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        if (!classDeclarationSyntax.IsSealed())
+        {
+            context.ReportDiagnostic(Rule018, classDeclarationSyntax);
+        }
+
         var allMethods = classDeclarationSyntax.Members.Where(member => member is MethodDeclarationSyntax)
             .Cast<MethodDeclarationSyntax>()
             .ToList();
@@ -246,7 +252,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             .ToList();
         if (classFactoryMethods.HasNone())
         {
-            context.ReportDiagnostic(Sas030, classDeclarationSyntax);
+            context.ReportDiagnostic(Rule010, classDeclarationSyntax);
         }
         else
         {
@@ -257,44 +263,35 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                 {
                     var acceptableReturnTypes =
                         allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(" or ");
-                    context.ReportDiagnostic(Sas031, method, acceptableReturnTypes);
+                    context.ReportDiagnostic(Rule011, method, acceptableReturnTypes);
                 }
 
                 if (context.IsMissingContent(method, ConstructorMethodCall))
                 {
-                    context.ReportDiagnostic(Sas032, method, ConstructorMethodCall);
+                    context.ReportDiagnostic(Rule012, method, ConstructorMethodCall);
                 }
             }
         }
 
-        var allConstructors = classDeclarationSyntax.Members.Where(member => member is ConstructorDeclarationSyntax)
-            .Cast<ConstructorDeclarationSyntax>()
-            .ToList();
-        if (allConstructors.HasAny())
+        if (!classDeclarationSyntax.HasOnlyPrivateInstanceConstructors(out var constructor))
         {
-            foreach (var constructor in allConstructors)
-            {
-                if (!constructor.IsPrivateInstanceConstructor())
-                {
-                    context.ReportDiagnostic(Sas033, constructor);
-                }
-            }
+            context.ReportDiagnostic(Rule013, constructor!);
         }
 
         var dehydratable = context.IsDehydratableAggregateRoot(classDeclarationSyntax);
         if (!dehydratable.ImplementsRehydrate)
         {
-            context.ReportDiagnostic(Sas034, classDeclarationSyntax);
+            context.ReportDiagnostic(Rule014, classDeclarationSyntax);
         }
 
         if (dehydratable is { IsDehydratable: true, ImplementsDehydrate: false })
         {
-            context.ReportDiagnostic(Sas035, classDeclarationSyntax);
+            context.ReportDiagnostic(Rule015, classDeclarationSyntax);
         }
 
         if (dehydratable is { IsDehydratable: true, MarkedAsEntityName: false })
         {
-            context.ReportDiagnostic(Sas036, classDeclarationSyntax);
+            context.ReportDiagnostic(Rule016, classDeclarationSyntax);
         }
 
         var allProperties = classDeclarationSyntax.Members.Where(member => member is PropertyDeclarationSyntax)
@@ -306,14 +303,9 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             {
                 if (property.HasPublicSetter())
                 {
-                    context.ReportDiagnostic(Sas037, property);
+                    context.ReportDiagnostic(Rule017, property);
                 }
             }
-        }
-
-        if (!classDeclarationSyntax.IsSealed())
-        {
-            context.ReportDiagnostic(Sas038, classDeclarationSyntax);
         }
     }
 
@@ -335,6 +327,11 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        if (!classDeclarationSyntax.IsSealed())
+        {
+            context.ReportDiagnostic(Rule027, classDeclarationSyntax);
+        }
+
         var allMethods = classDeclarationSyntax.Members.Where(member => member is MethodDeclarationSyntax)
             .Cast<MethodDeclarationSyntax>()
             .ToList();
@@ -343,7 +340,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             .ToList();
         if (classFactoryMethods.HasNone())
         {
-            context.ReportDiagnostic(Sas040, classDeclarationSyntax);
+            context.ReportDiagnostic(Rule020, classDeclarationSyntax);
         }
         else
         {
@@ -354,39 +351,30 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                 {
                     var acceptableReturnTypes =
                         allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(" or ");
-                    context.ReportDiagnostic(Sas041, method, acceptableReturnTypes);
+                    context.ReportDiagnostic(Rule021, method, acceptableReturnTypes);
                 }
             }
         }
 
-        var allConstructors = classDeclarationSyntax.Members.Where(member => member is ConstructorDeclarationSyntax)
-            .Cast<ConstructorDeclarationSyntax>()
-            .ToList();
-        if (allConstructors.HasAny())
+        if (!classDeclarationSyntax.HasOnlyPrivateInstanceConstructors(out var constructor))
         {
-            foreach (var constructor in allConstructors)
-            {
-                if (!constructor.IsPrivateInstanceConstructor())
-                {
-                    context.ReportDiagnostic(Sas042, constructor);
-                }
-            }
+            context.ReportDiagnostic(Rule022, constructor!);
         }
 
         var dehydratable = context.IsDehydratableEntity(classDeclarationSyntax);
         if (dehydratable is { IsDehydratable: true, ImplementsRehydrate: false })
         {
-            context.ReportDiagnostic(Sas043, classDeclarationSyntax);
+            context.ReportDiagnostic(Rule023, classDeclarationSyntax);
         }
 
         if (dehydratable is { IsDehydratable: true, ImplementsDehydrate: false })
         {
-            context.ReportDiagnostic(Sas044, classDeclarationSyntax);
+            context.ReportDiagnostic(Rule024, classDeclarationSyntax);
         }
 
         if (dehydratable is { IsDehydratable: true, MarkedAsEntityName: false })
         {
-            context.ReportDiagnostic(Sas045, classDeclarationSyntax);
+            context.ReportDiagnostic(Rule025, classDeclarationSyntax);
         }
 
         var allProperties = classDeclarationSyntax.Members.Where(member => member is PropertyDeclarationSyntax)
@@ -398,14 +386,9 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             {
                 if (property.HasPublicSetter())
                 {
-                    context.ReportDiagnostic(Sas046, property);
+                    context.ReportDiagnostic(Rule026, property);
                 }
             }
-        }
-
-        if (!classDeclarationSyntax.IsSealed())
-        {
-            context.ReportDiagnostic(Sas047, classDeclarationSyntax);
         }
     }
 
@@ -427,6 +410,11 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        if (!classDeclarationSyntax.IsSealed())
+        {
+            context.ReportDiagnostic(Rule036, classDeclarationSyntax);
+        }
+        
         var allMethods = classDeclarationSyntax.Members.Where(member => member is MethodDeclarationSyntax)
             .Cast<MethodDeclarationSyntax>()
             .ToList();
@@ -435,7 +423,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             .ToList();
         if (classFactoryMethods.HasNone())
         {
-            context.ReportDiagnostic(Sas050, classDeclarationSyntax);
+            context.ReportDiagnostic(Rule030, classDeclarationSyntax);
         }
         else
         {
@@ -446,29 +434,20 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                 {
                     var acceptableReturnTypes =
                         allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(" or ");
-                    context.ReportDiagnostic(Sas051, method, acceptableReturnTypes);
+                    context.ReportDiagnostic(Rule031, method, acceptableReturnTypes);
                 }
             }
         }
 
-        var allConstructors = classDeclarationSyntax.Members.Where(member => member is ConstructorDeclarationSyntax)
-            .Cast<ConstructorDeclarationSyntax>()
-            .ToList();
-        if (allConstructors.HasAny())
+        if (!classDeclarationSyntax.HasOnlyPrivateInstanceConstructors(out var constructor))
         {
-            foreach (var constructor in allConstructors)
-            {
-                if (!constructor.IsPrivateInstanceConstructor())
-                {
-                    context.ReportDiagnostic(Sas052, constructor);
-                }
-            }
+            context.ReportDiagnostic(Rule032, constructor!);
         }
 
         var dehydratable = context.IsDehydratableValueObject(classDeclarationSyntax);
         if (!dehydratable.ImplementsRehydrate)
         {
-            context.ReportDiagnostic(Sas053, classDeclarationSyntax);
+            context.ReportDiagnostic(Rule033, classDeclarationSyntax);
         }
 
         var allProperties = classDeclarationSyntax.Members.Where(member => member is PropertyDeclarationSyntax)
@@ -480,7 +459,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             {
                 if (property.HasPublicSetter())
                 {
-                    context.ReportDiagnostic(Sas054, property);
+                    context.ReportDiagnostic(Rule034, property);
                 }
             }
         }
@@ -500,14 +479,11 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             {
                 var acceptableReturnTypes =
                     allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(" or ");
-                context.ReportDiagnostic(Sas055, method, acceptableReturnTypes, nameof(SkipImmutabilityCheckAttribute));
+                context.ReportDiagnostic(Rule035, method, acceptableReturnTypes,
+                    nameof(SkipImmutabilityCheckAttribute));
             }
         }
 
-        if (!classDeclarationSyntax.IsSealed())
-        {
-            context.ReportDiagnostic(Sas056, classDeclarationSyntax);
-        }
     }
 
     private static void AnalyzeDomainEvent(SyntaxNodeAnalysisContext context)
@@ -530,17 +506,17 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
 
         if (!context.IsNamedInPastTense(classDeclarationSyntax))
         {
-            context.ReportDiagnostic(Sas063, classDeclarationSyntax);
+            context.ReportDiagnostic(Rule043, classDeclarationSyntax);
         }
 
         if (!classDeclarationSyntax.IsPublic())
         {
-            context.ReportDiagnostic(Sas060, classDeclarationSyntax);
+            context.ReportDiagnostic(Rule040, classDeclarationSyntax);
         }
 
         if (!classDeclarationSyntax.IsSealed())
         {
-            context.ReportDiagnostic(Sas061, classDeclarationSyntax);
+            context.ReportDiagnostic(Rule041, classDeclarationSyntax);
         }
 
         var allMethods = classDeclarationSyntax.Members.Where(member => member is MethodDeclarationSyntax)
@@ -551,7 +527,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             .ToList();
         if (classFactoryMethods.HasNone())
         {
-            context.ReportDiagnostic(Sas064, classDeclarationSyntax);
+            context.ReportDiagnostic(Rule044, classDeclarationSyntax);
         }
         else
         {
@@ -562,22 +538,14 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                 {
                     var acceptableReturnTypes =
                         allowedReturnTypes.Select(allowable => allowable.ToDisplayString()).Join(" or ");
-                    context.ReportDiagnostic(Sas065, method, acceptableReturnTypes);
+                    context.ReportDiagnostic(Rule045, method, acceptableReturnTypes);
                 }
             }
         }
 
-        var allConstructors = classDeclarationSyntax.Members.Where(member => member is ConstructorDeclarationSyntax)
-            .Cast<ConstructorDeclarationSyntax>()
-            .ToList();
-        if (allConstructors.HasAny())
+        if (!classDeclarationSyntax.HasParameterlessConstructor())
         {
-            var parameterlessConstructors = allConstructors
-                .Where(constructor => constructor.ParameterList.Parameters.Count == 0 && constructor.IsPublic());
-            if (parameterlessConstructors.HasNone())
-            {
-                context.ReportDiagnostic(Sas062, classDeclarationSyntax);
-            }
+            context.ReportDiagnostic(Rule042, classDeclarationSyntax);
         }
 
         var allProperties = classDeclarationSyntax.Members.Where(member => member is PropertyDeclarationSyntax)
@@ -589,20 +557,20 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             {
                 if (!property.HasPublicGetterAndSetter())
                 {
-                    context.ReportDiagnostic(Sas066, property);
+                    context.ReportDiagnostic(Rule046, property);
                 }
 
                 if (!property.IsRequired() && !property.IsInitialized())
                 {
                     if (!property.IsNullableType(context))
                     {
-                        context.ReportDiagnostic(Sas067, property);
+                        context.ReportDiagnostic(Rule047, property);
                     }
                 }
 
                 if (!property.IsNullableType(context) && property.IsOptionalType(context))
                 {
-                    context.ReportDiagnostic(Sas068, property);
+                    context.ReportDiagnostic(Rule048, property);
                 }
 
                 var allowedReturnTypes = context.GetAllowableDomainEventPropertyReturnTypes();
@@ -615,14 +583,14 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                                 !allowable.ToDisplayString().StartsWith("System.Collections")
                                 && !allowable.ToDisplayString().EndsWith("?"))
                             .Select(allowable => allowable.ToDisplayString()).Join(" or ");
-                    context.ReportDiagnostic(Sas069, property, acceptableReturnTypes);
+                    context.ReportDiagnostic(Rule049, property, acceptableReturnTypes);
                 }
             }
         }
     }
 }
 
-internal static partial class DomainDrivenDesignExtensions
+internal static class DomainDrivenDesignExtensions
 {
     private static INamedTypeSymbol[]? _allowableDomainEventPropertyReturnTypes;
 
@@ -733,7 +701,7 @@ internal static partial class DomainDrivenDesignExtensions
             ImplementsAggregateRehydrateMethod(semanticModel, compilation, classDeclarationSyntax, allMethods);
         var implementsDehydrate =
             ImplementsDehydrateMethod(semanticModel, compilation, classDeclarationSyntax, allMethods);
-        var hasAttribute = HasEntityNameAttribute(semanticModel, compilation, classDeclarationSyntax);
+        var hasAttribute = semanticModel.HasEntityNameAttribute(compilation, classDeclarationSyntax);
         return new DehydratableStatus(implementsDehydrate, implementsRehydrate, hasAttribute,
             () => implementsDehydrate || hasAttribute);
     }
@@ -801,7 +769,7 @@ internal static partial class DomainDrivenDesignExtensions
             ImplementsEntityRehydrateMethod(semanticModel, compilation, classDeclarationSyntax, allMethods);
         var implementsDehydrate =
             ImplementsDehydrateMethod(semanticModel, compilation, classDeclarationSyntax, allMethods);
-        var hasAttribute = HasEntityNameAttribute(semanticModel, compilation, classDeclarationSyntax);
+        var hasAttribute = semanticModel.HasEntityNameAttribute(compilation, classDeclarationSyntax);
         return new DehydratableStatus(implementsDehydrate, implementsRehydrate, hasAttribute,
             () => implementsRehydrate || hasAttribute || implementsRehydrate);
     }
@@ -872,16 +840,6 @@ internal static partial class DomainDrivenDesignExtensions
         }
 
         return true;
-    }
-
-    /// <summary>
-    ///     Whether the class either has a <see cref="EntityNameAttribute" /> declaration
-    /// </summary>
-    private static bool HasEntityNameAttribute(this SemanticModel semanticModel, Compilation compilation,
-        ClassDeclarationSyntax classDeclarationSyntax)
-    {
-        var attribute = classDeclarationSyntax.GetAttributeOfType<EntityNameAttribute>(semanticModel, compilation);
-        return attribute.Exists();
     }
 
     /// <summary>

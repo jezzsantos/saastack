@@ -26,21 +26,21 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
 {
     public sealed override ImmutableArray<string> FixableDiagnosticIds =>
         ImmutableArray.Create(
-            DomainDrivenDesignAnalyzer.Sas030.Id,
-            DomainDrivenDesignAnalyzer.Sas034.Id,
-            DomainDrivenDesignAnalyzer.Sas035.Id,
-            DomainDrivenDesignAnalyzer.Sas036.Id,
-            DomainDrivenDesignAnalyzer.Sas038.Id,
-            DomainDrivenDesignAnalyzer.Sas040.Id,
-            DomainDrivenDesignAnalyzer.Sas043.Id,
-            DomainDrivenDesignAnalyzer.Sas044.Id,
-            DomainDrivenDesignAnalyzer.Sas045.Id,
-            DomainDrivenDesignAnalyzer.Sas047.Id,
-            DomainDrivenDesignAnalyzer.Sas050.Id,
-            DomainDrivenDesignAnalyzer.Sas053.Id,
-            DomainDrivenDesignAnalyzer.Sas055.Id,
-            DomainDrivenDesignAnalyzer.Sas056.Id,
-            DomainDrivenDesignAnalyzer.Sas061.Id
+            DomainDrivenDesignAnalyzer.Rule010.Id,
+            DomainDrivenDesignAnalyzer.Rule014.Id,
+            DomainDrivenDesignAnalyzer.Rule015.Id,
+            DomainDrivenDesignAnalyzer.Rule016.Id,
+            DomainDrivenDesignAnalyzer.Rule018.Id,
+            DomainDrivenDesignAnalyzer.Rule020.Id,
+            DomainDrivenDesignAnalyzer.Rule023.Id,
+            DomainDrivenDesignAnalyzer.Rule024.Id,
+            DomainDrivenDesignAnalyzer.Rule025.Id,
+            DomainDrivenDesignAnalyzer.Rule027.Id,
+            DomainDrivenDesignAnalyzer.Rule030.Id,
+            DomainDrivenDesignAnalyzer.Rule033.Id,
+            DomainDrivenDesignAnalyzer.Rule035.Id,
+            DomainDrivenDesignAnalyzer.Rule036.Id,
+            DomainDrivenDesignAnalyzer.Rule041.Id
         );
 
     public override FixAllProvider GetFixAllProvider()
@@ -82,7 +82,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         var diagnostics = context.Diagnostics;
         var diagnostic = diagnostics.First();
 
-        if (diagnostics.Any(d => d.Id == DomainDrivenDesignAnalyzer.Sas034.Id))
+        if (diagnostics.Any(d => d.Id == DomainDrivenDesignAnalyzer.Rule014.Id))
         {
             var title = Resources.CodeFix_Title_AddRehydrateMethod;
             context.RegisterCodeFix(
@@ -92,7 +92,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
                 diagnostic);
         }
 
-        if (diagnostics.Any(d => d.Id == DomainDrivenDesignAnalyzer.Sas043.Id))
+        if (diagnostics.Any(d => d.Id == DomainDrivenDesignAnalyzer.Rule023.Id))
         {
             var title = Resources.CodeFix_Title_AddRehydrateMethod;
             context.RegisterCodeFix(
@@ -102,7 +102,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
                 diagnostic);
         }
 
-        if (diagnostics.Any(d => d.Id == DomainDrivenDesignAnalyzer.Sas053.Id))
+        if (diagnostics.Any(d => d.Id == DomainDrivenDesignAnalyzer.Rule033.Id))
         {
             var title = Resources.CodeFix_Title_AddRehydrateMethod;
             context.RegisterCodeFix(
@@ -113,7 +113,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         }
 
         if (diagnostics.Any(d =>
-                d.Id == DomainDrivenDesignAnalyzer.Sas035.Id))
+                d.Id == DomainDrivenDesignAnalyzer.Rule015.Id))
         {
             var title = Resources.CodeFix_Title_AddDehydrateMethodToEntity;
             context.RegisterCodeFix(
@@ -124,10 +124,10 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         }
         
         if (diagnostics.Any(d =>
-                d.Id == DomainDrivenDesignAnalyzer.Sas038.Id 
-                || d.Id == DomainDrivenDesignAnalyzer.Sas047.Id
-                || d.Id == DomainDrivenDesignAnalyzer.Sas056.Id
-                || d.Id == DomainDrivenDesignAnalyzer.Sas061.Id))
+                d.Id == DomainDrivenDesignAnalyzer.Rule018.Id
+                || d.Id == DomainDrivenDesignAnalyzer.Rule027.Id
+                || d.Id == DomainDrivenDesignAnalyzer.Rule036.Id
+                || d.Id == DomainDrivenDesignAnalyzer.Rule041.Id))
         {
             var title = Resources.CodeFix_Title_AddSealedToClass;
             context.RegisterCodeFix(
@@ -138,7 +138,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         }
 
         if (diagnostics.Any(d =>
-                d.Id == DomainDrivenDesignAnalyzer.Sas044.Id))
+                d.Id == DomainDrivenDesignAnalyzer.Rule024.Id))
         {
             var title = Resources.CodeFix_Title_AddDehydrateMethodToEntity;
             context.RegisterCodeFix(
@@ -149,7 +149,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         }
 
         if (diagnostics.Any(d =>
-                d.Id == DomainDrivenDesignAnalyzer.Sas030.Id))
+                d.Id == DomainDrivenDesignAnalyzer.Rule010.Id))
         {
             var title = Resources.CodeFix_Title_AddClassFactoryMethodToAggregate;
             context.RegisterCodeFix(
@@ -160,7 +160,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         }
 
         if (diagnostics.Any(d =>
-                d.Id == DomainDrivenDesignAnalyzer.Sas040.Id))
+                d.Id == DomainDrivenDesignAnalyzer.Rule020.Id))
         {
             var title = Resources.CodeFix_Title_AddClassFactoryMethodToEntity;
             context.RegisterCodeFix(
@@ -171,7 +171,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         }
 
         if (diagnostics.Any(d =>
-                d.Id == DomainDrivenDesignAnalyzer.Sas050.Id))
+                d.Id == DomainDrivenDesignAnalyzer.Rule030.Id))
         {
             var title = Resources.CodeFix_Title_AddClassFactoryMethodToValueObject;
             context.RegisterCodeFix(
@@ -182,7 +182,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         }
 
         if (diagnostics.Any(d =>
-                d.Id == DomainDrivenDesignAnalyzer.Sas036.Id || d.Id == DomainDrivenDesignAnalyzer.Sas045.Id))
+                d.Id == DomainDrivenDesignAnalyzer.Rule016.Id || d.Id == DomainDrivenDesignAnalyzer.Rule025.Id))
         {
             var title = Resources.CodeFix_Title_AddEntityValueAttributeToEntiyOrAggregate;
             context.RegisterCodeFix(
@@ -199,7 +199,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         var diagnostic = diagnostics.First();
 
         if (diagnostics.Any(d =>
-                d.Id == DomainDrivenDesignAnalyzer.Sas055.Id))
+                d.Id == DomainDrivenDesignAnalyzer.Rule035.Id))
         {
             var title1 = Resources.CodeFix_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod;
             context.RegisterCodeFix(

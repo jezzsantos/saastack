@@ -2,6 +2,10 @@ namespace Tools.Analyzers.Common;
 
 public static class AnalyzerConstants
 {
+    public const string ServiceOperationTypesNamespace = "Infrastructure.Web.Api.Operations.Shared";
+    public const string ResourceTypesNamespace = "Application.Resources.Shared";
+    public const string RequestTypeSuffix = "Request";
+    public const string ResponseTypeSuffix = "Response";
     public static readonly string[] PlatformNamespaces =
     {
 #if TESTINGONLY
@@ -19,13 +23,11 @@ public static class AnalyzerConstants
         "IntegrationTesting.WebApi.Common", "UnitTesting.Common"
     };
 
-    public const string ResourceTypesNamespace = "Application.Resources.Shared";
-
     public static class Categories
     {
+        public const string Application = "SaaStackApplication";
         public const string Ddd = "SaaStackDDD";
         public const string Documentation = "SaaStackDocumentation";
         public const string WebApi = "SaaStackWebApi";
-        public const string Application = "SaaStackApplication";
     }
 }

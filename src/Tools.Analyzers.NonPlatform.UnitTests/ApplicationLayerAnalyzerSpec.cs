@@ -33,7 +33,7 @@ public class AClass : IIdentifiableResource
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas070
+        public class GivenRule010
         {
             [Fact]
             public async Task WhenIsNotPublic_ThenAlerts()
@@ -48,12 +48,12 @@ internal class AClass : IIdentifiableResource
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas070, input, 5, 16, "AClass");
+                    ApplicationLayerAnalyzer.Rule010, input, 5, 16, "AClass");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas071
+        public class GivenRule011
         {
             [Fact]
             public async Task WhenHasCtorAndNotParameterless_ThenAlerts()
@@ -73,7 +73,7 @@ public class AClass : IIdentifiableResource
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas071, input, 5, 14, "AClass");
+                    ApplicationLayerAnalyzer.Rule011, input, 5, 14, "AClass");
             }
 
             [Fact]
@@ -94,7 +94,7 @@ public class AClass : IIdentifiableResource
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas071, input, 5, 14, "AClass");
+                    ApplicationLayerAnalyzer.Rule011, input, 5, 14, "AClass");
             }
 
             [Fact]
@@ -119,7 +119,7 @@ public class AClass : IIdentifiableResource
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas072
+        public class GivenRule012
         {
             [Fact]
             public async Task WhenAnyPropertyHasNoSetter_ThenAlerts()
@@ -136,12 +136,12 @@ public class AClass : IIdentifiableResource
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas072, input, 9, 20, "AProperty");
+                    ApplicationLayerAnalyzer.Rule012, input, 9, 20, "AProperty");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas073
+        public class GivenRule013
         {
             [Fact]
             public async Task WhenAnyPropertyReferenceTypeIsOptional_ThenAlerts()
@@ -159,9 +159,9 @@ public class AClass : IIdentifiableResource
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(input,
-                    (ApplicationLayerAnalyzer.Sas073, 10, 29, "AProperty", null),
-                    (ApplicationLayerAnalyzer.Sas074, 10, 29, "AProperty", [
-                        GivenRuleSas074.AllTypes,
+                    (ApplicationLayerAnalyzer.Rule013, 10, 29, "AProperty", null),
+                    (ApplicationLayerAnalyzer.Rule014, 10, 29, "AProperty", [
+                        GivenRule014.AllTypes,
                         AnalyzerConstants.ResourceTypesNamespace
                     ]));
             }
@@ -185,7 +185,7 @@ public class AClass : IIdentifiableResource
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas074
+        public class GivenRule014
         {
             public const string AllTypes =
                 "bool or string or ulong or int or long or double or decimal or System.DateTime or byte or System.IO.Stream";
@@ -206,7 +206,7 @@ public class AClass : IIdentifiableResource
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas074, input, 10, 26, "AProperty", AllTypes,
+                    ApplicationLayerAnalyzer.Rule014, input, 10, 26, "AProperty", AllTypes,
                     AnalyzerConstants.ResourceTypesNamespace);
             }
 
@@ -226,7 +226,7 @@ public class AClass : IIdentifiableResource
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas074, input, 10, 32, "AProperty", AllTypes,
+                    ApplicationLayerAnalyzer.Rule014, input, 10, 32, "AProperty", AllTypes,
                     AnalyzerConstants.ResourceTypesNamespace);
             }
 
@@ -246,7 +246,7 @@ public class AClass : IIdentifiableResource
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas074, input, 10, 46, "AProperty", AllTypes,
+                    ApplicationLayerAnalyzer.Rule014, input, 10, 46, "AProperty", AllTypes,
                     AnalyzerConstants.ResourceTypesNamespace);
             }
 
@@ -266,7 +266,7 @@ public class AClass : IIdentifiableResource
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas074, input, 10, 46, "AProperty", AllTypes,
+                    ApplicationLayerAnalyzer.Rule014, input, 10, 46, "AProperty", AllTypes,
                     AnalyzerConstants.ResourceTypesNamespace);
             }
 
@@ -423,7 +423,7 @@ namespace AnotherNamespace
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas074, input, 12, 38, "AProperty", AllTypes,
+                    ApplicationLayerAnalyzer.Rule014, input, 12, 38, "AProperty", AllTypes,
                     AnalyzerConstants.ResourceTypesNamespace);
             }
 
@@ -509,7 +509,7 @@ namespace AnotherNamespace
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas074, input, 12, 32, "AProperty", AllTypes,
+                    ApplicationLayerAnalyzer.Rule014, input, 12, 32, "AProperty", AllTypes,
                     AnalyzerConstants.ResourceTypesNamespace);
             }
 
@@ -610,7 +610,7 @@ namespace AnotherNamespace
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas074, input, 12, 44, "AProperty", AllTypes,
+                    ApplicationLayerAnalyzer.Rule014, input, 12, 44, "AProperty", AllTypes,
                     AnalyzerConstants.ResourceTypesNamespace);
             }
 
@@ -711,7 +711,7 @@ namespace AnotherNamespace
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas074, input, 12, 58, "AProperty", AllTypes,
+                    ApplicationLayerAnalyzer.Rule014, input, 12, 58, "AProperty", AllTypes,
                     AnalyzerConstants.ResourceTypesNamespace);
             }
         }
@@ -743,7 +743,7 @@ public class AClass : ReadModelEntity
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas080
+        public class GivenRule020
         {
             [Fact]
             public async Task WhenIsNotPublic_ThenAlerts()
@@ -761,12 +761,12 @@ internal class AClass : ReadModelEntity
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas080, input, 8, 16, "AClass");
+                    ApplicationLayerAnalyzer.Rule020, input, 8, 16, "AClass");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas081
+        public class GivenRule021
         {
             [Fact]
             public async Task WhenMissingEntityNameAttribute_ThenAlerts()
@@ -783,12 +783,12 @@ public class AClass : ReadModelEntity
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas081, input, 7, 14, "AClass");
+                    ApplicationLayerAnalyzer.Rule021, input, 7, 14, "AClass");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas082
+        public class GivenRule022
         {
             [Fact]
             public async Task WhenHasCtorAndNotParameterless_ThenAlerts()
@@ -811,7 +811,7 @@ public class AClass : ReadModelEntity
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas082, input, 8, 14, "AClass");
+                    ApplicationLayerAnalyzer.Rule022, input, 8, 14, "AClass");
             }
 
             [Fact]
@@ -835,7 +835,7 @@ public class AClass : ReadModelEntity
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas082, input, 8, 14, "AClass");
+                    ApplicationLayerAnalyzer.Rule022, input, 8, 14, "AClass");
             }
 
             [Fact]
@@ -863,7 +863,7 @@ public class AClass : ReadModelEntity
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas083
+        public class GivenRule023
         {
             [Fact]
             public async Task WhenAnyPropertyHasNoSetter_ThenAlerts()
@@ -881,12 +881,12 @@ public class AClass : ReadModelEntity
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas083, input, 10, 29, "AProperty");
+                    ApplicationLayerAnalyzer.Rule023, input, 10, 29, "AProperty");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas084
+        public class GivenRule024
         {
             [Fact]
             public async Task WhenAnyPropertyIsNullable_ThenAlerts()
@@ -904,7 +904,7 @@ public class AClass : ReadModelEntity
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas084, input, 10, 20, "AProperty");
+                    ApplicationLayerAnalyzer.Rule024, input, 10, 20, "AProperty");
             }
 
             [Fact]
@@ -947,7 +947,7 @@ public class AClass : ReadModelEntity
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas085
+        public class GivenRule025
         {
             private const string AllTypes =
                 "bool or string or ulong or int or long or double or decimal or System.DateTime or byte";
@@ -970,7 +970,7 @@ public class AClass : ReadModelEntity
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas085, input, 12, 27, "AProperty", AllTypes);
+                    ApplicationLayerAnalyzer.Rule025, input, 12, 27, "AProperty", AllTypes);
             }
 
             [Fact]
@@ -991,7 +991,7 @@ public class AClass : ReadModelEntity
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas085, input, 12, 33, "AProperty", AllTypes);
+                    ApplicationLayerAnalyzer.Rule025, input, 12, 33, "AProperty", AllTypes);
             }
 
             [Fact]
@@ -1012,7 +1012,7 @@ public class AClass : ReadModelEntity
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas085, input, 12, 47, "AProperty", AllTypes);
+                    ApplicationLayerAnalyzer.Rule025, input, 12, 47, "AProperty", AllTypes);
             }
 
             [Fact]
@@ -1033,7 +1033,7 @@ public class AClass : ReadModelEntity
 }";
 
                 await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
-                    ApplicationLayerAnalyzer.Sas085, input, 12, 47, "AProperty", AllTypes);
+                    ApplicationLayerAnalyzer.Rule025, input, 12, 47, "AProperty", AllTypes);
             }
 
             [Fact]

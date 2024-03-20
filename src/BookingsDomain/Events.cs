@@ -24,9 +24,9 @@ public static class Events
         public required DateTime OccurredUtc { get; set; }
     }
 
-#pragma warning disable SAS063
+#pragma warning disable SAASDDD043
     public sealed class ReservationMade : IDomainEvent
-#pragma warning restore SAS063
+#pragma warning restore SAASDDD043
     {
         public static ReservationMade Create(Identifier id, Identifier organizationId, Identifier borrowerId,
             DateTime start, DateTime end)
@@ -99,9 +99,9 @@ public static class Events
         public required DateTime OccurredUtc { get; set; }
     }
 
-#pragma warning disable SAS063
+#pragma warning disable SAASDDD043
     public sealed class TripBegan : IDomainEvent
-#pragma warning restore SAS063
+#pragma warning restore SAASDDD043
     {
         public static TripBegan Create(Identifier id, Identifier organizationId, Identifier tripId,
             DateTime beganAt, Location from)

@@ -62,54 +62,54 @@ namespace Tools.Analyzers.Platform {
         /// <summary>
         ///   Looks up a localized string similar to This type should have a &lt;summary&gt; to describe what it designed to do..
         /// </summary>
-        internal static string SAS001Description {
+        internal static string SAASDOC001Description {
             get {
-                return ResourceManager.GetString("SAS001Description", resourceCulture);
+                return ResourceManager.GetString("SAASDOC001Description", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Type &apos;{0}&apos; requires a documentation &lt;summary/&gt;.
         /// </summary>
-        internal static string SAS001MessageFormat {
+        internal static string SAASDOC001MessageFormat {
             get {
-                return ResourceManager.GetString("SAS001MessageFormat", resourceCulture);
+                return ResourceManager.GetString("SAASDOC001MessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Missing documentation.
         /// </summary>
-        internal static string SAS001Title {
+        internal static string SAASDOC001Title {
             get {
-                return ResourceManager.GetString("SAS001Title", resourceCulture);
+                return ResourceManager.GetString("SAASDOC001Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to This method should have a &lt;summary&gt; to describe what it designed to do..
         /// </summary>
-        internal static string SAS002Description {
+        internal static string SAASDOC002Description {
             get {
-                return ResourceManager.GetString("SAS002Description", resourceCulture);
+                return ResourceManager.GetString("SAASDOC002Description", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Extension method &apos;{0}&apos; requires a documentation &lt;summary/&gt;.
         /// </summary>
-        internal static string SAS002MessageFormat {
+        internal static string SAASDOC002MessageFormat {
             get {
-                return ResourceManager.GetString("SAS002MessageFormat", resourceCulture);
+                return ResourceManager.GetString("SAASDOC002MessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Missing documentation.
         /// </summary>
-        internal static string SAS002Title {
+        internal static string SAASDOC002Title {
             get {
-                return ResourceManager.GetString("SAS002Title", resourceCulture);
+                return ResourceManager.GetString("SAASDOC002Title", resourceCulture);
             }
         }
     }

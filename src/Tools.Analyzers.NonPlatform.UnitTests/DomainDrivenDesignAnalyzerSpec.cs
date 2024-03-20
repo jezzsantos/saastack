@@ -66,7 +66,7 @@ public sealed class AClass
     public class GivenARootAggregate
     {
         [Trait("Category", "Unit")]
-        public class GivenRuleSas030
+        public class GivenRule010
         {
             [Fact]
             public async Task WhenHasNoCreateMethod_ThenAlerts()
@@ -104,7 +104,7 @@ public sealed class AClass : AggregateRootBase
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas030, input, 11,
+                    DomainDrivenDesignAnalyzer.Rule010, input, 11,
                     21,
                     "AClass");
             }
@@ -149,7 +149,7 @@ public sealed class AClass : AggregateRootBase
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas030, input, 11,
+                    DomainDrivenDesignAnalyzer.Rule010, input, 11,
                     21,
                     "AClass");
             }
@@ -217,7 +217,7 @@ public sealed class EventOccurred : IDomainEvent
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas031
+        public class GivenRule011
         {
             [Fact]
             public async Task WhenCreateReturnsVoid_ThenAlerts()
@@ -277,7 +277,7 @@ public sealed class EventOccurred : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas031, input, 33,
+                    DomainDrivenDesignAnalyzer.Rule011, input, 33,
                     24,
                     "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
@@ -341,7 +341,7 @@ public sealed class EventOccurred : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas031, input, 33,
+                    DomainDrivenDesignAnalyzer.Rule011, input, 33,
                     26,
                     "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
@@ -470,7 +470,7 @@ public sealed class EventOccurred : IDomainEvent
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas032
+        public class GivenRule012
         {
             [Fact]
             public async Task WhenCreateMethodIsEmpty_ThenAlerts()
@@ -513,7 +513,7 @@ public sealed class AClass : AggregateRootBase
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas032, input, 32,
+                    DomainDrivenDesignAnalyzer.Rule012, input, 32,
                     26,
                     "Create", DomainDrivenDesignAnalyzer.ConstructorMethodCall);
             }
@@ -581,7 +581,7 @@ public sealed class EventOccurred : IDomainEvent
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas033
+        public class GivenRule013
         {
             [Fact]
             public async Task WhenNonPrivateConstructor_ThenAlerts()
@@ -642,7 +642,7 @@ public sealed class EventOccurred : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas033, input, 14,
+                    DomainDrivenDesignAnalyzer.Rule013, input, 14,
                     12, "AClass");
             }
 
@@ -709,7 +709,7 @@ public sealed class EventOccurred : IDomainEvent
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas034
+        public class GivenRule014
         {
             [Fact]
             public async Task WhenMissingRehydrateMethod_ThenAlerts()
@@ -756,7 +756,7 @@ public sealed class EventOccurred : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas034, input, 8,
+                    DomainDrivenDesignAnalyzer.Rule014, input, 8,
                     21,
                     "AClass");
             }
@@ -825,7 +825,7 @@ public sealed class EventOccurred : IDomainEvent
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas035
+        public class GivenRule015
         {
             [Fact]
             public async Task WhenDehydratableAndMissingDehydrateMethod_ThenAlerts()
@@ -888,7 +888,7 @@ public sealed class EventOccurred : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas035, input, 14,
+                    DomainDrivenDesignAnalyzer.Rule015, input, 14,
                     21, "AClass");
             }
 
@@ -963,7 +963,7 @@ public sealed class EventOccurred : IDomainEvent
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas036
+        public class GivenRule016
         {
             [Fact]
             public async Task WhenDehydratableAndMissingEntityNameAttribute_ThenAlerts()
@@ -1031,7 +1031,7 @@ public sealed class EventOccurred : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas036, input, 14,
+                    DomainDrivenDesignAnalyzer.Rule016, input, 14,
                     21,
                     "AClass");
             }
@@ -1107,7 +1107,7 @@ public sealed class EventOccurred : IDomainEvent
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas037
+        public class GivenRule017
         {
             [Fact]
             public async Task WhenPropertyHasPublicSetter_ThenAlerts()
@@ -1170,7 +1170,7 @@ public sealed class EventOccurred : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas037, input, 40,
+                    DomainDrivenDesignAnalyzer.Rule017, input, 40,
                     19, "AProperty");
             }
 
@@ -1365,7 +1365,7 @@ public sealed class EventOccurred : IDomainEvent
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas038
+        public class GivenRule018
         {
             [Fact]
             public async Task WhenClassIsNotSealed_ThenAlerts()
@@ -1428,7 +1428,7 @@ public sealed class EventOccurred : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas038, input, 12,
+                    DomainDrivenDesignAnalyzer.Rule018, input, 12,
                     14, "AClass");
             }
 
@@ -1501,7 +1501,7 @@ public sealed class EventOccurred : IDomainEvent
     public class GivenAnEntity
     {
         [Trait("Category", "Unit")]
-        public class GivenRuleSas040
+        public class GivenRule020
         {
             [Fact]
             public async Task WhenHasNoCreateMethod_ThenAlerts()
@@ -1527,7 +1527,7 @@ public sealed class AClass : EntityBase
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas040, input, 9,
+                    DomainDrivenDesignAnalyzer.Rule020, input, 9,
                     21, "AClass");
             }
 
@@ -1559,7 +1559,7 @@ public sealed class AClass : EntityBase
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas040, input, 9,
+                    DomainDrivenDesignAnalyzer.Rule020, input, 9,
                     21,
                     "AClass");
             }
@@ -1598,7 +1598,7 @@ public sealed class AClass : EntityBase
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas041
+        public class GivenRule021
         {
             [Fact]
             public async Task WhenCreateReturnsVoid_ThenAlerts()
@@ -1629,7 +1629,7 @@ public sealed class AClass : EntityBase
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas041, input, 21,
+                    DomainDrivenDesignAnalyzer.Rule021, input, 21,
                     24, "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
 
@@ -1663,7 +1663,7 @@ public sealed class AClass : EntityBase
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas041, input, 21,
+                    DomainDrivenDesignAnalyzer.Rule021, input, 21,
                     26, "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
 
@@ -1733,7 +1733,7 @@ public sealed class AClass : EntityBase
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas042
+        public class GivenRule022
         {
             [Fact]
             public async Task WhenNonPrivateConstructor_ThenAlerts()
@@ -1765,7 +1765,7 @@ public sealed class AClass : EntityBase
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas042, input, 12,
+                    DomainDrivenDesignAnalyzer.Rule022, input, 12,
                     12, "AClass");
             }
 
@@ -1803,7 +1803,7 @@ public sealed class AClass : EntityBase
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas043
+        public class GivenRule023
         {
             [Fact]
             public async Task WhenDehydratableAndMissingRehydrateMethod_ThenAlerts()
@@ -1850,7 +1850,7 @@ public sealed class AClass : EntityBase
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas043, input, 16,
+                    DomainDrivenDesignAnalyzer.Rule023, input, 16,
                     21, "AClass");
             }
 
@@ -1908,7 +1908,7 @@ public sealed class AClass : EntityBase
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas044
+        public class GivenRule024
         {
             [Fact]
             public async Task WhenDehydratableAndMissingDehydrateMethod_ThenAlerts()
@@ -1955,7 +1955,7 @@ public sealed class AClass : EntityBase
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas044, input, 16,
+                    DomainDrivenDesignAnalyzer.Rule024, input, 16,
                     21, "AClass");
             }
 
@@ -2012,7 +2012,7 @@ public sealed class AClass : EntityBase
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas045
+        public class GivenRule025
         {
             [Fact]
             public async Task WhenDehydratableAndMissingEntityNameAttribute_ThenAlerts()
@@ -2062,7 +2062,7 @@ public sealed class AClass : EntityBase
     }
 }";
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas045, input, 15,
+                    DomainDrivenDesignAnalyzer.Rule025, input, 15,
                     21,
                     "AClass");
             }
@@ -2120,7 +2120,7 @@ public sealed class AClass : EntityBase
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas046
+        public class GivenRule026
         {
             [Fact]
             public async Task WhenPropertyHasPublicSetter_ThenAlerts()
@@ -2155,7 +2155,7 @@ public sealed class AClass : EntityBase
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas046, input, 27,
+                    DomainDrivenDesignAnalyzer.Rule026, input, 27,
                     19, "AProperty");
             }
 
@@ -2266,7 +2266,7 @@ public sealed class AClass : EntityBase
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas047
+        public class GivenRule027
         {
             [Fact]
             public async Task WhenClassIsNotSealed_ThenAlerts()
@@ -2301,7 +2301,7 @@ public class AClass : EntityBase
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas047, input, 11,
+                    DomainDrivenDesignAnalyzer.Rule027, input, 11,
                     14, "AClass");
             }
 
@@ -2346,7 +2346,7 @@ public sealed class AClass : EntityBase
     public class GivenAValueObject
     {
         [Trait("Category", "Unit")]
-        public class GivenRuleSas050
+        public class GivenRule030
         {
             [Fact]
             public async Task WhenHasNoCreateMethod_ThenAlerts()
@@ -2382,7 +2382,7 @@ public sealed class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas050, input, 11,
+                    DomainDrivenDesignAnalyzer.Rule030, input, 11,
                     21, "AClass");
             }
 
@@ -2425,7 +2425,7 @@ public sealed class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas050, input, 11,
+                    DomainDrivenDesignAnalyzer.Rule030, input, 11,
                     21, "AClass");
             }
 
@@ -2473,7 +2473,7 @@ public sealed class AClass : ValueObjectBase<AClass>
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas051
+        public class GivenRule031
         {
             [Fact]
             public async Task WhenCreateReturnsVoid_ThenAlerts()
@@ -2514,7 +2514,7 @@ public sealed class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas051, input, 19,
+                    DomainDrivenDesignAnalyzer.Rule031, input, 19,
                     24, "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
 
@@ -2558,7 +2558,7 @@ public sealed class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas051, input, 19,
+                    DomainDrivenDesignAnalyzer.Rule031, input, 19,
                     26, "Create", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>");
             }
 
@@ -2648,7 +2648,7 @@ public sealed class AClass : ValueObjectBase<AClass>
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas052
+        public class GivenRule032
         {
             [Fact]
             public async Task WhenNonPrivateConstructor_ThenAlerts()
@@ -2690,7 +2690,7 @@ public sealed class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas052, input, 14,
+                    DomainDrivenDesignAnalyzer.Rule032, input, 14,
                     12, "AClass");
             }
 
@@ -2738,7 +2738,7 @@ public sealed class AClass : ValueObjectBase<AClass>
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas053
+        public class GivenRule033
         {
             [Fact]
             public async Task WhenMissingRehydrateMethod_ThenAlerts()
@@ -2775,7 +2775,7 @@ public sealed class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas053, input, 12,
+                    DomainDrivenDesignAnalyzer.Rule033, input, 12,
                     21, "AClass");
             }
 
@@ -2824,7 +2824,7 @@ public sealed class AClass : ValueObjectBase<AClass>
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas054
+        public class GivenRule034
         {
             [Fact]
             public async Task WhenPropertyHasPublicSetter_ThenAlerts()
@@ -2867,7 +2867,7 @@ public sealed class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas054, input, 35,
+                    DomainDrivenDesignAnalyzer.Rule034, input, 35,
                     19, "AProperty");
             }
 
@@ -3001,7 +3001,7 @@ public sealed class AClass : ValueObjectBase<AClass>
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas055
+        public class GivenRule035
         {
             [Fact]
             public async Task WhenMethodReturnsVoid_ThenAlerts()
@@ -3048,7 +3048,7 @@ public sealed class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas055, input, 37,
+                    DomainDrivenDesignAnalyzer.Rule035, input, 37,
                     17, "AMethod",
                     "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
                     nameof(SkipImmutabilityCheckAttribute));
@@ -3100,7 +3100,7 @@ public sealed class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas055, input, 37,
+                    DomainDrivenDesignAnalyzer.Rule035, input, 37,
                     19, "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
                     nameof(SkipImmutabilityCheckAttribute));
             }
@@ -3302,7 +3302,7 @@ public sealed class AClass : ValueObjectBase<AClass>
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas056
+        public class GivenRule036
         {
             [Fact]
             public async Task WhenIsNotSealed_ThenAlerts()
@@ -3350,7 +3350,7 @@ public class AClass : ValueObjectBase<AClass>
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas056, input, 13,
+                    DomainDrivenDesignAnalyzer.Rule036, input, 13,
                     14, "AClass");
             }
 
@@ -3438,7 +3438,7 @@ public sealed class AClassed : IDomainEvent
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas060
+        public class GivenRule040
         {
             [Fact]
             public async Task WhenIsNotPublic_ThenAlerts()
@@ -3464,12 +3464,12 @@ internal sealed class AClassed : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas060, input, 5, 23, "AClassed");
+                    DomainDrivenDesignAnalyzer.Rule040, input, 5, 23, "AClassed");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas061
+        public class GivenRule041
         {
             [Fact]
             public async Task WhenIsNotSealed_ThenAlerts()
@@ -3495,12 +3495,12 @@ public class AClassed : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas061, input, 5, 14, "AClassed");
+                    DomainDrivenDesignAnalyzer.Rule041, input, 5, 14, "AClassed");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas062
+        public class GivenRule042
         {
             [Fact]
             public async Task WhenHasCtorAndNotParameterless_ThenAlerts()
@@ -3532,7 +3532,7 @@ public sealed class AClassed : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas062, input, 5, 21, "AClassed");
+                    DomainDrivenDesignAnalyzer.Rule042, input, 5, 21, "AClassed");
             }
 
             [Fact]
@@ -3565,7 +3565,7 @@ public sealed class AClassed : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas062, input, 5, 21, "AClassed");
+                    DomainDrivenDesignAnalyzer.Rule042, input, 5, 21, "AClassed");
             }
 
             [Fact]
@@ -3602,7 +3602,7 @@ public sealed class AClassed : IDomainEvent
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas063
+        public class GivenRule043
         {
             [Fact]
             public async Task WhenNotNamedInThePastTense_ThenAlerts()
@@ -3628,7 +3628,7 @@ public sealed class AClass : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas063, input, 5, 21, "AClass");
+                    DomainDrivenDesignAnalyzer.Rule043, input, 5, 21, "AClass");
             }
 
             [Fact]
@@ -3659,7 +3659,7 @@ public sealed class AClassed : IDomainEvent
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas064
+        public class GivenRule044
         {
             [Fact]
             public async Task WhenMissingCreateFactory_ThenAlerts()
@@ -3676,12 +3676,12 @@ public sealed class AClassed : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas064, input, 5, 21, "AClassed");
+                    DomainDrivenDesignAnalyzer.Rule044, input, 5, 21, "AClassed");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas065
+        public class GivenRule045
         {
             [Fact]
             public async Task WhenCreateFactoryReturnsWrongType_ThenAlerts()
@@ -3703,12 +3703,12 @@ public sealed class AClassed : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas065, input, 7, 26, "Create", "ANamespace.AClassed");
+                    DomainDrivenDesignAnalyzer.Rule045, input, 7, 26, "Create", "ANamespace.AClassed");
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas066
+        public class GivenRule046
         {
             [Fact]
             public async Task WhenAnyPropertyHasNoSetter_ThenAlerts()
@@ -3736,12 +3736,12 @@ public sealed class AClassed : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas066, input, 20, 20, "AProperty", null);
+                    DomainDrivenDesignAnalyzer.Rule046, input, 20, 20, "AProperty", null);
             }
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas067
+        public class GivenRule047
         {
             [Fact]
             public async Task WhenAnyPropertyReferenceTypeIsNotRequiredAndNotInitializedAndNotNullable_ThenAlerts()
@@ -3769,7 +3769,7 @@ public sealed class AClassed : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas067, input, 20, 19, "AProperty");
+                    DomainDrivenDesignAnalyzer.Rule047, input, 20, 19, "AProperty");
             }
 
             [Fact]
@@ -4026,7 +4026,7 @@ public sealed class AClassed : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas067, input, 20, 21, "AProperty");
+                    DomainDrivenDesignAnalyzer.Rule047, input, 20, 21, "AProperty");
             }
 
             [Fact]
@@ -4259,7 +4259,7 @@ public sealed class AClassed : IDomainEvent
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas068
+        public class GivenRule048
         {
             [Fact]
             public async Task WhenAnyPropertyReferenceTypeIsOptional_ThenAlerts()
@@ -4289,8 +4289,8 @@ public sealed class AClassed : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(input,
-                    (DomainDrivenDesignAnalyzer.Sas068, 22, 38, "AProperty", null),
-                    (DomainDrivenDesignAnalyzer.Sas069, 22, 38, "AProperty", [GivenRuleSas069.AllTypes]));
+                    (DomainDrivenDesignAnalyzer.Rule048, 22, 38, "AProperty", null),
+                    (DomainDrivenDesignAnalyzer.Rule049, 22, 38, "AProperty", [GivenRule049.AllTypes]));
             }
 
             [Fact]
@@ -4324,7 +4324,7 @@ public sealed class AClassed : IDomainEvent
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRuleSas069
+        public class GivenRule049
         {
             public const string AllTypes =
                 "bool or string or ulong or int or long or double or decimal or System.DateTime or byte";
@@ -4356,7 +4356,7 @@ public sealed class AClassed : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas069, input, 21, 26, "AProperty", AllTypes);
+                    DomainDrivenDesignAnalyzer.Rule049, input, 21, 26, "AProperty", AllTypes);
             }
 
             [Fact]
@@ -4387,7 +4387,7 @@ public sealed class AClassed : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas069, input, 22, 32, "AProperty", AllTypes);
+                    DomainDrivenDesignAnalyzer.Rule049, input, 22, 32, "AProperty", AllTypes);
             }
 
             [Fact]
@@ -4418,7 +4418,7 @@ public sealed class AClassed : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas069, input, 22, 46, "AProperty", AllTypes);
+                    DomainDrivenDesignAnalyzer.Rule049, input, 22, 46, "AProperty", AllTypes);
             }
 
             [Fact]
@@ -4449,7 +4449,7 @@ public sealed class AClassed : IDomainEvent
 }";
 
                 await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Sas069, input, 22, 46, "AProperty", AllTypes);
+                    DomainDrivenDesignAnalyzer.Rule049, input, 22, 46, "AProperty", AllTypes);
             }
 
             [Fact]

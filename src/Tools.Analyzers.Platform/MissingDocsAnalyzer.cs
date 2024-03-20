@@ -11,8 +11,8 @@ namespace Tools.Analyzers.Platform;
 
 /// <summary>
 ///     An analyzer to find public declarations that are missing a documentation &lt;summary&gt; node.
-///     SAS001: All public/internal classes, structs, records, interfaces, delegates and enums
-///     SAS002: All public/internal static methods and all public/internal extension methods (in public types)
+///     SAASDOC001: All public/internal classes, structs, records, interfaces, delegates and enums
+///     SAASDOC002: All public/internal static methods and all public/internal extension methods (in public types)
 ///     Note: Document declarations are only enforced for Platform projects.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -21,16 +21,18 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
     private const string InheritDocXmlElementName = "inheritdoc";
     private const string SummaryXmlElementName = "summary";
 
-    internal static readonly DiagnosticDescriptor Sas001 = "SAS001".GetDescriptor(DiagnosticSeverity.Warning,
-        AnalyzerConstants.Categories.Documentation, nameof(Resources.SAS001Title), nameof(Resources.SAS001Description),
-        nameof(Resources.SAS001MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule001 = "SAASDOC001".GetDescriptor(DiagnosticSeverity.Warning,
+        AnalyzerConstants.Categories.Documentation, nameof(Resources.SAASDOC001Title),
+        nameof(Resources.SAASDOC001Description),
+        nameof(Resources.SAASDOC001MessageFormat));
 
-    internal static readonly DiagnosticDescriptor Sas002 = "SAS002".GetDescriptor(DiagnosticSeverity.Warning,
-        AnalyzerConstants.Categories.Documentation, nameof(Resources.SAS002Title), nameof(Resources.SAS002Description),
-        nameof(Resources.SAS002MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule002 = "SAASDOC002".GetDescriptor(DiagnosticSeverity.Warning,
+        AnalyzerConstants.Categories.Documentation, nameof(Resources.SAASDOC002Title),
+        nameof(Resources.SAASDOC002Description),
+        nameof(Resources.SAASDOC002MessageFormat));
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(Sas001, Sas002);
+        ImmutableArray.Create(Rule001, Rule002);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -68,13 +70,13 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
         var docs = memberDeclarationSyntax.GetDocumentationCommentTriviaSyntax(context);
         if (docs is null)
         {
-            context.ReportDiagnostic(Sas001, memberDeclarationSyntax);
+            context.ReportDiagnostic(Rule001, memberDeclarationSyntax);
             return;
         }
 
         if (!docs.IsLanguageForCSharp())
         {
-            context.ReportDiagnostic(Sas001, memberDeclarationSyntax);
+            context.ReportDiagnostic(Rule001, memberDeclarationSyntax);
             return;
         }
 
@@ -88,13 +90,13 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
         var summary = xmlContent.GetFirstXmlElement(SummaryXmlElementName);
         if (summary is null)
         {
-            context.ReportDiagnostic(Sas001, memberDeclarationSyntax);
+            context.ReportDiagnostic(Rule001, memberDeclarationSyntax);
             return;
         }
 
         if (summary.IsEmptyNode())
         {
-            context.ReportDiagnostic(Sas001, memberDeclarationSyntax);
+            context.ReportDiagnostic(Rule001, memberDeclarationSyntax);
         }
     }
 
@@ -129,13 +131,13 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
         var docs = methodDeclarationSyntax.GetDocumentationCommentTriviaSyntax(context);
         if (docs is null)
         {
-            context.ReportDiagnostic(Sas002, methodDeclarationSyntax);
+            context.ReportDiagnostic(Rule002, methodDeclarationSyntax);
             return;
         }
 
         if (!docs.IsLanguageForCSharp())
         {
-            context.ReportDiagnostic(Sas002, methodDeclarationSyntax);
+            context.ReportDiagnostic(Rule002, methodDeclarationSyntax);
             return;
         }
 
@@ -149,13 +151,13 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
         var summary = xmlContent.GetFirstXmlElement(SummaryXmlElementName);
         if (summary is null)
         {
-            context.ReportDiagnostic(Sas002, methodDeclarationSyntax);
+            context.ReportDiagnostic(Rule002, methodDeclarationSyntax);
             return;
         }
 
         if (summary.IsEmptyNode())
         {
-            context.ReportDiagnostic(Sas002, methodDeclarationSyntax);
+            context.ReportDiagnostic(Rule002, methodDeclarationSyntax);
         }
     }
 }

@@ -134,211 +134,258 @@
         <value>Wrong nullable return type</value>
     </data>
 
-    <data name="SAS010Description" xml:space="preserve">
+    <data name="SAASWEB010Description" xml:space="preserve">
         <value>This method should return a 'Result&lt;T&gt;' type.</value>
     </data>
-    <data name="SAS010MessageFormat" xml:space="preserve">
+    <data name="SAASWEB010MessageFormat" xml:space="preserve">
         <value>If method '{0}' is supposed to be a service operation, then it should return one of these possible types: '{1}'</value>
     </data>
-    <data name="SAS010Title" xml:space="preserve">
+    <data name="SAASWEB010Title" xml:space="preserve">
         <value>Wrong return type</value>
     </data>
-    <data name="SAS011Description" xml:space="preserve">
+    <data name="SAASWEB011Description" xml:space="preserve">
         <value>This service operation should have at least one parameter, and that parameter should be derived from: 'IWebRequest&lt;TResponse&gt;'.</value>
     </data>
-    <data name="SAS011MessageFormat" xml:space="preserve">
+    <data name="SAASWEB011MessageFormat" xml:space="preserve">
         <value>Service operation '{0}' should have at least one parameter of a type derived from: 'IWebRequest&lt;TResponse&gt;'</value>
     </data>
-    <data name="SAS011Title" xml:space="preserve">
+    <data name="SAASWEB011Title" xml:space="preserve">
         <value>Missing first parameter or wrong parameter type</value>
     </data>
-    <data name="SAS012Description" xml:space="preserve">
+    <data name="SAASWEB012Description" xml:space="preserve">
         <value>This service operation can only have a 'CancellationToken' as its second parameter.</value>
     </data>
-    <data name="SAS012MessageFormat" xml:space="preserve">
+    <data name="SAASWEB012MessageFormat" xml:space="preserve">
         <value>Service operation '{0}' can only have a 'CancellationToken' as its second parameter</value>
     </data>
-    <data name="SAS012Title" xml:space="preserve">
+    <data name="SAASWEB012Title" xml:space="preserve">
         <value>Wrong second parameter type</value>
     </data>
-    <data name="SAS013Description" xml:space="preserve">
+    <data name="SAASWEB013Description" xml:space="preserve">
         <value>The request type for this service operation should be declared with a '[RouteAttribute]' on it.</value>
     </data>
-    <data name="SAS013MessageFormat" xml:space="preserve">
+    <data name="SAASWEB013MessageFormat" xml:space="preserve">
         <value>Service operation '{0}' has a request type that does not have a '[RouteAttribute]' on it</value>
     </data>
-    <data name="SAS013Title" xml:space="preserve">
+    <data name="SAASWEB013Title" xml:space="preserve">
         <value>Missing '[RouteAttribute]' on request type</value>
     </data>
-    <data name="SAS014Description" xml:space="preserve">
+    <data name="SAASWEB014Description" xml:space="preserve">
         <value>This service operation has a route declared on its request that is different from other service operations in this class.</value>
     </data>
-    <data name="SAS014MessageFormat" xml:space="preserve">
+    <data name="SAASWEB014MessageFormat" xml:space="preserve">
         <value>Service operation '{0}' is required to have a request with a route for the same primary resource as the other service operations in this class</value>
     </data>
-    <data name="SAS014Title" xml:space="preserve">
+    <data name="SAASWEB014Title" xml:space="preserve">
         <value>Wrong route group</value>
     </data>
-    <data name="SAS015Description" xml:space="preserve">
+    <data name="SAASWEB015Description" xml:space="preserve">
         <value>This service operation uses the same request type as another service operation in this class.</value>
     </data>
-    <data name="SAS015MessageFormat" xml:space="preserve">
+    <data name="SAASWEB015MessageFormat" xml:space="preserve">
         <value>Service operation '{0}' uses the same type for its first parameter as does another service operation in this class. They must use different request types</value>
     </data>
-    <data name="SAS015Title" xml:space="preserve">
+    <data name="SAASWEB015Title" xml:space="preserve">
         <value>Duplicate request type</value>
     </data>
-    <data name="SAS016Description" xml:space="preserve">
+    <data name="SAASWEB016Description" xml:space="preserve">
         <value>This service operation should return an appropriate Result type for the operation.</value>
     </data>
-    <data name="SAS016MessageFormat" xml:space="preserve">
+    <data name="SAASWEB016MessageFormat" xml:space="preserve">
         <value>Service operation '{0}' is defined as a '{1}' operation, and can only return one of these types: '{2}'</value>
     </data>
-    <data name="SAS016Title" xml:space="preserve">
+    <data name="SAASWEB016Title" xml:space="preserve">
         <value>Unexpected return type for operation</value>
     </data>
-    <data name="SAS017Description" xml:space="preserve">
+    <data name="SAASWEB017Description" xml:space="preserve">
         <value>The request type should be declared with a '[RouteAttribute]' on it.</value>
     </data>
-    <data name="SAS017MessageFormat" xml:space="preserve">
+    <data name="SAASWEB017MessageFormat" xml:space="preserve">
         <value>Request type '{0}' should declare a '[RouteAttribute]'</value>
     </data>
-    <data name="SAS017Title" xml:space="preserve">
+    <data name="SAASWEB017Title" xml:space="preserve">
         <value>Missing '[RouteAttribute]'</value>
     </data>
-    <data name="SAS018Description" xml:space="preserve">
+    <data name="SAASWEB018Description" xml:space="preserve">
         <value>The request type should be not declare a '[AuthorizeAttribute]' on it, since the '[RouteAttribute]' has been configured with 'Anonymous' access.</value>
     </data>
-    <data name="SAS018MessageFormat" xml:space="preserve">
+    <data name="SAASWEB018MessageFormat" xml:space="preserve">
         <value>Request type '{0}' should not declare a '[AuthorizeAttribute]'</value>
     </data>
-    <data name="SAS018Title" xml:space="preserve">
+    <data name="SAASWEB018Title" xml:space="preserve">
         <value>Unexpected '[AuthorizeAttribute]'</value>
     </data>
-    <data name="SAS019Description" xml:space="preserve">
+    <data name="SAASWEB019Description" xml:space="preserve">
         <value>The request type should be declared with a '[AuthorizeAttribute]' on it to constrain role/feature access to it, since the '[RouteAttribute]' has been configured with secure access.</value>
     </data>
-    <data name="SAS019MessageFormat" xml:space="preserve">
+    <data name="SAASWEB019MessageFormat" xml:space="preserve">
         <value>Request type '{0}' should declare a '[AuthorizeAttribute]' to constrain role/feature access</value>
     </data>
-    <data name="SAS019Title" xml:space="preserve">
+    <data name="SAASWEB019Title" xml:space="preserve">
         <value>Missing '[AuthorizeAttribute]'</value>
     </data>
-    <data name="SAS030Description" xml:space="preserve">
+    <data name="SAASWEB031Description" xml:space="preserve">
+        <value>The request type should be suffixed with the word 'Request'.</value>
+    </data>
+    <data name="SAASWEB031MessageFormat" xml:space="preserve">
+        <value>Request '{0}' should be suffixed with the word 'Request'</value>
+    </data>
+    <data name="SAASWEB031Title" xml:space="preserve">
+        <value>Naming is wrong</value>
+    </data>
+    <data name="SAASWEB032Description" xml:space="preserve">
+        <value>The request type should be declared in the 'Infrastructure.Web.Api.Operations.Shared' namespace.</value>
+    </data>
+    <data name="SAASWEB032MessageFormat" xml:space="preserve">
+        <value>Request '{0}' should be declared in the 'Infrastructure.Web.Api.Operations.Shared' namespace</value>
+    </data>
+    <data name="SAASWEB032Title" xml:space="preserve">
+        <value>Location is wrong</value>
+    </data>
+    <data name="SAASWEB033Description" xml:space="preserve">
+        <value>The request should be declared with a '[RouteAttribute]' on it.</value>
+    </data>
+    <data name="SAASWEB033MessageFormat" xml:space="preserve">
+        <value>Request '{0}' should have a '[RouteAttribute]' on it</value>
+    </data>
+    <data name="SAASWEB033Title" xml:space="preserve">
+        <value>Missing '[RouteAttribute]' on request</value>
+    </data>
+    <data name="SAASWEB041Description" xml:space="preserve">
+        <value>The request type should be suffixed with the word 'Response'.</value>
+    </data>
+    <data name="SAASWEB041MessageFormat" xml:space="preserve">
+        <value>Request '{0}' should be suffixed with the word 'Response'</value>
+    </data>
+    <data name="SAASWEB041Title" xml:space="preserve">
+        <value>Naming is wrong</value>
+    </data>
+    <data name="SAASWEB042Description" xml:space="preserve">
+        <value>The response type should be declared in the 'Infrastructure.Web.Api.Operations.Shared' namespace.</value>
+    </data>
+    <data name="SAASWEB042MessageFormat" xml:space="preserve">
+        <value>Response '{0}' should be declared in the 'Infrastructure.Web.Api.Operations.Shared' namespace</value>
+    </data>
+    <data name="SAASWEB042Title" xml:space="preserve">
+        <value>Location is wrong</value>
+    </data>
+
+    <data name="SAASDDD010Description" xml:space="preserve">
         <value>Aggregate roots must have at least one 'Create()' class factory method.</value>
     </data>
-    <data name="SAS030MessageFormat" xml:space="preserve">
+    <data name="SAASDDD010MessageFormat" xml:space="preserve">
         <value>Aggregate root type '{0}' must implement a class factory method called 'Create()' to create new instances</value>
     </data>
-    <data name="SAS030Title" xml:space="preserve">
+    <data name="SAASDDD010Title" xml:space="preserve">
         <value>Missing 'Create()' method</value>
     </data>
-    <data name="SAS032Description" xml:space="preserve">
+    <data name="SAASDDD012Description" xml:space="preserve">
         <value>Create() class factory method must call specific code.</value>
     </data>
-    <data name="SAS032MessageFormat" xml:space="preserve">
+    <data name="SAASDDD012MessageFormat" xml:space="preserve">
         <value>Factory method '{0}' must make a call to method '{1}'</value>
     </data>
-    <data name="SAS032Title" xml:space="preserve">
+    <data name="SAASDDD012Title" xml:space="preserve">
         <value>Missing required call to method</value>
     </data>
-    <data name="SAS040Description" xml:space="preserve">
+    <data name="SAASDDD020Description" xml:space="preserve">
         <value>Entities must have at least one 'Create()' class factory method.</value>
     </data>
-    <data name="SAS040MessageFormat" xml:space="preserve">
+    <data name="SAASDDD020MessageFormat" xml:space="preserve">
         <value>Entity type '{0}' must implement a class factory method called 'Create()' to create new instances</value>
     </data>
-    <data name="SAS040Title" xml:space="preserve">
+    <data name="SAASDDD020Title" xml:space="preserve">
         <value>Missing 'Create()' method</value>
     </data>
-    <data name="SAS050Description" xml:space="preserve">
+    <data name="SAASDDD030Description" xml:space="preserve">
         <value>ValueObjects must have at least one 'Create()' class factory method.</value>
     </data>
-    <data name="SAS050MessageFormat" xml:space="preserve">
+    <data name="SAASDDD030MessageFormat" xml:space="preserve">
         <value>ValueObject type '{0}' must implement a class factory method called 'Create()' to create new instances</value>
     </data>
-    <data name="SAS050Title" xml:space="preserve">
+    <data name="SAASDDD030Title" xml:space="preserve">
         <value>Missing 'Create()' method</value>
     </data>
-    <data name="SAS055Description" xml:space="preserve">
+    <data name="SAASDDD035Description" xml:space="preserve">
         <value>Method must not mutate the ValueObject.</value>
     </data>
-    <data name="SAS055MessageFormat" xml:space="preserve">
+    <data name="SAASDDD035MessageFormat" xml:space="preserve">
         <value>Method '{0}' must not mutate this ValueObject's state, and must return a new instance of this ValueObject using one of these return types, either: '{1}', or can be suppressed by adding the '{2}' attribute to the method</value>
     </data>
-    <data name="SAS055Title" xml:space="preserve">
+    <data name="SAASDDD035Title" xml:space="preserve">
         <value>Method mutates ValueObject state</value>
     </data>
-    <data name="SAS063Description" xml:space="preserve">
+    <data name="SAASDDD043Description" xml:space="preserve">
         <value>Domain Event must be named in the past tense, as they occured in the past.</value>
     </data>
-    <data name="SAS063MessageFormat" xml:space="preserve">
+    <data name="SAASDDD043MessageFormat" xml:space="preserve">
         <value>Domain Event '{0}' must be named in the past tense</value>
     </data>
-    <data name="SAS063Title" xml:space="preserve">
+    <data name="SAASDDD043Title" xml:space="preserve">
         <value>Domain Event must be named in the past tense</value>
     </data>
-    <data name="SAS064Description" xml:space="preserve">
+    <data name="SAASDDD044Description" xml:space="preserve">
         <value>DomainEvent must have at least one 'Create()' class factory method.</value>
     </data>
-    <data name="SAS064MessageFormat" xml:space="preserve">
+    <data name="SAASDDD044MessageFormat" xml:space="preserve">
         <value>DomainEvent type '{0}' must implement a class factory method called 'Create()' to create new instances</value>
     </data>
-    <data name="SAS064Title" xml:space="preserve">
+    <data name="SAASDDD044Title" xml:space="preserve">
         <value>Missing 'Create()' method</value>
     </data>
-    <data name="SAS065Description" xml:space="preserve">
+    <data name="SAASDDD045Description" xml:space="preserve">
         <value>Create() class factory method must return the correct type.</value>
     </data>
-    <data name="SAS065MessageFormat" xml:space="preserve">
+    <data name="SAASDDD045MessageFormat" xml:space="preserve">
         <value>Factory method '{0}' must return this type: '{1}'</value>
     </data>
-    <data name="SAS065Title" xml:space="preserve">
+    <data name="SAASDDD045Title" xml:space="preserve">
         <value>Wrong return type</value>
     </data>
-    <data name="SAS067Description" xml:space="preserve">
+    <data name="SAASDDD047Description" xml:space="preserve">
         <value>Property must be marked 'required' or be nullable or be initialized.</value>
     </data>
-    <data name="SAS067MessageFormat" xml:space="preserve">
+    <data name="SAASDDD047MessageFormat" xml:space="preserve">
         <value>Property '{0}' must be marked 'required' or be nullable or be initialized</value>
     </data>
-    <data name="SAS067Title" xml:space="preserve">
+    <data name="SAASDDD047Title" xml:space="preserve">
         <value>Wrong declaration</value>
     </data>
-    <data name="SAS069Description" xml:space="preserve">
+    <data name="SAASDDD049Description" xml:space="preserve">
         <value>Property must have the return the correct type.</value>
     </data>
-    <data name="SAS069MessageFormat" xml:space="preserve">
+    <data name="SAASDDD049MessageFormat" xml:space="preserve">
         <value>Property '{0}' must return one of these primitive types: '{1}', or any Enum, or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types</value>
     </data>
-    <data name="SAS069Title" xml:space="preserve">
+    <data name="SAASDDD049Title" xml:space="preserve">
         <value>Wrong return type</value>
     </data>
-    <data name="SAS074Description" xml:space="preserve">
+
+    <data name="SAASAPP014Description" xml:space="preserve">
         <value>Property must have the return the correct type</value>
     </data>
-    <data name="SAS074MessageFormat" xml:space="preserve">
+    <data name="SAASAPP014MessageFormat" xml:space="preserve">
         <value>Property '{0}' must return one of these primitive types: '{1}', or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types, or be another type in the '{2}' namespace</value>
     </data>
-    <data name="SAS074Title" xml:space="preserve">
+    <data name="SAASAPP014Title" xml:space="preserve">
         <value>Wrong return type</value>
     </data>
-    <data name="SAS084Description" xml:space="preserve">
+    <data name="SAASAPP024Description" xml:space="preserve">
         <value>Property should be 'Optional&lt;T&gt;' not nullable.</value>
     </data>
-    <data name="SAS084MessageFormat" xml:space="preserve">
+    <data name="SAASAPP024MessageFormat" xml:space="preserve">
         <value>Property '{0}' should be 'Optional&lt;T&gt;' not nullable</value>
     </data>
-    <data name="SAS084Title" xml:space="preserve">
+    <data name="SAASAPP024Title" xml:space="preserve">
         <value>Wrong declaration</value>
     </data>
-    <data name="SAS085Description" xml:space="preserve">
+    <data name="SAASAPP025Description" xml:space="preserve">
         <value>Property must have the return the correct type</value>
     </data>
-    <data name="SAS085MessageFormat" xml:space="preserve">
+    <data name="SAASAPP025MessageFormat" xml:space="preserve">
         <value>Property '{0}' must return one of these primitive types: '{1}', or any ValueObject, or any Enum, or an Optional&lt;T&gt;/List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types</value>
     </data>
-    <data name="SAS085Title" xml:space="preserve">
+    <data name="SAASAPP025Title" xml:space="preserve">
         <value>Wrong return type</value>
     </data>
 

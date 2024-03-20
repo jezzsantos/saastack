@@ -465,623 +465,758 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This method should return a &apos;Result&lt;T&gt;&apos; type..
-        /// </summary>
-        internal static string SAS010Description {
-            get {
-                return ResourceManager.GetString("SAS010Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to If method &apos;{0}&apos; is supposed to be a service operation, then it should return one of these possible types: &apos;{1}&apos;.
-        /// </summary>
-        internal static string SAS010MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS010MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Wrong return type.
-        /// </summary>
-        internal static string SAS010Title {
-            get {
-                return ResourceManager.GetString("SAS010Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This service operation should have at least one parameter, and that parameter should be derived from: &apos;IWebRequest&lt;TResponse&gt;&apos;..
-        /// </summary>
-        internal static string SAS011Description {
-            get {
-                return ResourceManager.GetString("SAS011Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; should have at least one parameter of a type derived from: &apos;IWebRequest&lt;TResponse&gt;&apos;.
-        /// </summary>
-        internal static string SAS011MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS011MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Missing first parameter or wrong parameter type.
-        /// </summary>
-        internal static string SAS011Title {
-            get {
-                return ResourceManager.GetString("SAS011Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This service operation can only have a &apos;CancellationToken&apos; as its second parameter..
-        /// </summary>
-        internal static string SAS012Description {
-            get {
-                return ResourceManager.GetString("SAS012Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; can only have a &apos;CancellationToken&apos; as its second parameter.
-        /// </summary>
-        internal static string SAS012MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS012MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Wrong second parameter type.
-        /// </summary>
-        internal static string SAS012Title {
-            get {
-                return ResourceManager.GetString("SAS012Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The request type for this service operation should be declared with a &apos;[RouteAttribute]&apos; on it..
-        /// </summary>
-        internal static string SAS013Description {
-            get {
-                return ResourceManager.GetString("SAS013Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; has a request type that does not have a &apos;[RouteAttribute]&apos; on it.
-        /// </summary>
-        internal static string SAS013MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS013MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Missing &apos;[RouteAttribute]&apos; on request type.
-        /// </summary>
-        internal static string SAS013Title {
-            get {
-                return ResourceManager.GetString("SAS013Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This service operation has a route declared on its request that is different from other service operations in this class..
-        /// </summary>
-        internal static string SAS014Description {
-            get {
-                return ResourceManager.GetString("SAS014Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; is required to have a request with a route for the same primary resource as the other service operations in this class.
-        /// </summary>
-        internal static string SAS014MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS014MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Wrong route group.
-        /// </summary>
-        internal static string SAS014Title {
-            get {
-                return ResourceManager.GetString("SAS014Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This service operation uses the same request type as another service operation in this class..
-        /// </summary>
-        internal static string SAS015Description {
-            get {
-                return ResourceManager.GetString("SAS015Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; uses the same type for its first parameter as does another service operation in this class. They must use different request types.
-        /// </summary>
-        internal static string SAS015MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS015MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Duplicate request type.
-        /// </summary>
-        internal static string SAS015Title {
-            get {
-                return ResourceManager.GetString("SAS015Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This service operation should return an appropriate Result type for the operation..
-        /// </summary>
-        internal static string SAS016Description {
-            get {
-                return ResourceManager.GetString("SAS016Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; is defined as a &apos;{1}&apos; operation, and can only return one of these types: &apos;{2}&apos;.
-        /// </summary>
-        internal static string SAS016MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS016MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unexpected return type for operation.
-        /// </summary>
-        internal static string SAS016Title {
-            get {
-                return ResourceManager.GetString("SAS016Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The request type should be declared with a &apos;[RouteAttribute]&apos; on it..
-        /// </summary>
-        internal static string SAS017Description {
-            get {
-                return ResourceManager.GetString("SAS017Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Request type &apos;{0}&apos; should declare a &apos;[RouteAttribute]&apos;.
-        /// </summary>
-        internal static string SAS017MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS017MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Missing &apos;[RouteAttribute]&apos;.
-        /// </summary>
-        internal static string SAS017Title {
-            get {
-                return ResourceManager.GetString("SAS017Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The request type should be not declare a &apos;[AuthorizeAttribute]&apos; on it, since the &apos;[RouteAttribute]&apos; has been configured with &apos;Anonymous&apos; access..
-        /// </summary>
-        internal static string SAS018Description {
-            get {
-                return ResourceManager.GetString("SAS018Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Request type &apos;{0}&apos; should not declare a &apos;[AuthorizeAttribute]&apos;.
-        /// </summary>
-        internal static string SAS018MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS018MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unexpected &apos;[AuthorizeAttribute]&apos;.
-        /// </summary>
-        internal static string SAS018Title {
-            get {
-                return ResourceManager.GetString("SAS018Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The request type should be declared with a &apos;[AuthorizeAttribute]&apos; on it to constrain role/feature access to it, since the &apos;[RouteAttribute]&apos; has been configured with secure access..
-        /// </summary>
-        internal static string SAS019Description {
-            get {
-                return ResourceManager.GetString("SAS019Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Request type &apos;{0}&apos; should declare a &apos;[AuthorizeAttribute]&apos; to constrain role/feature access.
-        /// </summary>
-        internal static string SAS019MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS019MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Missing &apos;[AuthorizeAttribute]&apos;.
-        /// </summary>
-        internal static string SAS019Title {
-            get {
-                return ResourceManager.GetString("SAS019Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Aggregate roots must have at least one &apos;Create()&apos; class factory method..
-        /// </summary>
-        internal static string SAS030Description {
-            get {
-                return ResourceManager.GetString("SAS030Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Aggregate root type &apos;{0}&apos; must implement a class factory method called &apos;Create()&apos; to create new instances.
-        /// </summary>
-        internal static string SAS030MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS030MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Missing &apos;Create()&apos; method.
-        /// </summary>
-        internal static string SAS030Title {
-            get {
-                return ResourceManager.GetString("SAS030Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Create() class factory method must call specific code..
-        /// </summary>
-        internal static string SAS032Description {
-            get {
-                return ResourceManager.GetString("SAS032Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Factory method &apos;{0}&apos; must make a call to method &apos;{1}&apos;.
-        /// </summary>
-        internal static string SAS032MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS032MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Missing required call to method.
-        /// </summary>
-        internal static string SAS032Title {
-            get {
-                return ResourceManager.GetString("SAS032Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Entities must have at least one &apos;Create()&apos; class factory method..
-        /// </summary>
-        internal static string SAS040Description {
-            get {
-                return ResourceManager.GetString("SAS040Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Entity type &apos;{0}&apos; must implement a class factory method called &apos;Create()&apos; to create new instances.
-        /// </summary>
-        internal static string SAS040MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS040MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Missing &apos;Create()&apos; method.
-        /// </summary>
-        internal static string SAS040Title {
-            get {
-                return ResourceManager.GetString("SAS040Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ValueObjects must have at least one &apos;Create()&apos; class factory method..
-        /// </summary>
-        internal static string SAS050Description {
-            get {
-                return ResourceManager.GetString("SAS050Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ValueObject type &apos;{0}&apos; must implement a class factory method called &apos;Create()&apos; to create new instances.
-        /// </summary>
-        internal static string SAS050MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS050MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Missing &apos;Create()&apos; method.
-        /// </summary>
-        internal static string SAS050Title {
-            get {
-                return ResourceManager.GetString("SAS050Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Method must not mutate the ValueObject..
-        /// </summary>
-        internal static string SAS055Description {
-            get {
-                return ResourceManager.GetString("SAS055Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Method &apos;{0}&apos; must not mutate this ValueObject&apos;s state, and must return a new instance of this ValueObject using one of these return types, either: &apos;{1}&apos;, or can be suppressed by adding the &apos;{2}&apos; attribute to the method.
-        /// </summary>
-        internal static string SAS055MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS055MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Method mutates ValueObject state.
-        /// </summary>
-        internal static string SAS055Title {
-            get {
-                return ResourceManager.GetString("SAS055Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Domain Event must be named in the past tense, as they occured in the past..
-        /// </summary>
-        internal static string SAS063Description {
-            get {
-                return ResourceManager.GetString("SAS063Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Domain Event &apos;{0}&apos; must be named in the past tense.
-        /// </summary>
-        internal static string SAS063MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS063MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Domain Event must be named in the past tense.
-        /// </summary>
-        internal static string SAS063Title {
-            get {
-                return ResourceManager.GetString("SAS063Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to DomainEvent must have at least one &apos;Create()&apos; class factory method..
-        /// </summary>
-        internal static string SAS064Description {
-            get {
-                return ResourceManager.GetString("SAS064Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to DomainEvent type &apos;{0}&apos; must implement a class factory method called &apos;Create()&apos; to create new instances.
-        /// </summary>
-        internal static string SAS064MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS064MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Missing &apos;Create()&apos; method.
-        /// </summary>
-        internal static string SAS064Title {
-            get {
-                return ResourceManager.GetString("SAS064Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Create() class factory method must return the correct type..
-        /// </summary>
-        internal static string SAS065Description {
-            get {
-                return ResourceManager.GetString("SAS065Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Factory method &apos;{0}&apos; must return this type: &apos;{1}&apos;.
-        /// </summary>
-        internal static string SAS065MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS065MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Wrong return type.
-        /// </summary>
-        internal static string SAS065Title {
-            get {
-                return ResourceManager.GetString("SAS065Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Property must be marked &apos;required&apos; or be nullable or be initialized..
-        /// </summary>
-        internal static string SAS067Description {
-            get {
-                return ResourceManager.GetString("SAS067Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Property &apos;{0}&apos; must be marked &apos;required&apos; or be nullable or be initialized.
-        /// </summary>
-        internal static string SAS067MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS067MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Wrong declaration.
-        /// </summary>
-        internal static string SAS067Title {
-            get {
-                return ResourceManager.GetString("SAS067Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Property must have the return the correct type..
-        /// </summary>
-        internal static string SAS069Description {
-            get {
-                return ResourceManager.GetString("SAS069Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Property &apos;{0}&apos; must return one of these primitive types: &apos;{1}&apos;, or any Enum, or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types.
-        /// </summary>
-        internal static string SAS069MessageFormat {
-            get {
-                return ResourceManager.GetString("SAS069MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Wrong return type.
-        /// </summary>
-        internal static string SAS069Title {
-            get {
-                return ResourceManager.GetString("SAS069Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Property must have the return the correct type.
         /// </summary>
-        internal static string SAS074Description {
+        internal static string SAASAPP014Description {
             get {
-                return ResourceManager.GetString("SAS074Description", resourceCulture);
+                return ResourceManager.GetString("SAASAPP014Description", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Property &apos;{0}&apos; must return one of these primitive types: &apos;{1}&apos;, or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types, or be another type in the &apos;{2}&apos; namespace.
         /// </summary>
-        internal static string SAS074MessageFormat {
+        internal static string SAASAPP014MessageFormat {
             get {
-                return ResourceManager.GetString("SAS074MessageFormat", resourceCulture);
+                return ResourceManager.GetString("SAASAPP014MessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Wrong return type.
         /// </summary>
-        internal static string SAS074Title {
+        internal static string SAASAPP014Title {
             get {
-                return ResourceManager.GetString("SAS074Title", resourceCulture);
+                return ResourceManager.GetString("SAASAPP014Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Property should be &apos;Optional&lt;T&gt;&apos; not nullable..
         /// </summary>
-        internal static string SAS084Description {
+        internal static string SAASAPP024Description {
             get {
-                return ResourceManager.GetString("SAS084Description", resourceCulture);
+                return ResourceManager.GetString("SAASAPP024Description", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Property &apos;{0}&apos; should be &apos;Optional&lt;T&gt;&apos; not nullable.
         /// </summary>
-        internal static string SAS084MessageFormat {
+        internal static string SAASAPP024MessageFormat {
             get {
-                return ResourceManager.GetString("SAS084MessageFormat", resourceCulture);
+                return ResourceManager.GetString("SAASAPP024MessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Wrong declaration.
         /// </summary>
-        internal static string SAS084Title {
+        internal static string SAASAPP024Title {
             get {
-                return ResourceManager.GetString("SAS084Title", resourceCulture);
+                return ResourceManager.GetString("SAASAPP024Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Property must have the return the correct type.
         /// </summary>
-        internal static string SAS085Description {
+        internal static string SAASAPP025Description {
             get {
-                return ResourceManager.GetString("SAS085Description", resourceCulture);
+                return ResourceManager.GetString("SAASAPP025Description", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Property &apos;{0}&apos; must return one of these primitive types: &apos;{1}&apos;, or any ValueObject, or any Enum, or an Optional&lt;T&gt;/List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types.
         /// </summary>
-        internal static string SAS085MessageFormat {
+        internal static string SAASAPP025MessageFormat {
             get {
-                return ResourceManager.GetString("SAS085MessageFormat", resourceCulture);
+                return ResourceManager.GetString("SAASAPP025MessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Wrong return type.
         /// </summary>
-        internal static string SAS085Title {
+        internal static string SAASAPP025Title {
             get {
-                return ResourceManager.GetString("SAS085Title", resourceCulture);
+                return ResourceManager.GetString("SAASAPP025Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aggregate roots must have at least one &apos;Create()&apos; class factory method..
+        /// </summary>
+        internal static string SAASDDD010Description {
+            get {
+                return ResourceManager.GetString("SAASDDD010Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aggregate root type &apos;{0}&apos; must implement a class factory method called &apos;Create()&apos; to create new instances.
+        /// </summary>
+        internal static string SAASDDD010MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASDDD010MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing &apos;Create()&apos; method.
+        /// </summary>
+        internal static string SAASDDD010Title {
+            get {
+                return ResourceManager.GetString("SAASDDD010Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create() class factory method must call specific code..
+        /// </summary>
+        internal static string SAASDDD012Description {
+            get {
+                return ResourceManager.GetString("SAASDDD012Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Factory method &apos;{0}&apos; must make a call to method &apos;{1}&apos;.
+        /// </summary>
+        internal static string SAASDDD012MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASDDD012MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing required call to method.
+        /// </summary>
+        internal static string SAASDDD012Title {
+            get {
+                return ResourceManager.GetString("SAASDDD012Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entities must have at least one &apos;Create()&apos; class factory method..
+        /// </summary>
+        internal static string SAASDDD020Description {
+            get {
+                return ResourceManager.GetString("SAASDDD020Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entity type &apos;{0}&apos; must implement a class factory method called &apos;Create()&apos; to create new instances.
+        /// </summary>
+        internal static string SAASDDD020MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASDDD020MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing &apos;Create()&apos; method.
+        /// </summary>
+        internal static string SAASDDD020Title {
+            get {
+                return ResourceManager.GetString("SAASDDD020Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ValueObjects must have at least one &apos;Create()&apos; class factory method..
+        /// </summary>
+        internal static string SAASDDD030Description {
+            get {
+                return ResourceManager.GetString("SAASDDD030Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ValueObject type &apos;{0}&apos; must implement a class factory method called &apos;Create()&apos; to create new instances.
+        /// </summary>
+        internal static string SAASDDD030MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASDDD030MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing &apos;Create()&apos; method.
+        /// </summary>
+        internal static string SAASDDD030Title {
+            get {
+                return ResourceManager.GetString("SAASDDD030Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method must not mutate the ValueObject..
+        /// </summary>
+        internal static string SAASDDD035Description {
+            get {
+                return ResourceManager.GetString("SAASDDD035Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method &apos;{0}&apos; must not mutate this ValueObject&apos;s state, and must return a new instance of this ValueObject using one of these return types, either: &apos;{1}&apos;, or can be suppressed by adding the &apos;{2}&apos; attribute to the method.
+        /// </summary>
+        internal static string SAASDDD035MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASDDD035MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method mutates ValueObject state.
+        /// </summary>
+        internal static string SAASDDD035Title {
+            get {
+                return ResourceManager.GetString("SAASDDD035Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Domain Event must be named in the past tense, as they occured in the past..
+        /// </summary>
+        internal static string SAASDDD043Description {
+            get {
+                return ResourceManager.GetString("SAASDDD043Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Domain Event &apos;{0}&apos; must be named in the past tense.
+        /// </summary>
+        internal static string SAASDDD043MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASDDD043MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Domain Event must be named in the past tense.
+        /// </summary>
+        internal static string SAASDDD043Title {
+            get {
+                return ResourceManager.GetString("SAASDDD043Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DomainEvent must have at least one &apos;Create()&apos; class factory method..
+        /// </summary>
+        internal static string SAASDDD044Description {
+            get {
+                return ResourceManager.GetString("SAASDDD044Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DomainEvent type &apos;{0}&apos; must implement a class factory method called &apos;Create()&apos; to create new instances.
+        /// </summary>
+        internal static string SAASDDD044MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASDDD044MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing &apos;Create()&apos; method.
+        /// </summary>
+        internal static string SAASDDD044Title {
+            get {
+                return ResourceManager.GetString("SAASDDD044Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create() class factory method must return the correct type..
+        /// </summary>
+        internal static string SAASDDD045Description {
+            get {
+                return ResourceManager.GetString("SAASDDD045Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Factory method &apos;{0}&apos; must return this type: &apos;{1}&apos;.
+        /// </summary>
+        internal static string SAASDDD045MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASDDD045MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong return type.
+        /// </summary>
+        internal static string SAASDDD045Title {
+            get {
+                return ResourceManager.GetString("SAASDDD045Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must be marked &apos;required&apos; or be nullable or be initialized..
+        /// </summary>
+        internal static string SAASDDD047Description {
+            get {
+                return ResourceManager.GetString("SAASDDD047Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must be marked &apos;required&apos; or be nullable or be initialized.
+        /// </summary>
+        internal static string SAASDDD047MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASDDD047MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong declaration.
+        /// </summary>
+        internal static string SAASDDD047Title {
+            get {
+                return ResourceManager.GetString("SAASDDD047Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must have the return the correct type..
+        /// </summary>
+        internal static string SAASDDD049Description {
+            get {
+                return ResourceManager.GetString("SAASDDD049Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must return one of these primitive types: &apos;{1}&apos;, or any Enum, or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types.
+        /// </summary>
+        internal static string SAASDDD049MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASDDD049MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong return type.
+        /// </summary>
+        internal static string SAASDDD049Title {
+            get {
+                return ResourceManager.GetString("SAASDDD049Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This method should return a &apos;Result&lt;T&gt;&apos; type..
+        /// </summary>
+        internal static string SAASWEB010Description {
+            get {
+                return ResourceManager.GetString("SAASWEB010Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If method &apos;{0}&apos; is supposed to be a service operation, then it should return one of these possible types: &apos;{1}&apos;.
+        /// </summary>
+        internal static string SAASWEB010MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB010MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong return type.
+        /// </summary>
+        internal static string SAASWEB010Title {
+            get {
+                return ResourceManager.GetString("SAASWEB010Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This service operation should have at least one parameter, and that parameter should be derived from: &apos;IWebRequest&lt;TResponse&gt;&apos;..
+        /// </summary>
+        internal static string SAASWEB011Description {
+            get {
+                return ResourceManager.GetString("SAASWEB011Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; should have at least one parameter of a type derived from: &apos;IWebRequest&lt;TResponse&gt;&apos;.
+        /// </summary>
+        internal static string SAASWEB011MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB011MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing first parameter or wrong parameter type.
+        /// </summary>
+        internal static string SAASWEB011Title {
+            get {
+                return ResourceManager.GetString("SAASWEB011Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This service operation can only have a &apos;CancellationToken&apos; as its second parameter..
+        /// </summary>
+        internal static string SAASWEB012Description {
+            get {
+                return ResourceManager.GetString("SAASWEB012Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; can only have a &apos;CancellationToken&apos; as its second parameter.
+        /// </summary>
+        internal static string SAASWEB012MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB012MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong second parameter type.
+        /// </summary>
+        internal static string SAASWEB012Title {
+            get {
+                return ResourceManager.GetString("SAASWEB012Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The request type for this service operation should be declared with a &apos;[RouteAttribute]&apos; on it..
+        /// </summary>
+        internal static string SAASWEB013Description {
+            get {
+                return ResourceManager.GetString("SAASWEB013Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; has a request type that does not have a &apos;[RouteAttribute]&apos; on it.
+        /// </summary>
+        internal static string SAASWEB013MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB013MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing &apos;[RouteAttribute]&apos; on request type.
+        /// </summary>
+        internal static string SAASWEB013Title {
+            get {
+                return ResourceManager.GetString("SAASWEB013Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This service operation has a route declared on its request that is different from other service operations in this class..
+        /// </summary>
+        internal static string SAASWEB014Description {
+            get {
+                return ResourceManager.GetString("SAASWEB014Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; is required to have a request with a route for the same primary resource as the other service operations in this class.
+        /// </summary>
+        internal static string SAASWEB014MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB014MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong route group.
+        /// </summary>
+        internal static string SAASWEB014Title {
+            get {
+                return ResourceManager.GetString("SAASWEB014Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This service operation uses the same request type as another service operation in this class..
+        /// </summary>
+        internal static string SAASWEB015Description {
+            get {
+                return ResourceManager.GetString("SAASWEB015Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; uses the same type for its first parameter as does another service operation in this class. They must use different request types.
+        /// </summary>
+        internal static string SAASWEB015MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB015MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate request type.
+        /// </summary>
+        internal static string SAASWEB015Title {
+            get {
+                return ResourceManager.GetString("SAASWEB015Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This service operation should return an appropriate Result type for the operation..
+        /// </summary>
+        internal static string SAASWEB016Description {
+            get {
+                return ResourceManager.GetString("SAASWEB016Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; is defined as a &apos;{1}&apos; operation, and can only return one of these types: &apos;{2}&apos;.
+        /// </summary>
+        internal static string SAASWEB016MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB016MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected return type for operation.
+        /// </summary>
+        internal static string SAASWEB016Title {
+            get {
+                return ResourceManager.GetString("SAASWEB016Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The request type should be declared with a &apos;[RouteAttribute]&apos; on it..
+        /// </summary>
+        internal static string SAASWEB017Description {
+            get {
+                return ResourceManager.GetString("SAASWEB017Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request type &apos;{0}&apos; should declare a &apos;[RouteAttribute]&apos;.
+        /// </summary>
+        internal static string SAASWEB017MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB017MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing &apos;[RouteAttribute]&apos;.
+        /// </summary>
+        internal static string SAASWEB017Title {
+            get {
+                return ResourceManager.GetString("SAASWEB017Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The request type should be not declare a &apos;[AuthorizeAttribute]&apos; on it, since the &apos;[RouteAttribute]&apos; has been configured with &apos;Anonymous&apos; access..
+        /// </summary>
+        internal static string SAASWEB018Description {
+            get {
+                return ResourceManager.GetString("SAASWEB018Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request type &apos;{0}&apos; should not declare a &apos;[AuthorizeAttribute]&apos;.
+        /// </summary>
+        internal static string SAASWEB018MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB018MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected &apos;[AuthorizeAttribute]&apos;.
+        /// </summary>
+        internal static string SAASWEB018Title {
+            get {
+                return ResourceManager.GetString("SAASWEB018Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The request type should be declared with a &apos;[AuthorizeAttribute]&apos; on it to constrain role/feature access to it, since the &apos;[RouteAttribute]&apos; has been configured with secure access..
+        /// </summary>
+        internal static string SAASWEB019Description {
+            get {
+                return ResourceManager.GetString("SAASWEB019Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request type &apos;{0}&apos; should declare a &apos;[AuthorizeAttribute]&apos; to constrain role/feature access.
+        /// </summary>
+        internal static string SAASWEB019MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB019MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing &apos;[AuthorizeAttribute]&apos;.
+        /// </summary>
+        internal static string SAASWEB019Title {
+            get {
+                return ResourceManager.GetString("SAASWEB019Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The request type should be suffixed with the word &apos;Request&apos;..
+        /// </summary>
+        internal static string SAASWEB031Description {
+            get {
+                return ResourceManager.GetString("SAASWEB031Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request &apos;{0}&apos; should be suffixed with the word &apos;Request&apos;.
+        /// </summary>
+        internal static string SAASWEB031MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB031MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Naming is wrong.
+        /// </summary>
+        internal static string SAASWEB031Title {
+            get {
+                return ResourceManager.GetString("SAASWEB031Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The request type should be declared in the &apos;Infrastructure.Web.Api.Operations.Shared&apos; namespace..
+        /// </summary>
+        internal static string SAASWEB032Description {
+            get {
+                return ResourceManager.GetString("SAASWEB032Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request &apos;{0}&apos; should be declared in the &apos;Infrastructure.Web.Api.Operations.Shared&apos; namespace.
+        /// </summary>
+        internal static string SAASWEB032MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB032MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Location is wrong.
+        /// </summary>
+        internal static string SAASWEB032Title {
+            get {
+                return ResourceManager.GetString("SAASWEB032Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The request should be declared with a &apos;[RouteAttribute]&apos; on it..
+        /// </summary>
+        internal static string SAASWEB033Description {
+            get {
+                return ResourceManager.GetString("SAASWEB033Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request &apos;{0}&apos; should have a &apos;[RouteAttribute]&apos; on it.
+        /// </summary>
+        internal static string SAASWEB033MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB033MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing &apos;[RouteAttribute]&apos; on request.
+        /// </summary>
+        internal static string SAASWEB033Title {
+            get {
+                return ResourceManager.GetString("SAASWEB033Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The request type should be suffixed with the word &apos;Response&apos;..
+        /// </summary>
+        internal static string SAASWEB041Description {
+            get {
+                return ResourceManager.GetString("SAASWEB041Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request &apos;{0}&apos; should be suffixed with the word &apos;Response&apos;.
+        /// </summary>
+        internal static string SAASWEB041MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB041MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Naming is wrong.
+        /// </summary>
+        internal static string SAASWEB041Title {
+            get {
+                return ResourceManager.GetString("SAASWEB041Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The response type should be declared in the &apos;Infrastructure.Web.Api.Operations.Shared&apos; namespace..
+        /// </summary>
+        internal static string SAASWEB042Description {
+            get {
+                return ResourceManager.GetString("SAASWEB042Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Response &apos;{0}&apos; should be declared in the &apos;Infrastructure.Web.Api.Operations.Shared&apos; namespace.
+        /// </summary>
+        internal static string SAASWEB042MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB042MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Location is wrong.
+        /// </summary>
+        internal static string SAASWEB042Title {
+            get {
+                return ResourceManager.GetString("SAASWEB042Title", resourceCulture);
             }
         }
     }
