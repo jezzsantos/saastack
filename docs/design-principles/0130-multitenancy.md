@@ -63,7 +63,7 @@ A tenant can be scoped in a given digital product as any of these common concept
 * Never share any data between tenants, unless explicitly authorized by each tenant. Privacy is paramount.
 * Each tenant will likely want to customize the software running with their tenancy. Sometimes, this is just branding (fonts, colors, logos etc.), other times, it is the rules and configuration of the software.
 * Tenants will likely want to give access to their tenancy to people inside and outside their company. Some individuals (i.e., consultants) will have access to more than one tenancy at any time, regardless of whether they work for the company in the tenancy or for companies/independent bodies outside that company.
-* Physical partitioning of data is an important solution in a global SaaS solution.
+* Physical partitioning of data (called "sharding") is an important solution in a global SaaS solution.
 
 ## Implementation
 
@@ -249,15 +249,17 @@ With all these different services and all these different workloads in the produ
 
 ##### Logical Data Partitioning
 
-Logical data partitioning is a technique used to store data from multiple tenants in a single physical repository or service.
+Logical data "partitioning" is a technique used to store data from multiple tenants within a single physical repository or service, where records are divided into logical "containers" based upon some "key" (i.e., some identifier). That's is all data from one tenant is isolated from all data of another tenant.
+
+> Most repository technologies have size limits (per physical container), and partitioning is also a good way to work around these kinds of limits. For example, storing records starting with letters A,B,C, and D in one container and records from E,F,G, and H in another container, etc. increases the capacity of the database.
 
 This approach is supported by most data stores and third-party online services in one form or another. However, not all online services implement it very well.
 
-The key concept behind logical data partitioning is to utilize a single physical service (and usually account subscription) and specify a "partition" for each tenant in the data.
+The key concept behind logical data partitioning is to utilize a single physical service (and usually an account subscription) and specify a "partition" for each tenant in the data.
 
 For example, in a SQL database, you can add an additional foreign key column to each table that contains tenanted data called `TenantId` and ensure that this column participates in each and every SQL operation, such as SELECT, INSERT, UPDATE, and DELETE.
 
-> Whereas, shared data across all tenants will not require this constraint.
+> Where as, the data shared across all tenants will not require this partition key.
 >
 > There is a real world danger with this kind of partitioning, that developers can easily make a mistake and forget to include the `TenantId` in the query or update statement, and they can inadvertently expose data from one tenant to others, causing a data breach event.
 
@@ -277,49 +279,48 @@ Not all single data repositories and third-party services can address those need
 
 ##### Infrastructure Partitioning
 
-Infrastructure partitioning is similar to logical partitioning except that it uses separate (but similar) physical infrastructure to contain the data of each tenant. That could be a separate server, database, storage account, which is addressed differently than other partitions, sometimes in different physical locations or data centers.
+Infrastructure partitioning (called "sharding") is similar to logical/physical partitioning except that it uses separate (but cloned) physical infrastructure to contain the partition of data. That could be a separate server, separate database, separate storage account, etc, which is addressed differently than other shards, sometimes in different physical locations or in different geographic data centers.
 
-It is becoming increasingly financially viable for small companies to deploy this capability, thanks to the large cloud providers, who make it more economical and easier to perform.
+Thanks to the large cloud providers, it is becoming increasingly financially viable for small companies to deploy this capability. They make it more economical and easier to employ.
 
-Each tenant is assigned its own dedicated physical infrastructure for exclusive use. This infrastructure can be set up and taken down as tenants onboard and exit the SaaS platform.
+Each tenant (or group of tenants) is assigned its own dedicated physical infrastructure component for exclusive use (e.g., database). This infrastructure can be set up and taken down as tenants onboard and exit the SaaS platform.
 
-In some cases, physical ownership of the actual infrastructure and rights are put in place to protect data even after the subscription ends.
+This scheme offers some key benefits (over logical partitioning):
 
-In some cases, tenants do BYO of their own infrastructure to be used by the SaaS product.
+- In some cases, physical ownership of the actual infrastructure and rights need to be established to protect data even after the subscription ends.
 
-In some cases, tenants may also manage their own dedicated subscriptions to third-party services like stripe.com or chargebee.com.
+- In some cases, tenants do BYO of their own infrastructure to be used by the SaaS product.
 
-Infrastructure partitioning may be mandatory for SaaS products with specific compliance needs, such as HIPAA, PCI, or government, where shared data stores are not permitted or where they have expensive compliance and access requirements.
+- In some cases, tenants may also manage their own dedicated subscriptions to third-party services like: www.stripe.com or www.chargebee.com.
 
-Physical partitioning has many other benefits, including a reduced risk of accidental information disclosure since access to these dedicated resources is more difficult to execute accidentally in code or during production support, maintenance, and administrative processes.
+- Infrastructure partitioning may be mandatory for SaaS products with specific compliance needs, such as HIPAA, PCI, or government sovereignty needs, where shared data stores are not permitted or have expensive compliance and access requirements.
 
-Dedicated partitioned infrastructure can also be deployed closer to the tenant's region or onto their premises, which is impossible with logical data partitioned infrastructure.
+- Physical sharding has many other benefits, including a reduced risk of accidental information disclosure since access to these dedicated resources is more difficult to execute accidentally in code or during production support, maintenance, and administrative processes.
 
-Network latency can also be reduced by deploying dedicated infrastructure closer to the tenant, whereas data partitioned infrastructure is often shared from one or more physical locations that may not be physically close to the product consumers.
+- Dedicated sharded infrastructure can also be deployed closer to the tenant's region or onto their premises, which is impossible with logical data partitioned infrastructure, this makes geographical deployment possible.
 
-Finally, managing the cost of physical resources per tenant can be more carefully controlled and optimized by the buyer, thanks to mature cloud provider tools and services.
+- Network latency can also be reduced by deploying dedicated infrastructure closer to the tenant, whereas data partitioned infrastructure is often shared from one or more physical locations that may not be physically close to the product consumers.
+- Finally, managing the cost of physical resources per tenant can be more carefully controlled and optimized by the buyer, thanks to mature cloud provider tools and services.
 
-At some point, many SaaS products will need to explore infrastructure partitioning with certain customers, usually the larger or more strategic customers who are likely to have special needs.
+At some point, many SaaS products will need to explore infrastructure sharding with certain customers, usually the larger or more strategic customers who are likely to have special needs.
 
 ### Provisioning
 
-For SaaS products that wish to provision physical infrastructure to implement "Infrastructure Partitioning" for one or more tenants here are some options.
+For SaaS products that wish to provision physical infrastructure to implement "Infrastructure Sharding" for one or more tenants here are some options.
 
 Consider the following workflow:
 
 1. A new customer signs up for the platform. They register a new user, and that will create a new `Personal` organization for them to use the product. This organization will have a billing subscription that gives them some [limited] access level to the product at this time (i.e., a trial).
-2. At that time, or at some future time (like when they upgrade to a paid plan) a new event (e.g., `EndUsersDomain.Events.Registered`) can be subscribed to by adding a new `IEventNotificationRegistration` in one of the subdomains.
-3. This event is then raised at runtime, which triggers an application (in some subdomain) to make some API call to some cloud-based process to provision some specific infrastructure (e.g., via queue message or direct via an API call to an Azure function or AWS Lambda - there are many integration options). Let's assume that this triggers Azure to create a new SQL database in a regional data center physically closer to where this specific customer is signing up from.
+2. At that time, or at some future time (like when they upgrade to a paid plan), a new event (e.g., `EndUsersDomain.Events.Registered`) can be subscribed to by adding a new `IEventNotificationRegistration` in one of the subdomains.
+3. This event is then raised at runtime, which triggers an application (in some subdomain) to make some API call to some cloud-based process to provision some specific infrastructure (e.g., via queue message or direct via an API call to an Azure function or AWS Lambda - there are many integration options). Let's assume that this triggers Azure to create a new SQL database in a regional data center physically closer to where this specific customer is signing up.
 4. Let's assume that this cloud provisioning process takes some time to complete (perhaps several minutes), and meanwhile, the customer is starting using the product and try it out for themselves (using their `Personal` organisation, which we assume is using shared platform infrastructure at this time.
 5. When the provisioning process is completed (a few minutes later), a new message [containing some data about the provisioning process] is created and dropped on the `provisioning` queue (in Azure or AWS).
-6. The `DeliverProvisioning` task is triggered, and the message is picked up off the queue, and delivered to the `Ancillary` API by the Azure function or AWS Lambda.
+6. The `DeliverProvisioning` task is triggered, and the message is picked up off the queue and delivered to the `Ancillary` API by the Azure function or AWS Lambda.
 7. The `Ancillary` API then handles the message and forwards it to the `Organization` subdomain to update the settings of the `Personal` organization that the customer is using.
 8. As soon as that happens, if we assume that the message contained a connection string to another SQL database, then the very next HTTP request made by the customer will start to persist data to a newly provisioned database.
-9. From that point forward the newly provisioned database stores all tenanted core subdomain data in the newly provisioned database.
+9. From that point forward, the newly provisioned database stores all tenanted core subdomain data.
 
-The `provisioning` queue is already in place, and so is all handling of messages for that queue, all the way to updating the settings of a spefici `Organization`.
-
-All that is needed now is:
+Since the `provisioning` queue is already in place, and so is all the handling of messages for that queue, all the way to updating the settings of a specific `Organization`, all that is needed now is:
 
 1. A scripted provisioning process to be defined in some cloud provider. That could be via executing a script that automates the provisioning, or could be an API call direct to the cloud provider with some script already defined in the cloud provider.
 2. Some way to trigger the provisioning process itself, based upon some event in the software. Be that a new customer signup or some action they take. That could be `IEventNotificationRegistration` or another mechanism.
