@@ -130,15 +130,15 @@ When pushed, all branches will be built and tested with GitHub actions
 
 2. Run these tests:
 
-   In Rider, run all C# tests with Category= `Unit` and `Integration.Web`
+   In Rider, run all C# tests with Category= `Unit`, `Unit.Architecture` and `Integration.Web`
 
    > Note: Use `Group By > Category` in Rider's unit test explorer to view these three categories easily.
 
    OR, in a terminal:
 
-   - `dotnet test --filter:"Category=Unit" src\SaaStack.sln`
+   - `dotnet test --filter:"Category=Unit|Category=Unit.Architecture" src\SaaStack.sln`
 
-   - `dotnet test --filter Category=Integration.Web src\SaaStack.sln`
+   - `dotnet test --filter:"Category=Integration.Web" src\SaaStack.sln`
 
 3. Configure your "Commit " window to select the "Cleanup with 'Full Cleanup' profile".
 
@@ -268,13 +268,13 @@ To kill these processes:
 
 ### Everyday tests
 
-Run all C# tests with Category= `Unit` and `Integration.Web`
+Run all C# tests with Category= `Unit`, `Unit.Architecture` and `Integration.Web`
 
 OR, in a terminal:
 
-- `dotnet test --filter:"Category=Unit" src\SaaStack.sln`
+- `dotnet test --filter:"Category=Unit|Category=Unit.Architecture" src\SaaStack.sln`
 
-- `dotnet test --filter Category=Integration.Web src\SaaStack.sln`
+- `dotnet test --filter:"Category=Integration.Web" src\SaaStack.sln`
 
 > Note: All tests will be run in parallel in `Rider` or in `dotnet test`.
 
@@ -290,7 +290,7 @@ These tests should NOT be run frequently and can be scheduled to run as part of 
 >
 > Warning: They may incur charges, or they may trigger rate-limiting policies on the accounts they are run against.
 
-`dotnet test --filter Category=Integration.Persistence src\SaaStack.sln` (requires installing the server persistence components listed at the top of this page)
+`dotnet test --filter:"Category=Integration.Persistence" src\SaaStack.sln` (requires installing the server persistence components listed at the top of this page)
 
 > Note: If any of the `Integration.Persistence` category of tests fail, it is likely due to the fact that you don't have that technology installed on your local machine, or that you are not running your IDE as Administrator, and therefore cannot start/stop those local services without elevated permissions.
 
@@ -306,7 +306,7 @@ Only run these kinds of tests when the code in the technology adapters changes. 
 >
 > Warning: They may incur charges, or they may trigger rate-limiting policies on the accounts they are run against.
 
-`dotnet test --filter Category=Integration.External src\SaaStack.sln` (requires internet access to external services)
+`dotnet test --filter:"Category=Integration.External" src\SaaStack.sln` (requires internet access to external services)
 
 # Versioning the Code
 
