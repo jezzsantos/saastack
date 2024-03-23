@@ -7,6 +7,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Unavailability = Application.Resources.Shared.Unavailability;
 
 namespace CarsApplication;
 

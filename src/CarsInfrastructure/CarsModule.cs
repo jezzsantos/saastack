@@ -18,16 +18,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CarsInfrastructure;
 
-public class CarsModule : ISubDomainModule
+public class CarsModule : ISubdomainModule
 {
-    public Assembly ApiAssembly => typeof(CarsApi).Assembly;
+    public Assembly InfrastructureAssembly => typeof(CarsApi).Assembly;
 
     public Assembly DomainAssembly => typeof(CarRoot).Assembly;
 
-    public Dictionary<Type, string> AggregatePrefixes => new()
+    public Dictionary<Type, string> EntityPrefixes => new()
     {
         { typeof(CarRoot), "car" },
-        { typeof(UnavailabilityEntity), "unavail" }
+        { typeof(Unavailability), "unavail" }
     };
 
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware

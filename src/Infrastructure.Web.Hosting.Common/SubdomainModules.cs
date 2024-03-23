@@ -9,20 +9,20 @@ namespace Infrastructure.Web.Hosting.Common;
 /// <summary>
 ///     Modules used for registering subdomains
 /// </summary>
-public class SubDomainModules
+public class SubdomainModules
 {
-    private readonly Dictionary<Type, string> _aggregatePrefixes = new();
+    private readonly Dictionary<Type, string> _entityPrefixes = new();
     private readonly List<Assembly> _apiAssemblies = new();
-    private readonly List<Assembly> _domainAssemblies = new();
+    private readonly List<Assembly> _subdomainAssemblies = new();
     private readonly List<Action<WebApplication, List<MiddlewareRegistration>>>
         _minimalApiRegistrationFunctions = new();
     private readonly List<Action<ConfigurationManager, IServiceCollection>> _serviceCollectionFunctions = new();
 
-    public IDictionary<Type, string> AggregatePrefixes => _aggregatePrefixes;
+    public IDictionary<Type, string> EntityPrefixes => _entityPrefixes;
 
     public IReadOnlyList<Assembly> ApiAssemblies => _apiAssemblies;
 
-    public IReadOnlyList<Assembly> DomainAssemblies => _domainAssemblies;
+    public IReadOnlyList<Assembly> SubdomainAssemblies => _subdomainAssemblies;
 
     /// <summary>
     ///     Configure middleware in the pipeline
@@ -32,21 +32,24 @@ public class SubDomainModules
         _minimalApiRegistrationFunctions.ForEach(func => func(app, middlewares));
     }
 
-    public void Register(ISubDomainModule module)
+    /// <summary>
+    ///     Registers all the information from the <see cref="ISubdomainModule" />
+    /// </summary>
+    public void Register(ISubdomainModule module)
     {
         ArgumentNullException.ThrowIfNull(module);
-        ArgumentNullException.ThrowIfNull(module.ApiAssembly, nameof(module.ApiAssembly));
-        ArgumentNullException.ThrowIfNull(module.ApiAssembly, nameof(module.AggregatePrefixes));
+        ArgumentNullException.ThrowIfNull(module.InfrastructureAssembly, nameof(module.InfrastructureAssembly));
+        ArgumentNullException.ThrowIfNull(module.InfrastructureAssembly, nameof(module.EntityPrefixes));
         ArgumentNullException.ThrowIfNull(module.ConfigureMiddleware,
             nameof(module.ConfigureMiddleware));
 
-        _apiAssemblies.Add(module.ApiAssembly);
+        _apiAssemblies.Add(module.InfrastructureAssembly);
         if (module.DomainAssembly.Exists())
         {
-            _domainAssemblies.Add(module.DomainAssembly);
+            _subdomainAssemblies.Add(module.DomainAssembly);
         }
 
-        _aggregatePrefixes.Merge(module.AggregatePrefixes);
+        _entityPrefixes.Merge(module.EntityPrefixes);
         _minimalApiRegistrationFunctions.Add(module.ConfigureMiddleware);
         if (module.RegisterServices is not null)
         {
@@ -54,6 +57,9 @@ public class SubDomainModules
         }
     }
 
+    /// <summary>
+    ///     Registers all the services with the dependency injection container
+    /// </summary>
     public void RegisterServices(ConfigurationManager configuration, IServiceCollection serviceCollection)
     {
         _serviceCollectionFunctions.ForEach(func => func(configuration, serviceCollection));

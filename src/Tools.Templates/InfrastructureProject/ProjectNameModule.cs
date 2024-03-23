@@ -16,7 +16,7 @@ public class {SubDomainName}sModule : ISubDomainModule
 {
     public Assembly ApiAssembly => typeof({SubDomainName}sApi).Assembly;
 
-    public Assembly DomainAssembly => typeof({SubDomainName}Root).Assembly;
+    public Assembly? DomainAssembly => typeof({SubDomainName}Root).Assembly;
 
     public Dictionary<Type, string> AggregatePrefixes => new()
     {

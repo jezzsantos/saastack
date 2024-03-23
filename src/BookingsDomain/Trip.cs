@@ -12,20 +12,20 @@ using QueryAny;
 namespace BookingsDomain;
 
 [EntityName("Trip")]
-public sealed class TripEntity : EntityBase
+public sealed class Trip : EntityBase
 {
-    public static Result<TripEntity, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
+    public static Result<Trip, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
         RootEventHandler rootEventHandler)
     {
-        return new TripEntity(recorder, idFactory, rootEventHandler);
+        return new Trip(recorder, idFactory, rootEventHandler);
     }
 
-    private TripEntity(IRecorder recorder, IIdentifierFactory idFactory,
+    private Trip(IRecorder recorder, IIdentifierFactory idFactory,
         RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
     }
 
-    private TripEntity(ISingleValueObject<string> identifier, IDependencyContainer container,
+    private Trip(ISingleValueObject<string> identifier, IDependencyContainer container,
         HydrationProperties rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
         RootId = rehydratingProperties.GetValueOrDefault<Identifier>(nameof(RootId));
@@ -48,9 +48,9 @@ public sealed class TripEntity : EntityBase
 
     public Optional<Location> To { get; private set; }
 
-    public static EntityFactory<TripEntity> Rehydrate()
+    public static EntityFactory<Trip> Rehydrate()
     {
-        return (identifier, container, properties) => new TripEntity(identifier, container, properties);
+        return (identifier, container, properties) => new Trip(identifier, container, properties);
     }
 
     public override HydrationProperties Dehydrate()

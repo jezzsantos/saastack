@@ -4,9 +4,9 @@ namespace TestingStubApiHost;
 
 public static class HostedModules
 {
-    public static SubDomainModules Get()
+    public static SubdomainModules Get()
     {
-        var modules = new SubDomainModules();
+        var modules = new SubdomainModules();
 #if TESTINGONLY
         modules.Register(new StubApiModule());
 #endif

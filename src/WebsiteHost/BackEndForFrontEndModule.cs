@@ -12,13 +12,13 @@ using WebsiteHost.Application;
 
 namespace WebsiteHost;
 
-public class BackEndForFrontEndModule : ISubDomainModule
+public class BackEndForFrontEndModule : ISubdomainModule
 {
-    public Assembly ApiAssembly => typeof(RecordingApi).Assembly;
+    public Assembly InfrastructureAssembly => typeof(RecordingApi).Assembly;
 
     public Assembly? DomainAssembly => null;
 
-    public Dictionary<Type, string> AggregatePrefixes => new();
+    public Dictionary<Type, string> EntityPrefixes => new();
 
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
     {

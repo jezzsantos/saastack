@@ -16,7 +16,7 @@ using Tools.Analyzers.NonPlatform.Extensions;
 namespace Tools.Analyzers.NonPlatform;
 
 /// <summary>
-///     An analyzer to the correct implementation of root aggregates, entities, value objects and domain events:
+///     An analyzer to correct the implementation of root aggregates, entities, value objects and domain events:
 ///     Aggregate Roots:
 ///     SAASDDD010: Error: Aggregate roots must have at least one Create() class factory method
 ///     SAASDDD011: Error: Create() class factory methods must return correct types

@@ -8,6 +8,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
+using Unavailability = CarsApplication.Persistence.ReadModels.Unavailability;
 
 namespace CarsInfrastructure.Persistence.ReadModels;
 

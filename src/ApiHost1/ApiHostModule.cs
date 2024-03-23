@@ -7,13 +7,13 @@ namespace ApiHost1;
 /// <summary>
 ///     Provides a module for common services of a API host
 /// </summary>
-public class ApiHostModule : ISubDomainModule
+public class ApiHostModule : ISubdomainModule
 {
-    public Assembly ApiAssembly => typeof(HealthApi).Assembly;
+    public Assembly InfrastructureAssembly => typeof(HealthApi).Assembly;
 
-    public Assembly DomainAssembly => null!;
+    public Assembly? DomainAssembly => null;
 
-    public Dictionary<Type, string> AggregatePrefixes => new();
+    public Dictionary<Type, string> EntityPrefixes => new();
 
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
     {

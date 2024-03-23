@@ -29,5 +29,6 @@ public static class AnalyzerConstants
         public const string Ddd = "SaaStackDDD";
         public const string Documentation = "SaaStackDocumentation";
         public const string WebApi = "SaaStackWebApi";
+        public const string Host = "SaaStackHosts";
     }
 }

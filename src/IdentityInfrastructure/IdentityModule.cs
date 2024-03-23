@@ -27,17 +27,18 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace IdentityInfrastructure;
 
-public class IdentityModule : ISubDomainModule
+public class IdentityModule : ISubdomainModule
 {
-    public Assembly ApiAssembly => typeof(PasswordCredentialsApi).Assembly;
+    public Assembly InfrastructureAssembly => typeof(PasswordCredentialsApi).Assembly;
 
     public Assembly DomainAssembly => typeof(PasswordCredentialRoot).Assembly;
 
-    public Dictionary<Type, string> AggregatePrefixes => new()
+    public Dictionary<Type, string> EntityPrefixes => new()
     {
         { typeof(PasswordCredentialRoot), "pwdcred" },
         { typeof(AuthTokensRoot), "authtok" },
-        { typeof(APIKeyRoot), "apikey" }
+        { typeof(APIKeyRoot), "apikey" },
+        { typeof(SSOUserRoot), "ssocred_" }
     };
 
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware

@@ -21,13 +21,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace EndUsersInfrastructure;
 
-public class EndUsersModule : ISubDomainModule
+public class EndUsersModule : ISubdomainModule
 {
-    public Assembly ApiAssembly => typeof(EndUsersApi).Assembly;
+    public Assembly InfrastructureAssembly => typeof(EndUsersApi).Assembly;
 
     public Assembly DomainAssembly => typeof(EndUserRoot).Assembly;
 
-    public Dictionary<Type, string> AggregatePrefixes => new()
+    public Dictionary<Type, string> EntityPrefixes => new()
     {
         { typeof(EndUserRoot), "user" },
         { typeof(Membership), "mship" }

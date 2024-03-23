@@ -14,7 +14,7 @@ using Tools.Analyzers.NonPlatform.Extensions;
 namespace Tools.Analyzers.NonPlatform;
 
 /// <summary>
-///     An analyzer to the correct implementation of application DTOs and ReadModels:
+///     An analyzer to correct the implementation of application DTOs and ReadModels:
 ///     Application Resources:
 ///     SAASAPP010: Error: Resources must be public
 ///     SAASAPP011: Error: Resources must have a parameterless constructor

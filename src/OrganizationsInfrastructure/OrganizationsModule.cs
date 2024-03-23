@@ -24,13 +24,13 @@ using OrganizationsInfrastructure.Persistence.ReadModels;
 
 namespace OrganizationsInfrastructure;
 
-public class OrganizationsModule : ISubDomainModule
+public class OrganizationsModule : ISubdomainModule
 {
-    public Assembly ApiAssembly => typeof(OrganizationsModule).Assembly;
+    public Assembly InfrastructureAssembly => typeof(OrganizationsModule).Assembly;
 
     public Assembly DomainAssembly => typeof(OrganizationRoot).Assembly;
 
-    public Dictionary<Type, string> AggregatePrefixes => new()
+    public Dictionary<Type, string> EntityPrefixes => new()
     {
         { typeof(OrganizationRoot), "org" }
     };

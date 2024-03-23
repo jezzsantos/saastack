@@ -290,6 +290,9 @@
         <Compile Include="..\Domain.Common\ValueObjects\EventMetadataExtensions.cs">
             <Link>Reference\Domain.Common\ValueObjects\EventMetadataExtensions.cs</Link>
         </Compile>
+        <Compile Include="..\Infrastructure.Web.Hosting.Common\ISubdomainModule.cs">
+            <Link>Reference\Infrastructure.Web.Hosting.Common\ISubdomainModule.cs</Link>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>

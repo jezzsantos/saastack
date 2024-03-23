@@ -20,13 +20,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AncillaryInfrastructure;
 
-public class AncillaryModule : ISubDomainModule
+public class AncillaryModule : ISubdomainModule
 {
-    public Assembly ApiAssembly => typeof(UsagesApi).Assembly;
+    public Assembly InfrastructureAssembly => typeof(UsagesApi).Assembly;
 
     public Assembly DomainAssembly => typeof(AuditRoot).Assembly;
 
-    public Dictionary<Type, string> AggregatePrefixes => new()
+    public Dictionary<Type, string> EntityPrefixes => new()
     {
         { typeof(AuditRoot), "audit" },
         { typeof(EmailDeliveryRoot), "emaildelivery" }

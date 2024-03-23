@@ -16,7 +16,7 @@ public class TripsSpec
     {
         var recorder = new Mock<IRecorder>();
         var idFactory = new FixedIdentifierFactory("anid");
-        var trip = TripEntity.Create(recorder.Object, idFactory, _ => Result.Ok).Value;
+        var trip = Trip.Create(recorder.Object, idFactory, _ => Result.Ok).Value;
 
         _trips.Add(trip);
 
@@ -37,7 +37,7 @@ public class TripsSpec
     {
         var recorder = new Mock<IRecorder>();
         var idFactory = new FixedIdentifierFactory("anid");
-        var trip = TripEntity.Create(recorder.Object, idFactory, _ => Result.Ok).Value;
+        var trip = Trip.Create(recorder.Object, idFactory, _ => Result.Ok).Value;
         _trips.Add(trip);
 
         var result = _trips.Latest();

@@ -816,6 +816,33 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Aggregate or Entity should be registered with an identity prefix.
+        /// </summary>
+        internal static string SAASHST010Description {
+            get {
+                return ResourceManager.GetString("SAASHST010Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is missing an entry for a prefix for &apos;{1}&apos;.
+        /// </summary>
+        internal static string SAASHST010MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASHST010MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing prefix registration.
+        /// </summary>
+        internal static string SAASHST010Title {
+            get {
+                return ResourceManager.GetString("SAASHST010Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This method should return a &apos;Result&lt;T&gt;&apos; type..
         /// </summary>
         internal static string SAASWEB010Description {
@@ -1086,7 +1113,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The request type should be suffixed with the word &apos;Request&apos;..
+        ///   Looks up a localized string similar to The request type should end with the word &apos;Request&apos;..
         /// </summary>
         internal static string SAASWEB031Description {
             get {
@@ -1095,7 +1122,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Request &apos;{0}&apos; should be suffixed with the word &apos;Request&apos;.
+        ///   Looks up a localized string similar to Request &apos;{0}&apos; should end with the word &apos;Request&apos;.
         /// </summary>
         internal static string SAASWEB031MessageFormat {
             get {
@@ -1167,7 +1194,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The request type should be suffixed with the word &apos;Response&apos;..
+        ///   Looks up a localized string similar to The request type should end with the word &apos;Response&apos;..
         /// </summary>
         internal static string SAASWEB041Description {
             get {
@@ -1176,7 +1203,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Request &apos;{0}&apos; should be suffixed with the word &apos;Response&apos;.
+        ///   Looks up a localized string similar to Request &apos;{0}&apos; should be end with the word &apos;Response&apos;.
         /// </summary>
         internal static string SAASWEB041MessageFormat {
             get {

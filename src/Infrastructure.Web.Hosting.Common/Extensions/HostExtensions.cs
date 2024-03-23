@@ -76,7 +76,7 @@ public static class HostExtensions
     /// <summary>
     ///     Configures a WebHost
     /// </summary>
-    public static WebApplication ConfigureApiHost(this WebApplicationBuilder appBuilder, SubDomainModules modules,
+    public static WebApplication ConfigureApiHost(this WebApplicationBuilder appBuilder, SubdomainModules modules,
         WebHostOptions hostOptions)
     {
         var services = appBuilder.Services;
@@ -366,7 +366,7 @@ public static class HostExtensions
         void RegisterApplicationServices(bool isMultiTenanted)
         {
             services.AddHttpClient();
-            var prefixes = modules.AggregatePrefixes;
+            var prefixes = modules.EntityPrefixes;
             prefixes.Add(typeof(Checkpoint), CheckPointAggregatePrefix);
             services.AddSingleton<IIdentifierFactory>(_ => new HostIdentifierFactory(prefixes));
 
@@ -382,7 +382,7 @@ public static class HostExtensions
 
         void RegisterPersistence(bool usesQueues, bool isMultiTenanted)
         {
-            var domainAssemblies = modules.DomainAssemblies
+            var domainAssemblies = modules.SubdomainAssemblies
                 .Concat(new[] { typeof(DomainCommonMarker).Assembly, typeof(DomainSharedMarker).Assembly })
                 .ToArray();
 

@@ -506,7 +506,7 @@ An entity class should derive from `EntityBase,` and the designer should decide 
 For example,
 
 ```c#
-public sealed class UnavailabilityEntity : EntityBase
+public sealed class Unavailability : EntityBase
 {
 }
 ```
@@ -640,10 +640,10 @@ For example,
 ```c#
 // Note: The attribute below identifies the 'Trip' table/container in the persistence store
 [EntityName("Trip")]
-public sealed class TripEntity : EntityBase
+public sealed class Trip : EntityBase
 {
     // Note: This ctor must populate the entire internal state of the whole entity using properties that were rehydrated from the persistence store. Called by the 'Rehydrate()' method below
-    private TripEntity(Identifier identifier, IDependencyContainer container,
+    private Trip(Identifier identifier, IDependencyContainer container,
         IReadOnlyDictionary<string, object> rehydratingProperties) : base(
         identifier, container, rehydratingProperties)
     {
@@ -656,9 +656,9 @@ public sealed class TripEntity : EntityBase
     }
     
     // Note: This method is called by the runtime when the entity is loaded from a persistence store
-    public static EntityFactory<TripEntity> Rehydrate()
+    public static EntityFactory<Trip> Rehydrate()
     {
-        return (identifier, container, properties) => new TripEntity(identifier, container, properties);
+        return (identifier, container, properties) => new Trip(identifier, container, properties);
     }
 
     // Note: this method is called by the runtime when the entity is saved to a persistence store
@@ -683,10 +683,10 @@ public sealed class TripEntity : EntityBase
 For example,
 
 ```c#  
-public sealed class UnavailabilityEntity : EntityBase
+public sealed class Unavailability : EntityBase
 {
     // Note: This ctor only calls the base class. Called by the 'Create()' factory method
-    private UnavailabilityEntity(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
+    private Unavailability(IRecorder recorder, IIdentifierFactory idFactory, RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
     }
 ```
@@ -714,7 +714,7 @@ For example,
     {
         if (BeganAt.HasValue)
         {
-            return Error.RuleViolation(Resources.TripEntity_AlreadyBegan);
+            return Error.RuleViolation(Resources.Trip_AlreadyBegan);
         }
 
         var starts = DateTime.UtcNow;
@@ -742,17 +742,17 @@ For example:
 
         if (BeganAt.HasValue && From.NotExists())
         {
-            return Error.RuleViolation(Resources.TripEntity_NoStartingLocation);
+            return Error.RuleViolation(Resources.Trip_NoStartingLocation);
         }
 
         if (EndedAt.HasValue && !BeganAt.HasValue)
         {
-            return Error.RuleViolation(Resources.TripEntity_NotBegun);
+            return Error.RuleViolation(Resources.Trip_NotBegun);
         }
 
         if (EndedAt.HasValue && To.NotExists())
         {
-            return Error.RuleViolation(Resources.TripEntity_NoEndingLocation);
+            return Error.RuleViolation(Resources.Trip_NoEndingLocation);
         }
 
         return Result.Ok;

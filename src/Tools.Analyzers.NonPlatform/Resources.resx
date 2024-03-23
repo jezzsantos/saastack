@@ -225,10 +225,10 @@
         <value>Missing '[AuthorizeAttribute]'</value>
     </data>
     <data name="SAASWEB031Description" xml:space="preserve">
-        <value>The request type should be suffixed with the word 'Request'.</value>
+        <value>The request type should end with the word 'Request'.</value>
     </data>
     <data name="SAASWEB031MessageFormat" xml:space="preserve">
-        <value>Request '{0}' should be suffixed with the word 'Request'</value>
+        <value>Request '{0}' should end with the word 'Request'</value>
     </data>
     <data name="SAASWEB031Title" xml:space="preserve">
         <value>Naming is wrong</value>
@@ -252,10 +252,10 @@
         <value>Missing '[RouteAttribute]' on request</value>
     </data>
     <data name="SAASWEB041Description" xml:space="preserve">
-        <value>The request type should be suffixed with the word 'Response'.</value>
+        <value>The request type should end with the word 'Response'.</value>
     </data>
     <data name="SAASWEB041MessageFormat" xml:space="preserve">
-        <value>Request '{0}' should be suffixed with the word 'Response'</value>
+        <value>Request '{0}' should be end with the word 'Response'</value>
     </data>
     <data name="SAASWEB041Title" xml:space="preserve">
         <value>Naming is wrong</value>
@@ -387,6 +387,16 @@
     </data>
     <data name="SAASAPP025Title" xml:space="preserve">
         <value>Wrong return type</value>
+    </data>
+
+    <data name="SAASHST010Description" xml:space="preserve">
+        <value>Aggregate or Entity should be registered with an identity prefix</value>
+    </data>
+    <data name="SAASHST010MessageFormat" xml:space="preserve">
+        <value>{0} is missing an entry for a prefix for '{1}'</value>
+    </data>
+    <data name="SAASHST010Title" xml:space="preserve">
+        <value>Missing prefix registration</value>
     </data>
 
     <data name="CodeFix_Title_AddRehydrateMethod" xml:space="preserve">

@@ -7,15 +7,15 @@ using Domain.Interfaces.Entities;
 
 namespace CarsDomain;
 
-public sealed class UnavailabilityEntity : EntityBase
+public sealed class Unavailability : EntityBase
 {
-    public static Result<UnavailabilityEntity, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
+    public static Result<Unavailability, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
         RootEventHandler rootEventHandler)
     {
-        return new UnavailabilityEntity(recorder, idFactory, rootEventHandler);
+        return new Unavailability(recorder, idFactory, rootEventHandler);
     }
 
-    private UnavailabilityEntity(IRecorder recorder, IIdentifierFactory idFactory,
+    private Unavailability(IRecorder recorder, IIdentifierFactory idFactory,
         RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
     }
@@ -74,7 +74,7 @@ public sealed class UnavailabilityEntity : EntityBase
         }
     }
 
-    public bool IsDifferentCause(UnavailabilityEntity unavailability)
+    public bool IsDifferentCause(Unavailability unavailability)
     {
         if (CausedBy.NotExists())
         {

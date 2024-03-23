@@ -6,6 +6,19 @@ namespace Tools.Analyzers.Common.Extensions;
 
 public static class SymbolExtensions
 {
+    public static ExpressionSyntax? GetGetterExpression(this ISymbol method)
+    {
+        var syntaxReference = method.DeclaringSyntaxReferences.FirstOrDefault();
+
+        var syntax = syntaxReference?.GetSyntax();
+        if (syntax is ArrowExpressionClauseSyntax arrowExpressionClauseSyntax)
+        {
+            return arrowExpressionClauseSyntax.Expression;
+        }
+
+        return null;
+    }
+
     public static string GetMethodBody(this ISymbol method)
     {
         var syntaxReference = method.DeclaringSyntaxReferences.FirstOrDefault();

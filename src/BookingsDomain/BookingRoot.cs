@@ -114,7 +114,7 @@ public sealed class BookingRoot : AggregateRootBase
             case Events.TripAdded changed:
             {
                 var trip = RaiseEventToChildEntity(isReconstituting, changed, idFactory =>
-                    TripEntity.Create(Recorder, idFactory, RaiseChangeEvent), e => e.TripId!);
+                    Trip.Create(Recorder, idFactory, RaiseChangeEvent), e => e.TripId!);
                 if (!trip.IsSuccessful)
                 {
                     return trip.Error;

@@ -5,13 +5,13 @@ using Infrastructure.Web.Hosting.Common;
 
 namespace ApiHost1;
 
-public class TestingOnlyApiModule : ISubDomainModule
+public class TestingOnlyApiModule : ISubdomainModule
 {
-    public Assembly ApiAssembly => typeof(TestingWebApi).Assembly;
+    public Assembly InfrastructureAssembly => typeof(TestingWebApi).Assembly;
 
-    public Assembly DomainAssembly => null!;
+    public Assembly? DomainAssembly => null;
 
-    public Dictionary<Type, string> AggregatePrefixes => new();
+    public Dictionary<Type, string> EntityPrefixes => new();
 
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
     {

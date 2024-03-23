@@ -11,6 +11,7 @@ using Domain.Interfaces;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
+using Unavailability = CarsApplication.Persistence.ReadModels.Unavailability;
 
 namespace CarsInfrastructure.Persistence;
 

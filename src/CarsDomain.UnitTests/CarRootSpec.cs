@@ -24,7 +24,7 @@ public class CarRootSpec
         identifierFactory.Setup(f => f.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns((IIdentifiableEntity e) =>
             {
-                if (e is UnavailabilityEntity)
+                if (e is Unavailability)
                 {
                     return $"anunavailbilityid{++entityCount}".ToId();
                 }

@@ -59,3 +59,4 @@
  SAASAPP023 | SaaStackApplication | Error    | Properties must have public getters and setters                                                           
  SAASAPP024 | SaaStackApplication | Warning  | Properties must be Optional{T} not nullable                                                               
  SAASAPP025 | SaaStackApplication | Error    | Properties must of correct type                                                                           
+ SAASHST010 | SaaStackHosts       | Error    | Aggregate root or Entity should register an identity prefix                                               

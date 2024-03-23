@@ -10,16 +10,16 @@ using Xunit;
 namespace BookingsDomain.UnitTests;
 
 [Trait("Category", "Unit")]
-public class TripEntitySpec
+public class TripSpec
 {
-    private readonly TripEntity _trip;
+    private readonly Trip _trip;
 
-    public TripEntitySpec()
+    public TripSpec()
     {
         var recorder = new Mock<IRecorder>();
         var idFactory = new FixedIdentifierFactory("anid");
 
-        _trip = TripEntity.Create(recorder.Object, idFactory, _ => Result.Ok).Value;
+        _trip = Trip.Create(recorder.Object, idFactory, _ => Result.Ok).Value;
         _trip.RaiseChangeEvent(Events.TripAdded.Create("arootid".ToId(), "anorganizationid".ToId()));
     }
 

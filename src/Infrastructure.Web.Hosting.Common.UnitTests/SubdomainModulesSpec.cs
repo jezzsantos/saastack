@@ -8,9 +8,9 @@ using Xunit;
 namespace Infrastructure.Web.Hosting.Common.UnitTests;
 
 [Trait("Category", "Unit")]
-public class SubDomainModulesSpec
+public class SubdomainModulesSpec
 {
-    private readonly SubDomainModules _modules = new();
+    private readonly SubdomainModules _modules = new();
 
     [Fact]
     public void WhenRegisterAndNullModule_ThenThrows()
@@ -24,8 +24,8 @@ public class SubDomainModulesSpec
     {
         _modules.Invoking(x => x.Register(new TestModule
             {
-                ApiAssembly = null!,
-                DomainAssembly = typeof(SubDomainModulesSpec).Assembly
+                InfrastructureAssembly = null!,
+                DomainAssembly = typeof(SubdomainModulesSpec).Assembly
             }))
             .Should().Throw<ArgumentNullException>();
     }
@@ -35,7 +35,7 @@ public class SubDomainModulesSpec
     {
         _modules.Invoking(x => x.Register(new TestModule
             {
-                ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
+                InfrastructureAssembly = typeof(SubdomainModulesSpec).Assembly,
                 DomainAssembly = null!
             }))
             .Should().Throw<ArgumentNullException>();
@@ -46,9 +46,9 @@ public class SubDomainModulesSpec
     {
         _modules.Invoking(x => x.Register(new TestModule
             {
-                AggregatePrefixes = null!,
-                ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
-                DomainAssembly = typeof(SubDomainModulesSpec).Assembly
+                EntityPrefixes = null!,
+                InfrastructureAssembly = typeof(SubdomainModulesSpec).Assembly,
+                DomainAssembly = typeof(SubdomainModulesSpec).Assembly
             }))
             .Should().Throw<ArgumentNullException>();
     }
@@ -58,9 +58,9 @@ public class SubDomainModulesSpec
     {
         _modules.Invoking(x => x.Register(new TestModule
             {
-                AggregatePrefixes = new Dictionary<Type, string>(),
-                ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
-                DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
+                EntityPrefixes = new Dictionary<Type, string>(),
+                InfrastructureAssembly = typeof(SubdomainModulesSpec).Assembly,
+                DomainAssembly = typeof(SubdomainModulesSpec).Assembly,
                 RegisterServices = (_, _) => { }
             }))
             .Should().Throw<ArgumentNullException>();
@@ -71,9 +71,9 @@ public class SubDomainModulesSpec
     {
         _modules.Register(new TestModule
         {
-            AggregatePrefixes = new Dictionary<Type, string>(),
-            ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
-            DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
+            EntityPrefixes = new Dictionary<Type, string>(),
+            InfrastructureAssembly = typeof(SubdomainModulesSpec).Assembly,
+            DomainAssembly = typeof(SubdomainModulesSpec).Assembly,
             ConfigureMiddleware = (_, _) => { },
             RegisterServices = null!
         });
@@ -98,9 +98,9 @@ public class SubDomainModulesSpec
         var wasCalled = false;
         _modules.Register(new TestModule
         {
-            ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
-            DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
-            AggregatePrefixes = new Dictionary<Type, string>(),
+            InfrastructureAssembly = typeof(SubdomainModulesSpec).Assembly,
+            DomainAssembly = typeof(SubdomainModulesSpec).Assembly,
+            EntityPrefixes = new Dictionary<Type, string>(),
             ConfigureMiddleware = (_, _) => { },
             RegisterServices = (_, _) => { wasCalled = true; }
         });
@@ -125,9 +125,9 @@ public class SubDomainModulesSpec
         var wasCalled = false;
         _modules.Register(new TestModule
         {
-            ApiAssembly = typeof(SubDomainModulesSpec).Assembly,
-            DomainAssembly = typeof(SubDomainModulesSpec).Assembly,
-            AggregatePrefixes = new Dictionary<Type, string>(),
+            InfrastructureAssembly = typeof(SubdomainModulesSpec).Assembly,
+            DomainAssembly = typeof(SubdomainModulesSpec).Assembly,
+            EntityPrefixes = new Dictionary<Type, string>(),
             ConfigureMiddleware = (_, _) => { wasCalled = true; },
             RegisterServices = (_, _) => { }
         });
@@ -138,13 +138,13 @@ public class SubDomainModulesSpec
     }
 }
 
-public class TestModule : ISubDomainModule
+public class TestModule : ISubdomainModule
 {
-    public Assembly ApiAssembly { get; init; } = null!;
+    public Assembly InfrastructureAssembly { get; init; } = null!;
 
-    public Assembly DomainAssembly { get; init; } = null!;
+    public Assembly? DomainAssembly { get; set; }
 
-    public Dictionary<Type, string> AggregatePrefixes { get; init; } = null!;
+    public Dictionary<Type, string> EntityPrefixes { get; init; } = null!;
 
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware { get; init; } = null!;
 

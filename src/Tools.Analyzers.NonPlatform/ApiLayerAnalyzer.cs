@@ -10,12 +10,10 @@ using Tools.Analyzers.Common;
 using Tools.Analyzers.Common.Extensions;
 using Tools.Analyzers.NonPlatform.Extensions;
 
-// ReSharper disable InvalidXmlDocComment
-
 namespace Tools.Analyzers.NonPlatform;
 
 /// <summary>
-///     An analyzer to the correct implementation of WebAPI classes, and their requests and responses.
+///     An analyzer to correct the implementation of WebAPI classes, and their requests and responses.
 ///     WebApiServices:
 ///     SAASWEB10: Warning: Methods that are public, should return a <see cref="Task{T}" /> or just any T, where T is
 ///     either:

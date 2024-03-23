@@ -5,9 +5,9 @@ using Domain.Common.ValueObjects;
 
 namespace CarsDomain;
 
-public class Unavailabilities : IReadOnlyList<UnavailabilityEntity>
+public class Unavailabilities : IReadOnlyList<Unavailability>
 {
-    private readonly List<UnavailabilityEntity> _unavailabilities = new();
+    private readonly List<Unavailability> _unavailabilities = new();
 
     public Result<Error> EnsureInvariants()
     {
@@ -22,7 +22,7 @@ public class Unavailabilities : IReadOnlyList<UnavailabilityEntity>
         return Result.Ok;
     }
 
-    public IEnumerator<UnavailabilityEntity> GetEnumerator()
+    public IEnumerator<Unavailability> GetEnumerator()
     {
         return _unavailabilities.GetEnumerator();
     }
@@ -34,9 +34,9 @@ public class Unavailabilities : IReadOnlyList<UnavailabilityEntity>
 
     public int Count => _unavailabilities.Count;
 
-    public UnavailabilityEntity this[int index] => _unavailabilities[index];
+    public Unavailability this[int index] => _unavailabilities[index];
 
-    public void Add(UnavailabilityEntity unavailability)
+    public void Add(Unavailability unavailability)
     {
         var match = FindMatching(unavailability);
         if (match.Exists())
@@ -47,7 +47,7 @@ public class Unavailabilities : IReadOnlyList<UnavailabilityEntity>
         _unavailabilities.Add(unavailability);
     }
 
-    public UnavailabilityEntity? FindSlot(TimeSlot slot)
+    public Unavailability? FindSlot(TimeSlot slot)
     {
         return _unavailabilities.FirstOrDefault(una => una.Slot.Exists() && una.Slot == slot);
     }
@@ -61,7 +61,7 @@ public class Unavailabilities : IReadOnlyList<UnavailabilityEntity>
         }
     }
 
-    private UnavailabilityEntity? FindMatching(UnavailabilityEntity unavailability)
+    private Unavailability? FindMatching(Unavailability unavailability)
     {
         return _unavailabilities
             .FirstOrDefault(u =>
@@ -75,17 +75,17 @@ public class Unavailabilities : IReadOnlyList<UnavailabilityEntity>
                 .Any(next => InConflict(current, next)));
     }
 
-    private static bool IsDifferentFrom(UnavailabilityEntity current, UnavailabilityEntity next)
+    private static bool IsDifferentFrom(Unavailability current, Unavailability next)
     {
         return !next.Equals(current);
     }
 
-    private static bool InConflict(UnavailabilityEntity current, UnavailabilityEntity next)
+    private static bool InConflict(Unavailability current, Unavailability next)
     {
         return Overlaps(current, next) && HasDifferentCause(current, next);
     }
 
-    private static bool Overlaps(UnavailabilityEntity current, UnavailabilityEntity next)
+    private static bool Overlaps(Unavailability current, Unavailability next)
     {
         if (current.Slot.NotExists())
         {
@@ -100,7 +100,7 @@ public class Unavailabilities : IReadOnlyList<UnavailabilityEntity>
         return next.Slot.IsIntersecting(current.Slot);
     }
 
-    private static bool HasDifferentCause(UnavailabilityEntity current, UnavailabilityEntity next)
+    private static bool HasDifferentCause(Unavailability current, Unavailability next)
     {
         return current.IsDifferentCause(next);
     }

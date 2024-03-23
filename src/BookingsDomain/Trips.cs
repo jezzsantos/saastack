@@ -2,11 +2,11 @@
 
 namespace BookingsDomain;
 
-public class Trips : IReadOnlyList<TripEntity>
+public class Trips : IReadOnlyList<Trip>
 {
-    private readonly List<TripEntity> _trips = new();
+    private readonly List<Trip> _trips = new();
 
-    public IEnumerator<TripEntity> GetEnumerator()
+    public IEnumerator<Trip> GetEnumerator()
     {
         return _trips.GetEnumerator();
     }
@@ -18,14 +18,14 @@ public class Trips : IReadOnlyList<TripEntity>
 
     public int Count => _trips.Count;
 
-    public TripEntity this[int index] => _trips[index];
+    public Trip this[int index] => _trips[index];
 
-    public void Add(TripEntity trip)
+    public void Add(Trip trip)
     {
         _trips.Add(trip);
     }
 
-    public TripEntity? Latest()
+    public Trip? Latest()
     {
         return _trips.LastOrDefault();
     }

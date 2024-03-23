@@ -12,16 +12,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BookingsInfrastructure;
 
-public class BookingsModule : ISubDomainModule
+public class BookingsModule : ISubdomainModule
 {
-    public Assembly ApiAssembly => typeof(BookingsApi).Assembly;
+    public Assembly InfrastructureAssembly => typeof(BookingsApi).Assembly;
 
     public Assembly DomainAssembly => typeof(BookingRoot).Assembly;
 
-    public Dictionary<Type, string> AggregatePrefixes => new()
+    public Dictionary<Type, string> EntityPrefixes => new()
     {
         { typeof(BookingRoot), "booking" },
-        { typeof(TripEntity), "trip" }
+        { typeof(Trip), "trip" }
     };
 
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware

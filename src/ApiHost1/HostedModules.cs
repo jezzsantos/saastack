@@ -10,9 +10,9 @@ namespace ApiHost1;
 
 public static class HostedModules
 {
-    public static SubDomainModules Get()
+    public static SubdomainModules Get()
     {
-        var modules = new SubDomainModules();
+        var modules = new SubdomainModules();
         modules.Register(new ApiHostModule());
         modules.Register(new EndUsersModule());
         modules.Register(new OrganizationsModule());

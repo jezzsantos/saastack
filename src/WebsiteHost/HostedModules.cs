@@ -4,9 +4,9 @@ namespace WebsiteHost;
 
 public static class HostedModules
 {
-    public static SubDomainModules Get()
+    public static SubdomainModules Get()
     {
-        var modules = new SubDomainModules();
+        var modules = new SubdomainModules();
         modules.Register(new BackEndForFrontEndModule());
 
         return modules;

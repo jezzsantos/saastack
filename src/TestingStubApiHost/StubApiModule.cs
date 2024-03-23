@@ -5,13 +5,13 @@ using TestingStubApiHost.Api;
 
 namespace TestingStubApiHost;
 
-public class StubApiModule : ISubDomainModule
+public class StubApiModule : ISubdomainModule
 {
-    public Assembly ApiAssembly => typeof(StubHelloApi).Assembly;
+    public Assembly InfrastructureAssembly => typeof(StubHelloApi).Assembly;
 
     public Assembly DomainAssembly => typeof(StubHelloApi).Assembly;
 
-    public Dictionary<Type, string> AggregatePrefixes => new();
+    public Dictionary<Type, string> EntityPrefixes => new();
 
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
     {

@@ -150,7 +150,7 @@ public sealed class CarRoot : AggregateRootBase
             case Events.UnavailabilitySlotAdded created:
             {
                 var unavailability = RaiseEventToChildEntity(isReconstituting, created, idFactory =>
-                    UnavailabilityEntity.Create(Recorder, idFactory, RaiseChangeEvent), e => e.UnavailabilityId!);
+                    Unavailability.Create(Recorder, idFactory, RaiseChangeEvent), e => e.UnavailabilityId!);
                 if (!unavailability.IsSuccessful)
                 {
                     return unavailability.Error;

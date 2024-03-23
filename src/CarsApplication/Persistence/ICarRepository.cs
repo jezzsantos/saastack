@@ -4,6 +4,7 @@ using CarsApplication.Persistence.ReadModels;
 using CarsDomain;
 using Common;
 using Domain.Common.ValueObjects;
+using Unavailability = CarsApplication.Persistence.ReadModels.Unavailability;
 
 namespace CarsApplication.Persistence;
 

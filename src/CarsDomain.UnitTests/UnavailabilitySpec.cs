@@ -11,15 +11,15 @@ using Xunit;
 namespace CarsDomain.UnitTests;
 
 [Trait("Category", "Unit")]
-public class UnavailabilityEntitySpec
+public class UnavailabilitySpec
 {
     private readonly DateTime _end;
     private readonly Mock<IIdentifierFactory> _idFactory;
     private readonly Mock<IRecorder> _recorder;
     private readonly DateTime _start;
-    private readonly UnavailabilityEntity _unavailability;
+    private readonly Unavailability _unavailability;
 
-    public UnavailabilityEntitySpec()
+    public UnavailabilitySpec()
     {
         _recorder = new Mock<IRecorder>();
         _idFactory = new Mock<IIdentifierFactory>();
@@ -27,7 +27,7 @@ public class UnavailabilityEntitySpec
             .Returns("anid".ToId());
         _start = DateTime.UtcNow;
         _end = _start.AddHours(1);
-        _unavailability = UnavailabilityEntity.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok).Value;
+        _unavailability = Unavailability.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok).Value;
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class UnavailabilityEntitySpec
     [Fact]
     public void WhenIsDifferentCauseAndHasNoCausedByInEither_ThenReturnsFalse()
     {
-        var other = UnavailabilityEntity.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
+        var other = Unavailability.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
 
         var result = _unavailability.IsDifferentCause(other.Value);
 
@@ -80,7 +80,7 @@ public class UnavailabilityEntitySpec
     [Fact]
     public void WhenIsDifferentCauseAndHasNoCausedInSource_ThenReturnsTrue()
     {
-        var other = UnavailabilityEntity.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
+        var other = Unavailability.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
         other.Value.TestingOnly_Assign("acarid".ToId(), "anorganizationid".ToId(),
             TimeSlot.Create(_start, _end).Value, CausedBy.Create(UnavailabilityCausedBy.Other, null).Value);
 
@@ -96,7 +96,7 @@ public class UnavailabilityEntitySpec
     {
         _unavailability.TestingOnly_Assign("acarid".ToId(), "anorganizationid".ToId(),
             TimeSlot.Create(_start, _end).Value, CausedBy.Create(UnavailabilityCausedBy.Other, null).Value);
-        var other = UnavailabilityEntity.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
+        var other = Unavailability.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
 
         var result = _unavailability.IsDifferentCause(other.Value);
 
@@ -110,7 +110,7 @@ public class UnavailabilityEntitySpec
     {
         _unavailability.TestingOnly_Assign("acarid".ToId(), "anorganizationid".ToId(),
             TimeSlot.Create(_start, _end).Value, CausedBy.Create(UnavailabilityCausedBy.Other, null).Value);
-        var other = UnavailabilityEntity.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
+        var other = Unavailability.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
         other.Value.TestingOnly_Assign("acarid".ToId(), "anorganizationid".ToId(),
             TimeSlot.Create(_start, _end).Value, CausedBy.Create(UnavailabilityCausedBy.Other, null).Value);
 
@@ -126,7 +126,7 @@ public class UnavailabilityEntitySpec
     {
         _unavailability.TestingOnly_Assign("acarid".ToId(), "anorganizationid".ToId(),
             TimeSlot.Create(_start, _end).Value, CausedBy.Create(UnavailabilityCausedBy.Other, "areference1").Value);
-        var other = UnavailabilityEntity.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
+        var other = Unavailability.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
         other.Value.TestingOnly_Assign("acarid".ToId(), "anorganizationid".ToId(),
             TimeSlot.Create(_start, _end).Value, CausedBy.Create(UnavailabilityCausedBy.Other, "areference2").Value);
 
@@ -142,7 +142,7 @@ public class UnavailabilityEntitySpec
     {
         _unavailability.TestingOnly_Assign("acarid".ToId(), "anorganizationid".ToId(),
             TimeSlot.Create(_start, _end).Value, CausedBy.Create(UnavailabilityCausedBy.Other, null).Value);
-        var other = UnavailabilityEntity.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
+        var other = Unavailability.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
         other.Value.TestingOnly_Assign("acarid".ToId(), "anorganizationid".ToId(),
             TimeSlot.Create(_start, _end).Value, CausedBy.Create(UnavailabilityCausedBy.Maintenance, null).Value);
 
@@ -158,7 +158,7 @@ public class UnavailabilityEntitySpec
     {
         _unavailability.TestingOnly_Assign("acarid".ToId(), "anorganizationid".ToId(),
             TimeSlot.Create(_start, _end).Value, CausedBy.Create(UnavailabilityCausedBy.Other, "areference").Value);
-        var other = UnavailabilityEntity.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
+        var other = Unavailability.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
         other.Value.TestingOnly_Assign("acarid".ToId(), "anorganizationid".ToId(),
             TimeSlot.Create(_start, _end).Value,
             CausedBy.Create(UnavailabilityCausedBy.Maintenance, "areference").Value);
@@ -175,7 +175,7 @@ public class UnavailabilityEntitySpec
     {
         _unavailability.TestingOnly_Assign("acarid".ToId(), "anorganizationid".ToId(),
             TimeSlot.Create(_start, _end).Value, CausedBy.Create(UnavailabilityCausedBy.Other, "areference1").Value);
-        var other = UnavailabilityEntity.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
+        var other = Unavailability.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok);
         other.Value.TestingOnly_Assign("acarid".ToId(), "anorganizationid".ToId(),
             TimeSlot.Create(_start, _end).Value,
             CausedBy.Create(UnavailabilityCausedBy.Maintenance, "areference2").Value);
