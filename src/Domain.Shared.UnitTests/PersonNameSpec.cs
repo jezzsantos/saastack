@@ -9,7 +9,7 @@ namespace Domain.Shared.UnitTests;
 public class PersonNameSpec
 {
     [Fact]
-    public void WhenWhenConstructWithFirstName_ThenReturnsFirstName()
+    public void WhenConstructWithFirstName_ThenReturnsFirstName()
     {
         var result = PersonName.Create("afirstname", Optional<string>.None).Value;
 
@@ -18,7 +18,7 @@ public class PersonNameSpec
     }
 
     [Fact]
-    public void WhenWhenConstructWithFirstNameAndLastName_ThenReturnsBothNames()
+    public void WhenConstructWithFirstNameAndLastName_ThenReturnsBothNames()
     {
         var result = PersonName.Create("afirstname", "alastname").Value;
 

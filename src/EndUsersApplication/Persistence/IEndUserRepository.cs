@@ -8,7 +8,7 @@ namespace EndUsersApplication.Persistence;
 
 public interface IEndUserRepository : IApplicationRepository
 {
-    Task<Result<Optional<EndUserRoot>, Error>> FindByEmailAddressAsync(EmailAddress emailAddress,
+    Task<Result<Optional<EndUserRoot>, Error>> FindInvitedGuestByEmailAddressAsync(EmailAddress emailAddress,
         CancellationToken cancellationToken);
 
     Task<Result<EndUserRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken);

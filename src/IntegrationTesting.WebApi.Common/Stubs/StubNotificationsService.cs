@@ -28,11 +28,18 @@ public class StubNotificationsService : INotificationsService
     public string? LastReRegistrationCourtesyEmailRecipient { get; private set; }
 
     public Task<Result<Error>> NotifyPasswordRegistrationConfirmationAsync(ICallerContext caller, string emailAddress,
-        string name, string token,
-        CancellationToken cancellationToken)
+        string name, string token, CancellationToken cancellationToken)
     {
         LastRegistrationConfirmationEmailRecipient = emailAddress;
         LastRegistrationConfirmationToken = token;
+        return Task.FromResult(Result.Ok);
+    }
+
+    public Task<Result<Error>> NotifyReRegistrationCourtesyAsync(ICallerContext caller, string userId,
+        string emailAddress, string name,
+        string? timezone, string? countryCode, CancellationToken cancellationToken)
+    {
+        LastReRegistrationCourtesyEmailRecipient = emailAddress;
         return Task.FromResult(Result.Ok);
     }
 

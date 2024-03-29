@@ -16,7 +16,7 @@ public interface IEndUsersApplication
     Task<Result<Membership, Error>> CreateMembershipForCallerAsync(ICallerContext context, string organizationId,
         CancellationToken cancellationToken);
 
-    Task<Result<Optional<EndUser>, Error>> FindPersonByEmailAsync(ICallerContext context, string emailAddress,
+    Task<Result<Optional<EndUser>, Error>> FindPersonByEmailAddressAsync(ICallerContext context, string emailAddress,
         CancellationToken cancellationToken);
 
     Task<Result<EndUserWithMemberships, Error>> GetMembershipsAsync(ICallerContext context, string id,

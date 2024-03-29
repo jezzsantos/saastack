@@ -30,4 +30,7 @@
     <data name="EndUsersApplication_MembershipNotFound" xml:space="preserve">
         <value>The membership could not be found</value>
     </data>
+    <data name="EndUsersApplication_NotPersonProfile" xml:space="preserve">
+        <value>The profile for this person cannot be found</value>
+    </data>
 </root>

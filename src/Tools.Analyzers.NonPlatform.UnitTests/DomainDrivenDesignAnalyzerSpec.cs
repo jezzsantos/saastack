@@ -3880,7 +3880,7 @@ public sealed class AClassed : IDomainEvent
 
     public required DateTime OccurredUtc { get; set; }
 
-    public required string? AProperty { get; set; }
+    public string? AProperty { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -3994,7 +3994,7 @@ public sealed class AClassed : IDomainEvent
 
     public required DateTime OccurredUtc { get; set; }
 
-    public required string? AProperty { get; set; } = string.Empty;
+    public string? AProperty { get; set; } = string.Empty;
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
@@ -4316,7 +4316,7 @@ public sealed class AClassed : IDomainEvent
 
     public required DateTime OccurredUtc { get; set; }
 
-    public required string? AProperty { get; set; }
+    public string? AProperty { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);

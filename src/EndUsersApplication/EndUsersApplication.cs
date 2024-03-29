@@ -11,27 +11,33 @@ using Domain.Shared;
 using EndUsersApplication.Persistence;
 using EndUsersDomain;
 using Membership = Application.Resources.Shared.Membership;
-using PersonName = Application.Resources.Shared.PersonName;
+using PersonName = Domain.Shared.PersonName;
 
 namespace EndUsersApplication;
 
 public class EndUsersApplication : IEndUsersApplication
 {
     internal const string PermittedOperatorsSettingName = "Hosts:EndUsersApi:Authorization:OperatorWhitelist";
-    private static readonly char[] PermittedOperatorsDelimiters = { ';', ',', ' ' };
+    private static readonly char[] PermittedOperatorsDelimiters = [';', ',', ' '];
     private readonly IIdentifierFactory _idFactory;
+    private readonly INotificationsService _notificationsService;
     private readonly IOrganizationsService _organizationsService;
     private readonly IRecorder _recorder;
     private readonly IEndUserRepository _repository;
     private readonly IConfigurationSettings _settings;
+    private readonly IUserProfilesService _userProfilesService;
 
     public EndUsersApplication(IRecorder recorder, IIdentifierFactory idFactory, IConfigurationSettings settings,
-        IOrganizationsService organizationsService, IEndUserRepository repository)
+        INotificationsService notificationsService, IOrganizationsService organizationsService,
+        IUserProfilesService userProfilesService,
+        IEndUserRepository repository)
     {
         _recorder = recorder;
         _idFactory = idFactory;
         _settings = settings;
+        _notificationsService = notificationsService;
         _organizationsService = organizationsService;
+        _userProfilesService = userProfilesService;
         _repository = repository;
     }
 
@@ -77,9 +83,14 @@ public class EndUsersApplication : IEndUsersApplication
         }
 
         var machine = created.Value;
+        var profiled = await _userProfilesService.CreateMachineProfilePrivateAsync(context, machine.Id, name, timezone,
+            countryCode, cancellationToken);
+        if (!profiled.IsSuccessful)
+        {
+            return profiled.Error;
+        }
 
-        //TODO: get/create the profile for this machine (with first,tz,cc) - it may already be existent or not
-
+        var profile = profiled.Value;
         var (platformRoles, platformFeatures, tenantRoles, tenantFeatures) =
             EndUserRoot.GetInitialRolesAndFeatures(UserClassification.Machine, context.IsAuthenticated,
                 Optional<EmailAddress>.None, Optional<List<EmailAddress>>.None);
@@ -131,8 +142,7 @@ public class EndUsersApplication : IEndUsersApplication
         _recorder.TraceInformation(context.ToCall(), "Registered machine: {Id}", machine.Id);
         _recorder.TrackUsage(context.ToCall(), UsageConstants.Events.UsageScenarios.MachineRegistered);
 
-        return machine.ToRegisteredUser(defaultOrganizationId, null, name, null, Timezones.FindOrDefault(timezone),
-            CountryCodes.FindOrDefault(countryCode));
+        return machine.ToRegisteredUser(defaultOrganizationId, profile);
     }
 
     public async Task<Result<RegisteredEndUser, Error>> RegisterPersonAsync(ICallerContext context, string emailAddress,
@@ -144,24 +154,72 @@ public class EndUsersApplication : IEndUsersApplication
             return Error.RuleViolation(Resources.EndUsersApplication_NotAcceptedTerms);
         }
 
-        var created = EndUserRoot.Create(_recorder, _idFactory, UserClassification.Person);
-        if (!created.IsSuccessful)
-        {
-            return created.Error;
-        }
-
-        var user = created.Value;
-
-        //TODO: get/create the profile for this user (with email, first,last,tz,cc) - it may already be existent or not,
-        // if existent, then someone attempted to re-register with the same email address! we need to send a courtesy notification to them.
-        // if not, it needs to be created
-
         var username = EmailAddress.Create(emailAddress);
         if (!username.IsSuccessful)
         {
             return username.Error;
         }
 
+        var existingUser = await FindPersonByEmailAddressInternalAsync(context, username.Value, cancellationToken);
+        if (!existingUser.IsSuccessful)
+        {
+            return existingUser.Error;
+        }
+
+        EndUserRoot user;
+        UserProfile? profile;
+        if (existingUser.Value.HasValue)
+        {
+            user = existingUser.Value.Value.User;
+            if (user.Status == UserStatus.Registered)
+            {
+                profile = existingUser.Value.Value.Profile;
+                if (profile.NotExists()
+                    || profile.Type != UserProfileType.Person
+                    || profile.EmailAddress.HasNoValue())
+                {
+                    return Error.EntityNotFound(Resources.EndUsersApplication_NotPersonProfile);
+                }
+
+                var notified = await _notificationsService.NotifyReRegistrationCourtesyAsync(context, user.Id,
+                    profile.EmailAddress, profile.DisplayName, profile.Timezone, profile.Address.CountryCode,
+                    cancellationToken);
+                if (!notified.IsSuccessful)
+                {
+                    return notified.Error;
+                }
+
+                _recorder.TraceInformation(context.ToCall(),
+                    "Attempted re-registration of user: {Id}, with email {EmailAddress}", user.Id, emailAddress);
+                _recorder.TrackUsage(context.ToCall(), UsageConstants.Events.UsageScenarios.PersonReRegistered,
+                    new Dictionary<string, object>
+                    {
+                        { UsageConstants.Properties.Id, user.Id },
+                        { UsageConstants.Properties.EmailAddress, emailAddress }
+                    });
+
+                return user.ToRegisteredUser(user.Memberships.DefaultMembership.Id, profile);
+            }
+        }
+        else
+        {
+            var created = EndUserRoot.Create(_recorder, _idFactory, UserClassification.Person);
+            if (!created.IsSuccessful)
+            {
+                return created.Error;
+            }
+
+            user = created.Value;
+        }
+
+        var profiled = await _userProfilesService.CreatePersonProfilePrivateAsync(context, user.Id, emailAddress,
+            firstName, lastName, timezone, countryCode, cancellationToken);
+        if (!profiled.IsSuccessful)
+        {
+            return profiled.Error;
+        }
+
+        profile = profiled.Value;
         var permittedOperators = GetPermittedOperators();
         var (platformRoles, platformFeatures, tenantRoles, tenantFeatures) =
             EndUserRoot.GetInitialRolesAndFeatures(UserClassification.Person, context.IsAuthenticated, username.Value,
@@ -172,7 +230,7 @@ public class EndUsersApplication : IEndUsersApplication
             return registered.Error;
         }
 
-        var organizationName = Domain.Shared.PersonName.Create(firstName, lastName);
+        var organizationName = PersonName.Create(firstName, lastName);
         if (!organizationName.IsSuccessful)
         {
             return organizationName.Error;
@@ -207,9 +265,7 @@ public class EndUsersApplication : IEndUsersApplication
             "EndUser {Id} accepted their terms and conditions", user.Id);
         _recorder.TrackUsage(context.ToCall(), UsageConstants.Events.UsageScenarios.PersonRegistrationCreated);
 
-        return user.ToRegisteredUser(defaultOrganizationId, emailAddress, firstName, lastName,
-            Timezones.FindOrDefault(timezone),
-            CountryCodes.FindOrDefault(countryCode));
+        return user.ToRegisteredUser(defaultOrganizationId, profile);
     }
 
     public async Task<Result<Membership, Error>> CreateMembershipForCallerAsync(ICallerContext context,
@@ -238,7 +294,7 @@ public class EndUsersApplication : IEndUsersApplication
             return saved.Error;
         }
 
-        _recorder.TraceInformation(context.ToCall(), "EndUser {Id} has become a member of organisation {Organisation}",
+        _recorder.TraceInformation(context.ToCall(), "EndUser {Id} has become a member of organization {Organization}",
             user.Id, organizationId);
 
         var membership = saved.Value.FindMembership(organizationId.ToId());
@@ -250,31 +306,24 @@ public class EndUsersApplication : IEndUsersApplication
         return membership.Value.ToMembership();
     }
 
-    public async Task<Result<Optional<EndUser>, Error>> FindPersonByEmailAsync(ICallerContext context,
+    public async Task<Result<Optional<EndUser>, Error>> FindPersonByEmailAddressAsync(ICallerContext context,
         string emailAddress, CancellationToken cancellationToken)
     {
-        //TODO: find the profile of this person by email address from the profilesService
-        //And then, if not, lookup a endUser that has the email address as an invited guest
-
-        var match = EmailAddress.Create(emailAddress);
-        if (!match.IsSuccessful)
+        var email = EmailAddress.Create(emailAddress);
+        if (!email.IsSuccessful)
         {
-            return match.Error;
+            return email.Error;
         }
 
-        var retrieved = await _repository.FindByEmailAddressAsync(match.Value, cancellationToken);
+        var retrieved = await FindPersonByEmailAddressInternalAsync(context, email.Value, cancellationToken);
         if (!retrieved.IsSuccessful)
         {
             return retrieved.Error;
         }
 
-        if (retrieved.Value.HasValue)
-        {
-            var endUser = retrieved.Value.Value;
-            return endUser.ToUser().ToOptional();
-        }
-
-        return Optional<EndUser>.None;
+        return retrieved.Value.HasValue
+            ? retrieved.Value.Value.User.ToUser().ToOptional()
+            : Optional<EndUser>.None;
     }
 
     public async Task<Result<EndUser, Error>> AssignPlatformRolesAsync(ICallerContext context, string id,
@@ -371,6 +420,39 @@ public class EndUsersApplication : IEndUsersApplication
         return assignee.ToUserWithMemberships();
     }
 
+    private async Task<Result<Optional<EndUserWithProfile>, Error>> FindPersonByEmailAddressInternalAsync(
+        ICallerContext caller, EmailAddress emailAddress, CancellationToken cancellationToken)
+    {
+        var retrieved =
+            await _userProfilesService.FindPersonByEmailAddressPrivateAsync(caller, emailAddress, cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        if (retrieved.Value.HasValue)
+        {
+            var profile = retrieved.Value.Value;
+            var user = await _repository.LoadAsync(profile.UserId.ToId(), cancellationToken);
+            if (!user.IsSuccessful)
+            {
+                return user.Error;
+            }
+
+            return new EndUserWithProfile(user.Value, profile).ToOptional();
+        }
+
+        var invitedGuest = await _repository.FindInvitedGuestByEmailAddressAsync(emailAddress, cancellationToken);
+        if (!invitedGuest.IsSuccessful)
+        {
+            return invitedGuest.Error;
+        }
+
+        return invitedGuest.Value.HasValue
+            ? new EndUserWithProfile(invitedGuest.Value, null).ToOptional()
+            : Optional<EndUserWithProfile>.None;
+    }
+
     private Optional<List<EmailAddress>> GetPermittedOperators()
     {
         return _settings.Platform.GetString(PermittedOperatorsSettingName)
@@ -388,6 +470,8 @@ public class EndUsersApplication : IEndUsersApplication
             .Where(username => username is not null)
             .ToList()!;
     }
+
+    private record EndUserWithProfile(EndUserRoot User, UserProfile? Profile);
 }
 
 internal static class EndUserConversionExtensions
@@ -405,26 +489,12 @@ internal static class EndUserConversionExtensions
     }
 
     public static RegisteredEndUser ToRegisteredUser(this EndUserRoot user, Identifier defaultOrganizationId,
-        string? emailAddress, string firstName,
-        string? lastName, TimezoneIANA timezone, CountryCodeIso3166 countryCode)
+        UserProfile profile)
     {
         var endUser = ToUser(user);
         var registeredUser = endUser.Convert<EndUser, RegisteredEndUser>();
-        registeredUser.Profile = new ProfileWithDefaultMembership
-        {
-            Address = new ProfileAddress
-            {
-                CountryCode = countryCode.ToString()
-            },
-            AvatarUrl = null,
-            DisplayName = firstName,
-            EmailAddress = emailAddress,
-            Name = new PersonName { FirstName = firstName, LastName = lastName },
-            PhoneNumber = null,
-            Timezone = timezone.ToString(),
-            Id = user.Id,
-            DefaultOrganizationId = defaultOrganizationId
-        };
+        registeredUser.Profile = profile.Convert<UserProfile, UserProfileWithDefaultMembership>();
+        registeredUser.Profile.DefaultOrganizationId = defaultOrganizationId;
 
         return registeredUser;
     }

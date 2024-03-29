@@ -17,6 +17,7 @@ public static class UsageConstants
         public const string CallId = "CallId";
         public const string Component = "Component";
         public const string Duration = "Duration";
+        public const string EmailAddress = "EmailAddress";
         public const string EndPoint = "EndPoint";
         public const string HttpMethod = "Method";
         public const string HttpPath = "Path";
@@ -46,6 +47,7 @@ public static class UsageConstants
             public const string Measurement = "Measured";
             public const string PersonRegistrationConfirmed = "User Registered";
             public const string PersonRegistrationCreated = "User Registration Created";
+            public const string PersonReRegistered = "User Registration ReAttempted";
             public const string UserExtendedLogin = "User Extended Login";
             public const string UserLogin = "User Login";
             public const string UserLogout = "User Logout";

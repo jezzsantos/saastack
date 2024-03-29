@@ -52,7 +52,7 @@ The software accesses the data for each user on behalf of the tenant they belong
 
 In essence, a 'Tenant' is a loose boundary around some data and services that is shared by one or more specific users and not others.
 
-A tenant can be scoped in a given digital product as any of these common concepts: a Country, a Company, a Business, an Organisation, a Workspace, a Project, a Party, a Team, and any other kind of group or grouping.
+A tenant can be scoped in a given digital product as any of these common concepts: a Country, a Company, a Business, an Organization, a Workspace, a Project, a Party, a Team, and any other kind of group or grouping.
 
 > Depending on the specific product, all of these concepts can be manifested as separate tenants.
 
@@ -82,7 +82,7 @@ The choice SaaStack has made is to define all identities centrally, outside any 
 The implication of this decision is that:
 
 * An `EndUser` in the system is unique across all tenancies by their username (their email address). That implies that a human using the system is the same human (by email) address, no matter what tenancy they are working in at any one time. (e.g., an independent consultant collaborating with more than one company). That human can of course use several email addresses, should it be necessary (due to rules/constraints) to access any specific tenancy only with a certain email domain. Which is a common requirement in many enterprise B2B products.
-* Any `EndUser` can have any number of `Memberships` to any number of tenancies (`Organisations`), which is common for many B2B and B2C products. However, they must always have at least one (see later).
+* Any `EndUser` can have any number of `Memberships` to any number of tenancies (`Organizations`), which is common for many B2B and B2C products. However, they must always have at least one (see later).
 * The authentication (login) process, would be branded with the branding of the the SaaS product itself, since at that point in time, it is not clear which tenancy the user wishes to access. Which is common for a lot of B2C and B2B products. Think www.slack.com, or www.miro.com or www.google.com, etc, where you login to the unbranded product, before accessing the branded tenant.
 * This also means that any `Enduser` will need to have a default "home" tenancy at all times, so that they can always login to the platform and either make a choice about what context they are working in at that time, or be sent to the default tenancy they normally work in, or last worked in, etc..
 * This also means that when they register on the central platform they are automatically assigned to their own "personal" tenant (`Organization`), from which they can use the product (to some degree - depending on their subscription at that time). They must always have that personal `Organization`, for the times when they lose access to any other tenancy (i.e., a consultant ends their engagement with a company, or as an employee change jobs at any organization).
@@ -120,9 +120,9 @@ In SaaStack, a tenant is initially modeled as an `Organization`.
 
 > The "Organization" subdomain can be renamed to be any of these concepts, to fit the specific business model of the SaaS business: `Group`, `Company`, `Workspace`, `Project`, `Part` or `Team`, etc.
 
-When a new ~~tenant~~ `Organisation` is created (via the API), it is created in a centralized (and untenanted) part of the system, where all `EndUser` and `Memberships` are also created. This means that `Organizations` are global across the entire product.
+When a new ~~tenant~~ `Organization` is created (via the API), it is created in a centralized (and untenanted) part of the system, where all `EndUser` and `Memberships` are also created. This means that `Organizations` are global across the entire product.
 
-The data/record about the `Organisation` is created instantly. At the same time, the record is populated with any settings pertinent to that tenant. (see Configuration section below).
+The data/record about the `Organization` is created instantly. At the same time, the record is populated with any settings pertinent to that tenant. (see Configuration section below).
 
 If any infrastructure is required to be provisioned and configured, that process (automated or manual) can be triggered by registering a listener to events from the `Organization` events (via Notifications), and by responding to the `OrganizationsDomain.Events.Created` event.
 
@@ -313,7 +313,7 @@ Consider the following workflow:
 1. A new customer signs up for the platform. They register a new user, and that will create a new `Personal` organization for them to use the product. This organization will have a billing subscription that gives them some [limited] access level to the product at this time (i.e., a trial).
 2. At that time, or at some future time (like when they upgrade to a paid plan), a new event (e.g., `EndUsersDomain.Events.Registered`) can be subscribed to by adding a new `IEventNotificationRegistration` in one of the subdomains.
 3. This event is then raised at runtime, which triggers an application (in some subdomain) to make some API call to some cloud-based process to provision some specific infrastructure (e.g., via queue message or direct via an API call to an Azure function or AWS Lambda - there are many integration options). Let's assume that this triggers Azure to create a new SQL database in a regional data center physically closer to where this specific customer is signing up.
-4. Let's assume that this cloud provisioning process takes some time to complete (perhaps several minutes), and meanwhile, the customer is starting using the product and try it out for themselves (using their `Personal` organisation, which we assume is using shared platform infrastructure at this time.
+4. Let's assume that this cloud provisioning process takes some time to complete (perhaps several minutes), and meanwhile, the customer is starting using the product and try it out for themselves (using their `Personal` organization, which we assume is using shared platform infrastructure at this time.
 5. When the provisioning process is completed (a few minutes later), a new message [containing some data about the provisioning process] is created and dropped on the `provisioning` queue (in Azure or AWS).
 6. The `DeliverProvisioning` task is triggered, and the message is picked up off the queue and delivered to the `Ancillary` API by the Azure function or AWS Lambda.
 7. The `Ancillary` API then handles the message and forwards it to the `Organization` subdomain to update the settings of the `Personal` organization that the customer is using.

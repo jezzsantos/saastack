@@ -29,7 +29,7 @@ public class EndUsersInProcessServiceClient : IEndUsersService
     public async Task<Result<Optional<EndUser>, Error>> FindPersonByEmailPrivateAsync(ICallerContext caller,
         string emailAddress, CancellationToken cancellationToken)
     {
-        return await _endUsersApplication.FindPersonByEmailAsync(caller, emailAddress, cancellationToken);
+        return await _endUsersApplication.FindPersonByEmailAddressAsync(caller, emailAddress, cancellationToken);
     }
 
     public async Task<Result<EndUserWithMemberships, Error>> GetMembershipsPrivateAsync(ICallerContext caller,

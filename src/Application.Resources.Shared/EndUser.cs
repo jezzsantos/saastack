@@ -37,7 +37,7 @@ public enum EndUserClassification
 
 public class RegisteredEndUser : EndUser
 {
-    public ProfileWithDefaultMembership? Profile { get; set; }
+    public UserProfileWithDefaultMembership? Profile { get; set; }
 }
 
 public class EndUserWithMemberships : EndUser

@@ -1,6 +1,7 @@
 using System.Net;
 using ApiHost1;
 using Application.Resources.Shared;
+using Application.Services.Shared;
 using Common;
 using Domain.Interfaces.Authorization;
 using FluentAssertions;
@@ -9,6 +10,7 @@ using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using IntegrationTesting.WebApi.Common;
+using IntegrationTesting.WebApi.Common.Stubs;
 using Microsoft.Extensions.DependencyInjection;
 using UnitTesting.Common.Validation;
 using Xunit;
@@ -19,9 +21,13 @@ namespace IdentityInfrastructure.IntegrationTests;
 [Collection("API")]
 public class PasswordCredentialsApiSpec : WebApiSpec<Program>
 {
+    private readonly StubNotificationsService _notificationsService;
+
     public PasswordCredentialsApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
         EmptyAllRepositories();
+        _notificationsService = setup.GetRequiredService<INotificationsService>().As<StubNotificationsService>();
+        _notificationsService.Reset();
     }
 
     [Fact]
@@ -44,14 +50,38 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
         result.Content.Value.Credential.User.Roles.Should().ContainSingle(rol => rol == PlatformRoles.Standard.Name);
         result.Content.Value.Credential.User.Features.Should()
             .ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
-        result.Content.Value.Credential.User.Profile!.Id.Should().Be(result.Content.Value.Credential.User.Id);
+        result.Content.Value.Credential.User.Profile!.UserId.Should().Be(result.Content.Value.Credential.User.Id);
         result.Content.Value.Credential.User.Profile!.DefaultOrganizationId.Should().NotBeNullOrEmpty();
         result.Content.Value.Credential.User.Profile!.Name.FirstName.Should().Be("afirstname");
         result.Content.Value.Credential.User.Profile!.Name.LastName.Should().Be("alastname");
         result.Content.Value.Credential.User.Profile!.DisplayName.Should().Be("afirstname");
         result.Content.Value.Credential.User.Profile!.EmailAddress.Should().Be("auser@company.com");
         result.Content.Value.Credential.User.Profile!.Timezone.Should().Be(Timezones.Default.ToString());
-        result.Content.Value.Credential.User.Profile!.Address!.CountryCode.Should().Be(CountryCodes.Default.ToString());
+        result.Content.Value.Credential.User.Profile!.Address.CountryCode.Should().Be(CountryCodes.Default.ToString());
+    }
+
+    [Fact]
+    public async Task WhenRegisterSamePersonAgain_ThenSendsCourtesyEmail()
+    {
+        await Api.PostAsync(new RegisterPersonPasswordRequest
+        {
+            EmailAddress = "auser@company.com",
+            FirstName = "afirstname",
+            LastName = "alastname",
+            Password = "1Password!",
+            TermsAndConditionsAccepted = true
+        });
+
+        await Api.PostAsync(new RegisterPersonPasswordRequest
+        {
+            EmailAddress = "auser@company.com",
+            FirstName = "afirstname",
+            LastName = "alastname",
+            Password = "1Password!",
+            TermsAndConditionsAccepted = true
+        });
+
+        _notificationsService.LastReRegistrationCourtesyEmailRecipient.Should().Be("auser@company.com");
     }
 
     [Fact]

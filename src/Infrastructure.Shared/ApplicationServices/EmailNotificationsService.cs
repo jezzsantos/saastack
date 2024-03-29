@@ -58,4 +58,33 @@ public class EmailNotificationsService : INotificationsService
             ToDisplayName = name
         }, cancellationToken);
     }
+
+    public async Task<Result<Error>> NotifyReRegistrationCourtesyAsync(ICallerContext caller, string userId,
+        string emailAddress, string name,
+        string? timezone, string? countryCode, CancellationToken cancellationToken)
+    {
+        var htmlBody =
+            $"<p>Hello {name},</p>" +
+            $"<p>We have received a request to register a person using your email address at our web site {_productName}.</p>"
+            +
+            $"<p>Of course, your email address ('{emailAddress}') has already been registered at our site.</p>" +
+            "<p>If you are already aware of this, then there is nothing more to do.</p>" +
+            "<p>It is possible that some unknown party is trying to find out if your email address is already registered on this site, byt trying to re-register it.</p>"
+            +
+            "<p>We have blocked this attempt from succeeding, and no new account has been created. Your account is still safe.</p>"
+            +
+            "<p>We just thought you would like to know, that this is going on. There is nothing more you need to do.</p>"
+            +
+            $"<p>This is an automated email from the support team at {_productName}</p>";
+
+        return await _emailSchedulingService.ScheduleHtmlEmail(caller, new HtmlEmail
+        {
+            Subject = $"{_productName} Account Registration Attempt",
+            Body = htmlBody,
+            FromEmailAddress = _senderEmailAddress,
+            FromDisplayName = _senderName,
+            ToEmailAddress = emailAddress,
+            ToDisplayName = name
+        }, cancellationToken);
+    }
 }

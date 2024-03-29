@@ -317,9 +317,11 @@ public class PasswordCredentialsApplicationSpec
         var registeredAccount = new RegisteredEndUser
         {
             Id = "auserid",
-            Profile = new ProfileWithDefaultMembership
+            Profile = new UserProfileWithDefaultMembership
             {
                 Id = "anid",
+                UserId = "auserid",
+                Type = UserProfileType.Person,
                 Name = new PersonName
                 {
                     FirstName = "aname"

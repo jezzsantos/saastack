@@ -91,7 +91,7 @@ public static class Events
 
         public required bool IsDefault { get; set; }
 
-        public required string? MembershipId { get; set; }
+        public string? MembershipId { get; set; }
 
         public required string OrganizationId { get; set; }
 

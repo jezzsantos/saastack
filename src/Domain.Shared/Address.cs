@@ -8,8 +8,9 @@ public sealed class Address : ValueObjectBase<Address>
 {
     public static readonly Address Default = Create(CountryCodes.Default).Value;
 
-    public static Result<Address, Error> Create(string line1, string line2, string line3, string city, string state,
-        CountryCodeIso3166 countryCode, string zip)
+    public static Result<Address, Error> Create(string? line1, string? line2, string? line3, string? city,
+        string? state,
+        CountryCodeIso3166 countryCode, string? zip)
     {
         return new Address(line1, line2, line3, city, state, countryCode, zip);
     }

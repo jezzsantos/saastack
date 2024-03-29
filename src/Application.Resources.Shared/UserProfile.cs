@@ -1,10 +1,11 @@
 using Application.Interfaces.Resources;
+using Common;
 
 namespace Application.Resources.Shared;
 
-public class Profile : IIdentifiableResource
+public class UserProfile : IIdentifiableResource
 {
-    public ProfileAddress? Address { get; set; }
+    public ProfileAddress Address { get; set; } = new() { CountryCode = CountryCodes.Default.ToString() };
 
     public string? AvatarUrl { get; set; }
 
@@ -18,7 +19,17 @@ public class Profile : IIdentifiableResource
 
     public string? Timezone { get; set; }
 
+    public UserProfileType Type { get; set; }
+
+    public required string UserId { get; set; }
+
     public required string Id { get; set; }
+}
+
+public enum UserProfileType
+{
+    Person = 0,
+    Machine = 1
 }
 
 public class PersonName
@@ -45,7 +56,7 @@ public class ProfileAddress
     public string? Zip { get; set; }
 }
 
-public class ProfileWithDefaultMembership : Profile
+public class UserProfileWithDefaultMembership : UserProfile
 {
     public string? DefaultOrganizationId { get; set; }
 }

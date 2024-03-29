@@ -5,6 +5,7 @@ using EndUsersInfrastructure;
 using IdentityInfrastructure;
 using Infrastructure.Web.Hosting.Common;
 using OrganizationsInfrastructure;
+using UserProfilesInfrastructure;
 
 namespace ApiHost1;
 
@@ -14,6 +15,7 @@ public static class HostedModules
     {
         var modules = new SubdomainModules();
         modules.Register(new ApiHostModule());
+        modules.Register(new UserProfilesModule());
         modules.Register(new EndUsersModule());
         modules.Register(new OrganizationsModule());
         modules.Register(new IdentityModule());

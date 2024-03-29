@@ -48,7 +48,9 @@ public class EndUsersModule : ISubdomainModule
                     new EndUsersApplication.EndUsersApplication(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IIdentifierFactory>(),
                         c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                        c.GetRequiredService<INotificationsService>(),
                         c.GetRequiredService<IOrganizationsService>(),
+                        c.GetRequiredService<IUserProfilesService>(),
                         c.GetRequiredService<IEndUserRepository>()));
                 services.AddSingleton<IEndUserRepository>(c => new EndUserRepository(
                     c.GetRequiredService<IRecorder>(),

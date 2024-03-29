@@ -76,5 +76,14 @@ namespace EndUsersApplication {
                 return ResourceManager.GetString("EndUsersApplication_NotAcceptedTerms", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The profile for this person cannot be found.
+        /// </summary>
+        internal static string EndUsersApplication_NotPersonProfile {
+            get {
+                return ResourceManager.GetString("EndUsersApplication_NotPersonProfile", resourceCulture);
+            }
+        }
     }
 }

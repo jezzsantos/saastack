@@ -54,7 +54,8 @@ public class EndUserRepository : IEndUserRepository
         return user;
     }
 
-    public async Task<Result<Optional<EndUserRoot>, Error>> FindByEmailAddressAsync(EmailAddress emailAddress,
+    public async Task<Result<Optional<EndUserRoot>, Error>> FindInvitedGuestByEmailAddressAsync(
+        EmailAddress emailAddress,
         CancellationToken cancellationToken)
     {
         var query = Query.From<EndUser>()

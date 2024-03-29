@@ -12,6 +12,7 @@
         <ProjectReference Include="..\CarsInfrastructure\CarsInfrastructure.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Hosting.Common\Infrastructure.Web.Hosting.Common.csproj" />
         <ProjectReference Include="..\OrganizationsInfrastructure\OrganizationsInfrastructure.csproj" />
+        <ProjectReference Include="..\UserProfilesInfrastructure\UserProfilesInfrastructure.csproj" />
     </ItemGroup>
 
     <!-- Runs the source generator (in memory) on build -->

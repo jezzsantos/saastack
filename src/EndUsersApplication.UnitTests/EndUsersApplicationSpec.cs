@@ -15,6 +15,7 @@ using Moq;
 using UnitTesting.Common;
 using Xunit;
 using Membership = EndUsersDomain.Membership;
+using PersonName = Application.Resources.Shared.PersonName;
 
 namespace EndUsersApplication.UnitTests;
 
@@ -24,9 +25,11 @@ public class EndUsersApplicationSpec
     private readonly EndUsersApplication _application;
     private readonly Mock<ICallerContext> _caller;
     private readonly Mock<IIdentifierFactory> _idFactory;
+    private readonly Mock<INotificationsService> _notificationsService;
     private readonly Mock<IOrganizationsService> _organizationsService;
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IEndUserRepository> _repository;
+    private readonly Mock<IUserProfilesService> _userProfilesService;
 
     public EndUsersApplicationSpec()
     {
@@ -61,10 +64,13 @@ public class EndUsersApplicationSpec
                 CreatedById = "auserid",
                 Name = "aname"
             });
+        _userProfilesService = new Mock<IUserProfilesService>();
+        _notificationsService = new Mock<INotificationsService>();
 
         _application =
-            new EndUsersApplication(_recorder.Object, _idFactory.Object, settings.Object, _organizationsService.Object,
-                _repository.Object);
+            new EndUsersApplication(_recorder.Object, _idFactory.Object, settings.Object, _notificationsService.Object,
+                _organizationsService.Object,
+                _userProfilesService.Object, _repository.Object);
     }
 
     [Fact]
@@ -95,8 +101,38 @@ public class EndUsersApplicationSpec
     }
 
     [Fact]
-    public async Task WhenRegisterPerson_ThenRegisters()
+    public async Task WhenRegisterPersonAndNotExist_ThenRegisters()
     {
+        _userProfilesService.Setup(ups =>
+                ups.FindPersonByEmailAddressPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Optional<UserProfile>.None);
+        _repository.Setup(rep =>
+                rep.FindInvitedGuestByEmailAddressAsync(It.IsAny<EmailAddress>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Optional<EndUserRoot>.None);
+        _userProfilesService.Setup(ups =>
+                ups.CreatePersonProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserProfile
+            {
+                Id = "aprofileid",
+                Type = UserProfileType.Person,
+                UserId = "apersonid",
+                DisplayName = "afirstname",
+                Name = new PersonName
+                {
+                    FirstName = "afirstname",
+                    LastName = "alastname"
+                },
+                EmailAddress = "auser@company.com",
+                Timezone = "atimezone",
+                Address =
+                {
+                    CountryCode = "acountrycode"
+                }
+            });
+
         var result = await _application.RegisterPersonAsync(_caller.Object, "auser@company.com", "afirstname",
             "alastname",
             Timezones.Default.ToString(), CountryCodes.Default.ToString(), true, CancellationToken.None);
@@ -108,23 +144,175 @@ public class EndUsersApplicationSpec
         result.Value.Classification.Should().Be(EndUserClassification.Person);
         result.Value.Roles.Should().ContainSingle(role => role == PlatformRoles.Standard.Name);
         result.Value.Features.Should().ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
-        result.Value.Profile!.Id.Should().Be("anid");
+        result.Value.Profile!.Id.Should().Be("aprofileid");
         result.Value.Profile.DefaultOrganizationId.Should().Be("anorganizationid");
-        result.Value.Profile.Address!.CountryCode.Should().Be(CountryCodes.Default.ToString());
+        result.Value.Profile.Address.CountryCode.Should().Be("acountrycode");
         result.Value.Profile.Name.FirstName.Should().Be("afirstname");
         result.Value.Profile.Name.LastName.Should().Be("alastname");
         result.Value.Profile.DisplayName.Should().Be("afirstname");
         result.Value.Profile.EmailAddress.Should().Be("auser@company.com");
-        result.Value.Profile.Timezone.Should().Be(Timezones.Default.ToString());
+        result.Value.Profile.Timezone.Should().Be("atimezone");
         _organizationsService.Verify(os =>
             os.CreateOrganizationPrivateAsync(_caller.Object, "anid", "afirstname alastname",
                 OrganizationOwnership.Personal,
                 It.IsAny<CancellationToken>()));
+        _userProfilesService.Verify(ups =>
+            ups.CreatePersonProfilePrivateAsync(_caller.Object, "anid", "auser@company.com", "afirstname", "alastname",
+                Timezones.Default.ToString(), CountryCodes.Default.ToString(), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenRegisterPersonAndInvitedAsGuest_ThenCompletesRegistration()
+    {
+        var invitee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        _userProfilesService.Setup(ups =>
+                ups.FindPersonByEmailAddressPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Optional<UserProfile>.None);
+        _repository.Setup(rep =>
+                rep.FindInvitedGuestByEmailAddressAsync(It.IsAny<EmailAddress>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(invitee.ToOptional());
+        _userProfilesService.Setup(ups =>
+                ups.CreatePersonProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserProfile
+            {
+                Id = "aprofileid",
+                Type = UserProfileType.Person,
+                UserId = "apersonid",
+                DisplayName = "afirstname",
+                Name = new PersonName
+                {
+                    FirstName = "afirstname",
+                    LastName = "alastname"
+                },
+                EmailAddress = "auser@company.com",
+                Timezone = "atimezone",
+                Address =
+                {
+                    CountryCode = "acountrycode"
+                }
+            });
+
+        var result = await _application.RegisterPersonAsync(_caller.Object, "auser@company.com", "afirstname",
+            "alastname", Timezones.Default.ToString(), CountryCodes.Default.ToString(), true, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.Id.Should().Be("anid");
+        result.Value.Access.Should().Be(EndUserAccess.Enabled);
+        result.Value.Status.Should().Be(EndUserStatus.Registered);
+        result.Value.Classification.Should().Be(EndUserClassification.Person);
+        result.Value.Roles.Should().ContainSingle(role => role == PlatformRoles.Standard.Name);
+        result.Value.Features.Should().ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
+        result.Value.Profile!.Id.Should().Be("aprofileid");
+        result.Value.Profile.DefaultOrganizationId.Should().Be("anorganizationid");
+        result.Value.Profile.Address.CountryCode.Should().Be("acountrycode");
+        result.Value.Profile.Name.FirstName.Should().Be("afirstname");
+        result.Value.Profile.Name.LastName.Should().Be("alastname");
+        result.Value.Profile.DisplayName.Should().Be("afirstname");
+        result.Value.Profile.EmailAddress.Should().Be("auser@company.com");
+        result.Value.Profile.Timezone.Should().Be("atimezone");
+        _organizationsService.Verify(os =>
+            os.CreateOrganizationPrivateAsync(_caller.Object, "anid", "afirstname alastname",
+                OrganizationOwnership.Personal,
+                It.IsAny<CancellationToken>()));
+        _userProfilesService.Verify(ups =>
+            ups.CreatePersonProfilePrivateAsync(_caller.Object, "anid", "auser@company.com", "afirstname", "alastname",
+                Timezones.Default.ToString(), CountryCodes.Default.ToString(), It.IsAny<CancellationToken>()));
+        _notificationsService.Verify(ns => ns.NotifyReRegistrationCourtesyAsync(It.IsAny<ICallerContext>(),
+            It.IsAny<string>(),
+            It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenRegisterPersonAndAlreadyRegistered_ThenSendsCourtesyEmail()
+    {
+        var endUser = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        endUser.Register(Roles.Empty, Features.Empty, EmailAddress.Create("auser@company.com").Value);
+        _userProfilesService.Setup(ups =>
+                ups.FindPersonByEmailAddressPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserProfile
+            {
+                Id = "aprofileid",
+                Type = UserProfileType.Person,
+                UserId = "auserid",
+                DisplayName = "afirstname",
+                Name = new PersonName
+                {
+                    FirstName = "afirstname",
+                    LastName = "alastname"
+                },
+                EmailAddress = "anotheruser@company.com",
+                Address =
+                {
+                    CountryCode = "acountrycode"
+                },
+                Timezone = "atimezone"
+            }.ToOptional());
+        endUser.AddMembership("anorganizationid".ToId(), Roles.Empty, Features.Empty);
+        _repository.Setup(rep =>
+                rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(endUser);
+        _notificationsService.Setup(ns =>
+                ns.NotifyReRegistrationCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result.Ok);
+
+        var result = await _application.RegisterPersonAsync(_caller.Object, "auser@company.com", "afirstname",
+            "alastname", Timezones.Default.ToString(), CountryCodes.Default.ToString(), true, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.Id.Should().Be("anid");
+        result.Value.Access.Should().Be(EndUserAccess.Enabled);
+        result.Value.Status.Should().Be(EndUserStatus.Registered);
+        result.Value.Classification.Should().Be(EndUserClassification.Person);
+        result.Value.Roles.Should().BeEmpty();
+        result.Value.Features.Should().BeEmpty();
+        result.Value.Profile!.Id.Should().Be("aprofileid");
+        result.Value.Profile.DefaultOrganizationId.Should().Be("amembershipid0");
+        result.Value.Profile.Address.CountryCode.Should().Be("acountrycode");
+        result.Value.Profile.Name.FirstName.Should().Be("afirstname");
+        result.Value.Profile.Name.LastName.Should().Be("alastname");
+        result.Value.Profile.DisplayName.Should().Be("afirstname");
+        result.Value.Profile.EmailAddress.Should().Be("anotheruser@company.com");
+        result.Value.Profile.Timezone.Should().Be("atimezone");
+        _organizationsService.Verify(os =>
+            os.CreateOrganizationPrivateAsync(_caller.Object, It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<OrganizationOwnership>(), It.IsAny<CancellationToken>()), Times.Never);
+        _userProfilesService.Verify(ups =>
+            ups.CreatePersonProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+        _notificationsService.Verify(ns => ns.NotifyReRegistrationCourtesyAsync(_caller.Object, "anid",
+            "anotheruser@company.com", "afirstname", "atimezone", "acountrycode", CancellationToken.None));
     }
 
     [Fact]
     public async Task WhenRegisterMachineByAnonymousUser_ThenRegistersWithNoFeatures()
     {
+        _userProfilesService.Setup(ups =>
+                ups.CreateMachineProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserProfile
+            {
+                Id = "aprofileid",
+                Type = UserProfileType.Machine,
+                UserId = "amachineid",
+                DisplayName = "amachinename",
+                Name = new PersonName
+                {
+                    FirstName = "amachinename"
+                },
+                Timezone = "atimezone",
+                Address =
+                {
+                    CountryCode = "acountrycode"
+                }
+            });
         _caller.Setup(cc => cc.IsAuthenticated)
             .Returns(false);
 
@@ -138,16 +326,20 @@ public class EndUsersApplicationSpec
         result.Value.Classification.Should().Be(EndUserClassification.Machine);
         result.Value.Roles.Should().ContainSingle(role => role == PlatformRoles.Standard.Name);
         result.Value.Features.Should().ContainSingle(feat => feat == PlatformFeatures.Basic.Name);
-        result.Value.Profile!.Id.Should().Be("anid");
+        result.Value.Profile!.Id.Should().Be("aprofileid");
         result.Value.Profile.DefaultOrganizationId.Should().Be("anorganizationid");
-        result.Value.Profile.Address!.CountryCode.Should().Be(CountryCodes.Default.ToString());
-        result.Value.Profile.Name.FirstName.Should().Be("aname");
+        result.Value.Profile.Address.CountryCode.Should().Be("acountrycode");
+        result.Value.Profile.Name.FirstName.Should().Be("amachinename");
         result.Value.Profile.Name.LastName.Should().BeNull();
-        result.Value.Profile.DisplayName.Should().Be("aname");
+        result.Value.Profile.DisplayName.Should().Be("amachinename");
         result.Value.Profile.EmailAddress.Should().BeNull();
-        result.Value.Profile.Timezone.Should().Be(Timezones.Default.ToString());
+        result.Value.Profile.Timezone.Should().Be("atimezone");
         _organizationsService.Verify(os =>
             os.CreateOrganizationPrivateAsync(_caller.Object, "anid", "aname", OrganizationOwnership.Personal,
+                It.IsAny<CancellationToken>()));
+        _userProfilesService.Verify(ups =>
+            ups.CreateMachineProfilePrivateAsync(_caller.Object, "anid", "aname", Timezones.Default.ToString(),
+                CountryCodes.Default.ToString(),
                 It.IsAny<CancellationToken>()));
     }
 
@@ -161,6 +353,25 @@ public class EndUsersApplicationSpec
             .ReturnsAsync(adder);
         adder.Register(Roles.Empty, Features.Empty, EmailAddress.Create("auser@company.com").Value);
         adder.AddMembership("anotherorganizationid".ToId(), Roles.Empty, Features.Empty);
+        _userProfilesService.Setup(ups =>
+                ups.CreateMachineProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserProfile
+            {
+                Id = "aprofileid",
+                Type = UserProfileType.Machine,
+                UserId = "amachineid",
+                DisplayName = "amachinename",
+                Name = new PersonName
+                {
+                    FirstName = "amachinename"
+                },
+                Timezone = "atimezone",
+                Address =
+                {
+                    CountryCode = "acountrycode"
+                }
+            });
 
         var result = await _application.RegisterMachineAsync(_caller.Object, "aname", Timezones.Default.ToString(),
             CountryCodes.Default.ToString(), CancellationToken.None);
@@ -172,16 +383,20 @@ public class EndUsersApplicationSpec
         result.Value.Classification.Should().Be(EndUserClassification.Machine);
         result.Value.Roles.Should().ContainSingle(role => role == PlatformRoles.Standard.Name);
         result.Value.Features.Should().ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
-        result.Value.Profile!.Id.Should().Be("anid");
+        result.Value.Profile!.Id.Should().Be("aprofileid");
         result.Value.Profile.DefaultOrganizationId.Should().Be("anorganizationid");
-        result.Value.Profile.Address!.CountryCode.Should().Be(CountryCodes.Default.ToString());
-        result.Value.Profile.Name.FirstName.Should().Be("aname");
+        result.Value.Profile.Address.CountryCode.Should().Be("acountrycode");
+        result.Value.Profile.Name.FirstName.Should().Be("amachinename");
         result.Value.Profile.Name.LastName.Should().BeNull();
-        result.Value.Profile.DisplayName.Should().Be("aname");
+        result.Value.Profile.DisplayName.Should().Be("amachinename");
         result.Value.Profile.EmailAddress.Should().BeNull();
-        result.Value.Profile.Timezone.Should().Be(Timezones.Default.ToString());
+        result.Value.Profile.Timezone.Should().Be("atimezone");
         _organizationsService.Verify(os =>
             os.CreateOrganizationPrivateAsync(_caller.Object, "anid", "aname", OrganizationOwnership.Personal,
+                It.IsAny<CancellationToken>()));
+        _userProfilesService.Verify(ups =>
+            ups.CreateMachineProfilePrivateAsync(_caller.Object, "anid", "aname", Timezones.Default.ToString(),
+                CountryCodes.Default.ToString(),
                 It.IsAny<CancellationToken>()));
     }
 
@@ -202,7 +417,7 @@ public class EndUsersApplicationSpec
             .ReturnsAsync(assigner);
 
         var result = await _application.AssignPlatformRolesAsync(_caller.Object, "anassigneeid",
-            new List<string> { PlatformRoles.TestingOnly.Name },
+            [PlatformRoles.TestingOnly.Name],
             CancellationToken.None);
 
         result.Should().BeSuccess();
@@ -231,7 +446,7 @@ public class EndUsersApplicationSpec
             .ReturnsAsync(assigner);
 
         var result = await _application.AssignTenantRolesAsync(_caller.Object, "anorganizationid", "anassigneeid",
-            new List<string> { TenantRoles.TestingOnly.Name },
+            [TenantRoles.TestingOnly.Name],
             CancellationToken.None);
 
         result.Should().BeSuccess();
@@ -244,11 +459,17 @@ public class EndUsersApplicationSpec
     [Fact]
     public async Task WhenFindPersonByEmailAsyncAndNotExists_ThenReturnsNone()
     {
-        _repository.Setup(rep => rep.FindByEmailAddressAsync(It.IsAny<EmailAddress>(), It.IsAny<CancellationToken>()))
+        _userProfilesService.Setup(ups =>
+                ups.FindPersonByEmailAddressPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Optional<UserProfile>.None);
+        _repository.Setup(rep =>
+                rep.FindInvitedGuestByEmailAddressAsync(It.IsAny<EmailAddress>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Optional.None<EndUserRoot>());
 
         var result =
-            await _application.FindPersonByEmailAsync(_caller.Object, "auser@company.com", CancellationToken.None);
+            await _application.FindPersonByEmailAddressAsync(_caller.Object, "auser@company.com",
+                CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.Should().BeNone();
@@ -258,11 +479,17 @@ public class EndUsersApplicationSpec
     public async Task WhenFindPersonByEmailAsyncAndExists_ThenReturns()
     {
         var endUser = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
-        _repository.Setup(rep => rep.FindByEmailAddressAsync(It.IsAny<EmailAddress>(), It.IsAny<CancellationToken>()))
+        _userProfilesService.Setup(ups =>
+                ups.FindPersonByEmailAddressPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Optional<UserProfile>.None);
+        _repository.Setup(rep =>
+                rep.FindInvitedGuestByEmailAddressAsync(It.IsAny<EmailAddress>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(endUser.ToOptional());
 
         var result =
-            await _application.FindPersonByEmailAsync(_caller.Object, "auser@company.com", CancellationToken.None);
+            await _application.FindPersonByEmailAddressAsync(_caller.Object, "auser@company.com",
+                CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.Value.Id.Should().Be("anid");
