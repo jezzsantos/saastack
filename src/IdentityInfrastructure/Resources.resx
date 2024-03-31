@@ -24,16 +24,16 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="RegisterPersonRequestValidator_InvalidFirstName" xml:space="preserve">
+    <data name="RegisterPersonPasswordRequestValidator_InvalidFirstName" xml:space="preserve">
         <value>The 'FirstName' was either missing or is invalid</value>
     </data>
-    <data name="RegisterPersonRequestValidator_InvalidLastName" xml:space="preserve">
+    <data name="RegisterPersonPasswordRequestValidator_InvalidLastName" xml:space="preserve">
         <value>The 'LastName' was either missing or is invalid</value>
     </data>
-    <data name="RegisterPersonRequestValidator_InvalidEmail" xml:space="preserve">
+    <data name="RegisterPersonPasswordRequestValidator_InvalidEmail" xml:space="preserve">
       <value>The 'Email' is either missing or is an invalid email address</value>
     </data>
-    <data name="RegisterPersonRequestValidator_InvalidPassword" xml:space="preserve">
+    <data name="RegisterPersonPasswordRequestValidator_InvalidPassword" xml:space="preserve">
       <value>The 'Password' is either missing or invalid</value>
     </data>
     <data name="RegisterAnyRequestValidator_InvalidTimezone" xml:space="preserve">
@@ -42,7 +42,7 @@
     <data name="RegisterAnyRequestValidator_InvalidCountryCode" xml:space="preserve">
       <value>The 'CountryCode' is not a valid ISO3166 alpha-2 or alpha-3 code or numeric</value>
     </data>
-    <data name="RegisterPersonRequestValidator_InvalidTermsAndConditionsAccepted" xml:space="preserve">
+    <data name="RegisterPersonPasswordRequestValidator_InvalidTermsAndConditionsAccepted" xml:space="preserve">
       <value>The 'TermsAndConditionsAccepted' must be True</value>
     </data>
     <data name="RegisterMachineRequestValidator_InvalidName" xml:space="preserve">
@@ -80,5 +80,11 @@
     </data>
     <data name="TestSSOAuthenticationProvider_MissingUsername" xml:space="preserve">
       <value>The 'Username' must be provided for this authentication attempt</value>
+    </data>
+    <data name="RegisterPersonPasswordRequestValidator_InvalidInvitationToken" xml:space="preserve">
+      <value>The 'InvitationToken' is either missing or invalid</value>
+    </data>
+    <data name="AuthenticateSingleSignOnRequestValidator_InvalidInvitationToken" xml:space="preserve">
+      <value>The 'InvitationToken' is either missing or invalid</value>
     </data>
 </root>

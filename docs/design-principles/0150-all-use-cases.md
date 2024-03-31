@@ -61,7 +61,11 @@ These are the main use cases of this product that are exposed via "public" APIs 
 
 ### Users (End User)
 
-1. Assign [platform] roles to the current user
+1. Assign [platform] roles to an existing user
+1. Unassign [platform] roles to an existing user (except `Standard` role)
+1. Invite a guest to register on the platform (a referral)
+1. Resend an invitation to a guest
+1. Guest verifies an invitation is still valid
 
 ### Identities
 
@@ -78,15 +82,15 @@ These are the main use cases of this product that are exposed via "public" APIs 
 
 1. Register a new machine
 
-#### Passwords
+#### Password Credentials
 
 1. Authenticate the current user (with a password)
-2. Register a new person (with a password)
+2. Register a new person (with a password, and optional invitation)
 3. Confirm registration of a person (from email)
 
 #### Single-Sign On
 
-1. Authenticate and (auto-register) a person from another OAuth2 provider
+1. Authenticate and (auto-register) a person from another OAuth2 provider (with an optional invitation)
 
 ### Images
 
@@ -96,7 +100,7 @@ TBD
 
 1. Create a new organization for the current user
 2. Inspect a specific organization
-3. 
+3. Invite another user to the organization (by email, or an existing user by email or by ID)
 
 ### Subscriptions
 
@@ -104,9 +108,10 @@ TBD
 
 ### User Profiles
 
-TBD
+1. Change the names, phone, time zone of the profile,
+2. Change the address of the profile
 
-## BEFFE
+## Backend for Frontend
 
 These are the main use cases of this product that are exposed via "public" APIs in the Frontend, e.g., `WebsiteHost`.
 

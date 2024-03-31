@@ -9,14 +9,14 @@ using Xunit;
 namespace IdentityInfrastructure.UnitTests.Api.PasswordCredentials;
 
 [Trait("Category", "Unit")]
-public class RegisterPersonRequestValidatorSpec
+public class RegisterPersonPasswordRequestValidatorSpec
 {
     private readonly RegisterPersonPasswordRequest _dto;
-    private readonly RegisterPersonRequestValidator _validator;
+    private readonly RegisterPersonPasswordRequestValidator _validator;
 
-    public RegisterPersonRequestValidatorSpec()
+    public RegisterPersonPasswordRequestValidatorSpec()
     {
-        _validator = new RegisterPersonRequestValidator();
+        _validator = new RegisterPersonPasswordRequestValidator();
         _dto = new RegisterPersonPasswordRequest
         {
             FirstName = "afirstname",
@@ -36,6 +36,25 @@ public class RegisterPersonRequestValidatorSpec
     }
 
     [Fact]
+    public void WhenInvitationTokenIsEmpty_ThenSucceeds()
+    {
+        _dto.InvitationToken = string.Empty;
+
+        _validator.ValidateAndThrow(_dto);
+    }
+
+    [Fact]
+    public void WhenInvitationTokenIsInvalid_ThenThrows()
+    {
+        _dto.InvitationToken = "aninvalidtoken";
+
+        _validator
+            .Invoking(x => x.ValidateAndThrow(_dto))
+            .Should().Throw<ValidationException>()
+            .WithMessageLike(Resources.RegisterPersonPasswordRequestValidator_InvalidInvitationToken);
+    }
+
+    [Fact]
     public void WhenEmailIsEmpty_ThenThrows()
     {
         _dto.EmailAddress = string.Empty;
@@ -43,7 +62,7 @@ public class RegisterPersonRequestValidatorSpec
         _validator
             .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.RegisterPersonRequestValidator_InvalidEmail);
+            .WithMessageLike(Resources.RegisterPersonPasswordRequestValidator_InvalidEmail);
     }
 
     [Fact]
@@ -54,7 +73,7 @@ public class RegisterPersonRequestValidatorSpec
         _validator
             .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.RegisterPersonRequestValidator_InvalidEmail);
+            .WithMessageLike(Resources.RegisterPersonPasswordRequestValidator_InvalidEmail);
     }
 
     [Fact]
@@ -65,7 +84,7 @@ public class RegisterPersonRequestValidatorSpec
         _validator
             .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.RegisterPersonRequestValidator_InvalidPassword);
+            .WithMessageLike(Resources.RegisterPersonPasswordRequestValidator_InvalidPassword);
     }
 
     [Fact]
@@ -76,7 +95,7 @@ public class RegisterPersonRequestValidatorSpec
         _validator
             .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.RegisterPersonRequestValidator_InvalidFirstName);
+            .WithMessageLike(Resources.RegisterPersonPasswordRequestValidator_InvalidFirstName);
     }
 
     [Fact]
@@ -87,7 +106,7 @@ public class RegisterPersonRequestValidatorSpec
         _validator
             .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.RegisterPersonRequestValidator_InvalidFirstName);
+            .WithMessageLike(Resources.RegisterPersonPasswordRequestValidator_InvalidFirstName);
     }
 
     [Fact]
@@ -98,7 +117,7 @@ public class RegisterPersonRequestValidatorSpec
         _validator
             .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.RegisterPersonRequestValidator_InvalidLastName);
+            .WithMessageLike(Resources.RegisterPersonPasswordRequestValidator_InvalidLastName);
     }
 
     [Fact]
@@ -109,7 +128,7 @@ public class RegisterPersonRequestValidatorSpec
         _validator
             .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.RegisterPersonRequestValidator_InvalidLastName);
+            .WithMessageLike(Resources.RegisterPersonPasswordRequestValidator_InvalidLastName);
     }
 
     [Fact]
@@ -158,6 +177,6 @@ public class RegisterPersonRequestValidatorSpec
         _validator
             .Invoking(x => x.ValidateAndThrow(_dto))
             .Should().Throw<ValidationException>()
-            .WithMessageLike(Resources.RegisterPersonRequestValidator_InvalidTermsAndConditionsAccepted);
+            .WithMessageLike(Resources.RegisterPersonPasswordRequestValidator_InvalidTermsAndConditionsAccepted);
     }
 }

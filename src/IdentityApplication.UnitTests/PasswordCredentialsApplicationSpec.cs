@@ -286,7 +286,7 @@ public class PasswordCredentialsApplicationSpec
     }
 
     [Fact]
-    public async Task WhenRegisterPersonUserAccountAndAlreadyExists_ThenDoesNothing()
+    public async Task WhenRegisterPersonAsyncAndAlreadyExists_ThenDoesNothing()
     {
         var endUser = new RegisteredEndUser
         {
@@ -294,25 +294,26 @@ public class PasswordCredentialsApplicationSpec
         };
         _endUsersService.Setup(uas => uas.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(),
                 It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<RegisteredEndUser, Error>>(endUser));
         var credential = CreateUnVerifiedCredential();
         _repository.Setup(s => s.FindCredentialsByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<PasswordCredentialRoot>, Error>>(credential.ToOptional()));
 
-        var result = await _application.RegisterPersonAsync(_caller.Object, "afirstname",
+        var result = await _application.RegisterPersonAsync(_caller.Object, "aninvitationtoken", "afirstname",
             "alastname", "auser@company.com", "apassword", "atimezone", "acountrycode", true, CancellationToken.None);
 
         result.Value.User.Should().Be(endUser);
         _repository.Verify(s => s.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()),
             Times.Never);
-        _endUsersService.Verify(uas => uas.RegisterPersonPrivateAsync(_caller.Object,
+        _endUsersService.Verify(uas => uas.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
             "auser@company.com", "afirstname", "alastname", "atimezone", "acountrycode", true,
             It.IsAny<CancellationToken>()));
     }
 
     [Fact]
-    public async Task WhenRegisterPersonUserAccountAndNotExists_ThenCreatesAndSendsConfirmation()
+    public async Task WhenRegisterPersonAsyncAndNotExists_ThenCreatesAndSendsConfirmation()
     {
         var registeredAccount = new RegisteredEndUser
         {
@@ -332,13 +333,14 @@ public class PasswordCredentialsApplicationSpec
         };
         _endUsersService.Setup(uas => uas.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(),
                 It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<RegisteredEndUser, Error>>(registeredAccount));
         _repository.Setup(s => s.FindCredentialsByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<PasswordCredentialRoot>, Error>>(Optional<PasswordCredentialRoot>
                 .None));
 
-        var result = await _application.RegisterPersonAsync(_caller.Object, "afirstname",
+        var result = await _application.RegisterPersonAsync(_caller.Object, "aninvitationtoken", "afirstname",
             "alastname", "auser@company.com", "apassword", "atimezone", "acountrycode", true, CancellationToken.None);
 
         result.Value.User.Should().Be(registeredAccount);
@@ -354,7 +356,7 @@ public class PasswordCredentialsApplicationSpec
         _notificationsService.Verify(ns =>
             ns.NotifyPasswordRegistrationConfirmationAsync(_caller.Object, "auser@company.com", "adisplayname",
                 "averificationtoken", It.IsAny<CancellationToken>()));
-        _endUsersService.Verify(eus => eus.RegisterPersonPrivateAsync(_caller.Object,
+        _endUsersService.Verify(eus => eus.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
             "auser@company.com", "afirstname", "alastname", "atimezone", "acountrycode", true,
             It.IsAny<CancellationToken>()));
     }

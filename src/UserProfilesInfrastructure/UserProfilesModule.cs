@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using UserProfilesApplication;
 using UserProfilesApplication.Persistence;
 using UserProfilesDomain;
-using UserProfilesInfrastructure.Api;
+using UserProfilesInfrastructure.Api.Profiles;
 using UserProfilesInfrastructure.ApplicationServices;
 using UserProfilesInfrastructure.Persistence;
 using UserProfilesInfrastructure.Persistence.ReadModels;

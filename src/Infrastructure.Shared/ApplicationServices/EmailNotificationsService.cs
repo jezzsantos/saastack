@@ -13,9 +13,9 @@ namespace Infrastructure.Shared.ApplicationServices;
 /// </summary>
 public class EmailNotificationsService : INotificationsService
 {
-    public const string ProductNameSettingName = "ApplicationServices:Notifications:SenderProductName";
-    public const string SenderDisplayNameSettingName = "ApplicationServices:Notifications:SenderDisplayName";
-    public const string SenderEmailAddressSettingName = "ApplicationServices:Notifications:SenderEmailAddress";
+    private const string ProductNameSettingName = "ApplicationServices:Notifications:SenderProductName";
+    private const string SenderDisplayNameSettingName = "ApplicationServices:Notifications:SenderDisplayName";
+    private const string SenderEmailAddressSettingName = "ApplicationServices:Notifications:SenderEmailAddress";
     private readonly IEmailSchedulingService _emailSchedulingService;
     private readonly IHostSettings _hostSettings;
     private readonly string _productName;
@@ -35,6 +35,32 @@ public class EmailNotificationsService : INotificationsService
         _senderName = settings.Platform.GetString(SenderDisplayNameSettingName, nameof(EmailNotificationsService));
     }
 
+    public async Task<Result<Error>> NotifyGuestInvitationToPlatformAsync(ICallerContext caller, string token,
+        string inviteeEmailAddress,
+        string inviteeName, string inviterName, CancellationToken cancellationToken)
+    {
+        var webSiteUrl = _hostSettings.GetWebsiteHostBaseUrl();
+        var webSiteRoute = _websiteUiService.CreateRegistrationPageUrl(token);
+        var link = webSiteUrl.WithoutTrailingSlash() + webSiteRoute;
+        var htmlBody =
+            $"""
+             <p>Hello,</p>
+             <p>You have been invited by {inviterName} to {_productName}.</p>
+             <p>Please click this link to <a href="{link}">sign up</a></p>
+             <p>This is an automated email from the support team at {_productName}</p>
+             """;
+
+        return await _emailSchedulingService.ScheduleHtmlEmail(caller, new HtmlEmail
+        {
+            Subject = $"Welcome to {_productName}",
+            Body = htmlBody,
+            FromEmailAddress = _senderEmailAddress,
+            FromDisplayName = _senderName,
+            ToEmailAddress = inviteeEmailAddress,
+            ToDisplayName = inviteeName
+        }, cancellationToken);
+    }
+
     public async Task<Result<Error>> NotifyPasswordRegistrationConfirmationAsync(ICallerContext caller,
         string emailAddress, string name, string token,
         CancellationToken cancellationToken)
@@ -43,10 +69,12 @@ public class EmailNotificationsService : INotificationsService
         var webSiteRoute = _websiteUiService.ConstructPasswordRegistrationConfirmationPageUrl(token);
         var link = webSiteUrl.WithoutTrailingSlash() + webSiteRoute;
         var htmlBody =
-            $"<p>Hello {name},</p>" +
-            $"<p>Thank you for signing up at {_productName}.</p>" +
-            $"<p>Please click this link to <a href=\"{link}\">confirm your email address</a></p>" +
-            $"<p>This is an automated email from the support team at {_productName}</p>";
+            $"""
+             <p>Hello {name},</p>
+             <p>Thank you for signing up at {_productName}.</p>
+             <p>Please click this link to <a href="{link}">confirm your email address</a></p>
+             <p>This is an automated email from the support team at {_productName}</p>
+             """;
 
         return await _emailSchedulingService.ScheduleHtmlEmail(caller, new HtmlEmail
         {
@@ -64,18 +92,16 @@ public class EmailNotificationsService : INotificationsService
         string? timezone, string? countryCode, CancellationToken cancellationToken)
     {
         var htmlBody =
-            $"<p>Hello {name},</p>" +
-            $"<p>We have received a request to register a person using your email address at our web site {_productName}.</p>"
-            +
-            $"<p>Of course, your email address ('{emailAddress}') has already been registered at our site.</p>" +
-            "<p>If you are already aware of this, then there is nothing more to do.</p>" +
-            "<p>It is possible that some unknown party is trying to find out if your email address is already registered on this site, byt trying to re-register it.</p>"
-            +
-            "<p>We have blocked this attempt from succeeding, and no new account has been created. Your account is still safe.</p>"
-            +
-            "<p>We just thought you would like to know, that this is going on. There is nothing more you need to do.</p>"
-            +
-            $"<p>This is an automated email from the support team at {_productName}</p>";
+            $"""
+             <p>Hello {name},</p>
+             <p>We have received a request to register a person using your email address at our web site {_productName}.</p>
+             <p>Of course, your email address ('{emailAddress}') has already been registered at our site.</p>
+             <p>If you are already aware of this activity, then there is nothing more to do.</p>
+             <p>It is possible that some unknown party is trying to find out if your email address is already registered on this site, by trying to re-register it.</p>
+             <p>We have blocked this attempt from succeeding, and no new account has been created. Your account is still safe.</p>
+             <p>We just thought you would like to know, that this is going on. There is nothing more you need to do.</p>
+             <p>This is an automated email from the support team at {_productName}</p>
+             """;
 
         return await _emailSchedulingService.ScheduleHtmlEmail(caller, new HtmlEmail
         {

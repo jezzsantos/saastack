@@ -7,6 +7,8 @@ public interface ITokensService
 {
     APIKeyToken CreateAPIKey();
 
+    string CreateGuestInvitationToken();
+
     string CreateJWTRefreshToken();
 
     string CreatePasswordResetToken();

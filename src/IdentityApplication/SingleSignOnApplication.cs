@@ -24,7 +24,8 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         _authTokensService = authTokensService;
     }
 
-    public async Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext context, string providerName,
+    public async Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext context,
+        string? invitationToken, string providerName,
         string authCode, string? username, CancellationToken cancellationToken)
     {
         var retrieved = await _ssoProvidersService.FindByNameAsync(providerName, cancellationToken);
@@ -56,7 +57,8 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         string registeredUserId;
         if (!userExists.Value.HasValue)
         {
-            var autoRegistered = await _endUsersService.RegisterPersonPrivateAsync(context, userInfo.EmailAddress,
+            var autoRegistered = await _endUsersService.RegisterPersonPrivateAsync(context, invitationToken,
+                userInfo.EmailAddress,
                 userInfo.FirstName, userInfo.LastName, userInfo.Timezone.ToString(), userInfo.CountryCode.ToString(),
                 true,
                 cancellationToken);

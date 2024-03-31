@@ -6,7 +6,7 @@ using Infrastructure.Web.Api.Common.Validation;
 using Infrastructure.Web.Api.Operations.Shared.UserProfiles;
 using UserProfilesDomain;
 
-namespace UserProfilesInfrastructure.Api;
+namespace UserProfilesInfrastructure.Api.Profiles;
 
 public class ChangeProfileContactAddressRequestValidator : AbstractValidator<ChangeProfileContactAddressRequest>
 {

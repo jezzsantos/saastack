@@ -48,6 +48,12 @@
     <data name="EndUserRoot_UnassignableTenantFeature" xml:space="preserve">
         <value>The feature '{0}' is not a supported tenant feature</value>
     </data>
+    <data name="EndUserRoot_CannotUnassignBaselinePlatformRole" xml:space="preserve">
+        <value>The platform role '{0}' must always exist</value>
+    </data>
+    <data name="EndUserRoot_CannotUnassignUnassignedRole" xml:space="preserve">
+        <value>The platform role '{0}' cannot be removed, since it does not exist for this user</value>
+    </data>
     <data name="Memberships_NoDefault" xml:space="preserve">
         <value>At least one of the memberships must be the default membership</value>
     </data>
@@ -74,5 +80,26 @@
     </data>
     <data name="EndUserRoot_NotOperator" xml:space="preserve">
         <value>The assigner is not a member of the operations team</value>
+    </data>
+    <data name="GuestInvitation_NotInvited" xml:space="preserve">
+        <value>This invitation has not been sent yet</value>
+    </data>
+    <data name="GuestInvitation_AlreadyInvited" xml:space="preserve">
+        <value>This invitation has already been sent</value>
+    </data>
+    <data name="GuestInvitation_AlreadyAccepted" xml:space="preserve">
+        <value>This invitation has already been accepted</value>
+    </data>
+    <data name="EndUserRoot_GuestInvitationNeverSent" xml:space="preserve">
+        <value>A guest invitation has not been sent yet</value>
+    </data>
+    <data name="EndUserRoot_GuestAlreadyRegistered" xml:space="preserve">
+        <value>This guest has already been invited, and has now registered</value>
+    </data>
+    <data name="EndUserRoot_GuestInvitationHasExpired" xml:space="preserve">
+        <value>This guest invitation has expired, and the guest needs to invited again</value>
+    </data>
+    <data name="EndUserRoot_GuestInvitationAcceptedByNonAnonymousUser" xml:space="preserve">
+        <value>This guest invitation cannot be accepted by an authenticated user</value>
     </data>
 </root>

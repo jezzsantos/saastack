@@ -33,4 +33,10 @@
     <data name="EndUsersApplication_NotPersonProfile" xml:space="preserve">
         <value>The profile for this person cannot be found</value>
     </data>
+    <data name="EndUsersApplication_GuestAlreadyRegistered" xml:space="preserve">
+        <value>This guest is already registered as a user</value>
+    </data>
+    <data name="EndUsersApplication_AcceptedInvitationWithExistingEmailAddress" xml:space="preserve">
+        <value>A user with this email address is already registered</value>
+    </data>
 </root>

@@ -188,12 +188,14 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         }
     }
 
-    public async Task<Result<PasswordCredential, Error>> RegisterPersonAsync(ICallerContext context, string firstName,
+    public async Task<Result<PasswordCredential, Error>> RegisterPersonAsync(ICallerContext context,
+        string? invitationToken, string firstName,
         string lastName, string emailAddress, string password, string? timezone, string? countryCode,
         bool termsAndConditionsAccepted,
         CancellationToken cancellationToken)
     {
-        var registered = await _endUsersService.RegisterPersonPrivateAsync(context, emailAddress, firstName, lastName,
+        var registered = await _endUsersService.RegisterPersonPrivateAsync(context, invitationToken, emailAddress,
+            firstName, lastName,
             timezone, countryCode, termsAndConditionsAccepted, cancellationToken);
         if (!registered.IsSuccessful)
         {

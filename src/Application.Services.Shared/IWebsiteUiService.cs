@@ -6,4 +6,6 @@ namespace Application.Services.Shared;
 public interface IWebsiteUiService
 {
     string ConstructPasswordRegistrationConfirmationPageUrl(string token);
+
+    string CreateRegistrationPageUrl(string token);
 }

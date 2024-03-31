@@ -5,22 +5,26 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Shared;
+using EndUsersApplication.Persistence.ReadModels;
 using EndUsersDomain;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
 using EndUser = EndUsersApplication.Persistence.ReadModels.EndUser;
 using Membership = EndUsersApplication.Persistence.ReadModels.Membership;
+using Tasks = Application.Persistence.Common.Extensions.Tasks;
 
 namespace EndUsersInfrastructure.Persistence.ReadModels;
 
 public class EndUserProjection : IReadModelProjection
 {
+    private readonly IReadModelProjectionStore<Invitation> _invitations;
     private readonly IReadModelProjectionStore<Membership> _memberships;
     private readonly IReadModelProjectionStore<EndUser> _users;
 
     public EndUserProjection(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
         _users = new ReadModelProjectionStore<EndUser>(recorder, domainFactory, store);
+        _invitations = new ReadModelProjectionStore<Invitation>(recorder, domainFactory, store);
         _memberships = new ReadModelProjectionStore<Membership>(recorder, domainFactory, store);
     }
 
@@ -32,23 +36,30 @@ public class EndUserProjection : IReadModelProjection
         switch (changeEvent)
         {
             case Events.Created e:
-                return await _users.HandleCreateAsync(e.RootId.ToId(), dto =>
-                {
-                    dto.Classification = e.Classification;
-                    dto.Access = e.Access;
-                    dto.Status = e.Status;
-                }, cancellationToken);
+                return await Tasks.WhenAllAsync(_users.HandleCreateAsync(e.RootId.ToId(), dto =>
+                    {
+                        dto.Classification = e.Classification;
+                        dto.Access = e.Access;
+                        dto.Status = e.Status;
+                    }, cancellationToken),
+                    _invitations.HandleCreateAsync(e.RootId.ToId(), dto =>
+                        {
+                            dto.Status = e.Status;
+                        },
+                        cancellationToken));
 
             case Events.Registered e:
-                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
-                {
-                    dto.Classification = e.Classification;
-                    dto.Access = e.Access;
-                    dto.Status = e.Status;
-                    dto.Username = e.Username;
-                    dto.Roles = Roles.Create(e.Roles.ToArray()).Value;
-                    dto.Features = Features.Create(e.Features.ToArray()).Value;
-                }, cancellationToken);
+                return await Tasks.WhenAllAsync(_users.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                    {
+                        dto.Classification = e.Classification;
+                        dto.Access = e.Access;
+                        dto.Status = e.Status;
+                        dto.Username = e.Username;
+                        dto.Roles = Roles.Create(e.Roles.ToArray()).Value;
+                        dto.Features = Features.Create(e.Features.ToArray()).Value;
+                    }, cancellationToken),
+                    _invitations.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.Status = e.Status; },
+                        cancellationToken));
 
             case Events.MembershipAdded e:
                 return await _memberships.HandleCreateAsync(e.MembershipId.ToId(), dto =>
@@ -121,6 +132,20 @@ public class EndUserProjection : IReadModelProjection
                     dto.Roles = roles.Value;
                 }, cancellationToken);
 
+            case Events.PlatformRoleUnassigned e:
+                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                {
+                    var roles = dto.Roles.HasValue
+                        ? dto.Roles.Value.Remove(e.Role)
+                        : Roles.Create(e.Role);
+                    if (!roles.IsSuccessful)
+                    {
+                        return;
+                    }
+
+                    dto.Roles = roles.Value;
+                }, cancellationToken);
+
             case Events.PlatformFeatureAssigned e:
                 return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
@@ -133,6 +158,23 @@ public class EndUserProjection : IReadModelProjection
                     }
 
                     dto.Features = features.Value;
+                }, cancellationToken);
+
+            case Events.GuestInvitationCreated e:
+                return await _invitations.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                {
+                    dto.InvitedEmailAddress = e.EmailAddress;
+                    dto.Token = e.Token;
+                    dto.InvitedById = e.InvitedById;
+                }, cancellationToken);
+
+            case Events.GuestInvitationAccepted e:
+                return await _invitations.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                {
+                    dto.Token = Optional<string>.None;
+                    dto.Status = UserStatus.Registered.ToString();
+                    dto.AcceptedAtUtc = e.AcceptedAtUtc;
+                    dto.AcceptedEmailAddress = e.AcceptedEmailAddress;
                 }, cancellationToken);
 
             default:

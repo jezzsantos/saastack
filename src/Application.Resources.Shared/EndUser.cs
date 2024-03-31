@@ -57,3 +57,12 @@ public class Membership : IIdentifiableResource
 
     public required string Id { get; set; }
 }
+
+public class Invitation
+{
+    public required string EmailAddress { get; set; }
+
+    public required string FirstName { get; set; }
+
+    public string? LastName { get; set; }
+}

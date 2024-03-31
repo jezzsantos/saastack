@@ -27,7 +27,7 @@ public class EmailAddressSpec
     [Fact]
     public void WhenGuessPersonNameFromEmailAndPlainUsername_ThenReturnsName()
     {
-        var name = EmailAddress.Create("auser@company.com").Value.GuessPersonName();
+        var name = EmailAddress.Create("auser@company.com").Value.GuessPersonFullName();
 
         name.FirstName.Text.Should().Be("Auser");
         name.LastName.Should().BeNone();
@@ -36,7 +36,7 @@ public class EmailAddressSpec
     [Fact]
     public void WhenGuessPersonNameFromEmailAndMultipleDottedUsername_ThenReturnsName()
     {
-        var name = EmailAddress.Create("afirstname.amiddlename.alastname@company.com").Value.GuessPersonName();
+        var name = EmailAddress.Create("afirstname.amiddlename.alastname@company.com").Value.GuessPersonFullName();
 
         name.FirstName.Text.Should().Be("Afirstname");
         name.LastName.Value.Text.Should().Be("Alastname");
@@ -45,7 +45,7 @@ public class EmailAddressSpec
     [Fact]
     public void WhenGuessPersonNameFromEmailAndTwoDottedUsername_ThenReturnsName()
     {
-        var name = EmailAddress.Create("afirstname.alastname@company.com").Value.GuessPersonName();
+        var name = EmailAddress.Create("afirstname.alastname@company.com").Value.GuessPersonFullName();
 
         name.FirstName.Text.Should().Be("Afirstname");
         name.LastName.Value.Text.Should().Be("Alastname");
@@ -54,7 +54,7 @@ public class EmailAddressSpec
     [Fact]
     public void WhenGuessPersonNameFromEmailAndContainsPlusSign_ThenReturnsName()
     {
-        var name = EmailAddress.Create("afirstname+anothername@company.com").Value.GuessPersonName();
+        var name = EmailAddress.Create("afirstname+anothername@company.com").Value.GuessPersonFullName();
 
         name.FirstName.Text.Should().Be("Afirstname");
         name.LastName.Should().BeNone();
@@ -63,7 +63,7 @@ public class EmailAddressSpec
     [Fact]
     public void WhenGuessPersonNameFromEmailAndContainsPlusSignAndNumber_ThenReturnsName()
     {
-        var name = EmailAddress.Create("afirstname+9@company.com").Value.GuessPersonName();
+        var name = EmailAddress.Create("afirstname+9@company.com").Value.GuessPersonFullName();
 
         name.FirstName.Text.Should().Be("Afirstname");
         name.LastName.Should().BeNone();
@@ -72,7 +72,7 @@ public class EmailAddressSpec
     [Fact]
     public void WhenGuessPersonNameFromEmailAndGuessedFirstNameNotValid_ThenReturnsNameWithFallbackFirstName()
     {
-        var name = EmailAddress.Create("-@company.com").Value.GuessPersonName();
+        var name = EmailAddress.Create("-@company.com").Value.GuessPersonFullName();
 
         name.FirstName.Text.Should().Be(Resources.EmailAddress_FallbackGuessedFirstName);
         name.LastName.Should().BeNone();
@@ -81,7 +81,7 @@ public class EmailAddressSpec
     [Fact]
     public void WhenGuessPersonNameFromEmailAndGuessedLastNameNotValid_ThenReturnsNameWithNoLastName()
     {
-        var name = EmailAddress.Create("afirstname.b@company.com").Value.GuessPersonName();
+        var name = EmailAddress.Create("afirstname.b@company.com").Value.GuessPersonFullName();
 
         name.FirstName.Text.Should().Be("Afirstname");
         name.LastName.Should().BeNone();
@@ -90,7 +90,7 @@ public class EmailAddressSpec
     [Fact]
     public void WhenGuessPersonNameFromEmailAndGuessedFirstAndLastNameNotValid_ThenReturnsNameWithNoLastName()
     {
-        var name = EmailAddress.Create("1.2@company.com").Value.GuessPersonName();
+        var name = EmailAddress.Create("1.2@company.com").Value.GuessPersonFullName();
 
         name.FirstName.Text.Should().Be(Resources.EmailAddress_FallbackGuessedFirstName);
         name.LastName.Should().BeNone();

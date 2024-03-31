@@ -5,7 +5,7 @@ using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.UserProfiles;
 using UserProfilesApplication;
 
-namespace UserProfilesInfrastructure.Api;
+namespace UserProfilesInfrastructure.Api.Profiles;
 
 public class UserProfilesApi : IWebApiService
 {

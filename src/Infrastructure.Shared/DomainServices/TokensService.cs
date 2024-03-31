@@ -10,11 +10,6 @@ public sealed class TokensService : ITokensService
 {
     private const int DefaultTokenSizeInBytes = 32;
 
-    public string CreatePasswordResetToken()
-    {
-        return GenerateRandomTokenSafeForUrl();
-    }
-
     public APIKeyToken CreateAPIKey()
     {
         var token = GenerateRandomTokenSafeForUrl(CommonValidations.APIKeys.ApiKeyTokenSize,
@@ -31,7 +26,17 @@ public sealed class TokensService : ITokensService
         };
     }
 
+    public string CreateGuestInvitationToken()
+    {
+        return GenerateRandomTokenSafeForUrl();
+    }
+
     public string CreateJWTRefreshToken()
+    {
+        return GenerateRandomTokenSafeForUrl();
+    }
+
+    public string CreatePasswordResetToken()
     {
         return GenerateRandomTokenSafeForUrl();
     }

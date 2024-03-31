@@ -27,7 +27,11 @@ public interface IEndUsersApplication
     Task<Result<RegisteredEndUser, Error>> RegisterMachineAsync(ICallerContext context, string name, string? timezone,
         string? countryCode, CancellationToken cancellationToken);
 
-    Task<Result<RegisteredEndUser, Error>> RegisterPersonAsync(ICallerContext context, string emailAddress,
+    Task<Result<RegisteredEndUser, Error>> RegisterPersonAsync(ICallerContext context, string? invitationToken,
+        string emailAddress,
         string firstName, string? lastName, string? timezone, string? countryCode, bool termsAndConditionsAccepted,
+        CancellationToken cancellationToken);
+
+    Task<Result<EndUser, Error>> UnassignPlatformRolesAsync(ICallerContext context, string id, List<string> roles,
         CancellationToken cancellationToken);
 }

@@ -7,26 +7,30 @@ using Infrastructure.Web.Api.Operations.Shared.Identities;
 
 namespace IdentityInfrastructure.Api.PasswordCredentials;
 
-public class RegisterPersonRequestValidator : AbstractValidator<RegisterPersonPasswordRequest>
+public class RegisterPersonPasswordRequestValidator : AbstractValidator<RegisterPersonPasswordRequest>
 {
-    public RegisterPersonRequestValidator()
+    public RegisterPersonPasswordRequestValidator()
     {
+        RuleFor(req => req.InvitationToken)
+            .Matches(Validations.Credentials.InvitationToken)
+            .WithMessage(Resources.RegisterPersonPasswordRequestValidator_InvalidInvitationToken)
+            .When(req => req.InvitationToken.HasValue());
         RuleFor(req => req.FirstName)
             .NotEmpty()
             .Matches(Validations.Credentials.Person.Name)
-            .WithMessage(Resources.RegisterPersonRequestValidator_InvalidFirstName);
+            .WithMessage(Resources.RegisterPersonPasswordRequestValidator_InvalidFirstName);
         RuleFor(req => req.LastName)
             .NotEmpty()
             .Matches(Validations.Credentials.Person.Name)
-            .WithMessage(Resources.RegisterPersonRequestValidator_InvalidLastName);
+            .WithMessage(Resources.RegisterPersonPasswordRequestValidator_InvalidLastName);
         RuleFor(req => req.EmailAddress)
             .NotEmpty()
             .IsEmailAddress()
-            .WithMessage(Resources.RegisterPersonRequestValidator_InvalidEmail);
+            .WithMessage(Resources.RegisterPersonPasswordRequestValidator_InvalidEmail);
         RuleFor(req => req.Password)
             .NotEmpty()
             .Matches(CommonValidations.Passwords.Password.Strict)
-            .WithMessage(Resources.RegisterPersonRequestValidator_InvalidPassword);
+            .WithMessage(Resources.RegisterPersonPasswordRequestValidator_InvalidPassword);
         RuleFor(req => req.Timezone)
             .NotEmpty()
             .Matches(CommonValidations.Timezone)
@@ -40,6 +44,6 @@ public class RegisterPersonRequestValidator : AbstractValidator<RegisterPersonPa
         RuleFor(req => req.TermsAndConditionsAccepted)
             .NotEmpty()
             .Must(req => req)
-            .WithMessage(Resources.RegisterPersonRequestValidator_InvalidTermsAndConditionsAccepted);
+            .WithMessage(Resources.RegisterPersonPasswordRequestValidator_InvalidTermsAndConditionsAccepted);
     }
 }

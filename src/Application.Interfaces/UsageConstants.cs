@@ -43,6 +43,7 @@ public static class UsageConstants
             public const string Audit = "Audited";
             public const string BookingCancelled = "Booking Cancelled";
             public const string BookingCreated = "Booking Created";
+            public const string GuestInvited = "User Guest Invited";
             public const string MachineRegistered = "Machine Registered";
             public const string Measurement = "Measured";
             public const string PersonRegistrationConfirmed = "User Registered";

@@ -60,6 +60,24 @@ namespace EndUsersApplication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A user with this email address is already registered.
+        /// </summary>
+        internal static string EndUsersApplication_AcceptedInvitationWithExistingEmailAddress {
+            get {
+                return ResourceManager.GetString("EndUsersApplication_AcceptedInvitationWithExistingEmailAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This guest is already registered as a user.
+        /// </summary>
+        internal static string EndUsersApplication_GuestAlreadyRegistered {
+            get {
+                return ResourceManager.GetString("EndUsersApplication_GuestAlreadyRegistered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The membership could not be found.
         /// </summary>
         internal static string EndUsersApplication_MembershipNotFound {

@@ -9,6 +9,12 @@ namespace Application.Services.Shared;
 public interface INotificationsService
 {
     /// <summary>
+    ///     Notifies a user, via email, that they have been invited to register with the platform
+    /// </summary>
+    Task<Result<Error>> NotifyGuestInvitationToPlatformAsync(ICallerContext caller, string token,
+        string inviteeEmailAddress, string inviteeName, string inviterName, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Notifies a user, via email, to confirm their account registration
     /// </summary>
     Task<Result<Error>> NotifyPasswordRegistrationConfirmationAsync(ICallerContext caller, string emailAddress,

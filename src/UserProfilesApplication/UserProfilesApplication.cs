@@ -27,8 +27,8 @@ public class UserProfilesApplication : IUserProfilesApplication
     }
 
     public async Task<Result<UserProfile, Error>> CreateProfileAsync(ICallerContext caller, UserProfileType type,
-        string userId, string? emailAddress,
-        string firstName, string? lastName, string? timezone, string? countryCode, CancellationToken cancellationToken)
+        string userId, string? emailAddress, string firstName, string? lastName, string? timezone, string? countryCode,
+        CancellationToken cancellationToken)
     {
         if (type == UserProfileType.Person && emailAddress.HasNoValue())
         {
@@ -154,6 +154,31 @@ public class UserProfilesApplication : IUserProfilesApplication
         }
 
         return Optional<UserProfile>.None;
+    }
+
+    public async Task<Result<UserProfile, Error>> GetProfileAsync(ICallerContext caller, string userId,
+        CancellationToken cancellationToken)
+    {
+        if (userId != caller.CallerId)
+        {
+            return Error.ForbiddenAccess();
+        }
+
+        var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        if (!retrieved.Value.HasValue)
+        {
+            return Error.EntityNotFound();
+        }
+
+        var profile = retrieved.Value.Value;
+
+        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was retrieved for user {userId}", profile.Id, userId);
+        return profile.ToProfile();
     }
 
     public async Task<Result<UserProfile, Error>> ChangeProfileAsync(ICallerContext caller, string userId,

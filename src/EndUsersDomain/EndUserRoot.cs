@@ -7,9 +7,12 @@ using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
+using Domain.Services.Shared.DomainServices;
 using Domain.Shared;
 
 namespace EndUsersDomain;
+
+public delegate Task<Result<Error>> InvitationCallback(Identifier inviterId, string token);
 
 public sealed class EndUserRoot : AggregateRootBase
 {
@@ -35,6 +38,8 @@ public sealed class EndUserRoot : AggregateRootBase
     public UserClassification Classification { get; private set; }
 
     public Features Features { get; private set; } = Features.Create();
+
+    public GuestInvitation GuestInvitation { get; private set; } = GuestInvitation.Empty;
 
     private bool IsMachine => Classification == UserClassification.Machine;
 
@@ -83,6 +88,11 @@ public sealed class EndUserRoot : AggregateRootBase
             if (Features.HasNone())
             {
                 return Error.RuleViolation(Resources.EndUserRoot_AllPersonsMustHaveDefaultFeature);
+            }
+
+            if (GuestInvitation.IsStillOpen)
+            {
+                return Error.RuleViolation(Resources.EndUserRoot_GuestAlreadyRegistered);
             }
         }
 
@@ -229,6 +239,14 @@ public sealed class EndUserRoot : AggregateRootBase
                 return Result.Ok;
             }
 
+            case Events.PlatformRoleUnassigned added:
+            {
+                var roles = Roles.Remove(added.Role);
+                Roles = roles;
+                Recorder.TraceDebug(null, "EndUser {Id} removed role {Role}", Id, added.Role);
+                return Result.Ok;
+            }
+
             case Events.PlatformFeatureAssigned added:
             {
                 var features = Features.Add(added.Feature);
@@ -242,9 +260,65 @@ public sealed class EndUserRoot : AggregateRootBase
                 return Result.Ok;
             }
 
+            case Events.GuestInvitationCreated added:
+            {
+                var inviteeEmailAddress = EmailAddress.Create(added.EmailAddress);
+                if (!inviteeEmailAddress.IsSuccessful)
+                {
+                    return inviteeEmailAddress.Error;
+                }
+
+                var invited = GuestInvitation.IsStillOpen
+                    ? GuestInvitation.Renew(added.Token, inviteeEmailAddress.Value)
+                    : GuestInvitation.Invite(added.Token, inviteeEmailAddress.Value, added.InvitedById.ToId());
+                if (!invited.IsSuccessful)
+                {
+                    return invited.Error;
+                }
+
+                GuestInvitation = invited.Value;
+                Recorder.TraceDebug(null, "EndUser {Id} invited as a guest by {InvitedBy}", Id, added.InvitedById);
+                return Result.Ok;
+            }
+
+            case Events.GuestInvitationAccepted changed:
+            {
+                var acceptedEmailAddress = EmailAddress.Create(changed.AcceptedEmailAddress);
+                if (!acceptedEmailAddress.IsSuccessful)
+                {
+                    return acceptedEmailAddress.Error;
+                }
+
+                var accepted = GuestInvitation.Accept(acceptedEmailAddress.Value);
+                if (!accepted.IsSuccessful)
+                {
+                    return accepted.Error;
+                }
+
+                GuestInvitation = accepted.Value;
+                Recorder.TraceDebug(null, "EndUser {Id} accepted their guest invitation", Id);
+                return Result.Ok;
+            }
+
             default:
                 return HandleUnKnownStateChangedEvent(@event);
         }
+    }
+
+    public Result<Error> AcceptGuestInvitation(Identifier acceptedById, EmailAddress emailAddress)
+    {
+        if (IsNotAnonymousUser(acceptedById))
+        {
+            return Error.ForbiddenAccess(Resources.EndUserRoot_GuestInvitationAcceptedByNonAnonymousUser);
+        }
+
+        var verified = VerifyGuestInvitation();
+        if (!verified.IsSuccessful)
+        {
+            return verified.Error;
+        }
+
+        return RaiseChangeEvent(EndUsersDomain.Events.GuestInvitationAccepted.Create(Id, emailAddress));
     }
 
     public Result<Error> AddMembership(Identifier organizationId, Roles tenantRoles, Features tenantFeatures)
@@ -461,6 +535,31 @@ public sealed class EndUserRoot : AggregateRootBase
         return (platformRoles, platformFeatures, tenantRoles, tenantFeatures);
     }
 
+    public PersonName GuessGuestInvitationName()
+    {
+        return GuestInvitation.InviteeEmailAddress!.GuessPersonFullName();
+    }
+
+    public async Task<Result<Error>> InviteGuestAsync(ITokensService tokensService, Identifier inviterId,
+        EmailAddress inviteeEmailAddress, InvitationCallback onInvited)
+    {
+        if (IsRegistered)
+        {
+            return Result.Ok;
+        }
+
+        var token = tokensService.CreateGuestInvitationToken();
+        var raised =
+            RaiseChangeEvent(
+                EndUsersDomain.Events.GuestInvitationCreated.Create(Id, token, inviteeEmailAddress, inviterId));
+        if (!raised.IsSuccessful)
+        {
+            return raised.Error;
+        }
+
+        return await onInvited(inviterId, token);
+    }
+
     public Result<Error> Register(Roles roles, Features levels, Optional<EmailAddress> username)
     {
         if (Status != UserStatus.Unregistered)
@@ -468,8 +567,112 @@ public sealed class EndUserRoot : AggregateRootBase
             return Error.RuleViolation(Resources.EndUserRoot_AlreadyRegistered);
         }
 
+        if (GuestInvitation.CanAccept)
+        {
+            if (username.HasValue)
+            {
+                var accepted = RaiseChangeEvent(EndUsersDomain.Events.GuestInvitationAccepted.Create(Id, username));
+                if (!accepted.IsSuccessful)
+                {
+                    return accepted.Error;
+                }
+            }
+        }
+
         return RaiseChangeEvent(EndUsersDomain.Events.Registered.Create(Id, username, Classification,
             UserAccess.Enabled, UserStatus.Registered, roles, levels));
+    }
+
+    public async Task<Result<Error>> ReInviteGuestAsync(ITokensService tokensService, Identifier inviterId,
+        InvitationCallback onInvited)
+    {
+        if (!GuestInvitation.IsInvited)
+        {
+            return Error.RuleViolation(Resources.EndUserRoot_GuestInvitationNeverSent);
+        }
+
+        if (!GuestInvitation.IsStillOpen)
+        {
+            return Error.RuleViolation(Resources.EndUserRoot_GuestInvitationHasExpired);
+        }
+
+        return await InviteGuestAsync(tokensService, inviterId, GuestInvitation.InviteeEmailAddress!, onInvited);
+    }
+
+#if TESTINGONLY
+    public void TestingOnly_ExpireGuestInvitation()
+    {
+        GuestInvitation = GuestInvitation.TestingOnly_ExpireNow();
+    }
+#endif
+
+#if TESTINGONLY
+    public void TestingOnly_InviteGuest(EmailAddress emailAddress)
+    {
+        GuestInvitation = GuestInvitation.Invite("atoken", emailAddress, "aninviter".ToId()).Value;
+    }
+#endif
+
+    public Result<Error> UnassignPlatformRoles(EndUserRoot assigner, Roles platformRoles)
+    {
+        if (!IsPlatformOperator(assigner))
+        {
+            return Error.RuleViolation(Resources.EndUserRoot_NotOperator);
+        }
+
+        if (platformRoles.HasAny())
+        {
+            foreach (var role in platformRoles.Items)
+            {
+                if (!PlatformRoles.IsPlatformAssignableRole(role.Identifier))
+                {
+                    return Error.RuleViolation(Resources.EndUserRoot_UnassignablePlatformRole.Format(role.Identifier));
+                }
+
+                if (role.Identifier == PlatformRoles.Standard.Name)
+                {
+                    return Error.RuleViolation(
+                        Resources.EndUserRoot_CannotUnassignBaselinePlatformRole
+                            .Format(PlatformRoles.Standard.Name));
+                }
+
+                if (!Roles.HasRole(role.Identifier))
+                {
+                    return Error.RuleViolation(
+                        Resources.EndUserRoot_CannotUnassignUnassignedRole.Format(role.Identifier));
+                }
+
+                var removedRole =
+                    RaiseChangeEvent(
+                        EndUsersDomain.Events.PlatformRoleUnassigned.Create(Id, role));
+                if (!removedRole.IsSuccessful)
+                {
+                    return removedRole.Error;
+                }
+            }
+        }
+
+        return Result.Ok;
+    }
+
+    public Result<Error> VerifyGuestInvitation()
+    {
+        if (IsRegistered)
+        {
+            return Error.EntityExists(Resources.EndUserRoot_GuestAlreadyRegistered);
+        }
+
+        if (!GuestInvitation.IsInvited)
+        {
+            return Error.PreconditionViolation(Resources.EndUserRoot_GuestInvitationNeverSent);
+        }
+
+        if (!GuestInvitation.IsStillOpen)
+        {
+            return Error.PreconditionViolation(Resources.EndUserRoot_GuestInvitationHasExpired);
+        }
+
+        return Result.Ok;
     }
 
     private static bool IsPlatformOperator(EndUserRoot assigner)
@@ -486,5 +689,10 @@ public sealed class EndUserRoot : AggregateRootBase
         }
 
         return retrieved.Value.Roles.HasRole(TenantRoles.Owner);
+    }
+
+    private static bool IsNotAnonymousUser(Identifier userId)
+    {
+        return userId != CallerConstants.AnonymousUserId;
     }
 }

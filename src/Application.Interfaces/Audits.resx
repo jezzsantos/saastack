@@ -48,6 +48,9 @@
     <data name="EndUserApplication_PlatformRolesAssigned" xml:space="preserve">
         <value>EndUser.PlatformRolesAssigned</value>
     </data>
+    <data name="EndUserApplication_PlatformRolesUnassigned" xml:space="preserve">
+        <value>EndUser.PlatformRolesUnassigned</value>
+    </data>
     <data name="SingleSignOnApplication_Authenticate_AccountOnboarded" xml:space="preserve">
         <value>SingleSignOn.AutoRegistered</value>
     </data>

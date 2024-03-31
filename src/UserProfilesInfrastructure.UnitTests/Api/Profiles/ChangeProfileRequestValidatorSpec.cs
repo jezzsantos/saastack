@@ -3,10 +3,10 @@ using FluentAssertions;
 using FluentValidation;
 using Infrastructure.Web.Api.Operations.Shared.UserProfiles;
 using UnitTesting.Common.Validation;
-using UserProfilesInfrastructure.Api;
+using UserProfilesInfrastructure.Api.Profiles;
 using Xunit;
 
-namespace UserProfilesInfrastructure.UnitTests.Api;
+namespace UserProfilesInfrastructure.UnitTests.Api.Profiles;
 
 [Trait("Category", "Unit")]
 public class ChangeProfileRequestValidatorSpec

@@ -5,6 +5,7 @@ using Common;
 using Common.Configuration;
 using Domain.Common.Identity;
 using Domain.Interfaces;
+using Domain.Services.Shared.DomainServices;
 using EndUsersApplication;
 using EndUsersApplication.Persistence;
 using EndUsersDomain;
@@ -51,8 +52,21 @@ public class EndUsersModule : ISubdomainModule
                         c.GetRequiredService<INotificationsService>(),
                         c.GetRequiredService<IOrganizationsService>(),
                         c.GetRequiredService<IUserProfilesService>(),
+                        c.GetRequiredService<IInvitationRepository>(),
                         c.GetRequiredService<IEndUserRepository>()));
+                services.AddSingleton<IInvitationsApplication>(c =>
+                    new InvitationsApplication(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IIdentifierFactory>(),
+                        c.GetRequiredService<ITokensService>(),
+                        c.GetRequiredService<INotificationsService>(),
+                        c.GetRequiredService<IUserProfilesService>(),
+                        c.GetRequiredService<IInvitationRepository>()));
                 services.AddSingleton<IEndUserRepository>(c => new EndUserRepository(
+                    c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredService<IDomainFactory>(),
+                    c.GetRequiredService<IEventSourcingDddCommandStore<EndUserRoot>>(),
+                    c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.AddSingleton<IInvitationRepository>(c => new InvitationRepository(
                     c.GetRequiredService<IRecorder>(),
                     c.GetRequiredService<IDomainFactory>(),
                     c.GetRequiredService<IEventSourcingDddCommandStore<EndUserRoot>>(),

@@ -68,9 +68,9 @@ public class PasswordCredentialsApi : IWebApiService
         RegisterPersonPasswordRequest request, CancellationToken cancellationToken)
     {
         var credential = await _passwordCredentialsApplication.RegisterPersonAsync(_contextFactory.Create(),
-            request.FirstName,
-            request.LastName, request.EmailAddress, request.Password, request.Timezone, request.CountryCode,
-            request.TermsAndConditionsAccepted, cancellationToken);
+            request.InvitationToken,
+            request.FirstName, request.LastName, request.EmailAddress, request.Password, request.Timezone,
+            request.CountryCode, request.TermsAndConditionsAccepted, cancellationToken);
 
         return () => credential.HandleApplicationResult<RegisterPersonPasswordResponse, PasswordCredential>(creds =>
             new PostResult<RegisterPersonPasswordResponse>(new RegisterPersonPasswordResponse { Credential = creds }));

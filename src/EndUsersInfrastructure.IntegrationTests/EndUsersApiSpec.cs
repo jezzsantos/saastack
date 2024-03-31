@@ -34,7 +34,30 @@ public class EndUsersApiSpec : WebApiSpec<Program>
 #endif
     }
 
+    [Fact]
+    public async Task WhenUnassignPlatformRoles_ThenAssignsRoles()
+    {
+        var login = await LoginUserAsync(LoginUser.Operator);
+#if TESTINGONLY
+        await Api.PostAsync(new AssignPlatformRolesRequest
+        {
+            Id = login.User.Id,
+            Roles = new List<string> { PlatformRoles.TestingOnly.Name }
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        var result = await Api.PatchAsync(new UnassignPlatformRolesRequest
+        {
+            Id = login.User.Id,
+            Roles = new List<string> { PlatformRoles.TestingOnly.Name }
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        result.Content.Value.User!.Roles.Should()
+            .ContainInOrder(PlatformRoles.Standard.Name, PlatformRoles.Operations.Name);
+#endif
+    }
+
     private static void OverrideDependencies(IServiceCollection services)
     {
+        // Override dependencies here
     }
 }

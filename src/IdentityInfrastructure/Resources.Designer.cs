@@ -87,6 +87,15 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;InvitationToken&apos; is either missing or invalid.
+        /// </summary>
+        internal static string AuthenticateSingleSignOnRequestValidator_InvalidInvitationToken {
+            get {
+                return ResourceManager.GetString("AuthenticateSingleSignOnRequestValidator_InvalidInvitationToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;Provider&apos; is invalid or missing.
         /// </summary>
         internal static string AuthenticateSingleSignOnRequestValidator_InvalidProvider {
@@ -170,45 +179,54 @@ namespace IdentityInfrastructure {
         /// <summary>
         ///   Looks up a localized string similar to The &apos;Email&apos; is either missing or is an invalid email address.
         /// </summary>
-        internal static string RegisterPersonRequestValidator_InvalidEmail {
+        internal static string RegisterPersonPasswordRequestValidator_InvalidEmail {
             get {
-                return ResourceManager.GetString("RegisterPersonRequestValidator_InvalidEmail", resourceCulture);
+                return ResourceManager.GetString("RegisterPersonPasswordRequestValidator_InvalidEmail", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The &apos;FirstName&apos; was either missing or is invalid.
         /// </summary>
-        internal static string RegisterPersonRequestValidator_InvalidFirstName {
+        internal static string RegisterPersonPasswordRequestValidator_InvalidFirstName {
             get {
-                return ResourceManager.GetString("RegisterPersonRequestValidator_InvalidFirstName", resourceCulture);
+                return ResourceManager.GetString("RegisterPersonPasswordRequestValidator_InvalidFirstName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;InvitationToken&apos; is either missing or invalid.
+        /// </summary>
+        internal static string RegisterPersonPasswordRequestValidator_InvalidInvitationToken {
+            get {
+                return ResourceManager.GetString("RegisterPersonPasswordRequestValidator_InvalidInvitationToken", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The &apos;LastName&apos; was either missing or is invalid.
         /// </summary>
-        internal static string RegisterPersonRequestValidator_InvalidLastName {
+        internal static string RegisterPersonPasswordRequestValidator_InvalidLastName {
             get {
-                return ResourceManager.GetString("RegisterPersonRequestValidator_InvalidLastName", resourceCulture);
+                return ResourceManager.GetString("RegisterPersonPasswordRequestValidator_InvalidLastName", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The &apos;Password&apos; is either missing or invalid.
         /// </summary>
-        internal static string RegisterPersonRequestValidator_InvalidPassword {
+        internal static string RegisterPersonPasswordRequestValidator_InvalidPassword {
             get {
-                return ResourceManager.GetString("RegisterPersonRequestValidator_InvalidPassword", resourceCulture);
+                return ResourceManager.GetString("RegisterPersonPasswordRequestValidator_InvalidPassword", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The &apos;TermsAndConditionsAccepted&apos; must be True.
         /// </summary>
-        internal static string RegisterPersonRequestValidator_InvalidTermsAndConditionsAccepted {
+        internal static string RegisterPersonPasswordRequestValidator_InvalidTermsAndConditionsAccepted {
             get {
-                return ResourceManager.GetString("RegisterPersonRequestValidator_InvalidTermsAndConditionsAccepted", resourceCulture);
+                return ResourceManager.GetString("RegisterPersonPasswordRequestValidator_InvalidTermsAndConditionsAccepted", resourceCulture);
             }
         }
         

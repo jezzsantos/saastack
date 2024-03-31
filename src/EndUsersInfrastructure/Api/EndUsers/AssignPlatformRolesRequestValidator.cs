@@ -18,7 +18,7 @@ public class AssignPlatformRolesRequestValidator : AbstractValidator<AssignPlatf
             .NotEmpty()
             .WithMessage(Resources.AssignPlatformRolesRequestValidator_InvalidRoles);
         RuleFor(req => req.Roles)
-            .ForEach(dto => dto.Matches(Validations.Role)
+            .ForEach(req => req.Matches(Validations.Role)
                 .WithMessage(Resources.AssignPlatformRolesRequestValidator_InvalidRole));
     }
 }

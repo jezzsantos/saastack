@@ -38,7 +38,7 @@ public sealed class EmailAddress : SingleValueObjectBase<EmailAddress, string>
     }
 
     [SkipImmutabilityCheck]
-    public PersonName GuessPersonName()
+    public PersonName GuessPersonFullName()
     {
         var name = GuessPersonNameFromEmailAddress(Value);
 

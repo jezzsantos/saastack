@@ -17,8 +17,8 @@ public interface IPasswordCredentialsApplication
         string userId, CancellationToken cancellationToken);
 #endif
 
-    Task<Result<PasswordCredential, Error>> RegisterPersonAsync(ICallerContext context, string firstName,
-        string lastName,
-        string emailAddress, string password, string? timezone, string? countryCode, bool termsAndConditionsAccepted,
-        CancellationToken cancellationToken);
+    Task<Result<PasswordCredential, Error>> RegisterPersonAsync(ICallerContext context, string? invitationToken,
+        string firstName,
+        string lastName, string emailAddress, string password, string? timezone, string? countryCode,
+        bool termsAndConditionsAccepted, CancellationToken cancellationToken);
 }

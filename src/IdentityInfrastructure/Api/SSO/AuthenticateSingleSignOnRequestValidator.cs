@@ -1,14 +1,19 @@
 using Common.Extensions;
 using FluentValidation;
+using IdentityDomain;
 using Infrastructure.Web.Api.Common.Validation;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 
-namespace IdentityInfrastructure.Api.PasswordCredentials;
+namespace IdentityInfrastructure.Api.SSO;
 
 public class AuthenticateSingleSignOnRequestValidator : AbstractValidator<AuthenticateSingleSignOnRequest>
 {
     public AuthenticateSingleSignOnRequestValidator()
     {
+        RuleFor(req => req.InvitationToken)
+            .Matches(Validations.Credentials.InvitationToken)
+            .WithMessage(Resources.AuthenticateSingleSignOnRequestValidator_InvalidInvitationToken)
+            .When(req => req.InvitationToken.HasValue());
         RuleFor(req => req.Provider)
             .NotEmpty()
             .WithMessage(Resources.AuthenticateSingleSignOnRequestValidator_InvalidProvider);

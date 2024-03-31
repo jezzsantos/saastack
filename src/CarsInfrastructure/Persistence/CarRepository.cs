@@ -5,13 +5,13 @@ using CarsApplication.Persistence;
 using CarsApplication.Persistence.ReadModels;
 using CarsDomain;
 using Common;
-using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
 using Unavailability = CarsApplication.Persistence.ReadModels.Unavailability;
+using Tasks = Common.Extensions.Tasks;
 
 namespace CarsInfrastructure.Persistence;
 

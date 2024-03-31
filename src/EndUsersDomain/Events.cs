@@ -196,6 +196,25 @@ public static class Events
         public required DateTime OccurredUtc { get; set; }
     }
 
+    public sealed class PlatformRoleUnassigned : IDomainEvent
+    {
+        public static PlatformRoleUnassigned Create(Identifier id, Role role)
+        {
+            return new PlatformRoleUnassigned
+            {
+                RootId = id,
+                OccurredUtc = DateTime.UtcNow,
+                Role = role.Identifier
+            };
+        }
+
+        public required string Role { get; set; }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
+    }
+
     public sealed class PlatformFeatureAssigned : IDomainEvent
     {
         public static PlatformFeatureAssigned Create(Identifier id, Feature feature)
@@ -209,6 +228,54 @@ public static class Events
         }
 
         public required string Feature { get; set; }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
+    }
+
+    public sealed class GuestInvitationCreated : IDomainEvent
+    {
+        public static GuestInvitationCreated Create(Identifier id, string token, EmailAddress invitee,
+            Identifier invitedBy)
+        {
+            return new GuestInvitationCreated
+            {
+                RootId = id,
+                OccurredUtc = DateTime.UtcNow,
+                EmailAddress = invitee,
+                InvitedById = invitedBy,
+                Token = token
+            };
+        }
+
+        public required string EmailAddress { get; set; }
+
+        public required string InvitedById { get; set; }
+
+        public required string Token { get; set; }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
+    }
+
+    public sealed class GuestInvitationAccepted : IDomainEvent
+    {
+        public static GuestInvitationAccepted Create(Identifier id, EmailAddress emailAddress)
+        {
+            return new GuestInvitationAccepted
+            {
+                RootId = id,
+                OccurredUtc = DateTime.UtcNow,
+                AcceptedEmailAddress = emailAddress,
+                AcceptedAtUtc = DateTime.UtcNow
+            };
+        }
+
+        public required DateTime AcceptedAtUtc { get; set; }
+
+        public required string AcceptedEmailAddress { get; set; }
 
         public required string RootId { get; set; }
 

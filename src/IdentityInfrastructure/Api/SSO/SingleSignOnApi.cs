@@ -23,7 +23,8 @@ public class SingleSignOnApi : IWebApiService
         AuthenticateSingleSignOnRequest request, CancellationToken cancellationToken)
     {
         var authenticated =
-            await _singleSignOnApplication.AuthenticateAsync(_contextFactory.Create(), request.Provider,
+            await _singleSignOnApplication.AuthenticateAsync(_contextFactory.Create(), request.InvitationToken,
+                request.Provider,
                 request.AuthCode, request.Username, cancellationToken);
 
         return () => authenticated.HandleApplicationResult<AuthenticateResponse, AuthenticateTokens>(tok =>

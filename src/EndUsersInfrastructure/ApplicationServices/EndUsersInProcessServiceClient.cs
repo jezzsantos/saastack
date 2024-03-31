@@ -40,11 +40,11 @@ public class EndUsersInProcessServiceClient : IEndUsersService
     }
 
     public async Task<Result<RegisteredEndUser, Error>> RegisterPersonPrivateAsync(ICallerContext caller,
-        string emailAddress,
-        string firstName, string? lastName, string? timezone, string? countryCode, bool termsAndConditionsAccepted,
-        CancellationToken cancellationToken)
+        string? invitationToken, string emailAddress, string firstName, string? lastName, string? timezone,
+        string? countryCode, bool termsAndConditionsAccepted, CancellationToken cancellationToken)
     {
-        return await _endUsersApplication.RegisterPersonAsync(caller, emailAddress, firstName, lastName, timezone,
+        return await _endUsersApplication.RegisterPersonAsync(caller, invitationToken, emailAddress, firstName,
+            lastName, timezone,
             countryCode, termsAndConditionsAccepted, cancellationToken);
     }
 

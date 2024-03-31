@@ -76,5 +76,32 @@ namespace EndUsersInfrastructure {
                 return ResourceManager.GetString("AssignPlatformRolesRequestValidator_InvalidRoles", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Email&apos; is either missing or invalid.
+        /// </summary>
+        internal static string InviteGuestRequestValidator_InvalidEmail {
+            get {
+                return ResourceManager.GetString("InviteGuestRequestValidator_InvalidEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Token&apos; is either missing or invalid.
+        /// </summary>
+        internal static string ResendGuestInvitationRequestValidator_InvalidToken {
+            get {
+                return ResourceManager.GetString("ResendGuestInvitationRequestValidator_InvalidToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Token&apos; is either missing or invalid.
+        /// </summary>
+        internal static string VerifyGuestInvitationRequestValidator_InvalidToken {
+            get {
+                return ResourceManager.GetString("VerifyGuestInvitationRequestValidator_InvalidToken", resourceCulture);
+            }
+        }
     }
 }

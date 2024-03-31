@@ -21,4 +21,7 @@ public interface IUserProfilesApplication
 
     Task<Result<Optional<UserProfile>, Error>> FindPersonByEmailAddressAsync(ICallerContext caller, string emailAddress,
         CancellationToken cancellationToken);
+
+    Task<Result<UserProfile, Error>> GetProfileAsync(ICallerContext caller, string userId,
+        CancellationToken cancellationToken);
 }

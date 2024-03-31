@@ -30,4 +30,13 @@
     <data name="AssignPlatformRolesRequestValidator_InvalidRole" xml:space="preserve">
         <value>A Role is either missing or invalid</value>
     </data>
+    <data name="InviteGuestRequestValidator_InvalidEmail" xml:space="preserve">
+        <value>The 'Email' is either missing or invalid</value>
+    </data>
+    <data name="ResendGuestInvitationRequestValidator_InvalidToken" xml:space="preserve">
+        <value>The 'Token' is either missing or invalid</value>
+    </data>
+    <data name="VerifyGuestInvitationRequestValidator_InvalidToken" xml:space="preserve">
+        <value>The 'Token' is either missing or invalid</value>
+    </data>
 </root>

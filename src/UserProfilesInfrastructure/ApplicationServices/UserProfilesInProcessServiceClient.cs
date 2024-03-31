@@ -36,4 +36,10 @@ public class UserProfilesInProcessServiceClient : IUserProfilesService
     {
         return await _userProfilesApplication.FindPersonByEmailAddressAsync(caller, emailAddress, cancellationToken);
     }
+
+    public async Task<Result<UserProfile, Error>> GetProfilePrivateAsync(ICallerContext caller, string userId,
+        CancellationToken cancellationToken)
+    {
+        return await _userProfilesApplication.GetProfileAsync(caller, userId, cancellationToken);
+    }
 }

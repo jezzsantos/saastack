@@ -19,18 +19,19 @@ public class EndUsersApplication : IEndUsersApplication
 {
     internal const string PermittedOperatorsSettingName = "Hosts:EndUsersApi:Authorization:OperatorWhitelist";
     private static readonly char[] PermittedOperatorsDelimiters = [';', ',', ' '];
+    private readonly IEndUserRepository _endUserRepository;
     private readonly IIdentifierFactory _idFactory;
+    private readonly IInvitationRepository _invitationRepository;
     private readonly INotificationsService _notificationsService;
     private readonly IOrganizationsService _organizationsService;
     private readonly IRecorder _recorder;
-    private readonly IEndUserRepository _repository;
     private readonly IConfigurationSettings _settings;
     private readonly IUserProfilesService _userProfilesService;
 
     public EndUsersApplication(IRecorder recorder, IIdentifierFactory idFactory, IConfigurationSettings settings,
         INotificationsService notificationsService, IOrganizationsService organizationsService,
-        IUserProfilesService userProfilesService,
-        IEndUserRepository repository)
+        IUserProfilesService userProfilesService, IInvitationRepository invitationRepository,
+        IEndUserRepository endUserRepository)
     {
         _recorder = recorder;
         _idFactory = idFactory;
@@ -38,13 +39,14 @@ public class EndUsersApplication : IEndUsersApplication
         _notificationsService = notificationsService;
         _organizationsService = organizationsService;
         _userProfilesService = userProfilesService;
-        _repository = repository;
+        _invitationRepository = invitationRepository;
+        _endUserRepository = endUserRepository;
     }
 
     public async Task<Result<EndUser, Error>> GetPersonAsync(ICallerContext context, string id,
         CancellationToken cancellationToken)
     {
-        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        var retrieved = await _endUserRepository.LoadAsync(id.ToId(), cancellationToken);
         if (!retrieved.IsSuccessful)
         {
             return retrieved.Error;
@@ -60,7 +62,7 @@ public class EndUsersApplication : IEndUsersApplication
     public async Task<Result<EndUserWithMemberships, Error>> GetMembershipsAsync(ICallerContext context, string id,
         CancellationToken cancellationToken)
     {
-        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        var retrieved = await _endUserRepository.LoadAsync(id.ToId(), cancellationToken);
         if (!retrieved.IsSuccessful)
         {
             return retrieved.Error;
@@ -118,7 +120,7 @@ public class EndUsersApplication : IEndUsersApplication
 
         if (context.IsAuthenticated)
         {
-            var adder = await _repository.LoadAsync(context.ToCallerId(), cancellationToken);
+            var adder = await _endUserRepository.LoadAsync(context.ToCallerId(), cancellationToken);
             if (!adder.IsSuccessful)
             {
                 return adder.Error;
@@ -133,7 +135,7 @@ public class EndUsersApplication : IEndUsersApplication
             }
         }
 
-        var saved = await _repository.SaveAsync(machine, cancellationToken);
+        var saved = await _endUserRepository.SaveAsync(machine, cancellationToken);
         if (!saved.IsSuccessful)
         {
             return saved.Error;
@@ -145,35 +147,81 @@ public class EndUsersApplication : IEndUsersApplication
         return machine.ToRegisteredUser(defaultOrganizationId, profile);
     }
 
-    public async Task<Result<RegisteredEndUser, Error>> RegisterPersonAsync(ICallerContext context, string emailAddress,
-        string firstName, string? lastName, string? timezone, string? countryCode, bool termsAndConditionsAccepted,
-        CancellationToken cancellationToken)
+    public async Task<Result<RegisteredEndUser, Error>> RegisterPersonAsync(ICallerContext context,
+        string? invitationToken, string emailAddress, string firstName, string? lastName, string? timezone,
+        string? countryCode, bool termsAndConditionsAccepted, CancellationToken cancellationToken)
     {
         if (!termsAndConditionsAccepted)
         {
             return Error.RuleViolation(Resources.EndUsersApplication_NotAcceptedTerms);
         }
 
-        var username = EmailAddress.Create(emailAddress);
-        if (!username.IsSuccessful)
+        var email = EmailAddress.Create(emailAddress);
+        if (!email.IsSuccessful)
         {
-            return username.Error;
+            return email.Error;
         }
 
-        var existingUser = await FindPersonByEmailAddressInternalAsync(context, username.Value, cancellationToken);
-        if (!existingUser.IsSuccessful)
-        {
-            return existingUser.Error;
-        }
+        var username = email.Value;
 
-        EndUserRoot user;
-        UserProfile? profile;
-        if (existingUser.Value.HasValue)
+        var existingUser = Optional<EndUserWithProfile>.None;
+        if (invitationToken.HasValue())
         {
-            user = existingUser.Value.Value.User;
-            if (user.Status == UserStatus.Registered)
+            var retrievedGuest =
+                await FindInvitedGuestWithInvitationTokenAsync(invitationToken, cancellationToken);
+            if (!retrievedGuest.IsSuccessful)
             {
-                profile = existingUser.Value.Value.Profile;
+                return retrievedGuest.Error;
+            }
+
+            if (retrievedGuest.Value.HasValue)
+            {
+                var existingRegisteredUser =
+                    await FindProfileWithEmailAddressAsync(context, username, cancellationToken);
+                if (!existingRegisteredUser.IsSuccessful)
+                {
+                    return existingRegisteredUser.Error;
+                }
+
+                if (existingRegisteredUser.Value.HasValue)
+                {
+                    return Error.EntityExists(Resources.EndUsersApplication_AcceptedInvitationWithExistingEmailAddress);
+                }
+
+                var invitee = retrievedGuest.Value.Value;
+                var acceptedById = context.ToCallerId();
+                var accepted = invitee.AcceptGuestInvitation(acceptedById, username);
+                if (!accepted.IsSuccessful)
+                {
+                    return accepted.Error;
+                }
+
+                _recorder.TraceInformation(context.ToCall(), "Guest user {Id} accepted their invitation", invitee.Id);
+                existingUser = new EndUserWithProfile(invitee, null);
+            }
+        }
+
+        if (!existingUser.HasValue)
+        {
+            var registeredOrGuest =
+                await FindRegisteredPersonOrInvitedGuestByEmailAddressAsync(context, username, cancellationToken);
+            if (!registeredOrGuest.IsSuccessful)
+            {
+                return registeredOrGuest.Error;
+            }
+
+            existingUser = registeredOrGuest.Value;
+        }
+
+        EndUserRoot unregisteredUser;
+        UserProfile? profile;
+        if (existingUser.HasValue)
+        {
+            unregisteredUser = existingUser.Value.User;
+
+            if (unregisteredUser.Status == UserStatus.Registered)
+            {
+                profile = existingUser.Value.Profile;
                 if (profile.NotExists()
                     || profile.Type != UserProfileType.Person
                     || profile.EmailAddress.HasNoValue())
@@ -181,7 +229,8 @@ public class EndUsersApplication : IEndUsersApplication
                     return Error.EntityNotFound(Resources.EndUsersApplication_NotPersonProfile);
                 }
 
-                var notified = await _notificationsService.NotifyReRegistrationCourtesyAsync(context, user.Id,
+                var notified = await _notificationsService.NotifyReRegistrationCourtesyAsync(context,
+                    unregisteredUser.Id,
                     profile.EmailAddress, profile.DisplayName, profile.Timezone, profile.Address.CountryCode,
                     cancellationToken);
                 if (!notified.IsSuccessful)
@@ -190,15 +239,15 @@ public class EndUsersApplication : IEndUsersApplication
                 }
 
                 _recorder.TraceInformation(context.ToCall(),
-                    "Attempted re-registration of user: {Id}, with email {EmailAddress}", user.Id, emailAddress);
+                    "Attempted re-registration of user: {Id}, with email {EmailAddress}", unregisteredUser.Id, email);
                 _recorder.TrackUsage(context.ToCall(), UsageConstants.Events.UsageScenarios.PersonReRegistered,
                     new Dictionary<string, object>
                     {
-                        { UsageConstants.Properties.Id, user.Id },
-                        { UsageConstants.Properties.EmailAddress, emailAddress }
+                        { UsageConstants.Properties.Id, unregisteredUser.Id },
+                        { UsageConstants.Properties.EmailAddress, email }
                     });
 
-                return user.ToRegisteredUser(user.Memberships.DefaultMembership.Id, profile);
+                return unregisteredUser.ToRegisteredUser(unregisteredUser.Memberships.DefaultMembership.Id, profile);
             }
         }
         else
@@ -209,11 +258,11 @@ public class EndUsersApplication : IEndUsersApplication
                 return created.Error;
             }
 
-            user = created.Value;
+            unregisteredUser = created.Value;
         }
 
-        var profiled = await _userProfilesService.CreatePersonProfilePrivateAsync(context, user.Id, emailAddress,
-            firstName, lastName, timezone, countryCode, cancellationToken);
+        var profiled = await _userProfilesService.CreatePersonProfilePrivateAsync(context, unregisteredUser.Id,
+            username, firstName, lastName, timezone, countryCode, cancellationToken);
         if (!profiled.IsSuccessful)
         {
             return profiled.Error;
@@ -222,9 +271,9 @@ public class EndUsersApplication : IEndUsersApplication
         profile = profiled.Value;
         var permittedOperators = GetPermittedOperators();
         var (platformRoles, platformFeatures, tenantRoles, tenantFeatures) =
-            EndUserRoot.GetInitialRolesAndFeatures(UserClassification.Person, context.IsAuthenticated, username.Value,
+            EndUserRoot.GetInitialRolesAndFeatures(UserClassification.Person, context.IsAuthenticated, username,
                 permittedOperators);
-        var registered = user.Register(platformRoles, platformFeatures, username.Value);
+        var registered = unregisteredUser.Register(platformRoles, platformFeatures, username);
         if (!registered.IsSuccessful)
         {
             return registered.Error;
@@ -237,7 +286,7 @@ public class EndUsersApplication : IEndUsersApplication
         }
 
         var defaultOrganization =
-            await _organizationsService.CreateOrganizationPrivateAsync(context, user.Id,
+            await _organizationsService.CreateOrganizationPrivateAsync(context, unregisteredUser.Id,
                 organizationName.Value.FullName, OrganizationOwnership.Personal,
                 cancellationToken);
         if (!defaultOrganization.IsSuccessful)
@@ -246,32 +295,32 @@ public class EndUsersApplication : IEndUsersApplication
         }
 
         var defaultOrganizationId = defaultOrganization.Value.Id.ToId();
-        var enrolled = user.AddMembership(defaultOrganizationId, tenantRoles,
+        var enrolled = unregisteredUser.AddMembership(defaultOrganizationId, tenantRoles,
             tenantFeatures);
         if (!enrolled.IsSuccessful)
         {
             return enrolled.Error;
         }
 
-        var saved = await _repository.SaveAsync(user, cancellationToken);
+        var saved = await _endUserRepository.SaveAsync(unregisteredUser, cancellationToken);
         if (!saved.IsSuccessful)
         {
             return saved.Error;
         }
 
-        _recorder.TraceInformation(context.ToCall(), "Registered user: {Id}", user.Id);
-        _recorder.AuditAgainst(context.ToCall(), user.Id,
+        _recorder.TraceInformation(context.ToCall(), "Registered user: {Id}", unregisteredUser.Id);
+        _recorder.AuditAgainst(context.ToCall(), unregisteredUser.Id,
             Audits.EndUsersApplication_User_Registered_TermsAccepted,
-            "EndUser {Id} accepted their terms and conditions", user.Id);
+            "EndUser {Id} accepted their terms and conditions", unregisteredUser.Id);
         _recorder.TrackUsage(context.ToCall(), UsageConstants.Events.UsageScenarios.PersonRegistrationCreated);
 
-        return user.ToRegisteredUser(defaultOrganizationId, profile);
+        return unregisteredUser.ToRegisteredUser(defaultOrganizationId, profile);
     }
 
     public async Task<Result<Membership, Error>> CreateMembershipForCallerAsync(ICallerContext context,
         string organizationId, CancellationToken cancellationToken)
     {
-        var retrieved = await _repository.LoadAsync(context.ToCallerId(), cancellationToken);
+        var retrieved = await _endUserRepository.LoadAsync(context.ToCallerId(), cancellationToken);
         if (!retrieved.IsSuccessful)
         {
             return retrieved.Error;
@@ -288,7 +337,7 @@ public class EndUsersApplication : IEndUsersApplication
             return membered.Error;
         }
 
-        var saved = await _repository.SaveAsync(user, cancellationToken);
+        var saved = await _endUserRepository.SaveAsync(user, cancellationToken);
         if (!saved.IsSuccessful)
         {
             return saved.Error;
@@ -315,7 +364,8 @@ public class EndUsersApplication : IEndUsersApplication
             return email.Error;
         }
 
-        var retrieved = await FindPersonByEmailAddressInternalAsync(context, email.Value, cancellationToken);
+        var retrieved =
+            await FindRegisteredPersonOrInvitedGuestByEmailAddressAsync(context, email.Value, cancellationToken);
         if (!retrieved.IsSuccessful)
         {
             return retrieved.Error;
@@ -329,13 +379,13 @@ public class EndUsersApplication : IEndUsersApplication
     public async Task<Result<EndUser, Error>> AssignPlatformRolesAsync(ICallerContext context, string id,
         List<string> roles, CancellationToken cancellationToken)
     {
-        var retrievedAssignee = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        var retrievedAssignee = await _endUserRepository.LoadAsync(id.ToId(), cancellationToken);
         if (!retrievedAssignee.IsSuccessful)
         {
             return retrievedAssignee.Error;
         }
 
-        var retrievedAssigner = await _repository.LoadAsync(context.ToCallerId(), cancellationToken);
+        var retrievedAssigner = await _endUserRepository.LoadAsync(context.ToCallerId(), cancellationToken);
         if (!retrievedAssigner.IsSuccessful)
         {
             return retrievedAssigner.Error;
@@ -355,7 +405,7 @@ public class EndUsersApplication : IEndUsersApplication
             return assigned.Error;
         }
 
-        var updated = await _repository.SaveAsync(assignee, cancellationToken);
+        var updated = await _endUserRepository.SaveAsync(assignee, cancellationToken);
         if (!updated.IsSuccessful)
         {
             return updated.Error;
@@ -372,17 +422,63 @@ public class EndUsersApplication : IEndUsersApplication
         return updated.Value.ToUser();
     }
 
-    public async Task<Result<EndUserWithMemberships, Error>> AssignTenantRolesAsync(ICallerContext context,
-        string organizationId,
-        string id, List<string> roles, CancellationToken cancellationToken)
+    public async Task<Result<EndUser, Error>> UnassignPlatformRolesAsync(ICallerContext context, string id,
+        List<string> roles, CancellationToken cancellationToken)
     {
-        var retrievedAssignee = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        var retrievedAssignee = await _endUserRepository.LoadAsync(id.ToId(), cancellationToken);
         if (!retrievedAssignee.IsSuccessful)
         {
             return retrievedAssignee.Error;
         }
 
-        var retrievedAssigner = await _repository.LoadAsync(context.ToCallerId(), cancellationToken);
+        var retrievedAssigner = await _endUserRepository.LoadAsync(context.ToCallerId(), cancellationToken);
+        if (!retrievedAssigner.IsSuccessful)
+        {
+            return retrievedAssigner.Error;
+        }
+
+        var assignee = retrievedAssignee.Value;
+        var assigner = retrievedAssigner.Value;
+        var assigneeRoles = Roles.Create(roles.ToArray());
+        if (!assigneeRoles.IsSuccessful)
+        {
+            return assigneeRoles.Error;
+        }
+
+        var unassigned = assignee.UnassignPlatformRoles(assigner, assigneeRoles.Value);
+        if (!unassigned.IsSuccessful)
+        {
+            return unassigned.Error;
+        }
+
+        var updated = await _endUserRepository.SaveAsync(assignee, cancellationToken);
+        if (!updated.IsSuccessful)
+        {
+            return updated.Error;
+        }
+
+        _recorder.TraceInformation(context.ToCall(),
+            "EndUser {Id} has been unassigned platform roles {Roles}",
+            assignee.Id, roles.JoinAsOredChoices());
+        _recorder.AuditAgainst(context.ToCall(), assignee.Id,
+            Audits.EndUserApplication_PlatformRolesUnassigned,
+            "EndUser {AssignerId} unassigned the platform roles {Roles} from assignee {AssigneeId}",
+            assigner.Id, roles.JoinAsOredChoices(), assignee.Id);
+
+        return updated.Value.ToUser();
+    }
+
+    public async Task<Result<EndUserWithMemberships, Error>> AssignTenantRolesAsync(ICallerContext context,
+        string organizationId,
+        string id, List<string> roles, CancellationToken cancellationToken)
+    {
+        var retrievedAssignee = await _endUserRepository.LoadAsync(id.ToId(), cancellationToken);
+        if (!retrievedAssignee.IsSuccessful)
+        {
+            return retrievedAssignee.Error;
+        }
+
+        var retrievedAssigner = await _endUserRepository.LoadAsync(context.ToCallerId(), cancellationToken);
         if (!retrievedAssigner.IsSuccessful)
         {
             return retrievedAssigner.Error;
@@ -403,7 +499,7 @@ public class EndUsersApplication : IEndUsersApplication
         }
 
         var membership = assigned.Value;
-        var updated = await _repository.SaveAsync(assignee, cancellationToken);
+        var updated = await _endUserRepository.SaveAsync(assignee, cancellationToken);
         if (!updated.IsSuccessful)
         {
             return updated.Error;
@@ -420,11 +516,41 @@ public class EndUsersApplication : IEndUsersApplication
         return assignee.ToUserWithMemberships();
     }
 
-    private async Task<Result<Optional<EndUserWithProfile>, Error>> FindPersonByEmailAddressInternalAsync(
+    private async Task<Result<Optional<EndUserWithProfile>, Error>>
+        FindRegisteredPersonOrInvitedGuestByEmailAddressAsync(ICallerContext caller, EmailAddress emailAddress,
+            CancellationToken cancellationToken)
+    {
+        var existingProfile = await FindProfileWithEmailAddressAsync(caller, emailAddress, cancellationToken);
+        if (!existingProfile.IsSuccessful)
+        {
+            return existingProfile.Error;
+        }
+
+        if (existingProfile.Value.HasValue)
+        {
+            return existingProfile;
+        }
+
+        var existingInvitation = await FindInvitedGuestWithEmailAddressAsync(emailAddress, cancellationToken);
+        if (!existingInvitation.IsSuccessful)
+        {
+            return existingInvitation.Error;
+        }
+
+        if (existingInvitation.Value.HasValue)
+        {
+            return existingInvitation;
+        }
+
+        return Optional<EndUserWithProfile>.None;
+    }
+
+    private async Task<Result<Optional<EndUserWithProfile>, Error>> FindProfileWithEmailAddressAsync(
         ICallerContext caller, EmailAddress emailAddress, CancellationToken cancellationToken)
     {
         var retrieved =
-            await _userProfilesService.FindPersonByEmailAddressPrivateAsync(caller, emailAddress, cancellationToken);
+            await _userProfilesService.FindPersonByEmailAddressPrivateAsync(caller, emailAddress,
+                cancellationToken);
         if (!retrieved.IsSuccessful)
         {
             return retrieved.Error;
@@ -433,7 +559,7 @@ public class EndUsersApplication : IEndUsersApplication
         if (retrieved.Value.HasValue)
         {
             var profile = retrieved.Value.Value;
-            var user = await _repository.LoadAsync(profile.UserId.ToId(), cancellationToken);
+            var user = await _endUserRepository.LoadAsync(profile.UserId.ToId(), cancellationToken);
             if (!user.IsSuccessful)
             {
                 return user.Error;
@@ -442,7 +568,14 @@ public class EndUsersApplication : IEndUsersApplication
             return new EndUserWithProfile(user.Value, profile).ToOptional();
         }
 
-        var invitedGuest = await _repository.FindInvitedGuestByEmailAddressAsync(emailAddress, cancellationToken);
+        return Optional<EndUserWithProfile>.None;
+    }
+
+    private async Task<Result<Optional<EndUserWithProfile>, Error>> FindInvitedGuestWithEmailAddressAsync(
+        EmailAddress emailAddress, CancellationToken cancellationToken)
+    {
+        var invitedGuest =
+            await _invitationRepository.FindInvitedGuestByEmailAddressAsync(emailAddress, cancellationToken);
         if (!invitedGuest.IsSuccessful)
         {
             return invitedGuest.Error;
@@ -451,6 +584,19 @@ public class EndUsersApplication : IEndUsersApplication
         return invitedGuest.Value.HasValue
             ? new EndUserWithProfile(invitedGuest.Value, null).ToOptional()
             : Optional<EndUserWithProfile>.None;
+    }
+
+    private async Task<Result<Optional<EndUserRoot>, Error>> FindInvitedGuestWithInvitationTokenAsync(
+        string token, CancellationToken cancellationToken)
+    {
+        var invitedGuest =
+            await _invitationRepository.FindInvitedGuestByTokenAsync(token, cancellationToken);
+        if (!invitedGuest.IsSuccessful)
+        {
+            return invitedGuest.Error;
+        }
+
+        return invitedGuest.Value;
     }
 
     private Optional<List<EmailAddress>> GetPermittedOperators()

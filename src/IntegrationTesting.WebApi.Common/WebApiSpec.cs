@@ -186,22 +186,9 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
             _ => throw new ArgumentOutOfRangeException(nameof(who), who, null)
         };
 
-        var person = await Api.PostAsync(new RegisterPersonPasswordRequest
-        {
-            EmailAddress = emailAddress,
-            FirstName = firstName,
-            LastName = "alastname",
-            Password = PasswordForPerson,
-            TermsAndConditionsAccepted = true
-        });
+        var person = await RegisterUserAsync(emailAddress, firstName);
 
-        var token = NotificationsService.LastRegistrationConfirmationToken;
-        await Api.PostAsync(new ConfirmRegistrationPersonPasswordRequest
-        {
-            Token = token!
-        });
-
-        return await ReAuthenticateUserAsync(person.Content.Value.Credential!.User, who);
+        return await ReAuthenticateUserAsync(person.Credential!.User, who);
     }
 
     protected async Task<LoginDetails> ReAuthenticateUserAsync(RegisteredEndUser user,
@@ -219,6 +206,27 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         var refreshToken = login.Content.Value.Tokens.RefreshToken.Value;
 
         return new LoginDetails(accessToken, refreshToken, user);
+    }
+
+    protected async Task<RegisterPersonPasswordResponse> RegisterUserAsync(string emailAddress,
+        string firstName = "afirstname", string lastName = "alastname")
+    {
+        var person = await Api.PostAsync(new RegisterPersonPasswordRequest
+        {
+            EmailAddress = emailAddress,
+            FirstName = firstName,
+            LastName = lastName,
+            Password = PasswordForPerson,
+            TermsAndConditionsAccepted = true
+        });
+
+        var token = NotificationsService.LastRegistrationConfirmationToken;
+        await Api.PostAsync(new ConfirmRegistrationPersonPasswordRequest
+        {
+            Token = token!
+        });
+
+        return person.Content.Value;
     }
 
     protected void StartupServer<TAnotherHost>()

@@ -50,6 +50,23 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
         return new Roles(list);
     }
 
+    public static Result<Roles, Error> Create(params RoleLevel[] roles)
+    {
+        var list = new List<Role>();
+        foreach (var role in roles)
+        {
+            var rol = Role.Create(role);
+            if (!rol.IsSuccessful)
+            {
+                return rol.Error;
+            }
+
+            list.Add(rol.Value);
+        }
+
+        return new Roles(list);
+    }
+
     private Roles() : base(new List<Role>())
     {
     }

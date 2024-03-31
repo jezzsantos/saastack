@@ -87,6 +87,60 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The platform role &apos;{0}&apos; must always exist.
+        /// </summary>
+        internal static string EndUserRoot_CannotUnassignBaselinePlatformRole {
+            get {
+                return ResourceManager.GetString("EndUserRoot_CannotUnassignBaselinePlatformRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The platform role &apos;{0}&apos; cannot be removed, since it does not exist for this user.
+        /// </summary>
+        internal static string EndUserRoot_CannotUnassignUnassignedRole {
+            get {
+                return ResourceManager.GetString("EndUserRoot_CannotUnassignUnassignedRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This guest has already been invited, and has now registered.
+        /// </summary>
+        internal static string EndUserRoot_GuestAlreadyRegistered {
+            get {
+                return ResourceManager.GetString("EndUserRoot_GuestAlreadyRegistered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This guest invitation cannot be accepted by an authenticated user.
+        /// </summary>
+        internal static string EndUserRoot_GuestInvitationAcceptedByNonAnonymousUser {
+            get {
+                return ResourceManager.GetString("EndUserRoot_GuestInvitationAcceptedByNonAnonymousUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This guest invitation has expired, and the guest needs to invited again.
+        /// </summary>
+        internal static string EndUserRoot_GuestInvitationHasExpired {
+            get {
+                return ResourceManager.GetString("EndUserRoot_GuestInvitationHasExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A guest invitation has not been sent yet.
+        /// </summary>
+        internal static string EndUserRoot_GuestInvitationNeverSent {
+            get {
+                return ResourceManager.GetString("EndUserRoot_GuestInvitationNeverSent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The machine user cannot be unregistered.
         /// </summary>
         internal static string EndUserRoot_MachineNotRegistered {
@@ -173,6 +227,33 @@ namespace EndUsersDomain {
         internal static string EndUserRoot_UnassignableTenantRole {
             get {
                 return ResourceManager.GetString("EndUserRoot_UnassignableTenantRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This invitation has already been accepted.
+        /// </summary>
+        internal static string GuestInvitation_AlreadyAccepted {
+            get {
+                return ResourceManager.GetString("GuestInvitation_AlreadyAccepted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This invitation has already been sent.
+        /// </summary>
+        internal static string GuestInvitation_AlreadyInvited {
+            get {
+                return ResourceManager.GetString("GuestInvitation_AlreadyInvited", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This invitation has not been sent yet.
+        /// </summary>
+        internal static string GuestInvitation_NotInvited {
+            get {
+                return ResourceManager.GetString("GuestInvitation_NotInvited", resourceCulture);
             }
         }
         

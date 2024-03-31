@@ -7,11 +7,19 @@ namespace Infrastructure.Shared.ApplicationServices;
 /// </summary>
 public sealed class WebsiteUiService : IWebsiteUiService
 {
-    private const string RegistrationConfirmationPageRoute = "/confirm-registeration";
+    //EXTEND: these URLs must reflect those used by the website that handles UI 
+    private const string PasswordRegistrationConfirmationPageRoute = "/confirm-password-registration";
+    private const string RegistrationPageRoute = "/register";
 
     public string ConstructPasswordRegistrationConfirmationPageUrl(string token)
     {
         var escapedToken = Uri.EscapeDataString(token);
-        return $"{RegistrationConfirmationPageRoute}?token={escapedToken}";
+        return $"{PasswordRegistrationConfirmationPageRoute}?token={escapedToken}";
+    }
+
+    public string CreateRegistrationPageUrl(string token)
+    {
+        var escapedToken = Uri.EscapeDataString(token);
+        return $"{RegistrationPageRoute}?token={escapedToken}";
     }
 }

@@ -175,7 +175,7 @@ public class UserProfileApplicationSpec
 
         result.Should().BeError(ErrorCode.ForbiddenAccess);
     }
-    
+
     [Fact]
     public async Task WhenChangeProfileAsyncAndNotExists_ThenReturnsError()
     {
@@ -188,10 +188,9 @@ public class UserProfileApplicationSpec
 
         result.Should().BeError(ErrorCode.EntityNotFound);
     }
-    
 
     [Fact]
-    public async Task WhenChangeProfileAsync_ThenReturnsError()
+    public async Task WhenChangeProfileAsync_ThenChangesProfile()
     {
         _caller.Setup(cc => cc.CallerId)
             .Returns("auserid");
@@ -224,12 +223,13 @@ public class UserProfileApplicationSpec
 
         result.Should().BeError(ErrorCode.ForbiddenAccess);
     }
+
     [Fact]
     public async Task WhenChangeContactAddressAsyncAndNotExists_ThenReturnsError()
     {
         _caller.Setup(cc => cc.CallerId)
             .Returns("auserid");
-        
+
         var result = await _application.ChangeContactAddressAsync(_caller.Object, "auserid", "anewline1",
             "anewline2", "anewline3",
             "anewcity", "anewstate", CountryCodes.Australia.ToString(), "anewzipcode", CancellationToken.None);
@@ -259,5 +259,54 @@ public class UserProfileApplicationSpec
         result.Value.Address.State.Should().Be("anewstate");
         result.Value.Address.CountryCode.Should().Be(CountryCodes.Australia.ToString());
         result.Value.Address.Zip.Should().Be("anewzipcode");
+    }
+
+    [Fact]
+    public async Task WhenGetProfileAsyncAndNotOwner_ThenReturnsError()
+    {
+        _caller.Setup(cc => cc.CallerId)
+            .Returns("auserid");
+
+        _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Optional<UserProfileRoot>.None);
+
+        var result = await _application.GetProfileAsync(_caller.Object, "anotheruserid", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.ForbiddenAccess);
+    }
+
+    [Fact]
+    public async Task WhenGetProfileAsyncAndNotExists_ThenReturnsError()
+    {
+        _caller.Setup(cc => cc.CallerId)
+            .Returns("auserid");
+
+        _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Optional<UserProfileRoot>.None);
+
+        var result = await _application.GetProfileAsync(_caller.Object, "auserid", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityNotFound);
+    }
+
+    [Fact]
+    public async Task WhenGetProfileAsync_ThenReturnsProfile()
+    {
+        _caller.Setup(cc => cc.CallerId)
+            .Returns("auserid");
+
+        var profile = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
+            PersonName.Create("afirstname", "alastname").Value).Value;
+        _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(profile.ToOptional());
+
+        var result = await _application.GetProfileAsync(_caller.Object, "auserid", CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.Name.FirstName.Should().Be("afirstname");
+        result.Value.Name.LastName.Should().Be("alastname");
+        result.Value.DisplayName.Should().Be("afirstname");
+        result.Value.Timezone.Should().Be(Timezones.Default.ToString());
+        result.Value.Address.CountryCode.Should().Be(CountryCodes.Default.ToString());
     }
 }

@@ -1,11 +1,11 @@
 using FluentAssertions;
 using FluentValidation;
-using IdentityInfrastructure.Api.PasswordCredentials;
+using IdentityInfrastructure.Api.SSO;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using UnitTesting.Common.Validation;
 using Xunit;
 
-namespace IdentityInfrastructure.UnitTests.Api.PasswordCredentials;
+namespace IdentityInfrastructure.UnitTests.Api.SSO;
 
 [Trait("Category", "Unit")]
 public class AuthenticateSingleSignOnRequestValidatorSpec
@@ -28,6 +28,25 @@ public class AuthenticateSingleSignOnRequestValidatorSpec
     public void WhenAllProperties_ThenSucceeds()
     {
         _validator.ValidateAndThrow(_dto);
+    }
+
+    [Fact]
+    public void WhenInvitationTokenIsEmpty_ThenSucceeds()
+    {
+        _dto.InvitationToken = string.Empty;
+
+        _validator.ValidateAndThrow(_dto);
+    }
+
+    [Fact]
+    public void WhenInvitationTokenIsInvalid_ThenThrows()
+    {
+        _dto.InvitationToken = "aninvalidtoken";
+
+        _validator
+            .Invoking(x => x.ValidateAndThrow(_dto))
+            .Should().Throw<ValidationException>()
+            .WithMessageLike(Resources.AuthenticateSingleSignOnRequestValidator_InvalidInvitationToken);
     }
 
     [Fact]
