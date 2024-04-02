@@ -69,6 +69,15 @@ namespace OrganizationsDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must be an organization owner to perform this action.
+        /// </summary>
+        internal static string OrganizationRoot_AddMembership_NotOrgOwner {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_AddMembership_NotOrgOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The data type of the value: &apos;{0}&apos; is unsupported.
         /// </summary>
         internal static string Setting_InvalidDataType {

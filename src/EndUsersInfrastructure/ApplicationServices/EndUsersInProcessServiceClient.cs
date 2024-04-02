@@ -13,10 +13,13 @@ namespace EndUsersInfrastructure.ApplicationServices;
 public class EndUsersInProcessServiceClient : IEndUsersService
 {
     private readonly IEndUsersApplication _endUsersApplication;
+    private readonly IInvitationsApplication _invitationsApplication;
 
-    public EndUsersInProcessServiceClient(IEndUsersApplication endUsersApplication)
+    public EndUsersInProcessServiceClient(IEndUsersApplication endUsersApplication,
+        IInvitationsApplication invitationsApplication)
     {
         _endUsersApplication = endUsersApplication;
+        _invitationsApplication = invitationsApplication;
     }
 
     public async Task<Result<Membership, Error>> CreateMembershipForCallerPrivateAsync(ICallerContext caller,
@@ -37,6 +40,22 @@ public class EndUsersInProcessServiceClient : IEndUsersService
         CancellationToken cancellationToken)
     {
         return await _endUsersApplication.GetMembershipsAsync(caller, id, cancellationToken);
+    }
+
+    public async Task<Result<Membership, Error>> InviteMemberToOrganizationPrivateAsync(ICallerContext caller,
+        string organizationId, string? userId, string? emailAddress,
+        CancellationToken cancellationToken)
+    {
+        return await _invitationsApplication.InviteMemberToOrganizationAsync(caller, organizationId, userId,
+            emailAddress, cancellationToken);
+    }
+
+    public async Task<Result<SearchResults<MembershipWithUserProfile>, Error>> ListMembershipsForOrganizationAsync(
+        ICallerContext caller, string organizationId, SearchOptions searchOptions,
+        GetOptions getOptions, CancellationToken cancellationToken)
+    {
+        return await _endUsersApplication.ListMembershipsForOrganizationAsync(caller, organizationId, searchOptions,
+            getOptions, cancellationToken);
     }
 
     public async Task<Result<RegisteredEndUser, Error>> RegisterPersonPrivateAsync(ICallerContext caller,

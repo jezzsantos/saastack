@@ -74,7 +74,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenInviteUserAsGuestAndAlreadyRegistered_ThenReturnsError()
+    public async Task WhenInviteUserAsGuestAndAlreadyRegistered_ThenDoesNothing()
     {
         var login = await LoginUserAsync();
         var emailAddress = CreateRandomEmailAddress();
@@ -95,7 +95,9 @@ public class InvitationsApiSpec : WebApiSpec<Program>
             Email = emailAddress
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        result.Content.Value.Invitation!.EmailAddress.Should().Be(emailAddress);
+        result.Content.Value.Invitation!.FirstName.Should().Be("afirstname");
+        result.Content.Value.Invitation!.LastName.Should().Be("alastname");
         _notificationService.LastGuestInvitationEmailRecipient.Should().BeNull();
     }
 

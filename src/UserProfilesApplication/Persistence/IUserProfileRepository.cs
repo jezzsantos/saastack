@@ -17,4 +17,7 @@ public interface IUserProfileRepository : IApplicationRepository
     Task<Result<UserProfileRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken);
 
     Task<Result<UserProfileRoot, Error>> SaveAsync(UserProfileRoot profile, CancellationToken cancellationToken);
+
+    Task<Result<List<UserProfileRoot>, Error>> SearchAllByUserIdsAsync(List<Identifier> ids,
+        CancellationToken cancellationToken);
 }

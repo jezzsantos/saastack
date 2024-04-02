@@ -19,7 +19,8 @@ public class UserProfilesInProcessServiceClient : IUserProfilesService
         string machineId, string name, string? timezone,
         string? countryCode, CancellationToken cancellationToken)
     {
-        return await _userProfilesApplication.CreateProfileAsync(caller, UserProfileType.Machine, machineId, null, name,
+        return await _userProfilesApplication.CreateProfileAsync(caller, UserProfileClassification.Machine, machineId,
+            null, name,
             null, timezone, countryCode, cancellationToken);
     }
 
@@ -27,7 +28,8 @@ public class UserProfilesInProcessServiceClient : IUserProfilesService
         string personId, string emailAddress, string firstName,
         string? lastName, string? timezone, string? countryCode, CancellationToken cancellationToken)
     {
-        return await _userProfilesApplication.CreateProfileAsync(caller, UserProfileType.Person, personId, emailAddress,
+        return await _userProfilesApplication.CreateProfileAsync(caller, UserProfileClassification.Person, personId,
+            emailAddress,
             firstName, lastName, timezone, countryCode, cancellationToken);
     }
 
@@ -35,6 +37,12 @@ public class UserProfilesInProcessServiceClient : IUserProfilesService
         string emailAddress, CancellationToken cancellationToken)
     {
         return await _userProfilesApplication.FindPersonByEmailAddressAsync(caller, emailAddress, cancellationToken);
+    }
+
+    public async Task<Result<List<UserProfile>, Error>> GetAllProfilesPrivateAsync(ICallerContext caller,
+        List<string> ids, GetOptions options, CancellationToken cancellationToken)
+    {
+        return await _userProfilesApplication.GetAllProfilesAsync(caller, ids, options, cancellationToken);
     }
 
     public async Task<Result<UserProfile, Error>> GetProfilePrivateAsync(ICallerContext caller, string userId,

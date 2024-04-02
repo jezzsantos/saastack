@@ -11,6 +11,7 @@
         <ProjectReference Include="..\Application.Persistence.Interfaces\Application.Persistence.Interfaces.csproj" />
         <ProjectReference Include="..\Application.Resources.Shared\Application.Resources.Shared.csproj" />
         <ProjectReference Include="..\Application.Services.Shared\Application.Services.Shared.csproj" />
+        <ProjectReference Include="..\Domain.Shared\Domain.Shared.csproj" />
         <ProjectReference Include="..\OrganizationsDomain\OrganizationsDomain.csproj" />
     </ItemGroup>
 

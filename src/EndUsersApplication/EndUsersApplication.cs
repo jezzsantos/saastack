@@ -9,7 +9,9 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Shared;
 using EndUsersApplication.Persistence;
+using EndUsersApplication.Persistence.ReadModels;
 using EndUsersDomain;
+using EndUser = Application.Resources.Shared.EndUser;
 using Membership = Application.Resources.Shared.Membership;
 using PersonName = Domain.Shared.PersonName;
 
@@ -59,6 +61,28 @@ public class EndUsersApplication : IEndUsersApplication
         return user.ToUser();
     }
 
+    public async Task<Result<SearchResults<MembershipWithUserProfile>, Error>> ListMembershipsForOrganizationAsync(
+        ICallerContext caller, string organizationId, SearchOptions searchOptions,
+        GetOptions getOptions, CancellationToken cancellationToken)
+    {
+        var retrieved =
+            await _endUserRepository.SearchAllMembershipsByOrganizationAsync(organizationId.ToId(), searchOptions,
+                cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var members = retrieved.Value;
+        if (!IsMember(caller.ToCallerId(), members))
+        {
+            return Error.ForbiddenAccess(Resources.EndUsersApplication_CallerNotMember);
+        }
+
+        return searchOptions.ApplyWithMetadata(
+            await WithGetOptionsAsync(caller, members, getOptions, cancellationToken));
+    }
+
     public async Task<Result<EndUserWithMemberships, Error>> GetMembershipsAsync(ICallerContext context, string id,
         CancellationToken cancellationToken)
     {
@@ -94,8 +118,7 @@ public class EndUsersApplication : IEndUsersApplication
 
         var profile = profiled.Value;
         var (platformRoles, platformFeatures, tenantRoles, tenantFeatures) =
-            EndUserRoot.GetInitialRolesAndFeatures(UserClassification.Machine, context.IsAuthenticated,
-                Optional<EmailAddress>.None, Optional<List<EmailAddress>>.None);
+            EndUserRoot.GetInitialRolesAndFeatures(RolesAndFeaturesUseCase.CreatingMachine, context.IsAuthenticated);
         var registered = machine.Register(platformRoles, platformFeatures, Optional<EmailAddress>.None);
         if (!registered.IsSuccessful)
         {
@@ -126,9 +149,12 @@ public class EndUsersApplication : IEndUsersApplication
                 return adder.Error;
             }
 
+            var (_, _, tenantRoles2, tenantFeatures2) =
+                EndUserRoot.GetInitialRolesAndFeatures(RolesAndFeaturesUseCase.InvitingMachineToCreatorOrg,
+                    context.IsAuthenticated);
             var adderDefaultOrganizationId = adder.Value.Memberships.DefaultMembership.OrganizationId;
-            var adderEnrolled = machine.AddMembership(adderDefaultOrganizationId, tenantRoles,
-                tenantFeatures);
+            var adderEnrolled = machine.AddMembership(adderDefaultOrganizationId, tenantRoles2,
+                tenantFeatures2);
             if (!adderEnrolled.IsSuccessful)
             {
                 return adderEnrolled.Error;
@@ -223,7 +249,7 @@ public class EndUsersApplication : IEndUsersApplication
             {
                 profile = existingUser.Value.Profile;
                 if (profile.NotExists()
-                    || profile.Type != UserProfileType.Person
+                    || profile.Classification != UserProfileClassification.Person
                     || profile.EmailAddress.HasNoValue())
                 {
                     return Error.EntityNotFound(Resources.EndUsersApplication_NotPersonProfile);
@@ -271,7 +297,8 @@ public class EndUsersApplication : IEndUsersApplication
         profile = profiled.Value;
         var permittedOperators = GetPermittedOperators();
         var (platformRoles, platformFeatures, tenantRoles, tenantFeatures) =
-            EndUserRoot.GetInitialRolesAndFeatures(UserClassification.Person, context.IsAuthenticated, username,
+            EndUserRoot.GetInitialRolesAndFeatures(RolesAndFeaturesUseCase.CreatingPerson, context.IsAuthenticated,
+                username,
                 permittedOperators);
         var registered = unregisteredUser.Register(platformRoles, platformFeatures, username);
         if (!registered.IsSuccessful)
@@ -328,9 +355,7 @@ public class EndUsersApplication : IEndUsersApplication
 
         var user = retrieved.Value;
         var (_, _, tenantRoles, tenantFeatures) =
-            EndUserRoot.GetInitialRolesAndFeatures(UserClassification.Person, context.IsAuthenticated,
-                Optional<EmailAddress>.None,
-                Optional<List<EmailAddress>>.None);
+            EndUserRoot.GetInitialRolesAndFeatures(RolesAndFeaturesUseCase.CreatingOrg, context.IsAuthenticated);
         var membered = user.AddMembership(organizationId.ToId(), tenantRoles, tenantFeatures);
         if (!membered.IsSuccessful)
         {
@@ -516,6 +541,42 @@ public class EndUsersApplication : IEndUsersApplication
         return assignee.ToUserWithMemberships();
     }
 
+    private async Task<IEnumerable<MembershipWithUserProfile>> WithGetOptionsAsync(ICallerContext caller,
+        List<MembershipJoinInvitation> memberships, GetOptions options, CancellationToken cancellationToken)
+    {
+        var ids = memberships
+            .Where(membership => membership.Status.Value.ToEnumOrDefault(EndUserStatus.Unregistered)
+                                 == EndUserStatus.Registered)
+            .Select(membership => membership.UserId.Value).ToList();
+
+        var profiles = new List<UserProfile>();
+        if (ids.Count > 0)
+        {
+            var retrieved =
+                await _userProfilesService.GetAllProfilesPrivateAsync(caller, ids, options, cancellationToken);
+            if (retrieved.IsSuccessful)
+            {
+                profiles = retrieved.Value;
+            }
+        }
+
+        return memberships.ConvertAll(membership =>
+        {
+            var member = membership.ToMembership();
+            member.Profile = membership.Status.Value.ToEnumOrDefault(EndUserStatus.Unregistered)
+                             == EndUserStatus.Unregistered
+                ? membership.ToUnregisteredUserProfile()
+                : profiles.First(profile => profile.UserId == membership.UserId);
+
+            return member;
+        });
+    }
+
+    private static bool IsMember(Identifier userId, List<MembershipJoinInvitation> members)
+    {
+        return members.Any(ms => ms.UserId.Value.EqualsIgnoreCase(userId));
+    }
+
     private async Task<Result<Optional<EndUserWithProfile>, Error>>
         FindRegisteredPersonOrInvitedGuestByEmailAddressAsync(ICallerContext caller, EmailAddress emailAddress,
             CancellationToken cancellationToken)
@@ -622,11 +683,29 @@ public class EndUsersApplication : IEndUsersApplication
 
 internal static class EndUserConversionExtensions
 {
+    public static MembershipWithUserProfile ToMembership(this MembershipJoinInvitation membership)
+    {
+        var dto = new MembershipWithUserProfile
+        {
+            Id = membership.Id.Value,
+            UserId = membership.UserId.Value,
+            IsDefault = membership.IsDefault,
+            OrganizationId = membership.UserId.Value,
+            Status = membership.Status.Value.ToEnumOrDefault(EndUserStatus.Unregistered),
+            Roles = membership.Roles.Value.ToList(),
+            Features = membership.Features.Value.ToList(),
+            Profile = null!
+        };
+
+        return dto;
+    }
+
     public static Membership ToMembership(this EndUsersDomain.Membership ms)
     {
         return new Membership
         {
             Id = ms.Id,
+            UserId = ms.RootId.Value,
             IsDefault = ms.IsDefault,
             OrganizationId = ms.OrganizationId.Value,
             Features = ms.Features.ToList(),
@@ -643,6 +722,25 @@ internal static class EndUserConversionExtensions
         registeredUser.Profile.DefaultOrganizationId = defaultOrganizationId;
 
         return registeredUser;
+    }
+
+    public static UserProfile ToUnregisteredUserProfile(this MembershipJoinInvitation membership)
+    {
+        var dto = new UserProfile
+        {
+            Id = membership.UserId.Value,
+            UserId = membership.UserId.Value,
+            EmailAddress = membership.InvitedEmailAddress.Value,
+            DisplayName = membership.InvitedEmailAddress.Value,
+            Name = new Application.Resources.Shared.PersonName
+            {
+                FirstName = membership.InvitedEmailAddress.Value,
+                LastName = null
+            },
+            Classification = UserProfileClassification.Person
+        };
+
+        return dto;
     }
 
     public static EndUser ToUser(this EndUserRoot user)

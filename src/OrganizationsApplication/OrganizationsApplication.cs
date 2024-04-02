@@ -7,7 +7,9 @@ using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Services;
+using Domain.Shared;
 using OrganizationsApplication.Persistence;
 using OrganizationsDomain;
 
@@ -189,10 +191,92 @@ public class OrganizationsApplication : IOrganizationsApplication
 
         return settings.ToSettings();
     }
+
+    public async Task<Result<Organization, Error>> InviteMemberToOrganizationAsync(ICallerContext caller, string id,
+        string? userId, string? emailAddress, CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var organization = retrieved.Value;
+        var inviterRoles = Roles.Create(caller.Roles.Tenant);
+        if (!inviterRoles.IsSuccessful)
+        {
+            return inviterRoles.Error;
+        }
+
+        Identifier? addedUserId = null;
+        var added = await organization.AddMembershipAsync(caller.ToCallerId(), inviterRoles.Value, async () =>
+        {
+            var membership =
+                await _endUsersService.InviteMemberToOrganizationPrivateAsync(caller, id, userId, emailAddress,
+                    cancellationToken);
+            if (!membership.IsSuccessful)
+            {
+                return membership.Error;
+            }
+
+            addedUserId = membership.Value.UserId.ToId();
+            return Result.Ok;
+        });
+        if (!added.IsSuccessful)
+        {
+            return added.Error;
+        }
+
+        _recorder.TraceInformation(caller.ToCall(), "Organization {Id} has invited {UserId} to be a member",
+            organization.Id, addedUserId!);
+
+        return organization.ToOrganization();
+    }
+
+    public async Task<Result<SearchResults<OrganizationMember>, Error>> ListMembersForOrganizationAsync(
+        ICallerContext caller, string? id, SearchOptions searchOptions,
+        GetOptions getOptions, CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var organization = retrieved.Value;
+        var memberships =
+            await _endUsersService.ListMembershipsForOrganizationAsync(caller, organization.Id, searchOptions,
+                getOptions, cancellationToken);
+        if (!memberships.IsSuccessful)
+        {
+            return memberships.Error;
+        }
+
+        return searchOptions.ApplyWithMetadata(memberships.Value.Results.ConvertAll(x => x.ToMember()));
+    }
 }
 
 internal static class OrganizationConversionExtensions
 {
+    public static OrganizationMember ToMember(this MembershipWithUserProfile membership)
+    {
+        var dto = new OrganizationMember
+        {
+            Id = membership.Id,
+            UserId = membership.UserId,
+            IsDefault = membership.IsDefault,
+            IsRegistered = membership.Status == EndUserStatus.Registered,
+            IsOwner = membership.Roles.Contains(TenantRoles.Owner.Name),
+            Roles = membership.Roles,
+            Features = membership.Features,
+            EmailAddress = membership.Profile.EmailAddress,
+            Name = membership.Profile.Name,
+            Classification = membership.Profile.Classification
+        };
+
+        return dto;
+    }
+
     public static Organization ToOrganization(this OrganizationRoot organization)
     {
         return new Organization

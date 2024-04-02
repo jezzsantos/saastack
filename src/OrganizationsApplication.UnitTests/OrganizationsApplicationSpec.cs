@@ -5,6 +5,7 @@ using Application.Services.Shared;
 using Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using FluentAssertions;
@@ -90,6 +91,7 @@ public class OrganizationsApplicationSpec
             .ReturnsAsync(new Membership
             {
                 Id = "amembershipid",
+                UserId = "auserid",
                 OrganizationId = "anorganizationid",
                 IsDefault = false
             });
@@ -196,7 +198,7 @@ public class OrganizationsApplicationSpec
     public async Task WhenChangeSettings_ThenReturnsSettings()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            Ownership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            Ownership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
         org.CreateSettings(Settings.Create(new Dictionary<string, Setting>
         {
             { "aname1", Setting.Create("anoldvalue", true).Value },
@@ -216,7 +218,7 @@ public class OrganizationsApplicationSpec
         result.Should().BeSuccess();
         _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(o =>
             o.Name == "aname"
-            && o.Ownership == Ownership.Personal
+            && o.Ownership == Ownership.Shared
             && o.CreatedById == "auserid"
             && o.Settings.Properties.Count == 4
             && o.Settings.Properties["aname1"].Value.As<string>() == "anewvalue"
@@ -227,5 +229,177 @@ public class OrganizationsApplicationSpec
         _tenantSettingsService.Verify(tss =>
                 tss.CreateForTenantAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
             Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenInviteMemberToOrganizationAsyncAndNotExist_ThenReturnsError()
+    {
+        _repository.Setup(s =>
+                s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Error.EntityNotFound());
+
+        var result = await _application.InviteMemberToOrganizationAsync(_caller.Object, "anorganizationid",
+            "auserid", null, CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityNotFound);
+    }
+
+    [Fact]
+    public async Task WhenInviteMemberToOrganizationAsync_ThenInvites()
+    {
+        _caller.Setup(cc => cc.Roles)
+            .Returns(new ICallerContext.CallerRoles(Array.Empty<RoleLevel>(), new[] { TenantRoles.Owner }));
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            Ownership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+        _repository.Setup(s =>
+                s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+        _endUsersService.Setup(eus =>
+                eus.InviteMemberToOrganizationPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Membership
+            {
+                Id = "amembershipid",
+                UserId = "auserid",
+                OrganizationId = "anorganizationid",
+                IsDefault = false
+            });
+
+        var result = await _application.InviteMemberToOrganizationAsync(_caller.Object, "anorganizationid",
+            "auserid", null, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.Name.Should().Be("aname");
+        result.Value.CreatedById.Should().Be("auserid");
+        result.Value.Ownership.Should().Be(OrganizationOwnership.Shared);
+        _endUsersService.Verify(eus =>
+            eus.InviteMemberToOrganizationPrivateAsync(_caller.Object, "anorganizationid", "auserid", null,
+                CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task WhenListMembersForOrganizationAsyncAndNotExist_ThenReturnsError()
+    {
+        _repository.Setup(s =>
+                s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Error.EntityNotFound());
+
+        var result = await _application.ListMembersForOrganizationAsync(_caller.Object, "anorganizationid",
+            new SearchOptions(), new GetOptions(), CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityNotFound);
+    }
+
+    [Fact]
+    public async Task WhenListMembersForOrganizationAsyncWithUnregisteredUser_ThenReturnsMemberships()
+    {
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            Ownership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+        _repository.Setup(s =>
+                s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+        _endUsersService.Setup(eus => eus.ListMembershipsForOrganizationAsync(It.IsAny<ICallerContext>(),
+                It.IsAny<string>(),
+                It.IsAny<SearchOptions>(), It.IsAny<GetOptions>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SearchResults<MembershipWithUserProfile>
+            {
+                Results =
+                [
+                    new MembershipWithUserProfile
+                    {
+                        Id = "amembershipid",
+                        UserId = "auserid",
+                        Status = EndUserStatus.Unregistered,
+                        Roles = ["arole1", "arole2", "arole3"],
+                        Features = ["afeature1", "afeature2", "afeature3"],
+                        Profile = new UserProfile
+                        {
+                            Id = "aprofileid",
+                            UserId = "auserid",
+                            EmailAddress = "anemailaddress",
+                            Name = new PersonName
+                            {
+                                FirstName = "anemailaddress"
+                            },
+                            DisplayName = "anemailaddress"
+                        },
+                        OrganizationId = "anorganizationid",
+                        IsDefault = false
+                    }
+                ]
+            });
+
+        var result = await _application.ListMembersForOrganizationAsync(_caller.Object, "anorganizationid",
+            new SearchOptions(), new GetOptions(), CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.Results.Count.Should().Be(1);
+        result.Value.Results[0].Id.Should().Be("amembershipid");
+        result.Value.Results[0].UserId.Should().Be("auserid");
+        result.Value.Results[0].IsRegistered.Should().BeFalse();
+        result.Value.Results[0].IsOwner.Should().BeFalse();
+        result.Value.Results[0].EmailAddress.Should().Be("anemailaddress");
+        result.Value.Results[0].Name.FirstName.Should().Be("anemailaddress");
+        result.Value.Results[0].Name.LastName.Should().BeNull();
+        result.Value.Results[0].Roles.Should().ContainInOrder("arole1", "arole2", "arole3");
+        result.Value.Results[0].Features.Should().ContainInOrder("afeature1", "afeature2", "afeature3");
+    }
+
+    [Fact]
+    public async Task WhenListMembersForOrganizationAsyncWithRegisteredUsers_ThenReturnsMemberships()
+    {
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            Ownership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+        _repository.Setup(s =>
+                s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+        _endUsersService.Setup(eus => eus.ListMembershipsForOrganizationAsync(It.IsAny<ICallerContext>(),
+                It.IsAny<string>(),
+                It.IsAny<SearchOptions>(), It.IsAny<GetOptions>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SearchResults<MembershipWithUserProfile>
+            {
+                Results =
+                [
+                    new MembershipWithUserProfile
+                    {
+                        Id = "amembershipid",
+                        UserId = "auserid",
+                        Status = EndUserStatus.Registered,
+                        Roles = ["arole1", "arole2", "arole3"],
+                        Features = ["afeature1", "afeature2", "afeature3"],
+                        OrganizationId = "anorganizationid",
+                        Profile = new UserProfile
+                        {
+                            Id = "aprofileid",
+                            UserId = "auserid",
+                            EmailAddress = "anemailaddress",
+                            Name = new PersonName
+                            {
+                                FirstName = "afirstname",
+                                LastName = "alastname"
+                            },
+                            DisplayName = "adisplayname"
+                        },
+                        IsDefault = false
+                    }
+                ]
+            });
+
+        var result = await _application.ListMembersForOrganizationAsync(_caller.Object, "anorganizationid",
+            new SearchOptions(), new GetOptions(), CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.Results.Count.Should().Be(1);
+        result.Value.Results[0].Id.Should().Be("amembershipid");
+        result.Value.Results[0].UserId.Should().Be("auserid");
+        result.Value.Results[0].IsRegistered.Should().BeTrue();
+        result.Value.Results[0].IsOwner.Should().BeFalse();
+        result.Value.Results[0].EmailAddress.Should().Be("anemailaddress");
+        result.Value.Results[0].Name.FirstName.Should().Be("afirstname");
+        result.Value.Results[0].Name.LastName.Should().Be("alastname");
+        result.Value.Results[0].Roles.Should().ContainInOrder("arole1", "arole2", "arole3");
+        result.Value.Results[0].Features.Should().ContainInOrder("afeature1", "afeature2", "afeature3");
     }
 }

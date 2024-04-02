@@ -323,10 +323,7 @@ public sealed class EndUserRoot : AggregateRootBase
 
     public Result<Error> AddMembership(Identifier organizationId, Roles tenantRoles, Features tenantFeatures)
     {
-        if (!IsRegistered)
-        {
-            return Error.RuleViolation(Resources.EndUserRoot_NotRegistered);
-        }
+        //TODO: check that the adder is a member of this organization, and an owner of it
 
         var existing = Memberships.FindByOrganizationId(organizationId);
         if (existing.HasValue)
@@ -497,39 +494,57 @@ public sealed class EndUserRoot : AggregateRootBase
     ///     EXTEND: change this to assign initial roles and features for persons and machines
     /// </summary>
     public static (Roles PlatformRoles, Features PlatformFeatures, Roles TenantRoles, Features TenantFeatures)
-        GetInitialRolesAndFeatures(UserClassification classification, bool isAuthenticated,
-            Optional<EmailAddress> username, Optional<List<EmailAddress>> permittedOperators)
+        GetInitialRolesAndFeatures(RolesAndFeaturesUseCase useCase, bool isAuthenticated,
+            EmailAddress? username = null, List<EmailAddress>? permittedOperators = null)
     {
         var platformRoles = Roles.Create();
         platformRoles = platformRoles.Add(PlatformRoles.Standard).Value;
-        if (username.HasValue && permittedOperators.HasValue)
+        if (username.Exists() && permittedOperators.Exists())
         {
-            if (permittedOperators.Value
+            if (permittedOperators
                 .Select(x => x.Address)
-                .ContainsIgnoreCase(username.Value))
+                .ContainsIgnoreCase(username))
             {
                 platformRoles = platformRoles.Add(PlatformRoles.Operations).Value;
             }
         }
 
-        var tenantRoles = Roles.Create();
-        tenantRoles = tenantRoles.Add(TenantRoles.Member).Value;
-
         var platformFeatures = Features.Create();
+        Roles tenantRoles;
         var tenantFeatures = Features.Create();
-        if (classification == UserClassification.Machine)
+        switch (useCase)
         {
-            platformFeatures = platformFeatures.Add(isAuthenticated
-                ? PlatformFeatures.PaidTrial
-                : PlatformFeatures.Basic).Value;
-            tenantFeatures = tenantFeatures.Add(isAuthenticated
-                ? TenantFeatures.PaidTrial
-                : TenantFeatures.Basic).Value;
-        }
-        else
-        {
-            platformFeatures = platformFeatures.Add(PlatformFeatures.PaidTrial).Value;
-            tenantFeatures = tenantFeatures.Add(TenantFeatures.PaidTrial).Value;
+            case RolesAndFeaturesUseCase.CreatingMachine:
+                platformFeatures = platformFeatures.Add(isAuthenticated
+                    ? PlatformFeatures.PaidTrial
+                    : PlatformFeatures.Basic).Value;
+                tenantRoles = Roles.Create(TenantRoles.Owner, TenantRoles.Member).Value;
+                tenantFeatures = tenantFeatures.Add(isAuthenticated
+                    ? TenantFeatures.PaidTrial
+                    : TenantFeatures.Basic).Value;
+                break;
+
+            case RolesAndFeaturesUseCase.CreatingPerson:
+            case RolesAndFeaturesUseCase.CreatingOrg:
+                platformFeatures = platformFeatures.Add(PlatformFeatures.PaidTrial).Value;
+                tenantRoles = Roles.Create(TenantRoles.BillingAdmin, TenantRoles.Owner, TenantRoles.Member).Value;
+                tenantFeatures = tenantFeatures.Add(TenantFeatures.PaidTrial).Value;
+                break;
+
+            case RolesAndFeaturesUseCase.InvitingMemberToOrg:
+                platformFeatures = platformFeatures.Add(PlatformFeatures.PaidTrial).Value;
+                tenantFeatures = tenantFeatures.Add(TenantFeatures.PaidTrial).Value;
+                tenantRoles = Roles.Create(TenantRoles.Member).Value;
+                break;
+
+            case RolesAndFeaturesUseCase.InvitingMachineToCreatorOrg:
+                platformFeatures = platformFeatures.Add(PlatformFeatures.PaidTrial).Value;
+                tenantRoles = Roles.Create(TenantRoles.Member).Value;
+                tenantFeatures = tenantFeatures.Add(TenantFeatures.PaidTrial).Value;
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(useCase), useCase, null);
         }
 
         return (platformRoles, platformFeatures, tenantRoles, tenantFeatures);

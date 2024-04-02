@@ -24,6 +24,10 @@ public interface IEndUsersApplication
 
     Task<Result<EndUser, Error>> GetPersonAsync(ICallerContext context, string id, CancellationToken cancellationToken);
 
+    Task<Result<SearchResults<MembershipWithUserProfile>, Error>> ListMembershipsForOrganizationAsync(
+        ICallerContext caller,
+        string organizationId, SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken);
+
     Task<Result<RegisteredEndUser, Error>> RegisterMachineAsync(ICallerContext context, string name, string? timezone,
         string? countryCode, CancellationToken cancellationToken);
 

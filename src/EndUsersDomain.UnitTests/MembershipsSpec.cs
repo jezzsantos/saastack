@@ -163,11 +163,12 @@ public class MembershipsSpec
 
     private Membership CreateMembership(string organizationId = "anorganizationid", bool isDefault = true)
     {
+        var roles = Roles.Create(Membership.DefaultRole).Value;
         var features = Features.Create(Membership.DefaultFeature).Value;
         var membership = Membership.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok).Value;
         membership.As<IEventingEntity>()
             .RaiseEvent(Events.MembershipAdded.Create("arootid".ToId(),
-                organizationId.ToId(), isDefault, Roles.Empty, features), true);
+                organizationId.ToId(), isDefault, roles, features), true);
         return membership;
     }
 }

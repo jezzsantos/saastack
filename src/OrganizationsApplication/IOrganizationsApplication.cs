@@ -26,4 +26,10 @@ public interface IOrganizationsApplication
 
     Task<Result<TenantSettings, Error>> GetSettingsAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken);
+
+    Task<Result<Organization, Error>> InviteMemberToOrganizationAsync(ICallerContext caller, string id, string? userId,
+        string? emailAddress, CancellationToken cancellationToken);
+
+    Task<Result<SearchResults<OrganizationMember>, Error>> ListMembersForOrganizationAsync(ICallerContext caller,
+        string? id, SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken);
 }

@@ -322,7 +322,7 @@ public class PasswordCredentialsApplicationSpec
             {
                 Id = "anid",
                 UserId = "auserid",
-                Type = UserProfileType.Person,
+                Classification = UserProfileClassification.Person,
                 Name = new PersonName
                 {
                     FirstName = "aname"

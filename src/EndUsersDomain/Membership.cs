@@ -1,4 +1,5 @@
 using Common;
+using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
@@ -10,6 +11,7 @@ namespace EndUsersDomain;
 
 public sealed class Membership : EntityBase
 {
+    internal static readonly RoleLevel DefaultRole = TenantRoles.Member;
     internal static readonly FeatureLevel DefaultFeature = TenantFeatures.Basic;
 
     public static Result<Membership, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
@@ -111,9 +113,13 @@ public sealed class Membership : EntityBase
             return ensureInvariants.Error;
         }
 
+        if (!Roles.HasRole(DefaultRole))
+        {
+            return Error.RuleViolation(Resources.Membership_MissingDefaultRole.Format(DefaultRole.Name));
+        }
         if (!Features.HasFeature(DefaultFeature))
         {
-            return Error.RuleViolation(Resources.Membership_MissingDefaultFeature);
+            return Error.RuleViolation(Resources.Membership_MissingDefaultFeature.Format(DefaultFeature.Name));
         }
 
         return Result.Ok;

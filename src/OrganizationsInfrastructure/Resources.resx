@@ -27,4 +27,13 @@
     <data name="CreateOrganizationRequestValidator_InvalidName" xml:space="preserve">
         <value>The 'Name' is either missing or invalid</value>
     </data>
+    <data name="InviteOrganizationMemberRequestValidator_InvalidUserEmail" xml:space="preserve">
+        <value>The 'Email' is either missing or invalid</value>
+    </data>
+    <data name="InviteOrganizationMemberRequestValidator_MissingUserIdAndEmail" xml:space="preserve">
+        <value>Both the 'Email' and 'UserId' are missing</value>
+    </data>
+    <data name="InviteOrganizationMemberRequestValidator_BothUserIdAndEmail" xml:space="preserve">
+        <value>Only the 'Email' or the 'UserId' can be provided, not both</value>
+    </data>
 </root>

@@ -141,14 +141,6 @@ public class EndUserRootSpec
     }
 
     [Fact]
-    public void WhenAddMembershipAndNotRegistered_ThenReturnsError()
-    {
-        var result = _user.AddMembership("anorganizationid".ToId(), Roles.Create(), Features.Create());
-
-        result.Should().BeError(ErrorCode.RuleViolation, Resources.EndUserRoot_NotRegistered);
-    }
-
-    [Fact]
     public void WhenAddMembershipAndAlreadyMember_ThenReturns()
     {
         _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,

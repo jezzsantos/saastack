@@ -80,12 +80,12 @@ These are the main use cases of this product that are exposed via "public" APIs 
 
 #### Machines
 
-1. Register a new machine
+1. Register a new machine (anonymously or by authenticated user)
 
 #### Password Credentials
 
 1. Authenticate the current user (with a password)
-2. Register a new person (with a password, and optional invitation)
+2. Register a new person (with a password and with optional invitation)
 3. Confirm registration of a person (from email)
 
 #### Single-Sign On
@@ -98,9 +98,9 @@ TBD
 
 ### Organizations
 
-1. Create a new organization for the current user
+1. Create a new (shared) organization for the current user
 2. Inspect a specific organization
-3. Invite another user to the organization (by email, or an existing user by email or by ID)
+3. Invite another guest or person to an organization (guest by email, or an existing person by email or by ID)
 
 ### Subscriptions
 

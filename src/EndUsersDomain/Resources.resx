@@ -75,8 +75,11 @@
     <data name="EndUserRoot_NotOrganizationOwner" xml:space="preserve">
         <value>The assigner is not an owner of the organization</value>
     </data>
+    <data name="Membership_MissingDefaultRole" xml:space="preserve">
+        <value>A membership must always have at least the role '{0}'</value>
+    </data>
     <data name="Membership_MissingDefaultFeature" xml:space="preserve">
-        <value>A membership must always have the default feature set</value>
+        <value>A membership must always have at least the feature '{0}'</value>
     </data>
     <data name="EndUserRoot_NotOperator" xml:space="preserve">
         <value>The assigner is not a member of the operations team</value>

@@ -1,4 +1,5 @@
 using Common;
+using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Authorization;
@@ -78,10 +79,29 @@ public class MembershipSpec
     }
 
     [Fact]
-    public void WhenEnsureInvariantsAndMissingDefaultFeature_ThenReturnsError()
+    public void WhenEnsureInvariantsAndMissingDefaultRole_ThenReturnsError()
     {
+        _membership.As<IEventingEntity>()
+            .RaiseEvent(Events.MembershipFeatureAssigned.Create("arootid".ToId(),
+                    "anorganizationid".ToId(), "amembershipid".ToId(), Feature.Create(Membership.DefaultFeature).Value),
+                true);
+
         var result = _membership.EnsureInvariants();
 
-        result.Should().BeError(ErrorCode.RuleViolation, Resources.Membership_MissingDefaultFeature);
+        result.Should().BeError(ErrorCode.RuleViolation,
+            Resources.Membership_MissingDefaultRole.Format(Membership.DefaultRole.Name));
+    }
+
+    [Fact]
+    public void WhenEnsureInvariantsAndMissingDefaultFeature_ThenReturnsError()
+    {
+        _membership.As<IEventingEntity>()
+            .RaiseEvent(Events.MembershipRoleAssigned.Create("arootid".ToId(),
+                "anorganizationid".ToId(), "amembershipid".ToId(), Role.Create(Membership.DefaultRole).Value), true);
+        
+        var result = _membership.EnsureInvariants();
+
+        result.Should().BeError(ErrorCode.RuleViolation,
+            Resources.Membership_MissingDefaultFeature.Format(Membership.DefaultFeature.Name));
     }
 }

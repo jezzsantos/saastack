@@ -39,4 +39,10 @@
     <data name="EndUsersApplication_AcceptedInvitationWithExistingEmailAddress" xml:space="preserve">
         <value>A user with this email address is already registered</value>
     </data>
+    <data name="EndUsersApplication_CallerNotMember" xml:space="preserve">
+        <value>The caller is not a member of this organization</value>
+    </data>
+    <data name="InvitationsApplication_InviteToOrganizationWithoutEmailAddressOrUserId" xml:space="preserve">
+        <value>Cannot invite a user to an organization without either an email or user ID</value>
+    </data>
 </root>

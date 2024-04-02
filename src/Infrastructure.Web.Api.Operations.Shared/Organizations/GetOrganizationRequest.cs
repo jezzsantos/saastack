@@ -6,5 +6,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
 [Authorize(Roles.Platform_Standard)]
 public class GetOrganizationRequest : UnTenantedRequest<GetOrganizationResponse>, IUnTenantedOrganizationRequest
 {
-    public required string Id { get; set; }
+    public string? Id { get; set; }
 }

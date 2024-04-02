@@ -19,14 +19,14 @@ public class UserProfile : IIdentifiableResource
 
     public string? Timezone { get; set; }
 
-    public UserProfileType Type { get; set; }
+    public UserProfileClassification Classification { get; set; }
 
     public required string UserId { get; set; }
 
     public required string Id { get; set; }
 }
 
-public enum UserProfileType
+public enum UserProfileClassification
 {
     Person = 0,
     Machine = 1

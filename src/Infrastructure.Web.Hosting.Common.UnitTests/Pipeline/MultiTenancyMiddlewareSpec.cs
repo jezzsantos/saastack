@@ -431,14 +431,15 @@ public class MultiTenancyMiddlewareSpec
                 .ReturnsAsync(new EndUserWithMemberships
                 {
                     Id = "auserid",
-                    Memberships = new List<Membership>
-                    {
-                        new()
+                    Memberships =
+                    [
+                        new Membership
                         {
                             Id = "amembershipid",
+                            UserId = "auserid",
                             OrganizationId = "atenantid"
                         }
-                    }
+                    ]
                 });
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
@@ -490,14 +491,15 @@ public class MultiTenancyMiddlewareSpec
                 .ReturnsAsync(new EndUserWithMemberships
                 {
                     Id = "auserid",
-                    Memberships = new List<Membership>
-                    {
-                        new()
+                    Memberships =
+                    [
+                        new Membership
                         {
                             Id = "amembershipid",
+                            UserId = "auserid",
                             OrganizationId = "atenantid"
                         }
-                    }
+                    ]
                 });
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
@@ -527,15 +529,16 @@ public class MultiTenancyMiddlewareSpec
                 .ReturnsAsync(new EndUserWithMemberships
                 {
                     Id = "auserid",
-                    Memberships = new List<Membership>
-                    {
-                        new()
+                    Memberships =
+                    [
+                        new Membership
                         {
                             Id = "amembershipid",
+                            UserId = "auserid",
                             IsDefault = true,
                             OrganizationId = "adefaultorganizationid"
                         }
-                    }
+                    ]
                 });
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
@@ -588,14 +591,15 @@ public class MultiTenancyMiddlewareSpec
                 .ReturnsAsync(new EndUserWithMemberships
                 {
                     Id = "auserid",
-                    Memberships = new List<Membership>
-                    {
-                        new()
+                    Memberships =
+                    [
+                        new Membership
                         {
                             Id = "amembershipid",
+                            UserId = "auserid",
                             OrganizationId = "atenantid"
                         }
-                    }
+                    ]
                 });
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,

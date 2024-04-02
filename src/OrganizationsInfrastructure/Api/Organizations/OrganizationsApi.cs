@@ -33,14 +33,14 @@ public class OrganizationsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var organization =
-            await _organizationsApplication.GetOrganizationAsync(_contextFactory.Create(), request.Id,
+            await _organizationsApplication.GetOrganizationAsync(_contextFactory.Create(), request.Id!,
                 cancellationToken);
 
         return () =>
             organization.HandleApplicationResult<GetOrganizationResponse, Organization>(org =>
                 new GetOrganizationResponse { Organization = org });
     }
-    
+
 #if TESTINGONLY
     public async Task<ApiGetResult<OrganizationWithSettings, GetOrganizationSettingsResponse>> GetSettings(
         GetOrganizationSettingsRequest request, CancellationToken cancellationToken)
@@ -58,4 +58,31 @@ public class OrganizationsApi : IWebApiService
                 });
     }
 #endif
+
+    public async Task<ApiPostResult<Organization, InviteMemberToOrganizationResponse>> InviteMember(
+        InviteMemberToOrganizationRequest request,
+        CancellationToken cancellationToken)
+    {
+        var organization =
+            await _organizationsApplication.InviteMemberToOrganizationAsync(_contextFactory.Create(), request.Id!,
+                request.UserId, request.Email,
+                cancellationToken);
+
+        return () => organization.HandleApplicationResult<InviteMemberToOrganizationResponse, Organization>(org =>
+            new PostResult<InviteMemberToOrganizationResponse>(new InviteMemberToOrganizationResponse
+                { Organization = org }));
+    }
+
+    public async Task<ApiSearchResult<OrganizationMember, ListMembersForOrganizationResponse>> ListMembers(
+        ListMembersForOrganizationRequest request,
+        CancellationToken cancellationToken)
+    {
+        var members =
+            await _organizationsApplication.ListMembersForOrganizationAsync(_contextFactory.Create(), request.Id,
+                request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
+
+        return () =>
+            members.HandleApplicationResult(m =>
+                new ListMembersForOrganizationResponse { Members = m.Results, Metadata = m.Metadata });
+    }
 }

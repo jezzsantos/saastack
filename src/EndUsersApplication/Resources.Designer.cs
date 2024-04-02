@@ -69,6 +69,15 @@ namespace EndUsersApplication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The caller is not a member of this organization.
+        /// </summary>
+        internal static string EndUsersApplication_CallerNotMember {
+            get {
+                return ResourceManager.GetString("EndUsersApplication_CallerNotMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This guest is already registered as a user.
         /// </summary>
         internal static string EndUsersApplication_GuestAlreadyRegistered {
@@ -101,6 +110,15 @@ namespace EndUsersApplication {
         internal static string EndUsersApplication_NotPersonProfile {
             get {
                 return ResourceManager.GetString("EndUsersApplication_NotPersonProfile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot invite a user to an organization without either an email or user ID.
+        /// </summary>
+        internal static string InvitationsApplication_InviteToOrganizationWithoutEmailAddressOrUserId {
+            get {
+                return ResourceManager.GetString("InvitationsApplication_InviteToOrganizationWithoutEmailAddressOrUserId", resourceCulture);
             }
         }
     }

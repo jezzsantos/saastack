@@ -3,11 +3,15 @@ using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
+using Domain.Shared;
 
 namespace OrganizationsDomain;
+
+public delegate Task<Result<Error>> Callback();
 
 public sealed class OrganizationRoot : AggregateRootBase
 {
@@ -126,6 +130,16 @@ public sealed class OrganizationRoot : AggregateRootBase
         }
     }
 
+    public async Task<Result<Error>> AddMembershipAsync(Identifier inviterId, Roles inviterRoles, Callback onPermitted)
+    {
+        if (!IsOwner(inviterRoles))
+        {
+            return Error.RoleViolation(Resources.OrganizationRoot_AddMembership_NotOrgOwner);
+        }
+
+        return await onPermitted();
+    }
+
     public Result<Error> CreateSettings(Settings settings)
     {
         foreach (var (key, value) in settings.Properties)
@@ -166,5 +180,10 @@ public sealed class OrganizationRoot : AggregateRootBase
         }
 
         return Result.Ok;
+    }
+
+    private static bool IsOwner(Roles roles)
+    {
+        return roles.HasRole(TenantRoles.Owner);
     }
 }

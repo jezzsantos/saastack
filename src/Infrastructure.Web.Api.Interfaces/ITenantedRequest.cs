@@ -1,7 +1,7 @@
 namespace Infrastructure.Web.Api.Interfaces;
 
 /// <summary>
-///     Defines the request for a specific Tenant
+///     Defines a request for a specific tenant
 /// </summary>
 public interface ITenantedRequest
 {

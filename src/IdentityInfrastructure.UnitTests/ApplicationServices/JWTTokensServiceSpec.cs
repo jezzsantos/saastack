@@ -45,16 +45,17 @@ public class JWTTokensServiceSpec
             Id = "anid",
             Roles = new List<string> { PlatformRoles.Standard.Name },
             Features = new List<string> { PlatformFeatures.Basic.Name },
-            Memberships = new List<Membership>
-            {
-                new()
+            Memberships =
+            [
+                new Membership
                 {
                     Id = "amembershipid",
+                    UserId = "auserid",
                     OrganizationId = "anorganizationid",
                     Roles = new List<string> { TenantRoles.Member.Name },
                     Features = new List<string> { TenantFeatures.Basic.Name }
                 }
-            }
+            ]
         };
 
         var result = await _service.IssueTokensAsync(user);

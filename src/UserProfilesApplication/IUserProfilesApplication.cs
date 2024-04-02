@@ -15,12 +15,16 @@ public interface IUserProfilesApplication
         string? lastName,
         string? displayName, string? phoneNumber, string? timezone, CancellationToken cancellationToken);
 
-    Task<Result<UserProfile, Error>> CreateProfileAsync(ICallerContext caller, UserProfileType type, string userId,
+    Task<Result<UserProfile, Error>> CreateProfileAsync(ICallerContext caller, UserProfileClassification classification,
+        string userId,
         string? emailAddress, string firstName, string? lastName, string? timezone, string? countryCode,
         CancellationToken cancellationToken);
 
     Task<Result<Optional<UserProfile>, Error>> FindPersonByEmailAddressAsync(ICallerContext caller, string emailAddress,
         CancellationToken cancellationToken);
+
+    Task<Result<List<UserProfile>, Error>> GetAllProfilesAsync(ICallerContext caller, List<string> ids,
+        GetOptions options, CancellationToken cancellationToken);
 
     Task<Result<UserProfile, Error>> GetProfileAsync(ICallerContext caller, string userId,
         CancellationToken cancellationToken);

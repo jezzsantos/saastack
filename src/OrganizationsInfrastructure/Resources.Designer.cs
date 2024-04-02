@@ -67,5 +67,32 @@ namespace OrganizationsInfrastructure {
                 return ResourceManager.GetString("CreateOrganizationRequestValidator_InvalidName", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only the &apos;Email&apos; or the &apos;UserId&apos; can be provided, not both.
+        /// </summary>
+        internal static string InviteOrganizationMemberRequestValidator_BothUserIdAndEmail {
+            get {
+                return ResourceManager.GetString("InviteOrganizationMemberRequestValidator_BothUserIdAndEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Email&apos; is either missing or invalid.
+        /// </summary>
+        internal static string InviteOrganizationMemberRequestValidator_InvalidUserEmail {
+            get {
+                return ResourceManager.GetString("InviteOrganizationMemberRequestValidator_InvalidUserEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Both the &apos;Email&apos; and &apos;UserId&apos; are missing.
+        /// </summary>
+        internal static string InviteOrganizationMemberRequestValidator_MissingUserIdAndEmail {
+            get {
+                return ResourceManager.GetString("InviteOrganizationMemberRequestValidator_MissingUserIdAndEmail", resourceCulture);
+            }
+        }
     }
 }

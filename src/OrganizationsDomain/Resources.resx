@@ -33,4 +33,7 @@
     <data name="Setting_InvalidValueType" xml:space="preserve">
         <value>The value type of the value: '{0}' is unsupported</value>
     </data>
+    <data name="OrganizationRoot_AddMembership_NotOrgOwner" xml:space="preserve">
+        <value>You must be an organization owner to perform this action</value>
+    </data>
 </root>

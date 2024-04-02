@@ -51,7 +51,8 @@ public class UserProfileApplicationSpec
         _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user.ToOptional());
 
-        var result = await _application.CreateProfileAsync(_caller.Object, UserProfileType.Person, "apersonid",
+        var result = await _application.CreateProfileAsync(_caller.Object, UserProfileClassification.Person,
+            "apersonid",
             "anemailaddress", "afirstname", "alastname", Timezones.Default.ToString(), CountryCodes.Default.ToString(),
             CancellationToken.None);
 
@@ -66,7 +67,8 @@ public class UserProfileApplicationSpec
         _repository.Setup(rep => rep.FindByEmailAddressAsync(It.IsAny<EmailAddress>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user.ToOptional());
 
-        var result = await _application.CreateProfileAsync(_caller.Object, UserProfileType.Person, "apersonid",
+        var result = await _application.CreateProfileAsync(_caller.Object, UserProfileClassification.Person,
+            "apersonid",
             "auser@company.com", "afirstname", "alastname", Timezones.Default.ToString(),
             CountryCodes.Default.ToString(),
             CancellationToken.None);
@@ -77,12 +79,13 @@ public class UserProfileApplicationSpec
     [Fact]
     public async Task WhenCreateProfileAsyncForMachine_ThenCreatesProfile()
     {
-        var result = await _application.CreateProfileAsync(_caller.Object, UserProfileType.Machine, "amachineid",
+        var result = await _application.CreateProfileAsync(_caller.Object, UserProfileClassification.Machine,
+            "amachineid",
             "anemailaddress", "afirstname", "alastname", Timezones.Default.ToString(), CountryCodes.Default.ToString(),
             CancellationToken.None);
 
         result.Value.UserId.Should().Be("amachineid".ToId());
-        result.Value.Type.Should().Be(UserProfileType.Machine);
+        result.Value.Classification.Should().Be(UserProfileClassification.Machine);
         result.Value.DisplayName.Should().Be("afirstname");
         result.Value.Name.FirstName.Should().Be("afirstname");
         result.Value.Name.LastName.Should().BeNull();
@@ -108,12 +111,13 @@ public class UserProfileApplicationSpec
     [Fact]
     public async Task WhenCreateProfileAsyncForPerson_ThenCreatesProfile()
     {
-        var result = await _application.CreateProfileAsync(_caller.Object, UserProfileType.Person, "apersonid",
+        var result = await _application.CreateProfileAsync(_caller.Object, UserProfileClassification.Person,
+            "apersonid",
             "auser@company.com", "afirstname", "alastname", Timezones.Default.ToString(),
             CountryCodes.Default.ToString(), CancellationToken.None);
 
         result.Value.UserId.Should().Be("apersonid".ToId());
-        result.Value.Type.Should().Be(UserProfileType.Person);
+        result.Value.Classification.Should().Be(UserProfileClassification.Person);
         result.Value.DisplayName.Should().Be("afirstname");
         result.Value.Name.FirstName.Should().Be("afirstname");
         result.Value.Name.LastName.Should().Be("alastname");
@@ -308,5 +312,33 @@ public class UserProfileApplicationSpec
         result.Value.DisplayName.Should().Be("afirstname");
         result.Value.Timezone.Should().Be(Timezones.Default.ToString());
         result.Value.Address.CountryCode.Should().Be(CountryCodes.Default.ToString());
+    }
+
+    [Fact]
+    public async Task WhenGetAllProfilesAsyncAndNoIds_ThenReturnsProfiles()
+    {
+        var result = await _application.GetAllProfilesAsync(_caller.Object, new List<string>(), new GetOptions(),
+            CancellationToken.None);
+
+        result.Value.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task WhenGetAllProfilesAsync_ThenReturnsProfiles()
+    {
+        var profile = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
+            PersonName.Create("afirstname", "alastname").Value).Value;
+        _repository.Setup(rep =>
+                rep.SearchAllByUserIdsAsync(It.IsAny<List<Identifier>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<UserProfileRoot>
+            {
+                profile
+            });
+
+        var result = await _application.GetAllProfilesAsync(_caller.Object, new List<string> { "auserid" },
+            new GetOptions(), CancellationToken.None);
+
+        result.Value.Count.Should().Be(1);
+        result.Value[0].Id.Should().Be("anid");
     }
 }

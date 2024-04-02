@@ -188,13 +188,12 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 
         var person = await RegisterUserAsync(emailAddress, firstName);
 
-        return await ReAuthenticateUserAsync(person.Credential!.User, who);
+        return await ReAuthenticateUserAsync(person.Credential!.User);
     }
 
-    protected async Task<LoginDetails> ReAuthenticateUserAsync(RegisteredEndUser user,
-        LoginUser who = LoginUser.PersonA)
+    protected async Task<LoginDetails> ReAuthenticateUserAsync(RegisteredEndUser user)
     {
-        var emailAddress = GetEmailForPerson(who);
+        var emailAddress = user.Profile!.EmailAddress!;
 
         var login = await Api.PostAsync(new AuthenticatePasswordRequest
         {

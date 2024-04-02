@@ -258,11 +258,20 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A membership must always have the default feature set.
+        ///   Looks up a localized string similar to A membership must always have at least the feature &apos;{0}&apos;.
         /// </summary>
         internal static string Membership_MissingDefaultFeature {
             get {
                 return ResourceManager.GetString("Membership_MissingDefaultFeature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A membership must always have at least the role &apos;{0}&apos;.
+        /// </summary>
+        internal static string Membership_MissingDefaultRole {
+            get {
+                return ResourceManager.GetString("Membership_MissingDefaultRole", resourceCulture);
             }
         }
         

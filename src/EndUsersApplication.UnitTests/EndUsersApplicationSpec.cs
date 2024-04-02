@@ -124,7 +124,7 @@ public class EndUsersApplicationSpec
             .ReturnsAsync(new UserProfile
             {
                 Id = "aprofileid",
-                Type = UserProfileType.Person,
+                Classification = UserProfileClassification.Person,
                 UserId = "apersonid",
                 DisplayName = "afirstname",
                 Name = new PersonName
@@ -206,7 +206,7 @@ public class EndUsersApplicationSpec
             .ReturnsAsync(new UserProfile
             {
                 Id = "aprofileid",
-                Type = UserProfileType.Person,
+                Classification = UserProfileClassification.Person,
                 UserId = "apersonid",
                 DisplayName = "afirstname",
                 Name = new PersonName
@@ -276,7 +276,7 @@ public class EndUsersApplicationSpec
             .ReturnsAsync(new UserProfile
             {
                 Id = "aprofileid",
-                Type = UserProfileType.Person,
+                Classification = UserProfileClassification.Person,
                 UserId = "apersonid",
                 DisplayName = "afirstname",
                 Name = new PersonName
@@ -346,7 +346,7 @@ public class EndUsersApplicationSpec
             .ReturnsAsync(new UserProfile
             {
                 Id = "anotherprofileid",
-                Type = UserProfileType.Person,
+                Classification = UserProfileClassification.Person,
                 UserId = "anotherpersonid",
                 DisplayName = "afirstname",
                 Name = new PersonName
@@ -394,7 +394,7 @@ public class EndUsersApplicationSpec
             .ReturnsAsync(new UserProfile
             {
                 Id = "aprofileid",
-                Type = UserProfileType.Person,
+                Classification = UserProfileClassification.Person,
                 UserId = "auserid",
                 DisplayName = "afirstname",
                 Name = new PersonName
@@ -468,7 +468,7 @@ public class EndUsersApplicationSpec
             .ReturnsAsync(new UserProfile
             {
                 Id = "aprofileid",
-                Type = UserProfileType.Person,
+                Classification = UserProfileClassification.Person,
                 UserId = "apersonid",
                 DisplayName = "afirstname",
                 Name = new PersonName
@@ -523,7 +523,7 @@ public class EndUsersApplicationSpec
             .ReturnsAsync(new UserProfile
             {
                 Id = "aprofileid",
-                Type = UserProfileType.Machine,
+                Classification = UserProfileClassification.Machine,
                 UserId = "amachineid",
                 DisplayName = "amachinename",
                 Name = new PersonName
@@ -582,7 +582,7 @@ public class EndUsersApplicationSpec
             .ReturnsAsync(new UserProfile
             {
                 Id = "aprofileid",
-                Type = UserProfileType.Machine,
+                Classification = UserProfileClassification.Machine,
                 UserId = "amachineid",
                 DisplayName = "amachinename",
                 Name = new PersonName

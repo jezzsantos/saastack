@@ -26,11 +26,12 @@ public class UserProfilesApplication : IUserProfilesApplication
         _repository = repository;
     }
 
-    public async Task<Result<UserProfile, Error>> CreateProfileAsync(ICallerContext caller, UserProfileType type,
+    public async Task<Result<UserProfile, Error>> CreateProfileAsync(ICallerContext caller,
+        UserProfileClassification classification,
         string userId, string? emailAddress, string firstName, string? lastName, string? timezone, string? countryCode,
         CancellationToken cancellationToken)
     {
-        if (type == UserProfileType.Person && emailAddress.HasNoValue())
+        if (classification == UserProfileClassification.Person && emailAddress.HasNoValue())
         {
             return Error.RuleViolation(Resources.UserProfilesApplication_PersonMustHaveEmailAddress);
         }
@@ -46,7 +47,7 @@ public class UserProfilesApplication : IUserProfilesApplication
             return Error.EntityExists(Resources.UserProfilesApplication_ProfileExistsForUser);
         }
 
-        if (type == UserProfileType.Person && emailAddress.HasValue())
+        if (classification == UserProfileClassification.Person && emailAddress.HasValue())
         {
             var email = EmailAddress.Create(emailAddress);
             if (!email.IsSuccessful)
@@ -66,7 +67,7 @@ public class UserProfilesApplication : IUserProfilesApplication
             }
         }
 
-        var name = PersonName.Create(firstName, type == UserProfileType.Person
+        var name = PersonName.Create(firstName, classification == UserProfileClassification.Person
             ? lastName
             : Optional<string>.None);
         if (!name.IsSuccessful)
@@ -74,7 +75,8 @@ public class UserProfilesApplication : IUserProfilesApplication
             return name.Error;
         }
 
-        var created = UserProfileRoot.Create(_recorder, _identifierFactory, type.ToEnumOrDefault(ProfileType.Person),
+        var created = UserProfileRoot.Create(_recorder, _identifierFactory,
+            classification.ToEnumOrDefault(ProfileType.Person),
             userId.ToId(), name.Value);
         if (!created.IsSuccessful)
         {
@@ -82,7 +84,7 @@ public class UserProfilesApplication : IUserProfilesApplication
         }
 
         var profile = created.Value;
-        if (type == UserProfileType.Person)
+        if (classification == UserProfileClassification.Person)
         {
             var email2 = EmailAddress.Create(emailAddress!);
             if (!email2.IsSuccessful)
@@ -328,6 +330,35 @@ public class UserProfilesApplication : IUserProfilesApplication
 
         return saved.Value.ToProfile();
     }
+
+    public async Task<Result<List<UserProfile>, Error>> GetAllProfilesAsync(ICallerContext caller, List<string> ids,
+        GetOptions options, CancellationToken cancellationToken)
+    {
+        if (ids.HasNone())
+        {
+            return new List<UserProfile>();
+        }
+
+        var retrieved =
+            await _repository.SearchAllByUserIdsAsync(ids.Select(id => id.ToId()).ToList(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var profiles = retrieved.Value;
+        if (profiles.HasNone())
+        {
+            return new List<UserProfile>();
+        }
+
+        _recorder.TraceInformation(caller.ToCall(),
+            "Profiles were retrieved for {ExpectedCount} users, and returned {ActualCount} profiles", ids.Count,
+            profiles.Count);
+        return profiles
+            .ConvertAll(profile => profile.ToProfile())
+            .ToList();
+    }
 }
 
 internal static class UserProfileConversionExtensions
@@ -337,7 +368,7 @@ internal static class UserProfileConversionExtensions
         return new UserProfile
         {
             Id = profile.Id,
-            Type = profile.Type.ToEnumOrDefault(UserProfileType.Person),
+            Classification = profile.Type.ToEnumOrDefault(UserProfileClassification.Person),
             UserId = profile.UserId,
             Name = profile.Name.ToName(),
             DisplayName = profile.DisplayName.ValueOrDefault!,

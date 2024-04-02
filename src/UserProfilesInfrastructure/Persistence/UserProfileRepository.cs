@@ -55,6 +55,16 @@ public class UserProfileRepository : IUserProfileRepository
         return profile;
     }
 
+    public async Task<Result<List<UserProfileRoot>, Error>> SearchAllByUserIdsAsync(List<Identifier> ids,
+        CancellationToken cancellationToken)
+    {
+        var tasks = await Task.WhenAll(ids.Select(async id => await FindByUserIdAsync(id, cancellationToken)));
+        return tasks.ToList()
+            .Where(task => task is { IsSuccessful: true, HasValue: true })
+            .Select(task => task.Value.Value)
+            .ToList();
+    }
+
     public async Task<Result<Optional<UserProfileRoot>, Error>> FindByUserIdAsync(Identifier userId,
         CancellationToken cancellationToken)
     {
