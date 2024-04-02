@@ -1,5 +1,3 @@
-using Infrastructure.Web.Api.Interfaces;
-
 namespace Infrastructure.Web.Api.Common;
 
 /// <summary>
@@ -45,7 +43,6 @@ public static class HttpQueryParams
 {
     public const string APIKey = "apikey";
     public const string Format = "format";
-    public const string Tenant = nameof(ITenantedRequest.OrganizationId);
 }
 
 /// <summary>

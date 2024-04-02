@@ -15,9 +15,10 @@ namespace Infrastructure.Web.Hosting.Common.Pipeline;
 
 /// <summary>
 ///     Provides middleware to detect the tenant of incoming requests.
-///     Detects the current tenant from either the request itself (as "OrganizationId"),
-///     or, if missing, extracts the "DefaultOrganizationId" from the authenticated user
-///     and rewrites that value into the body of POST/PUT/PATCH requests, of it has an "OrganizationId"
+///     Detects the current tenant using the <see cref="ITenantDetective" />,
+///     and if required and missing, then extracts the "DefaultOrganizationId" from the authenticated user
+///     and sets the <see cref="ITenancyContext.Current" /> tenant.
+///     Downstream, an endpoint filter will rewrite the required, missing tenant into the request
 /// </summary>
 public class MultiTenancyMiddleware
 {

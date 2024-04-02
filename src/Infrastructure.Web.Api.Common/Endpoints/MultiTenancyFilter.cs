@@ -9,8 +9,11 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Infrastructure.Web.Api.Common.Endpoints;
 
 /// <summary>
-///     Provides a request filter that rewrites the tenant ID into request argument
-///     of the current <see cref="RequestDelegate" /> of the current EndPoint
+///     Provides a request filter that rewrites the tenant ID into the request parameter
+///     of the current <see cref="RequestDelegate" /> of the current EndPoint, if it is either:
+///     1. a <see cref="ITenantedRequest" />
+///     2. a <see cref="IUnTenantedOrganizationRequest" />
+///     but no rewrite for an untenanted request
 /// </summary>
 public class MultiTenancyFilter : IEndpointFilter
 {
@@ -42,26 +45,26 @@ public class MultiTenancyFilter : IEndpointFilter
             return Result.Ok;
         }
 
-        if (requestDto.Value is not ITenantedRequest tenantedRequest)
-        {
-            return Result.Ok;
-        }
-
         var tenantId = tenancyContext.Current;
-        if (tenantId.NotExists())
+        if (tenantId.HasNoValue())
         {
             return Result.Ok;
         }
 
-        var organizationId = tenantId;
-        if (organizationId.HasNoValue())
+        if (requestDto.Value is ITenantedRequest tenantedRequest)
         {
-            return Result.Ok;
+            if (tenantedRequest.OrganizationId.HasNoValue())
+            {
+                tenantedRequest.OrganizationId = tenantId;
+            }
         }
 
-        if (tenantedRequest.OrganizationId.HasNoValue())
+        if (requestDto.Value is IUnTenantedOrganizationRequest unTenantedOrganizationRequest)
         {
-            tenantedRequest.OrganizationId = organizationId;
+            if (unTenantedOrganizationRequest.Id.HasNoValue())
+            {
+                unTenantedOrganizationRequest.Id = tenantId;
+            }
         }
 
         return Result.Ok;

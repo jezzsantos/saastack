@@ -11,16 +11,20 @@ namespace Infrastructure.Web.Api.Common;
 
 /// <summary>
 ///     Provides a detective that determines the tenant of the request from data within the request,
-///     in either from the <see cref="ITenantedRequest.OrganizationId" /> field in the body,
-///     from the query string or from the <see cref="HttpHeaders.Tenant" /> header.
+///     from one of these sources:
+///     1. The <see cref="ITenantedRequest.OrganizationId" /> field in the body,
+///     2. The <see cref="IUnTenantedOrganizationRequest.Id" /> field in the body,
+///     3. The <see cref="HttpQueryParams.Tenant" /> query string,
+///     4. The <see cref="HttpHeaders.Tenant" /> header.
 /// </summary>
 public class RequestTenantDetective : ITenantDetective
 {
     public async Task<Result<TenantDetectionResult, Error>> DetectTenantAsync(HttpContext httpContext,
         Optional<Type> requestDtoType, CancellationToken cancellationToken)
     {
-        var shouldHaveTenantId = IsTenantedRequest(requestDtoType);
-        var (found, tenantIdFromRequest) = await ParseTenantIdFromRequestAsync(httpContext.Request, cancellationToken);
+        var shouldHaveTenantId = IsTenantedRequest(requestDtoType, out var type);
+        var (found, tenantIdFromRequest) =
+            await ParseTenantIdFromRequestAsync(httpContext.Request, type, cancellationToken);
         if (found)
         {
             return new TenantDetectionResult(shouldHaveTenantId, tenantIdFromRequest);
@@ -29,20 +33,34 @@ public class RequestTenantDetective : ITenantDetective
         return new TenantDetectionResult(shouldHaveTenantId, null);
     }
 
-    private static bool IsTenantedRequest(Optional<Type> requestDtoType)
+    private static bool IsTenantedRequest(Optional<Type> requestDtoType, out RequestDtoType type)
     {
+        type = RequestDtoType.UnTenanted;
         if (!requestDtoType.HasValue)
         {
             return false;
         }
 
-        return requestDtoType.Value.IsAssignableTo(typeof(ITenantedRequest));
+        if (requestDtoType.Value.IsAssignableTo(typeof(ITenantedRequest)))
+        {
+            type = RequestDtoType.Tenanted;
+            return true;
+        }
+
+        if (requestDtoType.Value.IsAssignableTo(typeof(IUnTenantedOrganizationRequest)))
+        {
+            type = RequestDtoType.UnTenantedOrganization;
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
     ///     Attempts to locate the tenant ID from the request query, or header, or body
     /// </summary>
     private static async Task<(bool HasTenantId, string? tenantId)> ParseTenantIdFromRequestAsync(HttpRequest request,
+        RequestDtoType type,
         CancellationToken cancellationToken)
     {
         if (request.Headers.TryGetValue(HttpHeaders.Tenant, out var tenantIdFromHeader))
@@ -54,19 +72,56 @@ public class RequestTenantDetective : ITenantDetective
             }
         }
 
-        if (request.Query.TryGetValue(HttpQueryParams.Tenant, out var tenantIdFromQueryString))
+        if (type.IsTenanted)
         {
-            var value = GetFirstStringValue(tenantIdFromQueryString);
-            if (value.HasValue())
+            if (request.Query.TryGetValue(nameof(ITenantedRequest.OrganizationId), out var tenantIdFromQueryString))
             {
-                return (true, value);
+                var value = GetFirstStringValue(tenantIdFromQueryString);
+                if (value.HasValue())
+                {
+                    return (true, value);
+                }
+            }
+        }
+
+        if (type.IsUnTenantedOrganization)
+        {
+            if (request.Query.TryGetValue(nameof(IUnTenantedOrganizationRequest.Id), out var tenantIdFromQueryString))
+            {
+                var value = GetFirstStringValue(tenantIdFromQueryString);
+                if (value.HasValue())
+                {
+                    return (true, value);
+                }
+            }
+        }
+
+        if (type.IsUntenanted)
+        {
+            if (request.Query.TryGetValue(nameof(ITenantedRequest.OrganizationId), out var tenantIdFromQueryString))
+            {
+                var value = GetFirstStringValue(tenantIdFromQueryString);
+                if (value.HasValue())
+                {
+                    return (true, value);
+                }
+            }
+
+            if (request.Query.TryGetValue(nameof(RequestWithTenantIds.TenantId), out var tenantIdFromQueryString2))
+            {
+                var value = GetFirstStringValue(tenantIdFromQueryString2);
+                if (value.HasValue())
+                {
+                    return (true, value);
+                }
             }
         }
 
         var couldHaveBody = new HttpMethod(request.Method).CanHaveBody();
         if (couldHaveBody)
         {
-            var (found, tenantIdFromRequestBody) = await ParseTenantIdFromRequestBodyAsync(request, cancellationToken);
+            var (found, tenantIdFromRequestBody) =
+                await ParseTenantIdFromRequestBodyAsync(request, type, cancellationToken);
             if (found)
             {
                 return (true, tenantIdFromRequestBody);
@@ -77,7 +132,7 @@ public class RequestTenantDetective : ITenantDetective
     }
 
     private static async Task<(bool HasTenantId, string? tenantId)> ParseTenantIdFromRequestBodyAsync(
-        HttpRequest request, CancellationToken cancellationToken)
+        HttpRequest request, RequestDtoType type, CancellationToken cancellationToken)
     {
         if (request.Body.Position != 0)
         {
@@ -89,18 +144,37 @@ public class RequestTenantDetective : ITenantDetective
             try
             {
                 var requestWithTenantId =
-                    await request.ReadFromJsonAsync(typeof(RequestWithTenantId), cancellationToken);
+                    await request.ReadFromJsonAsync(typeof(RequestWithTenantIds), cancellationToken);
                 request.RewindBody();
-                if (requestWithTenantId is RequestWithTenantId tenantId)
+                if (requestWithTenantId is RequestWithTenantIds requestWithTenantIds)
                 {
-                    if (tenantId.OrganizationId.HasValue())
+                    if (type.IsTenanted)
                     {
-                        return (true, tenantId.OrganizationId);
+                        if (requestWithTenantIds.OrganizationId.HasValue())
+                        {
+                            return (true, requestWithTenantIds.OrganizationId);
+                        }
                     }
 
-                    if (tenantId.TenantId.HasValue())
+                    if (type.IsUnTenantedOrganization)
                     {
-                        return (true, tenantId.TenantId);
+                        if (requestWithTenantIds.Id.HasValue())
+                        {
+                            return (true, requestWithTenantIds.Id);
+                        }
+                    }
+
+                    if (type.IsUntenanted)
+                    {
+                        if (requestWithTenantIds.OrganizationId.HasValue())
+                        {
+                            return (true, requestWithTenantIds.OrganizationId);
+                        }
+
+                        if (requestWithTenantIds.TenantId.HasValue())
+                        {
+                            return (true, requestWithTenantIds.TenantId);
+                        }
                     }
                 }
             }
@@ -113,12 +187,49 @@ public class RequestTenantDetective : ITenantDetective
         if (request.ContentType == HttpContentTypes.FormUrlEncoded)
         {
             var form = await request.ReadFormAsync(cancellationToken);
-            if (form.TryGetValue(nameof(ITenantedRequest.OrganizationId), out var tenantId))
+
+            if (type.IsTenanted)
             {
-                var value = GetFirstStringValue(tenantId);
-                if (value.HasValue())
+                if (form.TryGetValue(nameof(ITenantedRequest.OrganizationId), out var tenantId1))
                 {
-                    return (true, value);
+                    var value = GetFirstStringValue(tenantId1);
+                    if (value.HasValue())
+                    {
+                        return (true, value);
+                    }
+                }
+            }
+
+            if (type.IsUnTenantedOrganization)
+            {
+                if (form.TryGetValue(nameof(IUnTenantedOrganizationRequest.Id), out var tenantId1))
+                {
+                    var value = GetFirstStringValue(tenantId1);
+                    if (value.HasValue())
+                    {
+                        return (true, value);
+                    }
+                }
+            }
+
+            if (type.IsUntenanted)
+            {
+                if (form.TryGetValue(nameof(ITenantedRequest.OrganizationId), out var tenantId1))
+                {
+                    var value = GetFirstStringValue(tenantId1);
+                    if (value.HasValue())
+                    {
+                        return (true, value);
+                    }
+                }
+
+                if (form.TryGetValue(nameof(RequestWithTenantIds.TenantId), out var tenantId2))
+                {
+                    var value = GetFirstStringValue(tenantId2);
+                    if (value.HasValue())
+                    {
+                        return (true, value);
+                    }
                 }
             }
         }
@@ -132,13 +243,29 @@ public class RequestTenantDetective : ITenantDetective
     }
 
     /// <summary>
-    ///     Defines a request that could have a tenant ID within it
+    ///     Defines a request that could have a tenant ID within it,
+    ///     in any of these properties
     /// </summary>
     // ReSharper disable once MemberCanBePrivate.Global
-    internal class RequestWithTenantId : ITenantedRequest
+    internal class RequestWithTenantIds : ITenantedRequest, IUnTenantedOrganizationRequest
     {
         public string? TenantId { get; [UsedImplicitly] set; }
 
         public string? OrganizationId { get; set; }
+
+        public string? Id { get; set; }
+    }
+
+    internal class RequestDtoType
+    {
+        public static readonly RequestDtoType Tenanted = new() { IsTenanted = true };
+        public static readonly RequestDtoType UnTenanted = new() { IsUntenanted = true };
+        public static readonly RequestDtoType UnTenantedOrganization = new() { IsUnTenantedOrganization = true };
+
+        public bool IsTenanted { get; init; }
+
+        public bool IsUntenanted { get; init; }
+
+        public bool IsUnTenantedOrganization { get; init; }
     }
 }

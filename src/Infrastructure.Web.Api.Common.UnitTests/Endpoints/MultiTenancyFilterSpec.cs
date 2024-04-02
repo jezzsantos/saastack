@@ -27,7 +27,7 @@ public class MultiTenancyFilterSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAndWrongRequestDelegateSignature_ThenContinuesPipeline()
+    public async Task WhenInvokeAndWrongRequestDelegateSignature_ThenNoRewriteAndContinuesPipeline()
     {
         var httpContext = new DefaultHttpContext
         {
@@ -41,7 +41,7 @@ public class MultiTenancyFilterSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAndUnTenantedRequestInDelegateSignature_ThenContinuesPipeline()
+    public async Task WhenInvokeAndUnTenantedRequestInDelegateSignature_ThenNoRewriteAndContinuesPipeline()
     {
         var httpContext = new DefaultHttpContext
         {
@@ -56,7 +56,7 @@ public class MultiTenancyFilterSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAndNoTenantInTenancyContext_ThenContinuesPipeline()
+    public async Task WhenInvokeAndNoTenantInTenancyContext_ThenNoRewriteAndContinuesPipeline()
     {
         var httpContext = new DefaultHttpContext
         {
@@ -72,7 +72,7 @@ public class MultiTenancyFilterSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAndEmptyTenantInTenancyContext_ThenContinuesPipeline()
+    public async Task WhenInvokeAndEmptyTenantInTenancyContext_ThenNoRewriteAndContinuesPipeline()
     {
         _tenancyContext.Setup(tc => tc.Current)
             .Returns(string.Empty);
@@ -90,7 +90,8 @@ public class MultiTenancyFilterSpec
     }
 
     [Fact]
-    public async Task WhenInvokeAndTenantIdInRequestAlreadyPopulated_ThenContinuesPipeline()
+    public async Task
+        WhenInvokeForTenantedRequestAndTenantIdInRequestAlreadyPopulated_ThenNoRewriteAndContinuesPipeline()
     {
         _tenancyContext.Setup(tc => tc.Current)
             .Returns("atenantid");
@@ -102,7 +103,7 @@ public class MultiTenancyFilterSpec
         {
             new { }, new TestTenantedRequest
             {
-                OrganizationId = "anorganizationid"
+                OrganizationId = "anoldorganizationid"
             }
         };
         var context = new DefaultEndpointFilterInvocationContext(httpContext, args);
@@ -110,11 +111,11 @@ public class MultiTenancyFilterSpec
         await _filter.InvokeAsync(context, _next.Object);
 
         _next.Verify(n => n.Invoke(context));
-        context.Arguments[1].As<TestTenantedRequest>().OrganizationId.Should().Be("anorganizationid");
+        context.Arguments[1].As<TestTenantedRequest>().OrganizationId.Should().Be("anoldorganizationid");
     }
 
     [Fact]
-    public async Task WhenInvokeAndTenantIdInRequestIsEmpty_ThenPopulatesAndContinuesPipeline()
+    public async Task WhenInvokeForTenantedRequestAndTenantIdInRequestIsEmpty_ThenRewritesAndContinuesPipeline()
     {
         _tenancyContext.Setup(tc => tc.Current)
             .Returns("atenantid");
@@ -138,10 +139,41 @@ public class MultiTenancyFilterSpec
         context.Arguments[1].As<TestTenantedRequest>().OrganizationId.Should().Be("atenantid");
     }
 
+    [Fact]
+    public async Task
+        WhenInvokeForUnTenantedOrganizationRequestAndTenantIdInRequestIsEmpty_ThenRewritesAndContinuesPipeline()
+    {
+        _tenancyContext.Setup(tc => tc.Current)
+            .Returns("atenantid");
+        var httpContext = new DefaultHttpContext
+        {
+            RequestServices = _serviceProvider.Object
+        };
+
+        var args = new object[]
+        {
+            new { }, new TestUnTenantedOrganizationRequest
+            {
+                Id = null
+            }
+        };
+        var context = new DefaultEndpointFilterInvocationContext(httpContext, args);
+
+        await _filter.InvokeAsync(context, _next.Object);
+
+        _next.Verify(n => n.Invoke(context));
+        context.Arguments[1].As<TestUnTenantedOrganizationRequest>().Id.Should().Be("atenantid");
+    }
+
     private class TestUnTenantedRequest : IWebRequest<TestResponse>;
 
     private class TestTenantedRequest : IWebRequest<TestResponse>, ITenantedRequest
     {
         public string? OrganizationId { get; set; }
+    }
+
+    private class TestUnTenantedOrganizationRequest : IWebRequest<TestResponse>, IUnTenantedOrganizationRequest
+    {
+        public string? Id { get; set; }
     }
 }
