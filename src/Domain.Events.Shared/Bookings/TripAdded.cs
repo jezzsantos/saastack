@@ -1,26 +1,21 @@
+using Domain.Common;
 using Domain.Common.ValueObjects;
-using Domain.Interfaces.Entities;
+using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.Bookings;
 
-public sealed class TripAdded : IDomainEvent
+public sealed class TripAdded : DomainEvent
 {
-    public static TripAdded Create(Identifier id, Identifier organizationId)
+    public TripAdded(Identifier id) : base(id)
     {
-        return new TripAdded
-        {
-            RootId = id,
-            OrganizationId = organizationId,
-            TripId = null,
-            OccurredUtc = DateTime.UtcNow
-        };
+    }
+
+    [UsedImplicitly]
+    public TripAdded()
+    {
     }
 
     public required string OrganizationId { get; set; }
 
     public string? TripId { get; set; }
-
-    public required string RootId { get; set; }
-
-    public required DateTime OccurredUtc { get; set; }
 }

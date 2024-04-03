@@ -6,6 +6,7 @@ using Domain.Events.Shared.EndUsers;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Shared;
+using Domain.Shared.EndUsers;
 using EndUsersApplication.Persistence.ReadModels;
 using EndUsersDomain;
 using Infrastructure.Persistence.Common;
@@ -170,7 +171,7 @@ public class EndUserProjection : IReadModelProjection
                 return await _invitations.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     dto.Token = Optional<string>.None;
-                    dto.Status = UserStatus.Registered.ToString();
+                    dto.Status = UserStatus.Registered;
                     dto.AcceptedAtUtc = e.AcceptedAtUtc;
                     dto.AcceptedEmailAddress = e.AcceptedEmailAddress;
                 }, cancellationToken);

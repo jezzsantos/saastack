@@ -1,10 +1,17 @@
-using Domain.Interfaces.Entities;
+using Domain.Common;
+using Domain.Common.ValueObjects;
+using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.Identities.PasswordCredentials;
 
-public sealed class AccountUnlocked : IDomainEvent
+public sealed class AccountUnlocked : DomainEvent
 {
-    public required string RootId { get; set; }
+    public AccountUnlocked(Identifier id) : base(id)
+    {
+    }
 
-    public required DateTime OccurredUtc { get; set; }
+    [UsedImplicitly]
+    public AccountUnlocked()
+    {
+    }
 }

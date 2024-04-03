@@ -4,6 +4,7 @@ using Application.Persistence.Interfaces;
 using Common;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using Domain.Shared.EndUsers;
 using EndUsersApplication.Persistence;
 using EndUsersApplication.Persistence.ReadModels;
 using EndUsersDomain;
@@ -50,13 +51,21 @@ public class EndUserRepository : IEndUserRepository
 
     public async Task<Result<EndUserRoot, Error>> SaveAsync(EndUserRoot user, CancellationToken cancellationToken)
     {
+        return await SaveAsync(user, false, cancellationToken);
+    }
+
+    public async Task<Result<EndUserRoot, Error>> SaveAsync(EndUserRoot user, bool reload,
+        CancellationToken cancellationToken)
+    {
         var saved = await _users.SaveAsync(user, cancellationToken);
         if (!saved.IsSuccessful)
         {
             return saved.Error;
         }
 
-        return user;
+        return reload
+            ? await LoadAsync(user.Id, cancellationToken)
+            : user;
     }
 
     public async Task<Result<List<MembershipJoinInvitation>, Error>> SearchAllMembershipsByOrganizationAsync(
@@ -72,7 +81,7 @@ public class EndUserRepository : IEndUserRepository
             .Select(mje => mje.IsDefault)
             .Select(mje => mje.LastPersistedAtUtc)
             .SelectFromJoin<Invitation, string>(mje => mje.InvitedEmailAddress, inv => inv.InvitedEmailAddress)
-            .SelectFromJoin<Invitation, string>(mje => mje.Status, inv => inv.Status)
+            .SelectFromJoin<Invitation, UserStatus>(mje => mje.Status, inv => inv.Status)
             .OrderBy(mje => mje.LastPersistedAtUtc)
             .WithSearchOptions(searchOptions);
 

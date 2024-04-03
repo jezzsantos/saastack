@@ -1,14 +1,21 @@
-using Domain.Interfaces.Entities;
+using Domain.Common;
+using Domain.Common.ValueObjects;
+using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.UserProfiles;
 
-public sealed class PhoneNumberChanged : IDomainEvent
+public sealed class PhoneNumberChanged : DomainEvent
 {
+    public PhoneNumberChanged(Identifier id) : base(id)
+    {
+    }
+
+    [UsedImplicitly]
+    public PhoneNumberChanged()
+    {
+    }
+
     public required string Number { get; set; }
 
     public required string UserId { get; set; }
-
-    public required string RootId { get; set; }
-
-    public required DateTime OccurredUtc { get; set; }
 }

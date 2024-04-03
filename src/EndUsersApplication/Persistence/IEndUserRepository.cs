@@ -13,6 +13,8 @@ public interface IEndUserRepository : IApplicationRepository
 
     Task<Result<EndUserRoot, Error>> SaveAsync(EndUserRoot user, CancellationToken cancellationToken);
 
+    Task<Result<EndUserRoot, Error>> SaveAsync(EndUserRoot user, bool reload, CancellationToken cancellationToken);
+
     Task<Result<List<MembershipJoinInvitation>, Error>> SearchAllMembershipsByOrganizationAsync(
         Identifier organizationId,
         SearchOptions searchOptions, CancellationToken cancellationToken);

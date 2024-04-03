@@ -54,7 +54,7 @@ public sealed class ReadModelProjector : IReadModelProjector, IDisposable
             return Result.Ok;
         }
 
-        var streamEntityType = Enumerable.First(eventStream).EntityType;
+        var streamEntityType = Enumerable.First(eventStream).RootAggregateType;
         var firstEventVersion = Enumerable.First(eventStream).Version;
         var projection = GetProjectionForStream(Projections, streamEntityType);
         if (!projection.IsSuccessful)

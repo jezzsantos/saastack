@@ -4,7 +4,9 @@ using Application.Services.Shared;
 using Common;
 using Domain.Common.Identity;
 using Domain.Interfaces;
+using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Hosting.Common.Extensions;
+using Infrastructure.Interfaces;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Web.Hosting.Common;
 using Microsoft.AspNetCore.Builder;
@@ -15,6 +17,7 @@ using UserProfilesApplication.Persistence;
 using UserProfilesDomain;
 using UserProfilesInfrastructure.Api.Profiles;
 using UserProfilesInfrastructure.ApplicationServices;
+using UserProfilesInfrastructure.Notifications;
 using UserProfilesInfrastructure.Persistence;
 using UserProfilesInfrastructure.Persistence.ReadModels;
 
@@ -51,10 +54,16 @@ public class UserProfilesModule : ISubdomainModule
                     c.GetRequiredService<IDomainFactory>(),
                     c.GetRequiredService<IEventSourcingDddCommandStore<UserProfileRoot>>(),
                     c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterUnTenantedEventing<UserProfileRoot, UserProfileProjection>(
+                services
+                    .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
+                        new UserProfileNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
+                            c.GetRequiredService<IUserProfilesApplication>()));
+                services.RegisterUnTenantedEventing<UserProfileRoot, UserProfileProjection, UserProfileNotifier>(
                     c => new UserProfileProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
-                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                        c.GetRequiredServiceForPlatform<IDataStore>()),
+                    c => new UserProfileNotifier(c
+                        .GetRequiredService<IEnumerable<IDomainEventNotificationConsumer>>()));
 
                 services.AddSingleton<IUserProfilesService, UserProfilesInProcessServiceClient>();
             };

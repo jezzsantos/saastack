@@ -1,17 +1,17 @@
 ﻿namespace Infrastructure.Eventing.Interfaces.Notifications;
 
 /// <summary>
-///     Defines the registration information for both a notifications producer and a notifications consumer
+///     Defines the registration information for both a domain and integration consumers
 /// </summary>
 public interface IEventNotificationRegistration
 {
     /// <summary>
-    ///     Returns the consumer of the events
+    ///     Returns the consumers of domain events
     /// </summary>
-    IEventNotificationConsumer Consumer { get; }
+    List<IDomainEventNotificationConsumer> DomainEventConsumers { get; }
 
     /// <summary>
-    ///     Returns the producer of the events
+    ///     Returns the translator of integration events
     /// </summary>
-    IEventNotificationProducer Producer { get; }
+    IIntegrationEventNotificationTranslator IntegrationEventTranslator { get; }
 }

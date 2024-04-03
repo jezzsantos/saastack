@@ -63,7 +63,7 @@ public sealed class EventHandlerBaseSpec : IDisposable
                 Version = 5,
                 Data = null!,
                 Metadata = null!,
-                EntityType = null!,
+                RootAggregateType = null!,
                 EventType = null!,
                 LastPersistedAtUtc = default
             },
@@ -74,7 +74,7 @@ public sealed class EventHandlerBaseSpec : IDisposable
                 Version = 3,
                 Data = null!,
                 Metadata = null!,
-                EntityType = null!,
+                RootAggregateType = null!,
                 EventType = null!,
                 LastPersistedAtUtc = default
             },
@@ -85,7 +85,7 @@ public sealed class EventHandlerBaseSpec : IDisposable
                 Version = 4,
                 Data = null!,
                 Metadata = null!,
-                EntityType = null!,
+                RootAggregateType = null!,
                 EventType = null!,
                 LastPersistedAtUtc = default
             }
@@ -122,7 +122,7 @@ public sealed class EventHandlerBaseSpec : IDisposable
                 Version = 5,
                 Data = null!,
                 Metadata = null!,
-                EntityType = null!,
+                RootAggregateType = null!,
                 EventType = null!,
                 LastPersistedAtUtc = default
             },
@@ -133,7 +133,7 @@ public sealed class EventHandlerBaseSpec : IDisposable
                 Version = 3,
                 Data = null!,
                 Metadata = null!,
-                EntityType = null!,
+                RootAggregateType = null!,
                 EventType = null!,
                 LastPersistedAtUtc = default
             },
@@ -144,7 +144,7 @@ public sealed class EventHandlerBaseSpec : IDisposable
                 Version = 4,
                 Data = null!,
                 Metadata = null!,
-                EntityType = null!,
+                RootAggregateType = null!,
                 EventType = null!,
                 LastPersistedAtUtc = default
             }
@@ -179,7 +179,7 @@ public sealed class EventHandlerBaseSpec : IDisposable
                 Version = 5,
                 Data = null!,
                 Metadata = null!,
-                EntityType = null!,
+                RootAggregateType = null!,
                 EventType = null!,
                 LastPersistedAtUtc = default
             },
@@ -190,7 +190,7 @@ public sealed class EventHandlerBaseSpec : IDisposable
                 Version = 2,
                 Data = null!,
                 Metadata = null!,
-                EntityType = null!,
+                RootAggregateType = null!,
                 EventType = null!,
                 LastPersistedAtUtc = default
             },
@@ -201,7 +201,7 @@ public sealed class EventHandlerBaseSpec : IDisposable
                 Version = 4,
                 Data = null!,
                 Metadata = null!,
-                EntityType = null!,
+                RootAggregateType = null!,
                 EventType = null!,
                 LastPersistedAtUtc = default
             }

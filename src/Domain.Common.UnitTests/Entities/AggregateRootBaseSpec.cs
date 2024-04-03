@@ -161,8 +161,8 @@ public class AggregateRootBaseSpec
 
         _aggregate.Events.Count.Should().Be(2);
         _aggregate.Events[0].Should().BeOfType<TestAggregateRoot.CreateEvent>();
-        _aggregate.Events.Last().Should().BeEquivalentTo(new TestAggregateRoot.ChangeEvent
-            { APropertyName = "achangedvalue" });
+        _aggregate.Events.Last().As<TestAggregateRoot.ChangeEvent>().APropertyName.Should().Be("achangedvalue");
+        _aggregate.Events.Last().OccurredUtc.Should().BeNear(DateTime.UtcNow);
         _aggregate.LastModifiedAtUtc.Should().BeNear(DateTime.UtcNow);
     }
 

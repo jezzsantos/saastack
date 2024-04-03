@@ -329,7 +329,7 @@ public class CarsApplicationSpec
                     ManufactureModel = "amodel",
                     ManufactureYear = 2023,
                     OrganizationId = "anorganizationid",
-                    Status = "astatus",
+                    Status = CarStatus.Registered,
                     VehicleOwnerId = "anownerid"
                 }
             }));
@@ -348,7 +348,7 @@ public class CarsApplicationSpec
         result.Value.Results[0].Owner!.Id.Should().Be("anownerid");
         result.Value.Results[0].Plate!.Jurisdiction.Should().Be("ajurisdiction");
         result.Value.Results[0].Plate!.Number.Should().Be("aplate");
-        result.Value.Results[0].Status.Should().Be("astatus");
+        result.Value.Results[0].Status.Should().Be(CarStatus.Registered.ToString());
     }
 
     [Fact]
@@ -369,7 +369,7 @@ public class CarsApplicationSpec
                     ManufactureModel = "amodel",
                     ManufactureYear = 2023,
                     OrganizationId = "anorganizationid",
-                    Status = "astatus",
+                    Status = CarStatus.Registered,
                     VehicleOwnerId = "anownerid"
                 }
             }));
@@ -388,7 +388,7 @@ public class CarsApplicationSpec
         result.Value.Results[0].Owner!.Id.Should().Be("anownerid");
         result.Value.Results[0].Plate!.Jurisdiction.Should().Be("ajurisdiction");
         result.Value.Results[0].Plate!.Number.Should().Be("aplate");
-        result.Value.Results[0].Status.Should().Be("astatus");
+        result.Value.Results[0].Status.Should().Be(CarStatus.Registered.ToString());
     }
 
     [Fact]

@@ -1,6 +1,8 @@
 using ApiHost1;
 using Domain.Interfaces.Authorization;
+using EndUsersInfrastructure.IntegrationTests.Stubs;
 using FluentAssertions;
+using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.EndUsers;
 using IntegrationTesting.WebApi.Common;
@@ -13,9 +15,22 @@ namespace EndUsersInfrastructure.IntegrationTests;
 [Collection("API")]
 public class EndUsersApiSpec : WebApiSpec<Program>
 {
+    private readonly StubEventNotificationMessageBroker _messageBroker;
+
     public EndUsersApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
         EmptyAllRepositories();
+        _messageBroker = setup.GetRequiredService<IEventNotificationMessageBroker>()
+            .As<StubEventNotificationMessageBroker>();
+        _messageBroker.Reset();
+    }
+
+    [Fact]
+    public async Task WhenRegisterUser_ThenPublishesRegistrationIntegrationEvent()
+    {
+        var login = await LoginUserAsync();
+
+        _messageBroker.LastPublishedEvent!.RootId.Should().Be(login.User.Id);
     }
 
     [Fact]
@@ -58,6 +73,6 @@ public class EndUsersApiSpec : WebApiSpec<Program>
 
     private static void OverrideDependencies(IServiceCollection services)
     {
-        // Override dependencies here
+        services.AddSingleton<IEventNotificationMessageBroker, StubEventNotificationMessageBroker>();
     }
 }

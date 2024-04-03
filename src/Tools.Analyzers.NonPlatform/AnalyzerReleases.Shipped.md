@@ -39,7 +39,7 @@
  SAASDDD035 | SaaStackDDD         | Error    | ValueObjects must only have immutable methods                                                             
  SAASDDD036 | SaaStackDDD         | Warning  | ValueObjects should be marked as sealed.                                                                  
  SAASDDD040 | SaaStackDDD         | Error    | DomainEvents must be public                                                                               
- SAASDDD041 | SaaStackDDD         | Warning  | DomainEvents must be sealed                                                                               
+ SAASDDD041 | SaaStackDDD         | Warning  | DomainEvents should be sealed                                                                             
  SAASDDD042 | SaaStackDDD         | Error    | DomainEvents must have a parameterless constructor                                                        
  SAASDDD043 | SaaStackDDD         | Error    | DomainEvents must be named in the past tense                                                              
  SAASDDD045 | SaaStackDDD         | Error    | Create() class factory methods must return correct types                                                  
@@ -47,6 +47,13 @@
  SAASDDD047 | SaaStackDDD         | Error    | Properties must be marked required or nullable or initialized                                             
  SAASDDD048 | SaaStackDDD         | Error    | Properties must be nullable not Optional{T}                                                               
  SAASDDD049 | SaaStackDDD         | Error    | Properties must be of correct type                                                                        
+ SAASEVT010 | SaaStackEventing    | Error    | IntegrationEvents must be public                                                                          
+ SAASEVT011 | SaaStackEventing    | Warning  | IntegrationEvents should be sealed                                                                        
+ SAASEVT012 | SaaStackEventing    | Error    | IntegrationEvents must have a parameterless constructor                                                   
+ SAASEVT013 | SaaStackEventing    | Error    | Properties must have public getters and setters                                                           
+ SAASEVT014 | SaaStackEventing    | Error    | Properties must be marked required or nullable or initialized                                             
+ SAASEVT015 | SaaStackEventing    | Error    | Properties must be nullable not Optional{T}                                                               
+ SAASEVT016 | SaaStackEventing    | Error    | Properties must be of correct type                                                                        
  SAASAPP010 | SaaStackApplication | Error    | Resources must be public                                                                                  
  SAASAPP011 | SaaStackApplication | Error    | Resources must have a parameterless constructor                                                           
  SAASAPP012 | SaaStackApplication | Error    | Properties must have public getters and setters                                                           

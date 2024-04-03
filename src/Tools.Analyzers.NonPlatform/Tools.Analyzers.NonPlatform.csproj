@@ -227,6 +227,9 @@
         <Compile Include="..\Domain.Interfaces\DomainFactories.cs">
             <Link>Reference\Domain.Interfaces\DomainFactories.cs</Link>
         </Compile>
+        <Compile Include="..\Domain.Common\DomainEvent.cs">
+            <Link>Reference\Domain.Common\DomainEvent.cs</Link>
+        </Compile>
         <Compile Include="..\Domain.Common\Resources.Designer.cs">
             <Link>Reference\Domain.Common\Resources.Designer.cs</Link>
         </Compile>
@@ -292,6 +295,9 @@
         </Compile>
         <Compile Include="..\Infrastructure.Web.Hosting.Common\ISubdomainModule.cs">
             <Link>Reference\Infrastructure.Web.Hosting.Common\ISubdomainModule.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.Eventing.Interfaces\Notifications\IIntegrationEvent.cs">
+            <Link>Reference\Infrastructure.Eventing.Interfaces\Notifications\IIntegrationEvent.cs</Link>
         </Compile>
     </ItemGroup>
 

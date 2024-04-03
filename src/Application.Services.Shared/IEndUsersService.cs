@@ -6,9 +6,6 @@ namespace Application.Services.Shared;
 
 public interface IEndUsersService
 {
-    Task<Result<Membership, Error>> CreateMembershipForCallerPrivateAsync(ICallerContext caller, string organizationId,
-        CancellationToken cancellationToken);
-
     Task<Result<Optional<EndUser>, Error>> FindPersonByEmailPrivateAsync(ICallerContext caller, string emailAddress,
         CancellationToken cancellationToken);
 

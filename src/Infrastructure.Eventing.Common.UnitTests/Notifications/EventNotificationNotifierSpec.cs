@@ -1,6 +1,5 @@
 ﻿using Application.Persistence.Interfaces;
 using Common;
-using Common.Extensions;
 using Domain.Common;
 using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
@@ -17,6 +16,8 @@ namespace Infrastructure.Eventing.Common.UnitTests.Notifications;
 [Trait("Category", "Unit")]
 public sealed class EventNotificationNotifierSpec : IDisposable
 {
+    private readonly Mock<IDomainEventNotificationConsumer> _domainConsumer;
+    private readonly Mock<IEventNotificationMessageBroker> _messageBroker;
     private readonly EventNotificationNotifier _notifier;
     private readonly Mock<IEventNotificationRegistration> _registration;
 
@@ -25,14 +26,22 @@ public sealed class EventNotificationNotifierSpec : IDisposable
         var recorder = new Mock<IRecorder>();
         var changeEventTypeMigrator = new ChangeEventTypeMigrator();
         _registration = new Mock<IEventNotificationRegistration>();
-        _registration.Setup(p => p.Producer.RootAggregateType)
+        _registration.Setup(p => p.IntegrationEventTranslator.RootAggregateType)
             .Returns(typeof(string));
-        _registration.Setup(p => p.Producer.PublishAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<IDomainEvent>, Error>>(Optional<IDomainEvent>.None));
-        _registration.Setup(p => p.Consumer.NotifyAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<bool, Error>>(true));
+        _registration.Setup(p =>
+                p.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Optional<IIntegrationEvent>.None);
+        _domainConsumer = new Mock<IDomainEventNotificationConsumer>();
+        _domainConsumer.Setup(c => c.NotifyAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result.Ok);
+        _messageBroker = new Mock<IEventNotificationMessageBroker>();
+        _messageBroker.Setup(mb => mb.PublishAsync(It.IsAny<IIntegrationEvent>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result.Ok);
+        _registration.Setup(p => p.DomainEventConsumers)
+            .Returns([_domainConsumer.Object]);
         var registrations = new List<IEventNotificationRegistration> { _registration.Object };
-        _notifier = new EventNotificationNotifier(recorder.Object, changeEventTypeMigrator, registrations.ToArray());
+        _notifier = new EventNotificationNotifier(recorder.Object, changeEventTypeMigrator, registrations,
+            _messageBroker.Object);
     }
 
     ~EventNotificationNotifierSpec()
@@ -57,25 +66,29 @@ public sealed class EventNotificationNotifierSpec : IDisposable
     [Fact]
     public async Task WhenWriteEventStreamAndNoEvents_ThenReturns()
     {
-        await _notifier.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>(),
+        await _notifier.WriteEventStreamAsync("astreamname", [],
             CancellationToken.None);
 
-        _registration.Verify(p => p.Producer.PublishAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()),
+        _domainConsumer.Verify(c => c.NotifyAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _messageBroker.Verify(mb => mb.PublishAsync(It.IsAny<IIntegrationEvent>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _registration.Verify(
+            p => p.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
     [Fact]
-    public async Task WhenWriteEventStreamAndNoConfiguredConsumer_ThenReturns()
+    public async Task WhenWriteEventStreamAndNoRegisteredConsumers_ThenReturns()
     {
-        _registration.Setup(p => p.Producer.RootAggregateType)
+        _registration.Setup(p => p.IntegrationEventTranslator.RootAggregateType)
             .Returns(typeof(string));
 
-        var result = await _notifier.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
-        {
-            new()
+        var result = await _notifier.WriteEventStreamAsync("astreamname", [
+            new EventStreamChangeEvent
             {
                 Data = null!,
-                EntityType = "atypename",
+                RootAggregateType = "atypename",
                 EventType = null!,
                 Id = null!,
                 LastPersistedAtUtc = default,
@@ -83,23 +96,27 @@ public sealed class EventNotificationNotifierSpec : IDisposable
                 StreamName = null!,
                 Version = 0
             }
-        }, CancellationToken.None);
+        ], CancellationToken.None);
 
         result.Should().BeSuccess();
-        _registration.Verify(p => p.Producer.PublishAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()),
+        _domainConsumer.Verify(c => c.NotifyAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _messageBroker.Verify(mb => mb.PublishAsync(It.IsAny<IIntegrationEvent>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _registration.Verify(
+            p => p.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
     [Fact]
     public async Task WhenWriteEventStreamAndDeserializationOfEventsFails_ThenReturnsError()
     {
-        var result = await _notifier.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
-        {
-            new()
+        var result = await _notifier.WriteEventStreamAsync("astreamname", [
+            new EventStreamChangeEvent
             {
                 Id = "anid",
-                EntityType = nameof(String),
-                Data = new TestChangeEvent
+                RootAggregateType = nameof(String),
+                Data = new TestDomainEvent
                 {
                     RootId = "aneventid"
                 }.ToEventJson(),
@@ -109,200 +126,187 @@ public sealed class EventNotificationNotifierSpec : IDisposable
                 LastPersistedAtUtc = default,
                 StreamName = null!
             }
-        }, CancellationToken.None);
+        ], CancellationToken.None);
 
         result.Should().BeError(ErrorCode.RuleViolation);
     }
 
     [Fact]
-    public async Task WhenWriteEventStreamAndProducerDoesNotPublishEvent_ThenReturns()
+    public async Task WhenWriteEventStreamAndTranslatorDoesNotTranslateEvent_ThenOnlyNotifiesDomainEvent()
     {
-        _registration.Setup(p => p.Producer.PublishAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
-            .Returns((IDomainEvent _, CancellationToken _) =>
-                Task.FromResult<Result<Optional<IDomainEvent>, Error>>(Optional<IDomainEvent>.None));
+        _registration.Setup(p =>
+                p.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IDomainEvent _, CancellationToken _) => Optional<IIntegrationEvent>.None);
 
-        var result = await _notifier.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
-        {
-            new()
+        var result = await _notifier.WriteEventStreamAsync("astreamname", [
+            new EventStreamChangeEvent
             {
                 Id = "anid1",
-                EntityType = nameof(String),
-                Data = new TestChangeEvent { RootId = "aneventid1" }.ToEventJson(),
+                RootAggregateType = nameof(String),
+                Data = new TestDomainEvent { RootId = "aneventid" }.ToEventJson(),
                 Version = 0,
-                Metadata = new EventMetadata(typeof(TestChangeEvent).AssemblyQualifiedName!),
+                Metadata = new EventMetadata(typeof(TestDomainEvent).AssemblyQualifiedName!),
                 EventType = null!,
                 LastPersistedAtUtc = default,
                 StreamName = null!
             }
-        }, CancellationToken.None);
+        ], CancellationToken.None);
 
         result.Should().BeSuccess();
-        _registration.Verify(p => p.Producer.PublishAsync(It.Is<TestChangeEvent>(e =>
-            e.RootId == "aneventid1"
+        _registration.Verify(p => p.IntegrationEventTranslator.TranslateAsync(It.Is<TestDomainEvent>(e =>
+            e.RootId == "aneventid"
         ), It.IsAny<CancellationToken>()));
-        _registration.Verify(p => p.Consumer.NotifyAsync(It.IsAny<TestChangeEvent>(), It.IsAny<CancellationToken>()),
+        _domainConsumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(ce =>
+            ce.RootId == "aneventid"
+        ), It.IsAny<CancellationToken>()));
+        _messageBroker.Verify(mb => mb.PublishAsync(It.IsAny<IIntegrationEvent>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
     [Fact]
-    public async Task WhenWriteEventStreamAndFirstEverEvent_ThenNotifiesEvents()
+    public async Task WhenWriteEventStreamWithSingleEvent_ThenNotifiesBothDomainAndIntegrationEvents()
     {
-        _registration.Setup(p => p.Producer.PublishAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
-            .Returns((IDomainEvent @event, CancellationToken _) =>
-                Task.FromResult<Result<Optional<IDomainEvent>, Error>>(new TestChangeEvent { RootId = @event.RootId }
-                    .ToOptional<IDomainEvent>()));
+        _registration.Setup(p =>
+                p.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IDomainEvent domainEvent, CancellationToken _) =>
+                new TestIntegrationEvent(domainEvent.RootId).ToOptional<IIntegrationEvent>());
 
-        var result = await _notifier.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
-        {
-            new()
+        var result = await _notifier.WriteEventStreamAsync("astreamname", [
+            new EventStreamChangeEvent
             {
                 Id = "anid1",
-                EntityType = nameof(String),
-                Data = new TestChangeEvent { RootId = "aneventid1" }.ToEventJson(),
+                RootAggregateType = nameof(String),
+                Data = new TestDomainEvent { RootId = "aneventid" }.ToEventJson(),
                 Version = 0,
-                Metadata = new EventMetadata(typeof(TestChangeEvent).AssemblyQualifiedName!),
+                Metadata = new EventMetadata(typeof(TestDomainEvent).AssemblyQualifiedName!),
+                EventType = null!,
+                LastPersistedAtUtc = default,
+                StreamName = null!
+            }
+        ], CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _registration.Verify(p => p.IntegrationEventTranslator.TranslateAsync(It.Is<TestDomainEvent>(e =>
+            e.RootId == "aneventid"
+        ), It.IsAny<CancellationToken>()));
+        _domainConsumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(ce =>
+            ce.RootId == "aneventid"
+        ), It.IsAny<CancellationToken>()));
+        _messageBroker.Verify(mb => mb.PublishAsync(It.Is<TestIntegrationEvent>(ie =>
+            ie.RootId == "aneventid"
+        ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenWriteEventStreamWithMultipleEvents_ThenNotifiesBothDomainAndIntegrationEvents()
+    {
+        _registration.Setup(p =>
+                p.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IDomainEvent domainEvent, CancellationToken _) =>
+                new TestIntegrationEvent(domainEvent.RootId).ToOptional<IIntegrationEvent>());
+
+        var result = await _notifier.WriteEventStreamAsync("astreamname", [
+            new EventStreamChangeEvent
+            {
+                Id = "anid1",
+                RootAggregateType = nameof(String),
+                Data = new TestDomainEvent { RootId = "aneventid1" }.ToEventJson(),
+                Version = 0,
+                Metadata = new EventMetadata(typeof(TestDomainEvent).AssemblyQualifiedName!),
                 EventType = null!,
                 LastPersistedAtUtc = default,
                 StreamName = null!
             },
-            new()
+
+            new EventStreamChangeEvent
             {
                 Id = "anid2",
-                EntityType = nameof(String),
-                Data = new TestChangeEvent { RootId = "aneventid2" }.ToEventJson(),
+                RootAggregateType = nameof(String),
+                Data = new TestDomainEvent { RootId = "aneventid2" }.ToEventJson(),
                 Version = 1,
-                Metadata = new EventMetadata(typeof(TestChangeEvent).AssemblyQualifiedName!),
+                Metadata = new EventMetadata(typeof(TestDomainEvent).AssemblyQualifiedName!),
                 EventType = null!,
                 LastPersistedAtUtc = default,
                 StreamName = null!
             },
-            new()
+
+            new EventStreamChangeEvent
             {
                 Id = "anid3",
-                EntityType = nameof(String),
-                Data = new TestChangeEvent { RootId = "aneventid3" }.ToEventJson(),
+                RootAggregateType = nameof(String),
+                Data = new TestDomainEvent { RootId = "aneventid3" }.ToEventJson(),
                 Version = 2,
-                Metadata = new EventMetadata(typeof(TestChangeEvent).AssemblyQualifiedName!),
+                Metadata = new EventMetadata(typeof(TestDomainEvent).AssemblyQualifiedName!),
                 EventType = null!,
                 LastPersistedAtUtc = default,
                 StreamName = null!
             }
-        }, CancellationToken.None);
+        ], CancellationToken.None);
 
         result.Should().BeSuccess();
-        _registration.Verify(p => p.Producer.PublishAsync(It.Is<TestChangeEvent>(e =>
+        _registration.Verify(p => p.IntegrationEventTranslator.TranslateAsync(It.Is<TestDomainEvent>(e =>
+            e.RootId == "aneventid1"
+        ), It.IsAny<CancellationToken>()));
+        _domainConsumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(e =>
+            e.RootId == "aneventid1"
+        ), It.IsAny<CancellationToken>()));
+        _messageBroker.Verify(mb => mb.PublishAsync(It.Is<TestIntegrationEvent>(e =>
+            e.RootId == "aneventid1"
+        ), It.IsAny<CancellationToken>()));
+        _registration.Verify(p => p.IntegrationEventTranslator.TranslateAsync(It.Is<TestDomainEvent>(e =>
             e.RootId == "aneventid2"
         ), It.IsAny<CancellationToken>()));
-        _registration.Verify(p => p.Consumer.NotifyAsync(It.Is<TestChangeEvent>(e =>
+        _domainConsumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(e =>
             e.RootId == "aneventid2"
         ), It.IsAny<CancellationToken>()));
-        _registration.Verify(p => p.Producer.PublishAsync(It.Is<TestChangeEvent>(e =>
+        _messageBroker.Verify(mb => mb.PublishAsync(It.Is<TestIntegrationEvent>(e =>
+            e.RootId == "aneventid2"
+        ), It.IsAny<CancellationToken>()));
+        _registration.Verify(r => r.IntegrationEventTranslator.TranslateAsync(It.Is<TestDomainEvent>(e =>
             e.RootId == "aneventid3"
         ), It.IsAny<CancellationToken>()));
-        _registration.Verify(p => p.Consumer.NotifyAsync(It.Is<TestChangeEvent>(e =>
+        _domainConsumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(e =>
+            e.RootId == "aneventid3"
+        ), It.IsAny<CancellationToken>()));
+        _messageBroker.Verify(mb => mb.PublishAsync(It.Is<TestIntegrationEvent>(e =>
             e.RootId == "aneventid3"
         ), It.IsAny<CancellationToken>()));
     }
 
     [Fact]
-    public async Task WhenWriteEventStreamAndConsumerDoesNotHandleEvent_ThenReturnsError()
+    public async Task WhenWriteEventStreamAndDomainConsumerReturnsError_ThenStopsAndReturnsError()
     {
-        _registration.Setup(p => p.Producer.PublishAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
-            .Returns((IDomainEvent @event, CancellationToken _) =>
-                Task.FromResult<Result<Optional<IDomainEvent>, Error>>(new TestChangeEvent { RootId = @event.RootId }
-                    .ToOptional<IDomainEvent>()));
-        _registration.Setup(p => p.Consumer.NotifyAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<bool, Error>>(false));
+        _registration.Setup(p =>
+                p.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IDomainEvent domainEvent, CancellationToken _) =>
+                new TestIntegrationEvent(domainEvent.RootId).ToOptional<IIntegrationEvent>());
+        _domainConsumer.Setup(c => c.NotifyAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Error.RuleViolation("amessage"));
 
-        var result = await _notifier.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
-        {
-            new()
+        var result = await _notifier.WriteEventStreamAsync("astreamname", [
+            new EventStreamChangeEvent
             {
                 Id = "anid1",
-                EntityType = nameof(String),
-                Data = new TestChangeEvent { RootId = "aneventid1" }.ToEventJson(),
+                RootAggregateType = nameof(String),
+                Data = new TestDomainEvent { RootId = "aneventid" }.ToEventJson(),
                 Version = 0,
-                Metadata = new EventMetadata(typeof(TestChangeEvent).AssemblyQualifiedName!),
+                Metadata = new EventMetadata(typeof(TestDomainEvent).AssemblyQualifiedName!),
                 EventType = null!,
                 LastPersistedAtUtc = default,
                 StreamName = null!
             }
-        }, CancellationToken.None);
+        ], CancellationToken.None);
 
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.EventNotificationNotifier_ConsumerError.Format("IEventNotificationConsumerProxy", "anid1",
-                typeof(TestChangeEvent).AssemblyQualifiedName!));
-        _registration.Verify(p => p.Producer.PublishAsync(It.Is<TestChangeEvent>(e =>
-            e.RootId == "aneventid1"
+        result.Should().BeError(ErrorCode.RuleViolation, "amessage");
+        _domainConsumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(e =>
+            e.RootId == "aneventid"
         ), It.IsAny<CancellationToken>()));
-        _registration.Verify(p => p.Consumer.NotifyAsync(It.Is<TestChangeEvent>(e =>
-            e.RootId == "aneventid1"
-        ), It.IsAny<CancellationToken>()));
+        _registration.Verify(
+            p => p.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _messageBroker.Verify(mb => mb.PublishAsync(It.IsAny<TestIntegrationEvent>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+
     }
 
-    [Fact]
-    public async Task WhenWriteEventStream_ThenNotifiesEvents()
-    {
-        _registration.Setup(p => p.Producer.PublishAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
-            .Returns((IDomainEvent @event, CancellationToken _) =>
-                Task.FromResult<Result<Optional<IDomainEvent>, Error>>(new TestChangeEvent { RootId = @event.RootId }
-                    .ToOptional<IDomainEvent>()));
-
-        var result = await _notifier.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
-        {
-            new()
-            {
-                Id = "anid1",
-                EntityType = nameof(String),
-                Data = new TestChangeEvent { RootId = "aneventid1" }.ToEventJson(),
-                Version = 3,
-                Metadata = new EventMetadata(typeof(TestChangeEvent).AssemblyQualifiedName!),
-                EventType = null!,
-                LastPersistedAtUtc = default,
-                StreamName = null!
-            },
-            new()
-            {
-                Id = "anid2",
-                EntityType = nameof(String),
-                Data = new TestChangeEvent { RootId = "aneventid2" }.ToEventJson(),
-                Version = 4,
-                Metadata = new EventMetadata(typeof(TestChangeEvent).AssemblyQualifiedName!),
-                EventType = null!,
-                LastPersistedAtUtc = default,
-                StreamName = null!
-            },
-            new()
-            {
-                Id = "anid3",
-                EntityType = nameof(String),
-                Data = new TestChangeEvent { RootId = "aneventid3" }.ToEventJson(),
-                Version = 5,
-                Metadata = new EventMetadata(typeof(TestChangeEvent).AssemblyQualifiedName!),
-                EventType = null!,
-                LastPersistedAtUtc = default,
-                StreamName = null!
-            }
-        }, CancellationToken.None);
-
-        result.Should().BeSuccess();
-        _registration.Verify(p => p.Producer.PublishAsync(It.Is<TestChangeEvent>(e =>
-            e.RootId == "aneventid1"
-        ), It.IsAny<CancellationToken>()));
-        _registration.Verify(p => p.Consumer.NotifyAsync(It.Is<TestChangeEvent>(e =>
-            e.RootId == "aneventid1"
-        ), It.IsAny<CancellationToken>()));
-        _registration.Verify(p => p.Producer.PublishAsync(It.Is<TestChangeEvent>(e =>
-            e.RootId == "aneventid2"
-        ), It.IsAny<CancellationToken>()));
-        _registration.Verify(p => p.Consumer.NotifyAsync(It.Is<TestChangeEvent>(e =>
-            e.RootId == "aneventid2"
-        ), It.IsAny<CancellationToken>()));
-        _registration.Verify(p => p.Producer.PublishAsync(It.Is<TestChangeEvent>(e =>
-            e.RootId == "aneventid3"
-        ), It.IsAny<CancellationToken>()));
-        _registration.Verify(p => p.Consumer.NotifyAsync(It.Is<TestChangeEvent>(e =>
-            e.RootId == "aneventid3"
-        ), It.IsAny<CancellationToken>()));
-    }
 }

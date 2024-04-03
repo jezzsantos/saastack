@@ -7,6 +7,7 @@ using CarsDomain;
 using Common;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using Domain.Shared.Cars;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
@@ -89,7 +90,7 @@ public class CarRepository : ICarRepository
 
         var queriedCars = await _carQueries.QueryAsync(Query.From<Car>()
             .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
-            .AndWhere<string>(c => c.Status, ConditionOperator.EqualTo, CarStatus.Registered.ToString())
+            .AndWhere<CarStatus>(c => c.Status, ConditionOperator.EqualTo, CarStatus.Registered)
             .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
         if (!queriedCars.IsSuccessful)
         {

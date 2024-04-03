@@ -1,10 +1,17 @@
-using Domain.Interfaces.Entities;
+using Domain.Common;
+using Domain.Common.ValueObjects;
+using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.Identities.PasswordCredentials;
 
-public sealed class RegistrationVerificationVerified : IDomainEvent
+public sealed class RegistrationVerificationVerified : DomainEvent
 {
-    public required string RootId { get; set; }
+    public RegistrationVerificationVerified(Identifier id) : base(id)
+    {
+    }
 
-    public required DateTime OccurredUtc { get; set; }
+    [UsedImplicitly]
+    public RegistrationVerificationVerified()
+    {
+    }
 }

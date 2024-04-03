@@ -2,6 +2,7 @@ using Common;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.EndUsers;
 using Domain.Shared;
+using Domain.Shared.EndUsers;
 
 namespace EndUsersDomain;
 
@@ -9,22 +10,18 @@ public static class Events
 {
     public static Created Created(Identifier id, UserClassification classification)
     {
-        return new Created
+        return new Created(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
-            Classification = classification.ToString(),
-            Access = UserAccess.Enabled.ToString(),
-            Status = UserStatus.Unregistered.ToString()
+            Classification = classification,
+            Access = UserAccess.Enabled,
+            Status = UserStatus.Unregistered
         };
     }
 
     public static GuestInvitationAccepted GuestInvitationAccepted(Identifier id, EmailAddress emailAddress)
     {
-        return new GuestInvitationAccepted
+        return new GuestInvitationAccepted(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             AcceptedEmailAddress = emailAddress,
             AcceptedAtUtc = DateTime.UtcNow
         };
@@ -33,10 +30,8 @@ public static class Events
     public static GuestInvitationCreated GuestInvitationCreated(Identifier id, string token, EmailAddress invitee,
         Identifier invitedBy)
     {
-        return new GuestInvitationCreated
+        return new GuestInvitationCreated(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             EmailAddress = invitee,
             InvitedById = invitedBy,
             Token = token
@@ -46,10 +41,8 @@ public static class Events
     public static MembershipAdded MembershipAdded(Identifier id, Identifier organizationId, bool isDefault, Roles roles,
         Features features)
     {
-        return new MembershipAdded
+        return new MembershipAdded(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             MembershipId = null,
             IsDefault = isDefault,
             OrganizationId = organizationId,
@@ -61,10 +54,8 @@ public static class Events
     public static MembershipDefaultChanged MembershipDefaultChanged(Identifier id, Identifier fromMembershipId,
         Identifier toMembershipId)
     {
-        return new MembershipDefaultChanged
+        return new MembershipDefaultChanged(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             FromMembershipId = fromMembershipId,
             ToMembershipId = toMembershipId
         };
@@ -73,10 +64,8 @@ public static class Events
     public static MembershipFeatureAssigned MembershipFeatureAssigned(Identifier id, Identifier organizationId,
         Identifier membershipId, Feature feature)
     {
-        return new MembershipFeatureAssigned
+        return new MembershipFeatureAssigned(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             OrganizationId = organizationId,
             MembershipId = membershipId,
             Feature = feature.Identifier
@@ -87,10 +76,8 @@ public static class Events
         Identifier membershipId,
         Role role)
     {
-        return new MembershipRoleAssigned
+        return new MembershipRoleAssigned(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             OrganizationId = organizationId,
             MembershipId = membershipId,
             Role = role.Identifier
@@ -99,50 +86,46 @@ public static class Events
 
     public static PlatformFeatureAssigned PlatformFeatureAssigned(Identifier id, Feature feature)
     {
-        return new PlatformFeatureAssigned
+        return new PlatformFeatureAssigned(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             Feature = feature.Identifier
         };
     }
 
     public static PlatformRoleAssigned PlatformRoleAssigned(Identifier id, Role role)
     {
-        return new PlatformRoleAssigned
+        return new PlatformRoleAssigned(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             Role = role.Identifier
         };
     }
 
     public static PlatformRoleUnassigned PlatformRoleUnassigned(Identifier id, Role role)
     {
-        return new PlatformRoleUnassigned
+        return new PlatformRoleUnassigned(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             Role = role.Identifier
         };
     }
 
-    public static Registered Registered(Identifier id, Optional<EmailAddress> username,
-        UserClassification classification,
-        UserAccess access, UserStatus status,
-        Roles roles,
-        Features features)
+    public static Registered Registered(Identifier id, EndUserProfile userProfile, Optional<EmailAddress> username,
+        UserClassification classification, UserAccess access, UserStatus status, Roles roles, Features features)
     {
-        return new Registered
+        return new Registered(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             Username = username.ValueOrDefault!,
-            Classification = classification.ToString(),
-            Access = access.ToString(),
-            Status = status.ToString(),
+            Classification = classification,
+            Access = access,
+            Status = status,
             Roles = roles.ToList(),
-            Features = features.ToList()
+            Features = features.ToList(),
+            UserProfile = new RegisteredUserProfile
+            {
+                FirstName = userProfile.Name.FirstName,
+                LastName = userProfile.Name.LastName.ValueOrDefault!,
+                Timezone = userProfile.Timezone.ToString(),
+                CountryCode = userProfile.Address.CountryCode.ToString()
+            }
         };
     }
 }

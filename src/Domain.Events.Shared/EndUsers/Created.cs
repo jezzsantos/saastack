@@ -1,16 +1,24 @@
-using Domain.Interfaces.Entities;
+using Domain.Common;
+using Domain.Common.ValueObjects;
+using Domain.Shared.EndUsers;
+using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.EndUsers;
 
-public sealed class Created : IDomainEvent
+public sealed class Created : DomainEvent
 {
-    public required string Access { get; set; }
+    public Created(Identifier id) : base(id)
+    {
+    }
 
-    public required string Classification { get; set; }
+    [UsedImplicitly]
+    public Created()
+    {
+    }
 
-    public required string Status { get; set; }
+    public UserAccess Access { get; set; }
 
-    public required string RootId { get; set; }
+    public UserClassification Classification { get; set; }
 
-    public required DateTime OccurredUtc { get; set; }
+    public UserStatus Status { get; set; }
 }

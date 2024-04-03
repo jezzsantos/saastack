@@ -48,7 +48,7 @@ namespace Tools.Analyzers.NonPlatform;
 ///     SAASDDD036: Warning: ValueObjects should be marked as sealed
 ///     DomainEvents:
 ///     SAASDDD040: Error: DomainEvents must be public
-///     SAASDDD041: Warning: DomainEvents must be sealed
+///     SAASDDD041: Warning: DomainEvents should be sealed
 ///     SAASDDD042: Error: DomainEvents must have a parameterless constructor
 ///     SAASDDD043: Information: DomainEvents must be named in the past tense
 ///     SAASDDD044: Error: DomainEvents must have at least one Create() class factory method
@@ -57,7 +57,7 @@ namespace Tools.Analyzers.NonPlatform;
 ///     SAASDDD047: Error: Properties must be required or nullable or initialized
 ///     SAASDDD048: Error: Properties must be nullable, not Optional{T} for interoperability
 ///     SAASDDD049: Error: Properties must have return type of primitives, List{TPrimitive}, Dictionary{string,TPrimitive},
-///     or be enums
+///     or be enums, or other DTOs
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
@@ -164,17 +164,17 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
         AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD035Title), nameof(Resources.SAASDDD035Description),
         nameof(Resources.SAASDDD035MessageFormat));
     internal static readonly DiagnosticDescriptor Rule036 = "SAASDDD036".GetDescriptor(DiagnosticSeverity.Warning,
-        AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassMustBeSealed),
-        nameof(Resources.Diagnostic_Description_ClassMustBeSealed),
-        nameof(Resources.Diagnostic_MessageFormat_ClassMustBeSealed));
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassShouldBeSealed),
+        nameof(Resources.Diagnostic_Description_ClassShouldBeSealed),
+        nameof(Resources.Diagnostic_MessageFormat_ClassShouldBeSealed));
     internal static readonly DiagnosticDescriptor Rule040 = "SAASDDD040".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassMustBePublic),
         nameof(Resources.Diagnostic_Description_ClassMustBePublic),
         nameof(Resources.Diagnostic_MessageFormat_ClassMustBePublic));
     internal static readonly DiagnosticDescriptor Rule041 = "SAASDDD041".GetDescriptor(DiagnosticSeverity.Warning,
-        AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassMustBeSealed),
-        nameof(Resources.Diagnostic_Description_ClassMustBeSealed),
-        nameof(Resources.Diagnostic_MessageFormat_ClassMustBeSealed));
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassShouldBeSealed),
+        nameof(Resources.Diagnostic_Description_ClassShouldBeSealed),
+        nameof(Resources.Diagnostic_MessageFormat_ClassShouldBeSealed));
     internal static readonly DiagnosticDescriptor Rule042 = "SAASDDD042".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassMustHaveParameterlessConstructor),
         nameof(Resources.Diagnostic_Description_ClassMustHaveParameterlessConstructor),
@@ -553,7 +553,9 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                     context.ReportDiagnostic(Rule046, property);
                 }
 
-                if (!property.IsRequired() && !property.IsInitialized())
+                if (!property.IsEnumOrNullableEnumType(context)
+                    && !property.IsRequired()
+                    && !property.IsInitialized())
                 {
                     if (!property.IsNullableType(context))
                     {
@@ -568,7 +570,8 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
 
                 var allowedReturnTypes = context.GetAllowableDomainEventPropertyReturnTypes();
                 if (context.HasIncorrectReturnType(property, allowedReturnTypes)
-                    && !property.IsEnumType(context))
+                    && !property.IsEnumOrNullableEnumType(context)
+                    && !property.IsDtoOrNullableDto(context, allowedReturnTypes.ToList()))
                 {
                     var acceptableReturnTypes =
                         allowedReturnTypes

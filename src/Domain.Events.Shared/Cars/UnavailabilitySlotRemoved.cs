@@ -1,14 +1,21 @@
-using Domain.Interfaces.Entities;
+using Domain.Common;
+using Domain.Common.ValueObjects;
+using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.Cars;
 
-public sealed class UnavailabilitySlotRemoved : IDomainEvent
+public sealed class UnavailabilitySlotRemoved : DomainEvent
 {
+    public UnavailabilitySlotRemoved(Identifier id) : base(id)
+    {
+    }
+
+    [UsedImplicitly]
+    public UnavailabilitySlotRemoved()
+    {
+    }
+
     public required string OrganizationId { get; set; }
 
     public required string UnavailabilityId { get; set; }
-
-    public required string RootId { get; set; }
-
-    public required DateTime OccurredUtc { get; set; }
 }

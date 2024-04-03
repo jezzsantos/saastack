@@ -10,6 +10,7 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 using Domain.Services.Shared.DomainServices;
 using Domain.Shared;
+using Domain.Shared.EndUsers;
 
 namespace EndUsersDomain;
 
@@ -37,6 +38,8 @@ public sealed class EndUserRoot : AggregateRootBase
     public UserAccess Access { get; private set; }
 
     public UserClassification Classification { get; private set; }
+
+    public Membership DefaultMembership => Memberships.DefaultMembership;
 
     public Features Features { get; private set; } = Features.Create();
 
@@ -106,9 +109,9 @@ public sealed class EndUserRoot : AggregateRootBase
         {
             case Created created:
             {
-                Access = created.Access.ToEnumOrDefault(UserAccess.Enabled);
-                Status = created.Status.ToEnumOrDefault(UserStatus.Unregistered);
-                Classification = created.Classification.ToEnumOrDefault(UserClassification.Person);
+                Access = created.Access;
+                Status = created.Status;
+                Classification = created.Classification;
                 Features = Features.Create();
                 Roles = Roles.Create();
                 return Result.Ok;
@@ -116,9 +119,9 @@ public sealed class EndUserRoot : AggregateRootBase
 
             case Registered changed:
             {
-                Access = changed.Access.ToEnumOrDefault(UserAccess.Enabled);
-                Status = changed.Status.ToEnumOrDefault(UserStatus.Unregistered);
-                Classification = changed.Classification.ToEnumOrDefault(UserClassification.Person);
+                Access = changed.Access;
+                Status = changed.Status;
+                Classification = changed.Classification;
 
                 var roles = Roles.Create(changed.Roles.ToArray());
                 if (!roles.IsSuccessful)
@@ -576,7 +579,7 @@ public sealed class EndUserRoot : AggregateRootBase
         return await onInvited(inviterId, token);
     }
 
-    public Result<Error> Register(Roles roles, Features levels, Optional<EmailAddress> username)
+    public Result<Error> Register(Roles roles, Features levels, EndUserProfile profile, Optional<EmailAddress> username)
     {
         if (Status != UserStatus.Unregistered)
         {
@@ -595,7 +598,7 @@ public sealed class EndUserRoot : AggregateRootBase
             }
         }
 
-        return RaiseChangeEvent(EndUsersDomain.Events.Registered(Id, username, Classification,
+        return RaiseChangeEvent(EndUsersDomain.Events.Registered(Id, profile, username, Classification,
             UserAccess.Enabled, UserStatus.Registered, roles, levels));
     }
 

@@ -157,7 +157,7 @@ public static class WebApplicationExtensions
 
                 await next();
             });
-        }, "Pipeline: Event Projections/Notifications is enabled"));
+        }, "Pipeline: Event Projections/Notifications are enabled"));
     }
 
     /// <summary>

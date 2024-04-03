@@ -7,66 +7,65 @@ public static class Events
 {
     public static CarChanged CarChanged(Identifier id, Identifier organizationId, Identifier carId)
     {
-        return new CarChanged
+        return new CarChanged(id)
         {
-            RootId = id,
             OrganizationId = organizationId,
-            CarId = carId,
-            OccurredUtc = DateTime.UtcNow
+            CarId = carId
         };
     }
 
     public static Created Created(Identifier id, Identifier organizationId)
     {
-        return new Created
+        return new Created(id)
         {
-            RootId = id,
-            OrganizationId = organizationId,
-            OccurredUtc = DateTime.UtcNow
+            OrganizationId = organizationId
         };
     }
 
     public static ReservationMade ReservationMade(Identifier id, Identifier organizationId, Identifier borrowerId,
         DateTime start, DateTime end)
     {
-        return new ReservationMade
+        return new ReservationMade(id)
         {
-            RootId = id,
             OrganizationId = organizationId,
             BorrowerId = borrowerId,
             Start = start,
-            End = end,
-            OccurredUtc = DateTime.UtcNow
+            End = end
+        };
+    }
+
+    public static TripAdded TripAdded(Identifier id, Identifier organizationId)
+    {
+        return new TripAdded(id)
+        {
+            OrganizationId = organizationId,
+            TripId = null
         };
     }
 
     public static TripBegan TripBegan(Identifier id, Identifier organizationId, Identifier tripId,
         DateTime beganAt, Location from)
     {
-        return new TripBegan
+        return new TripBegan(id)
         {
-            RootId = id,
             OrganizationId = organizationId,
             TripId = tripId,
             BeganAt = beganAt,
-            BeganFrom = from,
-            OccurredUtc = DateTime.UtcNow
+            BeganFrom = from
         };
     }
 
     public static TripEnded TripEnded(Identifier id, Identifier organizationId, Identifier tripId, DateTime beganAt,
         Location from, DateTime endedAt, Location to)
     {
-        return new TripEnded
+        return new TripEnded(id)
         {
-            RootId = id,
             OrganizationId = organizationId,
             TripId = tripId,
             BeganAt = beganAt,
             BeganFrom = from,
             EndedAt = endedAt,
-            EndedTo = to,
-            OccurredUtc = DateTime.UtcNow
+            EndedTo = to
         };
     }
 }

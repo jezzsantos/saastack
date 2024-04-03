@@ -4,6 +4,7 @@ using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Shared;
+using Domain.Shared.EndUsers;
 using EndUsersApplication.Persistence;
 using EndUsersApplication.Persistence.ReadModels;
 using EndUsersDomain;
@@ -37,7 +38,7 @@ public class InvitationRepository : IInvitationRepository
     {
         var query = Query.From<Invitation>()
             .Where<string>(eu => eu.InvitedEmailAddress, ConditionOperator.EqualTo, emailAddress.Address)
-            .AndWhere<string>(eu => eu.Status, ConditionOperator.EqualTo, UserStatus.Unregistered.ToString());
+            .AndWhere<UserStatus>(eu => eu.Status, ConditionOperator.EqualTo, UserStatus.Unregistered);
         return await FindFirstByQueryAsync(query, cancellationToken);
     }
 
@@ -46,7 +47,7 @@ public class InvitationRepository : IInvitationRepository
     {
         var query = Query.From<Invitation>()
             .Where<string>(eu => eu.Token, ConditionOperator.EqualTo, token)
-            .AndWhere<string>(eu => eu.Status, ConditionOperator.EqualTo, UserStatus.Unregistered.ToString());
+            .AndWhere<UserStatus>(eu => eu.Status, ConditionOperator.EqualTo, UserStatus.Unregistered);
         return await FindFirstByQueryAsync(query, cancellationToken);
     }
 

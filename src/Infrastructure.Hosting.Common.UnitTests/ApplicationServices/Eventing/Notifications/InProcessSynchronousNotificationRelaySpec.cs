@@ -16,8 +16,9 @@ namespace Infrastructure.Hosting.Common.UnitTests.ApplicationServices.Eventing.N
 [Trait("Category", "Unit")]
 public class InProcessSynchronousNotificationRelaySpec
 {
-    private readonly TestConsumer _consumer;
+    private readonly TestDomainConsumer _domainConsumer;
     private readonly EventSourcingDddCommandStore<TestEventingAggregateRoot> _eventSourcingStore;
+    private readonly TestMessageBroker _messageBroker;
     private readonly InProcessSynchronousNotificationRelay _relay;
 
     public InProcessSynchronousNotificationRelaySpec()
@@ -37,16 +38,18 @@ public class InProcessSynchronousNotificationRelaySpec
         _eventSourcingStore =
             new EventSourcingDddCommandStore<TestEventingAggregateRoot>(recorder.Object, domainFactory.Object,
                 migrator.Object, store.Object);
-        _consumer = new TestConsumer();
-        var registration = new EventNotificationRegistration(
-            new PassThroughEventNotificationProducer<TestEventingAggregateRoot>(),
-            _consumer);
+        _domainConsumer = new TestDomainConsumer();
+        _messageBroker = new TestMessageBroker();
+        var registration =
+            new EventNotificationRegistration(
+                new NoOpIntegrationEventNotificationTranslator<TestEventingAggregateRoot>(), [_domainConsumer]);
         var registrations = new List<IEventNotificationRegistration>
         {
             registration
         };
 
-        _relay = new InProcessSynchronousNotificationRelay(recorder.Object, migrator.Object, registrations,
+        _relay = new InProcessSynchronousNotificationRelay(recorder.Object, migrator.Object, _messageBroker,
+            registrations,
             _eventSourcingStore);
     }
 
@@ -73,8 +76,9 @@ public class InProcessSynchronousNotificationRelaySpec
 
         await _eventSourcingStore.SaveAsync(aggregate, CancellationToken.None);
 
-        _consumer.ProjectedEvents.Length.Should().Be(2);
-        _consumer.ProjectedEvents[0].As<TestEvent>().Id.Should().Be("aneventid1");
-        _consumer.ProjectedEvents[1].As<TestEvent>().Id.Should().Be("aneventid2");
+        _domainConsumer.ProjectedEvents.Length.Should().Be(2);
+        _domainConsumer.ProjectedEvents[0].As<TestEvent>().Id.Should().Be("aneventid1");
+        _domainConsumer.ProjectedEvents[1].As<TestEvent>().Id.Should().Be("aneventid2");
+        _messageBroker.ProjectedEvents.Length.Should().Be(0);
     }
 }

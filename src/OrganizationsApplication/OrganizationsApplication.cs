@@ -16,7 +16,7 @@ using OrganizationOwnership = Domain.Shared.Organizations.OrganizationOwnership;
 
 namespace OrganizationsApplication;
 
-public class OrganizationsApplication : IOrganizationsApplication
+public partial class OrganizationsApplication : IOrganizationsApplication
 {
     private readonly IEndUsersService _endUsersService;
     private readonly IIdentifierFactory _identifierFactory;
@@ -71,55 +71,6 @@ public class OrganizationsApplication : IOrganizationsApplication
         return Result.Ok;
     }
 
-    public async Task<Result<Organization, Error>> CreateOrganizationAsync(ICallerContext caller, string creatorId,
-        string name, Application.Resources.Shared.OrganizationOwnership ownership, CancellationToken cancellationToken)
-    {
-        var displayName = DisplayName.Create(name);
-        if (!displayName.IsSuccessful)
-        {
-            return displayName.Error;
-        }
-
-        var created = OrganizationRoot.Create(_recorder, _identifierFactory, _tenantSettingService,
-            ownership.ToEnumOrDefault(OrganizationOwnership.Shared), creatorId.ToId(), displayName.Value);
-        if (!created.IsSuccessful)
-        {
-            return created.Error;
-        }
-
-        var org = created.Value;
-        var newSettings = await _tenantSettingsService.CreateForTenantAsync(caller, org.Id, cancellationToken);
-        if (!newSettings.IsSuccessful)
-        {
-            return newSettings.Error;
-        }
-
-        var organizationSettings = newSettings.Value.ToSettings();
-        if (!organizationSettings.IsSuccessful)
-        {
-            return organizationSettings.Error;
-        }
-
-        var configured = org.CreateSettings(organizationSettings.Value);
-        if (!configured.IsSuccessful)
-        {
-            return configured.Error;
-        }
-
-        //TODO: Get the billing details for the creator and add the billing subscription for them
-
-        var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (!saved.IsSuccessful)
-        {
-            return saved.Error;
-        }
-
-        _recorder.TraceInformation(caller.ToCall(), "Created organization: {Id}, by {CreatedBy}", org.Id,
-            saved.Value.CreatedById);
-
-        return saved.Value.ToOrganization();
-    }
-
     public async Task<Result<Organization, Error>> CreateSharedOrganizationAsync(ICallerContext caller, string name,
         CancellationToken cancellationToken)
     {
@@ -131,16 +82,7 @@ public class OrganizationsApplication : IOrganizationsApplication
             return created.Error;
         }
 
-        //TODO: replaced by a notification!
-        var organization = created.Value;
-        var membership =
-            await _endUsersService.CreateMembershipForCallerPrivateAsync(caller, organization.Id, cancellationToken);
-        if (!membership.IsSuccessful)
-        {
-            return membership.Error;
-        }
-
-        return organization;
+        return created.Value;
     }
 
     public async Task<Result<Organization, Error>> GetOrganizationAsync(ICallerContext caller, string id,
@@ -255,6 +197,55 @@ public class OrganizationsApplication : IOrganizationsApplication
         }
 
         return searchOptions.ApplyWithMetadata(memberships.Value.Results.ConvertAll(x => x.ToMember()));
+    }
+
+    private async Task<Result<Organization, Error>> CreateOrganizationAsync(ICallerContext caller, string creatorId,
+        string name, Application.Resources.Shared.OrganizationOwnership ownership, CancellationToken cancellationToken)
+    {
+        var displayName = DisplayName.Create(name);
+        if (!displayName.IsSuccessful)
+        {
+            return displayName.Error;
+        }
+
+        var created = OrganizationRoot.Create(_recorder, _identifierFactory, _tenantSettingService,
+            ownership.ToEnumOrDefault(OrganizationOwnership.Shared), creatorId.ToId(), displayName.Value);
+        if (!created.IsSuccessful)
+        {
+            return created.Error;
+        }
+
+        var org = created.Value;
+        var newSettings = await _tenantSettingsService.CreateForTenantAsync(caller, org.Id, cancellationToken);
+        if (!newSettings.IsSuccessful)
+        {
+            return newSettings.Error;
+        }
+
+        var organizationSettings = newSettings.Value.ToSettings();
+        if (!organizationSettings.IsSuccessful)
+        {
+            return organizationSettings.Error;
+        }
+
+        var configured = org.CreateSettings(organizationSettings.Value);
+        if (!configured.IsSuccessful)
+        {
+            return configured.Error;
+        }
+
+        //TODO: Get the billing details for the creator and add the billing subscription for them
+
+        var saved = await _repository.SaveAsync(org, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
+
+        _recorder.TraceInformation(caller.ToCall(), "Created organization: {Id}, by {CreatedBy}", org.Id,
+            saved.Value.CreatedById);
+
+        return saved.Value.ToOrganization();
     }
 }
 

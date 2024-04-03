@@ -43,20 +43,20 @@ public class TestAggregateRoot : AggregateRootBase
         RaiseChangeEvent(new ChangeEvent { APropertyName = value });
     }
 
-    public class CreateEvent : IDomainEvent
+    public class CreateEvent : DomainEvent
     {
-        public string RootId { get; set; } = "anid";
-
-        public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+        public CreateEvent() : base("anid")
+        {
+        }
     }
 
-    public class ChangeEvent : IDomainEvent
+    public class ChangeEvent : DomainEvent
     {
+        public ChangeEvent() : base("anid")
+        {
+        }
+
         public required string APropertyName { get; set; }
-
-        public string RootId { get; set; } = "anid";
-
-        public DateTime OccurredUtc { get; set; }
     }
 }
 

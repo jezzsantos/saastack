@@ -81,7 +81,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
             new()
             {
                 Data = null!,
-                EntityType = "atypename",
+                RootAggregateType = "atypename",
                 EventType = null!,
                 Id = null!,
                 LastPersistedAtUtc = default,
@@ -117,7 +117,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
             new()
             {
                 Data = null!,
-                EntityType = nameof(String),
+                RootAggregateType = nameof(String),
                 EventType = null!,
                 Id = null!,
                 LastPersistedAtUtc = default,
@@ -141,7 +141,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
             new()
             {
                 Id = "anid1",
-                EntityType = nameof(String),
+                RootAggregateType = nameof(String),
                 Data = new TestEvent { RootId = "aneventid1" }.ToEventJson(),
                 Version = 4,
                 Metadata = new EventMetadata(typeof(TestEvent).AssemblyQualifiedName!),
@@ -152,7 +152,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
             new()
             {
                 Id = "anid2",
-                EntityType = nameof(String),
+                RootAggregateType = nameof(String),
                 Data = new TestEvent { RootId = "aneventid2" }.ToEventJson(),
                 Version = 5,
                 Metadata = new EventMetadata(typeof(TestEvent).AssemblyQualifiedName!),
@@ -163,7 +163,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
             new()
             {
                 Id = "anid3",
-                EntityType = nameof(String),
+                RootAggregateType = nameof(String),
                 Data = new TestEvent { RootId = "aneventid3" }.ToEventJson(),
                 Version = 6,
                 Metadata = new EventMetadata(typeof(TestEvent).AssemblyQualifiedName!),
@@ -198,7 +198,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
             {
                 Id = "anid",
                 LastPersistedAtUtc = default,
-                EntityType = nameof(String),
+                RootAggregateType = nameof(String),
                 EventType = null!,
                 Data = new TestEvent
                 {
@@ -225,7 +225,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
             new()
             {
                 Id = "anid1",
-                EntityType = nameof(String),
+                RootAggregateType = nameof(String),
                 Data = new TestEvent { RootId = "aneventid1" }.ToEventJson(),
                 Version = startingCheckpoint,
                 Metadata = new EventMetadata(typeof(TestEvent).AssemblyQualifiedName!),
@@ -236,7 +236,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
             new()
             {
                 Id = "anid2",
-                EntityType = nameof(String),
+                RootAggregateType = nameof(String),
                 Data = new TestEvent { RootId = "aneventid2" }.ToEventJson(),
                 Version = startingCheckpoint + 1,
                 Metadata = new EventMetadata(typeof(TestEvent).AssemblyQualifiedName!),
@@ -247,7 +247,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
             new()
             {
                 Id = "anid3",
-                EntityType = nameof(String),
+                RootAggregateType = nameof(String),
                 Data = new TestEvent { RootId = "aneventid3" }.ToEventJson(),
                 Version = startingCheckpoint + 2,
                 Metadata = new EventMetadata(typeof(TestEvent).AssemblyQualifiedName!),
@@ -284,7 +284,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
             new()
             {
                 Id = "anid1",
-                EntityType = nameof(String),
+                RootAggregateType = nameof(String),
                 Data = new TestEvent { RootId = "aneventid1" }.ToEventJson(),
                 Version = 3,
                 Metadata = new EventMetadata(typeof(TestEvent).AssemblyQualifiedName!),
@@ -317,7 +317,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
             new()
             {
                 Id = "anid1",
-                EntityType = nameof(String),
+                RootAggregateType = nameof(String),
                 Data = new TestEvent { RootId = "aneventid1" }.ToEventJson(),
                 Version = 3,
                 Metadata = new EventMetadata(typeof(TestEvent).AssemblyQualifiedName!),
@@ -328,7 +328,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
             new()
             {
                 Id = "anid2",
-                EntityType = nameof(String),
+                RootAggregateType = nameof(String),
                 Data = new TestEvent { RootId = "aneventid2" }.ToEventJson(),
                 Version = 4,
                 Metadata = new EventMetadata(typeof(TestEvent).AssemblyQualifiedName!),
@@ -339,7 +339,7 @@ public sealed class ReadModelProjectorSpec : IDisposable
             new()
             {
                 Id = "anid3",
-                EntityType = nameof(String),
+                RootAggregateType = nameof(String),
                 Data = new TestEvent { RootId = "aneventid3" }.ToEventJson(),
                 Version = 5,
                 Metadata = new EventMetadata(typeof(TestEvent).AssemblyQualifiedName!),

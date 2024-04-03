@@ -1,12 +1,19 @@
-using Domain.Interfaces.Entities;
+using Domain.Common;
+using Domain.Common.ValueObjects;
+using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.EndUsers;
 
-public sealed class PlatformRoleUnassigned : IDomainEvent
+public sealed class PlatformRoleUnassigned : DomainEvent
 {
+    public PlatformRoleUnassigned(Identifier id) : base(id)
+    {
+    }
+
+    [UsedImplicitly]
+    public PlatformRoleUnassigned()
+    {
+    }
+
     public required string Role { get; set; }
-
-    public required string RootId { get; set; }
-
-    public required DateTime OccurredUtc { get; set; }
 }

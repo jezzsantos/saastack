@@ -3,18 +3,18 @@
 namespace Infrastructure.Eventing.Common.Notifications;
 
 /// <summary>
-///     Provides the registration information for both a producer and consumer
+///     Provides the registration information for both consumers of domain and integration events
 /// </summary>
 public sealed class EventNotificationRegistration : IEventNotificationRegistration
 {
-    public EventNotificationRegistration(IEventNotificationProducer producer,
-        IEventNotificationConsumer consumer)
+    public EventNotificationRegistration(IIntegrationEventNotificationTranslator translator,
+        List<IDomainEventNotificationConsumer> domainEventConsumers)
     {
-        Producer = producer;
-        Consumer = consumer;
+        DomainEventConsumers = domainEventConsumers;
+        IntegrationEventTranslator = translator;
     }
 
-    public IEventNotificationProducer Producer { get; }
+    public IIntegrationEventNotificationTranslator IntegrationEventTranslator { get; }
 
-    public IEventNotificationConsumer Consumer { get; }
+    public List<IDomainEventNotificationConsumer> DomainEventConsumers { get; }
 }

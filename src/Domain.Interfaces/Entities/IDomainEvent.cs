@@ -1,7 +1,7 @@
 namespace Domain.Interfaces.Entities;
 
 /// <summary>
-///     Defines a domain event to communicate past events of an aggregate
+///     Defines a domain event to communicate past events of an aggregate within the same bounded context
 /// </summary>
 public interface IDomainEvent
 {

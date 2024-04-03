@@ -19,6 +19,7 @@ using Domain.Shared;
 using Infrastructure.Common;
 using Infrastructure.Common.Extensions;
 using Infrastructure.Eventing.Common.Projections.ReadModels;
+using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Hosting.Common;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Hosting.Common.Recording;
@@ -28,6 +29,7 @@ using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Shared.ApplicationServices;
 using Infrastructure.Shared.ApplicationServices;
 using Infrastructure.Shared.ApplicationServices.External;
+using Infrastructure.Shared.Eventing.Notifications;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Common.Validation;
@@ -61,7 +63,7 @@ public static class HostExtensions
     private const string AllowedCORSOriginsSettingName = "Hosts:AllowedCORSOrigins";
     private const string CheckPointAggregatePrefix = "check";
     private const string LoggingSettingName = "Logging";
-    private static readonly char[] AllowedCORSOriginsDelimiters = { ',', ';', ' ' };
+    private static readonly char[] AllowedCORSOriginsDelimiters = [',', ';', ' '];
 #if TESTINGONLY
     private static readonly Dictionary<string, IWebRequest> StubQueueDrainingServiceQueuedApiMappings = new()
     {
@@ -90,6 +92,7 @@ public static class HostExtensions
         RegisterNotifications(hostOptions.UsesNotifications);
         modules.RegisterServices(appBuilder.Configuration, services);
         RegisterApplicationServices(hostOptions.IsMultiTenanted);
+        RegisterEventing(hostOptions.Persistence.UsesEventing);
         RegisterPersistence(hostOptions.Persistence.UsesQueues, hostOptions.IsMultiTenanted);
         RegisterCors(hostOptions.CORS);
 
@@ -377,6 +380,14 @@ public static class HostExtensions
             else
             {
                 services.AddSingleton<ICallerContextFactory, AspNetCallerContextFactory>();
+            }
+        }
+
+        void RegisterEventing(bool usesEventing)
+        {
+            if (usesEventing)
+            {
+                services.AddPerHttpRequest<IEventNotificationMessageBroker, ExampleEventNotificationMessageBroker>();
             }
         }
 

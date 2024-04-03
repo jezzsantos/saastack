@@ -1,5 +1,6 @@
 ﻿using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Cars;
+using Domain.Shared.Cars;
 
 namespace CarsDomain;
 
@@ -7,51 +8,43 @@ public static class Events
 {
     public static Created Created(Identifier id, Identifier organizationId)
     {
-        return new Created
+        return new Created(id)
         {
-            RootId = id,
             OrganizationId = organizationId,
-            OccurredUtc = DateTime.UtcNow,
-            Status = CarStatus.Unregistered.ToString()
+            Status = CarStatus.Unregistered
         };
     }
 
     public static ManufacturerChanged ManufacturerChanged(Identifier id, Identifier organizationId,
         Manufacturer manufacturer)
     {
-        return new ManufacturerChanged
+        return new ManufacturerChanged(id)
         {
-            RootId = id,
             OrganizationId = organizationId,
             Year = manufacturer.Year,
             Make = manufacturer.Make,
-            Model = manufacturer.Model,
-            OccurredUtc = DateTime.UtcNow
+            Model = manufacturer.Model
         };
     }
 
     public static OwnershipChanged OwnershipChanged(Identifier id, Identifier organizationId, VehicleOwner owner)
     {
-        return new OwnershipChanged
+        return new OwnershipChanged(id)
         {
-            RootId = id,
             OrganizationId = organizationId,
             Owner = owner.OwnerId,
-            Managers = new List<string> { owner.OwnerId },
-            OccurredUtc = DateTime.UtcNow
+            Managers = [owner.OwnerId]
         };
     }
 
     public static RegistrationChanged RegistrationChanged(Identifier id, Identifier organizationId, LicensePlate plate)
     {
-        return new RegistrationChanged
+        return new RegistrationChanged(id)
         {
-            RootId = id,
             OrganizationId = organizationId,
             Jurisdiction = plate.Jurisdiction,
             Number = plate.Number,
-            Status = CarStatus.Registered.ToString(),
-            OccurredUtc = DateTime.UtcNow
+            Status = CarStatus.Registered
         };
     }
 
@@ -59,28 +52,24 @@ public static class Events
         TimeSlot slot,
         CausedBy causedBy)
     {
-        return new UnavailabilitySlotAdded
+        return new UnavailabilitySlotAdded(id)
         {
-            RootId = id,
             OrganizationId = organizationId,
             From = slot.From,
             To = slot.To,
             CausedByReason = causedBy.Reason,
             CausedByReference = causedBy.Reference,
-            UnavailabilityId = null,
-            OccurredUtc = DateTime.UtcNow
+            UnavailabilityId = null
         };
     }
 
     public static UnavailabilitySlotRemoved UnavailabilitySlotRemoved(Identifier id, Identifier organizationId,
         Identifier unavailabilityId)
     {
-        return new UnavailabilitySlotRemoved
+        return new UnavailabilitySlotRemoved(id)
         {
-            RootId = id,
             OrganizationId = organizationId,
-            UnavailabilityId = unavailabilityId,
-            OccurredUtc = DateTime.UtcNow
+            UnavailabilityId = unavailabilityId
         };
     }
 }

@@ -1,4 +1,4 @@
-namespace EndUsersDomain;
+namespace Domain.Shared.EndUsers;
 
 public enum UserClassification
 {

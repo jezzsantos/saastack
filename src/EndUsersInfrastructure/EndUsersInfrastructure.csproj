@@ -20,6 +20,7 @@
 
     <!-- Runs the source generator (in memory) on build -->
     <ItemGroup>
+        <ProjectReference Include="..\Integration.Events.Shared\Integration.Events.Shared.csproj" />
         <ProjectReference Include="..\Tools.Generators.Web.Api\Tools.Generators.Web.Api.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 

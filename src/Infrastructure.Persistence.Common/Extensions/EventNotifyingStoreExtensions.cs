@@ -53,7 +53,7 @@ public static class EventNotifyingStoreExtensions
         return new EventStreamChangeEvent
         {
             Data = changeEvent.Data,
-            EntityType = changeEvent.EntityType,
+            RootAggregateType = changeEvent.EntityType,
             EventType = changeEvent.EventType,
             Id = changeEvent.Id,
             LastPersistedAtUtc = changeEvent.LastPersistedAtUtc,

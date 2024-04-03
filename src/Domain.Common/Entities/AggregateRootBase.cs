@@ -314,12 +314,12 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
     /// <summary>
     ///     Raises the <see cref="@event" /> to an new instance of the <see cref="childEntityFactory" />
     /// </summary>
-    protected Result<TEntity, Error> RaiseEventToChildEntity<TEntity, TChangeEvent>(bool isReconstituting,
-        TChangeEvent @event,
+    protected Result<TEntity, Error> RaiseEventToChildEntity<TEntity, TDomainEvent>(bool isReconstituting,
+        TDomainEvent @event,
         Func<IIdentifierFactory, Result<TEntity, Error>> childEntityFactory,
-        Expression<Func<TChangeEvent, string?>> eventChildId)
+        Expression<Func<TDomainEvent, string?>> eventChildId)
         where TEntity : IEventingEntity
-        where TChangeEvent : IDomainEvent
+        where TDomainEvent : IDomainEvent
     {
         var identifierFactory = isReconstituting
             ? GetChildId().ToIdentifierFactory()
@@ -351,9 +351,9 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
     ///     Raises the <see cref="@event" /> to an new instance of the <see cref="childEntity" />
     /// </summary>
     // ReSharper disable once MemberCanBeMadeStatic.Global
-    protected Result<Error> RaiseEventToChildEntity<TEntity, TChangeEvent>(TChangeEvent @event, TEntity childEntity)
+    protected Result<Error> RaiseEventToChildEntity<TEntity, TDomainEvent>(TDomainEvent @event, TEntity childEntity)
         where TEntity : IEventingEntity
-        where TChangeEvent : IDomainEvent
+        where TDomainEvent : IDomainEvent
     {
         return childEntity.HandleStateChanged(@event);
     }

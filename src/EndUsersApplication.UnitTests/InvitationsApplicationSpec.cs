@@ -8,6 +8,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Services.Shared.DomainServices;
 using Domain.Shared;
+using Domain.Shared.EndUsers;
 using EndUsersApplication.Persistence;
 using EndUsersDomain;
 using FluentAssertions;
@@ -65,7 +66,8 @@ public class InvitationsApplicationSpec
             .ReturnsAsync(inviter);
         var invitee = EndUserRoot
             .Create(_recorder.Object, "aninviteeid".ToIdentifierFactory(), UserClassification.Person).Value;
-        invitee.Register(Roles.Empty, Features.Empty, EmailAddress.Create("aninvitee@company.com").Value);
+        invitee.Register(Roles.Empty, Features.Empty, EndUserProfile.Create("afirstname").Value,
+            EmailAddress.Create("aninvitee@company.com").Value);
         _invitationRepository.Setup(rep =>
                 rep.FindInvitedGuestByEmailAddressAsync(It.IsAny<EmailAddress>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(invitee.ToOptional());

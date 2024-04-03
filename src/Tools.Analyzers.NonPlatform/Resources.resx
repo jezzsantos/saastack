@@ -79,14 +79,23 @@
     <data name="Diagnostic_Title_PropertyMustBeSettable" xml:space="preserve">
         <value>Property must not be settable</value>
     </data>
-    <data name="Diagnostic_Description_ClassMustBeSealed" xml:space="preserve">
+    <data name="Diagnostic_Description_ClassShouldBeSealed" xml:space="preserve">
         <value>Class should be marked as 'sealed'.</value>
     </data>
-    <data name="Diagnostic_MessageFormat_ClassMustBeSealed" xml:space="preserve">
+    <data name="Diagnostic_MessageFormat_ClassShouldBeSealed" xml:space="preserve">
         <value>Class '{0}' should be marked as 'sealed'</value>
     </data>
-    <data name="Diagnostic_Title_ClassMustBeSealed" xml:space="preserve">
+    <data name="Diagnostic_Title_ClassShouldBeSealed" xml:space="preserve">
         <value>Class should be marked as 'sealed'</value>
+    </data>
+    <data name="Diagnostic_Description_ClassMustBeSealed" xml:space="preserve">
+        <value>Class must be marked as 'sealed'.</value>
+    </data>
+    <data name="Diagnostic_MessageFormat_ClassMustBeSealed" xml:space="preserve">
+        <value>Class '{0}' must be marked as 'sealed'</value>
+    </data>
+    <data name="Diagnostic_Title_ClassMustBeSealed" xml:space="preserve">
+        <value>Class must be marked as 'sealed'</value>
     </data>
     <data name="Diagnostic_Description_ClassMustBePublic" xml:space="preserve">
         <value>Class should be 'public'.</value>
@@ -355,9 +364,28 @@
         <value>Property must have the return the correct type.</value>
     </data>
     <data name="SAASDDD049MessageFormat" xml:space="preserve">
-        <value>Property '{0}' must return one of these primitive types: '{1}', or any Enum, or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types</value>
+        <value>Property '{0}' must return one of these primitive types: '{1}', or any Enum, or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types, or another DTO</value>
     </data>
     <data name="SAASDDD049Title" xml:space="preserve">
+        <value>Wrong return type</value>
+    </data>
+
+    <data name="SAASEVT014Description" xml:space="preserve">
+        <value>Property must be marked 'required' or be nullable or be initialized.</value>
+    </data>
+    <data name="SAASEVT014MessageFormat" xml:space="preserve">
+        <value>Property '{0}' must be marked 'required' or be nullable or be initialized</value>
+    </data>
+    <data name="SAASEVT014Title" xml:space="preserve">
+        <value>Wrong declaration</value>
+    </data>
+    <data name="SAASEVT016Description" xml:space="preserve">
+        <value>Property must have the return the correct type.</value>
+    </data>
+    <data name="SAASEVT016MessageFormat" xml:space="preserve">
+        <value>Property '{0}' must return one of these primitive types: '{1}', or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types, or another DTO</value>
+    </data>
+    <data name="SAASEVT016Title" xml:space="preserve">
         <value>Wrong return type</value>
     </data>
 

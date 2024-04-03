@@ -4,16 +4,16 @@ using Infrastructure.Eventing.Interfaces.Notifications;
 
 namespace Infrastructure.Hosting.Common.UnitTests.ApplicationServices.Eventing.Notifications;
 
-internal class TestConsumer : IEventNotificationConsumer
+internal class TestDomainConsumer : IDomainEventNotificationConsumer
 {
     private readonly List<IDomainEvent> _projectedEvents = new();
 
     public IDomainEvent[] ProjectedEvents => _projectedEvents.ToArray();
 
-    public Task<Result<bool, Error>> NotifyAsync(IDomainEvent changeEvent, CancellationToken cancellationToken)
+    public Task<Result<Error>> NotifyAsync(IDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        _projectedEvents.Add(changeEvent);
+        _projectedEvents.Add(domainEvent);
 
-        return Task.FromResult<Result<bool, Error>>(true);
+        return Task.FromResult(Result.Ok);
     }
 }

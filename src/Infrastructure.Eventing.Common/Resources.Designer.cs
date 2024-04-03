@@ -60,16 +60,7 @@ namespace Infrastructure.Eventing.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The consumer &apos;{0}&apos; did not handle the event &apos;{1}&apos; with event type &apos;{2}&apos;. Aborting notifications.
-        /// </summary>
-        internal static string EventNotificationNotifier_ConsumerError {
-            get {
-                return ResourceManager.GetString("EventNotificationNotifier_ConsumerError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The producer &apos;{0}&apos; did not handle the event &apos;{1}&apos; with event type &apos;{2}&apos;. Aborting notifications.
+        ///   Looks up a localized string similar to The producer &apos;{0}&apos; failed to handle the domain event &apos;{1}&apos; with event type &apos;{2}&apos;. Aborting notifications.
         /// </summary>
         internal static string EventNotificationNotifier_ProducerError {
             get {

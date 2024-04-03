@@ -195,7 +195,7 @@ public sealed class BookingRoot : AggregateRootBase
             return Error.RuleViolation(Resources.BookingRoot_ReservationRequiresCar);
         }
 
-        var added = RaiseChangeEvent(TripAdded.Create(Id, OrganizationId));
+        var added = RaiseChangeEvent(BookingsDomain.Events.TripAdded(Id, OrganizationId));
         if (!added.IsSuccessful)
         {
             return added.Error;

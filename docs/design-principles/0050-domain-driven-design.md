@@ -4,7 +4,7 @@
 
 ## Design Principles
 
-1. We want to design our software according to the use cases we understand from the real world. Thus, focusing on [modeling behaviors](../decisions/0040-modeling.md) in the software rather than modeling the data required to enable the software to operate (a.k.a Data-Modeling).
+1. We want to design our software according to the use cases we understand from the real world. Thus, focusing on [modeling behaviors](../decisions/0040-modeling.md) in the software rather than modeling the data (a.k.a Data-Modeling) required to enable the software to operate. Data modeling is too database and technology focused.
 2. We want to define discrete boundaries of "state" changes, and thus, we want to use the notion of "aggregates" to do that where an aggregate represents the smallest atomic unit of state change.
 3. We want to define at least one root aggregate per explicit subdomain. (Ideally, one per subdomain).
 4. We want aggregates to be the source/producer of "domain events" that represent atomic units of change, and have them communicated to other subdomains (either: remotely over HTTP, or in-process), using a pub-sub mechanism.
@@ -15,30 +15,31 @@
 9. When an Aggregate's state change is persisted, the domain events (that it created) will be published to any consumers registered to receive them. These consumers may be other subdomains in the same process, or running in other processes.
 10.
 11. We want to re-use the design principles of DDD, such as "AggregateRoots", "Entities", "ValueObjects", "Repositories", "Factories", "Subdomains" etc. Where:
-1. All Aggregates, Entities, and ValueObjects will be instantiated by class factories. They will validate all data entering the domain. They will return `Result<Error>` for any validation errors.
-2. They will ensure that no Aggregate ("Aggregate" being the graph of all child/ancestor Entities and ValueObjects) is ever in an invalid state at any time.
-3. Aggregates will verify their own "invariants" whenever there is a state change. Invariants are the things about an aggregate that don't change.
-4. ValueObjects will always be immutable and only "equal" based on their internal state.
-5. Entities and Aggregates will be mutable, and "equal" by their unique identifier (despite differences in their internal value).
-6. A subdomain defines the initial bounded context for a Root Aggregate. Other bounded contexts will evolve as the product evolves.
-12. We want to leverage Hexagonal/Onion/Clean architecture principles:
-1. The Application Layer defines one (or more) external interfaces/contracts for the Subdomain.
-2. All dependencies only point inward. i.e., The Domain Layer strictly has no dependency on the Application Layer, nor on the Infrastructure Layer. In contrast, the Infrastructure Layer and Application Layer can have dependencies on the Domain Layer (directly or indirectly).
-3. We want to avoid building [Transaction Scripts (and anemic domain models)](https://martinfowler.com/eaaCatalog/transactionScript.html) in the Application Layer, as that encourages tight coupling, and anemic domain models.
-4. Application interfaces/contracts will be composed of commands and queries (CQRS):
+12. All Aggregates, Entities, and ValueObjects will be instantiated by class factories. They will validate all data entering the domain. They will return `Result<Error>` for any validation errors.
+13. They will ensure that no Aggregate ("Aggregate" being the graph of all child/ancestor Entities and ValueObjects) is ever in an invalid state at any time.
+14. Aggregates will verify their own "invariants" whenever there is a state change. Invariants are the things about an aggregate that don't change.
+15. ValueObjects will always be immutable and only "equal" based on their internal state.
+16. Entities and Aggregates will be mutable, and "equal" by their unique identifier (despite differences in their internal value).
+17. A subdomain defines the initial bounded context for a Root Aggregate. Other bounded contexts will evolve as the product evolves.
+18. We want to leverage Hexagonal/Onion/Clean architecture principles:
+19. The Application Layer defines one (or more) external interfaces/contracts for the Subdomain.
+20. All dependencies only point inward. i.e., The Domain Layer strictly has no dependency on the Application Layer, nor on the Infrastructure Layer. In contrast, the Infrastructure Layer and Application Layer can have dependencies on the Domain Layer (directly or indirectly).
+21. We want to avoid building [Transaction Scripts (and anemic domain models)](https://martinfowler.com/eaaCatalog/transactionScript.html) in the Application Layer, as that encourages tight coupling, and anemic domain models.
+22. Application interfaces/contracts will be composed of commands and queries (CQRS):
    1. For "commands" it will delegate the command to one (or more) Root Aggregates (i.e., that results in a change of state).
-   2. For "queries" it will delegate the query directly to a read model in a DataStore. In rare cases, the query may involve an Aggregate to check access rules.
-5. The Application Layer delegates all decisions (in a command or query) to an Aggregate. The only decisions that should exist in the Application Layer, are:
-   1. The statelessness of the contract. Stateless or Stateful. i.e., Where to pull data from (which ApplicationService/Repository) and where to push it (which ApplicationService/Repository) and when.
-   2. Which Aggregate use case to invoke, when.
-6. The Application Layer is responsible for providing the Domain Layer with all the data it needs to execute the specific use case.
-7. The Application Layer is responsible for converting all data it obtains (either from Repository/ApplicationService, or from its contract parameters) into ValueObjects that the Domain Layer requires.
-8. The Application Layer will use the [Tell Don't Ask](https://martinfowler.com/bliki/TellDontAsk.html) pattern to instruct the Aggregate to execute the use case.
-9. The Application Layer will convert all changed domain states (in any command or query responses) into shared DTOs (e.g., Resources) that can be shared with all ApplicationServices. e.g., A REST API is one such ApplicationService, as is any adapter to any 3rd party system.
-10. We want to use [Dependency Injection](0060-dependency-injection.md) to inject the necessary dependencies into the Application Layer (ApplicationServices) and Domain Layer (DomainServices), such that they remain decoupled from adapter implementations.
-11. There will be far fewer DomainServices than ApplicationServices. Both kinds of services will be designed in terms of the needs of the consuming subdomain component (and perhaps combined into a more general abstraction if being consumed by multiple subdomains). They shall be as domain-specific as possible and not be described in terms of the technology that implements them (upholding the SOLID principle of [ISP](https://en.wikipedia.org/wiki/Interface_segregation_principle)).
-12. The Application Layer can be exposed by any number of interfaces (e.g., a REST API, a Queue, or a Service Bus)
-13. We want to capture, measure, and monitor usage activity, diagnostics, and audit key events in the system by using the [Recorder](0030-recording.md).
+   2. For "queries" it will delegate the query directly to a read model in an `IDataStore`. In rare cases, the query may involve an Aggregate to check access rules.
+23. The Application Layer delegates all decisions (in a command or query) to an Aggregate. The only decisions that should exist in the Application Layer, are:
+   1. The statelessness of the contract. Stateless or Stateful.
+   2. Where to pull data from (which ApplicationService/Repository) and where to push it (which ApplicationService/Repository) and when.
+   3. Which Aggregate use case to invoke, when.
+24. The Application Layer is responsible for providing the Domain Layer with all the data it needs to execute the specific use case. Also, may require domain services for data processing.
+25. The Application Layer is responsible for converting all data it obtains (either from Repository/ApplicationService, or from its contract parameters) into ValueObjects that the Domain Layer requires. Domain Layer does not accept variables in anything but primitives and ValueObjects.
+26. The Application Layer will use the [Tell Don't Ask](https://martinfowler.com/bliki/TellDontAsk.html) pattern to instruct the Aggregate to execute the use case, no matter how complex the use case is (or isn't). The [Law of Demeter](https://en.wikipedia.org/wiki/Law_of_Demeter) also applies to reading any data from an Aggregate.
+27. The Application Layer will convert all changed domain states (in any command or query responses) into shared DTOs (e.g., Resources) that can be shared with all other Application Services. e.g., A REST API is one such Application Service, as is any adapter to any 3rd party system.
+28. We want to use [Dependency Injection](0060-dependency-injection.md) to inject the necessary dependencies into the Application Layer (as Application Services) and Domain Layer (as Domain Services), such that they remain decoupled from concrete adapter implementations.
+29. We expect that there will be far fewer Domain Services than Application Services. Both kinds of services will be designed in terms of the needs of the consuming subdomain component (and perhaps combined into a more general abstraction if being consumed by multiple subdomains). They shall be as domain-specific as possible and not be described in terms of the technology that implements them (upholding the SOLID principle of [ISP](https://en.wikipedia.org/wiki/Interface_segregation_principle)).
+30. The Application Layer can be exposed to any number of interfaces (e.g., a REST API, a Queue, or a Service Bus) or as consumer of domain events notifications.
+31. We want to capture, measure, and monitor usage activity, diagnostics, and audit key events in the system by using the [Recorder](0030-recording.md).
 
 ## Implementation
 
@@ -48,32 +49,36 @@ In DDD parlance, a "Generic" subdomain is one that is generic to all products. I
 
 A "Core" subdomain is unique to your product and a vital characteristic of it.
 
-> That is not to say that the Generic subdomains are not vital; they are absolutely vital for operation, it is just that it is not vital that you build them yourself.
+> That is not to say that the Generic subdomains are not vital; they are absolutely vital for operation. It is just that it is not vital that you build them yourself.
 
 <img alt="Subdomains" src="../images/Subdomains.png" style="zoom:50%;" />
 
-For example, in this codebase, we have provided 2 "Core" subdomains (`Cars` and `Bookings`) that together define the larger "domain" of this example product to be `Car Sharing`. The other subdomains are all Generic subdomains:
+Among the subdomains will exist one or more "bounded contexts". In DDD, a bounded context is simply a defined boundary within which the semantics of the aggregates and use cases in the subdomains are well-known and unambiguous. Given that in the real world, many aspects of the same thing/concept are only relevant in specific contexts. That is exactly what a bounded context is meant to be. A codified specific context, where meaning is clear, using names of things that can other meanings in different contexts.
 
-- `EndUsers`, `Organizations`, `Profiles,` and `Subscriptions` are all generic subdomains related to the multi-tenancy and identity management within a typical SaaS product.
-- `AuthN`, `Auxillary`, `Images` (and `Workers`) are all generic subdomains related to the operation of a typical SaaS product.
+For example, in this codebase, we have provided two "Core" subdomains: `Cars` and `Bookings`. Together, these two subdomains alone are understood together to represent the "core" of a bounded context of borrowing cars with the "Car Sharing" domain.
+
+The other subdomains are all "Generic" subdomains, and form another more technical bounded context where they work together to provide consistency and rules that govern things like multi-tenancy, ownership and payment authority, etc:
+
+- `EndUsers`, `Organizations`, `UserProfiles`, `Identities`, and `Subscriptions` are all generic subdomains related to the multi-tenancy and identity management within a typical SaaS product.
+- `Ancillary`, `Images` (and `Workers`) are all generic subdomains related to the operation of a typical SaaS product.
 
 #### Your first few Subdomains
 
-When starting a new product, many developers who are unfamiliar with DDD wonder how to get started defining the new core subdomains of their products. It is a fair question. They are (more often than not) used to thinking about software design in terms of the data tables, columns, and datatypes required by relational databases (a.k.a data modeling). So, they expect that there is some similar way of working in DDD that easily translates. This is not really the case.
+When starting a new product, many developers who are unfamiliar with DDD wonder how to start defining the new core subdomains of their products. It is a fair question. They are (more often than not) used to thinking about software design in terms of the data tables, columns, and data types required by relational databases (a.k.a. data modeling). So, they expect that there is some similar way of working in DDD that can be easily translated. This is not really the case.
 
-There has been a lot of work done on what is called "strategic" design in DDD. Whole books have been written on it; some like [Eric Evans's "blue book"](https://www.domainlanguage.com/ddd/) are very comprehensive and well worth the read. They guide you through designing the subdomains and bounded contexts of your software, using context maps and things like that. Most of that material makes a lot of sense, but getting started with applying it before you have any software built is still quite challenging, particularly when building software products.
+A lot of work has been done on what is called "strategic" design in DDD. Whole books have been written on it; some like [Eric Evans's "blue book"](https://www.domainlanguage.com/ddd/) are very comprehensive and well worth the read. They guide you through understanding and designing the subdomains and bounded contexts of your software using context maps and things like that. Most of that material makes a lot of sense, but getting started with applying it before you have any software built is still quite challenging, particularly when building software products from scratch.
 
 However, what is not so hard is answering this question:
 
-Q1. What are the use cases for using the software you want to build? a.k.a What, specifically, should your software do?
+Q. What are the use cases for using the software you want to build? a.k.a What, specifically, should your software do?
 
 If you can answer that question, then you are already designing the "Subdomains" of your domain.
 
-We recommend that you just get started focusing on your use cases, and the database design will fall out of the back of that process. That would be very scary and risky if you were data modeling, but you are not doing that now, you are domain modeling instead.
+We recommend that you just get started focusing on your use cases, and the database design will fall out of the back of that process. It would be very scary and risky if you were data modeling, but you are not doing that now; you are doing "domain modeling" instead.
 
 Just take the answer to the question above, then group the use cases into groups around a common concept, and then make each one of those concepts a new subdomain.
 
-What should you call the subdomains?
+Q. What should you call the subdomains?
 
 Well, best call them the same things that you use to describe them in the real world. This will eventually become your ubiquitous language.
 
@@ -81,7 +86,7 @@ Well, best call them the same things that you use to describe them in the real w
 >
 > So, for example, it is relatively safe to use the simple noun "Car" to represent the physical object (of ~30,000 parts, the thing that one gets in and drives away), even though you are only modeling very basic details about it, like its color, mileage, location, make, model and year, number of windows, car seats, etc. However, what if your specific business decides to include using bicycles, boats, buses or trucks later on? Would "Vehicle" have been a better option to start with? Context matters.
 
-In the "Car Sharing" world (the example domain in the codebase that you are learning from), we know that this domain is all about people (end-users) making reservations (bookings on some future schedule) to use a car (owned by someone else), finding the car at some location, then gaining access to the car (digital or physical key), then driving the car on some journey over some route for some time, eventually, returning the car to some location, and being charged for its use.
+In the example "Car Sharing" world (the example domain in the codebase that you are learning from), we know that this domain is all about people (end-users) making reservations (bookings on some future schedule) to use a car (owned by someone else), finding the car at some location, then gaining access to the car (digital or physical key), then driving the car on some journey over some route for some time, eventually, returning the car to some location, and being charged for its use.
 
 So, from that simple "mental model" of the real world, we know that we are likely to have these initial core subdomains:
 
@@ -102,7 +107,7 @@ For the proposed subdomains that don't have use cases specifically yet, they won
 
 > For example, you may not be able to come up with a use case for manipulating a Location or a Trip just yet, or for that matter, an Unavailability. That is fine. A car may go on a Trip and have a start and end Location, and while it is booked, it is Unavailable for hire by someone else. But this does not mean that those concepts need to be subdomains in their own rights. Indeed, Unavailability has no meaning without the context of a Car, so it is probably not separate from a Car.
 
-So, Unavailability starts out as an entity of a Car, and Location can start out as two value objects of a Booking, i.e, PickUpLocation and DropoffLocation. Trips could be a child entity of a Booking since you can do several of them during a Booking.
+So, "Unavailability" starts out as an entity of a Car, and "Location" can start out as two value objects of a Booking, i.e., "Pick up" location and "Drop off" Location. Trips could be a child entity of a Booking since you can do several of them during a Booking.
 
 As time goes on, and as you explore your product opportunities further, it is very common that subdomains both diverge (and split up) or converge (and merge together). This is very normal, and unavoidable, and unpredictable, and unknowable ahead of time. So we recommend that you don't try to second guess the future since it is likely to change as you move forward.
 
@@ -117,9 +122,9 @@ A quick note about [Bounded Contexts](https://martinfowler.com/bliki/BoundedCont
 
 Bounded Contexts are another vital concept in Strategic DDD design, and often one that is difficult to implement in code.
 
-Your software does not need to **explicitly** model its bounded contexts for the sake of it.
+Your software does not actually need to **explicitly** model its bounded contexts for the sake of it, nor for completeness.
 
-> They are more of a high-level design attribute than anything else, most useful in context maps.
+> They are more of a high-level design attribute than anything else, and they are most useful in context maps used for design and solving design problems.
 >
 > Yes, they are useful for drawing context maps and the like (at later dates), but they are not necessary to get started on modeling the real world with DDD design.
 
@@ -175,7 +180,7 @@ public sealed class CarRoot : AggregateRootBase
 
 #### Creation
 
-When a new aggregate is created, it must be constructed with a class factory method. This method will then be called from the Application Layer when a new aggregate needs to be created.
+When a new aggregate is created, it must be constructed using a class factory method. This method will then be called from the Application Layer when a new aggregate needs to be created.
 
 > Instantiating an aggregate using a constructor directly is not permitted from outside of the domain.
 
@@ -440,7 +445,7 @@ Aggregates may have conditions within states that are "invariant". That is, thin
 
 Sometimes, those invariants are only true at certain times (in certain states). Sometimes, they are true at all times (in all states).
 
-> For example, for a Booking to be made for a Car, the car must not only exist, but it must be roadworthy, as well as have availability at that time. Availability can change over time (as bookings are made), but roadworthiness may not change. When the car is first created (as an aggregate), it may not have the details it needs to pass the roadworthiness test yet. Those details may come in a future domain event, so the invariant can be applied only after that time.
+> For example, for a Booking to be made for a Car, the car must not only exist, but it must be roadworthy, as well as have availability at that time. Availability can change over time (as bookings are made), but road worthiness may not change. When the car is first created (as an aggregate), it may not have the details it needs to pass the road worthiness test yet. Those details may come in a future domain event, so the invariant can be applied only after that time.
 
 Invariants are strictly checked/validated in three places in a subdomain:
 
@@ -959,13 +964,34 @@ The only invariants that need verifying are when the value object is constructed
 
 ### Event Notifications
 
-TODO: How do we notify consumers of produced domain events?
+In the design of most distributed systems of the nature of this system (or, of systems that are expected to evolve into distributed systems later), it is common to decouple each of the subdomains from each other. De-coupling effectively is absolutely vital to allowing the system to change, grow and evolve over time. Lack of effective de-coupling (at the technical level) is the main reason most software systems devolve into big-balls-of-mud, simply because of coupling.
 
- 
+There are several techniques for de-coupling your subdomains, including: separating layers, using ports and adapters, starting with a modular monoliths and decomposing it into microservices later etc.
 
+Another one of these techniques is the use of Event-Driven Architecture (EDA), where change in communicated within and across boundaries.
 
+EDA relies on the fact that your system will emit "domain events", that it can share both within specific bounded contexts (as "domain events"), and externally to other systems (as "integration events".
 
+> When sharing events within a bounded context (or within the same process) the process can remain consistent, we call these "domain events".
+>
+> When sharing events across bounded contexts (or across processes and hosts) these events are called "integration events".
 
+In SaaStack:
 
+1. We use "domain events" to communicate changes (within the Domain Layer) and within all aggregates and entities. Regardless of whether we are using event sourcing for persistence or not.
+2. We publish all "domain events" whenever the state of any aggregate is saved in any repository, via the `EventSourcingDddCommandStore` or via the `SnapshottingDddCommandStore`.
+3. We treat "domain events" and "integration events" slightly differently:
+   1. "domain events" are published synchronously and handled synchronously after the aggregate is saved, and are always consistent.
+   2. "integration events" are published synchronously, but are expected to be handled asynchronously (by a message broker) and be eventually consistent.
 
+> We assume that all "domain events" are only ever published to other subdomains that are in the same "bounded context" and thus, also in the same host process. When this is not true, for example, if subdomains of the same bounded context are split into separate host processes, then these subdomains will need to communicate with "integration events" instead, and they will be eventually consistent.
 
+The synchronous publication of all "domain events" is handled automatically by the `IEventNotifyingStoreNotificationRelay` (after events have first been projected by the `IEventNotifyingStoreProjectionRelay`).
+
+![Eventing](../images/Persistence-Eventing.png)
+
+Domain events are published synchronously (round-robin) one at a time:
+
+1. First, to all registered `IDomainEventNotificationConsumer` consumers. These consumers can fail and report back errors that are captured synchronously.
+2. Then to all registered `IIntegrationEventNotificationTranslator` translators, that have the option to translate o domain event into an integration event, or not. This translation can also fail, and report back errors that are captured synchronously.
+3. Finally, if the translator translates a domain event into an integration event it is then published to the `IEventNotificationMessageBroker` that should send the integration event to some external message broker, who will deliver it asynchronous to external consumers. This can also fail, and report back errors that are captured synchronously

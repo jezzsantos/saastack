@@ -1,7 +1,6 @@
 ﻿using Common;
 using Common.Extensions;
 using Domain.Common.Extensions;
-using Domain.Interfaces.Entities;
 using FluentAssertions;
 using UnitTesting.Common;
 using Xunit;
@@ -23,7 +22,7 @@ public class ChangeEventTypeMigratorSpec
     [Fact]
     public void WhenRehydrateAndTypeKnown_ThenReturnsNewInstance()
     {
-        var eventJson = new TestChangeEvent { RootId = "anentityid" }.ToEventJson();
+        var eventJson = new TestChangeEvent().ToEventJson();
         var result = _migrator.Rehydrate("aneventid", eventJson, typeof(TestChangeEvent).AssemblyQualifiedName!).Value;
 
         result.Should().BeOfType<TestChangeEvent>();
@@ -33,7 +32,7 @@ public class ChangeEventTypeMigratorSpec
     [Fact]
     public void WhenRehydrateAndUnknownType_ThenReturnsError()
     {
-        var eventJson = new TestChangeEvent { RootId = "anentityid" }.ToEventJson();
+        var eventJson = new TestChangeEvent().ToEventJson();
 
         var result = _migrator.Rehydrate("aneventid", eventJson, "anunknowntype");
 
@@ -45,7 +44,7 @@ public class ChangeEventTypeMigratorSpec
     public void WhenRehydrateAndUnknownTypeAndMappingStillNotExist_ThenReturnsError()
     {
         _mappings.Add("anunknowntype", "anotherunknowntype");
-        var eventJson = new TestChangeEvent { RootId = "anentityid" }.ToEventJson();
+        var eventJson = new TestChangeEvent().ToEventJson();
 
         var result = _migrator.Rehydrate("aneventid", eventJson, "anunknowntype");
 
@@ -57,7 +56,7 @@ public class ChangeEventTypeMigratorSpec
     public void WhenRehydrateAndUnknownTypeAndMappingExists_ThenReturnsNewInstance()
     {
         _mappings.Add("anunknowntype", typeof(TestRenamedChangeEvent).AssemblyQualifiedName!);
-        var eventJson = new TestChangeEvent { RootId = "anentityid" }.ToEventJson();
+        var eventJson = new TestChangeEvent().ToEventJson();
         var result = _migrator.Rehydrate("aneventid", eventJson, "anunknowntype").Value;
 
         result.Should().BeOfType<TestRenamedChangeEvent>();
@@ -65,16 +64,16 @@ public class ChangeEventTypeMigratorSpec
     }
 }
 
-public class TestChangeEvent : IDomainEvent
+public class TestChangeEvent : DomainEvent
 {
-    public string RootId { get; set; } = "anid";
-
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public TestChangeEvent() : base("anentityid")
+    {
+    }
 }
 
-public class TestRenamedChangeEvent : IDomainEvent
+public class TestRenamedChangeEvent : DomainEvent
 {
-    public string RootId { get; set; } = "anid";
-
-    public DateTime OccurredUtc { get; set; } = DateTime.UtcNow;
+    public TestRenamedChangeEvent() : base("anid")
+    {
+    }
 }

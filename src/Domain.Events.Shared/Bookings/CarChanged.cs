@@ -1,14 +1,21 @@
-using Domain.Interfaces.Entities;
+using Domain.Common;
+using Domain.Common.ValueObjects;
+using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.Bookings;
 
-public sealed class CarChanged : IDomainEvent
+public sealed class CarChanged : DomainEvent
 {
+    public CarChanged(Identifier id) : base(id)
+    {
+    }
+
+    [UsedImplicitly]
+    public CarChanged()
+    {
+    }
+
     public required string CarId { get; set; }
 
     public required string OrganizationId { get; set; }
-
-    public required string RootId { get; set; }
-
-    public required DateTime OccurredUtc { get; set; }
 }

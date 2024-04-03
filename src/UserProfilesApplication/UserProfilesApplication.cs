@@ -12,7 +12,7 @@ using PersonName = Domain.Shared.PersonName;
 
 namespace UserProfilesApplication;
 
-public class UserProfilesApplication : IUserProfilesApplication
+public partial class UserProfilesApplication : IUserProfilesApplication
 {
     private readonly IIdentifierFactory _identifierFactory;
     private readonly IRecorder _recorder;
@@ -24,114 +24,6 @@ public class UserProfilesApplication : IUserProfilesApplication
         _recorder = recorder;
         _identifierFactory = identifierFactory;
         _repository = repository;
-    }
-
-    public async Task<Result<UserProfile, Error>> CreateProfileAsync(ICallerContext caller,
-        UserProfileClassification classification,
-        string userId, string? emailAddress, string firstName, string? lastName, string? timezone, string? countryCode,
-        CancellationToken cancellationToken)
-    {
-        if (classification == UserProfileClassification.Person && emailAddress.HasNoValue())
-        {
-            return Error.RuleViolation(Resources.UserProfilesApplication_PersonMustHaveEmailAddress);
-        }
-
-        var retrievedById = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
-        if (!retrievedById.IsSuccessful)
-        {
-            return retrievedById.Error;
-        }
-
-        if (retrievedById.Value.HasValue)
-        {
-            return Error.EntityExists(Resources.UserProfilesApplication_ProfileExistsForUser);
-        }
-
-        if (classification == UserProfileClassification.Person && emailAddress.HasValue())
-        {
-            var email = EmailAddress.Create(emailAddress);
-            if (!email.IsSuccessful)
-            {
-                return email.Error;
-            }
-
-            var retrievedByEmail = await _repository.FindByEmailAddressAsync(email.Value, cancellationToken);
-            if (!retrievedByEmail.IsSuccessful)
-            {
-                return retrievedByEmail.Error;
-            }
-
-            if (retrievedByEmail.Value.HasValue)
-            {
-                return Error.EntityExists(Resources.UserProfilesApplication_ProfileExistsForEmailAddress);
-            }
-        }
-
-        var name = PersonName.Create(firstName, classification == UserProfileClassification.Person
-            ? lastName
-            : Optional<string>.None);
-        if (!name.IsSuccessful)
-        {
-            return name.Error;
-        }
-
-        var created = UserProfileRoot.Create(_recorder, _identifierFactory,
-            classification.ToEnumOrDefault(ProfileType.Person),
-            userId.ToId(), name.Value);
-        if (!created.IsSuccessful)
-        {
-            return created.Error;
-        }
-
-        var profile = created.Value;
-        if (classification == UserProfileClassification.Person)
-        {
-            var email2 = EmailAddress.Create(emailAddress!);
-            if (!email2.IsSuccessful)
-            {
-                return email2.Error;
-            }
-
-            var emailed = profile.SetEmailAddress(userId.ToId(), email2.Value);
-            if (!emailed.IsSuccessful)
-            {
-                return emailed.Error;
-            }
-        }
-
-        var address = Address.Create(CountryCodes.FindOrDefault(countryCode));
-        if (!address.IsSuccessful)
-        {
-            return address.Error;
-        }
-
-        var contacted = profile.SetContactAddress(userId.ToId(), address.Value);
-        if (!contacted.IsSuccessful)
-        {
-            return contacted.Error;
-        }
-
-        var tz = Timezone.Create(Timezones.FindOrDefault(timezone));
-        if (!tz.IsSuccessful)
-        {
-            return tz.Error;
-        }
-
-        var timezoned = profile.SetTimezone(userId.ToId(), tz.Value);
-        if (!timezoned.IsSuccessful)
-        {
-            return timezoned.Error;
-        }
-
-        var saved = await _repository.SaveAsync(profile, cancellationToken);
-        if (!saved.IsSuccessful)
-        {
-            return saved.Error;
-        }
-
-        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was created for user {userId}", profile.Id, userId);
-
-        return saved.Value.ToProfile();
     }
 
     public async Task<Result<Optional<UserProfile>, Error>> FindPersonByEmailAddressAsync(ICallerContext caller,
@@ -161,7 +53,8 @@ public class UserProfilesApplication : IUserProfilesApplication
     public async Task<Result<UserProfile, Error>> GetProfileAsync(ICallerContext caller, string userId,
         CancellationToken cancellationToken)
     {
-        if (userId != caller.CallerId)
+        if (!caller.IsServiceAccount
+            && userId != caller.CallerId)
         {
             return Error.ForbiddenAccess();
         }
@@ -358,6 +251,114 @@ public class UserProfilesApplication : IUserProfilesApplication
         return profiles
             .ConvertAll(profile => profile.ToProfile())
             .ToList();
+    }
+
+    private async Task<Result<UserProfile, Error>> CreateProfileAsync(ICallerContext caller,
+        UserProfileClassification classification, string userId, string? emailAddress, string firstName,
+        string? lastName, string? timezone, string? countryCode,
+        CancellationToken cancellationToken)
+    {
+        if (classification == UserProfileClassification.Person && emailAddress.HasNoValue())
+        {
+            return Error.RuleViolation(Resources.UserProfilesApplication_PersonMustHaveEmailAddress);
+        }
+
+        var retrievedById = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
+        if (!retrievedById.IsSuccessful)
+        {
+            return retrievedById.Error;
+        }
+
+        if (retrievedById.Value.HasValue)
+        {
+            return Error.EntityExists(Resources.UserProfilesApplication_ProfileExistsForUser);
+        }
+
+        if (classification == UserProfileClassification.Person && emailAddress.HasValue())
+        {
+            var email = EmailAddress.Create(emailAddress);
+            if (!email.IsSuccessful)
+            {
+                return email.Error;
+            }
+
+            var retrievedByEmail = await _repository.FindByEmailAddressAsync(email.Value, cancellationToken);
+            if (!retrievedByEmail.IsSuccessful)
+            {
+                return retrievedByEmail.Error;
+            }
+
+            if (retrievedByEmail.Value.HasValue)
+            {
+                return Error.EntityExists(Resources.UserProfilesApplication_ProfileExistsForEmailAddress);
+            }
+        }
+
+        var name = PersonName.Create(firstName, classification == UserProfileClassification.Person
+            ? lastName
+            : Optional<string>.None);
+        if (!name.IsSuccessful)
+        {
+            return name.Error;
+        }
+
+        var created = UserProfileRoot.Create(_recorder, _identifierFactory,
+            classification.ToEnumOrDefault(ProfileType.Person),
+            userId.ToId(), name.Value);
+        if (!created.IsSuccessful)
+        {
+            return created.Error;
+        }
+
+        var profile = created.Value;
+        if (classification == UserProfileClassification.Person)
+        {
+            var email2 = EmailAddress.Create(emailAddress!);
+            if (!email2.IsSuccessful)
+            {
+                return email2.Error;
+            }
+
+            var emailed = profile.SetEmailAddress(userId.ToId(), email2.Value);
+            if (!emailed.IsSuccessful)
+            {
+                return emailed.Error;
+            }
+        }
+
+        var address = Address.Create(CountryCodes.FindOrDefault(countryCode));
+        if (!address.IsSuccessful)
+        {
+            return address.Error;
+        }
+
+        var contacted = profile.SetContactAddress(userId.ToId(), address.Value);
+        if (!contacted.IsSuccessful)
+        {
+            return contacted.Error;
+        }
+
+        var tz = Timezone.Create(Timezones.FindOrDefault(timezone));
+        if (!tz.IsSuccessful)
+        {
+            return tz.Error;
+        }
+
+        var timezoned = profile.SetTimezone(userId.ToId(), tz.Value);
+        if (!timezoned.IsSuccessful)
+        {
+            return timezoned.Error;
+        }
+
+        var saved = await _repository.SaveAsync(profile, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
+
+        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was created for user {userId}", profile.Id, userId);
+
+        return saved.Value.ToProfile();
     }
 }
 

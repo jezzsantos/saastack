@@ -66,8 +66,6 @@ public sealed class OrganizationRoot : AggregateRootBase
             return ensureInvariants.Error;
         }
 
-        //TODO: add your other invariant rules here
-
         return Result.Ok;
     }
 

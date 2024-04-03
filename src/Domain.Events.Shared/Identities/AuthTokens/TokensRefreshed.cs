@@ -1,9 +1,20 @@
-using Domain.Interfaces.Entities;
+using Domain.Common;
+using Domain.Common.ValueObjects;
+using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.Identities.AuthTokens;
 
-public sealed class TokensRefreshed : IDomainEvent
+public sealed class TokensRefreshed : DomainEvent
 {
+    public TokensRefreshed(Identifier id) : base(id)
+    {
+    }
+
+    [UsedImplicitly]
+    public TokensRefreshed()
+    {
+    }
+
     public required string AccessToken { get; set; }
 
     public required DateTime AccessTokenExpiresOn { get; set; }
@@ -13,8 +24,4 @@ public sealed class TokensRefreshed : IDomainEvent
     public required DateTime RefreshTokenExpiresOn { get; set; }
 
     public required string UserId { get; set; }
-
-    public required string RootId { get; set; }
-
-    public required DateTime OccurredUtc { get; set; }
 }

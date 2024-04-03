@@ -10,7 +10,7 @@ public class EventStreamChangeEvent
 {
     public required string Data { get; set; }
 
-    public required string EntityType { get; set; }
+    public required string RootAggregateType { get; set; }
 
     public required string EventType { get; set; }
 

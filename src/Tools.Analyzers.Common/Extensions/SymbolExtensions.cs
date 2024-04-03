@@ -32,6 +32,59 @@ public static class SymbolExtensions
         return string.Empty;
     }
 
+    public static bool HasParameterlessConstructor(this INamedTypeSymbol symbol)
+    {
+        var constructors = symbol.InstanceConstructors;
+        if (constructors.Length == 0)
+        {
+            return true;
+        }
+
+        return symbol.InstanceConstructors
+            .Any(c => c.DeclaredAccessibility == Microsoft.CodeAnalysis.Accessibility.Public
+                      && c.Parameters.Length == 0);
+    }
+
+    public static bool HasPropertiesOfAllowableTypes(this INamedTypeSymbol symbol,
+        List<INamedTypeSymbol> allowableTypes)
+    {
+        var properties = symbol.GetMembers()
+            .OfType<IPropertySymbol>()
+            .Select(p => p.GetMethod?.ReturnType)
+            .Where(rt => rt is not null);
+
+        foreach (var property in properties)
+        {
+            if (!allowableTypes.Any(allowableType => property!.IsOfType(allowableType)))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static bool HasPublicGetterAndSetterProperties(this INamedTypeSymbol symbol)
+    {
+        var properties = symbol.GetMembers()
+            .OfType<IPropertySymbol>();
+
+        foreach (var property in properties)
+        {
+            if (property.DeclaredAccessibility != Microsoft.CodeAnalysis.Accessibility.Public)
+            {
+                return false;
+            }
+
+            if (property.GetMethod is null || property.SetMethod is null)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static bool IsEnum(this ITypeSymbol symbol)
     {
         return symbol.TypeKind == TypeKind.Enum;

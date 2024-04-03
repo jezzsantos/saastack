@@ -12,40 +12,32 @@ public static class Events
         public static Domain.Events.Shared.Ancillary.EmailDelivery.Created Created(Identifier id,
             QueuedMessageId messageId)
         {
-            return new Domain.Events.Shared.Ancillary.EmailDelivery.Created
+            return new Domain.Events.Shared.Ancillary.EmailDelivery.Created(id)
             {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
                 MessageId = messageId
             };
         }
 
         public static DeliveryAttempted DeliveryAttempted(Identifier id, DateTime when)
         {
-            return new DeliveryAttempted
+            return new DeliveryAttempted(id)
             {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
                 When = when
             };
         }
 
         public static DeliveryFailed DeliveryFailed(Identifier id, DateTime when)
         {
-            return new DeliveryFailed
+            return new DeliveryFailed(id)
             {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
                 When = when
             };
         }
 
         public static DeliverySucceeded DeliverySucceeded(Identifier id, DateTime when)
         {
-            return new DeliverySucceeded
+            return new DeliverySucceeded(id)
             {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
                 When = when
             };
         }
@@ -53,10 +45,8 @@ public static class Events
         public static EmailDetailsChanged EmailDetailsChanged(Identifier id, string subject, string body,
             EmailRecipient to)
         {
-            return new EmailDetailsChanged
+            return new EmailDetailsChanged(id)
             {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
                 Subject = subject,
                 Body = body,
                 ToEmailAddress = to.EmailAddress,
@@ -70,10 +60,8 @@ public static class Events
         public static Created Created(Identifier id, Identifier againstId, Optional<Identifier> organizationId,
             string auditCode, Optional<string> messageTemplate, TemplateArguments templateArguments)
         {
-            return new Created
+            return new Created(id)
             {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
                 OrganizationId = organizationId.HasValue
                     ? organizationId.Value.Text
                     : null,

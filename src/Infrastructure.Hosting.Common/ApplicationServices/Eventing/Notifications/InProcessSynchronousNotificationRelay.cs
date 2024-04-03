@@ -14,10 +14,11 @@ public class InProcessSynchronousNotificationRelay : EventStreamHandlerBase,
     IEventNotifyingStoreNotificationRelay
 {
     public InProcessSynchronousNotificationRelay(IRecorder recorder, IEventSourcedChangeEventMigrator migrator,
+        IEventNotificationMessageBroker messageBroker,
         IEnumerable<IEventNotificationRegistration> registrations,
         params IEventNotifyingStore[] eventingStores) : base(recorder, eventingStores)
     {
-        Notifier = new EventNotificationNotifier(recorder, migrator, registrations.ToArray());
+        Notifier = new EventNotificationNotifier(recorder, migrator, registrations.ToList(), messageBroker);
     }
 
     protected override void Dispose(bool disposing)

@@ -8,10 +8,8 @@ public static class Events
 {
     public static ContactAddressChanged ContactAddressChanged(Identifier id, Identifier userId, Address address)
     {
-        return new ContactAddressChanged
+        return new ContactAddressChanged(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             UserId = userId,
             Line1 = address.Line1,
             Line2 = address.Line2,
@@ -25,10 +23,8 @@ public static class Events
 
     public static Created Created(Identifier id, ProfileType type, Identifier userId, PersonName name)
     {
-        return new Created
+        return new Created(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             UserId = userId,
             FirstName = name.FirstName,
             LastName = name.LastName.ValueOrDefault!,
@@ -39,10 +35,8 @@ public static class Events
 
     public static DisplayNameChanged DisplayNameChanged(Identifier id, Identifier userId, PersonDisplayName name)
     {
-        return new DisplayNameChanged
+        return new DisplayNameChanged(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             UserId = userId,
             DisplayName = name
         };
@@ -50,10 +44,8 @@ public static class Events
 
     public static EmailAddressChanged EmailAddressChanged(Identifier id, Identifier userId, EmailAddress emailAddress)
     {
-        return new EmailAddressChanged
+        return new EmailAddressChanged(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             UserId = userId,
             EmailAddress = emailAddress
         };
@@ -61,10 +53,8 @@ public static class Events
 
     public static NameChanged NameChanged(Identifier id, Identifier userId, PersonName name)
     {
-        return new NameChanged
+        return new NameChanged(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             UserId = userId,
             FirstName = name.FirstName,
             LastName = name.LastName.ValueOrDefault!
@@ -73,10 +63,8 @@ public static class Events
 
     public static PhoneNumberChanged PhoneNumberChanged(Identifier id, Identifier userId, PhoneNumber number)
     {
-        return new PhoneNumberChanged
+        return new PhoneNumberChanged(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             UserId = userId,
             Number = number
         };
@@ -84,10 +72,8 @@ public static class Events
 
     public static TimezoneChanged TimezoneChanged(Identifier id, Identifier userId, Timezone timezone)
     {
-        return new TimezoneChanged
+        return new TimezoneChanged(id)
         {
-            RootId = id,
-            OccurredUtc = DateTime.UtcNow,
             UserId = userId,
             Timezone = timezone.Code.ToString()
         };

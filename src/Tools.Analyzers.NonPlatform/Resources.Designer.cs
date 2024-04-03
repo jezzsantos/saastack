@@ -159,7 +159,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Class should be marked as &apos;sealed&apos;..
+        ///   Looks up a localized string similar to Class must be marked as &apos;sealed&apos;..
         /// </summary>
         internal static string Diagnostic_Description_ClassMustBeSealed {
             get {
@@ -173,6 +173,15 @@ namespace Tools.Analyzers.NonPlatform {
         internal static string Diagnostic_Description_ClassMustHaveParameterlessConstructor {
             get {
                 return ResourceManager.GetString("Diagnostic_Description_ClassMustHaveParameterlessConstructor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class should be marked as &apos;sealed&apos;..
+        /// </summary>
+        internal static string Diagnostic_Description_ClassShouldBeSealed {
+            get {
+                return ResourceManager.GetString("Diagnostic_Description_ClassShouldBeSealed", resourceCulture);
             }
         }
         
@@ -267,7 +276,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Class &apos;{0}&apos; should be marked as &apos;sealed&apos;.
+        ///   Looks up a localized string similar to Class &apos;{0}&apos; must be marked as &apos;sealed&apos;.
         /// </summary>
         internal static string Diagnostic_MessageFormat_ClassMustBeSealed {
             get {
@@ -281,6 +290,15 @@ namespace Tools.Analyzers.NonPlatform {
         internal static string Diagnostic_MessageFormat_ClassMustHaveParameterlessConstructor {
             get {
                 return ResourceManager.GetString("Diagnostic_MessageFormat_ClassMustHaveParameterlessConstructor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class &apos;{0}&apos; should be marked as &apos;sealed&apos;.
+        /// </summary>
+        internal static string Diagnostic_MessageFormat_ClassShouldBeSealed {
+            get {
+                return ResourceManager.GetString("Diagnostic_MessageFormat_ClassShouldBeSealed", resourceCulture);
             }
         }
         
@@ -375,7 +393,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Class should be marked as &apos;sealed&apos;.
+        ///   Looks up a localized string similar to Class must be marked as &apos;sealed&apos;.
         /// </summary>
         internal static string Diagnostic_Title_ClassMustBeSealed {
             get {
@@ -389,6 +407,15 @@ namespace Tools.Analyzers.NonPlatform {
         internal static string Diagnostic_Title_ClassMustHaveParameterlessConstructor {
             get {
                 return ResourceManager.GetString("Diagnostic_Title_ClassMustHaveParameterlessConstructor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class should be marked as &apos;sealed&apos;.
+        /// </summary>
+        internal static string Diagnostic_Title_ClassShouldBeSealed {
+            get {
+                return ResourceManager.GetString("Diagnostic_Title_ClassShouldBeSealed", resourceCulture);
             }
         }
         
@@ -798,7 +825,7 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Property &apos;{0}&apos; must return one of these primitive types: &apos;{1}&apos;, or any Enum, or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types.
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must return one of these primitive types: &apos;{1}&apos;, or any Enum, or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types, or another DTO.
         /// </summary>
         internal static string SAASDDD049MessageFormat {
             get {
@@ -812,6 +839,60 @@ namespace Tools.Analyzers.NonPlatform {
         internal static string SAASDDD049Title {
             get {
                 return ResourceManager.GetString("SAASDDD049Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must be marked &apos;required&apos; or be nullable or be initialized..
+        /// </summary>
+        internal static string SAASEVT014Description {
+            get {
+                return ResourceManager.GetString("SAASEVT014Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must be marked &apos;required&apos; or be nullable or be initialized.
+        /// </summary>
+        internal static string SAASEVT014MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASEVT014MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong declaration.
+        /// </summary>
+        internal static string SAASEVT014Title {
+            get {
+                return ResourceManager.GetString("SAASEVT014Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must have the return the correct type..
+        /// </summary>
+        internal static string SAASEVT016Description {
+            get {
+                return ResourceManager.GetString("SAASEVT016Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must return one of these primitive types: &apos;{1}&apos;, or a List&lt;T&gt;/Dictionary&lt;string, T&gt; of one of those types, or another DTO.
+        /// </summary>
+        internal static string SAASEVT016MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASEVT016MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong return type.
+        /// </summary>
+        internal static string SAASEVT016Title {
+            get {
+                return ResourceManager.GetString("SAASEVT016Title", resourceCulture);
             }
         }
         

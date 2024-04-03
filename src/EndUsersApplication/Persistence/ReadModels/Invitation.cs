@@ -1,5 +1,6 @@
 using Application.Persistence.Common;
 using Common;
+using Domain.Shared.EndUsers;
 using QueryAny;
 
 namespace EndUsersApplication.Persistence.ReadModels;
@@ -15,7 +16,7 @@ public class Invitation : ReadModelEntity
 
     public Optional<string> InvitedEmailAddress { get; set; }
 
-    public Optional<string> Status { get; set; }
+    public Optional<UserStatus> Status { get; set; }
 
     public Optional<string> Token { get; set; }
 }

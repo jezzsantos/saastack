@@ -4,7 +4,7 @@ using Common;
 
 namespace EndUsersApplication;
 
-public interface IEndUsersApplication
+public partial interface IEndUsersApplication
 {
     Task<Result<EndUser, Error>> AssignPlatformRolesAsync(ICallerContext context, string id, List<string> roles,
         CancellationToken cancellationToken);
@@ -12,9 +12,6 @@ public interface IEndUsersApplication
     Task<Result<EndUserWithMemberships, Error>> AssignTenantRolesAsync(ICallerContext context, string organizationId,
         string id,
         List<string> roles, CancellationToken cancellationToken);
-
-    Task<Result<Membership, Error>> CreateMembershipForCallerAsync(ICallerContext context, string organizationId,
-        CancellationToken cancellationToken);
 
     Task<Result<Optional<EndUser>, Error>> FindPersonByEmailAddressAsync(ICallerContext context, string emailAddress,
         CancellationToken cancellationToken);

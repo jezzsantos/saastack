@@ -92,7 +92,7 @@ public sealed class CarRoot : AggregateRootBase
             case Created created:
             {
                 OrganizationId = created.OrganizationId.ToId();
-                Status = created.Status.ToEnum<CarStatus>();
+                Status = created.Status;
                 return Result.Ok;
             }
 
@@ -143,7 +143,7 @@ public sealed class CarRoot : AggregateRootBase
                 }
 
                 License = plate.Value;
-                Status = changed.Status.ToEnum<CarStatus>();
+                Status = changed.Status;
                 Recorder.TraceDebug(null, "Car {Id} registration changed to {Jurisdiction}, {Number}", Id,
                     changed.Jurisdiction, changed.Number);
                 return Result.Ok;

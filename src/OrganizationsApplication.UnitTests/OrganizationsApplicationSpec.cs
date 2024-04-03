@@ -60,42 +60,10 @@ public class OrganizationsApplicationSpec
     }
 
     [Fact]
-    public async Task WhenCreateOrganizationAsync_ThenReturnsOrganization()
-    {
-        var result =
-            await _application.CreateOrganizationAsync(_caller.Object, "auserid", "aname",
-                Application.Resources.Shared.OrganizationOwnership.Personal, CancellationToken.None);
-
-        result.Value.Name.Should().Be("aname");
-        result.Value.Ownership.Should().Be(Application.Resources.Shared.OrganizationOwnership.Personal);
-        result.Value.CreatedById.Should().Be("auserid");
-        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(org =>
-            org.Name == "aname"
-            && org.Ownership == OrganizationOwnership.Personal
-            && org.CreatedById == "auserid"
-            && org.Settings.Properties.Count == 1
-            && org.Settings.Properties["aname"].Value.As<string>() == "avalue"
-            && org.Settings.Properties["aname"].IsEncrypted == false
-        ), It.IsAny<CancellationToken>()));
-        _tenantSettingsService.Verify(tss =>
-            tss.CreateForTenantAsync(_caller.Object, "anid", It.IsAny<CancellationToken>()));
-    }
-
-    [Fact]
     public async Task WhenCreateSharedOrganizationAsync_ThenReturnsSharedOrganization()
     {
         _caller.Setup(c => c.CallerId)
             .Returns("acallerid");
-        _endUsersService.Setup(eus =>
-                eus.CreateMembershipForCallerPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new Membership
-            {
-                Id = "amembershipid",
-                UserId = "auserid",
-                OrganizationId = "anorganizationid",
-                IsDefault = false
-            });
 
         var result =
             await _application.CreateSharedOrganizationAsync(_caller.Object, "aname",
@@ -114,8 +82,6 @@ public class OrganizationsApplicationSpec
         ), It.IsAny<CancellationToken>()));
         _tenantSettingsService.Verify(tss =>
             tss.CreateForTenantAsync(_caller.Object, "anid", It.IsAny<CancellationToken>()));
-        _endUsersService.Verify(eus =>
-            eus.CreateMembershipForCallerPrivateAsync(_caller.Object, "anid", It.IsAny<CancellationToken>()));
     }
 
     [Fact]

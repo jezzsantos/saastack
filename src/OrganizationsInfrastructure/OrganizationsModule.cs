@@ -8,7 +8,9 @@ using Domain.Common.Identity;
 using Domain.Interfaces;
 using Domain.Interfaces.Services;
 using Infrastructure.Common.DomainServices;
+using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Hosting.Common.Extensions;
+using Infrastructure.Interfaces;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Web.Hosting.Common;
 using Infrastructure.Web.Hosting.Common.ApplicationServices;
@@ -19,6 +21,7 @@ using OrganizationsApplication;
 using OrganizationsApplication.Persistence;
 using OrganizationsDomain;
 using OrganizationsInfrastructure.ApplicationServices;
+using OrganizationsInfrastructure.Notifications;
 using OrganizationsInfrastructure.Persistence;
 using OrganizationsInfrastructure.Persistence.ReadModels;
 
@@ -63,10 +66,16 @@ public class OrganizationsModule : ISubdomainModule
                     c.GetRequiredService<IDomainFactory>(),
                     c.GetRequiredService<IEventSourcingDddCommandStore<OrganizationRoot>>(),
                     c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterUnTenantedEventing<OrganizationRoot, OrganizationProjection>(
+                services
+                    .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
+                        new OrganizationNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
+                            c.GetRequiredService<IOrganizationsApplication>()));
+                services.RegisterUnTenantedEventing<OrganizationRoot, OrganizationProjection, OrganizationNotifier>(
                     c => new OrganizationProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
-                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                        c.GetRequiredServiceForPlatform<IDataStore>()),
+                    c => new OrganizationNotifier(c
+                        .GetRequiredService<IEnumerable<IDomainEventNotificationConsumer>>()));
 
                 services.AddSingleton<IOrganizationsService>(c =>
                     new OrganizationsInProcessServiceClient(c.LazyGetRequiredService<IOrganizationsApplication>()));

@@ -1,9 +1,20 @@
-using Domain.Interfaces.Entities;
+using Domain.Common;
+using Domain.Common.ValueObjects;
+using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.Cars;
 
-public sealed class ManufacturerChanged : IDomainEvent
+public sealed class ManufacturerChanged : DomainEvent
 {
+    public ManufacturerChanged(Identifier id) : base(id)
+    {
+    }
+
+    [UsedImplicitly]
+    public ManufacturerChanged()
+    {
+    }
+
     public required string Make { get; set; }
 
     public required string Model { get; set; }
@@ -11,8 +22,4 @@ public sealed class ManufacturerChanged : IDomainEvent
     public required string OrganizationId { get; set; }
 
     public required int Year { get; set; }
-
-    public required string RootId { get; set; }
-
-    public required DateTime OccurredUtc { get; set; }
 }

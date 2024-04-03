@@ -14,11 +14,9 @@ public static class Events
     {
         public static Created Created(Identifier id, Identifier userId)
         {
-            return new Created
+            return new Created(id)
             {
-                RootId = id,
-                UserId = userId,
-                OccurredUtc = DateTime.UtcNow
+                UserId = userId
             };
         }
 
@@ -26,15 +24,13 @@ public static class Events
             DateTime accessTokenExpiresOn,
             string refreshToken, DateTime refreshTokenExpiresOn)
         {
-            return new TokensChanged
+            return new TokensChanged(id)
             {
-                RootId = id,
                 UserId = userId,
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
                 AccessTokenExpiresOn = accessTokenExpiresOn,
-                RefreshTokenExpiresOn = refreshTokenExpiresOn,
-                OccurredUtc = DateTime.UtcNow
+                RefreshTokenExpiresOn = refreshTokenExpiresOn
             };
         }
 
@@ -42,25 +38,21 @@ public static class Events
             DateTime accessTokenExpiresOn,
             string refreshToken, DateTime refreshTokenExpiresOn)
         {
-            return new TokensRefreshed
+            return new TokensRefreshed(id)
             {
-                RootId = id,
                 UserId = userId,
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
                 AccessTokenExpiresOn = accessTokenExpiresOn,
-                RefreshTokenExpiresOn = refreshTokenExpiresOn,
-                OccurredUtc = DateTime.UtcNow
+                RefreshTokenExpiresOn = refreshTokenExpiresOn
             };
         }
 
         public static TokensRevoked TokensRevoked(Identifier id, Identifier userId)
         {
-            return new TokensRevoked
+            return new TokensRevoked(id)
             {
-                RootId = id,
-                UserId = userId,
-                OccurredUtc = DateTime.UtcNow
+                UserId = userId
             };
         }
     }
@@ -69,105 +61,79 @@ public static class Events
     {
         public static AccountLocked AccountLocked(Identifier id)
         {
-            return new AccountLocked
-            {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow
-            };
+            return new AccountLocked(id);
         }
 
         public static AccountUnlocked AccountUnlocked(Identifier id)
         {
-            return new AccountUnlocked
-            {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow
-            };
+            return new AccountUnlocked(id);
         }
 
         public static Domain.Events.Shared.Identities.PasswordCredentials.Created Created(Identifier id,
             Identifier userId)
         {
-            return new Domain.Events.Shared.Identities.PasswordCredentials.Created
+            return new Domain.Events.Shared.Identities.PasswordCredentials.Created(id)
             {
-                RootId = id,
-                UserId = userId,
-                OccurredUtc = DateTime.UtcNow
+                UserId = userId
             };
         }
 
         public static CredentialsChanged CredentialsChanged(Identifier id, string passwordHash)
         {
-            return new CredentialsChanged
+            return new CredentialsChanged(id)
             {
-                RootId = id,
-                PasswordHash = passwordHash,
-                OccurredUtc = DateTime.UtcNow
+                PasswordHash = passwordHash
             };
         }
 
         public static PasswordResetCompleted PasswordResetCompleted(Identifier id, string token, string passwordHash)
         {
-            return new PasswordResetCompleted
+            return new PasswordResetCompleted(id)
             {
-                RootId = id,
                 Token = token,
-                PasswordHash = passwordHash,
-                OccurredUtc = DateTime.UtcNow
+                PasswordHash = passwordHash
             };
         }
 
         public static PasswordResetInitiated PasswordResetInitiated(Identifier id, string token)
         {
-            return new PasswordResetInitiated
+            return new PasswordResetInitiated(id)
             {
-                RootId = id,
-                Token = token,
-                OccurredUtc = DateTime.UtcNow
+                Token = token
             };
         }
 
         public static PasswordVerified PasswordVerified(Identifier id, bool isVerified,
             bool auditAttempt)
         {
-            return new PasswordVerified
+            return new PasswordVerified(id)
             {
-                RootId = id,
                 IsVerified = isVerified,
-                AuditAttempt = auditAttempt,
-                OccurredUtc = DateTime.UtcNow
+                AuditAttempt = auditAttempt
             };
         }
 
         public static RegistrationChanged RegistrationChanged(Identifier id, EmailAddress emailAddress,
             PersonDisplayName name)
         {
-            return new RegistrationChanged
+            return new RegistrationChanged(id)
             {
-                RootId = id,
                 EmailAddress = emailAddress,
-                Name = name,
-                OccurredUtc = DateTime.UtcNow
+                Name = name
             };
         }
 
         public static RegistrationVerificationCreated RegistrationVerificationCreated(Identifier id, string token)
         {
-            return new RegistrationVerificationCreated
+            return new RegistrationVerificationCreated(id)
             {
-                RootId = id,
-                Token = token,
-                OccurredUtc = DateTime.UtcNow
+                Token = token
             };
         }
 
         public static RegistrationVerificationVerified RegistrationVerificationVerified(Identifier id)
         {
-            return new RegistrationVerificationVerified
-            {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow
-            };
+            return new RegistrationVerificationVerified(id);
         }
     }
 
@@ -176,35 +142,29 @@ public static class Events
         public static Domain.Events.Shared.Identities.APIKeys.Created Created(Identifier id, Identifier userId,
             string keyToken, string keyHash)
         {
-            return new Domain.Events.Shared.Identities.APIKeys.Created
+            return new Domain.Events.Shared.Identities.APIKeys.Created(id)
             {
-                RootId = id,
                 UserId = userId,
                 KeyToken = keyToken,
-                KeyHash = keyHash,
-                OccurredUtc = DateTime.UtcNow
+                KeyHash = keyHash
             };
         }
 
         public static KeyVerified KeyVerified(Identifier id, bool isVerified)
         {
-            return new KeyVerified
+            return new KeyVerified(id)
             {
-                RootId = id,
-                IsVerified = isVerified,
-                OccurredUtc = DateTime.UtcNow
+                IsVerified = isVerified
             };
         }
 
         public static ParametersChanged ParametersChanged(Identifier id, string description,
             DateTime expiresOn)
         {
-            return new ParametersChanged
+            return new ParametersChanged(id)
             {
-                RootId = id,
                 Description = description,
-                ExpiresOn = expiresOn,
-                OccurredUtc = DateTime.UtcNow
+                ExpiresOn = expiresOn
             };
         }
     }
@@ -214,28 +174,24 @@ public static class Events
         public static Domain.Events.Shared.Identities.SSOUsers.Created Created(Identifier id, string providerName,
             Identifier userId)
         {
-            return new Domain.Events.Shared.Identities.SSOUsers.Created
+            return new Domain.Events.Shared.Identities.SSOUsers.Created(id)
             {
-                RootId = id,
                 ProviderName = providerName,
-                UserId = userId,
-                OccurredUtc = DateTime.UtcNow
+                UserId = userId
             };
         }
 
         public static TokensUpdated TokensUpdated(Identifier id, string tokens, EmailAddress emailAddress,
             PersonName name, Timezone timezone, Address address)
         {
-            return new TokensUpdated
+            return new TokensUpdated(id)
             {
-                RootId = id,
                 Tokens = tokens,
                 EmailAddress = emailAddress,
                 FirstName = name.FirstName,
                 LastName = name.LastName.ValueOrDefault?.Text,
                 Timezone = timezone.Code.ToString(),
-                CountryCode = address.CountryCode.ToString(),
-                OccurredUtc = DateTime.UtcNow
+                CountryCode = address.CountryCode.ToString()
             };
         }
     }

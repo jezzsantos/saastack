@@ -1,9 +1,20 @@
-using Domain.Interfaces.Entities;
+using Domain.Common;
+using Domain.Common.ValueObjects;
+using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.Identities.SSOUsers;
 
-public sealed class TokensUpdated : IDomainEvent
+public sealed class TokensUpdated : DomainEvent
 {
+    public TokensUpdated(Identifier id) : base(id)
+    {
+    }
+
+    [UsedImplicitly]
+    public TokensUpdated()
+    {
+    }
+
     public required string CountryCode { get; set; }
 
     public required string EmailAddress { get; set; }
@@ -15,8 +26,4 @@ public sealed class TokensUpdated : IDomainEvent
     public required string Timezone { get; set; }
 
     public required string Tokens { get; set; }
-
-    public required string RootId { get; set; }
-
-    public required DateTime OccurredUtc { get; set; }
 }

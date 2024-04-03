@@ -11,9 +11,12 @@ using EndUsersApplication.Persistence;
 using EndUsersDomain;
 using EndUsersInfrastructure.Api.EndUsers;
 using EndUsersInfrastructure.ApplicationServices;
+using EndUsersInfrastructure.Notifications;
 using EndUsersInfrastructure.Persistence;
 using EndUsersInfrastructure.Persistence.ReadModels;
+using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Hosting.Common.Extensions;
+using Infrastructure.Interfaces;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Web.Hosting.Common;
 using Microsoft.AspNetCore.Builder;
@@ -50,7 +53,6 @@ public class EndUsersModule : ISubdomainModule
                         c.GetRequiredService<IIdentifierFactory>(),
                         c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
                         c.GetRequiredService<INotificationsService>(),
-                        c.GetRequiredService<IOrganizationsService>(),
                         c.GetRequiredService<IUserProfilesService>(),
                         c.GetRequiredService<IInvitationRepository>(),
                         c.GetRequiredService<IEndUserRepository>()));
@@ -71,10 +73,15 @@ public class EndUsersModule : ISubdomainModule
                     c.GetRequiredService<IDomainFactory>(),
                     c.GetRequiredService<IEventSourcingDddCommandStore<EndUserRoot>>(),
                     c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterUnTenantedEventing<EndUserRoot, EndUserProjection>(
+                services
+                    .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
+                        new EndUserDomainNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
+                            c.GetRequiredService<IEndUsersApplication>()));
+                services.RegisterUnTenantedEventing<EndUserRoot, EndUserProjection, EndUserNotifier>(
                     c => new EndUserProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
-                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                        c.GetRequiredServiceForPlatform<IDataStore>()),
+                    c => new EndUserNotifier(c.GetRequiredService<IEnumerable<IDomainEventNotificationConsumer>>()));
 
                 services.AddSingleton<IEndUsersService, EndUsersInProcessServiceClient>();
             };

@@ -22,13 +22,6 @@ public class EndUsersInProcessServiceClient : IEndUsersService
         _invitationsApplication = invitationsApplication;
     }
 
-    public async Task<Result<Membership, Error>> CreateMembershipForCallerPrivateAsync(ICallerContext caller,
-        string organizationId,
-        CancellationToken cancellationToken)
-    {
-        return await _endUsersApplication.CreateMembershipForCallerAsync(caller, organizationId, cancellationToken);
-    }
-
     public async Task<Result<Optional<EndUser>, Error>> FindPersonByEmailPrivateAsync(ICallerContext caller,
         string emailAddress, CancellationToken cancellationToken)
     {

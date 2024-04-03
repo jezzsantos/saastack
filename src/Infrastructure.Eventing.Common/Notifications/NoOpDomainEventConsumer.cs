@@ -7,10 +7,10 @@ namespace Infrastructure.Eventing.Common.Notifications;
 /// <summary>
 ///     Provides a consumer that handles all events and does nothing with them
 /// </summary>
-public sealed class NoOpConsumer : IEventNotificationConsumer
+public sealed class NoOpDomainEventConsumer : IDomainEventNotificationConsumer
 {
-    public Task<Result<bool, Error>> NotifyAsync(IDomainEvent changeEvent, CancellationToken cancellationToken)
+    public Task<Result<Error>> NotifyAsync(IDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        return Task.FromResult<Result<bool, Error>>(true);
+        return Task.FromResult(Result.Ok);
     }
 }

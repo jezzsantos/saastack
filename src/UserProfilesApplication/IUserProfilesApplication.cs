@@ -4,7 +4,7 @@ using Common;
 
 namespace UserProfilesApplication;
 
-public interface IUserProfilesApplication
+public partial interface IUserProfilesApplication
 {
     Task<Result<UserProfile, Error>> ChangeContactAddressAsync(ICallerContext caller, string userId, string? line1,
         string? line2,
@@ -14,11 +14,6 @@ public interface IUserProfilesApplication
     Task<Result<UserProfile, Error>> ChangeProfileAsync(ICallerContext caller, string userId, string? firstName,
         string? lastName,
         string? displayName, string? phoneNumber, string? timezone, CancellationToken cancellationToken);
-
-    Task<Result<UserProfile, Error>> CreateProfileAsync(ICallerContext caller, UserProfileClassification classification,
-        string userId,
-        string? emailAddress, string firstName, string? lastName, string? timezone, string? countryCode,
-        CancellationToken cancellationToken);
 
     Task<Result<Optional<UserProfile>, Error>> FindPersonByEmailAddressAsync(ICallerContext caller, string emailAddress,
         CancellationToken cancellationToken);

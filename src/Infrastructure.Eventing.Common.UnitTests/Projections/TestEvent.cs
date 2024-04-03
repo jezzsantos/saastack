@@ -1,10 +1,10 @@
-using Domain.Interfaces.Entities;
+using Domain.Common;
 
 namespace Infrastructure.Eventing.Common.UnitTests.Projections;
 
-public class TestEvent : IDomainEvent
+public class TestEvent : DomainEvent
 {
-    public DateTime OccurredUtc { get; set; }
-
-    public string RootId { get; set; } = "arootid";
+    public TestEvent() : base("arootid")
+    {
+    }
 }

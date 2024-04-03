@@ -56,6 +56,24 @@ public static class SyntaxFilterExtensions
         return null;
     }
 
+    public static bool HasParameterlessConstructor(this ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        var allConstructors = classDeclarationSyntax.Members.Where(member => member is ConstructorDeclarationSyntax)
+            .Cast<ConstructorDeclarationSyntax>()
+            .ToList();
+        if (allConstructors.Count > 0)
+        {
+            var parameterlessConstructors = allConstructors
+                .Where(constructor => constructor.ParameterList.Parameters.Count == 0 && constructor.IsPublic());
+            if (!parameterlessConstructors.Any())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static bool HasPublicGetterAndSetter(this PropertyDeclarationSyntax propertyDeclarationSyntax)
     {
         var propertyAccessibility = new Accessibility(propertyDeclarationSyntax.Modifiers);
@@ -106,6 +124,25 @@ public static class SyntaxFilterExtensions
         return true;
     }
 
+    public static bool HasPublicGetterAndSetterProperties(this ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        var allProperties = classDeclarationSyntax.Members.Where(member => member is PropertyDeclarationSyntax)
+            .Cast<PropertyDeclarationSyntax>()
+            .ToList();
+        if (allProperties.Count > 0)
+        {
+            foreach (var property in allProperties)
+            {
+                if (!property.HasPublicGetterAndSetter())
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     public static bool HasPublicSetter(this PropertyDeclarationSyntax propertyDeclarationSyntax)
     {
         var propertyAccessibility = new Accessibility(propertyDeclarationSyntax.Modifiers);
@@ -133,6 +170,74 @@ public static class SyntaxFilterExtensions
         return setterAccessibility is { IsPublic: true, IsStatic: false };
     }
 
+    public static bool IsDtoOrNullableDto(this PropertyDeclarationSyntax propertyDeclarationSyntax,
+        SyntaxNodeAnalysisContext context, List<INamedTypeSymbol> allowableTypes)
+    {
+        var propertySymbol = context.SemanticModel.GetDeclaredSymbol(propertyDeclarationSyntax);
+        if (propertySymbol is null)
+        {
+            return false;
+        }
+
+        var getter = propertySymbol.GetMethod;
+        if (getter is null)
+        {
+            return false;
+        }
+
+        var returnType = propertySymbol.GetMethod!.ReturnType;
+        if (returnType.IsNullable(context))
+        {
+            if (IsDto(returnType.WithoutNullable(context)))
+            {
+                return true;
+            }
+        }
+
+        if (IsDto(returnType))
+        {
+            return true;
+        }
+
+        return false;
+
+        bool IsDto(ITypeSymbol symbol)
+        {
+            if (symbol is not INamedTypeSymbol namedTypeSymbol)
+            {
+                return false;
+            }
+
+            if (!namedTypeSymbol.IsReferenceType) //We dont accept any enums, or other value types
+            {
+                return false;
+            }
+
+            if (namedTypeSymbol.IsStatic
+                || namedTypeSymbol.DeclaredAccessibility != Microsoft.CodeAnalysis.Accessibility.Public)
+            {
+                return false;
+            }
+
+            if (!namedTypeSymbol.HasParameterlessConstructor())
+            {
+                return false;
+            }
+
+            if (!namedTypeSymbol.HasPublicGetterAndSetterProperties())
+            {
+                return false;
+            }
+
+            if (!namedTypeSymbol.HasPropertiesOfAllowableTypes(allowableTypes))
+            {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
     public static bool IsEmptyNode(this XmlNodeSyntax nodeSyntax)
     {
         if (nodeSyntax is XmlTextSyntax textSyntax)
@@ -149,7 +254,7 @@ public static class SyntaxFilterExtensions
         return true;
     }
 
-    public static bool IsEnumType(this PropertyDeclarationSyntax propertyDeclarationSyntax,
+    public static bool IsEnumOrNullableEnumType(this PropertyDeclarationSyntax propertyDeclarationSyntax,
         SyntaxNodeAnalysisContext context)
     {
         var propertySymbol = context.SemanticModel.GetDeclaredSymbol(propertyDeclarationSyntax);
@@ -165,6 +270,14 @@ public static class SyntaxFilterExtensions
         }
 
         var returnType = propertySymbol.GetMethod!.ReturnType;
+        if (returnType.IsNullable(context))
+        {
+            if (returnType.WithoutNullable(context).IsEnum())
+            {
+                return true;
+            }
+        }
+
         if (returnType.IsEnum())
         {
             return true;
@@ -305,27 +418,6 @@ public static class SyntaxFilterExtensions
         return !isDerivedFrom;
     }
 
-    public static bool IsReferenceType(this PropertyDeclarationSyntax propertyDeclarationSyntax,
-        SyntaxNodeAnalysisContext context)
-    {
-        var propertySymbol = context.SemanticModel.GetDeclaredSymbol(propertyDeclarationSyntax);
-        if (propertySymbol is null)
-        {
-            return false;
-        }
-
-        var getter = propertySymbol.GetMethod;
-        if (getter is null)
-        {
-            return false;
-        }
-
-        var returnType = getter.ReturnType;
-
-        return returnType.IsReferenceType;
-    }    
-
-    
     public static bool IsNullableType(this PropertyDeclarationSyntax propertyDeclarationSyntax,
         SyntaxNodeAnalysisContext context)
     {
@@ -439,6 +531,26 @@ public static class SyntaxFilterExtensions
     {
         var accessibility = new Accessibility(methodDeclarationSyntax.Modifiers);
         return accessibility is { IsPublic: true, IsStatic: true };
+    }
+
+    public static bool IsReferenceType(this PropertyDeclarationSyntax propertyDeclarationSyntax,
+        SyntaxNodeAnalysisContext context)
+    {
+        var propertySymbol = context.SemanticModel.GetDeclaredSymbol(propertyDeclarationSyntax);
+        if (propertySymbol is null)
+        {
+            return false;
+        }
+
+        var getter = propertySymbol.GetMethod;
+        if (getter is null)
+        {
+            return false;
+        }
+
+        var returnType = getter.ReturnType;
+
+        return returnType.IsReferenceType;
     }
 
     public static bool IsRequired(this MemberDeclarationSyntax memberDeclarationSyntax)

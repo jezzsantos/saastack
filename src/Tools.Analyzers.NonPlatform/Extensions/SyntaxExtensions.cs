@@ -46,24 +46,6 @@ public static class SyntaxExtensions
         return true;
     }
 
-    public static bool HasParameterlessConstructor(this ClassDeclarationSyntax classDeclarationSyntax)
-    {
-        var allConstructors = classDeclarationSyntax.Members.Where(member => member is ConstructorDeclarationSyntax)
-            .Cast<ConstructorDeclarationSyntax>()
-            .ToList();
-        if (allConstructors.HasAny())
-        {
-            var parameterlessConstructors = allConstructors
-                .Where(constructor => constructor.ParameterList.Parameters.Count == 0 && constructor.IsPublic());
-            if (parameterlessConstructors.HasNone())
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     public static bool HasRouteAttribute(this ClassDeclarationSyntax classDeclarationSyntax,
         SyntaxNodeAnalysisContext context)
     {

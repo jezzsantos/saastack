@@ -136,7 +136,7 @@ public static class EventingExtensions
     {
         AddEventing<TAggregateRoot, TProjection>(services, scope, projectionFactory);
         Eventing.AddNotificationFactory<TAggregateRoot, TNotificationRegistration>();
-        services.AddWithLifetime(scope, notificationFactory);
+        services.AddPerHttpRequest(notificationFactory);
         return services;
     }
 
@@ -212,6 +212,7 @@ public static class EventingExtensions
             new InProcessSynchronousNotificationRelay(
                 c.GetRequiredService<IRecorder>(),
                 c.GetRequiredService<IEventSourcedChangeEventMigrator>(),
+                c.GetRequiredService<IEventNotificationMessageBroker>(),
                 Eventing.ResolveNotificationRegistrations(c),
                 Eventing.ResolveNotificationStores(c).ToArray()));
 

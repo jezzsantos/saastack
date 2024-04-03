@@ -344,7 +344,7 @@ internal static class CarConversionExtensions
             },
             Plate = new CarLicensePlate
                 { Jurisdiction = car.LicenseJurisdiction, Number = car.LicenseNumber },
-            Status = car.Status
+            Status = car.Status.ToString()
         };
     }
 

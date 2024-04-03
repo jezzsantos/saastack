@@ -7,6 +7,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
+        <ProjectReference Include="..\Domain.Events.Shared\Domain.Events.Shared.csproj" />
         <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
     </ItemGroup>
 

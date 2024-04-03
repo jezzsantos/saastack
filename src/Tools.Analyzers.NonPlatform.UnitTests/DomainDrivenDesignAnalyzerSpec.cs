@@ -4234,6 +4234,298 @@ public sealed class AClassed : IDomainEvent
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
+
+            [Fact]
+            public async Task WhenAnyPropertyEnumTypeIsNotRequiredAndNotInitializedAndNotNullable_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public AnEnum AProperty { get; set; }
+}
+public enum AnEnum
+{
+    AValue
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyEnumValueTypeIsRequiredAndNotInitializedAndNotNullable_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = AnEnum.AValue,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required AnEnum AProperty { get; set; }
+}
+public enum AnEnum
+{
+    AValue
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyEnumTypeIsInitializedAndNotRequiredAndNotNullable_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public AnEnum AProperty { get; set; } = AnEnum.AValue;
+}
+public enum AnEnum
+{
+    AValue
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyEnumTypeIsNullableAndNotRequiredAndNotInitialized_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public AnEnum? AProperty { get; set; }
+}
+public enum AnEnum
+{
+    AValue
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyEnumTypeIsNullableAndRequiredAndNotInitialized_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = AnEnum.AValue,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required AnEnum? AProperty { get; set; }
+}
+public enum AnEnum
+{
+    AValue
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyEnumTypeIsNullableAndInitializedAndNotRequired_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public AnEnum? AProperty { get; set; } = AnEnum.AValue;
+}
+public enum AnEnum
+{
+    AValue
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyEnumTypeIsInitializedAndRequiredAndNotNullable_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = AnEnum.AValue,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required AnEnum AProperty { get; set; } = AnEnum.AValue;
+}
+public enum AnEnum
+{
+    AValue
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyEnumTypeIsInitializedAndNullableAndNotRequired_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public AnEnum? AProperty { get; set; } = AnEnum.AValue;
+}
+public enum AnEnum
+{
+    AValue
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyEnumTypeIsInitializedAndRequiredAndNullable_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = AnEnum.AValue,
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required AnEnum? AProperty { get; set; } = AnEnum.AValue;
+}
+public enum AnEnum
+{
+    AValue
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
         }
 
         [Trait("Category", "Unit")]
@@ -4472,7 +4764,6 @@ public sealed class AClassed : IDomainEvent
     {
         return new AClassed
         {
-            AProperty = AnEnum.AValue,
             RootId = string.Empty,
             OccurredUtc = DateTime.UtcNow
         };
@@ -4482,7 +4773,7 @@ public sealed class AClassed : IDomainEvent
 
     public required DateTime OccurredUtc { get; set; }
 
-    public required AnEnum AProperty { get; set; }
+    public AnEnum AProperty { get; set; }
 }
 public enum AnEnum
 {
@@ -4548,6 +4839,83 @@ public sealed class AClassed : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 
     public required Dictionary<string, int> AProperty { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyIsNotADto_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Domain.Interfaces.Entities;
+namespace ANamespace;
+public sealed class AClassed : IDomainEvent
+{
+    public static AClassed Create()
+    {
+        return new AClassed
+        {
+            AProperty = new ADto(),
+            RootId = string.Empty,
+            OccurredUtc = DateTime.UtcNow
+        };
+    }
+
+    public required string RootId { get; set; }
+
+    public required DateTime OccurredUtc { get; set; }
+
+    public required ADto AProperty { get; set; }
+}
+public class ADto
+{
+    public string AProperty { get; }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Rule049, input, 22, 26, "AProperty", AllTypes);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyIsADto_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Domain.Interfaces.Entities;
+using AnOtherNamespace;
+namespace ANamespace
+{
+    public sealed class AClassed : IDomainEvent
+    {
+        public static AClassed Create()
+        {
+            return new AClassed
+            {
+                AProperty = new ADto { AProperty1 = string.Empty },
+                RootId = string.Empty,
+                OccurredUtc = DateTime.UtcNow
+            };
+        }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
+
+        public required ADto AProperty { get; set; }
+    }
+}
+namespace AnOtherNamespace
+{
+    public class ADto
+    {
+        public required string AProperty1 { get; set; }
+
+        public string? AProperty2 { get; set; }
+    }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);

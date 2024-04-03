@@ -1,6 +1,7 @@
 using Application.Persistence.Common;
 using CarsDomain;
 using Common;
+using Domain.Shared.Cars;
 using QueryAny;
 
 namespace CarsApplication.Persistence.ReadModels;
@@ -22,7 +23,7 @@ public class Car : ReadModelEntity
 
     public Optional<string> OrganizationId { get; set; }
 
-    public Optional<string> Status { get; set; }
+    public Optional<CarStatus> Status { get; set; }
 
     public Optional<string> VehicleOwnerId { get; set; }
 }
