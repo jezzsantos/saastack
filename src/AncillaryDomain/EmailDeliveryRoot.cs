@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
+using Domain.Events.Shared.Ancillary.EmailDelivery;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
@@ -15,7 +16,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
         QueuedMessageId messageId)
     {
         var root = new EmailDeliveryRoot(recorder, idFactory);
-        root.RaiseCreateEvent(AncillaryDomain.Events.EmailDelivery.Created.Create(root.Id, messageId));
+        root.RaiseCreateEvent(AncillaryDomain.Events.EmailDelivery.Created(root.Id, messageId));
         return root;
     }
 
@@ -62,7 +63,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
     {
         switch (@event)
         {
-            case Events.EmailDelivery.Created created:
+            case Created created:
             {
                 var messageId = QueuedMessageId.Create(created.MessageId);
                 if (!messageId.IsSuccessful)
@@ -74,7 +75,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.EmailDelivery.EmailDetailsChanged changed:
+            case EmailDetailsChanged changed:
             {
                 var emailAddress = EmailAddress.Create(changed.ToEmailAddress);
                 if (!emailAddress.IsSuccessful)
@@ -93,7 +94,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.EmailDelivery.DeliveryAttempted changed:
+            case DeliveryAttempted changed:
             {
                 var attempted = Attempts.Attempt(changed.When);
                 if (!attempted.IsSuccessful)
@@ -106,13 +107,13 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.EmailDelivery.DeliveryFailed _:
+            case DeliveryFailed _:
             {
                 Recorder.TraceDebug(null, "EmailDelivery {Id} failed a delivery", Id);
                 return Result.Ok;
             }
 
-            case Events.EmailDelivery.DeliverySucceeded changed:
+            case DeliverySucceeded changed:
             {
                 Delivered = changed.When;
                 Recorder.TraceDebug(null, "EmailDelivery {Id} succeeded delivery", Id);
@@ -132,7 +133,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
         }
 
         var when = DateTime.UtcNow;
-        var attempted = RaiseChangeEvent(AncillaryDomain.Events.EmailDelivery.DeliveryAttempted.Create(Id, when));
+        var attempted = RaiseChangeEvent(AncillaryDomain.Events.EmailDelivery.DeliveryAttempted(Id, when));
         if (!attempted.IsSuccessful)
         {
             return attempted.Error;
@@ -155,7 +156,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
 
         var when = DateTime.UtcNow;
         return RaiseChangeEvent(
-            AncillaryDomain.Events.EmailDelivery.DeliveryFailed.Create(Id, when));
+            AncillaryDomain.Events.EmailDelivery.DeliveryFailed(Id, when));
     }
 
     public Result<Error> SetEmailDetails(string? subject, string? body, EmailRecipient recipient)
@@ -173,7 +174,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
         }
 
         return RaiseChangeEvent(
-            AncillaryDomain.Events.EmailDelivery.EmailDetailsChanged.Create(Id, subject!, body!, recipient));
+            AncillaryDomain.Events.EmailDelivery.EmailDetailsChanged(Id, subject!, body!, recipient));
     }
 
     public Result<Error> SucceededDelivery(Optional<string> transactionId)
@@ -190,7 +191,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
 
         var when = DateTime.UtcNow;
         return RaiseChangeEvent(
-            AncillaryDomain.Events.EmailDelivery.DeliverySucceeded.Create(Id, when));
+            AncillaryDomain.Events.EmailDelivery.DeliverySucceeded(Id, when));
     }
 
 #if TESTINGONLY

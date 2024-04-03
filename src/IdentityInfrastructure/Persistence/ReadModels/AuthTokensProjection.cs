@@ -2,6 +2,7 @@ using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Identities.AuthTokens;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using IdentityApplication.Persistence.ReadModels;
@@ -27,11 +28,11 @@ public class AuthTokensProjection : IReadModelProjection
     {
         switch (changeEvent)
         {
-            case Events.AuthTokens.Created e:
+            case Created e:
                 return await _authTokens.HandleCreateAsync(e.RootId.ToId(), dto => { dto.UserId = e.UserId; },
                     cancellationToken);
 
-            case Events.AuthTokens.TokensChanged e:
+            case TokensChanged e:
                 return await _authTokens.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     dto.AccessToken = e.AccessToken;
@@ -40,7 +41,7 @@ public class AuthTokensProjection : IReadModelProjection
                     dto.RefreshTokenExpiresOn = e.RefreshTokenExpiresOn;
                 }, cancellationToken);
 
-            case Events.AuthTokens.TokensRefreshed e:
+            case TokensRefreshed e:
                 return await _authTokens.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     dto.AccessToken = e.AccessToken;
@@ -49,7 +50,7 @@ public class AuthTokensProjection : IReadModelProjection
                     dto.RefreshTokenExpiresOn = e.RefreshTokenExpiresOn;
                 }, cancellationToken);
 
-            case Events.AuthTokens.TokensRevoked e:
+            case TokensRevoked e:
                 return await _authTokens.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     dto.AccessToken = Optional<string>.None;

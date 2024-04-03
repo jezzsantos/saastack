@@ -2,8 +2,10 @@ using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Organizations;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Shared.Organizations;
 using FluentAssertions;
 using Moq;
 using Xunit;
@@ -28,7 +30,7 @@ public class OrganizationRootSpec
             .Returns((string value) => value);
 
         _org = OrganizationRoot.Create(recorder.Object, identifierFactory.Object, tenantSettingService.Object,
-            Ownership.Personal, "acreatorid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Personal, "acreatorid".ToId(), DisplayName.Create("aname").Value).Value;
     }
 
     [Fact]
@@ -36,7 +38,7 @@ public class OrganizationRootSpec
     {
         _org.Name.Name.Should().Be("aname");
         _org.CreatedById.Should().Be("acreatorid".ToId());
-        _org.Ownership.Should().Be(Ownership.Personal);
+        _org.Ownership.Should().Be(OrganizationOwnership.Personal);
         _org.Settings.Should().Be(Settings.Empty);
     }
 
@@ -52,7 +54,7 @@ public class OrganizationRootSpec
         _org.Settings.Properties.Count.Should().Be(2);
         _org.Settings.Properties["aname1"].Should().Be(Setting.Create("avalue1", true).Value);
         _org.Settings.Properties["aname2"].Should().Be(Setting.Create("avalue2", true).Value);
-        _org.Events.Last().Should().BeOfType<Events.SettingCreated>();
+        _org.Events.Last().Should().BeOfType<SettingCreated>();
     }
 
     [Fact]
@@ -73,7 +75,7 @@ public class OrganizationRootSpec
         _org.Settings.Properties["aname1"].Should().Be(Setting.Create("anewvalue1", true).Value);
         _org.Settings.Properties["aname2"].Should().Be(Setting.Create("anoldvalue2", false).Value);
         _org.Settings.Properties["aname3"].Should().Be(Setting.Create("anewvalue3", true).Value);
-        _org.Events[3].Should().BeOfType<Events.SettingUpdated>();
-        _org.Events.Last().Should().BeOfType<Events.SettingCreated>();
+        _org.Events[3].Should().BeOfType<SettingUpdated>();
+        _org.Events.Last().Should().BeOfType<SettingCreated>();
     }
 }

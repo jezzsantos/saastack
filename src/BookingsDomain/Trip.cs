@@ -3,6 +3,7 @@ using Domain.Common.Entities;
 using Domain.Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Bookings;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
@@ -69,14 +70,14 @@ public sealed class Trip : EntityBase
     {
         switch (@event)
         {
-            case Events.TripAdded added:
+            case TripAdded added:
             {
                 RootId = added.RootId.ToId();
                 OrganizationId = added.OrganizationId.ToId();
                 return Result.Ok;
             }
 
-            case Events.TripBegan changed:
+            case TripBegan changed:
             {
                 var from = Location.Create(changed.BeganFrom);
                 if (!from.IsSuccessful)
@@ -89,7 +90,7 @@ public sealed class Trip : EntityBase
                 return Result.Ok;
             }
 
-            case Events.TripEnded changed:
+            case TripEnded changed:
             {
                 var to = Location.Create(changed.EndedTo);
                 if (!to.IsSuccessful)
@@ -141,7 +142,7 @@ public sealed class Trip : EntityBase
         }
 
         var starts = DateTime.UtcNow;
-        return RaiseChangeEvent(Events.TripBegan.Create(RootId.Value, OrganizationId.Value, Id, starts, from));
+        return RaiseChangeEvent(Events.TripBegan(RootId.Value, OrganizationId.Value, Id, starts, from));
     }
 
     public Result<Error> End(Location to)
@@ -157,7 +158,7 @@ public sealed class Trip : EntityBase
         }
 
         var ends = DateTime.UtcNow;
-        return RaiseChangeEvent(Events.TripEnded.Create(RootId.Value, OrganizationId.Value, Id, BeganAt.Value,
+        return RaiseChangeEvent(Events.TripEnded(RootId.Value, OrganizationId.Value, Id, BeganAt.Value,
             From.Value, ends, to));
     }
 

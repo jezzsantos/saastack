@@ -1,6 +1,7 @@
 using Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Bookings;
 using FluentAssertions;
 using Moq;
 using UnitTesting.Common;
@@ -20,7 +21,7 @@ public class TripSpec
         var idFactory = new FixedIdentifierFactory("anid");
 
         _trip = Trip.Create(recorder.Object, idFactory, _ => Result.Ok).Value;
-        _trip.RaiseChangeEvent(Events.TripAdded.Create("arootid".ToId(), "anorganizationid".ToId()));
+        _trip.RaiseChangeEvent(TripAdded.Create("arootid".ToId(), "anorganizationid".ToId()));
     }
 
     [Fact]

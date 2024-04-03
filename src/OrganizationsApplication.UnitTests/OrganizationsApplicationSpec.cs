@@ -14,6 +14,7 @@ using OrganizationsApplication.Persistence;
 using OrganizationsDomain;
 using UnitTesting.Common;
 using Xunit;
+using OrganizationOwnership = Domain.Shared.Organizations.OrganizationOwnership;
 
 namespace OrganizationsApplication.UnitTests;
 
@@ -63,14 +64,14 @@ public class OrganizationsApplicationSpec
     {
         var result =
             await _application.CreateOrganizationAsync(_caller.Object, "auserid", "aname",
-                OrganizationOwnership.Personal, CancellationToken.None);
+                Application.Resources.Shared.OrganizationOwnership.Personal, CancellationToken.None);
 
         result.Value.Name.Should().Be("aname");
-        result.Value.Ownership.Should().Be(OrganizationOwnership.Personal);
+        result.Value.Ownership.Should().Be(Application.Resources.Shared.OrganizationOwnership.Personal);
         result.Value.CreatedById.Should().Be("auserid");
         _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(org =>
             org.Name == "aname"
-            && org.Ownership == Ownership.Personal
+            && org.Ownership == OrganizationOwnership.Personal
             && org.CreatedById == "auserid"
             && org.Settings.Properties.Count == 1
             && org.Settings.Properties["aname"].Value.As<string>() == "avalue"
@@ -101,11 +102,11 @@ public class OrganizationsApplicationSpec
                 CancellationToken.None);
 
         result.Value.Name.Should().Be("aname");
-        result.Value.Ownership.Should().Be(OrganizationOwnership.Shared);
+        result.Value.Ownership.Should().Be(Application.Resources.Shared.OrganizationOwnership.Shared);
         result.Value.CreatedById.Should().Be("acallerid");
         _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(org =>
             org.Name == "aname"
-            && org.Ownership == Ownership.Shared
+            && org.Ownership == OrganizationOwnership.Shared
             && org.CreatedById == "acallerid"
             && org.Settings.Properties.Count == 1
             && org.Settings.Properties["aname"].Value.As<string>() == "avalue"
@@ -134,7 +135,7 @@ public class OrganizationsApplicationSpec
     public async Task WhenGet_ThenReturnsOrganization()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            Ownership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
         org.CreateSettings(Settings.Create(new Dictionary<string, Setting>
         {
             { "aname", Setting.Create("avalue", true).Value }
@@ -147,7 +148,7 @@ public class OrganizationsApplicationSpec
 
         result.Value.Name.Should().Be("aname");
         result.Value.CreatedById.Should().Be("auserid");
-        result.Value.Ownership.Should().Be(OrganizationOwnership.Personal);
+        result.Value.Ownership.Should().Be(Application.Resources.Shared.OrganizationOwnership.Personal);
     }
 
     [Fact]
@@ -166,7 +167,7 @@ public class OrganizationsApplicationSpec
     public async Task WhenGetSettings_ThenReturnsSettings()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            Ownership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
         org.CreateSettings(Settings.Create(new Dictionary<string, Setting>
         {
             { "aname", Setting.Create("avalue", true).Value }
@@ -198,7 +199,7 @@ public class OrganizationsApplicationSpec
     public async Task WhenChangeSettings_ThenReturnsSettings()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            Ownership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
         org.CreateSettings(Settings.Create(new Dictionary<string, Setting>
         {
             { "aname1", Setting.Create("anoldvalue", true).Value },
@@ -218,7 +219,7 @@ public class OrganizationsApplicationSpec
         result.Should().BeSuccess();
         _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(o =>
             o.Name == "aname"
-            && o.Ownership == Ownership.Shared
+            && o.Ownership == OrganizationOwnership.Shared
             && o.CreatedById == "auserid"
             && o.Settings.Properties.Count == 4
             && o.Settings.Properties["aname1"].Value.As<string>() == "anewvalue"
@@ -250,7 +251,7 @@ public class OrganizationsApplicationSpec
         _caller.Setup(cc => cc.Roles)
             .Returns(new ICallerContext.CallerRoles(Array.Empty<RoleLevel>(), new[] { TenantRoles.Owner }));
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            Ownership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(org);
@@ -273,7 +274,7 @@ public class OrganizationsApplicationSpec
         result.Should().BeSuccess();
         result.Value.Name.Should().Be("aname");
         result.Value.CreatedById.Should().Be("auserid");
-        result.Value.Ownership.Should().Be(OrganizationOwnership.Shared);
+        result.Value.Ownership.Should().Be(Application.Resources.Shared.OrganizationOwnership.Shared);
         _endUsersService.Verify(eus =>
             eus.InviteMemberToOrganizationPrivateAsync(_caller.Object, "anorganizationid", "auserid", null,
                 CancellationToken.None));
@@ -296,7 +297,7 @@ public class OrganizationsApplicationSpec
     public async Task WhenListMembersForOrganizationAsyncWithUnregisteredUser_ThenReturnsMemberships()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            Ownership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(org);
@@ -351,7 +352,7 @@ public class OrganizationsApplicationSpec
     public async Task WhenListMembersForOrganizationAsyncWithRegisteredUsers_ThenReturnsMemberships()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            Ownership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(org);

@@ -4,6 +4,7 @@ using Domain.Common.Entities;
 using Domain.Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Bookings;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
@@ -19,7 +20,7 @@ public sealed class BookingRoot : AggregateRootBase
         Identifier organizationId)
     {
         var root = new BookingRoot(recorder, idFactory);
-        root.RaiseCreateEvent(BookingsDomain.Events.Created.Create(root.Id, organizationId));
+        root.RaiseCreateEvent(BookingsDomain.Events.Created(root.Id, organizationId));
         return root;
     }
 
@@ -91,13 +92,13 @@ public sealed class BookingRoot : AggregateRootBase
     {
         switch (@event)
         {
-            case Events.Created created:
+            case Created created:
             {
                 OrganizationId = created.OrganizationId.ToId();
                 return Result.Ok;
             }
 
-            case Events.ReservationMade changed:
+            case ReservationMade changed:
             {
                 BorrowerId = changed.BorrowerId.ToId();
                 Start = changed.Start;
@@ -105,13 +106,13 @@ public sealed class BookingRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.CarChanged changed:
+            case CarChanged changed:
             {
                 CarId = changed.CarId.ToId();
                 return Result.Ok;
             }
 
-            case Events.TripAdded changed:
+            case TripAdded changed:
             {
                 var trip = RaiseEventToChildEntity(isReconstituting, changed, idFactory =>
                     Trip.Create(Recorder, idFactory, RaiseChangeEvent), e => e.TripId!);
@@ -125,14 +126,14 @@ public sealed class BookingRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.TripBegan changed:
+            case TripBegan changed:
             {
                 Recorder.TraceDebug(null, "Booking {Id} has started trip {TripId} from {From}",
                     Id, changed.TripId, changed.BeganFrom);
                 return Result.Ok;
             }
 
-            case Events.TripEnded changed:
+            case TripEnded changed:
             {
                 Recorder.TraceDebug(null, "Booking {Id} has ended trip {TripId} at {To}",
                     Id, changed.TripId, changed.EndedTo);
@@ -156,7 +157,7 @@ public sealed class BookingRoot : AggregateRootBase
 
     public Result<Error> ChangeCar(Identifier carId)
     {
-        return RaiseChangeEvent(BookingsDomain.Events.CarChanged.Create(Id, OrganizationId, carId));
+        return RaiseChangeEvent(BookingsDomain.Events.CarChanged(Id, OrganizationId, carId));
     }
 
     public Result<Error> MakeReservation(Identifier borrowerId, DateTime start, DateTime end)
@@ -184,7 +185,7 @@ public sealed class BookingRoot : AggregateRootBase
         }
 
         return RaiseChangeEvent(
-            BookingsDomain.Events.ReservationMade.Create(Id, OrganizationId, borrowerId, start, end));
+            BookingsDomain.Events.ReservationMade(Id, OrganizationId, borrowerId, start, end));
     }
 
     public Result<Error> StartTrip(Location from)
@@ -194,7 +195,7 @@ public sealed class BookingRoot : AggregateRootBase
             return Error.RuleViolation(Resources.BookingRoot_ReservationRequiresCar);
         }
 
-        var added = RaiseChangeEvent(BookingsDomain.Events.TripAdded.Create(Id, OrganizationId));
+        var added = RaiseChangeEvent(TripAdded.Create(Id, OrganizationId));
         if (!added.IsSuccessful)
         {
             return added.Error;

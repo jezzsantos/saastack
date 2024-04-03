@@ -5,18 +5,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Domain.Events.Shared\Domain.Events.Shared.csproj" />
+        <ProjectReference Include="..\Domain.Services.Shared\Domain.Services.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
-        <ProjectReference Include="..\Domain.Interfaces\Domain.Interfaces.csproj" />
-        <ProjectReference Include="..\Domain.Services.Shared\Domain.Services.Shared.csproj" />
-        <ProjectReference Include="..\Domain.Shared\Domain.Shared.csproj" />
-    </ItemGroup>
-
     <ItemGroup>
         <EmbeddedResource Update="Resources.resx">
             <Generator>ResXFileCodeGenerator</Generator>

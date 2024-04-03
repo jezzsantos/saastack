@@ -12,6 +12,7 @@ using Domain.Interfaces.Services;
 using Domain.Shared;
 using OrganizationsApplication.Persistence;
 using OrganizationsDomain;
+using OrganizationOwnership = Domain.Shared.Organizations.OrganizationOwnership;
 
 namespace OrganizationsApplication;
 
@@ -71,7 +72,7 @@ public class OrganizationsApplication : IOrganizationsApplication
     }
 
     public async Task<Result<Organization, Error>> CreateOrganizationAsync(ICallerContext caller, string creatorId,
-        string name, OrganizationOwnership ownership, CancellationToken cancellationToken)
+        string name, Application.Resources.Shared.OrganizationOwnership ownership, CancellationToken cancellationToken)
     {
         var displayName = DisplayName.Create(name);
         if (!displayName.IsSuccessful)
@@ -80,7 +81,7 @@ public class OrganizationsApplication : IOrganizationsApplication
         }
 
         var created = OrganizationRoot.Create(_recorder, _identifierFactory, _tenantSettingService,
-            ownership.ToEnumOrDefault(Ownership.Shared), creatorId.ToId(), displayName.Value);
+            ownership.ToEnumOrDefault(OrganizationOwnership.Shared), creatorId.ToId(), displayName.Value);
         if (!created.IsSuccessful)
         {
             return created.Error;
@@ -123,13 +124,14 @@ public class OrganizationsApplication : IOrganizationsApplication
         CancellationToken cancellationToken)
     {
         var creatorId = caller.CallerId;
-        var created = await CreateOrganizationAsync(caller, creatorId, name, OrganizationOwnership.Shared,
-            cancellationToken);
+        var created = await CreateOrganizationAsync(caller, creatorId, name,
+            Application.Resources.Shared.OrganizationOwnership.Shared, cancellationToken);
         if (!created.IsSuccessful)
         {
             return created.Error;
         }
 
+        //TODO: replaced by a notification!
         var organization = created.Value;
         var membership =
             await _endUsersService.CreateMembershipForCallerPrivateAsync(caller, organization.Id, cancellationToken);
@@ -284,7 +286,8 @@ internal static class OrganizationConversionExtensions
             Id = organization.Id,
             Name = organization.Name,
             CreatedById = organization.CreatedById,
-            Ownership = organization.Ownership.ToEnumOrDefault(OrganizationOwnership.Shared)
+            Ownership = organization.Ownership.ToEnumOrDefault(
+                Application.Resources.Shared.OrganizationOwnership.Shared)
         };
     }
 

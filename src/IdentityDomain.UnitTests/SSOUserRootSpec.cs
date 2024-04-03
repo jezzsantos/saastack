@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Identities.SSOUsers;
 using Domain.Interfaces.Entities;
 using Domain.Services.Shared.DomainServices;
 using Domain.Shared;
@@ -57,6 +58,6 @@ public class SSOUserRootSpec
         _user.Name.Value.LastName.Should().BeNone();
         _user.Timezone.Value.Code.Should().Be(Timezones.Default);
         _user.Address.Value.CountryCode.Should().Be(CountryCodes.Default);
-        _user.Events.Last().Should().BeOfType<Events.SSOUsers.TokensUpdated>();
+        _user.Events.Last().Should().BeOfType<TokensUpdated>();
     }
 }

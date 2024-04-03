@@ -4,6 +4,7 @@ using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Ancillary.EmailDelivery;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Infrastructure.Persistence.Common;
@@ -27,7 +28,7 @@ public class EmailDeliveryProjection : IReadModelProjection
     {
         switch (changeEvent)
         {
-            case Events.EmailDelivery.Created e:
+            case Created e:
                 return await _deliveries.HandleCreateAsync(e.RootId.ToId(), dto =>
                     {
                         dto.MessageId = e.MessageId;
@@ -38,7 +39,7 @@ public class EmailDeliveryProjection : IReadModelProjection
                     },
                     cancellationToken);
 
-            case Events.EmailDelivery.EmailDetailsChanged e:
+            case EmailDetailsChanged e:
                 return await _deliveries.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     dto.Subject = e.Subject;
@@ -47,7 +48,7 @@ public class EmailDeliveryProjection : IReadModelProjection
                     dto.ToDisplayName = e.ToDisplayName;
                 }, cancellationToken);
 
-            case Events.EmailDelivery.DeliveryAttempted e:
+            case DeliveryAttempted e:
                 return await _deliveries.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     var attempts = dto.Attempts.HasValue
@@ -65,11 +66,11 @@ public class EmailDeliveryProjection : IReadModelProjection
                     dto.LastAttempted = e.When;
                 }, cancellationToken);
 
-            case Events.EmailDelivery.DeliveryFailed e:
+            case DeliveryFailed e:
                 return await _deliveries.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.Failed = e.When; },
                     cancellationToken);
 
-            case Events.EmailDelivery.DeliverySucceeded e:
+            case DeliverySucceeded e:
                 return await _deliveries.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.Delivered = e.When; },
                     cancellationToken);
 

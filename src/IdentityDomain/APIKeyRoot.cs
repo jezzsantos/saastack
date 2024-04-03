@@ -4,10 +4,11 @@ using Domain.Common.Entities;
 using Domain.Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Identities.APIKeys;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
-using Domain.Shared;
+using Domain.Shared.Identities;
 using IdentityDomain.DomainServices;
 
 namespace IdentityDomain;
@@ -20,7 +21,7 @@ public sealed class APIKeyRoot : AggregateRootBase
         IAPIKeyHasherService apiKeyHasherService, Identifier userId, APIKeyToken keyToken)
     {
         var root = new APIKeyRoot(recorder, idFactory, apiKeyHasherService);
-        root.RaiseCreateEvent(IdentityDomain.Events.APIKeys.Created.Create(root.Id, userId, keyToken.Token,
+        root.RaiseCreateEvent(IdentityDomain.Events.APIKeys.Created(root.Id, userId, keyToken.Token,
             apiKeyHasherService.HashAPIKey(keyToken.Key)));
         return root;
     }
@@ -70,7 +71,7 @@ public sealed class APIKeyRoot : AggregateRootBase
     {
         switch (@event)
         {
-            case Events.APIKeys.Created created:
+            case Created created:
             {
                 UserId = created.UserId.ToId();
 
@@ -84,7 +85,7 @@ public sealed class APIKeyRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.APIKeys.ParametersChanged changed:
+            case ParametersChanged changed:
             {
                 Description = changed.Description;
                 ExpiresOn = changed.ExpiresOn;
@@ -92,7 +93,7 @@ public sealed class APIKeyRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.APIKeys.KeyVerified _:
+            case KeyVerified _:
             {
                 Recorder.TraceDebug(null, "ApiKey {Id} verified", Id);
                 return Result.Ok;
@@ -136,7 +137,7 @@ public sealed class APIKeyRoot : AggregateRootBase
             return error3;
         }
 
-        return RaiseChangeEvent(IdentityDomain.Events.APIKeys.ParametersChanged.Create(Id, description, expiresOn));
+        return RaiseChangeEvent(IdentityDomain.Events.APIKeys.ParametersChanged(Id, description, expiresOn));
     }
 
     public Result<bool, Error> VerifyKey(string key)
@@ -164,7 +165,7 @@ public sealed class APIKeyRoot : AggregateRootBase
         }
 
         var isVerified = verified.Value;
-        var raised = RaiseChangeEvent(IdentityDomain.Events.APIKeys.KeyVerified.Create(Id, isVerified));
+        var raised = RaiseChangeEvent(IdentityDomain.Events.APIKeys.KeyVerified(Id, isVerified));
         if (!raised.IsSuccessful)
         {
             return raised.Error;

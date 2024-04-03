@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.UserProfiles;
 using Domain.Interfaces.Entities;
 using Domain.Shared;
 using FluentAssertions;
@@ -37,7 +38,7 @@ public class UserProfileRootSpec
         _profile.EmailAddress.HasValue.Should().BeFalse();
         _profile.Address.Should().Be(Address.Default);
         _profile.Timezone.Should().Be(Timezone.Default);
-        _profile.Events.Last().Should().BeOfType<Events.Created>();
+        _profile.Events.Last().Should().BeOfType<Created>();
     }
 
     [Fact]
@@ -72,7 +73,7 @@ public class UserProfileRootSpec
 
         result.Should().BeSuccess();
         _profile.EmailAddress.Value.Should().Be(emailAddress);
-        _profile.Events.Last().Should().BeOfType<Events.EmailAddressChanged>();
+        _profile.Events.Last().Should().BeOfType<EmailAddressChanged>();
     }
 
     [Fact]
@@ -101,7 +102,7 @@ public class UserProfileRootSpec
         _profile.Address.State.Should().Be("astate");
         _profile.Address.CountryCode.Should().Be(CountryCodes.Default);
         _profile.Address.Zip.Should().Be("azip");
-        _profile.Events.Last().Should().BeOfType<Events.ContactAddressChanged>();
+        _profile.Events.Last().Should().BeOfType<ContactAddressChanged>();
     }
 
     [Fact]
@@ -123,7 +124,7 @@ public class UserProfileRootSpec
 
         result.Should().BeSuccess();
         _profile.Address.CountryCode.Should().Be(CountryCodes.Default);
-        _profile.Events.Last().Should().BeOfType<Events.TimezoneChanged>();
+        _profile.Events.Last().Should().BeOfType<TimezoneChanged>();
     }
 
     [Fact]
@@ -146,7 +147,7 @@ public class UserProfileRootSpec
         result.Should().BeSuccess();
         _profile.Name.Value.FirstName.Text.Should().Be("anewfirstname");
         _profile.Name.Value.LastName.Value.Text.Should().Be("anewlastname");
-        _profile.Events.Last().Should().BeOfType<Events.NameChanged>();
+        _profile.Events.Last().Should().BeOfType<NameChanged>();
     }
 
     [Fact]
@@ -168,7 +169,7 @@ public class UserProfileRootSpec
 
         result.Should().BeSuccess();
         _profile.DisplayName.Value.Text.Should().Be("anewdisplayname");
-        _profile.Events.Last().Should().BeOfType<Events.DisplayNameChanged>();
+        _profile.Events.Last().Should().BeOfType<DisplayNameChanged>();
     }
 
     [Fact]
@@ -190,6 +191,6 @@ public class UserProfileRootSpec
 
         result.Should().BeSuccess();
         _profile.PhoneNumber.Value.Number.Should().Be("+6498876986");
-        _profile.Events.Last().Should().BeOfType<Events.PhoneNumberChanged>();
+        _profile.Events.Last().Should().BeOfType<PhoneNumberChanged>();
     }
 }

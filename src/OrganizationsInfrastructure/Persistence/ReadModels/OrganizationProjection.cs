@@ -2,6 +2,7 @@ using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Organizations;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Infrastructure.Persistence.Common;
@@ -27,7 +28,7 @@ public class OrganizationProjection : IReadModelProjection
     {
         switch (changeEvent)
         {
-            case Events.Created e:
+            case Created e:
                 return await _organizations.HandleCreateAsync(e.RootId.ToId(), dto =>
                     {
                         dto.Name = e.Name;
@@ -36,7 +37,7 @@ public class OrganizationProjection : IReadModelProjection
                     },
                     cancellationToken);
 
-            case Events.SettingCreated _:
+            case SettingCreated _:
                 return true;
 
             default:

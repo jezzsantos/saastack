@@ -2,7 +2,7 @@
 using Common;
 using Domain.Interfaces.Validations;
 using Domain.Services.Shared.DomainServices;
-using Domain.Shared;
+using Domain.Shared.Identities;
 
 namespace Infrastructure.Shared.DomainServices;
 

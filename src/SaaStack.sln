@@ -342,6 +342,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserProfilesInfrastructure.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserProfilesInfrastructure.UnitTests", "UserProfilesInfrastructure.UnitTests\UserProfilesInfrastructure.UnitTests.csproj", "{A9D1A686-DEBA-4EC6-93E2-290392F41B13}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Events.Shared", "Domain.Events.Shared\Domain.Events.Shared.csproj", "{3AC2CCAF-A248-4FCA-9C42-BD207E528D27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1093,6 +1095,12 @@ Global
 		{A9D1A686-DEBA-4EC6-93E2-290392F41B13}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A9D1A686-DEBA-4EC6-93E2-290392F41B13}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
 		{A9D1A686-DEBA-4EC6-93E2-290392F41B13}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
+		{3AC2CCAF-A248-4FCA-9C42-BD207E528D27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AC2CCAF-A248-4FCA-9C42-BD207E528D27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AC2CCAF-A248-4FCA-9C42-BD207E528D27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AC2CCAF-A248-4FCA-9C42-BD207E528D27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AC2CCAF-A248-4FCA-9C42-BD207E528D27}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
+		{3AC2CCAF-A248-4FCA-9C42-BD207E528D27}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F5C77A86-38AF-40E4-82FC-617E624B2754} = {508E7DA4-4DF2-4201-955D-CCF70C41AD05}
@@ -1258,5 +1266,6 @@ Global
 		{2F4A4802-AD6F-472A-BD65-58896285E00C} = {153F22CE-3C45-4CF5-991A-01C866EC429F}
 		{8CB11E5D-01DE-4FCF-98B1-4998E80D561D} = {153F22CE-3C45-4CF5-991A-01C866EC429F}
 		{A9D1A686-DEBA-4EC6-93E2-290392F41B13} = {153F22CE-3C45-4CF5-991A-01C866EC429F}
+		{3AC2CCAF-A248-4FCA-9C42-BD207E528D27} = {3782A767-2274-4F44-80C6-D6C6EEB9C9A5}
 	EndGlobalSection
 EndGlobal

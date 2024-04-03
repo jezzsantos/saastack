@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.EndUsers;
 using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
@@ -71,8 +72,8 @@ public class EndUserRootSpec
         _user.Features.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Basic.Name).Value);
         _user.GuestInvitation.IsAccepted.Should().BeTrue();
         _user.GuestInvitation.AcceptedEmailAddress.Should().Be(emailAddress);
-        _user.Events[2].Should().BeOfType<Events.GuestInvitationAccepted>();
-        _user.Events.Last().Should().BeOfType<Events.Registered>();
+        _user.Events[2].Should().BeOfType<GuestInvitationAccepted>();
+        _user.Events.Last().Should().BeOfType<Registered>();
     }
 
     [Fact]
@@ -87,7 +88,7 @@ public class EndUserRootSpec
         _user.Classification.Should().Be(UserClassification.Person);
         _user.Roles.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Standard.Name).Value);
         _user.Features.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Basic.Name).Value);
-        _user.Events.Last().Should().BeOfType<Events.Registered>();
+        _user.Events.Last().Should().BeOfType<Registered>();
     }
 
     [Fact]
@@ -170,7 +171,7 @@ public class EndUserRootSpec
             && ms.IsDefault
             && ms.Roles == roles
             && ms.Features == features);
-        _user.Events.Last().Should().BeOfType<Events.MembershipAdded>();
+        _user.Events.Last().Should().BeOfType<MembershipAdded>();
     }
 
     [Fact]
@@ -196,7 +197,7 @@ public class EndUserRootSpec
             && ms.IsDefault
             && ms.Roles == roles
             && ms.Features == features);
-        _user.Events.Last().Should().BeOfType<Events.MembershipDefaultChanged>();
+        _user.Events.Last().Should().BeOfType<MembershipDefaultChanged>();
     }
 
 #if TESTINGONLY
@@ -260,7 +261,7 @@ public class EndUserRootSpec
         _user.Memberships[0].Roles.Should().Be(Roles.Create(TenantRoles.Member.Name).Value);
         _user.Memberships[0].Features.Should()
             .Be(Features.Create(TenantFeatures.Basic.Name, TenantFeatures.TestingOnly.Name).Value);
-        _user.Events.Last().Should().BeOfType<Events.MembershipFeatureAssigned>();
+        _user.Events.Last().Should().BeOfType<MembershipFeatureAssigned>();
     }
 #endif
 
@@ -313,7 +314,7 @@ public class EndUserRootSpec
             .Be(Roles.Create(TenantRoles.Member.Name, TenantRoles.TestingOnly.Name).Value);
         _user.Memberships[0].Features.Should()
             .Be(Features.Create(TenantFeatures.Basic.Name).Value);
-        _user.Events.Last().Should().BeOfType<Events.MembershipRoleAssigned>();
+        _user.Events.Last().Should().BeOfType<MembershipRoleAssigned>();
     }
 #endif
 
@@ -351,7 +352,7 @@ public class EndUserRootSpec
         result.Should().BeSuccess();
         _user.Roles.HasNone().Should().BeTrue();
         _user.Features.Should().Be(Features.Create(PlatformFeatures.TestingOnly.Name).Value);
-        _user.Events.Last().Should().BeOfType<Events.PlatformFeatureAssigned>();
+        _user.Events.Last().Should().BeOfType<PlatformFeatureAssigned>();
     }
 #endif
 
@@ -389,7 +390,7 @@ public class EndUserRootSpec
         result.Should().BeSuccess();
         _user.Roles.Should().Be(Roles.Create(PlatformRoles.TestingOnly.Name).Value);
         _user.Features.HasNone().Should().BeTrue();
-        _user.Events.Last().Should().BeOfType<Events.PlatformRoleAssigned>();
+        _user.Events.Last().Should().BeOfType<PlatformRoleAssigned>();
     }
 #endif
 
@@ -454,7 +455,7 @@ public class EndUserRootSpec
         result.Should().BeSuccess();
         _user.Roles.HasNone().Should().BeTrue();
         _user.Features.HasNone().Should().BeTrue();
-        _user.Events.Last().Should().BeOfType<Events.PlatformRoleUnassigned>();
+        _user.Events.Last().Should().BeOfType<PlatformRoleUnassigned>();
     }
 #endif
 
@@ -473,7 +474,7 @@ public class EndUserRootSpec
             });
 
         wasCallbackCalled.Should().BeFalse();
-        _user.Events.Last().Should().BeOfType<Events.Created>();
+        _user.Events.Last().Should().BeOfType<Created>();
         _user.GuestInvitation.IsInvited.Should().BeFalse();
         _user.GuestInvitation.IsAccepted.Should().BeFalse();
     }
@@ -494,7 +495,7 @@ public class EndUserRootSpec
             });
 
         wasCallbackCalled.Should().BeTrue();
-        _user.Events.Last().Should().BeOfType<Events.GuestInvitationCreated>();
+        _user.Events.Last().Should().BeOfType<GuestInvitationCreated>();
         _user.GuestInvitation.IsInvited.Should().BeTrue();
         _user.GuestInvitation.IsAccepted.Should().BeFalse();
     }
@@ -513,7 +514,7 @@ public class EndUserRootSpec
             });
 
         wasCallbackCalled.Should().BeTrue();
-        _user.Events.Last().Should().BeOfType<Events.GuestInvitationCreated>();
+        _user.Events.Last().Should().BeOfType<GuestInvitationCreated>();
         _user.GuestInvitation.IsInvited.Should().BeTrue();
         _user.GuestInvitation.IsAccepted.Should().BeFalse();
     }
@@ -572,7 +573,7 @@ public class EndUserRootSpec
             });
 
         wasCallbackCalled.Should().BeTrue();
-        _user.Events.Last().Should().BeOfType<Events.GuestInvitationCreated>();
+        _user.Events.Last().Should().BeOfType<GuestInvitationCreated>();
         _user.GuestInvitation.IsInvited.Should().BeTrue();
         _user.GuestInvitation.IsAccepted.Should().BeFalse();
     }
@@ -680,7 +681,7 @@ public class EndUserRootSpec
         var result = _user.AcceptGuestInvitation(CallerConstants.AnonymousUserId.ToId(), emailAddress);
 
         result.Should().BeSuccess();
-        _user.Events.Last().Should().BeOfType<Events.GuestInvitationAccepted>();
+        _user.Events.Last().Should().BeOfType<GuestInvitationAccepted>();
         _user.GuestInvitation.IsAccepted.Should().BeTrue();
         _user.GuestInvitation.AcceptedEmailAddress.Should().Be(emailAddress);
     }

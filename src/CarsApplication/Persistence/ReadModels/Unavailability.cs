@@ -1,6 +1,6 @@
 ﻿using Application.Persistence.Common;
-using CarsDomain;
 using Common;
+using Domain.Shared.Cars;
 using QueryAny;
 
 namespace CarsApplication.Persistence.ReadModels;

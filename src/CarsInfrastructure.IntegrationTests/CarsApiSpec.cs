@@ -2,6 +2,7 @@ using System.Net;
 using ApiHost1;
 using Application.Resources.Shared;
 using CarsDomain;
+using Domain.Shared.Cars;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Cars;

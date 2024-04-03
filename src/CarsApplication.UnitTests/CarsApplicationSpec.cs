@@ -7,6 +7,7 @@ using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
+using Domain.Shared.Cars;
 using FluentAssertions;
 using Moq;
 using UnitTesting.Common;

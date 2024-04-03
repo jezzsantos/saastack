@@ -2,8 +2,9 @@ using Common;
 using Domain.Common.Events;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Identities.APIKeys;
 using Domain.Interfaces.Entities;
-using Domain.Shared;
+using Domain.Shared.Identities;
 using FluentAssertions;
 using IdentityDomain.DomainServices;
 using Moq;
@@ -83,7 +84,7 @@ public class APIKeyRootSpec
         _apiKey.Description.Should().BeSome("adescription");
         _apiKey.ExpiresOn.Should().BeSome(expires);
         _apiKey.UserId.Should().Be("auserid".ToId());
-        _apiKey.Events.Last().Should().BeOfType<Events.APIKeys.ParametersChanged>();
+        _apiKey.Events.Last().Should().BeOfType<ParametersChanged>();
     }
 
     [Fact]
@@ -98,7 +99,7 @@ public class APIKeyRootSpec
         _apiKey.Description.Should().BeSome("adescription");
         _apiKey.ExpiresOn.Should().BeSome(expiresOn);
         _apiKey.UserId.Should().Be("auserid".ToId());
-        _apiKey.Events.Last().Should().BeOfType<Events.APIKeys.ParametersChanged>();
+        _apiKey.Events.Last().Should().BeOfType<ParametersChanged>();
     }
 
     [Fact]
@@ -119,7 +120,7 @@ public class APIKeyRootSpec
 
         result.Should().BeSuccess();
         result.Value.Should().BeTrue();
-        _apiKey.Events.Last().Should().BeOfType<Events.APIKeys.KeyVerified>();
+        _apiKey.Events.Last().Should().BeOfType<KeyVerified>();
     }
 
     [Fact]

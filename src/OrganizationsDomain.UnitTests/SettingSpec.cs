@@ -1,4 +1,5 @@
 using Domain.Interfaces.Services;
+using Domain.Shared.Organizations;
 using FluentAssertions;
 using Moq;
 using UnitTesting.Common;

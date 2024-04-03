@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Services;
+using Domain.Shared.Organizations;
 
 namespace OrganizationsDomain;
 
@@ -93,11 +94,4 @@ public sealed class Setting : ValueObjectBase<Setting>
 
         return new Setting(value, valueType, isEncrypted);
     }
-}
-
-public enum SettingValueType
-{
-    String = 0,
-    Number = 1,
-    Boolean = 2
 }

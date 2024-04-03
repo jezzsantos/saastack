@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.EndUsers;
 using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Shared;
@@ -11,8 +12,8 @@ namespace EndUsersDomain;
 
 public sealed class Membership : EntityBase
 {
-    internal static readonly RoleLevel DefaultRole = TenantRoles.Member;
     internal static readonly FeatureLevel DefaultFeature = TenantFeatures.Basic;
+    internal static readonly RoleLevel DefaultRole = TenantRoles.Member;
 
     public static Result<Membership, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
         RootEventHandler rootEventHandler)
@@ -39,7 +40,7 @@ public sealed class Membership : EntityBase
     {
         switch (@event)
         {
-            case Events.MembershipAdded added:
+            case MembershipAdded added:
             {
                 RootId = added.RootId.ToId();
                 OrganizationId = added.OrganizationId.ToId();
@@ -61,7 +62,7 @@ public sealed class Membership : EntityBase
                 return Result.Ok;
             }
 
-            case Events.MembershipDefaultChanged changed:
+            case MembershipDefaultChanged changed:
             {
                 if (changed.FromMembershipId == Id)
                 {
@@ -76,7 +77,7 @@ public sealed class Membership : EntityBase
                 return Result.Ok;
             }
 
-            case Events.MembershipRoleAssigned added:
+            case MembershipRoleAssigned added:
             {
                 var role = Roles.Add(added.Role);
                 if (!role.IsSuccessful)
@@ -88,7 +89,7 @@ public sealed class Membership : EntityBase
                 return Result.Ok;
             }
 
-            case Events.MembershipFeatureAssigned added:
+            case MembershipFeatureAssigned added:
             {
                 var feature = Features.Add(added.Feature);
                 if (!feature.IsSuccessful)
@@ -117,6 +118,7 @@ public sealed class Membership : EntityBase
         {
             return Error.RuleViolation(Resources.Membership_MissingDefaultRole.Format(DefaultRole.Name));
         }
+
         if (!Features.HasFeature(DefaultFeature))
         {
             return Error.RuleViolation(Resources.Membership_MissingDefaultFeature.Format(DefaultFeature.Name));

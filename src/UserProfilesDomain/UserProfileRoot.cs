@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.UserProfiles;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
@@ -16,7 +17,7 @@ public sealed class UserProfileRoot : AggregateRootBase
         ProfileType type, Identifier userId, PersonName name)
     {
         var root = new UserProfileRoot(recorder, idFactory);
-        root.RaiseCreateEvent(UserProfilesDomain.Events.Created.Create(root.Id, type, userId, name));
+        root.RaiseCreateEvent(UserProfilesDomain.Events.Created(root.Id, type, userId, name));
         return root;
     }
 
@@ -84,7 +85,7 @@ public sealed class UserProfileRoot : AggregateRootBase
     {
         switch (@event)
         {
-            case Events.Created created:
+            case Created created:
             {
                 UserId = created.UserId.ToId();
                 Type = created.Type.ToEnumOrDefault(ProfileType.Person);
@@ -111,7 +112,7 @@ public sealed class UserProfileRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.EmailAddressChanged changed:
+            case EmailAddressChanged changed:
             {
                 var email = Domain.Shared.EmailAddress.Create(changed.EmailAddress);
                 if (!email.IsSuccessful)
@@ -125,7 +126,7 @@ public sealed class UserProfileRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.ContactAddressChanged changed:
+            case ContactAddressChanged changed:
             {
                 var address = Address.Create(changed.Line1, changed.Line2, changed.Line3, changed.City, changed.State,
                     CountryCodes.FindOrDefault(changed.CountryCode), changed.Zip);
@@ -139,7 +140,7 @@ public sealed class UserProfileRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.TimezoneChanged changed:
+            case TimezoneChanged changed:
             {
                 var timezone = Timezone.Create(changed.Timezone);
                 if (!timezone.IsSuccessful)
@@ -152,7 +153,7 @@ public sealed class UserProfileRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.NameChanged changed:
+            case NameChanged changed:
             {
                 var name = PersonName.Create(changed.FirstName, changed.LastName);
                 if (!name.IsSuccessful)
@@ -165,7 +166,7 @@ public sealed class UserProfileRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.DisplayNameChanged changed:
+            case DisplayNameChanged changed:
             {
                 var name = PersonDisplayName.Create(changed.DisplayName);
                 if (!name.IsSuccessful)
@@ -178,7 +179,7 @@ public sealed class UserProfileRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.PhoneNumberChanged changed:
+            case PhoneNumberChanged changed:
             {
                 var number = Domain.Shared.PhoneNumber.Create(changed.Number);
                 if (!number.IsSuccessful)
@@ -203,7 +204,7 @@ public sealed class UserProfileRoot : AggregateRootBase
             return Error.RoleViolation(Resources.UserProfilesDomain_NotOwner);
         }
 
-        return RaiseChangeEvent(UserProfilesDomain.Events.DisplayNameChanged.Create(Id, UserId, displayName));
+        return RaiseChangeEvent(UserProfilesDomain.Events.DisplayNameChanged(Id, UserId, displayName));
     }
 
     public Result<Error> ChangeName(Identifier modifierId, PersonName name)
@@ -213,7 +214,7 @@ public sealed class UserProfileRoot : AggregateRootBase
             return Error.RoleViolation(Resources.UserProfilesDomain_NotOwner);
         }
 
-        return RaiseChangeEvent(UserProfilesDomain.Events.NameChanged.Create(Id, UserId, name));
+        return RaiseChangeEvent(UserProfilesDomain.Events.NameChanged(Id, UserId, name));
     }
 
     public Result<Error> ChangePhoneNumber(Identifier modifierId, PhoneNumber number)
@@ -228,7 +229,7 @@ public sealed class UserProfileRoot : AggregateRootBase
             return Error.RuleViolation(Resources.UserProfilesDomain_NotAPerson);
         }
 
-        return RaiseChangeEvent(UserProfilesDomain.Events.PhoneNumberChanged.Create(Id, UserId, number));
+        return RaiseChangeEvent(UserProfilesDomain.Events.PhoneNumberChanged(Id, UserId, number));
     }
 
     public Result<Error> SetContactAddress(Identifier modifierId, Address address)
@@ -238,7 +239,7 @@ public sealed class UserProfileRoot : AggregateRootBase
             return Error.RoleViolation(Resources.UserProfilesDomain_NotOwner);
         }
 
-        return RaiseChangeEvent(UserProfilesDomain.Events.ContactAddressChanged.Create(Id, UserId, address));
+        return RaiseChangeEvent(UserProfilesDomain.Events.ContactAddressChanged(Id, UserId, address));
     }
 
     public Result<Error> SetEmailAddress(Identifier modifierId, EmailAddress emailAddress)
@@ -253,7 +254,7 @@ public sealed class UserProfileRoot : AggregateRootBase
             return Error.RuleViolation(Resources.UserProfilesDomain_NotAPerson);
         }
 
-        return RaiseChangeEvent(UserProfilesDomain.Events.EmailAddressChanged.Create(Id, UserId, emailAddress));
+        return RaiseChangeEvent(UserProfilesDomain.Events.EmailAddressChanged(Id, UserId, emailAddress));
     }
 
     public Result<Error> SetTimezone(Identifier modifierId, Timezone timezone)
@@ -263,7 +264,7 @@ public sealed class UserProfileRoot : AggregateRootBase
             return Error.RoleViolation(Resources.UserProfilesDomain_NotOwner);
         }
 
-        return RaiseChangeEvent(UserProfilesDomain.Events.TimezoneChanged.Create(Id, UserId, timezone));
+        return RaiseChangeEvent(UserProfilesDomain.Events.TimezoneChanged(Id, UserId, timezone));
     }
 
 #if TESTINGONLY

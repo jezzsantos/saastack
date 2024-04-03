@@ -2,6 +2,7 @@ using Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Identities.AuthTokens;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
@@ -14,7 +15,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
         Identifier userId)
     {
         var root = new AuthTokensRoot(recorder, idFactory);
-        root.RaiseCreateEvent(IdentityDomain.Events.AuthTokens.Created.Create(root.Id, userId));
+        root.RaiseCreateEvent(IdentityDomain.Events.AuthTokens.Created(root.Id, userId));
         return root;
     }
 
@@ -64,13 +65,13 @@ public sealed class AuthTokensRoot : AggregateRootBase
     {
         switch (@event)
         {
-            case Events.AuthTokens.Created created:
+            case Created created:
             {
                 UserId = created.UserId.ToId();
                 return Result.Ok;
             }
 
-            case Events.AuthTokens.TokensChanged changed:
+            case TokensChanged changed:
             {
                 AccessToken = changed.AccessToken;
                 RefreshToken = changed.RefreshToken;
@@ -80,7 +81,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.AuthTokens.TokensRefreshed changed:
+            case TokensRefreshed changed:
             {
                 AccessToken = changed.AccessToken;
                 RefreshToken = changed.RefreshToken;
@@ -90,7 +91,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.AuthTokens.TokensRevoked changed:
+            case TokensRevoked changed:
             {
                 AccessToken = Optional<string>.None;
                 RefreshToken = Optional<string>.None;
@@ -124,7 +125,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
         }
 
         return RaiseChangeEvent(
-            IdentityDomain.Events.AuthTokens.TokensRefreshed.Create(Id, UserId, accessToken, accessTokenExpiresOn,
+            IdentityDomain.Events.AuthTokens.TokensRefreshed(Id, UserId, accessToken, accessTokenExpiresOn,
                 refreshToken, refreshTokenExpiresOn));
     }
 
@@ -141,7 +142,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
         }
 
         return RaiseChangeEvent(
-            IdentityDomain.Events.AuthTokens.TokensRevoked.Create(Id, UserId));
+            IdentityDomain.Events.AuthTokens.TokensRevoked(Id, UserId));
     }
 
     public Result<Error> SetTokens(string accessToken, string refreshToken, DateTime accessTokenExpiresOn,
@@ -154,7 +155,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
         }
 
         return RaiseChangeEvent(
-            IdentityDomain.Events.AuthTokens.TokensChanged.Create(Id, UserId, accessToken, accessTokenExpiresOn,
+            IdentityDomain.Events.AuthTokens.TokensChanged(Id, UserId, accessToken, accessTokenExpiresOn,
                 refreshToken, refreshTokenExpiresOn));
     }
 
@@ -163,7 +164,7 @@ public sealed class AuthTokensRoot : AggregateRootBase
         DateTime refreshTokenExpiresOn)
     {
         return RaiseChangeEvent(
-            IdentityDomain.Events.AuthTokens.TokensChanged.Create(Id, UserId, accessToken, accessTokenExpiresOn,
+            IdentityDomain.Events.AuthTokens.TokensChanged(Id, UserId, accessToken, accessTokenExpiresOn,
                 refreshToken, refreshTokenExpiresOn));
     }
 #endif

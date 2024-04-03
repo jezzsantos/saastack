@@ -2,12 +2,14 @@ using Common;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Organizations;
 using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
 using Domain.Shared;
+using Domain.Shared.Organizations;
 
 namespace OrganizationsDomain;
 
@@ -18,10 +20,11 @@ public sealed class OrganizationRoot : AggregateRootBase
     private readonly ITenantSettingService _tenantSettingService;
 
     public static Result<OrganizationRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
-        ITenantSettingService tenantSettingService, Ownership ownership, Identifier createdBy, DisplayName name)
+        ITenantSettingService tenantSettingService, OrganizationOwnership ownership, Identifier createdBy,
+        DisplayName name)
     {
         var root = new OrganizationRoot(recorder, idFactory, tenantSettingService);
-        root.RaiseCreateEvent(OrganizationsDomain.Events.Created.Create(root.Id, ownership, createdBy, name));
+        root.RaiseCreateEvent(OrganizationsDomain.Events.Created(root.Id, ownership, createdBy, name));
         return root;
     }
 
@@ -44,7 +47,7 @@ public sealed class OrganizationRoot : AggregateRootBase
 
     public DisplayName Name { get; private set; } = DisplayName.Empty;
 
-    public Ownership Ownership { get; private set; }
+    public OrganizationOwnership Ownership { get; private set; }
 
     public Settings Settings { get; private set; } = Settings.Empty;
 
@@ -72,7 +75,7 @@ public sealed class OrganizationRoot : AggregateRootBase
     {
         switch (@event)
         {
-            case Events.Created created:
+            case Created created:
             {
                 var name = DisplayName.Create(created.Name);
                 if (!name.IsSuccessful)
@@ -86,7 +89,7 @@ public sealed class OrganizationRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.SettingCreated created:
+            case SettingCreated created:
             {
                 var value = Setting.From(created.StringValue, created.ValueType, created.IsEncrypted,
                     _tenantSettingService);
@@ -106,7 +109,7 @@ public sealed class OrganizationRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.SettingUpdated updated:
+            case SettingUpdated updated:
             {
                 var to = Setting.From(updated.To, updated.ToType, updated.IsEncrypted, _tenantSettingService);
                 if (!to.IsSuccessful)
@@ -147,7 +150,7 @@ public sealed class OrganizationRoot : AggregateRootBase
             var valueValue = value.IsEncrypted
                 ? _tenantSettingService.Encrypt(value.Value.ToString() ?? string.Empty)
                 : value.Value.ToString() ?? string.Empty;
-            RaiseChangeEvent(OrganizationsDomain.Events.SettingCreated.Create(Id, key, valueValue, value.ValueType,
+            RaiseChangeEvent(OrganizationsDomain.Events.SettingCreated(Id, key, valueValue, value.ValueType,
                 value.IsEncrypted));
         }
 
@@ -164,7 +167,7 @@ public sealed class OrganizationRoot : AggregateRootBase
                     ? _tenantSettingService.Encrypt(value.Value.ToString() ?? string.Empty)
                     : value.Value.ToString() ?? string.Empty;
                 var oldValue = oldSetting!.Value.ToString() ?? string.Empty;
-                RaiseChangeEvent(OrganizationsDomain.Events.SettingUpdated.Create(Id, key, oldValue,
+                RaiseChangeEvent(OrganizationsDomain.Events.SettingUpdated(Id, key, oldValue,
                     oldSetting.ValueType,
                     valueValue, value.ValueType, value.IsEncrypted));
             }
@@ -174,7 +177,7 @@ public sealed class OrganizationRoot : AggregateRootBase
                     ? _tenantSettingService.Encrypt(value.Value.ToString() ?? string.Empty)
                     : value.Value.ToString() ?? string.Empty;
                 RaiseChangeEvent(
-                    OrganizationsDomain.Events.SettingCreated.Create(Id, key, valueValue, value.ValueType,
+                    OrganizationsDomain.Events.SettingCreated(Id, key, valueValue, value.ValueType,
                         value.IsEncrypted));
             }
         }

@@ -2,6 +2,7 @@ using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.UserProfiles;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Infrastructure.Persistence.Common;
@@ -27,7 +28,7 @@ public class UserProfileProjection : IReadModelProjection
     {
         switch (changeEvent)
         {
-            case Events.Created e:
+            case Created e:
                 return await _users.HandleCreateAsync(e.RootId.ToId(), dto =>
                 {
                     dto.Type = e.Type;
@@ -37,30 +38,30 @@ public class UserProfileProjection : IReadModelProjection
                     dto.LastName = e.LastName;
                 }, cancellationToken);
 
-            case Events.NameChanged e:
+            case NameChanged e:
                 return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     dto.FirstName = e.FirstName;
                     dto.LastName = e.LastName;
                 }, cancellationToken);
 
-            case Events.DisplayNameChanged e:
+            case DisplayNameChanged e:
                 return await _users.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.DisplayName = e.DisplayName; },
                     cancellationToken);
 
-            case Events.EmailAddressChanged e:
+            case EmailAddressChanged e:
                 return await _users.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.EmailAddress = e.EmailAddress; },
                     cancellationToken);
 
-            case Events.PhoneNumberChanged e:
+            case PhoneNumberChanged e:
                 return await _users.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.PhoneNumber = e.Number; },
                     cancellationToken);
 
-            case Events.TimezoneChanged e:
+            case TimezoneChanged e:
                 return await _users.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.Timezone = e.Timezone; },
                     cancellationToken);
 
-            case Events.ContactAddressChanged e:
+            case ContactAddressChanged e:
                 return await _users.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.CountryCode = e.CountryCode; },
                     cancellationToken);
 

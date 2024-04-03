@@ -4,6 +4,7 @@ using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Identities.PasswordCredentials;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
@@ -27,7 +28,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
     {
         var root = new PasswordCredentialRoot(recorder, idFactory, settings, emailAddressService, tokensService,
             passwordHasherService);
-        root.RaiseCreateEvent(IdentityDomain.Events.PasswordCredentials.Created.Create(root.Id, userId));
+        root.RaiseCreateEvent(IdentityDomain.Events.PasswordCredentials.Created(root.Id, userId));
         return root;
     }
 
@@ -117,14 +118,14 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
     {
         switch (@event)
         {
-            case Events.PasswordCredentials.Created created:
+            case Created created:
             {
                 UserId = created.UserId.ToId();
                 Recorder.TraceDebug(null, "Password credential {Id} was created for {UserId}", Id, created.UserId);
                 return Result.Ok;
             }
 
-            case Events.PasswordCredentials.CredentialsChanged changed:
+            case CredentialsChanged changed:
             {
                 var set = Password.SetPassword(_passwordHasherService, changed.PasswordHash);
                 if (!set.IsSuccessful)
@@ -137,7 +138,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.PasswordCredentials.RegistrationChanged changed:
+            case RegistrationChanged changed:
             {
                 var registration = IdentityDomain.Registration.Create(changed.EmailAddress, changed.Name);
                 if (!registration.IsSuccessful)
@@ -150,7 +151,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.PasswordCredentials.PasswordVerified changed:
+            case PasswordVerified changed:
             {
                 if (changed.AuditAttempt)
                 {
@@ -163,33 +164,33 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.PasswordCredentials.AccountLocked _:
+            case AccountLocked _:
             {
                 Recorder.TraceDebug(null, "Password credential {Id} was locked", Id);
                 return Result.Ok;
             }
 
-            case Events.PasswordCredentials.AccountUnlocked _:
+            case AccountUnlocked _:
             {
                 Recorder.TraceDebug(null, "Password credential {Id} was unlocked", Id);
                 return Result.Ok;
             }
 
-            case Events.PasswordCredentials.RegistrationVerificationCreated created:
+            case RegistrationVerificationCreated created:
             {
                 Verification = Verification.Renew(created.Token);
                 Recorder.TraceDebug(null, "Password credential {Id} verification has been renewed", Id);
                 return Result.Ok;
             }
 
-            case Events.PasswordCredentials.RegistrationVerificationVerified _:
+            case RegistrationVerificationVerified _:
             {
                 Verification = Verification.Verify();
                 Recorder.TraceDebug(null, "Password credential {Id} has been verified", Id);
                 return Result.Ok;
             }
 
-            case Events.PasswordCredentials.PasswordResetInitiated changed:
+            case PasswordResetInitiated changed:
             {
                 var reset = Password.InitiatePasswordReset(changed.Token);
                 if (!reset.IsSuccessful)
@@ -202,7 +203,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.PasswordCredentials.PasswordResetCompleted changed:
+            case PasswordResetCompleted changed:
             {
                 var reset = Password.ResetPassword(_passwordHasherService, changed.Token, changed.PasswordHash);
                 if (!reset.IsSuccessful)
@@ -247,7 +248,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
         }
 
         var token = _tokensService.CreatePasswordResetToken();
-        return RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.PasswordResetInitiated.Create(Id, token));
+        return RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.PasswordResetInitiated(Id, token));
     }
 
     public Result<Error> InitiateRegistrationVerification()
@@ -259,7 +260,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
 
         var token = _tokensService.CreateRegistrationVerificationToken();
         return RaiseChangeEvent(
-            IdentityDomain.Events.PasswordCredentials.RegistrationVerificationCreated.Create(Id, token));
+            IdentityDomain.Events.PasswordCredentials.RegistrationVerificationCreated(Id, token));
     }
 
     public Result<Error> ResetPassword(string token, string password)
@@ -298,11 +299,11 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
 
         var passwordHash = _passwordHasherService.HashPassword(password);
         RaiseChangeEvent(
-            IdentityDomain.Events.PasswordCredentials.PasswordResetCompleted.Create(Id, token, passwordHash));
+            IdentityDomain.Events.PasswordCredentials.PasswordResetCompleted(Id, token, passwordHash));
 
         if (Login.HasJustUnlocked)
         {
-            RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.AccountUnlocked.Create(Id));
+            RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.AccountUnlocked(Id));
         }
 
         return Result.Ok;
@@ -317,14 +318,14 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
         }
 
         return RaiseChangeEvent(
-            IdentityDomain.Events.PasswordCredentials.CredentialsChanged.Create(Id,
+            IdentityDomain.Events.PasswordCredentials.CredentialsChanged(Id,
                 _passwordHasherService.HashPassword(password)));
     }
 
     public Result<Error> SetRegistrationDetails(EmailAddress emailAddress, PersonDisplayName displayName)
     {
         return RaiseChangeEvent(
-            IdentityDomain.Events.PasswordCredentials.RegistrationChanged.Create(Id, emailAddress, displayName));
+            IdentityDomain.Events.PasswordCredentials.RegistrationChanged(Id, emailAddress, displayName));
     }
 
 #if TESTINGONLY
@@ -387,7 +388,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
         var isVerified = verify.Value;
         var raised =
             RaiseChangeEvent(
-                IdentityDomain.Events.PasswordCredentials.PasswordVerified.Create(Id, isVerified, auditAttempt));
+                IdentityDomain.Events.PasswordCredentials.PasswordVerified(Id, isVerified, auditAttempt));
         if (!raised.IsSuccessful)
         {
             return raised.Error;
@@ -395,7 +396,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
 
         if (Login.HasJustLocked)
         {
-            var locked = RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.AccountLocked.Create(Id));
+            var locked = RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.AccountLocked(Id));
             if (!locked.IsSuccessful)
             {
                 return locked.Error;
@@ -404,7 +405,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
 
         if (Login.HasJustUnlocked)
         {
-            var unlocked = RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.AccountUnlocked.Create(Id));
+            var unlocked = RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.AccountUnlocked(Id));
             if (!unlocked.IsSuccessful)
             {
                 return unlocked.Error;
@@ -423,7 +424,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
                 : Resources.PasswordCredentialsRoot_RegistrationVerifyingExpired);
         }
 
-        return RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.RegistrationVerificationVerified.Create(Id));
+        return RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.RegistrationVerificationVerified(Id));
     }
 
     private static LoginMonitor CreateLoginMonitor(IConfigurationSettings settings)

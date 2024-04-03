@@ -1,4 +1,5 @@
 using Common;
+using Domain.Shared.Cars;
 using FluentAssertions;
 using UnitTesting.Common;
 using Xunit;

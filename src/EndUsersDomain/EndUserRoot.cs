@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.EndUsers;
 using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
@@ -20,7 +21,7 @@ public sealed class EndUserRoot : AggregateRootBase
         UserClassification classification)
     {
         var root = new EndUserRoot(recorder, idFactory);
-        root.RaiseCreateEvent(EndUsersDomain.Events.Created.Create(root.Id, classification));
+        root.RaiseCreateEvent(EndUsersDomain.Events.Created(root.Id, classification));
         return root;
     }
 
@@ -103,7 +104,7 @@ public sealed class EndUserRoot : AggregateRootBase
     {
         switch (@event)
         {
-            case Events.Created created:
+            case Created created:
             {
                 Access = created.Access.ToEnumOrDefault(UserAccess.Enabled);
                 Status = created.Status.ToEnumOrDefault(UserStatus.Unregistered);
@@ -113,7 +114,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.Registered changed:
+            case Registered changed:
             {
                 Access = changed.Access.ToEnumOrDefault(UserAccess.Enabled);
                 Status = changed.Status.ToEnumOrDefault(UserStatus.Unregistered);
@@ -137,7 +138,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.MembershipAdded added:
+            case MembershipAdded added:
             {
                 var membership = RaiseEventToChildEntity(isReconstituting, added, idFactory =>
                     Membership.Create(Recorder, idFactory, RaiseChangeEvent), e => e.MembershipId);
@@ -153,7 +154,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.MembershipDefaultChanged changed:
+            case MembershipDefaultChanged changed:
             {
                 var fromMembership = Memberships.FindByMembershipId(changed.FromMembershipId.ToId());
                 if (!fromMembership.HasValue)
@@ -186,7 +187,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.MembershipRoleAssigned added:
+            case MembershipRoleAssigned added:
             {
                 var membershipId = added.MembershipId.ToId();
                 var membership = Memberships.FindByMembershipId(membershipId);
@@ -206,7 +207,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.MembershipFeatureAssigned added:
+            case MembershipFeatureAssigned added:
             {
                 var membershipId = added.MembershipId.ToId();
                 var membership = Memberships.FindByMembershipId(membershipId);
@@ -226,7 +227,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.PlatformRoleAssigned added:
+            case PlatformRoleAssigned added:
             {
                 var roles = Roles.Add(added.Role);
                 if (!roles.IsSuccessful)
@@ -239,7 +240,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.PlatformRoleUnassigned added:
+            case PlatformRoleUnassigned added:
             {
                 var roles = Roles.Remove(added.Role);
                 Roles = roles;
@@ -247,7 +248,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.PlatformFeatureAssigned added:
+            case PlatformFeatureAssigned added:
             {
                 var features = Features.Add(added.Feature);
                 if (!features.IsSuccessful)
@@ -260,7 +261,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.GuestInvitationCreated added:
+            case GuestInvitationCreated added:
             {
                 var inviteeEmailAddress = EmailAddress.Create(added.EmailAddress);
                 if (!inviteeEmailAddress.IsSuccessful)
@@ -281,7 +282,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case Events.GuestInvitationAccepted changed:
+            case GuestInvitationAccepted changed:
             {
                 var acceptedEmailAddress = EmailAddress.Create(changed.AcceptedEmailAddress);
                 if (!acceptedEmailAddress.IsSuccessful)
@@ -318,7 +319,7 @@ public sealed class EndUserRoot : AggregateRootBase
             return verified.Error;
         }
 
-        return RaiseChangeEvent(EndUsersDomain.Events.GuestInvitationAccepted.Create(Id, emailAddress));
+        return RaiseChangeEvent(EndUsersDomain.Events.GuestInvitationAccepted(Id, emailAddress));
     }
 
     public Result<Error> AddMembership(Identifier organizationId, Roles tenantRoles, Features tenantFeatures)
@@ -333,7 +334,7 @@ public sealed class EndUserRoot : AggregateRootBase
 
         var isDefault = Memberships.HasNone();
         var added = RaiseChangeEvent(
-            EndUsersDomain.Events.MembershipAdded.Create(Id, organizationId, isDefault, tenantRoles, tenantFeatures));
+            EndUsersDomain.Events.MembershipAdded(Id, organizationId, isDefault, tenantRoles, tenantFeatures));
         if (!added.IsSuccessful)
         {
             return added.Error;
@@ -344,7 +345,7 @@ public sealed class EndUserRoot : AggregateRootBase
             var defaultMembership = Memberships.DefaultMembership;
             var addedMembership = Memberships.FindByOrganizationId(organizationId);
             return RaiseChangeEvent(
-                EndUsersDomain.Events.MembershipDefaultChanged.Create(Id, defaultMembership.Id,
+                EndUsersDomain.Events.MembershipDefaultChanged(Id, defaultMembership.Id,
                     addedMembership.Value.Id));
         }
 
@@ -377,7 +378,7 @@ public sealed class EndUserRoot : AggregateRootBase
 
                 var addedFeature =
                     RaiseChangeEvent(
-                        EndUsersDomain.Events.MembershipFeatureAssigned.Create(Id, organizationId, membership.Value.Id,
+                        EndUsersDomain.Events.MembershipFeatureAssigned(Id, organizationId, membership.Value.Id,
                             feature));
                 if (!addedFeature.IsSuccessful)
                 {
@@ -414,7 +415,7 @@ public sealed class EndUserRoot : AggregateRootBase
 
                 var addedRole =
                     RaiseChangeEvent(
-                        EndUsersDomain.Events.MembershipRoleAssigned.Create(Id, organizationId, membership.Value.Id,
+                        EndUsersDomain.Events.MembershipRoleAssigned(Id, organizationId, membership.Value.Id,
                             role));
                 if (!addedRole.IsSuccessful)
                 {
@@ -445,7 +446,7 @@ public sealed class EndUserRoot : AggregateRootBase
 
                 var addedFeature =
                     RaiseChangeEvent(
-                        EndUsersDomain.Events.PlatformFeatureAssigned.Create(Id, feature));
+                        EndUsersDomain.Events.PlatformFeatureAssigned(Id, feature));
                 if (!addedFeature.IsSuccessful)
                 {
                     return addedFeature.Error;
@@ -474,7 +475,7 @@ public sealed class EndUserRoot : AggregateRootBase
 
                 var addedRole =
                     RaiseChangeEvent(
-                        EndUsersDomain.Events.PlatformRoleAssigned.Create(Id, role));
+                        EndUsersDomain.Events.PlatformRoleAssigned(Id, role));
                 if (!addedRole.IsSuccessful)
                 {
                     return addedRole.Error;
@@ -566,7 +567,7 @@ public sealed class EndUserRoot : AggregateRootBase
         var token = tokensService.CreateGuestInvitationToken();
         var raised =
             RaiseChangeEvent(
-                EndUsersDomain.Events.GuestInvitationCreated.Create(Id, token, inviteeEmailAddress, inviterId));
+                EndUsersDomain.Events.GuestInvitationCreated(Id, token, inviteeEmailAddress, inviterId));
         if (!raised.IsSuccessful)
         {
             return raised.Error;
@@ -586,7 +587,7 @@ public sealed class EndUserRoot : AggregateRootBase
         {
             if (username.HasValue)
             {
-                var accepted = RaiseChangeEvent(EndUsersDomain.Events.GuestInvitationAccepted.Create(Id, username));
+                var accepted = RaiseChangeEvent(EndUsersDomain.Events.GuestInvitationAccepted(Id, username));
                 if (!accepted.IsSuccessful)
                 {
                     return accepted.Error;
@@ -594,7 +595,7 @@ public sealed class EndUserRoot : AggregateRootBase
             }
         }
 
-        return RaiseChangeEvent(EndUsersDomain.Events.Registered.Create(Id, username, Classification,
+        return RaiseChangeEvent(EndUsersDomain.Events.Registered(Id, username, Classification,
             UserAccess.Enabled, UserStatus.Registered, roles, levels));
     }
 
@@ -659,7 +660,7 @@ public sealed class EndUserRoot : AggregateRootBase
 
                 var removedRole =
                     RaiseChangeEvent(
-                        EndUsersDomain.Events.PlatformRoleUnassigned.Create(Id, role));
+                        EndUsersDomain.Events.PlatformRoleUnassigned(Id, role));
                 if (!removedRole.IsSuccessful)
                 {
                     return removedRole.Error;

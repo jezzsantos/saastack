@@ -1,284 +1,148 @@
 using Common;
 using Domain.Common.ValueObjects;
-using Domain.Interfaces.Entities;
+using Domain.Events.Shared.EndUsers;
 using Domain.Shared;
 
 namespace EndUsersDomain;
 
 public static class Events
 {
-    public sealed class Created : IDomainEvent
+    public static Created Created(Identifier id, UserClassification classification)
     {
-        public static Created Create(Identifier id, UserClassification classification)
+        return new Created
         {
-            return new Created
-            {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
-                Classification = classification.ToString(),
-                Access = UserAccess.Enabled.ToString(),
-                Status = UserStatus.Unregistered.ToString()
-            };
-        }
-
-        public required string Access { get; set; }
-
-        public required string Classification { get; set; }
-
-        public required string Status { get; set; }
-
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
+            RootId = id,
+            OccurredUtc = DateTime.UtcNow,
+            Classification = classification.ToString(),
+            Access = UserAccess.Enabled.ToString(),
+            Status = UserStatus.Unregistered.ToString()
+        };
     }
 
-    public sealed class Registered : IDomainEvent
+    public static GuestInvitationAccepted GuestInvitationAccepted(Identifier id, EmailAddress emailAddress)
     {
-        public static Registered Create(Identifier id, Optional<EmailAddress> username,
-            UserClassification classification,
-            UserAccess access, UserStatus status,
-            Roles roles,
-            Features features)
+        return new GuestInvitationAccepted
         {
-            return new Registered
-            {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
-                Username = username.ValueOrDefault!,
-                Classification = classification.ToString(),
-                Access = access.ToString(),
-                Status = status.ToString(),
-                Roles = roles.ToList(),
-                Features = features.ToList()
-            };
-        }
-
-        public required string Access { get; set; }
-
-        public required string Classification { get; set; }
-
-        public required List<string> Features { get; set; }
-
-        public required List<string> Roles { get; set; }
-
-        public required string Status { get; set; }
-
-        public string? Username { get; set; }
-
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
+            RootId = id,
+            OccurredUtc = DateTime.UtcNow,
+            AcceptedEmailAddress = emailAddress,
+            AcceptedAtUtc = DateTime.UtcNow
+        };
     }
 
-    public sealed class MembershipAdded : IDomainEvent
+    public static GuestInvitationCreated GuestInvitationCreated(Identifier id, string token, EmailAddress invitee,
+        Identifier invitedBy)
     {
-        public static MembershipAdded Create(Identifier id, Identifier organizationId, bool isDefault, Roles roles,
-            Features features)
+        return new GuestInvitationCreated
         {
-            return new MembershipAdded
-            {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
-                MembershipId = null,
-                IsDefault = isDefault,
-                OrganizationId = organizationId,
-                Roles = roles.ToList(),
-                Features = features.ToList()
-            };
-        }
-
-        public required List<string> Features { get; set; }
-
-        public required bool IsDefault { get; set; }
-
-        public string? MembershipId { get; set; }
-
-        public required string OrganizationId { get; set; }
-
-        public required List<string> Roles { get; set; }
-
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
+            RootId = id,
+            OccurredUtc = DateTime.UtcNow,
+            EmailAddress = invitee,
+            InvitedById = invitedBy,
+            Token = token
+        };
     }
 
-    public sealed class MembershipDefaultChanged : IDomainEvent
+    public static MembershipAdded MembershipAdded(Identifier id, Identifier organizationId, bool isDefault, Roles roles,
+        Features features)
     {
-        public static MembershipDefaultChanged Create(Identifier id, Identifier fromMembershipId,
-            Identifier toMembershipId)
+        return new MembershipAdded
         {
-            return new MembershipDefaultChanged
-            {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
-                FromMembershipId = fromMembershipId,
-                ToMembershipId = toMembershipId
-            };
-        }
-
-        public required string FromMembershipId { get; set; }
-
-        public required string ToMembershipId { get; set; }
-
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
+            RootId = id,
+            OccurredUtc = DateTime.UtcNow,
+            MembershipId = null,
+            IsDefault = isDefault,
+            OrganizationId = organizationId,
+            Roles = roles.ToList(),
+            Features = features.ToList()
+        };
     }
 
-    public sealed class MembershipRoleAssigned : IDomainEvent
+    public static MembershipDefaultChanged MembershipDefaultChanged(Identifier id, Identifier fromMembershipId,
+        Identifier toMembershipId)
     {
-        public static MembershipRoleAssigned Create(Identifier id, Identifier organizationId, Identifier membershipId,
-            Role role)
+        return new MembershipDefaultChanged
         {
-            return new MembershipRoleAssigned
-            {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
-                OrganizationId = organizationId,
-                MembershipId = membershipId,
-                Role = role.Identifier
-            };
-        }
-
-        public required string MembershipId { get; set; }
-
-        public required string OrganizationId { get; set; }
-
-        public required string Role { get; set; }
-
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
+            RootId = id,
+            OccurredUtc = DateTime.UtcNow,
+            FromMembershipId = fromMembershipId,
+            ToMembershipId = toMembershipId
+        };
     }
 
-    public sealed class MembershipFeatureAssigned : IDomainEvent
+    public static MembershipFeatureAssigned MembershipFeatureAssigned(Identifier id, Identifier organizationId,
+        Identifier membershipId, Feature feature)
     {
-        public static MembershipFeatureAssigned Create(Identifier id, Identifier organizationId,
-            Identifier membershipId, Feature feature)
+        return new MembershipFeatureAssigned
         {
-            return new MembershipFeatureAssigned
-            {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
-                OrganizationId = organizationId,
-                MembershipId = membershipId,
-                Feature = feature.Identifier
-            };
-        }
-
-        public required string Feature { get; set; }
-
-        public required string MembershipId { get; set; }
-
-        public required string OrganizationId { get; set; }
-
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
+            RootId = id,
+            OccurredUtc = DateTime.UtcNow,
+            OrganizationId = organizationId,
+            MembershipId = membershipId,
+            Feature = feature.Identifier
+        };
     }
 
-    public sealed class PlatformRoleAssigned : IDomainEvent
+    public static MembershipRoleAssigned MembershipRoleAssigned(Identifier id, Identifier organizationId,
+        Identifier membershipId,
+        Role role)
     {
-        public static PlatformRoleAssigned Create(Identifier id, Role role)
+        return new MembershipRoleAssigned
         {
-            return new PlatformRoleAssigned
-            {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
-                Role = role.Identifier
-            };
-        }
-
-        public required string Role { get; set; }
-
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
+            RootId = id,
+            OccurredUtc = DateTime.UtcNow,
+            OrganizationId = organizationId,
+            MembershipId = membershipId,
+            Role = role.Identifier
+        };
     }
 
-    public sealed class PlatformRoleUnassigned : IDomainEvent
+    public static PlatformFeatureAssigned PlatformFeatureAssigned(Identifier id, Feature feature)
     {
-        public static PlatformRoleUnassigned Create(Identifier id, Role role)
+        return new PlatformFeatureAssigned
         {
-            return new PlatformRoleUnassigned
-            {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
-                Role = role.Identifier
-            };
-        }
-
-        public required string Role { get; set; }
-
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
+            RootId = id,
+            OccurredUtc = DateTime.UtcNow,
+            Feature = feature.Identifier
+        };
     }
 
-    public sealed class PlatformFeatureAssigned : IDomainEvent
+    public static PlatformRoleAssigned PlatformRoleAssigned(Identifier id, Role role)
     {
-        public static PlatformFeatureAssigned Create(Identifier id, Feature feature)
+        return new PlatformRoleAssigned
         {
-            return new PlatformFeatureAssigned
-            {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
-                Feature = feature.Identifier
-            };
-        }
-
-        public required string Feature { get; set; }
-
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
+            RootId = id,
+            OccurredUtc = DateTime.UtcNow,
+            Role = role.Identifier
+        };
     }
 
-    public sealed class GuestInvitationCreated : IDomainEvent
+    public static PlatformRoleUnassigned PlatformRoleUnassigned(Identifier id, Role role)
     {
-        public static GuestInvitationCreated Create(Identifier id, string token, EmailAddress invitee,
-            Identifier invitedBy)
+        return new PlatformRoleUnassigned
         {
-            return new GuestInvitationCreated
-            {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
-                EmailAddress = invitee,
-                InvitedById = invitedBy,
-                Token = token
-            };
-        }
-
-        public required string EmailAddress { get; set; }
-
-        public required string InvitedById { get; set; }
-
-        public required string Token { get; set; }
-
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
+            RootId = id,
+            OccurredUtc = DateTime.UtcNow,
+            Role = role.Identifier
+        };
     }
 
-    public sealed class GuestInvitationAccepted : IDomainEvent
+    public static Registered Registered(Identifier id, Optional<EmailAddress> username,
+        UserClassification classification,
+        UserAccess access, UserStatus status,
+        Roles roles,
+        Features features)
     {
-        public static GuestInvitationAccepted Create(Identifier id, EmailAddress emailAddress)
+        return new Registered
         {
-            return new GuestInvitationAccepted
-            {
-                RootId = id,
-                OccurredUtc = DateTime.UtcNow,
-                AcceptedEmailAddress = emailAddress,
-                AcceptedAtUtc = DateTime.UtcNow
-            };
-        }
-
-        public required DateTime AcceptedAtUtc { get; set; }
-
-        public required string AcceptedEmailAddress { get; set; }
-
-        public required string RootId { get; set; }
-
-        public required DateTime OccurredUtc { get; set; }
+            RootId = id,
+            OccurredUtc = DateTime.UtcNow,
+            Username = username.ValueOrDefault!,
+            Classification = classification.ToString(),
+            Access = access.ToString(),
+            Status = status.ToString(),
+            Roles = roles.ToList(),
+            Features = features.ToList()
+        };
     }
 }

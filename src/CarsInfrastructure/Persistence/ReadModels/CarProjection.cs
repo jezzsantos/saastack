@@ -4,6 +4,7 @@ using CarsApplication.Persistence.ReadModels;
 using CarsDomain;
 using Common;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Cars;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Infrastructure.Persistence.Common;
@@ -30,14 +31,14 @@ public class CarProjection : IReadModelProjection
     {
         switch (changeEvent)
         {
-            case Events.Created e:
+            case Created e:
                 return await _cars.HandleCreateAsync(e.RootId.ToId(), dto =>
                 {
                     dto.OrganizationId = e.OrganizationId;
                     dto.Status = e.Status;
                 }, cancellationToken);
 
-            case Events.ManufacturerChanged e:
+            case ManufacturerChanged e:
                 return await _cars.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.ManufactureYear = e.Year;
@@ -45,14 +46,14 @@ public class CarProjection : IReadModelProjection
                     dto.ManufactureModel = e.Model;
                 }, cancellationToken);
 
-            case Events.OwnershipChanged e:
+            case OwnershipChanged e:
                 return await _cars.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.VehicleOwnerId = e.Owner;
                     dto.ManagerIds = VehicleManagers.Create(e.Owner).Value;
                 }, cancellationToken);
 
-            case Events.RegistrationChanged e:
+            case RegistrationChanged e:
                 return await _cars.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.LicenseJurisdiction = e.Jurisdiction;
@@ -60,7 +61,7 @@ public class CarProjection : IReadModelProjection
                     dto.Status = e.Status;
                 }, cancellationToken);
 
-            case Events.UnavailabilitySlotAdded e:
+            case UnavailabilitySlotAdded e:
                 return await _unavailabilities.HandleCreateAsync(e.UnavailabilityId!, dto =>
                 {
                     dto.OrganizationId = e.OrganizationId;
@@ -71,7 +72,7 @@ public class CarProjection : IReadModelProjection
                     dto.CausedByReference = e.CausedByReference!;
                 }, cancellationToken);
 
-            case Events.UnavailabilitySlotRemoved e:
+            case UnavailabilitySlotRemoved e:
                 return await _unavailabilities.HandleDeleteAsync(e.UnavailabilityId, cancellationToken);
 
             default:

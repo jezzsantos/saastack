@@ -4,6 +4,7 @@ using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Ancillary.Audits;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Infrastructure.Persistence.Common;
@@ -27,7 +28,7 @@ public class AuditProjection : IReadModelProjection
     {
         switch (changeEvent)
         {
-            case Events.Audits.Created e:
+            case Created e:
                 return await _audits.HandleCreateAsync(e.RootId.ToId(), dto =>
                 {
                     dto.OrganizationId = e.OrganizationId;

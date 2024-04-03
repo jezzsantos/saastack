@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Ancillary.Audits;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
@@ -16,7 +17,7 @@ public sealed class AuditRoot : AggregateRootBase
         TemplateArguments templateArguments)
     {
         var root = new AuditRoot(recorder, idFactory);
-        root.RaiseCreateEvent(AncillaryDomain.Events.Audits.Created.Create(root.Id, againstId, organizationId,
+        root.RaiseCreateEvent(AncillaryDomain.Events.Audits.Created(root.Id, againstId, organizationId,
             auditCode,
             messageTemplate, templateArguments));
         return root;
@@ -62,7 +63,7 @@ public sealed class AuditRoot : AggregateRootBase
     {
         switch (@event)
         {
-            case Events.Audits.Created created:
+            case Created created:
             {
                 OrganizationId = created.OrganizationId.HasValue()
                     ? created.OrganizationId.ToId()

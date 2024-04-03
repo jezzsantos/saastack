@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Cars;
 using Domain.Interfaces.Entities;
 
 namespace CarsDomain;
@@ -48,7 +49,7 @@ public sealed class Unavailability : EntityBase
     {
         switch (@event)
         {
-            case Events.UnavailabilitySlotAdded added:
+            case UnavailabilitySlotAdded added:
             {
                 var slot = TimeSlot.Create(added.From, added.To);
                 if (!slot.IsSuccessful)
@@ -109,7 +110,7 @@ public sealed class Unavailability : EntityBase
     public void TestingOnly_Assign(Identifier carId, Identifier organizationId, TimeSlot timeSlot,
         CausedBy causedBy)
     {
-        RaiseChangeEvent(Events.UnavailabilitySlotAdded.Create(carId, organizationId, timeSlot, causedBy));
+        RaiseChangeEvent(Events.UnavailabilitySlotAdded(carId, organizationId, timeSlot, causedBy));
     }
 #endif
 }

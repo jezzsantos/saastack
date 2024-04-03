@@ -3,6 +3,7 @@ using Application.Persistence.Interfaces;
 using Common;
 using Domain.Common.Events;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Identities.APIKeys;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using IdentityApplication.Persistence.ReadModels;
@@ -28,7 +29,7 @@ public class APIKeyProjection : IReadModelProjection
     {
         switch (changeEvent)
         {
-            case Events.APIKeys.Created e:
+            case Created e:
                 return await _authTokens.HandleCreateAsync(e.RootId.ToId(), dto =>
                     {
                         dto.UserId = e.UserId;
@@ -36,14 +37,14 @@ public class APIKeyProjection : IReadModelProjection
                     },
                     cancellationToken);
 
-            case Events.APIKeys.ParametersChanged e:
+            case ParametersChanged e:
                 return await _authTokens.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     dto.Description = e.Description;
                     dto.ExpiresOn = e.ExpiresOn.ToOptional();
                 }, cancellationToken);
 
-            case Events.APIKeys.KeyVerified _:
+            case KeyVerified _:
                 return true;
 
             case Global.StreamDeleted e:

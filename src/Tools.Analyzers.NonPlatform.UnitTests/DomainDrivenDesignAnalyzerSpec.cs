@@ -3659,28 +3659,6 @@ public sealed class AClassed : IDomainEvent
         }
 
         [Trait("Category", "Unit")]
-        public class GivenRule044
-        {
-            [Fact]
-            public async Task WhenMissingCreateFactory_ThenAlerts()
-            {
-                const string input = @"
-using System;
-using Domain.Interfaces.Entities;
-namespace ANamespace;
-public sealed class AClassed : IDomainEvent
-{
-    public required string RootId { get; set; }
-
-    public required DateTime OccurredUtc { get; set; }
-}";
-
-                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
-                    DomainDrivenDesignAnalyzer.Rule044, input, 5, 21, "AClassed");
-            }
-        }
-
-        [Trait("Category", "Unit")]
         public class GivenRule045
         {
             [Fact]

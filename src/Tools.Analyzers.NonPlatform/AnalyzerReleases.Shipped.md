@@ -42,7 +42,6 @@
  SAASDDD041 | SaaStackDDD         | Warning  | DomainEvents must be sealed                                                                               
  SAASDDD042 | SaaStackDDD         | Error    | DomainEvents must have a parameterless constructor                                                        
  SAASDDD043 | SaaStackDDD         | Error    | DomainEvents must be named in the past tense                                                              
- SAASDDD044 | SaaStackDDD         | Error    | DomainEvents must have at least one Create() class factory method                                         
  SAASDDD045 | SaaStackDDD         | Error    | Create() class factory methods must return correct types                                                  
  SAASDDD046 | SaaStackDDD         | Error    | Properties must have public getters and setters                                                           
  SAASDDD047 | SaaStackDDD         | Error    | Properties must be marked required or nullable or initialized                                             

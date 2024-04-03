@@ -1,5 +1,5 @@
 using Common;
-using Domain.Shared;
+using Domain.Shared.Identities;
 
 namespace Domain.Services.Shared.DomainServices;
 

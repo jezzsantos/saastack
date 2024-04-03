@@ -182,9 +182,6 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
     internal static readonly DiagnosticDescriptor Rule043 = "SAASDDD043".GetDescriptor(DiagnosticSeverity.Info,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD043Title), nameof(Resources.SAASDDD043Description),
         nameof(Resources.SAASDDD043MessageFormat));
-    internal static readonly DiagnosticDescriptor Rule044 = "SAASDDD044".GetDescriptor(DiagnosticSeverity.Error,
-        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD044Title), nameof(Resources.SAASDDD044Description),
-        nameof(Resources.SAASDDD044MessageFormat));
     internal static readonly DiagnosticDescriptor Rule045 = "SAASDDD045".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD045Title), nameof(Resources.SAASDDD045Description),
         nameof(Resources.SAASDDD045MessageFormat));
@@ -209,7 +206,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
             Rule010, Rule011, Rule012, Rule013, Rule014, Rule015, Rule016, Rule017, Rule018,
             Rule020, Rule021, Rule022, Rule023, Rule024, Rule025, Rule026, Rule027,
             Rule030, Rule031, Rule032, Rule033, Rule034, Rule035, Rule036,
-            Rule040, Rule041, Rule042, Rule043, Rule044, Rule045, Rule046, Rule047, Rule048, Rule049);
+            Rule040, Rule041, Rule042, Rule043, Rule045, Rule046, Rule047, Rule048, Rule049);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -525,11 +522,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
         var classFactoryMethods = allMethods
             .Where(method => method.IsPublicStaticMethod() && method.IsNamed(ClassFactoryMethodName))
             .ToList();
-        if (classFactoryMethods.HasNone())
-        {
-            context.ReportDiagnostic(Rule044, classDeclarationSyntax);
-        }
-        else
+        if (classFactoryMethods.HasAny())
         {
             foreach (var method in classFactoryMethods)
             {

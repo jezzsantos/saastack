@@ -44,7 +44,7 @@ public class MembershipSpec
         var features = Features.Create();
 
         _membership.As<IEventingEntity>()
-            .RaiseEvent(Events.MembershipAdded.Create("arootid".ToId(),
+            .RaiseEvent(Events.MembershipAdded("arootid".ToId(),
                 "anorganizationid".ToId(), true, roles, features), true);
 
         _membership.IsDefault.Should().BeTrue();
@@ -60,7 +60,7 @@ public class MembershipSpec
         var role = Role.Create(TenantRoles.Member).Value;
 
         _membership.As<IEventingEntity>()
-            .RaiseEvent(Events.MembershipRoleAssigned.Create("arootid".ToId(),
+            .RaiseEvent(Events.MembershipRoleAssigned("arootid".ToId(),
                 "anorganizationid".ToId(), "amembershipid".ToId(), role), true);
 
         _membership.Roles.HasRole(role).Should();
@@ -72,7 +72,7 @@ public class MembershipSpec
         var feature = Feature.Create(TenantFeatures.Basic).Value;
 
         _membership.As<IEventingEntity>()
-            .RaiseEvent(Events.MembershipFeatureAssigned.Create("arootid".ToId(),
+            .RaiseEvent(Events.MembershipFeatureAssigned("arootid".ToId(),
                 "anorganizationid".ToId(), "amembershipid".ToId(), feature), true);
 
         _membership.Features.HasFeature(feature).Should();
@@ -82,7 +82,7 @@ public class MembershipSpec
     public void WhenEnsureInvariantsAndMissingDefaultRole_ThenReturnsError()
     {
         _membership.As<IEventingEntity>()
-            .RaiseEvent(Events.MembershipFeatureAssigned.Create("arootid".ToId(),
+            .RaiseEvent(Events.MembershipFeatureAssigned("arootid".ToId(),
                     "anorganizationid".ToId(), "amembershipid".ToId(), Feature.Create(Membership.DefaultFeature).Value),
                 true);
 
@@ -96,9 +96,9 @@ public class MembershipSpec
     public void WhenEnsureInvariantsAndMissingDefaultFeature_ThenReturnsError()
     {
         _membership.As<IEventingEntity>()
-            .RaiseEvent(Events.MembershipRoleAssigned.Create("arootid".ToId(),
+            .RaiseEvent(Events.MembershipRoleAssigned("arootid".ToId(),
                 "anorganizationid".ToId(), "amembershipid".ToId(), Role.Create(Membership.DefaultRole).Value), true);
-        
+
         var result = _membership.EnsureInvariants();
 
         result.Should().BeError(ErrorCode.RuleViolation,

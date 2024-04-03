@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Ancillary.EmailDelivery;
 using Domain.Interfaces.Entities;
 using Domain.Shared;
 using FluentAssertions;
@@ -35,7 +36,7 @@ public class EmailDeliverRootSpec
         var result = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
 
         result.MessageId.Should().Be(messageId);
-        result.Events.Last().Should().BeOfType<Events.EmailDelivery.Created>();
+        result.Events.Last().Should().BeOfType<Created>();
     }
 
     [Fact]
@@ -73,7 +74,7 @@ public class EmailDeliverRootSpec
 
         result.Should().BeSuccess();
         root.Recipient.Should().Be(recipient);
-        root.Events.Last().Should().BeOfType<Events.EmailDelivery.EmailDetailsChanged>();
+        root.Events.Last().Should().BeOfType<EmailDetailsChanged>();
     }
 
     [Fact]
@@ -103,7 +104,7 @@ public class EmailDeliverRootSpec
         result.Value.Should().BeFalse();
         root.Attempts.Attempts.Count.Should().Be(1);
         root.Attempts.Attempts[0].Should().BeNear(DateTime.UtcNow);
-        root.Events.Last().Should().BeOfType<Events.EmailDelivery.DeliveryAttempted>();
+        root.Events.Last().Should().BeOfType<DeliveryAttempted>();
     }
 
     [Fact]
@@ -141,7 +142,7 @@ public class EmailDeliverRootSpec
         var result = root.FailedDelivery();
 
         result.Should().BeSuccess();
-        root.Events.Last().Should().BeOfType<Events.EmailDelivery.DeliveryFailed>();
+        root.Events.Last().Should().BeOfType<DeliveryFailed>();
     }
 
     [Fact]
@@ -181,7 +182,7 @@ public class EmailDeliverRootSpec
         result.Should().BeSuccess();
         root.IsDelivered.Should().BeTrue();
         root.Delivered.Should().BeNear(DateTime.UtcNow);
-        root.Events.Last().Should().BeOfType<Events.EmailDelivery.DeliverySucceeded>();
+        root.Events.Last().Should().BeOfType<DeliverySucceeded>();
     }
 
     private static QueuedMessageId CreateMessageId()

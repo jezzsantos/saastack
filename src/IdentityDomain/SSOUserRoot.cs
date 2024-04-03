@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Identities.SSOUsers;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
@@ -20,7 +21,7 @@ public sealed class SSOUserRoot : AggregateRootBase
         string providerName, Identifier userId)
     {
         var root = new SSOUserRoot(recorder, idFactory, encryptionService);
-        root.RaiseCreateEvent(IdentityDomain.Events.SSOUsers.Created.Create(root.Id, providerName, userId));
+        root.RaiseCreateEvent(IdentityDomain.Events.SSOUsers.Created(root.Id, providerName, userId));
         return root;
     }
 
@@ -73,14 +74,14 @@ public sealed class SSOUserRoot : AggregateRootBase
     {
         switch (@event)
         {
-            case Events.SSOUsers.Created created:
+            case Created created:
             {
                 ProviderName = created.ProviderName;
                 UserId = created.UserId.ToId();
                 return Result.Ok;
             }
 
-            case Events.SSOUsers.TokensUpdated changed:
+            case TokensUpdated changed:
             {
                 var emailAddress = Domain.Shared.EmailAddress.Create(changed.EmailAddress);
                 if (!emailAddress.IsSuccessful)
@@ -126,7 +127,7 @@ public sealed class SSOUserRoot : AggregateRootBase
     {
         var secureTokens = _encryptionService.Encrypt(tokens.ToJson(false)!);
         return RaiseChangeEvent(
-            IdentityDomain.Events.SSOUsers.TokensUpdated.Create(Id, secureTokens, emailAddress, name, timezone,
+            IdentityDomain.Events.SSOUsers.TokensUpdated(Id, secureTokens, emailAddress, name, timezone,
                 address));
     }
 }

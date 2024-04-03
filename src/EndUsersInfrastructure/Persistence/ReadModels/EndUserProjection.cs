@@ -2,6 +2,7 @@ using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.EndUsers;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Shared;
@@ -35,20 +36,17 @@ public class EndUserProjection : IReadModelProjection
     {
         switch (changeEvent)
         {
-            case Events.Created e:
+            case Created e:
                 return await Tasks.WhenAllAsync(_users.HandleCreateAsync(e.RootId.ToId(), dto =>
                     {
                         dto.Classification = e.Classification;
                         dto.Access = e.Access;
                         dto.Status = e.Status;
                     }, cancellationToken),
-                    _invitations.HandleCreateAsync(e.RootId.ToId(), dto =>
-                        {
-                            dto.Status = e.Status;
-                        },
+                    _invitations.HandleCreateAsync(e.RootId.ToId(), dto => { dto.Status = e.Status; },
                         cancellationToken));
 
-            case Events.Registered e:
+            case Registered e:
                 return await Tasks.WhenAllAsync(_users.HandleUpdateAsync(e.RootId.ToId(), dto =>
                     {
                         dto.Classification = e.Classification;
@@ -61,7 +59,7 @@ public class EndUserProjection : IReadModelProjection
                     _invitations.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.Status = e.Status; },
                         cancellationToken));
 
-            case Events.MembershipAdded e:
+            case MembershipAdded e:
                 return await _memberships.HandleCreateAsync(e.MembershipId.ToId(), dto =>
                 {
                     dto.IsDefault = e.IsDefault;
@@ -71,7 +69,7 @@ public class EndUserProjection : IReadModelProjection
                     dto.Features = Features.Create(e.Features.ToArray()).Value;
                 }, cancellationToken);
 
-            case Events.MembershipDefaultChanged e:
+            case MembershipDefaultChanged e:
             {
                 var from = await _memberships.HandleUpdateAsync(e.FromMembershipId.ToId(),
                     dto => { dto.IsDefault = false; }, cancellationToken);
@@ -90,7 +88,7 @@ public class EndUserProjection : IReadModelProjection
                 return to;
             }
 
-            case Events.MembershipRoleAssigned e:
+            case MembershipRoleAssigned e:
                 return await _memberships.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     var roles = dto.Roles.HasValue
@@ -104,7 +102,7 @@ public class EndUserProjection : IReadModelProjection
                     dto.Roles = roles.Value;
                 }, cancellationToken);
 
-            case Events.MembershipFeatureAssigned e:
+            case MembershipFeatureAssigned e:
                 return await _memberships.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     var features = dto.Features.HasValue
@@ -118,7 +116,7 @@ public class EndUserProjection : IReadModelProjection
                     dto.Features = features.Value;
                 }, cancellationToken);
 
-            case Events.PlatformRoleAssigned e:
+            case PlatformRoleAssigned e:
                 return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     var roles = dto.Roles.HasValue
@@ -132,7 +130,7 @@ public class EndUserProjection : IReadModelProjection
                     dto.Roles = roles.Value;
                 }, cancellationToken);
 
-            case Events.PlatformRoleUnassigned e:
+            case PlatformRoleUnassigned e:
                 return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     var roles = dto.Roles.HasValue
@@ -146,7 +144,7 @@ public class EndUserProjection : IReadModelProjection
                     dto.Roles = roles.Value;
                 }, cancellationToken);
 
-            case Events.PlatformFeatureAssigned e:
+            case PlatformFeatureAssigned e:
                 return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     var features = dto.Features.HasValue
@@ -160,7 +158,7 @@ public class EndUserProjection : IReadModelProjection
                     dto.Features = features.Value;
                 }, cancellationToken);
 
-            case Events.GuestInvitationCreated e:
+            case GuestInvitationCreated e:
                 return await _invitations.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     dto.InvitedEmailAddress = e.EmailAddress;
@@ -168,7 +166,7 @@ public class EndUserProjection : IReadModelProjection
                     dto.InvitedById = e.InvitedById;
                 }, cancellationToken);
 
-            case Events.GuestInvitationAccepted e:
+            case GuestInvitationAccepted e:
                 return await _invitations.HandleUpdateAsync(e.RootId.ToId(), dto =>
                 {
                     dto.Token = Optional<string>.None;

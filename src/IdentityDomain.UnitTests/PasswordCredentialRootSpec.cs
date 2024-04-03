@@ -2,6 +2,7 @@ using Common;
 using Common.Configuration;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Identities.PasswordCredentials;
 using Domain.Interfaces.Entities;
 using Domain.Services.Shared.DomainServices;
 using Domain.Shared;
@@ -81,7 +82,7 @@ public class PasswordCredentialRootSpec
 
         _credential.Verification.IsStillVerifying.Should().BeTrue();
         _credential.Events.Last().Should()
-            .BeOfType<Events.PasswordCredentials.RegistrationVerificationCreated>();
+            .BeOfType<RegistrationVerificationCreated>();
     }
 
     [Fact]
@@ -101,7 +102,7 @@ public class PasswordCredentialRootSpec
         _credential.SetCredential("apassword");
 
         _credential.Password.PasswordHash.Should().Be("apasswordhash");
-        _credential.Events.Last().Should().BeOfType<Events.PasswordCredentials.CredentialsChanged>();
+        _credential.Events.Last().Should().BeOfType<CredentialsChanged>();
     }
 
     [Fact]
@@ -112,7 +113,7 @@ public class PasswordCredentialRootSpec
 
         _credential.Registration.Value.EmailAddress.Should().Be(EmailAddress.Create("auser@company.com").Value);
         _credential.Registration.Value.Name.Should().Be(PersonDisplayName.Create("adisplayname").Value);
-        _credential.Events.Last().Should().BeOfType<Events.PasswordCredentials.RegistrationChanged>();
+        _credential.Events.Last().Should().BeOfType<RegistrationChanged>();
     }
 
     [Fact]
@@ -127,7 +128,7 @@ public class PasswordCredentialRootSpec
         _credential.Login.FailedPasswordAttempts.Should().Be(0);
         _credential.Login.IsLocked.Should().BeFalse();
         _credential.Login.ToggledLocked.Should().BeFalse();
-        _credential.Events.Last().Should().BeOfType<Events.PasswordCredentials.Created>();
+        _credential.Events.Last().Should().BeOfType<Created>();
     }
 
     [Fact]
@@ -145,8 +146,8 @@ public class PasswordCredentialRootSpec
         _credential.Login.FailedPasswordAttempts.Should().Be(1);
         _credential.Login.IsLocked.Should().BeFalse();
         _credential.Login.ToggledLocked.Should().BeFalse();
-        _credential.Events[1].Should().BeOfType<Events.PasswordCredentials.CredentialsChanged>();
-        _credential.Events.Last().Should().BeOfType<Events.PasswordCredentials.PasswordVerified>();
+        _credential.Events[1].Should().BeOfType<CredentialsChanged>();
+        _credential.Events.Last().Should().BeOfType<PasswordVerified>();
     }
 
     [Fact]
@@ -162,8 +163,8 @@ public class PasswordCredentialRootSpec
         _credential.Login.FailedPasswordAttempts.Should().Be(0);
         _credential.Login.IsLocked.Should().BeFalse();
         _credential.Login.ToggledLocked.Should().BeFalse();
-        _credential.Events[1].Should().BeOfType<Events.PasswordCredentials.CredentialsChanged>();
-        _credential.Events.Last().Should().BeOfType<Events.PasswordCredentials.PasswordVerified>();
+        _credential.Events[1].Should().BeOfType<CredentialsChanged>();
+        _credential.Events.Last().Should().BeOfType<PasswordVerified>();
         _passwordHasherService.Verify(ph => ph.ValidatePassword("apassword", false));
     }
 
@@ -180,9 +181,9 @@ public class PasswordCredentialRootSpec
             .Be(Validations.Credentials.Login.DefaultMaxFailedPasswordAttempts);
         _credential.Login.IsLocked.Should().BeTrue();
         _credential.Login.ToggledLocked.Should().BeTrue();
-        _credential.Events[1].Should().BeOfType<Events.PasswordCredentials.CredentialsChanged>();
-        _credential.Events[2].Should().BeOfType<Events.PasswordCredentials.PasswordVerified>();
-        _credential.Events.Last().Should().BeOfType<Events.PasswordCredentials.AccountLocked>();
+        _credential.Events[1].Should().BeOfType<CredentialsChanged>();
+        _credential.Events[2].Should().BeOfType<PasswordVerified>();
+        _credential.Events.Last().Should().BeOfType<AccountLocked>();
     }
 
     [Fact]
@@ -202,9 +203,9 @@ public class PasswordCredentialRootSpec
         _credential.Login.FailedPasswordAttempts.Should().Be(0);
         _credential.Login.IsLocked.Should().BeFalse();
         _credential.Login.ToggledLocked.Should().BeTrue();
-        _credential.Events[1].Should().BeOfType<Events.PasswordCredentials.CredentialsChanged>();
-        _credential.Events[2].Should().BeOfType<Events.PasswordCredentials.PasswordVerified>();
-        _credential.Events.Last().Should().BeOfType<Events.PasswordCredentials.AccountUnlocked>();
+        _credential.Events[1].Should().BeOfType<CredentialsChanged>();
+        _credential.Events[2].Should().BeOfType<PasswordVerified>();
+        _credential.Events.Last().Should().BeOfType<AccountUnlocked>();
     }
 
     [Fact]
@@ -241,7 +242,7 @@ public class PasswordCredentialRootSpec
         _credential.VerifyRegistration();
 
         _credential.Verification.IsVerified.Should().BeTrue();
-        _credential.Events.Last().Should().BeOfType<Events.PasswordCredentials.RegistrationVerificationVerified>();
+        _credential.Events.Last().Should().BeOfType<RegistrationVerificationVerified>();
     }
 
     [Fact]
@@ -285,9 +286,9 @@ public class PasswordCredentialRootSpec
         _credential.InitiatePasswordReset();
 
         _credential.Password.IsInitiating.Should().BeTrue();
-        _credential.Events[1].Should().BeOfType<Events.PasswordCredentials.CredentialsChanged>();
-        _credential.Events[2].Should().BeOfType<Events.PasswordCredentials.RegistrationChanged>();
-        _credential.Events.Last().Should().BeOfType<Events.PasswordCredentials.PasswordResetInitiated>();
+        _credential.Events[1].Should().BeOfType<CredentialsChanged>();
+        _credential.Events[2].Should().BeOfType<RegistrationChanged>();
+        _credential.Events.Last().Should().BeOfType<PasswordResetInitiated>();
     }
 
     [Fact]
@@ -376,8 +377,8 @@ public class PasswordCredentialRootSpec
         _passwordHasherService.Verify(ph => ph.ValidatePassword("anewpassword", false));
         _credential.Login.IsLocked.Should().BeFalse();
         _credential.Login.ToggledLocked.Should().BeTrue();
-        _credential.Events[12].Should().BeOfType<Events.PasswordCredentials.PasswordResetCompleted>();
-        _credential.Events.Last().Should().BeOfType<Events.PasswordCredentials.AccountUnlocked>();
+        _credential.Events[12].Should().BeOfType<PasswordResetCompleted>();
+        _credential.Events.Last().Should().BeOfType<AccountUnlocked>();
     }
 
     [Fact]

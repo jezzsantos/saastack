@@ -1,4 +1,4 @@
-namespace Domain.Shared;
+namespace Domain.Shared.Identities;
 
 public class APIKeyToken
 {

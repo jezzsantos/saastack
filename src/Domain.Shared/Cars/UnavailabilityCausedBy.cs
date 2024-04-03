@@ -1,4 +1,4 @@
-﻿namespace CarsDomain;
+﻿namespace Domain.Shared.Cars;
 
 public enum UnavailabilityCausedBy
 {

@@ -2,6 +2,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Identities.AuthTokens;
 using Domain.Interfaces.Entities;
 using FluentAssertions;
 using Moq;
@@ -45,7 +46,7 @@ public class AuthTokensRootSpec
         _authTokens.RefreshToken.Should().BeSome("arefreshtoken");
         _authTokens.AccessTokenExpiresOn.Should().BeSome(accessTokenExpiresOn);
         _authTokens.RefreshTokenExpiresOn.Should().BeSome(refreshTokenExpiresOn);
-        _authTokens.Events.Last().Should().BeOfType<Events.AuthTokens.TokensChanged>();
+        _authTokens.Events.Last().Should().BeOfType<TokensChanged>();
     }
 
     [Fact]
@@ -106,7 +107,7 @@ public class AuthTokensRootSpec
         _authTokens.RefreshToken.Should().BeSome("arefreshtoken2");
         _authTokens.AccessTokenExpiresOn.Should().BeSome(accessTokenExpiresOn2);
         _authTokens.RefreshTokenExpiresOn.Should().BeSome(refreshTokenExpiresOn2);
-        _authTokens.Events.Last().Should().BeOfType<Events.AuthTokens.TokensRefreshed>();
+        _authTokens.Events.Last().Should().BeOfType<TokensRefreshed>();
     }
 
     [Fact]
@@ -144,6 +145,6 @@ public class AuthTokensRootSpec
         _authTokens.RefreshToken.Should().BeNone();
         _authTokens.AccessTokenExpiresOn.Should().BeNone();
         _authTokens.RefreshTokenExpiresOn.Should().BeNone();
-        _authTokens.Events.Last().Should().BeOfType<Events.AuthTokens.TokensRevoked>();
+        _authTokens.Events.Last().Should().BeOfType<TokensRevoked>();
     }
 }

@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using Domain.Shared.Cars;
 
 namespace CarsDomain;
 
