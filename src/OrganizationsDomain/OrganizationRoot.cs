@@ -1,4 +1,5 @@
 using Common;
+using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
@@ -12,8 +13,6 @@ using Domain.Shared;
 using Domain.Shared.Organizations;
 
 namespace OrganizationsDomain;
-
-public delegate Task<Result<Error>> Callback();
 
 public sealed class OrganizationRoot : AggregateRootBase
 {
@@ -126,19 +125,35 @@ public sealed class OrganizationRoot : AggregateRootBase
                 return Result.Ok;
             }
 
+            case MembershipAdded added:
+            {
+                Recorder.TraceDebug(null, "Organization {Id} added membership for {User}", Id,
+                    (added.EmailAddress.HasValue()
+                        ? added.EmailAddress
+                        : added.UserId)!);
+                return Result.Ok;
+            }
+
             default:
                 return HandleUnKnownStateChangedEvent(@event);
         }
     }
 
-    public async Task<Result<Error>> AddMembershipAsync(Identifier inviterId, Roles inviterRoles, Callback onPermitted)
+    public Result<Error> AddMembership(Identifier inviterId, Roles inviterRoles, Optional<Identifier> userId,
+        Optional<EmailAddress> emailAddress)
     {
         if (!IsOwner(inviterRoles))
         {
             return Error.RoleViolation(Resources.OrganizationRoot_AddMembership_NotOrgOwner);
         }
 
-        return await onPermitted();
+        if (!userId.HasValue
+            && !emailAddress.HasValue)
+        {
+            return Error.RuleViolation(Resources.OrganizationRoot_AddMembership_UserIdAndEmailMissing);
+        }
+
+        return RaiseChangeEvent(OrganizationsDomain.Events.MembershipAdded(Id, inviterId, userId, emailAddress));
     }
 
     public Result<Error> CreateSettings(Settings settings)

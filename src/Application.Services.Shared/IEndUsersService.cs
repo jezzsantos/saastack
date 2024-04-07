@@ -12,9 +12,6 @@ public interface IEndUsersService
     Task<Result<EndUserWithMemberships, Error>> GetMembershipsPrivateAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken);
 
-    Task<Result<Membership, Error>> InviteMemberToOrganizationPrivateAsync(ICallerContext caller, string organizationId,
-        string? userId, string? emailAddress, CancellationToken cancellationToken);
-
     Task<Result<SearchResults<MembershipWithUserProfile>, Error>> ListMembershipsForOrganizationAsync(
         ICallerContext caller,
         string organizationId, SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken);

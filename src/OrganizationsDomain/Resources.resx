@@ -36,4 +36,7 @@
     <data name="OrganizationRoot_AddMembership_NotOrgOwner" xml:space="preserve">
         <value>You must be an organization owner to perform this action</value>
     </data>
+    <data name="OrganizationRoot_AddMembership_UserIdAndEmailMissing" xml:space="preserve">
+        <value>Both the ID of the user and an email for the user is missing</value>
+    </data>
 </root>

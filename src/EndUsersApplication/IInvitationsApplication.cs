@@ -4,13 +4,10 @@ using Common;
 
 namespace EndUsersApplication;
 
-public interface IInvitationsApplication
+public partial interface IInvitationsApplication
 {
     Task<Result<Invitation, Error>> InviteGuestAsync(ICallerContext context, string emailAddress,
         CancellationToken cancellationToken);
-
-    Task<Result<Membership, Error>> InviteMemberToOrganizationAsync(ICallerContext context, string organizationId,
-        string? userId, string? emailAddress, CancellationToken cancellationToken);
 
     Task<Result<Error>> ResendGuestInvitationAsync(ICallerContext context, string token,
         CancellationToken cancellationToken);

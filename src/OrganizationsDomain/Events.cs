@@ -1,5 +1,7 @@
+using Common;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Organizations;
+using Domain.Shared;
 using Domain.Shared.Organizations;
 
 namespace OrganizationsDomain;
@@ -13,7 +15,18 @@ public static class Events
         {
             Name = name,
             Ownership = ownership,
-            CreatedById = createdBy,
+            CreatedById = createdBy
+        };
+    }
+
+    public static MembershipAdded MembershipAdded(Identifier id, Identifier invitedById, Optional<Identifier> userId,
+        Optional<EmailAddress> userEmailAddress)
+    {
+        return new MembershipAdded(id)
+        {
+            InvitedById = invitedById,
+            UserId = userId.ValueOrDefault!,
+            EmailAddress = userEmailAddress.ValueOrDefault?.Address
         };
     }
 

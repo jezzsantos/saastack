@@ -13,5 +13,5 @@ public class EndUserNotifier : IEventNotificationRegistration
     public List<IDomainEventNotificationConsumer> DomainEventConsumers { get; }
 
     public IIntegrationEventNotificationTranslator IntegrationEventTranslator =>
-        new EndUserIntegrationEventNotificationTranslator<EndUserRoot>();
+        new EndUserNotificationTranslator<EndUserRoot>();
 }

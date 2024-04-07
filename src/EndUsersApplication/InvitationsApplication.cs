@@ -15,10 +15,10 @@ using Membership = Application.Resources.Shared.Membership;
 
 namespace EndUsersApplication;
 
-public class InvitationsApplication : IInvitationsApplication
+public partial class InvitationsApplication : IInvitationsApplication
 {
     private readonly IIdentifierFactory _idFactory;
-    private readonly IInvitationRepository _invitationsRepository;
+    private readonly IInvitationRepository _repository;
     private readonly INotificationsService _notificationsService;
     private readonly IRecorder _recorder;
     private readonly ITokensService _tokensService;
@@ -26,27 +26,27 @@ public class InvitationsApplication : IInvitationsApplication
 
     public InvitationsApplication(IRecorder recorder, IIdentifierFactory idFactory, ITokensService tokensService,
         INotificationsService notificationsService, IUserProfilesService userProfilesService,
-        IInvitationRepository invitationsRepository)
+        IInvitationRepository repository)
     {
         _recorder = recorder;
         _idFactory = idFactory;
         _tokensService = tokensService;
         _notificationsService = notificationsService;
         _userProfilesService = userProfilesService;
-        _invitationsRepository = invitationsRepository;
+        _repository = repository;
     }
 
     public async Task<Result<Invitation, Error>> InviteGuestAsync(ICallerContext context, string emailAddress,
         CancellationToken cancellationToken)
     {
-        var invited = await InviteGuestByEmailInternalAsync(context, emailAddress, cancellationToken);
+        var invited = await InviteGuestByEmailInternalAsync(context, context.CallerId, emailAddress, cancellationToken);
         if (!invited.IsSuccessful)
         {
             return invited.Error;
         }
 
         var invitee = invited.Value.Invitee;
-        var saved = await _invitationsRepository.SaveAsync(invitee, cancellationToken);
+        var saved = await _repository.SaveAsync(invitee, cancellationToken);
         if (!saved.IsSuccessful)
         {
             return saved.Error;
@@ -63,63 +63,10 @@ public class InvitationsApplication : IInvitationsApplication
         return invited.Value.Invitee.ToInvitation(invited.Value.Profile);
     }
 
-    public async Task<Result<Membership, Error>> InviteMemberToOrganizationAsync(ICallerContext context,
-        string organizationId, string? userId, string? emailAddress, CancellationToken cancellationToken)
-    {
-        if (emailAddress.HasNoValue() && userId.HasNoValue())
-        {
-            return Error.RuleViolation(Resources
-                .InvitationsApplication_InviteToOrganizationWithoutEmailAddressOrUserId);
-        }
-
-        EndUserRoot invitee;
-        if (emailAddress.HasValue())
-        {
-            var invited = await InviteGuestByEmailInternalAsync(context, emailAddress, cancellationToken);
-            if (!invited.IsSuccessful)
-            {
-                return invited.Error;
-            }
-
-            invitee = invited.Value.Invitee;
-        }
-        else
-        {
-            var invited = await InviteGuestByUserIdInternalAsync(context, userId!, cancellationToken);
-            if (!invited.IsSuccessful)
-            {
-                return invited.Error;
-            }
-
-            invitee = invited.Value.Invitee;
-        }
-
-        var (_, _, tenantRoles, tenantFeatures) =
-            EndUserRoot.GetInitialRolesAndFeatures(RolesAndFeaturesUseCase.InvitingMemberToOrg,
-                context.IsAuthenticated);
-        var enrolled = invitee.AddMembership(organizationId.ToId(), tenantRoles, tenantFeatures);
-        if (!enrolled.IsSuccessful)
-        {
-            return enrolled.Error;
-        }
-
-        var membership = invitee.FindMembership(organizationId.ToId());
-        var saved = await _invitationsRepository.SaveAsync(invitee, cancellationToken);
-        if (!saved.IsSuccessful)
-        {
-            return saved.Error;
-        }
-
-        _recorder.TraceInformation(context.ToCall(),
-            "EndUser {Id} has been invited to organization {Organization}", saved.Value.Id, organizationId);
-
-        return membership.Value.ToMembership();
-    }
-
     public async Task<Result<Error>> ResendGuestInvitationAsync(ICallerContext context, string token,
         CancellationToken cancellationToken)
     {
-        var retrievedInviter = await _invitationsRepository.LoadAsync(context.ToCallerId(), cancellationToken);
+        var retrievedInviter = await _repository.LoadAsync(context.ToCallerId(), cancellationToken);
         if (!retrievedInviter.IsSuccessful)
         {
             return retrievedInviter.Error;
@@ -127,7 +74,7 @@ public class InvitationsApplication : IInvitationsApplication
 
         var inviter = retrievedInviter.Value;
 
-        var retrievedGuest = await _invitationsRepository.FindInvitedGuestByTokenAsync(token, cancellationToken);
+        var retrievedGuest = await _repository.FindInvitedGuestByTokenAsync(token, cancellationToken);
         if (!retrievedGuest.IsSuccessful)
         {
             return retrievedGuest.Error;
@@ -148,7 +95,7 @@ public class InvitationsApplication : IInvitationsApplication
             return invited.Error;
         }
 
-        var saved = await _invitationsRepository.SaveAsync(invitee, cancellationToken);
+        var saved = await _repository.SaveAsync(invitee, cancellationToken);
         if (!saved.IsSuccessful)
         {
             return saved.Error;
@@ -168,7 +115,7 @@ public class InvitationsApplication : IInvitationsApplication
     public async Task<Result<Invitation, Error>> VerifyGuestInvitationAsync(ICallerContext context, string token,
         CancellationToken cancellationToken)
     {
-        var retrievedGuest = await _invitationsRepository.FindInvitedGuestByTokenAsync(token, cancellationToken);
+        var retrievedGuest = await _repository.FindInvitedGuestByTokenAsync(token, cancellationToken);
         if (!retrievedGuest.IsSuccessful)
         {
             return retrievedGuest.Error;
@@ -190,11 +137,65 @@ public class InvitationsApplication : IInvitationsApplication
         return invitee.ToInvitation();
     }
 
-    private async Task<Result<(EndUserRoot Invitee, UserProfile? Profile), Error>> InviteGuestByEmailInternalAsync(
-        ICallerContext context,
-        string emailAddress, CancellationToken cancellationToken)
+    private async Task<Result<Membership, Error>> InviteMemberToOrganizationAsync(ICallerContext context,
+        string organizationId, string invitedById, string? userId, string? emailAddress,
+        CancellationToken cancellationToken)
     {
-        var retrievedInviter = await _invitationsRepository.LoadAsync(context.ToCallerId(), cancellationToken);
+        if (emailAddress.HasNoValue() && userId.HasNoValue())
+        {
+            return Error.RuleViolation(Resources
+                .InvitationsApplication_InviteMemberToOrganization_NoUserIdNorEmailAddress);
+        }
+
+        EndUserRoot invitee = null!;
+        if (emailAddress.HasValue())
+        {
+            var invited = await InviteGuestByEmailInternalAsync(context, invitedById, emailAddress, cancellationToken);
+            if (!invited.IsSuccessful)
+            {
+                return invited.Error;
+            }
+
+            invitee = invited.Value.Invitee;
+        }
+
+        if (userId.HasValue())
+        {
+            var invited = await InviteGuestByUserIdInternalAsync(context, invitedById, userId, cancellationToken);
+            if (!invited.IsSuccessful)
+            {
+                return invited.Error;
+            }
+
+            invitee = invited.Value.Invitee;
+        }
+
+        var (_, _, tenantRoles, tenantFeatures) =
+            EndUserRoot.GetInitialRolesAndFeatures(RolesAndFeaturesUseCase.InvitingMemberToOrg,
+                context.IsAuthenticated);
+        var enrolled = invitee.AddMembership(organizationId.ToId(), tenantRoles, tenantFeatures);
+        if (!enrolled.IsSuccessful)
+        {
+            return enrolled.Error;
+        }
+
+        var membership = invitee.FindMembership(organizationId.ToId());
+        var saved = await _repository.SaveAsync(invitee, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
+
+        _recorder.TraceInformation(context.ToCall(),
+            "EndUser {Id} has been invited to organization {Organization}", saved.Value.Id, organizationId);
+
+        return membership.Value.ToMembership();
+    }
+
+    private async Task<Result<(EndUserRoot Invitee, UserProfile? Profile), Error>> InviteGuestByEmailInternalAsync(
+        ICallerContext context, string invitedById, string emailAddress, CancellationToken cancellationToken)
+    {
+        var retrievedInviter = await _repository.LoadAsync(invitedById.ToId(), cancellationToken);
         if (!retrievedInviter.IsSuccessful)
         {
             return retrievedInviter.Error;
@@ -209,7 +210,7 @@ public class InvitationsApplication : IInvitationsApplication
         }
 
         var retrievedGuest =
-            await _invitationsRepository.FindInvitedGuestByEmailAddressAsync(email.Value, cancellationToken);
+            await _repository.FindInvitedGuestByEmailAddressAsync(email.Value, cancellationToken);
         if (!retrievedGuest.IsSuccessful)
         {
             return retrievedGuest.Error;
@@ -237,7 +238,7 @@ public class InvitationsApplication : IInvitationsApplication
             if (retrievedEmailOwner.Value.HasValue)
             {
                 var retrievedInvitee =
-                    await _invitationsRepository.LoadAsync(retrievedEmailOwner.Value.Value.UserId.ToId(),
+                    await _repository.LoadAsync(retrievedEmailOwner.Value.Value.UserId.ToId(),
                         cancellationToken);
                 if (!retrievedInvitee.IsSuccessful)
                 {
@@ -268,10 +269,10 @@ public class InvitationsApplication : IInvitationsApplication
     }
 
     private async Task<Result<(EndUserRoot Invitee, UserProfile? Profile), Error>> InviteGuestByUserIdInternalAsync(
-        ICallerContext context,
+        ICallerContext context, string invitedById,
         string userId, CancellationToken cancellationToken)
     {
-        var retrievedInviter = await _invitationsRepository.LoadAsync(context.ToCallerId(), cancellationToken);
+        var retrievedInviter = await _repository.LoadAsync(invitedById.ToId(), cancellationToken);
         if (!retrievedInviter.IsSuccessful)
         {
             return retrievedInviter.Error;
@@ -279,7 +280,7 @@ public class InvitationsApplication : IInvitationsApplication
 
         var inviter = retrievedInviter.Value;
 
-        var retrievedInvitee = await _invitationsRepository.LoadAsync(userId.ToId(), cancellationToken);
+        var retrievedInvitee = await _repository.LoadAsync(userId.ToId(), cancellationToken);
         if (!retrievedInvitee.IsSuccessful)
         {
             return retrievedInvitee.Error;

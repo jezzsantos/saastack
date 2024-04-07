@@ -152,29 +152,57 @@ public partial class OrganizationsApplication : IOrganizationsApplication
             return inviterRoles.Error;
         }
 
-        Identifier? addedUserId = null;
-        var added = await organization.AddMembershipAsync(caller.ToCallerId(), inviterRoles.Value, async () =>
+        if (emailAddress.HasValue())
         {
-            var membership =
-                await _endUsersService.InviteMemberToOrganizationPrivateAsync(caller, id, userId, emailAddress,
-                    cancellationToken);
-            if (!membership.IsSuccessful)
+            var email = EmailAddress.Create(emailAddress);
+            if (!email.IsSuccessful)
             {
-                return membership.Error;
+                return email.Error;
             }
 
-            addedUserId = membership.Value.UserId.ToId();
-            return Result.Ok;
-        });
-        if (!added.IsSuccessful)
-        {
-            return added.Error;
+            var added = organization.AddMembership(caller.ToCallerId(), inviterRoles.Value, Optional<Identifier>.None,
+                email.Value);
+            if (!added.IsSuccessful)
+            {
+                return added.Error;
+            }
+
+            var saved = await _repository.SaveAsync(organization, cancellationToken);
+            if (!saved.IsSuccessful)
+            {
+                return saved.Error;
+            }
+
+            organization = saved.Value;
+            _recorder.TraceInformation(caller.ToCall(), "Organization {Id} has invited {UserEmail} to be a member",
+                organization.Id, emailAddress);
+
+            return organization.ToOrganization();
         }
 
-        _recorder.TraceInformation(caller.ToCall(), "Organization {Id} has invited {UserId} to be a member",
-            organization.Id, addedUserId!);
+        if (userId.HasValue())
+        {
+            var added = organization.AddMembership(caller.ToCallerId(), inviterRoles.Value, userId.ToId(),
+                Optional<EmailAddress>.None);
+            if (!added.IsSuccessful)
+            {
+                return added.Error;
+            }
 
-        return organization.ToOrganization();
+            var saved = await _repository.SaveAsync(organization, cancellationToken);
+            if (!saved.IsSuccessful)
+            {
+                return saved.Error;
+            }
+
+            organization = saved.Value;
+            _recorder.TraceInformation(caller.ToCall(), "Organization {Id} has invited {UserId} to be a member",
+                organization.Id, userId);
+
+            return organization.ToOrganization();
+        }
+
+        return Error.RuleViolation(Resources.OrganizationApplication_InvitedNoUserNorEmail);
     }
 
     public async Task<Result<SearchResults<OrganizationMember>, Error>> ListMembersForOrganizationAsync(

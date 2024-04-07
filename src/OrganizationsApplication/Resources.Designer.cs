@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OrganizationsDomain {
+namespace OrganizationsApplication {
     using System;
     
     
@@ -38,7 +38,7 @@ namespace OrganizationsDomain {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("OrganizationsDomain.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("OrganizationsApplication.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,47 +60,11 @@ namespace OrganizationsDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The name is invalid.
+        ///   Looks up a localized string similar to There is no &apos;UserId&apos; nor &apos;Email&apos;.
         /// </summary>
-        internal static string OrganizationDisplayName_InvalidName {
+        internal static string OrganizationApplication_InvitedNoUserNorEmail {
             get {
-                return ResourceManager.GetString("OrganizationDisplayName_InvalidName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You must be an organization owner to perform this action.
-        /// </summary>
-        internal static string OrganizationRoot_AddMembership_NotOrgOwner {
-            get {
-                return ResourceManager.GetString("OrganizationRoot_AddMembership_NotOrgOwner", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Both the ID of the user and an email for the user is missing.
-        /// </summary>
-        internal static string OrganizationRoot_AddMembership_UserIdAndEmailMissing {
-            get {
-                return ResourceManager.GetString("OrganizationRoot_AddMembership_UserIdAndEmailMissing", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The data type of the value: &apos;{0}&apos; is unsupported.
-        /// </summary>
-        internal static string Setting_InvalidDataType {
-            get {
-                return ResourceManager.GetString("Setting_InvalidDataType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The value type of the value: &apos;{0}&apos; is unsupported.
-        /// </summary>
-        internal static string Setting_InvalidValueType {
-            get {
-                return ResourceManager.GetString("Setting_InvalidValueType", resourceCulture);
+                return ResourceManager.GetString("OrganizationApplication_InvitedNoUserNorEmail", resourceCulture);
             }
         }
     }

@@ -3,11 +3,14 @@ using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Organizations;
+using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Shared;
 using Domain.Shared.Organizations;
 using FluentAssertions;
 using Moq;
+using UnitTesting.Common;
 using Xunit;
 
 namespace OrganizationsDomain.UnitTests;
@@ -77,5 +80,44 @@ public class OrganizationRootSpec
         _org.Settings.Properties["aname3"].Should().Be(Setting.Create("anewvalue3", true).Value);
         _org.Events[3].Should().BeOfType<SettingUpdated>();
         _org.Events.Last().Should().BeOfType<SettingCreated>();
+    }
+
+    [Fact]
+    public void WhenAddMembershipAndInviterNotOwner_ThenReturnsError()
+    {
+        var result = _org.AddMembership("aninviterid".ToId(), Roles.Empty, Optional<Identifier>.None,
+            Optional<EmailAddress>.None);
+
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_AddMembership_NotOrgOwner);
+    }
+
+    [Fact]
+    public void WhenAddMembershipAndNoUser_ThenReturnsError()
+    {
+        var result = _org.AddMembership("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            Optional<Identifier>.None, Optional<EmailAddress>.None);
+
+        result.Should().BeError(ErrorCode.RuleViolation,
+            Resources.OrganizationRoot_AddMembership_UserIdAndEmailMissing);
+    }
+
+    [Fact]
+    public void WhenAddMembershipWithUserId_ThenAddsMembership()
+    {
+        var result = _org.AddMembership("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            "auserid".ToId(), Optional<EmailAddress>.None);
+
+        result.Should().BeSuccess();
+        _org.Events.Last().Should().BeOfType<MembershipAdded>();
+    }
+
+    [Fact]
+    public void WhenAddMembershipWithEmailAddress_ThenAddsMembership()
+    {
+        var result = _org.AddMembership("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            Optional<Identifier>.None, EmailAddress.Create("auser@company.com").Value);
+
+        result.Should().BeSuccess();
+        _org.Events.Last().Should().BeOfType<MembershipAdded>();
     }
 }

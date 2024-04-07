@@ -116,9 +116,9 @@ namespace EndUsersApplication {
         /// <summary>
         ///   Looks up a localized string similar to Cannot invite a user to an organization without either an email or user ID.
         /// </summary>
-        internal static string InvitationsApplication_InviteToOrganizationWithoutEmailAddressOrUserId {
+        internal static string InvitationsApplication_InviteMemberToOrganization_NoUserIdNorEmailAddress {
             get {
-                return ResourceManager.GetString("InvitationsApplication_InviteToOrganizationWithoutEmailAddressOrUserId", resourceCulture);
+                return ResourceManager.GetString("InvitationsApplication_InviteMemberToOrganization_NoUserIdNorEmailAddress", resourceCulture);
             }
         }
     }

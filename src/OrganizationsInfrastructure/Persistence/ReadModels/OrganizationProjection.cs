@@ -40,6 +40,9 @@ public class OrganizationProjection : IReadModelProjection
             case SettingCreated _:
                 return true;
 
+            case MembershipAdded _:
+                return true;
+
             default:
                 return false;
         }

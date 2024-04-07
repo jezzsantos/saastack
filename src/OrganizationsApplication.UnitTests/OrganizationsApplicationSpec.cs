@@ -212,6 +212,23 @@ public class OrganizationsApplicationSpec
     }
 
     [Fact]
+    public async Task WhenInviteMemberToOrganizationAsyncAndNoUserIdNorEmail_ThenReturnsError()
+    {
+        _caller.Setup(cc => cc.Roles)
+            .Returns(new ICallerContext.CallerRoles(Array.Empty<RoleLevel>(), new[] { TenantRoles.Owner }));
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+        _repository.Setup(s =>
+                s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+
+        var result = await _application.InviteMemberToOrganizationAsync(_caller.Object, "anorganizationid",
+            null, null, CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.OrganizationApplication_InvitedNoUserNorEmail);
+    }
+
+    [Fact]
     public async Task WhenInviteMemberToOrganizationAsync_ThenInvites()
     {
         _caller.Setup(cc => cc.Roles)
@@ -221,18 +238,6 @@ public class OrganizationsApplicationSpec
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(org);
-        _endUsersService.Setup(eus =>
-                eus.InviteMemberToOrganizationPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new Membership
-            {
-                Id = "amembershipid",
-                UserId = "auserid",
-                OrganizationId = "anorganizationid",
-                IsDefault = false
-            });
 
         var result = await _application.InviteMemberToOrganizationAsync(_caller.Object, "anorganizationid",
             "auserid", null, CancellationToken.None);
@@ -241,9 +246,9 @@ public class OrganizationsApplicationSpec
         result.Value.Name.Should().Be("aname");
         result.Value.CreatedById.Should().Be("auserid");
         result.Value.Ownership.Should().Be(Application.Resources.Shared.OrganizationOwnership.Shared);
-        _endUsersService.Verify(eus =>
-            eus.InviteMemberToOrganizationPrivateAsync(_caller.Object, "anorganizationid", "auserid", null,
-                CancellationToken.None));
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(o =>
+            o.Id == "anid"
+        ), It.IsAny<CancellationToken>()));
     }
 
     [Fact]

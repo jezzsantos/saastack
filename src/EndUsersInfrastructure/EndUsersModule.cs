@@ -75,8 +75,10 @@ public class EndUsersModule : ISubdomainModule
                     c.GetRequiredServiceForPlatform<IDataStore>()));
                 services
                     .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
-                        new EndUserDomainNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
-                            c.GetRequiredService<IEndUsersApplication>()));
+                        new EndUserNotificationConsumer(
+                            c.GetRequiredService<ICallerContextFactory>(),
+                            c.GetRequiredService<IEndUsersApplication>(),
+                            c.GetRequiredService<IInvitationsApplication>()));
                 services.RegisterUnTenantedEventing<EndUserRoot, EndUserProjection, EndUserNotifier>(
                     c => new EndUserProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),

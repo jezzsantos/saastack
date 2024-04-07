@@ -9,8 +9,7 @@ namespace EndUsersInfrastructure.Notifications;
 /// <summary>
 ///     Provides an example translator of domain events that should be published as integration events
 /// </summary>
-public sealed class
-    EndUserIntegrationEventNotificationTranslator<TAggregateRoot> : IIntegrationEventNotificationTranslator
+public sealed class EndUserNotificationTranslator<TAggregateRoot> : IIntegrationEventNotificationTranslator
     where TAggregateRoot : IEventingAggregateRoot
 {
     public Type RootAggregateType => typeof(TAggregateRoot);

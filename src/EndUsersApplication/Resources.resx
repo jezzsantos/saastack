@@ -42,7 +42,7 @@
     <data name="EndUsersApplication_CallerNotMember" xml:space="preserve">
         <value>The caller is not a member of this organization</value>
     </data>
-    <data name="InvitationsApplication_InviteToOrganizationWithoutEmailAddressOrUserId" xml:space="preserve">
+    <data name="InvitationsApplication_InviteMemberToOrganization_NoUserIdNorEmailAddress" xml:space="preserve">
         <value>Cannot invite a user to an organization without either an email or user ID</value>
     </data>
 </root>
