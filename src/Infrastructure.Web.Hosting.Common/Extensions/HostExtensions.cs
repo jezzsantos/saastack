@@ -18,6 +18,7 @@ using Domain.Interfaces.Services;
 using Domain.Shared;
 using Infrastructure.Common;
 using Infrastructure.Common.Extensions;
+using Infrastructure.Eventing.Common.Notifications;
 using Infrastructure.Eventing.Common.Projections.ReadModels;
 using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Hosting.Common;
@@ -29,7 +30,6 @@ using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Shared.ApplicationServices;
 using Infrastructure.Shared.ApplicationServices;
 using Infrastructure.Shared.ApplicationServices.External;
-using Infrastructure.Shared.Eventing.Notifications;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Common.Validation;
@@ -387,7 +387,7 @@ public static class HostExtensions
         {
             if (usesEventing)
             {
-                services.AddPerHttpRequest<IEventNotificationMessageBroker, ExampleEventNotificationMessageBroker>();
+                services.AddPerHttpRequest<IEventNotificationMessageBroker, NoOpEventNotificationMessageBroker>();
             }
         }
 
@@ -416,17 +416,17 @@ public static class HostExtensions
             RegisterStoreForTestingOnly(services, usesQueues, isMultiTenanted);
 #else
             //HACK: we need a reasonable value for production here like SQLServerDataStore
-            services.AddForPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(_ =>
-                NullStore.Instance);
+            services.AddForPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, NoOpStore>(_ =>
+                NoOpStore.Instance);
             if (isMultiTenanted)
             {
-                services.AddPerHttpRequest<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(_ =>
-                    NullStore.Instance);
+                services.AddPerHttpRequest<IDataStore, IEventStore, IBlobStore, IQueueStore, NoOpStore>(_ =>
+                    NoOpStore.Instance);
             }
             else
             {
-                services.AddSingleton<IDataStore, IEventStore, IBlobStore, IQueueStore, NullStore>(_ =>
-                    NullStore.Instance);
+                services.AddSingleton<IDataStore, IEventStore, IBlobStore, IQueueStore, NoOpStore>(_ =>
+                    NoOpStore.Instance);
             }
 #endif
         }

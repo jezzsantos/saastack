@@ -27,7 +27,7 @@ public class FlagsmithHttpServiceClientSpec : ExternalApiSpec
     public FlagsmithHttpServiceClientSpec(ExternalApiSetup setup) : base(setup, OverrideDependencies)
     {
         var settings = setup.GetRequiredService<IConfigurationSettings>();
-        _serviceClient = new FlagsmithHttpServiceClient(NullRecorder.Instance, settings, new TestHttpClientFactory());
+        _serviceClient = new FlagsmithHttpServiceClient(NoOpRecorder.Instance, settings, new TestHttpClientFactory());
         if (!_isInitialized)
         {
             _isInitialized = true;

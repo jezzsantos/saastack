@@ -10,11 +10,11 @@ namespace AncillaryInfrastructure.ApplicationServices;
 /// <summary>
 ///     Provides a <see cref="IEmailDeliveryService" /> that does nothing
 /// </summary>
-public class NullEmailDeliveryService : IEmailDeliveryService
+public class NoOpEmailDeliveryService : IEmailDeliveryService
 {
     private readonly IRecorder _recorder;
 
-    public NullEmailDeliveryService(IRecorder recorder)
+    public NoOpEmailDeliveryService(IRecorder recorder)
     {
         _recorder = recorder;
     }
@@ -25,7 +25,7 @@ public class NullEmailDeliveryService : IEmailDeliveryService
         string fromEmailAddress, string? fromDisplayName, CancellationToken cancellationToken = default)
     {
         _recorder.TraceInformation(context.ToCall(),
-            $"{nameof(NullUsageDeliveryService)} delivers email event {{Event}} for {{For}} with properties: {{Properties}}",
+            $"{nameof(NoOpUsageDeliveryService)} delivers email event {{Event}} for {{For}} with properties: {{Properties}}",
             subject, toEmailAddress, new
             {
                 To = toEmailAddress,

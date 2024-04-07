@@ -27,7 +27,7 @@ public static class HostExtensions
         services.AddSingleton<IFeatureFlags, EmptyFeatureFlags>();
 
 #if TESTINGONLY
-        services.AddSingleton<ICrashReporter>(new NullCrashReporter());
+        services.AddSingleton<ICrashReporter>(new NoOpCrashReporter());
 #else
 #if HOSTEDONAWS
             services.AddSingleton<ICrashReporter>(c =>

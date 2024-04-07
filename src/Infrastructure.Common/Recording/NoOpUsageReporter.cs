@@ -8,7 +8,7 @@ namespace Infrastructure.Common.Recording;
 ///     An <see cref="IUsageReporter" /> that does nothing
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class NullUsageReporter : IUsageReporter
+public class NoOpUsageReporter : IUsageReporter
 {
     public void Track(ICallContext? context, string forId, string eventName,
         Dictionary<string, object>? additional = null)

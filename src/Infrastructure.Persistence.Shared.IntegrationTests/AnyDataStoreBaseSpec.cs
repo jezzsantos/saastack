@@ -17,7 +17,7 @@ public abstract class AnyDataStoreBaseSpec
     private const int ReasonableNumberOfEntitiesToSort = 50; //number of entities to create to thoroughly test sorting
     private static readonly IDomainFactory DomainFactory;
     private static readonly TimeSpan ReasonableTimeDelayBetweenTimestamps = TimeSpan.FromMilliseconds(20);
-    private static readonly IRecorder Recorder = NullRecorder.Instance;
+    private static readonly IRecorder Recorder = NoOpRecorder.Instance;
     private readonly DataStoreInfo _firstJoiningSetup;
     private readonly DataStoreInfo _secondJoiningSetup;
     protected readonly DataStoreInfo Setup;

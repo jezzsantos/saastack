@@ -30,7 +30,7 @@ public static class HostExtensions
         services.AddSingleton<IFeatureFlags, EmptyFeatureFlags>();
 
 #if TESTINGONLY
-        services.AddSingleton<ICrashReporter>(new NullCrashReporter());
+        services.AddSingleton<ICrashReporter>(new NoOpCrashReporter());
 #else
 #if HOSTEDONAZURE
             //Note: ApplicationInsights TelemetryClient is not added by default by the runtime V4

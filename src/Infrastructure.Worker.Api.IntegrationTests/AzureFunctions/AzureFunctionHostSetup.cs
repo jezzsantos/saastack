@@ -29,7 +29,7 @@ public class AzureFunctionHostSetup : IApiWorkerSpec, IDisposable
         var settings = new AspNetDynamicConfigurationSettings(new ConfigurationBuilder()
             .AddJsonFile("appsettings.Testing.json", true)
             .Build());
-        var recorder = NullRecorder.Instance;
+        var recorder = NoOpRecorder.Instance;
         QueueStore = AzureStorageAccountQueueStore.Create(recorder, settings);
         AzureStorageAccountBase.InitializeAllTests();
     }

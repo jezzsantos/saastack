@@ -79,8 +79,8 @@ public class AncillaryModule : ISubdomainModule
                         c.GetRequiredService<IMessageQueueIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
 
-                services.AddSingleton<IUsageDeliveryService, NullUsageDeliveryService>();
-                services.AddSingleton<IEmailDeliveryService, NullEmailDeliveryService>();
+                services.AddSingleton<IUsageDeliveryService, NoOpUsageDeliveryService>();
+                services.AddSingleton<IEmailDeliveryService, NoOpEmailDeliveryService>();
                 services.AddSingleton<IProvisioningNotificationService, OrganizationProvisioningNotificationService>();
             };
         }

@@ -31,12 +31,12 @@ public class QueuedUsageReporter : IUsageReporter
 
     // ReSharper disable once UnusedParameter.Local
     public QueuedUsageReporter(IDependencyContainer container, IConfigurationSettings settings)
-        : this(new UsageMessageQueue(NullRecorder.Instance, container.GetRequiredService<IMessageQueueIdFactory>(),
+        : this(new UsageMessageQueue(NoOpRecorder.Instance, container.GetRequiredService<IMessageQueueIdFactory>(),
 #if !TESTINGONLY
 #if HOSTEDONAZURE
-                AzureStorageAccountQueueStore.Create(NullRecorder.Instance, settings)
+                AzureStorageAccountQueueStore.Create(NoOpRecorder.Instance, settings)
 #elif HOSTEDONAWS
-                AWSSQSQueueStore.Create(NullRecorder.Instance, settings)
+                AWSSQSQueueStore.Create(NoOpRecorder.Instance, settings)
 #endif
 #else
             container.GetRequiredServiceForPlatform<IQueueStore>()

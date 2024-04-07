@@ -10,11 +10,11 @@ namespace AncillaryInfrastructure.ApplicationServices;
 /// <summary>
 ///     Provides a <see cref="IUsageDeliveryService" /> that does nothing
 /// </summary>
-public class NullUsageDeliveryService : IUsageDeliveryService
+public class NoOpUsageDeliveryService : IUsageDeliveryService
 {
     private readonly IRecorder _recorder;
 
-    public NullUsageDeliveryService(IRecorder recorder)
+    public NoOpUsageDeliveryService(IRecorder recorder)
     {
         _recorder = recorder;
     }
@@ -27,7 +27,7 @@ public class NullUsageDeliveryService : IUsageDeliveryService
             ? additional.ToJson(false)!
             : "none";
         _recorder.TraceInformation(context.ToCall(),
-            $"{nameof(NullUsageDeliveryService)} delivers usage event {{Event}} for {{For}} with properties: {{Properties}}",
+            $"{nameof(NoOpUsageDeliveryService)} delivers usage event {{Event}} for {{For}} with properties: {{Properties}}",
             eventName, forId, properties);
 
         return Task.FromResult(Result.Ok);

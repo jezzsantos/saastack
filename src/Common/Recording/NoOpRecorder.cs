@@ -7,11 +7,11 @@ namespace Common.Recording;
 ///     A <see cref="IRecorder" /> that does nothing
 /// </summary>
 [ExcludeFromCodeCoverage]
-public sealed class NullRecorder : IRecorder
+public sealed class NoOpRecorder : IRecorder
 {
-    public static readonly IRecorder Instance = new NullRecorder();
+    public static readonly IRecorder Instance = new NoOpRecorder();
 
-    private NullRecorder()
+    private NoOpRecorder()
     {
     }
 

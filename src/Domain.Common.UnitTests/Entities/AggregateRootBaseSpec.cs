@@ -140,9 +140,9 @@ public class AggregateRootBaseSpec
     {
         var container = new Mock<IDependencyContainer>();
         container.Setup(c => c.GetRequiredService<IRecorder>())
-            .Returns(NullRecorder.Instance);
+            .Returns(NoOpRecorder.Instance);
         container.Setup(c => c.GetRequiredService<IIdentifierFactory>())
-            .Returns(new NullIdentifierFactory());
+            .Returns(new EmptyIdentifierFactory());
 
         var created =
             TestAggregateRoot.Rehydrate()("anid".ToId(), container.Object,

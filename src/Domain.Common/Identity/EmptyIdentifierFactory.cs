@@ -7,7 +7,7 @@ namespace Domain.Common.Identity;
 /// <summary>
 ///     Provides a <see cref="IIdentifierFactory" /> that generates empty <see cref="Identifier" />
 /// </summary>
-public class NullIdentifierFactory : IIdentifierFactory
+public class EmptyIdentifierFactory : IIdentifierFactory
 {
     public Result<Identifier, Error> Create(IIdentifiableEntity entity)
     {
@@ -16,6 +16,6 @@ public class NullIdentifierFactory : IIdentifierFactory
 
     public bool IsValid(Identifier value)
     {
-        throw new NotImplementedException();
+        return value == Identifier.Empty();
     }
 }

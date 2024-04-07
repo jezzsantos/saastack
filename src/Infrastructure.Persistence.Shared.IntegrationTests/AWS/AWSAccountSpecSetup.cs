@@ -14,7 +14,7 @@ public class AWSAccountSpecSetup : StoreSpecSetupBase, IDisposable
 {
     public AWSAccountSpecSetup()
     {
-        QueueStore = AWSSQSQueueStore.Create(NullRecorder.Instance, Settings);
+        QueueStore = AWSSQSQueueStore.Create(NoOpRecorder.Instance, Settings);
         AWSAccountBase.InitializeAllTests();
     }
 

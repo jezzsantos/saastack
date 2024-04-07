@@ -8,7 +8,7 @@ namespace Infrastructure.Common.Recording;
 ///     An <see cref="IMetricReporter" /> that does nothing
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class NullMetricReporter : IMetricReporter
+public class NoOpMetricReporter : IMetricReporter
 {
     public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
     {

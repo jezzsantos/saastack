@@ -14,7 +14,7 @@ public class AzureStorageAccountSpecSetup : StoreSpecSetupBase, IDisposable
 {
     public AzureStorageAccountSpecSetup()
     {
-        QueueStore = AzureStorageAccountQueueStore.Create(NullRecorder.Instance, Settings);
+        QueueStore = AzureStorageAccountQueueStore.Create(NoOpRecorder.Instance, Settings);
         AzureStorageAccountBase.InitializeAllTests();
     }
 

@@ -16,14 +16,14 @@ namespace Infrastructure.Persistence.Common.ApplicationServices;
 /// </summary>
 [ExcludeFromCodeCoverage]
 [UsedImplicitly]
-public class NullStore : IDataStore, IBlobStore, IQueueStore,
+public class NoOpStore : IDataStore, IBlobStore, IQueueStore,
     IEventStore
 {
-    private NullStore()
+    private NoOpStore()
     {
     }
 
-    public static NullStore Instance => new();
+    public static NoOpStore Instance => new();
 
     public Task<Result<Error>> DeleteAsync(string containerName, string blobName, CancellationToken cancellationToken)
     {

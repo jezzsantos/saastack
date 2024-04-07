@@ -344,6 +344,9 @@
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=518DB9880AD5ED449C104E766AB6FAF0/EntryName/@EntryValue">A domain event</s:String>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=518DB9880AD5ED449C104E766AB6FAF0/Position/@EntryValue">10</s:Int64>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=567DCF4B487C244A9F6BB46E4E9F3B84/Position/@EntryValue">6</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=7157EC608F18334D87D371616A0283F4/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=7157EC608F18334D87D371616A0283F4/EntryName/@EntryValue">Domain Event</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=7157EC608F18334D87D371616A0283F4/Position/@EntryValue">11</s:Int64>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=7F2A1BE8D0078241A9AE7802038BAD3C/Position/@EntryValue">7</s:Int64>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=C4795E57DDEC1C4F97BBC8C7173EBBCA/Position/@EntryValue">8</s:Int64>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0C41D02830B426419B2E0D9AF25191F6/@KeyIndexDefined">True</s:Boolean>
@@ -594,7 +597,6 @@ public sealed class $name$ : ValueObjectBase&lt;$name$&gt;
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=518DB9880AD5ED449C104E766AB6FAF0/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=518DB9880AD5ED449C104E766AB6FAF0/Text/@EntryValue">using Domain.Common;
 using Domain.Common.ValueObjects;
-using Domain.Shared.Organizations;
 using JetBrains.Annotations;
 
 namespace $ns$;
@@ -612,8 +614,47 @@ public sealed class $class$ : DomainEvent
 
     public required string $prop1$ { get; set; }
 }</s:String>
-	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=518DB9880AD5ED449C104E766AB6FAF0/UITag/@EntryValue"></s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=518DB9880AD5ED449C104E766AB6FAF0/UITag/@EntryValue">SaaStack</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7032419A3D210E42B9EA159377807335/@KeyIndexDefined">False</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/CustomProperties/=Extension/@EntryIndexedValue">cs</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/CustomProperties/=FileName/@EntryIndexedValue">IntegrationEvent</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/CustomProperties/=ValidateFileName/@EntryIndexedValue">True</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Description/@EntryValue">Integration Event</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Field/=class/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Field/=class/Expression/@EntryValue">getFileNameWithoutExtension()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Field/=class/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Field/=class/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Field/=ns/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Field/=ns/Expression/@EntryValue">fileDefaultNamespace()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Field/=ns/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Field/=ns/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Field/=prop1/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Field/=prop1/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Scope/=E8F0594528C33E45BBFEC6CFE851095D/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Scope/=E8F0594528C33E45BBFEC6CFE851095D/Type/@EntryValue">InCSharpProjectFile</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Text/@EntryValue">using Infrastructure.Eventing.Common.Notifications;
+using JetBrains.Annotations;
+
+namespace $ns$;
+
+public sealed class $class$ : IntegrationEvent
+{
+    public $class$(string id) : base(id)
+    {
+    }
+
+    [UsedImplicitly]
+    public $class$()
+    {
+    }
+
+    public required string $prop1$ { get; set; }
+}</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/UITag/@EntryValue">SaaStack</s:String>
 	
 	
 	

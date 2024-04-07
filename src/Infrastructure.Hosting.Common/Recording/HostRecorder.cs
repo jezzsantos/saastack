@@ -224,7 +224,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
     {
         return options.CrashReporting switch
         {
-            CrashReporterOption.None => new NullCrashReporter(),
+            CrashReporterOption.None => new NoOpCrashReporter(),
             CrashReporterOption.Cloud =>
 #if HOSTEDONAZURE
                 new ApplicationInsightsCrashReporter(container),
@@ -239,7 +239,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
     {
         return options.AuditReporting switch
         {
-            AuditReporterOption.None => new NullAuditReporter(),
+            AuditReporterOption.None => new NoOpAuditReporter(),
             AuditReporterOption.ReliableQueue => new QueuedAuditReporter(container,
                 container.GetRequiredServiceForPlatform<IConfigurationSettings>()),
             _ => throw new ArgumentOutOfRangeException(nameof(options.MetricReporting))
@@ -252,7 +252,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
     {
         return options.MetricReporting switch
         {
-            MetricReporterOption.None => new NullMetricReporter(),
+            MetricReporterOption.None => new NoOpMetricReporter(),
             MetricReporterOption.Cloud =>
 #if HOSTEDONAZURE
                 new ApplicationInsightsMetricReporter(container),
@@ -267,7 +267,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
     {
         return options.UsageReporting switch
         {
-            UsageReporterOption.None => new NullUsageReporter(),
+            UsageReporterOption.None => new NoOpUsageReporter(),
             UsageReporterOption.ReliableQueue => new QueuedUsageReporter(container,
                 container.GetRequiredServiceForPlatform<IConfigurationSettings>()),
             _ => throw new ArgumentOutOfRangeException(nameof(options.MetricReporting))

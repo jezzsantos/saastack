@@ -6,12 +6,12 @@ using JetBrains.Annotations;
 namespace Infrastructure.Common.Recording;
 
 /// <summary>
-///     An <see cref="ICrashReporter" /> that does nothing
+///     An <see cref="IAuditReporter" /> that does nothing
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class NullCrashReporter : ICrashReporter
+public class NoOpAuditReporter : IAuditReporter
 {
-    public void Crash(ICallContext? context, CrashLevel level, Exception exception,
+    public void Audit(ICallContext? context, string againstId, string auditCode,
         [StructuredMessageTemplate] string messageTemplate, params object[] templateArgs)
     {
     }
