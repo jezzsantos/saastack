@@ -36,7 +36,13 @@
     <data name="ReadModelProjector_CheckpointError" xml:space="preserve">
         <value>The event stream {0} is at checkpoint '{1}', but new events are at version {2}. Perhaps some event history is missing?</value>
     </data>
-    <data name="EventNotificationNotifier_ProducerError" xml:space="preserve">
-        <value>The producer '{0}' failed to handle the domain event '{1}' with event type '{2}'. Aborting notifications</value>
+    <data name="EventNotificationNotifier_TranslatorError" xml:space="preserve">
+        <value>The translator '{0}' failed to handle the domain event '{1}' with event type '{2}'. Aborting notifications</value>
+    </data>
+    <data name="EventNotificationNotifier_ConsumerError" xml:space="preserve">
+        <value>The consumer '{0}' failed to handle the domain event '{1}' with event type '{2}'. Aborting notifications</value>
+    </data>
+    <data name="EventNotificationNotifier_MessageBrokerError" xml:space="preserve">
+        <value>The message broker '{0}' failed to handle the integration event '{1}' with event type '{2}'. Aborting notifications</value>
     </data>
 </root>

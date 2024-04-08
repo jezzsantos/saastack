@@ -264,44 +264,4 @@ This is an example overview of how both these persistence flows work for the `Bo
 
 Regardless of the chosen persistence scheme, when the state of any aggregate is saved, it will yield some change events (most recently raised domain events, since the last rehydration) that can and will be relayed to other components in the system to drive Read Model Projections (Event Sourcing) and Notifications (Event Driven Architecture).
 
-Read Models are typically always used within the same sub-domain or by other sub-domains running in the same process. Notifications are designed to be transmitted to remote subdomains or to other external systems - via an asynchronous "event broker".
-
-Projections and Notifications must be "consistent" with the update of the aggregates that produce the change events. This requires reliable implementations (e.g. Outbox Pattern) and they must guarantee delivery of the change events in order (e.g. FIFO Queues). If either of these technical requirements cannot be guaranteed then there is a high probability (when the system comes under load or stress) that downstream consumers of these change events will be permanently out of date, affecting data integrity of dependent systems.
-
-> By default, both mechanisms of updating read models and sending notifications should be done reliably and asynchronously after a source aggregate is changed, such that the collective system is eventually consistent. This asynchronous update (typically expected to take anywhere between ~100ms-500ms) means that read model data and consumers of notifications can be immediately out of date with the subdomains that update their source aggregates.
->
-> When this update process is synchronous (and in-process), that part of the system will achieve 100% consistency, which is convenient, but this is not a true reality for when the system is eventually split up and has become a distributed system. (this is the goal of all modular monoliths). In distributed systems that are eventually consistent, API clients are required to employ different strategies to handle this eventual consistency, which are disruptive to switch to later when a monolithic backend becomes distributed.
->
-> For example, if a client calls a command API and then after receiving a response, immediately calls a query API that would include the changed data, the queried data may have not yet been updated yet. This is one reason why commands should return changed data synchronously in their responses, to help clients predict changed data.
->
-> Because of this constraint, it is better to start the modular monolith on an eventually consistent model rather than start a fully consistent model since these client strategies should to be established sooner rather than being later re-engineered.
-
-The following diagram illustrates the "logical" process that is triggered when an aggregate state is updated.
-
-![Persistence-Eventing](../images/Persistence-Eventing.png)
-
-> The implementation details of this "logical" process can be different depending on the specific "relay" mechanisms in place.
-
-#### Read Model Projections
-
-Read model "projections" are a mechanism to produce (and keep up to date) one (or more) "read models", which are typically "records" that represent the latest state of the aggregates and entities, in event sourced persistent schemes. These read models are typically used directly by CQRS queries.
-
-> Note: In snapshotting persistence schemes, "read models" are the exact same as the "write models", they share the same data. However, there is no "write model" in an event source scheme, and write models cannot be queried.
-
-One major advantage of producing "read models" is that they are all built from the historical stream of events. This means that we can have several of them at the same time, containing different data, and all coherent with each other, unlike what is possible with snapshotting stores.
-
-Another advantage of this scheme is that we can build several "denormalized" sets of records (e.g. in a relational database) that are optimized for specific queries - no longer requiring complex joins to give desired results.
-
-Another advantage (only available to event-sourced persistence scheme) is that we can rebuild any read model at any time, in any way we like, and never lose any historical data. Read models then become temporary and disposable. All the source data is in the event streams. The advantage here is that when the software changes and the queried data needs changing, we can use any of the historical data that already exists in the aggregate event streams to rebuild different data in completely new read models.
-
-> This capability is impossible in snapshotting persistence schemes.
-
-#### Notifications
-
-Notifications are the mechanism by which subdomains can communicate to other subdomains or to other systems about what is happening in the source subdomain. Particularly necessary in micros-services deployments. This is normally done in distributed systems with a message broker of some kind (i.e., a queue, a message bus, or a message broker).
-
-Change events raised through notifications are not expected to be coupled to consuming systems, so they can be mapped to more granular or coarse events.
-
-Consumers of notifications must register to receive notifications.
-
-A "notification registration" consists of a producer and a consumer. The producer translates the source `IDomainEvent` to an appropriate `IDomainEvent` to share outside the source component, and then that event is relayed to the consumer to handle.
+See [Eventing](0170-eventing.md) for more details

@@ -961,37 +961,3 @@ public sealed class VehicleManagers : ValueObjectBase<VehicleManagers>
 Unlike root aggregates and entities, there is no explicit way to verify the invariants of a constructed value object.
 
 The only invariants that need verifying are when the value object is constructed and then all data is required to be validated. This is always performed in the `Create` class factory.
-
-### Event Notifications
-
-In the design of most distributed systems of the nature of this system (or, of systems that are expected to evolve into distributed systems later), it is common to decouple each of the subdomains from each other. De-coupling effectively is absolutely vital to allowing the system to change, grow and evolve over time. Lack of effective de-coupling (at the technical level) is the main reason most software systems devolve into big-balls-of-mud, simply because of coupling.
-
-There are several techniques for de-coupling your subdomains, including: separating layers, using ports and adapters, starting with a modular monoliths and decomposing it into microservices later etc.
-
-Another one of these techniques is the use of Event-Driven Architecture (EDA), where change in communicated within and across boundaries.
-
-EDA relies on the fact that your system will emit "domain events", that it can share both within specific bounded contexts (as "domain events"), and externally to other systems (as "integration events".
-
-> When sharing events within a bounded context (or within the same process) the process can remain consistent, we call these "domain events".
->
-> When sharing events across bounded contexts (or across processes and hosts) these events are called "integration events".
-
-In SaaStack:
-
-1. We use "domain events" to communicate changes (within the Domain Layer) and within all aggregates and entities. Regardless of whether we are using event sourcing for persistence or not.
-2. We publish all "domain events" whenever the state of any aggregate is saved in any repository, via the `EventSourcingDddCommandStore` or via the `SnapshottingDddCommandStore`.
-3. We treat "domain events" and "integration events" slightly differently:
-   1. "domain events" are published synchronously and handled synchronously after the aggregate is saved, and are always consistent.
-   2. "integration events" are published synchronously, but are expected to be handled asynchronously (by a message broker) and be eventually consistent.
-
-> We assume that all "domain events" are only ever published to other subdomains that are in the same "bounded context" and thus, also in the same host process. When this is not true, for example, if subdomains of the same bounded context are split into separate host processes, then these subdomains will need to communicate with "integration events" instead, and they will be eventually consistent.
-
-The synchronous publication of all "domain events" is handled automatically by the `IEventNotifyingStoreNotificationRelay` (after events have first been projected by the `IEventNotifyingStoreProjectionRelay`).
-
-![Eventing](../images/Persistence-Eventing.png)
-
-Domain events are published synchronously (round-robin) one at a time:
-
-1. First, to all registered `IDomainEventNotificationConsumer` consumers. These consumers can fail and report back errors that are captured synchronously.
-2. Then to all registered `IIntegrationEventNotificationTranslator` translators, that have the option to translate o domain event into an integration event, or not. This translation can also fail, and report back errors that are captured synchronously.
-3. Finally, if the translator translates a domain event into an integration event it is then published to the `IEventNotificationMessageBroker` that should send the integration event to some external message broker, who will deliver it asynchronous to external consumers. This can also fail, and report back errors that are captured synchronously

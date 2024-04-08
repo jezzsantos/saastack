@@ -219,7 +219,7 @@ public sealed class
             return updated;
         }
 
-        var published = await this.SaveAndPublishEventsAsync(aggregate, OnEventStreamChanged, (_, _, _) =>
+        var published = await this.SaveAndPublishChangesAsync(aggregate, OnEventStreamChanged, (_, _, _) =>
         {
             var aggregateName = $"{_containerName}_{entity.Id}";
             return Task.FromResult<Result<string, Error>>(aggregateName);

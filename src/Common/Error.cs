@@ -42,6 +42,21 @@ public readonly struct Error
             ? $"{message}{Environment.NewLine}\t{Message}"
             : message);
     }
+
+    /// <summary>
+    ///     Wraps the existing message within the specified message, for the specified code
+    /// </summary>
+    public Error Wrap(ErrorCode code, string message)
+    {
+        if (message.HasNoValue())
+        {
+            return new Error(code, Message);
+        }
+
+        return new Error(code, Message.HasValue() && Message != NoErrorMessage
+            ? $"{Code}: {message}{Environment.NewLine}\t{Message}"
+            : $"{Code}: {message}");
+    }
 #endif
 
     /// <summary>

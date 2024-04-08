@@ -1,5 +1,6 @@
 ﻿using Application.Persistence.Interfaces;
 using Common;
+using Common.Extensions;
 using Domain.Common;
 using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
@@ -26,7 +27,7 @@ public sealed class EventNotificationNotifierSpec : IDisposable
         var recorder = new Mock<IRecorder>();
         var changeEventTypeMigrator = new ChangeEventTypeMigrator();
         _registration = new Mock<IEventNotificationRegistration>();
-        _registration.Setup(p => p.IntegrationEventTranslator.RootAggregateType)
+        _registration.Setup(reg => reg.IntegrationEventTranslator.RootAggregateType)
             .Returns(typeof(string));
         _registration.Setup(p =>
                 p.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
@@ -37,7 +38,7 @@ public sealed class EventNotificationNotifierSpec : IDisposable
         _messageBroker = new Mock<IEventNotificationMessageBroker>();
         _messageBroker.Setup(mb => mb.PublishAsync(It.IsAny<IIntegrationEvent>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Ok);
-        _registration.Setup(p => p.DomainEventConsumers)
+        _registration.Setup(reg => reg.DomainEventConsumers)
             .Returns([_domainConsumer.Object]);
         var registrations = new List<IEventNotificationRegistration> { _registration.Object };
         _notifier = new EventNotificationNotifier(recorder.Object, changeEventTypeMigrator, registrations,
@@ -74,14 +75,15 @@ public sealed class EventNotificationNotifierSpec : IDisposable
         _messageBroker.Verify(mb => mb.PublishAsync(It.IsAny<IIntegrationEvent>(), It.IsAny<CancellationToken>()),
             Times.Never);
         _registration.Verify(
-            p => p.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()),
+            reg => reg.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(),
+                It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
     [Fact]
     public async Task WhenWriteEventStreamAndNoRegisteredConsumers_ThenReturns()
     {
-        _registration.Setup(p => p.IntegrationEventTranslator.RootAggregateType)
+        _registration.Setup(reg => reg.IntegrationEventTranslator.RootAggregateType)
             .Returns(typeof(string));
 
         var result = await _notifier.WriteEventStreamAsync("astreamname", [
@@ -104,7 +106,8 @@ public sealed class EventNotificationNotifierSpec : IDisposable
         _messageBroker.Verify(mb => mb.PublishAsync(It.IsAny<IIntegrationEvent>(), It.IsAny<CancellationToken>()),
             Times.Never);
         _registration.Verify(
-            p => p.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()),
+            reg => reg.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(),
+                It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -153,7 +156,7 @@ public sealed class EventNotificationNotifierSpec : IDisposable
         ], CancellationToken.None);
 
         result.Should().BeSuccess();
-        _registration.Verify(p => p.IntegrationEventTranslator.TranslateAsync(It.Is<TestDomainEvent>(e =>
+        _registration.Verify(reg => reg.IntegrationEventTranslator.TranslateAsync(It.Is<TestDomainEvent>(e =>
             e.RootId == "aneventid"
         ), It.IsAny<CancellationToken>()));
         _domainConsumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(ce =>
@@ -186,7 +189,7 @@ public sealed class EventNotificationNotifierSpec : IDisposable
         ], CancellationToken.None);
 
         result.Should().BeSuccess();
-        _registration.Verify(p => p.IntegrationEventTranslator.TranslateAsync(It.Is<TestDomainEvent>(e =>
+        _registration.Verify(reg => reg.IntegrationEventTranslator.TranslateAsync(It.Is<TestDomainEvent>(e =>
             e.RootId == "aneventid"
         ), It.IsAny<CancellationToken>()));
         _domainConsumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(ce =>
@@ -244,7 +247,7 @@ public sealed class EventNotificationNotifierSpec : IDisposable
         ], CancellationToken.None);
 
         result.Should().BeSuccess();
-        _registration.Verify(p => p.IntegrationEventTranslator.TranslateAsync(It.Is<TestDomainEvent>(e =>
+        _registration.Verify(reg => reg.IntegrationEventTranslator.TranslateAsync(It.Is<TestDomainEvent>(e =>
             e.RootId == "aneventid1"
         ), It.IsAny<CancellationToken>()));
         _domainConsumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(e =>
@@ -253,7 +256,7 @@ public sealed class EventNotificationNotifierSpec : IDisposable
         _messageBroker.Verify(mb => mb.PublishAsync(It.Is<TestIntegrationEvent>(e =>
             e.RootId == "aneventid1"
         ), It.IsAny<CancellationToken>()));
-        _registration.Verify(p => p.IntegrationEventTranslator.TranslateAsync(It.Is<TestDomainEvent>(e =>
+        _registration.Verify(reg => reg.IntegrationEventTranslator.TranslateAsync(It.Is<TestDomainEvent>(e =>
             e.RootId == "aneventid2"
         ), It.IsAny<CancellationToken>()));
         _domainConsumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(e =>
@@ -297,16 +300,92 @@ public sealed class EventNotificationNotifierSpec : IDisposable
             }
         ], CancellationToken.None);
 
-        result.Should().BeError(ErrorCode.RuleViolation, "amessage");
+        result.Should().BeError(ErrorCode.Unexpected, Error.RuleViolation("amessage")
+            .Wrap(Resources.EventNotificationNotifier_ConsumerError.Format("IDomainEventNotificationConsumerProxy",
+                "aneventid", typeof(TestDomainEvent).AssemblyQualifiedName!)).ToString());
         _domainConsumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(e =>
             e.RootId == "aneventid"
         ), It.IsAny<CancellationToken>()));
         _registration.Verify(
-            p => p.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()),
+            reg => reg.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(),
+                It.IsAny<CancellationToken>()),
             Times.Never);
         _messageBroker.Verify(mb => mb.PublishAsync(It.IsAny<TestIntegrationEvent>(), It.IsAny<CancellationToken>()),
             Times.Never);
-
     }
 
+    [Fact]
+    public async Task WhenWriteEventStreamAndIntegrationTranslatorReturnsError_ThenStopsAndReturnsError()
+    {
+        _registration.Setup(p =>
+                p.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IDomainEvent domainEvent, CancellationToken _) =>
+                new TestIntegrationEvent(domainEvent.RootId).ToOptional<IIntegrationEvent>());
+        _registration.Setup(reg =>
+                reg.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Error.RuleViolation("amessage"));
+
+        var result = await _notifier.WriteEventStreamAsync("astreamname", [
+            new EventStreamChangeEvent
+            {
+                Id = "anid1",
+                RootAggregateType = nameof(String),
+                Data = new TestDomainEvent { RootId = "aneventid" }.ToEventJson(),
+                Version = 0,
+                Metadata = new EventMetadata(typeof(TestDomainEvent).AssemblyQualifiedName!),
+                EventType = null!,
+                LastPersistedAtUtc = default,
+                StreamName = null!
+            }
+        ], CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.Unexpected, Error.RuleViolation("amessage")
+            .Wrap(Resources.EventNotificationNotifier_TranslatorError.Format(
+                "IIntegrationEventNotificationTranslatorProxy",
+                "aneventid", typeof(TestDomainEvent).AssemblyQualifiedName!)).ToString());
+        _domainConsumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(e =>
+            e.RootId == "aneventid"
+        ), It.IsAny<CancellationToken>()));
+        _registration.Verify(
+            reg => reg.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(),
+                It.IsAny<CancellationToken>()));
+        _messageBroker.Verify(mb => mb.PublishAsync(It.IsAny<TestIntegrationEvent>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenWriteEventStreamAndMessageBrokerReturnsError_ThenStopsAndReturnsError()
+    {
+        _registration.Setup(p =>
+                p.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IDomainEvent domainEvent, CancellationToken _) =>
+                new TestIntegrationEvent(domainEvent.RootId).ToOptional<IIntegrationEvent>());
+        _messageBroker.Setup(mb => mb.PublishAsync(It.IsAny<IIntegrationEvent>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Error.RuleViolation("amessage"));
+
+        var result = await _notifier.WriteEventStreamAsync("astreamname", [
+            new EventStreamChangeEvent
+            {
+                Id = "anid1",
+                RootAggregateType = nameof(String),
+                Data = new TestDomainEvent { RootId = "aneventid" }.ToEventJson(),
+                Version = 0,
+                Metadata = new EventMetadata(typeof(TestDomainEvent).AssemblyQualifiedName!),
+                EventType = null!,
+                LastPersistedAtUtc = default,
+                StreamName = null!
+            }
+        ], CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.Unexpected, Error.RuleViolation("amessage")
+            .Wrap(Resources.EventNotificationNotifier_MessageBrokerError.Format("IEventNotificationMessageBrokerProxy",
+                "aneventid", typeof(TestDomainEvent).AssemblyQualifiedName!)).ToString());
+        _domainConsumer.Verify(c => c.NotifyAsync(It.Is<TestDomainEvent>(e =>
+            e.RootId == "aneventid"
+        ), It.IsAny<CancellationToken>()));
+        _registration.Verify(
+            reg => reg.IntegrationEventTranslator.TranslateAsync(It.IsAny<IDomainEvent>(),
+                It.IsAny<CancellationToken>()));
+        _messageBroker.Verify(mb => mb.PublishAsync(It.IsAny<TestIntegrationEvent>(), It.IsAny<CancellationToken>()));
+    }
 }

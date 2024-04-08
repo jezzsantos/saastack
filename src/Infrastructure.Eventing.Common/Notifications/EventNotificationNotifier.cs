@@ -101,7 +101,7 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
 
             var @event = deserialized.Value;
             var domainEventsRelayed =
-                await RelayDomainEventToAllConsumersAsync(registration, @event, cancellationToken);
+                await RelayDomainEventToAllConsumersAsync(registration, changeEvent, @event, cancellationToken);
             if (!domainEventsRelayed.IsSuccessful)
             {
                 return domainEventsRelayed.Error;
@@ -120,18 +120,23 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
 
     private static async Task<Result<Error>> RelayDomainEventToAllConsumersAsync(
         IEventNotificationRegistration registration,
-        IDomainEvent @event, CancellationToken cancellationToken)
+        EventStreamChangeEvent changeEvent, IDomainEvent @event, CancellationToken cancellationToken)
     {
         if (registration.DomainEventConsumers.HasNone())
         {
             return Result.Ok;
         }
 
-        var results = await Task.WhenAll(registration.DomainEventConsumers
-            .Select(consumer => consumer.NotifyAsync(@event, cancellationToken)));
-        if (results.Any(r => !r.IsSuccessful))
+        foreach (var consumer in registration.DomainEventConsumers)
         {
-            return results.First(r => !r.IsSuccessful).Error;
+            var result = await consumer.NotifyAsync(@event, cancellationToken);
+            if (!result.IsSuccessful)
+            {
+                return result.Error
+                    .Wrap(ErrorCode.Unexpected, Resources.EventNotificationNotifier_ConsumerError.Format(
+                        consumer.GetType().Name, @event.RootId,
+                        changeEvent.Metadata.Fqn));
+            }
         }
 
         return Result.Ok;
@@ -144,9 +149,10 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
         var published = await registration.IntegrationEventTranslator.TranslateAsync(@event, cancellationToken);
         if (!published.IsSuccessful)
         {
-            return published.Error.Wrap(Resources.EventNotificationNotifier_ProducerError.Format(
+            return published.Error.Wrap(ErrorCode.Unexpected,
+                Resources.EventNotificationNotifier_TranslatorError.Format(
                 registration.IntegrationEventTranslator.GetType().Name,
-                @event, changeEvent.Metadata.Fqn));
+                @event.RootId, changeEvent.Metadata.Fqn));
         }
 
         var publishedEvent = published.Value;
@@ -162,7 +168,9 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
         var brokered = await _messageBroker.PublishAsync(integrationEvent, cancellationToken);
         if (!brokered.IsSuccessful)
         {
-            return brokered.Error;
+            return brokered.Error.Wrap(ErrorCode.Unexpected,
+                Resources.EventNotificationNotifier_MessageBrokerError.Format(
+                    _messageBroker.GetType().Name, @event.RootId, changeEvent.Metadata.Fqn));
         }
 
         return Result.Ok;

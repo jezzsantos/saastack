@@ -10,6 +10,7 @@
 * [Domain Driven Design](0050-domain-driven-design.md) how to design your aggregates, and domains
 * [Dependency Injection](0060-dependency-injection.md) how you implement DI
 * [Persistence](0070-persistence.md) how you design your repository layer, and promote domain events
+* [Eventing](0170-eventing.md) how we implement Eventing and enable Event Driven Architecture
 * [Ports and Adapters](0080-ports-and-adapters.md) how we keep infrastructure components at arm's length, and testable, and how we integrate with any 3rd party system
 * [Authentication and Authorization](0090-authentication-authorization.md) how we authenticate and authorize users
 * [Email Delivery](0100-email-delivery.md) how we send emails and deliver them asynchronously and reliably
@@ -18,3 +19,4 @@
 * [Multi-Tenancy](0130-multitenancy.md) how we support multiple tenants in our system (both logical and physical infrastructure)
 * [Developer Tooling](0140-developer-tooling.md) all the tooling that is included in this codebase to help developers use this codebase effectively, and consistently
 * [User Lifecycle](0160-user-lifecycle.md) how are users managed on the platform, and the relationship to their organizations
+* 

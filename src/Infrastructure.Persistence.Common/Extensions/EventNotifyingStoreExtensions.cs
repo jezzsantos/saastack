@@ -9,9 +9,9 @@ namespace Infrastructure.Persistence.Common.Extensions;
 public static class EventNotifyingStoreExtensions
 {
     /// <summary>
-    ///     Saves and then publishes all events from the aggregate root to any listeners
+    ///     Saves and then publishes all events from the aggregate root to any event handlers
     /// </summary>
-    public static async Task<Result<Error>> SaveAndPublishEventsAsync<TAggregateRoot>(this IEventNotifyingStore store,
+    public static async Task<Result<Error>> SaveAndPublishChangesAsync<TAggregateRoot>(this IEventNotifyingStore store,
         TAggregateRoot aggregate, EventStreamChangedAsync<EventStreamChangedArgs>? eventHandler,
         Func<TAggregateRoot, List<EventSourcedChangeEvent>, CancellationToken, Task<Result<string, Error>>> onSave,
         CancellationToken cancellationToken)
@@ -39,13 +39,29 @@ public static class EventNotifyingStoreExtensions
 
         aggregate.ClearChanges();
 
-        var raised = await PublishChangeEventsAsync(store, eventHandler, changedEvents, streamName, cancellationToken);
+        var raised = await PublishChangesAsync(store, eventHandler, changedEvents, streamName, cancellationToken);
         if (!raised.IsSuccessful)
         {
             return raised.Error;
         }
 
         return Result.Ok;
+    }
+
+    private static async Task<Result<Error>> PublishChangesAsync(IEventNotifyingStore store,
+        EventStreamChangedAsync<EventStreamChangedArgs>? eventHandler,
+        IEnumerable<EventSourcedChangeEvent> changes, string streamName, CancellationToken cancellationToken)
+    {
+        if (eventHandler.NotExists())
+        {
+            return Result.Ok;
+        }
+
+        var changeEvents = changes
+            .Select(changeEvent => ToChangeEvent(changeEvent, streamName))
+            .ToList();
+
+        return await NotifyEventHandlers(store, eventHandler, streamName, changeEvents, cancellationToken);
     }
 
     private static EventStreamChangeEvent ToChangeEvent(EventSourcedChangeEvent changeEvent, string streamName)
@@ -63,31 +79,26 @@ public static class EventNotifyingStoreExtensions
         };
     }
 
-    private static async Task<Result<Error>> PublishChangeEventsAsync(IEventNotifyingStore store,
-        EventStreamChangedAsync<EventStreamChangedArgs>? eventHandler,
-        IEnumerable<EventSourcedChangeEvent> changes, string streamName, CancellationToken cancellationToken)
-    {
-        if (eventHandler.NotExists())
-        {
-            return Result.Ok;
-        }
-
-        var changeEvents = changes
-            .Select(changeEvent => ToChangeEvent(changeEvent, streamName))
-            .ToList();
-
-        return await PublishToListeners(store, eventHandler, streamName, changeEvents, cancellationToken);
-    }
-
-    private static async Task<Result<Error>> PublishToListeners(IEventNotifyingStore store,
+    private static async Task<Result<Error>> NotifyEventHandlers(IEventNotifyingStore store,
         EventStreamChangedAsync<EventStreamChangedArgs> eventHandler, string streamName,
         IReadOnlyList<EventStreamChangeEvent> changeEvents, CancellationToken cancellationToken)
     {
         var args = new EventStreamChangedArgs(changeEvents);
         eventHandler.Invoke(store, args, cancellationToken);
         var completed = await args.CompleteAsync();
-        return !completed.IsSuccessful
-            ? completed.Error.Wrap(Resources.EventSourcingDddCommandStore_PublishFailed.Format(streamName))
-            : Result.Ok;
+
+        if (completed.IsSuccessful)
+        {
+            return Result.Ok;
+        }
+
+        var error = completed.Error;
+        if (error.Code == ErrorCode.Unexpected)
+        {
+            return error;
+        }
+
+        return completed.Error.Wrap(ErrorCode.Unexpected,
+            Resources.EventSourcingDddCommandStore_PublishFailed.Format(streamName));
     }
 }

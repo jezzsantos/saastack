@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Xunit;
+using Environment = System.Environment;
 
 namespace Common.UnitTests;
 
@@ -62,5 +63,46 @@ public class ErrorSpec
         result.Code.Should().Be(ErrorCode.RuleViolation);
         result.Message.Should()
             .Be($"anothermessage{Environment.NewLine}\tamessage{Environment.NewLine}\taruleviolation");
+    }
+
+    [Fact]
+    public void WhenWrapWithCodeOnNoErrorWithNoMessage_ThenReturnsNewError()
+    {
+        var result = Error.NoError.Wrap(ErrorCode.Unexpected, "");
+
+        result.Code.Should().Be(ErrorCode.Unexpected);
+        result.Message.Should().Be(Error.NoErrorMessage);
+    }
+
+    [Fact]
+    public void WhenWrapWithCodeOnNoErrorWithMessage_ThenReturnsNewError()
+    {
+        var result = Error.NoError.Wrap(ErrorCode.Unexpected, "amessage");
+
+        result.Code.Should().Be(ErrorCode.Unexpected);
+        result.Message.Should().Be($"{nameof(ErrorCode.NoError)}: amessage");
+    }
+
+    [Fact]
+    public void WhenWrapWithCodeOnAnyErrorWithMessage_ThenReturnsNewError()
+    {
+        var result = Error.RuleViolation("aruleviolation")
+            .Wrap(ErrorCode.Unexpected, "amessage");
+
+        result.Code.Should().Be(ErrorCode.Unexpected);
+        result.Message.Should().Be($"{nameof(ErrorCode.RuleViolation)}: amessage{Environment.NewLine}\taruleviolation");
+    }
+
+    [Fact]
+    public void WhenWrapWithCodeOnAnyErrorWithMessageAgain_ThenReturnsNewError()
+    {
+        var result = Error.RuleViolation("aruleviolation")
+            .Wrap(ErrorCode.EntityExists, "amessage")
+            .Wrap(ErrorCode.Unexpected, "anothermessage");
+
+        result.Code.Should().Be(ErrorCode.Unexpected);
+        result.Message.Should()
+            .Be(
+                $"{nameof(ErrorCode.EntityExists)}: anothermessage{Environment.NewLine}\t{nameof(ErrorCode.RuleViolation)}: amessage{Environment.NewLine}\taruleviolation");
     }
 }

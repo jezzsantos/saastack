@@ -99,7 +99,7 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
             return Error.EntityExists(Resources.IEventSourcingDddCommandStore_SaveWithAggregateIdMissing);
         }
 
-        var published = await this.SaveAndPublishEventsAsync(aggregate, OnEventStreamChanged,
+        var published = await this.SaveAndPublishChangesAsync(aggregate, OnEventStreamChanged,
             (root, changedEvents, token) =>
                 _eventStore.AddEventsAsync(_entityName, root.Id.Value, changedEvents, token), cancellationToken);
         if (!published.IsSuccessful)

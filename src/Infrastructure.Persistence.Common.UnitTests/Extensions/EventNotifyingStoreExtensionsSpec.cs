@@ -34,7 +34,7 @@ public class EventNotifyingStoreExtensionsSpec : IEventNotifyingStore
             .Returns(new Result<List<EventSourcedChangeEvent>, Error>(new List<EventSourcedChangeEvent>()));
 
         var wasCalled = false;
-        var result = await store.Object.SaveAndPublishEventsAsync(aggregate.Object,
+        var result = await store.Object.SaveAndPublishChangesAsync(aggregate.Object,
             OnEventStreamChanged, (_, _, _) =>
             {
                 wasCalled = true;
@@ -61,7 +61,7 @@ public class EventNotifyingStoreExtensionsSpec : IEventNotifyingStore
             }));
 
         var wasCalled = false;
-        var result = await store.Object.SaveAndPublishEventsAsync(aggregate.Object,
+        var result = await store.Object.SaveAndPublishChangesAsync(aggregate.Object,
             OnEventStreamChanged, (_, _, _) =>
             {
                 wasCalled = true;
@@ -90,15 +90,17 @@ public class EventNotifyingStoreExtensionsSpec : IEventNotifyingStore
         _failHandler = true;
 
         var wasCalled = false;
-        var result = await store.Object.SaveAndPublishEventsAsync(aggregate.Object,
+        var result = await store.Object.SaveAndPublishChangesAsync(aggregate.Object,
             OnEventStreamChanged, (_, _, _) =>
             {
                 wasCalled = true;
                 return Task.FromResult<Result<string, Error>>("aname");
             }, CancellationToken.None);
 
-        result.Should().BeError(ErrorCode.RuleViolation,
-            $"{Resources.EventSourcingDddCommandStore_PublishFailed.Format("aname")}{Environment.NewLine}\tamessage");
+        result.Should().BeError(ErrorCode.Unexpected,
+            Error.RuleViolation(
+                    $"{Resources.EventSourcingDddCommandStore_PublishFailed.Format("aname")}{Environment.NewLine}\tamessage")
+                .ToString());
         wasCalled.Should().BeTrue();
         aggregate.Verify(a => a.GetChanges());
         aggregate.Verify(a => a.ClearChanges());
@@ -123,7 +125,7 @@ public class EventNotifyingStoreExtensionsSpec : IEventNotifyingStore
             }));
 
         var wasCalled = false;
-        var result = await store.Object.SaveAndPublishEventsAsync(aggregate.Object,
+        var result = await store.Object.SaveAndPublishChangesAsync(aggregate.Object,
             OnEventStreamChanged, (_, _, _) =>
             {
                 wasCalled = true;

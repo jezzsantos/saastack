@@ -60,11 +60,29 @@ namespace Infrastructure.Eventing.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The producer &apos;{0}&apos; failed to handle the domain event &apos;{1}&apos; with event type &apos;{2}&apos;. Aborting notifications.
+        ///   Looks up a localized string similar to The consumer &apos;{0}&apos; failed to handle the domain event &apos;{1}&apos; with event type &apos;{2}&apos;. Aborting notifications.
         /// </summary>
-        internal static string EventNotificationNotifier_ProducerError {
+        internal static string EventNotificationNotifier_ConsumerError {
             get {
-                return ResourceManager.GetString("EventNotificationNotifier_ProducerError", resourceCulture);
+                return ResourceManager.GetString("EventNotificationNotifier_ConsumerError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The message broker &apos;{0}&apos; failed to handle the integration event &apos;{1}&apos; with event type &apos;{2}&apos;. Aborting notifications.
+        /// </summary>
+        internal static string EventNotificationNotifier_MessageBrokerError {
+            get {
+                return ResourceManager.GetString("EventNotificationNotifier_MessageBrokerError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The translator &apos;{0}&apos; failed to handle the domain event &apos;{1}&apos; with event type &apos;{2}&apos;. Aborting notifications.
+        /// </summary>
+        internal static string EventNotificationNotifier_TranslatorError {
+            get {
+                return ResourceManager.GetString("EventNotificationNotifier_TranslatorError", resourceCulture);
             }
         }
         

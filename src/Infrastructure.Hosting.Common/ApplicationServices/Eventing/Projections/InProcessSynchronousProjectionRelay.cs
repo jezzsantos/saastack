@@ -11,13 +11,15 @@ namespace Infrastructure.Hosting.Common.ApplicationServices.Eventing.Projections
 ///     instances, listens to them raise change events, and relays them to
 ///     registered read model projections synchronously.
 /// </summary>
-public class InProcessSynchronousProjectionRelay : EventStreamHandlerBase, IEventNotifyingStoreProjectionRelay
+public sealed class InProcessSynchronousProjectionRelay : EventStreamHandlerBase, IEventNotifyingStoreProjectionRelay
 {
+    private readonly IReadModelProjector _projector;
+
     public InProcessSynchronousProjectionRelay(IRecorder recorder, IEventSourcedChangeEventMigrator migrator,
         IProjectionCheckpointRepository checkpointStore, IEnumerable<IReadModelProjection> projections,
         params IEventNotifyingStore[] eventingStores) : base(recorder, eventingStores)
     {
-        Projector = new ReadModelProjector(recorder, checkpointStore, migrator, projections.ToArray());
+        _projector = new ReadModelProjector(recorder, checkpointStore, migrator, projections.ToArray());
     }
 
     protected override void Dispose(bool disposing)
@@ -25,15 +27,13 @@ public class InProcessSynchronousProjectionRelay : EventStreamHandlerBase, IEven
         base.Dispose(disposing);
         if (disposing)
         {
-            (Projector as IDisposable)?.Dispose();
+            (_projector as IDisposable)?.Dispose();
         }
     }
-
-    public IReadModelProjector Projector { get; }
 
     protected override async Task<Result<Error>> HandleStreamEventsAsync(string streamName,
         List<EventStreamChangeEvent> eventStream, CancellationToken cancellationToken)
     {
-        return await Projector.WriteEventStreamAsync(streamName, eventStream, cancellationToken);
+        return await _projector.WriteEventStreamAsync(streamName, eventStream, cancellationToken);
     }
 }
