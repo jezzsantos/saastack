@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Interfaces.Clients;
 /// <summary>
 ///     Defines a JSON response
 /// </summary>
-public class JsonResponse
+public class JsonResponse : IDisposable
 {
     public Result<string?, ResponseProblem> Content { get; init; }
 
@@ -17,6 +17,13 @@ public class JsonResponse
     public required string RequestId { get; init; }
 
     public required HttpStatusCode StatusCode { get; init; }
+
+    public Stream? RawContent { get; set; }
+
+    public void Dispose()
+    {
+        RawContent?.Dispose();
+    }
 }
 
 /// <summary>

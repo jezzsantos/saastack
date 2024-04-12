@@ -17,6 +17,8 @@ public static class HttpContentTypes
     public const string Xml = "application/xml";
     public const string XmlProblem = "application/problem+xml";
     public const string XmlWithCharset = "application/xml; charset=utf-8";
+    public const string ImagePng = "image/png";
+    public const string ImageJpeg = "image/jpeg";
 }
 
 /// <summary>

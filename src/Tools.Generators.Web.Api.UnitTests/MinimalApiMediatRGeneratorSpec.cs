@@ -107,7 +107,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                [Route("aroute", ServiceOperation.Get)]
+                                                [Route("aroute", OperationMethod.Get)]
                                                 public class ARequest : IWebRequest<AResponse>
                                                 {
                                                 }
@@ -161,7 +161,7 @@ public class MinimalApiMediatRGeneratorSpec
                             await Task.CompletedTask;
                             var api = new global::ANamespace.AServiceClass();
                             var result = api.AMethod(request);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
                         }
                     }
 
@@ -183,7 +183,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                [Route("aroute", ServiceOperation.Get)]
+                                                [Route("aroute", OperationMethod.Get)]
                                                 public class ARequest : IWebRequest<AResponse>
                                                 {
                                                 }
@@ -236,7 +236,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var api = new global::ANamespace.AServiceClass();
                             var result = await api.AMethod(request);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
                         }
                     }
 
@@ -259,7 +259,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                [Route("aroute", ServiceOperation.Get)]
+                                                [Route("aroute", OperationMethod.Get)]
                                                 public class ARequest : IWebRequest<AResponse>
                                                 {
                                                 }
@@ -313,7 +313,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var api = new global::ANamespace.AServiceClass();
                             var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
                         }
                     }
 
@@ -336,7 +336,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                [Route("aroute", ServiceOperation.Get, isTestingOnly:true)]
+                                                [Route("aroute", OperationMethod.Get, isTestingOnly:true)]
                                                 public class ARequest : IWebRequest<AResponse>
                                                 {
                                                 }
@@ -393,7 +393,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var api = new global::ANamespace.AServiceClass();
                             var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
                         }
                     }
                 #endif
@@ -417,7 +417,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                [Route("aroute", ServiceOperation.Get, access:AccessType.HMAC, isTestingOnly:true)]
+                                                [Route("aroute", OperationMethod.Get, access:AccessType.HMAC, isTestingOnly:true)]
                                                 public class ARequest : IWebRequest<AResponse>
                                                 {
                                                 }
@@ -475,7 +475,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var api = new global::ANamespace.AServiceClass();
                             var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
                         }
                     }
                 #endif
@@ -499,7 +499,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                [Route("aroute", ServiceOperation.Get, access:AccessType.Token, isTestingOnly:true)]
+                                                [Route("aroute", OperationMethod.Get, access:AccessType.Token, isTestingOnly:true)]
                                                 public class ARequest : IWebRequest<AResponse>
                                                 {
                                                 }
@@ -557,7 +557,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var api = new global::ANamespace.AServiceClass();
                             var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
                         }
                     }
                 #endif
@@ -582,7 +582,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                [Route("aroute", ServiceOperation.Get)]
+                                                [Route("aroute", OperationMethod.Get)]
                                                 public class ARequest : IWebRequest<AResponse>
                                                 {
                                                 }
@@ -654,7 +654,7 @@ public class MinimalApiMediatRGeneratorSpec
                 
                             var api = new global::ANamespace.AServiceClass(contextFactory);
                             var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
                         }
                     }
 
@@ -677,7 +677,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                [Route("aroute", ServiceOperation.Get, access:AccessType.Token, isTestingOnly:true)]
+                                                [Route("aroute", OperationMethod.Get, access:AccessType.Token, isTestingOnly:true)]
                                                 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
                                                 [Authorize(Roles.Platform_Operations, Features.Platform_PaidTrial)]
                                                 public class ARequest : IWebRequest<AResponse>
@@ -738,7 +738,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var api = new global::ANamespace.AServiceClass();
                             var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
                         }
                     }
                 #endif
@@ -762,7 +762,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                [Route("aroute", ServiceOperation.Get, access:AccessType.Token, isTestingOnly:true)]
+                                                [Route("aroute", OperationMethod.Get, access:AccessType.Token, isTestingOnly:true)]
                                                 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
                                                 public class ARequest : IWebRequest<AResponse>
                                                 {
@@ -822,7 +822,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var api = new global::ANamespace.AServiceClass();
                             var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
                         }
                     }
                 #endif
@@ -846,7 +846,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                [Route("aroute", ServiceOperation.Get, access:AccessType.Token)]
+                                                [Route("aroute", OperationMethod.Get, access:AccessType.Token)]
                                                 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
                                                 public class ARequest : IWebRequest<AResponse>, ITenantedRequest
                                                 {
@@ -905,7 +905,88 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var api = new global::ANamespace.AServiceClass();
                             var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                        }
+                    }
+
+                }
+
+
+                """);
+        }
+
+        [Fact]
+        public void WhenDefinesAPostRequestThatIsIHasMultipartForm_ThenGenerates()
+        {
+            var compilation = CreateCompilation("""
+                                                using System;
+                                                using System.Threading;
+                                                using Infrastructure.Web.Api.Interfaces;
+
+                                                namespace ANamespace;
+
+                                                public class AResponse : IWebResponse
+                                                {
+                                                }
+                                                [Route("aroute", OperationMethod.Post, access:AccessType.Token)]
+                                                [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
+                                                public class ARequest : IWebRequest<AResponse>, IHasMultipartForm
+                                                {
+                                                }
+                                                public class AServiceClass : IWebApiService
+                                                {
+                                                    public async Task<string> AMethod(ARequest request, CancellationToken cancellationToken)
+                                                    {
+                                                         return "";
+                                                    }
+                                                }
+                                                """);
+
+            var result = Generate(compilation);
+
+            result.Should().Be(
+                """
+                // <auto-generated/>
+                using System.Threading;
+                using System;
+                using Microsoft.Extensions.DependencyInjection;
+                using Microsoft.AspNetCore.Http;
+                using Microsoft.AspNetCore.Builder;
+                using Infrastructure.Web.Api.Interfaces;
+                using Infrastructure.Web.Api.Common.Extensions;
+
+                namespace compilation
+                {
+                    public static class MinimalApiRegistration
+                    {
+                        public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
+                        {
+                            var aserviceclassGroup = app.MapGroup(string.Empty)
+                                .WithGroupName("AServiceClass")
+                                .RequireCors("__DefaultCorsPolicy")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
+                            aserviceclassGroup.MapPost("aroute",
+                                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::ANamespace.ARequest request) =>
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                .RequireAuthorization("Token")
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}")
+                                .DisableAntiforgery();
+                
+                        }
+                    }
+                }
+
+                namespace ANamespace.AServiceClassMediatRHandlers
+                {
+                    public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
+                    {
+                        public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                        {
+                            var api = new global::ANamespace.AServiceClass();
+                            var result = await api.AMethod(request, cancellationToken);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Post);
                         }
                     }
 
@@ -928,7 +1009,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                [Route("aroute", ServiceOperation.Get, access:AccessType.Token, isTestingOnly:true)]
+                                                [Route("aroute", OperationMethod.Get, access:AccessType.Token, isTestingOnly:true)]
                                                 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
                                                 public class ARequest : IWebRequest<AResponse>
                                                 {
@@ -989,7 +1070,7 @@ public class MinimalApiMediatRGeneratorSpec
                         {
                             var api = new global::ANamespace.AServiceClass();
                             var result = await api.AMethod(request, cancellationToken);
-                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.Get);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
                         }
                     }
                 #endif

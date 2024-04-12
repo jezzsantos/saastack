@@ -2,7 +2,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
-[Route("/sso/auth", ServiceOperation.Post)]
+[Route("/sso/auth", OperationMethod.Post)]
 public class AuthenticateSingleSignOnRequest : UnTenantedRequest<AuthenticateResponse>
 {
     public required string AuthCode { get; set; }

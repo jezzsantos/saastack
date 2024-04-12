@@ -394,6 +394,53 @@ public class JsonClientSpec
             result.Error.Exception.Should().BeNull();
             result.Error.Errors.Should().BeNull();
         }
+
+        [Fact]
+        public async Task WhenGetStringResponseAsyncAndContentTypeIsImageForSuccess_ThenReturnsResponse()
+        {
+            using var stream = new MemoryStream();
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StreamContent(stream)
+                {
+                    Headers =
+                    {
+                        ContentType = new MediaTypeHeaderValue(HttpContentTypes.ImagePng)
+                    }
+                }
+            };
+
+            var result =
+                await JsonClient.GetStringResponseAsync(response, null, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeTrue();
+            result.HasValue.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task WhenGetStringResponseAsyncAndContentTypeIsFileForSuccess_ThenReturnsResponse()
+        {
+            using var stream = new MemoryStream();
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StreamContent(stream)
+                {
+                    Headers =
+                    {
+                        ContentType = new MediaTypeHeaderValue(HttpContentTypes.OctetStream)
+                    }
+                }
+            };
+
+            var result =
+                await JsonClient.GetStringResponseAsync(response, null, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeTrue();
+            result.HasValue.Should().BeFalse();
+        }
+        
     }
 }
 

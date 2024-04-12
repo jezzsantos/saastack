@@ -2,7 +2,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 
-[Route("/auth", ServiceOperation.Post)]
+[Route("/auth", OperationMethod.Post)]
 public class AuthenticateRequest : UnTenantedRequest<AuthenticateResponse>
 {
     public string? AuthCode { get; set; }

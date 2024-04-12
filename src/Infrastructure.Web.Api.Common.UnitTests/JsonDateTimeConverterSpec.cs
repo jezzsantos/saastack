@@ -68,7 +68,7 @@ public class JsonDateTimeConverterSpec
         converter.Write(writer, now, JsonSerializerOptions.Default);
 
         writer.Flush();
-        stream.Seek(0, SeekOrigin.Begin);
+        stream.Rewind();
         var result = new StreamReader(stream).ReadToEnd();
 
         result.Should().Be($"{now.ToUnixSeconds()}");
@@ -85,7 +85,7 @@ public class JsonDateTimeConverterSpec
         converter.Write(writer, now, JsonSerializerOptions.Default);
 
         writer.Flush();
-        stream.Seek(0, SeekOrigin.Begin);
+        stream.Rewind();
         var result = new StreamReader(stream).ReadToEnd();
 
         result.Should().Be($"\"{now.ToIso8601()}\"");

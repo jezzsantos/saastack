@@ -2,7 +2,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.EndUsers;
 
-[Route("/users/{id}/roles", ServiceOperation.Post, AccessType.Token)]
+[Route("/users/{id}/roles", OperationMethod.Post, AccessType.Token)]
 [Authorize(Interfaces.Roles.Platform_Operations)]
 public class AssignPlatformRolesRequest : UnTenantedRequest<AssignPlatformRolesResponse>
 {

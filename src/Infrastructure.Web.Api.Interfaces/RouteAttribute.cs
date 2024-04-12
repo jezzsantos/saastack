@@ -15,16 +15,16 @@ public class RouteAttribute : Attribute
 #if !NETSTANDARD2_0
         [StringSyntax("Route")]
 #endif
-        string routeTemplate, ServiceOperation operation,
+        string routeTemplate, OperationMethod method,
         AccessType access = AccessType.Anonymous, bool isTestingOnly = false)
     {
-        if (!Enum.IsDefined(typeof(ServiceOperation), operation))
+        if (!Enum.IsDefined(typeof(OperationMethod), method))
         {
-            throw new InvalidEnumArgumentException(nameof(operation), (int)operation, typeof(ServiceOperation));
+            throw new InvalidEnumArgumentException(nameof(method), (int)method, typeof(OperationMethod));
         }
 
         RouteTemplate = routeTemplate;
-        Operation = operation;
+        Method = method;
         Access = access;
         IsTestingOnly = isTestingOnly;
     }
@@ -33,7 +33,7 @@ public class RouteAttribute : Attribute
 
     public bool IsTestingOnly { get; }
 
-    public ServiceOperation Operation { get; }
+    public OperationMethod Method { get; }
 
     public string RouteTemplate { get; }
 }

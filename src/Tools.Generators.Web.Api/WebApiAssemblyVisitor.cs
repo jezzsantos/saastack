@@ -30,6 +30,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
     private readonly INamedTypeSymbol _authorizeAttributeSymbol;
     private readonly CancellationToken _cancellationToken;
     private readonly INamedTypeSymbol _cancellationTokenSymbol;
+    private readonly INamedTypeSymbol _multipartFormSymbol;
     private readonly INamedTypeSymbol _routeAttributeSymbol;
     private readonly INamedTypeSymbol _serviceInterfaceSymbol;
     private readonly INamedTypeSymbol _tenantedWebRequestInterfaceSymbol;
@@ -52,6 +53,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         _authorizeAttributeFeaturesSymbol = compilation.GetTypeByMetadataName(typeof(Features).FullName!)!;
         _cancellationTokenSymbol = compilation.GetTypeByMetadataName(typeof(CancellationToken).FullName!)!;
         _voidSymbol = compilation.GetTypeByMetadataName(typeof(void).FullName!)!;
+        _multipartFormSymbol = compilation.GetTypeByMetadataName(typeof(IHasMultipartForm).FullName!)!;
     }
 
     public List<ServiceOperationRegistration> OperationRegistrations { get; } = new();
@@ -199,18 +201,20 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             var methodName = method.Name;
             var isAsync = method.IsAsync;
             var hasCancellationToken = method.Parameters.Length == 2;
+            var isMultipart = requestType.IsDerivedFrom(_multipartFormSymbol);
 
             OperationRegistrations.Add(new ServiceOperationRegistration
             {
                 Class = classRegistration,
-                RequestDtoName = new TypeName(requestTypeNamespace, requestTypeName),
+                RequestDto = new TypeName(requestTypeNamespace, requestTypeName),
                 IsRequestDtoTenanted = requestTypeIsMultiTenanted,
-                ResponseDtoName = new TypeName(responseTypeNamespace, responseTypeName),
-                OperationType = operationType,
+                ResponseDto = new TypeName(responseTypeNamespace, responseTypeName),
+                OperationMethod = operationType,
                 OperationAccess = operationAccess,
                 OperationAuthorization = operationAuthorization,
                 IsTestingOnly = isTestingOnly,
                 IsAsync = isAsync,
+                IsMultipartFormData = isMultipart,
                 HasCancellationToken = hasCancellationToken,
                 MethodName = methodName,
                 MethodBody = methodBody,
@@ -235,14 +239,14 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             return new TypeName(symbol.ContainingNamespace.ToDisplayString(), symbol.Name);
         }
 
-        static ServiceOperation FromOperationVerb(string? operation)
+        static OperationMethod FromOperationVerb(string? operation)
         {
             if (operation is null)
             {
-                return ServiceOperation.Get;
+                return OperationMethod.Get;
             }
 
-            return (ServiceOperation)Enum.Parse(typeof(ServiceOperation), operation, true);
+            return (OperationMethod)Enum.Parse(typeof(OperationMethod), operation, true);
         }
 
         static AccessType FromAccessType(string? access)
@@ -465,6 +469,8 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
         public bool IsAsync { get; set; }
 
+        public bool IsMultipartFormData { get; set; }
+
         public bool IsRequestDtoTenanted { get; set; }
 
         public bool IsTestingOnly { get; set; }
@@ -477,11 +483,11 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
         public OperationAuthorization? OperationAuthorization { get; set; }
 
-        public ServiceOperation OperationType { get; set; }
+        public OperationMethod OperationMethod { get; set; }
 
-        public TypeName RequestDtoName { get; set; } = null!;
+        public TypeName RequestDto { get; set; } = null!;
 
-        public TypeName ResponseDtoName { get; set; } = null!;
+        public TypeName ResponseDto { get; set; } = null!;
 
         public string? RoutePath { get; set; }
     }

@@ -75,9 +75,9 @@ public sealed class TestingWebApi : IWebApiService
     {
         await Task.CompletedTask;
         var repositoryTypes = GetAllRepositoryTypes();
-        var platformRepositories = GetRepositories(_serviceProvider, repositoryTypes);
+        var repositories = GetRepositories(_serviceProvider, repositoryTypes);
 
-        DestroyAllRepositories(platformRepositories);
+        DestroyAllRepositories(repositories);
 
         return () => new Result<EmptyResponse, Error>();
     }

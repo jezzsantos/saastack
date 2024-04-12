@@ -77,7 +77,7 @@ internal class MiddlewareTestingAssertions : ObjectAssertions<HttpResponse, Midd
 
     private static ProblemDetails? GetProblemDetails(HttpResponse response)
     {
-        response.Body.Seek(0, SeekOrigin.Begin);
+        response.Body.Rewind();
         var body = response.Body.ReadFully();
 
         var problem = Encoding.UTF8.GetString(body).FromJson<ProblemDetails>();

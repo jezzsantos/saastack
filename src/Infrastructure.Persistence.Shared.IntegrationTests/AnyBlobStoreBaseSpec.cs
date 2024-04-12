@@ -86,7 +86,7 @@ public abstract class AnyBlobStoreBaseSpec
                 CancellationToken.None);
 
             result.Value.Value.ContentType.Should().Be(contentType);
-            downloaded.Seek(0, SeekOrigin.Begin);
+            downloaded.Rewind();
             downloaded.ReadFully().Should().BeEquivalentTo(data);
         }
     }
@@ -159,7 +159,7 @@ public abstract class AnyBlobStoreBaseSpec
                 CancellationToken.None);
 
             result.Value.Value.ContentType.Should().Be(newContentType);
-            downloaded.Seek(0, SeekOrigin.Begin);
+            downloaded.Rewind();
             downloaded.ReadFully().Should().BeEquivalentTo(newData);
         }
     }
@@ -181,7 +181,7 @@ public abstract class AnyBlobStoreBaseSpec
                 CancellationToken.None);
 
             result.Value.Value.ContentType.Should().Be(contentType);
-            downloaded.Seek(0, SeekOrigin.Begin);
+            downloaded.Rewind();
             downloaded.ReadFully().Should().BeEquivalentTo(data);
         }
     }

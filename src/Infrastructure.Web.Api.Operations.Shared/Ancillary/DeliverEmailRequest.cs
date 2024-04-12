@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 
-[Route("/emails/deliver", ServiceOperation.Post, AccessType.HMAC)]
+[Route("/emails/deliver", OperationMethod.Post, AccessType.HMAC)]
 [Authorize(Roles.Platform_ServiceAccount)]
 public class DeliverEmailRequest : UnTenantedRequest<DeliverMessageResponse>
 {

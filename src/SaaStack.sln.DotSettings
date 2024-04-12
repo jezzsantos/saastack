@@ -339,7 +339,13 @@
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EMigrateBlankLinesAroundFieldToBlankLinesAroundProperty/@EntryIndexedValue">True</s:Boolean>
 	<s:Int64 x:Key="/Default/Environment/UnitTesting/ParallelProcessesCount/@EntryValue">10</s:Int64>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=0F0850FC1FE1104DB503D10E2A76D620/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=0F0850FC1FE1104DB503D10E2A76D620/EntryName/@EntryValue">API DELETE Request DTO</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=0F0850FC1FE1104DB503D10E2A76D620/Position/@EntryValue">19</s:Int64>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=2CBD6971A7955044AD2624B84FB49E38/Position/@EntryValue">9</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=337185EBCDCBAA49B6CFAF4C879B9C28/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=337185EBCDCBAA49B6CFAF4C879B9C28/EntryName/@EntryValue">&lt;No Name&gt;</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=337185EBCDCBAA49B6CFAF4C879B9C28/Position/@EntryValue">17</s:Int64>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=518DB9880AD5ED449C104E766AB6FAF0/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=518DB9880AD5ED449C104E766AB6FAF0/EntryName/@EntryValue">A domain event</s:String>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=518DB9880AD5ED449C104E766AB6FAF0/Position/@EntryValue">10</s:Int64>
@@ -347,7 +353,25 @@
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=7157EC608F18334D87D371616A0283F4/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=7157EC608F18334D87D371616A0283F4/EntryName/@EntryValue">Domain Event</s:String>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=7157EC608F18334D87D371616A0283F4/Position/@EntryValue">11</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=772ACDEA78426D48A255240B28079866/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=772ACDEA78426D48A255240B28079866/EntryName/@EntryValue">API POST Request DTO</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=772ACDEA78426D48A255240B28079866/Position/@EntryValue">13</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=786FF241DEF61F4093B63A31755FFF7C/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=786FF241DEF61F4093B63A31755FFF7C/EntryName/@EntryValue">API GET Request DTO</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=786FF241DEF61F4093B63A31755FFF7C/Position/@EntryValue">15</s:Int64>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=7F2A1BE8D0078241A9AE7802038BAD3C/Position/@EntryValue">7</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=A3ED03ECAA4D7C4493946D592CD5CC11/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=A3ED03ECAA4D7C4493946D592CD5CC11/EntryName/@EntryValue">&lt;No Name&gt;</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=A3ED03ECAA4D7C4493946D592CD5CC11/Position/@EntryValue">18</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=B0386A533680FE4090B457E8A2CFCD60/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=B0386A533680FE4090B457E8A2CFCD60/EntryName/@EntryValue">API GET Request DTO</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=B0386A533680FE4090B457E8A2CFCD60/Position/@EntryValue">14</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/EntryName/@EntryValue">&lt;No Name&gt;</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Position/@EntryValue">12</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=C1B660127AB09C4181FE5C203B658331/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=C1B660127AB09C4181FE5C203B658331/EntryName/@EntryValue">API DELETE Request DTO</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=C1B660127AB09C4181FE5C203B658331/Position/@EntryValue">16</s:Int64>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=C4795E57DDEC1C4F97BBC8C7173EBBCA/Position/@EntryValue">8</s:Int64>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0C41D02830B426419B2E0D9AF25191F6/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0C41D02830B426419B2E0D9AF25191F6/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
@@ -447,6 +471,68 @@ public sealed class $name$Entity : EntityBase
     
     public string? $propertyname$ { get; private set; }
 }$END$$SELECTION$</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/CustomProperties/=Extension/@EntryIndexedValue">cs</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/CustomProperties/=FileName/@EntryIndexedValue">ValidatorSpec</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/CustomProperties/=ValidateFileName/@EntryIndexedValue">True</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Description/@EntryValue">Request DTO Validator Test Class</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Field/=Action/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Field/=Action/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Field/=ns/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Field/=ns/Expression/@EntryValue">fileDefaultNamespace()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Field/=ns/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Field/=ns/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Field/=Resource/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Field/=Resource/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Scope/=E8F0594528C33E45BBFEC6CFE851095D/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Scope/=E8F0594528C33E45BBFEC6CFE851095D/Type/@EntryValue">InCSharpProjectFile</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Text/@EntryValue">using Domain.Common.Identity;
+using FluentAssertions;
+using FluentValidation;
+using $Resource$sInfrastructure.Api.$Resource$s;
+using Infrastructure.Web.Api.Operations.Shared.$Resource$s;
+using UnitTesting.Common.Validation;
+using Xunit;
+
+namespace $ns$;
+
+[Trait("Category", "Unit")]
+public class $Action$$Resource$RequestValidatorSpec
+{
+    private readonly $Action$$Resource$Request _dto;
+    private readonly $Action$$Resource$RequestValidator _validator;
+
+    public $Action$$Resource$RequestValidatorSpec()
+    {
+        _validator = new $Action$$Resource$RequestValidator(new FixedIdentifierFactory("anid"));
+        _dto = new $Action$$Resource$Request
+        {
+            Id = "anid",
+            Property = "avalue"
+        };
+    }
+
+    [Fact]
+    public void WhenAllProperties_ThenSucceeds()
+    {
+        _validator.ValidateAndThrow(_dto);
+    }
+
+    [Fact]
+    public void WhenPropertyIsEmpty_ThenThrows()
+    {
+        _dto.Property = string.Empty;
+
+        _validator
+            .Invoking(x =&gt; x.ValidateAndThrow(_dto))
+            .Should().Throw&lt;ValidationException&gt;()
+            .WithMessageLike(Resources.$Action$$Resource$RequestValidator_InvalidProperty);
+    }
+}</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/UITag/@EntryValue">SaaStack</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=170E7AF6269E004AA22A3DC764E9AED2/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=170E7AF6269E004AA22A3DC764E9AED2/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=170E7AF6269E004AA22A3DC764E9AED2/Description/@EntryValue">A DDD value object with a single value</s:String>
@@ -491,6 +577,29 @@ public sealed class $name$ : SingleValueObjectBase&lt;$name$, $datatype$&gt;
         };
     }
 }$END$$SELECTION$</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Description/@EntryValue">A DELETE API definition</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Field/=Action/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Field/=Action/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Field/=resource/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Field/=Resource/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Field/=resource/Expression/@EntryValue">decapitalize(Resource)</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Field/=resource/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Field/=resource/Order/@EntryValue">2</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Field/=Resource/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Scope/=C3001E7C0DA78E4487072B7E050D86C5/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Scope/=C3001E7C0DA78E4487072B7E050D86C5/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Scope/=C3001E7C0DA78E4487072B7E050D86C5/Type/@EntryValue">InCSharpFile</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Shortcut/@EntryValue">deleteapi</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Text/@EntryValue">public async Task&lt;ApiDeleteResult&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
+{
+    var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
+
+    return () =&gt; $resource$.HandleApplicationResult();
+}</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=24BF978A3E745B4C95751624A71E837E/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=24BF978A3E745B4C95751624A71E837E/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=24BF978A3E745B4C95751624A71E837E/Description/@EntryValue">A DDD value object with multiple values</s:String>
@@ -575,6 +684,78 @@ public sealed class $name$ : ValueObjectBase&lt;$name$&gt;
 
     public $datatype$ $param3$ { get; }
 }$END$$SELECTION$</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/CustomProperties/=Extension/@EntryIndexedValue">cs</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/CustomProperties/=FileName/@EntryIndexedValue">Validator</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/CustomProperties/=ValidateFileName/@EntryIndexedValue">True</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Description/@EntryValue">Request Validator</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Field/=Action/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Field/=Action/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Field/=ns/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Field/=ns/Expression/@EntryValue">fileDefaultNamespace()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Field/=ns/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Field/=ns/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Field/=Resource/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Field/=Resource/InitialRange/@EntryValue">0</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Field/=Resource/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Scope/=E8F0594528C33E45BBFEC6CFE851095D/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Scope/=E8F0594528C33E45BBFEC6CFE851095D/Type/@EntryValue">InCSharpProjectFile</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Text/@EntryValue">using Domain.Common.Identity;
+using Domain.Interfaces.Validations;
+using FluentValidation;
+using Infrastructure.Web.Api.Common.Validation;
+
+namespace $ns$;
+
+public class $Action$$Resource$RequestValidator : AbstractValidator&lt;$Action$$Resource$Request&gt;
+{
+    public $Action$$Resource$RequestValidator(IIdentifierFactory identifierFactory)
+    {
+        RuleFor(req =&gt; req.Id)
+            .IsEntityId(identifierFactory)
+            .WithMessage(CommonValidationResources.AnyValidator_InvalidId);
+    }
+}</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/UITag/@EntryValue">SaaStack</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Description/@EntryValue">A POST API definition</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Field/=action/@KeyIndexDefined">False</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Field/=Action/@KeyIndexDefined">True</s:Boolean>
+	
+	
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Field/=Action/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Field/=dto/@KeyIndexDefined">False</s:Boolean>
+	
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Field/=name/@KeyIndexDefined">False</s:Boolean>
+	
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Field/=request/@KeyIndexDefined">False</s:Boolean>
+	
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Field/=resource/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Field/=Resource/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Field/=resource/Expression/@EntryValue">decapitalize(Resource)</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Field/=resource/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Field/=resource/Order/@EntryValue">2</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Field/=Resource/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Field/=response/@KeyIndexDefined">False</s:Boolean>
+	
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Field/=result/@KeyIndexDefined">False</s:Boolean>
+	
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Scope/=C3001E7C0DA78E4487072B7E050D86C5/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Scope/=C3001E7C0DA78E4487072B7E050D86C5/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Scope/=C3001E7C0DA78E4487072B7E050D86C5/Type/@EntryValue">InCSharpFile</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Shortcut/@EntryValue">postapi</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Text/@EntryValue">public async Task&lt;ApiPostResult&lt;$Resource$, $Action$$Resource$Response&gt;&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
+{
+    var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
+
+    return () =&gt; $resource$.HandleApplicationResult&lt;$Action$$Resource$Response, $Resource$&gt;(x =&gt; new PostResult&lt;$Action$$Resource$Response&gt;(new $Action$$Resource$Response { $Resource$ = x }));
+}</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=518DB9880AD5ED449C104E766AB6FAF0/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=518DB9880AD5ED449C104E766AB6FAF0/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=518DB9880AD5ED449C104E766AB6FAF0/CustomProperties/=Extension/@EntryIndexedValue">cs</s:String>
@@ -615,6 +796,29 @@ public sealed class $class$ : DomainEvent
     public required string $prop1$ { get; set; }
 }</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=518DB9880AD5ED449C104E766AB6FAF0/UITag/@EntryValue">SaaStack</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Description/@EntryValue">A SEARCH API definition</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Field/=Action/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Field/=Action/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Field/=resource/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Field/=Resource/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Field/=resource/Expression/@EntryValue">decapitalize(Resource)</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Field/=resource/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Field/=resource/Order/@EntryValue">2</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Field/=Resource/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Scope/=C3001E7C0DA78E4487072B7E050D86C5/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Scope/=C3001E7C0DA78E4487072B7E050D86C5/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Scope/=C3001E7C0DA78E4487072B7E050D86C5/Type/@EntryValue">InCSharpFile</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Shortcut/@EntryValue">searchapi</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Text/@EntryValue">public async Task&lt;ApiSearchResult&lt;$Resource$, $Action$$Resource$Response&gt;&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
+{
+    var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
+
+    return () =&gt; $resource$.HandleApplicationResult(x =&gt; new $Action$$Resource$Response { $Resource$s = x.Results, Metadata = c.Metadata });
+}</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7032419A3D210E42B9EA159377807335/@KeyIndexDefined">False</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
@@ -655,6 +859,88 @@ public sealed class $class$ : IntegrationEvent
     public required string $prop1$ { get; set; }
 }</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/UITag/@EntryValue">SaaStack</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/CustomProperties/=Extension/@EntryIndexedValue">cs</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/CustomProperties/=FileName/@EntryIndexedValue">Request</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/CustomProperties/=ValidateFileName/@EntryIndexedValue">True</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Description/@EntryValue">API GET Request DTO</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Field/=Action/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Field/=Action/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Field/=Filename/@KeyIndexDefined">False</s:Boolean>
+	
+	
+	
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Field/=ns/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Field/=ns/Expression/@EntryValue">fileDefaultNamespace()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Field/=ns/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Field/=ns/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Field/=Resource/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Field/=Resource/Order/@EntryValue">3</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Field/=route/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Field/=route/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Scope/=E8F0594528C33E45BBFEC6CFE851095D/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Scope/=E8F0594528C33E45BBFEC6CFE851095D/Type/@EntryValue">InCSharpProjectFile</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/Text/@EntryValue">using Infrastructure.Web.Api.Interfaces;
+
+namespace $ns$;
+
+[Route("/$route$/{Id}", OperationMethod.Get, AccessType.Token)]
+[Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
+public class $Action$$Resource$Request : TenantedRequest&lt;$Action$$Resource$Response&gt;
+{
+    public required string Id { get; set; }
+}
+
+//TODO: move to its own file
+public class $Action$$Resource$Response : IWebResponse
+{
+    public $Resource$? $Resource$ { get; set; }
+}</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=772ACDEA78426D48A255240B28079866/UITag/@EntryValue">SaaStack</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/CustomProperties/=Extension/@EntryIndexedValue">cs</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/CustomProperties/=FileName/@EntryIndexedValue">Request</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/CustomProperties/=ValidateFileName/@EntryIndexedValue">True</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Description/@EntryValue">API DELETE Request DTO</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Field/=Action/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Field/=Action/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Field/=Filename/@KeyIndexDefined">False</s:Boolean>
+	
+	
+	
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Field/=ns/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Field/=ns/Expression/@EntryValue">fileDefaultNamespace()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Field/=ns/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Field/=ns/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Field/=Resource/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Field/=Resource/Order/@EntryValue">3</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Field/=route/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Field/=route/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Scope/=E8F0594528C33E45BBFEC6CFE851095D/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Scope/=E8F0594528C33E45BBFEC6CFE851095D/Type/@EntryValue">InCSharpProjectFile</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/Text/@EntryValue">using Infrastructure.Web.Api.Interfaces;
+
+namespace $ns$;
+
+[Route("/$route$/{Id}", OperationMethod.Delete, AccessType.Token)]
+[Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
+public class $Action$$Resource$Request : TenantedDeleteRequest
+{
+    public required string Id { get; set; }
+}
+
+//TODO: move to its own file
+public class $Action$$Resource$Response : IWebResponse
+{
+    public $Resource$? $Resource$ { get; set; }
+}</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/UITag/@EntryValue">SaaStack</s:String>
 	
 	
 	
@@ -727,6 +1013,169 @@ public async Task When$condition$_Then$outcome$()
 {
     $END$
 }</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/CustomProperties/=Extension/@EntryIndexedValue">cs</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/CustomProperties/=FileName/@EntryIndexedValue">ReadModel</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/CustomProperties/=ValidateFileName/@EntryIndexedValue">False</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Description/@EntryValue">Read Model</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Field/=filename/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Field/=filename/Expression/@EntryValue">getAlphaNumericFileNameWithoutExtension()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Field/=filename/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Field/=filename/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Field/=ns/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Field/=ns/Expression/@EntryValue">fileDefaultNamespace()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Field/=ns/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Field/=ns/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Scope/=E8F0594528C33E45BBFEC6CFE851095D/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Scope/=E8F0594528C33E45BBFEC6CFE851095D/Type/@EntryValue">InCSharpProjectFile</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Text/@EntryValue">using Application.Persistence.Common;
+using Common;
+using QueryAny;
+
+namespace $ns$;
+
+[EntityName("$filename$")]
+public class $filename$ : ReadModelEntity
+{
+    public Optional&lt;string&gt; Property { get; set; }
+}</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/UITag/@EntryValue">SaaStack</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/CustomProperties/=Extension/@EntryIndexedValue">cs</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/CustomProperties/=FileName/@EntryIndexedValue">Request</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/CustomProperties/=ValidateFileName/@EntryIndexedValue">True</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Description/@EntryValue">API SEARCH Request DTO</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=Action/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=Action/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=Filename/@KeyIndexDefined">False</s:Boolean>
+	
+	
+	
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=ns/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=ns/Expression/@EntryValue">fileDefaultNamespace()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=ns/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=ns/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=Resource/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=Resource/Order/@EntryValue">3</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=route/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=route/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Scope/=E8F0594528C33E45BBFEC6CFE851095D/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Scope/=E8F0594528C33E45BBFEC6CFE851095D/Type/@EntryValue">InCSharpProjectFile</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Text/@EntryValue">using Infrastructure.Web.Api.Interfaces;
+
+namespace $ns$;
+
+[Route("/$route$", OperationMethod.Search, AccessType.Token)]
+[Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
+public class $Action$$Resource$ : TenantedSearchRequest&lt;$Action$$Resource$Response&gt;
+{
+}
+
+//TODO: move to its own file
+public class $Action$$Resource$Response : SearchResponse
+{
+    public List&lt;$Resource$&gt;? $Resource$s { get; set; }
+}</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/UITag/@EntryValue">SaaStack</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/CustomProperties/=Extension/@EntryIndexedValue">cs</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/CustomProperties/=FileName/@EntryIndexedValue">Request</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/CustomProperties/=ValidateFileName/@EntryIndexedValue">True</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Description/@EntryValue">API POST Request DTO</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Field/=Action/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Field/=Action/Order/@EntryValue">3</s:Int64>
+	
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Field/=Filename/@KeyIndexDefined">False</s:Boolean>
+	
+	
+	
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Field/=ns/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Field/=ns/Expression/@EntryValue">fileDefaultNamespace()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Field/=ns/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Field/=ns/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Field/=Property/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Field/=Property/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Field/=Resource/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Field/=Resource/Order/@EntryValue">4</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Field/=Response/@KeyIndexDefined">False</s:Boolean>
+	
+	
+	
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Field/=route/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Field/=route/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Scope/=E8F0594528C33E45BBFEC6CFE851095D/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Scope/=E8F0594528C33E45BBFEC6CFE851095D/Type/@EntryValue">InCSharpProjectFile</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Text/@EntryValue">using Infrastructure.Web.Api.Interfaces;
+
+namespace $ns$;
+
+[Route("/$route$", OperationMethod.Post, AccessType.Token)]
+[Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
+public class $Action$$Resource$Request : TenantedRequest&lt;$Action$$Resource$Response&gt;
+{
+    public required string $Property$ { get; set; }
+}
+
+//TODO: move to its own file
+public class $Action$$Resource$Response : IWebResponse
+{
+    public $Resource$? $Resource$ { get; set; }
+}</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/UITag/@EntryValue">SaaStack</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/CustomProperties/=Extension/@EntryIndexedValue">cs</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/CustomProperties/=FileName/@EntryIndexedValue">Request</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/CustomProperties/=ValidateFileName/@EntryIndexedValue">True</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Description/@EntryValue">API PUTPATCH Request DTO</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Field/=Action/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Field/=Action/Order/@EntryValue">3</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Field/=Filename/@KeyIndexDefined">False</s:Boolean>
+	
+	
+	
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Field/=ns/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Field/=ns/Expression/@EntryValue">fileDefaultNamespace()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Field/=ns/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Field/=ns/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Field/=Property/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Field/=Property/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Field/=Resource/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Field/=Resource/Order/@EntryValue">4</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Field/=route/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Field/=route/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Scope/=E8F0594528C33E45BBFEC6CFE851095D/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Scope/=E8F0594528C33E45BBFEC6CFE851095D/Type/@EntryValue">InCSharpProjectFile</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/Text/@EntryValue">using Infrastructure.Web.Api.Interfaces;
+
+namespace $ns$;
+
+[Route("/$route$/{Id}", OperationMethod.PutPatch, AccessType.Token)]
+[Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
+public class $Action$$Resource$Request : TenantedRequest&lt;$Action$$Resource$Response&gt;
+{
+    public required string Id { get; set; }
+    
+    public required string $Property$ { get; set; }
+}
+
+//TODO: move to its own file
+public class $Action$$Resource$Response : IWebResponse
+{
+    public $Resource$? $Resource$ { get; set; }
+}</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C1B660127AB09C4181FE5C203B658331/UITag/@EntryValue">SaaStack</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C46EC722B20A634ABBA30FAB3673BECF/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C46EC722B20A634ABBA30FAB3673BECF/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C46EC722B20A634ABBA30FAB3673BECF/Applicability/=Surround/@EntryIndexedValue">True</s:Boolean>
@@ -745,6 +1194,29 @@ public async Task When$condition$_Then$outcome$()
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C46EC722B20A634ABBA30FAB3673BECF/Text/@EntryValue">#if TESTINGONLY
      $SELECTION$$END$ 
   #endif</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Description/@EntryValue">A GET API definition</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Field/=Action/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Field/=Action/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Field/=resource/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Field/=Resource/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Field/=resource/Expression/@EntryValue">decapitalize(Resource)</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Field/=resource/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Field/=resource/Order/@EntryValue">2</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Field/=Resource/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Scope/=C3001E7C0DA78E4487072B7E050D86C5/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Scope/=C3001E7C0DA78E4487072B7E050D86C5/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Scope/=C3001E7C0DA78E4487072B7E050D86C5/Type/@EntryValue">InCSharpFile</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Shortcut/@EntryValue">getapi</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Text/@EntryValue">public async Task&lt;ApiGetResult&lt;$Resource$, $Action$$Resource$Response&gt;&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
+{
+    var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
+
+    return () =&gt; $resource$.HandleApplicationResult&lt;$Action$$Resource$Response, $Resource$&gt;(x =&gt; new $Action$$Resource$Response { $Resource$ = x });
+}</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D3A5BB394F1F30409407264EA0161946/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D3A5BB394F1F30409407264EA0161946/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D3A5BB394F1F30409407264EA0161946/Description/@EntryValue">A DDD root aggregate</s:String>
@@ -897,6 +1369,29 @@ public sealed class $name$Root : AggregateRootBase
 
     public required DateTime OccurredUtc { get; set; }
 }$END$$SELECTION$</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Description/@EntryValue">A PUTPATCH API definition</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Field/=Action/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Field/=Action/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Field/=resource/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Field/=Resource/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Field/=resource/Expression/@EntryValue">decapitalize(Resource)</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Field/=resource/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Field/=resource/Order/@EntryValue">2</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Field/=Resource/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Scope/=C3001E7C0DA78E4487072B7E050D86C5/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Scope/=C3001E7C0DA78E4487072B7E050D86C5/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Scope/=C3001E7C0DA78E4487072B7E050D86C5/Type/@EntryValue">InCSharpFile</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Shortcut/@EntryValue">putpatchapi</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Text/@EntryValue">public async Task&lt;ApiPutPatchResult&lt;$Resource$, $Action$$Resource$Response&gt;&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
+{
+    var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
+
+    return () =&gt; $resource$.HandleApplicationResult&lt;$Action$$Resource$Response, $Resource$&gt;(x =&gt; new $Action$$Resource$Response { $Resource$ = x });
+}</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=FB91EB49F0C92544901777E29C183C25/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=FB91EB49F0C92544901777E29C183C25/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=FB91EB49F0C92544901777E29C183C25/Description/@EntryValue">Test Method (xUnit)</s:String>
@@ -947,6 +1442,7 @@ public void When$condition$_Then$outcome$()
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=afeature/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=afeaturelevel/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=afieldname/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=afilename/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=afilter/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=afilterfield/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=afirstname/@EntryIndexedValue">True</s:Boolean>
@@ -1000,6 +1496,7 @@ public void When$condition$_Then$outcome$()
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aneventname/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aneventtype/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anewcity/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=anewdescription/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anewdisplayname/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anewfirstname/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anewid/@EntryIndexedValue">True</s:Boolean>
@@ -1014,6 +1511,7 @@ public void When$condition$_Then$outcome$()
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anexistinguserid/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anhtmlbody/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anid/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=animageid/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aninstance/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aninvalidcode/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=aninvalidemail/@EntryIndexedValue">True</s:Boolean>
@@ -1060,6 +1558,7 @@ public void When$condition$_Then$outcome$()
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anotheruserid/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anothervalue/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anownerid/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Antiforgery/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anumber/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anumberproperty/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=anunavailbilityid/@EntryIndexedValue">True</s:Boolean>
@@ -1145,6 +1644,7 @@ public void When$condition$_Then$outcome$()
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=atransactionid/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=atype/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=atypename/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=aurl/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=auserid/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=ausername/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=authz/@EntryIndexedValue">True</s:Boolean>

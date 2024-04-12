@@ -2,7 +2,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 
-[Route("/cars/{id}/offline", ServiceOperation.PutPatch, AccessType.Token)]
+[Route("/cars/{id}/offline", OperationMethod.PutPatch, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class TakeOfflineCarRequest : TenantedRequest<GetCarResponse>
 {

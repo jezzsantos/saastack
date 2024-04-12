@@ -142,7 +142,7 @@ public static class HttpRequestExtensions
     {
         if (httpRequest.Body.CanSeek)
         {
-            httpRequest.Body.Seek(0, SeekOrigin.Begin);
+            httpRequest.Body.Rewind();
         }
     }
 

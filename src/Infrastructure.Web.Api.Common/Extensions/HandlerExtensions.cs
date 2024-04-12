@@ -12,12 +12,21 @@ public static class HandlerExtensions
     /// <summary>
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
-    public static IResult HandleApiResult(this ApiEmptyResult result, ServiceOperation operation)
+    public static IResult HandleApiResult(this ApiStreamResult result, OperationMethod method)
+    {
+        return result()
+            .Match(response => response.Value.ToResult(method), error => error.ToResult());
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
+    /// </summary>
+    public static IResult HandleApiResult(this ApiEmptyResult result, OperationMethod method)
     {
         return result()
             .Match(response => (response.HasValue
                     ? response.Value
-                    : new PostResult<EmptyResponse>(new EmptyResponse())).ToResult(operation),
+                    : new PostResult<EmptyResponse>(new EmptyResponse())).ToResult(method),
                 error => error.ToResult());
     }
 
@@ -25,65 +34,65 @@ public static class HandlerExtensions
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
     public static IResult HandleApiResult<TResource, TResponse>(this ApiResult<TResource, TResponse> result,
-        ServiceOperation operation)
+        OperationMethod method)
         where TResponse : IWebResponse
     {
         return result()
-            .Match(response => ((PostResult<TResponse>)response.Value).ToResult(operation), error => error.ToResult());
+            .Match(response => ((PostResult<TResponse>)response.Value).ToResult(method), error => error.ToResult());
     }
 
     /// <summary>
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
     public static IResult HandleApiResult<TResource, TResponse>(this ApiPostResult<TResource, TResponse> result,
-        ServiceOperation operation)
+        OperationMethod method)
         where TResponse : IWebResponse
     {
         return result()
-            .Match(response => response.Value.ToResult(operation), error => error.ToResult());
+            .Match(response => response.Value.ToResult(method), error => error.ToResult());
     }
 
     /// <summary>
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
     public static IResult HandleApiResult<TResource, TResponse>(this ApiPutPatchResult<TResource, TResponse> result,
-        ServiceOperation operation)
+        OperationMethod method)
         where TResponse : IWebResponse
     {
         return result()
-            .Match(response => ((PostResult<TResponse>)response.Value).ToResult(operation), error => error.ToResult());
+            .Match(response => ((PostResult<TResponse>)response.Value).ToResult(method), error => error.ToResult());
     }
 
     /// <summary>
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
     public static IResult HandleApiResult<TResource, TResponse>(this ApiGetResult<TResource, TResponse> result,
-        ServiceOperation operation)
+        OperationMethod method)
         where TResponse : IWebResponse
     {
         return result()
-            .Match(response => ((PostResult<TResponse>)response.Value).ToResult(operation), error => error.ToResult());
+            .Match(response => ((PostResult<TResponse>)response.Value).ToResult(method), error => error.ToResult());
     }
 
     /// <summary>
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
     public static IResult HandleApiResult<TResource, TResponse>(this ApiSearchResult<TResource, TResponse> result,
-        ServiceOperation operation)
+        OperationMethod method)
         where TResponse : IWebSearchResponse
     {
         return result()
-            .Match(response => ((PostResult<TResponse>)response.Value).ToResult(operation), error => error.ToResult());
+            .Match(response => ((PostResult<TResponse>)response.Value).ToResult(method), error => error.ToResult());
     }
 
     /// <summary>
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
     public static IResult HandleApiResult(this ApiDeleteResult result,
-        ServiceOperation operation)
+        OperationMethod method)
     {
         return result()
-            .Match(response => ((PostResult<EmptyResponse>)response.Value).ToResult(operation),
+            .Match(response => ((PostResult<EmptyResponse>)response.Value).ToResult(method),
                 error => error.ToResult());
     }
 
@@ -131,28 +140,43 @@ public static class HandlerExtensions
             error => new Result<EmptyResponse, Error>(error));
     }
 
-    private static IResult ToResult<TResponse>(this PostResult<TResponse> postResult, ServiceOperation operation)
+    /// <summary>
+    ///     Converts the <see cref="Result{IHasStream,Error}" /> to an <see cref="Result{StreamResult,Error}" />
+    /// </summary>
+    public static Result<StreamResult, Error> HandleApplicationResult<TResource>(this Result<TResource, Error> result,
+        Func<TResource, StreamResult> onSuccess)
+    {
+        return result.Match(stream => new Result<StreamResult, Error>(onSuccess(stream.Value)),
+            error => new Result<StreamResult, Error>(error));
+    }
+
+    private static IResult ToResult(this StreamResult result, OperationMethod _)
+    {
+        return Results.Stream(result.Stream, result.ContentType);
+    }
+
+    private static IResult ToResult<TResponse>(this PostResult<TResponse> postResult, OperationMethod method)
         where TResponse : IWebResponse
     {
         var response = postResult.Response;
         var location = postResult.Location;
-        switch (operation)
+        switch (method)
         {
-            case ServiceOperation.Get:
-            case ServiceOperation.Search:
+            case OperationMethod.Get:
+            case OperationMethod.Search:
                 return Results.Ok(response);
 
-            case ServiceOperation.Post:
+            case OperationMethod.Post:
             {
                 return location.HasValue()
                     ? Results.Created(location, response)
                     : Results.Ok(response);
             }
 
-            case ServiceOperation.PutPatch:
+            case OperationMethod.PutPatch:
                 return Results.Accepted(null, response);
 
-            case ServiceOperation.Delete:
+            case OperationMethod.Delete:
                 return Results.NoContent();
 
             default:

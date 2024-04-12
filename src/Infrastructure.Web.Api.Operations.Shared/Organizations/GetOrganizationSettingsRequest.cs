@@ -3,7 +3,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
 
-[Route("/organizations/{Id}/settings", ServiceOperation.Get, AccessType.Token, true)]
+[Route("/organizations/{Id}/settings", OperationMethod.Get, AccessType.Token, true)]
 [Authorize(Roles.Platform_Standard)]
 public class GetOrganizationSettingsRequest : UnTenantedRequest<GetOrganizationSettingsResponse>
 {

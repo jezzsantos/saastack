@@ -3,7 +3,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 
-[Route("/environments/{EnvironmentApiKey}/edge-identities/{IdentityUuid}/edge-featurestates/", ServiceOperation.Post)]
+[Route("/environments/{EnvironmentApiKey}/edge-identities/{IdentityUuid}/edge-featurestates/", OperationMethod.Post)]
 public class
     FlagsmithCreateEdgeIdentityFeatureStateRequest : IWebRequest<FlagsmithCreateEdgeIdentityFeatureStateResponse>
 {

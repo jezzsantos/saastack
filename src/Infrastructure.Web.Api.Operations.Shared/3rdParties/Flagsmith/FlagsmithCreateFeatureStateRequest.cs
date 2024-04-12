@@ -3,7 +3,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 
-[Route("/environments/{EnvironmentApiKey}/featurestates/{FeatureStateId}/", ServiceOperation.PutPatch)]
+[Route("/environments/{EnvironmentApiKey}/featurestates/{FeatureStateId}/", OperationMethod.PutPatch)]
 public class FlagsmithCreateFeatureStateRequest : IWebRequest<FlagsmithCreateFeatureStateResponse>
 {
     [JsonPropertyName("enabled")] public bool Enabled { get; set; }

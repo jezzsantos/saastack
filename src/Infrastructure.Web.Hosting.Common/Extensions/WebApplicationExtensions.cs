@@ -233,6 +233,9 @@ public static class WebApplicationExtensions
             }
         }
 #endif
+
+        middlewares.Add(new MiddlewareRegistration(56, app => { app.UseAntiforgery(); },
+            "Pipeline: Anti-forgery detection"));
     }
 
     /// <summary>

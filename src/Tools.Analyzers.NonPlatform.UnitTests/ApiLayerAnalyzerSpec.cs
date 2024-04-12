@@ -1,13 +1,11 @@
 extern alias NonPlatformAnalyzers;
 extern alias CommonAnalyzers;
 using CommonAnalyzers::Tools.Analyzers.Common;
+using NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces;
 using Xunit;
 using TypeExtensions = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.TypeExtensions;
-using ServiceOperation = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.ServiceOperation;
 using IWebResponse = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebResponse;
 using IWebSearchResponse = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebSearchResponse;
-using Route = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.RouteAttribute;
-using Authorize = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.AuthorizeAttribute;
 using SearchResultMetadata = NonPlatformAnalyzers::Application.Interfaces.SearchResultMetadata;
 using AccessType = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.AccessType;
 using ApiLayerAnalyzer = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.ApiLayerAnalyzer;
@@ -799,10 +797,11 @@ public class AClass : IWebApiService
     }
 }";
 
-                await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule015,
-                    input,
-                    (9, 27, "AMethod1"),
-                    (13, 27, "AMethod2"));
+                await Verify.DiagnosticExists<ApiLayerAnalyzer>(input,
+                    (ApiLayerAnalyzer.Rule015, 9, 27, "AMethod1", null),
+                    (ApiLayerAnalyzer.Rule020, 9, 27, "AMethod1", null),
+                    (ApiLayerAnalyzer.Rule015, 13, 27, "AMethod2", null),
+                    (ApiLayerAnalyzer.Rule020, 13, 27, "AMethod2", null));
             }
         }
 
@@ -927,7 +926,7 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 44, "AMethod", ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
+                    input, 9, 44, "AMethod", OperationMethod.Post, ExpectedAllowedResultTypes(OperationMethod.Post));
             }
 
             [Fact]
@@ -1048,7 +1047,7 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 54, "AMethod", ServiceOperation.Get, ExpectedAllowedResultTypes(ServiceOperation.Get));
+                    input, 9, 54, "AMethod", OperationMethod.Get, ExpectedAllowedResultTypes(OperationMethod.Get));
             }
 
             [Fact]
@@ -1069,8 +1068,8 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 54, "AMethod", ServiceOperation.Search,
-                    ExpectedAllowedResultTypes(ServiceOperation.Search));
+                    input, 9, 54, "AMethod", OperationMethod.Search,
+                    ExpectedAllowedResultTypes(OperationMethod.Search));
             }
 
             [Fact]
@@ -1091,8 +1090,8 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 54, "AMethod", ServiceOperation.PutPatch,
-                    ExpectedAllowedResultTypes(ServiceOperation.PutPatch));
+                    input, 9, 54, "AMethod", OperationMethod.PutPatch,
+                    ExpectedAllowedResultTypes(OperationMethod.PutPatch));
             }
 
             [Fact]
@@ -1113,8 +1112,8 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 54, "AMethod", ServiceOperation.Delete,
-                    ExpectedAllowedResultTypes(ServiceOperation.Delete));
+                    input, 9, 54, "AMethod", OperationMethod.Delete,
+                    ExpectedAllowedResultTypes(OperationMethod.Delete));
             }
 
             [Fact]
@@ -1135,7 +1134,7 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 47, "AMethod", ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
+                    input, 9, 47, "AMethod", OperationMethod.Post, ExpectedAllowedResultTypes(OperationMethod.Post));
             }
 
             [Fact]
@@ -1196,8 +1195,8 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 47, "AMethod", ServiceOperation.PutPatch,
-                    ExpectedAllowedResultTypes(ServiceOperation.PutPatch));
+                    input, 9, 47, "AMethod", OperationMethod.PutPatch,
+                    ExpectedAllowedResultTypes(OperationMethod.PutPatch));
             }
 
             [Fact]
@@ -1218,8 +1217,8 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 47, "AMethod", ServiceOperation.Delete,
-                    ExpectedAllowedResultTypes(ServiceOperation.Delete));
+                    input, 9, 47, "AMethod", OperationMethod.Delete,
+                    ExpectedAllowedResultTypes(OperationMethod.Delete));
             }
 
             [Fact]
@@ -1240,7 +1239,7 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 56, "AMethod", ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
+                    input, 9, 56, "AMethod", OperationMethod.Post, ExpectedAllowedResultTypes(OperationMethod.Post));
             }
 
             [Fact]
@@ -1261,7 +1260,7 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 56, "AMethod", ServiceOperation.Get, ExpectedAllowedResultTypes(ServiceOperation.Get));
+                    input, 9, 56, "AMethod", OperationMethod.Get, ExpectedAllowedResultTypes(OperationMethod.Get));
             }
 
             [Fact]
@@ -1302,8 +1301,8 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 56, "AMethod", ServiceOperation.PutPatch,
-                    ExpectedAllowedResultTypes(ServiceOperation.PutPatch));
+                    input, 9, 56, "AMethod", OperationMethod.PutPatch,
+                    ExpectedAllowedResultTypes(OperationMethod.PutPatch));
             }
 
             [Fact]
@@ -1324,8 +1323,8 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 56, "AMethod", ServiceOperation.Delete,
-                    ExpectedAllowedResultTypes(ServiceOperation.Delete));
+                    input, 9, 56, "AMethod", OperationMethod.Delete,
+                    ExpectedAllowedResultTypes(OperationMethod.Delete));
             }
 
             [Fact]
@@ -1346,7 +1345,7 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 52, "AMethod", ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
+                    input, 9, 52, "AMethod", OperationMethod.Post, ExpectedAllowedResultTypes(OperationMethod.Post));
             }
 
             [Fact]
@@ -1367,7 +1366,7 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 52, "AMethod", ServiceOperation.Get, ExpectedAllowedResultTypes(ServiceOperation.Get));
+                    input, 9, 52, "AMethod", OperationMethod.Get, ExpectedAllowedResultTypes(OperationMethod.Get));
             }
 
             [Fact]
@@ -1388,8 +1387,8 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 52, "AMethod", ServiceOperation.Search,
-                    ExpectedAllowedResultTypes(ServiceOperation.Search));
+                    input, 9, 52, "AMethod", OperationMethod.Search,
+                    ExpectedAllowedResultTypes(OperationMethod.Search));
             }
 
             [Fact]
@@ -1430,8 +1429,8 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 52, "AMethod", ServiceOperation.Delete,
-                    ExpectedAllowedResultTypes(ServiceOperation.Delete));
+                    input, 9, 52, "AMethod", OperationMethod.Delete,
+                    ExpectedAllowedResultTypes(OperationMethod.Delete));
             }
 
             [Fact]
@@ -1452,7 +1451,7 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 28, "AMethod", ServiceOperation.Post, ExpectedAllowedResultTypes(ServiceOperation.Post));
+                    input, 9, 28, "AMethod", OperationMethod.Post, ExpectedAllowedResultTypes(OperationMethod.Post));
             }
 
             [Fact]
@@ -1473,7 +1472,7 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 28, "AMethod", ServiceOperation.Get, ExpectedAllowedResultTypes(ServiceOperation.Get));
+                    input, 9, 28, "AMethod", OperationMethod.Get, ExpectedAllowedResultTypes(OperationMethod.Get));
             }
 
             [Fact]
@@ -1494,8 +1493,8 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 28, "AMethod", ServiceOperation.Search,
-                    ExpectedAllowedResultTypes(ServiceOperation.Search));
+                    input, 9, 28, "AMethod", OperationMethod.Search,
+                    ExpectedAllowedResultTypes(OperationMethod.Search));
             }
 
             [Fact]
@@ -1516,8 +1515,8 @@ public class AClass : IWebApiService
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
-                    input, 9, 28, "AMethod", ServiceOperation.PutPatch,
-                    ExpectedAllowedResultTypes(ServiceOperation.PutPatch));
+                    input, 9, 28, "AMethod", OperationMethod.PutPatch,
+                    ExpectedAllowedResultTypes(OperationMethod.PutPatch));
             }
 
             [Fact]
@@ -1540,11 +1539,11 @@ public class AClass : IWebApiService
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
 
-            private static string ExpectedAllowedResultTypes(ServiceOperation operation)
+            private static string ExpectedAllowedResultTypes(OperationMethod method)
             {
                 return TypeExtensions.Stringify(
                     ApiLayerAnalyzer
-                        .AllowableOperationReturnTypes[operation].ToArray());
+                        .AllowableOperationReturnTypes[method].ToArray());
             }
         }
 
@@ -1631,6 +1630,61 @@ public class AClass : IWebApiService
                     input, 9, 35, "TestSecureRouteNoAuthorizeAttributeRequest");
             }
         }
+
+        [Trait("Category", "Unit")]
+        public class GivenRule020
+        {
+            [Fact]
+            public async Task WhenNoDuplicateRequests_ThenNoAlert()
+            {
+                const string input = @"
+using Infrastructure.Web.Api.Interfaces;
+using System.Threading.Tasks;
+using Common;
+using Tools.Analyzers.NonPlatform.UnitTests;
+namespace ANamespace;
+public class AClass : IWebApiService
+{
+    public ApiEmptyResult AMethod(TestGetRouteAttributeRequest request)
+    { 
+        return () => new Result<EmptyResponse, Error>();
+    }
+}";
+
+                await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenDuplicateRequests_ThenAlerts()
+            {
+                const string input = @"
+using Infrastructure.Web.Api.Interfaces;
+using System.Threading.Tasks;
+using Common;
+using Tools.Analyzers.NonPlatform.UnitTests;
+namespace ANamespace;
+public class AClass : IWebApiService
+{
+    public ApiEmptyResult AMethod1(TestGetRouteAttributeRequest1 request)
+    { 
+        return () => new Result<EmptyResponse, Error>();
+    }
+    public ApiEmptyResult AMethod2(TestGetRouteAttributeRequest5 request)
+    { 
+        return () => new Result<EmptyResponse, Error>();
+    }
+    public ApiEmptyResult AMethod3(TestGetRouteAttributeRequest2 request)
+    { 
+        return () => new Result<EmptyResponse, Error>();
+    }
+}";
+
+                await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule020,
+                    input,
+                    (9, 27, "AMethod1"),
+                    (13, 27, "AMethod2"));
+            }
+        }
     }
 
     [UsedImplicitly]
@@ -1646,7 +1700,7 @@ public class AClass : IWebApiService
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
-[Route(""/apath"", ServiceOperation.Get)]
+[Route(""/apath"", OperationMethod.Get)]
 internal class ARequest : IWebRequest
 {
     public required string AProperty { get; set; }
@@ -1667,7 +1721,7 @@ internal class ARequest : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
-[Route(""/apath"", ServiceOperation.Get)]
+[Route(""/apath"", OperationMethod.Get)]
 public class AClass : IWebRequest
 {
     public required string AProperty { get; set; }
@@ -1688,7 +1742,7 @@ public class AClass : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace anamespace;
-[Route(""/apath"", ServiceOperation.Get)]
+[Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
     public required string AProperty { get; set; }
@@ -1730,7 +1784,7 @@ public class ARequest : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
-[Route(""/apath"", ServiceOperation.Get)]
+[Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
     public ARequest(string value)
@@ -1752,7 +1806,7 @@ public class ARequest : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
-[Route(""/apath"", ServiceOperation.Get)]
+[Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
     private ARequest()
@@ -1774,7 +1828,7 @@ public class ARequest : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
-[Route(""/apath"", ServiceOperation.Get)]
+[Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
     public ARequest()
@@ -1799,7 +1853,7 @@ public class ARequest : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
-[Route(""/apath"", ServiceOperation.Get)]
+[Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
     public string? AProperty { get; }
@@ -1821,7 +1875,7 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
-[Route(""/apath"", ServiceOperation.Get)]
+[Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
     public Optional<string> AProperty { get; set; }
@@ -1838,7 +1892,7 @@ public class ARequest : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
-[Route(""/apath"", ServiceOperation.Get)]
+[Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
     public string? AProperty { get; set; }
@@ -2051,62 +2105,66 @@ public class TestSearchResponse : IWebSearchResponse
 }
 
 [UsedImplicitly]
-public class TestNoRouteAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
+public class TestNoRouteAttributeRequest : IWebRequest<TestResponse>;
 
-[Route("/aresource", ServiceOperation.Search)]
+[Route("/aresource", OperationMethod.Search)]
 [UsedImplicitly]
-public class TestSearchRouteAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
+public class TestSearchRouteAttributeRequest : IWebRequest<TestResponse>;
 
-[Route("/aresource", ServiceOperation.Post)]
+[Route("/aresource", OperationMethod.Post)]
 [UsedImplicitly]
-public class TestPostRouteAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
+public class TestPostRouteAttributeRequest : IWebRequest<TestResponse>;
 
-[Route("/aresource", ServiceOperation.Get)]
+[Route("/aresource", OperationMethod.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest : IWebRequest<TestResponse>;
 
-[Route("/aresource/1", ServiceOperation.Get)]
+[Route("/aresource/1", OperationMethod.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest1 : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest1 : IWebRequest<TestResponse>;
 
-[Route("/aresource/2", ServiceOperation.Get)]
+[Route("/aresource/2", OperationMethod.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest2 : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest2 : IWebRequest<TestResponse>;
 
-[Route("/aresource/3", ServiceOperation.Get)]
+[Route("/aresource/3", OperationMethod.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest3 : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest3 : IWebRequest<TestResponse>;
 
-[Route("/anotherresource/1", ServiceOperation.Get)]
+[Route("/anotherresource/1", OperationMethod.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest4 : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest4 : IWebRequest<TestResponse>;
 
-[Route("/aresource", ServiceOperation.PutPatch)]
+[Route("/aresource/1", OperationMethod.Get)]
 [UsedImplicitly]
-public class TestPutPatchRouteAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest5 : IWebRequest<TestResponse>;
 
-[Route("/aresource", ServiceOperation.Delete)]
+[Route("/aresource", OperationMethod.PutPatch)]
 [UsedImplicitly]
-public class TestDeleteRouteAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
+public class TestPutPatchRouteAttributeRequest : IWebRequest<TestResponse>;
+
+[Route("/aresource", OperationMethod.Delete)]
+[UsedImplicitly]
+public class TestDeleteRouteAttributeRequest : IWebRequest<TestResponse>;
 
 [AttributeUsage(AttributeTargets.Method)]
 [UsedImplicitly]
 public class TestAttribute : Attribute;
 
-[Route("/aresource", ServiceOperation.Post)]
+[Route("/aresource", OperationMethod.Post)]
 [UsedImplicitly]
-public class TestAnonymousRouteNoAuthorizeAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
+public class TestAnonymousRouteNoAuthorizeAttributeRequest : IWebRequest<TestResponse>;
 
-[Route("/aresource", ServiceOperation.Post)]
+[Route("/aresource", OperationMethod.Post)]
 [Authorize(Roles.Platform_Standard)]
 [UsedImplicitly]
-public class TestAnonymousRouteAuthorizeAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
+public class TestAnonymousRouteAuthorizeAttributeRequest : IWebRequest<TestResponse>;
 
-[Route("/aresource", ServiceOperation.Post, AccessType.Token)]
+[Route("/aresource", OperationMethod.Post, AccessType.Token)]
 [Authorize(Roles.Platform_Standard)]
 [UsedImplicitly]
-public class TestSecureRouteAuthorizeAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
+public class TestSecureRouteAuthorizeAttributeRequest : IWebRequest<TestResponse>;
 
-[Route("/aresource", ServiceOperation.Post, AccessType.Token)]
+[Route("/aresource", OperationMethod.Post, AccessType.Token)]
 [UsedImplicitly]
-public class TestSecureRouteNoAuthorizeAttributeRequest : NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebRequest<TestResponse>;
+public class TestSecureRouteNoAuthorizeAttributeRequest : IWebRequest<TestResponse>;

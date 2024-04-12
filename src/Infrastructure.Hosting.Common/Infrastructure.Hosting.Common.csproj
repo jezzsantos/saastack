@@ -8,7 +8,8 @@
     <ItemGroup>
         <ProjectReference Include="..\Infrastructure.Common\Infrastructure.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Eventing.Common\Infrastructure.Eventing.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Interfaces\Infrastructure.Interfaces.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Common\Infrastructure.Web.Api.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Operations.Shared\Infrastructure.Web.Api.Operations.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

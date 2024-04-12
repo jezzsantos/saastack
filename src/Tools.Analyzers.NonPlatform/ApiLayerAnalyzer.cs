@@ -24,15 +24,16 @@ namespace Tools.Analyzers.NonPlatform;
 ///     TResponse is same type as in the return value.
 ///     SAASWEB12: Warning: The second parameter can only be a <see cref="CancellationToken" />
 ///     SAASWEB13: Warning: These methods must be decorated with a <see cref="RouteAttribute" />
-///     SAASWEB14: Warning: The route (of all these methods in this class) should start with the same path
-///     SAASWEB15: Warning: There should be no methods in this class with the same <see cref="IWebRequest{TResponse}" />
+///     SAASWEB14: Warning: The route (of all service operations in this class) should start with the same path
+///     SAASWEB15: Warning: There should be no service operations in this class with the same
+///     <see cref="IWebRequest{TResponse}" />
 ///     SAASWEB16: Warning: This service operation should return an appropriate Result type for the operation
 ///     SAASWEB17: Warning: The request type should be declared with a <see cref="RouteAttribute" /> on it
 ///     SAASWEB18: Error: There should not be an <see cref="AuthorizeAttribute" /> if the <see cref="RouteAttribute" />
 ///     declares <see cref="AccessType.Anonymous" /> access
 ///     SAASWEB19: Warning: There should be a <see cref="AuthorizeAttribute" /> if the <see cref="RouteAttribute" />
-///     declares
-///     anything other than <see cref="AccessType.Anonymous" /> access
+///     declares anything other than <see cref="AccessType.Anonymous" /> access
+///     SAASWEB20: Warning: There should be no service operations in this class with the same route and method
 ///     Requests:
 ///     SAASWEB30: Error: Request must be public
 ///     SAASWEB31: Error: Request must be named with "Request" suffix
@@ -52,20 +53,23 @@ namespace Tools.Analyzers.NonPlatform;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class ApiLayerAnalyzer : DiagnosticAnalyzer
 {
-    internal static readonly Dictionary<Infrastructure.Web.Api.Interfaces.ServiceOperation, List<Type>>
+    internal static readonly Dictionary<OperationMethod, List<Type>>
         AllowableOperationReturnTypes =
             new()
             {
                 {
-                    Infrastructure.Web.Api.Interfaces.ServiceOperation.Post,
+                    OperationMethod.Post,
                     new List<Type> { typeof(ApiEmptyResult), typeof(ApiPostResult<,>) }
                 },
                 {
-                    Infrastructure.Web.Api.Interfaces.ServiceOperation.Get,
-                    new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>) }
+                    OperationMethod.Get,
+                    new List<Type>
+                    {
+                        typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>), typeof(ApiStreamResult)
+                    }
                 },
                 {
-                    Infrastructure.Web.Api.Interfaces.ServiceOperation.Search,
+                    OperationMethod.Search,
                     new List<Type>
                     {
                         typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>),
@@ -73,11 +77,11 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
                     }
                 },
                 {
-                    Infrastructure.Web.Api.Interfaces.ServiceOperation.PutPatch,
+                    OperationMethod.PutPatch,
                     new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiPutPatchResult<,>) }
                 },
                 {
-                    Infrastructure.Web.Api.Interfaces.ServiceOperation.Delete,
+                    OperationMethod.Delete,
                     new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiDeleteResult) }
                 }
             };
@@ -90,7 +94,8 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
         typeof(ApiGetResult<,>),
         typeof(ApiSearchResult<,>),
         typeof(ApiPutPatchResult<,>),
-        typeof(ApiDeleteResult)
+        typeof(ApiDeleteResult),
+        typeof(ApiStreamResult)
     };
 
     internal static readonly DiagnosticDescriptor Rule010 = "SAASWEB10".GetDescriptor(DiagnosticSeverity.Warning,
@@ -123,6 +128,9 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
     internal static readonly DiagnosticDescriptor Rule019 = "SAASWEB019".GetDescriptor(DiagnosticSeverity.Warning,
         AnalyzerConstants.Categories.WebApi, nameof(Resources.SAASWEB019Title), nameof(Resources.SAASWEB019Description),
         nameof(Resources.SAASWEB019MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule020 = "SAASWEB020".GetDescriptor(DiagnosticSeverity.Warning,
+        AnalyzerConstants.Categories.WebApi, nameof(Resources.SAASWEB020Title), nameof(Resources.SAASWEB020Description),
+        nameof(Resources.SAASWEB020MessageFormat));
 
     internal static readonly DiagnosticDescriptor Rule030 = "SAASWEB030".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.WebApi, nameof(Resources.Diagnostic_Title_ClassMustBePublic),
@@ -174,7 +182,8 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
         nameof(Resources.Diagnostic_MessageFormat_PropertyMustBeNullableNotOptional));
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(Rule010, Rule011, Rule012, Rule013, Rule014, Rule015, Rule016, Rule017, Rule018, Rule019,
+        ImmutableArray.Create(
+            Rule010, Rule011, Rule012, Rule013, Rule014, Rule015, Rule016, Rule017, Rule018, Rule019, Rule020,
             Rule030, Rule031, Rule032, Rule033, Rule034, Rule035, Rule036,
             Rule040, Rule041, Rule042, Rule043, Rule044, Rule045);
 
@@ -232,11 +241,9 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
             }
 
             var requestType = requestTypeSyntax!.GetBaseOfType<IWebRequest>(context);
-            operations.Add(methodDeclarationSyntax, new ServiceOperation(requestType!));
-
-            var operation =
-                (Infrastructure.Web.Api.Interfaces.ServiceOperation)routeAttribute!.ConstructorArguments[1].Value!;
-            if (OperationAndReturnsTypeDontMatch(context, methodDeclarationSyntax, operation, returnType!))
+            var operationMethod = (OperationMethod)routeAttribute!.ConstructorArguments[1].Value!;
+            operations.Add(methodDeclarationSyntax, new ServiceOperation(requestType!, operationMethod));
+            if (OperationAndReturnsTypeDontMatch(context, methodDeclarationSyntax, operationMethod, returnType!))
             {
                 continue;
             }
@@ -255,6 +262,7 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
 
         RoutesHaveSamePrimaryResource(context, operations);
         RequestTypesAreNotDuplicated(context, operations);
+        RoutesAndMethodsAreNotDuplicated(context, operations);
     }
 
     private static void AnalyzeRequestClass(SyntaxNodeAnalysisContext context)
@@ -378,19 +386,18 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    
     private static bool OperationAndReturnsTypeDontMatch(SyntaxNodeAnalysisContext context,
-        MethodDeclarationSyntax methodDeclarationSyntax, Infrastructure.Web.Api.Interfaces.ServiceOperation operation,
+        MethodDeclarationSyntax methodDeclarationSyntax, OperationMethod operationMethod,
         ITypeSymbol returnType)
     {
-        var allowedReturnTypes = AllowableOperationReturnTypes[operation];
+        var allowedReturnTypes = AllowableOperationReturnTypes[operationMethod];
 
         if (MatchesAllowedTypes(context, returnType, allowedReturnTypes.ToArray()))
         {
             return false;
         }
 
-        context.ReportDiagnostic(Rule016, methodDeclarationSyntax, operation,
+        context.ReportDiagnostic(Rule016, methodDeclarationSyntax, operationMethod,
             allowedReturnTypes.ToArray().Stringify());
 
         return true;
@@ -521,13 +528,29 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
     private static void RequestTypesAreNotDuplicated(SyntaxNodeAnalysisContext context,
         Dictionary<MethodDeclarationSyntax, ServiceOperation> operations)
     {
-        var duplicateRequestTypes = operations.GroupBy(ops => ops.Value.RequestType.ToDisplayString())
+        var duplicateRequestTypes = operations
+            .GroupBy(ops => ops.Value.RequestType.ToDisplayString())
             .Where(grp => grp.Count() > 1);
         foreach (var duplicateGroup in duplicateRequestTypes)
         {
             foreach (var entry in duplicateGroup)
             {
                 context.ReportDiagnostic(Rule015, entry.Key);
+            }
+        }
+    }
+
+    private static void RoutesAndMethodsAreNotDuplicated(SyntaxNodeAnalysisContext context,
+        Dictionary<MethodDeclarationSyntax, ServiceOperation> operations)
+    {
+        var duplicateRoutesAndMethods = operations
+            .GroupBy(ops => $"{ops.Value.Method}:{ops.Value.RouteSegments.Join("/")}")
+            .Where(grp => grp.Count() > 1);
+        foreach (var duplicateGroup in duplicateRoutesAndMethods)
+        {
+            foreach (var entry in duplicateGroup)
+            {
+                context.ReportDiagnostic(Rule020, entry.Key);
             }
         }
     }
@@ -601,10 +624,13 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
 
     private class ServiceOperation
     {
-        public ServiceOperation(ITypeSymbol requestType)
+        public ServiceOperation(ITypeSymbol requestType, OperationMethod method)
         {
             RequestType = requestType;
+            Method = method;
         }
+
+        public OperationMethod Method { get; }
 
         public ITypeSymbol RequestType { get; }
 

@@ -116,22 +116,31 @@ namespace {assemblyNamespace}
                 endpointRegistrations.AppendLine($"#if {TestingOnlyDirective}");
             }
 
-            var routeEndpointMethodNames = ToMinimalApiRegistrationMethodNames(registration.OperationType);
+            var routeEndpointMethodNames = ToMinimalApiRegistrationMethodNames(registration.OperationMethod);
             foreach (var routeEndpointMethod in routeEndpointMethodNames)
             {
                 endpointRegistrations.AppendLine(
                     $"            {groupName}.{routeEndpointMethod}(\"{registration.RoutePath}\",");
-                if (registration.OperationType == ServiceOperation.Get
-                    || registration.OperationType == ServiceOperation.Search
-                    || registration.OperationType == ServiceOperation.Delete)
+                if (registration.OperationMethod == OperationMethod.Get
+                    || registration.OperationMethod == OperationMethod.Search
+                    || registration.OperationMethod == OperationMethod.Delete)
                 {
                     endpointRegistrations.AppendLine(
-                        $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDtoName.FullName} request) =>");
+                        $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDto.FullName} request) =>");
                 }
                 else
                 {
-                    endpointRegistrations.AppendLine(
-                        $"                async (global::MediatR.IMediator mediator, global::{registration.RequestDtoName.FullName} request) =>");
+                    if (registration.OperationMethod == OperationMethod.Post
+                        && registration.IsMultipartFormData)
+                    {
+                        endpointRegistrations.AppendLine(
+                            $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::{registration.RequestDto.FullName} request) =>");
+                    }
+                    else
+                    {
+                        endpointRegistrations.AppendLine(
+                            $"                async (global::MediatR.IMediator mediator, global::{registration.RequestDto.FullName} request) =>");
+                    }
                 }
 
                 endpointRegistrations.Append(
@@ -158,6 +167,13 @@ namespace {assemblyNamespace}
                     endpointRegistrations.AppendLine();
                     endpointRegistrations.Append(
                         $@"                .RequireCallerAuthorization(""{policyName}"")");
+                }
+
+                if (registration.IsMultipartFormData)
+                {
+                    endpointRegistrations.AppendLine();
+                    endpointRegistrations.Append(
+                        @"                .DisableAntiforgery()");
                 }
 
                 endpointRegistrations.AppendLine(";");
@@ -219,7 +235,7 @@ namespace {assemblyNamespace}
 
         foreach (var registration in serviceRegistrations)
         {
-            var handlerClassName = $"{registration.MethodName}_{registration.RequestDtoName.Name}_Handler";
+            var handlerClassName = $"{registration.MethodName}_{registration.RequestDto.Name}_Handler";
             var constructorAndFields = BuildInjectorConstructorAndFields(handlerClassName,
                 registration.Class.Constructors.ToList());
 
@@ -229,7 +245,7 @@ namespace {assemblyNamespace}
             }
 
             handlerClasses.AppendLine(
-                $"    public class {handlerClassName} : global::MediatR.IRequestHandler<global::{registration.RequestDtoName.FullName},"
+                $"    public class {handlerClassName} : global::MediatR.IRequestHandler<global::{registration.RequestDto.FullName},"
                 + $" global::Microsoft.AspNetCore.Http.IResult>");
             handlerClasses.AppendLine("    {");
             if (constructorAndFields.HasValue())
@@ -238,7 +254,7 @@ namespace {assemblyNamespace}
             }
 
             handlerClasses.AppendLine($"        public async Task<global::Microsoft.AspNetCore.Http.IResult>"
-                                      + $" Handle(global::{registration.RequestDtoName.FullName} request, global::System.Threading.CancellationToken cancellationToken)");
+                                      + $" Handle(global::{registration.RequestDto.FullName} request, global::System.Threading.CancellationToken cancellationToken)");
             handlerClasses.AppendLine("        {");
             if (!registration.IsAsync)
             {
@@ -272,7 +288,7 @@ namespace {assemblyNamespace}
             handlerClasses.AppendLine(
                 $"            var result = {asyncAwait}api.{registration.MethodName}(request{hasCancellationToken});");
             handlerClasses.AppendLine(
-                $"            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.ServiceOperation.{registration.OperationType});");
+                $"            return result.HandleApiResult(global::{typeof(OperationMethod).FullName}.{registration.OperationMethod});");
             handlerClasses.AppendLine("        }");
             handlerClasses.AppendLine("    }");
             if (registration.IsTestingOnly)
@@ -339,15 +355,15 @@ namespace {assemblyNamespace}
         return visitor.OperationRegistrations;
     }
 
-    private static string[] ToMinimalApiRegistrationMethodNames(ServiceOperation operation)
+    private static string[] ToMinimalApiRegistrationMethodNames(OperationMethod method)
     {
-        return operation switch
+        return method switch
         {
-            ServiceOperation.Get => new[] { "MapGet" },
-            ServiceOperation.Search => new[] { "MapGet" },
-            ServiceOperation.Post => new[] { "MapPost" },
-            ServiceOperation.PutPatch => new[] { "MapPut", "MapPatch" },
-            ServiceOperation.Delete => new[] { "MapDelete" },
+            OperationMethod.Get => new[] { "MapGet" },
+            OperationMethod.Search => new[] { "MapGet" },
+            OperationMethod.Post => new[] { "MapPost" },
+            OperationMethod.PutPatch => new[] { "MapPut", "MapPatch" },
+            OperationMethod.Delete => new[] { "MapDelete" },
             _ => new[] { "MapGet" }
         };
     }

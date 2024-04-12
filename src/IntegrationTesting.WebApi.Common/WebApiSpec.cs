@@ -263,6 +263,11 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         _additionalServerProcesses.Add(process.Id);
     }
 
+    protected Stream GetTestImage()
+    {
+        return TestResources.ResourceManager.GetStream("TestImage")!;
+    }
+    
     private static string GetEmailForPerson(LoginUser who)
     {
         return who switch

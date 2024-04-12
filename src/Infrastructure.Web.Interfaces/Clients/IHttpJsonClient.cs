@@ -39,6 +39,13 @@ public interface IHttpJsonClient
     Task<JsonResponse> PostAsync(IWebRequest request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default);
 
+    Task<JsonResponse<TResponse>> PostAsync<TResponse>(IWebRequest<TResponse> request, PostFile file,
+        Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default)
+        where TResponse : IWebResponse, new();
+
+    Task<JsonResponse> PostAsync(IWebRequest request, PostFile file,
+        Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default);
+
     Task<JsonResponse<TResponse>> PutAsync<TResponse>(IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default)
         where TResponse : IWebResponse, new();
@@ -46,3 +53,5 @@ public interface IHttpJsonClient
     Task<JsonResponse> PutAsync(IWebRequest request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default);
 }
+
+public record PostFile(Stream Stream, string ContentType, string Filename = "file");

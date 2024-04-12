@@ -89,8 +89,8 @@
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\EmptyResponse.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\EmptyResponse.cs</Link>
         </Compile>
-        <Compile Include="..\Infrastructure.Web.Api.Interfaces\ServiceOperation.cs">
-            <Link>Reference\Infrastructure.Web.Api.Interfaces\ServiceOperation.cs</Link>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\OperationMethod.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\OperationMethod.cs</Link>
         </Compile>
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\AuthorizeAttribute.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\AuthorizeAttribute.cs</Link>

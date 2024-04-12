@@ -2,7 +2,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
-[Route("/passwords/register", ServiceOperation.Post)]
+[Route("/passwords/register", OperationMethod.Post)]
 public class RegisterPersonPasswordRequest : UnTenantedRequest<RegisterPersonPasswordResponse>
 {
     public string? CountryCode { get; set; }

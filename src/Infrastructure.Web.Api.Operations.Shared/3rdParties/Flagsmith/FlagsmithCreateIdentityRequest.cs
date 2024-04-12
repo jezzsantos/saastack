@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 
-[Route("/identities/", ServiceOperation.Post)]
+[Route("/identities/", OperationMethod.Post)]
 [UsedImplicitly]
 public class FlagsmithCreateIdentityRequest : IWebRequest<FlagsmithCreateIdentityResponse>
 {

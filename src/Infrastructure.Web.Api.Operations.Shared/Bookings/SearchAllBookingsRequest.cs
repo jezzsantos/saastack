@@ -2,7 +2,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Bookings;
 
-[Route("/bookings", ServiceOperation.Search, AccessType.Token)]
+[Route("/bookings", OperationMethod.Search, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class SearchAllBookingsRequest : TenantedSearchRequest<SearchAllBookingsResponse>
 {

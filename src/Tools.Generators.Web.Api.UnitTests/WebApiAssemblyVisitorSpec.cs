@@ -2,13 +2,13 @@ extern alias Generators;
 using System.Collections.Immutable;
 using System.Reflection;
 using FluentAssertions;
+using Generators::Infrastructure.Web.Api.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Moq;
 using Xunit;
 using IWebApiService = Generators::Infrastructure.Web.Api.Interfaces.IWebApiService;
 using IWebRequest = Generators::Infrastructure.Web.Api.Interfaces.IWebRequest;
-using ServiceOperation = Generators::Infrastructure.Web.Api.Interfaces.ServiceOperation;
 using WebApiAssemblyVisitor = Generators::Tools.Generators.Web.Api.WebApiAssemblyVisitor;
 using UsedImplicitly = Generators::JetBrains.Annotations.UsedImplicitlyAttribute;
 
@@ -376,7 +376,7 @@ public class WebApiAssemblyVisitorSpec
                                                     public class AResponse : IWebResponse
                                                     {
                                                     }
-                                                    [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", ServiceOperation.Get)]
+                                                    [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", OperationMethod.Get)]
                                                     public class ARequest : IWebRequest<AResponse>
                                                     {
                                                     }
@@ -408,14 +408,14 @@ public class WebApiAssemblyVisitorSpec
                                                     + $"         return \"\";{Environment.NewLine}"
                                                     + $"    }}{Environment.NewLine}");
                 registration.MethodName.Should().Be("AMethod");
-                registration.OperationType.Should().Be(ServiceOperation.Get);
+                registration.OperationMethod.Should().Be(OperationMethod.Get);
                 registration.OperationAuthorization.Should().BeNull();
                 registration.RoutePath.Should().Be("aroute");
                 registration.IsTestingOnly.Should().BeFalse();
-                registration.RequestDtoName.Name.Should().Be("ARequest");
-                registration.RequestDtoName.Namespace.Should().Be("ANamespace");
-                registration.ResponseDtoName.Name.Should().Be("AResponse");
-                registration.ResponseDtoName.Namespace.Should().Be("ANamespace");
+                registration.RequestDto.Name.Should().Be("ARequest");
+                registration.RequestDto.Namespace.Should().Be("ANamespace");
+                registration.ResponseDto.Name.Should().Be("AResponse");
+                registration.ResponseDto.Namespace.Should().Be("ANamespace");
             }
 
             [Fact]
@@ -431,7 +431,7 @@ public class WebApiAssemblyVisitorSpec
                                                     {
                                                     }
                                                     [Infrastructure.Web.Api.Interfaces.AuthorizeAttribute(Infrastructure.Web.Api.Interfaces.Roles.Platform_Standard, Infrastructure.Web.Api.Interfaces.Features.Platform_Basic)]
-                                                    [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", ServiceOperation.Get)]
+                                                    [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", OperationMethod.Get)]
                                                     public class ARequest : IWebRequest<AResponse>
                                                     {
                                                     }
@@ -463,15 +463,15 @@ public class WebApiAssemblyVisitorSpec
                                                     + $"         return \"\";{Environment.NewLine}"
                                                     + $"    }}{Environment.NewLine}");
                 registration.MethodName.Should().Be("AMethod");
-                registration.OperationType.Should().Be(ServiceOperation.Get);
+                registration.OperationMethod.Should().Be(OperationMethod.Get);
                 registration.OperationAuthorization!.PolicyName.Should().Be(
                     "POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}");
                 registration.RoutePath.Should().Be("aroute");
                 registration.IsTestingOnly.Should().BeFalse();
-                registration.RequestDtoName.Name.Should().Be("ARequest");
-                registration.RequestDtoName.Namespace.Should().Be("ANamespace");
-                registration.ResponseDtoName.Name.Should().Be("AResponse");
-                registration.ResponseDtoName.Namespace.Should().Be("ANamespace");
+                registration.RequestDto.Name.Should().Be("ARequest");
+                registration.RequestDto.Namespace.Should().Be("ANamespace");
+                registration.ResponseDto.Name.Should().Be("AResponse");
+                registration.ResponseDto.Namespace.Should().Be("ANamespace");
             }
 
             [Fact]
@@ -488,7 +488,7 @@ public class WebApiAssemblyVisitorSpec
                                                     }
                                                     [Infrastructure.Web.Api.Interfaces.AuthorizeAttribute(Infrastructure.Web.Api.Interfaces.Roles.Platform_Operations, Infrastructure.Web.Api.Interfaces.Features.Platform_Paid2)]
                                                     [Infrastructure.Web.Api.Interfaces.AuthorizeAttribute(Infrastructure.Web.Api.Interfaces.Roles.Platform_Standard, Infrastructure.Web.Api.Interfaces.Features.Platform_Basic)]
-                                                    [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", ServiceOperation.Get)]
+                                                    [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", OperationMethod.Get)]
                                                     public class ARequest : IWebRequest<AResponse>
                                                     {
                                                     }
@@ -520,16 +520,16 @@ public class WebApiAssemblyVisitorSpec
                                                     + $"         return \"\";{Environment.NewLine}"
                                                     + $"    }}{Environment.NewLine}");
                 registration.MethodName.Should().Be("AMethod");
-                registration.OperationType.Should().Be(ServiceOperation.Get);
+                registration.OperationMethod.Should().Be(OperationMethod.Get);
                 registration.OperationAuthorization!.PolicyName.Should().Be(
                     "POLICY:{|Features|:{|Platform|:[|paid2_features|]},|Roles|:{|Platform|:[|operations|]}}"
                     + "POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}");
                 registration.RoutePath.Should().Be("aroute");
                 registration.IsTestingOnly.Should().BeFalse();
-                registration.RequestDtoName.Name.Should().Be("ARequest");
-                registration.RequestDtoName.Namespace.Should().Be("ANamespace");
-                registration.ResponseDtoName.Name.Should().Be("AResponse");
-                registration.ResponseDtoName.Namespace.Should().Be("ANamespace");
+                registration.RequestDto.Name.Should().Be("ARequest");
+                registration.RequestDto.Namespace.Should().Be("ANamespace");
+                registration.ResponseDto.Name.Should().Be("AResponse");
+                registration.ResponseDto.Namespace.Should().Be("ANamespace");
             }
 
             [Fact]
@@ -544,7 +544,7 @@ public class WebApiAssemblyVisitorSpec
                                                     public class AResponse : IWebResponse
                                                     {
                                                     }
-                                                    [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", ServiceOperation.Get)]
+                                                    [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", OperationMethod.Get)]
                                                     public class ARequest : IWebRequest<AResponse>
                                                     {
                                                     }

@@ -35,7 +35,7 @@ public static class RequestExtensions
         return new RequestInfo
         {
             Route = route,
-            Operation = attribute.Operation,
+            Method = attribute.Method,
             IsTestingOnly = attribute.IsTestingOnly
         };
     }
@@ -156,7 +156,7 @@ public static class RequestExtensions
         Dictionary<string, object?> requestFields,
         StringBuilder route)
     {
-        if (attribute.Operation is not ServiceOperation.Get and not ServiceOperation.Search)
+        if (attribute.Method is not OperationMethod.Get and not OperationMethod.Search)
         {
             return route;
         }

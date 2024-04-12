@@ -2,7 +2,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 
-[Route("/record/trace", ServiceOperation.Post)]
+[Route("/record/trace", OperationMethod.Post)]
 public class RecordTraceRequest : UnTenantedEmptyRequest
 {
     public List<string>? Arguments { get; set; }

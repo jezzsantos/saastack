@@ -3,6 +3,6 @@ using JetBrains.Annotations;
 
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 
-[Route("/flags/", ServiceOperation.Get)]
+[Route("/flags/", OperationMethod.Get)]
 [UsedImplicitly]
 public class FlagsmithGetEnvironmentFlagsRequest : IWebRequest<FlagsmithGetEnvironmentFlagsResponse>;

@@ -7,7 +7,7 @@ public class RequestInfo
 {
     public required bool IsTestingOnly { get; init; }
 
-    public required ServiceOperation Operation { get; init; }
+    public required OperationMethod Method { get; init; }
 
     public required string Route { get; init; }
 }

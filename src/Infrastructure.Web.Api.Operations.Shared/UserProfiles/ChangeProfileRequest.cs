@@ -2,7 +2,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.UserProfiles;
 
-[Route("/profiles/{UserId}", ServiceOperation.PutPatch, AccessType.Token)]
+[Route("/profiles/{UserId}", OperationMethod.PutPatch, AccessType.Token)]
 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
 public class ChangeProfileRequest : UnTenantedRequest<GetProfileResponse>
 {

@@ -3,7 +3,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.OAuth2;
 
-[Route("/auth/token", ServiceOperation.Post)]
+[Route("/auth/token", OperationMethod.Post)]
 public class ExchangeOAuth2CodeForTokensRequest : UnTenantedRequest<ExchangeOAuth2CodeForTokensResponse>
 {
     [JsonPropertyName("client_id")] public required string ClientId { get; set; }

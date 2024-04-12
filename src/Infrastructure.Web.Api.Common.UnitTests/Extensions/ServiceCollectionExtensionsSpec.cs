@@ -86,7 +86,7 @@ public class ServiceCollectionExtensionsSpec
         }
     }
 
-    [Route("/aroute", ServiceOperation.Get)]
+    [Route("/aroute", OperationMethod.Get)]
     [UsedImplicitly]
     public class TestRequest2 : IWebRequest<TestResponse>;
 }

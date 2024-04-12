@@ -121,6 +121,7 @@ public static class HostExtensions
 
         void RegisterSharedServices()
         {
+            services.AddAntiforgery();
             services.AddHttpContextAccessor();
             services.AddSingleton<IFeatureFlags>(c =>
                 new FlagsmithHttpServiceClient(c.GetRequiredService<IRecorder>(),

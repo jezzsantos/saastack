@@ -2,7 +2,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
 
-[Route("/organizations/{Id}/members", ServiceOperation.Post, AccessType.Token)]
+[Route("/organizations/{Id}/members", OperationMethod.Post, AccessType.Token)]
 [Authorize(Roles.Tenant_Owner, Features.Tenant_Basic)]
 public class InviteMemberToOrganizationRequest : UnTenantedRequest<InviteMemberToOrganizationResponse>,
     IUnTenantedOrganizationRequest

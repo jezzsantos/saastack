@@ -14,6 +14,7 @@
  SAASWEB017 | SaaStackWebApi      | Warning  | The request type should be declared with a RouteAttribute on it.                                          
  SAASWEB018 | SaaStackWebApi      | Error    | The request type should not be declared with a AuthorizeAttribute on it.                                  
  SAASWEB019 | SaaStackWebApi      | Warning  | The request type should be declared with a AuthorizeAttribute on it.                                      
+ SAASWEB020 | SaaStackWebApi      | Warning  | There should be no methods in this class with the same route.                                             
  SAASDDD010 | SaaStackDDD         | Error    | Aggregate roots must have at least one Create() class factory method.                                     
  SAASDDD011 | SaaStackDDD         | Error    | Create() class factory methods must return correct types.                                                 
  SAASDDD012 | SaaStackDDD         | Error    | Aggregate roots must raise a create event in the class factory.                                           

@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 
-[Route("/audits/deliver", ServiceOperation.Post, AccessType.HMAC)]
+[Route("/audits/deliver", OperationMethod.Post, AccessType.HMAC)]
 [Authorize(Roles.Platform_ServiceAccount)]
 public class DeliverAuditRequest : UnTenantedRequest<DeliverMessageResponse>
 {

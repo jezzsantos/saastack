@@ -135,7 +135,7 @@ For "private" API requests, you declare them with the `isPrivate` option on the 
 For example,
 
 ```c# 
-[Route("/organizations/{id}/settings", ServiceOperation.Get, AccessType.Token, isPrivate = true)]
+[Route("/organizations/{id}/settings", OperationMethod.Get, AccessType.Token, isPrivate = true)]
 [Authorize(Roles.Platform_Operations)]
 public class GetOrganizationSettingsRequest : TenantedRequest<GetOrganizationSettingsResponse>
 {

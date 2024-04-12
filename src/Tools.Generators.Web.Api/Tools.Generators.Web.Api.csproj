@@ -43,6 +43,9 @@
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebResponse.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebResponse.cs</Link>
         </Compile>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\IHasMultipartForm.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\IHasMultipartForm.cs</Link>
+        </Compile>
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\ITenantedRequest.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\ITenantedRequest.cs</Link>
         </Compile>
@@ -58,8 +61,8 @@
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\Generated\Tools.Generators.Web.Api.Authorization\Tools.Generators.Web.Api.Authorization.AuthorizationAttributeGenerator\AuthorizeAttribute.g.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\AuthorizeAttribute.g.cs</Link>
         </Compile>
-        <Compile Include="..\Infrastructure.Web.Api.Interfaces\ServiceOperation.cs">
-            <Link>Reference\Infrastructure.Web.Api.Interfaces\ServiceOperation.cs</Link>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\OperationMethod.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\OperationMethod.cs</Link>
         </Compile>
         <Compile Include="..\Infrastructure.Web.Hosting.Common\WebHostingConstants.cs">
             <Link>Reference\Infrastructure.Web.Hosting.Common\WebHostingConstants.cs</Link>

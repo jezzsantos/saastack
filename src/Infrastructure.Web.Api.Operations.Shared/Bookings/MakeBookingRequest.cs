@@ -2,7 +2,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Bookings;
 
-[Route("/bookings", ServiceOperation.Post, AccessType.Token)]
+[Route("/bookings", OperationMethod.Post, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class MakeBookingRequest : TenantedRequest<MakeBookingResponse>
 {

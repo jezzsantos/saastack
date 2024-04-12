@@ -41,6 +41,13 @@ public delegate Result<TResponse, Error> ApiGetResult<TResource, TResponse>()
     where TResponse : IWebResponse;
 
 /// <summary>
+///     Defines a callback that returns any <see cref="Stream" /> or <see cref="Error" />.
+///     Supported for only Methods: Get
+/// </summary>
+// ReSharper disable once UnusedTypeParameter
+public delegate Result<StreamResult, Error> ApiStreamResult();
+
+/// <summary>
 ///     Defines a callback that returns any <see cref="TResponse" /> or <see cref="Error" />.
 ///     Supported for only Methods: Search.
 /// </summary>
@@ -55,9 +62,8 @@ public delegate Result<TResponse, Error> ApiSearchResult<TResource, TResponse>()
 public delegate Result<EmptyResponse, Error> ApiDeleteResult();
 
 /// <summary>
-///     Provides a container with a <see cref="TResponse" /> and other attributes describing a
+///     Provides a container with a <see cref="TResponse" /> and other attributes describing a POST result
 /// </summary>
-/// <typeparam name="TResponse"></typeparam>
 public class PostResult<TResponse>
     where TResponse : IWebResponse
 {
@@ -78,4 +84,20 @@ public class PostResult<TResponse>
     {
         return new PostResult<TResponse>(response);
     }
+}
+
+/// <summary>
+///     Provides a container describing a stream result
+/// </summary>
+public class StreamResult
+{
+    public StreamResult(Stream stream, string contentType)
+    {
+        Stream = stream;
+        ContentType = contentType;
+    }
+
+    public string ContentType { get; }
+
+    public Stream Stream { get; }
 }

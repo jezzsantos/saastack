@@ -1194,6 +1194,33 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This service operation has the same route and method as another service operation in this class..
+        /// </summary>
+        internal static string SAASWEB020Description {
+            get {
+                return ResourceManager.GetString("SAASWEB020Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service operation &apos;{0}&apos; has the same route and method as does another service operation in this class. They must use different routes.
+        /// </summary>
+        internal static string SAASWEB020MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB020MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate route and method.
+        /// </summary>
+        internal static string SAASWEB020Title {
+            get {
+                return ResourceManager.GetString("SAASWEB020Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The request type should end with the word &apos;Request&apos;..
         /// </summary>
         internal static string SAASWEB031Description {

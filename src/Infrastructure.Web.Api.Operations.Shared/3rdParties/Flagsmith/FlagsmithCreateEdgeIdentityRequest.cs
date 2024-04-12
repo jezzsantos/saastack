@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 
-[Route("/environments/{EnvironmentApiKey}/edge-identities/", ServiceOperation.Post)]
+[Route("/environments/{EnvironmentApiKey}/edge-identities/", OperationMethod.Post)]
 [UsedImplicitly]
 public class FlagsmithCreateEdgeIdentityRequest : IWebRequest<FlagsmithCreateEdgeIdentityResponse>
 {

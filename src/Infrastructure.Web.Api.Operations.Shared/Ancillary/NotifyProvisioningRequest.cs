@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 
-[Route("/provisioning/notify", ServiceOperation.Post, AccessType.HMAC)]
+[Route("/provisioning/notify", OperationMethod.Post, AccessType.HMAC)]
 [Authorize(Roles.Platform_ServiceAccount)]
 public class NotifyProvisioningRequest : UnTenantedRequest<DeliverMessageResponse>
 {

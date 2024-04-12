@@ -32,7 +32,7 @@ public class RequestExtensionsSpec
         var result = request.GetRequestInfo();
 
         result.Route.Should().Be("/aroute/{unknown}");
-        result.Operation.Should().Be(ServiceOperation.Get);
+        result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
 
@@ -44,7 +44,7 @@ public class RequestExtensionsSpec
         var result = request.GetRequestInfo();
 
         result.Route.Should().Be("/aroute");
-        result.Operation.Should().Be(ServiceOperation.Get);
+        result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
 
@@ -65,7 +65,7 @@ public class RequestExtensionsSpec
         result.Route.Should()
             .Be(
                 "/aroute?adatetimeproperty=2023-10-29T12%3a30%3a15Z&anumberproperty=999&astringproperty=avalue&id=anid");
-        result.Operation.Should().Be(ServiceOperation.Get);
+        result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
 
@@ -84,7 +84,7 @@ public class RequestExtensionsSpec
         var result = request.GetRequestInfo();
 
         result.Route.Should().Be("/aroute");
-        result.Operation.Should().Be(ServiceOperation.Post);
+        result.Method.Should().Be(OperationMethod.Post);
         result.IsTestingOnly.Should().BeFalse();
     }
 
@@ -96,7 +96,7 @@ public class RequestExtensionsSpec
         var result = request.GetRequestInfo();
 
         result.Route.Should().Be("/aroute/{unknown}");
-        result.Operation.Should().Be(ServiceOperation.Get);
+        result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
 
@@ -117,7 +117,7 @@ public class RequestExtensionsSpec
         result.Route.Should()
             .Be(
                 "/aroute/{unknown}?adatetimeproperty=2023-10-29T12%3a30%3a15Z&anumberproperty=999&astringproperty=avalue&id=anid");
-        result.Operation.Should().Be(ServiceOperation.Get);
+        result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
 
@@ -136,7 +136,7 @@ public class RequestExtensionsSpec
         var result = request.GetRequestInfo();
 
         result.Route.Should().Be("/aroute/{unknown}");
-        result.Operation.Should().Be(ServiceOperation.Post);
+        result.Method.Should().Be(OperationMethod.Post);
         result.IsTestingOnly.Should().BeFalse();
     }
 
@@ -156,7 +156,7 @@ public class RequestExtensionsSpec
         var result = request.GetRequestInfo();
 
         result.Route.Should().Be("/aroute/apath1/xxxyyy/apath2/apath3");
-        result.Operation.Should().Be(ServiceOperation.Get);
+        result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
 
@@ -179,7 +179,7 @@ public class RequestExtensionsSpec
         result.Route.Should()
             .Be(
                 "/aroute/anid/apath1/xxx999yyy/apath2/avalue1/avalue2/apath3?adatetimeproperty=2023-10-29T12%3a30%3a15Z&astringproperty3=avalue3");
-        result.Operation.Should().Be(ServiceOperation.Get);
+        result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
 
@@ -201,7 +201,7 @@ public class RequestExtensionsSpec
 
         result.Route.Should()
             .Be("/aroute/anid/apath1/xxxyyy/apath2/avalue1/apath3?adatetimeproperty=2023-10-29T12%3a30%3a15Z");
-        result.Operation.Should().Be(ServiceOperation.Get);
+        result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
     }
 
@@ -221,7 +221,7 @@ public class RequestExtensionsSpec
         var result = request.GetRequestInfo();
 
         result.Route.Should().Be("/aroute/apath1/xxxyyy/apath2/apath3");
-        result.Operation.Should().Be(ServiceOperation.Post);
+        result.Method.Should().Be(OperationMethod.Post);
         result.IsTestingOnly.Should().BeFalse();
     }
 
@@ -242,7 +242,7 @@ public class RequestExtensionsSpec
         var result = request.GetRequestInfo();
 
         result.Route.Should().Be("/aroute/anid/apath1/xxx999yyy/apath2/avalue1/avalue2/apath3");
-        result.Operation.Should().Be(ServiceOperation.Post);
+        result.Method.Should().Be(OperationMethod.Post);
         result.IsTestingOnly.Should().BeFalse();
     }
 
@@ -263,7 +263,7 @@ public class RequestExtensionsSpec
         var result = request.GetRequestInfo();
 
         result.Route.Should().Be("/aroute/anid/apath1/xxxyyy/apath2/avalue1/apath3");
-        result.Operation.Should().Be(ServiceOperation.Post);
+        result.Method.Should().Be(OperationMethod.Post);
         result.IsTestingOnly.Should().BeFalse();
     }
 
@@ -288,10 +288,10 @@ public class RequestExtensionsSpec
 
     private class NoRouteRequest : IWebRequest<TestResponse>;
 
-    [Route("/aroute/{unknown}", ServiceOperation.Get)]
+    [Route("/aroute/{unknown}", OperationMethod.Get)]
     private class HasNoPropertiesRequest : IWebRequest<TestResponse>;
 
-    [Route("/aroute", ServiceOperation.Get)]
+    [Route("/aroute", OperationMethod.Get)]
     private class HasNoPlaceholdersGetRequest : IWebRequest<TestResponse>
     {
         public DateTime? ADateTimeProperty { get; set; }
@@ -303,7 +303,7 @@ public class RequestExtensionsSpec
         public string? Id { get; set; }
     }
 
-    [Route("/aroute", ServiceOperation.Post)]
+    [Route("/aroute", OperationMethod.Post)]
     private class HasNoPlaceholdersPostRequest : IWebRequest<TestResponse>
     {
         public DateTime? ADateTimeProperty { get; set; }
@@ -315,7 +315,7 @@ public class RequestExtensionsSpec
         public string? Id { get; set; }
     }
 
-    [Route("/aroute/{unknown}", ServiceOperation.Get)]
+    [Route("/aroute/{unknown}", OperationMethod.Get)]
     private class HasUnknownPlaceholderGetRequest : IWebRequest<TestResponse>
     {
         public DateTime? ADateTimeProperty { get; set; }
@@ -327,7 +327,7 @@ public class RequestExtensionsSpec
         public string? Id { get; set; }
     }
 
-    [Route("/aroute/{unknown}", ServiceOperation.Post)]
+    [Route("/aroute/{unknown}", OperationMethod.Post)]
     private class HasUnknownPlaceholderPostRequest : IWebRequest<TestResponse>
     {
         public DateTime? ADateTimeProperty { get; set; }
@@ -340,7 +340,7 @@ public class RequestExtensionsSpec
     }
 
     [Route("/aroute/{id}/apath1/xxx{anumberproperty}yyy/apath2/{astringproperty1}/{astringproperty2}/apath3",
-        ServiceOperation.Get)]
+        OperationMethod.Get)]
     private class HasPlaceholdersGetRequest : IWebRequest<TestResponse>
     {
         public DateTime? ADateTimeProperty { get; set; }
@@ -357,7 +357,7 @@ public class RequestExtensionsSpec
     }
 
     [Route("/aroute/{id}/apath1/xxx{anumberproperty}yyy/apath2/{astringproperty1}/{astringproperty2}/apath3",
-        ServiceOperation.Post)]
+        OperationMethod.Post)]
     private class HasPlaceholdersPostRequest : IWebRequest<TestResponse>
     {
         public DateTime? ADateTimeProperty { get; set; }

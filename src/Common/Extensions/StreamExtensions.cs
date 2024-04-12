@@ -32,8 +32,19 @@ public static class StreamExtensions
             return memoryStream.ToArray();
         }
 
-        using var memoryStream2 = MemoryManager.GetStream();
+        await using var memoryStream2 = MemoryManager.GetStream();
         await value.CopyToAsync(memoryStream2, cancellationToken);
         return memoryStream2.ToArray();
+    }
+
+    /// <summary>
+    ///     Rewinds a stream to its beginning
+    /// </summary>
+    public static void Rewind(this Stream stream)
+    {
+        if (stream.CanSeek)
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+        }
     }
 }

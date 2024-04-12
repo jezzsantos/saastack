@@ -3,7 +3,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 
-[Route("/environments/{EnvironmentApiKey}/featurestates/", ServiceOperation.Post)]
+[Route("/environments/{EnvironmentApiKey}/featurestates/", OperationMethod.Post)]
 public class FlagsmithGetFeatureStatesRequest : IWebRequest<FlagsmithGetFeatureStatesResponse>
 {
     public required string EnvironmentApiKey { get; set; }

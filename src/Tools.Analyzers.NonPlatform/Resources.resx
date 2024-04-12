@@ -233,6 +233,16 @@
     <data name="SAASWEB019Title" xml:space="preserve">
         <value>Missing '[AuthorizeAttribute]'</value>
     </data>
+    <data name="SAASWEB020Description" xml:space="preserve">
+        <value>This service operation has the same route and method as another service operation in this class.</value>
+    </data>
+    <data name="SAASWEB020MessageFormat" xml:space="preserve">
+        <value>Service operation '{0}' has the same route and method as does another service operation in this class. They must use different routes</value>
+    </data>
+    <data name="SAASWEB020Title" xml:space="preserve">
+        <value>Duplicate route and method</value>
+    </data>
+
     <data name="SAASWEB031Description" xml:space="preserve">
         <value>The request type should end with the word 'Request'.</value>
     </data>
