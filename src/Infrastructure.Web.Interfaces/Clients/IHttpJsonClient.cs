@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Interfaces.Clients;
 /// </summary>
 public interface IHttpJsonClient
 {
-    Task<JsonResponse> DeleteAsync<TResponse>(IWebRequest<TResponse> request,
+    Task<JsonResponse<TResponse>> DeleteAsync<TResponse>(IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = default)
         where TResponse : IWebResponse, new();
@@ -47,6 +47,10 @@ public interface IHttpJsonClient
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default);
 
     Task<JsonResponse<TResponse>> PutAsync<TResponse>(IWebRequest<TResponse> request,
+        Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default)
+        where TResponse : IWebResponse, new();
+
+    Task<JsonResponse<TResponse>> PutAsync<TResponse>(IWebRequest<TResponse> request, PostFile file,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default)
         where TResponse : IWebResponse, new();
 

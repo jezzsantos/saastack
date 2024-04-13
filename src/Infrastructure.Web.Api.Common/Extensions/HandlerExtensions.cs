@@ -177,7 +177,10 @@ public static class HandlerExtensions
                 return Results.Accepted(null, response);
 
             case OperationMethod.Delete:
-                return Results.NoContent();
+                var hasResponse = response is not EmptyResponse;
+                return hasResponse
+                    ? Results.Accepted(null, response)
+                    : Results.NoContent();
 
             default:
                 return Results.Ok(response);

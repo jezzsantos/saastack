@@ -2,11 +2,12 @@ using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Common.Pipeline;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
-namespace Infrastructure.Web.Api.Common.UnitTests;
+namespace Infrastructure.Web.Api.Common.UnitTests.Pipeline;
 
 [Trait("Category", "Unit")]
 public class ValidationBehaviorSpec

@@ -1,6 +1,7 @@
 using System.Reflection;
 using Common.Extensions;
 using FluentValidation;
+using Infrastructure.Web.Api.Common.Pipeline;
 using Infrastructure.Web.Api.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Http;

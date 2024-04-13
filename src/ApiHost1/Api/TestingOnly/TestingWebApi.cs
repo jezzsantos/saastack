@@ -143,11 +143,20 @@ public sealed class TestingWebApi : IWebApiService
             { Message = "amessage" });
     }
 
-    public async Task<ApiDeleteResult> StatusesDelete(StatusesDeleteTestingOnlyRequest request,
+    public async Task<ApiDeleteResult> StatusesDelete1(StatusesDeleteTestingOnlyRequest request,
         CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         return () => new Result<EmptyResponse, Error>(new EmptyResponse());
+    }
+
+    public async Task<ApiResult<string, StatusesTestingOnlyResponse>> StatusesDelete2(
+        StatusesDeleteWithResponseTestingOnlyRequest request,
+        CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () =>
+            new Result<StatusesTestingOnlyResponse, Error>(new StatusesTestingOnlyResponse { Message = "amessage" });
     }
 
     public async Task<ApiGetResult<string, StatusesTestingOnlyResponse>> StatusesGet(
@@ -158,7 +167,7 @@ public sealed class TestingWebApi : IWebApiService
             new Result<StatusesTestingOnlyResponse, Error>(new StatusesTestingOnlyResponse { Message = "amessage" });
     }
 
-    public async Task<ApiPostResult<string, StatusesTestingOnlyResponse>> StatusesPost(
+    public async Task<ApiPostResult<string, StatusesTestingOnlyResponse>> StatusesPost1(
         StatusesPostTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;

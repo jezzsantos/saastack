@@ -2,6 +2,7 @@ using System.Reflection;
 using FluentAssertions;
 using FluentValidation;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Common.Pipeline;
 using Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;

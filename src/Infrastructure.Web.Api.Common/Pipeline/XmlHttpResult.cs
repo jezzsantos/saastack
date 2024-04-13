@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.Web.Api.Common;
+namespace Infrastructure.Web.Api.Common.Pipeline;
 
 /// <summary>
 ///     An action result which formats the given object as XML.

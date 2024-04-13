@@ -9,10 +9,9 @@ namespace Infrastructure.Web.Interfaces.Clients;
 /// </summary>
 public interface IServiceClient : IFireAndForgetServiceClient
 {
-    Task<Result<string?, ResponseProblem>> DeleteAsync<TResponse>(ICallerContext? context,
-        IWebRequest<TResponse> request,
-        Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = null)
-        where TResponse : IWebResponse, new();
+    Task<Result<string?, ResponseProblem>> DeleteAsync(ICallerContext? context,
+        IWebRequest request,
+        Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = null);
 
     Task<Result<TResponse, ResponseProblem>> GetAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request,

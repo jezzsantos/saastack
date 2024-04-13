@@ -3,6 +3,7 @@ using System.Text;
 using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Endpoints;
+using Infrastructure.Web.Api.Common.Pipeline;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;

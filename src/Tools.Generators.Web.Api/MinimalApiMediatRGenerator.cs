@@ -121,16 +121,15 @@ namespace {assemblyNamespace}
             {
                 endpointRegistrations.AppendLine(
                     $"            {groupName}.{routeEndpointMethod}(\"{registration.RoutePath}\",");
-                if (registration.OperationMethod == OperationMethod.Get
-                    || registration.OperationMethod == OperationMethod.Search
-                    || registration.OperationMethod == OperationMethod.Delete)
+                if (registration.OperationMethod is OperationMethod.Get or OperationMethod.Search
+                    or OperationMethod.Delete)
                 {
                     endpointRegistrations.AppendLine(
                         $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDto.FullName} request) =>");
                 }
                 else
                 {
-                    if (registration.OperationMethod == OperationMethod.Post
+                    if (registration.OperationMethod is OperationMethod.Post or OperationMethod.PutPatch
                         && registration.IsMultipartFormData)
                     {
                         endpointRegistrations.AppendLine(

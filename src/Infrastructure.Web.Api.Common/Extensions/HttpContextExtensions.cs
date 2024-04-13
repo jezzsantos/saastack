@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Infrastructure.Web.Api.Common.Pipeline;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.DependencyInjection;

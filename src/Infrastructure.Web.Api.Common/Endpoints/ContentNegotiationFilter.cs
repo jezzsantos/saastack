@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using Common.Extensions;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Common.Pipeline;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;

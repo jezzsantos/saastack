@@ -73,12 +73,22 @@ public class DefaultStatusCodeApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenDelete_ThenReturnsNoContent()
+    public async Task WhenDeleteAndNoResponse_ThenReturnsNoContent()
     {
         var result = await Api.DeleteAsync(new StatusesDeleteTestingOnlyRequest());
 
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);
         result.Content.HasValue.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task WhenDeleteWithResponse_ThenReturnsNoContent()
+    {
+        var result = await Api.DeleteAsync(new StatusesDeleteWithResponseTestingOnlyRequest());
+
+        result.StatusCode.Should().Be(HttpStatusCode.Accepted);
+        result.Content.HasValue.Should().BeTrue();
+        result.Content.Value.Message.Should().Be("amessage");
     }
 }
 #endif

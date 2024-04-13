@@ -1,3 +1,4 @@
+using Infrastructure.Web.Api.Common.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Web.Api.Common.Extensions;

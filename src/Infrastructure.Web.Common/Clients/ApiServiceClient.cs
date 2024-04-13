@@ -35,10 +35,9 @@ public class ApiServiceClient : IServiceClient
         _retryPolicy = ApiClientRetryPolicies.CreateRetryWithExponentialBackoffAndJitter(retryCount);
     }
 
-    public async Task<Result<string?, ResponseProblem>> DeleteAsync<TResponse>(ICallerContext? context,
-        IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
+    public async Task<Result<string?, ResponseProblem>> DeleteAsync(ICallerContext? context,
+        IWebRequest request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)
-        where TResponse : IWebResponse, new()
     {
         using var client = CreateJsonClient(context, requestFilter, out var modifiedRequestFilter);
         return await _retryPolicy.ExecuteAsync(

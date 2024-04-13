@@ -50,12 +50,12 @@ public class JsonClient : IHttpJsonClient, IDisposable
         }
     }
 
-    public async Task<JsonResponse> DeleteAsync<TResponse>(IWebRequest<TResponse> request,
+    public async Task<JsonResponse<TResponse>> DeleteAsync<TResponse>(IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default)
         where TResponse : IWebResponse, new()
     {
         var response = await SendRequestAsync(HttpMethod.Delete, request, null, requestFilter, cancellationToken);
-        var content = await GetStringResponseAsync(response, _jsonOptions, cancellationToken);
+        var content = await GetTypedResponseAsync<TResponse>(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);
     }
@@ -159,6 +159,17 @@ public class JsonClient : IHttpJsonClient, IDisposable
         where TResponse : IWebResponse, new()
     {
         var response = await SendRequestAsync(HttpMethod.Put, request, null, requestFilter, cancellationToken);
+        var content = await GetTypedResponseAsync<TResponse>(response, _jsonOptions, cancellationToken);
+
+        return CreateResponse(response, content);
+    }
+
+    public async Task<JsonResponse<TResponse>> PutAsync<TResponse>(IWebRequest<TResponse> request, PostFile file,
+        Action<HttpRequestMessage>? requestFilter = null,
+        CancellationToken? cancellationToken = default)
+        where TResponse : IWebResponse, new()
+    {
+        var response = await SendRequestAsync(HttpMethod.Put, request, file, requestFilter, cancellationToken);
         var content = await GetTypedResponseAsync<TResponse>(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);

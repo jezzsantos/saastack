@@ -6,7 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 
-namespace Infrastructure.Web.Api.Common;
+namespace Infrastructure.Web.Api.Common.Pipeline;
 
 /// <summary>
 ///     Defines a <see cref="IPipelineBehavior{TRequest,IResult}" /> for validating all incoming
