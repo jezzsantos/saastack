@@ -6,6 +6,25 @@ namespace UserProfilesDomain;
 
 public static class Events
 {
+    public static AvatarAdded AvatarAdded(Identifier id, Identifier userId, Avatar avatar)
+    {
+        return new AvatarAdded(id)
+        {
+            UserId = userId,
+            AvatarId = avatar.ImageId,
+            AvatarUrl = avatar.Url
+        };
+    }
+
+    public static AvatarRemoved AvatarRemoved(Identifier id, Identifier userId, Identifier avatarId)
+    {
+        return new AvatarRemoved(id)
+        {
+            UserId = userId,
+            AvatarId = avatarId
+        };
+    }
+
     public static ContactAddressChanged ContactAddressChanged(Identifier id, Identifier userId, Address address)
     {
         return new ContactAddressChanged(id)

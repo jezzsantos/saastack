@@ -1,6 +1,7 @@
 using System.Reflection;
 using Application.Interfaces.Services;
 using Application.Persistence.Interfaces;
+using Application.Services.Shared;
 using Common;
 using Domain.Common.Identity;
 using Domain.Interfaces;
@@ -8,6 +9,7 @@ using ImagesApplication;
 using ImagesApplication.Persistence;
 using ImagesDomain;
 using ImagesInfrastructure.Api.Images;
+using ImagesInfrastructure.ApplicationServices;
 using ImagesInfrastructure.Persistence;
 using ImagesInfrastructure.Persistence.ReadModels;
 using Infrastructure.Hosting.Common.Extensions;
@@ -59,6 +61,8 @@ public class ImagesModule : ISubdomainModule
                     c => new ImageProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
+
+                services.AddSingleton<IImagesService, ImagesInProcessServiceClient>();
             };
         }
     }

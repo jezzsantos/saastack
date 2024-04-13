@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Services.Shared;
 using Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
@@ -32,6 +33,7 @@ public class UserProfileApplicationDomainEventHandlersSpec
         _idFactory = new Mock<IIdentifierFactory>();
         _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
+        var imagesService = new Mock<IImagesService>();
         _repository = new Mock<IUserProfileRepository>();
         _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Optional<UserProfileRoot>.None);
@@ -40,7 +42,8 @@ public class UserProfileApplicationDomainEventHandlersSpec
         _repository.Setup(rep => rep.SaveAsync(It.IsAny<UserProfileRoot>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((UserProfileRoot root, CancellationToken _) => root);
 
-        _application = new UserProfilesApplication(_recorder.Object, _idFactory.Object, _repository.Object);
+        _application = new UserProfilesApplication(_recorder.Object, _idFactory.Object, imagesService.Object,
+            _repository.Object);
     }
 
     [Fact]
@@ -111,7 +114,7 @@ public class UserProfileApplicationDomainEventHandlersSpec
             && up.PhoneNumber.HasValue == false
             && up.Address.CountryCode == CountryCodes.Default
             && up.Timezone == Timezones.Default
-            && up.AvatarUrl.HasValue == false
+            && up.Avatar.HasValue == false
         ), It.IsAny<CancellationToken>()));
     }
 
@@ -136,7 +139,7 @@ public class UserProfileApplicationDomainEventHandlersSpec
             && up.PhoneNumber.HasValue == false
             && up.Address.CountryCode == CountryCodes.Default
             && up.Timezone == Timezones.Default
-            && up.AvatarUrl.HasValue == false
+            && up.Avatar.HasValue == false
         ), It.IsAny<CancellationToken>()));
     }
 }

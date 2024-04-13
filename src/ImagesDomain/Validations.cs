@@ -13,7 +13,6 @@ public static class Validations
         public static readonly IReadOnlyList<string> AllowableContentTypes = new[]
         {
             "image/jpeg",
-            "image/x-png",
             "image/png",
             "image/gif"
         };

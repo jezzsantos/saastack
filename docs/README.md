@@ -1,3 +1,7 @@
+# All Use cases
+
+Take a look at all the [public API use cases](design-principles/0000-all-use-cases.md) for this software
+
 # Architecture Design Records
 
 Browse our [Architectural Design Records](decisions/README.md) that describe the key assumptions and decisions made behind the design of this code template.
@@ -10,7 +14,9 @@ Learn about the [Design Principles and Implementation details](design-principles
 
 Supporting tooling used to help you be more productive with this template, and code examples.
 
-We make extensive use Roslyn Analyzers, Code Fixes and Source Generators to help you and your team be highly productive in following the established patterns this codebase.
+We make extensive use Roslyn Analyzers, Code Fixes and Source Generators and Architecture tests to help you and your team be highly productive in following the established patterns this codebase. And more importantly detect and fix when those principles are violated.
+
+For more details see the [Developer Tooling](design-principles/0140-developer-tooling.md) documentation.
 
 For example, we make it trivial to define robust REST API's, and under the covers the tooling converts those API definitions into MediatR brokered minimal APIs for you. But you never have to write all that minimal API boiler plate stuff.
 

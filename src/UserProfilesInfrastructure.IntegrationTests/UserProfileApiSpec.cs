@@ -2,8 +2,10 @@ using System.Net;
 using ApiHost1;
 using Common;
 using FluentAssertions;
+using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.UserProfiles;
+using Infrastructure.Web.Interfaces.Clients;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -37,6 +39,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
         result.Content.Value.Profile.Name.LastName.Should().Be("anewlastname");
         result.Content.Value.Profile.DisplayName.Should().Be("anewdisplayname");
         result.Content.Value.Profile.Timezone.Should().Be(Timezones.Sydney.ToString());
+        result.Content.Value.Profile.AvatarUrl.Should().BeNull();
     }
 
     [Fact]
@@ -102,6 +105,54 @@ public class UserProfileApiSpec : WebApiSpec<Program>
         }, req => req.SetJWTBearerToken(loginB.AccessToken));
 
         result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task WhenChangeAvatarByAnotherUser_ThenForbidden()
+    {
+        var loginA = await LoginUserAsync();
+        var loginB = await LoginUserAsync(LoginUser.PersonB);
+
+        var result = await Api.PutAsync(new ChangeProfileAvatarRequest
+            {
+                UserId = loginA.User.Id
+            }, new PostFile(GetTestImage(), HttpContentTypes.ImagePng, "afilename"),
+            req => req.SetJWTBearerToken(loginB.AccessToken));
+
+        result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task WhenChangeAvatar_ThenChanges()
+    {
+        var login = await LoginUserAsync();
+
+        var result = await Api.PutAsync(new ChangeProfileAvatarRequest
+            {
+                UserId = login.User.Id
+            }, new PostFile(GetTestImage(), HttpContentTypes.ImagePng, "afilename"),
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        result.Content.Value.Profile!.AvatarUrl.Should().StartWith("https://localhost:5001/images/image_");
+    }
+
+    [Fact]
+    public async Task WhenDeleteAvatar_ThenDeletes()
+    {
+        var login = await LoginUserAsync();
+
+        await Api.PutAsync(new ChangeProfileAvatarRequest
+            {
+                UserId = login.User.Id
+            }, new PostFile(GetTestImage(), HttpContentTypes.ImagePng, "afilename"),
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        var result = await Api.DeleteAsync(new DeleteProfileAvatarRequest
+        {
+            UserId = login.User.Id
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        result.Content.Value.Profile!.AvatarUrl.Should().BeNull();
     }
 
     private static void OverrideDependencies(IServiceCollection services)

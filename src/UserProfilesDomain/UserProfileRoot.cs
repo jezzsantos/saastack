@@ -11,6 +11,10 @@ using Domain.Shared;
 
 namespace UserProfilesDomain;
 
+public delegate Task<Result<Avatar, Error>> CreateAvatarAction(PersonDisplayName displayName);
+
+public delegate Task<Result<Error>> RemoveAvatarAction(Identifier avatarId);
+
 public sealed class UserProfileRoot : AggregateRootBase
 {
     public static Result<UserProfileRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
@@ -33,7 +37,7 @@ public sealed class UserProfileRoot : AggregateRootBase
 
     public Address Address { get; private set; } = Address.Default;
 
-    public Optional<string> AvatarUrl { get; private set; }
+    public Optional<Avatar> Avatar { get; private set; }
 
     public Optional<PersonDisplayName> DisplayName { get; private set; }
 
@@ -108,7 +112,7 @@ public sealed class UserProfileRoot : AggregateRootBase
                 Address = Address.Default;
                 EmailAddress = Optional<EmailAddress>.None;
                 Timezone = Timezone.Default;
-                AvatarUrl = Optional<string>.None;
+                Avatar = Optional<Avatar>.None;
                 return Result.Ok;
             }
 
@@ -192,9 +196,63 @@ public sealed class UserProfileRoot : AggregateRootBase
                 return Result.Ok;
             }
 
+            case AvatarAdded added:
+            {
+                var avatar = UserProfilesDomain.Avatar.Create(added.AvatarId.ToId(), added.AvatarUrl);
+                if (!avatar.IsSuccessful)
+                {
+                    return avatar.Error;
+                }
+
+                Avatar = avatar.Value;
+                Recorder.TraceDebug(null, "Profile {Id} added avatar {Image}", Id, avatar.Value.ImageId);
+                return Result.Ok;
+            }
+
+            case AvatarRemoved _:
+            {
+                Avatar = Optional<Avatar>.None;
+                Recorder.TraceDebug(null, "Profile {Id} removed avatar", Id);
+                return Result.Ok;
+            }
+
             default:
                 return HandleUnKnownStateChangedEvent(@event);
         }
+    }
+
+    public async Task<Result<Error>> ChangeAvatarAsync(Identifier modifierId, CreateAvatarAction onCreateNew,
+        RemoveAvatarAction onRemoveOld)
+    {
+        if (IsNotOwner(modifierId))
+        {
+            return Error.RoleViolation(Resources.UserProfilesDomain_NotOwner);
+        }
+
+        if (Type != ProfileType.Person)
+        {
+            return Error.RuleViolation(Resources.UserProfilesDomain_NotAPerson);
+        }
+
+        var existingAvatarId = Avatar.HasValue
+            ? Avatar.Value.ImageId.ToOptional()
+            : Optional<Identifier>.None;
+        var created = await onCreateNew(DisplayName);
+        if (!created.IsSuccessful)
+        {
+            return created.Error;
+        }
+
+        if (existingAvatarId.HasValue)
+        {
+            var removed = await onRemoveOld(existingAvatarId.Value);
+            if (!removed.IsSuccessful)
+            {
+                return removed.Error;
+            }
+        }
+
+        return RaiseChangeEvent(UserProfilesDomain.Events.AvatarAdded(Id, UserId, created.Value));
     }
 
     public Result<Error> ChangeDisplayName(Identifier modifierId, PersonDisplayName displayName)
@@ -230,6 +288,33 @@ public sealed class UserProfileRoot : AggregateRootBase
         }
 
         return RaiseChangeEvent(UserProfilesDomain.Events.PhoneNumberChanged(Id, UserId, number));
+    }
+
+    public async Task<Result<Error>> DeleteAvatarAsync(Identifier deleterId, RemoveAvatarAction onRemoveOld)
+    {
+        if (IsNotOwner(deleterId))
+        {
+            return Error.RoleViolation(Resources.UserProfilesDomain_NotOwner);
+        }
+
+        if (Type != ProfileType.Person)
+        {
+            return Error.RuleViolation(Resources.UserProfilesDomain_NotAPerson);
+        }
+
+        if (!Avatar.HasValue)
+        {
+            return Error.RuleViolation(Resources.UserProfilesDomain_NoAvatar);
+        }
+
+        var avatarId = Avatar.Value.ImageId;
+        var removed = await onRemoveOld(avatarId);
+        if (!removed.IsSuccessful)
+        {
+            return removed.Error;
+        }
+
+        return RaiseChangeEvent(UserProfilesDomain.Events.AvatarRemoved(Id, UserId, avatarId));
     }
 
     public Result<Error> SetContactAddress(Identifier modifierId, Address address)

@@ -48,6 +48,7 @@ public class UserProfilesModule : ISubdomainModule
                 services.AddSingleton<IUserProfilesApplication>(c =>
                     new UserProfilesApplication.UserProfilesApplication(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IIdentifierFactory>(),
+                        c.GetRequiredService<IImagesService>(),
                         c.GetRequiredService<IUserProfileRepository>()));
                 services.AddSingleton<IUserProfileRepository>(c => new UserProfileRepository(
                     c.GetRequiredService<IRecorder>(),

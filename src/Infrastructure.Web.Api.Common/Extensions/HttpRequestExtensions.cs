@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using Application.Interfaces;
+using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
@@ -10,7 +11,7 @@ namespace Infrastructure.Web.Api.Common.Extensions;
 
 public static class HttpRequestExtensions
 {
-    public const string BearerTokenPrefix = "Bearer";
+    private const string BearerTokenPrefix = "Bearer";
 
     /// <summary>
     ///     Whether the specified <see cref="method" /> could have a content body.
@@ -133,6 +134,25 @@ public static class HttpRequestExtensions
         return token.HasValue()
             ? token
             : Optional<string>.None;
+    }
+
+    /// <summary>
+    ///     Returns the uploaded file from the specified <see cref="request" />,
+    ///     given a specified <see cref="maxSizeInBytes" /> and <see cref="allowableContentTypes" />
+    /// </summary>
+    public static Result<FileUpload, Error> GetUploadedFile(this HttpRequest request,
+        IFileUploadService fileUploadService, long maxSizeInBytes, IReadOnlyList<string> allowableContentTypes)
+    {
+        var uploads = request.Form.Files
+            .Select(file => new FileUpload
+            {
+                Content = file.OpenReadStream(),
+                ContentType = file.ContentType,
+                Filename = file.FileName,
+                Size = file.Length
+            }).ToList();
+
+        return fileUploadService.GetUploadedFile(uploads, maxSizeInBytes, allowableContentTypes);
     }
 
     /// <summary>

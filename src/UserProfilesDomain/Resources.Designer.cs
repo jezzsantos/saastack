@@ -60,6 +60,15 @@ namespace UserProfilesDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The URL is invalid.
+        /// </summary>
+        internal static string Avatar_InvalidUrl {
+            get {
+                return ResourceManager.GetString("Avatar_InvalidUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This profile is for a machine, and must not have an email address.
         /// </summary>
         internal static string UserProfileRoot_MachineHasEmailAddress {
@@ -83,6 +92,15 @@ namespace UserProfilesDomain {
         internal static string UserProfileRoot_PersonHasNoEmailAddress {
             get {
                 return ResourceManager.GetString("UserProfileRoot_PersonHasNoEmailAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This profile has no avatar to delete.
+        /// </summary>
+        internal static string UserProfilesDomain_NoAvatar {
+            get {
+                return ResourceManager.GetString("UserProfilesDomain_NoAvatar", resourceCulture);
             }
         }
         

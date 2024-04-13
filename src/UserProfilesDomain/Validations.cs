@@ -18,4 +18,15 @@ public static class Validations
         public static readonly Validation State = CommonValidations.DescriptiveName();
         public static readonly Validation Zip = CommonValidations.DescriptiveName();
     }
+
+    public static class Avatar
+    {
+        public const long MaxSizeInBytes = 134_217_728; //approx 100MB
+        public static readonly IReadOnlyList<string> AllowableContentTypes = new[]
+        {
+            "image/jpeg",
+            "image/png",
+            "image/gif"
+        };
+    }
 }

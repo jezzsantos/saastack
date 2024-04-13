@@ -9,6 +9,8 @@ public class UserProfile : ReadModelEntity
 {
     public Optional<string> AvatarId { get; set; }
 
+    public Optional<string> AvatarUrl { get; set; }
+
     public Optional<string> CountryCode { get; set; }
 
     public Optional<string> DisplayName { get; set; }

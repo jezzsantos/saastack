@@ -62,10 +62,10 @@ These are the main use cases of this product that are exposed via "public" APIs 
 ### Users (End User)
 
 1. Assign [platform] roles to an existing user
-1. Unassign [platform] roles to an existing user (except `Standard` role)
-1. Invite a guest to register on the platform (a referral)
-1. Resend an invitation to a guest
-1. Guest verifies an invitation is still valid
+2. Unassign [platform] roles to an existing user (except `Standard` role)
+3. Invite a guest to register on the platform (a referral)
+4. Resend an invitation to a guest
+5. Guest verifies an invitation is still valid
 
 ### Identities
 
@@ -94,7 +94,11 @@ These are the main use cases of this product that are exposed via "public" APIs 
 
 ### Images
 
-TBD
+1. Upload a new image (supported image types: jpeg,png, gif, maximum size: 100MB)
+2. Update the metadata about an image (i.e. Description)
+3. Delete an image
+4. Inspect a specific image
+5. Download the image file
 
 ### Organizations
 
@@ -110,6 +114,8 @@ TBD
 
 1. Change the names, phone, time zone of the profile,
 2. Change the address of the profile
+3. Add an Avatar image the profile
+4. Remove the Avatar from the profile
 
 ## Backend for Frontend
 

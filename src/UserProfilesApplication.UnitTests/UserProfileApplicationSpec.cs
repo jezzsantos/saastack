@@ -1,4 +1,6 @@
 using Application.Interfaces;
+using Application.Resources.Shared;
+using Application.Services.Shared;
 using Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
@@ -20,6 +22,7 @@ public class UserProfileApplicationSpec
     private readonly UserProfilesApplication _application;
     private readonly Mock<ICallerContext> _caller;
     private readonly Mock<IIdentifierFactory> _idFactory;
+    private readonly Mock<IImagesService> _imagesService;
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IUserProfileRepository> _repository;
 
@@ -30,6 +33,7 @@ public class UserProfileApplicationSpec
         _idFactory = new Mock<IIdentifierFactory>();
         _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
+        _imagesService = new Mock<IImagesService>();
         _repository = new Mock<IUserProfileRepository>();
         _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Optional<UserProfileRoot>.None);
@@ -39,7 +43,8 @@ public class UserProfileApplicationSpec
             .Returns((UserProfileRoot root, CancellationToken _) =>
                 Task.FromResult<Result<UserProfileRoot, Error>>(root));
 
-        _application = new UserProfilesApplication(_recorder.Object, _idFactory.Object, _repository.Object);
+        _application = new UserProfilesApplication(_recorder.Object, _idFactory.Object, _imagesService.Object,
+            _repository.Object);
     }
 
     [Fact]
@@ -74,12 +79,16 @@ public class UserProfileApplicationSpec
     public async Task WhenChangeProfileAsyncAndNotOwner_ThenReturnsError()
     {
         _caller.Setup(cc => cc.CallerId)
-            .Returns("auserid");
+            .Returns("anotheruserid");
+        var user = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
+            PersonName.Create("afirstname", "alastname").Value).Value;
+        _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user.ToOptional());
 
-        var result = await _application.ChangeProfileAsync(_caller.Object, "anotheruserid", "afirstname", "alastname",
+        var result = await _application.ChangeProfileAsync(_caller.Object, "auserid", "afirstname", "alastname",
             "adisplayname", "aphonenumber", "atimezone", CancellationToken.None);
 
-        result.Should().BeError(ErrorCode.ForbiddenAccess);
+        result.Should().BeError(ErrorCode.RoleViolation);
     }
 
     [Fact]
@@ -258,10 +267,206 @@ public class UserProfileApplicationSpec
                 profile
             });
 
-        var result = await _application.GetAllProfilesAsync(_caller.Object, new List<string> { "auserid" },
+        var result = await _application.GetAllProfilesAsync(_caller.Object, ["auserid"],
             new GetOptions(), CancellationToken.None);
 
         result.Value.Count.Should().Be(1);
         result.Value[0].Id.Should().Be("anid");
+    }
+
+    [Fact]
+    public async Task WhenChangeProfileAvatarAsyncAndNotExists_ThenReturnsError()
+    {
+        _caller.Setup(cc => cc.CallerId)
+            .Returns("auserid");
+        var upload = new FileUpload
+        {
+            Content = new MemoryStream(),
+            ContentType = "acontenttype",
+            Filename = null,
+            Size = 0
+        };
+
+        var result =
+            await _application.ChangeProfileAvatarAsync(_caller.Object, "auserid", upload, CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityNotFound);
+    }
+
+    [Fact]
+    public async Task WhenChangeProfileAvatarAsyncAndNotOwner_ThenReturnsError()
+    {
+        _caller.Setup(cc => cc.CallerId)
+            .Returns("anotheruserid");
+        var upload = new FileUpload
+        {
+            Content = new MemoryStream(),
+            ContentType = "acontenttype",
+            Filename = null,
+            Size = 0
+        };
+        var user = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
+            PersonName.Create("afirstname", "alastname").Value).Value;
+        _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user.ToOptional());
+
+        var result =
+            await _application.ChangeProfileAvatarAsync(_caller.Object, "auserid", upload, CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.RoleViolation);
+    }
+
+    [Fact]
+    public async Task WhenChangeProfileAvatarAsyncAndNoExistingAvatar_ThenReturnsProfile()
+    {
+        _caller.Setup(cc => cc.CallerId)
+            .Returns("auserid");
+        var upload = new FileUpload
+        {
+            Content = new MemoryStream(),
+            ContentType = "acontenttype",
+            Filename = null,
+            Size = 0
+        };
+        var user = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
+            PersonName.Create("afirstname", "alastname").Value).Value;
+        _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user.ToOptional());
+        _imagesService.Setup(isv =>
+                isv.CreateImageAsync(It.IsAny<ICallerContext>(), It.IsAny<FileUpload>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Image
+            {
+                ContentType = "acontenttype",
+                Description = "adescription",
+                Filename = "afilename",
+                Url = "aurl",
+                Id = "animageid"
+            });
+
+        var result =
+            await _application.ChangeProfileAvatarAsync(_caller.Object, "auserid", upload, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.AvatarUrl.Should().Be("aurl");
+        _repository.Verify(rep => rep.SaveAsync(It.Is<UserProfileRoot>(profile =>
+            profile.Avatar.Value.ImageId == "animageid".ToId()
+            && profile.Avatar.Value.Url == "aurl"
+        ), It.IsAny<CancellationToken>()));
+        _imagesService.Verify(isv =>
+            isv.CreateImageAsync(_caller.Object, upload, "afirstname", It.IsAny<CancellationToken>()));
+        _imagesService.Verify(
+            isv => isv.DeleteImageAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenChangeProfileAvatarAsyncAndExistingAvatar_ThenReturnsProfile()
+    {
+        _caller.Setup(cc => cc.CallerId)
+            .Returns("auserid");
+        var upload = new FileUpload
+        {
+            Content = new MemoryStream(),
+            ContentType = "acontenttype",
+            Filename = null,
+            Size = 0
+        };
+        var user = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
+            PersonName.Create("afirstname", "alastname").Value).Value;
+        await user.ChangeAvatarAsync("auserid".ToId(),
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("anoldimageid".ToId(), "aurl").Value),
+            _ => Task.FromResult(Result.Ok));
+        _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user.ToOptional());
+        _imagesService.Setup(isv =>
+                isv.CreateImageAsync(It.IsAny<ICallerContext>(), It.IsAny<FileUpload>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Image
+            {
+                ContentType = "acontenttype",
+                Description = "adescription",
+                Filename = "afilename",
+                Url = "aurl",
+                Id = "animageid"
+            });
+
+        var result =
+            await _application.ChangeProfileAvatarAsync(_caller.Object, "auserid", upload, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.AvatarUrl.Should().Be("aurl");
+        _repository.Verify(rep => rep.SaveAsync(It.Is<UserProfileRoot>(profile =>
+            profile.Avatar.Value.ImageId == "animageid".ToId()
+            && profile.Avatar.Value.Url == "aurl"
+        ), It.IsAny<CancellationToken>()));
+        _imagesService.Verify(isv =>
+            isv.CreateImageAsync(_caller.Object, upload, "afirstname", It.IsAny<CancellationToken>()));
+        _imagesService.Verify(
+            isv => isv.DeleteImageAsync(_caller.Object, "anoldimageid", It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenDeleteProfileAvatarAsyncAndNotExists_ThenReturnsError()
+    {
+        _caller.Setup(cc => cc.CallerId)
+            .Returns("auserid");
+
+        var result =
+            await _application.DeleteProfileAvatarAsync(_caller.Object, "auserid", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityNotFound);
+    }
+
+    [Fact]
+    public async Task WhenDeleteProfileAvatarAsyncAndNotOwner_ThenReturnsError()
+    {
+        _caller.Setup(cc => cc.CallerId)
+            .Returns("anotheruserid");
+        var user = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
+            PersonName.Create("afirstname", "alastname").Value).Value;
+        _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user.ToOptional());
+
+        var result =
+            await _application.DeleteProfileAvatarAsync(_caller.Object, "auserid", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.RoleViolation);
+    }
+
+    [Fact]
+    public async Task WhenDeleteProfileAvatarAsync_ThenReturnsProfile()
+    {
+        _caller.Setup(cc => cc.CallerId)
+            .Returns("auserid");
+        var user = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
+            PersonName.Create("afirstname", "alastname").Value).Value;
+        await user.ChangeAvatarAsync("auserid".ToId(),
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("anoldimageid".ToId(), "aurl").Value),
+            _ => Task.FromResult(Result.Ok));
+        _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user.ToOptional());
+        _imagesService.Setup(isv =>
+                isv.CreateImageAsync(It.IsAny<ICallerContext>(), It.IsAny<FileUpload>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Image
+            {
+                ContentType = "acontenttype",
+                Description = "adescription",
+                Filename = "afilename",
+                Url = "aurl",
+                Id = "animageid"
+            });
+
+        var result =
+            await _application.DeleteProfileAvatarAsync(_caller.Object, "auserid", CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.AvatarUrl.Should().BeNull();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<UserProfileRoot>(profile =>
+            profile.Avatar.HasValue == false
+        ), It.IsAny<CancellationToken>()));
+        _imagesService.Verify(
+            isv => isv.DeleteImageAsync(_caller.Object, "anoldimageid", It.IsAny<CancellationToken>()));
     }
 }

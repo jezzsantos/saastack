@@ -1,5 +1,4 @@
 using Application.Resources.Shared;
-using Common;
 using ImagesApplication;
 using ImagesDomain;
 using Infrastructure.Interfaces;
@@ -14,15 +13,14 @@ public class ImagesApi : IWebApiService
 {
     private readonly IImagesApplication _application;
     private readonly ICallerContextFactory _contextFactory;
+    private readonly IFileUploadService _fileUploadService;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IFileUploadService _uploadFileService;
 
-    public ImagesApi(IHttpContextAccessor httpContextAccessor, IFileUploadService uploadFileService,
-        ICallerContextFactory contextFactory,
-        IImagesApplication application)
+    public ImagesApi(IHttpContextAccessor httpContextAccessor, IFileUploadService fileUploadService,
+        ICallerContextFactory contextFactory, IImagesApplication application)
     {
         _httpContextAccessor = httpContextAccessor;
-        _uploadFileService = uploadFileService;
+        _fileUploadService = fileUploadService;
         _contextFactory = contextFactory;
         _application = application;
     }
@@ -64,7 +62,8 @@ public class ImagesApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var httpRequest = _httpContextAccessor.HttpContext!.Request;
-        var uploaded = httpRequest.GetUploadedFile(_uploadFileService);
+        var uploaded = httpRequest.GetUploadedFile(_fileUploadService, Validations.Images.MaxSizeInBytes,
+            Validations.Images.AllowableContentTypes);
         if (!uploaded.IsSuccessful)
         {
             return () => uploaded.Error;
@@ -76,24 +75,5 @@ public class ImagesApi : IWebApiService
         return () =>
             image.HandleApplicationResult<UploadImageResponse, Image>(x =>
                 new PostResult<UploadImageResponse>(new UploadImageResponse { Image = x }));
-    }
-}
-
-internal static class ImagesApiExtensions
-{
-    internal static Result<FileUpload, Error> GetUploadedFile(this HttpRequest httpRequest,
-        IFileUploadService uploadFileService)
-    {
-        var uploads = httpRequest.Form.Files
-            .Select(file => new FileUpload
-            {
-                Content = file.OpenReadStream(),
-                ContentType = file.ContentType,
-                Filename = file.FileName,
-                Size = file.Length
-            }).ToList();
-
-        return uploadFileService.GetUploadedFile(uploads, Validations.Images.MaxSizeInBytes,
-            Validations.Images.AllowableContentTypes);
     }
 }

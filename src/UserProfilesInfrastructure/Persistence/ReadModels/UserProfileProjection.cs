@@ -65,6 +65,22 @@ public class UserProfileProjection : IReadModelProjection
                 return await _users.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.CountryCode = e.CountryCode; },
                     cancellationToken);
 
+            case AvatarAdded e:
+                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                    {
+                        dto.AvatarId = e.AvatarId;
+                        dto.AvatarUrl = e.AvatarUrl;
+                    },
+                    cancellationToken);
+
+            case AvatarRemoved e:
+                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                    {
+                        dto.AvatarId = Optional<string>.None;
+                        dto.AvatarUrl = Optional<string>.None;
+                    },
+                    cancellationToken);
+
             default:
                 return false;
         }

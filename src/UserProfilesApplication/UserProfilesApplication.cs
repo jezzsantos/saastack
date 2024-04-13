@@ -1,6 +1,7 @@
 using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Resources.Shared;
+using Application.Services.Shared;
 using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
@@ -15,15 +16,106 @@ namespace UserProfilesApplication;
 public partial class UserProfilesApplication : IUserProfilesApplication
 {
     private readonly IIdentifierFactory _identifierFactory;
+    private readonly IImagesService _imagesService;
     private readonly IRecorder _recorder;
     private readonly IUserProfileRepository _repository;
 
     public UserProfilesApplication(IRecorder recorder, IIdentifierFactory identifierFactory,
-        IUserProfileRepository repository)
+        IImagesService imagesService, IUserProfileRepository repository)
     {
         _recorder = recorder;
         _identifierFactory = identifierFactory;
+        _imagesService = imagesService;
         _repository = repository;
+    }
+
+    public async Task<Result<UserProfile, Error>> ChangeProfileAvatarAsync(ICallerContext caller, string userId,
+        FileUpload upload, CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        if (!retrieved.Value.HasValue)
+        {
+            return Error.EntityNotFound();
+        }
+
+        var profile = retrieved.Value.Value;
+        var avatared = await profile.ChangeAvatarAsync(caller.ToCallerId(), async displayName =>
+        {
+            var created = await _imagesService.CreateImageAsync(caller, upload, displayName.Text, cancellationToken);
+            if (!created.IsSuccessful)
+            {
+                return created.Error;
+            }
+
+            return Avatar.Create(created.Value.Id.ToId(), created.Value.Url);
+        }, async avatarId =>
+        {
+            var removed = await _imagesService.DeleteImageAsync(caller, avatarId, cancellationToken);
+            return !removed.IsSuccessful
+                ? removed.Error
+                : Result.Ok;
+        });
+        if (!avatared.IsSuccessful)
+        {
+            return avatared.Error;
+        }
+
+        var saved = await _repository.SaveAsync(profile, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
+
+        profile = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} avatar was added for user {UserId}", profile.Id,
+            userId);
+
+        return profile.ToProfile();
+    }
+
+    public async Task<Result<UserProfile, Error>> DeleteProfileAvatarAsync(ICallerContext caller, string userId,
+        CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        if (!retrieved.Value.HasValue)
+        {
+            return Error.EntityNotFound();
+        }
+
+        var profile = retrieved.Value.Value;
+        var deleted = await profile.DeleteAvatarAsync(caller.ToCallerId(), async avatarId =>
+        {
+            var removed = await _imagesService.DeleteImageAsync(caller, avatarId, cancellationToken);
+            return !removed.IsSuccessful
+                ? removed.Error
+                : Result.Ok;
+        });
+        if (!deleted.IsSuccessful)
+        {
+            return deleted.Error;
+        }
+
+        var saved = await _repository.SaveAsync(profile, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
+
+        profile = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} avatar was deleted for user {UserId}", profile.Id,
+            userId);
+
+        return profile.ToProfile();
     }
 
     public async Task<Result<Optional<UserProfile>, Error>> FindPersonByEmailAddressAsync(ICallerContext caller,
@@ -71,8 +163,8 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         }
 
         var profile = retrieved.Value.Value;
-
-        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was retrieved for user {userId}", profile.Id, userId);
+        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was retrieved for user {UserId}", profile.Id, userId);
+        
         return profile.ToProfile();
     }
 
@@ -80,11 +172,6 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         string? firstName, string? lastName, string? displayName, string? phoneNumber, string? timezone,
         CancellationToken cancellationToken)
     {
-        if (userId != caller.CallerId)
-        {
-            return Error.ForbiddenAccess();
-        }
-
         var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
         if (!retrieved.IsSuccessful)
         {
@@ -165,9 +252,10 @@ public partial class UserProfilesApplication : IUserProfilesApplication
             return saved.Error;
         }
 
-        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was updated for user {userId}", profile.Id, userId);
+        profile = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was updated for user {UserId}", profile.Id, userId);
 
-        return saved.Value.ToProfile();
+        return profile.ToProfile();
     }
 
     public async Task<Result<UserProfile, Error>> ChangeContactAddressAsync(ICallerContext caller, string userId,
@@ -218,10 +306,11 @@ public partial class UserProfilesApplication : IUserProfilesApplication
             return saved.Error;
         }
 
-        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} contact address was updated for user {userId}",
+        profile = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} contact address was updated for user {UserId}",
             profile.Id, userId);
 
-        return saved.Value.ToProfile();
+        return profile.ToProfile();
     }
 
     public async Task<Result<List<UserProfile>, Error>> GetAllProfilesAsync(ICallerContext caller, List<string> ids,
@@ -248,6 +337,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         _recorder.TraceInformation(caller.ToCall(),
             "Profiles were retrieved for {ExpectedCount} users, and returned {ActualCount} profiles", ids.Count,
             profiles.Count);
+        
         return profiles
             .ConvertAll(profile => profile.ToProfile())
             .ToList();
@@ -356,9 +446,10 @@ public partial class UserProfilesApplication : IUserProfilesApplication
             return saved.Error;
         }
 
-        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was created for user {userId}", profile.Id, userId);
+        profile = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was created for user {UserId}", profile.Id, userId);
 
-        return saved.Value.ToProfile();
+        return profile.ToProfile();
     }
 }
 
@@ -377,7 +468,9 @@ internal static class UserProfileConversionExtensions
             PhoneNumber = profile.PhoneNumber.ValueOrDefault!,
             Address = profile.Address.ToAddress(),
             Timezone = profile.Timezone.Code.ToString(),
-            AvatarUrl = profile.AvatarUrl.ValueOrDefault
+            AvatarUrl = profile.Avatar.HasValue
+                ? profile.Avatar.Value.Url
+                : null
         };
     }
 

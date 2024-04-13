@@ -193,4 +193,118 @@ public class UserProfileRootSpec
         _profile.PhoneNumber.Value.Number.Should().Be("+6498876986");
         _profile.Events.Last().Should().BeOfType<PhoneNumberChanged>();
     }
+
+    [Fact]
+    public async Task WhenChangeAvatarAsyncAndNotOwner_ThenReturnsError()
+    {
+        var result = await _profile.ChangeAvatarAsync("anotheruserid".ToId(),
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("animageid".ToId(), "aurl").Value),
+            _ => Task.FromResult(Result.Ok));
+
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfilesDomain_NotOwner);
+    }
+
+    [Fact]
+    public async Task WhenChangeAvatarAsyncAndNotPerson_ThenReturnsError()
+    {
+#if TESTINGONLY
+        _profile.TestingOnly_ChangeType(ProfileType.Machine);
+#endif
+
+        var result = await _profile.ChangeAvatarAsync("auserid".ToId(),
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("aimageid".ToId(), "aurl").Value),
+            _ => Task.FromResult(Result.Ok));
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.UserProfilesDomain_NotAPerson);
+    }
+
+    [Fact]
+    public async Task WhenChangeAvatarAsyncAndNoExistingAvatar_ThenChanges()
+    {
+        Identifier? imageDeletedId = null;
+        var result = await _profile.ChangeAvatarAsync("auserid".ToId(),
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("animageid".ToId(), "aurl").Value),
+            id =>
+            {
+                imageDeletedId = id;
+                return Task.FromResult(Result.Ok);
+            });
+
+        imageDeletedId.Should().BeNull();
+        result.Should().BeSuccess();
+        _profile.Avatar.Value.ImageId.Should().Be("animageid".ToId());
+        _profile.Avatar.Value.Url.Should().Be("aurl");
+        _profile.Events.Last().Should().BeOfType<AvatarAdded>();
+    }
+
+    [Fact]
+    public async Task WhenChangeAvatarAsyncAndHasExistingAvatar_ThenChanges()
+    {
+        Identifier? imageDeletedId = null;
+        await _profile.ChangeAvatarAsync("auserid".ToId(),
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("anoldimageid".ToId(), "aurl").Value),
+            _ => Task.FromResult(Result.Ok));
+
+        var result = await _profile.ChangeAvatarAsync("auserid".ToId(),
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("animageid".ToId(), "aurl").Value),
+            id =>
+            {
+                imageDeletedId = id;
+                return Task.FromResult(Result.Ok);
+            });
+
+        imageDeletedId.Should().Be("anoldimageid".ToId());
+        result.Should().BeSuccess();
+        _profile.Avatar.Value.ImageId.Should().Be("animageid".ToId());
+        _profile.Avatar.Value.Url.Should().Be("aurl");
+        _profile.Events.Last().Should().BeOfType<AvatarAdded>();
+    }
+
+    [Fact]
+    public async Task WhenDeleteAvatarAsyncAndNotOwner_ThenReturnsError()
+    {
+        var result = await _profile.DeleteAvatarAsync("anotheruserid".ToId(), _ => Task.FromResult(Result.Ok));
+
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfilesDomain_NotOwner);
+    }
+
+    [Fact]
+    public async Task WhenDeleteAvatarAsyncAndNotPerson_ThenReturnsError()
+    {
+#if TESTINGONLY
+        _profile.TestingOnly_ChangeType(ProfileType.Machine);
+#endif
+
+        var result = await _profile.DeleteAvatarAsync("auserid".ToId(), _ => Task.FromResult(Result.Ok));
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.UserProfilesDomain_NotAPerson);
+    }
+
+    [Fact]
+    public async Task WhenDeleteAvatarAsyncAndNoExistingAvatar_ThenReturnsError()
+    {
+        var result = await _profile.DeleteAvatarAsync("auserid".ToId(), _ => Task.FromResult(Result.Ok));
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.UserProfilesDomain_NoAvatar);
+    }
+
+    [Fact]
+    public async Task WhenDeleteAvatarAsyncAndHasExistingAvatar_ThenChanges()
+    {
+        Identifier? imageDeletedId = null;
+        await _profile.ChangeAvatarAsync("auserid".ToId(),
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("anoldimageid".ToId(), "aurl").Value),
+            _ => Task.FromResult(Result.Ok));
+
+        var result = await _profile.DeleteAvatarAsync("auserid".ToId(), id =>
+        {
+            imageDeletedId = id;
+            return Task.FromResult(Result.Ok);
+        });
+
+        imageDeletedId.Should().Be("anoldimageid".ToId());
+        result.Should().BeSuccess();
+        _profile.Avatar.HasValue.Should().BeFalse();
+        _profile.Events.Last().Should().BeOfType<AvatarRemoved>();
+    }
 }

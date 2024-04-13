@@ -6,9 +6,9 @@ public class Image : IIdentifiableResource
 {
     public required string ContentType { get; set; }
 
-    public required string Description { get; set; }
+    public string? Description { get; set; }
 
-    public required string Filename { get; set; }
+    public string? Filename { get; set; }
 
     public required string Url { get; set; }
 

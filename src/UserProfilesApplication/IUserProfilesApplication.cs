@@ -15,6 +15,12 @@ public partial interface IUserProfilesApplication
         string? lastName,
         string? displayName, string? phoneNumber, string? timezone, CancellationToken cancellationToken);
 
+    Task<Result<UserProfile, Error>> ChangeProfileAvatarAsync(ICallerContext caller, string userId, FileUpload upload,
+        CancellationToken cancellationToken);
+
+    Task<Result<UserProfile, Error>> DeleteProfileAvatarAsync(ICallerContext caller, string userId,
+        CancellationToken cancellationToken);
+
     Task<Result<Optional<UserProfile>, Error>> FindPersonByEmailAddressAsync(ICallerContext caller, string emailAddress,
         CancellationToken cancellationToken);
 
