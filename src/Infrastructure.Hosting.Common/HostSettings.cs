@@ -1,6 +1,8 @@
 ﻿using Application.Interfaces.Services;
 using Common.Configuration;
 using Common.Extensions;
+using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Operations.Shared.Images;
 
 namespace Infrastructure.Hosting.Common;
 
@@ -12,6 +14,7 @@ public class HostSettings : IHostSettings
     internal const string AncillaryApiHmacSecretSettingName = "Hosts:AncillaryApi:HMACAuthNSecret";
     internal const string AncillaryApiHostBaseUrlSettingName = "Hosts:AncillaryApi:BaseUrl";
     internal const string AnyApiBaseUrlSettingName = "Hosts:AnyApi:BaseUrl";
+    internal const string ImagesApiHostBaseUrlSettingName = "Hosts:ImagesApi:BaseUrl";
     internal const string WebsiteHostBaseUrlSettingName = "Hosts:WebsiteHost:BaseUrl";
     internal const string WebsiteHostCSRFEncryptionSettingName = "Hosts:WebsiteHost:CSRFAESSecret";
     internal const string WebsiteHostCSRFSigningSettingName = "Hosts:WebsiteHost:CSRFHMACSecret";
@@ -59,6 +62,16 @@ public class HostSettings : IHostSettings
             Resources.HostSettings_MissingSetting.Format(WebsiteHostCSRFSigningSettingName));
     }
 
+    public string MakeImagesApiGetUrl(string imageId)
+    {
+        var baseUrl = GetImagesApiHostBaseUrl().WithoutTrailingSlash();
+        var requestUrl = new DownloadImageRequest { Id = imageId }
+            .GetRequestInfo().Route
+            .WithoutLeadingSlash();
+
+        return new Uri(new Uri(baseUrl), requestUrl).AbsoluteUri;
+    }
+
     public string GetApiHost1BaseUrl()
     {
         var baseUrl = _settings.Platform.GetString(AnyApiBaseUrlSettingName);
@@ -93,5 +106,17 @@ public class HostSettings : IHostSettings
 
         throw new InvalidOperationException(
             Resources.HostSettings_MissingSetting.Format(WebsiteHostCSRFEncryptionSettingName));
+    }
+
+    private string GetImagesApiHostBaseUrl()
+    {
+        var apiHostBaseUrl = _settings.Platform.GetString(ImagesApiHostBaseUrlSettingName);
+        if (apiHostBaseUrl.HasValue())
+        {
+            return apiHostBaseUrl.WithoutTrailingSlash();
+        }
+
+        throw new InvalidOperationException(
+            Resources.HostSettings_MissingSetting.Format(ImagesApiHostBaseUrlSettingName));
     }
 }

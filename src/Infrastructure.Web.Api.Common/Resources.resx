@@ -30,4 +30,22 @@
     <data name="HttpRequestExtensions_HMACAuthorizationNotSupported" xml:space="preserve">
         <value>HMAC authorization cannot be relayed as an authorization method</value>
     </data>
+    <data name="FileUploadService_NoFiles" xml:space="preserve">
+        <value>There are no files to upload</value>
+    </data>
+    <data name="FileUploadService_MissingContent" xml:space="preserve">
+        <value>The uploaded file has no content, and is 0B in size</value>
+    </data>
+    <data name="FileUploadService_InvalidFileSize" xml:space="preserve">
+        <value>The uploaded file exceeds the maximum size in bytes of '{0:N}B'</value>
+    </data>
+    <data name="FileUploadService_InvalidFileExtensionForFileType" xml:space="preserve">
+        <value>The uploaded file name must have the same extension as the content of the file</value>
+    </data>
+    <data name="FileUploadService_DisallowedFileContent" xml:space="preserve">
+        <value>The uploaded file content type '{0}' is not recognized as a supported file</value>
+    </data>
+    <data name="FileUploadService_InvalidContentTypeForFileType" xml:space="preserve">
+        <value>The uploaded file detected as '{0}' does not match the content type '{1}'</value>
+    </data>
 </root>

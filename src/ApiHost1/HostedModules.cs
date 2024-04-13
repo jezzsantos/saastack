@@ -3,6 +3,7 @@ using BookingsInfrastructure;
 using CarsInfrastructure;
 using EndUsersInfrastructure;
 using IdentityInfrastructure;
+using ImagesInfrastructure;
 using Infrastructure.Web.Hosting.Common;
 using OrganizationsInfrastructure;
 using UserProfilesInfrastructure;
@@ -15,6 +16,7 @@ public static class HostedModules
     {
         var modules = new SubdomainModules();
         modules.Register(new ApiHostModule());
+        modules.Register(new ImagesModule());
         modules.Register(new UserProfilesModule());
         modules.Register(new EndUsersModule());
         modules.Register(new OrganizationsModule());

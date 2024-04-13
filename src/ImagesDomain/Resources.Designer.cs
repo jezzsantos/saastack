@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Infrastructure.Web.Api.Common {
+namespace ImagesDomain {
     using System;
     
     
@@ -38,7 +38,7 @@ namespace Infrastructure.Web.Api.Common {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Infrastructure.Web.Api.Common.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ImagesDomain.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,74 +60,47 @@ namespace Infrastructure.Web.Api.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The uploaded file content type &apos;{0}&apos; is not recognized as a supported file.
+        ///   Looks up a localized string similar to The size of the image &apos;{0}&apos;B is too large.
         /// </summary>
-        internal static string FileUploadService_DisallowedFileContent {
+        internal static string ImageRoot_ImageSizeExceeded {
             get {
-                return ResourceManager.GetString("FileUploadService_DisallowedFileContent", resourceCulture);
+                return ResourceManager.GetString("ImageRoot_ImageSizeExceeded", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The uploaded file detected as &apos;{0}&apos; does not match the content type &apos;{1}&apos;.
+        ///   Looks up a localized string similar to The image description is invalid.
         /// </summary>
-        internal static string FileUploadService_InvalidContentTypeForFileType {
+        internal static string ImageRoot_InvalidDescription {
             get {
-                return ResourceManager.GetString("FileUploadService_InvalidContentTypeForFileType", resourceCulture);
+                return ResourceManager.GetString("ImageRoot_InvalidDescription", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The uploaded file name must have the same extension as the content of the file.
+        ///   Looks up a localized string similar to The image filename is invalid.
         /// </summary>
-        internal static string FileUploadService_InvalidFileExtensionForFileType {
+        internal static string ImageRoot_InvalidFilename {
             get {
-                return ResourceManager.GetString("FileUploadService_InvalidFileExtensionForFileType", resourceCulture);
+                return ResourceManager.GetString("ImageRoot_InvalidFilename", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The uploaded file exceeds the maximum size in bytes of &apos;{0:N}B&apos;.
+        ///   Looks up a localized string similar to The conten type of this image is missing.
         /// </summary>
-        internal static string FileUploadService_InvalidFileSize {
+        internal static string ImageRoot_MissingContentType {
             get {
-                return ResourceManager.GetString("FileUploadService_InvalidFileSize", resourceCulture);
+                return ResourceManager.GetString("ImageRoot_MissingContentType", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The uploaded file has no content, and is 0B in size.
+        ///   Looks up a localized string similar to The content type &apos;{0}&apos; is not a supported image type.
         /// </summary>
-        internal static string FileUploadService_MissingContent {
+        internal static string ImageRoot_UnsupportedContentType {
             get {
-                return ResourceManager.GetString("FileUploadService_MissingContent", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to There are no files to upload.
-        /// </summary>
-        internal static string FileUploadService_NoFiles {
-            get {
-                return ResourceManager.GetString("FileUploadService_NoFiles", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to HMAC authorization cannot be relayed as an authorization method.
-        /// </summary>
-        internal static string HttpRequestExtensions_HMACAuthorizationNotSupported {
-            get {
-                return ResourceManager.GetString("HttpRequestExtensions_HMACAuthorizationNotSupported", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The request DTO type &apos;{0}&apos; is missing a &apos;{1}&apos; declared on the class.
-        /// </summary>
-        internal static string RequestExtensions_MissingRouteAttribute {
-            get {
-                return ResourceManager.GetString("RequestExtensions_MissingRouteAttribute", resourceCulture);
+                return ResourceManager.GetString("ImageRoot_UnsupportedContentType", resourceCulture);
             }
         }
     }

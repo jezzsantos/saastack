@@ -83,4 +83,15 @@ public class HostSettingsSpec
 
         result.Should().Be("asecret");
     }
+
+    [Fact]
+    public void WhenMakeImagesApiGetUrl_ThenReturnsUrl()
+    {
+        _settings.Setup(s => s.Platform.GetString(HostSettings.ImagesApiHostBaseUrlSettingName, It.IsAny<string>()))
+            .Returns("http://localhost/");
+
+        var result = _service.MakeImagesApiGetUrl("animageid");
+
+        result.Should().Be("http://localhost/images/animageid/download");
+    }
 }

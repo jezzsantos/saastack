@@ -35,4 +35,9 @@ public interface IHostSettings
     ///     Returns the CSRF signature secret
     /// </summary>
     string GetWebsiteHostCSRFSigningSecret();
+
+    /// <summary>
+    ///     Returns the URL for the specified <see cref="Image" />
+    /// </summary>
+    string MakeImagesApiGetUrl(string imageId);
 }

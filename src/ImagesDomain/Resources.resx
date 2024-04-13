@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="ImageRoot_UnsupportedContentType" xml:space="preserve">
+        <value>The content type '{0}' is not a supported image type</value>
+    </data>
+    <data name="ImageRoot_ImageSizeExceeded" xml:space="preserve">
+        <value>The size of the image '{0}'B is too large</value>
+    </data>
+    <data name="ImageRoot_MissingContentType" xml:space="preserve">
+        <value>The conten type of this image is missing</value>
+    </data>
+    <data name="ImageRoot_InvalidDescription" xml:space="preserve">
+        <value>The image description is invalid</value>
+    </data>
+    <data name="ImageRoot_InvalidFilename" xml:space="preserve">
+        <value>The image filename is invalid</value>
+    </data>
+</root>
