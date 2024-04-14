@@ -313,6 +313,38 @@ public static class StringExtensions
 
         return defaultValue;
     }
+
+    /// <summary>
+    ///     Converts the <see cref="value" /> to a long value
+    /// </summary>
+    public static long ToLong(this string? value)
+    {
+        if (value.HasNoValue())
+        {
+            return -1;
+        }
+
+        return long.Parse(value);
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="value" /> to a long value,
+    ///     and in the case where the value cannot be converted, uses the <see cref="defaultValue" />
+    /// </summary>
+    public static long ToLongOrDefault(this string? value, long defaultValue)
+    {
+        if (value.HasNoValue())
+        {
+            return defaultValue;
+        }
+
+        if (long.TryParse(value, out var converted))
+        {
+            return converted;
+        }
+
+        return defaultValue;
+    }
 #endif
 #if COMMON_PROJECT
     /// <summary>

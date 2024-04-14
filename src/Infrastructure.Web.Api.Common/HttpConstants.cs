@@ -30,6 +30,7 @@ public static class HttpHeaders
     public const string Accept = "Accept";
     public const string AntiCSRF = "anti-csrf-tok";
     public const string Authorization = "Authorization";
+    public const string ContentLength = "Content-Length";
     public const string ContentType = "Content-Type";
     public const string HMACSignature = "X-Hub-Signature";
     public const string Origin = "Origin";

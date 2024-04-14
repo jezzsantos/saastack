@@ -10,20 +10,22 @@ namespace Infrastructure.Web.Interfaces.Clients;
 /// </summary>
 public class JsonResponse : IDisposable
 {
-    public Result<string?, ResponseProblem> Content { get; init; }
-
-    public required HttpResponseHeaders Headers { get; set; }
-
-    public required string RequestId { get; init; }
-
-    public required HttpStatusCode StatusCode { get; init; }
-
-    public Stream? RawContent { get; set; }
-
     public void Dispose()
     {
         RawContent?.Dispose();
     }
+
+    public Result<string?, ResponseProblem> Content { get; init; }
+
+    public required HttpContentHeaders ContentHeaders { get; set; }
+
+    public required HttpResponseHeaders Headers { get; set; }
+
+    public Stream? RawContent { get; set; }
+
+    public required string RequestId { get; init; }
+
+    public required HttpStatusCode StatusCode { get; init; }
 }
 
 /// <summary>

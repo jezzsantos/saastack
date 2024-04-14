@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Web;
 using Common.Extensions;
@@ -209,10 +210,20 @@ public static class RequestExtensions
     /// </summary>
     private static Dictionary<string, object?> GetRequestFields(IWebRequest request)
     {
-        return request.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).ToDictionary
-        (
-            propInfo => propInfo.Name.ToLowerInvariant(),
-            propInfo => propInfo.GetValue(request, null)
-        );
+        return request.GetType()
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .ToDictionary
+            (
+                GetPropertyName,
+                propInfo => propInfo.GetValue(request, null)
+            );
+
+        static string GetPropertyName(PropertyInfo propInfo)
+        {
+            var jsonPropertyName = propInfo.GetCustomAttribute<JsonPropertyNameAttribute>();
+            return jsonPropertyName.Exists()
+                ? jsonPropertyName.Name
+                : propInfo.Name.ToLowerInvariant();
+        }
     }
 }

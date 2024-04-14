@@ -56,6 +56,36 @@ public class ApiServiceClient : IServiceClient
             cancellationToken ?? CancellationToken.None);
     }
 
+    public async Task<Result<BinaryResponse, ResponseProblem>> GetBinaryAsync(ICallerContext? context,
+        IWebRequest request, Action<HttpRequestMessage>? requestFilter = null,
+        CancellationToken? cancellationToken = null)
+    {
+        using var client = CreateJsonClient(context, requestFilter, out var modifiedRequestFilter);
+        return await _retryPolicy.ExecuteAsync(
+            async ct =>
+            {
+                var response = await client.GetAsync(request, modifiedRequestFilter, ct);
+                return new BinaryResponse
+                {
+                    Content = response.RawContent!,
+                    ContentType = response.ContentHeaders.ContentType?.MediaType!,
+                    ContentLength = response.ContentHeaders.ContentLength!.Value,
+                    StatusCode = response.StatusCode
+                };
+            },
+            cancellationToken ?? CancellationToken.None);
+    }
+
+    public async Task<Result<string?, ResponseProblem>> GetStringAsync(ICallerContext? context, IWebRequest request,
+        Action<HttpRequestMessage>? requestFilter = null,
+        CancellationToken? cancellationToken = null)
+    {
+        using var client = CreateJsonClient(context, requestFilter, out var modifiedRequestFilter);
+        return await _retryPolicy.ExecuteAsync(
+            async ct => (await client.GetAsync(request, modifiedRequestFilter, ct)).Content,
+            cancellationToken ?? CancellationToken.None);
+    }
+
     public async Task<Result<TResponse, ResponseProblem>> PatchAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)

@@ -423,6 +423,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         {
             StatusCode = response.StatusCode,
             Content = content,
+            ContentHeaders = response.Content.Headers,
             Headers = response.Headers,
             RequestId = response.GetOrCreateRequestId(),
             RawContent = content.IsSuccessful && !content.HasValue
@@ -439,6 +440,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         {
             StatusCode = response.StatusCode,
             Content = content,
+            ContentHeaders = response.Content.Headers,
             Headers = response.Headers,
             RequestId = response.GetOrCreateRequestId(),
             RawContent = content.IsSuccessful && !content.HasValue
