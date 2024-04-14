@@ -11,7 +11,7 @@ using Flag = Common.FeatureFlags.Flag;
 namespace Infrastructure.Shared.ApplicationServices.External;
 
 /// <summary>
-///     Provides an adapter to the feature flagging services of FlagSmith
+///     Provides an adapter to the feature flagging services of FlagSmith.com
 ///     <see href="https://docs.flagsmith.com/clients/server-side?language=dotnet" />
 ///     Note: Flagsmith already supports caching and optimizations like LocalEvaluation to limit the number of network
 ///     calls made, so we don't need to implement explicit caching.

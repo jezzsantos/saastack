@@ -87,8 +87,10 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
             })
             .ConfigureTestServices(services =>
             {
+                //EXTEND: Add more stubs to 3rd party systems required by all tests 
                 services.AddSingleton<INotificationsService, StubNotificationsService>();
                 services.AddSingleton<IFeatureFlags, StubFeatureFlags>();
+                services.AddSingleton<IAvatarService, StubAvatarService>();
                 if (_overridenTestingDependencies.Exists())
                 {
                     _overridenTestingDependencies.Invoke(services);
@@ -173,6 +175,11 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 #if TESTINGONLY
         Api.PostAsync(new DestroyAllRepositoriesRequest()).GetAwaiter().GetResult();
 #endif
+    }
+
+    protected Stream GetTestImage()
+    {
+        return TestResources.ResourceManager.GetStream("TestImage")!;
     }
 
     protected async Task<LoginDetails> LoginUserAsync(LoginUser who = LoginUser.PersonA)
@@ -263,11 +270,6 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         _additionalServerProcesses.Add(process.Id);
     }
 
-    protected Stream GetTestImage()
-    {
-        return TestResources.ResourceManager.GetStream("TestImage")!;
-    }
-    
     private static string GetEmailForPerson(LoginUser who)
     {
         return who switch

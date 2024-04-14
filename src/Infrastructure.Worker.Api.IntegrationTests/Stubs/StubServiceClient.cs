@@ -39,6 +39,20 @@ public class StubServiceClient : IServiceClient
         throw new NotImplementedException();
     }
 
+    public Task<Result<BinaryResponse, ResponseProblem>> GetBinaryAsync(ICallerContext? context, IWebRequest request,
+        Action<HttpRequestMessage>? requestFilter = null,
+        CancellationToken? cancellationToken = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Result<string?, ResponseProblem>> GetStringAsync(ICallerContext? context, IWebRequest request,
+        Action<HttpRequestMessage>? requestFilter = null,
+        CancellationToken? cancellationToken = null)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<Result<TResponse, ResponseProblem>> PatchAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)

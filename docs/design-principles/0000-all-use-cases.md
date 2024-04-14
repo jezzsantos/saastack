@@ -112,6 +112,9 @@ TBD
 
 ### User Profiles
 
+A user profile will be automatically created for every new registered `EndUser` on the platform (person or machine).
+When a person is registered we also query the `IAvatarService` to see if we can find a default avatar for the persons email. The default adapter is Gravatar.com.
+
 1. Change the names, phone, time zone of the profile,
 2. Change the address of the profile
 3. Add an Avatar image the profile

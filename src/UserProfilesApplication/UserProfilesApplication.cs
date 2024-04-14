@@ -15,17 +15,19 @@ namespace UserProfilesApplication;
 
 public partial class UserProfilesApplication : IUserProfilesApplication
 {
+    private readonly IAvatarService _avatarService;
     private readonly IIdentifierFactory _identifierFactory;
     private readonly IImagesService _imagesService;
     private readonly IRecorder _recorder;
     private readonly IUserProfileRepository _repository;
 
     public UserProfilesApplication(IRecorder recorder, IIdentifierFactory identifierFactory,
-        IImagesService imagesService, IUserProfileRepository repository)
+        IImagesService imagesService, IAvatarService avatarService, IUserProfileRepository repository)
     {
         _recorder = recorder;
         _identifierFactory = identifierFactory;
         _imagesService = imagesService;
+        _avatarService = avatarService;
         _repository = repository;
     }
 
@@ -44,22 +46,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         }
 
         var profile = retrieved.Value.Value;
-        var avatared = await profile.ChangeAvatarAsync(caller.ToCallerId(), async displayName =>
-        {
-            var created = await _imagesService.CreateImageAsync(caller, upload, displayName.Text, cancellationToken);
-            if (!created.IsSuccessful)
-            {
-                return created.Error;
-            }
-
-            return Avatar.Create(created.Value.Id.ToId(), created.Value.Url);
-        }, async avatarId =>
-        {
-            var removed = await _imagesService.DeleteImageAsync(caller, avatarId, cancellationToken);
-            return !removed.IsSuccessful
-                ? removed.Error
-                : Result.Ok;
-        });
+        var avatared = await ChangeAvatarInternalAsync(caller, caller.ToCallerId(), profile, upload, cancellationToken);
         if (!avatared.IsSuccessful)
         {
             return avatared.Error;
@@ -164,7 +151,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
 
         var profile = retrieved.Value.Value;
         _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was retrieved for user {UserId}", profile.Id, userId);
-        
+
         return profile.ToProfile();
     }
 
@@ -337,7 +324,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         _recorder.TraceInformation(caller.ToCall(),
             "Profiles were retrieved for {ExpectedCount} users, and returned {ActualCount} profiles", ids.Count,
             profiles.Count);
-        
+
         return profiles
             .ConvertAll(profile => profile.ToProfile())
             .ToList();
@@ -403,13 +390,13 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         var profile = created.Value;
         if (classification == UserProfileClassification.Person)
         {
-            var email2 = EmailAddress.Create(emailAddress!);
-            if (!email2.IsSuccessful)
+            var personEmail = EmailAddress.Create(emailAddress!);
+            if (!personEmail.IsSuccessful)
             {
-                return email2.Error;
+                return personEmail.Error;
             }
 
-            var emailed = profile.SetEmailAddress(userId.ToId(), email2.Value);
+            var emailed = profile.SetEmailAddress(userId.ToId(), personEmail.Value);
             if (!emailed.IsSuccessful)
             {
                 return emailed.Error;
@@ -440,6 +427,22 @@ public partial class UserProfilesApplication : IUserProfilesApplication
             return timezoned.Error;
         }
 
+        if (classification == UserProfileClassification.Person)
+        {
+            //Attempt to download the default avatar for the user. If this fails, we just move on
+            var defaultAvatared = await _avatarService.FindAvatarAsync(caller, emailAddress!, cancellationToken);
+            if (defaultAvatared is { IsSuccessful: true, Value.HasValue: true })
+            {
+                var upload = defaultAvatared.Value.Value;
+                var avatared =
+                    await ChangeAvatarInternalAsync(caller, userId.ToId(), profile, upload, cancellationToken);
+                if (!avatared.IsSuccessful)
+                {
+                    return avatared.Error;
+                }
+            }
+        }
+
         var saved = await _repository.SaveAsync(profile, cancellationToken);
         if (!saved.IsSuccessful)
         {
@@ -450,6 +453,27 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was created for user {UserId}", profile.Id, userId);
 
         return profile.ToProfile();
+    }
+
+    private async Task<Result<Error>> ChangeAvatarInternalAsync(ICallerContext caller, Identifier modifierId,
+        UserProfileRoot profile, FileUpload upload, CancellationToken cancellationToken)
+    {
+        return await profile.ChangeAvatarAsync(modifierId, async displayName =>
+        {
+            var created = await _imagesService.CreateImageAsync(caller, upload, displayName.Text, cancellationToken);
+            if (!created.IsSuccessful)
+            {
+                return created.Error;
+            }
+
+            return Avatar.Create(created.Value.Id.ToId(), created.Value.Url);
+        }, async avatarId =>
+        {
+            var removed = await _imagesService.DeleteImageAsync(caller, avatarId, cancellationToken);
+            return !removed.IsSuccessful
+                ? removed.Error
+                : Result.Ok;
+        });
     }
 }
 

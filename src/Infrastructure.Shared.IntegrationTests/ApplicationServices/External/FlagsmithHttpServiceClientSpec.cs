@@ -230,6 +230,7 @@ public class FlagsmithHttpServiceClientSpec : ExternalApiSpec
 
     private static void OverrideDependencies(IServiceCollection services)
     {
+        //Do nothing
     }
 
     private async Task SetupEnvironmentAsync()

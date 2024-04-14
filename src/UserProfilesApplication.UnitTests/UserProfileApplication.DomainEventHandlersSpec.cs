@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
 using Domain.Common.Identity;
@@ -21,8 +22,10 @@ namespace UserProfilesApplication.UnitTests;
 public class UserProfileApplicationDomainEventHandlersSpec
 {
     private readonly UserProfilesApplication _application;
+    private readonly Mock<IAvatarService> _avatarService;
     private readonly Mock<ICallerContext> _caller;
     private readonly Mock<IIdentifierFactory> _idFactory;
+    private readonly Mock<IImagesService> _imagesService;
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IUserProfileRepository> _repository;
 
@@ -33,7 +36,11 @@ public class UserProfileApplicationDomainEventHandlersSpec
         _idFactory = new Mock<IIdentifierFactory>();
         _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
-        var imagesService = new Mock<IImagesService>();
+        _imagesService = new Mock<IImagesService>();
+        _avatarService = new Mock<IAvatarService>();
+        _avatarService.Setup(avs =>
+                avs.FindAvatarAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Optional<FileUpload>.None);
         _repository = new Mock<IUserProfileRepository>();
         _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Optional<UserProfileRoot>.None);
@@ -42,8 +49,8 @@ public class UserProfileApplicationDomainEventHandlersSpec
         _repository.Setup(rep => rep.SaveAsync(It.IsAny<UserProfileRoot>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((UserProfileRoot root, CancellationToken _) => root);
 
-        _application = new UserProfilesApplication(_recorder.Object, _idFactory.Object, imagesService.Object,
-            _repository.Object);
+        _application = new UserProfilesApplication(_recorder.Object, _idFactory.Object, _imagesService.Object,
+            _avatarService.Object, _repository.Object);
     }
 
     [Fact]
@@ -104,6 +111,9 @@ public class UserProfileApplicationDomainEventHandlersSpec
             await _application.HandleEndUserRegisteredAsync(_caller.Object, domainEvent, CancellationToken.None);
 
         result.Should().BeSuccess();
+        _avatarService.Verify(
+            avs => avs.FindAvatarAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
         _repository.Verify(rep => rep.SaveAsync(It.Is<UserProfileRoot>(up =>
             up.UserId == "amachineid".ToId()
             && up.Type == ProfileType.Machine
@@ -129,6 +139,8 @@ public class UserProfileApplicationDomainEventHandlersSpec
             await _application.HandleEndUserRegisteredAsync(_caller.Object, domainEvent, CancellationToken.None);
 
         result.Should().BeSuccess();
+        _avatarService.Verify(avs =>
+            avs.FindAvatarAsync(_caller.Object, "auser@company.com", It.IsAny<CancellationToken>()));
         _repository.Verify(rep => rep.SaveAsync(It.Is<UserProfileRoot>(up =>
             up.UserId == "apersonid".ToId()
             && up.Type == ProfileType.Person
@@ -140,6 +152,55 @@ public class UserProfileApplicationDomainEventHandlersSpec
             && up.Address.CountryCode == CountryCodes.Default
             && up.Timezone == Timezones.Default
             && up.Avatar.HasValue == false
+        ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenHandleEndUserRegisteredAsyncForPersonAndHasDefaultAvatar_ThenCreatesProfile()
+    {
+        var domainEvent = Events.Registered("apersonid".ToId(), EndUserProfile.Create("afirstname", "alastname").Value,
+            EmailAddress.Create("auser@company.com").Value, UserClassification.Person, UserAccess.Enabled,
+            UserStatus.Registered, Roles.Empty, Features.Empty);
+        var upload = new FileUpload
+        {
+            Content = new MemoryStream(),
+            ContentType = "acontenttype",
+            Filename = null,
+            Size = 0
+        };
+        _avatarService.Setup(avs =>
+                avs.FindAvatarAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(upload.ToOptional());
+        _imagesService.Setup(isv =>
+                isv.CreateImageAsync(It.IsAny<ICallerContext>(), It.IsAny<FileUpload>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Image
+            {
+                ContentType = "acontenttype",
+                Description = "adescription",
+                Filename = "afilename",
+                Url = "aurl",
+                Id = "animageid"
+            });
+
+        var result =
+            await _application.HandleEndUserRegisteredAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _avatarService.Verify(avs =>
+            avs.FindAvatarAsync(_caller.Object, "auser@company.com", It.IsAny<CancellationToken>()));
+        _repository.Verify(rep => rep.SaveAsync(It.Is<UserProfileRoot>(up =>
+            up.UserId == "apersonid".ToId()
+            && up.Type == ProfileType.Person
+            && up.DisplayName.Value.Text == "afirstname"
+            && up.Name.Value.FirstName == "afirstname"
+            && up.Name.Value.LastName.Value == "alastname"
+            && up.EmailAddress.Value == "auser@company.com"
+            && up.PhoneNumber.HasValue == false
+            && up.Address.CountryCode == CountryCodes.Default
+            && up.Timezone == Timezones.Default
+            && up.Avatar.Value.ImageId == "animageid"
+            && up.Avatar.Value.Url == "aurl"
         ), It.IsAny<CancellationToken>()));
     }
 }

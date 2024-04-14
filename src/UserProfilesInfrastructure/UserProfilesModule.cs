@@ -2,12 +2,14 @@ using System.Reflection;
 using Application.Persistence.Interfaces;
 using Application.Services.Shared;
 using Common;
+using Common.Configuration;
 using Domain.Common.Identity;
 using Domain.Interfaces;
 using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Interfaces;
 using Infrastructure.Persistence.Interfaces;
+using Infrastructure.Shared.ApplicationServices.External;
 using Infrastructure.Web.Hosting.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -45,10 +47,17 @@ public class UserProfilesModule : ISubdomainModule
         {
             return (_, services) =>
             {
+                services.AddSingleton<IAvatarService>(c =>
+                    new GravatarHttpServiceClient(
+                        c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                        c.GetRequiredService<IHttpClientFactory>()));
+
                 services.AddSingleton<IUserProfilesApplication>(c =>
                     new UserProfilesApplication.UserProfilesApplication(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IIdentifierFactory>(),
                         c.GetRequiredService<IImagesService>(),
+                        c.GetRequiredService<IAvatarService>(),
                         c.GetRequiredService<IUserProfileRepository>()));
                 services.AddSingleton<IUserProfileRepository>(c => new UserProfileRepository(
                     c.GetRequiredService<IRecorder>(),

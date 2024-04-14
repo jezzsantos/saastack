@@ -34,6 +34,7 @@ public class UserProfileApplicationSpec
         _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
         _imagesService = new Mock<IImagesService>();
+        var avatarService = new Mock<IAvatarService>();
         _repository = new Mock<IUserProfileRepository>();
         _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Optional<UserProfileRoot>.None);
@@ -44,7 +45,7 @@ public class UserProfileApplicationSpec
                 Task.FromResult<Result<UserProfileRoot, Error>>(root));
 
         _application = new UserProfilesApplication(_recorder.Object, _idFactory.Object, _imagesService.Object,
-            _repository.Object);
+            avatarService.Object, _repository.Object);
     }
 
     [Fact]
