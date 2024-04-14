@@ -20,6 +20,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
 {
     private readonly IEndUsersService _endUsersService;
     private readonly IIdentifierFactory _identifierFactory;
+    private readonly IImagesService _imagesService;
     private readonly IRecorder _recorder;
     private readonly IOrganizationRepository _repository;
     private readonly ITenantSettingService _tenantSettingService;
@@ -27,13 +28,14 @@ public partial class OrganizationsApplication : IOrganizationsApplication
 
     public OrganizationsApplication(IRecorder recorder, IIdentifierFactory identifierFactory,
         ITenantSettingsService tenantSettingsService, ITenantSettingService tenantSettingService,
-        IEndUsersService endUsersService,
+        IEndUsersService endUsersService, IImagesService imagesService,
         IOrganizationRepository repository)
     {
         _recorder = recorder;
         _identifierFactory = identifierFactory;
         _tenantSettingService = tenantSettingService;
         _endUsersService = endUsersService;
+        _imagesService = imagesService;
         _tenantSettingsService = tenantSettingsService;
         _repository = repository;
     }
@@ -227,6 +229,81 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         return searchOptions.ApplyWithMetadata(memberships.Value.Results.ConvertAll(x => x.ToMember()));
     }
 
+    public async Task<Result<Organization, Error>> ChangeAvatarAsync(ICallerContext caller, string id,
+        FileUpload upload, CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var modifierRoles = Roles.Create(caller.Roles.Tenant);
+        if (!modifierRoles.IsSuccessful)
+        {
+            return modifierRoles.Error;
+        }
+
+        var org = retrieved.Value;
+        var avatared = await ChangeAvatarInternalAsync(caller, caller.ToCallerId(), modifierRoles.Value, org, upload,
+            cancellationToken);
+        if (!avatared.IsSuccessful)
+        {
+            return avatared.Error;
+        }
+
+        var saved = await _repository.SaveAsync(org, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
+
+        org = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Changed avatar for organization: {Id}", org.Id);
+
+        return org.ToOrganization();
+    }
+
+    public async Task<Result<Organization, Error>> DeleteAvatarAsync(ICallerContext caller, string id,
+        CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var deleterRoles = Roles.Create(caller.Roles.Tenant);
+        if (!deleterRoles.IsSuccessful)
+        {
+            return deleterRoles.Error;
+        }
+
+        var org = retrieved.Value;
+        var deleted = await org.DeleteAvatarAsync(caller.ToCallerId(), deleterRoles.Value, async avatarId =>
+        {
+            var removed = await _imagesService.DeleteImageAsync(caller, avatarId, cancellationToken);
+            return !removed.IsSuccessful
+                ? removed.Error
+                : Result.Ok;
+        });
+        if (!deleted.IsSuccessful)
+        {
+            return deleted.Error;
+        }
+
+        var saved = await _repository.SaveAsync(org, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
+
+        org = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Organization {Id} avatar was deleted", org.Id);
+
+        return org.ToOrganization();
+    }
+
     private async Task<Result<Organization, Error>> CreateOrganizationAsync(ICallerContext caller, string creatorId,
         string name, Application.Resources.Shared.OrganizationOwnership ownership, CancellationToken cancellationToken)
     {
@@ -275,6 +352,28 @@ public partial class OrganizationsApplication : IOrganizationsApplication
 
         return saved.Value.ToOrganization();
     }
+
+    private async Task<Result<Error>> ChangeAvatarInternalAsync(ICallerContext caller, Identifier modifierId,
+        Roles modifierRoles,
+        OrganizationRoot organization, FileUpload upload, CancellationToken cancellationToken)
+    {
+        return await organization.ChangeAvatarAsync(modifierId, modifierRoles, async name =>
+        {
+            var created = await _imagesService.CreateImageAsync(caller, upload, name.Text, cancellationToken);
+            if (!created.IsSuccessful)
+            {
+                return created.Error;
+            }
+
+            return Avatar.Create(created.Value.Id.ToId(), created.Value.Url);
+        }, async avatarId =>
+        {
+            var removed = await _imagesService.DeleteImageAsync(caller, avatarId, cancellationToken);
+            return !removed.IsSuccessful
+                ? removed.Error
+                : Result.Ok;
+        });
+    }
 }
 
 internal static class OrganizationConversionExtensions
@@ -306,7 +405,10 @@ internal static class OrganizationConversionExtensions
             Name = organization.Name,
             CreatedById = organization.CreatedById,
             Ownership = organization.Ownership.ToEnumOrDefault(
-                Application.Resources.Shared.OrganizationOwnership.Shared)
+                Application.Resources.Shared.OrganizationOwnership.Shared),
+            AvatarUrl = organization.Avatar.HasValue
+                ? organization.Avatar.Value.Url
+                : null
         };
     }
 

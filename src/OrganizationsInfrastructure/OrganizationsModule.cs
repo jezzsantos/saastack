@@ -60,6 +60,7 @@ public class OrganizationsModule : ISubdomainModule
                         c.GetRequiredService<ITenantSettingsService>(),
                         c.GetRequiredService<ITenantSettingService>(),
                         c.GetRequiredService<IEndUsersService>(),
+                        c.GetRequiredService<IImagesService>(),
                         c.GetRequiredService<IOrganizationRepository>()));
                 services.AddSingleton<IOrganizationRepository>(c => new OrganizationRepository(
                     c.GetRequiredService<IRecorder>(),

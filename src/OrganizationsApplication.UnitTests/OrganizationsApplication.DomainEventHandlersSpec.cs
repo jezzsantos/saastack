@@ -48,13 +48,15 @@ public class OrganizationsApplicationDomainEventHandlersSpec
         tenantSettingService.Setup(tss => tss.Decrypt(It.IsAny<string>()))
             .Returns((string value) => value);
         var endUsersService = new Mock<IEndUsersService>();
+        var imagesService = new Mock<IImagesService>();
         _repository = new Mock<IOrganizationRepository>();
         _repository.Setup(ar => ar.SaveAsync(It.IsAny<OrganizationRoot>(), It.IsAny<CancellationToken>()))
             .Returns((OrganizationRoot root, CancellationToken _) =>
                 Task.FromResult<Result<OrganizationRoot, Error>>(root));
 
         _application = new OrganizationsApplication(recorder.Object, idFactory.Object,
-            _tenantSettingsService.Object, tenantSettingService.Object, endUsersService.Object, _repository.Object);
+            _tenantSettingsService.Object, tenantSettingService.Object, endUsersService.Object, imagesService.Object,
+            _repository.Object);
     }
 
     [Fact]

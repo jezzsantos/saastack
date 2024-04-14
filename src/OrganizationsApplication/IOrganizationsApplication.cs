@@ -7,10 +7,16 @@ namespace OrganizationsApplication;
 
 public partial interface IOrganizationsApplication
 {
+    Task<Result<Organization, Error>> ChangeAvatarAsync(ICallerContext caller, string id, FileUpload upload,
+        CancellationToken cancellationToken);
+
     Task<Result<Error>> ChangeSettingsAsync(ICallerContext caller, string id,
         TenantSettings settings, CancellationToken cancellationToken);
 
     Task<Result<Organization, Error>> CreateSharedOrganizationAsync(ICallerContext caller, string name,
+        CancellationToken cancellationToken);
+
+    Task<Result<Organization, Error>> DeleteAvatarAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken);
 
     Task<Result<Organization, Error>> GetOrganizationAsync(ICallerContext caller, string id,

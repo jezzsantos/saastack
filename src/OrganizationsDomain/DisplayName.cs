@@ -11,7 +11,7 @@ public sealed class DisplayName : SingleValueObjectBase<DisplayName, string>
 
     public static Result<DisplayName, Error> Create(string value)
     {
-        if (value.IsInvalidParameter(Validations.Organization.DisplayName, nameof(value),
+        if (value.IsInvalidParameter(Validations.DisplayName, nameof(value),
                 Resources.OrganizationDisplayName_InvalidName, out var error))
         {
             return error;

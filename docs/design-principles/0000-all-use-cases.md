@@ -105,6 +105,8 @@ These are the main use cases of this product that are exposed via "public" APIs 
 1. Create a new (shared) organization for the current user
 2. Inspect a specific organization
 3. Invite another guest or person to an organization (guest by email, or an existing person by email or by ID)
+4. Add an Avatar image the organization
+5. Remove the Avatar from the organization
 
 ### Subscriptions
 

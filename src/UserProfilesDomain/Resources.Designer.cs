@@ -60,20 +60,29 @@ namespace UserProfilesDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The URL is invalid.
-        /// </summary>
-        internal static string Avatar_InvalidUrl {
-            get {
-                return ResourceManager.GetString("Avatar_InvalidUrl", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to This profile is for a machine, and must not have an email address.
         /// </summary>
         internal static string UserProfileRoot_MachineHasEmailAddress {
             get {
                 return ResourceManager.GetString("UserProfileRoot_MachineHasEmailAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This profile has no avatar to delete.
+        /// </summary>
+        internal static string UserProfileRoot_NoAvatar {
+            get {
+                return ResourceManager.GetString("UserProfileRoot_NoAvatar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This kind of profile must not have an email address.
+        /// </summary>
+        internal static string UserProfileRoot_NotAPerson {
+            get {
+                return ResourceManager.GetString("UserProfileRoot_NotAPerson", resourceCulture);
             }
         }
         
@@ -87,38 +96,20 @@ namespace UserProfilesDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The profile can only be changed by its owner.
+        /// </summary>
+        internal static string UserProfileRoot_NotOwner {
+            get {
+                return ResourceManager.GetString("UserProfileRoot_NotOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This profile is for a person, but has no email address.
         /// </summary>
         internal static string UserProfileRoot_PersonHasNoEmailAddress {
             get {
                 return ResourceManager.GetString("UserProfileRoot_PersonHasNoEmailAddress", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This profile has no avatar to delete.
-        /// </summary>
-        internal static string UserProfilesDomain_NoAvatar {
-            get {
-                return ResourceManager.GetString("UserProfilesDomain_NoAvatar", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This kind of profile must not have an email address.
-        /// </summary>
-        internal static string UserProfilesDomain_NotAPerson {
-            get {
-                return ResourceManager.GetString("UserProfilesDomain_NotAPerson", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The profile can only be changed by its owner.
-        /// </summary>
-        internal static string UserProfilesDomain_NotOwner {
-            get {
-                return ResourceManager.GetString("UserProfilesDomain_NotOwner", resourceCulture);
             }
         }
     }

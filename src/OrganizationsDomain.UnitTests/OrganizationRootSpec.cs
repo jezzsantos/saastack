@@ -88,7 +88,7 @@ public class OrganizationRootSpec
         var result = _org.AddMembership("aninviterid".ToId(), Roles.Empty, Optional<Identifier>.None,
             Optional<EmailAddress>.None);
 
-        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_AddMembership_NotOrgOwner);
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_NotOrgOwner);
     }
 
     [Fact]
@@ -119,5 +119,94 @@ public class OrganizationRootSpec
 
         result.Should().BeSuccess();
         _org.Events.Last().Should().BeOfType<MembershipAdded>();
+    }
+
+    [Fact]
+    public async Task WhenChangeAvatarAsyncAndNotOwner_ThenReturnsError()
+    {
+        var result = await _org.ChangeAvatarAsync("anotheruserid".ToId(), Roles.Empty,
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("animageid".ToId(), "aurl").Value),
+            _ => Task.FromResult(Result.Ok));
+
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_NotOrgOwner);
+    }
+
+    [Fact]
+    public async Task WhenChangeAvatarAsyncAndNoExistingAvatar_ThenChanges()
+    {
+        Identifier? imageDeletedId = null;
+        var result = await _org.ChangeAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("animageid".ToId(), "aurl").Value),
+            id =>
+            {
+                imageDeletedId = id;
+                return Task.FromResult(Result.Ok);
+            });
+
+        imageDeletedId.Should().BeNull();
+        result.Should().BeSuccess();
+        _org.Avatar.Value.ImageId.Should().Be("animageid".ToId());
+        _org.Avatar.Value.Url.Should().Be("aurl");
+        _org.Events.Last().Should().BeOfType<AvatarAdded>();
+    }
+
+    [Fact]
+    public async Task WhenChangeAvatarAsyncAndHasExistingAvatar_ThenChanges()
+    {
+        Identifier? imageDeletedId = null;
+        await _org.ChangeAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("anoldimageid".ToId(), "aurl").Value),
+            _ => Task.FromResult(Result.Ok));
+
+        var result = await _org.ChangeAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("animageid".ToId(), "aurl").Value),
+            id =>
+            {
+                imageDeletedId = id;
+                return Task.FromResult(Result.Ok);
+            });
+
+        imageDeletedId.Should().Be("anoldimageid".ToId());
+        result.Should().BeSuccess();
+        _org.Avatar.Value.ImageId.Should().Be("animageid".ToId());
+        _org.Avatar.Value.Url.Should().Be("aurl");
+        _org.Events.Last().Should().BeOfType<AvatarAdded>();
+    }
+
+    [Fact]
+    public async Task WhenDeleteAvatarAsyncAndNotOwner_ThenReturnsError()
+    {
+        var result = await _org.DeleteAvatarAsync("anotheruserid".ToId(), Roles.Empty, _ => Task.FromResult(Result.Ok));
+
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_NotOrgOwner);
+    }
+
+    [Fact]
+    public async Task WhenDeleteAvatarAsyncAndNoExistingAvatar_ThenReturnsError()
+    {
+        var result = await _org.DeleteAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            _ => Task.FromResult(Result.Ok));
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.OrganizationRoot_NoAvatar);
+    }
+
+    [Fact]
+    public async Task WhenDeleteAvatarAsyncAndHasExistingAvatar_ThenChanges()
+    {
+        Identifier? imageDeletedId = null;
+        await _org.ChangeAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("anoldimageid".ToId(), "aurl").Value),
+            _ => Task.FromResult(Result.Ok));
+
+        var result = await _org.DeleteAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value, id =>
+        {
+            imageDeletedId = id;
+            return Task.FromResult(Result.Ok);
+        });
+
+        imageDeletedId.Should().Be("anoldimageid".ToId());
+        result.Should().BeSuccess();
+        _org.Avatar.HasValue.Should().BeFalse();
+        _org.Events.Last().Should().BeOfType<AvatarRemoved>();
     }
 }

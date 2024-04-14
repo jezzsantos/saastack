@@ -60,6 +60,15 @@ namespace Domain.Shared {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The URL is invalid.
+        /// </summary>
+        internal static string Avatar_InvalidUrl {
+            get {
+                return ResourceManager.GetString("Avatar_InvalidUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Mr or Mrs.
         /// </summary>
         internal static string EmailAddress_FallbackGuessedFirstName {

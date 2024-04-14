@@ -3,7 +3,11 @@ using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 
-namespace UserProfilesDomain;
+namespace Domain.Shared;
+
+public delegate Task<Result<Avatar, Error>> CreateAvatarAction(Name name);
+
+public delegate Task<Result<Error>> RemoveAvatarAction(Identifier avatarId);
 
 public sealed class Avatar : ValueObjectBase<Avatar>
 {

@@ -69,20 +69,29 @@ namespace OrganizationsDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must be an organization owner to perform this action.
-        /// </summary>
-        internal static string OrganizationRoot_AddMembership_NotOrgOwner {
-            get {
-                return ResourceManager.GetString("OrganizationRoot_AddMembership_NotOrgOwner", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Both the ID of the user and an email for the user is missing.
         /// </summary>
         internal static string OrganizationRoot_AddMembership_UserIdAndEmailMissing {
             get {
                 return ResourceManager.GetString("OrganizationRoot_AddMembership_UserIdAndEmailMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This organization has no avatar to delete.
+        /// </summary>
+        internal static string OrganizationRoot_NoAvatar {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_NoAvatar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must be an organization owner to perform this action.
+        /// </summary>
+        internal static string OrganizationRoot_NotOrgOwner {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_NotOrgOwner", resourceCulture);
             }
         }
         

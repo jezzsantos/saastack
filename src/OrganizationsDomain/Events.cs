@@ -8,6 +8,23 @@ namespace OrganizationsDomain;
 
 public static class Events
 {
+    public static AvatarAdded AvatarAdded(Identifier id, Avatar avatar)
+    {
+        return new AvatarAdded(id)
+        {
+            AvatarId = avatar.ImageId,
+            AvatarUrl = avatar.Url
+        };
+    }
+
+    public static AvatarRemoved AvatarRemoved(Identifier id, Identifier avatarId)
+    {
+        return new AvatarRemoved(id)
+        {
+            AvatarId = avatarId
+        };
+    }
+
     public static Created Created(Identifier id, OrganizationOwnership ownership, Identifier createdBy,
         DisplayName name)
     {

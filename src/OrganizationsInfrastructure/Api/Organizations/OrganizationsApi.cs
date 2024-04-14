@@ -3,19 +3,46 @@ using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.Organizations;
+using Microsoft.AspNetCore.Http;
 using OrganizationsApplication;
+using OrganizationsDomain;
 
 namespace OrganizationsInfrastructure.Api.Organizations;
 
 public class OrganizationsApi : IWebApiService
 {
     private readonly ICallerContextFactory _contextFactory;
+    private readonly IFileUploadService _fileUploadService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IOrganizationsApplication _organizationsApplication;
 
-    public OrganizationsApi(ICallerContextFactory contextFactory, IOrganizationsApplication organizationsApplication)
+    public OrganizationsApi(IHttpContextAccessor httpContextAccessor, IFileUploadService fileUploadService,
+        ICallerContextFactory contextFactory, IOrganizationsApplication organizationsApplication)
     {
+        _httpContextAccessor = httpContextAccessor;
+        _fileUploadService = fileUploadService;
         _contextFactory = contextFactory;
         _organizationsApplication = organizationsApplication;
+    }
+
+    public async Task<ApiPutPatchResult<Organization, GetOrganizationResponse>> ChangeAvatar(
+        ChangeOrganizationAvatarRequest request, CancellationToken cancellationToken)
+    {
+        var httpRequest = _httpContextAccessor.HttpContext!.Request;
+        var uploaded = httpRequest.GetUploadedFile(_fileUploadService, Validations.Avatar.MaxSizeInBytes,
+            Validations.Avatar.AllowableContentTypes);
+        if (!uploaded.IsSuccessful)
+        {
+            return () => uploaded.Error;
+        }
+
+        var org =
+            await _organizationsApplication.ChangeAvatarAsync(_contextFactory.Create(), request.Id!,
+                uploaded.Value, cancellationToken);
+
+        return () =>
+            org.HandleApplicationResult<GetOrganizationResponse, Organization>(o =>
+                new GetOrganizationResponse { Organization = o });
     }
 
     public async Task<ApiPostResult<Organization, GetOrganizationResponse>> Create(CreateOrganizationRequest request,
@@ -27,6 +54,17 @@ public class OrganizationsApi : IWebApiService
 
         return () => organization.HandleApplicationResult<GetOrganizationResponse, Organization>(org =>
             new PostResult<GetOrganizationResponse>(new GetOrganizationResponse { Organization = org }));
+    }
+
+    public async Task<ApiResult<Organization, GetOrganizationResponse>> DeleteAvatar(
+        DeleteOrganizationAvatarRequest request, CancellationToken cancellationToken)
+    {
+        var org = await _organizationsApplication.DeleteAvatarAsync(_contextFactory.Create(), request.Id!,
+            cancellationToken);
+
+        return () =>
+            org.HandleApplicationResult<GetOrganizationResponse, Organization>(o =>
+                new GetOrganizationResponse { Organization = o });
     }
 
     public async Task<ApiGetResult<Organization, GetOrganizationResponse>> Get(GetOrganizationRequest request,

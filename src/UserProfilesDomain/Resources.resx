@@ -33,16 +33,13 @@
     <data name="UserProfileRoot_MachineHasEmailAddress" xml:space="preserve">
         <value>This profile is for a machine, and must not have an email address</value>
     </data>
-    <data name="UserProfilesDomain_NotOwner" xml:space="preserve">
+    <data name="UserProfileRoot_NotOwner" xml:space="preserve">
         <value>The profile can only be changed by its owner</value>
     </data>
-    <data name="UserProfilesDomain_NotAPerson" xml:space="preserve">
+    <data name="UserProfileRoot_NotAPerson" xml:space="preserve">
         <value>This kind of profile must not have an email address</value>
     </data>
-    <data name="Avatar_InvalidUrl" xml:space="preserve">
-        <value>The URL is invalid</value>
-    </data>
-    <data name="UserProfilesDomain_NoAvatar" xml:space="preserve">
+    <data name="UserProfileRoot_NoAvatar" xml:space="preserve">
         <value>This profile has no avatar to delete</value>
     </data>
 </root>

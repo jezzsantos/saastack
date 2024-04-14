@@ -11,10 +11,6 @@ using Domain.Shared;
 
 namespace UserProfilesDomain;
 
-public delegate Task<Result<Avatar, Error>> CreateAvatarAction(PersonDisplayName displayName);
-
-public delegate Task<Result<Error>> RemoveAvatarAction(Identifier avatarId);
-
 public sealed class UserProfileRoot : AggregateRootBase
 {
     public static Result<UserProfileRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
@@ -198,7 +194,7 @@ public sealed class UserProfileRoot : AggregateRootBase
 
             case AvatarAdded added:
             {
-                var avatar = UserProfilesDomain.Avatar.Create(added.AvatarId.ToId(), added.AvatarUrl);
+                var avatar = Domain.Shared.Avatar.Create(added.AvatarId.ToId(), added.AvatarUrl);
                 if (!avatar.IsSuccessful)
                 {
                     return avatar.Error;
@@ -226,18 +222,18 @@ public sealed class UserProfileRoot : AggregateRootBase
     {
         if (IsNotOwner(modifierId))
         {
-            return Error.RoleViolation(Resources.UserProfilesDomain_NotOwner);
+            return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
         }
 
         if (Type != ProfileType.Person)
         {
-            return Error.RuleViolation(Resources.UserProfilesDomain_NotAPerson);
+            return Error.RuleViolation(Resources.UserProfileRoot_NotAPerson);
         }
 
         var existingAvatarId = Avatar.HasValue
             ? Avatar.Value.ImageId.ToOptional()
             : Optional<Identifier>.None;
-        var created = await onCreateNew(DisplayName);
+        var created = await onCreateNew(Domain.Shared.Name.Create(DisplayName.Value.Text).Value);
         if (!created.IsSuccessful)
         {
             return created.Error;
@@ -259,7 +255,7 @@ public sealed class UserProfileRoot : AggregateRootBase
     {
         if (IsNotOwner(modifierId))
         {
-            return Error.RoleViolation(Resources.UserProfilesDomain_NotOwner);
+            return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
         }
 
         return RaiseChangeEvent(UserProfilesDomain.Events.DisplayNameChanged(Id, UserId, displayName));
@@ -269,7 +265,7 @@ public sealed class UserProfileRoot : AggregateRootBase
     {
         if (IsNotOwner(modifierId))
         {
-            return Error.RoleViolation(Resources.UserProfilesDomain_NotOwner);
+            return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
         }
 
         return RaiseChangeEvent(UserProfilesDomain.Events.NameChanged(Id, UserId, name));
@@ -279,12 +275,12 @@ public sealed class UserProfileRoot : AggregateRootBase
     {
         if (IsNotOwner(modifierId))
         {
-            return Error.RoleViolation(Resources.UserProfilesDomain_NotOwner);
+            return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
         }
 
         if (Type != ProfileType.Person)
         {
-            return Error.RuleViolation(Resources.UserProfilesDomain_NotAPerson);
+            return Error.RuleViolation(Resources.UserProfileRoot_NotAPerson);
         }
 
         return RaiseChangeEvent(UserProfilesDomain.Events.PhoneNumberChanged(Id, UserId, number));
@@ -294,17 +290,17 @@ public sealed class UserProfileRoot : AggregateRootBase
     {
         if (IsNotOwner(deleterId))
         {
-            return Error.RoleViolation(Resources.UserProfilesDomain_NotOwner);
+            return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
         }
 
         if (Type != ProfileType.Person)
         {
-            return Error.RuleViolation(Resources.UserProfilesDomain_NotAPerson);
+            return Error.RuleViolation(Resources.UserProfileRoot_NotAPerson);
         }
 
         if (!Avatar.HasValue)
         {
-            return Error.RuleViolation(Resources.UserProfilesDomain_NoAvatar);
+            return Error.RuleViolation(Resources.UserProfileRoot_NoAvatar);
         }
 
         var avatarId = Avatar.Value.ImageId;
@@ -321,7 +317,7 @@ public sealed class UserProfileRoot : AggregateRootBase
     {
         if (IsNotOwner(modifierId))
         {
-            return Error.RoleViolation(Resources.UserProfilesDomain_NotOwner);
+            return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
         }
 
         return RaiseChangeEvent(UserProfilesDomain.Events.ContactAddressChanged(Id, UserId, address));
@@ -331,12 +327,12 @@ public sealed class UserProfileRoot : AggregateRootBase
     {
         if (IsNotOwner(modifierId))
         {
-            return Error.RoleViolation(Resources.UserProfilesDomain_NotOwner);
+            return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
         }
 
         if (Type != ProfileType.Person)
         {
-            return Error.RuleViolation(Resources.UserProfilesDomain_NotAPerson);
+            return Error.RuleViolation(Resources.UserProfileRoot_NotAPerson);
         }
 
         return RaiseChangeEvent(UserProfilesDomain.Events.EmailAddressChanged(Id, UserId, emailAddress));
@@ -346,7 +342,7 @@ public sealed class UserProfileRoot : AggregateRootBase
     {
         if (IsNotOwner(modifierId))
         {
-            return Error.RoleViolation(Resources.UserProfilesDomain_NotOwner);
+            return Error.RoleViolation(Resources.UserProfileRoot_NotOwner);
         }
 
         return RaiseChangeEvent(UserProfilesDomain.Events.TimezoneChanged(Id, UserId, timezone));

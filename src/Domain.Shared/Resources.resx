@@ -42,4 +42,7 @@
     <data name="PhoneNumber_InvalidPhoneNumber" xml:space="preserve">
         <value>The PhoneNumber value is not a valid international phone number</value>
     </data>
+    <data name="Avatar_InvalidUrl" xml:space="preserve">
+        <value>The URL is invalid</value>
+    </data>
 </root>

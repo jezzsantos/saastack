@@ -48,7 +48,7 @@ public class UserProfileRootSpec
 
         var result = _profile.SetEmailAddress("anotheruserid".ToId(), emailAddress);
 
-        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfilesDomain_NotOwner);
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfileRoot_NotOwner);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class UserProfileRootSpec
 
         var result = _profile.SetEmailAddress("auserid".ToId(), emailAddress);
 
-        result.Should().BeError(ErrorCode.RuleViolation, Resources.UserProfilesDomain_NotAPerson);
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.UserProfileRoot_NotAPerson);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class UserProfileRootSpec
 
         var result = _profile.SetContactAddress("anotheruserid".ToId(), address);
 
-        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfilesDomain_NotOwner);
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfileRoot_NotOwner);
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public class UserProfileRootSpec
 
         var result = _profile.SetTimezone("anotheruserid".ToId(), timezone);
 
-        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfilesDomain_NotOwner);
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfileRoot_NotOwner);
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class UserProfileRootSpec
 
         var result = _profile.ChangeName("anotheruserid".ToId(), name);
 
-        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfilesDomain_NotOwner);
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfileRoot_NotOwner);
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public class UserProfileRootSpec
 
         var result = _profile.ChangeDisplayName("anotheruserid".ToId(), name);
 
-        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfilesDomain_NotOwner);
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfileRoot_NotOwner);
     }
 
     [Fact]
@@ -179,7 +179,7 @@ public class UserProfileRootSpec
 
         var result = _profile.ChangePhoneNumber("anotheruserid".ToId(), number);
 
-        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfilesDomain_NotOwner);
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfileRoot_NotOwner);
     }
 
     [Fact]
@@ -201,7 +201,7 @@ public class UserProfileRootSpec
             _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("animageid".ToId(), "aurl").Value),
             _ => Task.FromResult(Result.Ok));
 
-        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfilesDomain_NotOwner);
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfileRoot_NotOwner);
     }
 
     [Fact]
@@ -215,7 +215,7 @@ public class UserProfileRootSpec
             _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("aimageid".ToId(), "aurl").Value),
             _ => Task.FromResult(Result.Ok));
 
-        result.Should().BeError(ErrorCode.RuleViolation, Resources.UserProfilesDomain_NotAPerson);
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.UserProfileRoot_NotAPerson);
     }
 
     [Fact]
@@ -265,7 +265,7 @@ public class UserProfileRootSpec
     {
         var result = await _profile.DeleteAvatarAsync("anotheruserid".ToId(), _ => Task.FromResult(Result.Ok));
 
-        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfilesDomain_NotOwner);
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.UserProfileRoot_NotOwner);
     }
 
     [Fact]
@@ -277,7 +277,7 @@ public class UserProfileRootSpec
 
         var result = await _profile.DeleteAvatarAsync("auserid".ToId(), _ => Task.FromResult(Result.Ok));
 
-        result.Should().BeError(ErrorCode.RuleViolation, Resources.UserProfilesDomain_NotAPerson);
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.UserProfileRoot_NotAPerson);
     }
 
     [Fact]
@@ -285,7 +285,7 @@ public class UserProfileRootSpec
     {
         var result = await _profile.DeleteAvatarAsync("auserid".ToId(), _ => Task.FromResult(Result.Ok));
 
-        result.Should().BeError(ErrorCode.RuleViolation, Resources.UserProfilesDomain_NoAvatar);
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.UserProfileRoot_NoAvatar);
     }
 
     [Fact]

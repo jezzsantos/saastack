@@ -8,10 +8,10 @@ namespace Domain.Interfaces.Authorization;
 /// </summary>
 public static class TenantRoles
 {
-    public static readonly RoleLevel Member = new("member");
-    public static readonly RoleLevel Owner = new("member_owner", Member);
-    public static readonly RoleLevel BillingAdmin = new("billing_admin", Owner);
-    public static readonly RoleLevel TestingOnly = new("testingonly_tenant");
+    public static readonly RoleLevel Member = new("org_member");
+    public static readonly RoleLevel Owner = new("org_owner", Member);
+    public static readonly RoleLevel BillingAdmin = new("org_billing_admin", Owner);
+    public static readonly RoleLevel TestingOnly = new("org_testingonly");
     public static readonly Dictionary<string, RoleLevel> AllRoles = new()
     {
         { Member.Name, Member },

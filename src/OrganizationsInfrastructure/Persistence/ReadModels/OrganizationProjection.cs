@@ -43,6 +43,22 @@ public class OrganizationProjection : IReadModelProjection
             case MembershipAdded _:
                 return true;
 
+            case AvatarAdded e:
+                return await _organizations.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                    {
+                        dto.AvatarId = e.AvatarId;
+                        dto.AvatarUrl = e.AvatarUrl;
+                    },
+                    cancellationToken);
+
+            case AvatarRemoved e:
+                return await _organizations.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                    {
+                        dto.AvatarId = Optional<string>.None;
+                        dto.AvatarUrl = Optional<string>.None;
+                    },
+                    cancellationToken);
+
             default:
                 return false;
         }

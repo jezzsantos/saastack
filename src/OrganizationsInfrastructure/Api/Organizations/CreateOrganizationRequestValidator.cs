@@ -11,7 +11,7 @@ public class CreateOrganizationRequestValidator : AbstractValidator<CreateOrgani
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .Matches(Validations.Organization.DisplayName)
+            .Matches(Validations.DisplayName)
             .WithMessage(Resources.CreateOrganizationRequestValidator_InvalidName);
     }
 }

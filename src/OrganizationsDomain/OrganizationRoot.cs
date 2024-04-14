@@ -42,6 +42,8 @@ public sealed class OrganizationRoot : AggregateRootBase
         _tenantSettingService = tenantSettingService;
     }
 
+    public Optional<Avatar> Avatar { get; private set; }
+
     public Identifier CreatedById { get; private set; } = Identifier.Empty();
 
     public DisplayName Name { get; private set; } = DisplayName.Empty;
@@ -134,6 +136,26 @@ public sealed class OrganizationRoot : AggregateRootBase
                 return Result.Ok;
             }
 
+            case AvatarAdded added:
+            {
+                var avatar = Domain.Shared.Avatar.Create(added.AvatarId.ToId(), added.AvatarUrl);
+                if (!avatar.IsSuccessful)
+                {
+                    return avatar.Error;
+                }
+
+                Avatar = avatar.Value;
+                Recorder.TraceDebug(null, "Organization {Id} added avatar {Image}", Id, avatar.Value.ImageId);
+                return Result.Ok;
+            }
+
+            case AvatarRemoved _:
+            {
+                Avatar = Optional<Avatar>.None;
+                Recorder.TraceDebug(null, "Organization {Id} removed avatar", Id);
+                return Result.Ok;
+            }
+
             default:
                 return HandleUnKnownStateChangedEvent(@event);
         }
@@ -144,7 +166,7 @@ public sealed class OrganizationRoot : AggregateRootBase
     {
         if (!IsOwner(inviterRoles))
         {
-            return Error.RoleViolation(Resources.OrganizationRoot_AddMembership_NotOrgOwner);
+            return Error.RoleViolation(Resources.OrganizationRoot_NotOrgOwner);
         }
 
         if (!userId.HasValue
@@ -154,6 +176,59 @@ public sealed class OrganizationRoot : AggregateRootBase
         }
 
         return RaiseChangeEvent(OrganizationsDomain.Events.MembershipAdded(Id, inviterId, userId, emailAddress));
+    }
+
+    public async Task<Result<Error>> ChangeAvatarAsync(Identifier modifierId, Roles modifierRoles,
+        CreateAvatarAction onCreateNew,
+        RemoveAvatarAction onRemoveOld)
+    {
+        if (!IsOwner(modifierRoles))
+        {
+            return Error.RoleViolation(Resources.OrganizationRoot_NotOrgOwner);
+        }
+
+        var existingAvatarId = Avatar.HasValue
+            ? Avatar.Value.ImageId.ToOptional()
+            : Optional<Identifier>.None;
+        var created = await onCreateNew(Domain.Shared.Name.Create(Name.Name).Value);
+        if (!created.IsSuccessful)
+        {
+            return created.Error;
+        }
+
+        if (existingAvatarId.HasValue)
+        {
+            var removed = await onRemoveOld(existingAvatarId.Value);
+            if (!removed.IsSuccessful)
+            {
+                return removed.Error;
+            }
+        }
+
+        return RaiseChangeEvent(OrganizationsDomain.Events.AvatarAdded(Id, created.Value));
+    }
+
+    public async Task<Result<Error>> DeleteAvatarAsync(Identifier deleterId, Roles deleterRoles,
+        RemoveAvatarAction onRemoveOld)
+    {
+        if (!IsOwner(deleterRoles))
+        {
+            return Error.RoleViolation(Resources.OrganizationRoot_NotOrgOwner);
+        }
+
+        if (!Avatar.HasValue)
+        {
+            return Error.RuleViolation(Resources.OrganizationRoot_NoAvatar);
+        }
+
+        var avatarId = Avatar.Value.ImageId;
+        var removed = await onRemoveOld(avatarId);
+        if (!removed.IsSuccessful)
+        {
+            return removed.Error;
+        }
+
+        return RaiseChangeEvent(OrganizationsDomain.Events.AvatarRemoved(Id, avatarId));
     }
 
     public Result<Error> CreateSettings(Settings settings)

@@ -8,6 +8,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
+using Domain.Shared;
 using FluentAssertions;
 using Moq;
 using OrganizationsApplication.Persistence;
@@ -15,6 +16,7 @@ using OrganizationsDomain;
 using UnitTesting.Common;
 using Xunit;
 using OrganizationOwnership = Domain.Shared.Organizations.OrganizationOwnership;
+using PersonName = Application.Resources.Shared.PersonName;
 
 namespace OrganizationsApplication.UnitTests;
 
@@ -25,6 +27,7 @@ public class OrganizationsApplicationSpec
     private readonly Mock<ICallerContext> _caller;
     private readonly Mock<IEndUsersService> _endUsersService;
     private readonly Mock<IIdentifierFactory> _idFactory;
+    private readonly Mock<IImagesService> _imagesService;
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IOrganizationRepository> _repository;
     private readonly Mock<ITenantSettingService> _tenantSettingService;
@@ -50,13 +53,15 @@ public class OrganizationsApplicationSpec
         _tenantSettingService.Setup(tss => tss.Decrypt(It.IsAny<string>()))
             .Returns((string value) => value);
         _endUsersService = new Mock<IEndUsersService>();
+        _imagesService = new Mock<IImagesService>();
         _repository = new Mock<IOrganizationRepository>();
         _repository.Setup(ar => ar.SaveAsync(It.IsAny<OrganizationRoot>(), It.IsAny<CancellationToken>()))
             .Returns((OrganizationRoot root, CancellationToken _) =>
                 Task.FromResult<Result<OrganizationRoot, Error>>(root));
 
         _application = new OrganizationsApplication(_recorder.Object, _idFactory.Object,
-            _tenantSettingsService.Object, _tenantSettingService.Object, _endUsersService.Object, _repository.Object);
+            _tenantSettingsService.Object, _tenantSettingService.Object, _endUsersService.Object, _imagesService.Object,
+            _repository.Object);
     }
 
     [Fact]
@@ -85,7 +90,7 @@ public class OrganizationsApplicationSpec
     }
 
     [Fact]
-    public async Task WhenGetAndNotExists_ThenReturnsError()
+    public async Task WhenGetAsyncAndNotExists_ThenReturnsError()
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
@@ -98,7 +103,7 @@ public class OrganizationsApplicationSpec
     }
 
     [Fact]
-    public async Task WhenGet_ThenReturnsOrganization()
+    public async Task WhenGetAsync_ThenReturnsOrganization()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
             OrganizationOwnership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
@@ -118,7 +123,7 @@ public class OrganizationsApplicationSpec
     }
 
     [Fact]
-    public async Task WhenGetSettingsAndNotExists_ThenReturnsError()
+    public async Task WhenGetSettingsAsyncAndNotExists_ThenReturnsError()
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
@@ -130,7 +135,7 @@ public class OrganizationsApplicationSpec
     }
 
     [Fact]
-    public async Task WhenGetSettings_ThenReturnsSettings()
+    public async Task WhenGetSettingsasync_ThenReturnsSettings()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
             OrganizationOwnership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
@@ -149,7 +154,7 @@ public class OrganizationsApplicationSpec
     }
 
     [Fact]
-    public async Task WhenChangeSettingsAndNotExists_ThenReturnsError()
+    public async Task WhenChangeSettingsAsyncAndNotExists_ThenReturnsError()
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
@@ -162,7 +167,7 @@ public class OrganizationsApplicationSpec
     }
 
     [Fact]
-    public async Task WhenChangeSettings_ThenReturnsSettings()
+    public async Task WhenChangeSettingsAsync_ThenReturnsSettings()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
             OrganizationOwnership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
@@ -373,5 +378,171 @@ public class OrganizationsApplicationSpec
         result.Value.Results[0].Name.LastName.Should().Be("alastname");
         result.Value.Results[0].Roles.Should().ContainInOrder("arole1", "arole2", "arole3");
         result.Value.Results[0].Features.Should().ContainInOrder("afeature1", "afeature2", "afeature3");
+    }
+
+    [Fact]
+    public async Task WhenChangeAvatarAsyncAndNotExists_ThenReturnsError()
+    {
+        _repository.Setup(s =>
+                s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Error.EntityNotFound());
+        var upload = new FileUpload
+        {
+            Content = new MemoryStream(),
+            ContentType = "acontenttype"
+        };
+
+        var result =
+            await _application.ChangeAvatarAsync(_caller.Object, "anorganizationid", upload, CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityNotFound);
+    }
+
+    [Fact]
+    public async Task WhenChangeAvatarAsyncAndNoExistingAvatar_ThenReturnsOrganization()
+    {
+        _caller.Setup(cc => cc.Roles)
+            .Returns(new ICallerContext.CallerRoles(Array.Empty<RoleLevel>(), new[] { TenantRoles.Owner }));
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+        var upload = new FileUpload
+        {
+            Content = new MemoryStream(),
+            ContentType = "acontenttype"
+        };
+        _imagesService.Setup(isv =>
+                isv.CreateImageAsync(It.IsAny<ICallerContext>(), It.IsAny<FileUpload>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Image
+            {
+                ContentType = "acontenttype",
+                Description = "adescription",
+                Filename = "afilename",
+                Url = "aurl",
+                Id = "animageid"
+            });
+
+        var result =
+            await _application.ChangeAvatarAsync(_caller.Object, "anorganizationid", upload, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.AvatarUrl.Should().Be("aurl");
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(profile =>
+            profile.Avatar.Value.ImageId == "animageid".ToId()
+            && profile.Avatar.Value.Url == "aurl"
+        ), It.IsAny<CancellationToken>()));
+        _imagesService.Verify(isv =>
+            isv.CreateImageAsync(_caller.Object, upload, "aname", It.IsAny<CancellationToken>()));
+        _imagesService.Verify(
+            isv => isv.DeleteImageAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenChangeAvatarAsyncAndExistingAvatar_ThenReturnsOrganization()
+    {
+        _caller.Setup(cc => cc.Roles)
+            .Returns(new ICallerContext.CallerRoles(Array.Empty<RoleLevel>(), new[] { TenantRoles.Owner }));
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+        await org.ChangeAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("anoldimageid".ToId(), "aurl").Value),
+            _ => Task.FromResult(Result.Ok));
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+        var upload = new FileUpload
+        {
+            Content = new MemoryStream(),
+            ContentType = "acontenttype"
+        };
+        _imagesService.Setup(isv =>
+                isv.CreateImageAsync(It.IsAny<ICallerContext>(), It.IsAny<FileUpload>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Image
+            {
+                ContentType = "acontenttype",
+                Description = "adescription",
+                Filename = "afilename",
+                Url = "aurl",
+                Id = "animageid"
+            });
+        _imagesService.Setup(isv =>
+                isv.DeleteImageAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result.Ok);
+
+        var result =
+            await _application.ChangeAvatarAsync(_caller.Object, "anorganizationid", upload, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.AvatarUrl.Should().Be("aurl");
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(profile =>
+            profile.Avatar.Value.ImageId == "animageid".ToId()
+            && profile.Avatar.Value.Url == "aurl"
+        ), It.IsAny<CancellationToken>()));
+        _imagesService.Verify(isv =>
+            isv.CreateImageAsync(_caller.Object, upload, "aname", It.IsAny<CancellationToken>()));
+        _imagesService.Verify(
+            isv => isv.DeleteImageAsync(_caller.Object, "anoldimageid", It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenDeleteAvatarAsyncAndNotExists_ThenReturnsError()
+    {
+        _repository.Setup(s =>
+                s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Error.EntityNotFound());
+
+        var result =
+            await _application.DeleteAvatarAsync(_caller.Object, "auserid", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityNotFound);
+    }
+
+    [Fact]
+    public async Task WhenDeleteAvatarAsyncAndNotOwner_ThenReturnsError()
+    {
+        _caller.Setup(cc => cc.Roles)
+            .Returns(new ICallerContext.CallerRoles());
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+
+        var result =
+            await _application.DeleteAvatarAsync(_caller.Object, "auserid", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.RoleViolation);
+    }
+
+    [Fact]
+    public async Task WhenDeleteAvatarAsync_ThenReturnsOrganization()
+    {
+        _caller.Setup(cc => cc.Roles)
+            .Returns(new ICallerContext.CallerRoles(Array.Empty<RoleLevel>(), new[] { TenantRoles.Owner }));
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+        await org.ChangeAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("anoldimageid".ToId(), "aurl").Value),
+            _ => Task.FromResult(Result.Ok));
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+        _imagesService.Setup(isv =>
+                isv.DeleteImageAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result.Ok);
+
+        var result =
+            await _application.DeleteAvatarAsync(_caller.Object, "auserid", CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.AvatarUrl.Should().BeNull();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(profile =>
+            profile.Avatar.HasValue == false
+        ), It.IsAny<CancellationToken>()));
+        _imagesService.Verify(
+            isv => isv.DeleteImageAsync(_caller.Object, "anoldimageid", It.IsAny<CancellationToken>()));
     }
 }

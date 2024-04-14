@@ -4,7 +4,7 @@ using FluentAssertions;
 using UnitTesting.Common;
 using Xunit;
 
-namespace UserProfilesDomain.UnitTests;
+namespace Domain.Shared.UnitTests;
 
 [Trait("Category", "Unit")]
 public class AvatarSpec

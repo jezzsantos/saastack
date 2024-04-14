@@ -1,10 +1,13 @@
+using System.Net;
 using ApiHost1;
 using Application.Resources.Shared;
 using Domain.Interfaces.Authorization;
 using FluentAssertions;
+using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.Organizations;
+using Infrastructure.Web.Interfaces.Clients;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
 
@@ -84,7 +87,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
 
         var members = await Api.GetAsync(new ListMembersForOrganizationRequest
         {
-            Id = organizationId,
+            Id = organizationId
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
         members.Content.Value.Members!.Count.Should().Be(4);
@@ -125,6 +128,85 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         members.Content.Value.Members[3].Name.LastName.Should().BeNull();
         members.Content.Value.Members[3].Classification.Should().Be(UserProfileClassification.Machine);
         members.Content.Value.Members[3].Roles.Should().ContainSingle(role => role == TenantRoles.Member.Name);
+    }
+
+    [Fact]
+    public async Task WhenChangeAvatarByNonMember_ThenForbidden()
+    {
+        var loginA = await LoginUserAsync();
+        var loginB = await LoginUserAsync(LoginUser.PersonB);
+
+        var organizationId = loginA.User.Profile!.DefaultOrganizationId!;
+        var result = await Api.PutAsync(new ChangeOrganizationAvatarRequest
+            {
+                Id = organizationId
+            }, new PostFile(GetTestImage(), HttpContentTypes.ImagePng, "afilename"),
+            req => req.SetJWTBearerToken(loginB.AccessToken));
+
+        result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task WhenChangeAvatarByOrgMember_ThenForbidden()
+    {
+        var loginA = await LoginUserAsync();
+        var loginB = await LoginUserAsync(LoginUser.PersonB);
+
+        var organization = await Api.PostAsync(new CreateOrganizationRequest
+        {
+            Name = "anorganizationname"
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        loginA = await ReAuthenticateUserAsync(loginA.User);
+        var organizationId = organization.Content.Value.Organization!.Id;
+        await Api.PostAsync(new InviteMemberToOrganizationRequest
+        {
+            Id = organizationId,
+            Email = loginB.User.Profile!.EmailAddress
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        var result = await Api.PutAsync(new ChangeOrganizationAvatarRequest
+            {
+                Id = organizationId
+            }, new PostFile(GetTestImage(), HttpContentTypes.ImagePng, "afilename"),
+            req => req.SetJWTBearerToken(loginB.AccessToken));
+
+        result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task WhenChangeAvatar_ThenChanges()
+    {
+        var login = await LoginUserAsync();
+
+        var organizationId = login.User.Profile!.DefaultOrganizationId!;
+        var result = await Api.PutAsync(new ChangeOrganizationAvatarRequest
+            {
+                Id = organizationId
+            }, new PostFile(GetTestImage(), HttpContentTypes.ImagePng, "afilename"),
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        result.Content.Value.Organization!.AvatarUrl.Should().StartWith("https://localhost:5001/images/image_");
+    }
+
+    [Fact]
+    public async Task WhenDeleteAvatar_ThenDeletes()
+    {
+        var login = await LoginUserAsync();
+
+        var organizationId = login.User.Profile!.DefaultOrganizationId!;
+        await Api.PutAsync(new ChangeOrganizationAvatarRequest
+            {
+                Id = organizationId
+            }, new PostFile(GetTestImage(), HttpContentTypes.ImagePng, "afilename"),
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        var result = await Api.DeleteAsync(new DeleteOrganizationAvatarRequest
+        {
+            Id = organizationId
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        result.Content.Value.Organization!.AvatarUrl.Should().BeNull();
     }
 
     private static string CreateRandomEmailAddress()
