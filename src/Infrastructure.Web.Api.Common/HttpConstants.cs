@@ -5,7 +5,6 @@ namespace Infrastructure.Web.Api.Common;
 /// </summary>
 public static class HttpContentTypes
 {
-    public const string FormData = "multipart/form-data";
     public const string FormUrlEncoded = "application/x-www-form-urlencoded";
     public const string FormUrlEncodedWithCharset = "application/x-www-form-urlencoded; charset=utf-8";
     public const string Html = "text/html";
@@ -15,6 +14,7 @@ public static class HttpContentTypes
     public const string Json = "application/json";
     public const string JsonProblem = "application/problem+json";
     public const string JsonWithCharset = "application/json; charset=utf-8";
+    public const string MultiPartFormData = "multipart/form-data";
     public const string OctetStream = "application/octet-stream";
     public const string Text = "text/plain";
     public const string Xml = "application/xml";

@@ -236,6 +236,54 @@ public class RequestTenantDetectiveSpec
             result.Value.TenantId.Should().Be("anorganizationid");
             result.Value.ShouldHaveTenantId.Should().BeFalse();
         }
+
+        [Fact]
+        public async Task WhenDetectTenantAsyncAndTenantIdInMultiPartFormBodyAsTenantId_ThenReturnsTenantId()
+        {
+            var body = new MultipartFormDataContent("aboundary");
+            body.Add(new StringContent("anid"), nameof(IUnTenantedOrganizationRequest.Id));
+            body.Add(new StringContent("atenantid"), nameof(RequestTenantDetective.RequestWithTenantIds.TenantId));
+            var httpContext = new DefaultHttpContext
+            {
+                Request =
+                {
+                    Method = HttpMethods.Post,
+                    ContentType = $"{HttpContentTypes.MultiPartFormData}; boundary=\"aboundary\"",
+                    Body = await body.ReadAsStreamAsync()
+                }
+            };
+
+            var result =
+                await _detective.DetectTenantAsync(httpContext, typeof(TestUnTenantedRequest), CancellationToken.None);
+
+            result.Should().BeSuccess();
+            result.Value.TenantId.Should().Be("atenantid");
+            result.Value.ShouldHaveTenantId.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task WhenDetectTenantAsyncAndTenantIdInMultiPartFormBodyAsOrganizationId_ThenReturnsTenantId()
+        {
+            var body = new MultipartFormDataContent("aboundary");
+            body.Add(new StringContent("anid"), nameof(IUnTenantedOrganizationRequest.Id));
+            body.Add(new StringContent("anorganizationid"), nameof(ITenantedRequest.OrganizationId));
+            var httpContext = new DefaultHttpContext
+            {
+                Request =
+                {
+                    Method = HttpMethods.Post,
+                    ContentType = $"{HttpContentTypes.MultiPartFormData}; boundary=\"aboundary\"",
+                    Body = await body.ReadAsStreamAsync()
+                }
+            };
+
+            var result =
+                await _detective.DetectTenantAsync(httpContext, typeof(TestUnTenantedRequest), CancellationToken.None);
+
+            result.Should().BeSuccess();
+            result.Value.TenantId.Should().Be("anorganizationid");
+            result.Value.ShouldHaveTenantId.Should().BeFalse();
+        }
     }
 
     [Trait("Category", "Unit")]
@@ -324,6 +372,29 @@ public class RequestTenantDetectiveSpec
                     {
                         new(nameof(ITenantedRequest.OrganizationId), "anorganizationid")
                     }).ReadAsStreamAsync()
+                }
+            };
+
+            var result =
+                await _detective.DetectTenantAsync(httpContext, typeof(TestTenantedRequest), CancellationToken.None);
+
+            result.Should().BeSuccess();
+            result.Value.TenantId.Should().Be("anorganizationid");
+            result.Value.ShouldHaveTenantId.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task WhenDetectTenantAsyncAndTenantIdInMultiPartFormBody_ThenReturnsTenantId()
+        {
+            var body = new MultipartFormDataContent("aboundary");
+            body.Add(new StringContent("anorganizationid"), nameof(ITenantedRequest.OrganizationId));
+            var httpContext = new DefaultHttpContext
+            {
+                Request =
+                {
+                    Method = HttpMethods.Post,
+                    ContentType = $"{HttpContentTypes.MultiPartFormData}; boundary=\"aboundary\"",
+                    Body = await body.ReadAsStreamAsync()
                 }
             };
 
@@ -425,6 +496,30 @@ public class RequestTenantDetectiveSpec
                     {
                         new(nameof(IUnTenantedOrganizationRequest.Id), "atenantid")
                     }).ReadAsStreamAsync()
+                }
+            };
+
+            var result =
+                await _detective.DetectTenantAsync(httpContext, typeof(TestUnTenantedOrganizationRequest),
+                    CancellationToken.None);
+
+            result.Should().BeSuccess();
+            result.Value.TenantId.Should().Be("atenantid");
+            result.Value.ShouldHaveTenantId.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task WhenDetectTenantAsyncAndTenantIdInMultiPartFormBody_ThenReturnsTenantId()
+        {
+            var body = new MultipartFormDataContent("aboundary");
+            body.Add(new StringContent("atenantid"), nameof(IUnTenantedOrganizationRequest.Id));
+            var httpContext = new DefaultHttpContext
+            {
+                Request =
+                {
+                    Method = HttpMethods.Post,
+                    ContentType = $"{HttpContentTypes.MultiPartFormData}; boundary=\"aboundary\"",
+                    Body = await body.ReadAsStreamAsync()
                 }
             };
 

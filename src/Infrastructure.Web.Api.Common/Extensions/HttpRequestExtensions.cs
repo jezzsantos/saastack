@@ -156,6 +156,24 @@ public static class HttpRequestExtensions
     }
 
     /// <summary>
+    ///     Whether the MediaType (of the ContentType) is the specified <see cref="contentType" />
+    /// </summary>
+    public static bool IsContentType(this HttpRequest request, string contentType)
+    {
+        if (contentType.HasNoValue())
+        {
+            return false;
+        }
+
+        if (!MediaTypeHeaderValue.TryParse(request.ContentType, out var mediaType))
+        {
+            return false;
+        }
+
+        return mediaType.MediaType.EqualsIgnoreCase(contentType);
+    }
+
+    /// <summary>
     ///     Rewinds the <see cref="HttpRequest.Body" /> back to the start
     /// </summary>
     public static void RewindBody(this HttpRequest httpRequest)

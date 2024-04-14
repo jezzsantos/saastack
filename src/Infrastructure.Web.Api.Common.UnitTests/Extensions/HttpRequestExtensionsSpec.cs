@@ -500,6 +500,60 @@ public class HttpRequestExtensionsSpec
 
         result.Should().BeSome("asignature");
     }
+
+    [Fact]
+    public void WhenIsContentTypeAndNoContentType_ThenReturnsFalse()
+    {
+        var request = new Mock<HttpRequest>();
+
+        var result = request.Object.IsContentType(string.Empty);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenIsContentTypeAndDifferentContentType_ThenReturnsFalse()
+    {
+        var request = new Mock<HttpRequest>();
+        request.Setup(req => req.ContentType).Returns(HttpContentTypes.Xml);
+
+        var result = request.Object.IsContentType(HttpContentTypes.Json);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenIsContentTypeAndJsonWithoutCharSet_ThenReturnsTrue()
+    {
+        var request = new Mock<HttpRequest>();
+        request.Setup(req => req.ContentType).Returns(HttpContentTypes.Json);
+
+        var result = request.Object.IsContentType(HttpContentTypes.Json);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenIsContentTypeAndJsonWithCharSet_ThenReturnsTrue()
+    {
+        var request = new Mock<HttpRequest>();
+        request.Setup(req => req.ContentType).Returns(HttpContentTypes.JsonWithCharset);
+
+        var result = request.Object.IsContentType(HttpContentTypes.Json);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenIsContentTypeAndMultiPartFormDataWithBoundary_ThenReturnsTrue()
+    {
+        var request = new Mock<HttpRequest>();
+        request.Setup(req => req.ContentType).Returns($"{HttpContentTypes.MultiPartFormData}; boundary=\"aboundary\"");
+
+        var result = request.Object.IsContentType(HttpContentTypes.MultiPartFormData);
+
+        result.Should().BeTrue();
+    }
 }
 
 public class TestPopulatedRequest : IWebRequest

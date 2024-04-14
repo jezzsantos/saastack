@@ -722,7 +722,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}POLICY:{|Features|:{|Platform|:[|paidtrial_features|]},|Roles|:{|Platform|:[|operations|]}}");
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}POLICY:{|Features|:{|Platform|:[|paidtrial_features|]},|Roles|:{|Platform|:[|platform_operations|]}}");
                 #endif
                 
                         }
@@ -806,7 +806,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}");
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}");
                 #endif
                 
                         }
@@ -891,7 +891,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}");
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}");
                 
                         }
                     }
@@ -971,7 +971,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}")
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
                                 .DisableAntiforgery();
                 
                         }
@@ -1052,13 +1052,13 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}")
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
                                 .DisableAntiforgery();
                             aserviceclassGroup.MapPatch("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}")
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
                                 .DisableAntiforgery();
                 
                         }
@@ -1141,7 +1141,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}");
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}");
                 #endif
                 
                         }

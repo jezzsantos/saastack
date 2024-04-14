@@ -4,6 +4,7 @@ using Application.Interfaces.Services;
 using Common;
 using Common.Extensions;
 using Domain.Interfaces;
+using Domain.Interfaces.Authorization;
 using FluentAssertions;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common;
@@ -99,7 +100,8 @@ public class HMACAuthenticationHandlerSpec
             claim.Type == AuthenticationConstants.Claims.ForId
             && claim.Value == CallerConstants.MaintenanceAccountUserId);
         result.Ticket.Principal.Claims.Should().Contain(claim =>
-            claim.Type == AuthenticationConstants.Claims.ForRole && claim.Value == "Platform_service");
+            claim.Type == AuthenticationConstants.Claims.ForRole
+            && claim.Value == $"Platform_{PlatformRoles.ServiceAccount.Name}");
         result.Ticket.Principal.Claims.Should().Contain(claim =>
             claim.Type == AuthenticationConstants.Claims.ForFeature
             && claim.Value == "Platform_basic_features");
@@ -139,7 +141,8 @@ public class HMACAuthenticationHandlerSpec
             claim.Type == AuthenticationConstants.Claims.ForId
             && claim.Value == CallerConstants.MaintenanceAccountUserId);
         result.Ticket.Principal.Claims.Should().Contain(claim =>
-            claim.Type == AuthenticationConstants.Claims.ForRole && claim.Value == "Platform_service");
+            claim.Type == AuthenticationConstants.Claims.ForRole
+            && claim.Value == $"Platform_{PlatformRoles.ServiceAccount.Name}");
         result.Ticket.Principal.Claims.Should().Contain(claim =>
             claim.Type == AuthenticationConstants.Claims.ForFeature
             && claim.Value == "Platform_basic_features");

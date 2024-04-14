@@ -94,7 +94,7 @@ public class AuthorizeAttribute : Attribute
     ///     Parses the specified <see cref="policyName" /> and extracts the <see cref="ICallerContext.CallerRoles" /> and the
     ///     <see cref="ICallerContext.CallerFeatures" /> for each policy
     ///     Note: a policy may look like this:
-    ///     "POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}"
+    ///     "POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|{platform_standard}|]}}"
     /// </summary>
     public static IReadOnlyList<(ICallerContext.CallerRoles Roles, ICallerContext.CallerFeatures Features)>
         ParsePolicyName(string policyName)

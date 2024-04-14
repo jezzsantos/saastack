@@ -139,7 +139,7 @@ public class RequestTenantDetective : ITenantDetective
             request.RewindBody();
         }
 
-        if (request.ContentType == HttpContentTypes.Json)
+        if (request.IsContentType(HttpContentTypes.Json))
         {
             try
             {
@@ -184,7 +184,8 @@ public class RequestTenantDetective : ITenantDetective
             }
         }
 
-        if (request.ContentType == HttpContentTypes.FormUrlEncoded)
+        if (request.IsContentType(HttpContentTypes.FormUrlEncoded)
+            || request.IsContentType(HttpContentTypes.MultiPartFormData))
         {
             var form = await request.ReadFormAsync(cancellationToken);
 

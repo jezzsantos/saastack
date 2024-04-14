@@ -76,10 +76,12 @@ public class JWTTokensServiceSpec
             .Contain(claim => claim.Type == AuthenticationConstants.Claims.ForId && claim.Value == "anid");
         token.Claims.Should()
             .Contain(
-                claim => claim.Type == AuthenticationConstants.Claims.ForRole && claim.Value == "Platform_standard");
+                claim => claim.Type == AuthenticationConstants.Claims.ForRole
+                         && claim.Value == $"Platform_{PlatformRoles.Standard.Name}");
         token.Claims.Should()
             .Contain(claim => claim.Type == AuthenticationConstants.Claims.ForRole
-                              && claim.Value == $"Tenant_member{ClaimExtensions.TenantIdDelimiter}anorganizationid");
+                              && claim.Value
+                              == $"Tenant_{TenantRoles.Member.Name}{ClaimExtensions.TenantIdDelimiter}anorganizationid");
         token.Claims.Should()
             .Contain(claim => claim.Type == AuthenticationConstants.Claims.ForFeature
                               && claim.Value == "Platform_basic_features");

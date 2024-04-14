@@ -46,7 +46,7 @@ public class OrganizationsApi : IWebApiService
         GetOrganizationSettingsRequest request, CancellationToken cancellationToken)
     {
         var organization =
-            await _organizationsApplication.GetOrganizationSettingsAsync(_contextFactory.Create(), request.Id,
+            await _organizationsApplication.GetOrganizationSettingsAsync(_contextFactory.Create(), request.Id!,
                 cancellationToken);
 
         return () =>

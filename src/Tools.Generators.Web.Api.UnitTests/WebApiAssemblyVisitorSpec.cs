@@ -2,6 +2,7 @@ extern alias Generators;
 using System.Collections.Immutable;
 using System.Reflection;
 using FluentAssertions;
+using Generators::Domain.Interfaces.Authorization;
 using Generators::Infrastructure.Web.Api.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -465,7 +466,7 @@ public class WebApiAssemblyVisitorSpec
                 registration.MethodName.Should().Be("AMethod");
                 registration.OperationMethod.Should().Be(OperationMethod.Get);
                 registration.OperationAuthorization!.PolicyName.Should().Be(
-                    "POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}");
+                    $"POLICY:{{|Features|:{{|Platform|:[|basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
                 registration.RoutePath.Should().Be("aroute");
                 registration.IsTestingOnly.Should().BeFalse();
                 registration.RequestDto.Name.Should().Be("ARequest");
@@ -522,8 +523,8 @@ public class WebApiAssemblyVisitorSpec
                 registration.MethodName.Should().Be("AMethod");
                 registration.OperationMethod.Should().Be(OperationMethod.Get);
                 registration.OperationAuthorization!.PolicyName.Should().Be(
-                    "POLICY:{|Features|:{|Platform|:[|paid2_features|]},|Roles|:{|Platform|:[|operations|]}}"
-                    + "POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|standard|]}}");
+                    $"POLICY:{{|Features|:{{|Platform|:[|paid2_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}"
+                    + $"POLICY:{{|Features|:{{|Platform|:[|basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
                 registration.RoutePath.Should().Be("aroute");
                 registration.IsTestingOnly.Should().BeFalse();
                 registration.RequestDto.Name.Should().Be("ARequest");

@@ -46,7 +46,7 @@ public static class StringExtensions
     /// <summary>
     ///     Whether the <see cref="other" /> is the same as the value (case-insensitive)
     /// </summary>
-    public static bool EqualsIgnoreCase(this string value, string other)
+    public static bool EqualsIgnoreCase(this string? value, string? other)
     {
         return string.Equals(value, other, StringComparison.OrdinalIgnoreCase);
     }
@@ -55,7 +55,7 @@ public static class StringExtensions
     /// <summary>
     ///     Whether the <see cref="other" /> is precisely the same as the value (case-sensitive)
     /// </summary>
-    public static bool EqualsOrdinal(this string value, string other)
+    public static bool EqualsOrdinal(this string? value, string? other)
     {
         return string.Equals(value, other, StringComparison.Ordinal);
     }
