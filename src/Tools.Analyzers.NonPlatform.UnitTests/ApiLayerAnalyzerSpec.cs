@@ -149,19 +149,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasPublicMethodWithTaskOfApiEmptyResultReturnType_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public Task<ApiEmptyResult> AMethod(TestGetRouteAttributeRequest request)
-    { 
+{{
+    public Task<ApiEmptyResult> AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
         return Task.FromResult<ApiEmptyResult>(() => new Result<EmptyResponse, Error>());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -169,19 +169,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasPublicMethodWithTaskOfApiResultReturnType_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public Task<ApiResult<TestResource, TestResponse>> AMethod(TestGetRouteAttributeRequest request)
-    {
+{{
+    public Task<ApiResult<TestResource, TestResponse>> AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{
         return Task.FromResult<ApiResult<TestResource, TestResponse>>(() => new Result<TestResponse, Error>());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -189,19 +189,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasPublicMethodWithTaskOfApiPostResultReturnType_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public Task<ApiPostResult<TestResource, TestResponse>> AMethod(TestPostRouteAttributeRequest request)
-    {
+{{
+    public Task<ApiPostResult<TestResource, TestResponse>> AMethod({nameof(TestPostRouteAttributeRequest)} request)
+    {{
         return Task.FromResult<ApiPostResult<TestResource, TestResponse>>(() => new Result<PostResult<TestResponse>, Error>());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -209,19 +209,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasPublicMethodWithTaskOfApiGetResultReturnType_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public Task<ApiGetResult<TestResource, TestResponse>> AMethod(TestGetRouteAttributeRequest request)
-    {
+{{
+    public Task<ApiGetResult<TestResource, TestResponse>> AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{
         return Task.FromResult<ApiGetResult<TestResource, TestResponse>>(() => new Result<TestResponse, Error>());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -229,19 +229,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasPublicMethodWithTaskOfApiSearchResultReturnType_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public Task<ApiSearchResult<TestResource, TestSearchResponse>> AMethod(TestSearchRouteAttributeRequest request)
-    {
+{{
+    public Task<ApiSearchResult<TestResource, TestSearchResponse>> AMethod({nameof(TestSearchRouteAttributeRequest)} request)
+    {{
         return Task.FromResult<ApiSearchResult<TestResource, TestSearchResponse>>(() => new Result<TestSearchResponse, Error>());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -249,19 +249,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasPublicMethodWithTaskOfApiPutPatchResultReturnType_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public Task<ApiPutPatchResult<TestResource, TestResponse>> AMethod(TestPutPatchRouteAttributeRequest request)
-    {
+{{
+    public Task<ApiPutPatchResult<TestResource, TestResponse>> AMethod({nameof(TestPutPatchRouteAttributeRequest)} request)
+    {{
         return Task.FromResult<ApiPutPatchResult<TestResource, TestResponse>>(() => new Result<TestResponse, Error>());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -269,19 +269,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasPublicMethodWithTaskOfApiDeleteResultReturnType_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public Task<ApiDeleteResult> AMethod(TestDeleteRouteAttributeRequest request)
-    {
+{{
+    public Task<ApiDeleteResult> AMethod({nameof(TestDeleteRouteAttributeRequest)} request)
+    {{
         return Task.FromResult<ApiDeleteResult>(() => new Result<EmptyResponse, Error>());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -308,19 +308,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasPublicMethodWithNakedApiEmptyResultReturnType_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestGetRouteAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -328,19 +328,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasPublicMethodWithNakedApiResultReturnType_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiResult<TestResource, TestResponse> AMethod(TestGetRouteAttributeRequest request)
-    {
+{{
+    public ApiResult<TestResource, TestResponse> AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{
         return () => new Result<TestResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -348,19 +348,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasPublicMethodWithNakedApiPostResultReturnType_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiPostResult<TestResource, TestResponse> AMethod(TestPostRouteAttributeRequest request)
-    {
+{{
+    public ApiPostResult<TestResource, TestResponse> AMethod({nameof(TestPostRouteAttributeRequest)} request)
+    {{
         return () => new Result<PostResult<TestResponse>, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -368,19 +368,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasPublicMethodWithNakedApiGetResultReturnType_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiGetResult<TestResource, TestResponse> AMethod(TestGetRouteAttributeRequest request)
-    {
+{{
+    public ApiGetResult<TestResource, TestResponse> AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{
         return () => new Result<TestResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -388,19 +388,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasPublicMethodWithNakedApiSearchResultReturnType_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiSearchResult<TestResource, TestSearchResponse> AMethod(TestSearchRouteAttributeRequest request)
-    {
+{{
+    public ApiSearchResult<TestResource, TestSearchResponse> AMethod({nameof(TestSearchRouteAttributeRequest)} request)
+    {{
         return () => new Result<TestSearchResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -408,19 +408,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasPublicMethodWithNakedApiPutPatchResultReturnType_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiPutPatchResult<TestResource, TestResponse> AMethod(TestPutPatchRouteAttributeRequest request)
-    {
+{{
+    public ApiPutPatchResult<TestResource, TestResponse> AMethod({nameof(TestPutPatchRouteAttributeRequest)} request)
+    {{
         return () => new Result<TestResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -428,19 +428,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasPublicMethodWithNakedApiDeleteResultReturnType_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiDeleteResult AMethod(TestDeleteRouteAttributeRequest request)
-    {
+{{
+    public ApiDeleteResult AMethod({nameof(TestDeleteRouteAttributeRequest)} request)
+    {{
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -472,7 +472,7 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasTooManyParameters_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
@@ -480,12 +480,12 @@ using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestGetRouteAttributeRequest request, CancellationToken cancellationToken, string value)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestGetRouteAttributeRequest)} request, CancellationToken cancellationToken, string value)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule011,
                     input, 10, 27, "AMethod");
@@ -514,19 +514,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenSecondParameterIsNotCancellationToken_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestGetRouteAttributeRequest request, string value)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestGetRouteAttributeRequest)} request, string value)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule012,
                     input, 9, 27, "AMethod");
@@ -535,7 +535,7 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenOnlyRequest_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
@@ -543,12 +543,12 @@ using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestGetRouteAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -556,7 +556,7 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenRequestAndCancellation_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
@@ -564,12 +564,12 @@ using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestGetRouteAttributeRequest request, CancellationToken cancellationToken)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestGetRouteAttributeRequest)} request, CancellationToken cancellationToken)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -581,64 +581,64 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenHasNoAttributes_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestNoRouteAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestNoRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(input,
                     (ApiLayerAnalyzer.Rule013, 9, 27, "AMethod", null),
-                    (ApiLayerAnalyzer.Rule017, 9, 35, "TestNoRouteAttributeRequest", null));
+                    (ApiLayerAnalyzer.Rule017, 9, 35, nameof(TestNoRouteAttributeRequest), null));
             }
 
             [Fact]
             public async Task WhenMissingAttribute_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
+{{
     [TestAttribute]
-    public ApiEmptyResult AMethod(TestNoRouteAttributeRequest request)
-    { 
+    public ApiEmptyResult AMethod({nameof(TestNoRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(input,
                     (ApiLayerAnalyzer.Rule013, 10, 27, "AMethod", null),
-                    (ApiLayerAnalyzer.Rule017, 10, 35, "TestNoRouteAttributeRequest", null));
+                    (ApiLayerAnalyzer.Rule017, 10, 35, nameof(TestNoRouteAttributeRequest), null));
             }
 
             [Fact]
             public async Task WhenAttribute_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestGetRouteAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -650,19 +650,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenOneRoute_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod1(TestGetRouteAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod1({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -670,23 +670,23 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenTwoWithSameRoute_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod1(TestGetRouteAttributeRequest1 request)
-    { 
+{{
+    public ApiEmptyResult AMethod1({nameof(TestGetRouteAttributeRequest1)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-    public ApiEmptyResult AMethod2(TestGetRouteAttributeRequest2 request)
-    { 
+    }}
+    public ApiEmptyResult AMethod2({nameof(TestGetRouteAttributeRequest2)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -694,27 +694,27 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenThreeWithSameRouteFirstSegment_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod1(TestGetRouteAttributeRequest1 request)
-    { 
+{{
+    public ApiEmptyResult AMethod1({nameof(TestGetRouteAttributeRequest1)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-    public ApiEmptyResult AMethod2(TestGetRouteAttributeRequest2 request)
-    { 
+    }}
+    public ApiEmptyResult AMethod2({nameof(TestGetRouteAttributeRequest2)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-    public ApiEmptyResult AMethod3(TestGetRouteAttributeRequest3 request)
-    { 
+    }}
+    public ApiEmptyResult AMethod3({nameof(TestGetRouteAttributeRequest3)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -722,27 +722,27 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenDifferentRouteSegments_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod1(TestGetRouteAttributeRequest1 request)
-    { 
+{{
+    public ApiEmptyResult AMethod1({nameof(TestGetRouteAttributeRequest1)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-    public ApiEmptyResult AMethod2(TestGetRouteAttributeRequest2 request)
-    { 
+    }}
+    public ApiEmptyResult AMethod2({nameof(TestGetRouteAttributeRequest2)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-    public ApiEmptyResult AMethod4(TestGetRouteAttributeRequest4 request)
-    { 
+    }}
+    public ApiEmptyResult AMethod4({nameof(TestGetRouteAttributeRequest4)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule014,
                     input, 17, 27, "AMethod4");
@@ -755,19 +755,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenNoDuplicateRequests_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestGetRouteAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -775,27 +775,27 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenDuplicateRequests_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod1(TestGetRouteAttributeRequest1 request)
-    { 
+{{
+    public ApiEmptyResult AMethod1({nameof(TestGetRouteAttributeRequest1)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-    public ApiEmptyResult AMethod2(TestGetRouteAttributeRequest1 request)
-    { 
+    }}
+    public ApiEmptyResult AMethod2({nameof(TestGetRouteAttributeRequest1)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-    public ApiEmptyResult AMethod3(TestGetRouteAttributeRequest2 request)
-    { 
+    }}
+    public ApiEmptyResult AMethod3({nameof(TestGetRouteAttributeRequest2)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(input,
                     (ApiLayerAnalyzer.Rule015, 9, 27, "AMethod1", null),
@@ -811,19 +811,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenPostAndReturnsApiEmptyResult_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestPostRouteAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestPostRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -831,19 +831,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenGetAndReturnsApiEmptyResult_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestGetRouteAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -851,19 +851,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenSearchAndReturnsApiEmptyResult_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestSearchRouteAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestSearchRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -871,19 +871,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenPutPatchAndReturnsApiEmptyResult_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestPutPatchRouteAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestPutPatchRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -891,19 +891,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenDeleteAndReturnsApiEmptyResult_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestDeleteRouteAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestDeleteRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -911,19 +911,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenPostAndReturnsApiResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiResult<string, TestResponse> AMethod(TestPostRouteAttributeRequest request)
-    { 
+{{
+    public ApiResult<string, TestResponse> AMethod({nameof(TestPostRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 44, "AMethod", OperationMethod.Post, ExpectedAllowedResultTypes(OperationMethod.Post));
@@ -932,19 +932,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenGetAndReturnsApiResult_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiResult<string, TestResponse> AMethod(TestGetRouteAttributeRequest request)
-    { 
+{{
+    public ApiResult<string, TestResponse> AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -952,19 +952,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenSearchAndReturnsApiResult_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiResult<string, TestResponse> AMethod(TestSearchRouteAttributeRequest request)
-    { 
+{{
+    public ApiResult<string, TestResponse> AMethod({nameof(TestSearchRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -972,19 +972,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenPutPatchAndReturnsApiResult_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiResult<string, TestResponse> AMethod(TestPutPatchRouteAttributeRequest request)
-    { 
+{{
+    public ApiResult<string, TestResponse> AMethod({nameof(TestPutPatchRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -992,19 +992,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenDeleteAndReturnsApiResult_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiResult<string, TestResponse> AMethod(TestDeleteRouteAttributeRequest request)
-    { 
+{{
+    public ApiResult<string, TestResponse> AMethod({nameof(TestDeleteRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -1012,19 +1012,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenPostAndReturnsApiPostResult_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiPostResult<TestResource, TestResponse> AMethod(TestPostRouteAttributeRequest request)
-    { 
+{{
+    public ApiPostResult<TestResource, TestResponse> AMethod({nameof(TestPostRouteAttributeRequest)} request)
+    {{ 
         return () => new PostResult<TestResponse>(new TestResponse(), ""/alocation"");
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -1032,19 +1032,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenGetAndReturnsApiPostResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiPostResult<TestResource, TestResponse> AMethod(TestGetRouteAttributeRequest request)
-    { 
+{{
+    public ApiPostResult<TestResource, TestResponse> AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
         return () => new PostResult<TestResponse>(new TestResponse(), ""/alocation"");
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 54, "AMethod", OperationMethod.Get, ExpectedAllowedResultTypes(OperationMethod.Get));
@@ -1053,19 +1053,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenSearchAndReturnsApiPostResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiPostResult<TestResource, TestResponse> AMethod(TestSearchRouteAttributeRequest request)
-    { 
+{{
+    public ApiPostResult<TestResource, TestResponse> AMethod({nameof(TestSearchRouteAttributeRequest)} request)
+    {{ 
         return () => new PostResult<TestResponse>(new TestResponse(), ""/alocation"");
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 54, "AMethod", OperationMethod.Search,
@@ -1075,19 +1075,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenPutPatchAndReturnsApiPostResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiPostResult<TestResource, TestResponse> AMethod(TestPutPatchRouteAttributeRequest request)
-    { 
+{{
+    public ApiPostResult<TestResource, TestResponse> AMethod({nameof(TestPutPatchRouteAttributeRequest)} request)
+    {{ 
         return () => new PostResult<TestResponse>(new TestResponse(), ""/alocation"");
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 54, "AMethod", OperationMethod.PutPatch,
@@ -1097,19 +1097,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenDeleteAndReturnsApiPostResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiPostResult<TestResource, TestResponse> AMethod(TestDeleteRouteAttributeRequest request)
-    { 
+{{
+    public ApiPostResult<TestResource, TestResponse> AMethod({nameof(TestDeleteRouteAttributeRequest)} request)
+    {{ 
         return () => new PostResult<TestResponse>(new TestResponse(), ""/alocation"");
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 54, "AMethod", OperationMethod.Delete,
@@ -1119,19 +1119,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenPostAndReturnsApiGetResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiGetResult<string, TestResponse> AMethod(TestPostRouteAttributeRequest request)
-    { 
+{{
+    public ApiGetResult<string, TestResponse> AMethod({nameof(TestPostRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 47, "AMethod", OperationMethod.Post, ExpectedAllowedResultTypes(OperationMethod.Post));
@@ -1140,19 +1140,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenGetAndReturnsApiGetResult_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiGetResult<string, TestResponse> AMethod(TestGetRouteAttributeRequest request)
-    { 
+{{
+    public ApiGetResult<string, TestResponse> AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -1160,19 +1160,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenSearchAndReturnsApiGetResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiGetResult<string, TestResponse> AMethod(TestSearchRouteAttributeRequest request)
-    { 
+{{
+    public ApiGetResult<string, TestResponse> AMethod({nameof(TestSearchRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -1180,19 +1180,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenPutPatchAndReturnsApiGetResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiGetResult<string, TestResponse> AMethod(TestPutPatchRouteAttributeRequest request)
-    { 
+{{
+    public ApiGetResult<string, TestResponse> AMethod({nameof(TestPutPatchRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 47, "AMethod", OperationMethod.PutPatch,
@@ -1202,19 +1202,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenDeleteAndReturnsApiGetResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiGetResult<string, TestResponse> AMethod(TestDeleteRouteAttributeRequest request)
-    { 
+{{
+    public ApiGetResult<string, TestResponse> AMethod({nameof(TestDeleteRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 47, "AMethod", OperationMethod.Delete,
@@ -1224,19 +1224,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenPostAndReturnsApiSearchResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiSearchResult<string, TestSearchResponse> AMethod(TestPostRouteAttributeRequest request)
-    { 
+{{
+    public ApiSearchResult<string, TestSearchResponse> AMethod({nameof(TestPostRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestSearchResponse, Error>(new TestSearchResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 56, "AMethod", OperationMethod.Post, ExpectedAllowedResultTypes(OperationMethod.Post));
@@ -1245,19 +1245,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenGetAndReturnsApiSearchResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiSearchResult<string, TestSearchResponse> AMethod(TestGetRouteAttributeRequest request)
-    { 
+{{
+    public ApiSearchResult<string, TestSearchResponse> AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestSearchResponse, Error>(new TestSearchResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 56, "AMethod", OperationMethod.Get, ExpectedAllowedResultTypes(OperationMethod.Get));
@@ -1266,19 +1266,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenSearchAndReturnsApiSearchResult_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiSearchResult<string, TestSearchResponse> AMethod(TestSearchRouteAttributeRequest request)
-    { 
+{{
+    public ApiSearchResult<string, TestSearchResponse> AMethod({nameof(TestSearchRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestSearchResponse, Error>(new TestSearchResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -1286,19 +1286,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenPutPatchAndReturnsApiSearchResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiSearchResult<string, TestSearchResponse> AMethod(TestPutPatchRouteAttributeRequest request)
-    { 
+{{
+    public ApiSearchResult<string, TestSearchResponse> AMethod({nameof(TestPutPatchRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestSearchResponse, Error>(new TestSearchResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 56, "AMethod", OperationMethod.PutPatch,
@@ -1308,19 +1308,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenDeleteAndReturnsApiSearchResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiSearchResult<string, TestSearchResponse> AMethod(TestDeleteRouteAttributeRequest request)
-    { 
+{{
+    public ApiSearchResult<string, TestSearchResponse> AMethod({nameof(TestDeleteRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestSearchResponse, Error>(new TestSearchResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 56, "AMethod", OperationMethod.Delete,
@@ -1330,19 +1330,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenPostAndReturnsApiPutPatchResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiPutPatchResult<string, TestResponse> AMethod(TestPostRouteAttributeRequest request)
-    { 
+{{
+    public ApiPutPatchResult<string, TestResponse> AMethod({nameof(TestPostRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 52, "AMethod", OperationMethod.Post, ExpectedAllowedResultTypes(OperationMethod.Post));
@@ -1351,19 +1351,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenGetAndReturnsApiPutPatchResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiPutPatchResult<string, TestResponse> AMethod(TestGetRouteAttributeRequest request)
-    { 
+{{
+    public ApiPutPatchResult<string, TestResponse> AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 52, "AMethod", OperationMethod.Get, ExpectedAllowedResultTypes(OperationMethod.Get));
@@ -1372,19 +1372,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenSearchAndReturnsApiPutPatchResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiPutPatchResult<string, TestResponse> AMethod(TestSearchRouteAttributeRequest request)
-    { 
+{{
+    public ApiPutPatchResult<string, TestResponse> AMethod({nameof(TestSearchRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 52, "AMethod", OperationMethod.Search,
@@ -1394,19 +1394,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenPutPatchAndReturnsApiPutPatchResult_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiPutPatchResult<string, TestResponse> AMethod(TestPutPatchRouteAttributeRequest request)
-    { 
+{{
+    public ApiPutPatchResult<string, TestResponse> AMethod({nameof(TestPutPatchRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -1414,19 +1414,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenDeleteAndReturnsApiPutPatchResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiPutPatchResult<string, TestResponse> AMethod(TestDeleteRouteAttributeRequest request)
-    { 
+{{
+    public ApiPutPatchResult<string, TestResponse> AMethod({nameof(TestDeleteRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<TestResponse, Error>(new TestResponse());
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 52, "AMethod", OperationMethod.Delete,
@@ -1436,19 +1436,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenPostAndReturnsApiDeleteResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiDeleteResult AMethod(TestPostRouteAttributeRequest request)
-    { 
+{{
+    public ApiDeleteResult AMethod({nameof(TestPostRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 28, "AMethod", OperationMethod.Post, ExpectedAllowedResultTypes(OperationMethod.Post));
@@ -1457,19 +1457,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenGetAndReturnsApiDeleteResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiDeleteResult AMethod(TestGetRouteAttributeRequest request)
-    { 
+{{
+    public ApiDeleteResult AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 28, "AMethod", OperationMethod.Get, ExpectedAllowedResultTypes(OperationMethod.Get));
@@ -1478,19 +1478,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenSearchAndReturnsApiDeleteResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiDeleteResult AMethod(TestSearchRouteAttributeRequest request)
-    { 
+{{
+    public ApiDeleteResult AMethod({nameof(TestSearchRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 28, "AMethod", OperationMethod.Search,
@@ -1500,19 +1500,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenPutPatchAndReturnsApiDeleteResult_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiDeleteResult AMethod(TestPutPatchRouteAttributeRequest request)
-    { 
+{{
+    public ApiDeleteResult AMethod({nameof(TestPutPatchRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule016,
                     input, 9, 28, "AMethod", OperationMethod.PutPatch,
@@ -1522,19 +1522,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenDeleteAndReturnsApiDeleteResult_ThenNotAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiDeleteResult AMethod(TestDeleteRouteAttributeRequest request)
-    { 
+{{
+    public ApiDeleteResult AMethod({nameof(TestDeleteRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -1553,19 +1553,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenRouteIsAnonymousAndMissingAuthorizeAttribute_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestAnonymousRouteNoAuthorizeAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestAnonymousRouteNoAuthorizeAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -1573,19 +1573,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenRouteIsNotAnonymousAndAuthorizeAttribute_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestSecureRouteAuthorizeAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestSecureRouteAuthorizeAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -1593,41 +1593,41 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenRouteIsAnonymousAndAuthorizeAttribute_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestAnonymousRouteAuthorizeAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestAnonymousRouteAuthorizeAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule018,
-                    input, 9, 35, "TestAnonymousRouteAuthorizeAttributeRequest");
+                    input, 9, 35, nameof(TestAnonymousRouteAuthorizeAttributeRequest));
             }
 
             [Fact]
             public async Task WhenRouteIsNotAnonymousAndNoAuthorizeAttribute_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestSecureRouteNoAuthorizeAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestSecureRouteNoAuthorizeAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule019,
-                    input, 9, 35, "TestSecureRouteNoAuthorizeAttributeRequest");
+                    input, 9, 35, nameof(TestSecureRouteNoAuthorizeAttributeRequest));
             }
         }
 
@@ -1637,19 +1637,19 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenNoDuplicateRequests_ThenNoAlert()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod(TestGetRouteAttributeRequest request)
-    { 
+{{
+    public ApiEmptyResult AMethod({nameof(TestGetRouteAttributeRequest)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
@@ -1657,27 +1657,27 @@ public class AClass : IWebApiService
             [Fact]
             public async Task WhenDuplicateRequests_ThenAlerts()
             {
-                const string input = @"
+                const string input = $@"
 using Infrastructure.Web.Api.Interfaces;
 using System.Threading.Tasks;
 using Common;
 using Tools.Analyzers.NonPlatform.UnitTests;
 namespace ANamespace;
 public class AClass : IWebApiService
-{
-    public ApiEmptyResult AMethod1(TestGetRouteAttributeRequest1 request)
-    { 
+{{
+    public ApiEmptyResult AMethod1({nameof(TestGetRouteAttributeRequest1)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-    public ApiEmptyResult AMethod2(TestGetRouteAttributeRequest5 request)
-    { 
+    }}
+    public ApiEmptyResult AMethod2({nameof(TestGetRouteAttributeRequest5)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-    public ApiEmptyResult AMethod3(TestGetRouteAttributeRequest2 request)
-    { 
+    }}
+    public ApiEmptyResult AMethod3({nameof(TestGetRouteAttributeRequest2)} request)
+    {{ 
         return () => new Result<EmptyResponse, Error>();
-    }
-}";
+    }}
+}}";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule020,
                     input,
