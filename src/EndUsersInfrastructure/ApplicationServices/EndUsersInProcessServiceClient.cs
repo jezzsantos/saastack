@@ -32,6 +32,12 @@ public class EndUsersInProcessServiceClient : IEndUsersService
         return await _endUsersApplication.GetMembershipsAsync(caller, id, cancellationToken);
     }
 
+    public async Task<Result<EndUser, Error>> GetUserPrivateAsync(ICallerContext caller, string id,
+        CancellationToken cancellationToken)
+    {
+        return await _endUsersApplication.GetUserAsync(caller, id, cancellationToken);
+    }
+
     public async Task<Result<SearchResults<MembershipWithUserProfile>, Error>> ListMembershipsForOrganizationAsync(
         ICallerContext caller, string organizationId, SearchOptions searchOptions,
         GetOptions getOptions, CancellationToken cancellationToken)
@@ -59,6 +65,6 @@ public class EndUsersInProcessServiceClient : IEndUsersService
     public async Task<Result<EndUser, Error>> GetPersonAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken)
     {
-        return await _endUsersApplication.GetPersonAsync(caller, id, cancellationToken);
+        return await _endUsersApplication.GetUserAsync(caller, id, cancellationToken);
     }
 }

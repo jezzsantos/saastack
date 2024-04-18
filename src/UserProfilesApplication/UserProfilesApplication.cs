@@ -6,6 +6,7 @@ using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Shared;
 using UserProfilesApplication.Persistence;
 using UserProfilesDomain;
@@ -129,6 +130,54 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         return Optional<UserProfile>.None;
     }
 
+    public async Task<Result<UserProfileForCurrent, Error>> GetCurrentUserProfileAsync(ICallerContext caller,
+        CancellationToken cancellationToken)
+    {
+        if (!caller.IsAuthenticated)
+        {
+            return new UserProfileForCurrent
+            {
+                Address = new ProfileAddress
+                {
+                    CountryCode = CountryCodes.Default.ToString()
+                },
+                AvatarUrl = null,
+                DisplayName = CallerConstants.AnonymousUserId,
+                EmailAddress = null,
+                Name = new Application.Resources.Shared.PersonName
+                {
+                    FirstName = CallerConstants.AnonymousUserId
+                },
+                PhoneNumber = null,
+                Timezone = null,
+                Classification = UserProfileClassification.Person,
+                UserId = CallerConstants.AnonymousUserId,
+                Id = CallerConstants.AnonymousUserId,
+                DefaultOrganizationId = null,
+                IsAuthenticated = false,
+                Features = [],
+                Roles = []
+            };
+        }
+
+        var retrieved = await _repository.FindByUserIdAsync(caller.ToCallerId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        if (!retrieved.Value.HasValue)
+        {
+            return Error.EntityNotFound();
+        }
+
+        var profile = retrieved.Value.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was retrieved for current user {UserId}", profile.Id,
+            profile.UserId);
+
+        return profile.ToCurrentProfile(caller);
+    }
+
     public async Task<Result<UserProfile, Error>> GetProfileAsync(ICallerContext caller, string userId,
         CancellationToken cancellationToken)
     {
@@ -150,7 +199,8 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         }
 
         var profile = retrieved.Value.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was retrieved for user {UserId}", profile.Id, userId);
+        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was retrieved for user {UserId}", profile.Id,
+            profile.UserId);
 
         return profile.ToProfile();
     }
@@ -240,7 +290,8 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         }
 
         profile = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was updated for user {UserId}", profile.Id, userId);
+        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was updated for user {UserId}", profile.Id,
+            profile.UserId);
 
         return profile.ToProfile();
     }
@@ -330,130 +381,6 @@ public partial class UserProfilesApplication : IUserProfilesApplication
             .ToList();
     }
 
-    private async Task<Result<UserProfile, Error>> CreateProfileAsync(ICallerContext caller,
-        UserProfileClassification classification, string userId, string? emailAddress, string firstName,
-        string? lastName, string? timezone, string? countryCode,
-        CancellationToken cancellationToken)
-    {
-        if (classification == UserProfileClassification.Person && emailAddress.HasNoValue())
-        {
-            return Error.RuleViolation(Resources.UserProfilesApplication_PersonMustHaveEmailAddress);
-        }
-
-        var retrievedById = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
-        if (!retrievedById.IsSuccessful)
-        {
-            return retrievedById.Error;
-        }
-
-        if (retrievedById.Value.HasValue)
-        {
-            return Error.EntityExists(Resources.UserProfilesApplication_ProfileExistsForUser);
-        }
-
-        if (classification == UserProfileClassification.Person && emailAddress.HasValue())
-        {
-            var email = EmailAddress.Create(emailAddress);
-            if (!email.IsSuccessful)
-            {
-                return email.Error;
-            }
-
-            var retrievedByEmail = await _repository.FindByEmailAddressAsync(email.Value, cancellationToken);
-            if (!retrievedByEmail.IsSuccessful)
-            {
-                return retrievedByEmail.Error;
-            }
-
-            if (retrievedByEmail.Value.HasValue)
-            {
-                return Error.EntityExists(Resources.UserProfilesApplication_ProfileExistsForEmailAddress);
-            }
-        }
-
-        var name = PersonName.Create(firstName, classification == UserProfileClassification.Person
-            ? lastName
-            : Optional<string>.None);
-        if (!name.IsSuccessful)
-        {
-            return name.Error;
-        }
-
-        var created = UserProfileRoot.Create(_recorder, _identifierFactory,
-            classification.ToEnumOrDefault(ProfileType.Person),
-            userId.ToId(), name.Value);
-        if (!created.IsSuccessful)
-        {
-            return created.Error;
-        }
-
-        var profile = created.Value;
-        if (classification == UserProfileClassification.Person)
-        {
-            var personEmail = EmailAddress.Create(emailAddress!);
-            if (!personEmail.IsSuccessful)
-            {
-                return personEmail.Error;
-            }
-
-            var emailed = profile.SetEmailAddress(userId.ToId(), personEmail.Value);
-            if (!emailed.IsSuccessful)
-            {
-                return emailed.Error;
-            }
-        }
-
-        var address = Address.Create(CountryCodes.FindOrDefault(countryCode));
-        if (!address.IsSuccessful)
-        {
-            return address.Error;
-        }
-
-        var contacted = profile.SetContactAddress(userId.ToId(), address.Value);
-        if (!contacted.IsSuccessful)
-        {
-            return contacted.Error;
-        }
-
-        var tz = Timezone.Create(Timezones.FindOrDefault(timezone));
-        if (!tz.IsSuccessful)
-        {
-            return tz.Error;
-        }
-
-        var timezoned = profile.SetTimezone(userId.ToId(), tz.Value);
-        if (!timezoned.IsSuccessful)
-        {
-            return timezoned.Error;
-        }
-
-        if (classification == UserProfileClassification.Person)
-        {
-            //Attempt to download the default avatar for the user. If this fails, we just move on
-            var defaultAvatared = await _avatarService.FindAvatarAsync(caller, emailAddress!, cancellationToken);
-            if (defaultAvatared is { IsSuccessful: true, Value.HasValue: true })
-            {
-                var upload = defaultAvatared.Value.Value;
-                var avatared =
-                    await ChangeAvatarInternalAsync(caller, userId.ToId(), profile, upload, cancellationToken);
-                if (!avatared.IsSuccessful)
-                {
-                    return avatared.Error;
-                }
-            }
-        }
-
-        var saved = await _repository.SaveAsync(profile, cancellationToken);
-        if (!saved.IsSuccessful)
-        {
-            return saved.Error;
-        }
-
-        profile = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was created for user {UserId}", profile.Id, userId);
-
-        return profile.ToProfile();
-    }
 
     private async Task<Result<Error>> ChangeAvatarInternalAsync(ICallerContext caller, Identifier modifierId,
         UserProfileRoot profile, FileUpload upload, CancellationToken cancellationToken)
@@ -479,6 +406,17 @@ public partial class UserProfilesApplication : IUserProfilesApplication
 
 internal static class UserProfileConversionExtensions
 {
+    public static UserProfileForCurrent ToCurrentProfile(this UserProfileRoot profile, ICallerContext caller)
+    {
+        var dto = profile.ToProfile().Convert<UserProfile, UserProfileForCurrent>();
+        dto.IsAuthenticated = caller.IsAuthenticated;
+        dto.Roles = caller.Roles.Platform.Select(rol => rol.Name).ToList();
+        dto.Features = caller.Features.Platform.Select(feat => feat.Name).ToList();
+        dto.DefaultOrganizationId = profile.DefaultOrganizationId.ValueOrDefault!;
+
+        return dto;
+    }
+
     public static UserProfile ToProfile(this UserProfileRoot profile)
     {
         return new UserProfile

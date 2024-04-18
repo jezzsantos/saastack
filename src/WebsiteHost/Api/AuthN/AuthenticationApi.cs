@@ -33,7 +33,7 @@ public class AuthenticationApi : IWebApiService
             PopulateCookies(response, tokens.Value);
         }
 
-        return () => tokens.HandleApplicationResult<AuthenticateResponse, AuthenticateTokens>(tok =>
+        return () => tokens.HandleApplicationResult<AuthenticateTokens, AuthenticateResponse>(tok =>
             new PostResult<AuthenticateResponse>(new AuthenticateResponse { UserId = tok.UserId }));
     }
 

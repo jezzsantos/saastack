@@ -81,6 +81,11 @@ public class UserProfileProjection : IReadModelProjection
                     },
                     cancellationToken);
 
+            case DefaultOrganizationChanged e:
+                return await _users.HandleUpdateAsync(e.RootId.ToId(),
+                    dto => { dto.DefaultOrganizationId = e.ToOrganizationId; },
+                    cancellationToken);
+
             default:
                 return false;
         }

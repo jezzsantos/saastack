@@ -27,7 +27,7 @@ public class SingleSignOnApi : IWebApiService
                 request.Provider,
                 request.AuthCode, request.Username, cancellationToken);
 
-        return () => authenticated.HandleApplicationResult<AuthenticateResponse, AuthenticateTokens>(tok =>
+        return () => authenticated.HandleApplicationResult<AuthenticateTokens, AuthenticateResponse>(tok =>
             new PostResult<AuthenticateResponse>(new AuthenticateResponse
             {
                 Tokens = tok

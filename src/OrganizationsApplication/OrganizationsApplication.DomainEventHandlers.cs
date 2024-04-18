@@ -1,9 +1,9 @@
 using Application.Interfaces;
-using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.EndUsers;
+using Domain.Shared.Organizations;
 
 namespace OrganizationsApplication;
 
@@ -14,7 +14,8 @@ partial class OrganizationsApplication
     {
         var name =
             $"{domainEvent.UserProfile.FirstName}{(domainEvent.UserProfile.LastName.HasValue() ? " " + domainEvent.UserProfile.LastName : string.Empty)}";
-        var organization = await CreateOrganizationAsync(caller, domainEvent.RootId.ToId(), name,
+        var organization = await CreateOrganizationInternalAsync(caller, domainEvent.RootId.ToId(),
+            domainEvent.Classification, name,
             OrganizationOwnership.Personal, cancellationToken);
         if (!organization.IsSuccessful)
         {

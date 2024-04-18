@@ -10,6 +10,7 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
 using Domain.Shared;
+using Domain.Shared.EndUsers;
 using Domain.Shared.Organizations;
 
 namespace OrganizationsDomain;
@@ -20,8 +21,14 @@ public sealed class OrganizationRoot : AggregateRootBase
 
     public static Result<OrganizationRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
         ITenantSettingService tenantSettingService, OrganizationOwnership ownership, Identifier createdBy,
-        DisplayName name)
+        UserClassification classification, DisplayName name)
     {
+        if (ownership == OrganizationOwnership.Shared
+            && classification != UserClassification.Person)
+        {
+            return Error.RuleViolation(Resources.OrganizationRoot_Create_SharedRequiresPerson);
+        }
+
         var root = new OrganizationRoot(recorder, idFactory, tenantSettingService);
         root.RaiseCreateEvent(OrganizationsDomain.Events.Created(root.Id, ownership, createdBy, name));
         return root;
@@ -169,6 +176,11 @@ public sealed class OrganizationRoot : AggregateRootBase
             return Error.RoleViolation(Resources.OrganizationRoot_NotOrgOwner);
         }
 
+        if (Ownership == OrganizationOwnership.Personal)
+        {
+            return Error.RuleViolation(Resources.OrganizationRoot_AddMembership_PersonalOrgMembershipNotAllowed);
+        }
+
         if (!userId.HasValue
             && !emailAddress.HasValue)
         {
@@ -208,6 +220,20 @@ public sealed class OrganizationRoot : AggregateRootBase
         return RaiseChangeEvent(OrganizationsDomain.Events.AvatarAdded(Id, created.Value));
     }
 
+    public Result<Error> CreateSettings(Settings settings)
+    {
+        foreach (var (key, value) in settings.Properties)
+        {
+            var valueValue = value.IsEncrypted
+                ? _tenantSettingService.Encrypt(value.Value.ToString() ?? string.Empty)
+                : value.Value.ToString() ?? string.Empty;
+            RaiseChangeEvent(OrganizationsDomain.Events.SettingCreated(Id, key, valueValue, value.ValueType,
+                value.IsEncrypted));
+        }
+
+        return Result.Ok;
+    }
+
     public async Task<Result<Error>> DeleteAvatarAsync(Identifier deleterId, Roles deleterRoles,
         RemoveAvatarAction onRemoveOld)
     {
@@ -231,19 +257,12 @@ public sealed class OrganizationRoot : AggregateRootBase
         return RaiseChangeEvent(OrganizationsDomain.Events.AvatarRemoved(Id, avatarId));
     }
 
-    public Result<Error> CreateSettings(Settings settings)
+#if TESTINGONLY
+    public void TestingOnly_ChangeOwnership(OrganizationOwnership ownership)
     {
-        foreach (var (key, value) in settings.Properties)
-        {
-            var valueValue = value.IsEncrypted
-                ? _tenantSettingService.Encrypt(value.Value.ToString() ?? string.Empty)
-                : value.Value.ToString() ?? string.Empty;
-            RaiseChangeEvent(OrganizationsDomain.Events.SettingCreated(Id, key, valueValue, value.ValueType,
-                value.IsEncrypted));
-        }
-
-        return Result.Ok;
+        Ownership = ownership;
     }
+#endif
 
     public Result<Error> UpdateSettings(Settings settings)
     {

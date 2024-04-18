@@ -10,6 +10,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Services;
 using Domain.Shared;
+using Domain.Shared.EndUsers;
 using OrganizationsApplication.Persistence;
 using OrganizationsDomain;
 using OrganizationOwnership = Domain.Shared.Organizations.OrganizationOwnership;
@@ -76,9 +77,17 @@ public partial class OrganizationsApplication : IOrganizationsApplication
     public async Task<Result<Organization, Error>> CreateSharedOrganizationAsync(ICallerContext caller, string name,
         CancellationToken cancellationToken)
     {
-        var creatorId = caller.CallerId;
-        var created = await CreateOrganizationAsync(caller, creatorId, name,
-            Application.Resources.Shared.OrganizationOwnership.Shared, cancellationToken);
+        var userId = caller.ToCallerId();
+        var retrieved = await _endUsersService.GetUserPrivateAsync(caller, userId, cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var user = retrieved.Value;
+        var created = await CreateOrganizationInternalAsync(caller, user.Id,
+            user.Classification.ToEnumOrDefault(UserClassification.Person), name,
+            OrganizationOwnership.Shared, cancellationToken);
         if (!created.IsSuccessful)
         {
             return created.Error;
@@ -304,8 +313,9 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         return org.ToOrganization();
     }
 
-    private async Task<Result<Organization, Error>> CreateOrganizationAsync(ICallerContext caller, string creatorId,
-        string name, Application.Resources.Shared.OrganizationOwnership ownership, CancellationToken cancellationToken)
+    private async Task<Result<Organization, Error>> CreateOrganizationInternalAsync(ICallerContext caller,
+        string creatorId, UserClassification classification, string name, OrganizationOwnership ownership,
+        CancellationToken cancellationToken)
     {
         var displayName = DisplayName.Create(name);
         if (!displayName.IsSuccessful)
@@ -314,7 +324,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         }
 
         var created = OrganizationRoot.Create(_recorder, _identifierFactory, _tenantSettingService,
-            ownership.ToEnumOrDefault(OrganizationOwnership.Shared), creatorId.ToId(), displayName.Value);
+            ownership, creatorId.ToId(), classification, displayName.Value);
         if (!created.IsSuccessful)
         {
             return created.Error;

@@ -35,7 +35,7 @@ public class UserProfilesApi : IWebApiService
                 cancellationToken);
 
         return () =>
-            profile.HandleApplicationResult<GetProfileResponse, UserProfile>(pro => new GetProfileResponse
+            profile.HandleApplicationResult<UserProfile, GetProfileResponse>(pro => new GetProfileResponse
                 { Profile = pro });
     }
 
@@ -48,7 +48,7 @@ public class UserProfilesApi : IWebApiService
                 cancellationToken);
 
         return () =>
-            profile.HandleApplicationResult<GetProfileResponse, UserProfile>(pro => new GetProfileResponse
+            profile.HandleApplicationResult<UserProfile, GetProfileResponse>(pro => new GetProfileResponse
                 { Profile = pro });
     }
 
@@ -68,7 +68,7 @@ public class UserProfilesApi : IWebApiService
                 uploaded.Value, cancellationToken);
 
         return () =>
-            profile.HandleApplicationResult<ChangeProfileAvatarResponse, UserProfile>(pro =>
+            profile.HandleApplicationResult<UserProfile, ChangeProfileAvatarResponse>(pro =>
                 new ChangeProfileAvatarResponse { Profile = pro });
     }
 
@@ -80,7 +80,18 @@ public class UserProfilesApi : IWebApiService
                 cancellationToken);
 
         return () =>
-            profile.HandleApplicationResult<DeleteProfileAvatarResponse, UserProfile>(pro =>
+            profile.HandleApplicationResult<UserProfile, DeleteProfileAvatarResponse>(pro =>
                 new DeleteProfileAvatarResponse { Profile = pro });
+    }
+
+    public async Task<ApiGetResult<UserProfileForCurrent, GetCurrentProfileResponse>> GetCurrentProfile(
+        GetCurrentProfileRequest request, CancellationToken cancellationToken)
+    {
+        var profile =
+            await _userProfilesApplication.GetCurrentUserProfileAsync(_contextFactory.Create(), cancellationToken);
+
+        return () =>
+            profile.HandleApplicationResult<UserProfileForCurrent, GetCurrentProfileResponse>(pro =>
+                new GetCurrentProfileResponse { Profile = pro });
     }
 }

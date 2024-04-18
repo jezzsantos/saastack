@@ -760,7 +760,7 @@ public class $Action$$Resource$RequestValidator : AbstractValidator&lt;$Action$$
 {
     var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
 
-    return () =&gt; $resource$.HandleApplicationResult&lt;$Action$$Resource$Response, $Resource$&gt;(x =&gt; new PostResult&lt;$Action$$Resource$Response&gt;(new $Action$$Resource$Response { $Resource$ = x }));
+    return () =&gt; $resource$.HandleApplicationResult&lt;$Resource$, $Action$$Resource$Response&gt;(x =&gt; new PostResult&lt;$Action$$Resource$Response&gt;(new $Action$$Resource$Response { $Resource$ = x }));
 }</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=518DB9880AD5ED449C104E766AB6FAF0/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=518DB9880AD5ED449C104E766AB6FAF0/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
@@ -1215,7 +1215,7 @@ public class $Action$$Resource$Response : IWebResponse
 {
     var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
 
-    return () =&gt; $resource$.HandleApplicationResult&lt;$Action$$Resource$Response, $Resource$&gt;(x =&gt; new $Action$$Resource$Response { $Resource$ = x });
+    return () =&gt; $resource$.HandleApplicationResult&lt;$Resource$, $Action$$Resource$Response&gt;(x =&gt; new $Action$$Resource$Response { $Resource$ = x });
 }</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D3A5BB394F1F30409407264EA0161946/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D3A5BB394F1F30409407264EA0161946/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
@@ -1390,7 +1390,7 @@ public sealed class $name$Root : AggregateRootBase
 {
     var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
 
-    return () =&gt; $resource$.HandleApplicationResult&lt;$Action$$Resource$Response, $Resource$&gt;(x =&gt; new $Action$$Resource$Response { $Resource$ = x });
+    return () =&gt; $resource$.HandleApplicationResult&lt;$Resource$, $Action$$Resource$Response&gt;(x =&gt; new $Action$$Resource$Response { $Resource$ = x });
 }</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=FB91EB49F0C92544901777E29C183C25/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=FB91EB49F0C92544901777E29C183C25/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>

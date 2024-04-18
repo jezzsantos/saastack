@@ -11,6 +11,7 @@ using Domain.Interfaces.ValueObjects;
 using Domain.Services.Shared.DomainServices;
 using Domain.Shared;
 using Domain.Shared.EndUsers;
+using Domain.Shared.Organizations;
 
 namespace EndUsersDomain;
 
@@ -159,16 +160,19 @@ public sealed class EndUserRoot : AggregateRootBase
 
             case MembershipDefaultChanged changed:
             {
-                var fromMembership = Memberships.FindByMembershipId(changed.FromMembershipId.ToId());
-                if (!fromMembership.HasValue)
+                if (changed.FromMembershipId.Exists())
                 {
-                    return Error.RuleViolation(Resources.EndUserRoot_MissingMembership);
-                }
+                    var fromMembership = Memberships.FindByMembershipId(changed.FromMembershipId.ToId());
+                    if (!fromMembership.HasValue)
+                    {
+                        return Error.RuleViolation(Resources.EndUserRoot_MissingMembership);
+                    }
 
-                var from = RaiseEventToChildEntity(changed, fromMembership.Value);
-                if (!from.IsSuccessful)
-                {
-                    return from.Error;
+                    var from = RaiseEventToChildEntity(changed, fromMembership.Value);
+                    if (!from.IsSuccessful)
+                    {
+                        return from.Error;
+                    }
                 }
 
                 var toMembership = Memberships.FindByMembershipId(changed.ToMembershipId.ToId());
@@ -185,7 +189,7 @@ public sealed class EndUserRoot : AggregateRootBase
 
                 Recorder.TraceDebug(null,
                     "EndUser {Id} changed default membership from {FromMembership} to {ToMembership}", Id,
-                    changed.FromMembershipId, changed.ToMembershipId);
+                    changed.FromMembershipId ?? "none", changed.ToMembershipId);
 
                 return Result.Ok;
             }
@@ -325,9 +329,22 @@ public sealed class EndUserRoot : AggregateRootBase
         return RaiseChangeEvent(EndUsersDomain.Events.GuestInvitationAccepted(Id, emailAddress));
     }
 
-    public Result<Error> AddMembership(Identifier organizationId, Roles tenantRoles, Features tenantFeatures)
+    public Result<Error> AddMembership(EndUserRoot adder, OrganizationOwnership ownership, Identifier organizationId,
+        Roles tenantRoles, Features tenantFeatures)
     {
-        //TODO: check that the adder is a member of this organization, and an owner of it
+        var skipOwnershipCheck = adder.Id == Id;
+        if (!skipOwnershipCheck)
+        {
+            if (!IsOrganizationOwner(adder, organizationId))
+            {
+                return Error.RoleViolation(Resources.EndUserRoot_NotOrganizationOwner);
+            }
+
+            if (ownership == OrganizationOwnership.Personal)
+            {
+                return Error.RuleViolation(Resources.EndUserRoot_Addmembership_SharedOwnershipRequired);
+            }
+        }
 
         var existing = Memberships.FindByOrganizationId(organizationId);
         if (existing.HasValue)
@@ -335,24 +352,21 @@ public sealed class EndUserRoot : AggregateRootBase
             return Result.Ok;
         }
 
-        var isDefault = Memberships.HasNone();
+        var isFirst = Memberships.HasNone();
         var added = RaiseChangeEvent(
-            EndUsersDomain.Events.MembershipAdded(Id, organizationId, isDefault, tenantRoles, tenantFeatures));
+            EndUsersDomain.Events.MembershipAdded(Id, organizationId, ownership, isFirst, tenantRoles, tenantFeatures));
         if (!added.IsSuccessful)
         {
             return added.Error;
         }
 
-        if (!isDefault)
-        {
-            var defaultMembership = Memberships.DefaultMembership;
-            var addedMembership = Memberships.FindByOrganizationId(organizationId);
-            return RaiseChangeEvent(
-                EndUsersDomain.Events.MembershipDefaultChanged(Id, defaultMembership.Id,
-                    addedMembership.Value.Id));
-        }
+        var defaultMembershipId = isFirst
+            ? Optional<Identifier>.None
+            : Memberships.DefaultMembership.Id.ToOptional();
+        var addedMembership = Memberships.FindByOrganizationId(organizationId);
 
-        return Result.Ok;
+        return RaiseChangeEvent(EndUsersDomain.Events.MembershipDefaultChanged(Id, defaultMembershipId,
+            addedMembership.Value.Id, addedMembership.Value.OrganizationId, tenantRoles, tenantFeatures));
     }
 
     public Result<Error> AssignMembershipFeatures(EndUserRoot assigner, Identifier organizationId,
@@ -360,7 +374,7 @@ public sealed class EndUserRoot : AggregateRootBase
     {
         if (!IsOrganizationOwner(assigner, organizationId))
         {
-            return Error.RuleViolation(Resources.EndUserRoot_NotOrganizationOwner);
+            return Error.RoleViolation(Resources.EndUserRoot_NotOrganizationOwner);
         }
 
         var membership = Memberships.FindByOrganizationId(organizationId);
@@ -398,7 +412,7 @@ public sealed class EndUserRoot : AggregateRootBase
     {
         if (!IsOrganizationOwner(assigner, organizationId))
         {
-            return Error.RuleViolation(Resources.EndUserRoot_NotOrganizationOwner);
+            return Error.RoleViolation(Resources.EndUserRoot_NotOrganizationOwner);
         }
 
         var membership = Memberships.FindByOrganizationId(organizationId);

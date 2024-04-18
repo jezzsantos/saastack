@@ -9,6 +9,8 @@ public class UserProfile : IIdentifiableResource
 
     public string? AvatarUrl { get; set; }
 
+    public UserProfileClassification Classification { get; set; }
+
     public required string DisplayName { get; set; }
 
     public string? EmailAddress { get; set; }
@@ -19,11 +21,18 @@ public class UserProfile : IIdentifiableResource
 
     public string? Timezone { get; set; }
 
-    public UserProfileClassification Classification { get; set; }
-
     public required string UserId { get; set; }
 
     public required string Id { get; set; }
+}
+
+public class UserProfileForCurrent : UserProfileWithDefaultMembership
+{
+    public List<string> Features { get; set; } = new();
+
+    public bool IsAuthenticated { get; set; }
+
+    public List<string> Roles { get; set; } = new();
 }
 
 public enum UserProfileClassification

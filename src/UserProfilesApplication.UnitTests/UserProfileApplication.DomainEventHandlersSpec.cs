@@ -101,7 +101,7 @@ public class UserProfileApplicationDomainEventHandlersSpec
     }
 
     [Fact]
-    public async Task WhenCreateProfileAsyncForMachine_ThenCreatesProfile()
+    public async Task WhenHandleEndUserRegisteredAsyncForMachine_ThenCreatesProfile()
     {
         var domainEvent = Events.Registered("amachineid".ToId(), EndUserProfile.Create("afirstname").Value,
             EmailAddress.Create("amachine@company.com").Value, UserClassification.Machine, UserAccess.Enabled,
@@ -202,5 +202,26 @@ public class UserProfileApplicationDomainEventHandlersSpec
             && up.Avatar.Value.ImageId == "animageid"
             && up.Avatar.Value.Url == "aurl"
         ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenHandleEndUserDefaultOrganizationChangedAsync_ThenSetsDefaultOrganization()
+    {
+        var domainEvent = Events.MembershipDefaultChanged("auserid".ToId(), "amembershipid".ToId(),
+            "amembershipid".ToId(), "anorganizationid".ToId(), Roles.Empty, Features.Empty);
+        var user = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
+            PersonName.Create("afirstname", "alastname").Value).Value;
+        _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user.ToOptional());
+
+        var result = await _application.HandleEndUserDefaultOrganizationChangedAsync(_caller.Object,
+            domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<UserProfileRoot>(up =>
+            up.UserId == "auserid".ToId()
+            && up.DefaultOrganizationId == "anorganizationid".ToId()
+        ), It.IsAny<CancellationToken>()));
+        _repository.Verify(rep => rep.FindByUserIdAsync("auserid".ToId(), It.IsAny<CancellationToken>()));
     }
 }

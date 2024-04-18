@@ -19,7 +19,7 @@ public partial interface IEndUsersApplication
     Task<Result<EndUserWithMemberships, Error>> GetMembershipsAsync(ICallerContext context, string id,
         CancellationToken cancellationToken);
 
-    Task<Result<EndUser, Error>> GetPersonAsync(ICallerContext context, string id, CancellationToken cancellationToken);
+    Task<Result<EndUser, Error>> GetUserAsync(ICallerContext context, string id, CancellationToken cancellationToken);
 
     Task<Result<SearchResults<MembershipWithUserProfile>, Error>> ListMembershipsForOrganizationAsync(
         ICallerContext caller,

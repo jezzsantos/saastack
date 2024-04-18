@@ -69,11 +69,29 @@ namespace OrganizationsDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot add another user to a Personal organization.
+        /// </summary>
+        internal static string OrganizationRoot_AddMembership_PersonalOrgMembershipNotAllowed {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_AddMembership_PersonalOrgMembershipNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Both the ID of the user and an email for the user is missing.
         /// </summary>
         internal static string OrganizationRoot_AddMembership_UserIdAndEmailMissing {
             get {
                 return ResourceManager.GetString("OrganizationRoot_AddMembership_UserIdAndEmailMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must be a person to create a &apos;Shared&apos; organization.
+        /// </summary>
+        internal static string OrganizationRoot_Create_SharedRequiresPerson {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_Create_SharedRequiresPerson", resourceCulture);
             }
         }
         
@@ -87,7 +105,7 @@ namespace OrganizationsDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must be an organization owner to perform this action.
+        ///   Looks up a localized string similar to Must be an organization owner to perform this action.
         /// </summary>
         internal static string OrganizationRoot_NotOrgOwner {
             get {

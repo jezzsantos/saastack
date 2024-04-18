@@ -32,7 +32,7 @@ public sealed class BookingsApi : IWebApiService
         var booking = await _bookingsApplication.MakeBookingAsync(_contextFactory.Create(), request.OrganizationId!,
             request.CarId, request.StartUtc, request.EndUtc, cancellationToken);
 
-        return () => booking.HandleApplicationResult<MakeBookingResponse, Booking>(c =>
+        return () => booking.HandleApplicationResult<Booking, MakeBookingResponse>(c =>
             new PostResult<MakeBookingResponse>(new MakeBookingResponse { Booking = c }));
     }
 

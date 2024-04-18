@@ -1,6 +1,7 @@
 using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
+using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.EndUsers;
 using Domain.Interfaces;
@@ -72,11 +73,14 @@ public class EndUserProjection : IReadModelProjection
 
             case MembershipDefaultChanged e:
             {
-                var from = await _memberships.HandleUpdateAsync(e.FromMembershipId.ToId(),
-                    dto => { dto.IsDefault = false; }, cancellationToken);
-                if (!from.IsSuccessful)
+                if (e.FromMembershipId.Exists())
                 {
-                    return from.Error;
+                    var from = await _memberships.HandleUpdateAsync(e.FromMembershipId.ToId(),
+                        dto => { dto.IsDefault = false; }, cancellationToken);
+                    if (!from.IsSuccessful)
+                    {
+                        return from.Error;
+                    }
                 }
 
                 var to = await _memberships.HandleUpdateAsync(e.ToMembershipId.ToId(),

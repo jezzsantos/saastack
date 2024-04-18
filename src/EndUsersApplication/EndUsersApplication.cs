@@ -45,7 +45,7 @@ public partial class EndUsersApplication : IEndUsersApplication
         _endUserRepository = endUserRepository;
     }
 
-    public async Task<Result<EndUser, Error>> GetPersonAsync(ICallerContext context, string id,
+    public async Task<Result<EndUser, Error>> GetUserAsync(ICallerContext context, string id,
         CancellationToken cancellationToken)
     {
         var retrieved = await _endUserRepository.LoadAsync(id.ToId(), cancellationToken);
@@ -136,33 +136,37 @@ public partial class EndUsersApplication : IEndUsersApplication
 
         if (context.IsAuthenticated)
         {
-            var adder = await _endUserRepository.LoadAsync(context.ToCallerId(), cancellationToken);
-            if (!adder.IsSuccessful)
+            var retrievedAdder = await _endUserRepository.LoadAsync(context.ToCallerId(), cancellationToken);
+            if (!retrievedAdder.IsSuccessful)
             {
-                return adder.Error;
+                return retrievedAdder.Error;
             }
 
-            var (_, _, tenantRoles2, tenantFeatures2) =
-                EndUserRoot.GetInitialRolesAndFeatures(RolesAndFeaturesUseCase.InvitingMachineToCreatorOrg,
-                    context.IsAuthenticated);
-            var adderDefaultOrganizationId = adder.Value.DefaultMembership.OrganizationId;
-            var adderEnrolled = machine.AddMembership(adderDefaultOrganizationId, tenantRoles2,
-                tenantFeatures2);
-            if (!adderEnrolled.IsSuccessful)
+            var adder = retrievedAdder.Value;
+            var adderDefaultMembership = adder.DefaultMembership;
+            if (adderDefaultMembership.IsShared)
             {
-                return adderEnrolled.Error;
-            }
+                var (_, _, tenantRoles2, tenantFeatures2) =
+                    EndUserRoot.GetInitialRolesAndFeatures(RolesAndFeaturesUseCase.InvitingMachineToCreatorOrg,
+                        context.IsAuthenticated);
+                var adderEnrolled = machine.AddMembership(adder, adderDefaultMembership.Ownership,
+                    adderDefaultMembership.OrganizationId, tenantRoles2, tenantFeatures2);
+                if (!adderEnrolled.IsSuccessful)
+                {
+                    return adderEnrolled.Error;
+                }
 
-            saved = await _endUserRepository.SaveAsync(saved.Value, cancellationToken);
-            if (!saved.IsSuccessful)
-            {
-                return saved.Error;
-            }
+                saved = await _endUserRepository.SaveAsync(saved.Value, cancellationToken);
+                if (!saved.IsSuccessful)
+                {
+                    return saved.Error;
+                }
 
-            machine = saved.Value;
-            _recorder.TraceInformation(context.ToCall(),
-                "Machine {Id} has become a member of {User} organization {Organization}",
-                machine.Id, adder.Value.Id, adderDefaultOrganizationId);
+                machine = saved.Value;
+                _recorder.TraceInformation(context.ToCall(),
+                    "Machine {Id} has become a member of {User} organization {Organization}",
+                    machine.Id, adder.Id, adderDefaultMembership.OrganizationId);
+            }
         }
 
         var defaultOrganizationId = machine.DefaultMembership.OrganizationId;
@@ -494,37 +498,38 @@ public partial class EndUsersApplication : IEndUsersApplication
         Identifier createdById, Identifier organizationId, OrganizationOwnership ownership,
         CancellationToken cancellationToken)
     {
-        var retrieved = await _endUserRepository.LoadAsync(createdById, cancellationToken);
-        if (!retrieved.IsSuccessful)
+        var retrievedInviter = await _endUserRepository.LoadAsync(createdById, cancellationToken);
+        if (!retrievedInviter.IsSuccessful)
         {
-            return retrieved.Error;
+            return retrievedInviter.Error;
         }
 
-        var creator = retrieved.Value;
+        var inviter = retrievedInviter.Value;
         var useCase = ownership switch
         {
             OrganizationOwnership.Shared => RolesAndFeaturesUseCase.CreatingOrg,
-            OrganizationOwnership.Personal => creator.Classification == UserClassification.Person
+            OrganizationOwnership.Personal => inviter.Classification == UserClassification.Person
                 ? RolesAndFeaturesUseCase.CreatingPerson
                 : RolesAndFeaturesUseCase.CreatingMachine,
             _ => RolesAndFeaturesUseCase.CreatingOrg
         };
         var (_, _, tenantRoles, tenantFeatures) =
             EndUserRoot.GetInitialRolesAndFeatures(useCase, context.IsAuthenticated);
-        var membered = creator.AddMembership(organizationId, tenantRoles, tenantFeatures);
+        var inviterOwnership = ownership.ToEnumOrDefault(Domain.Shared.Organizations.OrganizationOwnership.Shared);
+        var membered = inviter.AddMembership(inviter, inviterOwnership, organizationId, tenantRoles, tenantFeatures);
         if (!membered.IsSuccessful)
         {
             return membered.Error;
         }
 
-        var saved = await _endUserRepository.SaveAsync(creator, cancellationToken);
+        var saved = await _endUserRepository.SaveAsync(inviter, cancellationToken);
         if (!saved.IsSuccessful)
         {
             return saved.Error;
         }
 
         _recorder.TraceInformation(context.ToCall(), "EndUser {Id} has become a member of organization {Organization}",
-            creator.Id, organizationId);
+            inviter.Id, organizationId);
 
         var membership = saved.Value.FindMembership(organizationId);
         if (!membership.HasValue)
@@ -603,17 +608,17 @@ public partial class EndUsersApplication : IEndUsersApplication
     private async Task<Result<Optional<EndUserWithProfile>, Error>> FindProfileWithEmailAddressAsync(
         ICallerContext caller, EmailAddress emailAddress, CancellationToken cancellationToken)
     {
-        var retrieved =
+        var retrievedProfile =
             await _userProfilesService.FindPersonByEmailAddressPrivateAsync(caller, emailAddress,
                 cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (!retrievedProfile.IsSuccessful)
         {
-            return retrieved.Error;
+            return retrievedProfile.Error;
         }
 
-        if (retrieved.Value.HasValue)
+        if (retrievedProfile.Value.HasValue)
         {
-            var profile = retrieved.Value.Value;
+            var profile = retrievedProfile.Value.Value;
             var user = await _endUserRepository.LoadAsync(profile.UserId.ToId(), cancellationToken);
             if (!user.IsSuccessful)
             {

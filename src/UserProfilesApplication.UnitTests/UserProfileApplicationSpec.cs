@@ -4,6 +4,8 @@ using Application.Services.Shared;
 using Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Shared;
 using FluentAssertions;
@@ -469,5 +471,51 @@ public class UserProfileApplicationSpec
         ), It.IsAny<CancellationToken>()));
         _imagesService.Verify(
             isv => isv.DeleteImageAsync(_caller.Object, "anoldimageid", It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenGetCurrentUserProfileAsyncAndNotAuthenticated_ThenReturnsAnonymousProfile()
+    {
+        _caller.Setup(cc => cc.IsAuthenticated)
+            .Returns(false);
+
+        var result = await _application.GetCurrentUserProfileAsync(_caller.Object, CancellationToken.None);
+
+        result.Value.IsAuthenticated.Should().BeFalse();
+        result.Value.Id.Should().Be(CallerConstants.AnonymousUserId);
+        result.Value.UserId.Should().Be(CallerConstants.AnonymousUserId);
+        result.Value.Address.CountryCode.Should().Be(CountryCodes.Default.ToString());
+        result.Value.Roles.Should().BeEmpty();
+        result.Value.Features.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task WhenGetCurrentUserProfileAsyncAndAuthenticated_ThenReturnsProfile()
+    {
+        _caller.Setup(cc => cc.IsAuthenticated)
+            .Returns(true);
+        var roles = new ICallerContext.CallerRoles(new[] { PlatformRoles.Standard }, Array.Empty<RoleLevel>());
+        var features = new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Basic }, Array.Empty<FeatureLevel>());
+        _caller.Setup(cc => cc.Roles)
+            .Returns(roles);
+        _caller.Setup(cc => cc.Features)
+            .Returns(features);
+        var profile = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
+            PersonName.Create("afirstname", "alastname").Value).Value;
+        _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(profile.ToOptional());
+
+        var result = await _application.GetCurrentUserProfileAsync(_caller.Object, CancellationToken.None);
+
+        result.Value.IsAuthenticated.Should().BeTrue();
+        result.Value.Id.Should().Be("anid");
+        result.Value.UserId.Should().Be("auserid");
+        result.Value.Name.FirstName.Should().Be("afirstname");
+        result.Value.Name.LastName.Should().Be("alastname");
+        result.Value.DisplayName.Should().Be("afirstname");
+        result.Value.Timezone.Should().Be(Timezones.Default.ToString());
+        result.Value.Address.CountryCode.Should().Be(CountryCodes.Default.ToString());
+        result.Value.Roles.Should().ContainInOrder(PlatformRoles.Standard.Name);
+        result.Value.Features.Should().ContainInOrder(PlatformFeatures.Basic.Name);
     }
 }

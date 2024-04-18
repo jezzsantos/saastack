@@ -25,7 +25,7 @@ public sealed class ProvisioningsApi : IWebApiService
             await _ancillaryApplication.NotifyProvisioningAsync(_contextFactory.Create(), request.Message,
                 cancellationToken);
 
-        return () => delivered.HandleApplicationResult<DeliverMessageResponse, bool>(_ =>
+        return () => delivered.HandleApplicationResult<bool, DeliverMessageResponse>(_ =>
             new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsDelivered = true }));
     }
 

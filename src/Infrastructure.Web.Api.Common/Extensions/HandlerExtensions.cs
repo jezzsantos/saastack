@@ -88,8 +88,7 @@ public static class HandlerExtensions
     /// <summary>
     ///     Converts the <see cref="result" /> into an appropriate <see cref="IResult" /> depending on error returned
     /// </summary>
-    public static IResult HandleApiResult(this ApiDeleteResult result,
-        OperationMethod method)
+    public static IResult HandleApiResult(this ApiDeleteResult result, OperationMethod method)
     {
         return result()
             .Match(response => ((PostResult<EmptyResponse>)response.Value).ToResult(method),
@@ -110,7 +109,7 @@ public static class HandlerExtensions
     ///     <see cref="Result{TResponse,Error}" />
     ///     using the <see cref="onSuccess" /> callback
     /// </summary>
-    public static Result<TResponse, Error> HandleApplicationResult<TResponse, TResource>(
+    public static Result<TResponse, Error> HandleApplicationResult<TResource, TResponse>(
         this Result<TResource, Error> result, Func<TResource, TResponse> onSuccess)
         where TResponse : IWebResponse
     {
@@ -123,7 +122,7 @@ public static class HandlerExtensions
     ///     <see cref="Result{PostResult,Error}" />
     ///     using the <see cref="onSuccess" /> callback
     /// </summary>
-    public static Result<PostResult<TResponse>, Error> HandleApplicationResult<TResponse, TResource>(
+    public static Result<PostResult<TResponse>, Error> HandleApplicationResult<TResource, TResponse>(
         this Result<TResource, Error> result, Func<TResource, PostResult<TResponse>> onSuccess)
         where TResponse : IWebResponse
     {

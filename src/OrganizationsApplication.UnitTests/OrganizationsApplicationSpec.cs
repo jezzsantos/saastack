@@ -9,6 +9,7 @@ using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Shared;
+using Domain.Shared.EndUsers;
 using FluentAssertions;
 using Moq;
 using OrganizationsApplication.Persistence;
@@ -65,10 +66,17 @@ public class OrganizationsApplicationSpec
     }
 
     [Fact]
-    public async Task WhenCreateSharedOrganizationAsync_ThenReturnsSharedOrganization()
+    public async Task WhenCreateSharedOrganizationAsyncForPerson_ThenReturnsSharedOrganization()
     {
         _caller.Setup(c => c.CallerId)
             .Returns("acallerid");
+        _endUsersService.Setup(eus => eus.GetUserPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new EndUser
+            {
+                Id = "acallerid",
+                Classification = EndUserClassification.Person
+            });
 
         var result =
             await _application.CreateSharedOrganizationAsync(_caller.Object, "aname",
@@ -106,7 +114,8 @@ public class OrganizationsApplicationSpec
     public async Task WhenGetAsync_ThenReturnsOrganization()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            OrganizationOwnership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
         org.CreateSettings(Settings.Create(new Dictionary<string, Setting>
         {
             { "aname", Setting.Create("avalue", true).Value }
@@ -138,7 +147,8 @@ public class OrganizationsApplicationSpec
     public async Task WhenGetSettingsasync_ThenReturnsSettings()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            OrganizationOwnership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
         org.CreateSettings(Settings.Create(new Dictionary<string, Setting>
         {
             { "aname", Setting.Create("avalue", true).Value }
@@ -170,7 +180,8 @@ public class OrganizationsApplicationSpec
     public async Task WhenChangeSettingsAsync_ThenReturnsSettings()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            OrganizationOwnership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Shared, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
         org.CreateSettings(Settings.Create(new Dictionary<string, Setting>
         {
             { "aname1", Setting.Create("anoldvalue", true).Value },
@@ -220,9 +231,10 @@ public class OrganizationsApplicationSpec
     public async Task WhenInviteMemberToOrganizationAsyncAndNoUserIdNorEmail_ThenReturnsError()
     {
         _caller.Setup(cc => cc.Roles)
-            .Returns(new ICallerContext.CallerRoles(Array.Empty<RoleLevel>(), new[] { TenantRoles.Owner }));
+            .Returns(new ICallerContext.CallerRoles([], new[] { TenantRoles.Owner }));
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            OrganizationOwnership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Shared, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(org);
@@ -237,9 +249,10 @@ public class OrganizationsApplicationSpec
     public async Task WhenInviteMemberToOrganizationAsync_ThenInvites()
     {
         _caller.Setup(cc => cc.Roles)
-            .Returns(new ICallerContext.CallerRoles(Array.Empty<RoleLevel>(), new[] { TenantRoles.Owner }));
+            .Returns(new ICallerContext.CallerRoles([], new[] { TenantRoles.Owner }));
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            OrganizationOwnership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Shared, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(org);
@@ -273,7 +286,8 @@ public class OrganizationsApplicationSpec
     public async Task WhenListMembersForOrganizationAsyncWithUnregisteredUser_ThenReturnsMemberships()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            OrganizationOwnership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Shared, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(org);
@@ -328,7 +342,8 @@ public class OrganizationsApplicationSpec
     public async Task WhenListMembersForOrganizationAsyncWithRegisteredUsers_ThenReturnsMemberships()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            OrganizationOwnership.Shared, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Shared, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(org);
@@ -402,9 +417,10 @@ public class OrganizationsApplicationSpec
     public async Task WhenChangeAvatarAsyncAndNoExistingAvatar_ThenReturnsOrganization()
     {
         _caller.Setup(cc => cc.Roles)
-            .Returns(new ICallerContext.CallerRoles(Array.Empty<RoleLevel>(), new[] { TenantRoles.Owner }));
+            .Returns(new ICallerContext.CallerRoles([], new[] { TenantRoles.Owner }));
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            OrganizationOwnership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(org);
         var upload = new FileUpload
@@ -444,9 +460,10 @@ public class OrganizationsApplicationSpec
     public async Task WhenChangeAvatarAsyncAndExistingAvatar_ThenReturnsOrganization()
     {
         _caller.Setup(cc => cc.Roles)
-            .Returns(new ICallerContext.CallerRoles(Array.Empty<RoleLevel>(), new[] { TenantRoles.Owner }));
+            .Returns(new ICallerContext.CallerRoles([], new[] { TenantRoles.Owner }));
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            OrganizationOwnership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
         await org.ChangeAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value,
             _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("anoldimageid".ToId(), "aurl").Value),
             _ => Task.FromResult(Result.Ok));
@@ -507,7 +524,8 @@ public class OrganizationsApplicationSpec
         _caller.Setup(cc => cc.Roles)
             .Returns(new ICallerContext.CallerRoles());
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            OrganizationOwnership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(org);
 
@@ -521,9 +539,10 @@ public class OrganizationsApplicationSpec
     public async Task WhenDeleteAvatarAsync_ThenReturnsOrganization()
     {
         _caller.Setup(cc => cc.Roles)
-            .Returns(new ICallerContext.CallerRoles(Array.Empty<RoleLevel>(), new[] { TenantRoles.Owner }));
+            .Returns(new ICallerContext.CallerRoles([], new[] { TenantRoles.Owner }));
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
-            OrganizationOwnership.Personal, "auserid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
         await org.ChangeAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value,
             _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("anoldimageid".ToId(), "aurl").Value),
             _ => Task.FromResult(Result.Ok));

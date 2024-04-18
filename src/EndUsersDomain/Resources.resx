@@ -75,6 +75,9 @@
     <data name="EndUserRoot_NotOrganizationOwner" xml:space="preserve">
         <value>The assigner is not an owner of the organization</value>
     </data>
+    <data name="EndUserRoot_Addmembership_SharedOwnershipRequired" xml:space="preserve">
+        <value>The adder cannot add a membership to a personal organization</value>
+    </data>
     <data name="Membership_MissingDefaultRole" xml:space="preserve">
         <value>A membership must always have at least the role '{0}'</value>
     </data>
@@ -104,5 +107,8 @@
     </data>
     <data name="EndUserRoot_GuestInvitationAcceptedByNonAnonymousUser" xml:space="preserve">
         <value>This guest invitation cannot be accepted by an authenticated user</value>
+    </data>
+    <data name="EndUserRoot_AddMembership_MachineCannotHaveMemberships" xml:space="preserve">
+        <value>Cannot add a membership to machines organization</value>
     </data>
 </root>

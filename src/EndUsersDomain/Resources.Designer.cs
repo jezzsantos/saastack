@@ -60,6 +60,24 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot add a membership to machines organization.
+        /// </summary>
+        internal static string EndUserRoot_AddMembership_MachineCannotHaveMemberships {
+            get {
+                return ResourceManager.GetString("EndUserRoot_AddMembership_MachineCannotHaveMemberships", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The adder cannot add a membership to a personal organization.
+        /// </summary>
+        internal static string EndUserRoot_Addmembership_SharedOwnershipRequired {
+            get {
+                return ResourceManager.GetString("EndUserRoot_Addmembership_SharedOwnershipRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All person users must have at least one feature.
         /// </summary>
         internal static string EndUserRoot_AllPersonsMustHaveDefaultFeature {

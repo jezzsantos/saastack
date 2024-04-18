@@ -7,6 +7,7 @@ using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Shared;
+using Domain.Shared.EndUsers;
 using Domain.Shared.Organizations;
 using FluentAssertions;
 using Moq;
@@ -33,15 +34,25 @@ public class OrganizationRootSpec
             .Returns((string value) => value);
 
         _org = OrganizationRoot.Create(recorder.Object, identifierFactory.Object, tenantSettingService.Object,
-            OrganizationOwnership.Personal, "acreatorid".ToId(), DisplayName.Create("aname").Value).Value;
+            OrganizationOwnership.Shared, "acreatorid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
     }
 
+    [Fact]
+    public void WhenCreateWithMachineUser_ThenReturnsError()
+    {
+        var result = OrganizationRoot.Create(new Mock<IRecorder>().Object, new Mock<IIdentifierFactory>().Object,
+            new Mock<ITenantSettingService>().Object, OrganizationOwnership.Shared, "acreatorid".ToId(),
+            UserClassification.Machine, DisplayName.Create("aname").Value);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.OrganizationRoot_Create_SharedRequiresPerson);
+    }
     [Fact]
     public void WhenCreate_ThenAssigns()
     {
         _org.Name.Name.Should().Be("aname");
         _org.CreatedById.Should().Be("acreatorid".ToId());
-        _org.Ownership.Should().Be(OrganizationOwnership.Personal);
+        _org.Ownership.Should().Be(OrganizationOwnership.Shared);
         _org.Settings.Should().Be(Settings.Empty);
     }
 
@@ -99,6 +110,19 @@ public class OrganizationRootSpec
 
         result.Should().BeError(ErrorCode.RuleViolation,
             Resources.OrganizationRoot_AddMembership_UserIdAndEmailMissing);
+    }
+
+    [Fact]
+    public void WhenAddMembershipAndNotShared_ThenReturnsError()
+    {
+#if TESTINGONLY
+        _org.TestingOnly_ChangeOwnership(OrganizationOwnership.Personal);
+#endif
+        var result = _org.AddMembership("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            Optional<Identifier>.None, Optional<EmailAddress>.None);
+
+        result.Should().BeError(ErrorCode.RuleViolation,
+            Resources.OrganizationRoot_AddMembership_PersonalOrgMembershipNotAllowed);
     }
 
     [Fact]

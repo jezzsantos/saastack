@@ -72,17 +72,20 @@ internal sealed class AspNetCallerContext : ICallerContext
         }
 
         var scheme = authenticationFeature.AuthenticateResult?.Ticket?.AuthenticationScheme;
-        if (scheme.NotExists())
+        var schemes = scheme.HasValue()
+            ? scheme.Split(',', ';')
+            : Array.Empty<string>();
+        if (schemes.HasNone())
         {
             return Optional<ICallerContext.CallerAuthorization>.None;
         }
 
-        return GetCallerAuthorization(context, scheme);
+        return GetCallerAuthorization(context, schemes.ToList());
     }
 
-    private static ICallerContext.CallerAuthorization GetCallerAuthorization(HttpContext context, string scheme)
+    private static ICallerContext.CallerAuthorization GetCallerAuthorization(HttpContext context, List<string> schemes)
     {
-        if (scheme == JwtBearerDefaults.AuthenticationScheme)
+        if (schemes.ContainsIgnoreCase(JwtBearerDefaults.AuthenticationScheme))
         {
             var token = context.Request.GetTokenAuth();
             if (!token.HasValue)
@@ -93,7 +96,7 @@ internal sealed class AspNetCallerContext : ICallerContext
             return new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.Token, token);
         }
 
-        if (scheme == APIKeyAuthenticationHandler.AuthenticationScheme)
+        if (schemes.ContainsIgnoreCase(APIKeyAuthenticationHandler.AuthenticationScheme))
         {
             var apikey = context.Request.GetAPIKeyAuth();
             if (!apikey.HasValue)
@@ -104,7 +107,7 @@ internal sealed class AspNetCallerContext : ICallerContext
             return new ICallerContext.CallerAuthorization(ICallerContext.AuthorizationMethod.APIKey, apikey);
         }
 
-        if (scheme == HMACAuthenticationHandler.AuthenticationScheme)
+        if (schemes.ContainsIgnoreCase(HMACAuthenticationHandler.AuthenticationScheme))
         {
             return Optional<ICallerContext.CallerAuthorization>.None;
         }

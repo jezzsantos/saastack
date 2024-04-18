@@ -41,7 +41,7 @@ public class OrganizationsApi : IWebApiService
                 uploaded.Value, cancellationToken);
 
         return () =>
-            org.HandleApplicationResult<GetOrganizationResponse, Organization>(o =>
+            org.HandleApplicationResult<Organization, GetOrganizationResponse>(o =>
                 new GetOrganizationResponse { Organization = o });
     }
 
@@ -52,7 +52,7 @@ public class OrganizationsApi : IWebApiService
             await _organizationsApplication.CreateSharedOrganizationAsync(_contextFactory.Create(), request.Name,
                 cancellationToken);
 
-        return () => organization.HandleApplicationResult<GetOrganizationResponse, Organization>(org =>
+        return () => organization.HandleApplicationResult<Organization, GetOrganizationResponse>(org =>
             new PostResult<GetOrganizationResponse>(new GetOrganizationResponse { Organization = org }));
     }
 
@@ -63,7 +63,7 @@ public class OrganizationsApi : IWebApiService
             cancellationToken);
 
         return () =>
-            org.HandleApplicationResult<GetOrganizationResponse, Organization>(o =>
+            org.HandleApplicationResult<Organization, GetOrganizationResponse>(o =>
                 new GetOrganizationResponse { Organization = o });
     }
 
@@ -75,7 +75,7 @@ public class OrganizationsApi : IWebApiService
                 cancellationToken);
 
         return () =>
-            organization.HandleApplicationResult<GetOrganizationResponse, Organization>(org =>
+            organization.HandleApplicationResult<Organization, GetOrganizationResponse>(org =>
                 new GetOrganizationResponse { Organization = org });
     }
 
@@ -88,7 +88,7 @@ public class OrganizationsApi : IWebApiService
                 cancellationToken);
 
         return () =>
-            organization.HandleApplicationResult<GetOrganizationSettingsResponse, OrganizationWithSettings>(org =>
+            organization.HandleApplicationResult<OrganizationWithSettings, GetOrganizationSettingsResponse>(org =>
                 new GetOrganizationSettingsResponse
                 {
                     Organization = org,
@@ -106,7 +106,7 @@ public class OrganizationsApi : IWebApiService
                 request.UserId, request.Email,
                 cancellationToken);
 
-        return () => organization.HandleApplicationResult<InviteMemberToOrganizationResponse, Organization>(org =>
+        return () => organization.HandleApplicationResult<Organization, InviteMemberToOrganizationResponse>(org =>
             new PostResult<InviteMemberToOrganizationResponse>(new InviteMemberToOrganizationResponse
                 { Organization = org }));
     }

@@ -28,4 +28,6 @@ public class UserProfile : ReadModelEntity
     public Optional<string> Type { get; set; }
 
     public Optional<string> UserId { get; set; }
+
+    public Optional<string> DefaultOrganizationId { get; set; }
 }

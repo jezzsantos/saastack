@@ -12,6 +12,7 @@ using Domain.Shared.EndUsers;
 using EndUsersApplication.Persistence;
 using EndUsersDomain;
 using Membership = Application.Resources.Shared.Membership;
+using OrganizationOwnership = Domain.Shared.Organizations.OrganizationOwnership;
 
 namespace EndUsersApplication;
 
@@ -147,6 +148,12 @@ public partial class InvitationsApplication : IInvitationsApplication
                 .InvitationsApplication_InviteMemberToOrganization_NoUserIdNorEmailAddress);
         }
 
+        var inviter = await _repository.LoadAsync(invitedById.ToId(), cancellationToken);
+        if (!inviter.IsSuccessful)
+        {
+            return inviter.Error;
+        }
+
         EndUserRoot invitee = null!;
         if (emailAddress.HasValue())
         {
@@ -173,7 +180,8 @@ public partial class InvitationsApplication : IInvitationsApplication
         var (_, _, tenantRoles, tenantFeatures) =
             EndUserRoot.GetInitialRolesAndFeatures(RolesAndFeaturesUseCase.InvitingMemberToOrg,
                 context.IsAuthenticated);
-        var enrolled = invitee.AddMembership(organizationId.ToId(), tenantRoles, tenantFeatures);
+        var enrolled = invitee.AddMembership(inviter.Value, OrganizationOwnership.Shared, organizationId.ToId(),
+            tenantRoles, tenantFeatures);
         if (!enrolled.IsSuccessful)
         {
             return enrolled.Error;

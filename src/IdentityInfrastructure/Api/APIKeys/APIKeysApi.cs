@@ -24,7 +24,7 @@ public class APIKeysApi : IWebApiService
     {
         var apiKey = await _apiKeysApplication.CreateAPIKeyAsync(_contextFactory.Create(), cancellationToken);
 
-        return () => apiKey.HandleApplicationResult<CreateAPIKeyResponse, APIKey>(x =>
+        return () => apiKey.HandleApplicationResult<APIKey, CreateAPIKeyResponse>(x =>
             new PostResult<CreateAPIKeyResponse>(new CreateAPIKeyResponse { ApiKey = x.Key }));
     }
 #endif

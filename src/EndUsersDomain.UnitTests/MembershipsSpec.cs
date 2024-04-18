@@ -3,6 +3,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using Domain.Shared;
+using Domain.Shared.Organizations;
 using FluentAssertions;
 using Moq;
 using UnitTesting.Common;
@@ -168,7 +169,7 @@ public class MembershipsSpec
         var membership = Membership.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok).Value;
         membership.As<IEventingEntity>()
             .RaiseEvent(Events.MembershipAdded("arootid".ToId(),
-                organizationId.ToId(), isDefault, roles, features), true);
+                organizationId.ToId(), OrganizationOwnership.Shared, isDefault, roles, features), true);
         return membership;
     }
 }

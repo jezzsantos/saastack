@@ -18,6 +18,7 @@ using Moq;
 using UnitTesting.Common;
 using Xunit;
 using Membership = EndUsersDomain.Membership;
+using OrganizationOwnership = Domain.Shared.Organizations.OrganizationOwnership;
 using PersonName = Application.Resources.Shared.PersonName;
 
 namespace EndUsersApplication.UnitTests;
@@ -77,7 +78,7 @@ public class EndUsersApplicationSpec
         _endUserRepository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
-        var result = await _application.GetPersonAsync(_caller.Object, "anid", CancellationToken.None);
+        var result = await _application.GetUserAsync(_caller.Object, "anid", CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.Id.Should().Be("anid");
@@ -138,7 +139,8 @@ public class EndUsersApplicationSpec
             .ReturnsAsync((EndUserRoot root, bool _, CancellationToken _) =>
             {
                 // HACK: By this time, domain events have created the default membership
-                root.AddMembership("anorganizationid".ToId(), Roles.Empty, Features.Empty);
+                root.AddMembership(root, OrganizationOwnership.Personal, "anorganizationid".ToId(), Roles.Empty,
+                    Features.Empty);
                 return root;
             });
 
@@ -227,7 +229,8 @@ public class EndUsersApplicationSpec
             .ReturnsAsync((EndUserRoot root, bool _, CancellationToken _) =>
             {
                 // HACK: By this time, domain events have created the default membership
-                root.AddMembership("anorganizationid".ToId(), Roles.Empty, Features.Empty);
+                root.AddMembership(root, OrganizationOwnership.Personal, "anorganizationid".ToId(), Roles.Empty,
+                    Features.Empty);
                 return root;
             });
 
@@ -304,7 +307,8 @@ public class EndUsersApplicationSpec
             .ReturnsAsync((EndUserRoot root, bool _, CancellationToken _) =>
             {
                 // HACK: By this time, domain events have created the default membership
-                root.AddMembership("anorganizationid".ToId(), Roles.Empty, Features.Empty);
+                root.AddMembership(root, OrganizationOwnership.Personal, "anorganizationid".ToId(), Roles.Empty,
+                    Features.Empty);
                 return root;
             });
 
@@ -419,7 +423,8 @@ public class EndUsersApplicationSpec
                 },
                 Timezone = "atimezone"
             }.ToOptional());
-        endUser.AddMembership("anorganizationid".ToId(), Roles.Empty, Features.Empty);
+        endUser.AddMembership(endUser, OrganizationOwnership.Shared, "anorganizationid".ToId(), Roles.Empty,
+            Features.Empty);
         _endUserRepository.Setup(rep =>
                 rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(endUser);
@@ -496,7 +501,8 @@ public class EndUsersApplicationSpec
             .ReturnsAsync((EndUserRoot root, bool _, CancellationToken _) =>
             {
                 // HACK: By this time, domain events have created the default membership
-                root.AddMembership("anorganizationid".ToId(), Roles.Empty, Features.Empty);
+                root.AddMembership(root, OrganizationOwnership.Personal, "anorganizationid".ToId(), Roles.Empty,
+                    Features.Empty);
                 return root;
             });
 
@@ -559,7 +565,8 @@ public class EndUsersApplicationSpec
             .ReturnsAsync((EndUserRoot root, bool _, CancellationToken _) =>
             {
                 // HACK: By this time, domain events have created the default membership
-                root.AddMembership("anorganizationid".ToId(), Roles.Empty, Features.Empty);
+                root.AddMembership(root, OrganizationOwnership.Personal, "anorganizationid".ToId(), Roles.Empty,
+                    Features.Empty);
                 return root;
             });
 
@@ -600,7 +607,8 @@ public class EndUsersApplicationSpec
             .ReturnsAsync(adder);
         adder.Register(Roles.Empty, Features.Empty, EndUserProfile.Create("afirstname").Value,
             EmailAddress.Create("auser@company.com").Value);
-        adder.AddMembership("anotherorganizationid".ToId(), Roles.Empty, Features.Empty);
+        adder.AddMembership(adder, OrganizationOwnership.Shared, "anotherorganizationid".ToId(), Roles.Empty,
+            Features.Empty);
         _userProfilesService.Setup(ups =>
                 ups.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
@@ -705,20 +713,22 @@ public class EndUsersApplicationSpec
     {
         _caller.Setup(cc => cc.CallerId)
             .Returns("anassignerid");
-        var assignee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
-        assignee.Register(Roles.Create(PlatformRoles.Standard).Value, Features.Create(PlatformFeatures.Basic).Value,
-            EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
-        assignee.AddMembership("anorganizationid".ToId(), Roles.Create(TenantRoles.Member).Value,
-            Features.Create(TenantFeatures.Basic).Value);
-        _endUserRepository.Setup(rep => rep.LoadAsync("anassigneeid".ToId(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(assignee);
         var assigner = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
         assigner.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Create(),
             EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
-        assigner.AddMembership("anorganizationid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+        assigner.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+            Roles.Create(TenantRoles.Owner).Value,
             Features.Create(TenantFeatures.Basic).Value);
         _endUserRepository.Setup(rep => rep.LoadAsync("anassignerid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(assigner);
+        var assignee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        assignee.Register(Roles.Create(PlatformRoles.Standard).Value, Features.Create(PlatformFeatures.Basic).Value,
+            EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
+        assignee.AddMembership(assignee, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+            Roles.Create(TenantRoles.Member).Value,
+            Features.Create(TenantFeatures.Basic).Value);
+        _endUserRepository.Setup(rep => rep.LoadAsync("anassigneeid".ToId(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(assignee);
 
         var result = await _application.AssignTenantRolesAsync(_caller.Object, "anorganizationid", "anassigneeid",
             [TenantRoles.TestingOnly.Name],
@@ -795,7 +805,8 @@ public class EndUsersApplicationSpec
         var user = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
         user.Register(Roles.Create(PlatformRoles.Standard).Value, Features.Create(PlatformFeatures.Basic).Value,
             EndUserProfile.Create("afirstname").Value, EmailAddress.Create("auser@company.com").Value);
-        user.AddMembership("anorganizationid".ToId(), Roles.Create(TenantRoles.Member).Value,
+        user.AddMembership(user, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+            Roles.Create(TenantRoles.Member).Value,
             Features.Create(TenantFeatures.PaidTrial).Value);
         _endUserRepository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);

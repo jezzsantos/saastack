@@ -12,6 +12,9 @@ public interface IEndUsersService
     Task<Result<EndUserWithMemberships, Error>> GetMembershipsPrivateAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken);
 
+    Task<Result<EndUser, Error>> GetUserPrivateAsync(ICallerContext caller, string id,
+        CancellationToken cancellationToken);
+
     Task<Result<SearchResults<MembershipWithUserProfile>, Error>> ListMembershipsForOrganizationAsync(
         ICallerContext caller,
         string organizationId, SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken);

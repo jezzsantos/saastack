@@ -16,6 +16,7 @@ using Moq;
 using UnitTesting.Common;
 using Xunit;
 using Events = OrganizationsDomain.Events;
+using OrganizationOwnership = Domain.Shared.Organizations.OrganizationOwnership;
 using PersonName = Application.Resources.Shared.PersonName;
 
 namespace EndUsersApplication.UnitTests;
@@ -76,6 +77,8 @@ public class InvitationsApplicationDomainEventHandlersSpec
     {
         var inviter = EndUserRoot
             .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
+        inviter.AddMembership(inviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+            Roles.Create(TenantRoles.Owner).Value, Features.Empty);
         _repository.Setup(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(inviter);
         _repository.Setup(rep =>
@@ -132,6 +135,8 @@ public class InvitationsApplicationDomainEventHandlersSpec
     {
         var inviter = EndUserRoot
             .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
+        inviter.AddMembership(inviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+            Roles.Create(TenantRoles.Owner).Value, Features.Empty);
         _repository.Setup(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(inviter);
         _repository.Setup(rep =>
@@ -185,6 +190,8 @@ public class InvitationsApplicationDomainEventHandlersSpec
     {
         var inviter = EndUserRoot
             .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
+        inviter.AddMembership(inviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+            Roles.Create(TenantRoles.Owner).Value, Features.Empty);
         _repository.Setup(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(inviter);
         var invitee = EndUserRoot

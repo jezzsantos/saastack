@@ -121,6 +121,7 @@ When a person is registered we also query the `IAvatarService` to see if we can 
 2. Change the address of the profile
 3. Add an Avatar image the profile
 4. Remove the Avatar from the profile
+5. Inspect the profile of the current (Authenticated) user
 
 ## Backend for Frontend
 

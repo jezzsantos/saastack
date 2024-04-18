@@ -25,7 +25,7 @@ public class InvitationsApi : IWebApiService
             await _invitationsApplication.VerifyGuestInvitationAsync(_contextFactory.Create(), request.Token,
                 cancellationToken);
 
-        return () => invitation.HandleApplicationResult<VerifyGuestInvitationResponse, Invitation>(invite =>
+        return () => invitation.HandleApplicationResult<Invitation, VerifyGuestInvitationResponse>(invite =>
             new VerifyGuestInvitationResponse { Invitation = invite });
     }
 
@@ -36,7 +36,7 @@ public class InvitationsApi : IWebApiService
             await _invitationsApplication.InviteGuestAsync(_contextFactory.Create(), request.Email,
                 cancellationToken);
 
-        return () => invitation.HandleApplicationResult<InviteGuestResponse, Invitation>(invite =>
+        return () => invitation.HandleApplicationResult<Invitation, InviteGuestResponse>(invite =>
             new PostResult<InviteGuestResponse>(new InviteGuestResponse { Invitation = invite }));
     }
 

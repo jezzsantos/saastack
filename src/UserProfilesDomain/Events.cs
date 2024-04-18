@@ -1,3 +1,4 @@
+using Common;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.UserProfiles;
 using Domain.Shared;
@@ -49,6 +50,16 @@ public static class Events
             LastName = name.LastName.ValueOrDefault!,
             DisplayName = name.FirstName,
             Type = type.ToString()
+        };
+    }
+
+    public static DefaultOrganizationChanged DefaultOrganizationChanged(Identifier id, Identifier userId,
+        Optional<Identifier> fromOrganizationId, Identifier toOrganizationId)
+    {
+        return new DefaultOrganizationChanged(id)
+        {
+            FromOrganizationId = fromOrganizationId.ValueOrDefault!,
+            ToOrganizationId = toOrganizationId
         };
     }
 

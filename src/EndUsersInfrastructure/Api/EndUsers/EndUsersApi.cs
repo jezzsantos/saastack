@@ -25,7 +25,7 @@ public class EndUsersApi : IWebApiService
             await _endUsersApplication.AssignPlatformRolesAsync(_contextFactory.Create(), request.Id,
                 request.Roles ?? new List<string>(), cancellationToken);
 
-        return () => user.HandleApplicationResult<AssignPlatformRolesResponse, EndUser>(usr =>
+        return () => user.HandleApplicationResult<EndUser, AssignPlatformRolesResponse>(usr =>
             new PostResult<AssignPlatformRolesResponse>(new AssignPlatformRolesResponse { User = usr }));
     }
 
@@ -37,7 +37,7 @@ public class EndUsersApi : IWebApiService
                 request.Roles ?? new List<string>(), cancellationToken);
 
         return () =>
-            user.HandleApplicationResult<AssignPlatformRolesResponse, EndUser>(usr => new AssignPlatformRolesResponse
+            user.HandleApplicationResult<EndUser, AssignPlatformRolesResponse>(usr => new AssignPlatformRolesResponse
                 { User = usr });
     }
 }

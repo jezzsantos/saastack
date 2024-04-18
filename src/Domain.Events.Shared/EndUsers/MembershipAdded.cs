@@ -1,5 +1,6 @@
 using Domain.Common;
 using Domain.Common.ValueObjects;
+using Domain.Shared.Organizations;
 using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.EndUsers;
@@ -22,6 +23,8 @@ public sealed class MembershipAdded : DomainEvent
     public string? MembershipId { get; set; }
 
     public required string OrganizationId { get; set; }
+
+    public OrganizationOwnership Ownership { get; set; }
 
     public required List<string> Roles { get; set; }
 }

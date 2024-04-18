@@ -8,7 +8,7 @@ namespace EndUsersDomain;
 
 public sealed class GuestInvitation : ValueObjectBase<GuestInvitation>
 {
-    public static readonly TimeSpan DefaultTokenExpiry = TimeSpan.FromDays(7);
+    public static readonly TimeSpan DefaultTokenExpiry = TimeSpan.FromDays(14);
     public static readonly GuestInvitation Empty = new();
 
     public static Result<GuestInvitation, Error> Create()

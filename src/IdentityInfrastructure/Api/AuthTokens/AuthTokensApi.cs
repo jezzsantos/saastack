@@ -26,7 +26,7 @@ public class AuthTokensApi : IWebApiService
             await _authTokensApplication.RefreshTokenAsync(_contextFactory.Create(), request.RefreshToken,
                 cancellationToken);
 
-        return () => tokens.HandleApplicationResult<RefreshTokenResponse, AuthenticateTokens>(tok =>
+        return () => tokens.HandleApplicationResult<AuthenticateTokens, RefreshTokenResponse>(tok =>
             new PostResult<RefreshTokenResponse>(new RefreshTokenResponse
             {
                 Tokens = tok

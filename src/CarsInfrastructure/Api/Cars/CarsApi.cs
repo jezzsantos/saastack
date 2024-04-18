@@ -39,7 +39,7 @@ public sealed class CarsApi : IWebApiService
         var car = await _carsApplication.RegisterCarAsync(_contextFactory.Create(), request.OrganizationId!,
             request.Make, request.Model, request.Year, request.Jurisdiction, request.NumberPlate, cancellationToken);
 
-        return () => car.HandleApplicationResult<GetCarResponse, Car>(c =>
+        return () => car.HandleApplicationResult<Car, GetCarResponse>(c =>
             new PostResult<GetCarResponse>(new GetCarResponse { Car = c }, new GetCarRequest { Id = c.Id }.ToUrl()));
     }
 

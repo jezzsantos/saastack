@@ -7,6 +7,7 @@ using Domain.Events.Shared.EndUsers;
 using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Shared;
+using Domain.Shared.Organizations;
 
 namespace EndUsersDomain;
 
@@ -36,6 +37,10 @@ public sealed class Membership : EntityBase
 
     public Optional<Identifier> RootId { get; private set; } = Optional<Identifier>.None;
 
+    public Optional<OrganizationOwnership> Ownership { get; private set; }
+
+    public bool IsShared => Ownership is { HasValue: true, Value: OrganizationOwnership.Shared };
+
     protected override Result<Error> OnStateChanged(IDomainEvent @event)
     {
         switch (@event)
@@ -45,6 +50,7 @@ public sealed class Membership : EntityBase
                 RootId = added.RootId.ToId();
                 OrganizationId = added.OrganizationId.ToId();
                 IsDefault = added.IsDefault;
+                Ownership = added.Ownership;
                 var roles = Roles.Create(added.Roles.ToArray());
                 if (!roles.IsSuccessful)
                 {

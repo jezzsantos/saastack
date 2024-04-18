@@ -3,6 +3,8 @@ using Domain.Common.ValueObjects;
 using Domain.Events.Shared.EndUsers;
 using Domain.Shared;
 using Domain.Shared.EndUsers;
+using Domain.Shared.Organizations;
+using Created = Domain.Events.Shared.EndUsers.Created;
 
 namespace EndUsersDomain;
 
@@ -38,7 +40,8 @@ public static class Events
         };
     }
 
-    public static MembershipAdded MembershipAdded(Identifier id, Identifier organizationId, bool isDefault, Roles roles,
+    public static MembershipAdded MembershipAdded(Identifier id, Identifier organizationId,
+        OrganizationOwnership ownership, bool isDefault, Roles roles,
         Features features)
     {
         return new MembershipAdded(id)
@@ -47,17 +50,22 @@ public static class Events
             IsDefault = isDefault,
             OrganizationId = organizationId,
             Roles = roles.ToList(),
-            Features = features.ToList()
+            Features = features.ToList(),
+            Ownership = ownership
         };
     }
 
-    public static MembershipDefaultChanged MembershipDefaultChanged(Identifier id, Identifier fromMembershipId,
-        Identifier toMembershipId)
+    public static MembershipDefaultChanged MembershipDefaultChanged(Identifier id,
+        Optional<Identifier> fromMembershipId,
+        Identifier toMembershipId, Identifier toOrganizationId, Roles roles, Features features)
     {
         return new MembershipDefaultChanged(id)
         {
-            FromMembershipId = fromMembershipId,
-            ToMembershipId = toMembershipId
+            FromMembershipId = fromMembershipId.ValueOrDefault!,
+            ToMembershipId = toMembershipId,
+            ToOrganizationId = toOrganizationId,
+            Roles = roles.ToList(),
+            Features = features.ToList()
         };
     }
 

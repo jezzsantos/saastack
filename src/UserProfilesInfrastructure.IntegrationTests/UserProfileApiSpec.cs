@@ -1,6 +1,7 @@
 using System.Net;
 using ApiHost1;
 using Common;
+using Domain.Interfaces;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
@@ -153,6 +154,36 @@ public class UserProfileApiSpec : WebApiSpec<Program>
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
         result.Content.Value.Profile!.AvatarUrl.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task WhenGetCurrentUserForAnonymous_ThenNotAuthenticated()
+    {
+        var result = await Api.GetAsync(new GetCurrentProfileRequest());
+
+        result.Content.Value.Profile!.IsAuthenticated.Should().BeFalse();
+        result.Content.Value.Profile.Id.Should().Be(CallerConstants.AnonymousUserId);
+        result.Content.Value.Profile.UserId.Should().Be(CallerConstants.AnonymousUserId);
+        result.Content.Value.Profile.DefaultOrganizationId.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task WhenGetCurrentUserForAuthenticated_ThenAuthenticated()
+    {
+        var login = await LoginUserAsync();
+
+        var result = await Api.GetAsync(new GetCurrentProfileRequest(),
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        result.Content.Value.Profile!.IsAuthenticated.Should().BeTrue();
+        result.Content.Value.Profile.Id.Should().NotBeNullOrEmpty();
+        result.Content.Value.Profile.UserId.Should().Be(login.User.Id);
+        result.Content.Value.Profile.DefaultOrganizationId.Should().NotBeNullOrEmpty();
+        result.Content.Value.Profile.Name.FirstName.Should().Be("persona");
+        result.Content.Value.Profile.Name.LastName.Should().Be("alastname");
+        result.Content.Value.Profile.DisplayName.Should().Be("persona");
+        result.Content.Value.Profile.Timezone.Should().Be(Timezones.Default.ToString());
+        result.Content.Value.Profile.AvatarUrl.Should().BeNull();
     }
 
     private static void OverrideDependencies(IServiceCollection services)

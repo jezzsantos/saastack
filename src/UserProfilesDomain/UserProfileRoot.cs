@@ -35,6 +35,8 @@ public sealed class UserProfileRoot : AggregateRootBase
 
     public Optional<Avatar> Avatar { get; private set; }
 
+    public Optional<Identifier> DefaultOrganizationId { get; private set; }
+
     public Optional<PersonDisplayName> DisplayName { get; private set; }
 
     public Optional<EmailAddress> EmailAddress { get; private set; }
@@ -212,6 +214,14 @@ public sealed class UserProfileRoot : AggregateRootBase
                 return Result.Ok;
             }
 
+            case DefaultOrganizationChanged changed:
+            {
+                DefaultOrganizationId = changed.ToOrganizationId.ToId();
+                Recorder.TraceDebug(null, "Profile {Id} changed its default organization to {OrganizationId}", Id,
+                    changed.ToOrganizationId);
+                return Result.Ok;
+            }
+
             default:
                 return HandleUnKnownStateChangedEvent(@event);
         }
@@ -249,6 +259,17 @@ public sealed class UserProfileRoot : AggregateRootBase
         }
 
         return RaiseChangeEvent(UserProfilesDomain.Events.AvatarAdded(Id, UserId, created.Value));
+    }
+
+    public Result<Error> ChangeDefaultOrganization(Identifier modifierId, Identifier organizationId)
+    {
+        if (DefaultOrganizationId.HasValue && DefaultOrganizationId.Value == organizationId)
+        {
+            return Result.Ok;
+        }
+
+        return RaiseChangeEvent(
+            UserProfilesDomain.Events.DefaultOrganizationChanged(Id, UserId, DefaultOrganizationId, organizationId));
     }
 
     public Result<Error> ChangeDisplayName(Identifier modifierId, PersonDisplayName displayName)

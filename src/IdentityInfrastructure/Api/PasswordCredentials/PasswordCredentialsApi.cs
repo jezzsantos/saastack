@@ -29,7 +29,7 @@ public class PasswordCredentialsApi : IWebApiService
                 request.Password,
                 cancellationToken);
 
-        return () => authenticated.HandleApplicationResult<AuthenticateResponse, AuthenticateTokens>(tok =>
+        return () => authenticated.HandleApplicationResult<AuthenticateTokens, AuthenticateResponse>(tok =>
             new PostResult<AuthenticateResponse>(new AuthenticateResponse
             {
                 Tokens = tok
@@ -58,7 +58,7 @@ public class PasswordCredentialsApi : IWebApiService
             request.UserId, cancellationToken);
 
         return () =>
-            token.HandleApplicationResult<GetRegistrationPersonConfirmationResponse, PasswordCredentialConfirmation>(
+            token.HandleApplicationResult<PasswordCredentialConfirmation, GetRegistrationPersonConfirmationResponse>(
                 con =>
                     new GetRegistrationPersonConfirmationResponse { Token = con.Token });
     }
@@ -72,7 +72,7 @@ public class PasswordCredentialsApi : IWebApiService
             request.FirstName, request.LastName, request.EmailAddress, request.Password, request.Timezone,
             request.CountryCode, request.TermsAndConditionsAccepted, cancellationToken);
 
-        return () => credential.HandleApplicationResult<RegisterPersonPasswordResponse, PasswordCredential>(creds =>
+        return () => credential.HandleApplicationResult<PasswordCredential, RegisterPersonPasswordResponse>(creds =>
             new PostResult<RegisterPersonPasswordResponse>(new RegisterPersonPasswordResponse { Credential = creds }));
     }
 }

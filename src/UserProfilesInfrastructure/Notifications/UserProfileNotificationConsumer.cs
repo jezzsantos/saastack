@@ -27,6 +27,11 @@ public class UserProfileNotificationConsumer : IDomainEventNotificationConsumer
                 return await _userProfilesApplication.HandleEndUserRegisteredAsync(_callerContextFactory.Create(),
                     registered, cancellationToken);
 
+            case MembershipDefaultChanged changed:
+                return await _userProfilesApplication.HandleEndUserDefaultOrganizationChangedAsync(
+                    _callerContextFactory.Create(),
+                    changed, cancellationToken);
+
             default:
                 return Result.Ok;
         }

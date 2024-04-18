@@ -20,13 +20,12 @@ public class MachineCredentialsApi : IWebApiService
     }
 
     public async Task<ApiPostResult<MachineCredential, RegisterMachineResponse>> RegisterMachine(
-        RegisterMachineRequest request,
-        CancellationToken cancellationToken)
+        RegisterMachineRequest request, CancellationToken cancellationToken)
     {
         var machine = await _machineCredentialsApplication.RegisterMachineAsync(_contextFactory.Create(), request.Name,
             request.Timezone, request.CountryCode, request.ApiKeyExpiresOnUtc, cancellationToken);
 
-        return () => machine.HandleApplicationResult<RegisterMachineResponse, MachineCredential>(x =>
+        return () => machine.HandleApplicationResult<MachineCredential, RegisterMachineResponse>(x =>
             new PostResult<RegisterMachineResponse>(new RegisterMachineResponse { Machine = x }));
     }
 }

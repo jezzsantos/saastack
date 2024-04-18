@@ -5,6 +5,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Shared;
+using Domain.Shared.Organizations;
 using FluentAssertions;
 using Moq;
 using UnitTesting.Common;
@@ -44,8 +45,8 @@ public class MembershipSpec
         var features = Features.Create();
 
         _membership.As<IEventingEntity>()
-            .RaiseEvent(Events.MembershipAdded("arootid".ToId(),
-                "anorganizationid".ToId(), true, roles, features), true);
+            .RaiseEvent(Events.MembershipAdded("arootid".ToId(), "anorganizationid".ToId(),
+                OrganizationOwnership.Shared, true, roles, features), true);
 
         _membership.IsDefault.Should().BeTrue();
         _membership.RootId.Should().Be("arootid".ToId());

@@ -33,13 +33,19 @@
     <data name="Setting_InvalidValueType" xml:space="preserve">
         <value>The value type of the value: '{0}' is unsupported</value>
     </data>
+    <data name="OrganizationRoot_Create_SharedRequiresPerson" xml:space="preserve">
+        <value>Must be a person to create a 'Shared' organization</value>
+    </data>
     <data name="OrganizationRoot_NotOrgOwner" xml:space="preserve">
-        <value>You must be an organization owner to perform this action</value>
+        <value>Must be an organization owner to perform this action</value>
     </data>
     <data name="OrganizationRoot_AddMembership_UserIdAndEmailMissing" xml:space="preserve">
         <value>Both the ID of the user and an email for the user is missing</value>
     </data>
     <data name="OrganizationRoot_NoAvatar" xml:space="preserve">
         <value>This organization has no avatar to delete</value>
+    </data>
+    <data name="OrganizationRoot_AddMembership_PersonalOrgMembershipNotAllowed" xml:space="preserve">
+        <value>Cannot add another user to a Personal organization</value>
     </data>
 </root>

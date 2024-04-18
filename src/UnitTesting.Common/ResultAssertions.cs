@@ -50,9 +50,11 @@ public class ResultAssertions : ObjectAssertions<Result<Error>, ResultAssertions
             .Given(() => Subject)
             .ForCondition(result => result.IsSuccessful)
             .FailWith(
-                "Expected {context:result} to return a Successful value {reason}, but it returned an Error with code {0}.",
+                "Expected {context:result} to return a Successful value {reason}, but it returned an Error {0}.",
                 result => !result.IsSuccessful
-                    ? result.Error.Code
+                    ? result.Error.Message.HasValue()
+                        ? $"{result.Error.Code}: {result.Error.Message}"
+                        : result.Error.Code
                     : ErrorCode.NoError);
 
         return new AndConstraint<ResultAssertions>(this);

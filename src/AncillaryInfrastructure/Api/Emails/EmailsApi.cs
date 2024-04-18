@@ -25,7 +25,7 @@ public sealed class EmailsApi : IWebApiService
         var delivered =
             await _ancillaryApplication.DeliverEmailAsync(_contextFactory.Create(), request.Message, cancellationToken);
 
-        return () => delivered.HandleApplicationResult<DeliverMessageResponse, bool>(_ =>
+        return () => delivered.HandleApplicationResult<bool, DeliverMessageResponse>(_ =>
             new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsDelivered = true }));
     }
 
