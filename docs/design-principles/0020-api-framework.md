@@ -316,12 +316,12 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
 
 6. You would then add a validation class to validate the inbound request (see next section)
 
-7. Lastly, you would write an integration test to test that your API works in the test category: `Integration.Web`.
+7. Lastly, you would write an integration test to test that your API works in the test category: `Integration.API`.
 
    - For example, in the project and folder: `CarsApi.IntegrationTests/CarsApiSpec.cs`
 
    ```c#
-   [Trait("Category", "Integration.Web")] [Collection("API")]
+   [Trait("Category", "Integration.API")] [Collection("API")]
    public class CarsApiSpec : WebApiSpecSetup<Program>
    {
        public CarsApiSpec(WebApplicationFactory<Program> factory) : base(factory)

@@ -16,7 +16,7 @@ using Xunit;
 
 namespace EndUsersInfrastructure.IntegrationTests;
 
-[Trait("Category", "Integration.Web")]
+[Trait("Category", "Integration.API")]
 [Collection("API")]
 public class InvitationsApiSpec : WebApiSpec<Program>
 {

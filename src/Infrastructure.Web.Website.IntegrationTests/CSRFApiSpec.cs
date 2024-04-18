@@ -17,7 +17,7 @@ namespace Infrastructure.Web.Website.IntegrationTests;
 [UsedImplicitly]
 public class CSRFApiSpec
 {
-    [Trait("Category", "Integration.Web")]
+    [Trait("Category", "Integration.Website")]
     [Collection("API")]
     public class GivenNoContext : WebApiSpec<Program>
     {
@@ -61,7 +61,7 @@ public class CSRFApiSpec
         }
     }
 
-    [Trait("Category", "Integration.Web")]
+    [Trait("Category", "Integration.Website")]
     [Collection("API")]
     public class GivenAnInsecureGetRequest : WebApiSpec<Program>
     {
@@ -115,7 +115,7 @@ public class CSRFApiSpec
         }
     }
 
-    [Trait("Category", "Integration.Web")]
+    [Trait("Category", "Integration.Website")]
     [Collection("API")]
     public class GivenAnInsecurePostRequestByAnonymousUser : WebApiSpec<Program>
     {
@@ -226,7 +226,7 @@ public class CSRFApiSpec
         }
     }
 
-    [Trait("Category", "Integration.Web")]
+    [Trait("Category", "Integration.Website")]
     [Collection("API")]
     public class GivenAnInsecurePostRequestByAuthenticatedUser : WebApiSpec<Program>
     {

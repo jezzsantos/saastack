@@ -61,7 +61,7 @@ jobs:
         run: >
           dotnet test --no-build --verbosity normal
           --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}}
-          --filter:"Category=Integration.Web" --collect:"XPlat Code Coverage" --results-directory:"src/TestResults/csharp"
+          --filter:"Category=Integration.API|Category=Integration.Website" --collect:"XPlat Code Coverage" --results-directory:"src/TestResults/csharp"
           --logger:"trx"
           --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
           --test-adapter-path:. "${{env.SOLUTION_PATH}}"

@@ -15,7 +15,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Web.Website.IntegrationTests;
 
-[Trait("Category", "Integration.Web")]
+[Trait("Category", "Integration.Website")]
 [Collection("API")]
 public class FeatureFlagsApiSpec : WebApiSpec<Program>
 {

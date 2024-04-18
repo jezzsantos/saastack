@@ -13,7 +13,7 @@ using Xunit;
 
 namespace OrganizationsInfrastructure.IntegrationTests;
 
-[Trait("Category", "Integration.Web")]
+[Trait("Category", "Integration.API")]
 [Collection("API")]
 public class OrganizationsApiSpec : WebApiSpec<Program>
 {

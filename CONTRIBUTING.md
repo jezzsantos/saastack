@@ -141,7 +141,8 @@ There are 3 flavors of build configuration: `Debug`, `Release` and `ReleaseForDe
 
 * Run all the **unit** tests (`Category=Unit`)
 * Run all the **architecture** tests (`Category=Unit.Architecture`)
-* Run all the **integration** tests (`Category=Integration.Web`)
+* Run all the **integration** tests (`Category=Integration.API`)
+* Run all the **integration** tests (`Category=Integration.Website`)
 
 > All automated tests must pass in GitHub Actions to submit changes to the codebase
 

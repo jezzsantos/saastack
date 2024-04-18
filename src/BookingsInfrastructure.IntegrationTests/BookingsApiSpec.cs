@@ -12,7 +12,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace BookingsInfrastructure.IntegrationTests;
 
-[Trait("Category", "Integration.Web")]
+[Trait("Category", "Integration.API")]
 [Collection("API")]
 public class BookingsApiSpec : WebApiSpec<Program>
 {

@@ -13,7 +13,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace AncillaryInfrastructure.IntegrationTests;
 
-[Trait("Category", "Integration.Web")]
+[Trait("Category", "Integration.API")]
 [Collection("API")]
 public class AuditsApiSpec : WebApiSpec<Program>
 {

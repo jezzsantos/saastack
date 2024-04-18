@@ -14,7 +14,7 @@ using Xunit;
 
 namespace IdentityInfrastructure.IntegrationTests;
 
-[Trait("Category", "Integration.Web")]
+[Trait("Category", "Integration.API")]
 [Collection("API")]
 public class MachineCredentialsApiSpec : WebApiSpec<Program>
 {

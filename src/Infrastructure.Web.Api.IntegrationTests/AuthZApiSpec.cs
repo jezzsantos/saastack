@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Infrastructure.Web.Api.IntegrationTests;
 
-[Trait("Category", "Integration.Web")]
+[Trait("Category", "Integration.API")]
 [Collection("API")]
 public class AuthZApiSpec : WebApiSpec<Program>
 {

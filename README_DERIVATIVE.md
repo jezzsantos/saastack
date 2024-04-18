@@ -130,7 +130,7 @@ When pushed, all branches will be built and tested with GitHub actions
 
 2. Run these tests:
 
-   In Rider, run all C# tests with Category= `Unit`, `Unit.Architecture` and `Integration.Web`
+   In Rider, run all C# tests with Category= `Unit`, `Unit.Architecture`, `Integration.API` and`Integration.Website`
 
    > Note: Use `Group By > Category` in Rider's unit test explorer to view these three categories easily.
 
@@ -138,7 +138,7 @@ When pushed, all branches will be built and tested with GitHub actions
 
    - `dotnet test --filter:"Category=Unit|Category=Unit.Architecture" src\SaaStack.sln`
 
-   - `dotnet test --filter:"Category=Integration.Web" src\SaaStack.sln`
+   - `dotnet test --filter:"Category=Integration.API|Category=Integration.Website" src\SaaStack.sln`
 
 3. Configure your "Commit " window to select the "Cleanup with 'Full Cleanup' profile".
 
@@ -268,13 +268,13 @@ To kill these processes:
 
 ### Everyday tests
 
-Run all C# tests with Category= `Unit`, `Unit.Architecture` and `Integration.Web`
+Run all C# tests with Category= `Unit`, `Unit.Architecture`, `Integration.API` and `Integration.Website`
 
 OR, in a terminal:
 
 - `dotnet test --filter:"Category=Unit|Category=Unit.Architecture" src\SaaStack.sln`
 
-- `dotnet test --filter:"Category=Integration.Web" src\SaaStack.sln`
+- `dotnet test --filter:"Category=Integration.API|Category=Integration.Website" src\SaaStack.sln`
 
 > Note: All tests will be run in parallel in `Rider` or in `dotnet test`.
 

@@ -11,7 +11,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Web.Api.IntegrationTests;
 
-[Trait("Category", "Integration.Web")]
+[Trait("Category", "Integration.API")]
 [Collection("API")]
 public class DataFormatsApiSpec : WebApiSpec<Program>
 {

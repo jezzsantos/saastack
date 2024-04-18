@@ -13,7 +13,7 @@ namespace Infrastructure.Web.Api.IntegrationTests;
 [UsedImplicitly]
 public class RequestCorrelationApiSpec
 {
-    [Trait("Category", "Integration.Web")]
+    [Trait("Category", "Integration.API")]
     [Collection("API")]
     public class GivenAnHttpClient : WebApiSpec<Program>
     {
@@ -65,7 +65,7 @@ public class RequestCorrelationApiSpec
         }
     }
 
-    [Trait("Category", "Integration.Web")]
+    [Trait("Category", "Integration.API")]
     [Collection("API")]
     public class GivenAJsonClient : WebApiSpec<Program>
     {
