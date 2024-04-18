@@ -321,19 +321,24 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
             return initiated.Error;
         }
 
-        var updated = await _repository.SaveAsync(credentials, cancellationToken);
-        if (!updated.IsSuccessful)
+        var notified = await _notificationsService.NotifyPasswordRegistrationConfirmationAsync(context,
+            credentials.Registration.Value.EmailAddress,
+            credentials.Registration.Value.Name, credentials.Verification.Token, cancellationToken);
+        if (!notified.IsSuccessful)
         {
-            return updated.Error;
+            return notified.Error;
         }
 
-        await _notificationsService.NotifyPasswordRegistrationConfirmationAsync(context,
-            updated.Value.Registration.Value.EmailAddress,
-            updated.Value.Registration.Value.Name, updated.Value.Verification.Token, cancellationToken);
+        var saved = await _repository.SaveAsync(credentials, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
 
-        _recorder.TraceInformation(context.ToCall(), "Password credentials created for {UserId}", updated.Value.UserId);
+        credentials = saved.Value;
+        _recorder.TraceInformation(context.ToCall(), "Password credentials created for {UserId}", credentials.UserId);
 
-        return updated.Value.ToCredential(user);
+        return credentials.ToCredential(user);
     }
 
     /// <summary>

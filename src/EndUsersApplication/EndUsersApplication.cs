@@ -258,10 +258,8 @@ public partial class EndUsersApplication : IEndUsersApplication
                 }
 
                 var notified = await _notificationsService.NotifyReRegistrationCourtesyAsync(context,
-                    unregisteredUser.Id,
-                    unregisteredUserProfile.EmailAddress, unregisteredUserProfile.DisplayName,
-                    unregisteredUserProfile.Timezone, unregisteredUserProfile.Address.CountryCode,
-                    cancellationToken);
+                    unregisteredUser.Id, unregisteredUserProfile.EmailAddress, unregisteredUserProfile.DisplayName,
+                    unregisteredUserProfile.Timezone, unregisteredUserProfile.Address.CountryCode, cancellationToken);
                 if (!notified.IsSuccessful)
                 {
                     return notified.Error;
