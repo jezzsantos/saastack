@@ -819,11 +819,11 @@ public sealed class $class$ : DomainEvent
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Scope/=C3001E7C0DA78E4487072B7E050D86C5/Type/@EntryValue">InCSharpFile</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Shortcut/@EntryValue">searchapi</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
-	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Text/@EntryValue">public async Task&lt;ApiSearchResult&lt;$Resource$, $Action$$Resource$Response&gt;&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Text/@EntryValue">public async Task&lt;ApiSearchResult&lt;$Resource$, $Action$$Resource$sResponse&gt;&gt; $Action$$Resource$s($Action$$Resource$sRequest request, CancellationToken cancellationToken)
 {
-    var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
+    var $resource$s = await _application.$Action$$Resource$sAsync(_contextFactory.Create(), request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
 
-    return () =&gt; $resource$.HandleApplicationResult(x =&gt; new $Action$$Resource$Response { $Resource$s = x.Results, Metadata = c.Metadata });
+    return () =&gt; $resource$s.HandleApplicationResult(x =&gt; new $Action$$Resource$sResponse { $Resource$s = x.Results, Metadata = x.Metadata });
 }</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7032419A3D210E42B9EA159377807335/@KeyIndexDefined">False</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/@KeyIndexDefined">True</s:Boolean>

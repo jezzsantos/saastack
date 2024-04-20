@@ -28,4 +28,21 @@ public class APIKeysApi : IWebApiService
             new PostResult<CreateAPIKeyResponse>(new CreateAPIKeyResponse { ApiKey = x.Key }));
     }
 #endif
+
+    public async Task<ApiDeleteResult> DeleteAPIKey(DeleteAPIKeyRequest request, CancellationToken cancellationToken)
+    {
+        var key = await _apiKeysApplication.DeleteAPIKeyAsync(_contextFactory.Create(), request.Id, cancellationToken);
+
+        return () => key.HandleApplicationResult();
+    }
+
+    public async Task<ApiSearchResult<APIKey, SearchAllAPIKeysResponse>> SearchAllAPIKeys(
+        SearchAllAPIKeysRequest request, CancellationToken cancellationToken)
+    {
+        var keys = await _apiKeysApplication.SearchAllAPIKeysAsync(_contextFactory.Create(), request.ToSearchOptions(),
+            request.ToGetOptions(), cancellationToken);
+
+        return () => keys.HandleApplicationResult(x => new SearchAllAPIKeysResponse
+            { Keys = x.Results, Metadata = x.Metadata });
+    }
 }

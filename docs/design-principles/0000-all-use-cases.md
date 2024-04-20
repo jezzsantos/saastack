@@ -72,6 +72,8 @@ These are the main use cases of this product that are exposed via "public" APIs 
 #### API Keys
 
 1. Create a new API key for the current user
+2. List all API keys of the current (Authenticated) user
+3. Delete an API Key
 
 #### Auth Tokens
 
@@ -87,6 +89,10 @@ These are the main use cases of this product that are exposed via "public" APIs 
 1. Authenticate the current user (with a password)
 2. Register a new person (with a password and with optional invitation)
 3. Confirm registration of a person (from email)
+4. (coming soon) Initiate a password reset
+5. (coming soon) Resend password reset notification
+6. (coming soon) Confirm password reset
+7. (coming soon) Reset password
 
 #### Single-Sign On
 
@@ -104,13 +110,28 @@ These are the main use cases of this product that are exposed via "public" APIs 
 
 1. Create a new (shared) organization for the current user
 2. Inspect a specific organization
-3. Invite another guest or person to an organization (guest by email, or an existing person by email or by ID)
-4. Add an Avatar image the organization
+3. (coming soon) Change the organization's details
+4. Add an Avatar image to the organization
 5. Remove the Avatar from the organization
+6. Invite another guest or person to an organization (guest by email, or an existing person by email or by ID)
+7. (coming soon) Uninvite a member of the organization
+8. (coming soon) Assign roles to a member
+9. (coming soon) Unassign roles from a member
+10. (coming soon) List all members of the organization
+11. (coming soon) List all memberships of the current (Authenticated) user
+12. (coming soon) Delete the organization
 
 ### Subscriptions
 
-TBD
+A billing subscription is created for every `Organization` (personal and shared) on the platform (person and machine). It represents the billing subscription plan for that tenant/organization (i.e., pricing and cost). The subscription plan determines the `Features` each user has access to on the platform, and it defines the fiscal responsibilities that each `EndUser` has an obligation for (i.e., scheduled payments).
+
+Every `Organization` must have a single `EndUser` that owns the fiscal responsibility of the `Organization`, and who can control the extent of that responsibility.
+
+1. (coming soon) Inspect the subscription for the current (Authenticated) user
+2. (coming soon) Change the subscription plan
+3. (coming soon) Cancel the subscription plan
+4. (coming soon) Migrate the billing provider data (from one provider to the next)
+5. (coming soon) Transfer fiscal responsibility for the organization
 
 ### User Profiles
 
@@ -125,7 +146,7 @@ When a person is registered we also query the `IAvatarService` to see if we can 
 
 ## Backend for Frontend
 
-These are the main use cases of this product that are exposed via "public" APIs in the Frontend, e.g., `WebsiteHost`.
+These are the main use cases of this product that are exposed via "public" APIs in the Frontend BEFFE, e.g., `WebsiteHost`.
 
 > In many cases, these API calls are made from a JavaScript client and are forwarded to the Backend APIs.
 

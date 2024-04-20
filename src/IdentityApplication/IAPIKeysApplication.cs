@@ -13,7 +13,12 @@ public interface IAPIKeysApplication
     Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext context, CancellationToken cancellationToken);
 #endif
 
+    Task<Result<Error>> DeleteAPIKeyAsync(ICallerContext caller, string id, CancellationToken cancellationToken);
+
     Task<Result<Optional<EndUserWithMemberships>, Error>> FindMembershipsForAPIKeyAsync(ICallerContext context,
         string apiKey,
         CancellationToken cancellationToken);
+
+    Task<Result<SearchResults<APIKey>, Error>> SearchAllAPIKeysAsync(ICallerContext caller, SearchOptions searchOptions,
+        GetOptions getOptions, CancellationToken cancellationToken);
 }

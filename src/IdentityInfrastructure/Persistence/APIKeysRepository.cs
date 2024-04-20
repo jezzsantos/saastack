@@ -1,3 +1,5 @@
+using Application.Interfaces;
+using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
@@ -9,6 +11,7 @@ using IdentityDomain;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
+using Tasks = Common.Extensions.Tasks;
 
 namespace IdentityInfrastructure.Persistence;
 
@@ -31,6 +34,17 @@ public class APIKeysRepository : IAPIKeysRepository
             _apiKeys.DestroyAllAsync(cancellationToken));
     }
 
+    public async Task<Result<APIKeyRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
+    {
+        var apiKey = await _apiKeys.LoadAsync(id, cancellationToken);
+        if (!apiKey.IsSuccessful)
+        {
+            return apiKey.Error;
+        }
+
+        return apiKey;
+    }
+
     public async Task<Result<APIKeyRoot, Error>> SaveAsync(APIKeyRoot apiKey, CancellationToken cancellationToken)
     {
         var saved = await _apiKeys.SaveAsync(apiKey, cancellationToken);
@@ -40,6 +54,16 @@ public class APIKeysRepository : IAPIKeysRepository
         }
 
         return apiKey;
+    }
+
+    public async Task<Result<QueryResults<APIKey>, Error>> SearchAllForUserAsync(Identifier userId,
+        SearchOptions options, CancellationToken cancellationToken)
+    {
+        var query = Query.From<APIKey>()
+            .Where<string>(at => at.UserId, ConditionOperator.EqualTo, userId)
+            .WithSearchOptions(options);
+
+        return await _apiKeyQueries.QueryAsync(query, false, cancellationToken);
     }
 
     public async Task<Result<Optional<APIKeyRoot>, Error>> FindByAPIKeyTokenAsync(string keyToken,

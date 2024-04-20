@@ -1,3 +1,4 @@
+using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
@@ -33,6 +34,35 @@ public class APIKeysApplication : IAPIKeysApplication
         _repository = repository;
     }
 
+    public async Task<Result<Error>> DeleteAPIKeyAsync(ICallerContext caller, string id,
+        CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var apiKey = retrieved.Value;
+        var deleterId = caller.ToCallerId();
+        var deleted = apiKey.Delete(deleterId);
+        if (!deleted.IsSuccessful)
+        {
+            return deleted.Error;
+        }
+
+        var saved = await _repository.SaveAsync(apiKey, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
+
+        apiKey = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "API key {Id} was deleted by {User}", apiKey.Id, deleterId);
+
+        return Result.Ok;
+    }
+
     public async Task<Result<Optional<EndUserWithMemberships>, Error>> FindMembershipsForAPIKeyAsync(
         ICallerContext context, string apiKey,
         CancellationToken cancellationToken)
@@ -64,6 +94,23 @@ public class APIKeysApplication : IAPIKeysApplication
 
         var user = retrievedUser.Value;
         return user.ToOptional();
+    }
+
+    public async Task<Result<SearchResults<APIKey>, Error>> SearchAllAPIKeysAsync(ICallerContext caller,
+        SearchOptions searchOptions, GetOptions getOptions,
+        CancellationToken cancellationToken)
+    {
+        var userId = caller.ToCallerId();
+        var searched = await _repository.SearchAllForUserAsync(userId, searchOptions, cancellationToken);
+        if (!searched.IsSuccessful)
+        {
+            return searched.Error;
+        }
+
+        var apiKeys = searched.Value.Results;
+        _recorder.TraceInformation(caller.ToCall(), "All keys were fetched for user {User}", userId);
+
+        return searchOptions.ApplyWithMetadata(apiKeys.Select(key => key.ToApiKey()));
     }
 
 #if TESTINGONLY
@@ -99,11 +146,32 @@ public class APIKeysApplication : IAPIKeysApplication
             return saved.Error;
         }
 
+        apiKey = saved.Value;
+        return apiKey.ToApiKey(keyToken.ApiKey, description);
+    }
+}
+
+internal static class APIKeyConversionExtensions
+{
+    public static APIKey ToApiKey(this APIKeyRoot apiKey, string key, string description)
+    {
         return new APIKey
         {
             Description = description,
             ExpiresOnUtc = apiKey.ExpiresOn,
-            Key = keyToken.ApiKey,
+            Key = key,
+            UserId = apiKey.UserId,
+            Id = apiKey.Id
+        };
+    }
+
+    public static APIKey ToApiKey(this Persistence.ReadModels.APIKey apiKey)
+    {
+        return new APIKey
+        {
+            Description = apiKey.Description,
+            ExpiresOnUtc = apiKey.ExpiresOn,
+            Key = apiKey.KeyToken,
             UserId = apiKey.UserId,
             Id = apiKey.Id
         };

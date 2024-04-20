@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Persistence.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
@@ -16,6 +17,7 @@ using Moq;
 using UnitTesting.Common;
 using UnitTesting.Common.Validation;
 using Xunit;
+using APIKey = IdentityApplication.Persistence.ReadModels.APIKey;
 
 namespace IdentityApplication.UnitTests;
 
@@ -35,6 +37,8 @@ public class APIKeysApplicationSpec
     {
         _recorder = new Mock<IRecorder>();
         _caller = new Mock<ICallerContext>();
+        _caller.Setup(cc => cc.CallerId)
+            .Returns("auserid");
         _idFactory = new Mock<IIdentifierFactory>();
         _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
@@ -164,6 +168,7 @@ public class APIKeysApplicationSpec
         ), It.IsAny<CancellationToken>()));
     }
 #endif
+
     [Fact]
     public async Task WhenCreateApiKeyAsync_ThenCreates()
     {
@@ -185,6 +190,62 @@ public class APIKeysApplicationSpec
             && ak.Description == "adescription"
             && ak.UserId == "auserid"
             && ak.ExpiresOn.Value == expiresOn
+        ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenSearchAllAPIKeysAsync_ThenReturnsAll()
+    {
+        var expiresOn = DateTime.UtcNow.Add(APIKeysApplication.DefaultAPIKeyExpiry).AddMinutes(1);
+        _repository.Setup(rep => rep.SearchAllForUserAsync(It.IsAny<Identifier>(), It.IsAny<SearchOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new QueryResults<APIKey>([
+                new APIKey
+                {
+                    Id = "anid",
+                    KeyToken = "akeytoken",
+                    UserId = "auserid",
+                    Description = "adescription",
+                    ExpiresOn = expiresOn
+                }
+            ]));
+
+        var result = await _application.SearchAllAPIKeysAsync(_caller.Object, new SearchOptions(), new GetOptions(),
+            CancellationToken.None);
+
+        result.Value.Results.Count.Should().Be(1);
+        result.Value.Results[0].Id.Should().Be("anid");
+        result.Value.Results[0].Key.Should().Be("akeytoken");
+        result.Value.Results[0].UserId.Should().Be("auserid");
+        result.Value.Results[0].Description.Should().Be("adescription");
+        result.Value.Results[0].ExpiresOnUtc.Should().Be(expiresOn);
+        _repository.Verify(rep =>
+            rep.SearchAllForUserAsync("auserid".ToId(), It.IsAny<SearchOptions>(), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenDeleteAPIKeyAsyncAndNotExist_ThenReturnsError()
+    {
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Error.EntityNotFound());
+
+        var result = await _application.DeleteAPIKeyAsync(_caller.Object, "anid", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityNotFound);
+    }
+
+    [Fact]
+    public async Task WhenDeleteAPIKeyAsync_ThenDeletes()
+    {
+        var apiKey = CreateApiKey();
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(apiKey);
+
+        var result = await _application.DeleteAPIKeyAsync(_caller.Object, "anid", CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<APIKeyRoot>(key =>
+            key.IsDeleted
         ), It.IsAny<CancellationToken>()));
     }
 
