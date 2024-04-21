@@ -5,6 +5,7 @@ using Domain.Interfaces.Authorization;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Operations.Shared.EndUsers;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.Organizations;
 using Infrastructure.Web.Interfaces.Clients;
@@ -46,12 +47,33 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
 
         var result = await Api.PostAsync(new CreateOrganizationRequest
         {
-            Name = "anorganizationname"
+            Name = "aname"
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
+        var organizationId = result.Content.Value.Organization!.Id;
         result.Content.Value.Organization!.CreatedById.Should().Be(login.User.Id);
-        result.Content.Value.Organization!.Name.Should().Be("anorganizationname");
+        result.Content.Value.Organization!.Name.Should().Be("aname");
         result.Content.Value.Organization!.Ownership.Should().Be(OrganizationOwnership.Shared);
+
+        login = await ReAuthenticateUserAsync(login.User);
+        login.User.Profile!.DefaultOrganizationId.Should().Be(organizationId);
+
+        var members = await Api.GetAsync(new ListMembersForOrganizationRequest
+        {
+            Id = organizationId
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        members.Content.Value.Members!.Count.Should().Be(1);
+        members.Content.Value.Members[0].IsDefault.Should().BeTrue();
+        members.Content.Value.Members[0].IsOwner.Should().BeTrue();
+        members.Content.Value.Members[0].IsRegistered.Should().BeTrue();
+        members.Content.Value.Members[0].UserId.Should().Be(login.User.Id);
+        members.Content.Value.Members[0].EmailAddress.Should().Be(login.User.Profile!.EmailAddress);
+        members.Content.Value.Members[0].Name.FirstName.Should().Be("persona");
+        members.Content.Value.Members[0].Name.LastName.Should().Be("alastname");
+        members.Content.Value.Members[0].Classification.Should().Be(UserProfileClassification.Person);
+        members.Content.Value.Members[0].Roles.Should().ContainInOrder(TenantRoles.BillingAdmin.Name,
+            TenantRoles.Owner.Name, TenantRoles.Member.Name);
     }
 
     [Fact]
@@ -63,7 +85,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
 
         var organization = await Api.PostAsync(new CreateOrganizationRequest
         {
-            Name = "anorganizationname"
+            Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
         loginA = await ReAuthenticateUserAsync(loginA.User);
@@ -80,6 +102,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Email = loginC
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        //Automatically adds the machine to loginA organization
         var machine = await Api.PostAsync(new RegisterMachineRequest
         {
             Name = "amachinename"
@@ -154,7 +177,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
 
         var organization = await Api.PostAsync(new CreateOrganizationRequest
         {
-            Name = "anorganizationname"
+            Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
         loginA = await ReAuthenticateUserAsync(loginA.User);
@@ -207,6 +230,336 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
         result.Content.Value.Organization!.AvatarUrl.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task WhenChangeDetails_ThenDeletes()
+    {
+        var login = await LoginUserAsync();
+
+        var organizationId = login.User.Profile!.DefaultOrganizationId!;
+        var result = await Api.PutAsync(new ChangeOrganizationRequest
+        {
+            Id = organizationId,
+            Name = "anewname"
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        result.Content.Value.Organization!.Name.Should().Be("anewname");
+    }
+
+    [Fact]
+    public async Task WhenUnInviteGuestFromOrganization_ThenRemovesMember()
+    {
+        var loginA = await LoginUserAsync();
+        var loginC = CreateRandomEmailAddress();
+
+        var organization = await Api.PostAsync(new CreateOrganizationRequest
+        {
+            Name = "aname"
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        loginA = await ReAuthenticateUserAsync(loginA.User);
+        var organizationId = organization.Content.Value.Organization!.Id;
+
+        await Api.PostAsync(new InviteMemberToOrganizationRequest
+        {
+            Id = organizationId,
+            Email = loginC
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        var members = await Api.GetAsync(new ListMembersForOrganizationRequest
+        {
+            Id = organizationId
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+        var loginCId = members.Content.Value.Members![1].UserId;
+
+        await Api.DeleteAsync(new UnInviteMemberFromOrganizationRequest
+        {
+            Id = organizationId,
+            UserId = loginCId
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        members = await Api.GetAsync(new ListMembersForOrganizationRequest
+        {
+            Id = organizationId
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        members.Content.Value.Members!.Count.Should().Be(1);
+        members.Content.Value.Members[0].IsDefault.Should().BeTrue();
+        members.Content.Value.Members[0].IsOwner.Should().BeTrue();
+        members.Content.Value.Members[0].IsRegistered.Should().BeTrue();
+        members.Content.Value.Members[0].UserId.Should().Be(loginA.User.Id);
+        members.Content.Value.Members[0].EmailAddress.Should().Be(loginA.User.Profile!.EmailAddress);
+        members.Content.Value.Members[0].Name.FirstName.Should().Be("persona");
+        members.Content.Value.Members[0].Name.LastName.Should().Be("alastname");
+        members.Content.Value.Members[0].Classification.Should().Be(UserProfileClassification.Person);
+        members.Content.Value.Members[0].Roles.Should().ContainInOrder(TenantRoles.BillingAdmin.Name,
+            TenantRoles.Owner.Name, TenantRoles.Member.Name);
+    }
+
+    [Fact]
+    public async Task WhenUnInviteRegisteredUserFromOrganization_ThenRemovesMember()
+    {
+        var loginA = await LoginUserAsync();
+        var loginB = await LoginUserAsync(LoginUser.PersonB);
+
+        var organization = await Api.PostAsync(new CreateOrganizationRequest
+        {
+            Name = "aname"
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        loginA = await ReAuthenticateUserAsync(loginA.User);
+        var organizationId = organization.Content.Value.Organization!.Id;
+
+        await Api.PostAsync(new InviteMemberToOrganizationRequest
+        {
+            Id = organizationId,
+            Email = loginB.User.Profile!.EmailAddress
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        var members = await Api.GetAsync(new ListMembersForOrganizationRequest
+        {
+            Id = organizationId
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+        var loginBId = members.Content.Value.Members![1].UserId;
+
+        await Api.DeleteAsync(new UnInviteMemberFromOrganizationRequest
+        {
+            Id = organizationId,
+            UserId = loginBId
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        members = await Api.GetAsync(new ListMembersForOrganizationRequest
+        {
+            Id = organizationId
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        members.Content.Value.Members!.Count.Should().Be(1);
+        members.Content.Value.Members[0].IsDefault.Should().BeTrue();
+        members.Content.Value.Members[0].IsOwner.Should().BeTrue();
+        members.Content.Value.Members[0].IsRegistered.Should().BeTrue();
+        members.Content.Value.Members[0].UserId.Should().Be(loginA.User.Id);
+        members.Content.Value.Members[0].EmailAddress.Should().Be(loginA.User.Profile!.EmailAddress);
+        members.Content.Value.Members[0].Name.FirstName.Should().Be("persona");
+        members.Content.Value.Members[0].Name.LastName.Should().Be("alastname");
+        members.Content.Value.Members[0].Classification.Should().Be(UserProfileClassification.Person);
+        members.Content.Value.Members[0].Roles.Should().ContainInOrder(TenantRoles.BillingAdmin.Name,
+            TenantRoles.Owner.Name, TenantRoles.Member.Name);
+
+        loginB = await ReAuthenticateUserAsync(loginB.User);
+        var memberships = await Api.GetAsync(new ListMembershipsForCallerRequest(),
+            req => req.SetJWTBearerToken(loginB.AccessToken));
+
+        memberships.Content.Value.Memberships!.Count.Should().Be(1);
+        memberships.Content.Value.Memberships![0].OrganizationId.Should().NotBeNull();
+        memberships.Content.Value.Memberships![0].Ownership.Should().Be(OrganizationOwnership.Personal);
+    }
+
+    [Fact]
+    public async Task WhenUnInviteMembersFromOrganization_ThenRemovesMembers()
+    {
+        var loginA = await LoginUserAsync();
+        var loginB = await LoginUserAsync(LoginUser.PersonB);
+        var loginC = CreateRandomEmailAddress();
+
+        var organization = await Api.PostAsync(new CreateOrganizationRequest
+        {
+            Name = "aname"
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        loginA = await ReAuthenticateUserAsync(loginA.User);
+        var organizationId = organization.Content.Value.Organization!.Id;
+        await Api.PostAsync(new InviteMemberToOrganizationRequest
+        {
+            Id = organizationId,
+            Email = loginB.User.Profile!.EmailAddress
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        await Api.PostAsync(new InviteMemberToOrganizationRequest
+        {
+            Id = organizationId,
+            Email = loginC
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        //Automatically adds the machine to loginA organization
+        await Api.PostAsync(new RegisterMachineRequest
+        {
+            Name = "amachinename"
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        var members = await Api.GetAsync(new ListMembersForOrganizationRequest
+        {
+            Id = organizationId
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+        var loginBId = members.Content.Value.Members![1].UserId;
+        var loginCId = members.Content.Value.Members![2].UserId;
+        var machineId = members.Content.Value.Members![3].UserId;
+
+        await Api.DeleteAsync(new UnInviteMemberFromOrganizationRequest
+        {
+            Id = organizationId,
+            UserId = loginBId
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+        await Api.DeleteAsync(new UnInviteMemberFromOrganizationRequest
+        {
+            Id = organizationId,
+            UserId = loginCId
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+        await Api.DeleteAsync(new UnInviteMemberFromOrganizationRequest
+        {
+            Id = organizationId,
+            UserId = machineId
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        members = await Api.GetAsync(new ListMembersForOrganizationRequest
+        {
+            Id = organizationId
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        members.Content.Value.Members!.Count.Should().Be(1);
+        members.Content.Value.Members[0].IsDefault.Should().BeTrue();
+        members.Content.Value.Members[0].IsOwner.Should().BeTrue();
+        members.Content.Value.Members[0].IsRegistered.Should().BeTrue();
+        members.Content.Value.Members[0].UserId.Should().Be(loginA.User.Id);
+        members.Content.Value.Members[0].EmailAddress.Should().Be(loginA.User.Profile!.EmailAddress);
+        members.Content.Value.Members[0].Name.FirstName.Should().Be("persona");
+        members.Content.Value.Members[0].Name.LastName.Should().Be("alastname");
+        members.Content.Value.Members[0].Classification.Should().Be(UserProfileClassification.Person);
+        members.Content.Value.Members[0].Roles.Should().ContainInOrder(TenantRoles.BillingAdmin.Name,
+            TenantRoles.Owner.Name, TenantRoles.Member.Name);
+    }
+
+    [Fact]
+    public async Task WhenAssignRoles_ThenAssigns()
+    {
+        var loginA = await LoginUserAsync();
+        var loginB = await LoginUserAsync(LoginUser.PersonB);
+
+        var organization = await Api.PostAsync(new CreateOrganizationRequest
+        {
+            Name = "aname"
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        loginA = await ReAuthenticateUserAsync(loginA.User);
+        var organizationId = organization.Content.Value.Organization!.Id;
+        await Api.PostAsync(new InviteMemberToOrganizationRequest
+        {
+            Id = organizationId,
+            Email = loginB.User.Profile!.EmailAddress
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        await Api.PutAsync(new AssignRolesToOrganizationRequest
+        {
+            Id = organizationId,
+            UserId = loginB.User.Id,
+            Roles = [TenantRoles.Owner.Name]
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        var memberships = await Api.GetAsync(new ListMembershipsForCallerRequest(),
+            req => req.SetJWTBearerToken(loginB.AccessToken));
+
+        memberships.Content.Value.Memberships!.Count.Should().Be(2);
+        memberships.Content.Value.Memberships![0].OrganizationId.Should().NotBeNull();
+        memberships.Content.Value.Memberships![0].Ownership.Should().Be(OrganizationOwnership.Personal);
+        memberships.Content.Value.Memberships![0].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
+        memberships.Content.Value.Memberships![1].OrganizationId.Should().Be(organizationId);
+        memberships.Content.Value.Memberships![1].Ownership.Should().Be(OrganizationOwnership.Shared);
+        memberships.Content.Value.Memberships![1].Roles.Should()
+            .ContainInOrder(TenantRoles.Member.Name, TenantRoles.Owner.Name);
+    }
+
+    [Fact]
+    public async Task WhenUnassignAssignedRole_ThenUnassigns()
+    {
+        var loginA = await LoginUserAsync();
+        var loginB = await LoginUserAsync(LoginUser.PersonB);
+
+        var organization = await Api.PostAsync(new CreateOrganizationRequest
+        {
+            Name = "aname"
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        loginA = await ReAuthenticateUserAsync(loginA.User);
+        var organizationId = organization.Content.Value.Organization!.Id;
+        await Api.PostAsync(new InviteMemberToOrganizationRequest
+        {
+            Id = organizationId,
+            Email = loginB.User.Profile!.EmailAddress
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        await Api.PutAsync(new AssignRolesToOrganizationRequest
+        {
+            Id = organizationId,
+            UserId = loginB.User.Id,
+            Roles = [TenantRoles.Owner.Name]
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        await Api.PutAsync(new UnassignRolesFromOrganizationRequest
+        {
+            Id = organizationId,
+            UserId = loginB.User.Id,
+            Roles = [TenantRoles.Owner.Name]
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        var memberships = await Api.GetAsync(new ListMembershipsForCallerRequest(),
+            req => req.SetJWTBearerToken(loginB.AccessToken));
+
+        memberships.Content.Value.Memberships!.Count.Should().Be(2);
+        memberships.Content.Value.Memberships![0].OrganizationId.Should().NotBeNull();
+        memberships.Content.Value.Memberships![0].Ownership.Should().Be(OrganizationOwnership.Personal);
+        memberships.Content.Value.Memberships![0].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
+        memberships.Content.Value.Memberships![1].OrganizationId.Should().Be(organizationId);
+        memberships.Content.Value.Memberships![1].Ownership.Should().Be(OrganizationOwnership.Shared);
+        memberships.Content.Value.Memberships![1].Roles.Should().ContainInOrder(TenantRoles.Member.Name);
+    }
+
+    [Fact]
+    public async Task WhenDeleteAndHasMembers_ThenReturnsError()
+    {
+        var loginA = await LoginUserAsync();
+        var loginC = CreateRandomEmailAddress();
+
+        var organization = await Api.PostAsync(new CreateOrganizationRequest
+        {
+            Name = "aname"
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        loginA = await ReAuthenticateUserAsync(loginA.User);
+        var organizationId = organization.Content.Value.Organization!.Id;
+
+        await Api.PostAsync(new InviteMemberToOrganizationRequest
+        {
+            Id = organizationId,
+            Email = loginC
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        var result = await Api.DeleteAsync(new DeleteOrganizationRequest
+        {
+            Id = organizationId
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task WhenDeleteAndHasNoMembers_ThenDeletes()
+    {
+        var loginA = await LoginUserAsync();
+
+        var organization = await Api.PostAsync(new CreateOrganizationRequest
+        {
+            Name = "aname"
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        loginA = await ReAuthenticateUserAsync(loginA.User);
+        var organizationId = organization.Content.Value.Organization!.Id;
+
+        var result = await Api.DeleteAsync(new DeleteOrganizationRequest
+        {
+            Id = organizationId
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     private static string CreateRandomEmailAddress()

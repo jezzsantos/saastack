@@ -8,8 +8,10 @@ using Common;
 using Common.Extensions;
 using Common.FeatureFlags;
 using FluentAssertions;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
+using Infrastructure.Web.Api.Operations.Shared.UserProfiles;
 using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Interfaces.Clients;
 using IntegrationTesting.WebApi.Common.Stubs;
@@ -211,6 +213,9 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 
         var accessToken = login.Content.Value.Tokens!.AccessToken.Value;
         var refreshToken = login.Content.Value.Tokens.RefreshToken.Value;
+
+        var profile = await Api.GetAsync(new GetProfileForCallerRequest(), req => req.SetJWTBearerToken(accessToken));
+        user.Profile = profile.Content.Value.Profile;
 
         return new LoginDetails(accessToken, refreshToken, user);
     }

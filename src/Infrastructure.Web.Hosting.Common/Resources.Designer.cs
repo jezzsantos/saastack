@@ -231,11 +231,11 @@ namespace Infrastructure.Web.Hosting.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &apos;OrganizationId&apos; is missing from this request.
+        ///   Looks up a localized string similar to The ID of the organization is missing from this request.
         /// </summary>
-        internal static string MultiTenancyMiddleware_MissingTenantId {
+        internal static string MultiTenancyMiddleware_MissingDefaultOrganization {
             get {
-                return ResourceManager.GetString("MultiTenancyMiddleware_MissingTenantId", resourceCulture);
+                return ResourceManager.GetString("MultiTenancyMiddleware_MissingDefaultOrganization", resourceCulture);
             }
         }
         

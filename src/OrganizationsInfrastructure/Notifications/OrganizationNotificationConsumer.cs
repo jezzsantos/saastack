@@ -27,6 +27,14 @@ public class OrganizationNotificationConsumer : IDomainEventNotificationConsumer
                 return await _organizationsApplication.HandleEndUserRegisteredAsync(_callerContextFactory.Create(),
                     registered, cancellationToken);
 
+            case MembershipAdded added:
+                return await _organizationsApplication.HandleEndUserMembershipAddedAsync(
+                    _callerContextFactory.Create(), added, cancellationToken);
+
+            case MembershipRemoved removed:
+                return await _organizationsApplication.HandleEndUserMembershipRemovedAsync(
+                    _callerContextFactory.Create(), removed, cancellationToken);
+
             default:
                 return Result.Ok;
         }

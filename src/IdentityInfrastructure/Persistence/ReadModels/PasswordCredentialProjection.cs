@@ -1,7 +1,6 @@
 using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
-using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.PasswordCredentials;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
@@ -29,7 +28,7 @@ public class PasswordCredentialProjection : IReadModelProjection
         switch (changeEvent)
         {
             case Created e:
-                return await _credentials.HandleCreateAsync(e.RootId.ToId(), dto =>
+                return await _credentials.HandleCreateAsync(e.RootId, dto =>
                     {
                         dto.UserId = e.UserId;
                         dto.RegistrationVerified = false;
@@ -38,11 +37,11 @@ public class PasswordCredentialProjection : IReadModelProjection
                     cancellationToken);
 
             case CredentialsChanged e:
-                return await _credentials.HandleUpdateAsync(e.RootId.ToId(),
+                return await _credentials.HandleUpdateAsync(e.RootId,
                     dto => { dto.PasswordResetToken = Optional<string>.None; }, cancellationToken);
 
             case RegistrationChanged e:
-                return await _credentials.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _credentials.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.UserName = e.Name;
                     dto.UserEmailAddress = e.EmailAddress;
@@ -52,32 +51,32 @@ public class PasswordCredentialProjection : IReadModelProjection
                 return true;
 
             case AccountLocked e:
-                return await _credentials.HandleUpdateAsync(e.RootId.ToId(),
+                return await _credentials.HandleUpdateAsync(e.RootId,
                     dto => { dto.AccountLocked = true; },
                     cancellationToken);
 
             case AccountUnlocked e:
-                return await _credentials.HandleUpdateAsync(e.RootId.ToId(),
+                return await _credentials.HandleUpdateAsync(e.RootId,
                     dto => { dto.AccountLocked = false; },
                     cancellationToken);
 
             case RegistrationVerificationCreated e:
-                return await _credentials.HandleUpdateAsync(e.RootId.ToId(),
+                return await _credentials.HandleUpdateAsync(e.RootId,
                     dto => { dto.RegistrationVerificationToken = e.Token; }, cancellationToken);
 
             case RegistrationVerificationVerified e:
-                return await _credentials.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _credentials.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.RegistrationVerificationToken = Optional<string>.None;
                     dto.RegistrationVerified = true;
                 }, cancellationToken);
 
             case PasswordResetInitiated e:
-                return await _credentials.HandleUpdateAsync(e.RootId.ToId(),
+                return await _credentials.HandleUpdateAsync(e.RootId,
                     dto => { dto.PasswordResetToken = e.Token; }, cancellationToken);
 
             case PasswordResetCompleted e:
-                return await _credentials.HandleUpdateAsync(e.RootId.ToId(),
+                return await _credentials.HandleUpdateAsync(e.RootId,
                     dto => { dto.PasswordResetToken = Optional<string>.None; }, cancellationToken);
 
             default:

@@ -26,7 +26,7 @@ public class UserProfile : IIdentifiableResource
     public required string Id { get; set; }
 }
 
-public class UserProfileForCurrent : UserProfileWithDefaultMembership
+public class UserProfileForCaller : UserProfileWithDefaultMembership
 {
     public List<string> Features { get; set; } = new();
 

@@ -1,7 +1,7 @@
 using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
-using Domain.Common.ValueObjects;
+using Domain.Common.Events;
 using Domain.Events.Shared.Organizations;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
@@ -29,7 +29,7 @@ public class OrganizationProjection : IReadModelProjection
         switch (changeEvent)
         {
             case Created e:
-                return await _organizations.HandleCreateAsync(e.RootId.ToId(), dto =>
+                return await _organizations.HandleCreateAsync(e.RootId, dto =>
                     {
                         dto.Name = e.Name;
                         dto.Ownership = e.Ownership;
@@ -43,8 +43,17 @@ public class OrganizationProjection : IReadModelProjection
             case MembershipAdded _:
                 return true;
 
+            case MembershipRemoved _:
+                return true;
+
+            case MemberInvited _:
+                return true;
+
+            case MemberUnInvited _:
+                return true;
+
             case AvatarAdded e:
-                return await _organizations.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _organizations.HandleUpdateAsync(e.RootId, dto =>
                     {
                         dto.AvatarId = e.AvatarId;
                         dto.AvatarUrl = e.AvatarUrl;
@@ -52,12 +61,25 @@ public class OrganizationProjection : IReadModelProjection
                     cancellationToken);
 
             case AvatarRemoved e:
-                return await _organizations.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _organizations.HandleUpdateAsync(e.RootId, dto =>
                     {
                         dto.AvatarId = Optional<string>.None;
                         dto.AvatarUrl = Optional<string>.None;
                     },
                     cancellationToken);
+
+            case NameChanged e:
+                return await _organizations.HandleUpdateAsync(e.RootId, dto => { dto.Name = e.Name; },
+                    cancellationToken);
+
+            case RoleAssigned _:
+                return true;
+
+            case RoleUnassigned _:
+                return true;
+
+            case Global.StreamDeleted e:
+                return await _organizations.HandleDeleteAsync(e.RootId, cancellationToken);
 
             default:
                 return false;

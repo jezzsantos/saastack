@@ -321,7 +321,6 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         return Result.Ok;
     }
 
-#if TESTINGONLY
     public async Task<Result<Error>> CompletePasswordResetAsync(ICallerContext caller, string token, string password,
         CancellationToken cancellationToken)
     {
@@ -360,6 +359,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         return Result.Ok;
     }
 
+#if TESTINGONLY
     public async Task<Result<PasswordCredentialConfirmation, Error>> GetPersonRegistrationConfirmationAsync(
         ICallerContext context, string userId,
         CancellationToken cancellationToken)

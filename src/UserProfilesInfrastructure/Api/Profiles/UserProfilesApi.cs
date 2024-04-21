@@ -84,14 +84,14 @@ public class UserProfilesApi : IWebApiService
                 new DeleteProfileAvatarResponse { Profile = pro });
     }
 
-    public async Task<ApiGetResult<UserProfileForCurrent, GetCurrentProfileResponse>> GetCurrentProfile(
-        GetCurrentProfileRequest request, CancellationToken cancellationToken)
+    public async Task<ApiGetResult<UserProfileForCaller, GetProfileForCallerResponse>> GetProfileForCaller(
+        GetProfileForCallerRequest request, CancellationToken cancellationToken)
     {
         var profile =
             await _userProfilesApplication.GetCurrentUserProfileAsync(_contextFactory.Create(), cancellationToken);
 
         return () =>
-            profile.HandleApplicationResult<UserProfileForCurrent, GetCurrentProfileResponse>(pro =>
-                new GetCurrentProfileResponse { Profile = pro });
+            profile.HandleApplicationResult<UserProfileForCaller, GetProfileForCallerResponse>(pro =>
+                new GetProfileForCallerResponse { Profile = pro });
     }
 }

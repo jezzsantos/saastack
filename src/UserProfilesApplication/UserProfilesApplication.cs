@@ -130,12 +130,12 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         return Optional<UserProfile>.None;
     }
 
-    public async Task<Result<UserProfileForCurrent, Error>> GetCurrentUserProfileAsync(ICallerContext caller,
+    public async Task<Result<UserProfileForCaller, Error>> GetCurrentUserProfileAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
         if (!caller.IsAuthenticated)
         {
-            return new UserProfileForCurrent
+            return new UserProfileForCaller
             {
                 Address = new ProfileAddress
                 {
@@ -381,7 +381,6 @@ public partial class UserProfilesApplication : IUserProfilesApplication
             .ToList();
     }
 
-
     private async Task<Result<Error>> ChangeAvatarInternalAsync(ICallerContext caller, Identifier modifierId,
         UserProfileRoot profile, FileUpload upload, CancellationToken cancellationToken)
     {
@@ -406,9 +405,9 @@ public partial class UserProfilesApplication : IUserProfilesApplication
 
 internal static class UserProfileConversionExtensions
 {
-    public static UserProfileForCurrent ToCurrentProfile(this UserProfileRoot profile, ICallerContext caller)
+    public static UserProfileForCaller ToCurrentProfile(this UserProfileRoot profile, ICallerContext caller)
     {
-        var dto = profile.ToProfile().Convert<UserProfile, UserProfileForCurrent>();
+        var dto = profile.ToProfile().Convert<UserProfile, UserProfileForCaller>();
         dto.IsAuthenticated = caller.IsAuthenticated;
         dto.Roles = caller.Roles.Platform.Select(rol => rol.Name).ToList();
         dto.Features = caller.Features.Platform.Select(feat => feat.Name).ToList();

@@ -1,7 +1,6 @@
 using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
-using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.SSOUsers;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
@@ -29,7 +28,7 @@ public class SSOUserProjection : IReadModelProjection
         switch (changeEvent)
         {
             case Created e:
-                return await _users.HandleCreateAsync(e.RootId.ToId(), dto =>
+                return await _users.HandleCreateAsync(e.RootId, dto =>
                     {
                         dto.UserId = e.UserId;
                         dto.ProviderName = e.ProviderName;
@@ -37,7 +36,7 @@ public class SSOUserProjection : IReadModelProjection
                     cancellationToken);
 
             case TokensUpdated e:
-                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _users.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.Tokens = e.Tokens;
                     dto.EmailAddress = e.EmailAddress;

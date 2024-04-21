@@ -7,7 +7,13 @@ namespace OrganizationsApplication;
 
 public partial interface IOrganizationsApplication
 {
+    Task<Result<Organization, Error>> AssignRolesToOrganizationAsync(ICallerContext caller, string id, string userId,
+        List<string> roles, CancellationToken cancellationToken);
+
     Task<Result<Organization, Error>> ChangeAvatarAsync(ICallerContext caller, string id, FileUpload upload,
+        CancellationToken cancellationToken);
+
+    Task<Result<Organization, Error>> ChangeDetailsAsync(ICallerContext caller, string id, string? name,
         CancellationToken cancellationToken);
 
     Task<Result<Error>> ChangeSettingsAsync(ICallerContext caller, string id,
@@ -18,6 +24,8 @@ public partial interface IOrganizationsApplication
 
     Task<Result<Organization, Error>> DeleteAvatarAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken);
+
+    Task<Result<Error>> DeleteOrganizationAsync(ICallerContext caller, string? id, CancellationToken cancellationToken);
 
     Task<Result<Organization, Error>> GetOrganizationAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken);
@@ -35,4 +43,11 @@ public partial interface IOrganizationsApplication
 
     Task<Result<SearchResults<OrganizationMember>, Error>> ListMembersForOrganizationAsync(ICallerContext caller,
         string? id, SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken);
+
+    Task<Result<Organization, Error>> UnassignRolesFromOrganizationAsync(ICallerContext caller, string id,
+        string userId,
+        List<string> roles, CancellationToken cancellationToken);
+
+    Task<Result<Organization, Error>> UnInviteMemberFromOrganizationAsync(ICallerContext caller, string id,
+        string userId, CancellationToken cancellationToken);
 }

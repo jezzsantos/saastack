@@ -9,7 +9,7 @@ partial interface IUserProfilesApplication
     Task<Result<Error>> HandleEndUserRegisteredAsync(ICallerContext caller, Registered domainEvent,
         CancellationToken cancellationToken);
 
-    Task<Result<Error>> HandleEndUserDefaultOrganizationChangedAsync(ICallerContext caller,
-        MembershipDefaultChanged domainEvent,
+    Task<Result<Error>> HandleEndUserDefaultMembershipChangedAsync(ICallerContext caller,
+        DefaultMembershipChanged domainEvent,
         CancellationToken cancellationToken);
 }

@@ -9,9 +9,8 @@ public partial interface IEndUsersApplication
     Task<Result<EndUser, Error>> AssignPlatformRolesAsync(ICallerContext context, string id, List<string> roles,
         CancellationToken cancellationToken);
 
-    Task<Result<EndUserWithMemberships, Error>> AssignTenantRolesAsync(ICallerContext context, string organizationId,
-        string id,
-        List<string> roles, CancellationToken cancellationToken);
+    Task<Result<EndUser, Error>> ChangeDefaultMembershipAsync(ICallerContext caller, string organizationId,
+        CancellationToken cancellationToken);
 
     Task<Result<Optional<EndUser>, Error>> FindPersonByEmailAddressAsync(ICallerContext context, string emailAddress,
         CancellationToken cancellationToken);
@@ -20,6 +19,9 @@ public partial interface IEndUsersApplication
         CancellationToken cancellationToken);
 
     Task<Result<EndUser, Error>> GetUserAsync(ICallerContext context, string id, CancellationToken cancellationToken);
+
+    Task<Result<SearchResults<Membership>, Error>> ListMembershipsForCallerAsync(ICallerContext caller,
+        SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken);
 
     Task<Result<SearchResults<MembershipWithUserProfile>, Error>> ListMembershipsForOrganizationAsync(
         ICallerContext caller,

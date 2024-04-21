@@ -3,7 +3,6 @@ using Application.Persistence.Interfaces;
 using CarsApplication.Persistence.ReadModels;
 using CarsDomain;
 using Common;
-using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Cars;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
@@ -32,7 +31,7 @@ public class CarProjection : IReadModelProjection
         switch (changeEvent)
         {
             case Created e:
-                return await _cars.HandleCreateAsync(e.RootId.ToId(), dto =>
+                return await _cars.HandleCreateAsync(e.RootId, dto =>
                 {
                     dto.OrganizationId = e.OrganizationId;
                     dto.Status = e.Status;

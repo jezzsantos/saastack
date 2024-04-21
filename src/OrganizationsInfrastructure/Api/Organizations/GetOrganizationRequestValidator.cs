@@ -10,7 +10,7 @@ public class GetOrganizationRequestValidator : AbstractValidator<GetOrganization
 {
     public GetOrganizationRequestValidator(IIdentifierFactory identifierFactory)
     {
-        RuleFor(x => x.Id)
+        RuleFor(req => req.Id)
             .IsEntityId(identifierFactory)
             .WithMessage(CommonValidationResources.AnyValidator_InvalidId);
     }

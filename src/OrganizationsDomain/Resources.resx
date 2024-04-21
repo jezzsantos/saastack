@@ -36,16 +36,28 @@
     <data name="OrganizationRoot_Create_SharedRequiresPerson" xml:space="preserve">
         <value>Must be a person to create a 'Shared' organization</value>
     </data>
-    <data name="OrganizationRoot_NotOrgOwner" xml:space="preserve">
+    <data name="OrganizationRoot_UserNotOrgOwner" xml:space="preserve">
         <value>Must be an organization owner to perform this action</value>
     </data>
-    <data name="OrganizationRoot_AddMembership_UserIdAndEmailMissing" xml:space="preserve">
+    <data name="OrganizationRoot_UserNotMember" xml:space="preserve">
+        <value>User must be a member of this organization</value>
+    </data>
+    <data name="OrganizationRoot_InviteMember_UserIdAndEmailMissing" xml:space="preserve">
         <value>Both the ID of the user and an email for the user is missing</value>
     </data>
     <data name="OrganizationRoot_NoAvatar" xml:space="preserve">
         <value>This organization has no avatar to delete</value>
     </data>
-    <data name="OrganizationRoot_AddMembership_PersonalOrgMembershipNotAllowed" xml:space="preserve">
-        <value>Cannot add another user to a Personal organization</value>
+    <data name="OrganizationRoot_InviteMember_PersonalOrgMembershipNotAllowed" xml:space="preserve">
+        <value>Cannot add another user to a 'Personal' organization</value>
+    </data>
+    <data name="OrganizationRoot_UnInviteMember_PersonalOrg" xml:space="preserve">
+        <value>Cannot remove any members from a 'Personal' organization</value>
+    </data>
+    <data name="OrganizationRoot_RoleNotAssignable" xml:space="preserve">
+        <value>Role '{0}' is not assignable to a user</value>
+    </data>
+    <data name="OrganizationRoot_DeleteOrganization_MembersStillExist" xml:space="preserve">
+        <value>Cannot delete this organization while any others members still exist. They must be removed from the organization first</value>
     </data>
 </root>

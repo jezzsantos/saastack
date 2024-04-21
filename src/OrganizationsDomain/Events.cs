@@ -36,14 +36,67 @@ public static class Events
         };
     }
 
-    public static MembershipAdded MembershipAdded(Identifier id, Identifier invitedById, Optional<Identifier> userId,
+    public static MemberInvited MemberInvited(Identifier id, Identifier invitedById, Optional<Identifier> userId,
         Optional<EmailAddress> userEmailAddress)
     {
-        return new MembershipAdded(id)
+        return new MemberInvited(id)
         {
             InvitedById = invitedById,
             UserId = userId.ValueOrDefault!,
             EmailAddress = userEmailAddress.ValueOrDefault?.Address
+        };
+    }
+
+    public static MembershipAdded MembershipAdded(Identifier id, Identifier userId)
+    {
+        return new MembershipAdded(id)
+        {
+            UserId = userId
+        };
+    }
+
+    public static MembershipRemoved MembershipRemoved(Identifier id, Identifier userId)
+    {
+        return new MembershipRemoved(id)
+        {
+            UserId = userId
+        };
+    }
+
+    public static MemberUnInvited MemberUnInvited(Identifier id, Identifier unInvitedById, Identifier userId)
+    {
+        return new MemberUnInvited(id)
+        {
+            UninvitedById = unInvitedById,
+            UserId = userId
+        };
+    }
+
+    public static NameChanged NameChanged(Identifier id, DisplayName name)
+    {
+        return new NameChanged(id)
+        {
+            Name = name
+        };
+    }
+
+    public static RoleAssigned RoleAssigned(Identifier id, Identifier assignerId, Identifier userId, Role role)
+    {
+        return new RoleAssigned(id)
+        {
+            AssignedById = assignerId,
+            UserId = userId,
+            Role = role.Identifier
+        };
+    }
+
+    public static RoleUnassigned RoleUnassigned(Identifier id, Identifier unassignerId, Identifier userId, Role role)
+    {
+        return new RoleUnassigned(id)
+        {
+            UnassignedById = unassignerId,
+            UserId = userId,
+            Role = role.Identifier
         };
     }
 

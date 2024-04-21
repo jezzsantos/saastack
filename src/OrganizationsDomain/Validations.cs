@@ -4,6 +4,9 @@ namespace OrganizationsDomain;
 
 public static class Validations
 {
+    public static readonly Validation DisplayName = CommonValidations.DescriptiveName();
+    public static readonly Validation Role = CommonValidations.RoleLevel;
+
     public static class Avatar
     {
         public const long MaxSizeInBytes = 134_217_728; //approx 100MB
@@ -14,6 +17,4 @@ public static class Validations
             "image/gif"
         };
     }
-
-    public static readonly Validation DisplayName = CommonValidations.DescriptiveName();
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
+using Domain.Shared.Organizations;
 
 namespace EndUsersDomain;
 
@@ -10,6 +11,8 @@ public class Memberships : IReadOnlyList<Membership>
     private readonly List<Membership> _memberships = new();
 
     public Membership DefaultMembership => _memberships.First(ms => ms.IsDefault);
+
+    public bool HasPersonalOrganization => _memberships.Any(ms => ms.Ownership == OrganizationOwnership.Personal);
 
     public Result<Error> EnsureInvariants()
     {
@@ -80,6 +83,22 @@ public class Memberships : IReadOnlyList<Membership>
     {
         return _memberships
             .SingleOrDefault(ms => ms.OrganizationId == organizationId);
+    }
+
+    public Membership FindNextDefaultMembership()
+    {
+        var next = _memberships
+            .Except(new[] { DefaultMembership })
+            // ReSharper disable once SimplifyLinqExpressionUseMinByAndMaxBy
+            .OrderByDescending(ms => ms.CreatedAtUtc)
+            .FirstOrDefault();
+
+        if (next.NotExists())
+        {
+            throw new InvalidOperationException(Resources.Memberships_MissingNextDefaultMembership);
+        }
+
+        return next;
     }
 
     public void Remove(Identifier membershipId)

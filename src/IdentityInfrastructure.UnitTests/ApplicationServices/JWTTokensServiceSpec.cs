@@ -43,8 +43,8 @@ public class JWTTokensServiceSpec
             Access = EndUserAccess.Enabled,
             Status = EndUserStatus.Unregistered,
             Id = "anid",
-            Roles = new List<string> { PlatformRoles.Standard.Name },
-            Features = new List<string> { PlatformFeatures.Basic.Name },
+            Roles = [PlatformRoles.Standard.Name],
+            Features = [PlatformFeatures.Basic.Name],
             Memberships =
             [
                 new Membership
@@ -52,8 +52,8 @@ public class JWTTokensServiceSpec
                     Id = "amembershipid",
                     UserId = "auserid",
                     OrganizationId = "anorganizationid",
-                    Roles = new List<string> { TenantRoles.Member.Name },
-                    Features = new List<string> { TenantFeatures.Basic.Name }
+                    Roles = [TenantRoles.Member.Name],
+                    Features = [TenantFeatures.Basic.Name]
                 }
             ]
         };

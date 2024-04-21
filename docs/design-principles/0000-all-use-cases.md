@@ -66,6 +66,8 @@ These are the main use cases of this product that are exposed via "public" APIs 
 3. Invite a guest to register on the platform (a referral)
 4. Resend an invitation to a guest
 5. Guest verifies an invitation is still valid
+6. Change the default organization for the current (Authenticated) user
+7. List all memberships of the current (Authenticated) user
 
 ### Identities
 
@@ -110,16 +112,15 @@ These are the main use cases of this product that are exposed via "public" APIs 
 
 1. Create a new (shared) organization for the current user
 2. Inspect a specific organization
-3. (coming soon) Change the organization's details
+3. Change the organization's details
 4. Add an Avatar image to the organization
 5. Remove the Avatar from the organization
 6. Invite another guest or person to an organization (guest by email, or an existing person by email or by ID)
-7. (coming soon) Uninvite a member of the organization
-8. (coming soon) Assign roles to a member
-9. (coming soon) Unassign roles from a member
-10. (coming soon) List all members of the organization
-11. (coming soon) List all memberships of the current (Authenticated) user
-12. (coming soon) Delete the organization
+7. Un-invite a member from the organization
+8. Assign roles to a member
+9. Unassign roles from a member
+10. List all members of the organization
+11. Delete the organization (must be no remaining members)
 
 ### Subscriptions
 

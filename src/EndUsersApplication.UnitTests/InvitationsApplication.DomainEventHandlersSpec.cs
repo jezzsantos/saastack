@@ -58,14 +58,14 @@ public class InvitationsApplicationDomainEventHandlersSpec
     }
 
     [Fact]
-    public async Task WhenHandleOrganizationMembershipAddedAsyncAndNoUserIdNorEmailAddress_ThenReturnsError()
+    public async Task WhenHandleOrganizationMemberInvitedAsyncAndNoUserIdNorEmailAddress_ThenReturnsError()
     {
-        var domainEvent = Events.MembershipAdded("anorganizationid".ToId(), "aninviterid".ToId(),
+        var domainEvent = Events.MemberInvited("anorganizationid".ToId(), "aninviterid".ToId(),
             Optional<Identifier>.None,
             Optional<EmailAddress>.None);
 
         var result =
-            await _application.HandleOrganizationMembershipAddedAsync(_caller.Object, domainEvent,
+            await _application.HandleOrganizationMemberInvitedAsync(_caller.Object, domainEvent,
                 CancellationToken.None);
 
         result.Should().BeError(ErrorCode.RuleViolation,
@@ -73,7 +73,7 @@ public class InvitationsApplicationDomainEventHandlersSpec
     }
 
     [Fact]
-    public async Task WhenHandleOrganizationMembershipAddedAsyncWithRegisteredUserEmail_ThenAddsMembership()
+    public async Task WhenHandleOrganizationMemberInvitedAsyncWithRegisteredUserEmail_ThenAddsMembership()
     {
         var inviter = EndUserRoot
             .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
@@ -103,12 +103,12 @@ public class InvitationsApplicationDomainEventHandlersSpec
             .Create(_recorder.Object, "aninviteeid".ToIdentifierFactory(), UserClassification.Person).Value;
         _repository.Setup(rep => rep.LoadAsync("aninviteeid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(invitee);
-        var domainEvent = Events.MembershipAdded("anorganizationid".ToId(), "aninviterid".ToId(),
+        var domainEvent = Events.MemberInvited("anorganizationid".ToId(), "aninviterid".ToId(),
             Optional<Identifier>.None,
             EmailAddress.Create("aninvitee@company.com").Value);
 
         var result =
-            await _application.HandleOrganizationMembershipAddedAsync(_caller.Object, domainEvent,
+            await _application.HandleOrganizationMemberInvitedAsync(_caller.Object, domainEvent,
                 CancellationToken.None);
 
         result.Should().BeSuccess();
@@ -131,7 +131,7 @@ public class InvitationsApplicationDomainEventHandlersSpec
     }
 
     [Fact]
-    public async Task WhenHandleOrganizationMembershipAddedAsyncWithGuestEmailAddress_ThenAddsMembership()
+    public async Task WhenHandleOrganizationMemberInvitedAsyncWithGuestEmailAddress_ThenAddsMembership()
     {
         var inviter = EndUserRoot
             .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
@@ -158,12 +158,12 @@ public class InvitationsApplicationDomainEventHandlersSpec
                 UserId = "aninviterid",
                 Id = "aprofileid"
             });
-        var domainEvent = Events.MembershipAdded("anorganizationid".ToId(), "aninviterid".ToId(),
+        var domainEvent = Events.MemberInvited("anorganizationid".ToId(), "aninviterid".ToId(),
             Optional<Identifier>.None,
             EmailAddress.Create("aninvitee@company.com").Value);
 
         var result =
-            await _application.HandleOrganizationMembershipAddedAsync(_caller.Object, domainEvent,
+            await _application.HandleOrganizationMemberInvitedAsync(_caller.Object, domainEvent,
                 CancellationToken.None);
 
         result.Should().BeSuccess();
@@ -186,7 +186,7 @@ public class InvitationsApplicationDomainEventHandlersSpec
     }
 
     [Fact]
-    public async Task WhenHandleOrganizationMembershipAddedAsyncWithUserId_ThenAddsMembership()
+    public async Task WhenHandleOrganizationMemberInvitedAsyncWithUserId_ThenAddsMembership()
     {
         var inviter = EndUserRoot
             .Create(_recorder.Object, "aninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
@@ -212,11 +212,11 @@ public class InvitationsApplicationDomainEventHandlersSpec
                 UserId = "aninviterid",
                 Id = "aprofileid"
             });
-        var domainEvent = Events.MembershipAdded("anorganizationid".ToId(), "aninviterid".ToId(), "aninviteeid".ToId(),
+        var domainEvent = Events.MemberInvited("anorganizationid".ToId(), "aninviterid".ToId(), "aninviteeid".ToId(),
             Optional<EmailAddress>.None);
 
         var result =
-            await _application.HandleOrganizationMembershipAddedAsync(_caller.Object, domainEvent,
+            await _application.HandleOrganizationMemberInvitedAsync(_caller.Object, domainEvent,
                 CancellationToken.None);
 
         result.Should().BeSuccess();
@@ -235,5 +235,34 @@ public class InvitationsApplicationDomainEventHandlersSpec
             ups.GetProfilePrivateAsync(_caller.Object, "aninviterid", It.IsAny<CancellationToken>()));
         _repository.Verify(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()));
         _repository.Verify(rep => rep.LoadAsync("aninviteeid".ToId(), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenHandleOrganizationMemberUnInvitedAsync_ThenRemovesMembership()
+    {
+        var inviter = EndUserRoot
+            .Create(_recorder.Object, "anuninviterid".ToIdentifierFactory(), UserClassification.Person).Value;
+        inviter.AddMembership(inviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+            Roles.Create(TenantRoles.Owner).Value, Features.Empty);
+        _repository.Setup(rep => rep.LoadAsync("anuninviterid".ToId(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(inviter);
+        var invitee = EndUserRoot
+            .Create(_recorder.Object, "anuninviteeid".ToIdentifierFactory(), UserClassification.Person).Value;
+        await invitee.InviteGuestAsync(_tokensService.Object, "anuninviterid".ToId(),
+            EmailAddress.Create("aninvitee@company.com").Value, (_, _) => Task.FromResult(Result.Ok));
+        _repository.Setup(rep => rep.LoadAsync("anuninviteeid".ToId(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(invitee);
+        var domainEvent =
+            Events.MemberUnInvited("anorganizationid".ToId(), "anuninviterid".ToId(), "anuninviteeid".ToId());
+
+        var result = await _application.HandleOrganizationMemberUnInvitedAsync(_caller.Object, domainEvent,
+            CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<EndUserRoot>(eu =>
+            eu.Memberships.Count == 0
+        ), It.IsAny<CancellationToken>()));
+        _repository.Verify(rep => rep.LoadAsync("anuninviterid".ToId(), It.IsAny<CancellationToken>()));
+        _repository.Verify(rep => rep.LoadAsync("anuninviteeid".ToId(), It.IsAny<CancellationToken>()));
     }
 }

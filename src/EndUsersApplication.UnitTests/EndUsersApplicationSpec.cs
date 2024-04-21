@@ -666,7 +666,7 @@ public class EndUsersApplicationSpec
         _endUserRepository.Setup(rep => rep.LoadAsync("anassigneeid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(assignee);
         var assigner = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
-        assigner.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Create(),
+        assigner.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Empty,
             EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
         _endUserRepository.Setup(rep => rep.LoadAsync("anassignerid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(assigner);
@@ -693,7 +693,7 @@ public class EndUsersApplicationSpec
         _endUserRepository.Setup(rep => rep.LoadAsync("anassigneeid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(assignee);
         var assigner = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
-        assigner.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Create(),
+        assigner.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Empty,
             EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
         _endUserRepository.Setup(rep => rep.LoadAsync("anassignerid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(assigner);
@@ -704,40 +704,6 @@ public class EndUsersApplicationSpec
 
         result.Should().BeSuccess();
         result.Value.Roles.Should().ContainSingle(PlatformRoles.Standard.Name);
-    }
-#endif
-
-#if TESTINGONLY
-    [Fact]
-    public async Task WhenAssignTenantRolesAsync_ThenAssigns()
-    {
-        _caller.Setup(cc => cc.CallerId)
-            .Returns("anassignerid");
-        var assigner = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
-        assigner.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Create(),
-            EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
-        assigner.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
-            Roles.Create(TenantRoles.Owner).Value,
-            Features.Create(TenantFeatures.Basic).Value);
-        _endUserRepository.Setup(rep => rep.LoadAsync("anassignerid".ToId(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(assigner);
-        var assignee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
-        assignee.Register(Roles.Create(PlatformRoles.Standard).Value, Features.Create(PlatformFeatures.Basic).Value,
-            EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
-        assignee.AddMembership(assignee, OrganizationOwnership.Shared, "anorganizationid".ToId(),
-            Roles.Create(TenantRoles.Member).Value,
-            Features.Create(TenantFeatures.Basic).Value);
-        _endUserRepository.Setup(rep => rep.LoadAsync("anassigneeid".ToId(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(assignee);
-
-        var result = await _application.AssignTenantRolesAsync(_caller.Object, "anorganizationid", "anassigneeid",
-            [TenantRoles.TestingOnly.Name],
-            CancellationToken.None);
-
-        result.Should().BeSuccess();
-        result.Value.Roles.Should().ContainInOrder(PlatformRoles.Standard.Name);
-        result.Value.Memberships[0].Roles.Should()
-            .ContainInOrder(TenantRoles.Member.Name, TenantRoles.TestingOnly.Name);
     }
 #endif
 
@@ -825,5 +791,23 @@ public class EndUsersApplicationSpec
         result.Value.Memberships[0].OrganizationId.Should().Be("anorganizationid");
         result.Value.Memberships[0].Roles.Should().ContainSingle(role => role == TenantRoles.Member.Name);
         result.Value.Memberships[0].Features.Should().ContainSingle(feat => feat == TenantFeatures.PaidTrial.Name);
+    }
+
+    [Fact]
+    public async Task WhenChangeDefaultMembershipAsync_ThenChanges()
+    {
+        var user = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        user.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Empty,
+            EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
+        user.AddMembership(user, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+            Roles.Create(TenantRoles.Owner).Value,
+            Features.Create(TenantFeatures.Basic).Value);
+        _endUserRepository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        var result = await _application.ChangeDefaultMembershipAsync(_caller.Object, "anorganizationid",
+            CancellationToken.None);
+
+        result.Value.Id.Should().Be("anid");
     }
 }

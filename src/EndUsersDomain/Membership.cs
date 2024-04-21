@@ -31,15 +31,15 @@ public sealed class Membership : EntityBase
 
     public bool IsDefault { get; private set; }
 
+    public bool IsShared => Ownership is { HasValue: true, Value: OrganizationOwnership.Shared };
+
     public Optional<Identifier> OrganizationId { get; private set; } = Optional<Identifier>.None;
+
+    public Optional<OrganizationOwnership> Ownership { get; private set; }
 
     public Roles Roles { get; private set; } = Roles.Empty;
 
     public Optional<Identifier> RootId { get; private set; } = Optional<Identifier>.None;
-
-    public Optional<OrganizationOwnership> Ownership { get; private set; }
-
-    public bool IsShared => Ownership is { HasValue: true, Value: OrganizationOwnership.Shared };
 
     protected override Result<Error> OnStateChanged(IDomainEvent @event)
     {
@@ -68,7 +68,7 @@ public sealed class Membership : EntityBase
                 return Result.Ok;
             }
 
-            case MembershipDefaultChanged changed:
+            case DefaultMembershipChanged changed:
             {
                 if (changed.FromMembershipId == Id)
                 {
@@ -83,27 +83,34 @@ public sealed class Membership : EntityBase
                 return Result.Ok;
             }
 
-            case MembershipRoleAssigned added:
+            case MembershipRoleAssigned assigned:
             {
-                var role = Roles.Add(added.Role);
-                if (!role.IsSuccessful)
+                var roles = Roles.Add(assigned.Role);
+                if (!roles.IsSuccessful)
                 {
-                    return role.Error;
+                    return roles.Error;
                 }
 
-                Roles = role.Value;
+                Roles = roles.Value;
                 return Result.Ok;
             }
 
-            case MembershipFeatureAssigned added:
+            case MembershipRoleUnassigned unassigned:
             {
-                var feature = Features.Add(added.Feature);
-                if (!feature.IsSuccessful)
+                var roles = Roles.Remove(unassigned.Role);
+                Roles = roles;
+                return Result.Ok;
+            }
+
+            case MembershipFeatureAssigned assigned:
+            {
+                var features = Features.Add(assigned.Feature);
+                if (!features.IsSuccessful)
                 {
-                    return feature.Error;
+                    return features.Error;
                 }
 
-                Features = feature.Value;
+                Features = features.Value;
                 return Result.Ok;
             }
 

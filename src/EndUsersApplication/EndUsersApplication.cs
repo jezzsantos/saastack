@@ -61,6 +61,25 @@ public partial class EndUsersApplication : IEndUsersApplication
         return user.ToUser();
     }
 
+    public async Task<Result<SearchResults<Membership>, Error>> ListMembershipsForCallerAsync(ICallerContext caller,
+        SearchOptions searchOptions, GetOptions getOptions,
+        CancellationToken cancellationToken)
+    {
+        var userId = caller.ToCallerId();
+        var retrieved = await _endUserRepository.LoadAsync(userId, cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var user = retrieved.Value;
+        var memberships = user.Memberships.Select(ms => ms.ToMembership()).ToList();
+
+        _recorder.TraceInformation(caller.ToCall(), "Retrieved memberships for user: {Id}", user.Id);
+
+        return searchOptions.ApplyWithMetadata(memberships);
+    }
+
     public async Task<Result<SearchResults<MembershipWithUserProfile>, Error>> ListMembershipsForOrganizationAsync(
         ICallerContext caller, string organizationId, SearchOptions searchOptions,
         GetOptions getOptions, CancellationToken cancellationToken)
@@ -446,98 +465,34 @@ public partial class EndUsersApplication : IEndUsersApplication
         return updated.Value.ToUser();
     }
 
-    public async Task<Result<EndUserWithMemberships, Error>> AssignTenantRolesAsync(ICallerContext context,
-        string organizationId,
-        string id, List<string> roles, CancellationToken cancellationToken)
-    {
-        var retrievedAssignee = await _endUserRepository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrievedAssignee.IsSuccessful)
-        {
-            return retrievedAssignee.Error;
-        }
-
-        var retrievedAssigner = await _endUserRepository.LoadAsync(context.ToCallerId(), cancellationToken);
-        if (!retrievedAssigner.IsSuccessful)
-        {
-            return retrievedAssigner.Error;
-        }
-
-        var assignee = retrievedAssignee.Value;
-        var assigner = retrievedAssigner.Value;
-        var assigneeRoles = Roles.Create(roles.ToArray());
-        if (!assigneeRoles.IsSuccessful)
-        {
-            return assigneeRoles.Error;
-        }
-
-        var assigned = assignee.AssignMembershipRoles(assigner, organizationId.ToId(), assigneeRoles.Value);
-        if (!assigned.IsSuccessful)
-        {
-            return assigned.Error;
-        }
-
-        var membership = assigned.Value;
-        var updated = await _endUserRepository.SaveAsync(assignee, cancellationToken);
-        if (!updated.IsSuccessful)
-        {
-            return updated.Error;
-        }
-
-        _recorder.TraceInformation(context.ToCall(),
-            "EndUser {Id} has been assigned tenant roles {Roles} to membership {Membership}",
-            assignee.Id, roles.JoinAsOredChoices(), membership.Id);
-        _recorder.AuditAgainst(context.ToCall(), assignee.Id,
-            Audits.EndUserApplication_TenantRolesAssigned,
-            "EndUser {AssignerId} assigned the tenant roles {Roles} to assignee {AssigneeId} for membership {Membership}",
-            assigner.Id, roles.JoinAsOredChoices(), assignee.Id, membership.Id);
-
-        return assignee.ToUserWithMemberships();
-    }
-
-    private async Task<Result<Membership, Error>> CreateMembershipAsync(ICallerContext context,
-        Identifier createdById, Identifier organizationId, OrganizationOwnership ownership,
+    public async Task<Result<EndUser, Error>> ChangeDefaultMembershipAsync(ICallerContext caller, string organizationId,
         CancellationToken cancellationToken)
     {
-        var retrievedInviter = await _endUserRepository.LoadAsync(createdById, cancellationToken);
-        if (!retrievedInviter.IsSuccessful)
+        var userId = caller.ToCallerId();
+        var retrieved = await _endUserRepository.LoadAsync(userId, cancellationToken);
+        if (!retrieved.IsSuccessful)
         {
-            return retrievedInviter.Error;
+            return retrieved.Error;
         }
 
-        var inviter = retrievedInviter.Value;
-        var useCase = ownership switch
+        var user = retrieved.Value;
+        var changed = user.ChangeDefaultMembership(organizationId.ToId());
+        if (!changed.IsSuccessful)
         {
-            OrganizationOwnership.Shared => RolesAndFeaturesUseCase.CreatingOrg,
-            OrganizationOwnership.Personal => inviter.Classification == UserClassification.Person
-                ? RolesAndFeaturesUseCase.CreatingPerson
-                : RolesAndFeaturesUseCase.CreatingMachine,
-            _ => RolesAndFeaturesUseCase.CreatingOrg
-        };
-        var (_, _, tenantRoles, tenantFeatures) =
-            EndUserRoot.GetInitialRolesAndFeatures(useCase, context.IsAuthenticated);
-        var inviterOwnership = ownership.ToEnumOrDefault(Domain.Shared.Organizations.OrganizationOwnership.Shared);
-        var membered = inviter.AddMembership(inviter, inviterOwnership, organizationId, tenantRoles, tenantFeatures);
-        if (!membered.IsSuccessful)
-        {
-            return membered.Error;
+            return changed.Error;
         }
 
-        var saved = await _endUserRepository.SaveAsync(inviter, cancellationToken);
+        var saved = await _endUserRepository.SaveAsync(user, cancellationToken);
         if (!saved.IsSuccessful)
         {
             return saved.Error;
         }
 
-        _recorder.TraceInformation(context.ToCall(), "EndUser {Id} has become a member of organization {Organization}",
-            inviter.Id, organizationId);
+        user = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Default membership changed for user {Id} to {OrganizationId}",
+            user.Id, organizationId);
 
-        var membership = saved.Value.FindMembership(organizationId);
-        if (!membership.HasValue)
-        {
-            return Error.EntityNotFound(Resources.EndUsersApplication_MembershipNotFound);
-        }
-
-        return membership.Value.ToMembership();
+        return user.ToUser();
     }
 
     private async Task<IEnumerable<MembershipWithUserProfile>> WithGetOptionsAsync(ICallerContext caller,
@@ -690,6 +645,7 @@ internal static class EndUserConversionExtensions
             UserId = membership.UserId.Value,
             IsDefault = membership.IsDefault,
             OrganizationId = membership.UserId.Value,
+            Ownership = membership.Ownership.Value.ToEnumOrDefault(OrganizationOwnership.Shared),
             Status = membership.Status.Value.ToEnumOrDefault(EndUserStatus.Unregistered),
             Roles = membership.Roles.Value.ToList(),
             Features = membership.Features.Value.ToList(),
@@ -699,16 +655,17 @@ internal static class EndUserConversionExtensions
         return dto;
     }
 
-    public static Membership ToMembership(this EndUsersDomain.Membership ms)
+    public static Membership ToMembership(this EndUsersDomain.Membership membership)
     {
         return new Membership
         {
-            Id = ms.Id,
-            UserId = ms.RootId.Value,
-            IsDefault = ms.IsDefault,
-            OrganizationId = ms.OrganizationId.Value,
-            Features = ms.Features.ToList(),
-            Roles = ms.Roles.ToList()
+            Id = membership.Id,
+            UserId = membership.RootId.Value,
+            IsDefault = membership.IsDefault,
+            OrganizationId = membership.OrganizationId.Value,
+            Ownership = membership.Ownership.Value.ToEnumOrDefault(OrganizationOwnership.Shared),
+            Features = membership.Features.ToList(),
+            Roles = membership.Roles.ToList()
         };
     }
 

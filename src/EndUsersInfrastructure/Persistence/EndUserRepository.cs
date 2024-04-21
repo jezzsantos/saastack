@@ -78,6 +78,7 @@ public class EndUserRepository : IEndUserRepository
             .Select(mje => mje.Roles)
             .Select(mje => mje.Features)
             .Select(mje => mje.OrganizationId)
+            .Select(mje => mje.Ownership)
             .Select(mje => mje.IsDefault)
             .Select(mje => mje.LastPersistedAtUtc)
             .SelectFromJoin<Invitation, string>(mje => mje.InvitedEmailAddress, inv => inv.InvitedEmailAddress)

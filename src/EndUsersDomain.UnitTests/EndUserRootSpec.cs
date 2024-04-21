@@ -26,8 +26,8 @@ public class EndUserRootSpec
     {
         var owner = EndUserRoot.Create(recorder.Object, "anownerid".ToIdentifierFactory(), classification)
             .Value;
-        owner.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-            Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+        owner.Register(Roles.Create(PlatformRoles.Standard).Value,
+            Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
             EmailAddress.Create("orgowner@company.com").Value);
         owner.AddMembership(owner, OrganizationOwnership.Shared, organizationId.ToId(),
             Roles.Create(TenantRoles.Owner).Value, Features.Empty);
@@ -40,8 +40,8 @@ public class EndUserRootSpec
         var owner = EndUserRoot
             .Create(recorder.Object, "amemberid".ToIdentifierFactory(), UserClassification.Person)
             .Value;
-        owner.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-            Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+        owner.Register(Roles.Create(PlatformRoles.Standard).Value,
+            Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
             EmailAddress.Create("orgowner@company.com").Value);
         owner.AddMembership(owner, OrganizationOwnership.Shared, organizationId.ToId(),
             Roles.Create(TenantRoles.Member).Value, Features.Empty);
@@ -53,8 +53,8 @@ public class EndUserRootSpec
     {
         var @operator = EndUserRoot.Create(recorder.Object, identifierFactory.Object, UserClassification.Person)
             .Value;
-        @operator.Register(Roles.Create(PlatformRoles.Standard.Name, PlatformRoles.Operations.Name).Value,
-            Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+        @operator.Register(Roles.Create(PlatformRoles.Standard, PlatformRoles.Operations).Value,
+            Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
             EmailAddress.Create("operator@company.com").Value);
 
         return @operator;
@@ -108,14 +108,14 @@ public class EndUserRootSpec
             var userProfile = EndUserProfile.Create("afirstname").Value;
             await _user.InviteGuestAsync(_tokensService.Object, "aninviterid".ToId(), emailAddress,
                 (_, _) => Task.FromResult(Result.Ok));
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, userProfile, emailAddress);
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, userProfile, emailAddress);
 
             _user.Access.Should().Be(UserAccess.Enabled);
             _user.Status.Should().Be(UserStatus.Registered);
             _user.Classification.Should().Be(UserClassification.Person);
-            _user.Roles.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Standard.Name).Value);
-            _user.Features.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Basic.Name).Value);
+            _user.Roles.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Standard).Value);
+            _user.Features.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Basic).Value);
             _user.GuestInvitation.IsAccepted.Should().BeTrue();
             _user.GuestInvitation.AcceptedEmailAddress.Should().Be(emailAddress);
             _user.Events[2].Should().BeOfType<GuestInvitationAccepted>();
@@ -125,22 +125,22 @@ public class EndUserRootSpec
         [Fact]
         public void WhenRegister_ThenRegistered()
         {
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
 
             _user.Access.Should().Be(UserAccess.Enabled);
             _user.Status.Should().Be(UserStatus.Registered);
             _user.Classification.Should().Be(UserClassification.Person);
-            _user.Roles.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Standard.Name).Value);
-            _user.Features.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Basic.Name).Value);
+            _user.Roles.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Standard).Value);
+            _user.Features.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Basic).Value);
             _user.Events.Last().Should().BeOfType<Registered>();
         }
 
         [Fact]
         public void WhenEnsureInvariantsAndRegisteredPersonDoesNotHaveADefaultRole_ThenReturnsError()
         {
-            _user.Register(Roles.Empty, Features.Create(PlatformFeatures.Basic.Name).Value,
+            _user.Register(Roles.Empty, Features.Create(PlatformFeatures.Basic).Value,
                 EndUserProfile.Create("afirstname").Value, EmailAddress.Create("auser@company.com").Value);
 
             var result = _user.EnsureInvariants();
@@ -151,7 +151,7 @@ public class EndUserRootSpec
         [Fact]
         public void WhenEnsureInvariantsAndRegisteredPersonDoesNotHaveADefaultFeature_ThenReturnsError()
         {
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
                 Features.Empty, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
 
@@ -164,8 +164,8 @@ public class EndUserRootSpec
         public void WhenEnsureInvariantsAndRegisteredPersonStillInvited_ThenReturnsError()
         {
             var emailAddress = EmailAddress.Create("auser@company.com").Value;
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 emailAddress);
 #if TESTINGONLY
             _user.TestingOnly_InviteGuest(emailAddress);
@@ -180,8 +180,8 @@ public class EndUserRootSpec
         public void WhenAddMembershipByNonOwner_ThenReturnsError()
         {
             var inviter = CreateOrgMember(_recorder, "anorganizationid");
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
 
             var result = _user.AddMembership(inviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
@@ -195,8 +195,8 @@ public class EndUserRootSpec
         public void WhenAddMembershipAndAlreadyMember_ThenReturns()
         {
             var inviter = CreateOrgOwner(_recorder, "anorganizationid");
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             _user.AddMembership(inviter, OrganizationOwnership.Shared, "anorganizationid".ToId(), Roles.Empty,
                 Features.Empty);
@@ -209,10 +209,26 @@ public class EndUserRootSpec
         }
 
         [Fact]
+        public void WhenAddMembershipAndAlreadyPersonalOrg_ThenReturnsError()
+        {
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
+                EmailAddress.Create("auser@company.com").Value);
+            _user.AddMembership(_user, OrganizationOwnership.Personal, "anorganizationid1".ToId(), Roles.Empty,
+                Features.Empty);
+
+            var result = _user.AddMembership(_user, OrganizationOwnership.Personal, "anorganizationid2".ToId(),
+                Roles.Create(TenantRoles.Owner).Value, Features.Empty);
+
+            result.Should().BeError(ErrorCode.RuleViolation,
+                Resources.EndUserRoot_AddMembership_OnlyOnePersonalOrganization);
+        }
+
+        [Fact]
         public void WhenAddMembershipToPersonsSharedOrganization_ThenAddsMembership()
         {
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var inviter = CreateOrgOwner(_recorder, "anorganizationid");
 
@@ -227,14 +243,14 @@ public class EndUserRootSpec
                 && ms.IsDefault
                 && ms.Roles == roles
                 && ms.Features == features);
-            _user.Events.Last().Should().BeOfType<MembershipDefaultChanged>();
+            _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
         }
 
         [Fact]
         public void WhenAddMembershipToPersonsPersonalOrganization_ThenReturnsError()
         {
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var inviter = CreateOrgOwner(_recorder, "anorganizationid");
 
@@ -242,14 +258,14 @@ public class EndUserRootSpec
                 Roles.Create(TenantRoles.Member).Value, Features.Create(TenantFeatures.Basic).Value);
 
             result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_Addmembership_SharedOwnershipRequired);
+                Resources.EndUserRoot_AddMembership_SharedOwnershipRequired);
         }
 
         [Fact]
         public void WhenAddMembershipToMachinesPersonalOrganization_ThenReturnsError()
         {
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var inviter = CreateOrgOwner(_recorder, "anorganizationid", UserClassification.Machine);
             var roles = Roles.Create(TenantRoles.Member).Value;
@@ -259,14 +275,14 @@ public class EndUserRootSpec
                 roles, features);
 
             result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_Addmembership_SharedOwnershipRequired);
+                Resources.EndUserRoot_AddMembership_SharedOwnershipRequired);
         }
 
         [Fact]
         public void WhenAddMembershipToMachinesSharedOrganization_ThenAddsMembership()
         {
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var inviter = CreateOrgOwner(_recorder, "anorganizationid", UserClassification.Machine);
             var roles = Roles.Create(TenantRoles.Member).Value;
@@ -281,14 +297,14 @@ public class EndUserRootSpec
                 && ms.IsDefault
                 && ms.Roles == roles
                 && ms.Features == features);
-            _user.Events.Last().Should().BeOfType<MembershipDefaultChanged>();
+            _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
         }
 
         [Fact]
         public void WhenAddMembershipToSelfPersonalOrganization_ThenAddsMembership()
         {
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var roles = Roles.Create(TenantRoles.Member).Value;
             var features = Features.Create(TenantFeatures.Basic).Value;
@@ -302,14 +318,14 @@ public class EndUserRootSpec
                 && ms.IsDefault
                 && ms.Roles == roles
                 && ms.Features == features);
-            _user.Events.Last().Should().BeOfType<MembershipDefaultChanged>();
+            _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
         }
 
         [Fact]
         public void WhenAddMembershipToSelfSharedOrganization_ThenAddsMembership()
         {
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var roles = Roles.Create(TenantRoles.Member).Value;
             var features = Features.Create(TenantFeatures.Basic).Value;
@@ -323,15 +339,15 @@ public class EndUserRootSpec
                 && ms.IsDefault
                 && ms.Roles == roles
                 && ms.Features == features);
-            _user.Events.Last().Should().BeOfType<MembershipDefaultChanged>();
+            _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
         }
 
         [Fact]
         public void WhenAddMembership_ThenAddsMembershipAsDefaultWithRolesAndFeatures()
         {
             var inviter = CreateOrgOwner(_recorder, "anorganizationid");
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var roles = Roles.Create(TenantRoles.Member).Value;
             var features = Features.Create(TenantFeatures.Basic).Value;
@@ -345,15 +361,15 @@ public class EndUserRootSpec
                 && ms.IsDefault
                 && ms.Roles == roles
                 && ms.Features == features);
-            _user.Events.Last().Should().BeOfType<MembershipDefaultChanged>();
+            _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
         }
 
         [Fact]
         public void WhenAddMembershipAndAlreadyHasMembership_ThenChangesToDefaultMembership()
         {
             var inviter = CreateOrgOwner(_recorder, "anorganizationid2");
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var roles = Roles.Create(TenantRoles.Member).Value;
             var features = Features.Create(TenantFeatures.Basic).Value;
@@ -373,7 +389,7 @@ public class EndUserRootSpec
                 && ms.IsDefault
                 && ms.Roles == roles
                 && ms.Features == features);
-            _user.Events.Last().Should().BeOfType<MembershipDefaultChanged>();
+            _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
         }
 
 #if TESTINGONLY
@@ -408,8 +424,8 @@ public class EndUserRootSpec
         public void WhenAssignMembershipFeaturesAndFeatureNotAssignable_ThenReturnsError()
         {
             var assigner = CreateOrgOwner(_recorder, "anorganizationid");
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             _user.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
                 Roles.Create(TenantRoles.Member).Value,
@@ -424,11 +440,35 @@ public class EndUserRootSpec
 
 #if TESTINGONLY
         [Fact]
+        public void WhenAssignMembershipFeaturesAndHasFeature_ThenDoesNothing()
+        {
+            var assigner = CreateOrgOwner(_recorder, "anorganizationid");
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
+                EmailAddress.Create("auser@company.com").Value);
+            _user.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Member).Value,
+                Features.Create(TenantFeatures.Basic, TenantFeatures.TestingOnly).Value);
+
+            var result = _user.AssignMembershipFeatures(assigner, "anorganizationid".ToId(),
+                Features.Create(TenantFeatures.TestingOnly).Value);
+
+            result.Should().BeSuccess();
+            _user.Memberships[0].Roles.Should()
+                .Be(Roles.Create(TenantRoles.Member).Value);
+            _user.Memberships[0].Features.Should()
+                .Be(Features.Create(TenantFeatures.Basic, TenantFeatures.TestingOnly).Value);
+            _user.Events.Should().NotContainItemsAssignableTo<MembershipFeatureAssigned>();
+        }
+#endif
+
+#if TESTINGONLY
+        [Fact]
         public void WhenAssignMembershipFeatures_ThenAssigns()
         {
             var assigner = CreateOrgOwner(_recorder, "anorganizationid");
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             _user.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
                 Roles.Create(TenantRoles.Member).Value,
@@ -438,9 +478,9 @@ public class EndUserRootSpec
                 Features.Create(TenantFeatures.TestingOnly).Value);
 
             result.Should().BeSuccess();
-            _user.Memberships[0].Roles.Should().Be(Roles.Create(TenantRoles.Member.Name).Value);
+            _user.Memberships[0].Roles.Should().Be(Roles.Create(TenantRoles.Member).Value);
             _user.Memberships[0].Features.Should()
-                .Be(Features.Create(TenantFeatures.Basic.Name, TenantFeatures.TestingOnly.Name).Value);
+                .Be(Features.Create(TenantFeatures.Basic, TenantFeatures.TestingOnly).Value);
             _user.Events.Last().Should().BeOfType<MembershipFeatureAssigned>();
         }
 #endif
@@ -463,8 +503,8 @@ public class EndUserRootSpec
         public void WhenAssignMembershipRolesAndRoleNotAssignable_ThenReturnsError()
         {
             var assigner = CreateOrgOwner(_recorder, "anorganizationid");
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             _user.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
                 Roles.Create(TenantRoles.Member).Value,
@@ -474,16 +514,40 @@ public class EndUserRootSpec
                 Roles.Create("anunknownrole").Value);
 
             result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_UnassignableTenantRole.Format("anunknownrole"));
+                Resources.EndUserRoot_NotAssignableTenantRole.Format("anunknownrole"));
         }
+
+#if TESTINGONLY
+        [Fact]
+        public void WhenAssignMembershipRolesAndAlreadyHasRole_ThenDoesNothing()
+        {
+            var assigner = CreateOrgOwner(_recorder, "anorganizationid");
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
+                EmailAddress.Create("auser@company.com").Value);
+            _user.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Member, TenantRoles.TestingOnly).Value,
+                Features.Create(TenantFeatures.Basic).Value);
+
+            var result = _user.AssignMembershipRoles(assigner, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.TestingOnly).Value);
+
+            result.Should().BeSuccess();
+            _user.Memberships[0].Roles.Should()
+                .Be(Roles.Create(TenantRoles.Member, TenantRoles.TestingOnly).Value);
+            _user.Memberships[0].Features.Should()
+                .Be(Features.Create(TenantFeatures.Basic).Value);
+            _user.Events.Should().NotContainItemsAssignableTo<MembershipRoleAssigned>();
+        }
+#endif
 
 #if TESTINGONLY
         [Fact]
         public void WhenAssignMembershipRoles_ThenAssigns()
         {
             var assigner = CreateOrgOwner(_recorder, "anorganizationid");
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             _user.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
                 Roles.Create(TenantRoles.Member).Value,
@@ -494,10 +558,90 @@ public class EndUserRootSpec
 
             result.Should().BeSuccess();
             _user.Memberships[0].Roles.Should()
-                .Be(Roles.Create(TenantRoles.Member.Name, TenantRoles.TestingOnly.Name).Value);
+                .Be(Roles.Create(TenantRoles.Member, TenantRoles.TestingOnly).Value);
             _user.Memberships[0].Features.Should()
-                .Be(Features.Create(TenantFeatures.Basic.Name).Value);
+                .Be(Features.Create(TenantFeatures.Basic).Value);
             _user.Events.Last().Should().BeOfType<MembershipRoleAssigned>();
+        }
+#endif
+
+#if TESTINGONLY
+        [Fact]
+        public void WhenUnassignMembershipRolesAndAssignerNotOwner_ThenReturnsError()
+        {
+            var assigner = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
+                .Value;
+
+            var result = _user.UnassignMembershipRoles(assigner, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.TestingOnly).Value);
+
+            result.Should().BeError(ErrorCode.RoleViolation, Resources.EndUserRoot_NotOrganizationOwner);
+        }
+#endif
+
+        [Fact]
+        public void WhenUnassignMembershipRolesAndRoleNotAssignable_ThenReturnsError()
+        {
+            var assigner = CreateOrgOwner(_recorder, "anorganizationid");
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
+                EmailAddress.Create("auser@company.com").Value);
+            _user.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Member).Value,
+                Features.Create(TenantFeatures.Basic).Value);
+
+            var result = _user.UnassignMembershipRoles(assigner, "anorganizationid".ToId(),
+                Roles.Create("anunknownrole").Value);
+
+            result.Should().BeError(ErrorCode.RuleViolation,
+                Resources.EndUserRoot_NotAssignableTenantRole.Format("anunknownrole"));
+        }
+
+#if TESTINGONLY
+        [Fact]
+        public void WhenUnassignMembershipRolesAndNotHaveRole_ThenDoesNothing()
+        {
+            var assigner = CreateOrgOwner(_recorder, "anorganizationid");
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
+                EmailAddress.Create("auser@company.com").Value);
+            _user.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Member).Value,
+                Features.Create(TenantFeatures.Basic).Value);
+
+            var result = _user.UnassignMembershipRoles(assigner, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.TestingOnly).Value);
+
+            result.Should().BeSuccess();
+            _user.Memberships[0].Roles.Should()
+                .Be(Roles.Create(TenantRoles.Member).Value);
+            _user.Memberships[0].Features.Should()
+                .Be(Features.Create(TenantFeatures.Basic).Value);
+            _user.Events.Should().NotContainItemsAssignableTo<MembershipRoleUnassigned>();
+        }
+#endif
+
+#if TESTINGONLY
+        [Fact]
+        public void WhenUnassignMembershipRoles_ThenUnassigns()
+        {
+            var assigner = CreateOrgOwner(_recorder, "anorganizationid");
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
+                EmailAddress.Create("auser@company.com").Value);
+            _user.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Member, TenantRoles.TestingOnly).Value,
+                Features.Create(TenantFeatures.Basic).Value);
+
+            var result = _user.UnassignMembershipRoles(assigner, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.TestingOnly).Value);
+
+            result.Should().BeSuccess();
+            _user.Memberships[0].Roles.Should()
+                .Be(Roles.Create(TenantRoles.Member).Value);
+            _user.Memberships[0].Features.Should()
+                .Be(Features.Create(TenantFeatures.Basic).Value);
+            _user.Events.Last().Should().BeOfType<MembershipRoleUnassigned>();
         }
 #endif
 
@@ -522,8 +666,23 @@ public class EndUserRootSpec
             var result = _user.AssignPlatformFeatures(assigner, Features.Create("anunknownfeature").Value);
 
             result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_UnassignablePlatformFeature.Format("anunknownfeature"));
+                Resources.EndUserRoot_NotAssignablePlatformFeature.Format("anunknownfeature"));
         }
+
+#if TESTINGONLY
+        [Fact]
+        public void WhenAssignPlatformFeaturesAndHasFeature_ThenDoesNothing()
+        {
+            var assigner = CreateOperator(_recorder, _identifierFactory);
+            _user.AssignPlatformFeatures(assigner, Features.Create(PlatformFeatures.TestingOnly).Value);
+
+            var result = _user.AssignPlatformFeatures(assigner, Features.Create(PlatformFeatures.TestingOnly).Value);
+
+            result.Should().BeSuccess();
+            _user.Roles.HasNone().Should().BeTrue();
+            _user.Features.Should().Be(Features.Create(PlatformFeatures.TestingOnly).Value);
+        }
+#endif
 
 #if TESTINGONLY
         [Fact]
@@ -535,7 +694,7 @@ public class EndUserRootSpec
 
             result.Should().BeSuccess();
             _user.Roles.HasNone().Should().BeTrue();
-            _user.Features.Should().Be(Features.Create(PlatformFeatures.TestingOnly.Name).Value);
+            _user.Features.Should().Be(Features.Create(PlatformFeatures.TestingOnly).Value);
             _user.Events.Last().Should().BeOfType<PlatformFeatureAssigned>();
         }
 #endif
@@ -561,9 +720,24 @@ public class EndUserRootSpec
             var result = _user.AssignPlatformRoles(assigner, Roles.Create("anunknownrole").Value);
 
             result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_UnassignablePlatformRole.Format("anunknownrole"));
+                Resources.EndUserRoot_NotAssignablePlatformRole.Format("anunknownrole"));
         }
 
+#if TESTINGONLY
+        [Fact]
+        public void WhenAssignPlatformRolesAndHasRole_ThenDoesNothing()
+        {
+            var assigner = CreateOperator(_recorder, _identifierFactory);
+            _user.AssignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value);
+
+            var result = _user.AssignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value);
+
+            result.Should().BeSuccess();
+            _user.Roles.Should().Be(Roles.Create(PlatformRoles.TestingOnly).Value);
+            _user.Features.HasNone().Should().BeTrue();
+        }
+#endif
+        
 #if TESTINGONLY
         [Fact]
         public void WhenAssignPlatformRoles_ThenAssigns()
@@ -573,7 +747,7 @@ public class EndUserRootSpec
             var result = _user.AssignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value);
 
             result.Should().BeSuccess();
-            _user.Roles.Should().Be(Roles.Create(PlatformRoles.TestingOnly.Name).Value);
+            _user.Roles.Should().Be(Roles.Create(PlatformRoles.TestingOnly).Value);
             _user.Features.HasNone().Should().BeTrue();
             _user.Events.Last().Should().BeOfType<PlatformRoleAssigned>();
         }
@@ -600,19 +774,19 @@ public class EndUserRootSpec
             var result = _user.UnassignPlatformRoles(assigner, Roles.Create("anunknownrole").Value);
 
             result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_UnassignablePlatformRole.Format("anunknownrole"));
+                Resources.EndUserRoot_NotAssignablePlatformRole.Format("anunknownrole"));
         }
 
 #if TESTINGONLY
         [Fact]
-        public void WhenUnassignPlatformRolesAndUserNotAssignedRole_ThenReturnsError()
+        public void WhenUnassignPlatformRolesAndUserNotAssignedRole_ThenDoesNothing()
         {
             var assigner = CreateOperator(_recorder, _identifierFactory);
 
             var result = _user.UnassignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value);
 
-            result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_CannotUnassignUnassignedRole.Format(PlatformRoles.TestingOnly.Name));
+            result.Should().BeSuccess();
+            _user.Events.Should().NotContainItemsAssignableTo<PlatformRoleUnassigned>();
         }
 #endif
 
@@ -625,7 +799,7 @@ public class EndUserRootSpec
             var result = _user.UnassignPlatformRoles(assigner, Roles.Create(PlatformRoles.Standard).Value);
 
             result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_CannotUnassignBaselinePlatformRole.Format(PlatformRoles.Standard.Name));
+                Resources.EndUserRoot_CannotUnassignBaselinePlatformRole.Format(PlatformRoles.Standard));
         }
 #endif
 
@@ -871,6 +1045,112 @@ public class EndUserRootSpec
             _user.GuestInvitation.IsAccepted.Should().BeTrue();
             _user.GuestInvitation.AcceptedEmailAddress.Should().Be(emailAddress);
         }
+
+        [Fact]
+        public void WhenChangeDefaultMembershipAndNotAMember_ThenReturnsError()
+        {
+            var result = _user.ChangeDefaultMembership("anorganizationid".ToId());
+
+            result.Should().BeError(ErrorCode.RuleViolation,
+                Resources.EndUserRoot_NoMembership.Format("anorganizationid"));
+        }
+
+        [Fact]
+        public void WhenChangeDefaultMembershipAndAlreadyDefault_ThenReturns()
+        {
+            _user.AddMembership(_user, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Member).Value, Features.Create(TenantFeatures.Basic).Value);
+
+            var result = _user.ChangeDefaultMembership("anorganizationid".ToId());
+
+            result.Should().BeSuccess();
+            _user.Memberships.DefaultMembership.OrganizationId.Value.Should().Be("anorganizationid".ToId());
+        }
+
+        [Fact]
+        public void WhenChangeDefaultMembership_ThenChangesDefault()
+        {
+            _user.AddMembership(_user, OrganizationOwnership.Shared, "anorganizationid1".ToId(),
+                Roles.Create(TenantRoles.Member).Value, Features.Create(TenantFeatures.Basic).Value);
+            _user.AddMembership(_user, OrganizationOwnership.Shared, "anorganizationid2".ToId(),
+                Roles.Create(TenantRoles.Member).Value, Features.Create(TenantFeatures.Basic).Value);
+
+            var result = _user.ChangeDefaultMembership("anorganizationid1".ToId());
+
+            result.Should().BeSuccess();
+            _user.Memberships.DefaultMembership.OrganizationId.Value.Should().Be("anorganizationid1".ToId());
+            _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
+        }
+
+        [Fact]
+        public void WhenRemoveMembershipAndNotOwner_ThenReturnsError()
+        {
+            var result = _user.RemoveMembership(_user, "anorganizationid".ToId());
+
+            result.Should().BeError(ErrorCode.RoleViolation, Resources.EndUserRoot_NotOrganizationOwner);
+        }
+
+        [Fact]
+        public void WhenRemoveMembershipAndNotMember_ThenDoesNothing()
+        {
+            var uninviter = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
+                .Value;
+            uninviter.AddMembership(uninviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Owner).Value, Features.Create(TenantFeatures.Basic).Value);
+
+            var result = _user.RemoveMembership(uninviter, "anorganizationid".ToId());
+
+            result.Should().BeSuccess();
+            _user.Memberships.HasNone().Should().BeTrue();
+            _user.Events.Last().Should().BeOfType<Created>();
+        }
+
+        [Fact]
+        public void WhenRemoveMembershipAndIsNotDefaultMembership_ThenRemoves()
+        {
+            var uninviter = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
+                .Value;
+            uninviter.AddMembership(uninviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Owner).Value, Features.Create(TenantFeatures.Basic).Value);
+            _user.AddMembership(uninviter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Member).Value, Features.Create(TenantFeatures.Basic).Value);
+
+            var result = _user.RemoveMembership(uninviter, "anorganizationid".ToId());
+
+            result.Should().BeSuccess();
+            _user.Memberships.HasNone().Should().BeTrue();
+            _user.Events.Count.Should().Be(4);
+            _user.Events[0].Should().BeOfType<Created>();
+            _user.Events[1].Should().BeOfType<MembershipAdded>();
+            _user.Events[2].Should().BeOfType<DefaultMembershipChanged>();
+            _user.Events.Last().Should().BeOfType<MembershipRemoved>();
+        }
+
+        [Fact]
+        public void WhenRemoveMembershipAndIsDefaultMembership_ThenRemovesAndResetsDefault()
+        {
+            var uninviter = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
+                .Value;
+            uninviter.AddMembership(uninviter, OrganizationOwnership.Shared, "anorganizationid2".ToId(),
+                Roles.Create(TenantRoles.Owner).Value, Features.Create(TenantFeatures.Basic).Value);
+            _user.AddMembership(_user, OrganizationOwnership.Personal, "anorganizationid1".ToId(),
+                Roles.Create(TenantRoles.Owner).Value, Features.Create(TenantFeatures.Basic).Value);
+            _user.AddMembership(uninviter, OrganizationOwnership.Shared, "anorganizationid2".ToId(),
+                Roles.Create(TenantRoles.Member).Value, Features.Create(TenantFeatures.Basic).Value);
+
+            var result = _user.RemoveMembership(uninviter, "anorganizationid2".ToId());
+
+            result.Should().BeSuccess();
+            _user.Memberships.Count.Should().Be(1);
+            _user.Events.Count.Should().Be(7);
+            _user.Events[0].Should().BeOfType<Created>();
+            _user.Events[1].Should().BeOfType<MembershipAdded>();
+            _user.Events[2].Should().BeOfType<DefaultMembershipChanged>();
+            _user.Events[3].Should().BeOfType<MembershipAdded>();
+            _user.Events[4].Should().BeOfType<DefaultMembershipChanged>();
+            _user.Events[5].Should().BeOfType<DefaultMembershipChanged>();
+            _user.Events.Last().Should().BeOfType<MembershipRemoved>();
+        }
     }
 
     [Trait("Category", "Unit")]
@@ -923,8 +1203,8 @@ public class EndUserRootSpec
         [Fact]
         public void WhenAddMembershipToPersonsSharedOrganization_ThenAddsMembership()
         {
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var inviter = CreateOrgOwner(_recorder, "anorganizationid");
 
@@ -939,14 +1219,14 @@ public class EndUserRootSpec
                 && ms.IsDefault
                 && ms.Roles == roles
                 && ms.Features == features);
-            _user.Events.Last().Should().BeOfType<MembershipDefaultChanged>();
+            _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
         }
 
         [Fact]
         public void WhenAddMembershipToPersonsPersonalOrganization_ThenReturnsError()
         {
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var inviter = CreateOrgOwner(_recorder, "anorganizationid");
 
@@ -954,14 +1234,14 @@ public class EndUserRootSpec
                 Roles.Create(TenantRoles.Member).Value, Features.Create(TenantFeatures.Basic).Value);
 
             result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_Addmembership_SharedOwnershipRequired);
+                Resources.EndUserRoot_AddMembership_SharedOwnershipRequired);
         }
 
         [Fact]
         public void WhenAddMembershipToMachinesPersonalOrganization_ThenReturnsError()
         {
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var inviter = CreateOrgOwner(_recorder, "anorganizationid", UserClassification.Machine);
             var roles = Roles.Create(TenantRoles.Member).Value;
@@ -971,14 +1251,14 @@ public class EndUserRootSpec
                 roles, features);
 
             result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_Addmembership_SharedOwnershipRequired);
+                Resources.EndUserRoot_AddMembership_SharedOwnershipRequired);
         }
 
         [Fact]
         public void WhenAddMembershipToMachinesSharedOrganization_ThenAddsMembership()
         {
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var inviter = CreateOrgOwner(_recorder, "anorganizationid", UserClassification.Machine);
             var roles = Roles.Create(TenantRoles.Member).Value;
@@ -993,14 +1273,14 @@ public class EndUserRootSpec
                 && ms.IsDefault
                 && ms.Roles == roles
                 && ms.Features == features);
-            _user.Events.Last().Should().BeOfType<MembershipDefaultChanged>();
+            _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
         }
 
         [Fact]
         public void WhenAddMembershipToSelfPersonalOrganization_ThenAddsMembership()
         {
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var roles = Roles.Create(TenantRoles.Member).Value;
             var features = Features.Create(TenantFeatures.Basic).Value;
@@ -1014,14 +1294,14 @@ public class EndUserRootSpec
                 && ms.IsDefault
                 && ms.Roles == roles
                 && ms.Features == features);
-            _user.Events.Last().Should().BeOfType<MembershipDefaultChanged>();
+            _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
         }
 
         [Fact]
         public void WhenAddMembershipToSelfSharedOrganization_ThenAddsMembership()
         {
-            _user.Register(Roles.Create(PlatformRoles.Standard.Name).Value,
-                Features.Create(PlatformFeatures.Basic.Name).Value, EndUserProfile.Create("afirstname").Value,
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
                 EmailAddress.Create("auser@company.com").Value);
             var roles = Roles.Create(TenantRoles.Member).Value;
             var features = Features.Create(TenantFeatures.Basic).Value;
@@ -1035,7 +1315,7 @@ public class EndUserRootSpec
                 && ms.IsDefault
                 && ms.Roles == roles
                 && ms.Features == features);
-            _user.Events.Last().Should().BeOfType<MembershipDefaultChanged>();
+            _user.Events.Last().Should().BeOfType<DefaultMembershipChanged>();
         }
     }
 }

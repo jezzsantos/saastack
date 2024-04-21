@@ -207,14 +207,14 @@ public class UserProfileApplicationDomainEventHandlersSpec
     [Fact]
     public async Task WhenHandleEndUserDefaultOrganizationChangedAsync_ThenSetsDefaultOrganization()
     {
-        var domainEvent = Events.MembershipDefaultChanged("auserid".ToId(), "amembershipid".ToId(),
+        var domainEvent = Events.DefaultMembershipChanged("auserid".ToId(), "amembershipid".ToId(),
             "amembershipid".ToId(), "anorganizationid".ToId(), Roles.Empty, Features.Empty);
         var user = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
             PersonName.Create("afirstname", "alastname").Value).Value;
         _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user.ToOptional());
 
-        var result = await _application.HandleEndUserDefaultOrganizationChangedAsync(_caller.Object,
+        var result = await _application.HandleEndUserDefaultMembershipChangedAsync(_caller.Object,
             domainEvent, CancellationToken.None);
 
         result.Should().BeSuccess();

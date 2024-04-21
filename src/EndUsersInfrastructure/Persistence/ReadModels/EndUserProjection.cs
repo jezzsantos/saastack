@@ -39,17 +39,17 @@ public class EndUserProjection : IReadModelProjection
         switch (changeEvent)
         {
             case Created e:
-                return await Tasks.WhenAllAsync(_users.HandleCreateAsync(e.RootId.ToId(), dto =>
+                return await Tasks.WhenAllAsync(_users.HandleCreateAsync(e.RootId, dto =>
                     {
                         dto.Classification = e.Classification;
                         dto.Access = e.Access;
                         dto.Status = e.Status;
                     }, cancellationToken),
-                    _invitations.HandleCreateAsync(e.RootId.ToId(), dto => { dto.Status = e.Status; },
+                    _invitations.HandleCreateAsync(e.RootId, dto => { dto.Status = e.Status; },
                         cancellationToken));
 
             case Registered e:
-                return await Tasks.WhenAllAsync(_users.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await Tasks.WhenAllAsync(_users.HandleUpdateAsync(e.RootId, dto =>
                     {
                         dto.Classification = e.Classification;
                         dto.Access = e.Access;
@@ -58,20 +58,26 @@ public class EndUserProjection : IReadModelProjection
                         dto.Roles = Roles.Create(e.Roles.ToArray()).Value;
                         dto.Features = Features.Create(e.Features.ToArray()).Value;
                     }, cancellationToken),
-                    _invitations.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.Status = e.Status; },
+                    _invitations.HandleUpdateAsync(e.RootId, dto => { dto.Status = e.Status; },
                         cancellationToken));
 
             case MembershipAdded e:
-                return await _memberships.HandleCreateAsync(e.MembershipId.ToId(), dto =>
-                {
-                    dto.IsDefault = e.IsDefault;
-                    dto.UserId = e.RootId;
-                    dto.OrganizationId = e.OrganizationId;
-                    dto.Roles = Roles.Create(e.Roles.ToArray()).Value;
-                    dto.Features = Features.Create(e.Features.ToArray()).Value;
-                }, cancellationToken);
+                return e.MembershipId.HasValue()
+                    ? await _memberships.HandleCreateAsync(e.MembershipId, dto =>
+                    {
+                        dto.IsDefault = e.IsDefault;
+                        dto.UserId = e.RootId;
+                        dto.OrganizationId = e.OrganizationId;
+                        dto.Ownership = e.Ownership;
+                        dto.Roles = Roles.Create(e.Roles.ToArray()).Value;
+                        dto.Features = Features.Create(e.Features.ToArray()).Value;
+                    }, cancellationToken)
+                    : true;
 
-            case MembershipDefaultChanged e:
+            case MembershipRemoved e:
+                return await _memberships.HandleDeleteAsync(e.MembershipId, cancellationToken);
+
+            case DefaultMembershipChanged e:
             {
                 if (e.FromMembershipId.Exists())
                 {
@@ -94,7 +100,7 @@ public class EndUserProjection : IReadModelProjection
             }
 
             case MembershipRoleAssigned e:
-                return await _memberships.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _memberships.HandleUpdateAsync(e.RootId, dto =>
                 {
                     var roles = dto.Roles.HasValue
                         ? dto.Roles.Value.Add(e.Role)
@@ -107,8 +113,22 @@ public class EndUserProjection : IReadModelProjection
                     dto.Roles = roles.Value;
                 }, cancellationToken);
 
+            case MembershipRoleUnassigned e:
+                return await _memberships.HandleUpdateAsync(e.RootId, dto =>
+                {
+                    var roles = dto.Roles.HasValue
+                        ? dto.Roles.Value.Remove(e.Role)
+                        : new Result<Roles, Error>(Roles.Empty);
+                    if (!roles.IsSuccessful)
+                    {
+                        return;
+                    }
+
+                    dto.Roles = roles.Value;
+                }, cancellationToken);
+
             case MembershipFeatureAssigned e:
-                return await _memberships.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _memberships.HandleUpdateAsync(e.RootId, dto =>
                 {
                     var features = dto.Features.HasValue
                         ? dto.Features.Value.Add(e.Feature)
@@ -122,7 +142,7 @@ public class EndUserProjection : IReadModelProjection
                 }, cancellationToken);
 
             case PlatformRoleAssigned e:
-                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _users.HandleUpdateAsync(e.RootId, dto =>
                 {
                     var roles = dto.Roles.HasValue
                         ? dto.Roles.Value.Add(e.Role)
@@ -136,11 +156,11 @@ public class EndUserProjection : IReadModelProjection
                 }, cancellationToken);
 
             case PlatformRoleUnassigned e:
-                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _users.HandleUpdateAsync(e.RootId, dto =>
                 {
                     var roles = dto.Roles.HasValue
                         ? dto.Roles.Value.Remove(e.Role)
-                        : Roles.Create(e.Role);
+                        : new Result<Roles, Error>(Roles.Empty);
                     if (!roles.IsSuccessful)
                     {
                         return;
@@ -150,7 +170,7 @@ public class EndUserProjection : IReadModelProjection
                 }, cancellationToken);
 
             case PlatformFeatureAssigned e:
-                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _users.HandleUpdateAsync(e.RootId, dto =>
                 {
                     var features = dto.Features.HasValue
                         ? dto.Features.Value.Add(e.Feature)
@@ -164,7 +184,7 @@ public class EndUserProjection : IReadModelProjection
                 }, cancellationToken);
 
             case GuestInvitationCreated e:
-                return await _invitations.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _invitations.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.InvitedEmailAddress = e.EmailAddress;
                     dto.Token = e.Token;
@@ -172,7 +192,7 @@ public class EndUserProjection : IReadModelProjection
                 }, cancellationToken);
 
             case GuestInvitationAccepted e:
-                return await _invitations.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _invitations.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.Token = Optional<string>.None;
                     dto.Status = UserStatus.Registered;

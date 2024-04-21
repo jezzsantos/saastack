@@ -1,4 +1,5 @@
 using Common;
+using Domain.Common.Events;
 using Domain.Events.Shared.Organizations;
 using Domain.Interfaces.Entities;
 using EndUsersApplication;
@@ -25,14 +26,29 @@ public class EndUserNotificationConsumer : IDomainEventNotificationConsumer
     {
         switch (domainEvent)
         {
+            case Global.StreamDeleted deleted:
+                return await _endUsersApplication.HandleOrganizationDeletedAsync(_callerContextFactory.Create(),
+                    deleted, cancellationToken);
+
             case Created created:
                 return await _endUsersApplication.HandleOrganizationCreatedAsync(_callerContextFactory.Create(),
                     created, cancellationToken);
 
-            case MembershipAdded added:
-                return await _invitationsApplication.HandleOrganizationMembershipAddedAsync(
-                    _callerContextFactory.Create(),
-                    added, cancellationToken);
+            case MemberInvited added:
+                return await _invitationsApplication.HandleOrganizationMemberInvitedAsync(
+                    _callerContextFactory.Create(), added, cancellationToken);
+
+            case MemberUnInvited removed:
+                return await _invitationsApplication.HandleOrganizationMemberUnInvitedAsync(
+                    _callerContextFactory.Create(), removed, cancellationToken);
+
+            case RoleAssigned assigned:
+                return await _endUsersApplication.HandleOrganizationRoleAssignedAsync(
+                    _callerContextFactory.Create(), assigned, cancellationToken);
+
+            case RoleUnassigned unassigned:
+                return await _endUsersApplication.HandleOrganizationRoleUnassignedAsync(
+                    _callerContextFactory.Create(), unassigned, cancellationToken);
 
             default:
                 return Result.Ok;

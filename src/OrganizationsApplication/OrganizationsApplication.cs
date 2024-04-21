@@ -41,6 +41,49 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         _repository = repository;
     }
 
+    public async Task<Result<Organization, Error>> ChangeDetailsAsync(ICallerContext caller, string id,
+        string? name, CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var org = retrieved.Value;
+        if (name.HasValue())
+        {
+            var modifierRoles = Roles.Create(caller.Roles.Tenant);
+            if (!modifierRoles.IsSuccessful)
+            {
+                return modifierRoles.Error;
+            }
+
+            var orgName = DisplayName.Create(name);
+            if (!orgName.IsSuccessful)
+            {
+                return orgName.Error;
+            }
+
+            var changed = org.ChangeName(caller.ToCallerId(), modifierRoles.Value, orgName.Value);
+            if (!changed.IsSuccessful)
+            {
+                return changed.Error;
+            }
+        }
+
+        var saved = await _repository.SaveAsync(org, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
+
+        org = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Changed organization: {Id}", org.Id);
+
+        return org.ToOrganization();
+    }
+
     public async Task<Result<Error>> ChangeSettingsAsync(ICallerContext caller, string id,
         TenantSettings settings, CancellationToken cancellationToken)
     {
@@ -94,6 +137,41 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         }
 
         return created.Value;
+    }
+
+    public async Task<Result<Error>> DeleteOrganizationAsync(ICallerContext caller, string? id,
+        CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var deleterRoles = Roles.Create(caller.Roles.Tenant);
+        if (!deleterRoles.IsSuccessful)
+        {
+            return deleterRoles.Error;
+        }
+
+        var org = retrieved.Value;
+        var deleterId = caller.ToCallerId();
+        var deleted = org.DeleteOrganization(deleterId, deleterRoles.Value);
+        if (!deleted.IsSuccessful)
+        {
+            return deleted.Error;
+        }
+
+        var saved = await _repository.SaveAsync(org, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
+
+        org = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Deleted organization: {Id}", org.Id);
+
+        return Result.Ok;
     }
 
     public async Task<Result<Organization, Error>> GetOrganizationAsync(ICallerContext caller, string id,
@@ -156,7 +234,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
             return retrieved.Error;
         }
 
-        var organization = retrieved.Value;
+        var org = retrieved.Value;
         var inviterRoles = Roles.Create(caller.Roles.Tenant);
         if (!inviterRoles.IsSuccessful)
         {
@@ -171,49 +249,84 @@ public partial class OrganizationsApplication : IOrganizationsApplication
                 return email.Error;
             }
 
-            var added = organization.AddMembership(caller.ToCallerId(), inviterRoles.Value, Optional<Identifier>.None,
+            var invited = org.InviteMember(caller.ToCallerId(), inviterRoles.Value, Optional<Identifier>.None,
                 email.Value);
-            if (!added.IsSuccessful)
+            if (!invited.IsSuccessful)
             {
-                return added.Error;
+                return invited.Error;
             }
 
-            var saved = await _repository.SaveAsync(organization, cancellationToken);
+            var saved = await _repository.SaveAsync(org, cancellationToken);
             if (!saved.IsSuccessful)
             {
                 return saved.Error;
             }
 
-            organization = saved.Value;
+            org = saved.Value;
             _recorder.TraceInformation(caller.ToCall(), "Organization {Id} has invited {UserEmail} to be a member",
-                organization.Id, emailAddress);
+                org.Id, emailAddress);
 
-            return organization.ToOrganization();
+            return org.ToOrganization();
         }
 
         if (userId.HasValue())
         {
-            var added = organization.AddMembership(caller.ToCallerId(), inviterRoles.Value, userId.ToId(),
+            var invited = org.InviteMember(caller.ToCallerId(), inviterRoles.Value, userId.ToId(),
                 Optional<EmailAddress>.None);
-            if (!added.IsSuccessful)
+            if (!invited.IsSuccessful)
             {
-                return added.Error;
+                return invited.Error;
             }
 
-            var saved = await _repository.SaveAsync(organization, cancellationToken);
+            var saved = await _repository.SaveAsync(org, cancellationToken);
             if (!saved.IsSuccessful)
             {
                 return saved.Error;
             }
 
-            organization = saved.Value;
+            org = saved.Value;
             _recorder.TraceInformation(caller.ToCall(), "Organization {Id} has invited {UserId} to be a member",
-                organization.Id, userId);
+                org.Id, userId);
 
-            return organization.ToOrganization();
+            return org.ToOrganization();
         }
 
         return Error.RuleViolation(Resources.OrganizationApplication_InvitedNoUserNorEmail);
+    }
+
+    public async Task<Result<Organization, Error>> UnInviteMemberFromOrganizationAsync(ICallerContext caller, string id,
+        string userId, CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var removerRoles = Roles.Create(caller.Roles.Tenant);
+        if (!removerRoles.IsSuccessful)
+        {
+            return removerRoles.Error;
+        }
+
+        var org = retrieved.Value;
+        var uninvited = org.UnInviteMember(caller.ToCallerId(), removerRoles.Value, userId.ToId());
+        if (!uninvited.IsSuccessful)
+        {
+            return uninvited.Error;
+        }
+
+        var saved = await _repository.SaveAsync(org, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
+
+        org = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Uninvited member {UserId} from organization: {Id}", userId,
+            org.Id);
+
+        return org.ToOrganization();
     }
 
     public async Task<Result<SearchResults<OrganizationMember>, Error>> ListMembersForOrganizationAsync(
@@ -226,16 +339,100 @@ public partial class OrganizationsApplication : IOrganizationsApplication
             return retrieved.Error;
         }
 
-        var organization = retrieved.Value;
+        var org = retrieved.Value;
         var memberships =
-            await _endUsersService.ListMembershipsForOrganizationAsync(caller, organization.Id, searchOptions,
+            await _endUsersService.ListMembershipsForOrganizationAsync(caller, org.Id, searchOptions,
                 getOptions, cancellationToken);
         if (!memberships.IsSuccessful)
         {
             return memberships.Error;
         }
 
+        _recorder.TraceInformation(caller.ToCall(), "Organization {Id} listed its members", org.Id);
+
         return searchOptions.ApplyWithMetadata(memberships.Value.Results.ConvertAll(x => x.ToMember()));
+    }
+
+    public async Task<Result<Organization, Error>> AssignRolesToOrganizationAsync(ICallerContext caller, string id,
+        string userId, List<string> roles, CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var assignerRoles = Roles.Create(caller.Roles.Tenant);
+        if (!assignerRoles.IsSuccessful)
+        {
+            return assignerRoles.Error;
+        }
+
+        var rolesToAssign = Roles.Create(roles.ToArray());
+        if (!rolesToAssign.IsSuccessful)
+        {
+            return rolesToAssign.Error;
+        }
+
+        var org = retrieved.Value;
+        var assignerId = caller.ToCallerId();
+        var assigned = org.AssignRoles(assignerId, assignerRoles.Value, userId.ToId(), rolesToAssign.Value);
+        if (!assigned.IsSuccessful)
+        {
+            return assigned.Error;
+        }
+
+        var saved = await _repository.SaveAsync(org, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
+
+        org = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Organization {Id} assigned roles for {User}", org.Id, userId);
+
+        return org.ToOrganization();
+    }
+
+    public async Task<Result<Organization, Error>> UnassignRolesFromOrganizationAsync(ICallerContext caller, string id,
+        string userId, List<string> roles, CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        if (!retrieved.IsSuccessful)
+        {
+            return retrieved.Error;
+        }
+
+        var assignerRoles = Roles.Create(caller.Roles.Tenant);
+        if (!assignerRoles.IsSuccessful)
+        {
+            return assignerRoles.Error;
+        }
+
+        var rolesToUnassign = Roles.Create(roles.ToArray());
+        if (!rolesToUnassign.IsSuccessful)
+        {
+            return rolesToUnassign.Error;
+        }
+
+        var org = retrieved.Value;
+        var assignerId = caller.ToCallerId();
+        var unassigned = org.UnassignRoles(assignerId, assignerRoles.Value, userId.ToId(), rolesToUnassign.Value);
+        if (!unassigned.IsSuccessful)
+        {
+            return unassigned.Error;
+        }
+
+        var saved = await _repository.SaveAsync(org, cancellationToken);
+        if (!saved.IsSuccessful)
+        {
+            return saved.Error;
+        }
+
+        org = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Organization {Id} unassigned roles for {User}", org.Id, userId);
+
+        return org.ToOrganization();
     }
 
     public async Task<Result<Organization, Error>> ChangeAvatarAsync(ICallerContext caller, string id,
@@ -337,13 +534,13 @@ public partial class OrganizationsApplication : IOrganizationsApplication
             return newSettings.Error;
         }
 
-        var organizationSettings = newSettings.Value.ToSettings();
-        if (!organizationSettings.IsSuccessful)
+        var settings = newSettings.Value.ToSettings();
+        if (!settings.IsSuccessful)
         {
-            return organizationSettings.Error;
+            return settings.Error;
         }
 
-        var configured = org.CreateSettings(organizationSettings.Value);
+        var configured = org.CreateSettings(settings.Value);
         if (!configured.IsSuccessful)
         {
             return configured.Error;

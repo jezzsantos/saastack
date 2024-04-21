@@ -69,29 +69,38 @@ namespace OrganizationsDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot add another user to a Personal organization.
+        ///   Looks up a localized string similar to Must be a person to create a &apos;Shared&apos; organization.
         /// </summary>
-        internal static string OrganizationRoot_AddMembership_PersonalOrgMembershipNotAllowed {
+        internal static string OrganizationRoot_Create_SharedRequiresPerson {
             get {
-                return ResourceManager.GetString("OrganizationRoot_AddMembership_PersonalOrgMembershipNotAllowed", resourceCulture);
+                return ResourceManager.GetString("OrganizationRoot_Create_SharedRequiresPerson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot delete this organization while any others members still exist. They must be removed from the organization first.
+        /// </summary>
+        internal static string OrganizationRoot_DeleteOrganization_MembersStillExist {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_DeleteOrganization_MembersStillExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot add another user to a &apos;Personal&apos; organization.
+        /// </summary>
+        internal static string OrganizationRoot_InviteMember_PersonalOrgMembershipNotAllowed {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_InviteMember_PersonalOrgMembershipNotAllowed", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Both the ID of the user and an email for the user is missing.
         /// </summary>
-        internal static string OrganizationRoot_AddMembership_UserIdAndEmailMissing {
+        internal static string OrganizationRoot_InviteMember_UserIdAndEmailMissing {
             get {
-                return ResourceManager.GetString("OrganizationRoot_AddMembership_UserIdAndEmailMissing", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Must be a person to create a &apos;Shared&apos; organization.
-        /// </summary>
-        internal static string OrganizationRoot_Create_SharedRequiresPerson {
-            get {
-                return ResourceManager.GetString("OrganizationRoot_Create_SharedRequiresPerson", resourceCulture);
+                return ResourceManager.GetString("OrganizationRoot_InviteMember_UserIdAndEmailMissing", resourceCulture);
             }
         }
         
@@ -105,11 +114,38 @@ namespace OrganizationsDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Role &apos;{0}&apos; is not assignable to a user.
+        /// </summary>
+        internal static string OrganizationRoot_RoleNotAssignable {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_RoleNotAssignable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot remove any members from a &apos;Personal&apos; organization.
+        /// </summary>
+        internal static string OrganizationRoot_UnInviteMember_PersonalOrg {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_UnInviteMember_PersonalOrg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User must be a member of this organization.
+        /// </summary>
+        internal static string OrganizationRoot_UserNotMember {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_UserNotMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Must be an organization owner to perform this action.
         /// </summary>
-        internal static string OrganizationRoot_NotOrgOwner {
+        internal static string OrganizationRoot_UserNotOrgOwner {
             get {
-                return ResourceManager.GetString("OrganizationRoot_NotOrgOwner", resourceCulture);
+                return ResourceManager.GetString("OrganizationRoot_UserNotOrgOwner", resourceCulture);
             }
         }
         

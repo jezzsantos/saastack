@@ -60,8 +60,8 @@ public class OrganizationsApplicationSpec
             .Returns((OrganizationRoot root, CancellationToken _) =>
                 Task.FromResult<Result<OrganizationRoot, Error>>(root));
 
-        _application = new OrganizationsApplication(_recorder.Object, _idFactory.Object,
-            _tenantSettingsService.Object, _tenantSettingService.Object, _endUsersService.Object, _imagesService.Object,
+        _application = new OrganizationsApplication(_recorder.Object, _idFactory.Object, _tenantSettingsService.Object,
+            _tenantSettingService.Object, _endUsersService.Object, _imagesService.Object,
             _repository.Object);
     }
 
@@ -144,7 +144,7 @@ public class OrganizationsApplicationSpec
     }
 
     [Fact]
-    public async Task WhenGetSettingsasync_ThenReturnsSettings()
+    public async Task WhenGetSettingsAsync_ThenReturnsSettings()
     {
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
             OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
@@ -246,7 +246,32 @@ public class OrganizationsApplicationSpec
     }
 
     [Fact]
-    public async Task WhenInviteMemberToOrganizationAsync_ThenInvites()
+    public async Task WhenInviteMemberToOrganizationAsyncWithUserEmail_ThenInvites()
+    {
+        _caller.Setup(cc => cc.Roles)
+            .Returns(new ICallerContext.CallerRoles([], new[] { TenantRoles.Owner }));
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Shared, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
+        _repository.Setup(s =>
+                s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+
+        var result = await _application.InviteMemberToOrganizationAsync(_caller.Object, "anorganizationid",
+            null, "auser@company.com", CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.Name.Should().Be("aname");
+        result.Value.CreatedById.Should().Be("auserid");
+        result.Value.Ownership.Should().Be(Application.Resources.Shared.OrganizationOwnership.Shared);
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(o =>
+            o.Id == "anid"
+            && o.Memberships.Count == 0
+        ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenInviteMemberToOrganizationAsyncWithUserId_ThenInvites()
     {
         _caller.Setup(cc => cc.Roles)
             .Returns(new ICallerContext.CallerRoles([], new[] { TenantRoles.Owner }));
@@ -266,6 +291,7 @@ public class OrganizationsApplicationSpec
         result.Value.Ownership.Should().Be(Application.Resources.Shared.OrganizationOwnership.Shared);
         _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(o =>
             o.Id == "anid"
+            && o.Memberships.Count == 0
         ), It.IsAny<CancellationToken>()));
     }
 
@@ -563,5 +589,205 @@ public class OrganizationsApplicationSpec
         ), It.IsAny<CancellationToken>()));
         _imagesService.Verify(
             isv => isv.DeleteImageAsync(_caller.Object, "anoldimageid", It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenChangeDetailsAsyncAndNotExists_ThenReturnsError()
+    {
+        _repository.Setup(s =>
+                s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Error.EntityNotFound());
+
+        var result =
+            await _application.ChangeDetailsAsync(_caller.Object, "auserid", "aname", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityNotFound);
+    }
+
+    [Fact]
+    public async Task WhenChangeDetailsAsyncAndNotOwner_ThenReturnsError()
+    {
+        _caller.Setup(cc => cc.Roles)
+            .Returns(new ICallerContext.CallerRoles());
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+
+        var result =
+            await _application.ChangeDetailsAsync(_caller.Object, "auserid", "aname", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.RoleViolation);
+    }
+
+    [Fact]
+    public async Task WhenChangeDetailsAsync_ThenReturnsOrganization()
+    {
+        _caller.Setup(cc => cc.Roles)
+            .Returns(new ICallerContext.CallerRoles([], new[] { TenantRoles.Owner }));
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
+        await org.ChangeAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("anoldimageid".ToId(), "aurl").Value),
+            _ => Task.FromResult(Result.Ok));
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+        _imagesService.Setup(isv =>
+                isv.DeleteImageAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result.Ok);
+
+        var result =
+            await _application.ChangeDetailsAsync(_caller.Object, "auserid", "anewname", CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.Name.Should().Be("anewname");
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(profile =>
+            profile.Name == "anewname"
+        ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenUnInviteMemberFromOrganizationAsyncAndNotExists_ThenReturnsError()
+    {
+        _repository.Setup(s =>
+                s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Error.EntityNotFound());
+
+        var result =
+            await _application.UnInviteMemberFromOrganizationAsync(_caller.Object, "anid", "auserid",
+                CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityNotFound);
+    }
+
+    [Fact]
+    public async Task WhenUnInviteMemberFromOrganizationAsync_ThenRemovesMembership()
+    {
+        _caller.Setup(cc => cc.Roles)
+            .Returns(new ICallerContext.CallerRoles([], new[] { TenantRoles.Owner }));
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Shared, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
+        org.InviteMember("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value, "auserid".ToId(),
+            Optional<EmailAddress>.None);
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+
+        var result =
+            await _application.UnInviteMemberFromOrganizationAsync(_caller.Object, "anid", "auserid",
+                CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(o =>
+            o.Memberships.Count == 0
+        ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenAssignRolesToOrganizationAsyncAndNotExists_ThenReturnsError()
+    {
+        _repository.Setup(s =>
+                s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Error.EntityNotFound());
+
+        var result =
+            await _application.AssignRolesToOrganizationAsync(_caller.Object, "anorganizationid", "auserid",
+                new List<string>(), CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityNotFound);
+    }
+
+    [Fact]
+    public async Task WhenAssignRolesToOrganizationAsync_ThenAssigns()
+    {
+        _caller.Setup(cc => cc.Roles)
+            .Returns(new ICallerContext.CallerRoles([], new[] { TenantRoles.Owner }));
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
+        org.AddMembership("auserid".ToId());
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+
+        var result =
+            await _application.AssignRolesToOrganizationAsync(_caller.Object, "anorganizationid", "auserid",
+                new List<string>(), CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(root =>
+            root.Id == "anid"
+        ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenUnassignRolesFromOrganizationAsyncAndNotExists_ThenReturnsError()
+    {
+        _repository.Setup(s =>
+                s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Error.EntityNotFound());
+
+        var result =
+            await _application.UnassignRolesFromOrganizationAsync(_caller.Object, "anorganizationid", "auserid",
+                new List<string>(), CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityNotFound);
+    }
+
+    [Fact]
+    public async Task WhenUnassignRolesFromOrganizationAsync_ThenUnassigns()
+    {
+        _caller.Setup(cc => cc.Roles)
+            .Returns(new ICallerContext.CallerRoles([], new[] { TenantRoles.Owner }));
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
+        org.AddMembership("auserid".ToId());
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+
+        var result =
+            await _application.UnassignRolesFromOrganizationAsync(_caller.Object, "anorganizationid", "auserid",
+                new List<string>(), CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(root =>
+            root.Id == "anid"
+        ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenDeleteOrganizationAsyncAndNotExist_ThenReturnsError()
+    {
+        _repository.Setup(s =>
+                s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Error.EntityNotFound());
+
+        var result =
+            await _application.DeleteOrganizationAsync(_caller.Object, "anorganizationid", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityNotFound);
+    }
+
+    [Fact]
+    public async Task WhenDeleteOrganizationAsync_ThenDeletes()
+    {
+        _caller.Setup(cc => cc.Roles)
+            .Returns(new ICallerContext.CallerRoles([], new[] { TenantRoles.Owner }));
+        var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+
+        var result =
+            await _application.DeleteOrganizationAsync(_caller.Object, "anorganizationid", CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(root =>
+            root.IsDeleted
+        ), It.IsAny<CancellationToken>()));
     }
 }

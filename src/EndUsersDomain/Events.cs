@@ -20,6 +20,20 @@ public static class Events
         };
     }
 
+    public static DefaultMembershipChanged DefaultMembershipChanged(Identifier id,
+        Optional<Identifier> fromMembershipId, Identifier toMembershipId, Identifier toOrganizationId, Roles roles,
+        Features features)
+    {
+        return new DefaultMembershipChanged(id)
+        {
+            FromMembershipId = fromMembershipId.ValueOrDefault!,
+            ToMembershipId = toMembershipId,
+            ToOrganizationId = toOrganizationId,
+            Roles = roles.ToList(),
+            Features = features.ToList()
+        };
+    }
+
     public static GuestInvitationAccepted GuestInvitationAccepted(Identifier id, EmailAddress emailAddress)
     {
         return new GuestInvitationAccepted(id)
@@ -55,20 +69,6 @@ public static class Events
         };
     }
 
-    public static MembershipDefaultChanged MembershipDefaultChanged(Identifier id,
-        Optional<Identifier> fromMembershipId,
-        Identifier toMembershipId, Identifier toOrganizationId, Roles roles, Features features)
-    {
-        return new MembershipDefaultChanged(id)
-        {
-            FromMembershipId = fromMembershipId.ValueOrDefault!,
-            ToMembershipId = toMembershipId,
-            ToOrganizationId = toOrganizationId,
-            Roles = roles.ToList(),
-            Features = features.ToList()
-        };
-    }
-
     public static MembershipFeatureAssigned MembershipFeatureAssigned(Identifier id, Identifier organizationId,
         Identifier membershipId, Feature feature)
     {
@@ -80,11 +80,32 @@ public static class Events
         };
     }
 
+    public static MembershipRemoved MembershipRemoved(Identifier id, Identifier membershipId, Identifier organizationId,
+        Identifier uninviterId)
+    {
+        return new MembershipRemoved(id)
+        {
+            MembershipId = membershipId,
+            OrganizationId = organizationId,
+            UnInvitedById = uninviterId
+        };
+    }
+
     public static MembershipRoleAssigned MembershipRoleAssigned(Identifier id, Identifier organizationId,
-        Identifier membershipId,
-        Role role)
+        Identifier membershipId, Role role)
     {
         return new MembershipRoleAssigned(id)
+        {
+            OrganizationId = organizationId,
+            MembershipId = membershipId,
+            Role = role.Identifier
+        };
+    }
+
+    public static MembershipRoleUnassigned MembershipRoleUnassigned(Identifier id, Identifier organizationId,
+        Identifier membershipId, Role role)
+    {
+        return new MembershipRoleUnassigned(id)
         {
             OrganizationId = organizationId,
             MembershipId = membershipId,

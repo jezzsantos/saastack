@@ -89,18 +89,25 @@ Another advantage (only available to event-sourced persistence scheme) is that w
 
 ### Event Notifications
 
-Notifications are the mechanism by which subdomains can communicate to other subdomains (or to other processes) about what is happening in the source subdomain. This means that a source subdomain does not have to directly instruct another [dependent] target subdomain to update its state, when the source subdomain state changes. Typically, this is done by a direct synchronous method/API call. Now the target domain can simply react to the appearance of a "domain event" from the source subdomain, and take appropriate action. The coupling of the method/API call is gone.
+Notifications are the mechanism by which subdomains can communicate to other subdomains (or to other processes) about what is happening in the source subdomain. This means that a source subdomain does not have to [imperatively] instruct another [dependent] target subdomain to update its state, when the source subdomain state changes. Typically, this is done by a direct synchronous method/API call.
 
-> This is particularly useful when you have highly inter-dependent subdomains, that require that their data be in sync with each other (i.e., `EndUser` memberships with `Organizations`.
+Instead, the target domain can simply "observe" and react to the appearance of a "domain event" from the source subdomain, and take appropriate action.
 
-This characteristic is particularly necessary in distributed deployments, where direct calls are HTTP calls, requiring both the source and target subdomains to be responsive to each other.
+The coupling of the imperative method/API call is eliminated.
 
-Instead, this decoupling via "integration events" would normally done in distributed systems with a message broker of some kind (i.e., a queue, a message bus, etc.).
+> This is particularly useful when you have highly inter-dependent subdomains, that require that their data be in sync with each other (i.e., `EndUser` memberships with `Organizations` and `UserProfiles`. As seen below.
+
+![Generic Subdomains](../images/Event Flows - Generic.png)
+
+This eventing capability is particularly necessary in distributed deployments, where direct calls between separately deployed components are realized as HTTP calls (requiring both the source and target subdomains to be synchronously responsive and consistent to each other).
+
+Instead, decoupling this asynchronously via "integration events" would normally done in distributed systems with a message broker of some kind (i.e., a queue, a message bus, etc.).
 
 The synchronous publication of all "domain events" is handled automatically by the `IEventNotifyingStoreNotificationRelay` (after events have first been projected by the `IEventNotifyingStoreProjectionRelay`).
 
-Domain events are published synchronously (round-robin) one at a time:
+Domain/Integration events are published synchronously (round-robin) one at a time:
 
 1. First, to all registered `IDomainEventNotificationConsumer` consumers. These consumers can fail and report back errors that are captured synchronously.
 2. Then to all registered `IIntegrationEventNotificationTranslator` translators, that have the option to translate a "domain event" into an "integration event" or not. This translation can also fail, and report back errors that are captured synchronously.
 3. Finally, if the translator translates a "domain event" into an "integration event" it is then published to the `IEventNotificationMessageBroker` that should send the "integration event" to some external message broker, who will deliver it asynchronous to external consumers. This can also fail, and report back errors that are captured synchronously.
+

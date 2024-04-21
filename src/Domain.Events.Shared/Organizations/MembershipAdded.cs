@@ -15,9 +15,5 @@ public sealed class MembershipAdded : DomainEvent
     {
     }
 
-    public string? EmailAddress { get; set; }
-
-    public required string InvitedById { get; set; }
-
-    public string? UserId { get; set; }
+    public required string UserId { get; set; }
 }

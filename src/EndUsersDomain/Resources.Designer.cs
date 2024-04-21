@@ -60,7 +60,7 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot add a membership to machines organization.
+        ///   Looks up a localized string similar to Cannot add a membership to machine&apos;s organization.
         /// </summary>
         internal static string EndUserRoot_AddMembership_MachineCannotHaveMemberships {
             get {
@@ -69,11 +69,20 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The adder cannot add a membership to a personal organization.
+        ///   Looks up a localized string similar to Cannot add another &apos;Personal&apos; organization.
         /// </summary>
-        internal static string EndUserRoot_Addmembership_SharedOwnershipRequired {
+        internal static string EndUserRoot_AddMembership_OnlyOnePersonalOrganization {
             get {
-                return ResourceManager.GetString("EndUserRoot_Addmembership_SharedOwnershipRequired", resourceCulture);
+                return ResourceManager.GetString("EndUserRoot_AddMembership_OnlyOnePersonalOrganization", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The adder cannot add a membership to a &apos;Personal&apos; organization.
+        /// </summary>
+        internal static string EndUserRoot_AddMembership_SharedOwnershipRequired {
+            get {
+                return ResourceManager.GetString("EndUserRoot_AddMembership_SharedOwnershipRequired", resourceCulture);
             }
         }
         
@@ -186,6 +195,33 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The feature &apos;{0}&apos; is not a supported platform feature.
+        /// </summary>
+        internal static string EndUserRoot_NotAssignablePlatformFeature {
+            get {
+                return ResourceManager.GetString("EndUserRoot_NotAssignablePlatformFeature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The role &apos;{0}&apos; is not a supported platform role.
+        /// </summary>
+        internal static string EndUserRoot_NotAssignablePlatformRole {
+            get {
+                return ResourceManager.GetString("EndUserRoot_NotAssignablePlatformRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The role &apos;{0}&apos; is not a supported tenant role.
+        /// </summary>
+        internal static string EndUserRoot_NotAssignableTenantRole {
+            get {
+                return ResourceManager.GetString("EndUserRoot_NotAssignableTenantRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The assigner is not a member of the operations team.
         /// </summary>
         internal static string EndUserRoot_NotOperator {
@@ -213,20 +249,11 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The feature &apos;{0}&apos; is not a supported platform feature.
+        ///   Looks up a localized string similar to The remover cannot remove a membership from a &apos;Personal&apos; organization.
         /// </summary>
-        internal static string EndUserRoot_UnassignablePlatformFeature {
+        internal static string EndUserRoot_RemoveMembership_SharedOwnershipRequired {
             get {
-                return ResourceManager.GetString("EndUserRoot_UnassignablePlatformFeature", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The role &apos;{0}&apos; is not a supported platform role.
-        /// </summary>
-        internal static string EndUserRoot_UnassignablePlatformRole {
-            get {
-                return ResourceManager.GetString("EndUserRoot_UnassignablePlatformRole", resourceCulture);
+                return ResourceManager.GetString("EndUserRoot_RemoveMembership_SharedOwnershipRequired", resourceCulture);
             }
         }
         
@@ -236,15 +263,6 @@ namespace EndUsersDomain {
         internal static string EndUserRoot_UnassignableTenantFeature {
             get {
                 return ResourceManager.GetString("EndUserRoot_UnassignableTenantFeature", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The role &apos;{0}&apos; is not a supported tenant role.
-        /// </summary>
-        internal static string EndUserRoot_UnassignableTenantRole {
-            get {
-                return ResourceManager.GetString("EndUserRoot_UnassignableTenantRole", resourceCulture);
             }
         }
         
@@ -299,6 +317,15 @@ namespace EndUsersDomain {
         internal static string Memberships_DuplicateMemberships {
             get {
                 return ResourceManager.GetString("Memberships_DuplicateMemberships", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no more remaining memberships for this user.
+        /// </summary>
+        internal static string Memberships_MissingNextDefaultMembership {
+            get {
+                return ResourceManager.GetString("Memberships_MissingNextDefaultMembership", resourceCulture);
             }
         }
         

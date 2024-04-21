@@ -157,9 +157,9 @@ public class UserProfileApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenGetCurrentUserForAnonymous_ThenNotAuthenticated()
+    public async Task WhenGetProfileForCallerForAnonymous_ThenNotAuthenticated()
     {
-        var result = await Api.GetAsync(new GetCurrentProfileRequest());
+        var result = await Api.GetAsync(new GetProfileForCallerRequest());
 
         result.Content.Value.Profile!.IsAuthenticated.Should().BeFalse();
         result.Content.Value.Profile.Id.Should().Be(CallerConstants.AnonymousUserId);
@@ -168,11 +168,11 @@ public class UserProfileApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenGetCurrentUserForAuthenticated_ThenAuthenticated()
+    public async Task WhenGetProfileForCallerForAuthenticated_ThenAuthenticated()
     {
         var login = await LoginUserAsync();
 
-        var result = await Api.GetAsync(new GetCurrentProfileRequest(),
+        var result = await Api.GetAsync(new GetProfileForCallerRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         result.Content.Value.Profile!.IsAuthenticated.Should().BeTrue();

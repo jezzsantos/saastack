@@ -53,18 +53,20 @@ public class Membership : IIdentifiableResource
 
     public required string OrganizationId { get; set; }
 
+    public OrganizationOwnership Ownership { get; set; }
+
     public List<string> Roles { get; set; } = new();
 
-    public required string Id { get; set; }
-
     public required string UserId { get; set; }
+
+    public required string Id { get; set; }
 }
 
 public class MembershipWithUserProfile : Membership
 {
-    public EndUserStatus Status { get; set; }
-
     public required UserProfile Profile { get; set; }
+
+    public EndUserStatus Status { get; set; }
 }
 
 public class Invitation

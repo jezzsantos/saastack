@@ -60,6 +60,33 @@ namespace OrganizationsInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;Role&apos; is invalid.
+        /// </summary>
+        internal static string AssignRolesToOrganizationRequestValidator_InvalidRole {
+            get {
+                return ResourceManager.GetString("AssignRolesToOrganizationRequestValidator_InvalidRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Roles&apos; is either empty or contains invalid roles.
+        /// </summary>
+        internal static string AssignRolesToOrganizationRequestValidator_InvalidRoles {
+            get {
+                return ResourceManager.GetString("AssignRolesToOrganizationRequestValidator_InvalidRoles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Name&apos; is invalid.
+        /// </summary>
+        internal static string ChangeOrganizationRequestValidator_InvalidName {
+            get {
+                return ResourceManager.GetString("ChangeOrganizationRequestValidator_InvalidName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;Name&apos; is either missing or invalid.
         /// </summary>
         internal static string CreateOrganizationRequestValidator_InvalidName {

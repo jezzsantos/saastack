@@ -109,6 +109,11 @@ public class MultiTenancyMiddleware
     private async Task<Result<string?, Error>> VerifyDefaultOrganizationIdForCallerAsync(ICallerContext caller,
         List<Membership>? memberships, CancellationToken cancellationToken)
     {
+        if (!caller.IsAuthenticated)
+        {
+            return Error.Validation(Resources.MultiTenancyMiddleware_MissingDefaultOrganization);
+        }
+
         if (memberships.NotExists())
         {
             var retrievedMemberships = await GetMembershipsForCallerAsync(caller, cancellationToken);
@@ -126,7 +131,7 @@ public class MultiTenancyMiddleware
             return defaultOrganizationId;
         }
 
-        return Error.Validation(Resources.MultiTenancyMiddleware_MissingTenantId);
+        return Error.Validation(Resources.MultiTenancyMiddleware_MissingDefaultOrganization);
     }
 
     private async Task<Result<Error>> VerifyCallerMembershipAsync(ICallerContext caller, List<Membership>? memberships,

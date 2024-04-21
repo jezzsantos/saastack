@@ -1,7 +1,6 @@
 using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
-using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.AuthTokens;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
@@ -29,11 +28,11 @@ public class AuthTokensProjection : IReadModelProjection
         switch (changeEvent)
         {
             case Created e:
-                return await _authTokens.HandleCreateAsync(e.RootId.ToId(), dto => { dto.UserId = e.UserId; },
+                return await _authTokens.HandleCreateAsync(e.RootId, dto => { dto.UserId = e.UserId; },
                     cancellationToken);
 
             case TokensChanged e:
-                return await _authTokens.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _authTokens.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.AccessToken = e.AccessToken;
                     dto.RefreshToken = e.RefreshToken;
@@ -42,7 +41,7 @@ public class AuthTokensProjection : IReadModelProjection
                 }, cancellationToken);
 
             case TokensRefreshed e:
-                return await _authTokens.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _authTokens.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.AccessToken = e.AccessToken;
                     dto.RefreshToken = e.RefreshToken;
@@ -51,7 +50,7 @@ public class AuthTokensProjection : IReadModelProjection
                 }, cancellationToken);
 
             case TokensRevoked e:
-                return await _authTokens.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _authTokens.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.AccessToken = Optional<string>.None;
                     dto.RefreshToken = Optional<string>.None;

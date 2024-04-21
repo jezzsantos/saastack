@@ -87,6 +87,15 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to EndUser.TenantRolesUnassigned.
+        /// </summary>
+        public static string EndUserApplication_TenantRolesUnassigned {
+            get {
+                return ResourceManager.GetString("EndUserApplication_TenantRolesUnassigned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to EndUser.Registered.TermsAccepted.
         /// </summary>
         public static string EndUsersApplication_User_Registered_TermsAccepted {

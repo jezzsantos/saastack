@@ -27,7 +27,7 @@ public partial interface IUserProfilesApplication
     Task<Result<List<UserProfile>, Error>> GetAllProfilesAsync(ICallerContext caller, List<string> ids,
         GetOptions options, CancellationToken cancellationToken);
 
-    Task<Result<UserProfileForCurrent, Error>> GetCurrentUserProfileAsync(ICallerContext caller,
+    Task<Result<UserProfileForCaller, Error>> GetCurrentUserProfileAsync(ICallerContext caller,
         CancellationToken cancellationToken);
 
     Task<Result<UserProfile, Error>> GetProfileAsync(ICallerContext caller, string userId,

@@ -37,7 +37,7 @@ public class FeatureSpec
     [Fact]
     public void WhenCreateWithAKnownName_ThenReturnsValue()
     {
-        var result = Feature.Create(PlatformFeatures.Basic.Name);
+        var result = Feature.Create(PlatformFeatures.Basic);
 
         result.Should().BeSuccess();
         result.Value.Identifier.Should().Be(PlatformFeatures.Basic.Name);
@@ -50,7 +50,7 @@ public class FeaturesSpec
     [Fact]
     public void WhenCreate_ThenReturnsError()
     {
-        var result = Features.Create();
+        var result = Features.Empty;
 
         result.Items.Should().BeEmpty();
     }
@@ -66,10 +66,10 @@ public class FeaturesSpec
     [Fact]
     public void WhenCreateWithSingle_ThenReturnsValue()
     {
-        var result = Features.Create(PlatformFeatures.Basic.Name);
+        var result = Features.Create(PlatformFeatures.Basic);
 
         result.Should().BeSuccess();
-        result.Value.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Basic.Name).Value);
+        result.Value.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Basic).Value);
     }
 
 #if TESTINGONLY
@@ -80,8 +80,8 @@ public class FeaturesSpec
 
         result.Should().BeSuccess();
         result.Value.Items.Should().ContainInOrder(Feature.Create(
-                PlatformFeatures.TestingOnlySuperUser.Name).Value,
-            Feature.Create(PlatformFeatures.TestingOnly.Name).Value);
+                PlatformFeatures.TestingOnlySuperUser).Value,
+            Feature.Create(PlatformFeatures.TestingOnly).Value);
     }
 #endif
 
@@ -97,18 +97,18 @@ public class FeaturesSpec
     [Fact]
     public void WhenCreateWithListContainingValidItems_ThenReturnsValue()
     {
-        var result = Features.Create(PlatformFeatures.Basic.Name, PlatformFeatures.TestingOnly.Name);
+        var result = Features.Create(PlatformFeatures.Basic, PlatformFeatures.TestingOnly);
 
         result.Should().BeSuccess();
-        result.Value.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Basic.Name).Value,
-            Feature.Create(PlatformFeatures.TestingOnly.Name).Value);
+        result.Value.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Basic).Value,
+            Feature.Create(PlatformFeatures.TestingOnly).Value);
     }
 #endif
 
     [Fact]
     public void WhenAddStringWithUnknownName_ThenAddsFeature()
     {
-        var features = Features.Create();
+        var features = Features.Empty;
 
         var result = features.Add("anunknownfeature");
 
@@ -119,7 +119,7 @@ public class FeaturesSpec
     [Fact]
     public void WhenAddStringWithKnownName_ThenAddsFeature()
     {
-        var features = Features.Create();
+        var features = Features.Empty;
 
         var result = features.Add(PlatformFeatures.Basic.Name);
 
@@ -137,16 +137,16 @@ public class FeaturesSpec
 
         result.Should().BeSuccess();
         result.Value.Items.Should().ContainInOrder(
-            Feature.Create(PlatformFeatures.Basic.Name).Value,
-            Feature.Create(PlatformFeatures.TestingOnlySuperUser.Name).Value,
-            Feature.Create(PlatformFeatures.TestingOnly.Name).Value);
+            Feature.Create(PlatformFeatures.Basic).Value,
+            Feature.Create(PlatformFeatures.TestingOnlySuperUser).Value,
+            Feature.Create(PlatformFeatures.TestingOnly).Value);
     }
 #endif
 
     [Fact]
     public void WhenAddFeatureAndExists_ThenDoesNotAdd()
     {
-        var features = Features.Create();
+        var features = Features.Empty;
         features.Add(PlatformFeatures.Basic.Name);
 
         var result = features.Add(PlatformFeatures.Basic.Name);
@@ -159,22 +159,22 @@ public class FeaturesSpec
     [Fact]
     public void WhenAddFeatureAndNotExists_ThenAdds()
     {
-        var features = Features.Create();
-        features = features.Add(PlatformFeatures.Basic.Name).Value;
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.Basic).Value;
 
-        var result = features.Add(PlatformFeatures.TestingOnly.Name);
+        var result = features.Add(PlatformFeatures.TestingOnly);
 
         result.Should().BeSuccess();
-        result.Value.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Basic.Name).Value,
-            Feature.Create(PlatformFeatures.TestingOnly.Name).Value);
+        result.Value.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Basic).Value,
+            Feature.Create(PlatformFeatures.TestingOnly).Value);
     }
 #endif
 
     [Fact]
     public void WhenClear_ThenRemovesAllItems()
     {
-        var features = Features.Create();
-        features = features.Add(PlatformFeatures.Basic.Name).Value;
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.Basic).Value;
 
         var result = features.Clear();
 
@@ -184,8 +184,8 @@ public class FeaturesSpec
     [Fact]
     public void WhenHasAnyAndSome_ThenReturnsTrue()
     {
-        var features = Features.Create();
-        features = features.Add(PlatformFeatures.Basic.Name).Value;
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.Basic).Value;
 
         var result = features.HasAny();
 
@@ -195,7 +195,7 @@ public class FeaturesSpec
     [Fact]
     public void WhenHasAnyAndNone_ThenReturnsFalse()
     {
-        var features = Features.Create();
+        var features = Features.Empty;
 
         var result = features.HasAny();
 
@@ -205,8 +205,8 @@ public class FeaturesSpec
     [Fact]
     public void WhenHasNoneAndSome_ThenReturnsFalse()
     {
-        var features = Features.Create();
-        features = features.Add(PlatformFeatures.Basic.Name).Value;
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.Basic).Value;
 
         var result = features.HasNone();
 
@@ -216,7 +216,7 @@ public class FeaturesSpec
     [Fact]
     public void WhenHasNoneAndNone_ThenReturnsTrue()
     {
-        var features = Features.Create();
+        var features = Features.Empty;
 
         var result = features.HasNone();
 
@@ -226,7 +226,7 @@ public class FeaturesSpec
     [Fact]
     public void WhenHasLevelAndInvalidName_ThenReturnsFalse()
     {
-        var features = Features.Create();
+        var features = Features.Empty;
 
         var result = features.HasFeature("anunknownfeature");
 
@@ -237,10 +237,10 @@ public class FeaturesSpec
     [Fact]
     public void WhenHasHasLevelAndNoMatch_ThenReturnsFalse()
     {
-        var features = Features.Create();
-        features = features.Add(PlatformFeatures.Basic.Name).Value;
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.Basic).Value;
 
-        var result = features.HasFeature(PlatformFeatures.TestingOnly.Name);
+        var result = features.HasFeature(PlatformFeatures.TestingOnly);
 
         result.Should().BeFalse();
     }
@@ -249,10 +249,10 @@ public class FeaturesSpec
     [Fact]
     public void WhenHasHasLevelAndMatching_ThenReturnsTrue()
     {
-        var features = Features.Create();
-        features = features.Add(PlatformFeatures.Basic.Name).Value;
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.Basic).Value;
 
-        var result = features.HasFeature(PlatformFeatures.Basic.Name);
+        var result = features.HasFeature(PlatformFeatures.Basic);
 
         result.Should().BeTrue();
     }
@@ -260,8 +260,8 @@ public class FeaturesSpec
     [Fact]
     public void WhenRemoveAndInvalidName_ThenDoesNotRemove()
     {
-        var features = Features.Create();
-        features = features.Add(PlatformFeatures.Basic.Name).Value;
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.Basic).Value;
 
         var result = features.Remove("anunknownfeature");
 
@@ -272,8 +272,8 @@ public class FeaturesSpec
     [Fact]
     public void WhenRemoveAndNoMatch_ThenDoesNotRemove()
     {
-        var features = Features.Create();
-        features = features.Add(PlatformFeatures.Basic.Name).Value;
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.Basic).Value;
 
         var result = features.Remove(PlatformFeatures.TestingOnly.Name);
 
@@ -284,10 +284,10 @@ public class FeaturesSpec
     [Fact]
     public void WhenRemoveAndMatches_ThenRemoves()
     {
-        var features = Features.Create();
-        features = features.Add(PlatformFeatures.Basic.Name).Value;
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.Basic).Value;
 
-        var result = features.Remove(PlatformFeatures.Basic.Name);
+        var result = features.Remove(PlatformFeatures.Basic);
 
         result.Items.Should().BeEmpty();
     }
@@ -296,9 +296,9 @@ public class FeaturesSpec
     [Fact]
     public void WhenToList_ThenReturnsStringList()
     {
-        var features = Features.Create();
-        features = features.Add(PlatformFeatures.Basic.Name).Value;
-        features = features.Add(PlatformFeatures.TestingOnly.Name).Value;
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.Basic).Value;
+        features = features.Add(PlatformFeatures.TestingOnly).Value;
 
         var result = features.ToList();
 

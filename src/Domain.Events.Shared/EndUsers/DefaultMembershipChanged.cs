@@ -4,14 +4,14 @@ using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.EndUsers;
 
-public sealed class MembershipDefaultChanged : DomainEvent
+public sealed class DefaultMembershipChanged : DomainEvent
 {
-    public MembershipDefaultChanged(Identifier id) : base(id)
+    public DefaultMembershipChanged(Identifier id) : base(id)
     {
     }
 
     [UsedImplicitly]
-    public MembershipDefaultChanged()
+    public DefaultMembershipChanged()
     {
     }
 

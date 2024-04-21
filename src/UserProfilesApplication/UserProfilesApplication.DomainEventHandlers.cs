@@ -29,8 +29,8 @@ partial class UserProfilesApplication
         return Result.Ok;
     }
 
-    public async Task<Result<Error>> HandleEndUserDefaultOrganizationChangedAsync(ICallerContext caller,
-        MembershipDefaultChanged domainEvent,
+    public async Task<Result<Error>> HandleEndUserDefaultMembershipChangedAsync(ICallerContext caller,
+        DefaultMembershipChanged domainEvent,
         CancellationToken cancellationToken)
     {
         var profile = await UpdateDefaultOrganizationAsync(caller, domainEvent.RootId, domainEvent.ToOrganizationId,

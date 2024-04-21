@@ -36,13 +36,13 @@
     <data name="EndUserRoot_MissingMembership" xml:space="preserve">
         <value>The membership does not exist</value>
     </data>
-    <data name="EndUserRoot_UnassignableTenantRole" xml:space="preserve">
+    <data name="EndUserRoot_NotAssignableTenantRole" xml:space="preserve">
         <value>The role '{0}' is not a supported tenant role</value>
     </data>
-    <data name="EndUserRoot_UnassignablePlatformRole" xml:space="preserve">
+    <data name="EndUserRoot_NotAssignablePlatformRole" xml:space="preserve">
         <value>The role '{0}' is not a supported platform role</value>
     </data>
-    <data name="EndUserRoot_UnassignablePlatformFeature" xml:space="preserve">
+    <data name="EndUserRoot_NotAssignablePlatformFeature" xml:space="preserve">
         <value>The feature '{0}' is not a supported platform feature</value>
     </data>
     <data name="EndUserRoot_UnassignableTenantFeature" xml:space="preserve">
@@ -75,8 +75,11 @@
     <data name="EndUserRoot_NotOrganizationOwner" xml:space="preserve">
         <value>The assigner is not an owner of the organization</value>
     </data>
-    <data name="EndUserRoot_Addmembership_SharedOwnershipRequired" xml:space="preserve">
-        <value>The adder cannot add a membership to a personal organization</value>
+    <data name="EndUserRoot_AddMembership_SharedOwnershipRequired" xml:space="preserve">
+        <value>The adder cannot add a membership to a 'Personal' organization</value>
+    </data>
+    <data name="EndUserRoot_RemoveMembership_SharedOwnershipRequired" xml:space="preserve">
+        <value>The remover cannot remove a membership from a 'Personal' organization</value>
     </data>
     <data name="Membership_MissingDefaultRole" xml:space="preserve">
         <value>A membership must always have at least the role '{0}'</value>
@@ -109,6 +112,12 @@
         <value>This guest invitation cannot be accepted by an authenticated user</value>
     </data>
     <data name="EndUserRoot_AddMembership_MachineCannotHaveMemberships" xml:space="preserve">
-        <value>Cannot add a membership to machines organization</value>
+        <value>Cannot add a membership to machine's organization</value>
+    </data>
+    <data name="EndUserRoot_AddMembership_OnlyOnePersonalOrganization" xml:space="preserve">
+        <value>Cannot add another 'Personal' organization</value>
+    </data>
+    <data name="Memberships_MissingNextDefaultMembership" xml:space="preserve">
+        <value>There are no more remaining memberships for this user</value>
     </data>
 </root>

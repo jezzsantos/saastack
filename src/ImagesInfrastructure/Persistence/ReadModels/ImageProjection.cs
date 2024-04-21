@@ -1,7 +1,6 @@
 using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
-using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Images;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
@@ -29,11 +28,11 @@ public class ImageProjection : IReadModelProjection
         switch (changeEvent)
         {
             case Created e:
-                return await _images.HandleCreateAsync(e.RootId.ToId(), dto => { dto.ContentType = e.ContentType; },
+                return await _images.HandleCreateAsync(e.RootId, dto => { dto.ContentType = e.ContentType; },
                     cancellationToken);
 
             case DetailsChanged e:
-                return await _images.HandleUpdateAsync(e.RootId.ToId(),
+                return await _images.HandleUpdateAsync(e.RootId,
                     dto =>
                     {
                         dto.Description = e.Description;
@@ -41,7 +40,7 @@ public class ImageProjection : IReadModelProjection
                     }, cancellationToken);
 
             case AttributesChanged e:
-                return await _images.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.Size = e.Size; },
+                return await _images.HandleUpdateAsync(e.RootId, dto => { dto.Size = e.Size; },
                     cancellationToken);
 
             default:

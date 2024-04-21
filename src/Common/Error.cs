@@ -60,6 +60,15 @@ public readonly struct Error
 #endif
 
     /// <summary>
+    ///     Whether this error is of the specified <see cref="code" />
+    ///     and optional <see cref="message" />
+    /// </summary>
+    public bool Is(ErrorCode code, string? message = null)
+    {
+        return code == Code && (message == null || message == Message);
+    }
+
+    /// <summary>
     ///     Creates a <see cref="ErrorCode.NoError" /> error
     /// </summary>
     public static Error NoError => new(ErrorCode.NoError);
@@ -144,6 +153,14 @@ public readonly struct Error
         return new Error(ErrorCode.Unexpected, message);
     }
 
+    /// <summary>
+    ///     Creates a <see cref="ErrorCode.EntityDeleted" /> error
+    /// </summary>
+    public static Error EntityDeleted(string? message = null)
+    {
+        return new Error(ErrorCode.EntityDeleted, message);
+    }
+
     public override string ToString()
     {
         return $"{Code}: {Message}";
@@ -167,5 +184,6 @@ public enum ErrorCode
     NotAuthenticated,
     ForbiddenAccess,
     NotSubscribed,
-    Unexpected
+    Unexpected,
+    EntityDeleted
 }

@@ -50,7 +50,7 @@ public class RolesSpec
     [Fact]
     public void WhenCreate_ThenReturnsError()
     {
-        var result = Roles.Create();
+        var result = Roles.Empty;
 
         result.Items.Should().BeEmpty();
     }
@@ -108,7 +108,7 @@ public class RolesSpec
     [Fact]
     public void WhenAddStringWithUnknownName_ThenAddsRole()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
 
         var result = roles.Add("anunknownrole");
 
@@ -119,7 +119,7 @@ public class RolesSpec
     [Fact]
     public void WhenAddStringWithKnownName_ThenAddsRole()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
 
         var result = roles.Add(PlatformRoles.Standard.Name);
 
@@ -145,7 +145,7 @@ public class RolesSpec
     [Fact]
     public void WhenAddRoleAndExists_ThenDoesNotAdd()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
         roles.Add(PlatformRoles.Standard.Name);
 
         var result = roles.Add(PlatformRoles.Standard.Name);
@@ -158,7 +158,7 @@ public class RolesSpec
     [Fact]
     public void WhenAddRoleAndNotExists_ThenAdds()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
         roles = roles.Add(PlatformRoles.Standard.Name).Value;
 
         var result = roles.Add(PlatformRoles.TestingOnly.Name);
@@ -172,7 +172,7 @@ public class RolesSpec
     [Fact]
     public void WhenClear_ThenRemovesAllItems()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
         roles = roles.Add(PlatformRoles.Standard.Name).Value;
 
         var result = roles.Clear();
@@ -183,7 +183,7 @@ public class RolesSpec
     [Fact]
     public void WhenHasAnyAndSome_ThenReturnsTrue()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
         roles = roles.Add(PlatformRoles.Standard.Name).Value;
 
         var result = roles.HasAny();
@@ -194,7 +194,7 @@ public class RolesSpec
     [Fact]
     public void WhenHasAnyAndNone_ThenReturnsFalse()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
 
         var result = roles.HasAny();
 
@@ -204,7 +204,7 @@ public class RolesSpec
     [Fact]
     public void WhenHasNoneAndSome_ThenReturnsFalse()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
         roles = roles.Add(PlatformRoles.Standard.Name).Value;
 
         var result = roles.HasNone();
@@ -215,7 +215,7 @@ public class RolesSpec
     [Fact]
     public void WhenHasNoneAndNone_ThenReturnsTrue()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
 
         var result = roles.HasNone();
 
@@ -225,7 +225,7 @@ public class RolesSpec
     [Fact]
     public void WhenHasRoleAndInvalidName_ThenReturnsFalse()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
 
         var result = roles.HasRole("anunknownrole");
 
@@ -236,7 +236,7 @@ public class RolesSpec
     [Fact]
     public void WhenHasRoleAndNoMatch_ThenReturnsFalse()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
         roles = roles.Add(PlatformRoles.Standard.Name).Value;
 
         var result = roles.HasRole(PlatformRoles.TestingOnly.Name);
@@ -248,7 +248,7 @@ public class RolesSpec
     [Fact]
     public void WhenHasRoleAndMatching_ThenReturnsTrue()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
         roles = roles.Add(PlatformRoles.Standard.Name).Value;
 
         var result = roles.HasRole(PlatformRoles.Standard.Name);
@@ -259,7 +259,7 @@ public class RolesSpec
     [Fact]
     public void WhenRemoveAndInvalidName_ThenDoesNotRemove()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
         roles = roles.Add(PlatformRoles.Standard.Name).Value;
 
         var result = roles.Remove("anunknownrole");
@@ -271,7 +271,7 @@ public class RolesSpec
     [Fact]
     public void WhenRemoveAndNoMatch_ThenDoesNotRemove()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
         roles = roles.Add(PlatformRoles.Standard.Name).Value;
 
         var result = roles.Remove(PlatformRoles.TestingOnly.Name);
@@ -283,7 +283,7 @@ public class RolesSpec
     [Fact]
     public void WhenRemoveAndMatches_ThenRemoves()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
         roles = roles.Add(PlatformRoles.Standard.Name).Value;
 
         var result = roles.Remove(PlatformRoles.Standard.Name);
@@ -295,7 +295,7 @@ public class RolesSpec
     [Fact]
     public void WhenToList_ThenReturnsStringList()
     {
-        var roles = Roles.Create();
+        var roles = Roles.Empty;
         roles = roles.Add(PlatformRoles.Standard.Name).Value;
         roles = roles.Add(PlatformRoles.TestingOnly.Name).Value;
 

@@ -257,7 +257,7 @@ public class MultiTenancyMiddlewareSpec
                 _tenantDetective.Object);
 
             context.Response.Should().BeAProblem(HttpStatusCode.BadRequest,
-                Resources.MultiTenancyMiddleware_MissingTenantId);
+                Resources.MultiTenancyMiddleware_MissingDefaultOrganization);
             _tenantDetective.Verify(td =>
                 td.DetectTenantAsync(context, Optional<Type>.None, CancellationToken.None));
             _next.Verify(n => n.Invoke(It.IsAny<HttpContext>()), Times.Never);
@@ -468,7 +468,7 @@ public class MultiTenancyMiddlewareSpec
                 _tenantDetective.Object);
 
             context.Response.Should().BeAProblem(HttpStatusCode.BadRequest,
-                Resources.MultiTenancyMiddleware_MissingTenantId);
+                Resources.MultiTenancyMiddleware_MissingDefaultOrganization);
             _tenantDetective.Verify(td =>
                 td.DetectTenantAsync(context, Optional<Type>.None, CancellationToken.None));
             _next.Verify(n => n.Invoke(It.IsAny<HttpContext>()), Times.Never);
@@ -506,7 +506,7 @@ public class MultiTenancyMiddlewareSpec
                 _tenantDetective.Object);
 
             context.Response.Should().BeAProblem(HttpStatusCode.BadRequest,
-                Resources.MultiTenancyMiddleware_MissingTenantId);
+                Resources.MultiTenancyMiddleware_MissingDefaultOrganization);
             _tenantDetective.Verify(td =>
                 td.DetectTenantAsync(context, Optional<Type>.None, CancellationToken.None));
             _next.Verify(n => n.Invoke(It.IsAny<HttpContext>()), Times.Never);

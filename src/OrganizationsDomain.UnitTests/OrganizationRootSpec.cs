@@ -19,21 +19,24 @@ namespace OrganizationsDomain.UnitTests;
 [Trait("Category", "Unit")]
 public class OrganizationRootSpec
 {
+    private readonly Mock<IIdentifierFactory> _identifierFactory;
     private readonly OrganizationRoot _org;
+    private readonly Mock<IRecorder> _recorder;
+    private readonly Mock<ITenantSettingService> _tenantSettingService;
 
     public OrganizationRootSpec()
     {
-        var recorder = new Mock<IRecorder>();
-        var identifierFactory = new Mock<IIdentifierFactory>();
-        identifierFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
+        _recorder = new Mock<IRecorder>();
+        _identifierFactory = new Mock<IIdentifierFactory>();
+        _identifierFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns((IIdentifiableEntity _) => "anid".ToId());
-        var tenantSettingService = new Mock<ITenantSettingService>();
-        tenantSettingService.Setup(tss => tss.Encrypt(It.IsAny<string>()))
+        _tenantSettingService = new Mock<ITenantSettingService>();
+        _tenantSettingService.Setup(tss => tss.Encrypt(It.IsAny<string>()))
             .Returns((string value) => value);
-        tenantSettingService.Setup(tss => tss.Decrypt(It.IsAny<string>()))
+        _tenantSettingService.Setup(tss => tss.Decrypt(It.IsAny<string>()))
             .Returns((string value) => value);
 
-        _org = OrganizationRoot.Create(recorder.Object, identifierFactory.Object, tenantSettingService.Object,
+        _org = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object, _tenantSettingService.Object,
             OrganizationOwnership.Shared, "acreatorid".ToId(), UserClassification.Person,
             DisplayName.Create("aname").Value).Value;
     }
@@ -47,6 +50,7 @@ public class OrganizationRootSpec
 
         result.Should().BeError(ErrorCode.RuleViolation, Resources.OrganizationRoot_Create_SharedRequiresPerson);
     }
+
     [Fact]
     public void WhenCreate_ThenAssigns()
     {
@@ -94,55 +98,99 @@ public class OrganizationRootSpec
     }
 
     [Fact]
-    public void WhenAddMembershipAndInviterNotOwner_ThenReturnsError()
+    public void WhenInviteMemberAndInviterNotOwner_ThenReturnsError()
     {
-        var result = _org.AddMembership("aninviterid".ToId(), Roles.Empty, Optional<Identifier>.None,
+        var result = _org.InviteMember("aninviterid".ToId(), Roles.Empty, Optional<Identifier>.None,
             Optional<EmailAddress>.None);
 
-        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_NotOrgOwner);
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UserNotOrgOwner);
     }
 
     [Fact]
-    public void WhenAddMembershipAndNoUser_ThenReturnsError()
+    public void WhenInviteMemberAndNoUser_ThenReturnsError()
     {
-        var result = _org.AddMembership("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+        var result = _org.InviteMember("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value,
             Optional<Identifier>.None, Optional<EmailAddress>.None);
 
         result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.OrganizationRoot_AddMembership_UserIdAndEmailMissing);
+            Resources.OrganizationRoot_InviteMember_UserIdAndEmailMissing);
     }
 
     [Fact]
-    public void WhenAddMembershipAndNotShared_ThenReturnsError()
+    public void WhenInviteMemberAndNotShared_ThenReturnsError()
     {
 #if TESTINGONLY
         _org.TestingOnly_ChangeOwnership(OrganizationOwnership.Personal);
 #endif
-        var result = _org.AddMembership("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+        var result = _org.InviteMember("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value,
             Optional<Identifier>.None, Optional<EmailAddress>.None);
 
         result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.OrganizationRoot_AddMembership_PersonalOrgMembershipNotAllowed);
+            Resources.OrganizationRoot_InviteMember_PersonalOrgMembershipNotAllowed);
     }
 
     [Fact]
-    public void WhenAddMembershipWithUserId_ThenAddsMembership()
+    public void WhenInviteMemberWithUserId_ThenAddsMembership()
     {
-        var result = _org.AddMembership("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+        var result = _org.InviteMember("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value,
             "auserid".ToId(), Optional<EmailAddress>.None);
 
         result.Should().BeSuccess();
-        _org.Events.Last().Should().BeOfType<MembershipAdded>();
+        _org.Events.Last().Should().BeOfType<MemberInvited>();
     }
 
     [Fact]
-    public void WhenAddMembershipWithEmailAddress_ThenAddsMembership()
+    public void WhenInviteMemberWithEmailAddress_ThenAddsMembership()
     {
-        var result = _org.AddMembership("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+        var result = _org.InviteMember("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value,
             Optional<Identifier>.None, EmailAddress.Create("auser@company.com").Value);
 
         result.Should().BeSuccess();
-        _org.Events.Last().Should().BeOfType<MembershipAdded>();
+        _org.Events.Last().Should().BeOfType<MemberInvited>();
+    }
+
+    [Fact]
+    public void WhenUnInviteMemberAndRemoverNotOwner_ThenReturnsError()
+    {
+        var result = _org.UnInviteMember("aremoverid".ToId(), Roles.Empty, "auserid".ToId());
+
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UserNotOrgOwner);
+    }
+
+    [Fact]
+    public void WhenUnInviteMemberAndPersonalOrg_ThenReturnsError()
+    {
+        var org = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object,
+            _tenantSettingService.Object, OrganizationOwnership.Personal, "acreatorid".ToId(),
+            UserClassification.Person, DisplayName.Create("aname").Value).Value;
+
+        var result = org.UnInviteMember("aremoverid".ToId(), Roles.Create(TenantRoles.Owner).Value, "auserid".ToId());
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.OrganizationRoot_UnInviteMember_PersonalOrg);
+    }
+
+    [Fact]
+    public void WhenUnInviteMemberAndNotMember_ThenDoesNothing()
+    {
+        _org.InviteMember("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value, "auserid".ToId(),
+            Optional<EmailAddress>.None);
+
+        var result =
+            _org.UnInviteMember("aremoverid".ToId(), Roles.Create(TenantRoles.Owner).Value, "anotheruserid".ToId());
+
+        result.Should().BeSuccess();
+    }
+
+    [Fact]
+    public void WhenUnInviteMemberAndIsMember_ThenRemovesMember()
+    {
+        _org.InviteMember("aninviterid".ToId(), Roles.Create(TenantRoles.Owner).Value, "auserid".ToId(),
+            Optional<EmailAddress>.None);
+
+        var result =
+            _org.UnInviteMember("aremoverid".ToId(), Roles.Create(TenantRoles.Owner).Value, "auserid".ToId());
+
+        result.Should().BeSuccess();
     }
 
     [Fact]
@@ -152,7 +200,7 @@ public class OrganizationRootSpec
             _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("animageid".ToId(), "aurl").Value),
             _ => Task.FromResult(Result.Ok));
 
-        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_NotOrgOwner);
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UserNotOrgOwner);
     }
 
     [Fact]
@@ -202,7 +250,7 @@ public class OrganizationRootSpec
     {
         var result = await _org.DeleteAvatarAsync("anotheruserid".ToId(), Roles.Empty, _ => Task.FromResult(Result.Ok));
 
-        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_NotOrgOwner);
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UserNotOrgOwner);
     }
 
     [Fact]
@@ -232,5 +280,159 @@ public class OrganizationRootSpec
         result.Should().BeSuccess();
         _org.Avatar.HasValue.Should().BeFalse();
         _org.Events.Last().Should().BeOfType<AvatarRemoved>();
+    }
+
+    [Fact]
+    public void WhenAddMembershipAndExists_ThenDoesNothing()
+    {
+        _org.AddMembership("auserid".ToId());
+
+        var result = _org.AddMembership("auserid".ToId());
+
+        result.Should().BeSuccess();
+        _org.Memberships.Count.Should().Be(1);
+        _org.Memberships.Members[0].UserId.Should().Be("auserid".ToId());
+        _org.Events.Last().Should().BeOfType<MembershipAdded>();
+    }
+
+    [Fact]
+    public void WhenAddMembership_ThenAdded()
+    {
+        var result = _org.AddMembership("auserid".ToId());
+
+        result.Should().BeSuccess();
+        _org.Memberships.Count.Should().Be(1);
+        _org.Memberships.Members[0].UserId.Should().Be("auserid".ToId());
+        _org.Events.Last().Should().BeOfType<MembershipAdded>();
+    }
+
+    [Fact]
+    public void WhenRemoveMembershipAndNoTExist_ThenDoesNothing()
+    {
+        var result = _org.RemoveMembership("auserid".ToId());
+
+        result.Should().BeSuccess();
+        _org.Memberships.Count.Should().Be(0);
+        _org.Events.Last().Should().BeOfType<Created>();
+    }
+
+    [Fact]
+    public void WhenRemoveMembership_ThenRemoves()
+    {
+        _org.AddMembership("auserid".ToId());
+
+        var result = _org.RemoveMembership("auserid".ToId());
+
+        result.Should().BeSuccess();
+        _org.Memberships.Count.Should().Be(0);
+        _org.Events.Last().Should().BeOfType<MembershipRemoved>();
+    }
+
+    [Fact]
+    public void WhenAssignRolesAndNotOwner_ThenReturnsError()
+    {
+        var result = _org.AssignRoles("anassignerid".ToId(), Roles.Empty, "auserid".ToId(), Roles.Empty);
+
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UserNotOrgOwner);
+    }
+
+    [Fact]
+    public void WhenAssignRolesAndNotMember_ThenReturnsError()
+    {
+        var result = _org.AssignRoles("anassignerid".ToId(), Roles.Create(TenantRoles.Owner).Value, "auserid".ToId(),
+            Roles.Empty);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.OrganizationRoot_UserNotMember);
+    }
+
+    [Fact]
+    public void WhenAssignRolesAndNotAssignableRole_ThenReturnsError()
+    {
+        _org.AddMembership("auserid".ToId());
+
+        var result = _org.AssignRoles("anassignerid".ToId(), Roles.Create(TenantRoles.Owner).Value, "auserid".ToId(),
+            Roles.Create("arole").Value);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.OrganizationRoot_RoleNotAssignable.Format("arole"));
+    }
+
+    [Fact]
+    public void WhenAssignRoles_ThenAssigns()
+    {
+        _org.AddMembership("auserid".ToId());
+
+        var result = _org.AssignRoles("anassignerid".ToId(), Roles.Create(TenantRoles.Owner).Value, "auserid".ToId(),
+            Roles.Create(TenantRoles.BillingAdmin).Value);
+
+        result.Should().BeSuccess();
+        _org.Events.Last().Should().BeOfType<RoleAssigned>();
+    }
+
+    [Fact]
+    public void WhenUnassignRolesAndNotOwner_ThenReturnsError()
+    {
+        var result = _org.UnassignRoles("anassignerid".ToId(), Roles.Empty, "auserid".ToId(), Roles.Empty);
+
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UserNotOrgOwner);
+    }
+
+    [Fact]
+    public void WhenUnassignRolesAndNotMember_ThenReturnsError()
+    {
+        var result = _org.UnassignRoles("anassignerid".ToId(), Roles.Create(TenantRoles.Owner).Value, "auserid".ToId(),
+            Roles.Empty);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.OrganizationRoot_UserNotMember);
+    }
+
+    [Fact]
+    public void WhenUnassignRolesAndNotAssignableRole_ThenReturnsError()
+    {
+        _org.AddMembership("auserid".ToId());
+
+        var result = _org.UnassignRoles("anassignerid".ToId(), Roles.Create(TenantRoles.Owner).Value, "auserid".ToId(),
+            Roles.Create("arole").Value);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.OrganizationRoot_RoleNotAssignable.Format("arole"));
+    }
+
+    [Fact]
+    public void WhenUnassignRoles_ThenUnassigns()
+    {
+        _org.AddMembership("auserid".ToId());
+
+        var result = _org.UnassignRoles("anassignerid".ToId(), Roles.Create(TenantRoles.Owner).Value, "auserid".ToId(),
+            Roles.Create(TenantRoles.Owner).Value);
+
+        result.Should().BeSuccess();
+        _org.Events.Last().Should().BeOfType<RoleUnassigned>();
+    }
+
+    [Fact]
+    public void WhenDeleteOrganizationAndNotOwner_ThenReturnsError()
+    {
+        var result = _org.DeleteOrganization("adeleterid".ToId(), Roles.Empty);
+
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UserNotOrgOwner);
+    }
+
+    [Fact]
+    public void WhenDeleteOrganizationAndHasOtherMembers_ThenReturnsError()
+    {
+        _org.AddMembership("auserid1".ToId());
+
+        var result = _org.DeleteOrganization("adeleterid".ToId(), Roles.Create(TenantRoles.Owner).Value);
+
+        result.Should().BeError(ErrorCode.RuleViolation,
+            Resources.OrganizationRoot_DeleteOrganization_MembersStillExist);
+    }
+
+    [Fact]
+    public void WhenDeleteOrganization_ThenDeletes()
+    {
+        var result = _org.DeleteOrganization("adeleterid".ToId(), Roles.Create(TenantRoles.Owner).Value);
+
+        result.Should().BeSuccess();
+        _org.IsDeleted.Value.Should().BeTrue();
     }
 }

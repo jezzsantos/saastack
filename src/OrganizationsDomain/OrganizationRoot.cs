@@ -53,6 +53,8 @@ public sealed class OrganizationRoot : AggregateRootBase
 
     public Identifier CreatedById { get; private set; } = Identifier.Empty();
 
+    public Memberships Memberships { get; private set; } = Memberships.Empty;
+
     public DisplayName Name { get; private set; } = DisplayName.Empty;
 
     public OrganizationOwnership Ownership { get; private set; }
@@ -136,10 +138,36 @@ public sealed class OrganizationRoot : AggregateRootBase
 
             case MembershipAdded added:
             {
-                Recorder.TraceDebug(null, "Organization {Id} added membership for {User}", Id,
-                    (added.EmailAddress.HasValue()
-                        ? added.EmailAddress
-                        : added.UserId)!);
+                var membership = Membership.Create(added.RootId, added.UserId);
+                if (!membership.IsSuccessful)
+                {
+                    return membership.Error;
+                }
+
+                Memberships = Memberships.Add(membership.Value);
+                Recorder.TraceDebug(null, "Organization {Id} added member {User}", Id, added.UserId);
+                return Result.Ok;
+            }
+
+            case MembershipRemoved removed:
+            {
+                Memberships = Memberships.Remove(removed.UserId);
+                Recorder.TraceDebug(null, "Organization {Id} removed member {User}", Id, removed.UserId);
+                return Result.Ok;
+            }
+
+            case MemberInvited invited:
+            {
+                Recorder.TraceDebug(null, "Organization {Id} invited member {User}", Id,
+                    (invited.EmailAddress.HasValue()
+                        ? invited.EmailAddress
+                        : invited.UserId)!);
+                return Result.Ok;
+            }
+
+            case MemberUnInvited unInvited:
+            {
+                Recorder.TraceDebug(null, "Organization {Id} uninvited member {User}", Id, unInvited.UserId);
                 return Result.Ok;
             }
 
@@ -163,40 +191,83 @@ public sealed class OrganizationRoot : AggregateRootBase
                 return Result.Ok;
             }
 
+            case NameChanged changed:
+            {
+                var name = DisplayName.Create(changed.Name);
+                if (!name.IsSuccessful)
+                {
+                    return name.Error;
+                }
+
+                Name = name.Value;
+                Recorder.TraceDebug(null, "Organization {Id} changed name", Id);
+                return Result.Ok;
+            }
+
+            case RoleAssigned assigned:
+            {
+                Recorder.TraceDebug(null, "Organization {Id} assigned role {Role} to {User}", Id, assigned.Role,
+                    assigned.UserId);
+                return Result.Ok;
+            }
+
+            case RoleUnassigned unassigned:
+            {
+                Recorder.TraceDebug(null, "Organization {Id} unassigned role {Role} to {User}", Id, unassigned.Role,
+                    unassigned.UserId);
+                return Result.Ok;
+            }
+
             default:
                 return HandleUnKnownStateChangedEvent(@event);
         }
     }
 
-    public Result<Error> AddMembership(Identifier inviterId, Roles inviterRoles, Optional<Identifier> userId,
-        Optional<EmailAddress> emailAddress)
+    public Result<Error> AddMembership(Identifier userId)
     {
-        if (!IsOwner(inviterRoles))
+        if (Memberships.HasMember(userId))
         {
-            return Error.RoleViolation(Resources.OrganizationRoot_NotOrgOwner);
+            return Result.Ok;
         }
 
-        if (Ownership == OrganizationOwnership.Personal)
+        return RaiseChangeEvent(OrganizationsDomain.Events.MembershipAdded(Id, userId));
+    }
+
+    public Result<Error> AssignRoles(Identifier assignerId, Roles assignerRoles, Identifier userId, Roles rolesToAssign)
+    {
+        if (!IsOwner(assignerRoles))
         {
-            return Error.RuleViolation(Resources.OrganizationRoot_AddMembership_PersonalOrgMembershipNotAllowed);
+            return Error.RoleViolation(Resources.OrganizationRoot_UserNotOrgOwner);
         }
 
-        if (!userId.HasValue
-            && !emailAddress.HasValue)
+        if (!IsMember(userId))
         {
-            return Error.RuleViolation(Resources.OrganizationRoot_AddMembership_UserIdAndEmailMissing);
+            return Error.RuleViolation(Resources.OrganizationRoot_UserNotMember);
         }
 
-        return RaiseChangeEvent(OrganizationsDomain.Events.MembershipAdded(Id, inviterId, userId, emailAddress));
+        foreach (var role in rolesToAssign.Items)
+        {
+            if (!TenantRoles.IsTenantAssignableRole(role))
+            {
+                return Error.RuleViolation(Resources.OrganizationRoot_RoleNotAssignable.Format(role));
+            }
+
+            var assigned = RaiseChangeEvent(OrganizationsDomain.Events.RoleAssigned(Id, assignerId, userId, role));
+            if (!assigned.IsSuccessful)
+            {
+                return assigned.Error;
+            }
+        }
+
+        return Result.Ok;
     }
 
     public async Task<Result<Error>> ChangeAvatarAsync(Identifier modifierId, Roles modifierRoles,
-        CreateAvatarAction onCreateNew,
-        RemoveAvatarAction onRemoveOld)
+        CreateAvatarAction onCreateNew, RemoveAvatarAction onRemoveOld)
     {
         if (!IsOwner(modifierRoles))
         {
-            return Error.RoleViolation(Resources.OrganizationRoot_NotOrgOwner);
+            return Error.RoleViolation(Resources.OrganizationRoot_UserNotOrgOwner);
         }
 
         var existingAvatarId = Avatar.HasValue
@@ -220,6 +291,16 @@ public sealed class OrganizationRoot : AggregateRootBase
         return RaiseChangeEvent(OrganizationsDomain.Events.AvatarAdded(Id, created.Value));
     }
 
+    public Result<Error> ChangeName(Identifier modifierId, Roles modifierRoles, DisplayName name)
+    {
+        if (!IsOwner(modifierRoles))
+        {
+            return Error.RoleViolation(Resources.OrganizationRoot_UserNotOrgOwner);
+        }
+
+        return RaiseChangeEvent(OrganizationsDomain.Events.NameChanged(Id, name));
+    }
+
     public Result<Error> CreateSettings(Settings settings)
     {
         foreach (var (key, value) in settings.Properties)
@@ -239,7 +320,7 @@ public sealed class OrganizationRoot : AggregateRootBase
     {
         if (!IsOwner(deleterRoles))
         {
-            return Error.RoleViolation(Resources.OrganizationRoot_NotOrgOwner);
+            return Error.RoleViolation(Resources.OrganizationRoot_UserNotOrgOwner);
         }
 
         if (!Avatar.HasValue)
@@ -257,12 +338,118 @@ public sealed class OrganizationRoot : AggregateRootBase
         return RaiseChangeEvent(OrganizationsDomain.Events.AvatarRemoved(Id, avatarId));
     }
 
+    public Result<Error> DeleteOrganization(Identifier deleterId, Roles deleterRoles)
+    {
+        if (!IsOwner(deleterRoles))
+        {
+            return Error.RoleViolation(Resources.OrganizationRoot_UserNotOrgOwner);
+        }
+
+        //TODO: Must be the BillingBuyer
+        //TODO: BillingBuyer.CanBeUnsubscribed must be true
+
+        var otherMembers = Memberships.Members
+            .Select(m => m.UserId)
+            .Except(new[] { deleterId })
+            .ToList();
+        if (otherMembers.HasAny())
+        {
+            return Error.RuleViolation(Resources.OrganizationRoot_DeleteOrganization_MembersStillExist);
+        }
+
+        return RaisePermanentDeleteEvent(deleterId);
+    }
+
+    public Result<Error> InviteMember(Identifier inviterId, Roles inviterRoles, Optional<Identifier> userId,
+        Optional<EmailAddress> emailAddress)
+    {
+        if (!IsOwner(inviterRoles))
+        {
+            return Error.RoleViolation(Resources.OrganizationRoot_UserNotOrgOwner);
+        }
+
+        if (Ownership == OrganizationOwnership.Personal)
+        {
+            return Error.RuleViolation(Resources.OrganizationRoot_InviteMember_PersonalOrgMembershipNotAllowed);
+        }
+
+        if (!userId.HasValue
+            && !emailAddress.HasValue)
+        {
+            return Error.RuleViolation(Resources.OrganizationRoot_InviteMember_UserIdAndEmailMissing);
+        }
+
+        return RaiseChangeEvent(OrganizationsDomain.Events.MemberInvited(Id, inviterId, userId, emailAddress));
+    }
+
+    public Result<Error> RemoveMembership(Identifier userId)
+    {
+        if (!Memberships.HasMember(userId))
+        {
+            return Result.Ok;
+        }
+
+        return RaiseChangeEvent(OrganizationsDomain.Events.MembershipRemoved(Id, userId));
+    }
+
 #if TESTINGONLY
     public void TestingOnly_ChangeOwnership(OrganizationOwnership ownership)
     {
         Ownership = ownership;
     }
 #endif
+
+    public Result<Error> UnassignRoles(Identifier assignerId, Roles assignerRoles, Identifier userId,
+        Roles rolesToUnassign)
+    {
+        if (!IsOwner(assignerRoles))
+        {
+            return Error.RoleViolation(Resources.OrganizationRoot_UserNotOrgOwner);
+        }
+
+        if (!IsMember(userId))
+        {
+            return Error.RuleViolation(Resources.OrganizationRoot_UserNotMember);
+        }
+
+        foreach (var role in rolesToUnassign.Items)
+        {
+            if (!TenantRoles.IsTenantAssignableRole(role))
+            {
+                return Error.RuleViolation(Resources.OrganizationRoot_RoleNotAssignable.Format(role));
+            }
+
+            var assigned = RaiseChangeEvent(OrganizationsDomain.Events.RoleUnassigned(Id, assignerId, userId, role));
+            if (!assigned.IsSuccessful)
+            {
+                return assigned.Error;
+            }
+        }
+
+        return Result.Ok;
+    }
+
+    public Result<Error> UnInviteMember(Identifier removerId, Roles removerRoles, Identifier userId)
+    {
+        if (!IsOwner(removerRoles))
+        {
+            return Error.RoleViolation(Resources.OrganizationRoot_UserNotOrgOwner);
+        }
+
+        if (Ownership == OrganizationOwnership.Personal)
+        {
+            return Error.RuleViolation(Resources.OrganizationRoot_UnInviteMember_PersonalOrg);
+        }
+
+        if (!Memberships.HasMember(userId))
+        {
+            return Result.Ok;
+        }
+
+        //TODO: cannot remove if BillingBuyer
+
+        return RaiseChangeEvent(OrganizationsDomain.Events.MemberUnInvited(Id, removerId, userId));
+    }
 
     public Result<Error> UpdateSettings(Settings settings)
     {
@@ -295,5 +482,10 @@ public sealed class OrganizationRoot : AggregateRootBase
     private static bool IsOwner(Roles roles)
     {
         return roles.HasRole(TenantRoles.Owner);
+    }
+
+    private bool IsMember(Identifier userId)
+    {
+        return Memberships.HasMember(userId);
     }
 }

@@ -117,7 +117,7 @@ public class EventSourcingDddCommandStoreSpec
 
         var result = await _store.LoadAsync("anid".ToId(), CancellationToken.None);
 
-        result.Should().BeError(ErrorCode.EntityNotFound, Resources.IEventSourcingDddCommandStore_StreamTombstoned);
+        result.Should().BeError(ErrorCode.EntityDeleted, Resources.IEventSourcingDddCommandStore_StreamTombstoned);
     }
 
     [Fact]

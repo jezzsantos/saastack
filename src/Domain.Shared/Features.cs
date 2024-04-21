@@ -50,6 +50,23 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
         return new Features(list);
     }
 
+    public static Result<Features, Error> Create(params FeatureLevel[] features)
+    {
+        var list = new List<Feature>();
+        foreach (var feature in features)
+        {
+            var feat = Feature.Create(feature);
+            if (!feat.IsSuccessful)
+            {
+                return feat.Error;
+            }
+
+            list.Add(feat.Value);
+        }
+
+        return new Features(list);
+    }
+
     private Features() : base(new List<Feature>())
     {
     }
@@ -180,6 +197,17 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
         }
 
         return new Features(Value);
+    }
+
+    public Features Remove(FeatureLevel feature)
+    {
+        var feat = Feature.Create(feature);
+        if (!feat.IsSuccessful)
+        {
+            return this;
+        }
+
+        return Remove(feat.Value);
     }
 
     [SkipImmutabilityCheck]

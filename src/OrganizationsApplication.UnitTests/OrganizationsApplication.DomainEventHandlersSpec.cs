@@ -25,15 +25,18 @@ public class OrganizationsApplicationDomainEventHandlersSpec
 {
     private readonly OrganizationsApplication _application;
     private readonly Mock<ICallerContext> _caller;
+    private readonly Mock<IIdentifierFactory> _identifierFactory;
+    private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IOrganizationRepository> _repository;
+    private readonly Mock<ITenantSettingService> _tenantSettingService;
     private readonly Mock<ITenantSettingsService> _tenantSettingsService;
 
     public OrganizationsApplicationDomainEventHandlersSpec()
     {
-        var recorder = new Mock<IRecorder>();
+        _recorder = new Mock<IRecorder>();
         _caller = new Mock<ICallerContext>();
-        var idFactory = new Mock<IIdentifierFactory>();
-        idFactory.Setup(f => f.Create(It.IsAny<IIdentifiableEntity>()))
+        _identifierFactory = new Mock<IIdentifierFactory>();
+        _identifierFactory.Setup(f => f.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
         _tenantSettingsService = new Mock<ITenantSettingsService>();
         _tenantSettingsService.Setup(tss =>
@@ -42,10 +45,10 @@ public class OrganizationsApplicationDomainEventHandlersSpec
             {
                 { "aname", "avalue" }
             }));
-        var tenantSettingService = new Mock<ITenantSettingService>();
-        tenantSettingService.Setup(tss => tss.Encrypt(It.IsAny<string>()))
+        _tenantSettingService = new Mock<ITenantSettingService>();
+        _tenantSettingService.Setup(tss => tss.Encrypt(It.IsAny<string>()))
             .Returns((string value) => value);
-        tenantSettingService.Setup(tss => tss.Decrypt(It.IsAny<string>()))
+        _tenantSettingService.Setup(tss => tss.Decrypt(It.IsAny<string>()))
             .Returns((string value) => value);
         var endUsersService = new Mock<IEndUsersService>();
         var imagesService = new Mock<IImagesService>();
@@ -54,8 +57,8 @@ public class OrganizationsApplicationDomainEventHandlersSpec
             .Returns((OrganizationRoot root, CancellationToken _) =>
                 Task.FromResult<Result<OrganizationRoot, Error>>(root));
 
-        _application = new OrganizationsApplication(recorder.Object, idFactory.Object,
-            _tenantSettingsService.Object, tenantSettingService.Object, endUsersService.Object, imagesService.Object,
+        _application = new OrganizationsApplication(_recorder.Object, _identifierFactory.Object,
+            _tenantSettingsService.Object, _tenantSettingService.Object, endUsersService.Object, imagesService.Object,
             _repository.Object);
     }
 
@@ -103,5 +106,47 @@ public class OrganizationsApplicationDomainEventHandlersSpec
         ), It.IsAny<CancellationToken>()));
         _tenantSettingsService.Verify(tss =>
             tss.CreateForTenantAsync(_caller.Object, "anid", It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenHandleEndUserMembershipAddedAsync_ThenAddsMembership()
+    {
+        var domainEvent = Events.MembershipAdded("auserid".ToId(), "anorganizationid".ToId(),
+            OrganizationOwnership.Shared, false, Roles.Empty, Features.Empty);
+        var org = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Shared, "anownerid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+
+        var result =
+            await _application.HandleEndUserMembershipAddedAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(root =>
+            root.Memberships.Members.Count == 1
+            && root.Memberships.Members[0].UserId == "auserid"
+        ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenHandleEndUserMembershipRemovedAsync_ThenRemovesMembership()
+    {
+        var domainEvent = Events.MembershipRemoved("auserid".ToId(), "amembershipid".ToId(), "anorganizationid".ToId(),
+            "auserid".ToId());
+        var org = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Shared, "anownerid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
+        org.AddMembership("auserid".ToId());
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+
+        var result =
+            await _application.HandleEndUserMembershipRemovedAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(root =>
+            root.Memberships.Members.Count == 0
+        ), It.IsAny<CancellationToken>()));
     }
 }

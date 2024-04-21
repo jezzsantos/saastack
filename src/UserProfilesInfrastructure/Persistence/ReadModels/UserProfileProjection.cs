@@ -1,7 +1,6 @@
 using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
-using Domain.Common.ValueObjects;
 using Domain.Events.Shared.UserProfiles;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
@@ -29,7 +28,7 @@ public class UserProfileProjection : IReadModelProjection
         switch (changeEvent)
         {
             case Created e:
-                return await _users.HandleCreateAsync(e.RootId.ToId(), dto =>
+                return await _users.HandleCreateAsync(e.RootId, dto =>
                 {
                     dto.Type = e.Type;
                     dto.UserId = e.UserId;
@@ -39,34 +38,34 @@ public class UserProfileProjection : IReadModelProjection
                 }, cancellationToken);
 
             case NameChanged e:
-                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _users.HandleUpdateAsync(e.RootId, dto =>
                 {
                     dto.FirstName = e.FirstName;
                     dto.LastName = e.LastName;
                 }, cancellationToken);
 
             case DisplayNameChanged e:
-                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.DisplayName = e.DisplayName; },
+                return await _users.HandleUpdateAsync(e.RootId, dto => { dto.DisplayName = e.DisplayName; },
                     cancellationToken);
 
             case EmailAddressChanged e:
-                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.EmailAddress = e.EmailAddress; },
+                return await _users.HandleUpdateAsync(e.RootId, dto => { dto.EmailAddress = e.EmailAddress; },
                     cancellationToken);
 
             case PhoneNumberChanged e:
-                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.PhoneNumber = e.Number; },
+                return await _users.HandleUpdateAsync(e.RootId, dto => { dto.PhoneNumber = e.Number; },
                     cancellationToken);
 
             case TimezoneChanged e:
-                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.Timezone = e.Timezone; },
+                return await _users.HandleUpdateAsync(e.RootId, dto => { dto.Timezone = e.Timezone; },
                     cancellationToken);
 
             case ContactAddressChanged e:
-                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto => { dto.CountryCode = e.CountryCode; },
+                return await _users.HandleUpdateAsync(e.RootId, dto => { dto.CountryCode = e.CountryCode; },
                     cancellationToken);
 
             case AvatarAdded e:
-                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _users.HandleUpdateAsync(e.RootId, dto =>
                     {
                         dto.AvatarId = e.AvatarId;
                         dto.AvatarUrl = e.AvatarUrl;
@@ -74,7 +73,7 @@ public class UserProfileProjection : IReadModelProjection
                     cancellationToken);
 
             case AvatarRemoved e:
-                return await _users.HandleUpdateAsync(e.RootId.ToId(), dto =>
+                return await _users.HandleUpdateAsync(e.RootId, dto =>
                     {
                         dto.AvatarId = Optional<string>.None;
                         dto.AvatarUrl = Optional<string>.None;
@@ -82,7 +81,7 @@ public class UserProfileProjection : IReadModelProjection
                     cancellationToken);
 
             case DefaultOrganizationChanged e:
-                return await _users.HandleUpdateAsync(e.RootId.ToId(),
+                return await _users.HandleUpdateAsync(e.RootId,
                     dto => { dto.DefaultOrganizationId = e.ToOrganizationId; },
                     cancellationToken);
 

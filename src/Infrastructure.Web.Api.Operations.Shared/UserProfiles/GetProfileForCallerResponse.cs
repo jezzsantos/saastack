@@ -3,7 +3,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.UserProfiles;
 
-public class GetCurrentProfileResponse : IWebResponse
+public class GetProfileForCallerResponse : IWebResponse
 {
-    public UserProfileForCurrent? Profile { get; set; }
+    public UserProfileForCaller? Profile { get; set; }
 }

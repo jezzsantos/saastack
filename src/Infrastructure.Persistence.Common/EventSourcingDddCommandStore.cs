@@ -73,7 +73,7 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
 
                 if (IsTombstoned(events))
                 {
-                    return Error.EntityNotFound(Resources.IEventSourcingDddCommandStore_StreamTombstoned);
+                    return Error.EntityDeleted(Resources.IEventSourcingDddCommandStore_StreamTombstoned);
                 }
 
                 var lastPersistedAtUtc = events.Last().LastPersistedAtUtc;

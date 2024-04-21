@@ -338,6 +338,7 @@
 	<s:Boolean x:Key="/Default/Environment/Filtering/FileMasksToExclude/=src_002FApplication_002EInterfaces_002FResources_002F_002A_002E_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/FileMasksToExclude/=src_002FCommon_002FAnnotations_002Ecs/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/HideAutoProperties/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/Highlighting/UseShapedMarkers/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpKeepExistingMigration/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpPlaceEmbeddedOnSameLineMigration/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpUseContinuousIndentInsideBracesMigration/@EntryIndexedValue">True</s:Boolean>
@@ -559,7 +560,7 @@ using Domain.Common;
 using Domain.Common.ValueObjects;
 
 public sealed class $name$ : SingleValueObjectBase&lt;$name$, $datatype$&gt;
-{
+{$END$$SELECTION$
     public static Result&lt;$name$, Error&gt; Create($datatype$ value)
     {
         if (value.IsNotValuedParameter(nameof(value), out var error))
@@ -582,7 +583,7 @@ public sealed class $name$ : SingleValueObjectBase&lt;$name$, $datatype$&gt;
             return new $name$(parts[0]);
         };
     }
-}$END$$SELECTION$</s:String>
+}</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Description/@EntryValue">A DELETE API definition</s:String>
@@ -601,7 +602,7 @@ public sealed class $name$ : SingleValueObjectBase&lt;$name$, $datatype$&gt;
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Shortcut/@EntryValue">deleteapi</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Text/@EntryValue">public async Task&lt;ApiDeleteResult&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
-{
+{$END$$SELECTION$
     var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
 
     return () =&gt; $resource$.HandleApplicationResult();
@@ -644,7 +645,7 @@ using Domain.Common;
 using Domain.Common.ValueObjects;
 
 public sealed class $name$ : ValueObjectBase&lt;$name$&gt;
-{
+{$END$$SELECTION$
     public static Result&lt;$name$, Error&gt; Create($datatype$ $value1$, $datatype$ $value2$, $datatype$ $value3$)
     {
         if ($value1$.IsNotValuedParameter(nameof($value1$), out var error1))
@@ -689,7 +690,7 @@ public sealed class $name$ : ValueObjectBase&lt;$name$&gt;
     public $datatype$ $param2$ { get; }
 
     public $datatype$ $param3$ { get; }
-}$END$$SELECTION$</s:String>
+}</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=337185EBCDCBAA49B6CFAF4C879B9C28/CustomProperties/=Extension/@EntryIndexedValue">cs</s:String>
@@ -757,7 +758,7 @@ public class $Action$$Resource$RequestValidator : AbstractValidator&lt;$Action$$
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Shortcut/@EntryValue">postapi</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Text/@EntryValue">public async Task&lt;ApiPostResult&lt;$Resource$, $Action$$Resource$Response&gt;&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
-{
+{$END$$SELECTION$
     var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
 
     return () =&gt; $resource$.HandleApplicationResult&lt;$Resource$, $Action$$Resource$Response&gt;(x =&gt; new PostResult&lt;$Action$$Resource$Response&gt;(new $Action$$Resource$Response { $Resource$ = x }));
@@ -820,11 +821,12 @@ public sealed class $class$ : DomainEvent
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Shortcut/@EntryValue">searchapi</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Text/@EntryValue">public async Task&lt;ApiSearchResult&lt;$Resource$, $Action$$Resource$sResponse&gt;&gt; $Action$$Resource$s($Action$$Resource$sRequest request, CancellationToken cancellationToken)
-{
+{$END$$SELECTION$
     var $resource$s = await _application.$Action$$Resource$sAsync(_contextFactory.Create(), request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
 
     return () =&gt; $resource$s.HandleApplicationResult(x =&gt; new $Action$$Resource$sResponse { $Resource$s = x.Results, Metadata = x.Metadata });
 }</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=5FCCA601C0052D41816EB829C585A41C/@KeyIndexDefined">False</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7032419A3D210E42B9EA159377807335/@KeyIndexDefined">False</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=7157EC608F18334D87D371616A0283F4/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
@@ -1011,7 +1013,7 @@ public class $filename$
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=916253215A205544853D70076D82D47E/Text/@EntryValue">[Fact]
 public async Task When$condition$_Then$outcome$()
 {
-    $END$
+    Assert.Fail();$END$
 }</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A3ED03ECAA4D7C4493946D592CD5CC11/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
@@ -1083,6 +1085,7 @@ public class $Action$$Resource$Response : SearchResponse
     public List&lt;$Resource$&gt;? $Resource$s { get; set; }
 }</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/UITag/@EntryValue">SaaStack</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BA213BDD6696244FBBD08EAE54F32F4B/@KeyIndexDefined">False</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC5E4DBF3B3EFB4395D41760BF4E0DEC/CustomProperties/=Extension/@EntryIndexedValue">cs</s:String>
@@ -1194,6 +1197,7 @@ public class $Action$$Resource$Response : IWebResponse
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C46EC722B20A634ABBA30FAB3673BECF/Text/@EntryValue">#if TESTINGONLY
      $SELECTION$$END$ 
   #endif</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=C4F9AA5F6669A2438DAEE2694E029A99/@KeyIndexDefined">False</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Description/@EntryValue">A GET API definition</s:String>
@@ -1212,7 +1216,7 @@ public class $Action$$Resource$Response : IWebResponse
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Shortcut/@EntryValue">getapi</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Text/@EntryValue">public async Task&lt;ApiGetResult&lt;$Resource$, $Action$$Resource$Response&gt;&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
-{
+{$END$$SELECTION$
     var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
 
     return () =&gt; $resource$.HandleApplicationResult&lt;$Resource$, $Action$$Resource$Response&gt;(x =&gt; new $Action$$Resource$Response { $Resource$ = x });
@@ -1251,7 +1255,7 @@ using QueryAny;
 // TODO: DELETE this attribute if EventSourcing, LEAVE if Snapshotting
 [EntityName("$name$")]
 public sealed class $name$Root : AggregateRootBase
-{
+{$END$$SELECTION$
     public static Result&lt;$name$Root, Error&gt; Create(IRecorder recorder, IIdentifierFactory idFactory, Identifier organizationId)
     {
         var root = new $name$Root(recorder, idFactory);
@@ -1339,36 +1343,19 @@ public sealed class $name$Root : AggregateRootBase
     public Name? $propertyname$ { get; private set; }
 
     public Identifier OrganizationId { get; private set; } = Identifier.Empty();
-}$END$$SELECTION$</s:String>
-	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DC365433BC93AB4496DE555A7E296182/@KeyIndexDefined">True</s:Boolean>
-	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DC365433BC93AB4496DE555A7E296182/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
-	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DC365433BC93AB4496DE555A7E296182/Description/@EntryValue">A DDD domain event</s:String>
-	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DC365433BC93AB4496DE555A7E296182/Field/=name/@KeyIndexDefined">True</s:Boolean>
-	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DC365433BC93AB4496DE555A7E296182/Field/=name/Order/@EntryValue">0</s:Int64>
-	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DC365433BC93AB4496DE555A7E296182/Reformat/@EntryValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DC365433BC93AB4496DE555A7E296182/Scope/=C3001E7C0DA78E4487072B7E050D86C5/@KeyIndexDefined">True</s:Boolean>
-	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DC365433BC93AB4496DE555A7E296182/Scope/=C3001E7C0DA78E4487072B7E050D86C5/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
-	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DC365433BC93AB4496DE555A7E296182/Scope/=C3001E7C0DA78E4487072B7E050D86C5/Type/@EntryValue">InCSharpFile</s:String>
-	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DC365433BC93AB4496DE555A7E296182/Shortcut/@EntryValue">domainevent</s:String>
-	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DC365433BC93AB4496DE555A7E296182/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
-	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DC365433BC93AB4496DE555A7E296182/Text/@EntryValue">public sealed class $name$ : IDomainEvent
-{
-    public static $name$ Create(Identifier id, Identifier organizationId)
-    {
-        return new $name$
-        {
-            RootId = id,
-            OrganizationId = organizationId,
-            OccurredUtc = DateTime.UtcNow
-        };
-    }
-
-    public required string OrganizationId { get; set; }
-
-    public required string RootId { get; set; }
-
-    public required DateTime OccurredUtc { get; set; }
-}$END$$SELECTION$</s:String>
+}</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DC365433BC93AB4496DE555A7E296182/@KeyIndexDefined">False</s:Boolean>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Description/@EntryValue">A PUTPATCH API definition</s:String>
@@ -1387,7 +1374,7 @@ public sealed class $name$Root : AggregateRootBase
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Shortcut/@EntryValue">putpatchapi</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Text/@EntryValue">public async Task&lt;ApiPutPatchResult&lt;$Resource$, $Action$$Resource$Response&gt;&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
-{
+{$END$$SELECTION$
     var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
 
     return () =&gt; $resource$.HandleApplicationResult&lt;$Resource$, $Action$$Resource$Response&gt;(x =&gt; new $Action$$Resource$Response { $Resource$ = x });
@@ -1408,8 +1395,9 @@ public sealed class $name$Root : AggregateRootBase
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=FB91EB49F0C92544901777E29C183C25/Text/@EntryValue">[Fact]
 public void When$condition$_Then$outcome$()
 {
-    $END$
+    Assert.Fail();$END$
 }</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=FC8D7941811E074BA41BC7195D0E7D5A/@KeyIndexDefined">False</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=abaseurl/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=ablobname/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=abody/@EntryIndexedValue">True</s:Boolean>

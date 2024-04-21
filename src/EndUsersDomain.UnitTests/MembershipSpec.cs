@@ -41,8 +41,8 @@ public class MembershipSpec
     [Fact]
     public void WhenMembershipAddedEventRaised_ThenAssigned()
     {
-        var roles = Roles.Create();
-        var features = Features.Create();
+        var roles = Roles.Empty;
+        var features = Features.Empty;
 
         _membership.As<IEventingEntity>()
             .RaiseEvent(Events.MembershipAdded("arootid".ToId(), "anorganizationid".ToId(),

@@ -2,6 +2,7 @@ using Application.Interfaces;
 using Application.Services.Shared;
 using Common;
 using Common.Configuration;
+using Domain.Common.Events;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Authorization;
@@ -95,6 +96,100 @@ public class EndUsersApplicationDomainEventHandlersSpec
             && eu.Memberships[0].OrganizationId == "anorganizationid".ToId()
             && eu.Memberships[0].Roles.HasRole(TenantRoles.Member)
             && eu.Memberships[0].Features.HasFeature(TenantFeatures.Basic)
+        ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenHandleOrganizationRoleAssignedAsync_ThenAssigns()
+    {
+        var assigner = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        assigner.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Empty,
+            EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
+        assigner.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+            Roles.Create(TenantRoles.Owner).Value,
+            Features.Create(TenantFeatures.Basic).Value);
+        _endUserRepository.Setup(rep => rep.LoadAsync("anassignerid".ToId(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(assigner);
+        var assignee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        assignee.Register(Roles.Create(PlatformRoles.Standard).Value, Features.Create(PlatformFeatures.Basic).Value,
+            EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
+        assignee.AddMembership(assignee, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+            Roles.Create(TenantRoles.Member).Value,
+            Features.Create(TenantFeatures.Basic).Value);
+        _endUserRepository.Setup(rep => rep.LoadAsync("anassigneeid".ToId(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(assignee);
+        var domainEvent = Events.RoleAssigned("anorganizationid".ToId(), "anassignerid".ToId(), "anassigneeid".ToId(),
+            Role.Create(TenantRoles.TestingOnly).Value);
+
+        var result =
+            await _application.HandleOrganizationRoleAssignedAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _endUserRepository.Verify(rep => rep.SaveAsync(It.Is<EndUserRoot>(eu =>
+            eu.Memberships[0].Roles.HasRole(TenantRoles.Member)
+            && eu.Memberships[0].Roles.HasRole(TenantRoles.TestingOnly)
+        ), It.IsAny<CancellationToken>()));
+        _recorder.Verify(rec => rec.AuditAgainst(It.IsAny<ICallContext>(), "anid",
+            Audits.EndUserApplication_TenantRolesAssigned, It.IsAny<string>(),
+            It.IsAny<object[]>()));
+    }
+
+    [Fact]
+    public async Task WhenHandleOrganizationRoleUnassignedAsync_ThenAssigns()
+    {
+        var assigner = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        assigner.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Empty,
+            EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
+        assigner.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+            Roles.Create(TenantRoles.Owner).Value,
+            Features.Create(TenantFeatures.Basic).Value);
+        _endUserRepository.Setup(rep => rep.LoadAsync("anassignerid".ToId(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(assigner);
+        var assignee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        assignee.Register(Roles.Create(PlatformRoles.Standard).Value, Features.Create(PlatformFeatures.Basic).Value,
+            EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
+        assignee.AddMembership(assignee, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+            Roles.Create(TenantRoles.Member).Value,
+            Features.Create(TenantFeatures.Basic).Value);
+        assignee.AssignMembershipRoles(assigner, "anorganizationid".ToId(),
+            Roles.Create(TenantRoles.TestingOnly).Value);
+        _endUserRepository.Setup(rep => rep.LoadAsync("anassigneeid".ToId(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(assignee);
+        var domainEvent = Events.RoleUnassigned("anorganizationid".ToId(), "anassignerid".ToId(), "anassigneeid".ToId(),
+            Role.Create(TenantRoles.TestingOnly).Value);
+
+        var result =
+            await _application.HandleOrganizationRoleUnassignedAsync(_caller.Object, domainEvent,
+                CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _endUserRepository.Verify(rep => rep.SaveAsync(It.Is<EndUserRoot>(eu =>
+            eu.Memberships[0].Roles.HasRole(TenantRoles.Member)
+            && !eu.Memberships[0].Roles.HasRole(TenantRoles.TestingOnly)
+        ), It.IsAny<CancellationToken>()));
+        _recorder.Verify(rec => rec.AuditAgainst(It.IsAny<ICallContext>(), "anid",
+            Audits.EndUserApplication_TenantRolesUnassigned, It.IsAny<string>(),
+            It.IsAny<object[]>()));
+    }
+
+    [Fact]
+    public async Task WhenHandleOrganizationDeletedAsync_ThenRemovesMembership()
+    {
+        var deleter = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        deleter.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Create(TenantFeatures.Basic).Value,
+            EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
+        deleter.AddMembership(deleter, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+            Roles.Create(TenantRoles.Owner).Value, Features.Create(TenantFeatures.Basic).Value);
+        _endUserRepository.Setup(rep => rep.LoadAsync("adeleterid".ToId(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(deleter);
+        var domainEvent = Global.StreamDeleted.Create("anorganizationid".ToId(), "adeleterid".ToId());
+
+        var result =
+            await _application.HandleOrganizationDeletedAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _endUserRepository.Verify(rep => rep.SaveAsync(It.Is<EndUserRoot>(eu =>
+            eu.Memberships.Count == 0
         ), It.IsAny<CancellationToken>()));
     }
 }

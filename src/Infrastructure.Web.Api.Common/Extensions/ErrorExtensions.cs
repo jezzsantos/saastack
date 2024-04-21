@@ -22,6 +22,7 @@ public static class ErrorExtensions
             ErrorCode.NotAuthenticated => HttpErrorCode.Unauthorized,
             ErrorCode.ForbiddenAccess => HttpErrorCode.Forbidden,
             ErrorCode.NotSubscribed => HttpErrorCode.PaymentRequired,
+            ErrorCode.EntityDeleted => HttpErrorCode.MethodNotAllowed,
             _ => HttpErrorCode.InternalServerError
         };
 

@@ -90,8 +90,8 @@
     <data name="MultiTenancyMiddleware_InvalidTenantId" xml:space="preserve">
         <value>The 'OrganizationId' of the request is invalid</value>
     </data>
-    <data name="MultiTenancyMiddleware_MissingTenantId" xml:space="preserve">
-        <value>The 'OrganizationId' is missing from this request</value>
+    <data name="MultiTenancyMiddleware_MissingDefaultOrganization" xml:space="preserve">
+        <value>The ID of the organization is missing from this request</value>
     </data>
     <data name="MultiTenancyMiddleware_UserNotAMember" xml:space="preserve">
         <value>The authenticated user is not a member of organization '{0}'</value>
