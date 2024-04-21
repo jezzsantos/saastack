@@ -89,10 +89,10 @@ These are the main use cases of this product that are exposed via "public" APIs 
 1. Authenticate the current user (with a password)
 2. Register a new person (with a password and with optional invitation)
 3. Confirm registration of a person (from email)
-4. (coming soon) Initiate a password reset
-5. (coming soon) Resend password reset notification
-6. (coming soon) Confirm password reset
-7. (coming soon) Reset password
+4. Initiate a password reset
+5. Resend password reset notification
+6. Verify a password reset token
+7. Reset password
 
 #### Single-Sign On
 

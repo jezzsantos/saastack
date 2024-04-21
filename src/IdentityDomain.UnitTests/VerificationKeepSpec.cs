@@ -6,12 +6,12 @@ using Xunit;
 namespace IdentityDomain.UnitTests;
 
 [Trait("Category", "Unit")]
-public class VerificationSpec
+public class VerificationKeepSpec
 {
     [Fact]
     public void WhenConstructed_ThenIsNotSet()
     {
-        var invitation = Verification.Create().Value;
+        var invitation = VerificationKeep.Create().Value;
 
         invitation.IsStillVerifying.Should().BeFalse();
     }
@@ -19,7 +19,7 @@ public class VerificationSpec
     [Fact]
     public void WhenIsStillValidAndNoToken_ThenReturnsFalse()
     {
-        var invitation = Verification.Create().Value;
+        var invitation = VerificationKeep.Create().Value;
 
         invitation.IsStillVerifying.Should().BeFalse();
         invitation.Token.Should().BeNone();
@@ -29,11 +29,11 @@ public class VerificationSpec
     [Fact]
     public void WhenIsStillValidAfterSet_ThenReturnsTrue()
     {
-        var invitation = Verification.Create().Value;
+        var invitation = VerificationKeep.Create().Value;
         invitation = invitation.Renew("atoken");
 
         invitation.IsStillVerifying.Should().BeTrue();
         ((object)invitation.Token).Should().Be("atoken");
-        invitation.ExpiresUtc.Value.Should().BeNear(DateTime.UtcNow.Add(Verification.DefaultTokenExpiry));
+        invitation.ExpiresUtc.Value.Should().BeNear(DateTime.UtcNow.Add(VerificationKeep.DefaultTokenExpiry));
     }
 }

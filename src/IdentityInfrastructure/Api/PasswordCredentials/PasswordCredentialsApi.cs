@@ -36,6 +36,15 @@ public class PasswordCredentialsApi : IWebApiService
             }));
     }
 
+    public async Task<ApiEmptyResult> CompletePasswordReset(CompletePasswordResetRequest request,
+        CancellationToken cancellationToken)
+    {
+        var completion = await _passwordCredentialsApplication.CompletePasswordResetAsync(_contextFactory.Create(),
+            request.Token, request.Password, cancellationToken);
+
+        return () => completion.HandleApplicationResult();
+    }
+
     public async Task<ApiEmptyResult> ConfirmRegistration(ConfirmRegistrationPersonPasswordRequest request,
         CancellationToken cancellationToken)
     {
@@ -74,5 +83,34 @@ public class PasswordCredentialsApi : IWebApiService
 
         return () => credential.HandleApplicationResult<PasswordCredential, RegisterPersonPasswordResponse>(creds =>
             new PostResult<RegisterPersonPasswordResponse>(new RegisterPersonPasswordResponse { Credential = creds }));
+    }
+
+    public async Task<ApiEmptyResult> RequestPasswordReset(InitiatePasswordResetRequest request,
+        CancellationToken cancellationToken)
+    {
+        var reset = await _passwordCredentialsApplication.InitiatePasswordResetAsync(_contextFactory.Create(),
+            request.EmailAddress, cancellationToken);
+
+        return () => reset.HandleApplicationResult();
+    }
+
+    public async Task<ApiEmptyResult> ResendPasswordReset(ResendPasswordResetRequest request,
+        CancellationToken cancellationToken)
+    {
+        var resent =
+            await _passwordCredentialsApplication.ResendPasswordResetAsync(_contextFactory.Create(), request.Token,
+                cancellationToken);
+
+        return () => resent.HandleApplicationResult();
+    }
+
+    public async Task<ApiEmptyResult> VerifyPasswordReset(VerifyPasswordResetRequest request,
+        CancellationToken cancellationToken)
+    {
+        var verified =
+            await _passwordCredentialsApplication.VerifyPasswordResetAsync(_contextFactory.Create(), request.Token,
+                cancellationToken);
+
+        return () => verified.HandleApplicationResult();
     }
 }

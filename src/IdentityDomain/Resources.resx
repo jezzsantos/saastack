@@ -114,4 +114,8 @@
     <data name="APIKeyRoot_Verify_NoApiKey" xml:space="preserve">
         <value>The is no API key to verify yet</value>
     </data>
+    <data name="VerificationKeep_InvalidToken" xml:space="preserve">
+        <value>The verification token is either missing or invalid</value>
+    </data>
+
 </root>

@@ -52,6 +52,7 @@ public static class UsageConstants
             public const string UserExtendedLogin = "User Extended Login";
             public const string UserLogin = "User Login";
             public const string UserLogout = "User Logout";
+            public const string UserPasswordReset = "User Password Reset";
         }
 
         public static class Web

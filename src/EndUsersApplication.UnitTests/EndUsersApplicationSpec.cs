@@ -170,7 +170,7 @@ public class EndUsersApplicationSpec
                 cc.CallId == "acallid"
                 && cc.IsServiceAccount
             ), "anid", It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(ns => ns.NotifyReRegistrationCourtesyAsync(It.IsAny<ICallerContext>(),
+        _notificationsService.Verify(ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(),
             It.IsAny<string>(),
             It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
             It.IsAny<CancellationToken>()), Times.Never);
@@ -259,7 +259,7 @@ public class EndUsersApplicationSpec
                 cc.CallId == "acallid"
                 && cc.IsServiceAccount
             ), "anid", It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(ns => ns.NotifyReRegistrationCourtesyAsync(It.IsAny<ICallerContext>(),
+        _notificationsService.Verify(ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(),
             It.IsAny<string>(),
             It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
             It.IsAny<CancellationToken>()), Times.Never);
@@ -337,7 +337,7 @@ public class EndUsersApplicationSpec
                 cc.CallId == "acallid"
                 && cc.IsServiceAccount
             ), "anid", It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(ns => ns.NotifyReRegistrationCourtesyAsync(It.IsAny<ICallerContext>(),
+        _notificationsService.Verify(ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(),
             It.IsAny<string>(),
             It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
             It.IsAny<CancellationToken>()), Times.Never);
@@ -391,7 +391,7 @@ public class EndUsersApplicationSpec
                     It.IsAny<CancellationToken>()),
             Times.Never);
         _notificationsService.Verify(
-            ns => ns.NotifyReRegistrationCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+            ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<CancellationToken>()), Times.Never);
     }
@@ -429,7 +429,7 @@ public class EndUsersApplicationSpec
                 rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(endUser);
         _notificationsService.Setup(ns =>
-                ns.NotifyReRegistrationCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Ok);
@@ -459,7 +459,7 @@ public class EndUsersApplicationSpec
                 ups.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()),
             Times.Never);
-        _notificationsService.Verify(ns => ns.NotifyReRegistrationCourtesyAsync(_caller.Object, "anid",
+        _notificationsService.Verify(ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(_caller.Object, "anid",
             "anotheruser@company.com", "afirstname", "atimezone", "acountrycode", CancellationToken.None));
     }
 

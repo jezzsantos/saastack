@@ -16,7 +16,6 @@ public static class Validations
 
     public static class Credentials
     {
-        public static readonly Validation VerificationToken = CommonValidations.RandomToken();
         public static readonly Validation InvitationToken = CommonValidations.RandomToken();
 
         public static class Person
@@ -42,6 +41,7 @@ public static class Validations
         public static class Password
         {
             public static readonly Validation ResetToken = CommonValidations.RandomToken();
+            public static readonly Validation VerificationToken = CommonValidations.RandomToken();
         }
     }
 

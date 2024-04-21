@@ -7,7 +7,11 @@ namespace IdentityApplication.Persistence;
 
 public interface IPasswordCredentialsRepository : IApplicationRepository
 {
-    Task<Result<Optional<PasswordCredentialRoot>, Error>> FindCredentialsByTokenAsync(string token,
+    Task<Result<Optional<PasswordCredentialRoot>, Error>> FindCredentialsByPasswordResetTokenAsync(string token,
+        CancellationToken cancellationToken);
+
+    Task<Result<Optional<PasswordCredentialRoot>, Error>> FindCredentialsByRegistrationVerificationTokenAsync(
+        string token,
         CancellationToken cancellationToken);
 
     Task<Result<Optional<PasswordCredentialRoot>, Error>> FindCredentialsByUserIdAsync(Identifier userId,

@@ -11,7 +11,7 @@ public class ConfirmPersonRegistrationRequestValidator : AbstractValidator<Confi
     {
         RuleFor(req => req.Token)
             .NotEmpty()
-            .Matches(Validations.Credentials.VerificationToken)
+            .Matches(Validations.Credentials.Password.VerificationToken)
             .WithMessage(Resources.ConfirmPersonRegistrationRequestValidator_InvalidToken);
     }
 }

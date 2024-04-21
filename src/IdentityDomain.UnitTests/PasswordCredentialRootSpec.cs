@@ -80,7 +80,7 @@ public class PasswordCredentialRootSpec
     {
         _credential.InitiateRegistrationVerification();
 
-        _credential.Verification.IsStillVerifying.Should().BeTrue();
+        _credential.VerificationKeep.IsStillVerifying.Should().BeTrue();
         _credential.Events.Last().Should()
             .BeOfType<RegistrationVerificationCreated>();
     }
@@ -91,7 +91,7 @@ public class PasswordCredentialRootSpec
         _passwordHasherService.Setup(phs => phs.ValidatePassword(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns(false);
 
-        var result = _credential.SetCredential("notavalidpassword");
+        var result = _credential.SetPasswordCredential("notavalidpassword");
 
         result.Should().BeError(ErrorCode.Validation, Resources.PasswordCredentialsRoot_InvalidPassword);
     }
@@ -99,7 +99,7 @@ public class PasswordCredentialRootSpec
     [Fact]
     public void WhenSetCredentials_ThenSetsCredentials()
     {
-        _credential.SetCredential("apassword");
+        _credential.SetPasswordCredential("apassword");
 
         _credential.Password.PasswordHash.Should().Be("apasswordhash");
         _credential.Events.Last().Should().BeOfType<CredentialsChanged>();
@@ -138,7 +138,7 @@ public class PasswordCredentialRootSpec
             .Returns(true);
         _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(false);
-        _credential.SetCredential("apassword");
+        _credential.SetPasswordCredential("apassword");
         var result = _credential.VerifyPassword("1WrongPassword!");
 
         result.Should().BeSuccess();
@@ -155,7 +155,7 @@ public class PasswordCredentialRootSpec
     {
         _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(true);
-        _credential.SetCredential("apassword");
+        _credential.SetPasswordCredential("apassword");
         var result = _credential.VerifyPassword("apassword");
 
         result.Should().BeSuccess();
@@ -173,7 +173,7 @@ public class PasswordCredentialRootSpec
     {
         _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(false);
-        _credential.SetCredential("apassword");
+        _credential.SetPasswordCredential("apassword");
 #if TESTINGONLY
         _credential.TestingOnly_LockAccount("awrongpassword");
 #endif
@@ -191,7 +191,7 @@ public class PasswordCredentialRootSpec
     {
         _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(false);
-        _credential.SetCredential("apassword");
+        _credential.SetPasswordCredential("apassword");
 #if TESTINGONLY
         _credential.TestingOnly_LockAccount("awrongpassword");
         _credential.TestingOnly_ResetLoginCooldownPeriod();
@@ -241,7 +241,7 @@ public class PasswordCredentialRootSpec
 
         _credential.VerifyRegistration();
 
-        _credential.Verification.IsVerified.Should().BeTrue();
+        _credential.VerificationKeep.IsVerified.Should().BeTrue();
         _credential.Events.Last().Should().BeOfType<RegistrationVerificationVerified>();
     }
 
@@ -277,7 +277,7 @@ public class PasswordCredentialRootSpec
     {
         _tokensService.Setup(ts => ts.CreatePasswordResetToken())
             .Returns(Token);
-        _credential.SetCredential("apassword");
+        _credential.SetPasswordCredential("apassword");
         _credential.SetRegistrationDetails(EmailAddress.Create("auser@company.com").Value,
             PersonDisplayName.Create("aname").Value);
         _credential.InitiateRegistrationVerification();
@@ -285,19 +285,19 @@ public class PasswordCredentialRootSpec
 
         _credential.InitiatePasswordReset();
 
-        _credential.Password.IsInitiating.Should().BeTrue();
+        _credential.Password.IsResetInitiated.Should().BeTrue();
         _credential.Events[1].Should().BeOfType<CredentialsChanged>();
         _credential.Events[2].Should().BeOfType<RegistrationChanged>();
         _credential.Events.Last().Should().BeOfType<PasswordResetInitiated>();
     }
 
     [Fact]
-    public void WhenResetPasswordWithInvalidPassword_ThenReturnsError()
+    public void WhenCompletePasswordResetWithInvalidPassword_ThenReturnsError()
     {
         _passwordHasherService.Setup(phs => phs.ValidatePassword(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns(false);
 
-        var result = _credential.ResetPassword(Token, "apassword");
+        var result = _credential.CompletePasswordReset(Token, "apassword");
 
         result.Should().BeError(ErrorCode.Validation, Resources.PasswordCredentialsRoot_InvalidPassword);
 
@@ -305,12 +305,12 @@ public class PasswordCredentialRootSpec
     }
 
     [Fact]
-    public void WhenResetPasswordAndNoExistingPassword_ThenReturnsError()
+    public void WhenCompletePasswordResetAndNoExistingPassword_ThenReturnsError()
     {
         _passwordHasherService.Setup(phs => phs.ValidatePassword(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns(true);
 
-        var result = _credential.ResetPassword(Token, "apassword");
+        var result = _credential.CompletePasswordReset(Token, "apassword");
 
         result.Should().BeError(ErrorCode.PreconditionViolation, Resources.PasswordCredentialsRoot_NoPassword);
 
@@ -318,15 +318,15 @@ public class PasswordCredentialRootSpec
     }
 
     [Fact]
-    public void WhenResetPasswordAndSamePassword_ThenReturnsError()
+    public void WhenCompletePasswordResetAndSameAsOldPassword_ThenReturnsError()
     {
         _passwordHasherService.Setup(phs => phs.ValidatePassword(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns(true);
         _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(false);
-        _credential.SetCredential("apassword");
+            .Returns(true);
+        _credential.SetPasswordCredential("apassword");
 
-        var result = _credential.ResetPassword(Token, "apassword");
+        var result = _credential.CompletePasswordReset(Token, "apassword");
 
         result.Should().BeError(ErrorCode.Validation, Resources.PasswordCredentialsRoot_DuplicatePassword);
 
@@ -334,30 +334,30 @@ public class PasswordCredentialRootSpec
     }
 
     [Fact]
-    public void WhenResetPasswordAndExpired_ThenReturnsError()
+    public void WhenCompletePasswordResetAndExpired_ThenReturnsError()
     {
         _passwordHasherService.Setup(phs => phs.ValidatePassword(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns(true);
         _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(true);
-        _credential.SetCredential("apassword");
+            .Returns(false);
+        _credential.SetPasswordCredential("apassword");
         _credential.InitiateRegistrationVerification();
         _credential.VerifyRegistration();
 #if TESTINGONLY
         _credential.TestingOnly_ExpirePasswordResetVerification();
 #endif
-        var result = _credential.ResetPassword("atoken", "apassword");
+        var result = _credential.CompletePasswordReset("atoken", "apassword");
 
         result.Should().BeError(ErrorCode.PreconditionViolation,
             Resources.PasswordCredentialsRoot_PasswordResetTokenExpired);
     }
 
     [Fact]
-    public void WhenResetPasswordAndCredentialsLocked_ThenResetsPasswordAndUnlocks()
+    public void WhenCompletePasswordResetAndCredentialsLocked_ThenResetsPasswordAndUnlocks()
     {
         _tokensService.Setup(ts => ts.CreatePasswordResetToken())
             .Returns(Token);
-        _credential.SetCredential("apassword");
+        _credential.SetPasswordCredential("apassword");
         _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(false);
 #if TESTINGONLY
@@ -369,9 +369,9 @@ public class PasswordCredentialRootSpec
         _credential.VerifyRegistration();
         _credential.InitiatePasswordReset();
         _passwordHasherService.Setup(es => es.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(true);
+            .Returns(false);
 
-        _credential.ResetPassword(_credential.Password.Token, "anewpassword");
+        _credential.CompletePasswordReset(_credential.Password.ResetToken, "anewpassword");
 
         _passwordHasherService.Verify(ph => ph.ValidatePassword("apassword", true));
         _passwordHasherService.Verify(ph => ph.ValidatePassword("anewpassword", false));
@@ -382,7 +382,7 @@ public class PasswordCredentialRootSpec
     }
 
     [Fact]
-    public void WhenResetPassword_ThenResetsPassword()
+    public void WhenCompletePasswordReset_ThenResetsPassword()
     {
         _tokensService.Setup(ts => ts.CreatePasswordResetToken())
             .Returns(Token);
@@ -390,15 +390,15 @@ public class PasswordCredentialRootSpec
             .Returns(true);
         _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(true);
-        _credential.SetCredential("apassword");
-        _credential.SetCredential("apassword");
+        _credential.SetPasswordCredential("apassword");
+        _credential.SetPasswordCredential("apassword");
         _credential.SetRegistrationDetails(EmailAddress.Create("auser@company.com").Value,
             PersonDisplayName.Create("aname").Value);
         _credential.InitiateRegistrationVerification();
         _credential.VerifyRegistration();
         _credential.InitiatePasswordReset();
 
-        _credential.ResetPassword(_credential.Password.Token, "anewpassword");
+        _credential.CompletePasswordReset(_credential.Password.ResetToken, "anewpassword");
         _passwordHasherService.Verify(ph => ph.ValidatePassword("apassword", true));
         _passwordHasherService.Verify(ph => ph.ValidatePassword("anewpassword", false));
     }
@@ -421,7 +421,7 @@ public class PasswordCredentialRootSpec
     {
         _tokensService.Setup(ts => ts.CreatePasswordResetToken())
             .Returns(Token);
-        _credential.SetCredential("apassword");
+        _credential.SetPasswordCredential("apassword");
         _credential.InitiateRegistrationVerification();
         _credential.VerifyRegistration();
         _credential.InitiatePasswordReset();

@@ -87,4 +87,13 @@
     <data name="AuthenticateSingleSignOnRequestValidator_InvalidInvitationToken" xml:space="preserve">
       <value>The 'InvitationToken' is either missing or invalid</value>
     </data>
+    <data name="InitiatePasswordResetRequestValidator_InvalidEmailAddress" xml:space="preserve">
+      <value>The 'EmailAddress' is either missing or invalid</value>
+    </data>
+    <data name="CompletePasswordResetRequestValidator_InvalidPassword" xml:space="preserve">
+      <value>The 'Password' is either missing or invalid</value>
+    </data>
+    <data name="CompletePasswordResetRequestValidator_InvalidToken" xml:space="preserve">
+      <value>The 'Token' is either missing or invalid</value>
+    </data>
 </root>

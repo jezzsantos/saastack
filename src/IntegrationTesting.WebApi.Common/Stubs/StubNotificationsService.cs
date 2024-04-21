@@ -46,7 +46,23 @@ public class StubNotificationsService : INotificationsService
         return Task.FromResult(Result.Ok);
     }
 
-    public Task<Result<Error>> NotifyReRegistrationCourtesyAsync(ICallerContext caller, string userId,
+    public Task<Result<Error>> NotifyPasswordResetInitiatedAsync(ICallerContext caller, string name,
+        string emailAddress, string token,
+        CancellationToken cancellationToken)
+    {
+        LastPasswordResetEmailRecipient = emailAddress;
+        LastPasswordResetToken = token;
+        return Task.FromResult(Result.Ok);
+    }
+
+    public Task<Result<Error>> NotifyPasswordResetUnknownUserCourtesyAsync(ICallerContext caller, string emailAddress,
+        CancellationToken cancellationToken)
+    {
+        LastPasswordResetCourtesyEmailRecipient = emailAddress;
+        return Task.FromResult(Result.Ok);
+    }
+
+    public Task<Result<Error>> NotifyPasswordRegistrationRepeatCourtesyAsync(ICallerContext caller, string userId,
         string emailAddress, string name,
         string? timezone, string? countryCode, CancellationToken cancellationToken)
     {

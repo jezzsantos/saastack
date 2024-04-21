@@ -198,14 +198,15 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         return await ReAuthenticateUserAsync(person.Credential!.User);
     }
 
-    protected async Task<LoginDetails> ReAuthenticateUserAsync(RegisteredEndUser user)
+    protected async Task<LoginDetails> ReAuthenticateUserAsync(RegisteredEndUser user,
+        string password = PasswordForPerson)
     {
         var emailAddress = user.Profile!.EmailAddress!;
 
         var login = await Api.PostAsync(new AuthenticatePasswordRequest
         {
             Username = emailAddress,
-            Password = PasswordForPerson
+            Password = password
         });
 
         var accessToken = login.Content.Value.Tokens!.AccessToken.Value;

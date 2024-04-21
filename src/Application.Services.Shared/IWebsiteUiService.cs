@@ -7,5 +7,7 @@ public interface IWebsiteUiService
 {
     string ConstructPasswordRegistrationConfirmationPageUrl(string token);
 
+    string ConstructPasswordResetConfirmationPageUrl(string token);
+
     string CreateRegistrationPageUrl(string token);
 }

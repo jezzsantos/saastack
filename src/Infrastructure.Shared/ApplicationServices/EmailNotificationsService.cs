@@ -87,9 +87,64 @@ public class EmailNotificationsService : INotificationsService
         }, cancellationToken);
     }
 
-    public async Task<Result<Error>> NotifyReRegistrationCourtesyAsync(ICallerContext caller, string userId,
-        string emailAddress, string name,
-        string? timezone, string? countryCode, CancellationToken cancellationToken)
+    public async Task<Result<Error>> NotifyPasswordResetInitiatedAsync(ICallerContext caller, string name,
+        string emailAddress, string token,
+        CancellationToken cancellationToken)
+    {
+        var webSiteUrl = _hostSettings.GetWebsiteHostBaseUrl();
+        var webSiteRoute = _websiteUiService.ConstructPasswordResetConfirmationPageUrl(token);
+        var link = webSiteUrl.WithoutTrailingSlash() + webSiteRoute;
+        var htmlBody =
+            $$"""
+              <p>Hello {{name}},</p>
+              <p>We have received a request to reset your password at {{_productName}}.</p>
+              <p>If you did not make this request, please contact the {{_productName}} support team immediately.</p>
+              <p></p>
+              <p>If you expected this email, please click this link to <a href="{{link}}">reset your password</a></p>
+              <p>This is an automated email from the support team at {{_productName}}</p>
+              """;
+
+        return await _emailSchedulingService.ScheduleHtmlEmail(caller, new HtmlEmail
+        {
+            Subject = $"Reset your {_productName} password",
+            Body = htmlBody,
+            FromEmailAddress = _senderEmailAddress,
+            FromDisplayName = _senderName,
+            ToEmailAddress = emailAddress,
+            ToDisplayName = name
+        }, cancellationToken);
+    }
+
+    public async Task<Result<Error>> NotifyPasswordResetUnknownUserCourtesyAsync(ICallerContext caller,
+        string emailAddress,
+        CancellationToken cancellationToken)
+    {
+        var htmlBody =
+            $"""
+             <p>Hello,</p>
+             <p>We have received a very suspicious request to reset your password at our web site {_productName}.</p>
+             <p>You have no registered account at the web site of {_productName}, so you are safe.</p>
+             <p>It is possible that some suspicious party is trying to access your account through our web site, but it does not exist.</p>
+             <p></p>
+             <p>There is nothing more for you to do.</p>
+             <p>We have blocked this attempt from succeeding.</p>
+             <p>We just thought you would like to know, that this is going on.</p>
+             <p>This is an automated email from the support team at {_productName}</p>
+             """;
+
+        return await _emailSchedulingService.ScheduleHtmlEmail(caller, new HtmlEmail
+        {
+            Subject = $"{_productName} Account Registration Attempt",
+            Body = htmlBody,
+            FromEmailAddress = _senderEmailAddress,
+            FromDisplayName = _senderName,
+            ToEmailAddress = emailAddress,
+            ToDisplayName = emailAddress
+        }, cancellationToken);
+    }
+
+    public async Task<Result<Error>> NotifyPasswordRegistrationRepeatCourtesyAsync(ICallerContext caller, string userId,
+        string emailAddress, string name, string? timezone, string? countryCode, CancellationToken cancellationToken)
     {
         var htmlBody =
             $"""

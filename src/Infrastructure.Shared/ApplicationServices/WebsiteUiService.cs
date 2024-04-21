@@ -9,6 +9,7 @@ public sealed class WebsiteUiService : IWebsiteUiService
 {
     //EXTEND: these URLs must reflect those used by the website that handles UI 
     private const string PasswordRegistrationConfirmationPageRoute = "/confirm-password-registration";
+    private const string PasswordResetConfirmationPageRoute = "/confirm-password-reset";
     private const string RegistrationPageRoute = "/register";
 
     public string ConstructPasswordRegistrationConfirmationPageUrl(string token)
@@ -21,5 +22,11 @@ public sealed class WebsiteUiService : IWebsiteUiService
     {
         var escapedToken = Uri.EscapeDataString(token);
         return $"{RegistrationPageRoute}?token={escapedToken}";
+    }
+
+    public string ConstructPasswordResetConfirmationPageUrl(string token)
+    {
+        var escapedToken = Uri.EscapeDataString(token);
+        return $"{PasswordResetConfirmationPageRoute}?token={escapedToken}";
     }
 }

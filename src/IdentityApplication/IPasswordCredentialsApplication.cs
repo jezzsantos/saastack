@@ -9,6 +9,9 @@ public interface IPasswordCredentialsApplication
     Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext context, string username, string password,
         CancellationToken cancellationToken);
 
+    Task<Result<Error>> CompletePasswordResetAsync(ICallerContext caller, string token, string password,
+        CancellationToken cancellationToken);
+
     Task<Result<Error>> ConfirmPersonRegistrationAsync(ICallerContext context, string token,
         CancellationToken cancellationToken);
 
@@ -17,8 +20,17 @@ public interface IPasswordCredentialsApplication
         string userId, CancellationToken cancellationToken);
 #endif
 
+    Task<Result<Error>> InitiatePasswordResetAsync(ICallerContext caller, string emailAddress,
+        CancellationToken cancellationToken);
+
     Task<Result<PasswordCredential, Error>> RegisterPersonAsync(ICallerContext context, string? invitationToken,
         string firstName,
         string lastName, string emailAddress, string password, string? timezone, string? countryCode,
         bool termsAndConditionsAccepted, CancellationToken cancellationToken);
+
+    Task<Result<Error>> ResendPasswordResetAsync(ICallerContext caller, string token,
+        CancellationToken cancellationToken);
+
+    Task<Result<Error>> VerifyPasswordResetAsync(ICallerContext caller, string token, CancellationToken
+        cancellationToken);
 }

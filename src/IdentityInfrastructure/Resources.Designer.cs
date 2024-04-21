@@ -114,6 +114,24 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;Password&apos; is either missing or invalid.
+        /// </summary>
+        internal static string CompletePasswordResetRequestValidator_InvalidPassword {
+            get {
+                return ResourceManager.GetString("CompletePasswordResetRequestValidator_InvalidPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;Token&apos; is either missing or invalid.
+        /// </summary>
+        internal static string CompletePasswordResetRequestValidator_InvalidToken {
+            get {
+                return ResourceManager.GetString("CompletePasswordResetRequestValidator_InvalidToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;Token&apos; is either missing or invalid.
         /// </summary>
         internal static string ConfirmPersonRegistrationRequestValidator_InvalidToken {
@@ -128,6 +146,15 @@ namespace IdentityInfrastructure {
         internal static string CreateAPIKeyRequestValidator_InvalidExpiresOn {
             get {
                 return ResourceManager.GetString("CreateAPIKeyRequestValidator_InvalidExpiresOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;EmailAddress&apos; is either missing or invalid.
+        /// </summary>
+        internal static string InitiatePasswordResetRequestValidator_InvalidEmailAddress {
+            get {
+                return ResourceManager.GetString("InitiatePasswordResetRequestValidator_InvalidEmailAddress", resourceCulture);
             }
         }
         

@@ -23,6 +23,19 @@ public interface INotificationsService
     /// <summary>
     ///     Notifies a user, via email, to warn them that an attempt to re-register an account by another party has occurred
     /// </summary>
-    Task<Result<Error>> NotifyReRegistrationCourtesyAsync(ICallerContext caller, string userId, string emailAddress,
+    Task<Result<Error>> NotifyPasswordRegistrationRepeatCourtesyAsync(ICallerContext caller, string userId,
+        string emailAddress,
         string name, string? timezone, string? countryCode, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Notifies a user, via email, that their password reset has been initiated
+    /// </summary>
+    Task<Result<Error>> NotifyPasswordResetInitiatedAsync(ICallerContext caller, string name, string emailAddress,
+        string token, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Notifies an unknown user, via email, that their email has been used to initiate a password reset
+    /// </summary>
+    Task<Result<Error>> NotifyPasswordResetUnknownUserCourtesyAsync(ICallerContext caller, string emailAddress,
+        CancellationToken cancellationToken);
 }

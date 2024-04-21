@@ -30,7 +30,7 @@ public class PasswordKeepSpec
         var password = PasswordKeep.Create().Value;
 
         password.PasswordHash.Should().BeNone();
-        password.Token.Should().BeNone();
+        password.ResetToken.Should().BeNone();
         password.TokenExpiresUtc.Should().BeNone();
     }
 
@@ -56,7 +56,7 @@ public class PasswordKeepSpec
         var password = PasswordKeep.Create(_passwordHasherService.Object, "apasswordhash").Value;
 
         password.PasswordHash.Should().Be("apasswordhash");
-        password.Token.Should().BeNone();
+        password.ResetToken.Should().BeNone();
         password.TokenExpiresUtc.Should().BeNone();
     }
 
@@ -78,7 +78,7 @@ public class PasswordKeepSpec
         password = password.InitiatePasswordReset(Token).Value;
 
         password.PasswordHash.Should().Be("apasswordhash");
-        password.Token.Should().Be(Token);
+        password.ResetToken.Should().Be(Token);
         password.TokenExpiresUtc.Should().BeNear(DateTime.UtcNow.Add(PasswordKeep.DefaultResetExpiry));
     }
 
@@ -93,7 +93,7 @@ public class PasswordKeepSpec
         password = password.InitiatePasswordReset(token2).Value;
 
         password.PasswordHash.Should().Be("apasswordhash");
-        password.Token.Should().Be(token2);
+        password.ResetToken.Should().Be(token2);
         password.TokenExpiresUtc.Should().BeNear(DateTime.UtcNow.Add(PasswordKeep.DefaultResetExpiry));
     }
 
@@ -161,40 +161,40 @@ public class PasswordKeepSpec
     }
 
     [Fact]
-    public void WhenConfirmResetWithEmptyToken_ThenReturnsError()
+    public void WhenVerifyResetWithEmptyToken_ThenReturnsError()
     {
         var password = PasswordKeep.Create().Value;
 
-        var result = password.ConfirmReset(string.Empty);
+        var result = password.VerifyReset(string.Empty);
 
         result.Should().BeError(ErrorCode.Validation);
     }
 
     [Fact]
-    public void WhenConfirmResetWithInvalidToken_ThenReturnsError()
+    public void WhenVerifyResetWithInvalidToken_ThenReturnsError()
     {
         var password = PasswordKeep.Create().Value;
 
-        var result = password.ConfirmReset("aninvalidtoken");
+        var result = password.VerifyReset("aninvalidtoken");
 
         result.Should().BeError(ErrorCode.Validation, Resources.PasswordKeep_InvalidToken);
     }
 
     [Fact]
-    public void WhenConfirmResetAndTokensNotMatch_ThenReturnsError()
+    public void WhenVerifyResetAndTokensNotMatch_ThenReturnsError()
     {
         const string token1 = "5n6nA42SQrsO1UIgc7lIVebR6_3CmZwcthUEx3nF2sM";
         const string token2 = "7n6nA42SQrsO1UIgc7lIVebR6_3CmZwcthUEx3nF2sM";
         var password = PasswordKeep.Create(_passwordHasherService.Object, "apasswordhash").Value;
         password = password.InitiatePasswordReset(token1).Value;
 
-        var result = password.ConfirmReset(token2);
+        var result = password.VerifyReset(token2);
 
         result.Should().BeError(ErrorCode.RuleViolation, Resources.PasswordKeep_TokensNotMatch);
     }
 
     [Fact]
-    public void WhenConfirmResetAndTokenExpired_ThenReturnsError()
+    public void WhenVerifyResetAndTokenExpired_ThenReturnsError()
     {
         var password = PasswordKeep.Create(_passwordHasherService.Object, "apasswordhash").Value;
         password = password.InitiatePasswordReset(Token).Value;
@@ -202,58 +202,58 @@ public class PasswordKeepSpec
         password = password.TestingOnly_ExpireToken();
 #endif
 
-        var result = password.ConfirmReset(Token);
+        var result = password.VerifyReset(Token);
 
         result.Should().BeError(ErrorCode.PreconditionViolation, Resources.PasswordKeep_TokenExpired);
     }
 
     [Fact]
-    public void WhenResetPasswordAndEmptyPasswordHash_ThenReturnsError()
+    public void WhenCompletePasswordResetAndEmptyPasswordHash_ThenReturnsError()
     {
         var password = PasswordKeep.Create(_passwordHasherService.Object, "apasswordhash").Value;
 
-        var result = password.ResetPassword(_passwordHasherService.Object, Token, string.Empty);
+        var result = password.CompletePasswordReset(_passwordHasherService.Object, Token, string.Empty);
 
         result.Should().BeError(ErrorCode.Validation);
     }
 
     [Fact]
-    public void WhenResetPasswordAndTokenInvalid_ThenReturnsError()
+    public void WhenCompletePasswordResetAndTokenInvalid_ThenReturnsError()
     {
         var password = PasswordKeep.Create(_passwordHasherService.Object, "apasswordhash").Value;
 
-        var result = password.ResetPassword(_passwordHasherService.Object, "aninvalidtoken", "apassword");
+        var result = password.CompletePasswordReset(_passwordHasherService.Object, "aninvalidtoken", "apassword");
 
         result.Should().BeError(ErrorCode.Validation, Resources.PasswordKeep_InvalidToken);
     }
 
     [Fact]
-    public void WhenResetPasswordAndPasswordHashInvalid_ThenReturnsError()
+    public void WhenCompletePasswordResetAndPasswordHashInvalid_ThenReturnsError()
     {
         var password = PasswordKeep.Create(_passwordHasherService.Object, "apasswordhash").Value;
         _passwordHasherService.Setup(ph => ph.ValidatePasswordHash(It.IsAny<string>()))
             .Returns(false);
 
-        var result = password.ResetPassword(_passwordHasherService.Object, Token, "aninvalidpasswordhash");
+        var result = password.CompletePasswordReset(_passwordHasherService.Object, Token, "aninvalidpasswordhash");
 
         result.Should().BeError(ErrorCode.Validation, Resources.PasswordKeep_InvalidPasswordHash);
     }
 
     [Fact]
-    public void WhenResetPasswordAndTokenNotMatch_ThenReturnsError()
+    public void WhenCompletePasswordResetAndTokenNotMatch_ThenReturnsError()
     {
         const string token1 = "5n6nA42SQrsO1UIgc7lIVebR6_3CmZwcthUEx3nF2sM";
         const string token2 = "7n6nA42SQrsO1UIgc7lIVebR6_3CmZwcthUEx3nF2sM";
         var password = PasswordKeep.Create(_passwordHasherService.Object, "apasswordhash").Value;
         password = password.InitiatePasswordReset(token1).Value;
 
-        var result = password.ResetPassword(_passwordHasherService.Object, token2, "apasswordhash");
+        var result = password.CompletePasswordReset(_passwordHasherService.Object, token2, "apasswordhash");
 
         result.Should().BeError(ErrorCode.RuleViolation, Resources.PasswordKeep_TokensNotMatch);
     }
 
     [Fact]
-    public void WhenResetPasswordAndTokenExpired_ThenReturnsError()
+    public void WhenCompletePasswordResetAndTokenExpired_ThenReturnsError()
     {
         var password = PasswordKeep.Create(_passwordHasherService.Object, "apasswordhash").Value;
         password = password.InitiatePasswordReset(Token).Value;
@@ -261,31 +261,32 @@ public class PasswordKeepSpec
         password = password.TestingOnly_ExpireToken();
 #endif
 
-        var result = password.ResetPassword(_passwordHasherService.Object, Token, "apasswordhash");
+        var result = password.CompletePasswordReset(_passwordHasherService.Object, Token, "apasswordhash");
 
         result.Should().BeError(ErrorCode.PreconditionViolation, Resources.PasswordKeep_TokenExpired);
     }
 
     [Fact]
-    public void WhenResetPasswordAndNoPasswordSet_ThenReturnsError()
+    public void WhenCompletePasswordResetAndNoPasswordSet_ThenReturnsError()
     {
         var password = PasswordKeep.Create().Value;
 
-        var result = password.ResetPassword(_passwordHasherService.Object, Token, "apasswordhash");
+        var result = password.CompletePasswordReset(_passwordHasherService.Object, Token, "apasswordhash");
 
         result.Should().BeError(ErrorCode.RuleViolation, Resources.PasswordKeep_NoPasswordHash);
     }
 
     [Fact]
-    public void WhenResetPassword_ThenReturnsNewPassword()
+    public void WhenCompletePasswordReset_ThenReturnsNewPassword()
     {
         var password = PasswordKeep.Create(_passwordHasherService.Object, "apasswordhash").Value
             .InitiatePasswordReset(Token).Value;
 
-        password = password.ResetPassword(_passwordHasherService.Object, password.Token, "apasswordhash").Value;
+        password = password.CompletePasswordReset(_passwordHasherService.Object, password.ResetToken, "apasswordhash")
+            .Value;
 
         password.PasswordHash.Should().Be("apasswordhash");
-        password.Token.Should().BeNone();
+        password.ResetToken.Should().BeNone();
         password.TokenExpiresUtc.Should().BeNone();
     }
 }

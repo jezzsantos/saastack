@@ -56,17 +56,19 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
 
     public bool IsLocked => Login.IsLocked;
 
-    public bool IsPasswordInitiated => Password.IsInitiated;
+    public bool IsPasswordResetInitiated => Password.IsResetInitiated;
 
-    public bool IsPasswordResetStillValid => Password.IsInitiatingStillValid;
+    public bool IsPasswordResetStillValid => Password.IsResetStillValid;
 
-    public bool IsRegistrationVerified => Verification.IsVerified;
+    public bool IsPasswordSet => Password.HasPassword;
 
-    public bool IsVerificationStillVerifying => Verification.IsStillVerifying;
+    public bool IsRegistrationVerified => VerificationKeep.IsVerified;
 
-    public bool IsVerificationVerifying => Verification.IsVerifying;
+    public bool IsVerificationStillVerifying => VerificationKeep.IsStillVerifying;
 
-    public bool IsVerified => Verification.IsVerified;
+    public bool IsVerificationVerifying => VerificationKeep.IsVerifying;
+
+    public bool IsVerified => VerificationKeep.IsVerified;
 
     public LoginMonitor Login { get; private set; }
 
@@ -76,7 +78,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
 
     public Identifier UserId { get; private set; } = Identifier.Empty();
 
-    public Verification Verification { get; private set; } = Verification.Create().Value;
+    public VerificationKeep VerificationKeep { get; private set; } = VerificationKeep.Create().Value;
 
     public static AggregateRootFactory<PasswordCredentialRoot> Rehydrate()
     {
@@ -106,7 +108,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
         }
 
         if (!Registration.HasValue
-            && Password.IsInitiating)
+            && Password.IsResetInitiated)
         {
             return Error.RuleViolation(Resources.PasswordCredentialsRoot_PasswordInitiatedWithoutRegistration);
         }
@@ -178,14 +180,14 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
 
             case RegistrationVerificationCreated created:
             {
-                Verification = Verification.Renew(created.Token);
+                VerificationKeep = VerificationKeep.Renew(created.Token);
                 Recorder.TraceDebug(null, "Password credential {Id} verification has been renewed", Id);
                 return Result.Ok;
             }
 
             case RegistrationVerificationVerified _:
             {
-                Verification = Verification.Verify();
+                VerificationKeep = VerificationKeep.Verify();
                 Recorder.TraceDebug(null, "Password credential {Id} has been verified", Id);
                 return Result.Ok;
             }
@@ -205,7 +207,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
 
             case PasswordResetCompleted changed:
             {
-                var reset = Password.ResetPassword(_passwordHasherService, changed.Token, changed.PasswordHash);
+                var reset = Password.CompletePasswordReset(_passwordHasherService, changed.Token, changed.PasswordHash);
                 if (!reset.IsSuccessful)
                 {
                     return reset.Error;
@@ -222,20 +224,52 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
         }
     }
 
-    public Result<Error> ConfirmPasswordReset(string token)
+    public Result<Error> CompletePasswordReset(string token, string password)
     {
-        if (token.IsNotValuedParameter(nameof(token), out var error))
+        if (token.IsNotValuedParameter(nameof(token), out var error1))
         {
-            return error;
+            return error1;
         }
 
-        var confirmed = Password.ConfirmReset(token);
-        if (!confirmed.IsSuccessful)
+        if (password.IsInvalidParameter(pwd => _passwordHasherService.ValidatePassword(pwd, false),
+                nameof(password), Resources.PasswordCredentialsRoot_InvalidPassword, out var error2))
         {
-            return confirmed.Error;
+            return error2;
         }
 
-        Password = confirmed.Value;
+        if (!IsPasswordSet)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialsRoot_NoPassword);
+        }
+
+        if (password.IsInvalidParameter(pwd => !_passwordHasherService.VerifyPassword(pwd, Password.PasswordHash),
+                nameof(password), Resources.PasswordCredentialsRoot_DuplicatePassword, out var error3))
+        {
+            return error3;
+        }
+
+        if (!IsRegistrationVerified)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialsRoot_RegistrationUnverified);
+        }
+
+        if (!IsPasswordResetStillValid)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialsRoot_PasswordResetTokenExpired);
+        }
+
+        var passwordHash = _passwordHasherService.HashPassword(password);
+        var completed = RaiseChangeEvent(
+            IdentityDomain.Events.PasswordCredentials.PasswordResetCompleted(Id, token, passwordHash));
+        if (!completed.IsSuccessful)
+        {
+            return completed.Error;
+        }
+
+        if (Login.HasJustUnlocked)
+        {
+            return RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.AccountUnlocked(Id));
+        }
 
         return Result.Ok;
     }
@@ -263,53 +297,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
             IdentityDomain.Events.PasswordCredentials.RegistrationVerificationCreated(Id, token));
     }
 
-    public Result<Error> ResetPassword(string token, string password)
-    {
-        if (token.IsNotValuedParameter(nameof(token), out var error1))
-        {
-            return error1;
-        }
-
-        if (password.IsInvalidParameter(pwd => _passwordHasherService.ValidatePassword(pwd, false),
-                nameof(password), Resources.PasswordCredentialsRoot_InvalidPassword, out var error2))
-        {
-            return error2;
-        }
-
-        if (!IsPasswordInitiated)
-        {
-            return Error.PreconditionViolation(Resources.PasswordCredentialsRoot_NoPassword);
-        }
-
-        if (password.IsInvalidParameter(pwd => _passwordHasherService.VerifyPassword(pwd, Password.PasswordHash),
-                nameof(password), Resources.PasswordCredentialsRoot_DuplicatePassword, out var error3))
-        {
-            return error3;
-        }
-
-        if (!IsRegistrationVerified)
-        {
-            return Error.PreconditionViolation(Resources.PasswordCredentialsRoot_RegistrationUnverified);
-        }
-
-        if (!IsPasswordResetStillValid)
-        {
-            return Error.PreconditionViolation(Resources.PasswordCredentialsRoot_PasswordResetTokenExpired);
-        }
-
-        var passwordHash = _passwordHasherService.HashPassword(password);
-        RaiseChangeEvent(
-            IdentityDomain.Events.PasswordCredentials.PasswordResetCompleted(Id, token, passwordHash));
-
-        if (Login.HasJustUnlocked)
-        {
-            RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.AccountUnlocked(Id));
-        }
-
-        return Result.Ok;
-    }
-
-    public Result<Error> SetCredential(string password)
+    public Result<Error> SetPasswordCredential(string password)
     {
         if (password.IsInvalidParameter(pwd => _passwordHasherService.ValidatePassword(pwd, true),
                 nameof(password), Resources.PasswordCredentialsRoot_InvalidPassword, out var error1))
@@ -338,7 +326,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
 #if TESTINGONLY
     public void TestingOnly_ExpireRegistrationVerification()
     {
-        Verification = Verification.TestingOnly_ExpireToken();
+        VerificationKeep = VerificationKeep.TestingOnly_ExpireToken();
     }
 #endif
 
@@ -353,7 +341,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
 #if TESTINGONLY
     public void TestingOnly_RenewVerification(string token)
     {
-        Verification = Verification.Renew(token);
+        VerificationKeep = VerificationKeep.Renew(token);
     }
 #endif
 
@@ -413,6 +401,19 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
         }
 
         return isVerified;
+    }
+
+    public Result<Error> VerifyPasswordReset(string token)
+    {
+        var verified = Password.VerifyReset(token);
+        if (!verified.IsSuccessful)
+        {
+            return verified.Error;
+        }
+
+        Password = verified.Value;
+
+        return Result.Ok;
     }
 
     public Result<Error> VerifyRegistration()

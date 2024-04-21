@@ -83,7 +83,7 @@ public class EmailAddressServiceSpec
         var credential = PasswordCredentialRoot.Create(_recorder.Object, "acredentialid".ToIdentifierFactory(),
             _settings.Object, _emailAddressService.Object, _tokensService.Object, _passwordHasherService.Object,
             userId.ToId()).Value;
-        credential.SetCredential("apassword");
+        credential.SetPasswordCredential("apassword");
         credential.SetRegistrationDetails(EmailAddress.Create("auser@company.com").Value,
             PersonDisplayName.Create("aname").Value);
         return credential;

@@ -328,5 +328,14 @@ namespace IdentityDomain {
                 return ResourceManager.GetString("PasswordKeep_TokensNotMatch", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The verification token is either missing or invalid.
+        /// </summary>
+        internal static string VerificationKeep_InvalidToken {
+            get {
+                return ResourceManager.GetString("VerificationKeep_InvalidToken", resourceCulture);
+            }
+        }
     }
 }

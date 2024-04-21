@@ -31,8 +31,17 @@ public class PasswordCredentialsRepository : IPasswordCredentialsRepository
             _credentials.DestroyAllAsync(cancellationToken));
     }
 
-    public async Task<Result<Optional<PasswordCredentialRoot>, Error>> FindCredentialsByTokenAsync(string token,
-        CancellationToken cancellationToken)
+    public async Task<Result<Optional<PasswordCredentialRoot>, Error>> FindCredentialsByPasswordResetTokenAsync(
+        string token, CancellationToken cancellationToken)
+    {
+        var query = Query.From<PasswordCredential>()
+            .Where<string>(pc => pc.PasswordResetToken, ConditionOperator.EqualTo, token);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
+    public async Task<Result<Optional<PasswordCredentialRoot>, Error>>
+        FindCredentialsByRegistrationVerificationTokenAsync(string token,
+            CancellationToken cancellationToken)
     {
         var query = Query.From<PasswordCredential>()
             .Where<string>(pc => pc.RegistrationVerificationToken, ConditionOperator.EqualTo, token);

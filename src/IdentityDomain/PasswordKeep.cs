@@ -28,25 +28,23 @@ public sealed class PasswordKeep : ValueObjectBase<PasswordKeep>
         return new PasswordKeep(passwordHash, Optional<string>.None, Optional<DateTime>.None);
     }
 
-    private PasswordKeep(Optional<string> passwordHash, Optional<string> token,
+    private PasswordKeep(Optional<string> passwordHash, Optional<string> resetToken,
         Optional<DateTime> tokenExpiresUtc)
     {
         PasswordHash = passwordHash;
-        Token = token;
+        ResetToken = resetToken;
         TokenExpiresUtc = tokenExpiresUtc;
     }
 
-    public bool IsInitiated => PasswordHash.HasValue;
+    public bool HasPassword => PasswordHash.HasValue;
 
-    public bool IsInitiating => Token.HasValue && TokenExpiresUtc.HasValue;
+    public bool IsResetInitiated => ResetToken.HasValue && TokenExpiresUtc.HasValue;
 
-    public bool IsInitiatingStillValid => IsInitiating && TokenExpiresUtc > DateTime.UtcNow;
-
-    public bool IsReset => !Token.HasValue && !TokenExpiresUtc.HasValue;
+    public bool IsResetStillValid => IsResetInitiated && TokenExpiresUtc > DateTime.UtcNow;
 
     public Optional<string> PasswordHash { get; }
 
-    public Optional<string> Token { get; }
+    public Optional<string> ResetToken { get; }
 
     public Optional<DateTime> TokenExpiresUtc { get; }
 
@@ -62,58 +60,10 @@ public sealed class PasswordKeep : ValueObjectBase<PasswordKeep>
 
     protected override IEnumerable<object> GetAtomicValues()
     {
-        return new object[] { PasswordHash, Token, TokenExpiresUtc };
+        return new object[] { PasswordHash, ResetToken, TokenExpiresUtc };
     }
 
-    public Result<PasswordKeep, Error> ConfirmReset(string token)
-    {
-        if (token.IsNotValuedParameter(nameof(token), out var error1))
-        {
-            return error1;
-        }
-
-        if (token.IsInvalidParameter(Validations.Credentials.Password.ResetToken, nameof(token),
-                Resources.PasswordKeep_InvalidToken, out var error2))
-        {
-            return error2;
-        }
-
-        if (token.NotEqualsOrdinal(Token))
-        {
-            return Error.RuleViolation(Resources.PasswordKeep_TokensNotMatch);
-        }
-
-        if (!IsInitiatingStillValid)
-        {
-            return Error.PreconditionViolation(Resources.PasswordKeep_TokenExpired);
-        }
-
-        return this;
-    }
-
-    public Result<PasswordKeep, Error> InitiatePasswordReset(string token)
-    {
-        if (token.IsNotValuedParameter(nameof(token), out var error1))
-        {
-            return error1;
-        }
-
-        if (token.IsInvalidParameter(Validations.Credentials.Password.ResetToken, nameof(token),
-                Resources.PasswordKeep_InvalidToken, out var error2))
-        {
-            return error2;
-        }
-
-        if (!IsInitiated)
-        {
-            return Error.RuleViolation(Resources.PasswordKeep_NoPasswordHash);
-        }
-
-        var expiry = DateTime.UtcNow.Add(DefaultResetExpiry);
-        return new PasswordKeep(PasswordHash, token, expiry);
-    }
-
-    public Result<PasswordKeep, Error> ResetPassword(IPasswordHasherService passwordHasherService, string token,
+    public Result<PasswordKeep, Error> CompletePasswordReset(IPasswordHasherService passwordHasherService, string token,
         string passwordHash)
     {
         if (token.IsNotValuedParameter(nameof(token), out var error1))
@@ -138,22 +88,44 @@ public sealed class PasswordKeep : ValueObjectBase<PasswordKeep>
             return error4;
         }
 
-        if (!IsInitiated)
+        if (!HasPassword)
         {
             return Error.RuleViolation(Resources.PasswordKeep_NoPasswordHash);
         }
 
-        if (token.NotEqualsOrdinal(Token))
+        if (token.NotEqualsOrdinal(ResetToken))
         {
             return Error.RuleViolation(Resources.PasswordKeep_TokensNotMatch);
         }
 
-        if (!IsInitiatingStillValid)
+        if (!IsResetStillValid)
         {
             return Error.PreconditionViolation(Resources.PasswordKeep_TokenExpired);
         }
 
         return new PasswordKeep(passwordHash, Optional<string>.None, Optional<DateTime>.None);
+    }
+
+    public Result<PasswordKeep, Error> InitiatePasswordReset(string token)
+    {
+        if (token.IsNotValuedParameter(nameof(token), out var error1))
+        {
+            return error1;
+        }
+
+        if (token.IsInvalidParameter(Validations.Credentials.Password.ResetToken, nameof(token),
+                Resources.PasswordKeep_InvalidToken, out var error2))
+        {
+            return error2;
+        }
+
+        if (!HasPassword)
+        {
+            return Error.RuleViolation(Resources.PasswordKeep_NoPasswordHash);
+        }
+
+        var expiry = DateTime.UtcNow.Add(DefaultResetExpiry);
+        return new PasswordKeep(PasswordHash, token, expiry);
     }
 
     public Result<PasswordKeep, Error> SetPassword(IPasswordHasherService passwordHasherService, string passwordHash)
@@ -176,7 +148,7 @@ public sealed class PasswordKeep : ValueObjectBase<PasswordKeep>
 
     public PasswordKeep TestingOnly_ExpireToken()
     {
-        return new PasswordKeep(PasswordHash, Token, DateTime.UtcNow.SubtractSeconds(1));
+        return new PasswordKeep(PasswordHash, ResetToken, DateTime.UtcNow.SubtractSeconds(1));
     }
 #endif
 
@@ -194,11 +166,37 @@ public sealed class PasswordKeep : ValueObjectBase<PasswordKeep>
             return error2;
         }
 
-        if (!IsInitiated)
+        if (!HasPassword)
         {
             return Error.RuleViolation(Resources.PasswordKeep_NoPasswordHash);
         }
 
         return passwordHasherService.VerifyPassword(password, PasswordHash);
+    }
+
+    public Result<PasswordKeep, Error> VerifyReset(string token)
+    {
+        if (token.IsNotValuedParameter(nameof(token), out var error1))
+        {
+            return error1;
+        }
+
+        if (token.IsInvalidParameter(Validations.Credentials.Password.ResetToken, nameof(token),
+                Resources.PasswordKeep_InvalidToken, out var error2))
+        {
+            return error2;
+        }
+
+        if (token.NotEqualsOrdinal(ResetToken))
+        {
+            return Error.RuleViolation(Resources.PasswordKeep_TokensNotMatch);
+        }
+
+        if (!IsResetStillValid)
+        {
+            return Error.PreconditionViolation(Resources.PasswordKeep_TokenExpired);
+        }
+
+        return this;
     }
 }

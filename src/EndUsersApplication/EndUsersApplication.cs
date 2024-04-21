@@ -261,7 +261,7 @@ public partial class EndUsersApplication : IEndUsersApplication
                     return Error.EntityNotFound(Resources.EndUsersApplication_NotPersonProfile);
                 }
 
-                var notified = await _notificationsService.NotifyReRegistrationCourtesyAsync(context,
+                var notified = await _notificationsService.NotifyPasswordRegistrationRepeatCourtesyAsync(context,
                     unregisteredUser.Id, unregisteredUserProfile.EmailAddress, unregisteredUserProfile.DisplayName,
                     unregisteredUserProfile.Timezone, unregisteredUserProfile.Address.CountryCode, cancellationToken);
                 if (!notified.IsSuccessful)
