@@ -53,7 +53,7 @@ public sealed class SnapshottingQueryStore<TQueryableEntity> : ISnapshottingQuer
     {
         var retrieved = await _dataStore.RetrieveAsync(_containerName, id,
             PersistedEntityMetadata.FromType<TQueryableEntity>(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -91,7 +91,7 @@ public sealed class SnapshottingQueryStore<TQueryableEntity> : ISnapshottingQuer
         var queryResults = await _dataStore.QueryAsync(_containerName, query,
             PersistedEntityMetadata.FromType<TQueryableEntity>(),
             cancellationToken);
-        if (!queryResults.IsSuccessful)
+        if (queryResults.IsFailure)
         {
             return queryResults.Error;
         }

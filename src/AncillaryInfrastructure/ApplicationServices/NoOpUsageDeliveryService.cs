@@ -19,14 +19,14 @@ public class NoOpUsageDeliveryService : IUsageDeliveryService
         _recorder = recorder;
     }
 
-    public Task<Result<Error>> DeliverAsync(ICallerContext context, string forId, string eventName,
+    public Task<Result<Error>> DeliverAsync(ICallerContext caller, string forId, string eventName,
         Dictionary<string, string>? additional = null,
         CancellationToken cancellationToken = default)
     {
         var properties = additional.Exists()
             ? additional.ToJson(false)!
             : "none";
-        _recorder.TraceInformation(context.ToCall(),
+        _recorder.TraceInformation(caller.ToCall(),
             $"{nameof(NoOpUsageDeliveryService)} delivers usage event {{Event}} for {{For}} with properties: {{Properties}}",
             eventName, forId, properties);
 

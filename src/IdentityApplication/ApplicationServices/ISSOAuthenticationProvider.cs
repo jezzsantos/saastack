@@ -11,7 +11,7 @@ public interface ISSOAuthenticationProvider
 {
     string ProviderName { get; }
 
-    Task<Result<SSOUserInfo, Error>> AuthenticateAsync(ICallerContext context, string authCode, string? emailAddress,
+    Task<Result<SSOUserInfo, Error>> AuthenticateAsync(ICallerContext caller, string authCode, string? emailAddress,
         CancellationToken cancellationToken);
 }
 

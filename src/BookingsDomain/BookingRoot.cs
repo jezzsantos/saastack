@@ -72,7 +72,7 @@ public sealed class BookingRoot : AggregateRootBase
     public override Result<Error> EnsureInvariants()
     {
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }
@@ -116,7 +116,7 @@ public sealed class BookingRoot : AggregateRootBase
             {
                 var trip = RaiseEventToChildEntity(isReconstituting, changed, idFactory =>
                     Trip.Create(Recorder, idFactory, RaiseChangeEvent), e => e.TripId!);
-                if (!trip.IsSuccessful)
+                if (trip.IsFailure)
                 {
                     return trip.Error;
                 }
@@ -196,7 +196,7 @@ public sealed class BookingRoot : AggregateRootBase
         }
 
         var added = RaiseChangeEvent(BookingsDomain.Events.TripAdded(Id, OrganizationId));
-        if (!added.IsSuccessful)
+        if (added.IsFailure)
         {
             return added.Error;
         }

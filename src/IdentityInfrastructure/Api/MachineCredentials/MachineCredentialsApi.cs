@@ -9,20 +9,20 @@ namespace IdentityInfrastructure.Api.MachineCredentials;
 
 public class MachineCredentialsApi : IWebApiService
 {
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
     private readonly IMachineCredentialsApplication _machineCredentialsApplication;
 
-    public MachineCredentialsApi(ICallerContextFactory contextFactory,
+    public MachineCredentialsApi(ICallerContextFactory callerFactory,
         IMachineCredentialsApplication machineCredentialsApplication)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _machineCredentialsApplication = machineCredentialsApplication;
     }
 
     public async Task<ApiPostResult<MachineCredential, RegisterMachineResponse>> RegisterMachine(
         RegisterMachineRequest request, CancellationToken cancellationToken)
     {
-        var machine = await _machineCredentialsApplication.RegisterMachineAsync(_contextFactory.Create(), request.Name,
+        var machine = await _machineCredentialsApplication.RegisterMachineAsync(_callerFactory.Create(), request.Name,
             request.Timezone, request.CountryCode, request.ApiKeyExpiresOnUtc, cancellationToken);
 
         return () => machine.HandleApplicationResult<MachineCredential, RegisterMachineResponse>(x =>

@@ -98,7 +98,7 @@ For example,
 ```c#
     public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
-        var car = await _carsApplication.GetCarAsync(_contextFactory.Create(),
+        var car = await _carsApplication.GetCarAsync(_callerFactory.Create(),
             MultiTenancyConstants.DefaultOrganizationId, request.Id,
             cancellationToken);
 

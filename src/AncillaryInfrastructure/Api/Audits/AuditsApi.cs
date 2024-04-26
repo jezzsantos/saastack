@@ -11,11 +11,11 @@ namespace AncillaryInfrastructure.Api.Audits;
 public sealed class AuditsApi : IWebApiService
 {
     private readonly IAncillaryApplication _ancillaryApplication;
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
 
-    public AuditsApi(ICallerContextFactory contextFactory, IAncillaryApplication ancillaryApplication)
+    public AuditsApi(ICallerContextFactory callerFactory, IAncillaryApplication ancillaryApplication)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _ancillaryApplication = ancillaryApplication;
     }
 
@@ -23,7 +23,7 @@ public sealed class AuditsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var delivered =
-            await _ancillaryApplication.DeliverAuditAsync(_contextFactory.Create(), request.Message, cancellationToken);
+            await _ancillaryApplication.DeliverAuditAsync(_callerFactory.Create(), request.Message, cancellationToken);
 
         return () => delivered.HandleApplicationResult<bool, DeliverMessageResponse>(_ =>
             new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsDelivered = true }));
@@ -33,7 +33,7 @@ public sealed class AuditsApi : IWebApiService
     public async Task<ApiEmptyResult> DrainAll(DrainAllAuditsRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await _ancillaryApplication.DrainAllAuditsAsync(_contextFactory.Create(), cancellationToken);
+        var result = await _ancillaryApplication.DrainAllAuditsAsync(_callerFactory.Create(), cancellationToken);
 
         return () => result.Match(() => new Result<EmptyResponse, Error>(),
             error => new Result<EmptyResponse, Error>(error));
@@ -44,7 +44,7 @@ public sealed class AuditsApi : IWebApiService
     public async Task<ApiSearchResult<Audit, SearchAllAuditsResponse>> SearchAll(
         SearchAllAuditsRequest request, CancellationToken cancellationToken)
     {
-        var audits = await _ancillaryApplication.SearchAllAuditsAsync(_contextFactory.Create(),
+        var audits = await _ancillaryApplication.SearchAllAuditsAsync(_callerFactory.Create(),
             request.OrganizationId!, request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
 
         return () => audits.HandleApplicationResult(a => new SearchAllAuditsResponse

@@ -32,7 +32,7 @@ public static class ServiceClientExtensions
                 req.SetHMACAuth(request, hmacSecret);
                 req.SetRequestId(caller.ToCall());
             }, cancellationToken);
-            if (!posted.IsSuccessful)
+            if (posted.IsFailure)
             {
                 throw posted.Error.ToException();
             }

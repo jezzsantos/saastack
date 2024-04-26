@@ -19,7 +19,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
     public static Result<Roles, Error> Create(string role)
     {
         var rol = Role.Create(role);
-        if (!rol.IsSuccessful)
+        if (rol.IsFailure)
         {
             return rol.Error;
         }
@@ -39,7 +39,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
         foreach (var role in roles)
         {
             var rol = Role.Create(role);
-            if (!rol.IsSuccessful)
+            if (rol.IsFailure)
             {
                 return rol.Error;
             }
@@ -56,7 +56,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
         foreach (var role in roles)
         {
             var rol = Role.Create(role);
-            if (!rol.IsSuccessful)
+            if (rol.IsFailure)
             {
                 return rol.Error;
             }
@@ -95,7 +95,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
     public Result<Roles, Error> Add(string role)
     {
         var rol = Role.Create(role);
-        if (!rol.IsSuccessful)
+        if (rol.IsFailure)
         {
             return rol.Error;
         }
@@ -110,7 +110,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
         foreach (var level in allLevels)
         {
             var added = roles.Add(level);
-            if (!added.IsSuccessful)
+            if (added.IsFailure)
             {
                 return added.Error;
             }
@@ -155,7 +155,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
     public bool HasRole(string role)
     {
         var rol = Role.Create(role);
-        if (!rol.IsSuccessful)
+        if (rol.IsFailure)
         {
             return false;
         }
@@ -178,7 +178,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
     public Roles Remove(string role)
     {
         var rol = Role.Create(role);
-        if (!rol.IsSuccessful)
+        if (rol.IsFailure)
         {
             return this;
         }

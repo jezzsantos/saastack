@@ -155,7 +155,7 @@ public class TestSSOAuthenticationProvider : ISSOAuthenticationProvider
 {
     public const string Name = "atestprovider";
 
-    public Task<Result<SSOUserInfo, Error>> AuthenticateAsync(ICallerContext context, string authCode,
+    public Task<Result<SSOUserInfo, Error>> AuthenticateAsync(ICallerContext caller, string authCode,
         string? emailAddress,
         CancellationToken cancellationToken)
     {

@@ -36,7 +36,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         FileUpload upload, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -48,13 +48,13 @@ public partial class UserProfilesApplication : IUserProfilesApplication
 
         var profile = retrieved.Value.Value;
         var avatared = await ChangeAvatarInternalAsync(caller, caller.ToCallerId(), profile, upload, cancellationToken);
-        if (!avatared.IsSuccessful)
+        if (avatared.IsFailure)
         {
             return avatared.Error;
         }
 
         var saved = await _repository.SaveAsync(profile, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -70,7 +70,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -84,17 +84,17 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         var deleted = await profile.DeleteAvatarAsync(caller.ToCallerId(), async avatarId =>
         {
             var removed = await _imagesService.DeleteImageAsync(caller, avatarId, cancellationToken);
-            return !removed.IsSuccessful
+            return removed.IsFailure
                 ? removed.Error
                 : Result.Ok;
         });
-        if (!deleted.IsSuccessful)
+        if (deleted.IsFailure)
         {
             return deleted.Error;
         }
 
         var saved = await _repository.SaveAsync(profile, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -110,13 +110,13 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         string emailAddress, CancellationToken cancellationToken)
     {
         var email = EmailAddress.Create(emailAddress);
-        if (!email.IsSuccessful)
+        if (email.IsFailure)
         {
             return email.Error;
         }
 
         var retrieved = await _repository.FindByEmailAddressAsync(email.Value, cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -161,7 +161,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         }
 
         var retrieved = await _repository.FindByUserIdAsync(caller.ToCallerId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -188,7 +188,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         }
 
         var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -210,7 +210,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -226,13 +226,13 @@ public partial class UserProfilesApplication : IUserProfilesApplication
             var backupFirstname = profile.Name.Value.FirstName;
             var backupLastname = profile.Name.Value.LastName.ValueOrDefault?.Text;
             var name = PersonName.Create(firstName ?? backupFirstname, lastName ?? backupLastname);
-            if (!name.IsSuccessful)
+            if (name.IsFailure)
             {
                 return name.Error;
             }
 
             var named = profile.ChangeName(caller.ToCallerId(), name.Value);
-            if (!named.IsSuccessful)
+            if (named.IsFailure)
             {
                 return named.Error;
             }
@@ -241,13 +241,13 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         if (displayName.HasValue())
         {
             var display = PersonDisplayName.Create(displayName);
-            if (!display.IsSuccessful)
+            if (display.IsFailure)
             {
                 return display.Error;
             }
 
             var displayed = profile.ChangeDisplayName(caller.ToCallerId(), display.Value);
-            if (!displayed.IsSuccessful)
+            if (displayed.IsFailure)
             {
                 return displayed.Error;
             }
@@ -256,13 +256,13 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         if (phoneNumber.HasValue())
         {
             var phone = PhoneNumber.Create(phoneNumber);
-            if (!phone.IsSuccessful)
+            if (phone.IsFailure)
             {
                 return phone.Error;
             }
 
             var phoned = profile.ChangePhoneNumber(caller.ToCallerId(), phone.Value);
-            if (!phoned.IsSuccessful)
+            if (phoned.IsFailure)
             {
                 return phoned.Error;
             }
@@ -271,20 +271,20 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         if (timezone.HasValue())
         {
             var tz = Timezone.Create(Timezones.FindOrDefault(timezone));
-            if (!tz.IsSuccessful)
+            if (tz.IsFailure)
             {
                 return tz.Error;
             }
 
             var timezoned = profile.SetTimezone(caller.ToCallerId(), tz.Value);
-            if (!timezoned.IsSuccessful)
+            if (timezoned.IsFailure)
             {
                 return timezoned.Error;
             }
         }
 
         var saved = await _repository.SaveAsync(profile, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -307,7 +307,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         }
 
         var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -327,19 +327,19 @@ public partial class UserProfilesApplication : IUserProfilesApplication
             state ?? profile.Address.State,
             CountryCodes.FindOrDefault(countryCode ?? profile.Address.CountryCode.ToString()),
             zipCode ?? profile.Address.Zip);
-        if (!address.IsSuccessful)
+        if (address.IsFailure)
         {
             return address.Error;
         }
 
         var contacted = profile.SetContactAddress(caller.ToCallerId(), address.Value);
-        if (!contacted.IsSuccessful)
+        if (contacted.IsFailure)
         {
             return contacted.Error;
         }
 
         var saved = await _repository.SaveAsync(profile, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -361,7 +361,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
 
         var retrieved =
             await _repository.SearchAllByUserIdsAsync(ids.Select(id => id.ToId()).ToList(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -387,7 +387,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         return await profile.ChangeAvatarAsync(modifierId, async displayName =>
         {
             var created = await _imagesService.CreateImageAsync(caller, upload, displayName.Text, cancellationToken);
-            if (!created.IsSuccessful)
+            if (created.IsFailure)
             {
                 return created.Error;
             }
@@ -396,7 +396,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         }, async avatarId =>
         {
             var removed = await _imagesService.DeleteImageAsync(caller, avatarId, cancellationToken);
-            return !removed.IsSuccessful
+            return removed.IsFailure
                 ? removed.Error
                 : Result.Ok;
         });

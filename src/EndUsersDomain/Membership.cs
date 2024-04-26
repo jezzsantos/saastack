@@ -52,14 +52,14 @@ public sealed class Membership : EntityBase
                 IsDefault = added.IsDefault;
                 Ownership = added.Ownership;
                 var roles = Roles.Create(added.Roles.ToArray());
-                if (!roles.IsSuccessful)
+                if (roles.IsFailure)
                 {
                     return roles.Error;
                 }
 
                 Roles = roles.Value;
                 var features = Features.Create(added.Features.ToArray());
-                if (!features.IsSuccessful)
+                if (features.IsFailure)
                 {
                     return features.Error;
                 }
@@ -86,7 +86,7 @@ public sealed class Membership : EntityBase
             case MembershipRoleAssigned assigned:
             {
                 var roles = Roles.Add(assigned.Role);
-                if (!roles.IsSuccessful)
+                if (roles.IsFailure)
                 {
                     return roles.Error;
                 }
@@ -105,7 +105,7 @@ public sealed class Membership : EntityBase
             case MembershipFeatureAssigned assigned:
             {
                 var features = Features.Add(assigned.Feature);
-                if (!features.IsSuccessful)
+                if (features.IsFailure)
                 {
                     return features.Error;
                 }
@@ -122,7 +122,7 @@ public sealed class Membership : EntityBase
     public override Result<Error> EnsureInvariants()
     {
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }

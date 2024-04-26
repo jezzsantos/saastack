@@ -10,23 +10,12 @@ namespace AncillaryInfrastructure.Api.Provisionings;
 public sealed class ProvisioningsApi : IWebApiService
 {
     private readonly IAncillaryApplication _ancillaryApplication;
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
 
-    public ProvisioningsApi(ICallerContextFactory contextFactory, IAncillaryApplication ancillaryApplication)
+    public ProvisioningsApi(ICallerContextFactory callerFactory, IAncillaryApplication ancillaryApplication)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _ancillaryApplication = ancillaryApplication;
-    }
-
-    public async Task<ApiPostResult<bool, DeliverMessageResponse>> Notify(NotifyProvisioningRequest request,
-        CancellationToken cancellationToken)
-    {
-        var delivered =
-            await _ancillaryApplication.NotifyProvisioningAsync(_contextFactory.Create(), request.Message,
-                cancellationToken);
-
-        return () => delivered.HandleApplicationResult<bool, DeliverMessageResponse>(_ =>
-            new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsDelivered = true }));
     }
 
 #if TESTINGONLY
@@ -34,10 +23,21 @@ public sealed class ProvisioningsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var result =
-            await _ancillaryApplication.DrainAllProvisioningsAsync(_contextFactory.Create(), cancellationToken);
+            await _ancillaryApplication.DrainAllProvisioningsAsync(_callerFactory.Create(), cancellationToken);
 
         return () => result.Match(() => new Result<EmptyResponse, Error>(),
             error => new Result<EmptyResponse, Error>(error));
     }
 #endif
+
+    public async Task<ApiPostResult<bool, DeliverMessageResponse>> Notify(NotifyProvisioningRequest request,
+        CancellationToken cancellationToken)
+    {
+        var delivered =
+            await _ancillaryApplication.NotifyProvisioningAsync(_callerFactory.Create(), request.Message,
+                cancellationToken);
+
+        return () => delivered.HandleApplicationResult<bool, DeliverMessageResponse>(_ =>
+            new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsDelivered = true }));
+    }
 }

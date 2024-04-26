@@ -29,18 +29,18 @@ public class AuthTokensApplication : IAuthTokensApplication
         _repository = repository;
     }
 
-    public async Task<Result<AccessTokens, Error>> IssueTokensAsync(ICallerContext context, EndUserWithMemberships user,
+    public async Task<Result<AccessTokens, Error>> IssueTokensAsync(ICallerContext caller, EndUserWithMemberships user,
         CancellationToken cancellationToken)
     {
         var issued = await _jwtTokensService.IssueTokensAsync(user);
-        if (!issued.IsSuccessful)
+        if (issued.IsFailure)
         {
             return issued.Error;
         }
 
         var tokens = issued.Value;
         var retrieved = await _repository.FindByUserIdAsync(user.Id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -53,7 +53,7 @@ public class AuthTokensApplication : IAuthTokensApplication
         else
         {
             var root = AuthTokensRoot.Create(_recorder, _idFactory, user.Id.ToId());
-            if (!root.IsSuccessful)
+            if (root.IsFailure)
             {
                 return root.Error;
             }
@@ -63,27 +63,28 @@ public class AuthTokensApplication : IAuthTokensApplication
 
         var set = authTokens.SetTokens(tokens.AccessToken, tokens.RefreshToken, tokens.AccessTokenExpiresOn,
             tokens.RefreshTokenExpiresOn);
-        if (!set.IsSuccessful)
+        if (set.IsFailure)
         {
             return set.Error;
         }
 
-        var updated = await _repository.SaveAsync(authTokens, cancellationToken);
-        if (!updated.IsSuccessful)
+        var saved = await _repository.SaveAsync(authTokens, cancellationToken);
+        if (saved.IsFailure)
         {
-            return updated.Error;
+            return saved.Error;
         }
 
-        _recorder.TraceInformation(context.ToCall(), "AuthTokens were issued for {Id}", updated.Value.Id);
+        authTokens = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "AuthTokens were issued for {Id}", authTokens.Id);
 
         return tokens;
     }
 
-    public async Task<Result<AuthenticateTokens, Error>> RefreshTokenAsync(ICallerContext context, string refreshToken,
+    public async Task<Result<AuthenticateTokens, Error>> RefreshTokenAsync(ICallerContext caller, string refreshToken,
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.FindByRefreshTokenAsync(refreshToken, cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -95,15 +96,15 @@ public class AuthTokensApplication : IAuthTokensApplication
 
         var authTokens = retrieved.Value.Value;
         var retrievedUser =
-            await _endUsersService.GetMembershipsPrivateAsync(context, authTokens.UserId, cancellationToken);
-        if (!retrievedUser.IsSuccessful)
+            await _endUsersService.GetMembershipsPrivateAsync(caller, authTokens.UserId, cancellationToken);
+        if (retrievedUser.IsFailure)
         {
             return retrievedUser.Error;
         }
 
         var user = retrievedUser.Value;
         var issued = await _jwtTokensService.IssueTokensAsync(user);
-        if (!issued.IsSuccessful)
+        if (issued.IsFailure)
         {
             return issued.Error;
         }
@@ -111,18 +112,19 @@ public class AuthTokensApplication : IAuthTokensApplication
         var tokens = issued.Value;
         var renewed = authTokens.RenewTokens(refreshToken, tokens.AccessToken, tokens.RefreshToken,
             tokens.AccessTokenExpiresOn, tokens.RefreshTokenExpiresOn);
-        if (!renewed.IsSuccessful)
+        if (renewed.IsFailure)
         {
             return Error.NotAuthenticated();
         }
 
-        var updated = await _repository.SaveAsync(authTokens, cancellationToken);
-        if (!updated.IsSuccessful)
+        var saved = await _repository.SaveAsync(authTokens, cancellationToken);
+        if (saved.IsFailure)
         {
-            return updated.Error;
+            return saved.Error;
         }
 
-        _recorder.TraceInformation(context.ToCall(), "AuthTokens were refreshed for {Id}", updated.Value.Id);
+        authTokens = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "AuthTokens were refreshed for {Id}", authTokens.Id);
 
         return new AuthenticateTokens
         {
@@ -140,11 +142,11 @@ public class AuthTokensApplication : IAuthTokensApplication
         };
     }
 
-    public async Task<Result<Error>> RevokeRefreshTokenAsync(ICallerContext context, string refreshToken,
+    public async Task<Result<Error>> RevokeRefreshTokenAsync(ICallerContext caller, string refreshToken,
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.FindByRefreshTokenAsync(refreshToken, cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -156,18 +158,19 @@ public class AuthTokensApplication : IAuthTokensApplication
 
         var authTokens = retrieved.Value.Value;
         var invalidated = authTokens.Revoke(refreshToken);
-        if (!invalidated.IsSuccessful)
+        if (invalidated.IsFailure)
         {
             return invalidated.Error;
         }
 
-        var updated = await _repository.SaveAsync(authTokens, cancellationToken);
-        if (!updated.IsSuccessful)
+        var saved = await _repository.SaveAsync(authTokens, cancellationToken);
+        if (saved.IsFailure)
         {
-            return updated.Error;
+            return saved.Error;
         }
 
-        _recorder.TraceInformation(context.ToCall(), "AuthTokens were revoked for {Id}", updated.Value.Id);
+        authTokens = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "AuthTokens were revoked for {Id}", authTokens.Id);
 
         return Result.Ok;
     }

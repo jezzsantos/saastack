@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.IntegrationTests.Stubs;
 
 public class StubTenantSettingsService : ITenantSettingsService
 {
-    public async Task<Result<TenantSettings, Error>> CreateForTenantAsync(ICallerContext context, string tenantId,
+    public async Task<Result<TenantSettings, Error>> CreateForTenantAsync(ICallerContext caller, string tenantId,
         CancellationToken cancellationToken)
     {
         await Task.CompletedTask;

@@ -16,13 +16,13 @@ public sealed class Registration : ValueObjectBase<Registration>
         }
 
         var em = EmailAddress.Create(emailAddress);
-        if (!em.IsSuccessful)
+        if (em.IsFailure)
         {
             return em.Error;
         }
 
         var pdm = PersonDisplayName.Create(name);
-        if (!pdm.IsSuccessful)
+        if (pdm.IsFailure)
         {
             return pdm.Error;
         }

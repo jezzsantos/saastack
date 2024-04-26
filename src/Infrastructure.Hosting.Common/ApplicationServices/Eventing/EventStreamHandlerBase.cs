@@ -82,7 +82,7 @@ public abstract class EventStreamHandlerBase : IDisposable
                 var streamName = firstEvent.StreamName;
 
                 var ensured = EnsureContiguousVersions(streamName, eventStream);
-                if (!ensured.IsSuccessful)
+                if (ensured.IsFailure)
                 {
                     return ensured.Error;
                 }
@@ -90,7 +90,7 @@ public abstract class EventStreamHandlerBase : IDisposable
                 try
                 {
                     var handled = await HandleStreamEventsAsync(streamName, eventStream, CancellationToken.None);
-                    if (!handled.IsSuccessful)
+                    if (handled.IsFailure)
                     {
                         return handled.Error;
                     }

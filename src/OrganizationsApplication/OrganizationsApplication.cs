@@ -45,7 +45,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         string? name, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -54,26 +54,26 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         if (name.HasValue())
         {
             var modifierRoles = Roles.Create(caller.Roles.Tenant);
-            if (!modifierRoles.IsSuccessful)
+            if (modifierRoles.IsFailure)
             {
                 return modifierRoles.Error;
             }
 
             var orgName = DisplayName.Create(name);
-            if (!orgName.IsSuccessful)
+            if (orgName.IsFailure)
             {
                 return orgName.Error;
             }
 
             var changed = org.ChangeName(caller.ToCallerId(), modifierRoles.Value, orgName.Value);
-            if (!changed.IsSuccessful)
+            if (changed.IsFailure)
             {
                 return changed.Error;
             }
         }
 
         var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -88,26 +88,26 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         TenantSettings settings, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
         var org = retrieved.Value;
         var newSettings = settings.ToSettings();
-        if (!newSettings.IsSuccessful)
+        if (newSettings.IsFailure)
         {
             return newSettings.Error;
         }
 
         var updated = org.UpdateSettings(newSettings.Value);
-        if (!updated.IsSuccessful)
+        if (updated.IsFailure)
         {
             return updated.Error;
         }
 
         var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -122,7 +122,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
     {
         var userId = caller.ToCallerId();
         var retrieved = await _endUsersService.GetUserPrivateAsync(caller, userId, cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -131,7 +131,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         var created = await CreateOrganizationInternalAsync(caller, user.Id,
             user.Classification.ToEnumOrDefault(UserClassification.Person), name,
             OrganizationOwnership.Shared, cancellationToken);
-        if (!created.IsSuccessful)
+        if (created.IsFailure)
         {
             return created.Error;
         }
@@ -143,13 +143,13 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
         var deleterRoles = Roles.Create(caller.Roles.Tenant);
-        if (!deleterRoles.IsSuccessful)
+        if (deleterRoles.IsFailure)
         {
             return deleterRoles.Error;
         }
@@ -157,13 +157,13 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         var org = retrieved.Value;
         var deleterId = caller.ToCallerId();
         var deleted = org.DeleteOrganization(deleterId, deleterRoles.Value);
-        if (!deleted.IsSuccessful)
+        if (deleted.IsFailure)
         {
             return deleted.Error;
         }
 
         var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -178,7 +178,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -195,7 +195,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         string id, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -212,7 +212,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -229,14 +229,14 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         string? userId, string? emailAddress, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
         var org = retrieved.Value;
         var inviterRoles = Roles.Create(caller.Roles.Tenant);
-        if (!inviterRoles.IsSuccessful)
+        if (inviterRoles.IsFailure)
         {
             return inviterRoles.Error;
         }
@@ -244,20 +244,20 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         if (emailAddress.HasValue())
         {
             var email = EmailAddress.Create(emailAddress);
-            if (!email.IsSuccessful)
+            if (email.IsFailure)
             {
                 return email.Error;
             }
 
             var invited = org.InviteMember(caller.ToCallerId(), inviterRoles.Value, Optional<Identifier>.None,
                 email.Value);
-            if (!invited.IsSuccessful)
+            if (invited.IsFailure)
             {
                 return invited.Error;
             }
 
             var saved = await _repository.SaveAsync(org, cancellationToken);
-            if (!saved.IsSuccessful)
+            if (saved.IsFailure)
             {
                 return saved.Error;
             }
@@ -273,13 +273,13 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         {
             var invited = org.InviteMember(caller.ToCallerId(), inviterRoles.Value, userId.ToId(),
                 Optional<EmailAddress>.None);
-            if (!invited.IsSuccessful)
+            if (invited.IsFailure)
             {
                 return invited.Error;
             }
 
             var saved = await _repository.SaveAsync(org, cancellationToken);
-            if (!saved.IsSuccessful)
+            if (saved.IsFailure)
             {
                 return saved.Error;
             }
@@ -298,26 +298,26 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         string userId, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
         var removerRoles = Roles.Create(caller.Roles.Tenant);
-        if (!removerRoles.IsSuccessful)
+        if (removerRoles.IsFailure)
         {
             return removerRoles.Error;
         }
 
         var org = retrieved.Value;
         var uninvited = org.UnInviteMember(caller.ToCallerId(), removerRoles.Value, userId.ToId());
-        if (!uninvited.IsSuccessful)
+        if (uninvited.IsFailure)
         {
             return uninvited.Error;
         }
 
         var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -334,7 +334,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         GetOptions getOptions, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -343,7 +343,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         var memberships =
             await _endUsersService.ListMembershipsForOrganizationAsync(caller, org.Id, searchOptions,
                 getOptions, cancellationToken);
-        if (!memberships.IsSuccessful)
+        if (memberships.IsFailure)
         {
             return memberships.Error;
         }
@@ -357,19 +357,19 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         string userId, List<string> roles, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
         var assignerRoles = Roles.Create(caller.Roles.Tenant);
-        if (!assignerRoles.IsSuccessful)
+        if (assignerRoles.IsFailure)
         {
             return assignerRoles.Error;
         }
 
         var rolesToAssign = Roles.Create(roles.ToArray());
-        if (!rolesToAssign.IsSuccessful)
+        if (rolesToAssign.IsFailure)
         {
             return rolesToAssign.Error;
         }
@@ -377,13 +377,13 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         var org = retrieved.Value;
         var assignerId = caller.ToCallerId();
         var assigned = org.AssignRoles(assignerId, assignerRoles.Value, userId.ToId(), rolesToAssign.Value);
-        if (!assigned.IsSuccessful)
+        if (assigned.IsFailure)
         {
             return assigned.Error;
         }
 
         var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -398,19 +398,19 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         string userId, List<string> roles, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
         var assignerRoles = Roles.Create(caller.Roles.Tenant);
-        if (!assignerRoles.IsSuccessful)
+        if (assignerRoles.IsFailure)
         {
             return assignerRoles.Error;
         }
 
         var rolesToUnassign = Roles.Create(roles.ToArray());
-        if (!rolesToUnassign.IsSuccessful)
+        if (rolesToUnassign.IsFailure)
         {
             return rolesToUnassign.Error;
         }
@@ -418,13 +418,13 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         var org = retrieved.Value;
         var assignerId = caller.ToCallerId();
         var unassigned = org.UnassignRoles(assignerId, assignerRoles.Value, userId.ToId(), rolesToUnassign.Value);
-        if (!unassigned.IsSuccessful)
+        if (unassigned.IsFailure)
         {
             return unassigned.Error;
         }
 
         var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -439,13 +439,13 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         FileUpload upload, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
         var modifierRoles = Roles.Create(caller.Roles.Tenant);
-        if (!modifierRoles.IsSuccessful)
+        if (modifierRoles.IsFailure)
         {
             return modifierRoles.Error;
         }
@@ -453,13 +453,13 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         var org = retrieved.Value;
         var avatared = await ChangeAvatarInternalAsync(caller, caller.ToCallerId(), modifierRoles.Value, org, upload,
             cancellationToken);
-        if (!avatared.IsSuccessful)
+        if (avatared.IsFailure)
         {
             return avatared.Error;
         }
 
         var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -474,13 +474,13 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
         var deleterRoles = Roles.Create(caller.Roles.Tenant);
-        if (!deleterRoles.IsSuccessful)
+        if (deleterRoles.IsFailure)
         {
             return deleterRoles.Error;
         }
@@ -489,17 +489,17 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         var deleted = await org.DeleteAvatarAsync(caller.ToCallerId(), deleterRoles.Value, async avatarId =>
         {
             var removed = await _imagesService.DeleteImageAsync(caller, avatarId, cancellationToken);
-            return !removed.IsSuccessful
+            return removed.IsFailure
                 ? removed.Error
                 : Result.Ok;
         });
-        if (!deleted.IsSuccessful)
+        if (deleted.IsFailure)
         {
             return deleted.Error;
         }
 
         var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -515,33 +515,33 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         CancellationToken cancellationToken)
     {
         var displayName = DisplayName.Create(name);
-        if (!displayName.IsSuccessful)
+        if (displayName.IsFailure)
         {
             return displayName.Error;
         }
 
         var created = OrganizationRoot.Create(_recorder, _identifierFactory, _tenantSettingService,
             ownership, creatorId.ToId(), classification, displayName.Value);
-        if (!created.IsSuccessful)
+        if (created.IsFailure)
         {
             return created.Error;
         }
 
         var org = created.Value;
         var newSettings = await _tenantSettingsService.CreateForTenantAsync(caller, org.Id, cancellationToken);
-        if (!newSettings.IsSuccessful)
+        if (newSettings.IsFailure)
         {
             return newSettings.Error;
         }
 
         var settings = newSettings.Value.ToSettings();
-        if (!settings.IsSuccessful)
+        if (settings.IsFailure)
         {
             return settings.Error;
         }
 
         var configured = org.CreateSettings(settings.Value);
-        if (!configured.IsSuccessful)
+        if (configured.IsFailure)
         {
             return configured.Error;
         }
@@ -549,15 +549,16 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         //TODO: Get the billing details for the creator and add the billing subscription for them
 
         var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
 
+        org = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Created organization: {Id}, by {CreatedBy}", org.Id,
-            saved.Value.CreatedById);
+            org.CreatedById);
 
-        return saved.Value.ToOrganization();
+        return org.ToOrganization();
     }
 
     private async Task<Result<Error>> ChangeAvatarInternalAsync(ICallerContext caller, Identifier modifierId,
@@ -567,7 +568,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         return await organization.ChangeAvatarAsync(modifierId, modifierRoles, async name =>
         {
             var created = await _imagesService.CreateImageAsync(caller, upload, name.Text, cancellationToken);
-            if (!created.IsSuccessful)
+            if (created.IsFailure)
             {
                 return created.Error;
             }
@@ -576,7 +577,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         }, async avatarId =>
         {
             var removed = await _imagesService.DeleteImageAsync(caller, avatarId, cancellationToken);
-            return !removed.IsSuccessful
+            return removed.IsFailure
                 ? removed.Error
                 : Result.Ok;
         });
@@ -640,13 +641,13 @@ internal static class OrganizationConversionExtensions
 
             var value = tenantSetting.Value;
             var setting = Setting.Create(value, tenantSetting.IsEncrypted);
-            if (!setting.IsSuccessful)
+            if (setting.IsFailure)
             {
                 return setting.Error;
             }
 
             var added = settings.AddOrUpdate(key, setting.Value);
-            if (!added.IsSuccessful)
+            if (added.IsFailure)
             {
                 return added.Error;
             }

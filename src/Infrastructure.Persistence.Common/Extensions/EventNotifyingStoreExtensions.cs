@@ -18,7 +18,7 @@ public static class EventNotifyingStoreExtensions
         where TAggregateRoot : IChangeEventProducingAggregateRoot
     {
         var latestChanges = aggregate.GetChanges();
-        if (!latestChanges.IsSuccessful)
+        if (latestChanges.IsFailure)
         {
             return latestChanges.Error;
         }
@@ -30,7 +30,7 @@ public static class EventNotifyingStoreExtensions
         }
 
         var saved = await onSave(aggregate, changedEvents, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -40,7 +40,7 @@ public static class EventNotifyingStoreExtensions
         aggregate.ClearChanges();
 
         var raised = await PublishChangesAsync(store, eventHandler, changedEvents, streamName, cancellationToken);
-        if (!raised.IsSuccessful)
+        if (raised.IsFailure)
         {
             return raised.Error;
         }

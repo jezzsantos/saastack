@@ -29,7 +29,7 @@ public class AspNetHostLocalFileTenantSettingsService : ITenantSettingsService
         _filename = filename;
     }
 
-    public async Task<Result<TenantSettings, Error>> CreateForTenantAsync(ICallerContext context, string tenantId,
+    public async Task<Result<TenantSettings, Error>> CreateForTenantAsync(ICallerContext caller, string tenantId,
         CancellationToken cancellationToken)
     {
         await Task.CompletedTask;

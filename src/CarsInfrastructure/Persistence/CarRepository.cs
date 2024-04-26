@@ -42,7 +42,7 @@ public class CarRepository : ICarRepository
         CancellationToken cancellationToken)
     {
         var car = await _cars.LoadAsync(id, cancellationToken);
-        if (!car.IsSuccessful)
+        if (car.IsFailure)
         {
             return car.Error;
         }
@@ -55,7 +55,7 @@ public class CarRepository : ICarRepository
     public async Task<Result<CarRoot, Error>> SaveAsync(CarRoot car, bool reload, CancellationToken cancellationToken)
     {
         var saved = await _cars.SaveAsync(car, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -78,7 +78,7 @@ public class CarRepository : ICarRepository
                 .AndWhere<DateTime>(u => u.From, ConditionOperator.LessThanEqualTo, from)
                 .AndWhere<DateTime>(u => u.To, ConditionOperator.GreaterThanEqualTo, to),
             cancellationToken: cancellationToken);
-        if (!queriedUnavailabilities.IsSuccessful)
+        if (queriedUnavailabilities.IsFailure)
         {
             return queriedUnavailabilities.Error;
         }
@@ -92,7 +92,7 @@ public class CarRepository : ICarRepository
             .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
             .AndWhere<CarStatus>(c => c.Status, ConditionOperator.EqualTo, CarStatus.Registered)
             .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
-        if (!queriedCars.IsSuccessful)
+        if (queriedCars.IsFailure)
         {
             return queriedCars.Error;
         }
@@ -111,7 +111,7 @@ public class CarRepository : ICarRepository
         var queried = await _carQueries.QueryAsync(Query.From<Car>()
             .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
             .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
-        if (!queried.IsSuccessful)
+        if (queried.IsFailure)
         {
             return queried.Error;
         }
@@ -127,7 +127,7 @@ public class CarRepository : ICarRepository
             .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
             .AndWhere<string>(u => u.CarId, ConditionOperator.EqualTo, id)
             .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
-        if (!queried.IsSuccessful)
+        if (queried.IsFailure)
         {
             return queried.Error;
         }

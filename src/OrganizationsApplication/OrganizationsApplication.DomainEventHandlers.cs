@@ -18,7 +18,7 @@ partial class OrganizationsApplication
         var organization = await CreateOrganizationInternalAsync(caller, domainEvent.RootId.ToId(),
             domainEvent.Classification, name,
             OrganizationOwnership.Personal, cancellationToken);
-        if (!organization.IsSuccessful)
+        if (organization.IsFailure)
         {
             return organization.Error;
         }
@@ -31,7 +31,7 @@ partial class OrganizationsApplication
     {
         var organization = await AddMembershipInternalAsync(caller, domainEvent.RootId.ToId(),
             domainEvent.OrganizationId.ToId(), cancellationToken);
-        if (!organization.IsSuccessful)
+        if (organization.IsFailure)
         {
             return organization.Error;
         }
@@ -44,7 +44,7 @@ partial class OrganizationsApplication
     {
         var organization = await RemoveMembershipInternalAsync(caller, domainEvent.RootId.ToId(),
             domainEvent.OrganizationId.ToId(), cancellationToken);
-        if (!organization.IsSuccessful)
+        if (organization.IsFailure)
         {
             return organization.Error;
         }
@@ -56,7 +56,7 @@ partial class OrganizationsApplication
         Identifier organizationId, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(organizationId, cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             //Note: this may occur after an organization is deleted, and the owner removed
             if (retrieved.Error.Is(ErrorCode.EntityDeleted))
@@ -70,13 +70,13 @@ partial class OrganizationsApplication
 
         var org = retrieved.Value;
         var removed = org.RemoveMembership(userId);
-        if (!removed.IsSuccessful)
+        if (removed.IsFailure)
         {
             return removed.Error;
         }
 
         var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -91,20 +91,20 @@ partial class OrganizationsApplication
         Identifier organizationId, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(organizationId, cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
         var org = retrieved.Value;
         var added = org.AddMembership(userId);
-        if (!added.IsSuccessful)
+        if (added.IsFailure)
         {
             return added.Error;
         }
 
         var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }

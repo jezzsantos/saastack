@@ -12,23 +12,23 @@ namespace ImagesInfrastructure.Api.Images;
 public class ImagesApi : IWebApiService
 {
     private readonly IImagesApplication _application;
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
     private readonly IFileUploadService _fileUploadService;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public ImagesApi(IHttpContextAccessor httpContextAccessor, IFileUploadService fileUploadService,
-        ICallerContextFactory contextFactory, IImagesApplication application)
+        ICallerContextFactory callerFactory, IImagesApplication application)
     {
         _httpContextAccessor = httpContextAccessor;
         _fileUploadService = fileUploadService;
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _application = application;
     }
 
     public async Task<ApiStreamResult> DownloadImage(DownloadImageRequest request,
         CancellationToken cancellationToken)
     {
-        var download = await _application.DownloadImageAsync(_contextFactory.Create(), request.Id, cancellationToken);
+        var download = await _application.DownloadImageAsync(_callerFactory.Create(), request.Id, cancellationToken);
 
         return () => download.HandleApplicationResult(x => new StreamResult(x.Stream, x.ContentType));
     }
@@ -36,14 +36,14 @@ public class ImagesApi : IWebApiService
     public async Task<ApiGetResult<Image, GetImageResponse>> GetImage(GetImageRequest request,
         CancellationToken cancellationToken)
     {
-        var image = await _application.GetImageAsync(_contextFactory.Create(), request.Id, cancellationToken);
+        var image = await _application.GetImageAsync(_callerFactory.Create(), request.Id, cancellationToken);
 
         return () => image.HandleApplicationResult<Image, GetImageResponse>(x => new GetImageResponse { Image = x });
     }
 
     public async Task<ApiDeleteResult> ImageDelete(DeleteImageRequest request, CancellationToken cancellationToken)
     {
-        var image = await _application.DeleteImageAsync(_contextFactory.Create(), request.Id, cancellationToken);
+        var image = await _application.DeleteImageAsync(_callerFactory.Create(), request.Id, cancellationToken);
 
         return () => image.HandleApplicationResult();
     }
@@ -51,7 +51,7 @@ public class ImagesApi : IWebApiService
     public async Task<ApiPutPatchResult<Image, UpdateImageResponse>> UpdateImage(UpdateImageRequest request,
         CancellationToken cancellationToken)
     {
-        var image = await _application.UpdateImageAsync(_contextFactory.Create(), request.Id, request.Description,
+        var image = await _application.UpdateImageAsync(_callerFactory.Create(), request.Id, request.Description,
             cancellationToken);
 
         return () =>
@@ -64,12 +64,12 @@ public class ImagesApi : IWebApiService
         var httpRequest = _httpContextAccessor.HttpContext!.Request;
         var uploaded = httpRequest.GetUploadedFile(_fileUploadService, Validations.Images.MaxSizeInBytes,
             Validations.Images.AllowableContentTypes);
-        if (!uploaded.IsSuccessful)
+        if (uploaded.IsFailure)
         {
             return () => uploaded.Error;
         }
 
-        var image = await _application.UploadImageAsync(_contextFactory.Create(), uploaded.Value, request.Description,
+        var image = await _application.UploadImageAsync(_callerFactory.Create(), uploaded.Value, request.Description,
             cancellationToken);
 
         return () =>

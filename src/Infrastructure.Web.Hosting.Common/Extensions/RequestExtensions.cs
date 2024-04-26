@@ -20,7 +20,7 @@ public static class RequestExtensions
         }
 
         var userId = GetUserIdClaim(token);
-        if (!userId.IsSuccessful)
+        if (userId.IsFailure)
         {
             return userId.Error;
         }

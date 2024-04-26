@@ -11,13 +11,13 @@ namespace WebsiteHost.Api.AuthN;
 public class AuthenticationApi : IWebApiService
 {
     private readonly IAuthenticationApplication _authenticationApplication;
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public AuthenticationApi(ICallerContextFactory contextFactory, IAuthenticationApplication authenticationApplication,
+    public AuthenticationApi(ICallerContextFactory callerFactory, IAuthenticationApplication authenticationApplication,
         IHttpContextAccessor httpContextAccessor)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _authenticationApplication = authenticationApplication;
         _httpContextAccessor = httpContextAccessor;
     }
@@ -25,7 +25,7 @@ public class AuthenticationApi : IWebApiService
     public async Task<ApiPostResult<AuthenticateTokens, AuthenticateResponse>> Authenticate(
         AuthenticateRequest request, CancellationToken cancellationToken)
     {
-        var tokens = await _authenticationApplication.AuthenticateAsync(_contextFactory.Create(), request.Provider,
+        var tokens = await _authenticationApplication.AuthenticateAsync(_callerFactory.Create(), request.Provider,
             request.AuthCode, request.Username, request.Password, cancellationToken);
         if (tokens.IsSuccessful)
         {
@@ -39,7 +39,7 @@ public class AuthenticationApi : IWebApiService
 
     public async Task<ApiEmptyResult> Logout(LogoutRequest request, CancellationToken cancellationToken)
     {
-        var result = await _authenticationApplication.LogoutAsync(_contextFactory.Create(), cancellationToken);
+        var result = await _authenticationApplication.LogoutAsync(_callerFactory.Create(), cancellationToken);
         if (result.IsSuccessful)
         {
             var response = _httpContextAccessor.HttpContext!.Response;
@@ -55,7 +55,7 @@ public class AuthenticationApi : IWebApiService
         var refreshToken = GetRefreshTokenCookie(_httpContextAccessor.HttpContext!.Request);
 
         var tokens =
-            await _authenticationApplication.RefreshTokenAsync(_contextFactory.Create(), refreshToken,
+            await _authenticationApplication.RefreshTokenAsync(_callerFactory.Create(), refreshToken,
                 cancellationToken);
         if (tokens.IsSuccessful)
         {

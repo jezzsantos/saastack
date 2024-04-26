@@ -10,18 +10,18 @@ namespace BookingsInfrastructure.Api.Bookings;
 public sealed class BookingsApi : IWebApiService
 {
     private readonly IBookingsApplication _bookingsApplication;
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
 
-    public BookingsApi(ICallerContextFactory contextFactory, IBookingsApplication bookingsApplication)
+    public BookingsApi(ICallerContextFactory callerFactory, IBookingsApplication bookingsApplication)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _bookingsApplication = bookingsApplication;
     }
 
     public async Task<ApiDeleteResult> Cancel(CancelBookingRequest request, CancellationToken cancellationToken)
     {
         var booking =
-            await _bookingsApplication.CancelBookingAsync(_contextFactory.Create(), request.OrganizationId!, request.Id,
+            await _bookingsApplication.CancelBookingAsync(_callerFactory.Create(), request.OrganizationId!, request.Id,
                 cancellationToken);
         return () => booking.HandleApplicationResult();
     }
@@ -29,7 +29,7 @@ public sealed class BookingsApi : IWebApiService
     public async Task<ApiPostResult<Booking, MakeBookingResponse>> Make(MakeBookingRequest request,
         CancellationToken cancellationToken)
     {
-        var booking = await _bookingsApplication.MakeBookingAsync(_contextFactory.Create(), request.OrganizationId!,
+        var booking = await _bookingsApplication.MakeBookingAsync(_callerFactory.Create(), request.OrganizationId!,
             request.CarId, request.StartUtc, request.EndUtc, cancellationToken);
 
         return () => booking.HandleApplicationResult<Booking, MakeBookingResponse>(c =>
@@ -39,7 +39,7 @@ public sealed class BookingsApi : IWebApiService
     public async Task<ApiSearchResult<Booking, SearchAllBookingsResponse>> SearchAll(SearchAllBookingsRequest request,
         CancellationToken cancellationToken)
     {
-        var bookings = await _bookingsApplication.SearchAllBookingsAsync(_contextFactory.Create(),
+        var bookings = await _bookingsApplication.SearchAllBookingsAsync(_callerFactory.Create(),
             request.OrganizationId!, request.FromUtc, request.ToUtc, request.ToSearchOptions(), request.ToGetOptions(),
             cancellationToken);
 

@@ -58,7 +58,7 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
             "EventingDddCommandPersistence.Load", async context =>
             {
                 var eventStream = await _eventStore.GetEventStreamAsync(_entityName, id, cancellationToken);
-                if (!eventStream.IsSuccessful)
+                if (eventStream.IsFailure)
                 {
                     return eventStream.Error;
                 }
@@ -102,7 +102,7 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
         var published = await this.SaveAndPublishChangesAsync(aggregate, OnEventStreamChanged,
             (root, changedEvents, token) =>
                 _eventStore.AddEventsAsync(_entityName, root.Id.Value, changedEvents, token), cancellationToken);
-        if (!published.IsSuccessful)
+        if (published.IsFailure)
         {
             return published.Error;
         }

@@ -21,14 +21,14 @@ public class AuthenticationApplication : IAuthenticationApplication
         _serviceClient = serviceClient;
     }
 
-    public async Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext context, string provider,
+    public async Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext caller, string provider,
         string? authCode, string? username, string? password, CancellationToken cancellationToken)
     {
         Task<Result<AuthenticateResponse, ResponseProblem>> request;
         switch (provider)
         {
             case AuthenticationConstants.Providers.Credentials:
-                request = _serviceClient.PostAsync(context, new AuthenticatePasswordRequest
+                request = _serviceClient.PostAsync(caller, new AuthenticatePasswordRequest
                 {
                     Username = username!,
                     Password = password!
@@ -36,7 +36,7 @@ public class AuthenticationApplication : IAuthenticationApplication
                 break;
 
             default:
-                request = _serviceClient.PostAsync(context, new AuthenticateSingleSignOnRequest
+                request = _serviceClient.PostAsync(caller, new AuthenticateSingleSignOnRequest
                 {
                     AuthCode = authCode!,
                     Provider = provider
@@ -45,24 +45,24 @@ public class AuthenticationApplication : IAuthenticationApplication
         }
 
         var authenticated = await request;
-        if (!authenticated.IsSuccessful)
+        if (authenticated.IsFailure)
         {
             return authenticated.Error.ToError();
         }
 
-        _recorder.TrackUsage(context.ToCall(), UsageConstants.Events.UsageScenarios.UserLogin);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.UserLogin);
 
         return authenticated.Value.ToTokens();
     }
 
-    public Task<Result<Error>> LogoutAsync(ICallerContext context, CancellationToken cancellationToken)
+    public Task<Result<Error>> LogoutAsync(ICallerContext caller, CancellationToken cancellationToken)
     {
-        _recorder.TrackUsage(context.ToCall(), UsageConstants.Events.UsageScenarios.UserLogout);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.UserLogout);
 
         return Task.FromResult(Result.Ok);
     }
 
-    public async Task<Result<AuthenticateTokens, Error>> RefreshTokenAsync(ICallerContext context, string? refreshToken,
+    public async Task<Result<AuthenticateTokens, Error>> RefreshTokenAsync(ICallerContext caller, string? refreshToken,
         CancellationToken cancellationToken)
     {
         if (!refreshToken.HasValue())
@@ -70,16 +70,16 @@ public class AuthenticationApplication : IAuthenticationApplication
             return Error.NotAuthenticated();
         }
 
-        var refreshed = await _serviceClient.PostAsync(context, new RefreshTokenRequest
+        var refreshed = await _serviceClient.PostAsync(caller, new RefreshTokenRequest
         {
             RefreshToken = refreshToken
         }, null, cancellationToken);
-        if (!refreshed.IsSuccessful)
+        if (refreshed.IsFailure)
         {
             return refreshed.Error.ToError();
         }
 
-        _recorder.TrackUsage(context.ToCall(), UsageConstants.Events.UsageScenarios.UserExtendedLogin);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.UserExtendedLogin);
 
         return refreshed.Value.ToTokens();
     }

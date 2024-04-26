@@ -57,7 +57,7 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
             {
                 message = messageAsText.FromJson<TMessage>()!;
                 var handled = await onMessageReceivedAsync(message, cancellation);
-                if (!handled.IsSuccessful)
+                if (handled.IsFailure)
                 {
                     return handled.Error;
                 }
@@ -87,7 +87,7 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
         var messageJson = message.ToJson()!;
 
         var pushed = await _queueStore.PushAsync(_queueName, messageJson, cancellationToken);
-        if (!pushed.IsSuccessful)
+        if (pushed.IsFailure)
         {
             return pushed.Error;
         }

@@ -53,7 +53,7 @@ public partial class InProcessInMemStore : IQueueStore, IQueueStoreTrigger
             try
             {
                 var handled = await messageHandlerAsync(message, cancellationToken);
-                if (!handled.IsSuccessful)
+                if (handled.IsFailure)
                 {
                     return handled.Error;
                 }

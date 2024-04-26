@@ -51,7 +51,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
     public override Result<Error> EnsureInvariants()
     {
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }
@@ -66,7 +66,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
             case Created created:
             {
                 var messageId = QueuedMessageId.Create(created.MessageId);
-                if (!messageId.IsSuccessful)
+                if (messageId.IsFailure)
                 {
                     return messageId.Error;
                 }
@@ -78,13 +78,13 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
             case EmailDetailsChanged changed:
             {
                 var emailAddress = EmailAddress.Create(changed.ToEmailAddress);
-                if (!emailAddress.IsSuccessful)
+                if (emailAddress.IsFailure)
                 {
                     return emailAddress.Error;
                 }
 
                 var recipient = EmailRecipient.Create(emailAddress.Value, changed.ToDisplayName);
-                if (!recipient.IsSuccessful)
+                if (recipient.IsFailure)
                 {
                     return recipient.Error;
                 }
@@ -97,7 +97,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
             case DeliveryAttempted changed:
             {
                 var attempted = Attempts.Attempt(changed.When);
-                if (!attempted.IsSuccessful)
+                if (attempted.IsFailure)
                 {
                     return attempted.Error;
                 }
@@ -134,7 +134,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
 
         var when = DateTime.UtcNow;
         var attempted = RaiseChangeEvent(AncillaryDomain.Events.EmailDelivery.DeliveryAttempted(Id, when));
-        if (!attempted.IsSuccessful)
+        if (attempted.IsFailure)
         {
             return attempted.Error;
         }

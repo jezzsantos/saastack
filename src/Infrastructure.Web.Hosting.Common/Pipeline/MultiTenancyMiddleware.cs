@@ -43,7 +43,7 @@ public class MultiTenancyMiddleware
         var cancellationToken = context.RequestAborted;
 
         var result = await VerifyRequestAsync(caller, context, tenancyContext, tenantDetective, cancellationToken);
-        if (!result.IsSuccessful)
+        if (result.IsFailure)
         {
             var httpError = result.Error.ToHttpError();
             var details = Results.Problem(statusCode: (int)httpError.Code, detail: httpError.Message);
@@ -60,7 +60,7 @@ public class MultiTenancyMiddleware
     {
         var requestDtoType = GetRequestDtoType(httpContext);
         var detected = await tenantDetective.DetectTenantAsync(httpContext, requestDtoType, cancellationToken);
-        if (!detected.IsSuccessful)
+        if (detected.IsFailure)
         {
             return detected.Error;
         }
@@ -72,7 +72,7 @@ public class MultiTenancyMiddleware
         {
             var defaultOrganizationId =
                 await VerifyDefaultOrganizationIdForCallerAsync(caller, memberships, cancellationToken);
-            if (!defaultOrganizationId.IsSuccessful)
+            if (defaultOrganizationId.IsFailure)
             {
                 return defaultOrganizationId.Error;
             }
@@ -89,7 +89,7 @@ public class MultiTenancyMiddleware
         }
 
         var isMember = await VerifyCallerMembershipAsync(caller, memberships, tenantId, cancellationToken);
-        if (!isMember.IsSuccessful)
+        if (isMember.IsFailure)
         {
             return isMember.Error;
         }
@@ -117,7 +117,7 @@ public class MultiTenancyMiddleware
         if (memberships.NotExists())
         {
             var retrievedMemberships = await GetMembershipsForCallerAsync(caller, cancellationToken);
-            if (!retrievedMemberships.IsSuccessful)
+            if (retrievedMemberships.IsFailure)
             {
                 return retrievedMemberships.Error;
             }
@@ -145,7 +145,7 @@ public class MultiTenancyMiddleware
         if (memberships.NotExists())
         {
             var retrievedMemberships = await GetMembershipsForCallerAsync(caller, cancellationToken);
-            if (!retrievedMemberships.IsSuccessful)
+            if (retrievedMemberships.IsFailure)
             {
                 return retrievedMemberships.Error;
             }
@@ -176,7 +176,7 @@ public class MultiTenancyMiddleware
         }
 
         var settings = await organizationsService.GetSettingsPrivateAsync(caller, tenantId, cancellationToken);
-        if (!settings.IsSuccessful)
+        if (settings.IsFailure)
         {
             return settings.Error;
         }
@@ -224,7 +224,7 @@ public class MultiTenancyMiddleware
         }
 
         var memberships = await _endUsersService.GetMembershipsPrivateAsync(caller, caller.CallerId, cancellationToken);
-        if (!memberships.IsSuccessful)
+        if (memberships.IsFailure)
         {
             return memberships.Error;
         }

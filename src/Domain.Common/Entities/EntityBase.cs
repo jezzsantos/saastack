@@ -81,7 +81,7 @@ public abstract class EntityBase : IEntity, IEventingEntity, IDehydratableEntity
         if (isInstantiating)
         {
             var create = idFactory.Create(this);
-            if (!create.IsSuccessful)
+            if (create.IsFailure)
             {
                 throw new InvalidOperationException(create.Error.Message);
             }
@@ -159,7 +159,7 @@ public abstract class EntityBase : IEntity, IEventingEntity, IDehydratableEntity
     Result<Error> IDomainEventProducingEntity.RaiseEvent(IDomainEvent @event, bool validate)
     {
         var onStateChanged = OnStateChanged(@event);
-        if (!onStateChanged.IsSuccessful)
+        if (onStateChanged.IsFailure)
         {
             return onStateChanged;
         }
@@ -167,7 +167,7 @@ public abstract class EntityBase : IEntity, IEventingEntity, IDehydratableEntity
         if (validate)
         {
             var ensureInvariants = EnsureInvariants();
-            if (!ensureInvariants.IsSuccessful)
+            if (ensureInvariants.IsFailure)
             {
                 return ensureInvariants.Error;
             }
@@ -176,7 +176,7 @@ public abstract class EntityBase : IEntity, IEventingEntity, IDehydratableEntity
         if (_rootEventHandler.Exists())
         {
             var handler = _rootEventHandler.Invoke(@event);
-            if (!handler.IsSuccessful)
+            if (handler.IsFailure)
             {
                 return handler.Error;
             }

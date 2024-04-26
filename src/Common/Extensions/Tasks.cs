@@ -8,8 +8,8 @@ public static class Tasks
     public static async Task<Result<Error>> WhenAllAsync(params Task<Result<Error>>[] tasks)
     {
         var results = await Task.WhenAll(tasks);
-        return results.Any(x => !x.IsSuccessful)
-            ? results.First(x => !x.IsSuccessful).Error
+        return results.Any(x => x.IsFailure)
+            ? results.First(x => x.IsFailure).Error
             : Result.Ok;
     }
 }

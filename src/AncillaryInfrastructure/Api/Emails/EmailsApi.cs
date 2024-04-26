@@ -11,11 +11,11 @@ namespace AncillaryInfrastructure.Api.Emails;
 public sealed class EmailsApi : IWebApiService
 {
     private readonly IAncillaryApplication _ancillaryApplication;
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
 
-    public EmailsApi(ICallerContextFactory contextFactory, IAncillaryApplication ancillaryApplication)
+    public EmailsApi(ICallerContextFactory callerFactory, IAncillaryApplication ancillaryApplication)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _ancillaryApplication = ancillaryApplication;
     }
 
@@ -23,7 +23,7 @@ public sealed class EmailsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var delivered =
-            await _ancillaryApplication.DeliverEmailAsync(_contextFactory.Create(), request.Message, cancellationToken);
+            await _ancillaryApplication.DeliverEmailAsync(_callerFactory.Create(), request.Message, cancellationToken);
 
         return () => delivered.HandleApplicationResult<bool, DeliverMessageResponse>(_ =>
             new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsDelivered = true }));
@@ -33,7 +33,7 @@ public sealed class EmailsApi : IWebApiService
     public async Task<ApiEmptyResult> DrainAll(DrainAllEmailsRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await _ancillaryApplication.DrainAllEmailsAsync(_contextFactory.Create(), cancellationToken);
+        var result = await _ancillaryApplication.DrainAllEmailsAsync(_callerFactory.Create(), cancellationToken);
 
         return () => result.Match(() => new Result<EmptyResponse, Error>(),
             error => new Result<EmptyResponse, Error>(error));
@@ -44,7 +44,7 @@ public sealed class EmailsApi : IWebApiService
         SearchEmailDeliveriesRequest request,
         CancellationToken cancellationToken)
     {
-        var deliveries = await _ancillaryApplication.SearchAllEmailDeliveriesAsync(_contextFactory.Create(),
+        var deliveries = await _ancillaryApplication.SearchAllEmailDeliveriesAsync(_callerFactory.Create(),
             request.SinceUtc,
             request.ToSearchOptions(),
             request.ToGetOptions(), cancellationToken);

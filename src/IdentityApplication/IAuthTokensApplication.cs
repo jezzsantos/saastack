@@ -7,12 +7,12 @@ namespace IdentityApplication;
 
 public interface IAuthTokensApplication
 {
-    Task<Result<AccessTokens, Error>> IssueTokensAsync(ICallerContext context, EndUserWithMemberships user,
+    Task<Result<AccessTokens, Error>> IssueTokensAsync(ICallerContext caller, EndUserWithMemberships user,
         CancellationToken cancellationToken);
 
-    Task<Result<AuthenticateTokens, Error>> RefreshTokenAsync(ICallerContext context, string refreshToken,
+    Task<Result<AuthenticateTokens, Error>> RefreshTokenAsync(ICallerContext caller, string refreshToken,
         CancellationToken cancellationToken);
 
-    Task<Result<Error>> RevokeRefreshTokenAsync(ICallerContext context, string refreshToken,
+    Task<Result<Error>> RevokeRefreshTokenAsync(ICallerContext caller, string refreshToken,
         CancellationToken cancellationToken);
 }

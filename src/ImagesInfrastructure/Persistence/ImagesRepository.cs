@@ -37,7 +37,7 @@ public class ImagesRepository : IImagesRepository
     public async Task<Result<ImageRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {
         var image = await _images.LoadAsync(id, cancellationToken);
-        if (!image.IsSuccessful)
+        if (image.IsFailure)
         {
             return image.Error;
         }
@@ -49,7 +49,7 @@ public class ImagesRepository : IImagesRepository
         CancellationToken cancellationToken)
     {
         var saved = await _images.SaveAsync(profile, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -62,7 +62,7 @@ public class ImagesRepository : IImagesRepository
     {
         var blobName = id.ToString();
         var blob = await _imageBlobs.GetAsync(blobName, content, cancellationToken);
-        if (!blob.IsSuccessful)
+        if (blob.IsFailure)
         {
             return blob.Error;
         }

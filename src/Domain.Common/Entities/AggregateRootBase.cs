@@ -45,7 +45,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
         idFactory, Identifier.Empty())
     {
         var create = idFactory.Create(this);
-        if (!create.IsSuccessful)
+        if (create.IsFailure)
         {
             throw new InvalidOperationException(create.Error.Message);
         }
@@ -162,7 +162,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
         foreach (var @event in _events)
         {
             var next = versioning.Next();
-            if (!next.IsSuccessful)
+            if (next.IsFailure)
             {
                 return next.Error;
             }
@@ -171,7 +171,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
 
             var nextVersion = versioning.LastEventVersion;
             var versioned = @event.ToVersioned(IdFactory, GetType().Name, nextVersion);
-            if (!versioned.IsSuccessful)
+            if (versioned.IsFailure)
             {
                 return versioned.Error;
             }
@@ -220,13 +220,13 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
             }
 
             var onStateChanged = OnStateChanged(@event.Value, true);
-            if (!onStateChanged.IsSuccessful)
+            if (onStateChanged.IsFailure)
             {
                 return onStateChanged.Error;
             }
 
             var updatedChanged = EventStream.UpdateChange(change.Version);
-            if (!updatedChanged.IsSuccessful)
+            if (updatedChanged.IsFailure)
             {
                 return updatedChanged.Error;
             }
@@ -325,7 +325,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
             ? GetChildId().ToIdentifierFactory()
             : IdFactory;
         var createdChild = childEntityFactory(identifierFactory);
-        if (!createdChild.IsSuccessful)
+        if (createdChild.IsFailure)
         {
             return createdChild.Error;
         }
@@ -365,7 +365,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
     {
         var raised = RaiseEvent(Global.StreamDeleted.Create(Identifier.Create(Id), deletedById), false,
             false);
-        if (!raised.IsSuccessful)
+        if (raised.IsFailure)
         {
             return raised;
         }
@@ -404,7 +404,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
         if (changeState)
         {
             var onStateChanged = OnStateChanged(@event, false);
-            if (!onStateChanged.IsSuccessful)
+            if (onStateChanged.IsFailure)
             {
                 return onStateChanged;
             }
@@ -413,7 +413,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
         if (validate)
         {
             var ensureInvariants = EnsureInvariants();
-            if (!ensureInvariants.IsSuccessful)
+            if (ensureInvariants.IsFailure)
             {
                 return ensureInvariants.Error;
             }
@@ -421,7 +421,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
         else
         {
             var ensureBaseInvariants = EnsureBaseInvariants();
-            if (!ensureBaseInvariants.IsSuccessful)
+            if (ensureBaseInvariants.IsFailure)
             {
                 return ensureBaseInvariants.Error;
             }

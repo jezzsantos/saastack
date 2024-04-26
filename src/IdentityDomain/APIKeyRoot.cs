@@ -59,7 +59,7 @@ public sealed class APIKeyRoot : AggregateRootBase
     public override Result<Error> EnsureInvariants()
     {
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }
@@ -76,7 +76,7 @@ public sealed class APIKeyRoot : AggregateRootBase
                 UserId = created.UserId.ToId();
 
                 var apiKey = APIKeyKeep.Create(_apiKeyHasherService, created.KeyToken, created.KeyHash);
-                if (!apiKey.IsSuccessful)
+                if (apiKey.IsFailure)
                 {
                     return apiKey.Error;
                 }
@@ -159,14 +159,14 @@ public sealed class APIKeyRoot : AggregateRootBase
         }
 
         var verified = ApiKey.Value.Verify(_apiKeyHasherService, key);
-        if (!verified.IsSuccessful)
+        if (verified.IsFailure)
         {
             return verified.Error;
         }
 
         var isVerified = verified.Value;
         var raised = RaiseChangeEvent(IdentityDomain.Events.APIKeys.KeyVerified(Id, isVerified));
-        if (!raised.IsSuccessful)
+        if (raised.IsFailure)
         {
             return raised.Error;
         }

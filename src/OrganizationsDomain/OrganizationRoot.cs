@@ -71,7 +71,7 @@ public sealed class OrganizationRoot : AggregateRootBase
     public override Result<Error> EnsureInvariants()
     {
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }
@@ -86,7 +86,7 @@ public sealed class OrganizationRoot : AggregateRootBase
             case Created created:
             {
                 var name = DisplayName.Create(created.Name);
-                if (!name.IsSuccessful)
+                if (name.IsFailure)
                 {
                     return name.Error;
                 }
@@ -101,13 +101,13 @@ public sealed class OrganizationRoot : AggregateRootBase
             {
                 var value = Setting.From(created.StringValue, created.ValueType, created.IsEncrypted,
                     _tenantSettingService);
-                if (!value.IsSuccessful)
+                if (value.IsFailure)
                 {
                     return value.Error;
                 }
 
                 var settings = Settings.AddOrUpdate(created.Name, value.Value);
-                if (!settings.IsSuccessful)
+                if (settings.IsFailure)
                 {
                     return settings.Error;
                 }
@@ -120,13 +120,13 @@ public sealed class OrganizationRoot : AggregateRootBase
             case SettingUpdated updated:
             {
                 var to = Setting.From(updated.To, updated.ToType, updated.IsEncrypted, _tenantSettingService);
-                if (!to.IsSuccessful)
+                if (to.IsFailure)
                 {
                     return to.Error;
                 }
 
                 var settings = Settings.AddOrUpdate(updated.Name, to.Value);
-                if (!settings.IsSuccessful)
+                if (settings.IsFailure)
                 {
                     return settings.Error;
                 }
@@ -139,7 +139,7 @@ public sealed class OrganizationRoot : AggregateRootBase
             case MembershipAdded added:
             {
                 var membership = Membership.Create(added.RootId, added.UserId);
-                if (!membership.IsSuccessful)
+                if (membership.IsFailure)
                 {
                     return membership.Error;
                 }
@@ -174,7 +174,7 @@ public sealed class OrganizationRoot : AggregateRootBase
             case AvatarAdded added:
             {
                 var avatar = Domain.Shared.Avatar.Create(added.AvatarId.ToId(), added.AvatarUrl);
-                if (!avatar.IsSuccessful)
+                if (avatar.IsFailure)
                 {
                     return avatar.Error;
                 }
@@ -194,7 +194,7 @@ public sealed class OrganizationRoot : AggregateRootBase
             case NameChanged changed:
             {
                 var name = DisplayName.Create(changed.Name);
-                if (!name.IsSuccessful)
+                if (name.IsFailure)
                 {
                     return name.Error;
                 }
@@ -253,7 +253,7 @@ public sealed class OrganizationRoot : AggregateRootBase
             }
 
             var assigned = RaiseChangeEvent(OrganizationsDomain.Events.RoleAssigned(Id, assignerId, userId, role));
-            if (!assigned.IsSuccessful)
+            if (assigned.IsFailure)
             {
                 return assigned.Error;
             }
@@ -274,7 +274,7 @@ public sealed class OrganizationRoot : AggregateRootBase
             ? Avatar.Value.ImageId.ToOptional()
             : Optional<Identifier>.None;
         var created = await onCreateNew(Domain.Shared.Name.Create(Name.Name).Value);
-        if (!created.IsSuccessful)
+        if (created.IsFailure)
         {
             return created.Error;
         }
@@ -282,7 +282,7 @@ public sealed class OrganizationRoot : AggregateRootBase
         if (existingAvatarId.HasValue)
         {
             var removed = await onRemoveOld(existingAvatarId.Value);
-            if (!removed.IsSuccessful)
+            if (removed.IsFailure)
             {
                 return removed.Error;
             }
@@ -330,7 +330,7 @@ public sealed class OrganizationRoot : AggregateRootBase
 
         var avatarId = Avatar.Value.ImageId;
         var removed = await onRemoveOld(avatarId);
-        if (!removed.IsSuccessful)
+        if (removed.IsFailure)
         {
             return removed.Error;
         }
@@ -420,7 +420,7 @@ public sealed class OrganizationRoot : AggregateRootBase
             }
 
             var assigned = RaiseChangeEvent(OrganizationsDomain.Events.RoleUnassigned(Id, assignerId, userId, role));
-            if (!assigned.IsSuccessful)
+            if (assigned.IsFailure)
             {
                 return assigned.Error;
             }

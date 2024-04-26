@@ -12,12 +12,12 @@ public sealed class TestingWebApi : IWebApiService
 {
     private static List<Type>? _allRepositories;
     private static IReadOnlyList<IApplicationRepository>? _repositories;
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
     private readonly IServiceProvider _serviceProvider;
 
-    public TestingWebApi(ICallerContextFactory contextFactory, IServiceProvider serviceProvider)
+    public TestingWebApi(ICallerContextFactory callerFactory, IServiceProvider serviceProvider)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _serviceProvider = serviceProvider;
     }
 
@@ -27,7 +27,7 @@ public sealed class TestingWebApi : IWebApiService
     {
         await Task.CompletedTask;
         return () => new Result<GetCallerTestingOnlyResponse, Error>(new GetCallerTestingOnlyResponse
-            { CallerId = _contextFactory.Create().CallerId });
+            { CallerId = _callerFactory.Create().CallerId });
     }
 
     public async Task<ApiResult<string, GetCallerTestingOnlyResponse>> AuthNToken(
@@ -35,7 +35,7 @@ public sealed class TestingWebApi : IWebApiService
     {
         await Task.CompletedTask;
         return () => new Result<GetCallerTestingOnlyResponse, Error>(new GetCallerTestingOnlyResponse
-            { CallerId = _contextFactory.Create().CallerId });
+            { CallerId = _callerFactory.Create().CallerId });
     }
 
     public async Task<ApiResult<string, GetCallerTestingOnlyResponse>> AuthZAnonymous(
@@ -43,7 +43,7 @@ public sealed class TestingWebApi : IWebApiService
     {
         await Task.CompletedTask;
         return () => new Result<GetCallerTestingOnlyResponse, Error>(new GetCallerTestingOnlyResponse
-            { CallerId = _contextFactory.Create().CallerId });
+            { CallerId = _callerFactory.Create().CallerId });
     }
 
     public async Task<ApiResult<string, GetCallerTestingOnlyResponse>> AuthZByFeature(
@@ -51,7 +51,7 @@ public sealed class TestingWebApi : IWebApiService
     {
         await Task.CompletedTask;
         return () => new Result<GetCallerTestingOnlyResponse, Error>(new GetCallerTestingOnlyResponse
-            { CallerId = _contextFactory.Create().CallerId });
+            { CallerId = _callerFactory.Create().CallerId });
     }
 
     public async Task<ApiResult<string, GetCallerTestingOnlyResponse>> AuthZByRole(
@@ -59,7 +59,7 @@ public sealed class TestingWebApi : IWebApiService
     {
         await Task.CompletedTask;
         return () => new Result<GetCallerTestingOnlyResponse, Error>(new GetCallerTestingOnlyResponse
-            { CallerId = _contextFactory.Create().CallerId });
+            { CallerId = _callerFactory.Create().CallerId });
     }
 
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ContentNegotiationGet(

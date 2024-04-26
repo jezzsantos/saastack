@@ -79,9 +79,9 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
 
         var results = await Task.WhenAll(registrations.Select(
             registration => RelayEventStreamToAllConsumersInOrderAsync(registration, eventStream, cancellationToken)));
-        if (results.Any(r => !r.IsSuccessful))
+        if (results.Any(r => r.IsFailure))
         {
-            return results.First(r => !r.IsSuccessful).Error;
+            return results.First(r => r.IsFailure).Error;
         }
 
         return Result.Ok;
@@ -94,7 +94,7 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
         foreach (var changeEvent in eventStream)
         {
             var deserialized = DeserializeChangeEvent(changeEvent, _migrator);
-            if (!deserialized.IsSuccessful)
+            if (deserialized.IsFailure)
             {
                 return deserialized.Error;
             }
@@ -102,14 +102,14 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
             var @event = deserialized.Value;
             var domainEventsRelayed =
                 await RelayDomainEventToAllConsumersAsync(registration, changeEvent, @event, cancellationToken);
-            if (!domainEventsRelayed.IsSuccessful)
+            if (domainEventsRelayed.IsFailure)
             {
                 return domainEventsRelayed.Error;
             }
 
             var integrationEventsRelayed =
                 await RelayIntegrationEventToBrokerAsync(registration, changeEvent, @event, cancellationToken);
-            if (!integrationEventsRelayed.IsSuccessful)
+            if (integrationEventsRelayed.IsFailure)
             {
                 return integrationEventsRelayed.Error;
             }
@@ -130,7 +130,7 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
         foreach (var consumer in registration.DomainEventConsumers)
         {
             var result = await consumer.NotifyAsync(@event, cancellationToken);
-            if (!result.IsSuccessful)
+            if (result.IsFailure)
             {
                 return result.Error
                     .Wrap(ErrorCode.Unexpected, Resources.EventNotificationNotifier_ConsumerError.Format(
@@ -147,7 +147,7 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
         CancellationToken cancellationToken)
     {
         var published = await registration.IntegrationEventTranslator.TranslateAsync(@event, cancellationToken);
-        if (!published.IsSuccessful)
+        if (published.IsFailure)
         {
             return published.Error.Wrap(ErrorCode.Unexpected,
                 Resources.EventNotificationNotifier_TranslatorError.Format(
@@ -166,7 +166,7 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
 
         var integrationEvent = publishedEvent.Value;
         var brokered = await _messageBroker.PublishAsync(integrationEvent, cancellationToken);
-        if (!brokered.IsSuccessful)
+        if (brokered.IsFailure)
         {
             return brokered.Error.Wrap(ErrorCode.Unexpected,
                 Resources.EventNotificationNotifier_MessageBrokerError.Format(

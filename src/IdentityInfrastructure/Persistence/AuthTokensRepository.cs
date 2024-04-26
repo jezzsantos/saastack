@@ -51,7 +51,7 @@ public class AuthTokensRepository : IAuthTokensRepository
         CancellationToken cancellationToken)
     {
         var saved = await _tokens.SaveAsync(tokens, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -63,7 +63,7 @@ public class AuthTokensRepository : IAuthTokensRepository
         CancellationToken cancellationToken)
     {
         var queried = await _tokenQueries.QueryAsync(query, false, cancellationToken);
-        if (!queried.IsSuccessful)
+        if (queried.IsFailure)
         {
             return queried.Error;
         }
@@ -75,7 +75,7 @@ public class AuthTokensRepository : IAuthTokensRepository
         }
 
         var tokens = await _tokens.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
-        if (!tokens.IsSuccessful)
+        if (tokens.IsFailure)
         {
             return tokens.Error;
         }

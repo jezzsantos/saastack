@@ -202,9 +202,9 @@ public static class HttpRequestExtensions
     /// <summary>
     ///     Sets the <see cref="ICallerContext.Authorization" /> to the specified <see cref="message" />
     /// </summary>
-    public static void SetAuthorization(this HttpRequestMessage message, ICallerContext context)
+    public static void SetAuthorization(this HttpRequestMessage message, ICallerContext caller)
     {
-        var authorization = context.Authorization;
+        var authorization = caller.Authorization;
         if (!authorization.HasValue)
         {
             return;

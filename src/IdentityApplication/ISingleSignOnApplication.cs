@@ -6,7 +6,7 @@ namespace IdentityApplication;
 
 public interface ISingleSignOnApplication
 {
-    Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext context, string? invitationToken,
+    Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext caller, string? invitationToken,
         string providerName,
         string authCode, string? username, CancellationToken cancellationToken);
 }

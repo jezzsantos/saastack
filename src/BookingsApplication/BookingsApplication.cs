@@ -31,27 +31,27 @@ public class BookingsApplication : IBookingsApplication
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
         var booking = retrieved.Value;
         var cancellation = booking.Cancel();
-        if (!cancellation.IsSuccessful)
+        if (cancellation.IsFailure)
         {
             return cancellation.Error;
         }
 
         var released = await _carsService.ReleaseCarAvailabilityAsync(caller, organizationId, booking.CarId.Value,
             booking.Start.Value, booking.End.Value, cancellationToken);
-        if (!released.IsSuccessful)
+        if (released.IsFailure)
         {
             return released.Error;
         }
 
         var deleted = await _repository.DeleteBookingAsync(organizationId.ToId(), booking.Id, cancellationToken);
-        if (!deleted.IsSuccessful)
+        if (deleted.IsFailure)
         {
             return deleted.Error;
         }
@@ -76,14 +76,14 @@ public class BookingsApplication : IBookingsApplication
         DateTime? endUtc, CancellationToken cancellationToken)
     {
         var car = await _carsService.GetCarAsync(caller, organizationId, carId, cancellationToken);
-        if (!car.IsSuccessful)
+        if (car.IsFailure)
         {
             return car.Error;
         }
 
         var bookingEndUtc = endUtc.GetValueOrDefault(startUtc.Add(DefaultBookingDuration));
         var created = BookingRoot.Create(_recorder, _idFactory, organizationId.ToId());
-        if (!created.IsSuccessful)
+        if (created.IsFailure)
         {
             return created.Error;
         }
@@ -94,7 +94,7 @@ public class BookingsApplication : IBookingsApplication
 
         var reserved = await _carsService.ReserveCarIfAvailableAsync(caller, organizationId, carId, startUtc,
             bookingEndUtc, booking.Id, cancellationToken);
-        if (!reserved.IsSuccessful)
+        if (reserved.IsFailure)
         {
             return reserved.Error;
         }
@@ -104,25 +104,26 @@ public class BookingsApplication : IBookingsApplication
             return Error.RuleViolation(Resources.BookingsApplication_CarNotAvailable);
         }
 
-        var updated = await _repository.SaveAsync(booking, cancellationToken);
-        if (!updated.IsSuccessful)
+        var saved = await _repository.SaveAsync(booking, cancellationToken);
+        if (saved.IsFailure)
         {
-            return updated.Error;
+            return saved.Error;
         }
 
-        _recorder.TraceInformation(caller.ToCall(), "Booking {Id} was created", updated.Value.Id);
+        booking = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Booking {Id} was created", booking.Id);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.BookingCreated,
             new Dictionary<string, object>
             {
-                { UsageConstants.Properties.Id, updated.Value.Id },
-                { UsageConstants.Properties.Started, updated.Value.Start.Value.Hour },
+                { UsageConstants.Properties.Id, booking.Id },
+                { UsageConstants.Properties.Started, booking.Start.Value.Hour },
                 {
                     UsageConstants.Properties.Duration,
-                    updated.Value.End.Value.Subtract(updated.Value.Start.Value).Hours
+                    booking.End.Value.Subtract(booking.Start.Value).Hours
                 }
             });
 
-        return updated.Value.ToBooking();
+        return booking.ToBooking();
     }
 
     public async Task<Result<SearchResults<Booking>, Error>> SearchAllBookingsAsync(ICallerContext caller,
@@ -131,12 +132,14 @@ public class BookingsApplication : IBookingsApplication
     {
         var searched = await _repository.SearchAllBookingsAsync(organizationId.ToId(),
             fromUtc ?? DateTime.MinValue, toUtc ?? DateTime.MaxValue, searchOptions, cancellationToken);
-        if (!searched.IsSuccessful)
+        if (searched.IsFailure)
         {
             return searched.Error;
         }
 
         var bookings = searched.Value;
+        _recorder.TraceInformation(caller.ToCall(), "All bookings were fetched");
+        
         return searchOptions.ApplyWithMetadata(
             bookings.Select(booking => booking.ToBooking()));
     }

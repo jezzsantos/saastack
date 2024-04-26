@@ -20,7 +20,7 @@ public static class EventMetadataExtensions
         var typeName = metadata.Fqn;
         var eventData = eventJson;
         var rehydrated = migrator.Rehydrate(eventId, eventData, typeName);
-        if (!rehydrated.IsSuccessful)
+        if (rehydrated.IsFailure)
         {
             return rehydrated.Error;
         }

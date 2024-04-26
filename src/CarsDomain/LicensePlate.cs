@@ -9,13 +9,13 @@ public sealed class LicensePlate : ValueObjectBase<LicensePlate>
     public static Result<LicensePlate, Error> Create(string jurisdiction, string number)
     {
         var value1 = Jurisdiction.Create(jurisdiction);
-        if (!value1.IsSuccessful)
+        if (value1.IsFailure)
         {
             return value1.Error;
         }
 
         var value2 = NumberPlate.Create(number);
-        if (!value2.IsSuccessful)
+        if (value2.IsFailure)
         {
             return value2.Error;
         }

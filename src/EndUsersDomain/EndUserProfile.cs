@@ -12,19 +12,19 @@ public sealed class EndUserProfile : ValueObjectBase<EndUserProfile>
         string? countryCode = null)
     {
         var name = PersonName.Create(firstName, lastName);
-        if (!name.IsSuccessful)
+        if (name.IsFailure)
         {
             return name.Error;
         }
 
         var tz = Timezone.Create(Timezones.FindOrDefault(timezone));
-        if (!tz.IsSuccessful)
+        if (tz.IsFailure)
         {
             return tz.Error;
         }
 
         var address = Address.Create(CountryCodes.FindOrDefault(countryCode));
-        if (!address.IsSuccessful)
+        if (address.IsFailure)
         {
             return address.Error;
         }

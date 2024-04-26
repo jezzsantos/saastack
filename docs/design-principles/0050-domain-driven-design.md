@@ -358,14 +358,14 @@ For example, these two use-cases. The first use case is as simple as it gets. Th
 
         // Note: Constructs new data values in new value objects, which in turn executes other rules within those value objects. These value objects can fail to accept this data, and will return errors too!
         var causedBy = CausedBy.Create(UnavailabilityCausedBy.Reservation, referenceId);
-        if (!causedBy.IsSuccessful)
+        if (causedBy.IsFailure)
         {
             return causedBy.Error;
         }
 
         // Note: Raises a new domain event called UnavailabilitySlotAdded, this can also fail if the invariants of the aggregate fail, which is run after immediately the event is raised.
         var raised = RaiseChangeEvent(Car.UnavailabilitySlotAdded.Create(Id, OrganizationId, slot, causedBy.Value));
-        if (!raised.IsSuccessful)
+        if (raised.IsFailure)
         {
             return raised.Error;
         }
@@ -390,19 +390,19 @@ Then the aggregate handles the event being replayed to itself:
             {
                 // Note: we need to convert data in the domain event back into value objects
                 var jurisdiction = Jurisdiction.Create(changed.Jurisdiction);
-                if (!jurisdiction.IsSuccessful)
+                if (jurisdiction.IsFailure)
                 {
                     return jurisdiction.Error;
                 }
 
                 var number = NumberPlate.Create(changed.Number);
-                if (!number.IsSuccessful)
+                if (number.IsFailure)
                 {
                     return number.Error;
                 }
 
                 var plate = LicensePlate.Create(jurisdiction.Value, number.Value);
-                if (!plate.IsSuccessful)
+                if (plate.IsFailure)
                 {
                     return plate.Error;
                 }
@@ -421,7 +421,7 @@ Then the aggregate handles the event being replayed to itself:
             {
                 var unavailability = RaiseEventToChildEntity(isReconstituting, created, idFactory =>
                     UnavailabilityEntity.Create(Recorder, idFactory, RaiseChangeEvent), e => e.UnavailabilityId!);
-                if (!unavailability.IsSuccessful)
+                if (unavailability.IsFailure)
                 {
                     return unavailability.Error;
                 }
@@ -463,14 +463,14 @@ For example:
     {
         // Note: we ensure the base class invariants are still valid
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }
 
         // Note: We first delegate to the aggregates child/descendant entities
         var unavailabilityInvariants = Unavailabilities.EnsureInvariants();
-        if (!unavailabilityInvariants.IsSuccessful)
+        if (unavailabilityInvariants.IsFailure)
         {
             return unavailabilityInvariants.Error;
         }
@@ -538,7 +538,7 @@ For example, this is how the `CarRoot` creates an `UnavailabilityEntity` in resp
                 // Note: creates and relays the event to a new instance of the UnavailabilityEntity
                 var unavailability = RaiseEventToChildEntity(isReconstituting, created, idFactory =>
                     UnavailabilityEntity.Create(Recorder, idFactory, RaiseChangeEvent), e => e.UnavailabilityId!);
-                if (!unavailability.IsSuccessful)
+                if (unavailability.IsFailure)
                 {
                     return unavailability.Error;
                 }
@@ -573,13 +573,13 @@ then, in the `UnavailabilityEntity` class, the entity will also handle the same 
             case Car.UnavailabilitySlotAdded added:
             {
                 var slot = TimeSlot.Create(added.From, added.To);
-                if (!slot.IsSuccessful)
+                if (slot.IsFailure)
                 {
                     return slot.Error;
                 }
 
                 var causedBy = CausedBy.Create(added.CausedByReason, added.CausedByReference);
-                if (!causedBy.IsSuccessful)
+                if (causedBy.IsFailure)
                 {
                     return causedBy.Error;
                 }
@@ -740,7 +740,7 @@ For example:
     public override Result<Error> EnsureInvariants()
     {
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }

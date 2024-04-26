@@ -9,12 +9,12 @@ namespace EndUsersInfrastructure.Api.EndUsers;
 
 public class EndUsersApi : IWebApiService
 {
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
     private readonly IEndUsersApplication _endUsersApplication;
 
-    public EndUsersApi(ICallerContextFactory contextFactory, IEndUsersApplication endUsersApplication)
+    public EndUsersApi(ICallerContextFactory callerFactory, IEndUsersApplication endUsersApplication)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _endUsersApplication = endUsersApplication;
     }
 
@@ -22,7 +22,7 @@ public class EndUsersApi : IWebApiService
         AssignPlatformRolesRequest request, CancellationToken cancellationToken)
     {
         var user =
-            await _endUsersApplication.AssignPlatformRolesAsync(_contextFactory.Create(), request.Id,
+            await _endUsersApplication.AssignPlatformRolesAsync(_callerFactory.Create(), request.Id,
                 request.Roles ?? new List<string>(), cancellationToken);
 
         return () => user.HandleApplicationResult<EndUser, GetUserResponse>(usr =>
@@ -33,7 +33,7 @@ public class EndUsersApi : IWebApiService
         UnassignPlatformRolesRequest request, CancellationToken cancellationToken)
     {
         var user =
-            await _endUsersApplication.UnassignPlatformRolesAsync(_contextFactory.Create(), request.Id,
+            await _endUsersApplication.UnassignPlatformRolesAsync(_callerFactory.Create(), request.Id,
                 request.Roles ?? new List<string>(), cancellationToken);
 
         return () =>

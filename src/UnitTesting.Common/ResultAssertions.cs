@@ -20,7 +20,7 @@ public class ResultAssertions : ObjectAssertions<Result<Error>, ResultAssertions
         Execute.Assertion
             .BecauseOf(because, becauseArgs)
             .Given(() => Subject)
-            .ForCondition(result => !result.IsSuccessful)
+            .ForCondition(result => result.IsFailure)
             .FailWith(
                 "Expected {context:result} to return an Error with code {0}{reason}, but it returned a Successful value.",
                 _ => code)
@@ -51,7 +51,7 @@ public class ResultAssertions : ObjectAssertions<Result<Error>, ResultAssertions
             .ForCondition(result => result.IsSuccessful)
             .FailWith(
                 "Expected {context:result} to return a Successful value {reason}, but it returned an Error {0}.",
-                result => !result.IsSuccessful
+                result => result.IsFailure
                     ? result.Error.Message.HasValue()
                         ? $"{result.Error.Code}: {result.Error.Message}"
                         : result.Error.Code
@@ -75,7 +75,7 @@ public class ResultAssertions<TValue> : ObjectAssertions<Result<TValue, Error>, 
         Execute.Assertion
             .BecauseOf(because, becauseArgs)
             .Given(() => Subject)
-            .ForCondition(result => !result.IsSuccessful)
+            .ForCondition(result => result.IsFailure)
             .FailWith(
                 "Expected {context:result} to return an Error with code {0}{reason}, but it returned a Successful value.",
                 _ => code)
@@ -106,9 +106,9 @@ public class ResultAssertions<TValue> : ObjectAssertions<Result<TValue, Error>, 
             .ForCondition(result => result.IsSuccessful)
             .FailWith(
                 "Expected {context:result} to return a Successful value {reason}, but it returned an Error with code {0}, and message {1}.",
-                result => !result.IsSuccessful
+                result => result.IsFailure
                     ? result.Error.Code
-                    : ErrorCode.NoError, result => !result.IsSuccessful
+                    : ErrorCode.NoError, result => result.IsFailure
                     ? result.Error.Message
                     : string.Empty);
 

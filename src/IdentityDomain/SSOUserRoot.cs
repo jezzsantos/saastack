@@ -62,7 +62,7 @@ public sealed class SSOUserRoot : AggregateRootBase
     public override Result<Error> EnsureInvariants()
     {
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }
@@ -84,25 +84,25 @@ public sealed class SSOUserRoot : AggregateRootBase
             case TokensUpdated changed:
             {
                 var emailAddress = Domain.Shared.EmailAddress.Create(changed.EmailAddress);
-                if (!emailAddress.IsSuccessful)
+                if (emailAddress.IsFailure)
                 {
                     return emailAddress.Error;
                 }
 
                 var name = PersonName.Create(changed.FirstName, changed.LastName);
-                if (!name.IsSuccessful)
+                if (name.IsFailure)
                 {
                     return name.Error;
                 }
 
                 var timezone = Domain.Shared.Timezone.Create(changed.Timezone);
-                if (!timezone.IsSuccessful)
+                if (timezone.IsFailure)
                 {
                     return timezone.Error;
                 }
 
                 var address = Domain.Shared.Address.Create(CountryCodes.FindOrDefault(changed.CountryCode));
-                if (!address.IsSuccessful)
+                if (address.IsFailure)
                 {
                     return address.Error;
                 }

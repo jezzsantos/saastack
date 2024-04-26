@@ -86,7 +86,7 @@ public class AzureStorageAccountQueueStore : IQueueStore
         var queue = await ConnectToQueueAsync(queueName, cancellationToken);
 
         var retrieved = await GetNextMessageAsync(queue, cancellationToken);
-        if (!retrieved.IsSuccessful || !retrieved.Value.HasValue)
+        if (retrieved.IsFailure || !retrieved.Value.HasValue)
         {
             return false;
         }
@@ -95,7 +95,7 @@ public class AzureStorageAccountQueueStore : IQueueStore
         try
         {
             var handled = await messageHandlerAsync(queueMessage.MessageText, cancellationToken);
-            if (!handled.IsSuccessful)
+            if (handled.IsFailure)
             {
                 await ReturnMessageToQueueForNextPopAsync(queue, queueMessage, cancellationToken);
 

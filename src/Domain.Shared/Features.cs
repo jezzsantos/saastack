@@ -19,7 +19,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
     public static Result<Features, Error> Create(string feature)
     {
         var feat = Feature.Create(feature);
-        if (!feat.IsSuccessful)
+        if (feat.IsFailure)
         {
             return feat.Error;
         }
@@ -39,7 +39,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
         foreach (var feature in features)
         {
             var feat = Feature.Create(feature);
-            if (!feat.IsSuccessful)
+            if (feat.IsFailure)
             {
                 return feat.Error;
             }
@@ -56,7 +56,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
         foreach (var feature in features)
         {
             var feat = Feature.Create(feature);
-            if (!feat.IsSuccessful)
+            if (feat.IsFailure)
             {
                 return feat.Error;
             }
@@ -94,7 +94,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
     public Result<Features, Error> Add(string feature)
     {
         var featureLevel = Feature.Create(feature);
-        if (!featureLevel.IsSuccessful)
+        if (featureLevel.IsFailure)
         {
             return featureLevel.Error;
         }
@@ -109,7 +109,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
         foreach (var level in allLevels)
         {
             var added = features.Add(level);
-            if (!added.IsSuccessful)
+            if (added.IsFailure)
             {
                 return added.Error;
             }
@@ -148,7 +148,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
     public bool HasFeature(string feature)
     {
         var feat = Feature.Create(feature);
-        if (!feat.IsSuccessful)
+        if (feat.IsFailure)
         {
             return false;
         }
@@ -177,7 +177,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
     public Features Remove(string feature)
     {
         var feat = Feature.Create(feature);
-        if (!feat.IsSuccessful)
+        if (feat.IsFailure)
         {
             return this;
         }
@@ -202,7 +202,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
     public Features Remove(FeatureLevel feature)
     {
         var feat = Feature.Create(feature);
-        if (!feat.IsSuccessful)
+        if (feat.IsFailure)
         {
             return this;
         }

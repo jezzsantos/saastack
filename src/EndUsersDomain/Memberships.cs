@@ -19,7 +19,7 @@ public class Memberships : IReadOnlyList<Membership>
         foreach (var membership in _memberships)
         {
             var invariants = membership.EnsureInvariants();
-            if (!invariants.IsSuccessful)
+            if (invariants.IsFailure)
             {
                 return invariants.Error;
             }

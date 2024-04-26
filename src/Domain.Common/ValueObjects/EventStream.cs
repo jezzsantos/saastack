@@ -80,7 +80,7 @@ public sealed class EventStream : ValueObjectBase<EventStream>
         }
 
         var updated = Create(FirstEventVersion, LastEventVersion);
-        if (!updated.IsSuccessful)
+        if (updated.IsFailure)
         {
             return updated.Error;
         }
@@ -89,7 +89,7 @@ public sealed class EventStream : ValueObjectBase<EventStream>
         if (isFirstChange)
         {
             updated = Create(version, version);
-            if (!updated.IsSuccessful)
+            if (updated.IsFailure)
             {
                 return updated.Error;
             }
@@ -106,7 +106,7 @@ public sealed class EventStream : ValueObjectBase<EventStream>
         else
         {
             var next = updated.Value.Next();
-            if (!next.IsSuccessful)
+            if (next.IsFailure)
             {
                 return next;
             }

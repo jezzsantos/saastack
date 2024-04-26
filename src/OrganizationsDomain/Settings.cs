@@ -44,7 +44,7 @@ public sealed class Settings : ValueObjectBase<Settings>
     public Result<Settings, Error> AddOrUpdate(string name, object value, bool isEncrypted)
     {
         var settingValue = Setting.Create(value, isEncrypted);
-        if (!settingValue.IsSuccessful)
+        if (settingValue.IsFailure)
         {
             return settingValue.Error;
         }

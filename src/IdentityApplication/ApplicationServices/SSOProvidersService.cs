@@ -45,7 +45,7 @@ public class SSOProvidersService : ISSOProvidersService
         CancellationToken cancellationToken)
     {
         var retrievedProvider = await FindByNameAsync(providerName, cancellationToken);
-        if (!retrievedProvider.IsSuccessful)
+        if (retrievedProvider.IsFailure)
         {
             return retrievedProvider.Error;
         }
@@ -58,7 +58,7 @@ public class SSOProvidersService : ISSOProvidersService
         var provider = retrievedProvider.Value.Value;
         var retrievedUser =
             await _repository.FindUserInfoByUserIdAsync(provider.ProviderName, userId, cancellationToken);
-        if (!retrievedUser.IsSuccessful)
+        if (retrievedUser.IsFailure)
         {
             return retrievedUser.Error;
         }
@@ -71,7 +71,7 @@ public class SSOProvidersService : ISSOProvidersService
         else
         {
             var created = SSOUserRoot.Create(_recorder, _identifierFactory, _encryptionService, providerName, userId);
-            if (!created.IsSuccessful)
+            if (created.IsFailure)
             {
                 return created.Error;
             }
@@ -80,25 +80,25 @@ public class SSOProvidersService : ISSOProvidersService
         }
 
         var name = PersonName.Create(userInfo.FirstName, userInfo.LastName);
-        if (!name.IsSuccessful)
+        if (name.IsFailure)
         {
             return name.Error;
         }
 
         var emailAddress = EmailAddress.Create(userInfo.EmailAddress);
-        if (!emailAddress.IsSuccessful)
+        if (emailAddress.IsFailure)
         {
             return emailAddress.Error;
         }
 
         var timezone = Timezone.Create(userInfo.Timezone);
-        if (!timezone.IsSuccessful)
+        if (timezone.IsFailure)
         {
             return timezone.Error;
         }
 
         var address = Address.Create(userInfo.CountryCode);
-        if (!address.IsSuccessful)
+        if (address.IsFailure)
         {
             return address.Error;
         }
@@ -108,19 +108,19 @@ public class SSOProvidersService : ISSOProvidersService
                 SSOAuthToken.Create(tok.Type.ToEnumOrDefault(SSOAuthTokenType.AccessToken), tok.Value, tok.ExpiresOn)
                     .Value)
             .ToList());
-        if (!tokens.IsSuccessful)
+        if (tokens.IsFailure)
         {
             return tokens.Error;
         }
 
         var updated = user.UpdateDetails(tokens.Value, emailAddress.Value, name.Value, timezone.Value, address.Value);
-        if (!updated.IsSuccessful)
+        if (updated.IsFailure)
         {
             return updated.Error;
         }
 
         var saved = await _repository.SaveAsync(user, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }

@@ -37,7 +37,7 @@ public class AuditRepository : IAuditRepository
         CancellationToken cancellationToken)
     {
         var saved = await _audits.SaveAsync(audit, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -58,7 +58,7 @@ public class AuditRepository : IAuditRepository
         var queried = await _auditQueries.QueryAsync(Query.From<Audit>()
             .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
             .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
-        if (!queried.IsSuccessful)
+        if (queried.IsFailure)
         {
             return queried.Error;
         }
@@ -71,7 +71,7 @@ public class AuditRepository : IAuditRepository
         CancellationToken cancellationToken)
     {
         var audit = await _audits.LoadAsync(id, cancellationToken);
-        if (!audit.IsSuccessful)
+        if (audit.IsFailure)
         {
             return audit.Error;
         }

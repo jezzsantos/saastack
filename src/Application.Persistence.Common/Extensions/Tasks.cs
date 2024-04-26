@@ -11,10 +11,10 @@ public static class Tasks
     {
         var results = await Task.WhenAll(tasks);
 
-        var hasError = results.Any(result => !result.IsSuccessful);
+        var hasError = results.Any(result => result.IsFailure);
         if (hasError)
         {
-            return results.First(result => !result.IsSuccessful).Error;
+            return results.First(result => result.IsFailure).Error;
         }
 
         return results.All(result => result.Value);

@@ -23,8 +23,8 @@ public static class CallerContextExtensions
     /// <summary>
     ///     Returns the caller identifier from the context
     /// </summary>
-    public static Identifier ToCallerId(this ICallerContext context)
+    public static Identifier ToCallerId(this ICallerContext caller)
     {
-        return context.CallerId.ToId();
+        return caller.CallerId.ToId();
     }
 }

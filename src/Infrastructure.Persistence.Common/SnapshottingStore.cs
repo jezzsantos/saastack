@@ -36,7 +36,7 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
     {
         var retrieved = await _dataStore.RetrieveAsync(_containerName, id, PersistedEntityMetadata.FromType<TDto>(),
             cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -49,7 +49,7 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
         if (destroy)
         {
             var removed = await _dataStore.RemoveAsync(_containerName, id, cancellationToken);
-            if (!removed.IsSuccessful)
+            if (removed.IsFailure)
             {
                 return removed.Error;
             }
@@ -87,7 +87,7 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
     {
         var retrieved = await _dataStore.RetrieveAsync(_containerName, id,
             PersistedEntityMetadata.FromType<TDto>(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -123,7 +123,7 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
 
         var queryResults = await _dataStore.QueryAsync(_containerName, query, PersistedEntityMetadata.FromType<TDto>(),
             cancellationToken);
-        if (!queryResults.IsSuccessful)
+        if (queryResults.IsFailure)
         {
             return queryResults.Error;
         }
@@ -144,7 +144,7 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
     {
         var retrieved = await _dataStore.RetrieveAsync(_containerName, id, PersistedEntityMetadata.FromType<TDto>(),
             cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -162,7 +162,7 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
 
         dto.IsDeleted = false;
         var replaced = await _dataStore.ReplaceAsync(_containerName, id, dto, cancellationToken);
-        if (!replaced.IsSuccessful)
+        if (replaced.IsFailure)
         {
             return replaced.Error;
         }
@@ -181,7 +181,7 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
 
         var retrieved = await _dataStore.RetrieveAsync(_containerName, dto.Id.Value,
             PersistedEntityMetadata.FromType<TDto>(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -189,7 +189,7 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
         if (!retrieved.Value.HasValue)
         {
             var added = await _dataStore.AddAsync(_containerName, CommandEntity.FromDto(dto), cancellationToken);
-            if (!added.IsSuccessful)
+            if (added.IsFailure)
             {
                 return added.Error;
             }
@@ -213,7 +213,7 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
         }
 
         var updated = await _dataStore.ReplaceAsync(_containerName, dto.Id.Value, latest, cancellationToken);
-        if (!updated.IsSuccessful)
+        if (updated.IsFailure)
         {
             return updated.Error;
         }

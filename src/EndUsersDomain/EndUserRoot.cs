@@ -67,13 +67,13 @@ public sealed class EndUserRoot : AggregateRootBase
     public override Result<Error> EnsureInvariants()
     {
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }
 
         var memberships = Memberships.EnsureInvariants();
-        if (!memberships.IsSuccessful)
+        if (memberships.IsFailure)
         {
             return memberships.Error;
         }
@@ -125,14 +125,14 @@ public sealed class EndUserRoot : AggregateRootBase
                 Classification = changed.Classification;
 
                 var roles = Roles.Create(changed.Roles.ToArray());
-                if (!roles.IsSuccessful)
+                if (roles.IsFailure)
                 {
                     return roles.Error;
                 }
 
                 Roles = roles.Value;
                 var features = Features.Create(changed.Features.ToArray());
-                if (!features.IsSuccessful)
+                if (features.IsFailure)
                 {
                     return features.Error;
                 }
@@ -146,7 +146,7 @@ public sealed class EndUserRoot : AggregateRootBase
             {
                 var membership = RaiseEventToChildEntity(isReconstituting, added, idFactory =>
                     Membership.Create(Recorder, idFactory, RaiseChangeEvent), e => e.MembershipId);
-                if (!membership.IsSuccessful)
+                if (membership.IsFailure)
                 {
                     return membership.Error;
                 }
@@ -184,7 +184,7 @@ public sealed class EndUserRoot : AggregateRootBase
                     }
 
                     var from = RaiseEventToChildEntity(changed, fromMembership.Value);
-                    if (!from.IsSuccessful)
+                    if (from.IsFailure)
                     {
                         return from.Error;
                     }
@@ -197,7 +197,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 }
 
                 var to = RaiseEventToChildEntity(changed, toMembership.Value);
-                if (!to.IsSuccessful)
+                if (to.IsFailure)
                 {
                     return to.Error;
                 }
@@ -219,7 +219,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 }
 
                 var forwarded = RaiseEventToChildEntity(assigned, membership.Value);
-                if (!forwarded.IsSuccessful)
+                if (forwarded.IsFailure)
                 {
                     return forwarded.Error;
                 }
@@ -240,7 +240,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 }
 
                 var forwarded = RaiseEventToChildEntity(unassigned, membership.Value);
-                if (!forwarded.IsSuccessful)
+                if (forwarded.IsFailure)
                 {
                     return forwarded.Error;
                 }
@@ -261,7 +261,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 }
 
                 var forwarded = RaiseEventToChildEntity(assigned, membership.Value);
-                if (!forwarded.IsSuccessful)
+                if (forwarded.IsFailure)
                 {
                     return forwarded.Error;
                 }
@@ -274,7 +274,7 @@ public sealed class EndUserRoot : AggregateRootBase
             case PlatformRoleAssigned assigned:
             {
                 var roles = Roles.Add(assigned.Role);
-                if (!roles.IsSuccessful)
+                if (roles.IsFailure)
                 {
                     return roles.Error;
                 }
@@ -295,7 +295,7 @@ public sealed class EndUserRoot : AggregateRootBase
             case PlatformFeatureAssigned assigned:
             {
                 var features = Features.Add(assigned.Feature);
-                if (!features.IsSuccessful)
+                if (features.IsFailure)
                 {
                     return features.Error;
                 }
@@ -308,7 +308,7 @@ public sealed class EndUserRoot : AggregateRootBase
             case GuestInvitationCreated created:
             {
                 var inviteeEmailAddress = EmailAddress.Create(created.EmailAddress);
-                if (!inviteeEmailAddress.IsSuccessful)
+                if (inviteeEmailAddress.IsFailure)
                 {
                     return inviteeEmailAddress.Error;
                 }
@@ -316,7 +316,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 var invited = GuestInvitation.IsStillOpen
                     ? GuestInvitation.Renew(created.Token, inviteeEmailAddress.Value)
                     : GuestInvitation.Invite(created.Token, inviteeEmailAddress.Value, created.InvitedById.ToId());
-                if (!invited.IsSuccessful)
+                if (invited.IsFailure)
                 {
                     return invited.Error;
                 }
@@ -329,13 +329,13 @@ public sealed class EndUserRoot : AggregateRootBase
             case GuestInvitationAccepted changed:
             {
                 var acceptedEmailAddress = EmailAddress.Create(changed.AcceptedEmailAddress);
-                if (!acceptedEmailAddress.IsSuccessful)
+                if (acceptedEmailAddress.IsFailure)
                 {
                     return acceptedEmailAddress.Error;
                 }
 
                 var accepted = GuestInvitation.Accept(acceptedEmailAddress.Value);
-                if (!accepted.IsSuccessful)
+                if (accepted.IsFailure)
                 {
                     return accepted.Error;
                 }
@@ -358,7 +358,7 @@ public sealed class EndUserRoot : AggregateRootBase
         }
 
         var verified = VerifyGuestInvitation();
-        if (!verified.IsSuccessful)
+        if (verified.IsFailure)
         {
             return verified.Error;
         }
@@ -398,7 +398,7 @@ public sealed class EndUserRoot : AggregateRootBase
         var isFirst = Memberships.HasNone();
         var added = RaiseChangeEvent(
             EndUsersDomain.Events.MembershipAdded(Id, organizationId, ownership, isFirst, tenantRoles, tenantFeatures));
-        if (!added.IsSuccessful)
+        if (added.IsFailure)
         {
             return added.Error;
         }
@@ -445,7 +445,7 @@ public sealed class EndUserRoot : AggregateRootBase
                     RaiseChangeEvent(
                         EndUsersDomain.Events.MembershipFeatureAssigned(Id, organizationId, membership.Value.Id,
                             feature));
-                if (!addedFeature.IsSuccessful)
+                if (addedFeature.IsFailure)
                 {
                     return addedFeature.Error;
                 }
@@ -490,7 +490,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 RaiseChangeEvent(
                     EndUsersDomain.Events.MembershipRoleAssigned(Id, organizationId, membership.Value.Id,
                         role));
-            if (!addedRole.IsSuccessful)
+            if (addedRole.IsFailure)
             {
                 return addedRole.Error;
             }
@@ -524,7 +524,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 var addedFeature =
                     RaiseChangeEvent(
                         EndUsersDomain.Events.PlatformFeatureAssigned(Id, feature));
-                if (!addedFeature.IsSuccessful)
+                if (addedFeature.IsFailure)
                 {
                     return addedFeature.Error;
                 }
@@ -558,7 +558,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 var addedRole =
                     RaiseChangeEvent(
                         EndUsersDomain.Events.PlatformRoleAssigned(Id, role));
-                if (!addedRole.IsSuccessful)
+                if (addedRole.IsFailure)
                 {
                     return addedRole.Error;
                 }
@@ -669,7 +669,7 @@ public sealed class EndUserRoot : AggregateRootBase
         var raised =
             RaiseChangeEvent(
                 EndUsersDomain.Events.GuestInvitationCreated(Id, token, inviteeEmailAddress, inviterId));
-        if (!raised.IsSuccessful)
+        if (raised.IsFailure)
         {
             return raised.Error;
         }
@@ -689,7 +689,7 @@ public sealed class EndUserRoot : AggregateRootBase
             if (username.HasValue)
             {
                 var accepted = RaiseChangeEvent(EndUsersDomain.Events.GuestInvitationAccepted(Id, username));
-                if (!accepted.IsSuccessful)
+                if (accepted.IsFailure)
                 {
                     return accepted.Error;
                 }
@@ -745,7 +745,7 @@ public sealed class EndUserRoot : AggregateRootBase
                     defaultMembership.Id,
                     newDefaultMembership.Id, newDefaultMembership.OrganizationId, newDefaultMembership.Roles,
                     newDefaultMembership.Features));
-                if (!defaulted.IsSuccessful)
+                if (defaulted.IsFailure)
                 {
                     return defaulted.Error;
                 }
@@ -805,7 +805,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 RaiseChangeEvent(
                     EndUsersDomain.Events.MembershipRoleUnassigned(Id, organizationId, membership.Value.Id,
                         role));
-            if (!removedRole.IsSuccessful)
+            if (removedRole.IsFailure)
             {
                 return removedRole.Error;
             }
@@ -843,7 +843,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 }
 
                 var removedRole = RaiseChangeEvent(EndUsersDomain.Events.PlatformRoleUnassigned(Id, role));
-                if (!removedRole.IsSuccessful)
+                if (removedRole.IsFailure)
                 {
                     return removedRole.Error;
                 }

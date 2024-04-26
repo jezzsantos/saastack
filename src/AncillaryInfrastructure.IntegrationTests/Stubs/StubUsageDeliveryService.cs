@@ -10,7 +10,7 @@ public sealed class StubUsageDeliveryService : IUsageDeliveryService
 
     public Optional<string> LastEventName { get; private set; } = Optional<string>.None;
 
-    public Task<Result<Error>> DeliverAsync(ICallerContext context, string forId, string eventName,
+    public Task<Result<Error>> DeliverAsync(ICallerContext caller, string forId, string eventName,
         Dictionary<string, string>? additional = null,
         CancellationToken cancellationToken = default)
     {

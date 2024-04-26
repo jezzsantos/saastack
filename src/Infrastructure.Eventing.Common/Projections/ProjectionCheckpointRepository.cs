@@ -44,7 +44,7 @@ public sealed class ProjectionCheckpointRepository : IProjectionCheckpointReposi
     public async Task<Result<int, Error>> LoadCheckpointAsync(string streamName, CancellationToken cancellationToken)
     {
         var retrieved = await GetCheckpointAsync(streamName, cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -59,7 +59,7 @@ public sealed class ProjectionCheckpointRepository : IProjectionCheckpointReposi
         CancellationToken cancellationToken)
     {
         var retrieved = await GetCheckpointAsync(streamName, cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -75,7 +75,7 @@ public sealed class ProjectionCheckpointRepository : IProjectionCheckpointReposi
             checkpoint.Value.Id = _idFactory.Create(checkpoint.Value).Value.Text;
             var added = await _store.AddAsync(ContainerName, CommandEntity.FromType(checkpoint.Value),
                 cancellationToken);
-            if (!added.IsSuccessful)
+            if (added.IsFailure)
             {
                 return added.Error;
             }
@@ -86,7 +86,7 @@ public sealed class ProjectionCheckpointRepository : IProjectionCheckpointReposi
             var replaced = await _store.ReplaceAsync(ContainerName, checkpoint.Value.Id,
                 CommandEntity.FromType(checkpoint.Value),
                 cancellationToken);
-            if (!replaced.IsSuccessful)
+            if (replaced.IsFailure)
             {
                 return replaced.Error;
             }
@@ -104,7 +104,7 @@ public sealed class ProjectionCheckpointRepository : IProjectionCheckpointReposi
         var query = await _store.QueryAsync(ContainerName, Query.From<Checkpoint>()
                 .Where<string>(cp => cp.StreamName, ConditionOperator.EqualTo, streamName),
             PersistedEntityMetadata.FromType<Checkpoint>(), cancellationToken);
-        if (!query.IsSuccessful)
+        if (query.IsFailure)
         {
             return query.Error;
         }

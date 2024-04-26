@@ -58,7 +58,7 @@ public partial class LocalMachineJsonFileStore : IQueueStore, IQueueStoreTrigger
             try
             {
                 var handled = await messageHandlerAsync(message, cancellationToken);
-                if (!handled.IsSuccessful)
+                if (handled.IsFailure)
                 {
                     return handled.Error;
                 }

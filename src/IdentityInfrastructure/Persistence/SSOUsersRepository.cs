@@ -43,7 +43,7 @@ public class SSOUsersRepository : ISSOUsersRepository
     public async Task<Result<SSOUserRoot, Error>> SaveAsync(SSOUserRoot user, CancellationToken cancellationToken)
     {
         var saved = await _users.SaveAsync(user, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -56,7 +56,7 @@ public class SSOUsersRepository : ISSOUsersRepository
         CancellationToken cancellationToken)
     {
         var queried = await _userQueries.QueryAsync(query, false, cancellationToken);
-        if (!queried.IsSuccessful)
+        if (queried.IsFailure)
         {
             return queried.Error;
         }
@@ -68,7 +68,7 @@ public class SSOUsersRepository : ISSOUsersRepository
         }
 
         var users = await _users.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
-        if (!users.IsSuccessful)
+        if (users.IsFailure)
         {
             return users.Error;
         }

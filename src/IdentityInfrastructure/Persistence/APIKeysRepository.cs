@@ -37,7 +37,7 @@ public class APIKeysRepository : IAPIKeysRepository
     public async Task<Result<APIKeyRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {
         var apiKey = await _apiKeys.LoadAsync(id, cancellationToken);
-        if (!apiKey.IsSuccessful)
+        if (apiKey.IsFailure)
         {
             return apiKey.Error;
         }
@@ -48,7 +48,7 @@ public class APIKeysRepository : IAPIKeysRepository
     public async Task<Result<APIKeyRoot, Error>> SaveAsync(APIKeyRoot apiKey, CancellationToken cancellationToken)
     {
         var saved = await _apiKeys.SaveAsync(apiKey, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -78,7 +78,7 @@ public class APIKeysRepository : IAPIKeysRepository
         CancellationToken cancellationToken)
     {
         var queried = await _apiKeyQueries.QueryAsync(query, false, cancellationToken);
-        if (!queried.IsSuccessful)
+        if (queried.IsFailure)
         {
             return queried.Error;
         }
@@ -90,7 +90,7 @@ public class APIKeysRepository : IAPIKeysRepository
         }
 
         var tokens = await _apiKeys.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
-        if (!tokens.IsSuccessful)
+        if (tokens.IsFailure)
         {
             return tokens.Error;
         }

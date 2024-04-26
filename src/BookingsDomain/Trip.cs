@@ -80,7 +80,7 @@ public sealed class Trip : EntityBase
             case TripBegan changed:
             {
                 var from = Location.Create(changed.BeganFrom);
-                if (!from.IsSuccessful)
+                if (from.IsFailure)
                 {
                     return from.Error;
                 }
@@ -93,7 +93,7 @@ public sealed class Trip : EntityBase
             case TripEnded changed:
             {
                 var to = Location.Create(changed.EndedTo);
-                if (!to.IsSuccessful)
+                if (to.IsFailure)
                 {
                     return to.Error;
                 }
@@ -111,7 +111,7 @@ public sealed class Trip : EntityBase
     public override Result<Error> EnsureInvariants()
     {
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }

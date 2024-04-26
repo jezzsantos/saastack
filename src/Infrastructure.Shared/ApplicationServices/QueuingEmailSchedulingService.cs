@@ -36,7 +36,7 @@ public class QueuingEmailSchedulingService : IEmailSchedulingService
                 ToDisplayName = htmlEmail.ToDisplayName
             }
         }, cancellationToken);
-        if (!queued.IsSuccessful)
+        if (queued.IsFailure)
         {
             return queued.Error;
         }

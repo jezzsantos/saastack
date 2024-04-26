@@ -11,17 +11,17 @@ namespace UserProfilesInfrastructure.Api.Profiles;
 
 public class UserProfilesApi : IWebApiService
 {
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
     private readonly IFileUploadService _fileUploadService;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserProfilesApplication _userProfilesApplication;
 
     public UserProfilesApi(IHttpContextAccessor httpContextAccessor, IFileUploadService fileUploadService,
-        ICallerContextFactory contextFactory, IUserProfilesApplication userProfilesApplication)
+        ICallerContextFactory callerFactory, IUserProfilesApplication userProfilesApplication)
     {
         _httpContextAccessor = httpContextAccessor;
         _fileUploadService = fileUploadService;
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _userProfilesApplication = userProfilesApplication;
     }
 
@@ -29,7 +29,7 @@ public class UserProfilesApi : IWebApiService
         ChangeProfileContactAddressRequest request, CancellationToken cancellationToken)
     {
         var profile =
-            await _userProfilesApplication.ChangeContactAddressAsync(_contextFactory.Create(), request.UserId,
+            await _userProfilesApplication.ChangeContactAddressAsync(_callerFactory.Create(), request.UserId,
                 request.Line1, request.Line2, request.Line3, request.City, request.State, request.CountryCode,
                 request.Zip,
                 cancellationToken);
@@ -43,7 +43,7 @@ public class UserProfilesApi : IWebApiService
         ChangeProfileRequest request, CancellationToken cancellationToken)
     {
         var profile =
-            await _userProfilesApplication.ChangeProfileAsync(_contextFactory.Create(), request.UserId,
+            await _userProfilesApplication.ChangeProfileAsync(_callerFactory.Create(), request.UserId,
                 request.FirstName, request.LastName, request.DisplayName, request.PhoneNumber, request.Timezone,
                 cancellationToken);
 
@@ -58,13 +58,13 @@ public class UserProfilesApi : IWebApiService
         var httpRequest = _httpContextAccessor.HttpContext!.Request;
         var uploaded = httpRequest.GetUploadedFile(_fileUploadService, Validations.Avatar.MaxSizeInBytes,
             Validations.Avatar.AllowableContentTypes);
-        if (!uploaded.IsSuccessful)
+        if (uploaded.IsFailure)
         {
             return () => uploaded.Error;
         }
 
         var profile =
-            await _userProfilesApplication.ChangeProfileAvatarAsync(_contextFactory.Create(), request.UserId,
+            await _userProfilesApplication.ChangeProfileAvatarAsync(_callerFactory.Create(), request.UserId,
                 uploaded.Value, cancellationToken);
 
         return () =>
@@ -76,7 +76,7 @@ public class UserProfilesApi : IWebApiService
         DeleteProfileAvatarRequest request, CancellationToken cancellationToken)
     {
         var profile =
-            await _userProfilesApplication.DeleteProfileAvatarAsync(_contextFactory.Create(), request.UserId,
+            await _userProfilesApplication.DeleteProfileAvatarAsync(_callerFactory.Create(), request.UserId,
                 cancellationToken);
 
         return () =>
@@ -88,7 +88,7 @@ public class UserProfilesApi : IWebApiService
         GetProfileForCallerRequest request, CancellationToken cancellationToken)
     {
         var profile =
-            await _userProfilesApplication.GetCurrentUserProfileAsync(_contextFactory.Create(), cancellationToken);
+            await _userProfilesApplication.GetCurrentUserProfileAsync(_callerFactory.Create(), cancellationToken);
 
         return () =>
             profile.HandleApplicationResult<UserProfileForCaller, GetProfileForCallerResponse>(pro =>

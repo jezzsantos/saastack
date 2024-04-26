@@ -12,6 +12,6 @@ public interface IProvisioningNotificationService
     /// <summary>
     ///     Notifies of the provisioning event
     /// </summary>
-    Task<Result<Error>> NotifyAsync(ICallerContext context, string tenantId, TenantSettings settings,
+    Task<Result<Error>> NotifyAsync(ICallerContext caller, string tenantId, TenantSettings settings,
         CancellationToken cancellationToken);
 }

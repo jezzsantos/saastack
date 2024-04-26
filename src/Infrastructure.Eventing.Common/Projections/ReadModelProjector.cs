@@ -57,20 +57,20 @@ public sealed class ReadModelProjector : IReadModelProjector, IDisposable
         var streamEntityType = Enumerable.First(eventStream).RootAggregateType;
         var firstEventVersion = Enumerable.First(eventStream).Version;
         var projection = GetProjectionForStream(Projections, streamEntityType);
-        if (!projection.IsSuccessful)
+        if (projection.IsFailure)
         {
             return projection.Error;
         }
 
         var retrieved = await _checkpointStore.LoadCheckpointAsync(streamName, cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
         var checkpointVersion = retrieved.Value;
         var versioned = EnsureNextVersion(streamName, checkpointVersion, firstEventVersion);
-        if (!versioned.IsSuccessful)
+        if (versioned.IsFailure)
         {
             return versioned.Error;
         }
@@ -79,14 +79,14 @@ public sealed class ReadModelProjector : IReadModelProjector, IDisposable
         foreach (var changeEvent in SkipPreviouslyProjectedVersions(eventStream, checkpointVersion))
         {
             var deserialized = DeserializeEvent(changeEvent, _migrator);
-            if (!deserialized.IsSuccessful)
+            if (deserialized.IsFailure)
             {
                 return deserialized.Error;
             }
 
             var projected =
                 await ProjectEventAsync(projection.Value, deserialized.Value, changeEvent, cancellationToken);
-            if (!projected.IsSuccessful)
+            if (projected.IsFailure)
             {
                 return projected.Error;
             }
@@ -96,7 +96,7 @@ public sealed class ReadModelProjector : IReadModelProjector, IDisposable
 
         var newCheckpoint = checkpointVersion + processed;
         var saved = await _checkpointStore.SaveCheckpointAsync(streamName, newCheckpoint, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -108,7 +108,7 @@ public sealed class ReadModelProjector : IReadModelProjector, IDisposable
         EventStreamChangeEvent changeEvent, CancellationToken cancellationToken)
     {
         var projected = await projection.ProjectEventAsync(@event, cancellationToken);
-        if (!projected.IsSuccessful)
+        if (projected.IsFailure)
         {
             return projected.Error.Wrap(ErrorCode.Unexpected,
                 Resources.ReadModelProjector_ProjectionError_HandlerError.Format(

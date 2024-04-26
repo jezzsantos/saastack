@@ -21,7 +21,7 @@ partial class EndUsersApplication
         var ownership = domainEvent.Ownership.ToEnumOrDefault(OrganizationOwnership.Shared);
         var membership = await CreateMembershipAsync(caller, domainEvent.CreatedById.ToId(), domainEvent.RootId.ToId(),
             ownership, cancellationToken);
-        if (!membership.IsSuccessful)
+        if (membership.IsFailure)
         {
             return membership.Error;
         }
@@ -35,7 +35,7 @@ partial class EndUsersApplication
     {
         var deleted = await RemoveMembershipFromDeletedOrganizationAsync(caller, domainEvent.RootId.ToId(),
             domainEvent.DeletedById.ToId(), cancellationToken);
-        if (!deleted.IsSuccessful)
+        if (deleted.IsFailure)
         {
             return deleted.Error;
         }
@@ -49,7 +49,7 @@ partial class EndUsersApplication
     {
         var assigned = await AssignTenantRolesAsync(caller, domainEvent.AssignedById.ToId(), domainEvent.RootId.ToId(),
             domainEvent.UserId.ToId(), [domainEvent.Role], cancellationToken);
-        if (!assigned.IsSuccessful)
+        if (assigned.IsFailure)
         {
             return assigned.Error;
         }
@@ -64,7 +64,7 @@ partial class EndUsersApplication
         var assigned = await UnassignTenantRolesAsync(caller, domainEvent.UnassignedById.ToId(),
             domainEvent.RootId.ToId(), domainEvent.UserId.ToId(),
             [domainEvent.Role], cancellationToken);
-        if (!assigned.IsSuccessful)
+        if (assigned.IsFailure)
         {
             return assigned.Error;
         }
@@ -76,20 +76,20 @@ partial class EndUsersApplication
         Identifier organizationId, Identifier deletedById, CancellationToken cancellationToken)
     {
         var retrievedDeleter = await _endUserRepository.LoadAsync(deletedById, cancellationToken);
-        if (!retrievedDeleter.IsSuccessful)
+        if (retrievedDeleter.IsFailure)
         {
             return retrievedDeleter.Error;
         }
 
         var deleter = retrievedDeleter.Value;
         var removed = deleter.RemoveMembership(deleter, organizationId);
-        if (!removed.IsSuccessful)
+        if (removed.IsFailure)
         {
             return removed.Error;
         }
 
         var saved = await _endUserRepository.SaveAsync(deleter, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -107,7 +107,7 @@ partial class EndUsersApplication
         CancellationToken cancellationToken)
     {
         var retrievedInviter = await _endUserRepository.LoadAsync(createdById, cancellationToken);
-        if (!retrievedInviter.IsSuccessful)
+        if (retrievedInviter.IsFailure)
         {
             return retrievedInviter.Error;
         }
@@ -125,13 +125,13 @@ partial class EndUsersApplication
             EndUserRoot.GetInitialRolesAndFeatures(useCase, caller.IsAuthenticated);
         var inviterOwnership = ownership.ToEnumOrDefault(Domain.Shared.Organizations.OrganizationOwnership.Shared);
         var membered = inviter.AddMembership(inviter, inviterOwnership, organizationId, tenantRoles, tenantFeatures);
-        if (!membered.IsSuccessful)
+        if (membered.IsFailure)
         {
             return membered.Error;
         }
 
         var saved = await _endUserRepository.SaveAsync(inviter, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -153,13 +153,13 @@ partial class EndUsersApplication
         Identifier organizationId, Identifier assigneeId, List<string> roles, CancellationToken cancellationToken)
     {
         var retrievedAssigner = await _endUserRepository.LoadAsync(assignerId, cancellationToken);
-        if (!retrievedAssigner.IsSuccessful)
+        if (retrievedAssigner.IsFailure)
         {
             return retrievedAssigner.Error;
         }
 
         var retrievedAssignee = await _endUserRepository.LoadAsync(assigneeId, cancellationToken);
-        if (!retrievedAssignee.IsSuccessful)
+        if (retrievedAssignee.IsFailure)
         {
             return retrievedAssignee.Error;
         }
@@ -167,20 +167,20 @@ partial class EndUsersApplication
         var assigner = retrievedAssigner.Value;
         var assignee = retrievedAssignee.Value;
         var assigneeRoles = Roles.Create(roles.ToArray());
-        if (!assigneeRoles.IsSuccessful)
+        if (assigneeRoles.IsFailure)
         {
             return assigneeRoles.Error;
         }
 
         var assigned = assignee.AssignMembershipRoles(assigner, organizationId, assigneeRoles.Value);
-        if (!assigned.IsSuccessful)
+        if (assigned.IsFailure)
         {
             return assigned.Error;
         }
 
         var membership = assigned.Value;
         var saved = await _endUserRepository.SaveAsync(assignee, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -201,13 +201,13 @@ partial class EndUsersApplication
         Identifier organizationId, Identifier assigneeId, List<string> roles, CancellationToken cancellationToken)
     {
         var retrievedAssigner = await _endUserRepository.LoadAsync(unassignerId, cancellationToken);
-        if (!retrievedAssigner.IsSuccessful)
+        if (retrievedAssigner.IsFailure)
         {
             return retrievedAssigner.Error;
         }
 
         var retrievedAssignee = await _endUserRepository.LoadAsync(assigneeId, cancellationToken);
-        if (!retrievedAssignee.IsSuccessful)
+        if (retrievedAssignee.IsFailure)
         {
             return retrievedAssignee.Error;
         }
@@ -215,20 +215,20 @@ partial class EndUsersApplication
         var assigner = retrievedAssigner.Value;
         var assignee = retrievedAssignee.Value;
         var assigneeRoles = Roles.Create(roles.ToArray());
-        if (!assigneeRoles.IsSuccessful)
+        if (assigneeRoles.IsFailure)
         {
             return assigneeRoles.Error;
         }
 
         var assigned = assignee.UnassignMembershipRoles(assigner, organizationId, assigneeRoles.Value);
-        if (!assigned.IsSuccessful)
+        if (assigned.IsFailure)
         {
             return assigned.Error;
         }
 
         var membership = assigned.Value;
         var saved = await _endUserRepository.SaveAsync(assignee, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }

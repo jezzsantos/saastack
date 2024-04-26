@@ -47,7 +47,7 @@ public sealed class CSRFMiddleware
         }
 
         var result = VerifyRequest(request);
-        if (!result.IsSuccessful)
+        if (result.IsFailure)
         {
             var httpError = result.Error.ToHttpError();
             var details = Results.Problem(statusCode: (int)httpError.Code, detail: httpError.Message);
@@ -62,32 +62,32 @@ public sealed class CSRFMiddleware
     private Result<Error> VerifyRequest(HttpRequest request)
     {
         var hostName = GetHostName(_hostSettings);
-        if (!hostName.IsSuccessful)
+        if (hostName.IsFailure)
         {
             return hostName.Error;
         }
 
         var csrfCookie = GetCookie(request);
-        if (!csrfCookie.IsSuccessful)
+        if (csrfCookie.IsFailure)
         {
             return csrfCookie.Error;
         }
 
         var csrfHeader = GetHeader(request);
-        if (!csrfHeader.IsSuccessful)
+        if (csrfHeader.IsFailure)
         {
             return csrfHeader.Error;
         }
 
         var userId = request.GetUserIdFromAuthNCookie();
-        if (!userId.IsSuccessful)
+        if (userId.IsFailure)
         {
             return userId.Error;
         }
 
         var verifiedCookie =
             VerifyCookieAndHeaderForUser(_recorder, _csrfService, csrfCookie.Value, csrfHeader.Value, userId.Value);
-        if (!verifiedCookie.IsSuccessful)
+        if (verifiedCookie.IsFailure)
         {
             return verifiedCookie.Error;
         }
@@ -96,7 +96,7 @@ public sealed class CSRFMiddleware
         var refererHeader = GetHeader(request, HttpHeaders.Referer);
 
         var verifiedOrigin = VerifyOrigin(_recorder, hostName.Value, originHeader, refererHeader);
-        if (!verifiedOrigin.IsSuccessful)
+        if (verifiedOrigin.IsFailure)
         {
             return verifiedOrigin.Error;
         }

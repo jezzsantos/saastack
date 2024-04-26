@@ -6,12 +6,12 @@ namespace EndUsersApplication;
 
 public partial interface IInvitationsApplication
 {
-    Task<Result<Invitation, Error>> InviteGuestAsync(ICallerContext context, string emailAddress,
+    Task<Result<Invitation, Error>> InviteGuestAsync(ICallerContext caller, string emailAddress,
         CancellationToken cancellationToken);
 
-    Task<Result<Error>> ResendGuestInvitationAsync(ICallerContext context, string token,
+    Task<Result<Error>> ResendGuestInvitationAsync(ICallerContext caller, string token,
         CancellationToken cancellationToken);
 
-    Task<Result<Invitation, Error>> VerifyGuestInvitationAsync(ICallerContext context, string token,
+    Task<Result<Invitation, Error>> VerifyGuestInvitationAsync(ICallerContext caller, string token,
         CancellationToken cancellationToken);
 }

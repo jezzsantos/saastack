@@ -19,12 +19,12 @@ public class NoOpEmailDeliveryService : IEmailDeliveryService
         _recorder = recorder;
     }
 
-    public Task<Result<EmailDeliveryReceipt, Error>> DeliverAsync(ICallerContext context, string subject,
+    public Task<Result<EmailDeliveryReceipt, Error>> DeliverAsync(ICallerContext caller, string subject,
         string htmlBody,
         string toEmailAddress, string? toDisplayName,
         string fromEmailAddress, string? fromDisplayName, CancellationToken cancellationToken = default)
     {
-        _recorder.TraceInformation(context.ToCall(),
+        _recorder.TraceInformation(caller.ToCall(),
             $"{nameof(NoOpUsageDeliveryService)} delivers email event {{Event}} for {{For}} with properties: {{Properties}}",
             subject, toEmailAddress, new
             {

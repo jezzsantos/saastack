@@ -15,7 +15,7 @@ namespace IdentityInfrastructure.ApplicationServices;
 /// </summary>
 public class FakeOAuth2Service : IOAuth2Service
 {
-    public Task<Result<List<AuthToken>, Error>> ExchangeCodeForTokensAsync(ICallerContext context,
+    public Task<Result<List<AuthToken>, Error>> ExchangeCodeForTokensAsync(ICallerContext caller,
         OAuth2CodeTokenExchangeOptions options,
         CancellationToken cancellationToken)
     {

@@ -7,6 +7,6 @@ namespace Application.Interfaces.Services;
 /// </summary>
 public interface ITenantSettingsService
 {
-    Task<Result<TenantSettings, Error>> CreateForTenantAsync(ICallerContext context, string tenantId,
+    Task<Result<TenantSettings, Error>> CreateForTenantAsync(ICallerContext caller, string tenantId,
         CancellationToken cancellationToken);
 }

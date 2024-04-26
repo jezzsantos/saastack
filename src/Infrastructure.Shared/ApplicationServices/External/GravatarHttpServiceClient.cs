@@ -47,7 +47,7 @@ public class GravatarHttpServiceClient : IAvatarService
 
         var gravatar =
             await _serviceClient.FindAvatarAsync(caller, emailAddress, cancellationToken);
-        if (!gravatar.IsSuccessful
+        if (gravatar.IsFailure
             || !gravatar.Value.HasValue)
         {
             _recorder.TraceInformation(caller.ToCall(),
@@ -111,7 +111,7 @@ public class GravatarHttpServiceClient : IAvatarService
                         Default = DefaultImageBehaviour,
                         Width = 400
                     }, null, cancellationToken));
-                if (!response.IsSuccessful)
+                if (response.IsFailure)
                 {
                     return Optional<FileUpload>.None;
                 }

@@ -14,19 +14,19 @@ public sealed class Manufacturer : ValueObjectBase<Manufacturer>
     public static Result<Manufacturer, Error> Create(int year, string make, string model)
     {
         var newYear = Year.Create(year);
-        if (!newYear.IsSuccessful)
+        if (newYear.IsFailure)
         {
             return newYear.Error;
         }
 
         var newMake = Name.Create(make);
-        if (!newMake.IsSuccessful)
+        if (newMake.IsFailure)
         {
             return newMake.Error;
         }
 
         var newModel = Name.Create(model);
-        if (!newModel.IsSuccessful)
+        if (newModel.IsFailure)
         {
             return newModel.Error;
         }

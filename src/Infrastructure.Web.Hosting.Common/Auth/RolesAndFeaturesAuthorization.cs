@@ -75,17 +75,17 @@ public sealed class RolesAndFeaturesAuthorizationPolicyProvider : DefaultAuthori
 /// </summary>
 public sealed class RolesAndFeaturesAuthorizationHandler : AuthorizationHandler<RolesAndFeaturesRequirement>
 {
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
 
-    public RolesAndFeaturesAuthorizationHandler(ICallerContextFactory contextFactory)
+    public RolesAndFeaturesAuthorizationHandler(ICallerContextFactory callerFactory)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
     }
 
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
         RolesAndFeaturesRequirement requirement)
     {
-        var caller = _contextFactory.Create();
+        var caller = _callerFactory.Create();
 
         foreach (var platformRole in requirement.Roles.Platform)
         {

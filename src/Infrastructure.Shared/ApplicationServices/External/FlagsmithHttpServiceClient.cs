@@ -140,7 +140,7 @@ public partial class FlagsmithHttpServiceClient : IFeatureFlags
     {
         var featureFlag = GetFlagAsync(flag, Optional<string>.None, Optional<string>.None, CancellationToken.None)
             .GetAwaiter().GetResult();
-        if (!featureFlag.IsSuccessful)
+        if (featureFlag.IsFailure)
         {
             return FlagEnabledWhenNotExists;
         }
@@ -152,7 +152,7 @@ public partial class FlagsmithHttpServiceClient : IFeatureFlags
     {
         var featureFlag = GetFlagAsync(flag, Optional<string>.None, userId, CancellationToken.None).GetAwaiter()
             .GetResult();
-        if (!featureFlag.IsSuccessful)
+        if (featureFlag.IsFailure)
         {
             return FlagEnabledWhenNotExists;
         }
@@ -163,7 +163,7 @@ public partial class FlagsmithHttpServiceClient : IFeatureFlags
     public bool IsEnabled(Flag flag, Optional<string> tenantId, string userId)
     {
         var featureFlag = GetFlagAsync(flag, tenantId, userId, CancellationToken.None).GetAwaiter().GetResult();
-        if (!featureFlag.IsSuccessful)
+        if (featureFlag.IsFailure)
         {
             return FlagEnabledWhenNotExists;
         }

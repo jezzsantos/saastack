@@ -47,7 +47,7 @@ public class EmailDeliveryRepository : IEmailDeliveryRepository
         CancellationToken cancellationToken)
     {
         var saved = await _deliveries.SaveAsync(delivery, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -63,7 +63,7 @@ public class EmailDeliveryRepository : IEmailDeliveryRepository
         var queried = await _deliveryQueries.QueryAsync(Query.From<EmailDelivery>()
             .Where<DateTime?>(u => u.LastAttempted, ConditionOperator.GreaterThan, sinceUtc)
             .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
-        if (!queried.IsSuccessful)
+        if (queried.IsFailure)
         {
             return queried.Error;
         }
@@ -76,7 +76,7 @@ public class EmailDeliveryRepository : IEmailDeliveryRepository
         CancellationToken cancellationToken)
     {
         var delivery = await _deliveries.LoadAsync(id, cancellationToken);
-        if (!delivery.IsSuccessful)
+        if (delivery.IsFailure)
         {
             return delivery.Error;
         }
@@ -89,7 +89,7 @@ public class EmailDeliveryRepository : IEmailDeliveryRepository
         CancellationToken cancellationToken)
     {
         var queried = await _deliveryQueries.QueryAsync(query, false, cancellationToken);
-        if (!queried.IsSuccessful)
+        if (queried.IsFailure)
         {
             return queried.Error;
         }
@@ -101,7 +101,7 @@ public class EmailDeliveryRepository : IEmailDeliveryRepository
         }
 
         var deliveries = await _deliveries.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
-        if (!deliveries.IsSuccessful)
+        if (deliveries.IsFailure)
         {
             return deliveries.Error;
         }

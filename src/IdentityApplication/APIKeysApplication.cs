@@ -38,7 +38,7 @@ public class APIKeysApplication : IAPIKeysApplication
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -46,13 +46,13 @@ public class APIKeysApplication : IAPIKeysApplication
         var apiKey = retrieved.Value;
         var deleterId = caller.ToCallerId();
         var deleted = apiKey.Delete(deleterId);
-        if (!deleted.IsSuccessful)
+        if (deleted.IsFailure)
         {
             return deleted.Error;
         }
 
         var saved = await _repository.SaveAsync(apiKey, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -64,7 +64,7 @@ public class APIKeysApplication : IAPIKeysApplication
     }
 
     public async Task<Result<Optional<EndUserWithMemberships>, Error>> FindMembershipsForAPIKeyAsync(
-        ICallerContext context, string apiKey,
+        ICallerContext caller, string apiKey,
         CancellationToken cancellationToken)
     {
         var keyToken = _tokensService.ParseApiKey(apiKey);
@@ -74,7 +74,7 @@ public class APIKeysApplication : IAPIKeysApplication
         }
 
         var retrievedApiKey = await _repository.FindByAPIKeyTokenAsync(keyToken.Value.Token, cancellationToken);
-        if (!retrievedApiKey.IsSuccessful)
+        if (retrievedApiKey.IsFailure)
         {
             return retrievedApiKey.Error;
         }
@@ -85,9 +85,9 @@ public class APIKeysApplication : IAPIKeysApplication
         }
 
         var retrievedUser =
-            await _endUsersService.GetMembershipsPrivateAsync(context, retrievedApiKey.Value.Value.UserId,
+            await _endUsersService.GetMembershipsPrivateAsync(caller, retrievedApiKey.Value.Value.UserId,
                 cancellationToken);
-        if (!retrievedUser.IsSuccessful)
+        if (retrievedUser.IsFailure)
         {
             return Optional<EndUserWithMemberships>.None;
         }
@@ -102,7 +102,7 @@ public class APIKeysApplication : IAPIKeysApplication
     {
         var userId = caller.ToCallerId();
         var searched = await _repository.SearchAllForUserAsync(userId, searchOptions, cancellationToken);
-        if (!searched.IsSuccessful)
+        if (searched.IsFailure)
         {
             return searched.Error;
         }
@@ -114,20 +114,20 @@ public class APIKeysApplication : IAPIKeysApplication
     }
 
 #if TESTINGONLY
-    public async Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext context,
+    public async Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
-        return await CreateAPIKeyAsync(context, context.CallerId, context.CallerId, null, cancellationToken);
+        return await CreateAPIKeyAsync(caller, caller.CallerId, caller.CallerId, null, cancellationToken);
     }
 #endif
 
-    public async Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext context, string userId,
+    public async Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext caller, string userId,
         string description, DateTime? expiresOn, CancellationToken cancellationToken)
     {
         var keyToken = _tokensService.CreateAPIKey();
 
         var created = APIKeyRoot.Create(_recorder, _identifierFactory, _apiKeyHasherService, userId.ToId(), keyToken);
-        if (!created.IsSuccessful)
+        if (created.IsFailure)
         {
             return created.Error;
         }
@@ -135,13 +135,13 @@ public class APIKeysApplication : IAPIKeysApplication
         var apiKey = created.Value;
         var parameterized = apiKey.SetParameters(description,
             expiresOn ?? DateTime.UtcNow.ToNearestMinute().Add(DefaultAPIKeyExpiry));
-        if (!parameterized.IsSuccessful)
+        if (parameterized.IsFailure)
         {
             return parameterized.Error;
         }
 
         var saved = await _repository.SaveAsync(apiKey, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }

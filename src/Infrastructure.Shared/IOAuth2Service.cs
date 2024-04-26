@@ -10,7 +10,7 @@ namespace Infrastructure.Shared;
 /// </summary>
 public interface IOAuth2Service
 {
-    Task<Result<List<AuthToken>, Error>> ExchangeCodeForTokensAsync(ICallerContext context,
+    Task<Result<List<AuthToken>, Error>> ExchangeCodeForTokensAsync(ICallerContext caller,
         OAuth2CodeTokenExchangeOptions options,
         CancellationToken cancellationToken);
 }

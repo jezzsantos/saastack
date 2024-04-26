@@ -83,7 +83,7 @@ public class EndUserProjection : IReadModelProjection
                 {
                     var from = await _memberships.HandleUpdateAsync(e.FromMembershipId.ToId(),
                         dto => { dto.IsDefault = false; }, cancellationToken);
-                    if (!from.IsSuccessful)
+                    if (from.IsFailure)
                     {
                         return from.Error;
                     }
@@ -91,7 +91,7 @@ public class EndUserProjection : IReadModelProjection
 
                 var to = await _memberships.HandleUpdateAsync(e.ToMembershipId.ToId(),
                     dto => { dto.IsDefault = true; }, cancellationToken);
-                if (!to.IsSuccessful)
+                if (to.IsFailure)
                 {
                     return to.Error;
                 }
@@ -105,7 +105,7 @@ public class EndUserProjection : IReadModelProjection
                     var roles = dto.Roles.HasValue
                         ? dto.Roles.Value.Add(e.Role)
                         : Roles.Create(e.Role);
-                    if (!roles.IsSuccessful)
+                    if (roles.IsFailure)
                     {
                         return;
                     }
@@ -119,7 +119,7 @@ public class EndUserProjection : IReadModelProjection
                     var roles = dto.Roles.HasValue
                         ? dto.Roles.Value.Remove(e.Role)
                         : new Result<Roles, Error>(Roles.Empty);
-                    if (!roles.IsSuccessful)
+                    if (roles.IsFailure)
                     {
                         return;
                     }
@@ -133,7 +133,7 @@ public class EndUserProjection : IReadModelProjection
                     var features = dto.Features.HasValue
                         ? dto.Features.Value.Add(e.Feature)
                         : Features.Create(e.Feature);
-                    if (!features.IsSuccessful)
+                    if (features.IsFailure)
                     {
                         return;
                     }
@@ -147,7 +147,7 @@ public class EndUserProjection : IReadModelProjection
                     var roles = dto.Roles.HasValue
                         ? dto.Roles.Value.Add(e.Role)
                         : Roles.Create(e.Role);
-                    if (!roles.IsSuccessful)
+                    if (roles.IsFailure)
                     {
                         return;
                     }
@@ -161,7 +161,7 @@ public class EndUserProjection : IReadModelProjection
                     var roles = dto.Roles.HasValue
                         ? dto.Roles.Value.Remove(e.Role)
                         : new Result<Roles, Error>(Roles.Empty);
-                    if (!roles.IsSuccessful)
+                    if (roles.IsFailure)
                     {
                         return;
                     }
@@ -175,7 +175,7 @@ public class EndUserProjection : IReadModelProjection
                     var features = dto.Features.HasValue
                         ? dto.Features.Value.Add(e.Feature)
                         : Features.Create(e.Feature);
-                    if (!features.IsSuccessful)
+                    if (features.IsFailure)
                     {
                         return;
                     }

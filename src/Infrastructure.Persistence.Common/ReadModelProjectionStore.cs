@@ -41,7 +41,7 @@ public class ReadModelProjectionStore<TReadModelEntity> : IReadModelProjectionSt
         action?.Invoke(dto);
 
         var added = await _dataStore.AddAsync(ContainerName, CommandEntity.FromType(dto), cancellationToken);
-        if (!added.IsSuccessful)
+        if (added.IsFailure)
         {
             return added.Error;
         }
@@ -61,7 +61,7 @@ public class ReadModelProjectionStore<TReadModelEntity> : IReadModelProjectionSt
 
         var retrieved = await _dataStore.RetrieveAsync(ContainerName, id,
             PersistedEntityMetadata.FromType<TReadModelEntity>(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -72,7 +72,7 @@ public class ReadModelProjectionStore<TReadModelEntity> : IReadModelProjectionSt
         }
 
         var removed = await _dataStore.RemoveAsync(ContainerName, id, cancellationToken);
-        if (!removed.IsSuccessful)
+        if (removed.IsFailure)
         {
             return removed.Error;
         }
@@ -94,7 +94,7 @@ public class ReadModelProjectionStore<TReadModelEntity> : IReadModelProjectionSt
         var retrieved = await _dataStore.RetrieveAsync(ContainerName, id,
             PersistedEntityMetadata.FromType<TReadModelEntity>(),
             cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -108,7 +108,7 @@ public class ReadModelProjectionStore<TReadModelEntity> : IReadModelProjectionSt
         action(dto);
 
         var replaced = await _dataStore.ReplaceAsync(ContainerName, id, CommandEntity.FromType(dto), cancellationToken);
-        if (!replaced.IsSuccessful)
+        if (replaced.IsFailure)
         {
             return replaced.Error;
         }

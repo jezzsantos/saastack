@@ -21,7 +21,7 @@ partial class UserProfilesApplication
             await CreateProfileAsync(caller, classification, domainEvent.RootId, domainEvent.Username,
                 domainEvent.UserProfile.FirstName, domainEvent.UserProfile.LastName, domainEvent.UserProfile.Timezone,
                 domainEvent.UserProfile.CountryCode, cancellationToken);
-        if (!profile.IsSuccessful)
+        if (profile.IsFailure)
         {
             return profile.Error;
         }
@@ -35,7 +35,7 @@ partial class UserProfilesApplication
     {
         var profile = await UpdateDefaultOrganizationAsync(caller, domainEvent.RootId, domainEvent.ToOrganizationId,
             cancellationToken);
-        if (!profile.IsSuccessful)
+        if (profile.IsFailure)
         {
             return profile.Error;
         }
@@ -54,7 +54,7 @@ partial class UserProfilesApplication
         }
 
         var retrievedById = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
-        if (!retrievedById.IsSuccessful)
+        if (retrievedById.IsFailure)
         {
             return retrievedById.Error;
         }
@@ -67,13 +67,13 @@ partial class UserProfilesApplication
         if (classification == UserProfileClassification.Person && emailAddress.HasValue())
         {
             var email = EmailAddress.Create(emailAddress);
-            if (!email.IsSuccessful)
+            if (email.IsFailure)
             {
                 return email.Error;
             }
 
             var retrievedByEmail = await _repository.FindByEmailAddressAsync(email.Value, cancellationToken);
-            if (!retrievedByEmail.IsSuccessful)
+            if (retrievedByEmail.IsFailure)
             {
                 return retrievedByEmail.Error;
             }
@@ -87,7 +87,7 @@ partial class UserProfilesApplication
         var name = PersonName.Create(firstName, classification == UserProfileClassification.Person
             ? lastName
             : Optional<string>.None);
-        if (!name.IsSuccessful)
+        if (name.IsFailure)
         {
             return name.Error;
         }
@@ -95,7 +95,7 @@ partial class UserProfilesApplication
         var created = UserProfileRoot.Create(_recorder, _identifierFactory,
             classification.ToEnumOrDefault(ProfileType.Person),
             userId.ToId(), name.Value);
-        if (!created.IsSuccessful)
+        if (created.IsFailure)
         {
             return created.Error;
         }
@@ -104,38 +104,38 @@ partial class UserProfilesApplication
         if (classification == UserProfileClassification.Person)
         {
             var personEmail = EmailAddress.Create(emailAddress!);
-            if (!personEmail.IsSuccessful)
+            if (personEmail.IsFailure)
             {
                 return personEmail.Error;
             }
 
             var emailed = profile.SetEmailAddress(userId.ToId(), personEmail.Value);
-            if (!emailed.IsSuccessful)
+            if (emailed.IsFailure)
             {
                 return emailed.Error;
             }
         }
 
         var address = Address.Create(CountryCodes.FindOrDefault(countryCode));
-        if (!address.IsSuccessful)
+        if (address.IsFailure)
         {
             return address.Error;
         }
 
         var contacted = profile.SetContactAddress(userId.ToId(), address.Value);
-        if (!contacted.IsSuccessful)
+        if (contacted.IsFailure)
         {
             return contacted.Error;
         }
 
         var tz = Timezone.Create(Timezones.FindOrDefault(timezone));
-        if (!tz.IsSuccessful)
+        if (tz.IsFailure)
         {
             return tz.Error;
         }
 
         var timezoned = profile.SetTimezone(userId.ToId(), tz.Value);
-        if (!timezoned.IsSuccessful)
+        if (timezoned.IsFailure)
         {
             return timezoned.Error;
         }
@@ -149,7 +149,7 @@ partial class UserProfilesApplication
                 var upload = defaultAvatared.Value.Value;
                 var avatared =
                     await ChangeAvatarInternalAsync(caller, userId.ToId(), profile, upload, cancellationToken);
-                if (!avatared.IsSuccessful)
+                if (avatared.IsFailure)
                 {
                     return avatared.Error;
                 }
@@ -157,7 +157,7 @@ partial class UserProfilesApplication
         }
 
         var saved = await _repository.SaveAsync(profile, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -173,7 +173,7 @@ partial class UserProfilesApplication
         string defaultOrganizationId, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -185,13 +185,13 @@ partial class UserProfilesApplication
 
         var profile = retrieved.Value.Value;
         var defaulted = profile.ChangeDefaultOrganization(caller.ToCallerId(), defaultOrganizationId.ToId());
-        if (!defaulted.IsSuccessful)
+        if (defaulted.IsFailure)
         {
             return defaulted.Error;
         }
 
         var saved = await _repository.SaveAsync(profile, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }

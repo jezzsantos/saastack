@@ -20,7 +20,7 @@ public class FeatureFlagsApplication : IFeatureFlagsApplication
         _hmacSecret = hostSettings.GetAncillaryApiHostHmacAuthSecret();
     }
 
-    public async Task<Result<FeatureFlag, Error>> GetFeatureFlagForCallerAsync(ICallerContext context, string name,
+    public async Task<Result<FeatureFlag, Error>> GetFeatureFlagForCallerAsync(ICallerContext caller, string name,
         CancellationToken cancellationToken)
     {
         var request = new GetFeatureFlagForCallerRequest
@@ -28,8 +28,8 @@ public class FeatureFlagsApplication : IFeatureFlagsApplication
             Name = name
         };
 
-        var retrieved = await _serviceClient.GetAsync(context, request, null, cancellationToken);
-        if (!retrieved.IsSuccessful)
+        var retrieved = await _serviceClient.GetAsync(caller, request, null, cancellationToken);
+        if (retrieved.IsFailure)
         {
             return retrieved.Error.ToError();
         }
@@ -37,14 +37,14 @@ public class FeatureFlagsApplication : IFeatureFlagsApplication
         return retrieved.Value.Flag!;
     }
 
-    public async Task<Result<List<FeatureFlag>, Error>> GetAllFeatureFlagsAsync(ICallerContext context,
+    public async Task<Result<List<FeatureFlag>, Error>> GetAllFeatureFlagsAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
         var request = new GetAllFeatureFlagsRequest();
 
-        var retrieved = await _serviceClient.GetAsync(context, request, req => req.SetHMACAuth(request, _hmacSecret),
+        var retrieved = await _serviceClient.GetAsync(caller, request, req => req.SetHMACAuth(request, _hmacSecret),
             cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error.ToError();
         }

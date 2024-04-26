@@ -33,7 +33,7 @@ public class OrganizationRepository : IOrganizationRepository
     public async Task<Result<OrganizationRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {
         var organization = await _organizations.LoadAsync(id, cancellationToken);
-        if (!organization.IsSuccessful)
+        if (organization.IsFailure)
         {
             return organization.Error;
         }
@@ -45,7 +45,7 @@ public class OrganizationRepository : IOrganizationRepository
         CancellationToken cancellationToken)
     {
         var saved = await _organizations.SaveAsync(organization, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }

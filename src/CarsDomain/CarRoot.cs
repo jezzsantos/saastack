@@ -53,13 +53,13 @@ public sealed class CarRoot : AggregateRootBase
     public override Result<Error> EnsureInvariants()
     {
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }
 
         var unavailabilityInvariants = Unavailabilities.EnsureInvariants();
-        if (!unavailabilityInvariants.IsSuccessful)
+        if (unavailabilityInvariants.IsFailure)
         {
             return unavailabilityInvariants.Error;
         }
@@ -111,7 +111,7 @@ public sealed class CarRoot : AggregateRootBase
             case OwnershipChanged changed:
             {
                 var owner = VehicleOwner.Create(changed.Owner);
-                if (!owner.IsSuccessful)
+                if (owner.IsFailure)
                 {
                     return owner.Error;
                 }
@@ -125,19 +125,19 @@ public sealed class CarRoot : AggregateRootBase
             case RegistrationChanged changed:
             {
                 var jurisdiction = Jurisdiction.Create(changed.Jurisdiction);
-                if (!jurisdiction.IsSuccessful)
+                if (jurisdiction.IsFailure)
                 {
                     return jurisdiction.Error;
                 }
 
                 var number = NumberPlate.Create(changed.Number);
-                if (!number.IsSuccessful)
+                if (number.IsFailure)
                 {
                     return number.Error;
                 }
 
                 var plate = LicensePlate.Create(jurisdiction.Value, number.Value);
-                if (!plate.IsSuccessful)
+                if (plate.IsFailure)
                 {
                     return plate.Error;
                 }
@@ -153,7 +153,7 @@ public sealed class CarRoot : AggregateRootBase
             {
                 var unavailability = RaiseEventToChildEntity(isReconstituting, created, idFactory =>
                     Unavailability.Create(Recorder, idFactory, RaiseChangeEvent), e => e.UnavailabilityId!);
-                if (!unavailability.IsSuccessful)
+                if (unavailability.IsFailure)
                 {
                     return unavailability.Error;
                 }
@@ -229,7 +229,7 @@ public sealed class CarRoot : AggregateRootBase
         }
 
         var causedBy = CausedBy.Create(UnavailabilityCausedBy.Reservation, referenceId);
-        if (!causedBy.IsSuccessful)
+        if (causedBy.IsFailure)
         {
             return causedBy.Error;
         }
@@ -237,7 +237,7 @@ public sealed class CarRoot : AggregateRootBase
         var raised =
             RaiseChangeEvent(
                 CarsDomain.Events.UnavailabilitySlotAdded(Id, OrganizationId, slot, causedBy.Value));
-        if (!raised.IsSuccessful)
+        if (raised.IsFailure)
         {
             return raised.Error;
         }
@@ -261,7 +261,7 @@ public sealed class CarRoot : AggregateRootBase
         }
 
         var causedBy = CausedBy.Create(UnavailabilityCausedBy.Maintenance, null);
-        if (!causedBy.IsSuccessful)
+        if (causedBy.IsFailure)
         {
             return causedBy.Error;
         }
@@ -294,7 +294,7 @@ public sealed class CarRoot : AggregateRootBase
         }
 
         var causedBy = CausedBy.Create(UnavailabilityCausedBy.Offline, null);
-        if (!causedBy.IsSuccessful)
+        if (causedBy.IsFailure)
         {
             return causedBy.Error;
         }

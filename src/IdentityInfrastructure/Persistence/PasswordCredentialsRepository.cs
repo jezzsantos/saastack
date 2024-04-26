@@ -68,7 +68,7 @@ public class PasswordCredentialsRepository : IPasswordCredentialsRepository
         CancellationToken cancellationToken)
     {
         var saved = await _credentials.SaveAsync(credential, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -81,7 +81,7 @@ public class PasswordCredentialsRepository : IPasswordCredentialsRepository
         CancellationToken cancellationToken)
     {
         var queried = await _credentialQueries.QueryAsync(query, false, cancellationToken);
-        if (!queried.IsSuccessful)
+        if (queried.IsFailure)
         {
             return queried.Error;
         }
@@ -93,7 +93,7 @@ public class PasswordCredentialsRepository : IPasswordCredentialsRepository
         }
 
         var tokens = await _credentials.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
-        if (!tokens.IsSuccessful)
+        if (tokens.IsFailure)
         {
             return tokens.Error;
         }

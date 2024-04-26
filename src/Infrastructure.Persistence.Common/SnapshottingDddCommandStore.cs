@@ -47,7 +47,7 @@ public sealed class
         var retrieved = await _dataStore.RetrieveAsync(_containerName, id,
             PersistedEntityMetadata.FromType<TAggregateRootOrEntity>(),
             cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -60,7 +60,7 @@ public sealed class
         if (destroy)
         {
             var destroyed = await _dataStore.RemoveAsync(_containerName, id, cancellationToken);
-            if (!destroyed.IsSuccessful)
+            if (destroyed.IsFailure)
             {
                 return destroyed.Error;
             }
@@ -77,7 +77,7 @@ public sealed class
 
         entity.IsDeleted = true;
         var replaced = await _dataStore.ReplaceAsync(_containerName, id, entity, cancellationToken);
-        if (!replaced.IsSuccessful)
+        if (replaced.IsFailure)
         {
             return replaced.Error;
         }
@@ -104,7 +104,7 @@ public sealed class
     {
         var retrieved = await _dataStore.RetrieveAsync(_containerName, id,
             PersistedEntityMetadata.FromType<TAggregateRootOrEntity>(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -135,7 +135,7 @@ public sealed class
         var retrieved = await _dataStore.RetrieveAsync(_containerName, id,
             PersistedEntityMetadata.FromType<TAggregateRootOrEntity>(),
             cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -153,7 +153,7 @@ public sealed class
 
         entity.IsDeleted = false;
         var replaced = await _dataStore.ReplaceAsync(_containerName, id, entity, cancellationToken);
-        if (!replaced.IsSuccessful)
+        if (replaced.IsFailure)
         {
             return replaced.Error;
         }
@@ -172,7 +172,7 @@ public sealed class
 
         var retrieved = await _dataStore.RetrieveAsync(_containerName, entity.Id.Value,
             PersistedEntityMetadata.FromType<TAggregateRootOrEntity>(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -181,7 +181,7 @@ public sealed class
         {
             var added = await _dataStore.AddAsync(_containerName, CommandEntity.FromDomainEntity(entity),
                 cancellationToken);
-            if (!added.IsSuccessful)
+            if (added.IsFailure)
             {
                 return added.Error;
             }
@@ -205,7 +205,7 @@ public sealed class
         }
 
         var replaced = await _dataStore.ReplaceAsync(_containerName, entity.Id.Value, merged, cancellationToken);
-        if (!replaced.IsSuccessful)
+        if (replaced.IsFailure)
         {
             return replaced.Error;
         }
@@ -224,7 +224,7 @@ public sealed class
             var aggregateName = $"{_containerName}_{entity.Id}";
             return Task.FromResult<Result<string, Error>>(aggregateName);
         }, cancellationToken);
-        if (!published.IsSuccessful)
+        if (published.IsFailure)
         {
             return published.Error;
         }

@@ -10,11 +10,11 @@ namespace AncillaryInfrastructure.Api.Usages;
 public sealed class UsagesApi : IWebApiService
 {
     private readonly IAncillaryApplication _ancillaryApplication;
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
 
-    public UsagesApi(ICallerContextFactory contextFactory, IAncillaryApplication ancillaryApplication)
+    public UsagesApi(ICallerContextFactory callerFactory, IAncillaryApplication ancillaryApplication)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _ancillaryApplication = ancillaryApplication;
     }
 
@@ -22,7 +22,7 @@ public sealed class UsagesApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var delivered =
-            await _ancillaryApplication.DeliverUsageAsync(_contextFactory.Create(), request.Message, cancellationToken);
+            await _ancillaryApplication.DeliverUsageAsync(_callerFactory.Create(), request.Message, cancellationToken);
 
         return () => delivered.HandleApplicationResult<bool, DeliverMessageResponse>(_ =>
             new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsDelivered = true }));
@@ -32,7 +32,7 @@ public sealed class UsagesApi : IWebApiService
     public async Task<ApiEmptyResult> DrainAll(DrainAllUsagesRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await _ancillaryApplication.DrainAllUsagesAsync(_contextFactory.Create(), cancellationToken);
+        var result = await _ancillaryApplication.DrainAllUsagesAsync(_callerFactory.Create(), cancellationToken);
 
         return () => result.Match(() => new Result<EmptyResponse, Error>(),
             error => new Result<EmptyResponse, Error>(error));

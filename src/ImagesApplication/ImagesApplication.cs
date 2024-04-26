@@ -31,14 +31,14 @@ public class ImagesApplication : IImagesApplication
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
         var image = retrieved.Value;
         var deleted = image.Delete();
-        if (!deleted.IsSuccessful)
+        if (deleted.IsFailure)
         {
             return deleted.Error;
         }
@@ -52,7 +52,7 @@ public class ImagesApplication : IImagesApplication
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -63,7 +63,7 @@ public class ImagesApplication : IImagesApplication
         //It will ultimately be disposed by FileStreamHttpResult.Execute() after the response is written
         var content = new MemoryStream(); //HACK: possibly a better way to buffer this data in memory?
         var downloaded = await _repository.DownloadImageAsync(image.Id, content, cancellationToken);
-        if (!downloaded.IsSuccessful)
+        if (downloaded.IsFailure)
         {
             return downloaded.Error;
         }
@@ -83,7 +83,7 @@ public class ImagesApplication : IImagesApplication
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -98,7 +98,7 @@ public class ImagesApplication : IImagesApplication
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -107,13 +107,13 @@ public class ImagesApplication : IImagesApplication
         if (description.HasValue())
         {
             var detailed = image.ChangeDetails(description);
-            if (!detailed.IsSuccessful)
+            if (detailed.IsFailure)
             {
                 return detailed.Error;
             }
 
             var saved = await _repository.SaveAsync(image, cancellationToken);
-            if (!saved.IsSuccessful)
+            if (saved.IsFailure)
             {
                 return saved.Error;
             }
@@ -130,14 +130,14 @@ public class ImagesApplication : IImagesApplication
         CancellationToken cancellationToken)
     {
         var created = ImageRoot.Create(_recorder, _idFactory, upload.ContentType);
-        if (!created.IsSuccessful)
+        if (created.IsFailure)
         {
             return created.Error;
         }
 
         var image = created.Value;
         var attributed = image.SetAttributes(upload.Size);
-        if (!attributed.IsSuccessful)
+        if (attributed.IsFailure)
         {
             return attributed.Error;
         }
@@ -145,7 +145,7 @@ public class ImagesApplication : IImagesApplication
         if (description.HasValue())
         {
             var detailed = image.ChangeDetails(description, upload.Filename);
-            if (!detailed.IsSuccessful)
+            if (detailed.IsFailure)
             {
                 return detailed.Error;
             }
@@ -153,13 +153,13 @@ public class ImagesApplication : IImagesApplication
 
         var uploaded =
             await _repository.UploadImageAsync(image.Id, upload.ContentType, upload.Content, cancellationToken);
-        if (!uploaded.IsSuccessful)
+        if (uploaded.IsFailure)
         {
             return uploaded.Error;
         }
 
         var saved = await _repository.SaveAsync(image, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }

@@ -41,7 +41,7 @@ public class EndUserRepository : IEndUserRepository
     public async Task<Result<EndUserRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {
         var user = await _users.LoadAsync(id, cancellationToken);
-        if (!user.IsSuccessful)
+        if (user.IsFailure)
         {
             return user.Error;
         }
@@ -58,7 +58,7 @@ public class EndUserRepository : IEndUserRepository
         CancellationToken cancellationToken)
     {
         var saved = await _users.SaveAsync(user, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -87,7 +87,7 @@ public class EndUserRepository : IEndUserRepository
             .WithSearchOptions(searchOptions);
 
         var queried = await _membershipUserQueries.QueryAsync(query, cancellationToken: cancellationToken);
-        if (!queried.IsSuccessful)
+        if (queried.IsFailure)
         {
             return queried.Error;
         }

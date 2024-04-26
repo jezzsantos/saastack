@@ -24,8 +24,8 @@ public class AuthenticationApiSpec
     {
         _application = new Mock<IAuthenticationApplication>();
         _caller = new Mock<ICallerContext>();
-        var contextFactory = new Mock<ICallerContextFactory>();
-        contextFactory.Setup(ccf => ccf.Create())
+        var callerFactory = new Mock<ICallerContextFactory>();
+        callerFactory.Setup(ccf => ccf.Create())
             .Returns(_caller.Object);
         var httpRequest = new Mock<HttpRequest>();
         _httpRequestCookies = new Mock<IRequestCookieCollection>();
@@ -38,7 +38,7 @@ public class AuthenticationApiSpec
             .Returns(httpRequest.Object);
         httpContextAccessor.Setup(hca => hca.HttpContext!.Response)
             .Returns(httpResponse.Object);
-        _api = new AuthenticationApi(contextFactory.Object, _application.Object, httpContextAccessor.Object);
+        _api = new AuthenticationApi(callerFactory.Object, _application.Object, httpContextAccessor.Object);
     }
 
     [Fact]

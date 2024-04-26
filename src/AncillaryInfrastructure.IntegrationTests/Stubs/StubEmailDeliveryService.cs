@@ -12,7 +12,7 @@ public sealed class StubEmailDeliveryService : IEmailDeliveryService
 
     public Optional<string> LastSubject { get; private set; } = Optional<string>.None;
 
-    public Task<Result<EmailDeliveryReceipt, Error>> DeliverAsync(ICallerContext context, string subject,
+    public Task<Result<EmailDeliveryReceipt, Error>> DeliverAsync(ICallerContext caller, string subject,
         string htmlBody,
         string toEmailAddress, string? toDisplayName,
         string fromEmailAddress, string? fromDisplayName, CancellationToken cancellationToken = default)

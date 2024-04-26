@@ -9,19 +9,19 @@ namespace EndUsersInfrastructure.Api.Memberships;
 
 public class MembershipsApi : IWebApiService
 {
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
     private readonly IEndUsersApplication _endUsersApplication;
 
-    public MembershipsApi(ICallerContextFactory contextFactory, IEndUsersApplication endUsersApplication)
+    public MembershipsApi(ICallerContextFactory callerFactory, IEndUsersApplication endUsersApplication)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _endUsersApplication = endUsersApplication;
     }
 
     public async Task<ApiPutPatchResult<EndUser, GetUserResponse>> ChangeDefaultOrganization(
         ChangeDefaultOrganizationRequest request, CancellationToken cancellationToken)
     {
-        var user = await _endUsersApplication.ChangeDefaultMembershipAsync(_contextFactory.Create(),
+        var user = await _endUsersApplication.ChangeDefaultMembershipAsync(_callerFactory.Create(),
             request.OrganizationId, cancellationToken);
 
         return () => user.HandleApplicationResult<EndUser, GetUserResponse>(x => new GetUserResponse { User = x });
@@ -30,7 +30,7 @@ public class MembershipsApi : IWebApiService
     public async Task<ApiSearchResult<Membership, ListMembershipsForCallerResponse>> ListMembershipsForCaller(
         ListMembershipsForCallerRequest request, CancellationToken cancellationToken)
     {
-        var memberships = await _endUsersApplication.ListMembershipsForCallerAsync(_contextFactory.Create(),
+        var memberships = await _endUsersApplication.ListMembershipsForCallerAsync(_callerFactory.Create(),
             request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
 
         return () => memberships.HandleApplicationResult(ms => new ListMembershipsForCallerResponse

@@ -30,12 +30,12 @@ public class OAuth2HttpServiceClient : IOAuth2Service
         _redirectUri = redirectUri;
     }
 
-    public async Task<Result<List<AuthToken>, Error>> ExchangeCodeForTokensAsync(ICallerContext context,
+    public async Task<Result<List<AuthToken>, Error>> ExchangeCodeForTokensAsync(ICallerContext caller,
         OAuth2CodeTokenExchangeOptions options, CancellationToken cancellationToken)
     {
         try
         {
-            var response = await _serviceClient.PostAsync(context, new ExchangeOAuth2CodeForTokensRequest
+            var response = await _serviceClient.PostAsync(caller, new ExchangeOAuth2CodeForTokensRequest
             {
                 GrantType = "authorization_code",
                 Code = options.Code,
@@ -46,7 +46,7 @@ public class OAuth2HttpServiceClient : IOAuth2Service
             }, null, cancellationToken);
 
             var tokens = new List<AuthToken>();
-            if (!response.IsSuccessful)
+            if (response.IsFailure)
             {
                 return Error.NotAuthenticated(response.Error.Detail ?? response.Error.Title);
             }
@@ -62,7 +62,7 @@ public class OAuth2HttpServiceClient : IOAuth2Service
         }
         catch (Exception ex)
         {
-            _recorder.TraceError(context.ToCall(), ex, "Failed to exchange OAuth2 code with OAuth2 server {Server}",
+            _recorder.TraceError(caller.ToCall(), ex, "Failed to exchange OAuth2 code with OAuth2 server {Server}",
                 options.ServiceName);
             return Error.Unexpected(ex.Message);
         }

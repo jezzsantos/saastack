@@ -10,12 +10,12 @@ namespace IdentityInfrastructure.Api.AuthTokens;
 public class AuthTokensApi : IWebApiService
 {
     private readonly IAuthTokensApplication _authTokensApplication;
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
 
-    public AuthTokensApi(ICallerContextFactory contextFactory,
+    public AuthTokensApi(ICallerContextFactory callerFactory,
         IAuthTokensApplication authTokensApplication)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _authTokensApplication = authTokensApplication;
     }
 
@@ -23,7 +23,7 @@ public class AuthTokensApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var tokens =
-            await _authTokensApplication.RefreshTokenAsync(_contextFactory.Create(), request.RefreshToken,
+            await _authTokensApplication.RefreshTokenAsync(_callerFactory.Create(), request.RefreshToken,
                 cancellationToken);
 
         return () => tokens.HandleApplicationResult<AuthenticateTokens, RefreshTokenResponse>(tok =>
@@ -37,7 +37,7 @@ public class AuthTokensApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var tokens =
-            await _authTokensApplication.RevokeRefreshTokenAsync(_contextFactory.Create(), request.RefreshToken,
+            await _authTokensApplication.RevokeRefreshTokenAsync(_callerFactory.Create(), request.RefreshToken,
                 cancellationToken);
 
         return () => tokens.HandleApplicationResult();

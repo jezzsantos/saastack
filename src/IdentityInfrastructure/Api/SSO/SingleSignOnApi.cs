@@ -9,13 +9,13 @@ namespace IdentityInfrastructure.Api.SSO;
 
 public class SingleSignOnApi : IWebApiService
 {
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
     private readonly ISingleSignOnApplication _singleSignOnApplication;
 
-    public SingleSignOnApi(ICallerContextFactory contextFactory,
+    public SingleSignOnApi(ICallerContextFactory callerFactory,
         ISingleSignOnApplication singleSignOnApplication)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _singleSignOnApplication = singleSignOnApplication;
     }
 
@@ -23,7 +23,7 @@ public class SingleSignOnApi : IWebApiService
         AuthenticateSingleSignOnRequest request, CancellationToken cancellationToken)
     {
         var authenticated =
-            await _singleSignOnApplication.AuthenticateAsync(_contextFactory.Create(), request.InvitationToken,
+            await _singleSignOnApplication.AuthenticateAsync(_callerFactory.Create(), request.InvitationToken,
                 request.Provider,
                 request.AuthCode, request.Username, cancellationToken);
 

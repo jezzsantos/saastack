@@ -112,7 +112,7 @@ public class CarRepository : ICarRepository
         CancellationToken cancellationToken)
     {
         var car = await _cars.LoadAsync(id, cancellationToken);
-        if (!car.IsSuccessful)
+        if (car.IsFailure)
         {
             return car.Error;
         }
@@ -143,7 +143,7 @@ public class CarRepository : ICarRepository
             .Where<string>(u => u.OrganizationId, ConditionOperator.EqualTo, organizationId)
             .AndWhere<string>(u => u.CarId, ConditionOperator.EqualTo, id)
             .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
-        if (!unavailabilities.IsSuccessful)
+        if (unavailabilities.IsFailure)
         {
             return unavailabilities.Error;
         }

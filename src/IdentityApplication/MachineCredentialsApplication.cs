@@ -22,12 +22,12 @@ public class MachineCredentialsApplication : IMachineCredentialsApplication
         _apiKeyService = apiKeyService;
     }
 
-    public async Task<Result<MachineCredential, Error>> RegisterMachineAsync(ICallerContext context, string name,
+    public async Task<Result<MachineCredential, Error>> RegisterMachineAsync(ICallerContext caller, string name,
         string? timezone, string? countryCode, DateTime? apiKeyExpiresOn, CancellationToken cancellationToken)
     {
         var registered =
-            await _endUsersService.RegisterMachinePrivateAsync(context, name, timezone, countryCode, cancellationToken);
-        if (!registered.IsSuccessful)
+            await _endUsersService.RegisterMachinePrivateAsync(caller, name, timezone, countryCode, cancellationToken);
+        if (registered.IsFailure)
         {
             return registered.Error;
         }
@@ -36,21 +36,21 @@ public class MachineCredentialsApplication : IMachineCredentialsApplication
         var description = (machine.Profile.Exists()
             ? machine.Profile?.DisplayName
             : machine.Id) ?? machine.Id;
-        var keys = await _apiKeyService.CreateApiKeyAsync(context, machine.Id, description, apiKeyExpiresOn,
+        var keys = await _apiKeyService.CreateApiKeyAsync(caller, machine.Id, description, apiKeyExpiresOn,
             cancellationToken);
-        if (!keys.IsSuccessful)
+        if (keys.IsFailure)
         {
             return keys.Error;
         }
 
-        _recorder.TraceInformation(context.ToCall(), "Machine {Id} was registered", machine.Id);
+        _recorder.TraceInformation(caller.ToCall(), "Machine {Id} was registered", machine.Id);
 
         var apiKey = keys.Value;
         return new MachineCredential
         {
             Id = machine.Id,
             ApiKey = apiKey.Key,
-            CreatedById = context.CallerId,
+            CreatedById = caller.CallerId,
             ExpiresOnUtc = apiKey.ExpiresOnUtc,
             Description = apiKey.Description
         };

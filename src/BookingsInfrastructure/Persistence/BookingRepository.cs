@@ -34,7 +34,7 @@ public class BookingRepository : IBookingRepository
         CancellationToken cancellationToken)
     {
         var retrieved = await _bookings.GetAsync(id, true, false, cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -45,7 +45,7 @@ public class BookingRepository : IBookingRepository
         }
 
         var deleted = await _bookings.DeleteAsync(id, false, cancellationToken);
-        return !deleted.IsSuccessful
+        return deleted.IsFailure
             ? deleted.Error
             : Result.Ok;
     }
@@ -54,7 +54,7 @@ public class BookingRepository : IBookingRepository
         CancellationToken cancellationToken)
     {
         var retrieved = await _bookings.GetAsync(id, true, false, cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -66,7 +66,7 @@ public class BookingRepository : IBookingRepository
         CancellationToken cancellationToken)
     {
         var upserted = await _bookings.UpsertAsync(booking, false, cancellationToken);
-        if (!upserted.IsSuccessful)
+        if (upserted.IsFailure)
         {
             return upserted.Error;
         }
@@ -88,7 +88,7 @@ public class BookingRepository : IBookingRepository
             .AndWhere<DateTime>(u => u.Start, ConditionOperator.GreaterThanEqualTo, from)
             .AndWhere<DateTime>(u => u.End, ConditionOperator.LessThanEqualTo, to)
             .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
-        if (!queried.IsSuccessful)
+        if (queried.IsFailure)
         {
             return queried.Error;
         }

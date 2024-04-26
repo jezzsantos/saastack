@@ -588,11 +588,11 @@ public class MinimalApiMediatRGeneratorSpec
                                                 }
                                                 public class AServiceClass : IWebApiService
                                                 {
-                                                    private readonly ICallerContextFactory _contextFactory;
+                                                    private readonly ICallerContextFactory _callerFactory;
                                                     
-                                                    public CarsApi(ICallerContextFactory contextFactory)
+                                                    public CarsApi(ICallerContextFactory callerFactory)
                                                     {
-                                                        _contextFactory = contextFactory;
+                                                        _callerFactory = callerFactory;
                                                         _carsApplication = carsApplication;
                                                     }
                                                 
@@ -650,9 +650,9 @@ public class MinimalApiMediatRGeneratorSpec
                 
                         public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
                         {
-                            var contextFactory = _serviceProvider.GetRequiredService<<global namespace>.ICallerContextFactory>();
+                            var callerFactory = _serviceProvider.GetRequiredService<<global namespace>.ICallerContextFactory>();
                 
-                            var api = new global::ANamespace.AServiceClass(contextFactory);
+                            var api = new global::ANamespace.AServiceClass(callerFactory);
                             var result = await api.AMethod(request, cancellationToken);
                             return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
                         }

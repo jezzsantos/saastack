@@ -10,13 +10,13 @@ namespace IdentityInfrastructure.Api.PasswordCredentials;
 
 public class PasswordCredentialsApi : IWebApiService
 {
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
     private readonly IPasswordCredentialsApplication _passwordCredentialsApplication;
 
-    public PasswordCredentialsApi(ICallerContextFactory contextFactory,
+    public PasswordCredentialsApi(ICallerContextFactory callerFactory,
         IPasswordCredentialsApplication passwordCredentialsApplication)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _passwordCredentialsApplication = passwordCredentialsApplication;
     }
 
@@ -25,7 +25,7 @@ public class PasswordCredentialsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var authenticated =
-            await _passwordCredentialsApplication.AuthenticateAsync(_contextFactory.Create(), request.Username,
+            await _passwordCredentialsApplication.AuthenticateAsync(_callerFactory.Create(), request.Username,
                 request.Password,
                 cancellationToken);
 
@@ -39,7 +39,7 @@ public class PasswordCredentialsApi : IWebApiService
     public async Task<ApiEmptyResult> CompletePasswordReset(CompletePasswordResetRequest request,
         CancellationToken cancellationToken)
     {
-        var completion = await _passwordCredentialsApplication.CompletePasswordResetAsync(_contextFactory.Create(),
+        var completion = await _passwordCredentialsApplication.CompletePasswordResetAsync(_callerFactory.Create(),
             request.Token, request.Password, cancellationToken);
 
         return () => completion.HandleApplicationResult();
@@ -49,7 +49,7 @@ public class PasswordCredentialsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var result =
-            await _passwordCredentialsApplication.ConfirmPersonRegistrationAsync(_contextFactory.Create(),
+            await _passwordCredentialsApplication.ConfirmPersonRegistrationAsync(_callerFactory.Create(),
                 request.Token,
                 cancellationToken);
 
@@ -63,7 +63,7 @@ public class PasswordCredentialsApi : IWebApiService
             GetRegistrationPersonConfirmationRequest request, CancellationToken cancellationToken)
     {
         var token = await _passwordCredentialsApplication.GetPersonRegistrationConfirmationAsync(
-            _contextFactory.Create(),
+            _callerFactory.Create(),
             request.UserId, cancellationToken);
 
         return () =>
@@ -76,7 +76,7 @@ public class PasswordCredentialsApi : IWebApiService
     public async Task<ApiPostResult<PasswordCredential, RegisterPersonPasswordResponse>> RegisterPerson(
         RegisterPersonPasswordRequest request, CancellationToken cancellationToken)
     {
-        var credential = await _passwordCredentialsApplication.RegisterPersonAsync(_contextFactory.Create(),
+        var credential = await _passwordCredentialsApplication.RegisterPersonAsync(_callerFactory.Create(),
             request.InvitationToken,
             request.FirstName, request.LastName, request.EmailAddress, request.Password, request.Timezone,
             request.CountryCode, request.TermsAndConditionsAccepted, cancellationToken);
@@ -88,7 +88,7 @@ public class PasswordCredentialsApi : IWebApiService
     public async Task<ApiEmptyResult> RequestPasswordReset(InitiatePasswordResetRequest request,
         CancellationToken cancellationToken)
     {
-        var reset = await _passwordCredentialsApplication.InitiatePasswordResetAsync(_contextFactory.Create(),
+        var reset = await _passwordCredentialsApplication.InitiatePasswordResetAsync(_callerFactory.Create(),
             request.EmailAddress, cancellationToken);
 
         return () => reset.HandleApplicationResult();
@@ -98,7 +98,7 @@ public class PasswordCredentialsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var resent =
-            await _passwordCredentialsApplication.ResendPasswordResetAsync(_contextFactory.Create(), request.Token,
+            await _passwordCredentialsApplication.ResendPasswordResetAsync(_callerFactory.Create(), request.Token,
                 cancellationToken);
 
         return () => resent.HandleApplicationResult();
@@ -108,7 +108,7 @@ public class PasswordCredentialsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var verified =
-            await _passwordCredentialsApplication.VerifyPasswordResetAsync(_contextFactory.Create(), request.Token,
+            await _passwordCredentialsApplication.VerifyPasswordResetAsync(_callerFactory.Create(), request.Token,
                 cancellationToken);
 
         return () => verified.HandleApplicationResult();

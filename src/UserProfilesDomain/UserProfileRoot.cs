@@ -60,7 +60,7 @@ public sealed class UserProfileRoot : AggregateRootBase
     public override Result<Error> EnsureInvariants()
     {
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }
@@ -92,7 +92,7 @@ public sealed class UserProfileRoot : AggregateRootBase
                 UserId = created.UserId.ToId();
                 Type = created.Type.ToEnumOrDefault(ProfileType.Person);
                 var name = PersonName.Create(created.FirstName, created.LastName);
-                if (!name.IsSuccessful)
+                if (name.IsFailure)
                 {
                     return name.Error;
                 }
@@ -100,7 +100,7 @@ public sealed class UserProfileRoot : AggregateRootBase
                 Name = name.Value;
 
                 var displayName = PersonDisplayName.Create(created.DisplayName);
-                if (!displayName.IsSuccessful)
+                if (displayName.IsFailure)
                 {
                     return displayName.Error;
                 }
@@ -117,7 +117,7 @@ public sealed class UserProfileRoot : AggregateRootBase
             case EmailAddressChanged changed:
             {
                 var email = Domain.Shared.EmailAddress.Create(changed.EmailAddress);
-                if (!email.IsSuccessful)
+                if (email.IsFailure)
                 {
                     return email.Error;
                 }
@@ -132,7 +132,7 @@ public sealed class UserProfileRoot : AggregateRootBase
             {
                 var address = Address.Create(changed.Line1, changed.Line2, changed.Line3, changed.City, changed.State,
                     CountryCodes.FindOrDefault(changed.CountryCode), changed.Zip);
-                if (!address.IsSuccessful)
+                if (address.IsFailure)
                 {
                     return address.Error;
                 }
@@ -145,7 +145,7 @@ public sealed class UserProfileRoot : AggregateRootBase
             case TimezoneChanged changed:
             {
                 var timezone = Timezone.Create(changed.Timezone);
-                if (!timezone.IsSuccessful)
+                if (timezone.IsFailure)
                 {
                     return timezone.Error;
                 }
@@ -158,7 +158,7 @@ public sealed class UserProfileRoot : AggregateRootBase
             case NameChanged changed:
             {
                 var name = PersonName.Create(changed.FirstName, changed.LastName);
-                if (!name.IsSuccessful)
+                if (name.IsFailure)
                 {
                     return name.Error;
                 }
@@ -171,7 +171,7 @@ public sealed class UserProfileRoot : AggregateRootBase
             case DisplayNameChanged changed:
             {
                 var name = PersonDisplayName.Create(changed.DisplayName);
-                if (!name.IsSuccessful)
+                if (name.IsFailure)
                 {
                     return name.Error;
                 }
@@ -184,7 +184,7 @@ public sealed class UserProfileRoot : AggregateRootBase
             case PhoneNumberChanged changed:
             {
                 var number = Domain.Shared.PhoneNumber.Create(changed.Number);
-                if (!number.IsSuccessful)
+                if (number.IsFailure)
                 {
                     return number.Error;
                 }
@@ -197,7 +197,7 @@ public sealed class UserProfileRoot : AggregateRootBase
             case AvatarAdded added:
             {
                 var avatar = Domain.Shared.Avatar.Create(added.AvatarId.ToId(), added.AvatarUrl);
-                if (!avatar.IsSuccessful)
+                if (avatar.IsFailure)
                 {
                     return avatar.Error;
                 }
@@ -244,7 +244,7 @@ public sealed class UserProfileRoot : AggregateRootBase
             ? Avatar.Value.ImageId.ToOptional()
             : Optional<Identifier>.None;
         var created = await onCreateNew(Domain.Shared.Name.Create(DisplayName.Value.Text).Value);
-        if (!created.IsSuccessful)
+        if (created.IsFailure)
         {
             return created.Error;
         }
@@ -252,7 +252,7 @@ public sealed class UserProfileRoot : AggregateRootBase
         if (existingAvatarId.HasValue)
         {
             var removed = await onRemoveOld(existingAvatarId.Value);
-            if (!removed.IsSuccessful)
+            if (removed.IsFailure)
             {
                 return removed.Error;
             }
@@ -326,7 +326,7 @@ public sealed class UserProfileRoot : AggregateRootBase
 
         var avatarId = Avatar.Value.ImageId;
         var removed = await onRemoveOld(avatarId);
-        if (!removed.IsSuccessful)
+        if (removed.IsFailure)
         {
             return removed.Error;
         }

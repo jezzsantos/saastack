@@ -54,7 +54,7 @@ public class InvitationRepository : IInvitationRepository
     public async Task<Result<EndUserRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {
         var user = await _users.LoadAsync(id, cancellationToken);
-        if (!user.IsSuccessful)
+        if (user.IsFailure)
         {
             return user.Error;
         }
@@ -65,7 +65,7 @@ public class InvitationRepository : IInvitationRepository
     public async Task<Result<EndUserRoot, Error>> SaveAsync(EndUserRoot user, CancellationToken cancellationToken)
     {
         var saved = await _users.SaveAsync(user, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -77,7 +77,7 @@ public class InvitationRepository : IInvitationRepository
         CancellationToken cancellationToken)
     {
         var queried = await _invitationQueries.QueryAsync(query, false, cancellationToken);
-        if (!queried.IsSuccessful)
+        if (queried.IsFailure)
         {
             return queried.Error;
         }
@@ -89,7 +89,7 @@ public class InvitationRepository : IInvitationRepository
         }
 
         var users = await _users.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
-        if (!users.IsSuccessful)
+        if (users.IsFailure)
         {
             return users.Error;
         }

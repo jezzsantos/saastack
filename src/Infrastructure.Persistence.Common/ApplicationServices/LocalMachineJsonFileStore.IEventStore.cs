@@ -32,7 +32,7 @@ public partial class LocalMachineJsonFileStore : IEventStore
             : Optional<int>.None;
         var concurrencyCheck =
             this.VerifyConcurrencyCheck(streamName, latestStoredEventVersion, Enumerable.First(events).Version);
-        if (!concurrencyCheck.IsSuccessful)
+        if (concurrencyCheck.IsFailure)
         {
             return Task.FromResult<Result<string, Error>>(concurrencyCheck.Error);
         }

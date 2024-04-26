@@ -26,7 +26,7 @@ public class FakeSSOAuthenticationProvider : ISSOAuthenticationProvider
         _auth2Service = auth2Service;
     }
 
-    public async Task<Result<SSOUserInfo, Error>> AuthenticateAsync(ICallerContext context, string authCode,
+    public async Task<Result<SSOUserInfo, Error>> AuthenticateAsync(ICallerContext caller, string authCode,
         string? emailAddress, CancellationToken cancellationToken)
     {
         if (emailAddress.HasNoValue())
@@ -35,10 +35,10 @@ public class FakeSSOAuthenticationProvider : ISSOAuthenticationProvider
         }
 
         var retrievedTokens =
-            await _auth2Service.ExchangeCodeForTokensAsync(context,
+            await _auth2Service.ExchangeCodeForTokensAsync(caller,
                 new OAuth2CodeTokenExchangeOptions(ServiceName, authCode, emailAddress),
                 cancellationToken);
-        if (!retrievedTokens.IsSuccessful)
+        if (retrievedTokens.IsFailure)
         {
             return Error.NotAuthenticated();
         }

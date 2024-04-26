@@ -40,6 +40,11 @@ public readonly struct Result<TError>
     public bool IsSuccessful => !_error.HasValue;
 
     /// <summary>
+    ///     Whether the contained result has an error
+    /// </summary>
+    public bool IsFailure => !IsSuccessful;
+
+    /// <summary>
     ///     Returns the contained <see cref="Error" /> if there is one
     /// </summary>
     /// <exception cref="InvalidOperationException">If the result is not in a faulted state</exception>
@@ -70,7 +75,7 @@ public readonly struct Result<TError>
     /// </summary>
     public bool TryGetError(out TError? error)
     {
-        if (!IsSuccessful)
+        if (IsFailure)
         {
             error = _error!.Value;
             return true;
@@ -158,6 +163,14 @@ public readonly struct Result<TValue, TError>
     }
 
     /// <summary>
+    ///     Whether the contained result has an error
+    /// </summary>
+    public bool IsFailure
+    {
+        [DebuggerStepThrough] get => !IsSuccessful;
+    }
+
+    /// <summary>
     ///     Returns the contained <see cref="Value" /> if there is one
     /// </summary>
     /// <exception cref="InvalidOperationException">If the result is in a faulted state</exception>
@@ -166,7 +179,7 @@ public readonly struct Result<TValue, TError>
         [DebuggerStepThrough]
         get
         {
-            if (!IsSuccessful)
+            if (IsFailure)
             {
                 var errorDescription = _error!.HasValue
                     ? _error.Value.ToJson()!
@@ -252,7 +265,7 @@ public readonly struct Result<TValue, TError>
     /// </summary>
     public bool TryGetError(out TError? error)
     {
-        if (!IsSuccessful)
+        if (IsFailure)
         {
             error = _error!.Value;
             return true;

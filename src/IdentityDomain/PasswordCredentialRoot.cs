@@ -92,7 +92,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
     public override Result<Error> EnsureInvariants()
     {
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }
@@ -130,7 +130,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
             case CredentialsChanged changed:
             {
                 var set = Password.SetPassword(_passwordHasherService, changed.PasswordHash);
-                if (!set.IsSuccessful)
+                if (set.IsFailure)
                 {
                     return set.Error;
                 }
@@ -143,7 +143,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
             case RegistrationChanged changed:
             {
                 var registration = IdentityDomain.Registration.Create(changed.EmailAddress, changed.Name);
-                if (!registration.IsSuccessful)
+                if (registration.IsFailure)
                 {
                     return registration.Error;
                 }
@@ -195,7 +195,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
             case PasswordResetInitiated changed:
             {
                 var reset = Password.InitiatePasswordReset(changed.Token);
-                if (!reset.IsSuccessful)
+                if (reset.IsFailure)
                 {
                     return reset.Error;
                 }
@@ -208,7 +208,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
             case PasswordResetCompleted changed:
             {
                 var reset = Password.CompletePasswordReset(_passwordHasherService, changed.Token, changed.PasswordHash);
-                if (!reset.IsSuccessful)
+                if (reset.IsFailure)
                 {
                     return reset.Error;
                 }
@@ -261,7 +261,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
         var passwordHash = _passwordHasherService.HashPassword(password);
         var completed = RaiseChangeEvent(
             IdentityDomain.Events.PasswordCredentials.PasswordResetCompleted(Id, token, passwordHash));
-        if (!completed.IsSuccessful)
+        if (completed.IsFailure)
         {
             return completed.Error;
         }
@@ -368,7 +368,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
         }
 
         var verify = Password.Verify(_passwordHasherService, password);
-        if (!verify.IsSuccessful)
+        if (verify.IsFailure)
         {
             return verify.Error;
         }
@@ -377,7 +377,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
         var raised =
             RaiseChangeEvent(
                 IdentityDomain.Events.PasswordCredentials.PasswordVerified(Id, isVerified, auditAttempt));
-        if (!raised.IsSuccessful)
+        if (raised.IsFailure)
         {
             return raised.Error;
         }
@@ -385,7 +385,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
         if (Login.HasJustLocked)
         {
             var locked = RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.AccountLocked(Id));
-            if (!locked.IsSuccessful)
+            if (locked.IsFailure)
             {
                 return locked.Error;
             }
@@ -394,7 +394,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
         if (Login.HasJustUnlocked)
         {
             var unlocked = RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.AccountUnlocked(Id));
-            if (!unlocked.IsSuccessful)
+            if (unlocked.IsFailure)
             {
                 return unlocked.Error;
             }
@@ -406,7 +406,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
     public Result<Error> VerifyPasswordReset(string token)
     {
         var verified = Password.VerifyReset(token);
-        if (!verified.IsSuccessful)
+        if (verified.IsFailure)
         {
             return verified.Error;
         }

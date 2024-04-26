@@ -15,9 +15,9 @@ public class OrganizationProvisioningNotificationService : IProvisioningNotifica
         _organizationsService = organizationsService;
     }
 
-    public async Task<Result<Error>> NotifyAsync(ICallerContext context, string tenantId,
+    public async Task<Result<Error>> NotifyAsync(ICallerContext caller, string tenantId,
         TenantSettings settings, CancellationToken cancellationToken)
     {
-        return await _organizationsService.ChangeSettingsPrivateAsync(context, tenantId, settings, cancellationToken);
+        return await _organizationsService.ChangeSettingsPrivateAsync(caller, tenantId, settings, cancellationToken);
     }
 }

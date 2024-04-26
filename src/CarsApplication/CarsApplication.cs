@@ -28,14 +28,14 @@ public class CarsApplication : ICarsApplication
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
         var car = retrieved.Value;
         var deleted = car.Delete(caller.ToCallerId());
-        if (!deleted.IsSuccessful)
+        if (deleted.IsFailure)
         {
             return deleted.Error;
         }
@@ -48,7 +48,7 @@ public class CarsApplication : ICarsApplication
         CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -71,19 +71,19 @@ public class CarsApplication : ICarsApplication
 
         var car = retrieved.Value;
         var timeSlot = TimeSlot.Create(fromUtc, toUtc);
-        if (!timeSlot.IsSuccessful)
+        if (timeSlot.IsFailure)
         {
             return timeSlot.Error;
         }
 
         var changed = car.ScheduleMaintenance(timeSlot.Value);
-        if (!changed.IsSuccessful)
+        if (changed.IsFailure)
         {
             return changed.Error;
         }
 
-        var updated = await _repository.SaveAsync(car, cancellationToken);
-        return updated.Match<Result<Car, Error>>(c =>
+        var saved = await _repository.SaveAsync(car, cancellationToken);
+        return saved.Match<Result<Car, Error>>(c =>
         {
             _recorder.TraceInformation(caller.ToCall(), "Car {Id} was scheduled for maintenance from {From} until {To}",
                 car.Id, fromUtc, toUtc);
@@ -95,62 +95,62 @@ public class CarsApplication : ICarsApplication
         string model, int year, string location, string plate, CancellationToken cancellationToken)
     {
         var retrieved = CarRoot.Create(_recorder, _idFactory, organizationId.ToId());
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
         var car = retrieved.Value;
         var manufacturer = Manufacturer.Create(year, make, model);
-        if (!manufacturer.IsSuccessful)
+        if (manufacturer.IsFailure)
         {
             return manufacturer.Error;
         }
 
         var manufactured = car.SetManufacturer(manufacturer.Value);
-        if (!manufactured.IsSuccessful)
+        if (manufactured.IsFailure)
         {
             return manufactured.Error;
         }
 
         var ownerId = VehicleOwner.Create(caller.ToCallerId());
-        if (!ownerId.IsSuccessful)
+        if (ownerId.IsFailure)
         {
             return ownerId.Error;
         }
 
         var ownership = car.SetOwnership(ownerId.Value);
-        if (!ownership.IsSuccessful)
+        if (ownership.IsFailure)
         {
             return ownership.Error;
         }
 
         var jurisdiction = Jurisdiction.Create(location);
-        if (!jurisdiction.IsSuccessful)
+        if (jurisdiction.IsFailure)
         {
             return jurisdiction.Error;
         }
 
         var numberPlate = NumberPlate.Create(plate);
-        if (!numberPlate.IsSuccessful)
+        if (numberPlate.IsFailure)
         {
             return numberPlate.Error;
         }
 
         var license = LicensePlate.Create(jurisdiction.Value, numberPlate.Value);
-        if (!license.IsSuccessful)
+        if (license.IsFailure)
         {
             return license.Error;
         }
 
         var registration = car.ChangeRegistration(license.Value);
-        if (!registration.IsSuccessful)
+        if (registration.IsFailure)
         {
             return registration.Error;
         }
 
-        var updated = await _repository.SaveAsync(car, cancellationToken);
-        return updated.Match<Result<Car, Error>>(c =>
+        var saved = await _repository.SaveAsync(car, cancellationToken);
+        return saved.Match<Result<Car, Error>>(c =>
         {
             _recorder.TraceInformation(caller.ToCall(), "Car {Id} was registered", c.Value.Id);
             return c.Value.ToCar();
@@ -168,19 +168,19 @@ public class CarsApplication : ICarsApplication
 
         var car = retrieved.Value;
         var slot = TimeSlot.Create(fromUtc, toUtc);
-        if (!slot.IsSuccessful)
+        if (slot.IsFailure)
         {
             return slot.Error;
         }
 
         var released = car.ReleaseUnavailability(slot.Value);
-        if (!released.IsSuccessful)
+        if (released.IsFailure)
         {
             return released.Error;
         }
 
-        var updated = await _repository.SaveAsync(car, cancellationToken);
-        return updated.Match<Result<Car, Error>>(c =>
+        var saved = await _repository.SaveAsync(car, cancellationToken);
+        return saved.Match<Result<Car, Error>>(c =>
         {
             _recorder.TraceInformation(caller.ToCall(), "Car {Id} was made available from {From} until {To}",
                 car.Id, fromUtc, toUtc);
@@ -199,13 +199,13 @@ public class CarsApplication : ICarsApplication
 
         var car = retrieved.Value;
         var slot = TimeSlot.Create(fromUtc, toUtc);
-        if (!slot.IsSuccessful)
+        if (slot.IsFailure)
         {
             return slot.Error;
         }
 
         var availability = car.ReserveIfAvailable(slot.Value, referenceId);
-        if (!availability.IsSuccessful)
+        if (availability.IsFailure)
         {
             return availability.Error;
         }
@@ -216,8 +216,8 @@ public class CarsApplication : ICarsApplication
             return false;
         }
 
-        var updated = await _repository.SaveAsync(car, cancellationToken);
-        return updated.Match<Result<bool, Error>>(_ =>
+        var saved = await _repository.SaveAsync(car, cancellationToken);
+        return saved.Match<Result<bool, Error>>(_ =>
         {
             _recorder.TraceInformation(caller.ToCall(), "Car {Id} was reserved from {From} until {To}",
                 car.Id, fromUtc, toUtc);
@@ -233,7 +233,7 @@ public class CarsApplication : ICarsApplication
             fromUtc ?? DateTime.MinValue,
             toUtc ?? DateTime.MaxValue, searchOptions,
             cancellationToken);
-        if (!searched.IsSuccessful)
+        if (searched.IsFailure)
         {
             return searched.Error;
         }
@@ -248,7 +248,7 @@ public class CarsApplication : ICarsApplication
         string organizationId, SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken)
     {
         var searched = await _repository.SearchAllCarsAsync(organizationId.ToId(), searchOptions, cancellationToken);
-        if (!searched.IsSuccessful)
+        if (searched.IsFailure)
         {
             return searched.Error;
         }
@@ -268,7 +268,7 @@ public class CarsApplication : ICarsApplication
         var searched = await _repository.SearchAllCarUnavailabilitiesAsync(organizationId.ToId(), carId.ToId(),
             searchOptions,
             cancellationToken);
-        if (!searched.IsSuccessful)
+        if (searched.IsFailure)
         {
             return searched.Error;
         }
@@ -292,19 +292,19 @@ public class CarsApplication : ICarsApplication
 
         var car = retrieved.Value;
         var timeSlot = TimeSlot.Create(fromUtc.GetValueOrDefault(), toUtc.GetValueOrDefault());
-        if (!timeSlot.IsSuccessful)
+        if (timeSlot.IsFailure)
         {
             return timeSlot.Error;
         }
 
-        var changed = car.TakeOffline(timeSlot.Value);
-        if (!changed.IsSuccessful)
+        var offlined = car.TakeOffline(timeSlot.Value);
+        if (offlined.IsFailure)
         {
-            return changed.Error;
+            return offlined.Error;
         }
 
-        var updated = await _repository.SaveAsync(car, cancellationToken);
-        return updated.Match<Result<Car, Error>>(c =>
+        var saved = await _repository.SaveAsync(car, cancellationToken);
+        return saved.Match<Result<Car, Error>>(c =>
         {
             _recorder.TraceInformation(caller.ToCall(), "Car {Id} was taken offline", car.Id);
             return c.Value.ToCar();

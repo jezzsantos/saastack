@@ -15,11 +15,11 @@ public class RecordingApplication : IRecordingApplication
         _recorder = recorder;
     }
 
-    public Task<Result<Error>> RecordMeasurementAsync(ICallerContext context, string eventName,
+    public Task<Result<Error>> RecordMeasurementAsync(ICallerContext caller, string eventName,
         Dictionary<string, object?>? additional,
         CancellationToken cancellationToken)
     {
-        _recorder.Measure(context.ToCall(), eventName, (additional.Exists()
+        _recorder.Measure(caller.ToCall(), eventName, (additional.Exists()
             ? additional
                 .Where(pair => pair.Value.Exists())
                 .ToDictionary(pair => pair.Key, pair => pair.Value)
@@ -28,11 +28,11 @@ public class RecordingApplication : IRecordingApplication
         return Task.FromResult(Result.Ok);
     }
 
-    public Task<Result<Error>> RecordUsageAsync(ICallerContext context, string eventName,
+    public Task<Result<Error>> RecordUsageAsync(ICallerContext caller, string eventName,
         Dictionary<string, object?>? additional,
         CancellationToken cancellationToken)
     {
-        _recorder.TrackUsage(context.ToCall(), eventName, (additional.Exists()
+        _recorder.TrackUsage(caller.ToCall(), eventName, (additional.Exists()
             ? additional
                 .Where(pair => pair.Value.Exists())
                 .ToDictionary(pair => pair.Key, pair => pair.Value)

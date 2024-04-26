@@ -6,12 +6,12 @@ namespace AncillaryApplication;
 
 public interface IFeatureFlagsApplication
 {
-    Task<Result<List<FeatureFlag>, Error>> GetAllFeatureFlagsAsync(ICallerContext context,
+    Task<Result<List<FeatureFlag>, Error>> GetAllFeatureFlagsAsync(ICallerContext caller,
         CancellationToken cancellationToken);
 
-    Task<Result<FeatureFlag, Error>> GetFeatureFlagAsync(ICallerContext context, string name, string? tenantId,
+    Task<Result<FeatureFlag, Error>> GetFeatureFlagAsync(ICallerContext caller, string name, string? tenantId,
         string userId, CancellationToken cancellationToken);
 
-    Task<Result<FeatureFlag, Error>> GetFeatureFlagForCallerAsync(ICallerContext context, string name,
+    Task<Result<FeatureFlag, Error>> GetFeatureFlagForCallerAsync(ICallerContext caller, string name,
         CancellationToken cancellationToken);
 }

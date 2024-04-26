@@ -8,19 +8,19 @@ namespace AncillaryInfrastructure.Api.Recording;
 
 public sealed class RecordingApi : IWebApiService
 {
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
     private readonly IRecordingApplication _recordingApplication;
 
-    public RecordingApi(ICallerContextFactory contextFactory, IRecordingApplication recordingApplication)
+    public RecordingApi(ICallerContextFactory callerFactory, IRecordingApplication recordingApplication)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _recordingApplication = recordingApplication;
     }
 
     public async Task<ApiEmptyResult> RecordMeasurement(RecordMeasureRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await _recordingApplication.RecordMeasurementAsync(_contextFactory.Create(), request.EventName,
+        var result = await _recordingApplication.RecordMeasurementAsync(_callerFactory.Create(), request.EventName,
             request.Additional,
             cancellationToken);
 
@@ -31,7 +31,7 @@ public sealed class RecordingApi : IWebApiService
     public async Task<ApiEmptyResult> RecordUsage(RecordUseRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await _recordingApplication.RecordUsageAsync(_contextFactory.Create(), request.EventName,
+        var result = await _recordingApplication.RecordUsageAsync(_callerFactory.Create(), request.EventName,
             request.Additional,
             cancellationToken);
 

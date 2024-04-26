@@ -122,7 +122,7 @@ public class AWSSQSQueueStore : IQueueStore
         }
 
         var retrieved = await GetNextMessageAsync(queueUrl, cancellationToken);
-        if (!retrieved.IsSuccessful || !retrieved.Value.HasValue)
+        if (retrieved.IsFailure || !retrieved.Value.HasValue)
         {
             return false;
         }
@@ -131,7 +131,7 @@ public class AWSSQSQueueStore : IQueueStore
         try
         {
             var handled = await messageHandlerAsync(queueMessage.Body, cancellationToken);
-            if (!handled.IsSuccessful)
+            if (handled.IsFailure)
             {
                 await ReturnMessageToQueueForNextPopAsync(queueUrl, queueMessage, cancellationToken);
 
@@ -164,7 +164,7 @@ public class AWSSQSQueueStore : IQueueStore
         if (!queueUrl.HasValue)
         {
             var created = await CreateQueueAsync(queueName, cancellationToken);
-            if (!created.IsSuccessful)
+            if (created.IsFailure)
             {
                 return created.Error;
             }
@@ -228,7 +228,7 @@ public class AWSSQSQueueStore : IQueueStore
     {
         var sanitizedQueueName = queueName.SanitizeAndValidateQueueName();
         var created = await CreateDeadLetterQueueAsync(sanitizedQueueName, cancellationToken);
-        if (!created.IsSuccessful)
+        if (created.IsFailure)
         {
             return created.Error;
         }

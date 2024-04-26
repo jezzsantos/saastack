@@ -11,24 +11,24 @@ namespace OrganizationsInfrastructure.Api.Organizations;
 
 public class OrganizationsApi : IWebApiService
 {
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
     private readonly IFileUploadService _fileUploadService;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IOrganizationsApplication _organizationsApplication;
 
     public OrganizationsApi(IHttpContextAccessor httpContextAccessor, IFileUploadService fileUploadService,
-        ICallerContextFactory contextFactory, IOrganizationsApplication organizationsApplication)
+        ICallerContextFactory callerFactory, IOrganizationsApplication organizationsApplication)
     {
         _httpContextAccessor = httpContextAccessor;
         _fileUploadService = fileUploadService;
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _organizationsApplication = organizationsApplication;
     }
 
     public async Task<ApiPutPatchResult<Organization, GetOrganizationResponse>> AssignRoles(
         AssignRolesToOrganizationRequest request, CancellationToken cancellationToken)
     {
-        var organization = await _organizationsApplication.AssignRolesToOrganizationAsync(_contextFactory.Create(),
+        var organization = await _organizationsApplication.AssignRolesToOrganizationAsync(_callerFactory.Create(),
             request.Id!, request.UserId, request.Roles, cancellationToken);
 
         return () =>
@@ -42,13 +42,13 @@ public class OrganizationsApi : IWebApiService
         var httpRequest = _httpContextAccessor.HttpContext!.Request;
         var uploaded = httpRequest.GetUploadedFile(_fileUploadService, Validations.Avatar.MaxSizeInBytes,
             Validations.Avatar.AllowableContentTypes);
-        if (!uploaded.IsSuccessful)
+        if (uploaded.IsFailure)
         {
             return () => uploaded.Error;
         }
 
         var org =
-            await _organizationsApplication.ChangeAvatarAsync(_contextFactory.Create(), request.Id!,
+            await _organizationsApplication.ChangeAvatarAsync(_callerFactory.Create(), request.Id!,
                 uploaded.Value, cancellationToken);
 
         return () =>
@@ -59,7 +59,7 @@ public class OrganizationsApi : IWebApiService
     public async Task<ApiPutPatchResult<Organization, GetOrganizationResponse>> ChangeOrganization(
         ChangeOrganizationRequest request, CancellationToken cancellationToken)
     {
-        var organization = await _organizationsApplication.ChangeDetailsAsync(_contextFactory.Create(),
+        var organization = await _organizationsApplication.ChangeDetailsAsync(_callerFactory.Create(),
             request.Id!, request.Name, cancellationToken);
 
         return () =>
@@ -72,7 +72,7 @@ public class OrganizationsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var organization =
-            await _organizationsApplication.CreateSharedOrganizationAsync(_contextFactory.Create(), request.Name,
+            await _organizationsApplication.CreateSharedOrganizationAsync(_callerFactory.Create(), request.Name,
                 cancellationToken);
 
         return () => organization.HandleApplicationResult<Organization, GetOrganizationResponse>(org =>
@@ -82,7 +82,7 @@ public class OrganizationsApi : IWebApiService
     public async Task<ApiDeleteResult> Delete(DeleteOrganizationRequest request, CancellationToken cancellationToken)
     {
         var organization =
-            await _organizationsApplication.DeleteOrganizationAsync(_contextFactory.Create(), request.Id,
+            await _organizationsApplication.DeleteOrganizationAsync(_callerFactory.Create(), request.Id,
                 cancellationToken);
 
         return () => organization.HandleApplicationResult();
@@ -91,7 +91,7 @@ public class OrganizationsApi : IWebApiService
     public async Task<ApiResult<Organization, GetOrganizationResponse>> DeleteAvatar(
         DeleteOrganizationAvatarRequest request, CancellationToken cancellationToken)
     {
-        var org = await _organizationsApplication.DeleteAvatarAsync(_contextFactory.Create(), request.Id!,
+        var org = await _organizationsApplication.DeleteAvatarAsync(_callerFactory.Create(), request.Id!,
             cancellationToken);
 
         return () =>
@@ -103,7 +103,7 @@ public class OrganizationsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var organization =
-            await _organizationsApplication.GetOrganizationAsync(_contextFactory.Create(), request.Id!,
+            await _organizationsApplication.GetOrganizationAsync(_callerFactory.Create(), request.Id!,
                 cancellationToken);
 
         return () =>
@@ -116,7 +116,7 @@ public class OrganizationsApi : IWebApiService
         GetOrganizationSettingsRequest request, CancellationToken cancellationToken)
     {
         var organization =
-            await _organizationsApplication.GetOrganizationSettingsAsync(_contextFactory.Create(), request.Id!,
+            await _organizationsApplication.GetOrganizationSettingsAsync(_callerFactory.Create(), request.Id!,
                 cancellationToken);
 
         return () =>
@@ -134,7 +134,7 @@ public class OrganizationsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var organization =
-            await _organizationsApplication.InviteMemberToOrganizationAsync(_contextFactory.Create(), request.Id!,
+            await _organizationsApplication.InviteMemberToOrganizationAsync(_callerFactory.Create(), request.Id!,
                 request.UserId, request.Email,
                 cancellationToken);
 
@@ -148,7 +148,7 @@ public class OrganizationsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var members =
-            await _organizationsApplication.ListMembersForOrganizationAsync(_contextFactory.Create(), request.Id,
+            await _organizationsApplication.ListMembersForOrganizationAsync(_callerFactory.Create(), request.Id,
                 request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
 
         return () =>
@@ -159,7 +159,7 @@ public class OrganizationsApi : IWebApiService
     public async Task<ApiPutPatchResult<Organization, GetOrganizationResponse>> UnassignRoles(
         UnassignRolesFromOrganizationRequest request, CancellationToken cancellationToken)
     {
-        var organization = await _organizationsApplication.UnassignRolesFromOrganizationAsync(_contextFactory.Create(),
+        var organization = await _organizationsApplication.UnassignRolesFromOrganizationAsync(_callerFactory.Create(),
             request.Id!, request.UserId, request.Roles, cancellationToken);
 
         return () =>
@@ -170,7 +170,7 @@ public class OrganizationsApi : IWebApiService
     public async Task<ApiResult<Organization, UnInviteMemberFromOrganizationResponse>> UnInviteMember(
         UnInviteMemberFromOrganizationRequest request, CancellationToken cancellationToken)
     {
-        var organization = await _organizationsApplication.UnInviteMemberFromOrganizationAsync(_contextFactory.Create(),
+        var organization = await _organizationsApplication.UnInviteMemberFromOrganizationAsync(_callerFactory.Create(),
             request.Id!, request.UserId, cancellationToken);
 
         return () =>

@@ -17,7 +17,7 @@ public sealed class EmailAddressService : IEmailAddressService
     public async Task<bool> EnsureUniqueAsync(EmailAddress emailAddress, Identifier userId)
     {
         var retrieved = await _repository.FindCredentialsByUsernameAsync(emailAddress.Address, CancellationToken.None);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return false;
         }

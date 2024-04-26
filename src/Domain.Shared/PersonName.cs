@@ -10,7 +10,7 @@ public sealed class PersonName : ValueObjectBase<PersonName>
     public static Result<PersonName, Error> Create(string firstName, Optional<string> lastName)
     {
         var name1 = Name.Create(firstName);
-        if (!name1.IsSuccessful)
+        if (name1.IsFailure)
         {
             return name1.Error;
         }
@@ -18,7 +18,7 @@ public sealed class PersonName : ValueObjectBase<PersonName>
         if (lastName.HasValue)
         {
             var name2 = Name.Create(lastName);
-            if (!name2.IsSuccessful)
+            if (name2.IsFailure)
             {
                 return name2.Error;
             }

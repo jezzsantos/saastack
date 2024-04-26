@@ -35,7 +35,7 @@ public class UserProfileRepository : IUserProfileRepository
     public async Task<Result<UserProfileRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {
         var user = await _profiles.LoadAsync(id, cancellationToken);
-        if (!user.IsSuccessful)
+        if (user.IsFailure)
         {
             return user.Error;
         }
@@ -47,7 +47,7 @@ public class UserProfileRepository : IUserProfileRepository
         CancellationToken cancellationToken)
     {
         var saved = await _profiles.SaveAsync(profile, cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
@@ -86,7 +86,7 @@ public class UserProfileRepository : IUserProfileRepository
         CancellationToken cancellationToken)
     {
         var queried = await _profileQueries.QueryAsync(query, false, cancellationToken);
-        if (!queried.IsSuccessful)
+        if (queried.IsFailure)
         {
             return queried.Error;
         }
@@ -98,7 +98,7 @@ public class UserProfileRepository : IUserProfileRepository
         }
 
         var profiles = await _profiles.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
-        if (!profiles.IsSuccessful)
+        if (profiles.IsFailure)
         {
             return profiles.Error;
         }

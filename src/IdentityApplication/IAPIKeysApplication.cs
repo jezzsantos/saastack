@@ -6,16 +6,16 @@ namespace IdentityApplication;
 
 public interface IAPIKeysApplication
 {
-    Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext context, string userId, string description,
+    Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext caller, string userId, string description,
         DateTime? expiresOn, CancellationToken cancellationToken);
 
 #if TESTINGONLY
-    Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext context, CancellationToken cancellationToken);
+    Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext caller, CancellationToken cancellationToken);
 #endif
 
     Task<Result<Error>> DeleteAPIKeyAsync(ICallerContext caller, string id, CancellationToken cancellationToken);
 
-    Task<Result<Optional<EndUserWithMemberships>, Error>> FindMembershipsForAPIKeyAsync(ICallerContext context,
+    Task<Result<Optional<EndUserWithMemberships>, Error>> FindMembershipsForAPIKeyAsync(ICallerContext caller,
         string apiKey,
         CancellationToken cancellationToken);
 

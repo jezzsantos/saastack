@@ -32,7 +32,7 @@ public sealed class Unavailability : EntityBase
     public override Result<Error> EnsureInvariants()
     {
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }
@@ -52,13 +52,13 @@ public sealed class Unavailability : EntityBase
             case UnavailabilitySlotAdded added:
             {
                 var slot = TimeSlot.Create(added.From, added.To);
-                if (!slot.IsSuccessful)
+                if (slot.IsFailure)
                 {
                     return slot.Error;
                 }
 
                 var causedBy = CausedBy.Create(added.CausedByReason, added.CausedByReference);
-                if (!causedBy.IsSuccessful)
+                if (causedBy.IsFailure)
                 {
                     return causedBy.Error;
                 }

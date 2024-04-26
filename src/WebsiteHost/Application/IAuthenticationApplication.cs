@@ -6,11 +6,11 @@ namespace WebsiteHost.Application;
 
 public interface IAuthenticationApplication
 {
-    Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext context, string provider,
+    Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext caller, string provider,
         string? authCode, string? username, string? password, CancellationToken cancellationToken);
 
-    Task<Result<Error>> LogoutAsync(ICallerContext context, CancellationToken cancellationToken);
+    Task<Result<Error>> LogoutAsync(ICallerContext caller, CancellationToken cancellationToken);
 
-    Task<Result<AuthenticateTokens, Error>> RefreshTokenAsync(ICallerContext context, string? refreshToken,
+    Task<Result<AuthenticateTokens, Error>> RefreshTokenAsync(ICallerContext caller, string? refreshToken,
         CancellationToken cancellationToken);
 }

@@ -17,16 +17,16 @@ public class RecordingApplication : IRecordingApplication
         _recorder = recorder;
     }
 
-    public Task<Result<Error>> RecordCrashAsync(ICallerContext context, string message,
+    public Task<Result<Error>> RecordCrashAsync(ICallerContext caller, string message,
         CancellationToken cancellationToken)
     {
         var exceptionMessage = Resources.RecordingApplication_RecordCrash_ExceptionMessage.Format(message);
-        _recorder.Crash(context.ToCall(), CrashLevel.Critical, new Exception(exceptionMessage));
+        _recorder.Crash(caller.ToCall(), CrashLevel.Critical, new Exception(exceptionMessage));
 
         return Task.FromResult(Result.Ok);
     }
 
-    public Task<Result<Error>> RecordMeasurementAsync(ICallerContext context, string eventName,
+    public Task<Result<Error>> RecordMeasurementAsync(ICallerContext caller, string eventName,
         Dictionary<string, object?>? additional, ClientDetails clientDetails,
         CancellationToken cancellationToken)
     {
@@ -35,12 +35,12 @@ public class RecordingApplication : IRecordingApplication
                 .Where(pair => pair.Value.Exists())
                 .ToDictionary(pair => pair.Key, pair => pair.Value)
             : null)!);
-        _recorder.Measure(context.ToCall(), eventName, more);
+        _recorder.Measure(caller.ToCall(), eventName, more);
 
         return Task.FromResult(Result.Ok);
     }
 
-    public Task<Result<Error>> RecordPageViewAsync(ICallerContext context, string path, ClientDetails clientDetails,
+    public Task<Result<Error>> RecordPageViewAsync(ICallerContext caller, string path, ClientDetails clientDetails,
         CancellationToken cancellationToken)
     {
         const string eventName = UsageConstants.Events.Web.WebPageVisit;
@@ -50,12 +50,12 @@ public class RecordingApplication : IRecordingApplication
             { UsageConstants.Properties.Path, path }
         });
 
-        _recorder.TrackUsage(context.ToCall(), eventName, additional);
+        _recorder.TrackUsage(caller.ToCall(), eventName, additional);
 
         return Task.FromResult(Result.Ok);
     }
 
-    public Task<Result<Error>> RecordUsageAsync(ICallerContext context, string eventName,
+    public Task<Result<Error>> RecordUsageAsync(ICallerContext caller, string eventName,
         Dictionary<string, object?>? additional, ClientDetails clientDetails,
         CancellationToken cancellationToken)
     {
@@ -64,12 +64,12 @@ public class RecordingApplication : IRecordingApplication
                 .Where(pair => pair.Value.Exists())
                 .ToDictionary(pair => pair.Key, pair => pair.Value)
             : null)!);
-        _recorder.TrackUsage(context.ToCall(), eventName, more);
+        _recorder.TrackUsage(caller.ToCall(), eventName, more);
 
         return Task.FromResult(Result.Ok);
     }
 
-    public Task<Result<Error>> RecordTraceAsync(ICallerContext context, RecorderTraceLevel level,
+    public Task<Result<Error>> RecordTraceAsync(ICallerContext caller, RecorderTraceLevel level,
         string messageTemplate, List<string>? arguments,
         CancellationToken cancellationToken)
     {
@@ -80,23 +80,23 @@ public class RecordingApplication : IRecordingApplication
         switch (level)
         {
             case RecorderTraceLevel.Debug:
-                _recorder.TraceDebug(context.ToCall(), messageTemplate, args);
+                _recorder.TraceDebug(caller.ToCall(), messageTemplate, args);
                 return Task.FromResult(Result.Ok);
 
             case RecorderTraceLevel.Information:
-                _recorder.TraceInformation(context.ToCall(), messageTemplate, args);
+                _recorder.TraceInformation(caller.ToCall(), messageTemplate, args);
                 return Task.FromResult(Result.Ok);
 
             case RecorderTraceLevel.Warning:
-                _recorder.TraceWarning(context.ToCall(), messageTemplate, args);
+                _recorder.TraceWarning(caller.ToCall(), messageTemplate, args);
                 return Task.FromResult(Result.Ok);
 
             case RecorderTraceLevel.Error:
-                _recorder.TraceError(context.ToCall(), messageTemplate, args);
+                _recorder.TraceError(caller.ToCall(), messageTemplate, args);
                 return Task.FromResult(Result.Ok);
 
             default:
-                _recorder.TraceInformation(context.ToCall(), messageTemplate, args);
+                _recorder.TraceInformation(caller.ToCall(), messageTemplate, args);
                 return Task.FromResult(Result.Ok);
         }
     }

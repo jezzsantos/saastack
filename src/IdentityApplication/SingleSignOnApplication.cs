@@ -24,12 +24,12 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         _authTokensService = authTokensService;
     }
 
-    public async Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext context,
+    public async Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext caller,
         string? invitationToken, string providerName,
         string authCode, string? username, CancellationToken cancellationToken)
     {
         var retrieved = await _ssoProvidersService.FindByNameAsync(providerName, cancellationToken);
-        if (!retrieved.IsSuccessful)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -40,16 +40,16 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         }
 
         var provider = retrieved.Value.Value;
-        var authenticated = await provider.AuthenticateAsync(context, authCode, username, cancellationToken);
-        if (!authenticated.IsSuccessful)
+        var authenticated = await provider.AuthenticateAsync(caller, authCode, username, cancellationToken);
+        if (authenticated.IsFailure)
         {
             return authenticated.Error;
         }
 
         var userInfo = authenticated.Value;
         var userExists =
-            await _endUsersService.FindPersonByEmailPrivateAsync(context, userInfo.EmailAddress, cancellationToken);
-        if (!userExists.IsSuccessful)
+            await _endUsersService.FindPersonByEmailPrivateAsync(caller, userInfo.EmailAddress, cancellationToken);
+        if (userExists.IsFailure)
         {
             return userExists.Error;
         }
@@ -57,19 +57,19 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         string registeredUserId;
         if (!userExists.Value.HasValue)
         {
-            var autoRegistered = await _endUsersService.RegisterPersonPrivateAsync(context, invitationToken,
+            var autoRegistered = await _endUsersService.RegisterPersonPrivateAsync(caller, invitationToken,
                 userInfo.EmailAddress,
                 userInfo.FirstName, userInfo.LastName, userInfo.Timezone.ToString(), userInfo.CountryCode.ToString(),
                 true,
                 cancellationToken);
-            if (!autoRegistered.IsSuccessful)
+            if (autoRegistered.IsFailure)
             {
                 return autoRegistered.Error;
             }
 
             registeredUserId = autoRegistered.Value.Id;
 
-            _recorder.AuditAgainst(context.ToCall(), autoRegistered.Value.Id,
+            _recorder.AuditAgainst(caller.ToCall(), autoRegistered.Value.Id,
                 Audits.SingleSignOnApplication_Authenticate_AccountOnboarded,
                 "User {Id} was registered automatically from SSO {Provider}", autoRegistered.Value.Id, providerName);
         }
@@ -79,8 +79,8 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         }
 
         var registered =
-            await _endUsersService.GetMembershipsPrivateAsync(context, registeredUserId, cancellationToken);
-        if (!registered.IsSuccessful)
+            await _endUsersService.GetMembershipsPrivateAsync(caller, registeredUserId, cancellationToken);
+        if (registered.IsFailure)
         {
             return Error.NotAuthenticated();
         }
@@ -93,7 +93,7 @@ public class SingleSignOnApplication : ISingleSignOnApplication
 
         if (user.Access == EndUserAccess.Suspended)
         {
-            _recorder.AuditAgainst(context.ToCall(), user.Id,
+            _recorder.AuditAgainst(caller.ToCall(), user.Id,
                 Audits.SingleSignOnApplication_Authenticate_AccountSuspended,
                 "User {Id} tried to authenticate with SSO {Provider} with a suspended account", user.Id, providerName);
             return Error.EntityExists(Resources.SingleSignOnApplication_AccountSuspended);
@@ -101,17 +101,17 @@ public class SingleSignOnApplication : ISingleSignOnApplication
 
         var saved = await _ssoProvidersService.SaveUserInfoAsync(providerName, registeredUserId.ToId(), userInfo,
             cancellationToken);
-        if (!saved.IsSuccessful)
+        if (saved.IsFailure)
         {
             return saved.Error;
         }
 
-        _recorder.AuditAgainst(context.ToCall(), user.Id,
+        _recorder.AuditAgainst(caller.ToCall(), user.Id,
             Audits.SingleSignOnApplication_Authenticate_Succeeded,
             "User {Id} succeeded to authenticate with SSO {Provider}", user.Id, providerName);
 
-        var issued = await _authTokensService.IssueTokensAsync(context, user, cancellationToken);
-        if (!issued.IsSuccessful)
+        var issued = await _authTokensService.IssueTokensAsync(caller, user, cancellationToken);
+        if (issued.IsFailure)
         {
             return issued.Error;
         }

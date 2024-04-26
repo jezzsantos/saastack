@@ -34,7 +34,7 @@ public sealed class BinaryBlobStore : IBinaryBlobStore
         }
 
         var deleted = await _blobStore.DeleteAsync(_containerName, blobName, cancellationToken);
-        if (!deleted.IsSuccessful)
+        if (deleted.IsFailure)
         {
             return deleted.Error;
         }
@@ -67,7 +67,7 @@ public sealed class BinaryBlobStore : IBinaryBlobStore
         }
 
         var download = await _blobStore.DownloadAsync(_containerName, blobName, stream, cancellationToken);
-        if (!download.IsSuccessful)
+        if (download.IsFailure)
         {
             return download.Error;
         }
@@ -94,7 +94,7 @@ public sealed class BinaryBlobStore : IBinaryBlobStore
         }
 
         var upload = await _blobStore.UploadAsync(_containerName, blobName, contentType, stream, cancellationToken);
-        if (!upload.IsSuccessful)
+        if (upload.IsFailure)
         {
             return upload.Error;
         }

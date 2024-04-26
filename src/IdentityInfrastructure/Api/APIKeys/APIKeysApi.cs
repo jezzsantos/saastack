@@ -10,11 +10,11 @@ namespace IdentityInfrastructure.Api.APIKeys;
 public class APIKeysApi : IWebApiService
 {
     private readonly IAPIKeysApplication _apiKeysApplication;
-    private readonly ICallerContextFactory _contextFactory;
+    private readonly ICallerContextFactory _callerFactory;
 
-    public APIKeysApi(ICallerContextFactory contextFactory, IAPIKeysApplication apiKeysApplication)
+    public APIKeysApi(ICallerContextFactory callerFactory, IAPIKeysApplication apiKeysApplication)
     {
-        _contextFactory = contextFactory;
+        _callerFactory = callerFactory;
         _apiKeysApplication = apiKeysApplication;
     }
 
@@ -22,7 +22,7 @@ public class APIKeysApi : IWebApiService
     public async Task<ApiPostResult<APIKey, CreateAPIKeyResponse>> Create(
         CreateAPIKeyRequest request, CancellationToken cancellationToken)
     {
-        var apiKey = await _apiKeysApplication.CreateAPIKeyAsync(_contextFactory.Create(), cancellationToken);
+        var apiKey = await _apiKeysApplication.CreateAPIKeyAsync(_callerFactory.Create(), cancellationToken);
 
         return () => apiKey.HandleApplicationResult<APIKey, CreateAPIKeyResponse>(x =>
             new PostResult<CreateAPIKeyResponse>(new CreateAPIKeyResponse { ApiKey = x.Key }));
@@ -31,7 +31,7 @@ public class APIKeysApi : IWebApiService
 
     public async Task<ApiDeleteResult> DeleteAPIKey(DeleteAPIKeyRequest request, CancellationToken cancellationToken)
     {
-        var key = await _apiKeysApplication.DeleteAPIKeyAsync(_contextFactory.Create(), request.Id, cancellationToken);
+        var key = await _apiKeysApplication.DeleteAPIKeyAsync(_callerFactory.Create(), request.Id, cancellationToken);
 
         return () => key.HandleApplicationResult();
     }
@@ -39,7 +39,7 @@ public class APIKeysApi : IWebApiService
     public async Task<ApiSearchResult<APIKey, SearchAllAPIKeysResponse>> SearchAllAPIKeys(
         SearchAllAPIKeysRequest request, CancellationToken cancellationToken)
     {
-        var keys = await _apiKeysApplication.SearchAllAPIKeysAsync(_contextFactory.Create(), request.ToSearchOptions(),
+        var keys = await _apiKeysApplication.SearchAllAPIKeysAsync(_callerFactory.Create(), request.ToSearchOptions(),
             request.ToGetOptions(), cancellationToken);
 
         return () => keys.HandleApplicationResult(x => new SearchAllAPIKeysResponse
