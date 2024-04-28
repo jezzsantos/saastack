@@ -160,8 +160,8 @@ public class AspNetCallerContextSpec
         var result = new AspNetCallerContext(_httpContext.Object);
 
         result.Roles.All.Should().ContainInOrder(PlatformRoles.Standard, TenantRoles.Member);
-        result.Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
-        result.Roles.Tenant.Should().ContainSingle(rol => rol == TenantRoles.Member);
+        result.Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
+        result.Roles.Tenant.Should().OnlyContain(rol => rol == TenantRoles.Member);
     }
 
     [Fact]
@@ -194,8 +194,8 @@ public class AspNetCallerContextSpec
         var result = new AspNetCallerContext(_httpContext.Object);
 
         result.Features.All.Should().ContainInOrder(PlatformFeatures.Basic);
-        result.Features.Platform.Should().ContainSingle(feat => feat == PlatformFeatures.Basic);
-        result.Features.Tenant.Should().ContainSingle(feat => feat == TenantFeatures.Basic);
+        result.Features.Platform.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
+        result.Features.Tenant.Should().OnlyContain(feat => feat == TenantFeatures.Basic);
     }
 
     [Fact]

@@ -153,8 +153,8 @@ public class EndUsersApplicationSpec
         result.Value.Access.Should().Be(EndUserAccess.Enabled);
         result.Value.Status.Should().Be(EndUserStatus.Registered);
         result.Value.Classification.Should().Be(EndUserClassification.Person);
-        result.Value.Roles.Should().ContainSingle(role => role == PlatformRoles.Standard.Name);
-        result.Value.Features.Should().ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
+        result.Value.Roles.Should().OnlyContain(role => role == PlatformRoles.Standard.Name);
+        result.Value.Features.Should().ContainInOrder(TenantFeatures.PaidTrial.Name, TenantFeatures.Basic.Name);
         result.Value.Profile!.Id.Should().Be("aprofileid");
         result.Value.Profile.DefaultOrganizationId.Should().Be("anorganizationid");
         result.Value.Profile.Address.CountryCode.Should().Be("acountrycode");
@@ -242,8 +242,8 @@ public class EndUsersApplicationSpec
         result.Value.Access.Should().Be(EndUserAccess.Enabled);
         result.Value.Status.Should().Be(EndUserStatus.Registered);
         result.Value.Classification.Should().Be(EndUserClassification.Person);
-        result.Value.Roles.Should().ContainSingle(role => role == PlatformRoles.Standard.Name);
-        result.Value.Features.Should().ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
+        result.Value.Roles.Should().OnlyContain(role => role == PlatformRoles.Standard.Name);
+        result.Value.Features.Should().ContainInOrder(TenantFeatures.PaidTrial.Name, TenantFeatures.Basic.Name);
         result.Value.Profile!.Id.Should().Be("aprofileid");
         result.Value.Profile.DefaultOrganizationId.Should().Be("anorganizationid");
         result.Value.Profile.Address.CountryCode.Should().Be("acountrycode");
@@ -320,8 +320,8 @@ public class EndUsersApplicationSpec
         result.Value.Access.Should().Be(EndUserAccess.Enabled);
         result.Value.Status.Should().Be(EndUserStatus.Registered);
         result.Value.Classification.Should().Be(EndUserClassification.Person);
-        result.Value.Roles.Should().ContainSingle(role => role == PlatformRoles.Standard.Name);
-        result.Value.Features.Should().ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
+        result.Value.Roles.Should().OnlyContain(role => role == PlatformRoles.Standard.Name);
+        result.Value.Features.Should().ContainInOrder(TenantFeatures.PaidTrial.Name, TenantFeatures.Basic.Name);
         result.Value.Profile!.Id.Should().Be("aprofileid");
         result.Value.Profile.DefaultOrganizationId.Should().Be("anorganizationid");
         result.Value.Profile.Address.CountryCode.Should().Be("acountrycode");
@@ -515,8 +515,8 @@ public class EndUsersApplicationSpec
         result.Value.Access.Should().Be(EndUserAccess.Enabled);
         result.Value.Status.Should().Be(EndUserStatus.Registered);
         result.Value.Classification.Should().Be(EndUserClassification.Person);
-        result.Value.Roles.Should().ContainSingle(role => role == PlatformRoles.Standard.Name);
-        result.Value.Features.Should().ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
+        result.Value.Roles.Should().OnlyContain(role => role == PlatformRoles.Standard.Name);
+        result.Value.Features.Should().ContainInOrder(TenantFeatures.PaidTrial.Name, TenantFeatures.Basic.Name);
         result.Value.Profile!.Id.Should().Be("aprofileid");
         result.Value.Profile.DefaultOrganizationId.Should().Be("anorganizationid");
         result.Value.Profile.Address.CountryCode.Should().Be("acountrycode");
@@ -578,8 +578,8 @@ public class EndUsersApplicationSpec
         result.Value.Access.Should().Be(EndUserAccess.Enabled);
         result.Value.Status.Should().Be(EndUserStatus.Registered);
         result.Value.Classification.Should().Be(EndUserClassification.Machine);
-        result.Value.Roles.Should().ContainSingle(role => role == PlatformRoles.Standard.Name);
-        result.Value.Features.Should().ContainSingle(feat => feat == PlatformFeatures.Basic.Name);
+        result.Value.Roles.Should().OnlyContain(role => role == PlatformRoles.Standard.Name);
+        result.Value.Features.Should().OnlyContain(feat => feat == PlatformFeatures.Basic.Name);
         result.Value.Profile!.Id.Should().Be("aprofileid");
         result.Value.Profile.DefaultOrganizationId.Should().Be("anorganizationid");
         result.Value.Profile.Address.CountryCode.Should().Be("acountrycode");
@@ -637,8 +637,8 @@ public class EndUsersApplicationSpec
         result.Value.Access.Should().Be(EndUserAccess.Enabled);
         result.Value.Status.Should().Be(EndUserStatus.Registered);
         result.Value.Classification.Should().Be(EndUserClassification.Machine);
-        result.Value.Roles.Should().ContainSingle(role => role == PlatformRoles.Standard.Name);
-        result.Value.Features.Should().ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
+        result.Value.Roles.Should().OnlyContain(role => role == PlatformRoles.Standard.Name);
+        result.Value.Features.Should().ContainInOrder(TenantFeatures.PaidTrial.Name, TenantFeatures.Basic.Name);
         result.Value.Profile!.Id.Should().Be("aprofileid");
         result.Value.Profile.DefaultOrganizationId.Should().Be("anotherorganizationid");
         result.Value.Profile.Address.CountryCode.Should().Be("acountrycode");
@@ -703,7 +703,7 @@ public class EndUsersApplicationSpec
             CancellationToken.None);
 
         result.Should().BeSuccess();
-        result.Value.Roles.Should().ContainSingle(PlatformRoles.Standard.Name);
+        result.Value.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
     }
 #endif
 
@@ -784,13 +784,14 @@ public class EndUsersApplicationSpec
         result.Value.Access.Should().Be(EndUserAccess.Enabled);
         result.Value.Status.Should().Be(EndUserStatus.Registered);
         result.Value.Classification.Should().Be(EndUserClassification.Person);
-        result.Value.Roles.Should().ContainSingle(role => role == PlatformRoles.Standard.Name);
-        result.Value.Features.Should().ContainSingle(feat => feat == PlatformFeatures.Basic.Name);
+        result.Value.Roles.Should().OnlyContain(role => role == PlatformRoles.Standard.Name);
+        result.Value.Features.Should().OnlyContain(feat => feat == PlatformFeatures.Basic.Name);
         result.Value.Memberships.Count.Should().Be(1);
         result.Value.Memberships[0].IsDefault.Should().BeTrue();
         result.Value.Memberships[0].OrganizationId.Should().Be("anorganizationid");
-        result.Value.Memberships[0].Roles.Should().ContainSingle(role => role == TenantRoles.Member.Name);
-        result.Value.Memberships[0].Features.Should().ContainSingle(feat => feat == TenantFeatures.PaidTrial.Name);
+        result.Value.Memberships[0].Roles.Should().OnlyContain(role => role == TenantRoles.Member.Name);
+        result.Value.Memberships[0].Features.Should()
+            .ContainInOrder(TenantFeatures.PaidTrial.Name, TenantFeatures.Basic.Name);
     }
 
     [Fact]

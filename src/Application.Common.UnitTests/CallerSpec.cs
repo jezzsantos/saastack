@@ -20,7 +20,7 @@ public class CallerSpec
         result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeFalse();
         result.Roles.All.Should().BeEmpty();
-        result.Features.All.Should().ContainSingle(PlatformFeatures.Basic.Name);
+        result.Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.AnonymousUserId);
         result.CallId.Should().NotBeNull();
@@ -35,7 +35,7 @@ public class CallerSpec
         result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeFalse();
         result.Roles.All.Should().BeEmpty();
-        result.Features.All.Should().ContainSingle(PlatformFeatures.Basic.Name);
+        result.Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
         result.TenantId.Should().Be("atenantid");
         result.CallerId.Should().Be(CallerConstants.AnonymousUserId);
         result.CallId.Should().NotBeNullOrEmpty();
@@ -55,7 +55,7 @@ public class CallerSpec
         result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeFalse();
         result.Roles.All.Should().BeEmpty();
-        result.Features.All.Should().ContainSingle(PlatformFeatures.Basic.Name);
+        result.Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be("acallerid");
         result.CallId.Should().Be("acallid");
@@ -69,8 +69,8 @@ public class CallerSpec
         result.IsServiceAccount.Should().BeTrue();
         result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeTrue();
-        result.Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.ServiceAccount);
-        result.Features.All.Should().ContainSingle(PlatformFeatures.Basic.Name);
+        result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.ServiceAccount);
+        result.Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.ExternalWebhookAccountUserId);
         result.CallId.Should().Be("acallid");
@@ -84,8 +84,8 @@ public class CallerSpec
         result.IsServiceAccount.Should().BeTrue();
         result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeTrue();
-        result.Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.ServiceAccount);
-        result.Features.All.Should().ContainSingle(PlatformFeatures.Paid2.Name);
+        result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.ServiceAccount);
+        result.Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.Paid2);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.MaintenanceAccountUserId);
         result.CallId.Should().NotBeNullOrEmpty();
@@ -99,8 +99,8 @@ public class CallerSpec
         result.IsServiceAccount.Should().BeTrue();
         result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeTrue();
-        result.Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.ServiceAccount);
-        result.Features.All.Should().ContainSingle(PlatformFeatures.Paid2.Name);
+        result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.ServiceAccount);
+        result.Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.Paid2);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.MaintenanceAccountUserId);
         result.CallId.Should().Be("acallid");
@@ -114,8 +114,8 @@ public class CallerSpec
         result.IsServiceAccount.Should().BeTrue();
         result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeTrue();
-        result.Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.ServiceAccount);
-        result.Features.All.Should().ContainSingle(PlatformFeatures.Paid2.Name);
+        result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.ServiceAccount);
+        result.Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.Paid2);
         result.TenantId.Should().Be("atenantid");
         result.CallerId.Should().Be(CallerConstants.MaintenanceAccountUserId);
         result.CallId.Should().NotBeNullOrEmpty();
@@ -129,8 +129,8 @@ public class CallerSpec
         result.IsServiceAccount.Should().BeTrue();
         result.Authorization.Should().BeNone();
         result.IsAuthenticated.Should().BeTrue();
-        result.Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.ServiceAccount);
-        result.Features.All.Should().ContainSingle(PlatformFeatures.Paid2.Name);
+        result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.ServiceAccount);
+        result.Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.Paid2);
         result.TenantId.Should().BeNull();
         result.CallerId.Should().Be(CallerConstants.ServiceClientAccountUserId);
         result.CallId.Should().NotBeNullOrEmpty();

@@ -356,7 +356,7 @@ public class EndUserRootSpec
                 features);
 
             result.Should().BeSuccess();
-            _user.Memberships.Should().ContainSingle(ms =>
+            _user.Memberships.Should().OnlyContain(ms =>
                 ms.OrganizationId.Value == "anorganizationid"
                 && ms.IsDefault
                 && ms.Roles == roles

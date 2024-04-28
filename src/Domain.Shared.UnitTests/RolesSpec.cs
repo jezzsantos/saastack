@@ -12,7 +12,7 @@ public class RoleSpec
     [Fact]
     public void WhenCreateWithEmpty_ThenReturnsError()
     {
-        var result = Role.Create(string.Empty);
+        var result = Role.Create(new RoleLevel(string.Empty));
 
         result.Should().BeError(ErrorCode.Validation);
     }
@@ -20,7 +20,7 @@ public class RoleSpec
     [Fact]
     public void WhenCreateWithInvalidName_ThenReturnsError()
     {
-        var result = Role.Create("^aninvalidname^");
+        var result = Role.Create(new RoleLevel("^aninvalidname^"));
 
         result.Should().BeError(ErrorCode.Validation, Resources.Roles_InvalidRole);
     }
@@ -28,7 +28,7 @@ public class RoleSpec
     [Fact]
     public void WhenCreateWithUnknownName_ThenReturnsValue()
     {
-        var result = Role.Create("anunknownrole");
+        var result = Role.Create(new RoleLevel("anunknownrole"));
 
         result.Should().BeSuccess();
         result.Value.Identifier.Should().Be("anunknownrole");
@@ -37,7 +37,7 @@ public class RoleSpec
     [Fact]
     public void WhenCreateWithKnownName_ThenReturnsValue()
     {
-        var result = Role.Create(PlatformRoles.Standard.Name);
+        var result = Role.Create(PlatformRoles.Standard);
 
         result.Should().BeSuccess();
         result.Value.Identifier.Should().Be(PlatformRoles.Standard.Name);
@@ -66,10 +66,10 @@ public class RolesSpec
     [Fact]
     public void WhenCreateWithSingle_ThenReturnsValue()
     {
-        var result = Roles.Create(PlatformRoles.Standard.Name);
+        var result = Roles.Create(PlatformRoles.Standard);
 
         result.Should().BeSuccess();
-        result.Value.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Standard.Name).Value);
+        result.Value.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Standard).Value);
     }
 
 #if TESTINGONLY
@@ -79,9 +79,7 @@ public class RolesSpec
         var result = Roles.Create(PlatformRoles.TestingOnlySuperUser);
 
         result.Should().BeSuccess();
-        result.Value.Items.Should().ContainInOrder(Role.Create(
-                PlatformRoles.TestingOnlySuperUser.Name).Value,
-            Role.Create(PlatformRoles.TestingOnly.Name).Value);
+        result.Value.Items.Should().OnlyContain(rol => rol == Role.Create(PlatformRoles.TestingOnlySuperUser).Value);
     }
 #endif
 
@@ -97,11 +95,25 @@ public class RolesSpec
     [Fact]
     public void WhenCreateWithListContainingValidItems_ThenReturnsValue()
     {
-        var result = Roles.Create(PlatformRoles.Standard.Name, PlatformRoles.TestingOnly.Name);
+        var result = Roles.Create(PlatformRoles.Standard, PlatformRoles.TestingOnly);
 
         result.Should().BeSuccess();
-        result.Value.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Standard.Name).Value,
-            Role.Create(PlatformRoles.TestingOnly.Name).Value);
+        result.Value.Items.Count.Should().Be(2);
+        result.Value.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Standard).Value,
+            Role.Create(PlatformRoles.TestingOnly).Value);
+    }
+#endif
+
+#if TESTINGONLY
+    [Fact]
+    public void WhenCreateWithListContainingParent_ThenReturnsNormalizedValue()
+    {
+        var result = Roles.Create(PlatformRoles.Operations, PlatformRoles.Standard, PlatformRoles.TestingOnly);
+
+        result.Should().BeSuccess();
+        result.Value.Items.Count.Should().Be(2);
+        result.Value.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Operations).Value,
+            Role.Create(PlatformRoles.TestingOnly).Value);
     }
 #endif
 
@@ -113,7 +125,7 @@ public class RolesSpec
         var result = roles.Add("anunknownrole");
 
         result.Should().BeSuccess();
-        result.Value.Items.Should().ContainSingle(role => role.Identifier == "anunknownrole");
+        result.Value.Items.Should().OnlyContain(role => role.Identifier == "anunknownrole");
     }
 
     [Fact]
@@ -121,10 +133,10 @@ public class RolesSpec
     {
         var roles = Roles.Empty;
 
-        var result = roles.Add(PlatformRoles.Standard.Name);
+        var result = roles.Add(PlatformRoles.Standard);
 
         result.Should().BeSuccess();
-        result.Value.Items.Should().ContainSingle(role => role.Identifier == PlatformRoles.Standard.Name);
+        result.Value.Items.Should().OnlyContain(role => role.Identifier == PlatformRoles.Standard.Name);
     }
 
 #if TESTINGONLY
@@ -136,22 +148,49 @@ public class RolesSpec
         var result = roles.Add(PlatformRoles.TestingOnlySuperUser);
 
         result.Should().BeSuccess();
+        result.Value.Items.Count.Should().Be(2);
         result.Value.Items.Should().ContainInOrder(
-            Role.Create(PlatformRoles.Standard.Name).Value,
-            Role.Create(PlatformRoles.TestingOnlySuperUser.Name).Value,
-            Role.Create(PlatformRoles.TestingOnly.Name).Value);
+            Role.Create(PlatformRoles.Standard).Value,
+            Role.Create(PlatformRoles.TestingOnlySuperUser).Value);
     }
 #endif
+
+    [Fact]
+    public void WhenAddParentRoleLevel_ThenReturnsNormalizedValue()
+    {
+        var roles = Roles.Create(PlatformRoles.Standard).Value;
+
+        var result = roles.Add(PlatformRoles.Operations);
+
+        result.Should().BeSuccess();
+        result.Value.Items.Count.Should().Be(1);
+        result.Value.Items.Should().ContainInOrder(
+            Role.Create(PlatformRoles.Operations).Value);
+    }
+
+    [Fact]
+    public void WhenAddChildRoleLevel_ThenReturnsNormalizedValue()
+    {
+        var roles = Roles.Create(PlatformRoles.Operations).Value;
+
+        var result = roles.Add(PlatformRoles.Standard);
+
+        result.Should().BeSuccess();
+        result.Value.Items.Count.Should().Be(1);
+        result.Value.Items.Should().ContainInOrder(
+            Role.Create(PlatformRoles.Operations).Value);
+    }
+
     [Fact]
     public void WhenAddRoleAndExists_ThenDoesNotAdd()
     {
         var roles = Roles.Empty;
-        roles.Add(PlatformRoles.Standard.Name);
+        roles.Add(PlatformRoles.Standard);
 
-        var result = roles.Add(PlatformRoles.Standard.Name);
+        var result = roles.Add(PlatformRoles.Standard);
 
         result.Should().BeSuccess();
-        result.Value.Items.Should().ContainSingle(role => role.Identifier == PlatformRoles.Standard.Name);
+        result.Value.Items.Should().OnlyContain(role => role.Identifier == PlatformRoles.Standard.Name);
     }
 
 #if TESTINGONLY
@@ -159,13 +198,13 @@ public class RolesSpec
     public void WhenAddRoleAndNotExists_ThenAdds()
     {
         var roles = Roles.Empty;
-        roles = roles.Add(PlatformRoles.Standard.Name).Value;
+        roles = roles.Add(PlatformRoles.Standard).Value;
 
-        var result = roles.Add(PlatformRoles.TestingOnly.Name);
+        var result = roles.Add(PlatformRoles.TestingOnly);
 
         result.Should().BeSuccess();
-        result.Value.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Standard.Name).Value,
-            Role.Create(PlatformRoles.TestingOnly.Name).Value);
+        result.Value.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Standard).Value,
+            Role.Create(PlatformRoles.TestingOnly).Value);
     }
 #endif
 
@@ -173,7 +212,7 @@ public class RolesSpec
     public void WhenClear_ThenRemovesAllItems()
     {
         var roles = Roles.Empty;
-        roles = roles.Add(PlatformRoles.Standard.Name).Value;
+        roles = roles.Add(PlatformRoles.Standard).Value;
 
         var result = roles.Clear();
 
@@ -184,7 +223,7 @@ public class RolesSpec
     public void WhenHasAnyAndSome_ThenReturnsTrue()
     {
         var roles = Roles.Empty;
-        roles = roles.Add(PlatformRoles.Standard.Name).Value;
+        roles = roles.Add(PlatformRoles.Standard).Value;
 
         var result = roles.HasAny();
 
@@ -205,7 +244,7 @@ public class RolesSpec
     public void WhenHasNoneAndSome_ThenReturnsFalse()
     {
         var roles = Roles.Empty;
-        roles = roles.Add(PlatformRoles.Standard.Name).Value;
+        roles = roles.Add(PlatformRoles.Standard).Value;
 
         var result = roles.HasNone();
 
@@ -227,7 +266,7 @@ public class RolesSpec
     {
         var roles = Roles.Empty;
 
-        var result = roles.HasRole("anunknownrole");
+        var result = roles.HasRole(new RoleLevel("anunknownrole"));
 
         result.Should().BeFalse();
     }
@@ -237,21 +276,43 @@ public class RolesSpec
     public void WhenHasRoleAndNoMatch_ThenReturnsFalse()
     {
         var roles = Roles.Empty;
-        roles = roles.Add(PlatformRoles.Standard.Name).Value;
+        roles = roles.Add(PlatformRoles.Standard).Value;
 
-        var result = roles.HasRole(PlatformRoles.TestingOnly.Name);
+        var result = roles.HasRole(PlatformRoles.TestingOnly);
 
         result.Should().BeFalse();
     }
 #endif
 
     [Fact]
-    public void WhenHasRoleAndMatching_ThenReturnsTrue()
+    public void WhenHasRoleAndHasSameRole_ThenReturnsTrue()
     {
         var roles = Roles.Empty;
-        roles = roles.Add(PlatformRoles.Standard.Name).Value;
+        roles = roles.Add(PlatformRoles.Operations).Value;
 
-        var result = roles.HasRole(PlatformRoles.Standard.Name);
+        var result = roles.HasRole(PlatformRoles.Operations);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenHasRoleAndHasParentRole_ThenReturnsFalse()
+    {
+        var roles = Roles.Empty;
+        roles = roles.Add(PlatformRoles.Standard).Value;
+
+        var result = roles.HasRole(PlatformRoles.Operations);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenHasRoleAndHasChildRole_ThenReturnsTrue()
+    {
+        var roles = Roles.Empty;
+        roles = roles.Add(PlatformRoles.Operations).Value;
+
+        var result = roles.HasRole(PlatformRoles.Standard);
 
         result.Should().BeTrue();
     }
@@ -260,7 +321,7 @@ public class RolesSpec
     public void WhenRemoveAndInvalidName_ThenDoesNotRemove()
     {
         var roles = Roles.Empty;
-        roles = roles.Add(PlatformRoles.Standard.Name).Value;
+        roles = roles.Add(PlatformRoles.Standard).Value;
 
         var result = roles.Remove("anunknownrole");
 
@@ -272,9 +333,9 @@ public class RolesSpec
     public void WhenRemoveAndNoMatch_ThenDoesNotRemove()
     {
         var roles = Roles.Empty;
-        roles = roles.Add(PlatformRoles.Standard.Name).Value;
+        roles = roles.Add(PlatformRoles.Standard).Value;
 
-        var result = roles.Remove(PlatformRoles.TestingOnly.Name);
+        var result = roles.Remove(PlatformRoles.TestingOnly);
 
         result.Should().Be(roles);
     }
@@ -284,24 +345,60 @@ public class RolesSpec
     public void WhenRemoveAndMatches_ThenRemoves()
     {
         var roles = Roles.Empty;
-        roles = roles.Add(PlatformRoles.Standard.Name).Value;
+        roles = roles.Add(PlatformRoles.Standard).Value;
 
-        var result = roles.Remove(PlatformRoles.Standard.Name);
+        var result = roles.Remove(PlatformRoles.Standard);
+
+        result.Items.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenRemoveChildAndHasParent_ThenLeavesParent()
+    {
+        var roles = Roles.Empty;
+        roles = roles.Add(PlatformRoles.Operations).Value;
+
+        var result = roles.Remove(PlatformRoles.Standard);
+
+        result.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Operations).Value);
+    }
+
+    [Fact]
+    public void WhenRemoveParentAndHasDescendants_ThenLeavesDescendants()
+    {
+        var roles = Roles.Empty;
+        roles = roles.Add(PlatformRoles.Operations).Value;
+
+        var result = roles.Remove(PlatformRoles.Operations);
+
+        result.Items.Count.Should().Be(1);
+        result.Items.Should().ContainInOrder(Role.Create(PlatformRoles.Standard).Value);
+    }
+
+    [Fact]
+    public void WhenRemoveParentAndNoDescendants_ThenRemovesParent()
+    {
+        var roles = Roles.Empty;
+        roles = roles.Add(PlatformRoles.Standard).Value;
+
+        var result = roles.Remove(PlatformRoles.Standard);
 
         result.Items.Should().BeEmpty();
     }
 
 #if TESTINGONLY
     [Fact]
-    public void WhenToList_ThenReturnsStringList()
+    public void WhenDenormalize_ThenReturnsDenormalizedList()
     {
         var roles = Roles.Empty;
-        roles = roles.Add(PlatformRoles.Standard.Name).Value;
-        roles = roles.Add(PlatformRoles.TestingOnly.Name).Value;
+        roles = roles.Add(PlatformRoles.Operations).Value;
+        roles = roles.Add(PlatformRoles.TestingOnlySuperUser).Value;
 
-        var result = roles.ToList();
+        var result = roles.Denormalize();
 
-        result.Should().ContainInOrder(PlatformRoles.Standard.Name, PlatformRoles.TestingOnly.Name);
+        result.Count.Should().Be(4);
+        result.Should().ContainInOrder(PlatformRoles.Operations.Name, PlatformRoles.Standard.Name,
+            PlatformRoles.TestingOnlySuperUser.Name, PlatformRoles.TestingOnly.Name);
     }
 #endif
 }

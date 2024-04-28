@@ -3,57 +3,40 @@ using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
+using Domain.Interfaces.Extensions;
 using Domain.Interfaces.ValueObjects;
 
 namespace Domain.Shared;
 
+/// <summary>
+///     Defines a collection of normalized <see cref="Role" />.
+///     Since we only store the Name of the <see cref="RoleLevel" /> we need to maintain a normalized collection
+///     of <see cref="Role" />.
+/// </summary>
 public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
 {
     public static readonly Roles Empty = new();
 
-    public static Roles Create()
-    {
-        return new Roles();
-    }
-
     public static Result<Roles, Error> Create(string role)
     {
-        var rol = Role.Create(role);
-        if (rol.IsFailure)
-        {
-            return rol.Error;
-        }
-
-        return new Roles(rol.Value);
+        return Create(new RoleLevel(role));
     }
 
     public static Result<Roles, Error> Create(RoleLevel role)
     {
-        var allLevels = role.AllDescendantNames().ToArray();
-        return Create(allLevels);
+        return Create([role]);
     }
 
     public static Result<Roles, Error> Create(params string[] roles)
     {
-        var list = new List<Role>();
-        foreach (var role in roles)
-        {
-            var rol = Role.Create(role);
-            if (rol.IsFailure)
-            {
-                return rol.Error;
-            }
-
-            list.Add(rol.Value);
-        }
-
-        return new Roles(list);
+        return Create(roles.Select(role => new RoleLevel(role)).ToArray());
     }
 
     public static Result<Roles, Error> Create(params RoleLevel[] roles)
     {
+        var normalized = roles.Normalize();
         var list = new List<Role>();
-        foreach (var role in roles)
+        foreach (var role in normalized)
         {
             var rol = Role.Create(role);
             if (rol.IsFailure)
@@ -67,12 +50,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
         return new Roles(list);
     }
 
-    private Roles() : base(new List<Role>())
-    {
-    }
-
-    private Roles(Role roles) : base(new List<Role> { roles })
-
+    private Roles() : base([])
     {
     }
 
@@ -94,7 +72,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
 
     public Result<Roles, Error> Add(string role)
     {
-        var rol = Role.Create(role);
+        var rol = Role.Create(new RoleLevel(role));
         if (rol.IsFailure)
         {
             return rol.Error;
@@ -105,31 +83,13 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
 
     public Result<Roles, Error> Add(RoleLevel role)
     {
-        var roles = new Roles(Value.ToArray());
-        var allLevels = role.AllDescendantNames().ToArray();
-        foreach (var level in allLevels)
+        var rol = Role.Create(role);
+        if (rol.IsFailure)
         {
-            var added = roles.Add(level);
-            if (added.IsFailure)
-            {
-                return added.Error;
-            }
-
-            roles = added.Value;
+            return rol.Error;
         }
 
-        return roles;
-    }
-
-    public Roles Add(Role role)
-    {
-        if (!Value.Contains(role))
-        {
-            var newValues = Value.Concat(new[] { role });
-            return new Roles(newValues.ToArray());
-        }
-
-        return new Roles(Value);
+        return Add(rol.Value);
     }
 
 #pragma warning disable CA1822
@@ -137,6 +97,16 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
 #pragma warning restore CA1822
     {
         return Empty;
+    }
+
+    [SkipImmutabilityCheck]
+    public List<string> Denormalize()
+    {
+        return Items
+            .Select(rol => rol.AsLevel())
+            .ToArray()
+            .Denormalize()
+            .ToList();
     }
 
     [SkipImmutabilityCheck]
@@ -152,7 +122,14 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
     }
 
     [SkipImmutabilityCheck]
-    public bool HasRole(string role)
+    public bool HasRole(Role role)
+    {
+        var denormalized = Denormalize();
+        return denormalized.ContainsIgnoreCase(role.Identifier);
+    }
+
+    [SkipImmutabilityCheck]
+    public bool HasRole(RoleLevel role)
     {
         var rol = Role.Create(role);
         if (rol.IsFailure)
@@ -163,19 +140,12 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
         return HasRole(rol.Value);
     }
 
-    [SkipImmutabilityCheck]
-    public bool HasRole(Role role)
-    {
-        return Value.ToList().Select(rol => rol.Identifier).ContainsIgnoreCase(role);
-    }
-
-    [SkipImmutabilityCheck]
-    public bool HasRole(RoleLevel role)
-    {
-        return HasRole(role.Name);
-    }
-
     public Roles Remove(string role)
+    {
+        return Remove(new RoleLevel(role));
+    }
+
+    public Roles Remove(RoleLevel role)
     {
         var rol = Role.Create(role);
         if (rol.IsFailure)
@@ -186,23 +156,35 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
         return Remove(rol.Value);
     }
 
-    public Roles Remove(Role role)
+    private Roles Add(Role role)
     {
-        if (Value.Contains(role))
+        if (HasRole(role))
         {
-            var remaining = Value
-                .Where(rol => !rol.Equals(role))
-                .ToList();
-
-            return new Roles(remaining);
+            return new Roles(Value);
         }
 
-        return new Roles(Value);
+        var roles = Value
+            .Select(val => val.AsLevel())
+            .ToArray()
+            .Merge(role.AsLevel())
+            .Select(level => Role.Create(level).Value);
+
+        return new Roles(roles);
     }
 
-    [SkipImmutabilityCheck]
-    public List<string> ToList()
+    private Roles Remove(Role role)
     {
-        return Items.Select(rol => rol.Identifier).ToList();
+        if (!HasRole(role))
+        {
+            return new Roles(Value);
+        }
+
+        var roles = Value
+            .Select(rol => rol.AsLevel())
+            .ToArray()
+            .UnMerge(role.AsLevel())
+            .Select(level => Role.Create(level).Value);
+
+        return new Roles(roles);
     }
 }

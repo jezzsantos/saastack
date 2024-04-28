@@ -18,11 +18,11 @@ public class AuthorizeAttributeSpec
         {
             var result = new AuthorizeAttribute(Roles.Platform_Standard);
 
-            result.Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
-            result.Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
+            result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
+            result.Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
             result.Roles.Tenant.Should().BeEmpty();
-            result.Features.All.Should().ContainSingle(feat => feat == PlatformFeatures.Basic);
-            result.Features.Platform.Should().ContainSingle(feat => feat == PlatformFeatures.Basic);
+            result.Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
+            result.Features.Platform.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
             result.Features.Tenant.Should().BeEmpty();
         }
 
@@ -31,11 +31,11 @@ public class AuthorizeAttributeSpec
         {
             var result = new AuthorizeAttribute(Roles.Platform_Standard, Features.Platform_Basic);
 
-            result.Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
-            result.Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
+            result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
+            result.Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
             result.Roles.Tenant.Should().BeEmpty();
-            result.Features.All.Should().ContainSingle(level => level == PlatformFeatures.Basic);
-            result.Features.Platform.Should().ContainSingle(level => level == PlatformFeatures.Basic);
+            result.Features.All.Should().OnlyContain(level => level == PlatformFeatures.Basic);
+            result.Features.Platform.Should().OnlyContain(level => level == PlatformFeatures.Basic);
             result.Features.Tenant.Should().BeEmpty();
         }
 
@@ -44,11 +44,11 @@ public class AuthorizeAttributeSpec
         {
             var result = new AuthorizeAttribute(Roles.Platform_Standard, Features.Platform_PaidTrial);
 
-            result.Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
-            result.Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
+            result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
+            result.Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
             result.Roles.Tenant.Should().BeEmpty();
-            result.Features.All.Should().ContainSingle(level => level == PlatformFeatures.PaidTrial);
-            result.Features.Platform.Should().ContainSingle(level => level == PlatformFeatures.PaidTrial);
+            result.Features.All.Should().OnlyContain(level => level == PlatformFeatures.PaidTrial);
+            result.Features.Platform.Should().OnlyContain(level => level == PlatformFeatures.PaidTrial);
             result.Features.Tenant.Should().BeEmpty();
         }
 
@@ -57,11 +57,11 @@ public class AuthorizeAttributeSpec
         {
             var result = new AuthorizeAttribute(Roles.Platform_Standard | Roles.Platform_Operations);
 
-            result.Roles.All.Should().ContainInOrder(PlatformRoles.Operations, PlatformRoles.Standard);
-            result.Roles.Platform.Should().ContainInOrder(PlatformRoles.Operations, PlatformRoles.Standard);
+            result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Operations);
+            result.Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Operations);
             result.Roles.Tenant.Should().BeEmpty();
-            result.Features.All.Should().ContainSingle(level => level == PlatformFeatures.Basic);
-            result.Features.Platform.Should().ContainSingle(level => level == PlatformFeatures.Basic);
+            result.Features.All.Should().OnlyContain(level => level == PlatformFeatures.Basic);
+            result.Features.Platform.Should().OnlyContain(level => level == PlatformFeatures.Basic);
             result.Features.Tenant.Should().BeEmpty();
         }
 
@@ -70,11 +70,11 @@ public class AuthorizeAttributeSpec
         {
             var result = new AuthorizeAttribute(Features.Platform_Basic, Roles.Platform_Standard);
 
-            result.Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
-            result.Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
+            result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
+            result.Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
             result.Roles.Tenant.Should().BeEmpty();
-            result.Features.All.Should().ContainSingle(level => level == PlatformFeatures.Basic);
-            result.Features.Platform.Should().ContainSingle(level => level == PlatformFeatures.Basic);
+            result.Features.All.Should().OnlyContain(level => level == PlatformFeatures.Basic);
+            result.Features.Platform.Should().OnlyContain(level => level == PlatformFeatures.Basic);
             result.Features.Tenant.Should().BeEmpty();
         }
 
@@ -83,11 +83,11 @@ public class AuthorizeAttributeSpec
         {
             var result = new AuthorizeAttribute(Features.Platform_PaidTrial, Roles.Platform_Operations);
 
-            result.Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.Operations);
-            result.Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Operations);
+            result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Operations);
+            result.Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Operations);
             result.Roles.Tenant.Should().BeEmpty();
-            result.Features.All.Should().ContainSingle(level => level == PlatformFeatures.PaidTrial);
-            result.Features.Platform.Should().ContainSingle(level => level == PlatformFeatures.PaidTrial);
+            result.Features.All.Should().OnlyContain(level => level == PlatformFeatures.PaidTrial);
+            result.Features.Platform.Should().OnlyContain(level => level == PlatformFeatures.PaidTrial);
             result.Features.Tenant.Should().BeEmpty();
         }
 
@@ -96,13 +96,11 @@ public class AuthorizeAttributeSpec
         {
             var result = new AuthorizeAttribute(Features.Platform_Basic | Features.Platform_PaidTrial);
 
-            result.Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
-            result.Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
+            result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
+            result.Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
             result.Roles.Tenant.Should().BeEmpty();
-            result.Features.All.Should()
-                .ContainInOrder(PlatformFeatures.Basic, PlatformFeatures.PaidTrial);
-            result.Features.Platform.Should()
-                .ContainInOrder(PlatformFeatures.Basic, PlatformFeatures.PaidTrial);
+            result.Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.PaidTrial);
+            result.Features.Platform.Should().OnlyContain(feat => feat == PlatformFeatures.PaidTrial);
             result.Features.Tenant.Should().BeEmpty();
         }
 
@@ -113,13 +111,11 @@ public class AuthorizeAttributeSpec
                 new AuthorizeAttribute(Roles.Platform_Operations,
                     Features.Platform_PaidTrial | Features.Platform_Paid2);
 
-            result.Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.Operations);
-            result.Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Operations);
+            result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Operations);
+            result.Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Operations);
             result.Roles.Tenant.Should().BeEmpty();
-            result.Features.All.Should()
-                .ContainInOrder(PlatformFeatures.Paid2, PlatformFeatures.PaidTrial);
-            result.Features.Platform.Should()
-                .ContainInOrder(PlatformFeatures.Paid2, PlatformFeatures.PaidTrial);
+            result.Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.Paid2);
+            result.Features.Platform.Should().OnlyContain(feat => feat == PlatformFeatures.Paid2);
             result.Features.Tenant.Should().BeEmpty();
         }
 
@@ -129,11 +125,11 @@ public class AuthorizeAttributeSpec
             var result = new AuthorizeAttribute(Features.Platform_PaidTrial, Roles.Platform_Standard |
                                                                              Roles.Platform_Operations);
 
-            result.Roles.All.Should().ContainInOrder(PlatformRoles.Operations, PlatformRoles.Standard);
-            result.Roles.Platform.Should().ContainInOrder(PlatformRoles.Operations, PlatformRoles.Standard);
+            result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Operations);
+            result.Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Operations);
             result.Roles.Tenant.Should().BeEmpty();
-            result.Features.All.Should().ContainSingle(feat => feat == PlatformFeatures.PaidTrial);
-            result.Features.Platform.Should().ContainSingle(feat => feat == PlatformFeatures.PaidTrial);
+            result.Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.PaidTrial);
+            result.Features.Platform.Should().OnlyContain(feat => feat == PlatformFeatures.PaidTrial);
             result.Features.Tenant.Should().BeEmpty();
         }
     }
@@ -146,11 +142,11 @@ public class AuthorizeAttributeSpec
         {
             var result = new AuthorizeAttribute(Roles.Tenant_Member);
 
-            result.Roles.All.Should().ContainSingle(rol => rol == TenantRoles.Member);
+            result.Roles.All.Should().OnlyContain(rol => rol == TenantRoles.Member);
             result.Roles.Platform.Should().BeEmpty();
-            result.Roles.Tenant.Should().ContainSingle(rol => rol == TenantRoles.Member);
-            result.Features.All.Should().ContainSingle(level => level == PlatformFeatures.Basic);
-            result.Features.Platform.Should().ContainSingle(level => level == PlatformFeatures.Basic);
+            result.Roles.Tenant.Should().OnlyContain(rol => rol == TenantRoles.Member);
+            result.Features.All.Should().OnlyContain(level => level == PlatformFeatures.Basic);
+            result.Features.Platform.Should().OnlyContain(level => level == PlatformFeatures.Basic);
             result.Features.Tenant.Should().BeEmpty();
         }
 
@@ -159,11 +155,11 @@ public class AuthorizeAttributeSpec
         {
             var result = new AuthorizeAttribute(Roles.Tenant_Member | Roles.Tenant_Owner);
 
-            result.Roles.All.Should().ContainInOrder(TenantRoles.Member, TenantRoles.Owner);
+            result.Roles.All.Should().OnlyContain(rol => rol == TenantRoles.Owner);
             result.Roles.Platform.Should().BeEmpty();
-            result.Roles.Tenant.Should().ContainInOrder(TenantRoles.Member, TenantRoles.Owner);
-            result.Features.All.Should().ContainSingle(level => level == PlatformFeatures.Basic);
-            result.Features.Platform.Should().ContainSingle(level => level == PlatformFeatures.Basic);
+            result.Roles.Tenant.Should().OnlyContain(rol => rol == TenantRoles.Owner);
+            result.Features.All.Should().OnlyContain(level => level == PlatformFeatures.Basic);
+            result.Features.Platform.Should().OnlyContain(level => level == PlatformFeatures.Basic);
             result.Features.Tenant.Should().BeEmpty();
         }
 
@@ -172,12 +168,12 @@ public class AuthorizeAttributeSpec
         {
             var result = new AuthorizeAttribute(Features.Tenant_PaidTrial);
 
-            result.Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
-            result.Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
+            result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
+            result.Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
             result.Roles.Tenant.Should().BeEmpty();
-            result.Features.All.Should().ContainSingle(level => level == TenantFeatures.PaidTrial);
+            result.Features.All.Should().OnlyContain(level => level == TenantFeatures.PaidTrial);
             result.Features.Platform.Should().BeEmpty();
-            result.Features.Tenant.Should().ContainSingle(level => level == TenantFeatures.PaidTrial);
+            result.Features.Tenant.Should().OnlyContain(level => level == TenantFeatures.PaidTrial);
         }
 
         [Fact]
@@ -185,13 +181,12 @@ public class AuthorizeAttributeSpec
         {
             var result = new AuthorizeAttribute(Features.Tenant_PaidTrial | Features.Tenant_Paid2);
 
-            result.Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
-            result.Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
+            result.Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
+            result.Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
             result.Roles.Tenant.Should().BeEmpty();
-            result.Features.All.Should().ContainInOrder(TenantFeatures.Paid2, TenantFeatures.PaidTrial);
+            result.Features.All.Should().OnlyContain(feat => feat == TenantFeatures.Paid2);
             result.Features.Platform.Should().BeEmpty();
-            result.Features.Tenant.Should()
-                .ContainInOrder(TenantFeatures.Paid2, TenantFeatures.PaidTrial);
+            result.Features.Tenant.Should().OnlyContain(feat => feat == TenantFeatures.Paid2);
         }
 
         [Fact]
@@ -200,14 +195,12 @@ public class AuthorizeAttributeSpec
             var result = new AuthorizeAttribute(Roles.Tenant_Member, Features.Tenant_PaidTrial |
                                                                      Features.Tenant_Paid2);
 
-            result.Roles.All.Should().ContainSingle(rol => rol == TenantRoles.Member);
+            result.Roles.All.Should().OnlyContain(rol => rol == TenantRoles.Member);
             result.Roles.Platform.Should().BeEmpty();
-            result.Roles.Tenant.Should().ContainSingle(rol => rol == TenantRoles.Member);
-            result.Features.All.Should()
-                .ContainInOrder(TenantFeatures.Paid2, TenantFeatures.PaidTrial);
+            result.Roles.Tenant.Should().OnlyContain(rol => rol == TenantRoles.Member);
+            result.Features.All.Should().OnlyContain(feat => feat == TenantFeatures.Paid2);
             result.Features.Platform.Should().BeEmpty();
-            result.Features.Tenant.Should()
-                .ContainInOrder(TenantFeatures.Paid2, TenantFeatures.PaidTrial);
+            result.Features.Tenant.Should().OnlyContain(feat => feat == TenantFeatures.Paid2);
         }
 
         [Fact]
@@ -216,12 +209,12 @@ public class AuthorizeAttributeSpec
             var result = new AuthorizeAttribute(Features.Tenant_PaidTrial, Roles.Tenant_Owner |
                                                                            Roles.Tenant_Member);
 
-            result.Roles.All.Should().ContainInOrder(TenantRoles.Member, TenantRoles.Owner);
+            result.Roles.All.Should().OnlyContain(rol => rol == TenantRoles.Owner);
             result.Roles.Platform.Should().BeEmpty();
-            result.Roles.Tenant.Should().ContainInOrder(TenantRoles.Member, TenantRoles.Owner);
-            result.Features.All.Should().ContainSingle(feat => feat == TenantFeatures.PaidTrial);
+            result.Roles.Tenant.Should().OnlyContain(rol => rol == TenantRoles.Owner);
+            result.Features.All.Should().OnlyContain(feat => feat == TenantFeatures.PaidTrial);
             result.Features.Platform.Should().BeEmpty();
-            result.Features.Tenant.Should().ContainSingle(feat => feat == TenantFeatures.PaidTrial);
+            result.Features.Tenant.Should().OnlyContain(feat => feat == TenantFeatures.PaidTrial);
         }
 
         [Fact]
@@ -230,10 +223,10 @@ public class AuthorizeAttributeSpec
             var result = new AuthorizeAttribute(Roles.Tenant_Owner | Roles.Platform_Operations);
 
             result.Roles.All.Should().ContainInOrder(PlatformRoles.Operations, TenantRoles.Owner);
-            result.Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Operations);
-            result.Roles.Tenant.Should().ContainSingle(rol => rol == TenantRoles.Owner);
-            result.Features.All.Should().ContainSingle(feat => feat == PlatformFeatures.Basic);
-            result.Features.Platform.Should().ContainSingle(feat => feat == PlatformFeatures.Basic);
+            result.Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Operations);
+            result.Roles.Tenant.Should().OnlyContain(rol => rol == TenantRoles.Owner);
+            result.Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
+            result.Features.Platform.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
             result.Features.Tenant.Should().BeEmpty();
         }
     }
@@ -389,6 +382,27 @@ public class AuthorizeAttributeSpec
                     +
                     $"POLICY:{{|Features|:{{|Tenant|:[|paidtrial_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
         }
+
+        [Fact]
+        public void WhenCreatePolicyNameAndTwoSetsContainingMultipleRolesAndFeatures_ThenReturnsUniquePolicyNames()
+        {
+            var sets = new List<List<string>>
+            {
+                new()
+                {
+                    AuthorizeAttribute.FormatRoleName(Roles.Platform_Operations),
+                    AuthorizeAttribute.FormatRoleName(Roles.Platform_Standard),
+                    AuthorizeAttribute.FormatFeatureName(Features.Tenant_PaidTrial),
+                    AuthorizeAttribute.FormatFeatureName(Features.Tenant_Basic)
+                }
+            };
+
+            var result = AuthorizeAttribute.CreatePolicyName(sets);
+
+            result.Should()
+                .Be(
+                    $"POLICY:{{|Features|:{{|Tenant|:[|paidtrial_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
+        }
     }
 
     [Trait("Category", "Unit")]
@@ -420,8 +434,8 @@ public class AuthorizeAttributeSpec
                     $"POLICY:{{|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
 
             result.Count.Should().Be(1);
-            result[0].Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
-            result[0].Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
+            result[0].Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
+            result[0].Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
             result[0].Roles.Tenant.Should().BeEmpty();
             result[0].Features.All.Should().BeEmpty();
         }
@@ -433,11 +447,11 @@ public class AuthorizeAttributeSpec
                 $"POLICY:{{|Features|:{{|Platform|:[|basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
 
             result.Count.Should().Be(1);
-            result[0].Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
-            result[0].Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
+            result[0].Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
+            result[0].Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
             result[0].Roles.Tenant.Should().BeEmpty();
-            result[0].Features.All.Should().ContainSingle(feat => feat == PlatformFeatures.Basic);
-            result[0].Features.Platform.Should().ContainSingle(feat => feat == PlatformFeatures.Basic);
+            result[0].Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
+            result[0].Features.Platform.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
             result[0].Features.Tenant.Should().BeEmpty();
         }
 
@@ -450,18 +464,18 @@ public class AuthorizeAttributeSpec
                 $"POLICY:{{|Features|:{{|Tenant|:[|paidtrial_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
 
             result.Count.Should().Be(2);
-            result[0].Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
-            result[0].Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Standard);
+            result[0].Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
+            result[0].Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
             result[0].Roles.Tenant.Should().BeEmpty();
-            result[0].Features.All.Should().ContainSingle(feat => feat == PlatformFeatures.Basic);
+            result[0].Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
             result[0].Features.Platform.Should().BeEmpty();
-            result[0].Features.Tenant.Should().ContainSingle(feat => feat == PlatformFeatures.Basic);
-            result[1].Roles.All.Should().ContainSingle(rol => rol == PlatformRoles.Operations);
-            result[1].Roles.Platform.Should().ContainSingle(rol => rol == PlatformRoles.Operations);
+            result[0].Features.Tenant.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
+            result[1].Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Operations);
+            result[1].Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Operations);
             result[1].Roles.Tenant.Should().BeEmpty();
-            result[1].Features.All.Should().ContainSingle(feat => feat == PlatformFeatures.PaidTrial);
+            result[1].Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.PaidTrial);
             result[1].Features.Platform.Should().BeEmpty();
-            result[1].Features.Tenant.Should().ContainSingle(feat => feat == PlatformFeatures.PaidTrial);
+            result[1].Features.Tenant.Should().OnlyContain(feat => feat == PlatformFeatures.PaidTrial);
         }
     }
 }

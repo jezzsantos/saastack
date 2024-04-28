@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Application.Interfaces.Extensions;
 using Common.Extensions;
 
 namespace Application.Interfaces;

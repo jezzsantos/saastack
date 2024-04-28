@@ -21,7 +21,9 @@ public class ServiceCollectionExtensionsSpec
 
         services.RegisterValidators(new[] { typeof(ServiceCollectionExtensionsSpec).Assembly }, out _);
 
-        services.Should().ContainSingle(service => service.ImplementationType == typeof(TestRequestValidator));
+        services.Count.Should().Be(2);
+        services.Should().Contain(service => service.ImplementationType == typeof(TestRequestValidator));
+        services.Should().Contain(service => service.ImplementationType == typeof(TestRequestValidator2));
     }
 
     [Fact]

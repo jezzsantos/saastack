@@ -203,6 +203,9 @@
         <Compile Include="..\Domain.Interfaces\Entities\IChangeEventProducingAggregateRoot.cs">
             <Link>Reference\Domain.Interfaces\Entities\IChangeEventProducingAggregateRoot.cs</Link>
         </Compile>
+        <Compile Include="..\Domain.Interfaces\Extensions\HierarchicalLevelExtensions.cs">
+            <Link>Reference\Domain.Interfaces\Extensions\HierarchicalLevelExtensions.cs</Link>
+        </Compile>
         <Compile Include="..\Domain.Interfaces\ValueObjects\IValueObject.cs">
             <Link>Reference\Domain.Interfaces\ValueObjects\IValueObject.cs</Link>
         </Compile>

@@ -74,7 +74,7 @@ internal sealed class AspNetCallerContext : ICallerContext
         var scheme = authenticationFeature.AuthenticateResult?.Ticket?.AuthenticationScheme;
         var schemes = scheme.HasValue()
             ? scheme.Split(',', ';')
-            : Array.Empty<string>();
+            : [];
         if (schemes.HasNone())
         {
             return Optional<ICallerContext.CallerAuthorization>.None;

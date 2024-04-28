@@ -3,57 +3,40 @@ using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
+using Domain.Interfaces.Extensions;
 using Domain.Interfaces.ValueObjects;
 
 namespace Domain.Shared;
 
+/// <summary>
+///     Defines a collection of normalized <see cref="Feature" />.
+///     Since we only store the Name of the <see cref="FeatureLevel" /> we need to maintain a normalized collection
+///     of <see cref="Feature" />.
+/// </summary>
 public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
 {
     public static readonly Features Empty = new();
 
-    public static Features Create()
-    {
-        return new Features();
-    }
-
     public static Result<Features, Error> Create(string feature)
     {
-        var feat = Feature.Create(feature);
-        if (feat.IsFailure)
-        {
-            return feat.Error;
-        }
-
-        return new Features(feat.Value);
+        return Create(new FeatureLevel(feature));
     }
 
     public static Result<Features, Error> Create(FeatureLevel feature)
     {
-        var allLevels = feature.AllDescendantNames().ToArray();
-        return Create(allLevels);
+        return Create([feature]);
     }
 
     public static Result<Features, Error> Create(params string[] features)
     {
-        var list = new List<Feature>();
-        foreach (var feature in features)
-        {
-            var feat = Feature.Create(feature);
-            if (feat.IsFailure)
-            {
-                return feat.Error;
-            }
-
-            list.Add(feat.Value);
-        }
-
-        return new Features(list);
+        return Create(features.Select(feature => new FeatureLevel(feature)).ToArray());
     }
 
     public static Result<Features, Error> Create(params FeatureLevel[] features)
     {
+        var normalized = features.Normalize();
         var list = new List<Feature>();
-        foreach (var feature in features)
+        foreach (var feature in normalized)
         {
             var feat = Feature.Create(feature);
             if (feat.IsFailure)
@@ -67,11 +50,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
         return new Features(list);
     }
 
-    private Features() : base(new List<Feature>())
-    {
-    }
-
-    private Features(Feature feature) : base(new List<Feature> { feature })
+    private Features() : base([])
     {
     }
 
@@ -93,7 +72,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
 
     public Result<Features, Error> Add(string feature)
     {
-        var featureLevel = Feature.Create(feature);
+        var featureLevel = Feature.Create(new FeatureLevel(feature));
         if (featureLevel.IsFailure)
         {
             return featureLevel.Error;
@@ -104,31 +83,13 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
 
     public Result<Features, Error> Add(FeatureLevel feature)
     {
-        var features = new Features(Value.ToArray());
-        var allLevels = feature.AllDescendantNames().ToArray();
-        foreach (var level in allLevels)
+        var featureLevel = Feature.Create(feature);
+        if (featureLevel.IsFailure)
         {
-            var added = features.Add(level);
-            if (added.IsFailure)
-            {
-                return added.Error;
-            }
-
-            features = added.Value;
+            return featureLevel.Error;
         }
 
-        return features;
-    }
-
-    public Result<Features, Error> Add(Feature feature)
-    {
-        if (!Value.Contains(feature))
-        {
-            var newValues = Value.Concat(new[] { feature });
-            return new Features(newValues);
-        }
-
-        return new Features(Value);
+        return Add(featureLevel.Value);
     }
 
 #pragma warning disable CA1822
@@ -139,13 +100,30 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
     }
 
     [SkipImmutabilityCheck]
+    public List<string> Denormalize()
+    {
+        return Items
+            .Select(feat => feat.AsLevel())
+            .ToArray()
+            .Denormalize()
+            .ToList();
+    }
+
+    [SkipImmutabilityCheck]
     public bool HasAny()
     {
         return Value.HasAny();
     }
 
     [SkipImmutabilityCheck]
-    public bool HasFeature(string feature)
+    public bool HasFeature(Feature feature)
+    {
+        var denormalized = Denormalize();
+        return denormalized.ContainsIgnoreCase(feature.Identifier);
+    }
+
+    [SkipImmutabilityCheck]
+    public bool HasFeature(FeatureLevel feature)
     {
         var feat = Feature.Create(feature);
         if (feat.IsFailure)
@@ -157,18 +135,6 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
     }
 
     [SkipImmutabilityCheck]
-    public bool HasFeature(Feature feature)
-    {
-        return Value.ToList().Select(feat => feat.Identifier).ContainsIgnoreCase(feature);
-    }
-
-    [SkipImmutabilityCheck]
-    public bool HasFeature(FeatureLevel feature)
-    {
-        return HasFeature(feature.Name);
-    }
-
-    [SkipImmutabilityCheck]
     public bool HasNone()
     {
         return Value.HasNone();
@@ -176,27 +142,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
 
     public Features Remove(string feature)
     {
-        var feat = Feature.Create(feature);
-        if (feat.IsFailure)
-        {
-            return this;
-        }
-
-        return Remove(feat.Value);
-    }
-
-    public Features Remove(Feature feature)
-    {
-        if (Value.Contains(feature))
-        {
-            var remaining = Value
-                .Where(feat => !feat.Equals(feature))
-                .ToList();
-
-            return new Features(remaining);
-        }
-
-        return new Features(Value);
+        return Remove(new FeatureLevel(feature));
     }
 
     public Features Remove(FeatureLevel feature)
@@ -210,9 +156,35 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
         return Remove(feat.Value);
     }
 
-    [SkipImmutabilityCheck]
-    public List<string> ToList()
+    private Result<Features, Error> Add(Feature feature)
     {
-        return Items.Select(feat => feat.Identifier).ToList();
+        if (HasFeature(feature))
+        {
+            return new Features(Value);
+        }
+
+        var features = Value
+            .Select(val => val.AsLevel())
+            .ToArray()
+            .Merge(feature.AsLevel())
+            .Select(level => Feature.Create(level).Value);
+
+        return new Features(features);
+    }
+
+    private Features Remove(Feature feature)
+    {
+        if (!HasFeature(feature))
+        {
+            return new Features(Value);
+        }
+
+        var features = Value
+            .Select(feat => feat.AsLevel())
+            .ToArray()
+            .UnMerge(feature.AsLevel())
+            .Select(level => Feature.Create(level).Value);
+
+        return new Features(features);
     }
 }

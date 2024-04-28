@@ -7,6 +7,7 @@ using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using Domain.Interfaces.Extensions;
 using Domain.Shared;
 using UserProfilesApplication.Persistence;
 using UserProfilesDomain;
@@ -409,8 +410,8 @@ internal static class UserProfileConversionExtensions
     {
         var dto = profile.ToProfile().Convert<UserProfile, UserProfileForCaller>();
         dto.IsAuthenticated = caller.IsAuthenticated;
-        dto.Roles = caller.Roles.Platform.Select(rol => rol.Name).ToList();
-        dto.Features = caller.Features.Platform.Select(feat => feat.Name).ToList();
+        dto.Roles = caller.Roles.Platform.Denormalize().ToList();
+        dto.Features = caller.Features.Platform.Denormalize().ToList();
         dto.DefaultOrganizationId = profile.DefaultOrganizationId.ValueOrDefault!;
 
         return dto;

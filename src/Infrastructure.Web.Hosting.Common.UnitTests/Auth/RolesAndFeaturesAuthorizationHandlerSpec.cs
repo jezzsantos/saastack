@@ -55,7 +55,7 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
         _handler.HandleAsync(context);
 
         context.HasFailed.Should().BeTrue();
-        context.FailureReasons.Should().ContainSingle(x =>
+        context.FailureReasons.Should().OnlyContain(x =>
             x.Message == Resources.RolesAndFeaturesAuthorizationHandler_HandleRequirementAsync_MissingRole);
     }
 
@@ -72,7 +72,7 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
         _handler.HandleAsync(context);
 
         context.HasFailed.Should().BeTrue();
-        context.FailureReasons.Should().ContainSingle(x =>
+        context.FailureReasons.Should().OnlyContain(x =>
             x.Message == Resources.RolesAndFeaturesAuthorizationHandler_HandleRequirementAsync_MissingFeature);
     }
 
@@ -110,7 +110,7 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
         _handler.HandleAsync(context);
 
         context.HasFailed.Should().BeTrue();
-        context.FailureReasons.Should().ContainSingle(x =>
+        context.FailureReasons.Should().OnlyContain(x =>
             x.Message == Resources.RolesAndFeaturesAuthorizationHandler_HandleRequirementAsync_MissingRole);
     }
 
@@ -152,7 +152,7 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
         _handler.HandleAsync(context);
 
         context.HasFailed.Should().BeTrue();
-        context.FailureReasons.Should().ContainSingle(x =>
+        context.FailureReasons.Should().OnlyContain(x =>
             x.Message == Resources.RolesAndFeaturesAuthorizationHandler_HandleRequirementAsync_MissingRole);
 #endif
     }
@@ -190,7 +190,7 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
         _handler.HandleAsync(context);
 
         context.HasFailed.Should().BeTrue();
-        context.FailureReasons.Should().ContainSingle(x =>
+        context.FailureReasons.Should().OnlyContain(x =>
             x.Message == Resources.RolesAndFeaturesAuthorizationHandler_HandleRequirementAsync_MissingFeature);
     }
 
@@ -226,7 +226,7 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
         _handler.HandleAsync(context);
 
         context.HasFailed.Should().BeTrue();
-        context.FailureReasons.Should().ContainSingle(x =>
+        context.FailureReasons.Should().OnlyContain(x =>
             x.Message == Resources.RolesAndFeaturesAuthorizationHandler_HandleRequirementAsync_MissingFeature);
     }
 }

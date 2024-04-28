@@ -47,9 +47,9 @@ public class AuthorizeAttribute : Attribute
     public ICallerContext.CallerRoles Roles { get; }
 
     /// <summary>
-    ///     Converts the <see cref="rolesAndFeaturesSets" /> into their respective <see cref="PlatformRoles" /> and
-    ///     <see cref="PlatformFeatures" /> and then constructs a unique policy name for each of them.
-    ///     Note: each role or feature should come in in this form:
+    ///     Converts the <see cref="rolesAndFeaturesSets" /> into their respective <see cref="PlatformRoles" />,
+    ///     <see cref="PlatformFeatures" />, normalizes them, and then constructs a unique policy name for each of them.
+    ///     Note: each role or feature should come in this form:
     ///     e.g. "Role.Platform_Role1" or "Feature.Organization_Feature1"
     /// </summary>
     public static string CreatePolicyName(IReadOnlyList<IReadOnlyList<string>> rolesAndFeaturesSets)
@@ -80,18 +80,19 @@ public class AuthorizeAttribute : Attribute
         return CreatePoliciesName(setPolicyNames);
     }
 
-    public static string FormatFeatureName(Features flag)
+    internal static string FormatFeatureName(Features flag)
     {
         return $"{nameof(Interfaces.Features)}.{flag}";
     }
 
-    public static string FormatRoleName(Roles flag)
+    internal static string FormatRoleName(Roles flag)
     {
         return $"{nameof(Roles)}.{flag}";
     }
 
     /// <summary>
-    ///     Parses the specified <see cref="policyName" /> and extracts the <see cref="ICallerContext.CallerRoles" /> and the
+    ///     Parses the specified <see cref="policyName" /> and extracts the normalized
+    ///     <see cref="ICallerContext.CallerRoles" /> and the normalized
     ///     <see cref="ICallerContext.CallerFeatures" /> for each policy
     ///     Note: a policy may look like this:
     ///     "POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|{platform_standard}|]}}"

@@ -649,8 +649,8 @@ internal static class EndUserConversionExtensions
             OrganizationId = membership.UserId.Value,
             Ownership = membership.Ownership.Value.ToEnumOrDefault(OrganizationOwnership.Shared),
             Status = membership.Status.Value.ToEnumOrDefault(EndUserStatus.Unregistered),
-            Roles = membership.Roles.Value.ToList(),
-            Features = membership.Features.Value.ToList(),
+            Roles = membership.Roles.Value.Denormalize(),
+            Features = membership.Features.Value.Denormalize(),
             Profile = null!
         };
 
@@ -666,8 +666,8 @@ internal static class EndUserConversionExtensions
             IsDefault = membership.IsDefault,
             OrganizationId = membership.OrganizationId.Value,
             Ownership = membership.Ownership.Value.ToEnumOrDefault(OrganizationOwnership.Shared),
-            Features = membership.Features.ToList(),
-            Roles = membership.Roles.ToList()
+            Features = membership.Features.Denormalize(),
+            Roles = membership.Roles.Denormalize()
         };
     }
 
@@ -709,8 +709,8 @@ internal static class EndUserConversionExtensions
             Access = user.Access.ToEnumOrDefault(EndUserAccess.Enabled),
             Status = user.Status.ToEnumOrDefault(EndUserStatus.Unregistered),
             Classification = user.Classification.ToEnumOrDefault(EndUserClassification.Person),
-            Features = user.Features.ToList(),
-            Roles = user.Roles.ToList()
+            Features = user.Features.Denormalize(),
+            Roles = user.Roles.Denormalize()
         };
     }
 

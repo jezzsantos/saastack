@@ -68,7 +68,7 @@ public class JWTTokensServiceSpec
         var token = new JwtSecurityTokenHandler().ReadJwtToken(result.Value.AccessToken);
 
         token.Issuer.Should().Be("https://localhost");
-        token.Audiences.Should().ContainSingle(aud => aud == "https://localhost");
+        token.Audiences.Should().OnlyContain(aud => aud == "https://localhost");
         token.ValidTo.Should().BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry),
             TimeSpan.FromMinutes(1));
         token.Claims.Count().Should().Be(8);

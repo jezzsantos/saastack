@@ -1,4 +1,5 @@
 using Domain.Interfaces.Authorization;
+using Domain.Interfaces.Extensions;
 
 namespace Application.Interfaces;
 
@@ -12,15 +13,15 @@ public partial interface ICallerContext
     {
         public CallerRoles()
         {
-            All = Array.Empty<RoleLevel>();
-            Platform = Array.Empty<RoleLevel>();
-            Tenant = Array.Empty<RoleLevel>();
+            All = [];
+            Platform = [];
+            Tenant = [];
         }
 
         public CallerRoles(RoleLevel[]? platform, RoleLevel[]? tenant)
         {
-            Platform = platform ?? Array.Empty<RoleLevel>();
-            Tenant = tenant ?? Array.Empty<RoleLevel>();
+            Platform = platform.Normalize();
+            Tenant = tenant.Normalize();
             All = Platform
                 .Concat(Tenant)
                 .Distinct()
@@ -41,15 +42,15 @@ public partial interface ICallerContext
     {
         public CallerFeatures()
         {
-            All = Array.Empty<FeatureLevel>();
-            Platform = Array.Empty<FeatureLevel>();
-            Tenant = Array.Empty<FeatureLevel>();
+            All = [];
+            Platform = [];
+            Tenant = [];
         }
 
         public CallerFeatures(FeatureLevel[]? platform, FeatureLevel[]? tenant)
         {
-            Platform = platform ?? Array.Empty<FeatureLevel>();
-            Tenant = tenant ?? Array.Empty<FeatureLevel>();
+            Platform = platform.Normalize();
+            Tenant = tenant.Normalize();
             All = Platform
                 .Concat(Tenant)
                 .Distinct()

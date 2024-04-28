@@ -29,8 +29,8 @@ public static class Events
             FromMembershipId = fromMembershipId.ValueOrDefault!,
             ToMembershipId = toMembershipId,
             ToOrganizationId = toOrganizationId,
-            Roles = roles.ToList(),
-            Features = features.ToList()
+            Roles = roles.Denormalize(),
+            Features = features.Denormalize()
         };
     }
 
@@ -63,8 +63,8 @@ public static class Events
             MembershipId = null,
             IsDefault = isDefault,
             OrganizationId = organizationId,
-            Roles = roles.ToList(),
-            Features = features.ToList(),
+            Roles = roles.Denormalize(),
+            Features = features.Denormalize(),
             Ownership = ownership
         };
     }
@@ -146,8 +146,8 @@ public static class Events
             Classification = classification,
             Access = access,
             Status = status,
-            Roles = roles.ToList(),
-            Features = features.ToList(),
+            Roles = roles.Denormalize(),
+            Features = features.Denormalize(),
             UserProfile = new RegisteredUserProfile
             {
                 FirstName = userProfile.Name.FirstName,

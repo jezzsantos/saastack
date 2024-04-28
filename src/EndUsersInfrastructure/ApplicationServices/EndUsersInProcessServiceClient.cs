@@ -26,8 +26,7 @@ public class EndUsersInProcessServiceClient : IEndUsersService
     }
 
     public async Task<Result<EndUserWithMemberships, Error>> GetMembershipsPrivateAsync(ICallerContext caller,
-        string id,
-        CancellationToken cancellationToken)
+        string id, CancellationToken cancellationToken)
     {
         return await _endUsersApplication.GetMembershipsAsync(caller, id, cancellationToken);
     }

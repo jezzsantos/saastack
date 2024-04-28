@@ -12,7 +12,7 @@ public class FeatureSpec
     [Fact]
     public void WhenCreateWithEmpty_ThenReturnsError()
     {
-        var result = Feature.Create(string.Empty);
+        var result = Feature.Create(new FeatureLevel(string.Empty));
 
         result.Should().BeError(ErrorCode.Validation);
     }
@@ -20,7 +20,7 @@ public class FeatureSpec
     [Fact]
     public void WhenCreateWithInvalidName_ThenReturnsError()
     {
-        var result = Feature.Create("^aninvalidname^");
+        var result = Feature.Create(new FeatureLevel("^aninvalidname^"));
 
         result.Should().BeError(ErrorCode.Validation, Resources.Features_InvalidFeature);
     }
@@ -28,7 +28,7 @@ public class FeatureSpec
     [Fact]
     public void WhenCreateWithAnUnknownName_ThenReturnsValue()
     {
-        var result = Feature.Create("anunknownfeature");
+        var result = Feature.Create(new FeatureLevel("anunknownfeature"));
 
         result.Should().BeSuccess();
         result.Value.Identifier.Should().Be("anunknownfeature");
@@ -79,9 +79,8 @@ public class FeaturesSpec
         var result = Features.Create(PlatformFeatures.TestingOnlySuperUser);
 
         result.Should().BeSuccess();
-        result.Value.Items.Should().ContainInOrder(Feature.Create(
-                PlatformFeatures.TestingOnlySuperUser).Value,
-            Feature.Create(PlatformFeatures.TestingOnly).Value);
+        result.Value.Items.Should()
+            .OnlyContain(feat => feat == Feature.Create(PlatformFeatures.TestingOnlySuperUser).Value);
     }
 #endif
 
@@ -100,7 +99,22 @@ public class FeaturesSpec
         var result = Features.Create(PlatformFeatures.Basic, PlatformFeatures.TestingOnly);
 
         result.Should().BeSuccess();
+        result.Value.Items.Count.Should().Be(2);
         result.Value.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Basic).Value,
+            Feature.Create(PlatformFeatures.TestingOnly).Value);
+    }
+#endif
+
+#if TESTINGONLY
+    [Fact]
+    public void WhenCreateWithListContainingParent_ThenReturnsNormalizedValue()
+    {
+        var result = Features.Create(PlatformFeatures.Paid3, PlatformFeatures.Paid2, PlatformFeatures.PaidTrial,
+            PlatformFeatures.TestingOnly);
+
+        result.Should().BeSuccess();
+        result.Value.Items.Count.Should().Be(2);
+        result.Value.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Paid3).Value,
             Feature.Create(PlatformFeatures.TestingOnly).Value);
     }
 #endif
@@ -113,7 +127,7 @@ public class FeaturesSpec
         var result = features.Add("anunknownfeature");
 
         result.Should().BeSuccess();
-        result.Value.Items.Should().ContainSingle(feat => feat.Identifier == "anunknownfeature");
+        result.Value.Items.Should().OnlyContain(feat => feat.Identifier == "anunknownfeature");
     }
 
     [Fact]
@@ -124,7 +138,7 @@ public class FeaturesSpec
         var result = features.Add(PlatformFeatures.Basic.Name);
 
         result.Should().BeSuccess();
-        result.Value.Items.Should().ContainSingle(feat => feat.Identifier == PlatformFeatures.Basic.Name);
+        result.Value.Items.Should().OnlyContain(feat => feat.Identifier == PlatformFeatures.Basic.Name);
     }
 
 #if TESTINGONLY
@@ -136,12 +150,38 @@ public class FeaturesSpec
         var result = features.Add(PlatformFeatures.TestingOnlySuperUser);
 
         result.Should().BeSuccess();
+        result.Value.Items.Count.Should().Be(2);
         result.Value.Items.Should().ContainInOrder(
             Feature.Create(PlatformFeatures.Basic).Value,
-            Feature.Create(PlatformFeatures.TestingOnlySuperUser).Value,
-            Feature.Create(PlatformFeatures.TestingOnly).Value);
+            Feature.Create(PlatformFeatures.TestingOnlySuperUser).Value);
     }
 #endif
+
+    [Fact]
+    public void WhenAddParentFeatureLevel_ThenReturnsNormalizedValue()
+    {
+        var features = Features.Create(PlatformFeatures.Basic).Value;
+
+        var result = features.Add(PlatformFeatures.PaidTrial);
+
+        result.Should().BeSuccess();
+        result.Value.Items.Count.Should().Be(1);
+        result.Value.Items.Should().ContainInOrder(
+            Feature.Create(PlatformFeatures.PaidTrial).Value);
+    }
+
+    [Fact]
+    public void WhenAddChildFeatureLevel_ThenReturnsNormalizedValue()
+    {
+        var features = Features.Create(PlatformFeatures.PaidTrial).Value;
+
+        var result = features.Add(PlatformFeatures.Basic);
+
+        result.Should().BeSuccess();
+        result.Value.Items.Count.Should().Be(1);
+        result.Value.Items.Should().ContainInOrder(
+            Feature.Create(PlatformFeatures.PaidTrial).Value);
+    }
 
     [Fact]
     public void WhenAddFeatureAndExists_ThenDoesNotAdd()
@@ -152,7 +192,7 @@ public class FeaturesSpec
         var result = features.Add(PlatformFeatures.Basic.Name);
 
         result.Should().BeSuccess();
-        result.Value.Items.Should().ContainSingle(feat => feat.Identifier == PlatformFeatures.Basic.Name);
+        result.Value.Items.Should().OnlyContain(feat => feat.Identifier == PlatformFeatures.Basic.Name);
     }
 
 #if TESTINGONLY
@@ -228,7 +268,7 @@ public class FeaturesSpec
     {
         var features = Features.Empty;
 
-        var result = features.HasFeature("anunknownfeature");
+        var result = features.HasFeature(new FeatureLevel("anunknownfeature"));
 
         result.Should().BeFalse();
     }
@@ -247,10 +287,32 @@ public class FeaturesSpec
 #endif
 
     [Fact]
-    public void WhenHasHasLevelAndMatching_ThenReturnsTrue()
+    public void WhenHasFeatureAndHasSameFeature_ThenReturnsTrue()
     {
         var features = Features.Empty;
         features = features.Add(PlatformFeatures.Basic).Value;
+
+        var result = features.HasFeature(PlatformFeatures.Basic);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenHasFeatureAndHasParentFeature_ThenReturnsFalse()
+    {
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.Basic).Value;
+
+        var result = features.HasFeature(PlatformFeatures.PaidTrial);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhenHasFeatureAndHasChildFeature_ThenReturnsTrue()
+    {
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.PaidTrial).Value;
 
         var result = features.HasFeature(PlatformFeatures.Basic);
 
@@ -292,17 +354,52 @@ public class FeaturesSpec
         result.Items.Should().BeEmpty();
     }
 
-#if TESTINGONLY
     [Fact]
-    public void WhenToList_ThenReturnsStringList()
+    public void WhenRemoveChildAndHasParent_ThenLeavesParent()
+    {
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.PaidTrial).Value;
+
+        var result = features.Remove(PlatformFeatures.Basic);
+
+        result.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.PaidTrial).Value);
+    }
+
+    [Fact]
+    public void WhenRemoveParentAndHasDescendants_ThenLeavesDescendants()
+    {
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.PaidTrial).Value;
+
+        var result = features.Remove(PlatformFeatures.PaidTrial);
+
+        result.Items.Should().ContainInOrder(Feature.Create(PlatformFeatures.Basic).Value);
+    }
+
+    [Fact]
+    public void WhenRemoveParentAndNoDescendants_ThenRemovesParent()
     {
         var features = Features.Empty;
         features = features.Add(PlatformFeatures.Basic).Value;
-        features = features.Add(PlatformFeatures.TestingOnly).Value;
 
-        var result = features.ToList();
+        var result = features.Remove(PlatformFeatures.Basic);
 
-        result.Should().ContainInOrder(PlatformFeatures.Basic.Name, PlatformFeatures.TestingOnly.Name);
+        result.Items.Should().BeEmpty();
+    }
+
+#if TESTINGONLY
+    [Fact]
+    public void WhenDenormalize_ThenReturnsDenormalizedList()
+    {
+        var features = Features.Empty;
+        features = features.Add(PlatformFeatures.PaidTrial).Value;
+        features = features.Add(PlatformFeatures.TestingOnlySuperUser).Value;
+
+        var result = features.Denormalize();
+
+        result.Count.Should().Be(4);
+        result.Should().ContainInOrder(PlatformFeatures.PaidTrial.Name, PlatformFeatures.Basic.Name,
+            PlatformFeatures.TestingOnlySuperUser.Name, PlatformFeatures.TestingOnly.Name);
     }
 #endif
 }

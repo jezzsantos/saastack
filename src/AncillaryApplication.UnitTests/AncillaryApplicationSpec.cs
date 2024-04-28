@@ -444,7 +444,7 @@ public class AncillaryApplicationSpec
 
         result.Value.Results.Count.Should().Be(1);
         result.Value.Results[0].Id.Should().Be("anid");
-        result.Value.Results[0].Attempts.Should().ContainSingle(x => x.IsNear(datum));
+        result.Value.Results[0].Attempts.Should().OnlyContain(x => x.IsNear(datum));
         result.Value.Results[0].Subject.Should().Be("asubject");
         result.Value.Results[0].Body.Should().Be("abody");
         result.Value.Results[0].ToEmailAddress.Should().Be("arecipient@company.com");

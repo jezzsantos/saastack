@@ -132,7 +132,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         members.Content.Value.Members[1].Name.FirstName.Should().Be("personb");
         members.Content.Value.Members[1].Name.LastName.Should().Be("alastname");
         members.Content.Value.Members[1].Classification.Should().Be(UserProfileClassification.Person);
-        members.Content.Value.Members[1].Roles.Should().ContainSingle(role => role == TenantRoles.Member.Name);
+        members.Content.Value.Members[1].Roles.Should().OnlyContain(role => role == TenantRoles.Member.Name);
         members.Content.Value.Members[2].IsDefault.Should().BeTrue();
         members.Content.Value.Members[2].IsOwner.Should().BeFalse();
         members.Content.Value.Members[2].IsRegistered.Should().BeFalse();
@@ -141,7 +141,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         members.Content.Value.Members[2].Name.FirstName.Should().Be(loginC);
         members.Content.Value.Members[2].Name.LastName.Should().BeNull();
         members.Content.Value.Members[2].Classification.Should().Be(UserProfileClassification.Person);
-        members.Content.Value.Members[2].Roles.Should().ContainSingle(role => role == TenantRoles.Member.Name);
+        members.Content.Value.Members[2].Roles.Should().OnlyContain(role => role == TenantRoles.Member.Name);
         members.Content.Value.Members[3].IsDefault.Should().BeTrue();
         members.Content.Value.Members[3].IsOwner.Should().BeFalse();
         members.Content.Value.Members[3].IsRegistered.Should().BeTrue();
@@ -150,7 +150,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         members.Content.Value.Members[3].Name.FirstName.Should().Be("amachinename");
         members.Content.Value.Members[3].Name.LastName.Should().BeNull();
         members.Content.Value.Members[3].Classification.Should().Be(UserProfileClassification.Machine);
-        members.Content.Value.Members[3].Roles.Should().ContainSingle(role => role == TenantRoles.Member.Name);
+        members.Content.Value.Members[3].Roles.Should().OnlyContain(role => role == TenantRoles.Member.Name);
     }
 
     [Fact]
@@ -465,7 +465,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         memberships.Content.Value.Memberships![1].OrganizationId.Should().Be(organizationId);
         memberships.Content.Value.Memberships![1].Ownership.Should().Be(OrganizationOwnership.Shared);
         memberships.Content.Value.Memberships![1].Roles.Should()
-            .ContainInOrder(TenantRoles.Member.Name, TenantRoles.Owner.Name);
+            .ContainInOrder(TenantRoles.Owner.Name, TenantRoles.Member.Name);
     }
 
     [Fact]
@@ -513,6 +513,64 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         memberships.Content.Value.Memberships![1].Roles.Should().ContainInOrder(TenantRoles.Member.Name);
     }
 
+    [Fact]
+    public async Task WhenPromoteAndDemoteOwner_ThenDemotes()
+    {
+        var loginA = await LoginUserAsync();
+        var loginB = await LoginUserAsync(LoginUser.PersonB);
+
+        var organization = await Api.PostAsync(new CreateOrganizationRequest
+        {
+            Name = "aname"
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        loginA = await ReAuthenticateUserAsync(loginA.User);
+        var organizationId = organization.Content.Value.Organization!.Id;
+        await Api.PostAsync(new InviteMemberToOrganizationRequest
+        {
+            Id = organizationId,
+            Email = loginB.User.Profile!.EmailAddress
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        await Api.PutAsync(new AssignRolesToOrganizationRequest
+        {
+            Id = organizationId,
+            UserId = loginB.User.Id,
+            Roles = [TenantRoles.Owner.Name]
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        var memberships1 = await Api.GetAsync(new ListMembershipsForCallerRequest(),
+            req => req.SetJWTBearerToken(loginB.AccessToken));
+
+        memberships1.Content.Value.Memberships!.Count.Should().Be(2);
+        memberships1.Content.Value.Memberships![0].OrganizationId.Should().NotBeNull();
+        memberships1.Content.Value.Memberships![0].Ownership.Should().Be(OrganizationOwnership.Personal);
+        memberships1.Content.Value.Memberships![0].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
+        memberships1.Content.Value.Memberships![1].OrganizationId.Should().Be(organizationId);
+        memberships1.Content.Value.Memberships![1].Ownership.Should().Be(OrganizationOwnership.Shared);
+        memberships1.Content.Value.Memberships![1].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
+
+        await Api.PutAsync(new UnassignRolesFromOrganizationRequest
+        {
+            Id = organizationId,
+            UserId = loginB.User.Id,
+            Roles = [TenantRoles.Owner.Name]
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        var memberships2 = await Api.GetAsync(new ListMembershipsForCallerRequest(),
+            req => req.SetJWTBearerToken(loginB.AccessToken));
+
+        memberships2.Content.Value.Memberships!.Count.Should().Be(2);
+        memberships2.Content.Value.Memberships![0].OrganizationId.Should().NotBeNull();
+        memberships2.Content.Value.Memberships![0].Ownership.Should().Be(OrganizationOwnership.Personal);
+        memberships2.Content.Value.Memberships![0].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
+        memberships2.Content.Value.Memberships![1].OrganizationId.Should().Be(organizationId);
+        memberships2.Content.Value.Memberships![1].Ownership.Should().Be(OrganizationOwnership.Shared);
+        memberships2.Content.Value.Memberships![1].Roles.Should().ContainInOrder(TenantRoles.Member.Name);
+    }
+
+    
+    
     [Fact]
     public async Task WhenDeleteAndHasMembers_ThenReturnsError()
     {

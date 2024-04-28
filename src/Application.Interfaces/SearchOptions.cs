@@ -1,5 +1,6 @@
 ﻿using System.Linq.Dynamic.Core;
 using System.Linq.Dynamic.Core.Exceptions;
+using Application.Interfaces.Extensions;
 using Common;
 using Common.Extensions;
 

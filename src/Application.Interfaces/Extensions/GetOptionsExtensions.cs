@@ -2,7 +2,7 @@
 using Common;
 using Common.Extensions;
 
-namespace Application.Interfaces;
+namespace Application.Interfaces.Extensions;
 
 public static class GetOptionsExtensions
 {

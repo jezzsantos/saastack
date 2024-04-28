@@ -436,7 +436,7 @@ public sealed class EndUserRoot : AggregateRootBase
                         Resources.EndUserRoot_UnassignableTenantFeature.Format(feature.Identifier));
                 }
 
-                if (membership.Value.Features.HasFeature(feature.Identifier))
+                if (membership.Value.Features.HasFeature(feature))
                 {
                     return Result.Ok;
                 }
@@ -481,7 +481,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 return Error.RuleViolation(Resources.EndUserRoot_NotAssignableTenantRole.Format(role.Identifier));
             }
 
-            if (membership.Value.Roles.HasRole(role.Identifier))
+            if (membership.Value.Roles.HasRole(role))
             {
                 return membership.Value;
             }
@@ -516,7 +516,7 @@ public sealed class EndUserRoot : AggregateRootBase
                         Resources.EndUserRoot_NotAssignablePlatformFeature.Format(feature.Identifier));
                 }
 
-                if (Features.HasFeature(feature.Identifier))
+                if (Features.HasFeature(feature))
                 {
                     return Result.Ok;
                 }
@@ -550,7 +550,7 @@ public sealed class EndUserRoot : AggregateRootBase
                     return Error.RuleViolation(Resources.EndUserRoot_NotAssignablePlatformRole.Format(role.Identifier));
                 }
 
-                if (Roles.HasRole(role.Identifier))
+                if (Roles.HasRole(role))
                 {
                     return Result.Ok;
                 }
@@ -796,7 +796,7 @@ public sealed class EndUserRoot : AggregateRootBase
                 return Error.RuleViolation(Resources.EndUserRoot_NotAssignableTenantRole.Format(role.Identifier));
             }
 
-            if (!membership.Value.Roles.HasRole(role.Identifier))
+            if (!membership.Value.Roles.HasRole(role))
             {
                 return membership.Value;
             }
@@ -837,7 +837,7 @@ public sealed class EndUserRoot : AggregateRootBase
                             .Format(PlatformRoles.Standard.Name));
                 }
 
-                if (!Roles.HasRole(role.Identifier))
+                if (!Roles.HasRole(role))
                 {
                     return Result.Ok;
                 }

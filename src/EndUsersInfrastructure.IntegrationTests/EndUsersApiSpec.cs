@@ -41,7 +41,7 @@ public class EndUsersApiSpec : WebApiSpec<Program>
         var result = await Api.PostAsync(new AssignPlatformRolesRequest
         {
             Id = login.User.Id,
-            Roles = new List<string> { PlatformRoles.TestingOnly.Name }
+            Roles = [PlatformRoles.TestingOnly.Name]
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
         result.Content.Value.User!.Roles.Should()
@@ -57,17 +57,43 @@ public class EndUsersApiSpec : WebApiSpec<Program>
         await Api.PostAsync(new AssignPlatformRolesRequest
         {
             Id = login.User.Id,
-            Roles = new List<string> { PlatformRoles.TestingOnly.Name }
+            Roles = [PlatformRoles.TestingOnly.Name]
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
         var result = await Api.PatchAsync(new UnassignPlatformRolesRequest
         {
             Id = login.User.Id,
-            Roles = new List<string> { PlatformRoles.TestingOnly.Name }
+            Roles = [PlatformRoles.TestingOnly.Name]
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
         result.Content.Value.User!.Roles.Should()
-            .ContainInOrder(PlatformRoles.Standard.Name, PlatformRoles.Operations.Name);
+            .ContainInOrder(PlatformRoles.Operations.Name, PlatformRoles.Standard.Name);
+#endif
+    }
+
+    [Fact]
+    public async Task WhenAssignAndUnassignOperatorRoles_ThenRemainsStandardRole()
+    {
+        var @operator = await LoginUserAsync(LoginUser.Operator);
+        var loginA = await LoginUserAsync();
+#if TESTINGONLY
+        var result1 = await Api.PostAsync(new AssignPlatformRolesRequest
+        {
+            Id = loginA.User.Id,
+            Roles = [PlatformRoles.Operations.Name]
+        }, req => req.SetJWTBearerToken(@operator.AccessToken));
+
+        result1.Content.Value.User!.Roles.Should()
+            .ContainInOrder(PlatformRoles.Operations.Name, PlatformRoles.Standard.Name);
+
+        var result2 = await Api.PatchAsync(new UnassignPlatformRolesRequest
+        {
+            Id = loginA.User.Id,
+            Roles = [PlatformRoles.Operations.Name]
+        }, req => req.SetJWTBearerToken(@operator.AccessToken));
+
+        result2.Content.Value.User!.Roles.Should()
+            .OnlyContain(rol => rol == PlatformRoles.Standard.Name);
 #endif
     }
 

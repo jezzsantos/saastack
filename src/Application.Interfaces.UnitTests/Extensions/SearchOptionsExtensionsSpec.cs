@@ -1,7 +1,8 @@
+using Application.Interfaces.Extensions;
 using FluentAssertions;
 using Xunit;
 
-namespace Application.Interfaces.UnitTests;
+namespace Application.Interfaces.UnitTests.Extensions;
 
 [Trait("Category", "Unit")]
 public class SearchOptionsExtensionsSpec

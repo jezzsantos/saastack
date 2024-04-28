@@ -208,7 +208,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         result.Content.Value.Credential.User.Access.Should().Be(EndUserAccess.Enabled);
         result.Content.Value.Credential.User.Status.Should().Be(EndUserStatus.Registered);
         result.Content.Value.Credential.User.Classification.Should().Be(EndUserClassification.Person);
-        result.Content.Value.Credential.User.Roles.Should().ContainSingle(rol => rol == PlatformRoles.Standard.Name);
+        result.Content.Value.Credential.User.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
         result.Content.Value.Credential.User.Features.Should()
             .ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
         result.Content.Value.Credential.User.Profile!.UserId.Should().Be(result.Content.Value.Credential.User.Id);
@@ -248,7 +248,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         result.Content.Value.Credential.User.Access.Should().Be(EndUserAccess.Enabled);
         result.Content.Value.Credential.User.Status.Should().Be(EndUserStatus.Registered);
         result.Content.Value.Credential.User.Classification.Should().Be(EndUserClassification.Person);
-        result.Content.Value.Credential.User.Roles.Should().ContainSingle(rol => rol == PlatformRoles.Standard.Name);
+        result.Content.Value.Credential.User.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
         result.Content.Value.Credential.User.Features.Should()
             .ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
         result.Content.Value.Credential.User.Profile!.UserId.Should().Be(result.Content.Value.Credential.User.Id);
@@ -289,7 +289,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         result.Content.Value.Credential.User.Access.Should().Be(EndUserAccess.Enabled);
         result.Content.Value.Credential.User.Status.Should().Be(EndUserStatus.Registered);
         result.Content.Value.Credential.User.Classification.Should().Be(EndUserClassification.Person);
-        result.Content.Value.Credential.User.Roles.Should().ContainSingle(rol => rol == PlatformRoles.Standard.Name);
+        result.Content.Value.Credential.User.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
         result.Content.Value.Credential.User.Features.Should()
             .ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
         result.Content.Value.Credential.User.Profile!.UserId.Should().Be(result.Content.Value.Credential.User.Id);

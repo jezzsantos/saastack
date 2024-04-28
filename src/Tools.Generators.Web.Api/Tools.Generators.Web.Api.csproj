@@ -97,6 +97,9 @@
         <Compile Include="..\Domain.Interfaces\Authorization\TenantFeatures.cs">
             <Link>Reference\Domain.Interfaces\Authorization\TenantFeatures.cs</Link>
         </Compile>
+        <Compile Include="..\Domain.Interfaces\Extensions\HierarchicalLevelExtensions.cs">
+            <Link>Reference\Domain.Interfaces\Extensions\HierarchicalLevelExtensions.cs</Link>
+        </Compile>
     </ItemGroup>
 
 </Project>
