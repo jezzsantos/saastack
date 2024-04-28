@@ -153,6 +153,14 @@ public class CarsApplication : ICarsApplication
         return saved.Match<Result<Car, Error>>(c =>
         {
             _recorder.TraceInformation(caller.ToCall(), "Car {Id} was registered", c.Value.Id);
+            _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Core.CarRegistered,
+                new Dictionary<string, object>
+                {
+                    { UsageConstants.Properties.Id, car.Id },
+                    { UsageConstants.Properties.CarMake, car.Manufacturer.Value.Make.Text },
+                    { UsageConstants.Properties.CarModel, car.Manufacturer.Value.Model.Text },
+                    { UsageConstants.Properties.CarYear, car.Manufacturer.Value.Year.Number }
+                });
             return c.Value.ToCar();
         }, error => error);
     }

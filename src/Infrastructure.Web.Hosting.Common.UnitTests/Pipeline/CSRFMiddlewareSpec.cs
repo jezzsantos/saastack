@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
+using Application.Interfaces;
 using Application.Interfaces.Services;
 using Common;
 using Common.Extensions;
@@ -24,6 +25,7 @@ public class CSRFMiddlewareSpec
     private readonly CSRFMiddleware _middleware;
     private readonly Mock<RequestDelegate> _next;
     private readonly ServiceProvider _serviceProvider;
+    private readonly Mock<ICallerContextFactory> _callerContextFactory;
 
     public CSRFMiddlewareSpec()
     {
@@ -40,6 +42,9 @@ public class CSRFMiddlewareSpec
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddSingleton<ILoggerFactory>(new LoggerFactory());
         _serviceProvider = serviceCollection.BuildServiceProvider();
+        _callerContextFactory = new Mock<ICallerContextFactory>();
+        _callerContextFactory.Setup(c => c.Create())
+            .Returns(Mock.Of<ICallerContext>(cc => cc.CallerId == "auserid"));
 
         _middleware = new CSRFMiddleware(_next.Object, recorder.Object, _hostSettings.Object, _csrfService.Object);
     }
@@ -52,7 +57,7 @@ public class CSRFMiddlewareSpec
             Request = { Method = HttpMethods.Get }
         };
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         _next.Verify(n => n.Invoke(context));
         _csrfService.Verify(
@@ -66,7 +71,7 @@ public class CSRFMiddlewareSpec
         var context = SetupContext();
         _hostSettings.Setup(s => s.GetWebsiteHostBaseUrl()).Returns("notauri");
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         context.Response.Should().BeAProblem(HttpStatusCode.InternalServerError,
             Resources.CSRFMiddleware_InvalidHostName.Format("notauri"));
@@ -78,7 +83,7 @@ public class CSRFMiddlewareSpec
     {
         var context = SetupContext();
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         context.Response.Should().BeAProblem(HttpStatusCode.Forbidden,
             Resources.CSRFMiddleware_MissingCSRFCookieValue);
@@ -92,7 +97,7 @@ public class CSRFMiddlewareSpec
         context.Request.Cookies = SetupCookies(new Dictionary<string, string>
             { { CSRFConstants.Cookies.AntiCSRF, "ananticsrfcookie" } });
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         context.Response.Should().BeAProblem(HttpStatusCode.Forbidden,
             Resources.CSRFMiddleware_MissingCSRFHeaderValue);
@@ -110,7 +115,7 @@ public class CSRFMiddlewareSpec
         });
         context.Request.Headers.Append(CSRFConstants.Headers.AntiCSRF, new StringValues("ananticsrfheader"));
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         context.Response.Should().BeAProblem(HttpStatusCode.Forbidden,
             Resources.CSRFMiddleware_InvalidToken);
@@ -131,7 +136,7 @@ public class CSRFMiddlewareSpec
         });
         context.Request.Headers.Append(CSRFConstants.Headers.AntiCSRF, new StringValues("ananticsrfheader"));
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         context.Response.Should().BeAProblem(HttpStatusCode.Forbidden,
             Resources.CSRFMiddleware_InvalidToken);
@@ -152,7 +157,7 @@ public class CSRFMiddlewareSpec
                 It.IsAny<Optional<string>>()))
             .Returns(false);
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         context.Response.Should().BeAProblem(HttpStatusCode.Forbidden,
             Resources.CSRFMiddleware_InvalidSignature.Format(nameof(Optional.None)));
@@ -181,7 +186,7 @@ public class CSRFMiddlewareSpec
                 It.IsAny<Optional<string>>()))
             .Returns(false);
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         context.Response.Should().BeAProblem(HttpStatusCode.Forbidden,
             Resources.CSRFMiddleware_InvalidSignature.Format("auserid"));
@@ -212,7 +217,7 @@ public class CSRFMiddlewareSpec
                 It.IsAny<Optional<string>>()))
             .Returns(true);
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         context.Response.Should().BeAProblem(HttpStatusCode.Forbidden,
             Resources.CSRFMiddleware_MissingOriginAndReferer);
@@ -243,7 +248,7 @@ public class CSRFMiddlewareSpec
                 It.IsAny<Optional<string>>()))
             .Returns(true);
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         context.Response.Should().BeAProblem(HttpStatusCode.Forbidden,
             Resources.CSRFMiddleware_OriginMismatched);
@@ -274,7 +279,7 @@ public class CSRFMiddlewareSpec
                 It.IsAny<Optional<string>>()))
             .Returns(true);
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         context.Response.Should().BeAProblem(HttpStatusCode.Forbidden,
             Resources.CSRFMiddleware_RefererMismatched);
@@ -305,7 +310,7 @@ public class CSRFMiddlewareSpec
                 It.IsAny<Optional<string>>()))
             .Returns(true);
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         context.Response.Should().NotBeAProblem();
         _csrfService.Setup(crs => crs.VerifyTokens("ananticsrfheader", "ananticsrfcookie", "auserid"))
@@ -335,7 +340,7 @@ public class CSRFMiddlewareSpec
                 It.IsAny<Optional<string>>()))
             .Returns(true);
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         context.Response.Should().NotBeAProblem();
         _csrfService.Setup(crs => crs.VerifyTokens("ananticsrfheader", "ananticsrfcookie", "auserid"))
@@ -358,7 +363,7 @@ public class CSRFMiddlewareSpec
                 It.IsAny<Optional<string>>()))
             .Returns(true);
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         context.Response.Should().NotBeAProblem();
         _csrfService.Setup(crs => crs.VerifyTokens("ananticsrfheader", "ananticsrfcookie", Optional<string>.None))
@@ -381,7 +386,7 @@ public class CSRFMiddlewareSpec
                 It.IsAny<Optional<string>>()))
             .Returns(true);
 
-        await _middleware.InvokeAsync(context);
+        await _middleware.InvokeAsync(context, _callerContextFactory.Object);
 
         context.Response.Should().NotBeAProblem();
         _csrfService.Setup(crs => crs.VerifyTokens("ananticsrfheader", "ananticsrfcookie", Optional<string>.None))

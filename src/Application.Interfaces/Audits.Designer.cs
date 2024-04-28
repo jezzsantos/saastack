@@ -60,6 +60,33 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CSRFProtection.Failed.
+        /// </summary>
+        public static string CSRFMiddleware_CSRFProtection_Failed {
+            get {
+                return ResourceManager.GetString("CSRFMiddleware_CSRFProtection_Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EndUser.PlatformFeatureAssigned.
+        /// </summary>
+        public static string EndUserApplication_PlatformFeatureAssigned {
+            get {
+                return ResourceManager.GetString("EndUserApplication_PlatformFeatureAssigned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EndUser.PlatformFeatureUnassigned.
+        /// </summary>
+        public static string EndUserApplication_PlatformFeatureUnassigned {
+            get {
+                return ResourceManager.GetString("EndUserApplication_PlatformFeatureUnassigned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to EndUser.PlatformRolesAssigned.
         /// </summary>
         public static string EndUserApplication_PlatformRolesAssigned {
@@ -74,6 +101,24 @@ namespace Application.Interfaces {
         public static string EndUserApplication_PlatformRolesUnassigned {
             get {
                 return ResourceManager.GetString("EndUserApplication_PlatformRolesUnassigned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EndUser.TenantFeatureAssigned.
+        /// </summary>
+        public static string EndUserApplication_TenantFeatureAssigned {
+            get {
+                return ResourceManager.GetString("EndUserApplication_TenantFeatureAssigned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EndUser.TenantFeatureUnassigned.
+        /// </summary>
+        public static string EndUserApplication_TenantFeatureUnassigned {
+            get {
+                return ResourceManager.GetString("EndUserApplication_TenantFeatureUnassigned", resourceCulture);
             }
         }
         

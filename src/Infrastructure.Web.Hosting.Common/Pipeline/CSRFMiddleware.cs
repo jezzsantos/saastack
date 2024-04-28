@@ -1,6 +1,9 @@
+using Application.Common.Extensions;
+using Application.Interfaces;
 using Application.Interfaces.Services;
 using Common;
 using Common.Extensions;
+using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Hosting.Common.Extensions;
@@ -37,8 +40,9 @@ public sealed class CSRFMiddleware
         _csrfService = csrfService;
     }
 
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context, ICallerContextFactory callerContextFactory)
     {
+        var caller = callerContextFactory.Create();
         var request = context.Request;
         if (IgnoredMethods.Contains(request.Method))
         {
@@ -51,6 +55,8 @@ public sealed class CSRFMiddleware
         {
             var httpError = result.Error.ToHttpError();
             var details = Results.Problem(statusCode: (int)httpError.Code, detail: httpError.Message);
+            _recorder.Audit(caller.ToCall(), Audits.CSRFMiddleware_CSRFProtection_Failed,
+                "User {Id} failed CSRF protection", caller.CallerId);
             await details
                 .ExecuteAsync(context);
             return;

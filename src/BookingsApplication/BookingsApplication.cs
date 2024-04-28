@@ -57,7 +57,7 @@ public class BookingsApplication : IBookingsApplication
         }
 
         _recorder.TraceInformation(caller.ToCall(), "Booking {Id} was cancelled", booking.Id);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.BookingCancelled,
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Core.BookingCancelled,
             new Dictionary<string, object>
             {
                 { UsageConstants.Properties.Id, booking.Id },
@@ -112,7 +112,7 @@ public class BookingsApplication : IBookingsApplication
 
         booking = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Booking {Id} was created", booking.Id);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.BookingCreated,
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Core.BookingCreated,
             new Dictionary<string, object>
             {
                 { UsageConstants.Properties.Id, booking.Id },

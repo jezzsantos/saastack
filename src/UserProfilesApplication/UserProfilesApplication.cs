@@ -63,6 +63,8 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         profile = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Profile {Id} avatar was added for user {UserId}", profile.Id,
             userId);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
+            profile.ToUsageEvent(caller));
 
         return profile.ToProfile();
     }
@@ -103,6 +105,8 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         profile = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Profile {Id} avatar was deleted for user {UserId}", profile.Id,
             userId);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
+            profile.ToUsageEvent(caller));
 
         return profile.ToProfile();
     }
@@ -293,6 +297,8 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         profile = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was updated for user {UserId}", profile.Id,
             profile.UserId);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
+            profile.ToUsageEvent(caller));
 
         return profile.ToProfile();
     }
@@ -348,6 +354,8 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         profile = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Profile {Id} contact address was updated for user {UserId}",
             profile.Id, userId);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
+            profile.ToUsageEvent(caller));
 
         return profile.ToProfile();
     }
@@ -434,6 +442,27 @@ internal static class UserProfileConversionExtensions
                 ? profile.Avatar.Value.Url
                 : null
         };
+    }
+
+    public static Dictionary<string, object> ToUsageEvent(this UserProfileRoot profile, ICallerContext caller)
+    {
+        var context = new Dictionary<string, object>
+        {
+            [UsageConstants.Properties.UserIdOverride] = profile.UserId,
+            [UsageConstants.Properties.Name] = profile.Name.ToName(),
+            [UsageConstants.Properties.Timezone] = profile.Timezone.Code.ToString()
+        };
+        if (profile.EmailAddress.HasValue)
+        {
+            context[UsageConstants.Properties.EmailAddress] = profile.EmailAddress.Value.Address;
+        }
+
+        if (profile.Avatar.HasValue)
+        {
+            context[UsageConstants.Properties.AvatarUrl] = profile.Avatar.Value.Url;
+        }
+
+        return context;
     }
 
     private static ProfileAddress ToAddress(this Address address)

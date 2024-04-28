@@ -233,6 +233,11 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
 
         credentials = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Password reset initiated for {Id}", credentials.UserId);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserPasswordForgotten,
+            new Dictionary<string, object>
+            {
+                { nameof(PasswordCredential.Id), credentials.UserId }
+            });
 
         return Result.Ok;
     }
@@ -350,7 +355,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
 
         credentials = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Password was reset for {Id}", credentials.UserId);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.UserPasswordReset,
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserPasswordReset,
             new Dictionary<string, object>
             {
                 { nameof(credentials.Id), credentials.UserId }
@@ -414,7 +419,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         _recorder.TraceInformation(caller.ToCall(), "Password credentials for {UserId} have been verified",
             credential.UserId);
         _recorder.TrackUsage(caller.ToCall(),
-            UsageConstants.Events.UsageScenarios.PersonRegistrationConfirmed,
+            UsageConstants.Events.UsageScenarios.Generic.PersonRegistrationConfirmed,
             new Dictionary<string, object>
             {
                 { nameof(credential.Id), credential.UserId }

@@ -37,7 +37,7 @@ public class AuthenticationApplicationSpec
 
         result.Should().BeSuccess();
         _recorder.Verify(rec =>
-            rec.TrackUsage(It.IsAny<ICallContext>(), UsageConstants.Events.UsageScenarios.UserLogout, null));
+            rec.TrackUsage(It.IsAny<ICallContext>(), UsageConstants.Events.UsageScenarios.Generic.UserLogout, null));
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public class AuthenticationApplicationSpec
             && req.Password == "apassword"
         ), null, It.IsAny<CancellationToken>()));
         _recorder.Verify(rec =>
-            rec.TrackUsage(It.IsAny<ICallContext>(), UsageConstants.Events.UsageScenarios.UserLogin, null));
+            rec.TrackUsage(It.IsAny<ICallContext>(), UsageConstants.Events.UsageScenarios.Generic.UserLogin, null));
     }
 
     [Fact]
@@ -118,7 +118,7 @@ public class AuthenticationApplicationSpec
             req.AuthCode == "anauthcode"
         ), null, It.IsAny<CancellationToken>()));
         _recorder.Verify(rec =>
-            rec.TrackUsage(It.IsAny<ICallContext>(), UsageConstants.Events.UsageScenarios.UserLogin, null));
+            rec.TrackUsage(It.IsAny<ICallContext>(), UsageConstants.Events.UsageScenarios.Generic.UserLogin, null));
     }
 
     [Fact]
@@ -172,6 +172,7 @@ public class AuthenticationApplicationSpec
                 req.RefreshToken == "arefreshtoken"
             ), null, It.IsAny<CancellationToken>()));
         _recorder.Verify(rec =>
-            rec.TrackUsage(It.IsAny<ICallContext>(), UsageConstants.Events.UsageScenarios.UserExtendedLogin, null));
+            rec.TrackUsage(It.IsAny<ICallContext>(), UsageConstants.Events.UsageScenarios.Generic.UserExtendedLogin,
+                null));
     }
 }

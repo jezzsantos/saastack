@@ -151,7 +151,7 @@ public partial class EndUsersApplication : IEndUsersApplication
 
         machine = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Registered machine: {Id}", machine.Id);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.MachineRegistered);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.MachineRegistered);
 
         if (caller.IsAuthenticated)
         {
@@ -290,7 +290,7 @@ public partial class EndUsersApplication : IEndUsersApplication
 
                 _recorder.TraceInformation(caller.ToCall(),
                     "Attempted re-registration of user: {Id}, with email {EmailAddress}", unregisteredUser.Id, email);
-                _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.PersonReRegistered,
+                _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.PersonReRegistered,
                     new Dictionary<string, object>
                     {
                         { UsageConstants.Properties.Id, unregisteredUser.Id },
@@ -339,7 +339,7 @@ public partial class EndUsersApplication : IEndUsersApplication
         _recorder.AuditAgainst(caller.ToCall(), person.Id,
             Audits.EndUsersApplication_User_Registered_TermsAccepted,
             "EndUser {Id} accepted their terms and conditions", person.Id);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.PersonRegistrationCreated);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.PersonRegistrationCreated);
 
         var defaultOrganizationId = person.DefaultMembership.OrganizationId;
         var serviceCaller = Caller.CreateAsMaintenance(caller.CallId);

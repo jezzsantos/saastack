@@ -54,7 +54,7 @@ public partial class InvitationsApplication : IInvitationsApplication
 
         invitee = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Guest {Id} was invited", invitee.Id);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.GuestInvited,
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.GuestInvited,
             new Dictionary<string, object>
             {
                 { nameof(EndUserRoot.Id), invitee.Id },
@@ -103,7 +103,7 @@ public partial class InvitationsApplication : IInvitationsApplication
         }
 
         _recorder.TraceInformation(caller.ToCall(), "Guest {Id} was re-invited", invitee.Id);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.GuestInvited,
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.GuestInvited,
             new Dictionary<string, object>
             {
                 { nameof(EndUserRoot.Id), invitee.Id },

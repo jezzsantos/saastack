@@ -164,7 +164,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
             AugmentMessageTemplateAndArguments(context, $"Audit: {auditCode}, against {againstId}, {messageTemplate}",
                 templateArgs);
         TraceInformation(safeContext, augmentedMessageTemplate, augmentedArguments);
-        TrackUsageFor(safeContext, againstId, UsageConstants.Events.UsageScenarios.Audit,
+        TrackUsageFor(safeContext, againstId, UsageConstants.Events.UsageScenarios.Generic.Audit,
             new Dictionary<string, object>
             {
                 { UsageConstants.Properties.UsedById, againstId },
@@ -202,7 +202,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
         TraceInformation(safeContext, $"Measure: {eventName}");
         var usageContext = additional ?? new Dictionary<string, object>();
         usageContext.Add(UsageConstants.Properties.MetricEventName, eventName.ToLowerInvariant());
-        TrackUsage(safeContext, UsageConstants.Events.UsageScenarios.Measurement, usageContext);
+        TrackUsage(safeContext, UsageConstants.Events.UsageScenarios.Generic.Measurement, usageContext);
         _metricsReporter.Measure(safeContext, eventName, additional ?? new Dictionary<string, object>());
     }
 

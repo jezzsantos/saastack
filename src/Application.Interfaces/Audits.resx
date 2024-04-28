@@ -63,4 +63,19 @@
     <data name="SingleSignOnApplication_Authenticate_Succeeded" xml:space="preserve">
         <value>Authentication.Passed</value>
     </data>
+    <data name="CSRFMiddleware_CSRFProtection_Failed" xml:space="preserve">
+        <value>CSRFProtection.Failed</value>
+    </data>
+    <data name="EndUserApplication_PlatformFeatureAssigned" xml:space="preserve">
+        <value>EndUser.PlatformFeatureAssigned</value>
+    </data>
+    <data name="EndUserApplication_PlatformFeatureUnassigned" xml:space="preserve">
+        <value>EndUser.PlatformFeatureUnassigned</value>
+    </data>
+    <data name="EndUserApplication_TenantFeatureAssigned" xml:space="preserve">
+        <value>EndUser.TenantFeatureAssigned</value>
+    </data>
+    <data name="EndUserApplication_TenantFeatureUnassigned" xml:space="preserve">
+        <value>EndUser.TenantFeatureUnassigned</value>
+    </data>
 </root>

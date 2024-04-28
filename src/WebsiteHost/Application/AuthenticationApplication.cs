@@ -50,14 +50,14 @@ public class AuthenticationApplication : IAuthenticationApplication
             return authenticated.Error.ToError();
         }
 
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.UserLogin);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserLogin);
 
         return authenticated.Value.ToTokens();
     }
 
     public Task<Result<Error>> LogoutAsync(ICallerContext caller, CancellationToken cancellationToken)
     {
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.UserLogout);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserLogout);
 
         return Task.FromResult(Result.Ok);
     }
@@ -79,7 +79,7 @@ public class AuthenticationApplication : IAuthenticationApplication
             return refreshed.Error.ToError();
         }
 
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.UserExtendedLogin);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserExtendedLogin);
 
         return refreshed.Value.ToTokens();
     }
