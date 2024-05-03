@@ -4,6 +4,7 @@ using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Endpoints;
 using Infrastructure.Web.Api.Common.Pipeline;
+using Infrastructure.Web.Api.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -104,7 +105,7 @@ public class ContentNegotiationFilterSpec
 
         result.Should().BeOfType<FileStreamHttpResult>();
         result.As<FileStreamHttpResult>()
-            .ContentType.Should().Be(HttpContentTypes.OctetStream);
+            .ContentType.Should().Be(HttpConstants.ContentTypes.OctetStream);
         result.As<FileStreamHttpResult>()
             .FileStream.Should().BeSameAs(stream);
     }
@@ -121,7 +122,7 @@ public class ContentNegotiationFilterSpec
 
         result.Should().BeOfType<JsonHttpResult<object>>();
         result.As<JsonHttpResult<object>>()
-            .ContentType.Should().Be(HttpContentTypes.JsonProblem);
+            .ContentType.Should().Be(HttpConstants.ContentTypes.JsonProblem);
         result.As<JsonHttpResult<object>>()
             .StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
         result.As<JsonHttpResult<object>>().Value.As<ProblemDetails>().Status.Should().Be(500);
@@ -149,7 +150,7 @@ public class ContentNegotiationFilterSpec
 
         result.Should().BeOfType<JsonHttpResult<object>>();
         result.As<JsonHttpResult<object>>()
-            .ContentType.Should().Be(HttpContentTypes.JsonProblem);
+            .ContentType.Should().Be(HttpConstants.ContentTypes.JsonProblem);
         result.As<JsonHttpResult<object>>()
             .StatusCode.Should().Be(999);
         result.As<JsonHttpResult<object>>().Value.As<ProblemDetails>().Status.Should().Be(999);
@@ -173,7 +174,7 @@ public class ContentNegotiationFilterSpec
 
         result.Should().BeOfType<JsonHttpResult<object>>();
         result.As<JsonHttpResult<object>>()
-            .ContentType.Should().Be(HttpContentTypes.JsonProblem);
+            .ContentType.Should().Be(HttpConstants.ContentTypes.JsonProblem);
         result.As<JsonHttpResult<object>>()
             .StatusCode.Should().Be(999);
         result.As<JsonHttpResult<object>>().Value.As<HttpValidationProblemDetails>().Status.Should().Be(999);
@@ -229,10 +230,45 @@ public class ContentNegotiationFilterSpec
     }
 
     [Fact]
+    public async Task WhenInvokeAsyncWithNakedObjectResponseAndAcceptEverything_ThenReturnsJson()
+    {
+        var response = new TestResponse();
+        var httpContext = SetupHttpContext(FormatMechanism.AcceptHeader(HttpConstants.ContentTypes.Everything));
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<JsonHttpResult<object>>();
+        result.As<JsonHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<JsonHttpResult<object>>()
+            .Value.Should().Be(response);
+    }
+
+    [Fact]
+    public async Task WhenInvokeAsyncWithIResultResponseAndAcceptEverything_ThenReturnsJson()
+    {
+        var payload = new TestResponse();
+        var response = Results.Ok(payload);
+        var httpContext = SetupHttpContext(FormatMechanism.AcceptHeader(HttpConstants.ContentTypes.Everything));
+        var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
+        var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
+
+        var result = await _filter.InvokeAsync(context, next);
+
+        result.Should().BeOfType<JsonHttpResult<object>>();
+        result.As<JsonHttpResult<object>>()
+            .StatusCode.Should().Be((int)HttpStatusCode.OK);
+        result.As<JsonHttpResult<object>>()
+            .Value.Should().Be(payload);
+    }
+
+    [Fact]
     public async Task WhenInvokeAsyncWithNakedObjectResponseAndAcceptJson_ThenReturnsJson()
     {
         var response = new TestResponse();
-        var httpContext = SetupHttpContext(FormatMechanism.AcceptHeader(HttpContentTypes.Json));
+        var httpContext = SetupHttpContext(FormatMechanism.AcceptHeader(HttpConstants.ContentTypes.Json));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
@@ -250,7 +286,7 @@ public class ContentNegotiationFilterSpec
     {
         var payload = new TestResponse();
         var response = Results.Ok(payload);
-        var httpContext = SetupHttpContext(FormatMechanism.AcceptHeader(HttpContentTypes.Json));
+        var httpContext = SetupHttpContext(FormatMechanism.AcceptHeader(HttpConstants.ContentTypes.Json));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
@@ -267,7 +303,7 @@ public class ContentNegotiationFilterSpec
     public async Task WhenInvokeAsyncWithNakedObjectResponseAndAcceptXml_ThenReturnsXml()
     {
         var response = new TestResponse();
-        var httpContext = SetupHttpContext(FormatMechanism.AcceptHeader(HttpContentTypes.Xml));
+        var httpContext = SetupHttpContext(FormatMechanism.AcceptHeader(HttpConstants.ContentTypes.Xml));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
@@ -285,7 +321,7 @@ public class ContentNegotiationFilterSpec
     {
         var payload = new TestResponse();
         var response = Results.Ok(payload);
-        var httpContext = SetupHttpContext(FormatMechanism.AcceptHeader(HttpContentTypes.Xml));
+        var httpContext = SetupHttpContext(FormatMechanism.AcceptHeader(HttpConstants.ContentTypes.Xml));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
@@ -302,7 +338,7 @@ public class ContentNegotiationFilterSpec
     public async Task WhenInvokeAsyncWithNakedObjectResponseAndQueryStringFormatJson_ThenReturnsJson()
     {
         var response = new TestResponse();
-        var httpContext = SetupHttpContext(FormatMechanism.QueryString(HttpContentTypeFormatters.Json));
+        var httpContext = SetupHttpContext(FormatMechanism.QueryString(HttpConstants.ContentTypeFormatters.Json));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
@@ -320,7 +356,7 @@ public class ContentNegotiationFilterSpec
     {
         var payload = new TestResponse();
         var response = Results.Ok(payload);
-        var httpContext = SetupHttpContext(FormatMechanism.QueryString(HttpContentTypeFormatters.Json));
+        var httpContext = SetupHttpContext(FormatMechanism.QueryString(HttpConstants.ContentTypeFormatters.Json));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
@@ -337,7 +373,7 @@ public class ContentNegotiationFilterSpec
     public async Task WhenInvokeAsyncWithNakedObjectResponseAndQueryStringFormatXml_ThenReturnsXml()
     {
         var response = new TestResponse();
-        var httpContext = SetupHttpContext(FormatMechanism.QueryString(HttpContentTypeFormatters.Xml));
+        var httpContext = SetupHttpContext(FormatMechanism.QueryString(HttpConstants.ContentTypeFormatters.Xml));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
@@ -355,7 +391,7 @@ public class ContentNegotiationFilterSpec
     {
         var payload = new TestResponse();
         var response = Results.Ok(payload);
-        var httpContext = SetupHttpContext(FormatMechanism.QueryString(HttpContentTypeFormatters.Xml));
+        var httpContext = SetupHttpContext(FormatMechanism.QueryString(HttpConstants.ContentTypeFormatters.Xml));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
@@ -372,7 +408,7 @@ public class ContentNegotiationFilterSpec
     public async Task WhenInvokeAsyncWithNakedObjectResponseAndFormBodyFormatJson_ThenReturnsJson()
     {
         var response = new TestResponse();
-        var httpContext = SetupHttpContext(FormatMechanism.FormBody(HttpContentTypeFormatters.Json));
+        var httpContext = SetupHttpContext(FormatMechanism.FormBody(HttpConstants.ContentTypeFormatters.Json));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
@@ -390,7 +426,7 @@ public class ContentNegotiationFilterSpec
     {
         var payload = new TestResponse();
         var response = Results.Ok(payload);
-        var httpContext = SetupHttpContext(FormatMechanism.FormBody(HttpContentTypeFormatters.Json));
+        var httpContext = SetupHttpContext(FormatMechanism.FormBody(HttpConstants.ContentTypeFormatters.Json));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
@@ -407,7 +443,7 @@ public class ContentNegotiationFilterSpec
     public async Task WhenInvokeAsyncWithNakedObjectResponseAndFormBodyFormatXml_ThenReturnsXml()
     {
         var response = new TestResponse();
-        var httpContext = SetupHttpContext(FormatMechanism.FormBody(HttpContentTypeFormatters.Xml));
+        var httpContext = SetupHttpContext(FormatMechanism.FormBody(HttpConstants.ContentTypeFormatters.Xml));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
@@ -425,7 +461,7 @@ public class ContentNegotiationFilterSpec
     {
         var payload = new TestResponse();
         var response = Results.Ok(payload);
-        var httpContext = SetupHttpContext(FormatMechanism.FormBody(HttpContentTypeFormatters.Xml));
+        var httpContext = SetupHttpContext(FormatMechanism.FormBody(HttpConstants.ContentTypeFormatters.Xml));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
@@ -442,7 +478,7 @@ public class ContentNegotiationFilterSpec
     public async Task WhenInvokeAsyncWithNakedObjectResponseAndJsonBodyFormatXml_ThenReturnsXml()
     {
         var response = new TestResponse();
-        var httpContext = SetupHttpContext(FormatMechanism.JsonBody(HttpContentTypeFormatters.Xml));
+        var httpContext = SetupHttpContext(FormatMechanism.JsonBody(HttpConstants.ContentTypeFormatters.Xml));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
@@ -460,7 +496,7 @@ public class ContentNegotiationFilterSpec
     {
         var payload = new TestResponse();
         var response = Results.Ok(payload);
-        var httpContext = SetupHttpContext(FormatMechanism.JsonBody(HttpContentTypeFormatters.Xml));
+        var httpContext = SetupHttpContext(FormatMechanism.JsonBody(HttpConstants.ContentTypeFormatters.Xml));
         var context = new DefaultEndpointFilterInvocationContext(httpContext.Object);
         var next = new EndpointFilterDelegate(_ => new ValueTask<object?>(response));
 
@@ -503,14 +539,14 @@ public class ContentNegotiationFilterSpec
                 ? new HeaderDictionary()
                 : new HeaderDictionary(new Dictionary<string, StringValues>
                 {
-                    { HttpHeaders.Accept, new StringValues(mechanism.AcceptHeaderFormat) }
+                    { HttpConstants.Headers.Accept, new StringValues(mechanism.AcceptHeaderFormat) }
                 }));
         httpRequest.Setup(hr => hr.Query)
             .Returns(mechanism is null || mechanism.QueryStringFormat.HasNoValue()
                 ? new QueryCollection()
                 : new QueryCollection(new Dictionary<string, StringValues>
                 {
-                    { HttpQueryParams.Format, new StringValues(mechanism.QueryStringFormat) }
+                    { HttpConstants.QueryParams.Format, new StringValues(mechanism.QueryStringFormat) }
                 }));
         if (mechanism is not null)
         {
@@ -524,14 +560,14 @@ public class ContentNegotiationFilterSpec
             }
             else if (mechanism.JsonBodyFormat.HasValue())
             {
-                httpRequest.Setup(hr => hr.ContentType).Returns(HttpContentTypes.Json);
+                httpRequest.Setup(hr => hr.ContentType).Returns(HttpConstants.ContentTypes.Json);
                 httpRequest.Setup(hr => hr.Body)
                     .Returns(new MemoryStream(
                         Encoding.UTF8.GetBytes($"{{\"format\":\"{mechanism.JsonBodyFormat}\"}}")));
             }
             else
             {
-                httpRequest.Setup(hr => hr.ContentType).Returns(HttpContentTypes.Json);
+                httpRequest.Setup(hr => hr.ContentType).Returns(HttpConstants.ContentTypes.Json);
                 httpRequest.Setup(hr => hr.Body)
                     .Returns(new MemoryStream(Array.Empty<byte>()));
             }

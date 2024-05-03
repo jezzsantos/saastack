@@ -138,7 +138,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         {
             _recorder.AuditAgainst(caller.ToCall(), user.Id,
                 Audits.PasswordCredentialsApplication_Authenticate_BeforeVerified,
-                "User {Id} tried to authenticate with a password before verifying their account", user.Id);
+                "User {Id} tried to authenticate with a password before verifying their registration", user.Id);
             return Error.PreconditionViolation(Resources.PasswordCredentialsApplication_RegistrationNotVerified);
         }
 

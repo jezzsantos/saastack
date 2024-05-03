@@ -73,12 +73,12 @@ public class HttpRequestExtensionsSpec
         var context = Mock.Of<ICallContext>(cc => cc.CallId == "acallid");
         var message = new HttpRequestMessage
         {
-            Headers = { { HttpHeaders.RequestId, "arequestid" } }
+            Headers = { { HttpConstants.Headers.RequestId, "arequestid" } }
         };
 
         message.SetRequestId(context);
 
-        message.Headers.GetValues(HttpHeaders.RequestId).Should().OnlyContain(hdr => hdr == "arequestid");
+        message.Headers.GetValues(HttpConstants.Headers.RequestId).Should().OnlyContain(hdr => hdr == "arequestid");
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public class HttpRequestExtensionsSpec
 
         message.SetRequestId(context);
 
-        message.Headers.GetValues(HttpHeaders.RequestId).Should().OnlyContain(hdr => hdr == "acallid");
+        message.Headers.GetValues(HttpConstants.Headers.RequestId).Should().OnlyContain(hdr => hdr == "acallid");
     }
 
     [Fact]
@@ -100,7 +100,7 @@ public class HttpRequestExtensionsSpec
 
         message.SetHMACAuth(request, "asecret");
 
-        message.Headers.GetValues(HttpHeaders.HMACSignature).Should().OnlyContain(hdr =>
+        message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
             hdr == "sha1=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
     }
 
@@ -112,7 +112,7 @@ public class HttpRequestExtensionsSpec
 
         message.SetHMACAuth(request, "asecret");
 
-        message.Headers.GetValues(HttpHeaders.HMACSignature).Should().OnlyContain(hdr =>
+        message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
             hdr == "sha1=efab63816eb3c3ab799dfd64e717865116f7aa1547177293ec6598fe3cc8e3de");
     }
 
@@ -133,7 +133,8 @@ public class HttpRequestExtensionsSpec
 
         message.SetJWTBearerToken("atoken");
 
-        message.Headers.GetValues(HttpHeaders.Authorization).Should().OnlyContain(hdr => hdr == "Bearer atoken");
+        message.Headers.GetValues(HttpConstants.Headers.Authorization).Should()
+            .OnlyContain(hdr => hdr == "Bearer atoken");
     }
 
     [Fact]
@@ -154,7 +155,7 @@ public class HttpRequestExtensionsSpec
         message.SetAPIKey("anapikey");
 
         var base64Credential = Convert.ToBase64String(Encoding.UTF8.GetBytes("anapikey:"));
-        message.Headers.GetValues(HttpHeaders.Authorization).Should()
+        message.Headers.GetValues(HttpConstants.Headers.Authorization).Should()
             .OnlyContain(hdr => hdr == $"Basic {base64Credential}");
     }
 
@@ -195,7 +196,8 @@ public class HttpRequestExtensionsSpec
 
         message.SetAuthorization(context);
 
-        message.Headers.GetValues(HttpHeaders.Authorization).Should().OnlyContain(hdr => hdr == "Bearer avalue");
+        message.Headers.GetValues(HttpConstants.Headers.Authorization).Should()
+            .OnlyContain(hdr => hdr == "Bearer avalue");
     }
 
     [Fact]
@@ -210,7 +212,7 @@ public class HttpRequestExtensionsSpec
         message.SetAuthorization(context);
 
         var base64Credential = Convert.ToBase64String(Encoding.UTF8.GetBytes("avalue:"));
-        message.Headers.GetValues(HttpHeaders.Authorization).Should()
+        message.Headers.GetValues(HttpConstants.Headers.Authorization).Should()
             .OnlyContain(hdr => hdr == $"Basic {base64Credential}");
     }
 
@@ -243,7 +245,7 @@ public class HttpRequestExtensionsSpec
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(req => req.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.Authorization, new StringValues(new string[] { }) }
+            { HttpConstants.Headers.Authorization, new StringValues(new string[] { }) }
         });
 
         var result = httpRequest.Object.GetTokenAuth();
@@ -257,7 +259,7 @@ public class HttpRequestExtensionsSpec
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(req => req.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.Authorization, new StringValues(new[] { "avalue1", "avalue2" }) }
+            { HttpConstants.Headers.Authorization, new StringValues(new[] { "avalue1", "avalue2" }) }
         });
 
         var result = httpRequest.Object.GetTokenAuth();
@@ -271,7 +273,7 @@ public class HttpRequestExtensionsSpec
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(req => req.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.Authorization, new StringValues(new[] { "avalue1", "Bearer avalue2" }) }
+            { HttpConstants.Headers.Authorization, new StringValues(new[] { "avalue1", "Bearer avalue2" }) }
         });
 
         var result = httpRequest.Object.GetTokenAuth();
@@ -297,7 +299,7 @@ public class HttpRequestExtensionsSpec
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(req => req.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.Authorization, "Bearer atoken" }
+            { HttpConstants.Headers.Authorization, "Bearer atoken" }
         });
 
         var result = httpRequest.Object.GetBasicAuth();
@@ -313,7 +315,7 @@ public class HttpRequestExtensionsSpec
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(req => req.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.Authorization, $"Basic {credentials}" }
+            { HttpConstants.Headers.Authorization, $"Basic {credentials}" }
         });
 
         var result = httpRequest.Object.GetBasicAuth();
@@ -329,7 +331,7 @@ public class HttpRequestExtensionsSpec
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(req => req.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.Authorization, $"Basic {credentials}" }
+            { HttpConstants.Headers.Authorization, $"Basic {credentials}" }
         });
 
         var result = httpRequest.Object.GetBasicAuth();
@@ -345,7 +347,7 @@ public class HttpRequestExtensionsSpec
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(req => req.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.Authorization, $"Basic {credentials}" }
+            { HttpConstants.Headers.Authorization, $"Basic {credentials}" }
         });
 
         var result = httpRequest.Object.GetBasicAuth();
@@ -361,7 +363,7 @@ public class HttpRequestExtensionsSpec
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(req => req.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.Authorization, $"Basic {credentials}" }
+            { HttpConstants.Headers.Authorization, $"Basic {credentials}" }
         });
 
         var result = httpRequest.Object.GetBasicAuth();
@@ -389,7 +391,7 @@ public class HttpRequestExtensionsSpec
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(req => req.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.Authorization, $"Basic {credentials}" }
+            { HttpConstants.Headers.Authorization, $"Basic {credentials}" }
         });
         httpRequest.Setup(req => req.Query).Returns(new QueryCollection());
 
@@ -405,7 +407,7 @@ public class HttpRequestExtensionsSpec
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(req => req.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.Authorization, $"Basic {credentials}" }
+            { HttpConstants.Headers.Authorization, $"Basic {credentials}" }
         });
         httpRequest.Setup(req => req.Query).Returns(new QueryCollection());
 
@@ -421,7 +423,7 @@ public class HttpRequestExtensionsSpec
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(req => req.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.Authorization, $"Basic {credentials}" }
+            { HttpConstants.Headers.Authorization, $"Basic {credentials}" }
         });
         httpRequest.Setup(req => req.Query).Returns(new QueryCollection());
 
@@ -438,7 +440,7 @@ public class HttpRequestExtensionsSpec
         httpRequest.Setup(req => req.Query).Returns(new QueryCollection
         (new Dictionary<string, StringValues>
         {
-            { HttpQueryParams.APIKey, "" }
+            { HttpConstants.QueryParams.APIKey, "" }
         }));
 
         var result = httpRequest.Object.GetAPIKeyAuth();
@@ -454,7 +456,7 @@ public class HttpRequestExtensionsSpec
         httpRequest.Setup(req => req.Query).Returns(new QueryCollection
         (new Dictionary<string, StringValues>
         {
-            { HttpQueryParams.APIKey, "anapikey" }
+            { HttpConstants.QueryParams.APIKey, "anapikey" }
         }));
 
         var result = httpRequest.Object.GetAPIKeyAuth();
@@ -479,7 +481,7 @@ public class HttpRequestExtensionsSpec
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(req => req.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.HMACSignature, "" }
+            { HttpConstants.Headers.HMACSignature, "" }
         });
 
         var result = httpRequest.Object.GetHMACAuth();
@@ -493,7 +495,7 @@ public class HttpRequestExtensionsSpec
         var httpRequest = new Mock<HttpRequest>();
         httpRequest.Setup(req => req.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.HMACSignature, "asignature" }
+            { HttpConstants.Headers.HMACSignature, "asignature" }
         });
 
         var result = httpRequest.Object.GetHMACAuth();
@@ -515,9 +517,9 @@ public class HttpRequestExtensionsSpec
     public void WhenIsContentTypeAndDifferentContentType_ThenReturnsFalse()
     {
         var request = new Mock<HttpRequest>();
-        request.Setup(req => req.ContentType).Returns(HttpContentTypes.Xml);
+        request.Setup(req => req.ContentType).Returns(HttpConstants.ContentTypes.Xml);
 
-        var result = request.Object.IsContentType(HttpContentTypes.Json);
+        var result = request.Object.IsContentType(HttpConstants.ContentTypes.Json);
 
         result.Should().BeFalse();
     }
@@ -526,9 +528,9 @@ public class HttpRequestExtensionsSpec
     public void WhenIsContentTypeAndJsonWithoutCharSet_ThenReturnsTrue()
     {
         var request = new Mock<HttpRequest>();
-        request.Setup(req => req.ContentType).Returns(HttpContentTypes.Json);
+        request.Setup(req => req.ContentType).Returns(HttpConstants.ContentTypes.Json);
 
-        var result = request.Object.IsContentType(HttpContentTypes.Json);
+        var result = request.Object.IsContentType(HttpConstants.ContentTypes.Json);
 
         result.Should().BeTrue();
     }
@@ -537,9 +539,9 @@ public class HttpRequestExtensionsSpec
     public void WhenIsContentTypeAndJsonWithCharSet_ThenReturnsTrue()
     {
         var request = new Mock<HttpRequest>();
-        request.Setup(req => req.ContentType).Returns(HttpContentTypes.JsonWithCharset);
+        request.Setup(req => req.ContentType).Returns(HttpConstants.ContentTypes.JsonWithCharset);
 
-        var result = request.Object.IsContentType(HttpContentTypes.Json);
+        var result = request.Object.IsContentType(HttpConstants.ContentTypes.Json);
 
         result.Should().BeTrue();
     }
@@ -548,9 +550,10 @@ public class HttpRequestExtensionsSpec
     public void WhenIsContentTypeAndMultiPartFormDataWithBoundary_ThenReturnsTrue()
     {
         var request = new Mock<HttpRequest>();
-        request.Setup(req => req.ContentType).Returns($"{HttpContentTypes.MultiPartFormData}; boundary=\"aboundary\"");
+        request.Setup(req => req.ContentType)
+            .Returns($"{HttpConstants.ContentTypes.MultiPartFormData}; boundary=\"aboundary\"");
 
-        var result = request.Object.IsContentType(HttpContentTypes.MultiPartFormData);
+        var result = request.Object.IsContentType(HttpConstants.ContentTypes.MultiPartFormData);
 
         result.Should().BeTrue();
     }

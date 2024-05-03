@@ -6,7 +6,7 @@ using Application.Interfaces.Services;
 using Common;
 using Common.Extensions;
 using Infrastructure.Interfaces;
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.Pipeline;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,12 +20,12 @@ namespace Infrastructure.Web.Hosting.Common.UnitTests.Pipeline;
 [Trait("Category", "Unit")]
 public class CSRFMiddlewareSpec
 {
+    private readonly Mock<ICallerContextFactory> _callerContextFactory;
     private readonly Mock<CSRFMiddleware.ICSRFService> _csrfService;
     private readonly Mock<IHostSettings> _hostSettings;
     private readonly CSRFMiddleware _middleware;
     private readonly Mock<RequestDelegate> _next;
     private readonly ServiceProvider _serviceProvider;
-    private readonly Mock<ICallerContextFactory> _callerContextFactory;
 
     public CSRFMiddlewareSpec()
     {
@@ -211,8 +211,8 @@ public class CSRFMiddlewareSpec
             { AuthenticationConstants.Cookies.Token, tokenForUser }
         });
         context.Request.Headers.Append(CSRFConstants.Headers.AntiCSRF, new StringValues("ananticsrfheader"));
-        context.Request.Headers.Append(HttpHeaders.Origin, new StringValues(string.Empty));
-        context.Request.Headers.Append(HttpHeaders.Referer, new StringValues(string.Empty));
+        context.Request.Headers.Append(HttpConstants.Headers.Origin, new StringValues(string.Empty));
+        context.Request.Headers.Append(HttpConstants.Headers.Referer, new StringValues(string.Empty));
         _csrfService.Setup(crs => crs.VerifyTokens(It.IsAny<Optional<string>>(), It.IsAny<Optional<string>>(),
                 It.IsAny<Optional<string>>()))
             .Returns(true);
@@ -242,8 +242,8 @@ public class CSRFMiddlewareSpec
             { AuthenticationConstants.Cookies.Token, tokenForUser }
         });
         context.Request.Headers.Append(CSRFConstants.Headers.AntiCSRF, new StringValues("ananticsrfheader"));
-        context.Request.Headers.Append(HttpHeaders.Origin, new StringValues("anotherhostname"));
-        context.Request.Headers.Append(HttpHeaders.Referer, new StringValues(string.Empty));
+        context.Request.Headers.Append(HttpConstants.Headers.Origin, new StringValues("anotherhostname"));
+        context.Request.Headers.Append(HttpConstants.Headers.Referer, new StringValues(string.Empty));
         _csrfService.Setup(crs => crs.VerifyTokens(It.IsAny<Optional<string>>(), It.IsAny<Optional<string>>(),
                 It.IsAny<Optional<string>>()))
             .Returns(true);
@@ -273,8 +273,8 @@ public class CSRFMiddlewareSpec
             { AuthenticationConstants.Cookies.Token, tokenForUser }
         });
         context.Request.Headers.Append(CSRFConstants.Headers.AntiCSRF, new StringValues("ananticsrfheader"));
-        context.Request.Headers.Append(HttpHeaders.Origin, new StringValues(string.Empty));
-        context.Request.Headers.Append(HttpHeaders.Referer, new StringValues("anotherhostname"));
+        context.Request.Headers.Append(HttpConstants.Headers.Origin, new StringValues(string.Empty));
+        context.Request.Headers.Append(HttpConstants.Headers.Referer, new StringValues("anotherhostname"));
         _csrfService.Setup(crs => crs.VerifyTokens(It.IsAny<Optional<string>>(), It.IsAny<Optional<string>>(),
                 It.IsAny<Optional<string>>()))
             .Returns(true);
@@ -304,8 +304,8 @@ public class CSRFMiddlewareSpec
             { AuthenticationConstants.Cookies.Token, tokenForUser }
         });
         context.Request.Headers.Append(CSRFConstants.Headers.AntiCSRF, new StringValues("ananticsrfheader"));
-        context.Request.Headers.Append(HttpHeaders.Origin, new StringValues("https://localhost"));
-        context.Request.Headers.Append(HttpHeaders.Referer, new StringValues(string.Empty));
+        context.Request.Headers.Append(HttpConstants.Headers.Origin, new StringValues("https://localhost"));
+        context.Request.Headers.Append(HttpConstants.Headers.Referer, new StringValues(string.Empty));
         _csrfService.Setup(crs => crs.VerifyTokens(It.IsAny<Optional<string>>(), It.IsAny<Optional<string>>(),
                 It.IsAny<Optional<string>>()))
             .Returns(true);
@@ -334,8 +334,8 @@ public class CSRFMiddlewareSpec
             { AuthenticationConstants.Cookies.Token, tokenForUser }
         });
         context.Request.Headers.Append(CSRFConstants.Headers.AntiCSRF, new StringValues("ananticsrfheader"));
-        context.Request.Headers.Append(HttpHeaders.Origin, new StringValues(string.Empty));
-        context.Request.Headers.Append(HttpHeaders.Referer, new StringValues("https://localhost"));
+        context.Request.Headers.Append(HttpConstants.Headers.Origin, new StringValues(string.Empty));
+        context.Request.Headers.Append(HttpConstants.Headers.Referer, new StringValues("https://localhost"));
         _csrfService.Setup(crs => crs.VerifyTokens(It.IsAny<Optional<string>>(), It.IsAny<Optional<string>>(),
                 It.IsAny<Optional<string>>()))
             .Returns(true);
@@ -357,8 +357,8 @@ public class CSRFMiddlewareSpec
             { CSRFConstants.Cookies.AntiCSRF, "ananticsrfcookie" }
         });
         context.Request.Headers.Append(CSRFConstants.Headers.AntiCSRF, new StringValues("ananticsrfheader"));
-        context.Request.Headers.Append(HttpHeaders.Origin, new StringValues("https://localhost"));
-        context.Request.Headers.Append(HttpHeaders.Referer, new StringValues(string.Empty));
+        context.Request.Headers.Append(HttpConstants.Headers.Origin, new StringValues("https://localhost"));
+        context.Request.Headers.Append(HttpConstants.Headers.Referer, new StringValues(string.Empty));
         _csrfService.Setup(crs => crs.VerifyTokens(It.IsAny<Optional<string>>(), It.IsAny<Optional<string>>(),
                 It.IsAny<Optional<string>>()))
             .Returns(true);
@@ -380,8 +380,8 @@ public class CSRFMiddlewareSpec
             { CSRFConstants.Cookies.AntiCSRF, "ananticsrfcookie" }
         });
         context.Request.Headers.Append(CSRFConstants.Headers.AntiCSRF, new StringValues("ananticsrfheader"));
-        context.Request.Headers.Append(HttpHeaders.Origin, new StringValues(string.Empty));
-        context.Request.Headers.Append(HttpHeaders.Referer, new StringValues("https://localhost"));
+        context.Request.Headers.Append(HttpConstants.Headers.Origin, new StringValues(string.Empty));
+        context.Request.Headers.Append(HttpConstants.Headers.Referer, new StringValues("https://localhost"));
         _csrfService.Setup(crs => crs.VerifyTokens(It.IsAny<Optional<string>>(), It.IsAny<Optional<string>>(),
                 It.IsAny<Optional<string>>()))
             .Returns(true);

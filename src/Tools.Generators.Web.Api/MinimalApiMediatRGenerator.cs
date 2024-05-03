@@ -5,6 +5,7 @@ using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using Tools.Analyzers.Common;
 
 namespace Tools.Generators.Web.Api;
 
@@ -106,7 +107,7 @@ namespace {assemblyNamespace}
 
         var endpointFilters = BuildEndpointFilters(serviceRegistrations);
         endpointRegistrations.AppendLine($@"        var {groupName} = app.MapGroup({prefix})
-                .WithGroupName(""{serviceClassName}"")
+                .WithTags(""{serviceClassName}"")
                 .RequireCors(""{WebHostingConstants.DefaultCORSPolicyName}""){endpointFilters};");
 
         foreach (var registration in serviceRegistrations)
@@ -116,11 +117,12 @@ namespace {assemblyNamespace}
                 endpointRegistrations.AppendLine($"#if {TestingOnlyDirective}");
             }
 
-            var routeEndpointMethodNames = ToMinimalApiRegistrationMethodNames(registration.OperationMethod);
-            foreach (var routeEndpointMethod in routeEndpointMethodNames)
+            var routeEndpointMethods = ToHttpMethodNames(registration.OperationMethod);
+            foreach (var routeEndpointMethod in routeEndpointMethods)
             {
+                var endPointMethodName = $"Map{routeEndpointMethod}";
                 endpointRegistrations.AppendLine(
-                    $"            {groupName}.{routeEndpointMethod}(\"{registration.RoutePath}\",");
+                    $"            {groupName}.{endPointMethodName}(\"{registration.RoutePath}\",");
                 if (registration.OperationMethod is OperationMethod.Get or OperationMethod.Search
                     or OperationMethod.Delete)
                 {
@@ -175,13 +177,71 @@ namespace {assemblyNamespace}
                         @"                .DisableAntiforgery()");
                 }
 
-                endpointRegistrations.AppendLine(";");
+                endpointRegistrations.AppendLine();
+
+                var requestDtoName = registration.RequestDto;
+                var openApiName = GenerateOpenApiName(requestDtoName, routeEndpointMethod);
+                var openApiSummary = registration.DocumentedSummary;
+                endpointRegistrations.AppendLine(
+                    @"                .WithOpenApi(op =>");
+                endpointRegistrations.AppendLine(
+                    @"                    {");
+                endpointRegistrations.AppendLine(
+                    $@"                        op.OperationId = ""{openApiName}"";");
+                endpointRegistrations.AppendLine(
+                    $@"                        op.Description = ""(request type: {requestDtoName.Name})"";");
+                if (openApiSummary.HasValue())
+                {
+                    endpointRegistrations.AppendLine(
+                        $@"                        op.Summary = ""{openApiSummary}"";");
+                }
+
+                endpointRegistrations.AppendLine(
+                    @"                        op.Responses.Clear();");
+                if (registration.DocumentedResponseCodes.HasAny())
+                {
+                    foreach (var responseCode in registration.DocumentedResponseCodes)
+                    {
+                        endpointRegistrations.AppendLine(
+                            $@"                        op.Responses.Add(""{responseCode.StatusCode}"", new global::Microsoft.OpenApi.Models.OpenApiResponse");
+                        endpointRegistrations.AppendLine(
+                            @"                        {");
+                        endpointRegistrations.AppendLine(
+                            $@"                            Description = ""{responseCode.Reason}""");
+                        endpointRegistrations.AppendLine(
+                            @"                        });");
+                    }
+                }
+
+                endpointRegistrations.AppendLine(
+                    @"                        return op;");
+                endpointRegistrations.AppendLine(
+                    @"                    });");
             }
 
             if (registration.IsTestingOnly)
             {
                 endpointRegistrations.AppendLine("#endif");
             }
+        }
+
+        return;
+
+        string GenerateOpenApiName(WebApiAssemblyVisitor.TypeName requestDtoName, HttpMethod method)
+        {
+            var name = requestDtoName.Name;
+
+            if (name.EndsWith(AnalyzerConstants.RequestTypeSuffix))
+            {
+                name = name.Substring(0, name.Length - AnalyzerConstants.RequestTypeSuffix.Length);
+            }
+
+            if (method is HttpMethod.Put or HttpMethod.Patch)
+            {
+                name = $"{name} ({method})";
+            }
+
+            return name;
         }
     }
 
@@ -354,16 +414,16 @@ namespace {assemblyNamespace}
         return visitor.OperationRegistrations;
     }
 
-    private static string[] ToMinimalApiRegistrationMethodNames(OperationMethod method)
+    private static HttpMethod[] ToHttpMethodNames(OperationMethod method)
     {
         return method switch
         {
-            OperationMethod.Get => new[] { "MapGet" },
-            OperationMethod.Search => new[] { "MapGet" },
-            OperationMethod.Post => new[] { "MapPost" },
-            OperationMethod.PutPatch => new[] { "MapPut", "MapPatch" },
-            OperationMethod.Delete => new[] { "MapDelete" },
-            _ => new[] { "MapGet" }
+            OperationMethod.Get => [HttpMethod.Get],
+            OperationMethod.Search => [HttpMethod.Get],
+            OperationMethod.Post => [HttpMethod.Post],
+            OperationMethod.PutPatch => [HttpMethod.Put, HttpMethod.Patch],
+            OperationMethod.Delete => [HttpMethod.Delete],
+            _ => [HttpMethod.Get]
         };
     }
 }

@@ -4,7 +4,6 @@ using System.Text.Json;
 using Common;
 using Common.Extensions;
 using Infrastructure.Interfaces;
-using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
@@ -39,7 +38,7 @@ public static class WebsiteTestingExtensions
 
     public static Optional<string> GetCookie(this HttpResponseMessage responseMessage, string name)
     {
-        if (!responseMessage.Headers.TryGetValues(HttpHeaders.SetCookie, out var cookies))
+        if (!responseMessage.Headers.TryGetValues(HttpConstants.Headers.SetCookie, out var cookies))
         {
             return Optional<string>.None;
         }
@@ -136,6 +135,6 @@ public static class WebsiteTestingExtensions
         cookies.Add(new Cookie(CSRFConstants.Cookies.AntiCSRF, signature, "/", host));
         message.Headers.Add(CSRFConstants.Headers.AntiCSRF, token);
         var origin = $"{message.RequestUri.Scheme}{Uri.SchemeDelimiter}{message.RequestUri.Authority}";
-        message.Headers.Add(HttpHeaders.Origin, origin);
+        message.Headers.Add(HttpConstants.Headers.Origin, origin);
     }
 }

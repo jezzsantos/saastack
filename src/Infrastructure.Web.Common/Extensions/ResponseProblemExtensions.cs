@@ -1,7 +1,6 @@
 using System.Net;
 using Common;
 using Common.Extensions;
-using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Interfaces.Clients;
@@ -85,7 +84,7 @@ public static class ResponseProblemExtensions
             Instance = details.Instance
         };
 
-        if (details.Extensions.TryGetValue(HttpResponses.ProblemDetails.Extensions.ExceptionPropertyName,
+        if (details.Extensions.TryGetValue(HttpConstants.Responses.ProblemDetails.Extensions.ExceptionPropertyName,
                 out var exception))
         {
             if (exception.Exists())
@@ -94,7 +93,8 @@ public static class ResponseProblemExtensions
             }
         }
 
-        if (details.Extensions.TryGetValue(HttpResponses.ProblemDetails.Extensions.ValidationErrorPropertyName,
+        if (details.Extensions.TryGetValue(
+                HttpConstants.Responses.ProblemDetails.Extensions.ValidationErrorPropertyName,
                 out var validations))
         {
             if (validations.Exists())

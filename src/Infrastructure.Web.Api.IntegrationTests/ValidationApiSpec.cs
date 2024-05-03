@@ -32,8 +32,8 @@ public class ValidationApiSpec : WebApiSpec<Program>
         var result = await Api.GetAsync(new ValidationsValidatedTestingOnlyRequest { Id = "1234" });
 
         result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        result.Content.Error.Type.Should().Be("NotEmptyValidator");
-        result.Content.Error.Title.Should().Be("Validation Error");
+        result.Content.Error.Type.Should().Be("https://datatracker.ietf.org/doc/html/rfc9110#section-15.5");
+        result.Content.Error.Title.Should().Be("Bad Request");
         result.Content.Error.Status.Should().Be(400);
         result.Content.Error.Detail.Should().Be("'Field1' must not be empty.");
         result.Content.Error.Instance.Should().Match(@"https://localhost:?????/testingonly/validations/validated/1234");
@@ -51,8 +51,8 @@ public class ValidationApiSpec : WebApiSpec<Program>
         var result = await Api.GetAsync(new ValidationsValidatedTestingOnlyRequest { Id = "1234", Field1 = "123" });
 
         result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        result.Content.Error.Type.Should().Be("NotEmptyValidator");
-        result.Content.Error.Title.Should().Be("Validation Error");
+        result.Content.Error.Type.Should().Be("https://datatracker.ietf.org/doc/html/rfc9110#section-15.5");
+        result.Content.Error.Title.Should().Be("Bad Request");
         result.Content.Error.Status.Should().Be(400);
         result.Content.Error.Detail.Should().Be("'Field2' must not be empty.");
         result.Content.Error.Instance.Should()

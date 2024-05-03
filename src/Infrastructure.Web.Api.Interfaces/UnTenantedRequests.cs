@@ -25,4 +25,4 @@ public class UnTenantedDeleteRequest : IWebRequestVoid, IUnTenantedRequest;
 /// <summary>
 ///     Defines the request of a GET API for a stream not for an Organization
 /// </summary>
-public class UnTenantedStreamRequest : IWebRequestVoid, IUnTenantedRequest;
+public class UnTenantedStreamRequest : IWebRequestStream, IUnTenantedRequest;

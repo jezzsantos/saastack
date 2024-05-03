@@ -3,14 +3,14 @@ using System.Text.Json;
 using Application.Common.Extensions;
 using Application.Interfaces;
 using Common.Extensions;
-using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Common.Clients;
 
 /// <summary>
 ///     A service client used to call between API hosts, with retries.
-///     Adds both the <see cref="HttpHeaders.RequestId" /> and <see cref="HttpHeaders.Authorization" />
+///     Adds both the <see cref="HttpConstants.Headers.RequestId" /> and <see cref="HttpConstants.Headers.Authorization" />
 ///     to all downstream requests
 /// </summary>
 [ExcludeFromCodeCoverage]

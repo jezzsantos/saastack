@@ -18,7 +18,7 @@ public class HomeController : CSRFController
         EnsureWebsiteIsBuilt();
     }
 
-    [Route("/error")]
+    [HttpGet("error")]
     public IActionResult Error()
     {
         return Problem();

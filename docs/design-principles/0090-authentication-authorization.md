@@ -115,7 +115,7 @@ In the API layer, authentication is declarative, using the `[Route]` attribute, 
 For example,
 
 ```c#
-[Route("/cars/{id}", OperationMethod.Get, AccessType.Token)]
+[Route("/cars/{Id}", OperationMethod.Get, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_Basic)]
 public class GetCarRequest : TenantedRequest<GetCarResponse>
 {
@@ -194,7 +194,7 @@ In the API layer, authorization is declarative, using the `[Authorize]` attribut
 For example,
 
 ```c#
-[Route("/cars/{id}", OperationMethod.Get, AccessType.Token)]
+[Route("/cars/{Id}", OperationMethod.Get, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_Basic)]
 public class GetCarRequest : TenantedRequest<GetCarResponse>
 {

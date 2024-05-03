@@ -15,7 +15,7 @@ namespace Infrastructure.Web.Api.Common;
 ///     1. The <see cref="ITenantedRequest.OrganizationId" /> field in the body,
 ///     2. The <see cref="IUnTenantedOrganizationRequest.Id" /> field in the body,
 ///     3. The <see cref="HttpQueryParams.Tenant" /> query string,
-///     4. The <see cref="HttpHeaders.Tenant" /> header.
+///     4. The <see cref="HttpConstants.Headers.Tenant" /> header.
 /// </summary>
 public class RequestTenantDetective : ITenantDetective
 {
@@ -63,7 +63,7 @@ public class RequestTenantDetective : ITenantDetective
         RequestDtoType type,
         CancellationToken cancellationToken)
     {
-        if (request.Headers.TryGetValue(HttpHeaders.Tenant, out var tenantIdFromHeader))
+        if (request.Headers.TryGetValue(HttpConstants.Headers.Tenant, out var tenantIdFromHeader))
         {
             var value = GetFirstStringValue(tenantIdFromHeader);
             if (value.HasValue())
@@ -139,7 +139,7 @@ public class RequestTenantDetective : ITenantDetective
             request.RewindBody();
         }
 
-        if (request.IsContentType(HttpContentTypes.Json))
+        if (request.IsContentType(HttpConstants.ContentTypes.Json))
         {
             try
             {
@@ -184,8 +184,8 @@ public class RequestTenantDetective : ITenantDetective
             }
         }
 
-        if (request.IsContentType(HttpContentTypes.FormUrlEncoded)
-            || request.IsContentType(HttpContentTypes.MultiPartFormData))
+        if (request.IsContentType(HttpConstants.ContentTypes.FormUrlEncoded)
+            || request.IsContentType(HttpConstants.ContentTypes.MultiPartFormData))
         {
             var form = await request.ReadFormAsync(cancellationToken);
 

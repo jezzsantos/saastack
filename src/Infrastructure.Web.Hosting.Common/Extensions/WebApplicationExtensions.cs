@@ -5,15 +5,16 @@ using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Eventing.Interfaces.Projections;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
-using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Endpoints;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common;
 using Infrastructure.Web.Hosting.Common.ApplicationServices;
 using Infrastructure.Web.Hosting.Common.Pipeline;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Features;
@@ -96,7 +97,7 @@ public static class WebApplicationExtensions
                 };
                 if (exceptionStackTrace.HasValue())
                 {
-                    details.Extensions.Add(HttpResponses.ProblemDetails.Extensions.ExceptionPropertyName,
+                    details.Extensions.Add(HttpConstants.Responses.ProblemDetails.Extensions.ExceptionPropertyName,
                         exceptionStackTrace);
                 }
 
@@ -205,11 +206,35 @@ public static class WebApplicationExtensions
             //Nothing to register
         }, "Feature: Recording with -> {Recorder}", recorder));
 
+        if (hostOptions.UsesApiDocumentation)
+        {
+            var prefix = hostOptions.IsBackendForFrontEnd
+                ? WebConstants.BackEndForFrontEndDocsPath.Trim('/')
+                : string.Empty;
+            var url = builder.Configuration.GetValue<string>(WebHostDefaults.ServerUrlsKey);
+            var path = prefix.HasValue()
+                ? $"{url}/{prefix}"
+                : url!;
+            middlewares.Add(new MiddlewareRegistration(-50,
+                app =>
+                {
+                    app.MapSwagger();
+                    app.UseSwaggerUI(options =>
+                    {
+                        options.DocumentTitle = hostOptions.HostName;
+                        var endPoint = $"/swagger/{hostOptions.HostVersion}/swagger.json";
+                        options.SwaggerEndpoint(endPoint, hostOptions.HostName);
+                        //Note: puts the swagger docs at the root of the API
+                        options.RoutePrefix = prefix;
+                    });
+                }, "Feature: Open API documentation enabled with Swagger UI -> {Path}", path));
+        }
+
         var dataStore = builder.Services.GetRequiredServiceForPlatform<IDataStore>().GetType().Name;
         var eventStore = builder.Services.GetRequiredServiceForPlatform<IEventStore>().GetType().Name;
         var queueStore = builder.Services.GetRequiredServiceForPlatform<IQueueStore>().GetType().Name;
         var blobStore = builder.Services.GetRequiredServiceForPlatform<IBlobStore>().GetType().Name;
-        middlewares.Add(new MiddlewareRegistration(-50, _ =>
+        middlewares.Add(new MiddlewareRegistration(-40, _ =>
             {
                 //Nothing to register
             },

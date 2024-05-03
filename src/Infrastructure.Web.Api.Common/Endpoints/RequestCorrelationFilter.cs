@@ -1,4 +1,5 @@
 using Application.Common;
+using Infrastructure.Web.Api.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 
@@ -11,10 +12,10 @@ namespace Infrastructure.Web.Api.Common.Endpoints;
 public class RequestCorrelationFilter : IEndpointFilter
 {
     public const string CorrelationIdItemName = "_correlationId";
-    public const string ResponseHeaderName = HttpHeaders.RequestId;
+    public const string ResponseHeaderName = HttpConstants.Headers.RequestId;
 
     public static readonly string[] AcceptedRequestHeaderNames =
-        { "Correlation-Id", "X-Correlation-Id", HttpHeaders.RequestId, "X-Request-ID" };
+        { "Correlation-Id", "X-Correlation-Id", HttpConstants.Headers.RequestId, "X-Request-ID" };
 
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {

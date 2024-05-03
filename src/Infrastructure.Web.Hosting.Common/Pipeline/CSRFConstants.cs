@@ -1,4 +1,4 @@
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Hosting.Common.Pipeline;
 
@@ -13,12 +13,12 @@ public static class CSRFConstants
 
     public static class Cookies
     {
-        public const string AntiCSRF = HttpHeaders.AntiCSRF;
+        public const string AntiCSRF = HttpConstants.Headers.AntiCSRF;
         public static readonly TimeSpan DefaultCSRFExpiry = TimeSpan.FromDays(14);
     }
 
     public static class Headers
     {
-        public const string AntiCSRF = HttpHeaders.AntiCSRF;
+        public const string AntiCSRF = HttpConstants.Headers.AntiCSRF;
     }
 }

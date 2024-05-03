@@ -6,7 +6,7 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Gravatar;
 
 [Route("/avatar/{Hash}", OperationMethod.Get)]
 [UsedImplicitly]
-public class GravatarGetImageRequest : IWebRequestVoid
+public class GravatarGetImageRequest : IWebRequestStream
 {
     [JsonPropertyName("d")] public string? Default { get; set; }
 

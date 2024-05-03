@@ -1,7 +1,7 @@
 using Application.Interfaces.Services;
 using Common.Extensions;
 using Infrastructure.Interfaces;
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -38,6 +38,12 @@ public sealed class ReverseProxyMiddleware
 
         var request = context.Request;
         if (IsNotApiRequest(request))
+        {
+            await _next(context); //Continue down the pipeline
+            return;
+        }
+
+        if (context.Request.Path.StartsWithSegments(WebConstants.BackEndForFrontEndDocsPath))
         {
             await _next(context); //Continue down the pipeline
             return;
@@ -94,11 +100,11 @@ public sealed class ReverseProxyMiddleware
     {
         if (request.Cookies.TryGetValue(AuthenticationConstants.Cookies.Token, out var token))
         {
-            message.Headers.TryAddWithoutValidation(HttpHeaders.Authorization, $"Bearer {token}");
+            message.Headers.TryAddWithoutValidation(HttpConstants.Headers.Authorization, $"Bearer {token}");
         }
         else
         {
-            message.Headers.Remove(HttpHeaders.Authorization);
+            message.Headers.Remove(HttpConstants.Headers.Authorization);
         }
     }
 

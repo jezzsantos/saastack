@@ -2,7 +2,6 @@ using System.Net;
 using Common;
 using Common.Extensions;
 using FluentAssertions;
-using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common.Extensions;
 using Infrastructure.Web.Interfaces.Clients;
@@ -78,7 +77,7 @@ public class ResponseProblemExtensionsSpec
             Status = 999,
             Detail = "adetail",
             Instance = "aninstance",
-            Extensions = { { HttpResponses.ProblemDetails.Extensions.ExceptionPropertyName, "anexception" } }
+            Extensions = { { HttpConstants.Responses.ProblemDetails.Extensions.ExceptionPropertyName, "anexception" } }
         }.ToResponseProblem();
 
         result.Title.Should().Be("atitle");
@@ -109,7 +108,8 @@ public class ResponseProblemExtensionsSpec
             Status = 999,
             Detail = "adetail",
             Instance = "aninstance",
-            Extensions = { { HttpResponses.ProblemDetails.Extensions.ValidationErrorPropertyName, errors.ToJson() } }
+            Extensions =
+                { { HttpConstants.Responses.ProblemDetails.Extensions.ValidationErrorPropertyName, errors.ToJson() } }
         }.ToResponseProblem();
 
         result.Title.Should().Be("atitle");

@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Endpoints;
+using Infrastructure.Web.Api.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Xunit;
 
@@ -28,7 +29,7 @@ public class RequestCorrelationFilterSpec
         context.HttpContext.Response.Headers[RequestCorrelationFilter.ResponseHeaderName]
             .Should().NotBeNullOrEmpty();
         context.HttpContext.Items[RequestCorrelationFilter.CorrelationIdItemName]
-            .Should().Be(context.HttpContext.Response.Headers[HttpHeaders.RequestId].First());
+            .Should().Be(context.HttpContext.Response.Headers[HttpConstants.Headers.RequestId].First());
     }
 
     [Fact]
@@ -48,7 +49,7 @@ public class RequestCorrelationFilterSpec
 
         context.HttpContext.Items[RequestCorrelationFilter.CorrelationIdItemName]
             .Should().Be("acorrelationid");
-        context.HttpContext.Response.Headers[HttpHeaders.RequestId].First()
+        context.HttpContext.Response.Headers[HttpConstants.Headers.RequestId].First()
             .Should().Be("acorrelationid");
     }
 
@@ -65,7 +66,7 @@ public class RequestCorrelationFilterSpec
 
         context.HttpContext.Items[RequestCorrelationFilter.CorrelationIdItemName]
             .Should().Be("acorrelationid");
-        context.HttpContext.Response.Headers[HttpHeaders.RequestId].First()
+        context.HttpContext.Response.Headers[HttpConstants.Headers.RequestId].First()
             .Should().Be("acorrelationid");
     }
 }

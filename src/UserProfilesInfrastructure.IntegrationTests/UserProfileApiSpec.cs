@@ -3,8 +3,8 @@ using ApiHost1;
 using Common;
 using Domain.Interfaces;
 using FluentAssertions;
-using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.UserProfiles;
 using Infrastructure.Web.Interfaces.Clients;
 using IntegrationTesting.WebApi.Common;
@@ -117,7 +117,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
         var result = await Api.PutAsync(new ChangeProfileAvatarRequest
             {
                 UserId = loginA.User.Id
-            }, new PostFile(GetTestImage(), HttpContentTypes.ImagePng, "afilename"),
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
             req => req.SetJWTBearerToken(loginB.AccessToken));
 
         result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -131,7 +131,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
         var result = await Api.PutAsync(new ChangeProfileAvatarRequest
             {
                 UserId = login.User.Id
-            }, new PostFile(GetTestImage(), HttpContentTypes.ImagePng, "afilename"),
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         result.Content.Value.Profile!.AvatarUrl.Should().StartWith("https://localhost:5001/images/image_");
@@ -145,7 +145,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
         await Api.PutAsync(new ChangeProfileAvatarRequest
             {
                 UserId = login.User.Id
-            }, new PostFile(GetTestImage(), HttpContentTypes.ImagePng, "afilename"),
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var result = await Api.DeleteAsync(new DeleteProfileAvatarRequest

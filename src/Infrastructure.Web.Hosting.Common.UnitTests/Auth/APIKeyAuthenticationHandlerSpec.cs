@@ -6,7 +6,7 @@ using Common;
 using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Interfaces;
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -78,7 +78,7 @@ public class APIKeyAuthenticationHandlerSpec
         result.Succeeded.Should().BeFalse();
         result.Failure.Should().BeOfType<AuthenticationFailureException>()
             .Which.Message.Should()
-            .Be(Resources.APIKeyAuthenticationHandler_MissingParameter.Format(HttpQueryParams.APIKey));
+            .Be(Resources.APIKeyAuthenticationHandler_MissingParameter.Format(HttpConstants.QueryParams.APIKey));
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public class APIKeyAuthenticationHandlerSpec
                     It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<EndUserWithMemberships>, Error>>(Optional<EndUserWithMemberships>
                 .None));
-        _httpContext.Request.QueryString = QueryString.Create(HttpQueryParams.APIKey, "anapikey");
+        _httpContext.Request.QueryString = QueryString.Create(HttpConstants.QueryParams.APIKey, "anapikey");
         await _handler.InitializeAsync(new AuthenticationScheme(APIKeyAuthenticationHandler.AuthenticationScheme, null,
             typeof(APIKeyAuthenticationHandler)), _httpContext);
 
@@ -116,7 +116,7 @@ public class APIKeyAuthenticationHandlerSpec
                 ids.FindMembershipsForAPIKeyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<EndUserWithMemberships>, Error>>(user.ToOptional()));
-        _httpContext.Request.QueryString = QueryString.Create(HttpQueryParams.APIKey, "anapikey");
+        _httpContext.Request.QueryString = QueryString.Create(HttpConstants.QueryParams.APIKey, "anapikey");
         await _handler.InitializeAsync(new AuthenticationScheme(APIKeyAuthenticationHandler.AuthenticationScheme, null,
             typeof(APIKeyAuthenticationHandler)), _httpContext);
 
@@ -143,7 +143,7 @@ public class APIKeyAuthenticationHandlerSpec
                 ids.FindMembershipsForAPIKeyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult<Result<Optional<EndUserWithMemberships>, Error>>(user.ToOptional()));
-        _httpContext.Request.Headers[HttpHeaders.Authorization] =
+        _httpContext.Request.Headers[HttpConstants.Headers.Authorization] =
             $"Basic {Convert.ToBase64String("anapikey:"u8.ToArray())}";
         await _handler.InitializeAsync(new AuthenticationScheme(APIKeyAuthenticationHandler.AuthenticationScheme, null,
             typeof(APIKeyAuthenticationHandler)), _httpContext);

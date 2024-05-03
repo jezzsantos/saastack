@@ -204,6 +204,60 @@ namespace Infrastructure.Web.Hosting.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time..
+        /// </summary>
+        internal static string DefaultResponsesFilter_Example_RuleViolationError_Description {
+            get {
+                return ResourceManager.GetString("DefaultResponsesFilter_Example_RuleViolationError_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rule Violation.
+        /// </summary>
+        internal static string DefaultResponsesFilter_Example_RuleViolationError_Summary {
+            get {
+                return ResourceManager.GetString("DefaultResponsesFilter_Example_RuleViolationError_Summary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team..
+        /// </summary>
+        internal static string DefaultResponsesFilter_Example_UnexpectedError_Description {
+            get {
+                return ResourceManager.GetString("DefaultResponsesFilter_Example_UnexpectedError_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected Error.
+        /// </summary>
+        internal static string DefaultResponsesFilter_Example_UnexpectedError_Summary {
+            get {
+                return ResourceManager.GetString("DefaultResponsesFilter_Example_UnexpectedError_Summary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The incoming request is invalid in some way. The &apos;errors&apos; will contain the details of each of the validation errors..
+        /// </summary>
+        internal static string DefaultResponsesFilter_Example_ValidationError_Description {
+            get {
+                return ResourceManager.GetString("DefaultResponsesFilter_Example_ValidationError_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validation Error.
+        /// </summary>
+        internal static string DefaultResponsesFilter_Example_ValidationError_Summary {
+            get {
+                return ResourceManager.GetString("DefaultResponsesFilter_Example_ValidationError_Summary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed HMAC authentication.
         /// </summary>
         internal static string HMACAuthenticationHandler_FailedAuthentication {
@@ -218,6 +272,24 @@ namespace Infrastructure.Web.Hosting.Common {
         internal static string HMACAuthenticationHandler_MissingHeader {
             get {
                 return ResourceManager.GetString("HMACAuthenticationHandler_MissingHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to API Key Authorization using the &apos;{0}&apos; query parameter..
+        /// </summary>
+        internal static string HostExtensions_ApiDocumentation_APIKeyQueryDescription {
+            get {
+                return ResourceManager.GetString("HostExtensions_ApiDocumentation_APIKeyQueryDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Token Authorization using the {0} scheme. Example: &quot;{0} {{yourtoken}}&quot;.
+        /// </summary>
+        internal static string HostExtensions_ApiDocumentation_TokenDescription {
+            get {
+                return ResourceManager.GetString("HostExtensions_ApiDocumentation_TokenDescription", resourceCulture);
             }
         }
         

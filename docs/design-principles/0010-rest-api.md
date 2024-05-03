@@ -195,7 +195,7 @@ For examples:
 
 We always pluralize the element base URL:
 
-    /cars/{id}
+    /cars/{Id}
 
 ### Associations
 

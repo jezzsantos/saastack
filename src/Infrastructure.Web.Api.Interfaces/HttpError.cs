@@ -24,6 +24,7 @@ public struct HttpError
 /// </summary>
 public enum HttpErrorCode
 {
+    //EXTEND with others from HttpConstants.StatusCodes.SupportedErrors
     BadRequest = HttpStatusCode.BadRequest,
     Unauthorized = HttpStatusCode.Unauthorized,
     PaymentRequired = HttpStatusCode.PaymentRequired,

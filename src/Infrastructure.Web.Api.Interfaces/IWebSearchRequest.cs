@@ -4,4 +4,4 @@ namespace Infrastructure.Web.Api.Interfaces;
 ///     Defines the request of a SEARCH API
 /// </summary>
 public interface IWebSearchRequest<TResponse> : IWebRequest<TResponse>, IHasSearchOptions
-    where TResponse : IWebResponse;
+    where TResponse : IWebSearchResponse;

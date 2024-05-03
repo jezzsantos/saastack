@@ -56,6 +56,34 @@ public static class SyntaxFilterExtensions
         return null;
     }
 
+    /// <summary>
+    ///     Returns all the content in the XML node, and replaces newlines with spaces
+    /// </summary>
+    public static string? GetContent(this XmlNodeSyntax? nodeSyntax)
+    {
+        if (nodeSyntax is null)
+        {
+            return null;
+        }
+
+        if (nodeSyntax is XmlTextSyntax textSyntax)
+        {
+            var content = string.Join(string.Empty, textSyntax.TextTokens
+                .Where(tok => !string.IsNullOrWhiteSpace(tok.ToFullString()))
+                .Select(tok => tok.ToString()));
+
+            return content.TrimStart(['\t', ' ']).TrimEnd(['\t', ' ']);
+        }
+
+        if (nodeSyntax is XmlElementSyntax xmlElementSyntax)
+        {
+            var content = xmlElementSyntax.Content;
+            return string.Join(" ", content.Select(GetContent));
+        }
+
+        return null;
+    }
+
     public static bool HasParameterlessConstructor(this ClassDeclarationSyntax classDeclarationSyntax)
     {
         var allConstructors = classDeclarationSyntax.Members.Where(member => member is ConstructorDeclarationSyntax)
@@ -119,25 +147,6 @@ public static class SyntaxFilterExtensions
         if (getterAccessibility is { IsPublic: true, IsStatic: false })
         {
             return false;
-        }
-
-        return true;
-    }
-
-    public static bool HasPublicGetterAndSetterProperties(this ClassDeclarationSyntax classDeclarationSyntax)
-    {
-        var allProperties = classDeclarationSyntax.Members.Where(member => member is PropertyDeclarationSyntax)
-            .Cast<PropertyDeclarationSyntax>()
-            .ToList();
-        if (allProperties.Count > 0)
-        {
-            foreach (var property in allProperties)
-            {
-                if (!property.HasPublicGetterAndSetter())
-                {
-                    return false;
-                }
-            }
         }
 
         return true;
@@ -531,26 +540,6 @@ public static class SyntaxFilterExtensions
     {
         var accessibility = new Accessibility(methodDeclarationSyntax.Modifiers);
         return accessibility is { IsPublic: true, IsStatic: true };
-    }
-
-    public static bool IsReferenceType(this PropertyDeclarationSyntax propertyDeclarationSyntax,
-        SyntaxNodeAnalysisContext context)
-    {
-        var propertySymbol = context.SemanticModel.GetDeclaredSymbol(propertyDeclarationSyntax);
-        if (propertySymbol is null)
-        {
-            return false;
-        }
-
-        var getter = propertySymbol.GetMethod;
-        if (getter is null)
-        {
-            return false;
-        }
-
-        var returnType = getter.ReturnType;
-
-        return returnType.IsReferenceType;
     }
 
     public static bool IsRequired(this MemberDeclarationSyntax memberDeclarationSyntax)

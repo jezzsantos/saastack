@@ -4,8 +4,8 @@ using Application.Interfaces.Services;
 using Common;
 using Common.Extensions;
 using Infrastructure.Interfaces;
-using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.Extensions;
 using Microsoft.AspNetCore.Http;
 
@@ -98,8 +98,8 @@ public sealed class CSRFMiddleware
             return verifiedCookie.Error;
         }
 
-        var originHeader = GetHeader(request, HttpHeaders.Origin);
-        var refererHeader = GetHeader(request, HttpHeaders.Referer);
+        var originHeader = GetHeader(request, HttpConstants.Headers.Origin);
+        var refererHeader = GetHeader(request, HttpConstants.Headers.Referer);
 
         var verifiedOrigin = VerifyOrigin(_recorder, hostName.Value, originHeader, refererHeader);
         if (verifiedOrigin.IsFailure)
@@ -124,7 +124,7 @@ public sealed class CSRFMiddleware
             if (!originHost.HasValue || originHost.Value.NotEqualsIgnoreCase(hostName))
             {
                 recorder.TraceError(null,
-                    $"Request '{HttpHeaders.Origin}' is not from a trusted site: '{{Origin}}'",
+                    $"Request '{HttpConstants.Headers.Origin}' is not from a trusted site: '{{Origin}}'",
                     origin);
                 return Error.ForbiddenAccess(Resources.CSRFMiddleware_OriginMismatched);
             }
@@ -136,7 +136,7 @@ public sealed class CSRFMiddleware
             if (!refererHost.HasValue || refererHost.Value.NotEqualsIgnoreCase(hostName))
             {
                 recorder.TraceError(null,
-                    $"Request '{HttpHeaders.Referer}' is not from a trusted site: '{{Referer}}'",
+                    $"Request '{HttpConstants.Headers.Referer}' is not from a trusted site: '{{Referer}}'",
                     origin);
                 return Error.ForbiddenAccess(Resources.CSRFMiddleware_RefererMismatched);
             }

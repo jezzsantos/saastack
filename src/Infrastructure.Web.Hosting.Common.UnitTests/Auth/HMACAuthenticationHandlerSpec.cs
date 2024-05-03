@@ -8,6 +8,7 @@ using Domain.Interfaces.Authorization;
 using FluentAssertions;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -81,13 +82,13 @@ public class HMACAuthenticationHandlerSpec
         result.Succeeded.Should().BeFalse();
         result.Failure.Should().BeOfType<AuthenticationFailureException>()
             .Which.Message.Should()
-            .Be(Resources.HMACAuthenticationHandler_MissingHeader.Format(HttpHeaders.HMACSignature));
+            .Be(Resources.HMACAuthenticationHandler_MissingHeader.Format(HttpConstants.Headers.HMACSignature));
     }
 
     [Fact]
     public async Task WhenHandleAuthenticateAsyncAndNoSecret_ThenReturnsAuthenticated()
     {
-        _httpContext.Request.Headers[HttpHeaders.HMACSignature] = "asignature";
+        _httpContext.Request.Headers[HttpConstants.Headers.HMACSignature] = "asignature";
         _hostSettings.Setup(hs => hs.GetAncillaryApiHostHmacAuthSecret()).Returns(string.Empty);
         _httpContext.RequestServices = _serviceCollection.BuildServiceProvider();
         await _handler.InitializeAsync(new AuthenticationScheme(HMACAuthenticationHandler.AuthenticationScheme, null,
@@ -110,7 +111,7 @@ public class HMACAuthenticationHandlerSpec
     [Fact]
     public async Task WhenHandleAuthenticateAsyncAndWrongSignature_ThenReturnsFailure()
     {
-        _httpContext.Request.Headers[HttpHeaders.HMACSignature] = "asignature";
+        _httpContext.Request.Headers[HttpConstants.Headers.HMACSignature] = "asignature";
         await _handler.InitializeAsync(new AuthenticationScheme(HMACAuthenticationHandler.AuthenticationScheme, null,
             typeof(HMACAuthenticationHandler)), _httpContext);
 
@@ -129,7 +130,7 @@ public class HMACAuthenticationHandlerSpec
     {
         var body = new byte[] { 0x01 };
         var signature = new HMACSigner(body, "asecret").Sign();
-        _httpContext.Request.Headers[HttpHeaders.HMACSignature] = signature;
+        _httpContext.Request.Headers[HttpConstants.Headers.HMACSignature] = signature;
         _httpContext.Request.Body = new MemoryStream(body);
         await _handler.InitializeAsync(new AuthenticationScheme(HMACAuthenticationHandler.AuthenticationScheme, null,
             typeof(HMACAuthenticationHandler)), _httpContext);

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using Common;
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.Extensions;
 using Infrastructure.Web.Hosting.Common.Pipeline;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +24,7 @@ public abstract class CSRFController : Controller
         WriteSignatureToCookie(csrfTokenPair.Signature);
         var contents = WriteTokenToHtmlMetadata(pageHtml, csrfTokenPair.Token);
 
-        return File(contents, HttpContentTypes.Html);
+        return File(contents, HttpConstants.ContentTypes.Html);
     }
 
     private void WriteSignatureToCookie(string signature)

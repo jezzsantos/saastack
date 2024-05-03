@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
@@ -159,36 +160,23 @@ public static class HandlerExtensions
     {
         var response = postResult.Response;
         var location = postResult.Location;
-        switch (method)
+
+        var options =
+            new ResponseCodeOptions(response is not EmptyResponse, location.HasValue());
+        var statusCode = method.ToHttpMethod().GetDefaultResponseCode(options);
+
+        return statusCode switch
         {
-            case OperationMethod.Get:
-            case OperationMethod.Search:
-                return Results.Ok(response);
-
-            case OperationMethod.Post:
-            {
-                return location.HasValue()
-                    ? Results.Created(location, response)
-                    : Results.Ok(response);
-            }
-
-            case OperationMethod.PutPatch:
-                return Results.Accepted(null, response);
-
-            case OperationMethod.Delete:
-                var hasResponse = response is not EmptyResponse;
-                return hasResponse
-                    ? Results.Accepted(null, response)
-                    : Results.NoContent();
-
-            default:
-                return Results.Ok(response);
-        }
+            HttpStatusCode.OK => Results.Ok(response),
+            HttpStatusCode.Accepted => Results.Accepted(null, response),
+            HttpStatusCode.Created => Results.Created(location, response),
+            HttpStatusCode.NoContent => Results.NoContent(),
+            _ => Results.Ok(response)
+        };
     }
 
     private static IResult ToResult(this Error error)
     {
-        var httpError = error.ToHttpError();
-        return Results.Problem(statusCode: (int)httpError.Code, detail: httpError.Message);
+        return error.ToProblem();
     }
 }

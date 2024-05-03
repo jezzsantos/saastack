@@ -26,7 +26,7 @@ public static class HttpRequestExtensions
     /// </summary>
     public static Optional<string> GetAPIKeyAuth(this HttpRequest request)
     {
-        var fromQuery = request.Query[HttpQueryParams.APIKey].FirstOrDefault();
+        var fromQuery = request.Query[HttpConstants.QueryParams.APIKey].FirstOrDefault();
         if (fromQuery.HasValue())
         {
             return fromQuery;
@@ -50,8 +50,6 @@ public static class HttpRequestExtensions
     /// <summary>
     ///     Returns the values of the BASIC authentication from the request (if any)
     /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
     public static (Optional<string> Username, Optional<string> Password) GetBasicAuth(this HttpRequest request)
     {
         var fromBasicAuth = AuthenticationHeaderValue.TryParse(request.Headers.Authorization, out var result)
@@ -96,7 +94,7 @@ public static class HttpRequestExtensions
     /// </summary>
     public static Optional<string> GetHMACAuth(this HttpRequest request)
     {
-        var authorization = request.Headers[HttpHeaders.HMACSignature];
+        var authorization = request.Headers[HttpConstants.Headers.HMACSignature];
         if (authorization.NotExists() || authorization.Count == 0)
         {
             return Optional<string>.None;
@@ -185,7 +183,7 @@ public static class HttpRequestExtensions
     }
 
     /// <summary>
-    ///     Sets the <see cref="HttpHeaders.Authorization" /> header of the specified <see cref="message" />
+    ///     Sets the <see cref="HttpConstants.Headers.Authorization" /> header of the specified <see cref="message" />
     ///     to the <see cref="apiKey" />
     /// </summary>
     public static void SetAPIKey(this HttpRequestMessage message, string apiKey)
@@ -195,7 +193,7 @@ public static class HttpRequestExtensions
             return;
         }
 
-        message.Headers.Add(HttpHeaders.Authorization,
+        message.Headers.Add(HttpConstants.Headers.Authorization,
             $"Basic {Convert.ToBase64String(Encoding.UTF8.GetBytes($"{apiKey}:"))}");
     }
 
@@ -236,11 +234,11 @@ public static class HttpRequestExtensions
     {
         var signature = request.CreateHMACSignature(secret);
 
-        message.Headers.Add(HttpHeaders.HMACSignature, signature);
+        message.Headers.Add(HttpConstants.Headers.HMACSignature, signature);
     }
 
     /// <summary>
-    ///     Sets the <see cref="HttpHeaders.Authorization" /> header of the specified <see cref="message" />
+    ///     Sets the <see cref="HttpConstants.Headers.Authorization" /> header of the specified <see cref="message" />
     ///     to the <see cref="token" />
     /// </summary>
     public static void SetJWTBearerToken(this HttpRequestMessage message, string token)
@@ -250,11 +248,11 @@ public static class HttpRequestExtensions
             return;
         }
 
-        message.Headers.Add(HttpHeaders.Authorization, $"{BearerTokenPrefix} {token}");
+        message.Headers.Add(HttpConstants.Headers.Authorization, $"{BearerTokenPrefix} {token}");
     }
 
     /// <summary>
-    ///     Sets the <see cref="HttpHeaders.RequestId" /> header of the specified <see cref="message" />
+    ///     Sets the <see cref="HttpConstants.Headers.RequestId" /> header of the specified <see cref="message" />
     ///     to the <see cref="ICallContext.CallId" />
     /// </summary>
     public static void SetRequestId(this HttpRequestMessage message, ICallContext context)
@@ -265,12 +263,12 @@ public static class HttpRequestExtensions
             return;
         }
 
-        if (message.Headers.Contains(HttpHeaders.RequestId))
+        if (message.Headers.Contains(HttpConstants.Headers.RequestId))
         {
             return;
         }
 
-        message.Headers.Add(HttpHeaders.RequestId, context.CallId);
+        message.Headers.Add(HttpConstants.Headers.RequestId, context.CallId);
     }
 
     /// <summary>

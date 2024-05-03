@@ -2,6 +2,7 @@ using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
 using FluentAssertions;
+using Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
 using UnitTesting.Common;
 using Xunit;
@@ -202,7 +203,7 @@ public class FileUploadServiceSpec
                 new()
                 {
                     Content = stream,
-                    ContentType = HttpContentTypes.ImageJpeg,
+                    ContentType = HttpConstants.ContentTypes.ImageJpeg,
                     Size = content.Length,
                     Filename = "afilename"
                 }
@@ -211,7 +212,7 @@ public class FileUploadServiceSpec
             var result = _service.GetUploadedFile(uploads, 1000, new List<string> { "allowed" });
 
             result.Should().BeError(ErrorCode.Validation,
-                Resources.FileUploadService_DisallowedFileContent.Format(HttpContentTypes.ImageJpeg));
+                Resources.FileUploadService_DisallowedFileContent.Format(HttpConstants.ContentTypes.ImageJpeg));
         }
 
         [Fact]
@@ -225,18 +226,18 @@ public class FileUploadServiceSpec
                 new()
                 {
                     Content = stream,
-                    ContentType = HttpContentTypes.ImagePng,
+                    ContentType = HttpConstants.ContentTypes.ImagePng,
                     Size = content.Length,
                     Filename = "afilename"
                 }
             };
 
             var result = _service.GetUploadedFile(uploads, 1000,
-                new List<string> { HttpContentTypes.ImageJpeg, HttpContentTypes.ImagePng });
+                new List<string> { HttpConstants.ContentTypes.ImageJpeg, HttpConstants.ContentTypes.ImagePng });
 
             result.Should().BeError(ErrorCode.Validation,
-                Resources.FileUploadService_InvalidContentTypeForFileType.Format(HttpContentTypes.ImageJpeg,
-                    HttpContentTypes.ImagePng));
+                Resources.FileUploadService_InvalidContentTypeForFileType.Format(HttpConstants.ContentTypes.ImageJpeg,
+                    HttpConstants.ContentTypes.ImagePng));
         }
 
         [Fact]
@@ -250,13 +251,14 @@ public class FileUploadServiceSpec
                 new()
                 {
                     Content = stream,
-                    ContentType = HttpContentTypes.ImageJpeg,
+                    ContentType = HttpConstants.ContentTypes.ImageJpeg,
                     Size = content.Length,
                     Filename = "afilename.txt"
                 }
             };
 
-            var result = _service.GetUploadedFile(uploads, 1000, new List<string> { HttpContentTypes.ImageJpeg });
+            var result =
+                _service.GetUploadedFile(uploads, 1000, new List<string> { HttpConstants.ContentTypes.ImageJpeg });
 
             result.Should().BeError(ErrorCode.Validation,
                 Resources.FileUploadService_InvalidFileExtensionForFileType);
@@ -273,16 +275,17 @@ public class FileUploadServiceSpec
                 new()
                 {
                     Content = stream,
-                    ContentType = HttpContentTypes.ImageJpeg,
+                    ContentType = HttpConstants.ContentTypes.ImageJpeg,
                     Size = content.Length,
                     Filename = "afilename"
                 }
             };
 
-            var result = _service.GetUploadedFile(uploads, 1000, new List<string> { HttpContentTypes.ImageJpeg });
+            var result =
+                _service.GetUploadedFile(uploads, 1000, new List<string> { HttpConstants.ContentTypes.ImageJpeg });
 
             result.Should().BeSuccess();
-            result.Value.ContentType.Should().Be(HttpContentTypes.ImageJpeg);
+            result.Value.ContentType.Should().Be(HttpConstants.ContentTypes.ImageJpeg);
             result.Value.Filename.Should().Be("afilename.jpg");
             result.Value.Size.Should().Be(103);
             result.Value.Content.Position.Should().Be(0);
@@ -305,10 +308,11 @@ public class FileUploadServiceSpec
                 }
             };
 
-            var result = _service.GetUploadedFile(uploads, 1000, new List<string> { HttpContentTypes.ImageJpeg });
+            var result =
+                _service.GetUploadedFile(uploads, 1000, new List<string> { HttpConstants.ContentTypes.ImageJpeg });
 
             result.Should().BeSuccess();
-            result.Value.ContentType.Should().Be(HttpContentTypes.ImageJpeg);
+            result.Value.ContentType.Should().Be(HttpConstants.ContentTypes.ImageJpeg);
             result.Value.Filename.Should().Be("afilename.jpg");
             result.Value.Size.Should().Be(103L);
             result.Value.Content.Position.Should().Be(0);
@@ -325,16 +329,17 @@ public class FileUploadServiceSpec
                 new()
                 {
                     Content = stream,
-                    ContentType = HttpContentTypes.ImageJpeg,
+                    ContentType = HttpConstants.ContentTypes.ImageJpeg,
                     Size = content.Length,
                     Filename = "afilename.jpg"
                 }
             };
 
-            var result = _service.GetUploadedFile(uploads, 1000, new List<string> { HttpContentTypes.ImageJpeg });
+            var result =
+                _service.GetUploadedFile(uploads, 1000, new List<string> { HttpConstants.ContentTypes.ImageJpeg });
 
             result.Should().BeSuccess();
-            result.Value.ContentType.Should().Be(HttpContentTypes.ImageJpeg);
+            result.Value.ContentType.Should().Be(HttpConstants.ContentTypes.ImageJpeg);
             result.Value.Filename.Should().Be("afilename.jpg");
             result.Value.Size.Should().Be(103L);
             result.Value.Content.Position.Should().Be(0);

@@ -105,3 +105,12 @@ Specific class properties:
 
 TBD
 
+## Swagger UI
+
+> a.k.a OpenAPI documentation
+
+We provide Swagger UI tooling for both the frontend and backend APIs.
+
+For Backend API: you can find Swagger UI a the root URL of the site `/`
+
+From Frontend API: you can find the swagger UI at : `/swagger`

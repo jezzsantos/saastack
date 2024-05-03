@@ -28,8 +28,26 @@ public static class AnalyzerConstants
         public const string Application = "SaaStackApplication";
         public const string Ddd = "SaaStackDDD";
         public const string Eventing = "SaaStackEventing";
+        // ReSharper disable once MemberHidesStaticFromOuterClass
         public const string Documentation = "SaaStackDocumentation";
         public const string WebApi = "SaaStackWebApi";
         public const string Host = "SaaStackHosts";
+    }
+
+    public static class XmlDocumentation
+    {
+        public static class Elements
+        {
+            public const string InheritDoc = "inheritdoc";
+            public const string Summary = "summary";
+            public const string Remarks = "remarks";
+            public const string Response = "response";
+        }
+
+        public static class Attributes
+        {
+            public const string Param = "param";
+            public const string Code = "code";
+        }
     }
 }

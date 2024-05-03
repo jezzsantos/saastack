@@ -1,6 +1,5 @@
 using System.Net;
 using FluentValidation.Results;
-using Infrastructure.Web.Api.Common.Validation;
 using Infrastructure.Web.Api.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,18 +22,17 @@ public static class ValidationResultExtensions
             .ToList();
         var firstMessage = result.Errors.Select(error => error.ErrorMessage)
             .First();
-        var firstCode = result.Errors.Select(error => error.ErrorCode)
-            .First();
 
         var details = new ProblemDetails
         {
-            Type = firstCode,
-            Title = ValidationResources.ValidationBehavior_ErrorTitle,
+            Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5",
+            Title = "Bad Request",
             Status = (int)HttpStatusCode.BadRequest,
             Detail = firstMessage,
             Instance = requestUrl
         };
-        details.Extensions.Add(HttpResponses.ProblemDetails.Extensions.ValidationErrorPropertyName, validationDetails);
+        details.Extensions.Add(HttpConstants.Responses.ProblemDetails.Extensions.ValidationErrorPropertyName,
+            validationDetails);
 
         return details;
     }

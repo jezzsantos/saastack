@@ -17,10 +17,10 @@ public sealed class FileUploadService : IFileUploadService
     private static readonly byte[] ImagePngMagicBytes = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
     private static readonly IReadOnlyList<KnownFile> DetectableFileTypes = new[]
     {
-        new KnownFile(HttpContentTypes.ImageJpeg, ImageJpegMagicBytes, "jpg"),
-        new KnownFile(HttpContentTypes.ImageGif, ImageGif87MagicBytes, "gif"),
-        new KnownFile(HttpContentTypes.ImageGif, ImageGif89MagicBytes, "gif"),
-        new KnownFile(HttpContentTypes.ImagePng, ImagePngMagicBytes, "png")
+        new KnownFile(HttpConstants.ContentTypes.ImageJpeg, ImageJpegMagicBytes, "jpg"),
+        new KnownFile(HttpConstants.ContentTypes.ImageGif, ImageGif87MagicBytes, "gif"),
+        new KnownFile(HttpConstants.ContentTypes.ImageGif, ImageGif89MagicBytes, "gif"),
+        new KnownFile(HttpConstants.ContentTypes.ImagePng, ImagePngMagicBytes, "png")
     };
 
     public Result<FileUpload, Error> GetUploadedFile(IReadOnlyList<FileUpload> uploads, long maxSizeInBytes,
@@ -120,7 +120,7 @@ public sealed class FileUploadService : IFileUploadService
             return (true, declaredContentType, null);
         }
 
-        return (false, HttpContentTypes.OctetStream, null);
+        return (false, HttpConstants.ContentTypes.OctetStream, null);
     }
 
     private static bool IsContentType(Stream content, byte[] magicBytes)

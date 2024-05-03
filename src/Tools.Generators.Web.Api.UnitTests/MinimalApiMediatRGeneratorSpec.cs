@@ -139,14 +139,21 @@ public class MinimalApiMediatRGeneratorSpec
                         public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
-                                .WithGroupName("AServiceClass")
+                                .WithTags("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None));
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Responses.Clear();
+                                        return op;
+                                    });
                 
                         }
                     }
@@ -215,14 +222,21 @@ public class MinimalApiMediatRGeneratorSpec
                         public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
-                                .WithGroupName("AServiceClass")
+                                .WithTags("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None));
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Responses.Clear();
+                                        return op;
+                                    });
                 
                         }
                     }
@@ -292,14 +306,21 @@ public class MinimalApiMediatRGeneratorSpec
                         public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
-                                .WithGroupName("AServiceClass")
+                                .WithTags("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None));
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Responses.Clear();
+                                        return op;
+                                    });
                 
                         }
                     }
@@ -369,7 +390,7 @@ public class MinimalApiMediatRGeneratorSpec
                         public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
-                                .WithGroupName("AServiceClass")
+                                .WithTags("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
@@ -377,7 +398,14 @@ public class MinimalApiMediatRGeneratorSpec
                 #if TESTINGONLY
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None));
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Responses.Clear();
+                                        return op;
+                                    });
                 #endif
                 
                         }
@@ -450,7 +478,7 @@ public class MinimalApiMediatRGeneratorSpec
                         public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
-                                .WithGroupName("AServiceClass")
+                                .WithTags("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
@@ -459,7 +487,14 @@ public class MinimalApiMediatRGeneratorSpec
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
-                                .RequireAuthorization("HMAC");
+                                .RequireAuthorization("HMAC")
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Responses.Clear();
+                                        return op;
+                                    });
                 #endif
                 
                         }
@@ -532,7 +567,7 @@ public class MinimalApiMediatRGeneratorSpec
                         public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
-                                .WithGroupName("AServiceClass")
+                                .WithTags("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
@@ -541,7 +576,14 @@ public class MinimalApiMediatRGeneratorSpec
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
-                                .RequireAuthorization("Token");
+                                .RequireAuthorization("Token")
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Responses.Clear();
+                                        return op;
+                                    });
                 #endif
                 
                         }
@@ -624,14 +666,21 @@ public class MinimalApiMediatRGeneratorSpec
                         public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
-                                .WithGroupName("AServiceClass")
+                                .WithTags("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None));
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Responses.Clear();
+                                        return op;
+                                    });
                 
                         }
                     }
@@ -712,7 +761,7 @@ public class MinimalApiMediatRGeneratorSpec
                         public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
-                                .WithGroupName("AServiceClass")
+                                .WithTags("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
@@ -722,7 +771,14 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}POLICY:{|Features|:{|Platform|:[|paidtrial_features|]},|Roles|:{|Platform|:[|platform_operations|]}}");
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}POLICY:{|Features|:{|Platform|:[|paidtrial_features|]},|Roles|:{|Platform|:[|platform_operations|]}}")
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Responses.Clear();
+                                        return op;
+                                    });
                 #endif
                 
                         }
@@ -796,7 +852,7 @@ public class MinimalApiMediatRGeneratorSpec
                         public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
-                                .WithGroupName("AServiceClass")
+                                .WithTags("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
@@ -806,7 +862,14 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}");
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Responses.Clear();
+                                        return op;
+                                    });
                 #endif
                 
                         }
@@ -881,7 +944,7 @@ public class MinimalApiMediatRGeneratorSpec
                         public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
-                                .WithGroupName("AServiceClass")
+                                .WithTags("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.MultiTenancyFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
@@ -891,7 +954,14 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}");
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Responses.Clear();
+                                        return op;
+                                    });
                 
                         }
                     }
@@ -962,7 +1032,7 @@ public class MinimalApiMediatRGeneratorSpec
                         public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
-                                .WithGroupName("AServiceClass")
+                                .WithTags("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
@@ -972,7 +1042,14 @@ public class MinimalApiMediatRGeneratorSpec
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
                                 .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
-                                .DisableAntiforgery();
+                                .DisableAntiforgery()
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Responses.Clear();
+                                        return op;
+                                    });
                 
                         }
                     }
@@ -1043,7 +1120,7 @@ public class MinimalApiMediatRGeneratorSpec
                         public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
                         {
                             var aserviceclassGroup = app.MapGroup(string.Empty)
-                                .WithGroupName("AServiceClass")
+                                .WithTags("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
@@ -1053,13 +1130,27 @@ public class MinimalApiMediatRGeneratorSpec
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
                                 .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
-                                .DisableAntiforgery();
+                                .DisableAntiforgery()
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A (Put)";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Responses.Clear();
+                                        return op;
+                                    });
                             aserviceclassGroup.MapPatch("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
                                 .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
-                                .DisableAntiforgery();
+                                .DisableAntiforgery()
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A (Patch)";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Responses.Clear();
+                                        return op;
+                                    });
                 
                         }
                     }
@@ -1131,7 +1222,7 @@ public class MinimalApiMediatRGeneratorSpec
                         public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
                         {
                             var aserviceclassGroup = app.MapGroup("aprefix")
-                                .WithGroupName("AServiceClass")
+                                .WithTags("AServiceClass")
                                 .RequireCors("__DefaultCorsPolicy")
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
@@ -1141,7 +1232,118 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}");
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Responses.Clear();
+                                        return op;
+                                    });
+                #endif
+                
+                        }
+                    }
+                }
+
+                namespace ANamespace.AServiceClassMediatRHandlers
+                {
+                #if TESTINGONLY
+                    public class AMethod_ARequest_Handler : global::MediatR.IRequestHandler<global::ANamespace.ARequest, global::Microsoft.AspNetCore.Http.IResult>
+                    {
+                        public async Task<global::Microsoft.AspNetCore.Http.IResult> Handle(global::ANamespace.ARequest request, global::System.Threading.CancellationToken cancellationToken)
+                        {
+                            var api = new global::ANamespace.AServiceClass();
+                            var result = await api.AMethod(request, cancellationToken);
+                            return result.HandleApiResult(global::Infrastructure.Web.Api.Interfaces.OperationMethod.Get);
+                        }
+                    }
+                #endif
+
+                }
+
+
+                """);
+        }
+        [Fact]
+        public void WhenDefinesSummaryAndResponseCodes_ThenGenerates()
+        {
+            var compilation = CreateCompilation("""
+                                                using System;
+                                                using System.Threading;
+                                                using Infrastructure.Web.Api.Interfaces;
+
+                                                namespace ANamespace;
+
+                                                public class AResponse : IWebResponse
+                                                {
+                                                }
+                                                /// <summary>
+                                                /// ASummary sentence
+                                                /// </summary>
+                                                /// <response code="200">asuccesssummary</response>
+                                                /// <response code="400">afailuresummary</response>
+                                                [Route("aroute", OperationMethod.Get, access:AccessType.Token, isTestingOnly:true)]
+                                                [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
+                                                public class ARequest : IWebRequest<AResponse>
+                                                {
+                                                }
+                                                public class AServiceClass : IWebApiService
+                                                {
+                                                    public async Task<string> AMethod(ARequest request, CancellationToken cancellationToken)
+                                                    {
+                                                         return "";
+                                                    }
+                                                }
+                                                """);
+
+            var result = Generate(compilation);
+
+            result.Should().Be(
+                """
+                // <auto-generated/>
+                using System.Threading;
+                using System;
+                using Microsoft.Extensions.DependencyInjection;
+                using Microsoft.AspNetCore.Http;
+                using Microsoft.AspNetCore.Builder;
+                using Infrastructure.Web.Api.Interfaces;
+                using Infrastructure.Web.Api.Common.Extensions;
+
+                namespace compilation
+                {
+                    public static class MinimalApiRegistration
+                    {
+                        public static void RegisterRoutes(this global::Microsoft.AspNetCore.Builder.WebApplication app)
+                        {
+                            var aserviceclassGroup = app.MapGroup(string.Empty)
+                                .WithTags("AServiceClass")
+                                .RequireCors("__DefaultCorsPolicy")
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter>()
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
+                                .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
+                #if TESTINGONLY
+                            aserviceclassGroup.MapGet("aroute",
+                                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                .RequireAuthorization("Token")
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
+                                .WithOpenApi(op =>
+                                    {
+                                        op.OperationId = "A";
+                                        op.Description = "(request type: ARequest)";
+                                        op.Summary = "ASummary sentence";
+                                        op.Responses.Clear();
+                                        op.Responses.Add("200", new global::Microsoft.OpenApi.Models.OpenApiResponse
+                                        {
+                                            Description = "asuccesssummary"
+                                        });
+                                        op.Responses.Add("400", new global::Microsoft.OpenApi.Models.OpenApiResponse
+                                        {
+                                            Description = "afailuresummary"
+                                        });
+                                        return op;
+                                    });
                 #endif
                 
                         }

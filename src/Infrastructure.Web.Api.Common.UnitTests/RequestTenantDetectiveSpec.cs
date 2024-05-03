@@ -66,7 +66,7 @@ public class RequestTenantDetectiveSpec
         public async Task WhenDetectTenantAsyncAndTenantIdInHeader_ThenReturnsTenantId()
         {
             var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers.Append(HttpHeaders.Tenant, "atenantid");
+            httpContext.Request.Headers.Append(HttpConstants.Headers.Tenant, "atenantid");
 
             var result =
                 await _detective.DetectTenantAsync(httpContext, typeof(TestUnTenantedRequest), CancellationToken.None);
@@ -144,7 +144,7 @@ public class RequestTenantDetectiveSpec
                 Request =
                 {
                     Method = HttpMethods.Post,
-                    ContentType = HttpContentTypes.Json,
+                    ContentType = HttpConstants.ContentTypes.Json,
                     Body = new MemoryStream(Encoding.UTF8.GetBytes(new
                     {
                         Id = "anid",
@@ -170,7 +170,7 @@ public class RequestTenantDetectiveSpec
                 Request =
                 {
                     Method = HttpMethods.Post,
-                    ContentType = HttpContentTypes.Json,
+                    ContentType = HttpConstants.ContentTypes.Json,
                     Body = new MemoryStream(Encoding.UTF8.GetBytes(new
                     {
                         Id = "anid",
@@ -195,7 +195,7 @@ public class RequestTenantDetectiveSpec
                 Request =
                 {
                     Method = HttpMethods.Post,
-                    ContentType = HttpContentTypes.FormUrlEncoded,
+                    ContentType = HttpConstants.ContentTypes.FormUrlEncoded,
                     Body = await new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
                     {
                         new(nameof(IUnTenantedOrganizationRequest.Id), "anid"),
@@ -220,7 +220,7 @@ public class RequestTenantDetectiveSpec
                 Request =
                 {
                     Method = HttpMethods.Post,
-                    ContentType = HttpContentTypes.FormUrlEncoded,
+                    ContentType = HttpConstants.ContentTypes.FormUrlEncoded,
                     Body = await new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
                     {
                         new(nameof(IUnTenantedOrganizationRequest.Id), "anid"),
@@ -248,7 +248,7 @@ public class RequestTenantDetectiveSpec
                 Request =
                 {
                     Method = HttpMethods.Post,
-                    ContentType = $"{HttpContentTypes.MultiPartFormData}; boundary=\"aboundary\"",
+                    ContentType = $"{HttpConstants.ContentTypes.MultiPartFormData}; boundary=\"aboundary\"",
                     Body = await body.ReadAsStreamAsync()
                 }
             };
@@ -272,7 +272,7 @@ public class RequestTenantDetectiveSpec
                 Request =
                 {
                     Method = HttpMethods.Post,
-                    ContentType = $"{HttpContentTypes.MultiPartFormData}; boundary=\"aboundary\"",
+                    ContentType = $"{HttpConstants.ContentTypes.MultiPartFormData}; boundary=\"aboundary\"",
                     Body = await body.ReadAsStreamAsync()
                 }
             };
@@ -343,7 +343,7 @@ public class RequestTenantDetectiveSpec
                 Request =
                 {
                     Method = HttpMethods.Post,
-                    ContentType = HttpContentTypes.Json,
+                    ContentType = HttpConstants.ContentTypes.Json,
                     Body = new MemoryStream(Encoding.UTF8.GetBytes(new
                     {
                         OrganizationId = "atenantid"
@@ -367,7 +367,7 @@ public class RequestTenantDetectiveSpec
                 Request =
                 {
                     Method = HttpMethods.Post,
-                    ContentType = HttpContentTypes.FormUrlEncoded,
+                    ContentType = HttpConstants.ContentTypes.FormUrlEncoded,
                     Body = await new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
                     {
                         new(nameof(ITenantedRequest.OrganizationId), "anorganizationid")
@@ -393,7 +393,7 @@ public class RequestTenantDetectiveSpec
                 Request =
                 {
                     Method = HttpMethods.Post,
-                    ContentType = $"{HttpContentTypes.MultiPartFormData}; boundary=\"aboundary\"",
+                    ContentType = $"{HttpConstants.ContentTypes.MultiPartFormData}; boundary=\"aboundary\"",
                     Body = await body.ReadAsStreamAsync()
                 }
             };
@@ -466,7 +466,7 @@ public class RequestTenantDetectiveSpec
                 Request =
                 {
                     Method = HttpMethods.Post,
-                    ContentType = HttpContentTypes.Json,
+                    ContentType = HttpConstants.ContentTypes.Json,
                     Body = new MemoryStream(Encoding.UTF8.GetBytes(new
                     {
                         Id = "atenantid"
@@ -491,7 +491,7 @@ public class RequestTenantDetectiveSpec
                 Request =
                 {
                     Method = HttpMethods.Post,
-                    ContentType = HttpContentTypes.FormUrlEncoded,
+                    ContentType = HttpConstants.ContentTypes.FormUrlEncoded,
                     Body = await new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
                     {
                         new(nameof(IUnTenantedOrganizationRequest.Id), "atenantid")
@@ -518,7 +518,7 @@ public class RequestTenantDetectiveSpec
                 Request =
                 {
                     Method = HttpMethods.Post,
-                    ContentType = $"{HttpContentTypes.MultiPartFormData}; boundary=\"aboundary\"",
+                    ContentType = $"{HttpConstants.ContentTypes.MultiPartFormData}; boundary=\"aboundary\"",
                     Body = await body.ReadAsStreamAsync()
                 }
             };

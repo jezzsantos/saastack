@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -105,7 +106,7 @@ internal static partial class MicrosoftAspNetCoreExtensions
 
         options ??= response.HttpContext.ResolveXmlSerializerOptions();
 
-        response.ContentType = contentType ?? HttpContentTypes.XmlWithCharset;
+        response.ContentType = contentType ?? HttpConstants.ContentTypes.XmlWithCharset;
 
         // if no user provided token, pass the RequestAborted token and ignore OperationCanceledException
         if (!cancellationToken.CanBeCanceled)
@@ -131,7 +132,7 @@ internal static partial class MicrosoftAspNetCoreExtensions
 
         options ??= response.HttpContext.ResolveXmlSerializerOptions();
 
-        response.ContentType = contentType ?? HttpContentTypes.XmlWithCharset;
+        response.ContentType = contentType ?? HttpConstants.ContentTypes.XmlWithCharset;
 
         // if no user provided token, pass the RequestAborted token and ignore OperationCanceledException
         if (!cancellationToken.CanBeCanceled)

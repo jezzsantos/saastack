@@ -1,7 +1,11 @@
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Tools.Analyzers.Common;
+using Tools.Analyzers.Common.Extensions;
 using Tools.Generators.Web.Api.Extensions;
+using SymbolExtensions = Tools.Generators.Web.Api.Extensions.SymbolExtensions;
 
 namespace Tools.Generators.Web.Api;
 
@@ -56,7 +60,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         _multipartFormSymbol = compilation.GetTypeByMetadataName(typeof(IHasMultipartForm).FullName!)!;
     }
 
-    public List<ServiceOperationRegistration> OperationRegistrations { get; } = new();
+    public List<ServiceOperationRegistration> OperationRegistrations { get; } = [];
 
     public override void VisitAssembly(IAssemblySymbol symbol)
     {
@@ -197,11 +201,13 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             var responseType = GetResponseType(method.Parameters[0].Type);
             var responseTypeName = responseType.Name;
             var responseTypeNamespace = responseType.ContainingNamespace.ToDisplayString();
-            var methodBody = method.GetMethodBody();
+            var methodBody = SymbolExtensions.GetMethodBody(method);
             var methodName = method.Name;
             var isAsync = method.IsAsync;
             var hasCancellationToken = method.Parameters.Length == 2;
             var isMultipart = requestType.IsDerivedFrom(_multipartFormSymbol);
+            var documentedSummary = GetDocumentedSummary(requestType);
+            var documentedResponses = GetDocumentedResponses(requestType);
 
             OperationRegistrations.Add(new ServiceOperationRegistration
             {
@@ -218,11 +224,87 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                 HasCancellationToken = hasCancellationToken,
                 MethodName = methodName,
                 MethodBody = methodBody,
-                RoutePath = routePath
+                RoutePath = routePath,
+                DocumentedSummary = documentedSummary,
+                DocumentedResponseCodes = documentedResponses
             });
         }
 
         return;
+
+        string? GetDocumentedSummary(ISymbol requestType)
+        {
+            if (!TryGetDocumentation(requestType, out var trivia))
+            {
+                return null;
+            }
+
+            var xmlContent = trivia.Content;
+            var summary = xmlContent.SelectSingleElement(AnalyzerConstants.XmlDocumentation.Elements.Summary);
+            if (summary.NotExists())
+            {
+                return null;
+            }
+
+            var content = summary.GetContent();
+            return content;
+        }
+
+        List<ApiResponseCode> GetDocumentedResponses(ISymbol requestType)
+        {
+            if (!TryGetDocumentation(requestType, out var trivia))
+            {
+                return [];
+            }
+
+            var xmlContent = trivia.Content;
+            var responses = xmlContent.SelectElements(AnalyzerConstants.XmlDocumentation.Elements.Response);
+            if (responses.HasNone())
+            {
+                return [];
+            }
+
+            return responses
+                .Select<XmlNodeSyntax, ApiResponseCode?>(node =>
+                {
+                    var element = (XmlElementSyntax)node;
+                    var reason = element.GetContent();
+                    if (reason.HasNoValue())
+                    {
+                        return null;
+                    }
+
+                    var attributes = element.StartTag
+                        .Attributes.OfType<XmlTextAttributeSyntax>();
+                    var attribute = attributes
+                        .FirstOrDefault(attr =>
+                            attr.Name.ToString() == AnalyzerConstants.XmlDocumentation.Attributes.Code);
+                    if (attribute.NotExists()
+                        || attribute.TextTokens.HasNone())
+                    {
+                        return null;
+                    }
+
+                    var value = attribute.TextTokens.ToFullString();
+                    if (value.HasNoValue())
+                    {
+                        return null;
+                    }
+
+                    if (!int.TryParse(value, out var statusCode))
+                    {
+                        return null;
+                    }
+
+                    return new ApiResponseCode
+                    {
+                        StatusCode = statusCode,
+                        Reason = reason
+                    };
+                })
+                .Where(response => response.Exists())
+                .ToList()!;
+        }
 
         string? GetBasePath()
         {
@@ -281,7 +363,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                     {
                         var value = p.Value!.ToString();
                         var typeName = p.Type!.Name;
-                        var isRole = p.Type!.IsOfType(_authorizeAttributeRolesSymbol);
+                        var isRole = SymbolExtensions.IsOfType(p.Type!, _authorizeAttributeRolesSymbol);
                         if (isRole)
                         {
                             if (Enum.TryParse(value, true, out Roles role))
@@ -290,7 +372,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                             }
                         }
 
-                        var isFeature = p.Type!.IsOfType(_authorizeAttributeFeaturesSymbol);
+                        var isFeature = SymbolExtensions.IsOfType(p.Type!, _authorizeAttributeFeaturesSymbol);
                         if (isFeature)
                         {
                             if (Enum.TryParse(value, true, out Features feature))
@@ -330,7 +412,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             var isInjectionCtor = false;
             if (symbol.InstanceConstructors.IsDefaultOrEmpty)
             {
-                return new List<Constructor>();
+                return [];
             }
 
             foreach (var constructor in symbol.InstanceConstructors.OrderByDescending(
@@ -344,7 +426,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                     }
                 }
 
-                var body = constructor.GetMethodBody();
+                var body = SymbolExtensions.GetMethodBody(constructor);
                 ctors.Add(new Constructor
                 {
                     IsInjectionCtor = isInjectionCtor,
@@ -390,7 +472,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         // We assume that the return type is anything but void
         bool IsCorrectReturnType(IMethodSymbol method)
         {
-            return !method.ReturnType.IsOfType(_voidSymbol);
+            return !SymbolExtensions.IsOfType(method.ReturnType, _voidSymbol);
         }
 
         // We assume that the method one or two params:
@@ -413,7 +495,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             if (parameters.Length == 2)
             {
                 var secondParameter = parameters[1];
-                if (!secondParameter.Type.IsOfType(_cancellationTokenSymbol))
+                if (!SymbolExtensions.IsOfType(secondParameter.Type, _cancellationTokenSymbol))
                 {
                     return true;
                 }
@@ -451,7 +533,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             var parameters = method.Parameters;
             if (parameters.Length == 0)
             {
-                authorizeAttributes = new List<AttributeData>();
+                authorizeAttributes = [];
                 return false;
             }
 
@@ -461,9 +543,43 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         }
     }
 
+    private static bool TryGetDocumentation(ISymbol symbol, out DocumentationCommentTriviaSyntax trivia)
+    {
+        trivia = null!;
+        var syntaxes = symbol.DeclaringSyntaxReferences
+            .Select(x => x.GetSyntax())
+            .ToList();
+        if (syntaxes.HasNone())
+        {
+            return false;
+        }
+
+        trivia = syntaxes
+            .SelectMany(syntax => syntax.GetLeadingTrivia())
+            .Select(leadingTrivia => leadingTrivia.GetStructure())
+            .OfType<DocumentationCommentTriviaSyntax>()
+            .FirstOrDefault()!;
+
+        if (trivia.NotExists())
+        {
+            return false;
+        }
+
+        if (!trivia.IsLanguageForCSharp())
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public record ServiceOperationRegistration
     {
         public ApiServiceClassRegistration Class { get; set; } = null!;
+
+        public List<ApiResponseCode> DocumentedResponseCodes { get; set; } = [];
+
+        public string? DocumentedSummary { get; set; }
 
         public bool HasCancellationToken { get; set; }
 
@@ -569,5 +685,12 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         public TypeName TypeName { get; set; } = null!;
 
         public string VariableName { get; set; } = null!;
+    }
+
+    public record ApiResponseCode
+    {
+        public string? Reason { get; set; }
+
+        public int StatusCode { get; set; }
     }
 }

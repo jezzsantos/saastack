@@ -534,7 +534,7 @@ public class WebApiAssemblyVisitorSpec
             }
 
             [Fact]
-            public void WhenVisitNamedTypeAndClassHasRouteAttribute_ThenCreatesRegistration()
+            public void WhenVisitNamedTypeAndClassHasWebServiceAttribute_ThenCreatesRegistration()
             {
                 var compilation = CreateCompilation("""
                                                     using System;
@@ -567,6 +567,93 @@ public class WebApiAssemblyVisitorSpec
                 visitor.OperationRegistrations.Count.Should().Be(1);
                 var registration = visitor.OperationRegistrations.First();
                 registration.Class.BasePath.Should().Be("aprefix");
+            }
+            
+            [Fact]
+            public void WhenVisitNamedTypeAndClassHasXmlSummary_ThenCreatesRegistration()
+            {
+                var compilation = CreateCompilation("""
+                                                    using System;
+                                                    using Infrastructure.Web.Api.Interfaces;
+
+                                                    namespace ANamespace;
+
+                                                    public class AResponse : IWebResponse
+                                                    {
+                                                    }
+                                                    
+                                                    /// <summary>
+                                                    /// asummary
+                                                    /// </summary>
+                                                    [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", OperationMethod.Get)]
+                                                    public class ARequest : IWebRequest<AResponse>
+                                                    {
+                                                    }
+                                                    public class AServiceClass : Infrastructure.Web.Api.Interfaces.IWebApiService
+                                                    {
+                                                        public string AMethod(ARequest request)
+                                                        {
+                                                             return "";
+                                                        }
+                                                    }
+                                                    """);
+
+                var serviceClass = compilation.GetTypeByMetadataName("ANamespace.AServiceClass")!;
+                var visitor = new WebApiAssemblyVisitor(CancellationToken.None, compilation);
+
+                visitor.VisitNamedType(serviceClass);
+
+                visitor.OperationRegistrations.Count.Should().Be(1);
+                var registration = visitor.OperationRegistrations.First();
+                registration.DocumentedSummary.Should().Be("asummary");
+                registration.DocumentedResponseCodes.Should().BeEmpty();
+            }
+                      
+            [Fact]
+            public void WhenVisitNamedTypeAndClassHasXmlResponseCodes_ThenCreatesRegistration()
+            {
+                var compilation = CreateCompilation("""
+                                                    using System;
+                                                    using Infrastructure.Web.Api.Interfaces;
+
+                                                    namespace ANamespace;
+
+                                                    public class AResponse : IWebResponse
+                                                    {
+                                                    }
+                                                    
+                                                    /// <summary>
+                                                    /// asummary1
+                                                    /// asummary2
+                                                    /// </summary>
+                                                    /// <response>aresponsesummary1</response>
+                                                    /// <response code="">aresponsesummary2</response>
+                                                    /// <response code="200"></response>
+                                                    /// <response code="notanumber">aresponsesummary3</response>
+                                                    /// <response code="200">aresponsesummary4</response>
+                                                    [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", OperationMethod.Get)]
+                                                    public class ARequest : IWebRequest<AResponse>
+                                                    {
+                                                    }
+                                                    public class AServiceClass : Infrastructure.Web.Api.Interfaces.IWebApiService
+                                                    {
+                                                        public string AMethod(ARequest request)
+                                                        {
+                                                             return "";
+                                                        }
+                                                    }
+                                                    """);
+
+                var serviceClass = compilation.GetTypeByMetadataName("ANamespace.AServiceClass")!;
+                var visitor = new WebApiAssemblyVisitor(CancellationToken.None, compilation);
+
+                visitor.VisitNamedType(serviceClass);
+
+                visitor.OperationRegistrations.Count.Should().Be(1);
+                var registration = visitor.OperationRegistrations.First();
+                registration.DocumentedSummary.Should().Be("asummary1 asummary2");
+                registration.DocumentedResponseCodes.Count.Should().Be(1);
+                registration.DocumentedResponseCodes.Should().OnlyContain(x=> x.Reason == "aresponsesummary4" && x.StatusCode == 200);
             }
         }
 

@@ -1,5 +1,5 @@
 #if TESTINGONLY
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 using Infrastructure.Web.Interfaces.Clients;
 using Flag = Common.FeatureFlags.Flag;
@@ -120,7 +120,7 @@ partial class FlagsmithHttpServiceClient
 
     private static void AddApiToken(HttpRequestMessage req, TestingOnlyConfiguration configuration)
     {
-        req.Headers.Add(HttpHeaders.Authorization, $"Token {configuration.ApiToken}");
+        req.Headers.Add(HttpConstants.Headers.Authorization, $"Token {configuration.ApiToken}");
     }
 
     public class TestingOnlyConfiguration

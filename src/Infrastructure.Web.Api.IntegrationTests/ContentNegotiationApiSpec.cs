@@ -2,7 +2,7 @@
 using System.Net;
 using ApiHost1;
 using FluentAssertions;
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
@@ -21,7 +21,7 @@ public class ContentNegotiationApiSpec : WebApiSpec<Program>
     public async Task WhenGetWithNoAccept_ThenReturnsJsonResponse()
     {
         var result = await Api.GetAsync(new ContentNegotiationsTestingOnlyRequest(),
-            request => request.Headers.Remove(HttpHeaders.Accept));
+            request => request.Headers.Remove(HttpConstants.Headers.Accept));
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
         result.Content.Value.Message.Should().Be("amessage");
@@ -34,7 +34,7 @@ public class ContentNegotiationApiSpec : WebApiSpec<Program>
         {
             Method = HttpMethod.Get,
             RequestUri = new Uri("testingonly/negotiations/get", UriKind.Relative),
-            Headers = { { HttpHeaders.Accept, "application/unsupported" } }
+            Headers = { { HttpConstants.Headers.Accept, "application/unsupported" } }
         });
 
         result.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType);
@@ -44,7 +44,7 @@ public class ContentNegotiationApiSpec : WebApiSpec<Program>
     public async Task WhenGetWithAcceptForJson_ThenReturnsJsonResponse()
     {
         var result = await Api.GetAsync(new ContentNegotiationsTestingOnlyRequest(),
-            request => request.Headers.Add(HttpHeaders.Accept, HttpContentTypes.Json));
+            request => request.Headers.Add(HttpConstants.Headers.Accept, HttpConstants.ContentTypes.Json));
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
         result.Content.Value.Message.Should().Be("amessage");
@@ -57,7 +57,7 @@ public class ContentNegotiationApiSpec : WebApiSpec<Program>
         {
             Method = HttpMethod.Get,
             RequestUri = new Uri("testingonly/negotiations/get", UriKind.Relative),
-            Headers = { { HttpHeaders.Accept, HttpContentTypes.Xml } }
+            Headers = { { HttpConstants.Headers.Accept, HttpConstants.ContentTypes.Xml } }
         });
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -104,7 +104,7 @@ public class ContentNegotiationApiSpec : WebApiSpec<Program>
         {
             Method = HttpMethod.Get,
             RequestUri = new Uri("testingonly/negotiations/get?format=xml", UriKind.Relative),
-            Headers = { { HttpHeaders.Accept, HttpContentTypes.Xml } }
+            Headers = { { HttpConstants.Headers.Accept, HttpConstants.ContentTypes.Xml } }
         });
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);

@@ -3,6 +3,7 @@ using System.Text.Json;
 using Application.Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Common.Endpoints;
+using Infrastructure.Web.Api.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Infrastructure.Web.Api.Common.Extensions;
@@ -17,7 +18,7 @@ public static class HttpResponseExtensions
     {
         var contentType = response.Content.Headers.ContentType;
         if (contentType.Exists()
-            && contentType.MediaType == HttpContentTypes.JsonProblem)
+            && contentType.MediaType == HttpConstants.ContentTypes.JsonProblem)
         {
             return await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonOptions,
                 CancellationToken.None);
@@ -33,7 +34,7 @@ public static class HttpResponseExtensions
     public static string GetOrCreateRequestId(this HttpResponseMessage response)
     {
         string requestId;
-        if (response.Headers.TryGetValues(HttpHeaders.RequestId, out var requestIds))
+        if (response.Headers.TryGetValues(HttpConstants.Headers.RequestId, out var requestIds))
         {
             requestId = requestIds.FirstOrDefault() ?? Caller.GenerateCallId();
         }

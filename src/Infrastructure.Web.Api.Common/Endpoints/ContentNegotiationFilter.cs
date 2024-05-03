@@ -3,6 +3,7 @@ using System.Text.Json;
 using Common.Extensions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Common.Pipeline;
+using Infrastructure.Web.Api.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -76,7 +77,7 @@ public class ContentNegotiationFilter : IEndpointFilter
             case NegotiatedMimeType.Json:
             {
                 var contentType = isProblemValue
-                    ? HttpContentTypes.JsonProblem
+                    ? HttpConstants.ContentTypes.JsonProblem
                     : null;
                 return Results.Json(responseValue, statusCode: responseStatusCode, contentType: contentType);
             }
@@ -84,7 +85,7 @@ public class ContentNegotiationFilter : IEndpointFilter
             case NegotiatedMimeType.Xml:
             {
                 var contentType = isProblemValue
-                    ? HttpContentTypes.XmlProblem
+                    ? HttpConstants.ContentTypes.XmlProblem
                     : null;
                 return new XmlHttpResult<object>(responseValue, responseStatusCode, contentType);
             }
@@ -110,12 +111,17 @@ public class ContentNegotiationFilter : IEndpointFilter
 
         if (accepts.HasAny())
         {
-            if (accepts.ContainsIgnoreCase(HttpContentTypes.Json))
+            if (accepts.ContainsIgnoreCase(HttpConstants.ContentTypes.Everything))
             {
                 return NegotiatedMimeType.Json;
             }
 
-            if (accepts.ContainsIgnoreCase(HttpContentTypes.Xml))
+            if (accepts.ContainsIgnoreCase(HttpConstants.ContentTypes.Json))
+            {
+                return NegotiatedMimeType.Json;
+            }
+
+            if (accepts.ContainsIgnoreCase(HttpConstants.ContentTypes.Xml))
             {
                 return NegotiatedMimeType.Xml;
             }
@@ -123,12 +129,12 @@ public class ContentNegotiationFilter : IEndpointFilter
 
         if (queries.HasAny())
         {
-            if (queries.ContainsIgnoreCase(HttpContentTypeFormatters.Json))
+            if (queries.ContainsIgnoreCase(HttpConstants.ContentTypeFormatters.Json))
             {
                 return NegotiatedMimeType.Json;
             }
 
-            if (queries.ContainsIgnoreCase(HttpContentTypeFormatters.Xml))
+            if (queries.ContainsIgnoreCase(HttpConstants.ContentTypeFormatters.Xml))
             {
                 return NegotiatedMimeType.Xml;
             }
@@ -136,12 +142,12 @@ public class ContentNegotiationFilter : IEndpointFilter
 
         if (bodyField.HasValue())
         {
-            if (bodyField.EqualsIgnoreCase(HttpContentTypeFormatters.Json))
+            if (bodyField.EqualsIgnoreCase(HttpConstants.ContentTypeFormatters.Json))
             {
                 return NegotiatedMimeType.Json;
             }
 
-            if (bodyField.EqualsIgnoreCase(HttpContentTypeFormatters.Xml))
+            if (bodyField.EqualsIgnoreCase(HttpConstants.ContentTypeFormatters.Xml))
             {
                 return NegotiatedMimeType.Xml;
             }
@@ -195,14 +201,14 @@ public class ContentNegotiationFilter : IEndpointFilter
 
     private static StringValues GetFormatInFormData(HttpRequest httpRequest)
     {
-        return httpRequest.Form.TryGetValue(HttpQueryParams.Format, out var formats)
+        return httpRequest.Form.TryGetValue(HttpConstants.QueryParams.Format, out var formats)
             ? formats
             : StringValues.Empty;
     }
 
     private static StringValues GetFormatInQueryString(HttpRequest httpRequest)
     {
-        return httpRequest.Query.TryGetValue(HttpQueryParams.Format, out var formats)
+        return httpRequest.Query.TryGetValue(HttpConstants.QueryParams.Format, out var formats)
             ? formats
             : StringValues.Empty;
     }

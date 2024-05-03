@@ -150,15 +150,6 @@ namespace Infrastructure.Web.Api.Common.Validation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Validation Error.
-        /// </summary>
-        internal static string ValidationBehavior_ErrorTitle {
-            get {
-                return ResourceManager.GetString("ValidationBehavior_ErrorTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The property was invalid.
         /// </summary>
         internal static string ValidationValidator_InvalidProperty {

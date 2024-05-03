@@ -33,10 +33,16 @@ public static class SyntaxExtensions
         return trivia;
     }
 
-    public static XmlNodeSyntax? GetFirstXmlElement(this SyntaxList<XmlNodeSyntax> content, string elementName)
+    public static XmlNodeSyntax? SelectSingleElement(this SyntaxList<XmlNodeSyntax> content, string elementName)
+    {
+        return SelectElements(content, elementName)
+            .FirstOrDefault();
+    }
+
+    public static List<XmlNodeSyntax> SelectElements(this SyntaxList<XmlNodeSyntax> content, string elementName)
     {
         return GetXmlElements(content, elementName)
-            .FirstOrDefault();
+            .ToList();
     }
 
     public static ClassDeclarationSyntax InsertMember(this ClassDeclarationSyntax classDeclarationSyntax, int index,

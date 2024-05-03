@@ -24,9 +24,6 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="ValidationBehavior_ErrorTitle" xml:space="preserve">
-        <value>Validation Error</value>
-    </data>
     <data name="HasGetOptionsValidator_InvalidEmbed" xml:space="preserve">
       <value>The format of the Embed expression is invalid</value>
     </data>

@@ -36,6 +36,7 @@ using Infrastructure.Web.Api.Common.Validation;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.ApplicationServices;
 using Infrastructure.Web.Hosting.Common.Auth;
+using Infrastructure.Web.Hosting.Common.Documentation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -43,6 +44,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 #if TESTINGONLY
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
@@ -89,6 +91,7 @@ public static class HostExtensions
         RegisterAuthenticationAuthorization(hostOptions.Authorization, hostOptions.IsMultiTenanted);
         RegisterWireFormats();
         RegisterApiRequests();
+        RegisterApiDocumentation(hostOptions.HostName, hostOptions.HostVersion, hostOptions.UsesApiDocumentation);
         RegisterNotifications(hostOptions.UsesNotifications);
         modules.RegisterServices(appBuilder.Configuration, services);
         RegisterApplicationServices(hostOptions.IsMultiTenanted);
@@ -109,7 +112,7 @@ public static class HostExtensions
         app.EnableMultiTenancy(middlewares, hostOptions.IsMultiTenanted);
         app.EnableEventingPropagation(middlewares, hostOptions.Persistence.UsesEventing);
         app.EnableOtherFeatures(middlewares, hostOptions);
-
+        
         modules.ConfigureMiddleware(app, middlewares);
 
         middlewares
@@ -322,6 +325,85 @@ public static class HostExtensions
             });
         }
 
+        void RegisterApiDocumentation(string name, string version, bool usesApiDocumentation)
+        {
+            if (!usesApiDocumentation)
+            {
+                return;
+            }
+
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen(options =>
+            {
+                options.OperationFilter<FromFormMultiPartFilter>();
+                options.OperationFilter<DefaultResponsesFilter>();
+                options.SwaggerDoc(version, new OpenApiInfo
+                {
+                    Version = version,
+                    Title = name,
+                    Description = name
+                });
+
+                if (hostOptions.Authorization.UsesTokens)
+                {
+                    options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+                    {
+                        Type = SecuritySchemeType.ApiKey,
+                        Name = HttpConstants.Headers.Authorization,
+                        Description =
+                            Resources.HostExtensions_ApiDocumentation_TokenDescription.Format(JwtBearerDefaults
+                                .AuthenticationScheme),
+                        In = ParameterLocation.Header,
+                        Scheme = JwtBearerDefaults.AuthenticationScheme,
+                        BearerFormat = "JWT"
+                    });
+                    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = JwtBearerDefaults.AuthenticationScheme
+                                }
+                            },
+                            Array.Empty<string>()
+                        }
+                    });
+                }
+
+                if (hostOptions.Authorization.UsesApiKeys)
+                {
+                    options.AddSecurityDefinition(APIKeyAuthenticationHandler.AuthenticationScheme,
+                        new OpenApiSecurityScheme
+                        {
+                            Type = SecuritySchemeType.ApiKey,
+                            Name = HttpConstants.QueryParams.APIKey,
+                            Description =
+                                Resources.HostExtensions_ApiDocumentation_APIKeyQueryDescription.Format(HttpConstants.QueryParams
+                                    .APIKey),
+                            In = ParameterLocation.Query,
+                            Scheme = APIKeyAuthenticationHandler.AuthenticationScheme
+                        });
+                    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = APIKeyAuthenticationHandler.AuthenticationScheme
+                                }
+                            },
+                            Array.Empty<string>()
+                        }
+                    });
+                }
+            });
+        }
+
         void RegisterNotifications(bool usesNotifications)
         {
             if (usesNotifications)
@@ -456,7 +538,7 @@ public static class HostExtensions
                     {
                         corsBuilder.WithOrigins(origins);
                         corsBuilder.AllowAnyMethod();
-                        corsBuilder.WithHeaders(HttpHeaders.ContentType, HttpHeaders.Authorization);
+                        corsBuilder.WithHeaders(HttpConstants.Headers.ContentType, HttpConstants.Headers.Authorization);
                         corsBuilder.DisallowCredentials();
                         corsBuilder.SetPreflightMaxAge(TimeSpan.FromSeconds(600));
                     });
@@ -468,7 +550,7 @@ public static class HostExtensions
                     {
                         corsBuilder.AllowAnyOrigin();
                         corsBuilder.AllowAnyMethod();
-                        corsBuilder.WithHeaders(HttpHeaders.ContentType, HttpHeaders.Authorization);
+                        corsBuilder.WithHeaders(HttpConstants.Headers.ContentType, HttpConstants.Headers.Authorization);
                         corsBuilder.DisallowCredentials();
                         corsBuilder.SetPreflightMaxAge(TimeSpan.FromSeconds(600));
                     });

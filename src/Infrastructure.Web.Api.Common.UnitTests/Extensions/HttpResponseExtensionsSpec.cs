@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Interfaces;
 using Xunit;
 
 namespace Infrastructure.Web.Api.Common.UnitTests.Extensions;
@@ -22,7 +23,7 @@ public class HttpResponseExtensionsSpec
     {
         var message = new HttpResponseMessage
         {
-            Headers = { { HttpHeaders.RequestId, new List<string?>() } }
+            Headers = { { HttpConstants.Headers.RequestId, new List<string?>() } }
         };
 
         var result = message.GetOrCreateRequestId();
@@ -35,7 +36,7 @@ public class HttpResponseExtensionsSpec
     {
         var message = new HttpResponseMessage
         {
-            Headers = { { HttpHeaders.RequestId, new List<string?> { "arequestid1", "arequestid2" } } }
+            Headers = { { HttpConstants.Headers.RequestId, new List<string?> { "arequestid1", "arequestid2" } } }
         };
 
         var result = message.GetOrCreateRequestId();

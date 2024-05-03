@@ -4,7 +4,7 @@ namespace Infrastructure.Web.Api.Interfaces;
 ///     Defines the request of a SEARCH API
 /// </summary>
 public class SearchRequest<TResponse> : IWebSearchRequest<TResponse>
-    where TResponse : IWebResponse
+    where TResponse : IWebSearchResponse
 {
     public string? Embed { get; set; }
 

@@ -6,8 +6,8 @@ using Common;
 using Common.Extensions;
 using Infrastructure.Common.Extensions;
 using Infrastructure.Interfaces;
-using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -38,7 +38,7 @@ public class APIKeyAuthenticationHandler : AuthenticationHandler<APIKeyOptions>
         if (!apiKey.HasValue)
         {
             return AuthenticateResult.Fail(
-                Resources.APIKeyAuthenticationHandler_MissingParameter.Format(HttpQueryParams.APIKey));
+                Resources.APIKeyAuthenticationHandler_MissingParameter.Format(HttpConstants.QueryParams.APIKey));
         }
 
         var caller = Context.RequestServices.GetRequiredService<ICallerContextFactory>().Create();

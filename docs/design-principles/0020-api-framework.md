@@ -89,7 +89,7 @@ public sealed class CarsApi : IWebApiService
 where each service operation (method above) would have a unique request DTO that would be defined like this:
 
 ```c#
-[Route("/cars/{id}", OperationMethod.Get)]
+[Route("/cars/{Id}", OperationMethod.Get)]
 public class GetCarRequest : IWebRequest<GetCarResponse>
 {
     public required string Id { get; set; }
@@ -120,7 +120,7 @@ AND, we prefer NOT to have to create MediatR class like this, for every single o
 AND have to register the minimal API's like this:
 
 ```c#
-            carsGroup.MapGet("/cars/{id}",
+            carsGroup.MapGet("/cars/{Id}",
                 async (IMediator mediator, [AsParameters] GetCarRequest request) =>
                      await mediator.Send(request, CancellationToken.None))
                 .AddEndpointFilter<FilterA>()
@@ -264,7 +264,7 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
    - In `Infrastructure.Web.Api.Interfaces/Operations/Cars/GetCarRequest.cs`
 
    ```c#
-     [Route("/cars/{id}", OperationMethod.Get)]
+     [Route("/cars/{Id}", OperationMethod.Get)]
      public class GetCarRequest : IWebRequest<GetCarResponse>
      {
          public required string Id { get; set; }
@@ -291,14 +291,14 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
    - For example:
 
    ```c#
-     [Route("/cars/{id}", OperationMethod.Get)]
+     [Route("/cars/{Id}", OperationMethod.Get)]
      public class GetCarRequest : IWebRequest<GetCarResponse>
      {
          public required string Id { get; set; }
      }
    ```
 
-   > Note: Your route should always begin with a leading slash `/`, and you can substitute into the route any public property you define in your request class. For example, `/cars/{id}` where `{id}` refers to the property `public string Id { get; set; }`
+   > Note: Your route should always begin with a leading slash `/`, and you can substitute into the route any public property you define in your request class. For example, `/cars/{Id}` where `{Id}` refers to the property `public string Id { get; set; }`
    >
    > Note: All service operations must share the same primary route segment, corresponding to your resource (e.g. they all start with `/cars`. This also permits sub resources (e.g. `/cars/wheels`, but not different primary resources in the same class.
 

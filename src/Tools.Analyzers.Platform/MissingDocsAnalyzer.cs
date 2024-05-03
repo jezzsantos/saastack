@@ -18,9 +18,6 @@ namespace Tools.Analyzers.Platform;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class MissingDocsAnalyzer : DiagnosticAnalyzer
 {
-    private const string InheritDocXmlElementName = "inheritdoc";
-    private const string SummaryXmlElementName = "summary";
-
     internal static readonly DiagnosticDescriptor Rule001 = "SAASDOC001".GetDescriptor(DiagnosticSeverity.Warning,
         AnalyzerConstants.Categories.Documentation, nameof(Resources.SAASDOC001Title),
         nameof(Resources.SAASDOC001Description),
@@ -81,13 +78,13 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
         }
 
         var xmlContent = docs.Content;
-        var inheritdoc = xmlContent.GetFirstXmlElement(InheritDocXmlElementName);
+        var inheritdoc = xmlContent.SelectSingleElement(AnalyzerConstants.XmlDocumentation.Elements.InheritDoc);
         if (inheritdoc is not null)
         {
             return;
         }
 
-        var summary = xmlContent.GetFirstXmlElement(SummaryXmlElementName);
+        var summary = xmlContent.SelectSingleElement(AnalyzerConstants.XmlDocumentation.Elements.Summary);
         if (summary is null)
         {
             context.ReportDiagnostic(Rule001, memberDeclarationSyntax);
@@ -142,13 +139,13 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
         }
 
         var xmlContent = docs.Content;
-        var inheritdoc = xmlContent.GetFirstXmlElement(InheritDocXmlElementName);
+        var inheritdoc = xmlContent.SelectSingleElement(AnalyzerConstants.XmlDocumentation.Elements.InheritDoc);
         if (inheritdoc is not null)
         {
             return;
         }
 
-        var summary = xmlContent.GetFirstXmlElement(SummaryXmlElementName);
+        var summary = xmlContent.SelectSingleElement(AnalyzerConstants.XmlDocumentation.Elements.Summary);
         if (summary is null)
         {
             context.ReportDiagnostic(Rule002, methodDeclarationSyntax);

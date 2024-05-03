@@ -3,7 +3,7 @@ using System.Text;
 using ApiHost1;
 using Common.Extensions;
 using FluentAssertions;
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
@@ -42,7 +42,7 @@ public class DataFormatsApiSpec : WebApiSpec<Program>
         }.ToJson()!;
 
         var result = await HttpApi.PostAsync("/testingonly/formats/roundtrip",
-            new StringContent(request, Encoding.UTF8, HttpContentTypes.Json));
+            new StringContent(request, Encoding.UTF8, HttpConstants.ContentTypes.Json));
 
         var content = await result.Content.ReadAsStringAsync();
         content.Should().Be("{" + "\"custom\":" + "{" + "\"double\":91.1," + "\"enum\":\"twentyOne\","
@@ -76,7 +76,7 @@ public class DataFormatsApiSpec : WebApiSpec<Program>
         }.ToJson()!;
 
         var result = await HttpApi.PostAsync("/testingonly/formats/roundtrip?format=xml",
-            new StringContent(request, Encoding.UTF8, HttpContentTypes.Json));
+            new StringContent(request, Encoding.UTF8, HttpConstants.ContentTypes.Json));
 
         var content = await result.Content.ReadAsStringAsync();
         content.Should().Be("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
@@ -105,7 +105,7 @@ public class DataFormatsApiSpec : WebApiSpec<Program>
         }.ToJson()!;
 
         var result = await HttpApi.PostAsync("/testingonly/formats/roundtrip",
-            new StringContent(request, Encoding.UTF8, HttpContentTypes.Json));
+            new StringContent(request, Encoding.UTF8, HttpConstants.ContentTypes.Json));
 
         var content = await result.Content.ReadAsStringAsync();
         content.Should().Be("{" + "\"custom\":" + "{" + $"\"time\":\"{time2.ToIso8601()}\"" + "},"
@@ -127,7 +127,7 @@ public class DataFormatsApiSpec : WebApiSpec<Program>
         }.ToJson()!;
 
         var result = await HttpApi.PostAsync("/testingonly/formats/roundtrip",
-            new StringContent(request, Encoding.UTF8, HttpContentTypes.Json));
+            new StringContent(request, Encoding.UTF8, HttpConstants.ContentTypes.Json));
 
         var content = await result.Content.ReadAsStringAsync();
         content.Should().Be("{" + "\"custom\":" + "{" + $"\"time\":\"{time2.ToIso8601()}\"" + "},"
@@ -147,7 +147,7 @@ public class DataFormatsApiSpec : WebApiSpec<Program>
         }.ToJson()!;
 
         var result = await HttpApi.PostAsync("/testingonly/formats/roundtrip",
-            new StringContent(request, Encoding.UTF8, HttpContentTypes.Json));
+            new StringContent(request, Encoding.UTF8, HttpConstants.ContentTypes.Json));
 
         var content = await result.Content.ReadAsStringAsync();
         content.Should().Be("{" + "\"custom\":" + "{" + "\"enum\":\"twentyOne\"" + "},"

@@ -1,31 +1,35 @@
 using Common;
+using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Infrastructure.Web.Api.Common.Extensions;
 
 public static class ErrorExtensions
 {
     /// <summary>
-    ///     Converts the <see cref="ErrorCode" /> to a <see cref="Infrastructure.Web.Api.Interfaces.HttpError" />
+    ///     Converts the <see cref="Error" /> to a <see cref="Infrastructure.Web.Api.Interfaces.HttpError" />
     /// </summary>
     public static HttpError ToHttpError(this Error error)
     {
-        var code = error.Code switch
+        var httpStatusCode = HttpConstants.StatusCodes.SupportedErrorCodesMap
+            .FirstOrDefault(c => c.Value.Contains(error.Code));
+        if (httpStatusCode.NotExists())
         {
-            ErrorCode.Unexpected => HttpErrorCode.InternalServerError,
-            ErrorCode.RuleViolation => HttpErrorCode.BadRequest,
-            ErrorCode.Validation => HttpErrorCode.BadRequest,
-            ErrorCode.PreconditionViolation => HttpErrorCode.MethodNotAllowed,
-            ErrorCode.RoleViolation => HttpErrorCode.Forbidden,
-            ErrorCode.EntityNotFound => HttpErrorCode.NotFound,
-            ErrorCode.EntityExists => HttpErrorCode.Conflict,
-            ErrorCode.NotAuthenticated => HttpErrorCode.Unauthorized,
-            ErrorCode.ForbiddenAccess => HttpErrorCode.Forbidden,
-            ErrorCode.NotSubscribed => HttpErrorCode.PaymentRequired,
-            ErrorCode.EntityDeleted => HttpErrorCode.MethodNotAllowed,
-            _ => HttpErrorCode.InternalServerError
-        };
+            return new HttpError(HttpErrorCode.InternalServerError, error.Message);
+        }
 
-        return new HttpError(code, error.Message);
+        return new HttpError(httpStatusCode.Key.ToStatusCode().HttpErrorCode ?? HttpErrorCode.InternalServerError,
+            error.Message);
+    }
+
+    /// <summary>
+    ///     Converts the specified error to a <see cref="IResult" /> with a problem detail
+    /// </summary>
+    public static ProblemHttpResult ToProblem(this Error error)
+    {
+        var httpError = error.ToHttpError();
+        return (ProblemHttpResult)Results.Problem(statusCode: (int)httpError.Code, detail: httpError.Message);
     }
 }

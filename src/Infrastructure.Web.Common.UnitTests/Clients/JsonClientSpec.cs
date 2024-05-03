@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using FluentAssertions;
-using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common.Clients;
 using JetBrains.Annotations;
@@ -50,7 +49,7 @@ public class JsonClientSpec
                 {
                     Headers =
                     {
-                        ContentType = new MediaTypeHeaderValue(HttpContentTypes.Html)
+                        ContentType = new MediaTypeHeaderValue(HttpConstants.ContentTypes.Html)
                     }
                 }
             };
@@ -106,7 +105,7 @@ public class JsonClientSpec
                     Instance = "aninstance",
                     Status = 999,
                     Extensions = { { "aname", "avalue" } }
-                }, new MediaTypeHeaderValue(HttpContentTypes.JsonProblem)),
+                }, new MediaTypeHeaderValue(HttpConstants.ContentTypes.JsonProblem)),
                 ReasonPhrase = "areason"
             };
 
@@ -133,7 +132,7 @@ public class JsonClientSpec
                 {
                     AStringProperty = "astringproperty",
                     AnOtherProperty = "anotherproperty"
-                }, new MediaTypeHeaderValue(HttpContentTypes.Json))
+                }, new MediaTypeHeaderValue(HttpConstants.ContentTypes.Json))
             };
 
             var result =
@@ -178,7 +177,7 @@ public class JsonClientSpec
                     error_description = "anerrordescription",
                     error_uri = "anerroruri",
                     state = "astate"
-                }, new MediaTypeHeaderValue(HttpContentTypes.Json)),
+                }, new MediaTypeHeaderValue(HttpConstants.ContentTypes.Json)),
                 ReasonPhrase = "areason"
             };
 
@@ -231,7 +230,7 @@ public class JsonClientSpec
                 {
                     Headers =
                     {
-                        ContentType = new MediaTypeHeaderValue(HttpContentTypes.Html)
+                        ContentType = new MediaTypeHeaderValue(HttpConstants.ContentTypes.Html)
                     }
                 }
             };
@@ -250,7 +249,7 @@ public class JsonClientSpec
             var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent("acontent", new MediaTypeHeaderValue(HttpContentTypes.Text))
+                Content = new StringContent("acontent", new MediaTypeHeaderValue(HttpConstants.ContentTypes.Text))
             };
 
             var result =
@@ -304,7 +303,7 @@ public class JsonClientSpec
                     Instance = "aninstance",
                     Status = 999,
                     Extensions = { { "aname", "avalue" } }
-                }, new MediaTypeHeaderValue(HttpContentTypes.JsonProblem)),
+                }, new MediaTypeHeaderValue(HttpConstants.ContentTypes.JsonProblem)),
                 ReasonPhrase = "areason"
             };
 
@@ -331,7 +330,7 @@ public class JsonClientSpec
                 {
                     AStringProperty = "astringproperty",
                     AnOtherProperty = "anotherproperty"
-                }, new MediaTypeHeaderValue(HttpContentTypes.Json))
+                }, new MediaTypeHeaderValue(HttpConstants.ContentTypes.Json))
             };
 
             var result =
@@ -378,7 +377,7 @@ public class JsonClientSpec
                     error_description = "anerrordescription",
                     error_uri = "anerroruri",
                     state = "astate"
-                }, new MediaTypeHeaderValue(HttpContentTypes.Json)),
+                }, new MediaTypeHeaderValue(HttpConstants.ContentTypes.Json)),
                 ReasonPhrase = "areason"
             };
 
@@ -406,7 +405,7 @@ public class JsonClientSpec
                 {
                     Headers =
                     {
-                        ContentType = new MediaTypeHeaderValue(HttpContentTypes.ImagePng)
+                        ContentType = new MediaTypeHeaderValue(HttpConstants.ContentTypes.ImagePng)
                     }
                 }
             };
@@ -429,7 +428,7 @@ public class JsonClientSpec
                 {
                     Headers =
                     {
-                        ContentType = new MediaTypeHeaderValue(HttpContentTypes.OctetStream)
+                        ContentType = new MediaTypeHeaderValue(HttpConstants.ContentTypes.OctetStream)
                     }
                 }
             };
@@ -440,7 +439,6 @@ public class JsonClientSpec
             result.IsSuccessful.Should().BeTrue();
             result.HasValue.Should().BeFalse();
         }
-        
     }
 }
 

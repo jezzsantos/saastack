@@ -3,8 +3,8 @@ using ApiHost1;
 using Application.Resources.Shared;
 using Common.Extensions;
 using FluentAssertions;
-using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.Images;
 using Infrastructure.Web.Interfaces.Clients;
 using IntegrationTesting.WebApi.Common;
@@ -29,7 +29,7 @@ public class ImagesApiSpec : WebApiSpec<Program>
 
         var image = await UploadImage(login, "adescription");
 
-        image.ContentType.Should().Be(HttpContentTypes.ImagePng);
+        image.ContentType.Should().Be(HttpConstants.ContentTypes.ImagePng);
         image.Description.Should().Be("adescription");
         image.Filename.Should().Be("afilename.png");
         image.Url.Should().Be($"https://localhost:5001/images/{image.Id}/download");
@@ -47,7 +47,7 @@ public class ImagesApiSpec : WebApiSpec<Program>
             Id = image.Id
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Image!.ContentType.Should().Be(HttpContentTypes.ImagePng);
+        result.Content.Value.Image!.ContentType.Should().Be(HttpConstants.ContentTypes.ImagePng);
         result.Content.Value.Image.Description.Should().Be("adescription");
         result.Content.Value.Image.Filename.Should().Be("afilename.png");
         result.Content.Value.Image.Url.Should().Be($@"https://localhost:5001/images/{image.Id}/download");
@@ -98,7 +98,7 @@ public class ImagesApiSpec : WebApiSpec<Program>
             Description = "anewdescription"
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Image!.ContentType.Should().Be(HttpContentTypes.ImagePng);
+        result.Content.Value.Image!.ContentType.Should().Be(HttpConstants.ContentTypes.ImagePng);
         result.Content.Value.Image.Description.Should().Be("anewdescription");
         result.Content.Value.Image.Filename.Should().Be("afilename.png");
         result.Content.Value.Image.Url.Should().Be($"https://localhost:5001/images/{image.Id}/download");
@@ -109,7 +109,7 @@ public class ImagesApiSpec : WebApiSpec<Program>
         var result = await Api.PostAsync(new UploadImageRequest
             {
                 Description = description
-            }, new PostFile(GetTestImage(), HttpContentTypes.ImagePng, "afilename"),
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         return result.Content.Value.Image!;

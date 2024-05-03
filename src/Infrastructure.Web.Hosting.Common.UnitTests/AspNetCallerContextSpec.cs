@@ -5,8 +5,8 @@ using Domain.Interfaces.Authorization;
 using FluentAssertions;
 using Infrastructure.Common.Extensions;
 using Infrastructure.Interfaces;
-using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Endpoints;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -271,7 +271,7 @@ public class AspNetCallerContextSpec
         _httpContext.Setup(hc => hc.HttpContext!.Features).Returns(features);
         _httpContext.Setup(hc => hc.HttpContext!.Request.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.Authorization, "Bearer atoken" }
+            { HttpConstants.Headers.Authorization, "Bearer atoken" }
         });
 
         var result = new AspNetCallerContext(_httpContext.Object);
@@ -292,12 +292,12 @@ public class AspNetCallerContextSpec
         _httpContext.Setup(hc => hc.HttpContext!.Features).Returns(features);
         _httpContext.Setup(hc => hc.HttpContext!.Request.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.Authorization, "Bearer atoken" }
+            { HttpConstants.Headers.Authorization, "Bearer atoken" }
         });
         _httpContext.Setup(hc => hc.HttpContext!.Request.Query)
             .Returns(new QueryCollection(new Dictionary<string, StringValues>
             {
-                { HttpQueryParams.APIKey, "anapikey" }
+                { HttpConstants.QueryParams.APIKey, "anapikey" }
             }));
 
         var result = new AspNetCallerContext(_httpContext.Object);
@@ -326,7 +326,7 @@ public class AspNetCallerContextSpec
         _httpContext.Setup(hc => hc.HttpContext!.Features).Returns(features);
         _httpContext.Setup(hc => hc.HttpContext!.Request.Headers).Returns(new HeaderDictionary
         {
-            { HttpHeaders.Authorization, "Bearer atoken" }
+            { HttpConstants.Headers.Authorization, "Bearer atoken" }
         });
         _httpContext.Setup(hc => hc.HttpContext!.User.Claims).Returns(new List<Claim>
         {

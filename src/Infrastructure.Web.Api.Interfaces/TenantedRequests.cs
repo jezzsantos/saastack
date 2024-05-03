@@ -37,7 +37,7 @@ public class TenantedDeleteRequest : IWebRequestVoid, ITenantedRequest
 /// <summary>
 ///     Defines the request of a GET API for a stream for an Organization
 /// </summary>
-public class TenantedStreamRequest : IWebRequestVoid, ITenantedRequest
+public class TenantedStreamRequest : IWebRequestStream, ITenantedRequest
 {
     public string? OrganizationId { get; set; }
 }

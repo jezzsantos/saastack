@@ -17,7 +17,8 @@ public class WebHostOptions : HostOptions
             UsesHMAC = true
         },
         IsBackendForFrontEnd = false,
-        UsesNotifications = true
+        UsesNotifications = true,
+        UsesApiDocumentation = true
     };
     public new static readonly WebHostOptions BackEndApiHost = new(HostOptions.BackEndApiHost)
     {
@@ -29,7 +30,8 @@ public class WebHostOptions : HostOptions
             UsesHMAC = true
         },
         IsBackendForFrontEnd = false,
-        UsesNotifications = true
+        UsesNotifications = true,
+        UsesApiDocumentation = true
     };
 
     public new static readonly WebHostOptions BackEndForFrontEndWebHost = new(HostOptions.BackEndForFrontEndWebHost)
@@ -42,7 +44,8 @@ public class WebHostOptions : HostOptions
             UsesHMAC = false
         },
         IsBackendForFrontEnd = true,
-        UsesNotifications = false
+        UsesNotifications = false,
+        UsesApiDocumentation = true
     };
 
     public new static readonly WebHostOptions TestingStubsHost = new(HostOptions.TestingStubsHost)
@@ -55,7 +58,8 @@ public class WebHostOptions : HostOptions
             UsesHMAC = false
         },
         IsBackendForFrontEnd = false,
-        UsesNotifications = false
+        UsesNotifications = false,
+        UsesApiDocumentation = false
     };
 
     private WebHostOptions(HostOptions options) : base(options)
@@ -69,7 +73,11 @@ public class WebHostOptions : HostOptions
 
     public CORSOption CORS { get; private init; }
 
+    public string HostVersion { get; set; } = "v1";
+
     public bool IsBackendForFrontEnd { get; set; }
+
+    public bool UsesApiDocumentation { get; set; }
 
     public bool UsesNotifications { get; set; }
 }

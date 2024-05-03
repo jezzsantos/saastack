@@ -96,4 +96,28 @@
     <data name="MultiTenancyMiddleware_UserNotAMember" xml:space="preserve">
         <value>The authenticated user is not a member of organization '{0}'</value>
     </data>
+    <data name="HostExtensions_ApiDocumentation_TokenDescription" xml:space="preserve">
+        <value>Token Authorization using the {0} scheme. Example: "{0} {{yourtoken}}"</value>
+    </data>
+    <data name="HostExtensions_ApiDocumentation_APIKeyQueryDescription" xml:space="preserve">
+        <value>API Key Authorization using the '{0}' query parameter.</value>
+    </data>
+    <data name="DefaultResponsesFilter_Example_ValidationError_Description" xml:space="preserve">
+        <value>The incoming request is invalid in some way. The 'errors' will contain the details of each of the validation errors.</value>
+    </data>
+    <data name="DefaultResponsesFilter_Example_ValidationError_Summary" xml:space="preserve">
+        <value>Validation Error</value>
+    </data>
+    <data name="DefaultResponsesFilter_Example_RuleViolationError_Description" xml:space="preserve">
+        <value>A violation of a rule about whether this operation can be executed by this caller, or in the state the resource is in, at this time.</value>
+    </data>
+    <data name="DefaultResponsesFilter_Example_RuleViolationError_Summary" xml:space="preserve">
+        <value>Rule Violation</value>
+    </data>
+    <data name="DefaultResponsesFilter_Example_UnexpectedError_Description" xml:space="preserve">
+        <value>An unexpected error occured on the server, which should not have happened in normal operation. Please report this error, and the conditions under which it was discovered, to the support team.</value>
+    </data>
+    <data name="DefaultResponsesFilter_Example_UnexpectedError_Summary" xml:space="preserve">
+        <value>Unexpected Error</value>
+    </data>
 </root>

@@ -2,7 +2,7 @@
 using System.Net;
 using ApiHost1;
 using FluentAssertions;
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using IntegrationTesting.WebApi.Common;
 using JetBrains.Annotations;
@@ -27,7 +27,7 @@ public class RequestCorrelationApiSpec
             var result = await Api.GetAsync(new RequestCorrelationsTestingOnlyRequest());
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
-            result.Headers.GetValues(HttpHeaders.RequestId).FirstOrDefault().Should()
+            result.Headers.GetValues(HttpConstants.Headers.RequestId).FirstOrDefault().Should()
                 .NotBeNullOrEmpty();
         }
 
@@ -38,7 +38,7 @@ public class RequestCorrelationApiSpec
                 message => { message.Headers.Add("Request-ID", "acorrelationid"); });
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
-            result.Headers.GetValues(HttpHeaders.RequestId).FirstOrDefault().Should()
+            result.Headers.GetValues(HttpConstants.Headers.RequestId).FirstOrDefault().Should()
                 .Be("acorrelationid");
         }
 
@@ -49,7 +49,7 @@ public class RequestCorrelationApiSpec
                 message => { message.Headers.Add("X-Request-ID", "acorrelationid"); });
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
-            result.Headers.GetValues(HttpHeaders.RequestId).FirstOrDefault().Should()
+            result.Headers.GetValues(HttpConstants.Headers.RequestId).FirstOrDefault().Should()
                 .Be("acorrelationid");
         }
 
@@ -60,7 +60,7 @@ public class RequestCorrelationApiSpec
                 message => { message.Headers.Add("X-Correlation-ID", "acorrelationid"); });
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
-            result.Headers.GetValues(HttpHeaders.RequestId).FirstOrDefault().Should()
+            result.Headers.GetValues(HttpConstants.Headers.RequestId).FirstOrDefault().Should()
                 .Be("acorrelationid");
         }
     }

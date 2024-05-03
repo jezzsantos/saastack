@@ -2,7 +2,7 @@ using Common.Configuration;
 using Common.Recording;
 using FluentAssertions;
 using Infrastructure.Shared.ApplicationServices.External;
-using Infrastructure.Web.Api.Common;
+using Infrastructure.Web.Api.Interfaces;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.Extensions.DependencyInjection;
 using UnitTesting.Common;
@@ -29,7 +29,7 @@ public class GravatarHttpServiceClientSpec : ExternalApiSpec
             await _serviceClient.FindAvatarAsync(new TestCaller(), "jitewaboh@lagify.com", CancellationToken.None);
 
         result.Should().BeSuccess();
-        result.Value.Value.ContentType.Should().Be(HttpContentTypes.ImagePng);
+        result.Value.Value.ContentType.Should().Be(HttpConstants.ContentTypes.ImagePng);
         result.Value.Value.Content.Should().NotBeNull();
         result.Value.Value.Filename.Should().BeNull();
         result.Value.Value.Size.Should().Be(156531);

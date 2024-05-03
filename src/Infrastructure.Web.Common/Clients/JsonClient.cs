@@ -4,13 +4,11 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Common;
 using Common.Extensions;
-using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common.Extensions;
 using Infrastructure.Web.Interfaces.Clients;
 using Microsoft.AspNetCore.Mvc;
-using HttpHeaders = Infrastructure.Web.Api.Common.HttpHeaders;
 using JsonException = System.Text.Json.JsonException;
 using Task = System.Threading.Tasks.Task;
 
@@ -199,7 +197,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
             return response.StatusCode.ToResponseProblem(response.ReasonPhrase);
         }
 
-        if (contentType.MediaType == HttpContentTypes.JsonProblem)
+        if (contentType.MediaType == HttpConstants.ContentTypes.JsonProblem)
         {
             if (TryReadRfc7807Error(response, jsonOptions, cancellationToken, out var problem))
             {
@@ -207,7 +205,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
             }
         }
 
-        if (contentType.MediaType == HttpContentTypes.Json)
+        if (contentType.MediaType == HttpConstants.ContentTypes.Json)
         {
             if (response.IsSuccessStatusCode)
             {
@@ -225,12 +223,12 @@ public class JsonClient : IHttpJsonClient, IDisposable
             return response.StatusCode.ToResponseProblem(response.ReasonPhrase);
         }
 
-        if (contentType.MediaType is HttpContentTypes.Text or HttpContentTypes.Html)
+        if (contentType.MediaType is HttpConstants.ContentTypes.Text or HttpConstants.ContentTypes.Html)
         {
             return await response.Content.ReadAsStringAsync(cancellationToken ?? CancellationToken.None);
         }
 
-        if (contentType.MediaType == HttpContentTypes.OctetStream)
+        if (contentType.MediaType == HttpConstants.ContentTypes.OctetStream)
         {
             return default;
         }
@@ -254,7 +252,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
             return response.StatusCode.ToResponseProblem(response.ReasonPhrase);
         }
 
-        if (contentType.MediaType == HttpContentTypes.JsonProblem)
+        if (contentType.MediaType == HttpConstants.ContentTypes.JsonProblem)
         {
             if (TryReadRfc7807Error(response, jsonOptions, cancellationToken, out var problem))
             {
@@ -262,7 +260,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
             }
         }
 
-        if (contentType.MediaType == HttpContentTypes.Json)
+        if (contentType.MediaType == HttpConstants.ContentTypes.Json)
         {
             if (response.IsSuccessStatusCode)
             {
@@ -330,7 +328,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
             else
             {
                 content = method.CanHaveBody()
-                    ? new StringContent(request.SerializeToJson(), new MediaTypeHeaderValue(HttpContentTypes.Json))
+                    ? new StringContent(request.SerializeToJson(),
+                        new MediaTypeHeaderValue(HttpConstants.ContentTypes.Json))
                     : null;
             }
 
@@ -351,7 +350,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
             Method = method,
             RequestUri = new Uri(_client.BaseAddress!, requestUri.WithoutLeadingSlash()),
             Content = requestContent,
-            Headers = { { HttpHeaders.Accept, HttpContentTypes.Json } }
+            Headers = { { HttpConstants.Headers.Accept, HttpConstants.ContentTypes.Json } }
         };
         if (requestFilter is not null)
         {
