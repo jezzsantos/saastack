@@ -47,7 +47,7 @@ public class GravatarHttpServiceClientSpec
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new FileUpload
             {
-                ContentType = "acontenttype",
+                ContentType = new FileUploadContentType { MediaType = "acontenttype" },
                 Content = stream,
                 Filename = "afilename",
                 Size = 99
@@ -57,7 +57,7 @@ public class GravatarHttpServiceClientSpec
 
         result.Should().BeSuccess();
         result.Value.HasValue.Should().BeTrue();
-        result.Value.Value.ContentType.Should().Be("acontenttype");
+        result.Value.Value.ContentType.MediaType.Should().Be("acontenttype");
         result.Value.Value.Content.Should().BeSameAs(stream);
         result.Value.Value.Filename.Should().Be("afilename");
         result.Value.Value.Size.Should().Be(99);

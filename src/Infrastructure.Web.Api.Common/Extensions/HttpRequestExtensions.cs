@@ -145,7 +145,7 @@ public static class HttpRequestExtensions
             .Select(file => new FileUpload
             {
                 Content = file.OpenReadStream(),
-                ContentType = file.ContentType,
+                ContentType = FileUploadContentType.FromContentType(file.ContentType),
                 Filename = file.FileName,
                 Size = file.Length
             }).ToList();
@@ -158,17 +158,7 @@ public static class HttpRequestExtensions
     /// </summary>
     public static bool IsContentType(this HttpRequest request, string contentType)
     {
-        if (contentType.HasNoValue())
-        {
-            return false;
-        }
-
-        if (!MediaTypeHeaderValue.TryParse(request.ContentType, out var mediaType))
-        {
-            return false;
-        }
-
-        return mediaType.MediaType.EqualsIgnoreCase(contentType);
+        return contentType.IsMediaType(request.ContentType);
     }
 
     /// <summary>
@@ -296,5 +286,25 @@ public static class HttpRequestExtensions
         var verifier = new HMACVerifier(signer);
 
         return verifier.Verify(signature);
+    }
+
+    private static bool IsMediaType(this string? source, string? target)
+    {
+        if (source.HasNoValue() || target.HasNoValue())
+        {
+            return false;
+        }
+
+        if (!MediaTypeHeaderValue.TryParse(source, out var sourceMediaType))
+        {
+            return false;
+        }
+
+        if (!MediaTypeHeaderValue.TryParse(target, out var targetMediaType))
+        {
+            return false;
+        }
+
+        return sourceMediaType.MediaType.EqualsIgnoreCase(targetMediaType.MediaType);
     }
 }

@@ -366,8 +366,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
 
 #if TESTINGONLY
     public async Task<Result<PasswordCredentialConfirmation, Error>> GetPersonRegistrationConfirmationAsync(
-        ICallerContext caller, string userId,
-        CancellationToken cancellationToken)
+        ICallerContext caller, string userId, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.FindCredentialsByUserIdAsync(userId.ToId(), cancellationToken);
         if (retrieved.IsFailure)
@@ -379,8 +378,15 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         {
             return Error.EntityNotFound();
         }
-
+        
         var credential = retrieved.Value.Value;
+        var token = credential.VerificationKeep.Token;
+
+        if (!token.HasValue)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialsApplication_RegistrationAlreadyVerified);
+        }
+
         return new PasswordCredentialConfirmation
         {
             Token = credential.VerificationKeep.Token,

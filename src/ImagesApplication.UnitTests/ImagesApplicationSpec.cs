@@ -183,7 +183,7 @@ public class ImagesApplicationSpec
         var upload = new FileUpload
         {
             Content = content,
-            ContentType = "image/jpeg",
+            ContentType = new FileUploadContentType { MediaType = "image/jpeg" },
             Filename = "afilename",
             Size = 99
         };

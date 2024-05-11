@@ -10,12 +10,12 @@ namespace Infrastructure.Web.Api.Common;
 /// </summary>
 public sealed class FileUploadService : IFileUploadService
 {
-    internal const string UnknownContentType = "unknown";
+    internal const string UnknownMediaType = "unknown";
     internal static readonly byte[] ImageJpegMagicBytes = [0xFF, 0xD8, 0xFF];
     private static readonly byte[] ImageGif87MagicBytes = [0x47, 0x49, 0x46, 0x38, 0x37, 0x61];
     private static readonly byte[] ImageGif89MagicBytes = [0x47, 0x49, 0x46, 0x38, 0x39, 0x61];
     private static readonly byte[] ImagePngMagicBytes = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
-    private static readonly IReadOnlyList<KnownFile> DetectableFileTypes = new[]
+    private static readonly IReadOnlyList<KnownFile> DetectableImageTypes = new[]
     {
         new KnownFile(HttpConstants.ContentTypes.ImageJpeg, ImageJpegMagicBytes, "jpg"),
         new KnownFile(HttpConstants.ContentTypes.ImageGif, ImageGif87MagicBytes, "gif"),
@@ -44,29 +44,32 @@ public sealed class FileUploadService : IFileUploadService
         }
 
         var content = upload.Content;
-        var declaredContentType = upload.ContentType;
-        var detected = DetectFileContent(content, declaredContentType, allowableContentTypes);
+        var declaredMediaType = upload.ContentType.Exists()
+            ? upload.ContentType.MediaType
+            : null;
+        var detected = DetectFileContent(content, declaredMediaType, allowableContentTypes);
         if (!detected.IsAllowed)
         {
             return Error.Validation(Resources.FileUploadService_DisallowedFileContent
-                .Format(declaredContentType.HasValue()
-                    ? declaredContentType
-                    : UnknownContentType));
+                .Format(declaredMediaType.HasValue()
+                    ? declaredMediaType
+                    : UnknownMediaType));
         }
 
-        var detectedContentType = detected.ContentType;
-        if (declaredContentType.HasValue() && detectedContentType.HasValue()
-                                           && detectedContentType.NotEqualsIgnoreCase(declaredContentType))
+        var detectedMediaType = detected.MediaType;
+        if (declaredMediaType.HasValue()
+            && detectedMediaType.HasValue()
+            && declaredMediaType.NotEqualsIgnoreCase(detectedMediaType))
         {
             return Error.Validation(
-                Resources.FileUploadService_InvalidContentTypeForFileType.Format(detectedContentType,
-                    declaredContentType));
+                Resources.FileUploadService_InvalidContentTypeForFileType.Format(detectedMediaType,
+                    declaredMediaType));
         }
 
-        if (declaredContentType.HasNoValue()
-            && detected.ContentType.HasValue())
+        if (declaredMediaType.HasNoValue()
+            && detected.MediaType.HasValue())
         {
-            upload.ContentType = detected.ContentType;
+            upload.ContentType = FileUploadContentType.FromContentType(detected.MediaType);
         }
 
         var detectedExtension = detected.FileExtension.HasValue()
@@ -94,38 +97,37 @@ public sealed class FileUploadService : IFileUploadService
         return upload;
     }
 
-    private static (bool IsAllowed, string ContentType, string? FileExtension) DetectFileContent(Stream content,
-        string declaredContentType,
-        IReadOnlyList<string> allowableContentTypes)
+    private static (bool IsAllowed, string? MediaType, string? FileExtension) DetectFileContent(Stream content,
+        string? declaredMediaType, IReadOnlyList<string> allowableMediaTypes)
     {
-        if (allowableContentTypes.HasNone())
+        if (allowableMediaTypes.HasNone())
         {
-            return (false, declaredContentType, null);
+            return (false, declaredMediaType, null);
         }
 
-        foreach (var detectableFileType in DetectableFileTypes)
+        foreach (var detectableFileType in DetectableImageTypes)
         {
-            if (IsContentType(content, detectableFileType.MagicBytes))
+            if (IsMatchingStream(content, detectableFileType.MagicBytes))
             {
-                if (allowableContentTypes.Contains(detectableFileType.ContentType))
+                if (allowableMediaTypes.Contains(detectableFileType.MediaType))
                 {
-                    return (true, detectableFileType.ContentType, detectableFileType.FileExtension);
+                    return (true, detectableFileType.MediaType, detectableFileType.FileExtension);
                 }
             }
         }
 
-        if (declaredContentType.HasValue()
-            && allowableContentTypes.Contains(declaredContentType))
+        if (declaredMediaType.HasValue()
+            && allowableMediaTypes.Contains(declaredMediaType))
         {
-            return (true, declaredContentType, null);
+            return (true, declaredMediaType, null);
         }
 
         return (false, HttpConstants.ContentTypes.OctetStream, null);
     }
 
-    private static bool IsContentType(Stream content, byte[] magicBytes)
+    private static bool IsMatchingStream(Stream content, byte[] magicBytes)
     {
-        var maxBufferSize = DetectableFileTypes.Max(kf => kf.MagicBytes.Length);
+        var maxBufferSize = DetectableImageTypes.Max(kf => kf.MagicBytes.Length);
         var buffer = new byte[maxBufferSize];
         int bytesRead;
         try
@@ -144,5 +146,5 @@ public sealed class FileUploadService : IFileUploadService
         return isMatch;
     }
 
-    private record KnownFile(string ContentType, byte[] MagicBytes, string FileExtension);
+    private record KnownFile(string MediaType, byte[] MagicBytes, string FileExtension);
 }

@@ -16,6 +16,7 @@ public static class HttpConstants
         public const string Html = "text/html";
         public const string ImageGif = "image/gif";
         public const string ImageJpeg = "image/jpeg";
+        public const string ImageJpegWithCharset = "image/jpeg; utf-8";
         public const string ImagePng = "image/png";
         public const string Json = "application/json";
         public const string JsonProblem = "application/problem+json";

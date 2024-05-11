@@ -29,7 +29,8 @@ public class GravatarHttpServiceClientSpec : ExternalApiSpec
             await _serviceClient.FindAvatarAsync(new TestCaller(), "jitewaboh@lagify.com", CancellationToken.None);
 
         result.Should().BeSuccess();
-        result.Value.Value.ContentType.Should().Be(HttpConstants.ContentTypes.ImagePng);
+        result.Value.Value.ContentType.Charset.Should().BeNull();
+        result.Value.Value.ContentType.MediaType.Should().Be(HttpConstants.ContentTypes.ImagePng);
         result.Value.Value.Content.Should().NotBeNull();
         result.Value.Value.Filename.Should().BeNull();
         result.Value.Value.Size.Should().Be(156531);

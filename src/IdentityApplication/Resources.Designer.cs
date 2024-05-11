@@ -96,6 +96,15 @@ namespace IdentityApplication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The user account has already been verified.
+        /// </summary>
+        internal static string PasswordCredentialsApplication_RegistrationAlreadyVerified {
+            get {
+                return ResourceManager.GetString("PasswordCredentialsApplication_RegistrationAlreadyVerified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user account has not been verified.
         /// </summary>
         internal static string PasswordCredentialsApplication_RegistrationNotVerified {

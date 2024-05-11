@@ -285,7 +285,7 @@ public class UserProfileApplicationSpec
         var upload = new FileUpload
         {
             Content = new MemoryStream(),
-            ContentType = "acontenttype",
+            ContentType = new FileUploadContentType { MediaType = "acontenttype" },
             Filename = null,
             Size = 0
         };
@@ -304,7 +304,7 @@ public class UserProfileApplicationSpec
         var upload = new FileUpload
         {
             Content = new MemoryStream(),
-            ContentType = "acontenttype",
+            ContentType = new FileUploadContentType { MediaType = "acontenttype" },
             Filename = null,
             Size = 0
         };
@@ -327,7 +327,7 @@ public class UserProfileApplicationSpec
         var upload = new FileUpload
         {
             Content = new MemoryStream(),
-            ContentType = "acontenttype",
+            ContentType = new FileUploadContentType { MediaType = "acontenttype" },
             Filename = null,
             Size = 0
         };
@@ -371,7 +371,7 @@ public class UserProfileApplicationSpec
         var upload = new FileUpload
         {
             Content = new MemoryStream(),
-            ContentType = "acontenttype",
+            ContentType = new FileUploadContentType { MediaType = "acontenttype" },
             Filename = null,
             Size = 0
         };
@@ -494,8 +494,8 @@ public class UserProfileApplicationSpec
     {
         _caller.Setup(cc => cc.IsAuthenticated)
             .Returns(true);
-        var roles = new ICallerContext.CallerRoles(new[] { PlatformRoles.Standard }, Array.Empty<RoleLevel>());
-        var features = new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Basic }, Array.Empty<FeatureLevel>());
+        var roles = new ICallerContext.CallerRoles(new[] { PlatformRoles.Standard }, []);
+        var features = new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Basic }, []);
         _caller.Setup(cc => cc.Roles)
             .Returns(roles);
         _caller.Setup(cc => cc.Features)

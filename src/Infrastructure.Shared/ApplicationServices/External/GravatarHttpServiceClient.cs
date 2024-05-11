@@ -134,7 +134,7 @@ public class GravatarHttpServiceClient : IAvatarService
 
             return new FileUpload
             {
-                ContentType = contentType,
+                ContentType = FileUploadContentType.FromContentType(contentType),
                 Content = content,
                 Filename = null,
                 Size = contentLength

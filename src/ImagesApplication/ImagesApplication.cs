@@ -126,10 +126,9 @@ public class ImagesApplication : IImagesApplication
     }
 
     public async Task<Result<Image, Error>> UploadImageAsync(ICallerContext caller, FileUpload upload,
-        string? description,
-        CancellationToken cancellationToken)
+        string? description, CancellationToken cancellationToken)
     {
-        var created = ImageRoot.Create(_recorder, _idFactory, upload.ContentType);
+        var created = ImageRoot.Create(_recorder, _idFactory, upload.ContentType.MediaType!);
         if (created.IsFailure)
         {
             return created.Error;
@@ -152,7 +151,8 @@ public class ImagesApplication : IImagesApplication
         }
 
         var uploaded =
-            await _repository.UploadImageAsync(image.Id, upload.ContentType, upload.Content, cancellationToken);
+            await _repository.UploadImageAsync(image.Id, upload.ContentType.MediaType!, upload.Content,
+                cancellationToken);
         if (uploaded.IsFailure)
         {
             return uploaded.Error;

@@ -164,7 +164,7 @@ public class UserProfileApplicationDomainEventHandlersSpec
         var upload = new FileUpload
         {
             Content = new MemoryStream(),
-            ContentType = "acontenttype",
+            ContentType = new FileUploadContentType { MediaType = "acontenttype" },
             Filename = null,
             Size = 0
         };

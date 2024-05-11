@@ -430,7 +430,7 @@ public class OrganizationsApplicationSpec
         var upload = new FileUpload
         {
             Content = new MemoryStream(),
-            ContentType = "acontenttype"
+            ContentType = new FileUploadContentType { MediaType = "acontenttype" }
         };
 
         var result =
@@ -452,7 +452,7 @@ public class OrganizationsApplicationSpec
         var upload = new FileUpload
         {
             Content = new MemoryStream(),
-            ContentType = "acontenttype"
+            ContentType = new FileUploadContentType { MediaType = "acontenttype" }
         };
         _imagesService.Setup(isv =>
                 isv.CreateImageAsync(It.IsAny<ICallerContext>(), It.IsAny<FileUpload>(), It.IsAny<string>(),
@@ -498,7 +498,7 @@ public class OrganizationsApplicationSpec
         var upload = new FileUpload
         {
             Content = new MemoryStream(),
-            ContentType = "acontenttype"
+            ContentType = new FileUploadContentType { MediaType = "acontenttype" }
         };
         _imagesService.Setup(isv =>
                 isv.CreateImageAsync(It.IsAny<ICallerContext>(), It.IsAny<FileUpload>(), It.IsAny<string>(),

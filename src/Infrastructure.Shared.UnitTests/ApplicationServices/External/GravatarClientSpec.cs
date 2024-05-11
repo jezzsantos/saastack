@@ -1,5 +1,6 @@
 using System.Net;
 using Application.Interfaces;
+using Application.Resources.Shared;
 using Common;
 using FluentAssertions;
 using Infrastructure.Shared.ApplicationServices.External;
@@ -90,7 +91,7 @@ public class GravatarClientSpec
             {
                 StatusCode = HttpStatusCode.OK,
                 Content = stream,
-                ContentType = "acontenttype",
+                ContentType = HttpConstants.ContentTypes.ImageJpegWithCharset,
                 ContentLength = 999
             });
 
@@ -98,7 +99,8 @@ public class GravatarClientSpec
             await _client.FindAvatarAsync(_caller.Object, "anemailaddress", CancellationToken.None);
 
         result.Should().BeSuccess();
-        result.Value.Value.ContentType.Should().Be("acontenttype");
+        result.Value.Value.ContentType.Should()
+            .BeEquivalentTo(FileUploadContentType.FromContentType(HttpConstants.ContentTypes.ImageJpegWithCharset));
         result.Value.Value.Content.Should().BeSameAs(stream);
         result.Value.Value.Filename.Should().BeNull();
         result.Value.Value.Size.Should().Be(999);
