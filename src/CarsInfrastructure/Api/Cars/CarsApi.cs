@@ -20,14 +20,14 @@ public sealed class CarsApi : IWebApiService
 
     public async Task<ApiDeleteResult> Delete(DeleteCarRequest request, CancellationToken cancellationToken)
     {
-        var car = await _carsApplication.DeleteCarAsync(_callerFactory.Create(), request.OrganizationId!, request.Id,
+        var car = await _carsApplication.DeleteCarAsync(_callerFactory.Create(), request.OrganizationId!, request.Id!,
             cancellationToken);
         return () => car.HandleApplicationResult();
     }
 
     public async Task<ApiGetResult<Car, GetCarResponse>> Get(GetCarRequest request, CancellationToken cancellationToken)
     {
-        var car = await _carsApplication.GetCarAsync(_callerFactory.Create(), request.OrganizationId!, request.Id,
+        var car = await _carsApplication.GetCarAsync(_callerFactory.Create(), request.OrganizationId!, request.Id!,
             cancellationToken);
 
         return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
@@ -37,7 +37,8 @@ public sealed class CarsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var car = await _carsApplication.RegisterCarAsync(_callerFactory.Create(), request.OrganizationId!,
-            request.Make, request.Model, request.Year, request.Jurisdiction, request.NumberPlate, cancellationToken);
+            request.Make!, request.Model!, request.Year, request.Jurisdiction!, request.NumberPlate!,
+            cancellationToken);
 
         return () => car.HandleApplicationResult<Car, GetCarResponse>(c =>
             new PostResult<GetCarResponse>(new GetCarResponse { Car = c }, new GetCarRequest { Id = c.Id }.ToUrl()));
@@ -47,7 +48,7 @@ public sealed class CarsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var car = await _carsApplication.ScheduleMaintenanceCarAsync(_callerFactory.Create(), request.OrganizationId!,
-            request.Id, request.FromUtc, request.ToUtc, cancellationToken);
+            request.Id!, request.FromUtc, request.ToUtc, cancellationToken);
         return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }
 
@@ -77,7 +78,7 @@ public sealed class CarsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var unavailabilities = await _carsApplication.SearchAllUnavailabilitiesAsync(_callerFactory.Create(),
-            request.OrganizationId!, request.Id, request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
+            request.OrganizationId!, request.Id!, request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
 
         return () =>
             unavailabilities.HandleApplicationResult(c => new SearchAllCarUnavailabilitiesResponse
@@ -89,7 +90,7 @@ public sealed class CarsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var car = await _carsApplication.TakeOfflineCarAsync(_callerFactory.Create(), request.OrganizationId!,
-            request.Id, request.FromUtc, request.ToUtc, cancellationToken);
+            request.Id!, request.FromUtc, request.ToUtc, cancellationToken);
         return () => car.HandleApplicationResult(c => new GetCarResponse { Car = c });
     }
 }

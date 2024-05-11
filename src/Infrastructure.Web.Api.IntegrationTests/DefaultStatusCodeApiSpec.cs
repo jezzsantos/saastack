@@ -1,6 +1,5 @@
 #if TESTINGONLY
 using System.Net;
-using ApiHost1;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using IntegrationTesting.WebApi.Common;
@@ -10,9 +9,9 @@ namespace Infrastructure.Web.Api.IntegrationTests;
 
 [Trait("Category", "Integration.API")]
 [Collection("API")]
-public class DefaultStatusCodeApiSpec : WebApiSpec<Program>
+public class DefaultStatusCodeApiSpec : WebApiSpec<ApiHost1.Program>
 {
-    public DefaultStatusCodeApiSpec(WebApiSetup<Program> setup) : base(setup)
+    public DefaultStatusCodeApiSpec(WebApiSetup<ApiHost1.Program> setup) : base(setup)
     {
     }
 

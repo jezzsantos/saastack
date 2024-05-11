@@ -10,7 +10,7 @@ public class GravatarGetImageRequest : IWebRequestStream
 {
     [JsonPropertyName("d")] public string? Default { get; set; }
 
-    public required string Hash { get; set; }
+    public string? Hash { get; set; }
 
     [JsonPropertyName("s")] public int? Width { get; set; }
 }

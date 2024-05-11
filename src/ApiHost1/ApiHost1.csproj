@@ -16,6 +16,12 @@
         <ProjectReference Include="..\UserProfilesInfrastructure\UserProfilesInfrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>Infrastructure.Web.Api.IntegrationTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
     <!-- Runs the source generator (in memory) on build -->
     <ItemGroup>
         <ProjectReference Include="..\Tools.Generators.Web.Api\Tools.Generators.Web.Api.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />

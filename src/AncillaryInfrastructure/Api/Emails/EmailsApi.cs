@@ -23,7 +23,7 @@ public sealed class EmailsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var delivered =
-            await _ancillaryApplication.DeliverEmailAsync(_callerFactory.Create(), request.Message, cancellationToken);
+            await _ancillaryApplication.DeliverEmailAsync(_callerFactory.Create(), request.Message!, cancellationToken);
 
         return () => delivered.HandleApplicationResult<bool, DeliverMessageResponse>(_ =>
             new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsDelivered = true }));

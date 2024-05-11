@@ -121,20 +121,20 @@ public class AuthorizeAttribute : Attribute
                     ? new ICallerContext.CallerRoles()
                     : new ICallerContext.CallerRoles(policy.Roles.Platform is not null
                         ? policy.Roles.Platform.Select(rol => rol.ToRoleByName(RoleAndFeatureScope.Platform)).ToArray()
-                        : Array.Empty<RoleLevel>(), policy.Roles.Tenant is not null
+                        : [], policy.Roles.Tenant is not null
                         ? policy.Roles.Tenant.Select(rol => rol.ToRoleByName(RoleAndFeatureScope.Tenant)).ToArray()
-                        : Array.Empty<RoleLevel>());
+                        : []);
                 var features = policy.Features is null
                     ? new ICallerContext.CallerFeatures()
                     : new ICallerContext.CallerFeatures(policy.Features.Platform is not null
                             ? policy.Features.Platform
                                 .Select(feat => feat.ToFeatureByName(RoleAndFeatureScope.Platform))
                                 .ToArray()
-                            : Array.Empty<FeatureLevel>(),
+                            : [],
                         policy.Features.Tenant is not null
                             ? policy.Features.Tenant.Select(feat => feat.ToFeatureByName(RoleAndFeatureScope.Tenant))
                                 .ToArray()
-                            : Array.Empty<FeatureLevel>());
+                            : []);
                 return (roles, features);
             })
             .ToList();

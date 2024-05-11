@@ -1,6 +1,5 @@
 #if TESTINGONLY
 using System.Text;
-using ApiHost1;
 using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Interfaces;
@@ -13,9 +12,9 @@ namespace Infrastructure.Web.Api.IntegrationTests;
 
 [Trait("Category", "Integration.API")]
 [Collection("API")]
-public class DataFormatsApiSpec : WebApiSpec<Program>
+public class DataFormatsApiSpec : WebApiSpec<ApiHost1.Program>
 {
-    public DataFormatsApiSpec(WebApiSetup<Program> setup) : base(setup)
+    public DataFormatsApiSpec(WebApiSetup<ApiHost1.Program> setup) : base(setup)
     {
     }
 

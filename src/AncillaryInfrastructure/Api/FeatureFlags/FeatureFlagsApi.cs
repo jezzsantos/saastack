@@ -22,7 +22,7 @@ public class FeatureFlagsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var flag = await _featureFlagsApplication.GetFeatureFlagAsync(_callerFactory.Create(),
-            request.Name, request.TenantId, request.UserId, cancellationToken);
+            request.Name!, request.TenantId, request.UserId!, cancellationToken);
 
         return () => flag.HandleApplicationResult(f => new GetFeatureFlagResponse { Flag = f });
     }
@@ -41,7 +41,7 @@ public class FeatureFlagsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var flag = await _featureFlagsApplication.GetFeatureFlagForCallerAsync(_callerFactory.Create(),
-            request.Name, cancellationToken);
+            request.Name!, cancellationToken);
 
         return () => flag.HandleApplicationResult(f => new GetFeatureFlagResponse { Flag = f });
     }

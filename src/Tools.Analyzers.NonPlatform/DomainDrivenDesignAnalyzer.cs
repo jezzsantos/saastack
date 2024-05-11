@@ -65,7 +65,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
     public const string ClassFactoryMethodName = "Create";
     public const string ConstructorMethodCall = "RaiseCreateEvent"; // AggregateRootBase<T>.RaiseCreateEvent
     internal static readonly SpecialType[] AllowableDomainEventPrimitives =
-    {
+    [
         SpecialType.System_Boolean,
         SpecialType.System_String,
         SpecialType.System_UInt64,
@@ -75,7 +75,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
         SpecialType.System_Decimal,
         SpecialType.System_DateTime,
         SpecialType.System_Byte
-    };
+    ];
     internal static readonly DiagnosticDescriptor Rule010 = "SAASDDD010".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD010Title), nameof(Resources.SAASDDD010Description),
         nameof(Resources.SAASDDD010MessageFormat));
@@ -199,7 +199,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
     internal static readonly DiagnosticDescriptor Rule049 = "SAASDDD049".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD049Title), nameof(Resources.SAASDDD049Description),
         nameof(Resources.SAASDDD049MessageFormat));
-    private static readonly string[] IgnoredValueObjectMethodNames = { nameof(IDehydratableEntity.Dehydrate) };
+    private static readonly string[] IgnoredValueObjectMethodNames = [nameof(IDehydratableEntity.Dehydrate)];
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(
@@ -603,7 +603,7 @@ internal static class DomainDrivenDesignExtensions
         var resultType = context.Compilation.GetTypeByMetadataName(typeof(Result<,>).FullName!)!;
         var resultOfClassAndErrorType = resultType.Construct(classSymbol, errorType);
 
-        return new[] { classSymbol, resultOfClassAndErrorType };
+        return [classSymbol, resultOfClassAndErrorType];
     }
 
     public static INamedTypeSymbol[] GetAllowableDomainEventFactoryReturnTypes(this SyntaxNodeAnalysisContext context,
@@ -615,7 +615,7 @@ internal static class DomainDrivenDesignExtensions
             return Array.Empty<INamedTypeSymbol>();
         }
 
-        return new[] { classSymbol };
+        return [classSymbol];
     }
 
     public static INamedTypeSymbol[] GetAllowableDomainEventPropertyReturnTypes(this SyntaxNodeAnalysisContext context)
@@ -662,7 +662,7 @@ internal static class DomainDrivenDesignExtensions
         var resultType = context.Compilation.GetTypeByMetadataName(typeof(Result<,>).FullName!)!;
         var resultOfClassAndErrorType = resultType.Construct(classSymbol, errorType);
 
-        return new[] { classSymbol, resultOfClassAndErrorType };
+        return [classSymbol, resultOfClassAndErrorType];
     }
 
     public static bool HasIncorrectReturnType(this SyntaxNodeAnalysisContext context,
@@ -861,7 +861,7 @@ internal static class DomainDrivenDesignExtensions
         }
 
         var propertiesType = compilation.GetTypeByMetadataName(typeof(HydrationProperties).FullName!)!;
-        return new[] { propertiesType };
+        return [propertiesType];
     }
 
     /// <summary>
@@ -917,7 +917,7 @@ internal static class DomainDrivenDesignExtensions
         var factoryType = compilation.GetTypeByMetadataName(typeof(AggregateRootFactory<>).FullName!)!;
         var factoryOfClass = factoryType.Construct(classSymbol);
 
-        return new[] { factoryOfClass };
+        return [factoryOfClass];
     }
 
     private static INamedTypeSymbol[] GetAllowableEntityRehydrateReturnType(this SemanticModel semanticModel,
@@ -932,7 +932,7 @@ internal static class DomainDrivenDesignExtensions
         var factoryType = compilation.GetTypeByMetadataName(typeof(EntityFactory<>).FullName!)!;
         var factoryOfClass = factoryType.Construct(classSymbol);
 
-        return new[] { factoryOfClass };
+        return [factoryOfClass];
     }
 
     private static INamedTypeSymbol[] GetAllowableValueObjectRehydrateReturnType(this SemanticModel semanticModel,
@@ -947,7 +947,7 @@ internal static class DomainDrivenDesignExtensions
         var factoryType = compilation.GetTypeByMetadataName(typeof(ValueObjectFactory<>).FullName!)!;
         var factoryOfClass = factoryType.Construct(classSymbol);
 
-        return new[] { factoryOfClass };
+        return [factoryOfClass];
     }
 
     public class DehydratableStatus

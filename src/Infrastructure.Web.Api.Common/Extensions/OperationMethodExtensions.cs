@@ -19,4 +19,17 @@ public static class OperationMethodExtensions
             _ => HttpMethod.Get
         };
     }
+
+    /// <summary>
+    ///     Whether the specified <see cref="method" /> could have a request body
+    /// </summary>
+    public static bool CanHaveBody(this OperationMethod method)
+    {
+        return method switch
+        {
+            OperationMethod.Post => true,
+            OperationMethod.PutPatch => true,
+            _ => false
+        };
+    }
 }

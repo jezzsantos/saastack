@@ -101,6 +101,9 @@
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\RouteAttribute.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\RouteAttribute.cs</Link>
         </Compile>
+        <Compile Include="..\Infrastructure.Web.Api.Common\Extensions\OperationMethodExtensions.cs">
+            <Link>Reference\Infrastructure.Web.Api.Common\Extensions\OperationMethodExtensions.cs</Link>
+        </Compile>
         <Compile Include="..\Infrastructure.Interfaces\AuthenticationConstants.cs">
             <Link>Reference\Infrastructure.Interfaces\AuthenticationConstants.cs</Link>
         </Compile>

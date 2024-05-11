@@ -27,7 +27,7 @@ namespace Tools.Analyzers.NonPlatform;
 public class EventingAnalyzer : DiagnosticAnalyzer
 {
     internal static readonly SpecialType[] AllowableIntegrationEventPrimitives =
-    {
+    [
         SpecialType.System_Boolean,
         SpecialType.System_String,
         SpecialType.System_UInt64,
@@ -37,7 +37,7 @@ public class EventingAnalyzer : DiagnosticAnalyzer
         SpecialType.System_Decimal,
         SpecialType.System_DateTime,
         SpecialType.System_Byte
-    };
+    ];
     internal static readonly DiagnosticDescriptor Rule010 = "SAASEVT010".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Eventing, nameof(Resources.Diagnostic_Title_ClassMustBePublic),
         nameof(Resources.Diagnostic_Description_ClassMustBePublic),

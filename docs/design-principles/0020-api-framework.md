@@ -92,7 +92,7 @@ where each service operation (method above) would have a unique request DTO that
 [Route("/cars/{Id}", OperationMethod.Get)]
 public class GetCarRequest : IWebRequest<GetCarResponse>
 {
-    public required string Id { get; set; }
+    public string? Id { get; set; }
 }
 ```
 
@@ -267,7 +267,7 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
      [Route("/cars/{Id}", OperationMethod.Get)]
      public class GetCarRequest : IWebRequest<GetCarResponse>
      {
-         public required string Id { get; set; }
+         public string? Id { get; set; }
      }
    ```
    and, in `Infrastructure.Web.Api.Interfaces/Operations/Cars/GetCarResponse.cs`:

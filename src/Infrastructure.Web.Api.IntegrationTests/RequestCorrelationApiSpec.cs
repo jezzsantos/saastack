@@ -1,6 +1,5 @@
 #if TESTINGONLY
 using System.Net;
-using ApiHost1;
 using FluentAssertions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
@@ -15,9 +14,9 @@ public class RequestCorrelationApiSpec
 {
     [Trait("Category", "Integration.API")]
     [Collection("API")]
-    public class GivenAnHttpClient : WebApiSpec<Program>
+    public class GivenAnHttpClient : WebApiSpec<ApiHost1.Program>
     {
-        public GivenAnHttpClient(WebApiSetup<Program> setup) : base(setup)
+        public GivenAnHttpClient(WebApiSetup<ApiHost1.Program> setup) : base(setup)
         {
         }
 
@@ -67,9 +66,9 @@ public class RequestCorrelationApiSpec
 
     [Trait("Category", "Integration.API")]
     [Collection("API")]
-    public class GivenAJsonClient : WebApiSpec<Program>
+    public class GivenAJsonClient : WebApiSpec<ApiHost1.Program>
     {
-        public GivenAJsonClient(WebApiSetup<Program> setup) : base(setup)
+        public GivenAJsonClient(WebApiSetup<ApiHost1.Program> setup) : base(setup)
         {
         }
 

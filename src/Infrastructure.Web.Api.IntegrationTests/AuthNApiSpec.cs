@@ -1,6 +1,5 @@
 #if TESTINGONLY
 using System.Net;
-using ApiHost1;
 using Application.Resources.Shared;
 using Common.Configuration;
 using Domain.Interfaces;
@@ -18,12 +17,12 @@ namespace Infrastructure.Web.Api.IntegrationTests;
 
 [Trait("Category", "Integration.API")]
 [Collection("API")]
-public class AuthNApiSpec : WebApiSpec<Program>
+public class AuthNApiSpec : WebApiSpec<ApiHost1.Program>
 {
     private readonly IConfigurationSettings _settings;
     private readonly ITokensService _tokensService;
 
-    public AuthNApiSpec(WebApiSetup<Program> setup) : base(setup)
+    public AuthNApiSpec(WebApiSetup<ApiHost1.Program> setup) : base(setup)
     {
         EmptyAllRepositories();
         _settings = setup.GetRequiredService<IConfigurationSettings>();

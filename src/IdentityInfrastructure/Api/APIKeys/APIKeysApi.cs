@@ -31,7 +31,7 @@ public class APIKeysApi : IWebApiService
 
     public async Task<ApiDeleteResult> DeleteAPIKey(DeleteAPIKeyRequest request, CancellationToken cancellationToken)
     {
-        var key = await _apiKeysApplication.DeleteAPIKeyAsync(_callerFactory.Create(), request.Id, cancellationToken);
+        var key = await _apiKeysApplication.DeleteAPIKeyAsync(_callerFactory.Create(), request.Id!, cancellationToken);
 
         return () => key.HandleApplicationResult();
     }

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Cars;
@@ -8,7 +9,7 @@ public class ScheduleMaintenanceCarRequest : TenantedRequest<GetCarResponse>
 {
     public DateTime FromUtc { get; set; }
 
-    public required string Id { get; set; }
+    [Required] public string? Id { get; set; }
 
     public DateTime ToUtc { get; set; }
 }

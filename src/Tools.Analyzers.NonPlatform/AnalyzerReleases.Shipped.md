@@ -15,6 +15,20 @@
  SAASWEB018 | SaaStackWebApi      | Error    | The request type should not be declared with a AuthorizeAttribute on it.                                  
  SAASWEB019 | SaaStackWebApi      | Warning  | The request type should be declared with a AuthorizeAttribute on it.                                      
  SAASWEB020 | SaaStackWebApi      | Warning  | There should be no methods in this class with the same route.                                             
+ SAASWEB030 | SaaStackWebApi      | Error    | Request must be public                                                                                    
+ SAASWEB031 | SaaStackWebApi      | Error    | Request must be named with "Request" suffix                                                               
+ SAASWEB032 | SaaStackWebApi      | Error    | Request must be in namespace "Infrastructure.Web.Api.Operations.Shared"                                   
+ SAASWEB033 | SaaStackWebApi      | Error    | Request must have a <see cref="RouteAttribute" />                                                         
+ SAASWEB034 | SaaStackWebApi      | Error    | Request must have a parameterless constructor                                                             
+ SAASWEB035 | SaaStackWebApi      | Error    | Properties must have public getters and setters                                                           
+ SAASWEB036 | SaaStackWebApi      | Error    | Properties should be nullable not Optional{T} for interoperability                                        
+ SAASWEB037 | SaaStackWebApi      | Error    | Properties should NOT use required modifier                                                               
+ SAASWEB040 | SaaStackWebApi      | Error    | Response must be public                                                                                   
+ SAASWEB041 | SaaStackWebApi      | Error    | Response must be named with "Response" suffix                                                             
+ SAASWEB042 | SaaStackWebApi      | Error    | Response must be in namespace "Infrastructure.Web.Api.Operations.Shared"                                  
+ SAASWEB043 | SaaStackWebApi      | Error    | Response must have a parameterless constructor                                                            
+ SAASWEB044 | SaaStackWebApi      | Error    | Properties must have public getters and setters                                                           
+ SAASWEB045 | SaaStackWebApi      | Error    | Properties should be nullable not Optional{T} for interoperability                                        
  SAASDDD010 | SaaStackDDD         | Error    | Aggregate roots must have at least one Create() class factory method.                                     
  SAASDDD011 | SaaStackDDD         | Error    | Create() class factory methods must return correct types.                                                 
  SAASDDD012 | SaaStackDDD         | Error    | Aggregate roots must raise a create event in the class factory.                                           
@@ -38,6 +52,7 @@
  SAASDDD033 | SaaStackDDD         | Error    | ValueObjects must have a Rehydrate method.                                                                
  SAASDDD034 | SaaStackDDD         | Error    | Properties must not have public setters.                                                                  
  SAASDDD035 | SaaStackDDD         | Error    | ValueObjects must only have immutable methods                                                             
+ SAASDDD036 | SaaStackDDD         | Warning  | ValueObjects should be marked as sealed.                                                                  
  SAASDDD036 | SaaStackDDD         | Warning  | ValueObjects should be marked as sealed.                                                                  
  SAASDDD040 | SaaStackDDD         | Error    | DomainEvents must be public                                                                               
  SAASDDD041 | SaaStackDDD         | Warning  | DomainEvents should be sealed                                                                             

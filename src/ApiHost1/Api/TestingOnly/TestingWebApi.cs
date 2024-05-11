@@ -209,12 +209,22 @@ public sealed class TestingWebApi : IWebApiService
             { Message = $"amessage{request.Id}" });
     }
 
-    public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ValidationsValidated(
-        ValidationsValidatedTestingOnlyRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ValidationsValidatedGet(
+        ValidationsValidatedGetTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         return () => new Result<StringMessageTestingOnlyResponse, Error>(new StringMessageTestingOnlyResponse
-            { Message = $"amessage{request.Field1}" });
+            { Message = $"amessage{request.RequiredField}" });
+    }
+
+    public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> ValidationsValidatedPost(
+        ValidationsValidatedPostTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () =>
+            new PostResult<StringMessageTestingOnlyResponse>(
+                new StringMessageTestingOnlyResponse { Message = $"amessage{request.RequiredField}" },
+                "alocation");
     }
 
     private static IReadOnlyList<IApplicationRepository> GetRepositories(IServiceProvider services,

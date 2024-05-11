@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.UserProfiles;
@@ -10,5 +11,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.UserProfiles;
 public class ChangeProfileAvatarRequest : UnTenantedRequest<ChangeProfileAvatarResponse>, IHasMultipartForm
 {
     // Will also include bytes for the multipart-form image
-    public required string UserId { get; set; }
+    [Required] public string? UserId { get; set; }
 }

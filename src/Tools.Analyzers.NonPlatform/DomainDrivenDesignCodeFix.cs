@@ -232,7 +232,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
 
         var className = classDeclarationSyntax.Identifier.Text;
         var newMethod = GenerateMethod(
-            new[] { SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword },
+            [SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword],
             nameof(IRehydratableObject.Rehydrate),
             $"Domain.Interfaces.AggregateRootFactory<{className}>",
             null,
@@ -257,7 +257,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
 
         var className = classDeclarationSyntax.Identifier.Text;
         var newMethod = GenerateMethod(
-            new[] { SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword },
+            [SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword],
             DomainDrivenDesignAnalyzer.ClassFactoryMethodName,
             $"{nameof(Result)}<{className}, {nameof(Error)}>",
             new Dictionary<string, string>
@@ -285,7 +285,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
 
         var className = classDeclarationSyntax.Identifier.Text;
         var newMethod = GenerateMethod(
-            new[] { SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword },
+            [SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword],
             nameof(IRehydratableObject.Rehydrate),
             $"Domain.Interfaces.EntityFactory<{className}>",
             null,
@@ -308,7 +308,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
 
         var className = classDeclarationSyntax.Identifier.Text;
         var newMethod = GenerateMethod(
-            new[] { SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword },
+            [SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword],
             DomainDrivenDesignAnalyzer.ClassFactoryMethodName,
             $"{nameof(Result)}<{className}, {nameof(Error)}>",
             new Dictionary<string, string>
@@ -341,7 +341,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
 
         var className = classDeclarationSyntax.Identifier.Text;
         var newMethod = GenerateMethod(
-            new[] { SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword },
+            [SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword],
             nameof(IRehydratableObject.Rehydrate),
             $"Domain.Interfaces.ValueObjectFactory<{className}>",
             null,
@@ -371,7 +371,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
 
         var className = classDeclarationSyntax.Identifier.Text;
         var newMethod = GenerateMethod(
-            new[] { SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword },
+            [SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword],
             DomainDrivenDesignAnalyzer.ClassFactoryMethodName,
             $"{nameof(Result)}<{className}, {nameof(Error)}>",
             isSingleValueObject
@@ -392,7 +392,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         if (!isSingleValueObject)
         {
             var newConstructor = GenerateConstructor(
-                new[] { SyntaxKind.PrivateKeyword },
+                [SyntaxKind.PrivateKeyword],
                 className,
                 new Dictionary<string, string>
                 {
@@ -420,7 +420,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         }
 
         var newMethod = GenerateMethod(
-            new[] { SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword },
+            [SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword],
             nameof(IDehydratableEntity.Dehydrate),
             $"{nameof(HydrationProperties)}",
             null,
@@ -442,7 +442,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         }
 
         var newMethod = GenerateMethod(
-            new[] { SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword },
+            [SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword],
             nameof(IDehydratableEntity.Dehydrate),
             $"{nameof(HydrationProperties)}",
             null,

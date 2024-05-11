@@ -139,7 +139,7 @@ For example,
 [Authorize(Roles.Platform_Operations)]
 public class GetOrganizationSettingsRequest : TenantedRequest<GetOrganizationSettingsResponse>
 {
-    public required string Id { get; set; }
+    public string? Id { get; set; }
 }
 ```
 

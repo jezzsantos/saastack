@@ -21,7 +21,7 @@ public sealed class BookingsApi : IWebApiService
     public async Task<ApiDeleteResult> Cancel(CancelBookingRequest request, CancellationToken cancellationToken)
     {
         var booking =
-            await _bookingsApplication.CancelBookingAsync(_callerFactory.Create(), request.OrganizationId!, request.Id,
+            await _bookingsApplication.CancelBookingAsync(_callerFactory.Create(), request.OrganizationId!, request.Id!,
                 cancellationToken);
         return () => booking.HandleApplicationResult();
     }
@@ -30,7 +30,7 @@ public sealed class BookingsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var booking = await _bookingsApplication.MakeBookingAsync(_callerFactory.Create(), request.OrganizationId!,
-            request.CarId, request.StartUtc, request.EndUtc, cancellationToken);
+            request.CarId!, request.StartUtc.GetValueOrDefault(), request.EndUtc, cancellationToken);
 
         return () => booking.HandleApplicationResult<Booking, MakeBookingResponse>(c =>
             new PostResult<MakeBookingResponse>(new MakeBookingResponse { Booking = c }));

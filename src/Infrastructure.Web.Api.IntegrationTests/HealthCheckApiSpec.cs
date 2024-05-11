@@ -1,4 +1,3 @@
-using ApiHost1;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.Health;
 using IntegrationTesting.WebApi.Common;
@@ -8,9 +7,9 @@ namespace Infrastructure.Web.Api.IntegrationTests;
 
 [Trait("Category", "Integration.API")]
 [Collection("API")]
-public class HealthCheckApiSpec : WebApiSpec<Program>
+public class HealthCheckApiSpec : WebApiSpec<ApiHost1.Program>
 {
-    public HealthCheckApiSpec(WebApiSetup<Program> setup) : base(setup)
+    public HealthCheckApiSpec(WebApiSetup<ApiHost1.Program> setup) : base(setup)
     {
     }
 

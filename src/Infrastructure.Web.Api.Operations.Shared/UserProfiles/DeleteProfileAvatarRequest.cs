@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.UserProfiles;
@@ -9,5 +10,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.UserProfiles;
 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
 public class DeleteProfileAvatarRequest : UnTenantedRequest<DeleteProfileAvatarResponse>
 {
-    public required string UserId { get; set; }
+    [Required] public string? UserId { get; set; }
 }

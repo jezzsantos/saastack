@@ -68,6 +68,9 @@
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\OperationMethod.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\OperationMethod.cs</Link>
         </Compile>
+        <Compile Include="..\Infrastructure.Web.Api.Common\Extensions\OperationMethodExtensions.cs">
+            <Link>Reference\Infrastructure.Web.Api.Common\Extensions\OperationMethodExtensions.cs</Link>
+        </Compile>
         <Compile Include="..\Infrastructure.Web.Hosting.Common\WebHostingConstants.cs">
             <Link>Reference\Infrastructure.Web.Hosting.Common\WebHostingConstants.cs</Link>
         </Compile>

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Cars;
@@ -6,13 +7,13 @@ namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class RegisterCarRequest : TenantedRequest<GetCarResponse>
 {
-    public required string Jurisdiction { get; set; }
+    [Required] public string? Jurisdiction { get; set; }
 
-    public required string Make { get; set; }
+    [Required] public string? Make { get; set; }
 
-    public required string Model { get; set; }
+    [Required] public string? Model { get; set; }
 
-    public required string NumberPlate { get; set; }
+    [Required] public string? NumberPlate { get; set; }
 
-    public required int Year { get; set; }
+    [Required] public int Year { get; set; }
 }

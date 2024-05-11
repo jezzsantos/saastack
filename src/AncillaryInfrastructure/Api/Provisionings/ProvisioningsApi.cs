@@ -34,7 +34,7 @@ public sealed class ProvisioningsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var delivered =
-            await _ancillaryApplication.NotifyProvisioningAsync(_callerFactory.Create(), request.Message,
+            await _ancillaryApplication.NotifyProvisioningAsync(_callerFactory.Create(), request.Message!,
                 cancellationToken);
 
         return () => delivered.HandleApplicationResult<bool, DeliverMessageResponse>(_ =>

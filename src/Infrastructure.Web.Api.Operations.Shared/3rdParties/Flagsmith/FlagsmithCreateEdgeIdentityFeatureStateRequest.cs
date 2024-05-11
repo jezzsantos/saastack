@@ -9,11 +9,9 @@ public class
 {
     [JsonPropertyName("enabled")] public bool Enabled { get; set; }
 
-    public required string EnvironmentApiKey { get; set; }
+    public string? EnvironmentApiKey { get; set; }
 
     [JsonPropertyName("feature")] public int Feature { get; set; }
 
-    public required string IdentityUuid { get; set; }
+    public string? IdentityUuid { get; set; }
 }
-
-public class FlagsmithCreateEdgeIdentityFeatureStateResponse : IWebResponse;

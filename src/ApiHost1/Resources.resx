@@ -27,10 +27,10 @@
     <data name="GetTestingOnlyValidatedRequestValidator_InvalidId" xml:space="preserve">
         <value>The Id was either invalid or missing</value>
     </data>
-    <data name="GetTestingOnlyValidatedRequestValidator_InvalidField1" xml:space="preserve">
-        <value>The Field1 was either invalid or missing</value>
+    <data name="GetTestingOnlyValidatedRequestValidator_InvalidRequiredField" xml:space="preserve">
+        <value>The RequiredField was either invalid or missing</value>
     </data>
-    <data name="GetTestingOnlyValidatedRequestValidator_InvalidField2" xml:space="preserve">
-        <value>The Field2 was either invalid or missing</value>
+    <data name="GetTestingOnlyValidatedRequestValidator_InvalidOptionalField" xml:space="preserve">
+        <value>The OptionalField1 was either invalid or missing</value>
     </data>
 </root>

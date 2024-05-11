@@ -29,7 +29,7 @@ public class UserProfilesApi : IWebApiService
         ChangeProfileContactAddressRequest request, CancellationToken cancellationToken)
     {
         var profile =
-            await _userProfilesApplication.ChangeContactAddressAsync(_callerFactory.Create(), request.UserId,
+            await _userProfilesApplication.ChangeContactAddressAsync(_callerFactory.Create(), request.UserId!,
                 request.Line1, request.Line2, request.Line3, request.City, request.State, request.CountryCode,
                 request.Zip,
                 cancellationToken);
@@ -43,7 +43,7 @@ public class UserProfilesApi : IWebApiService
         ChangeProfileRequest request, CancellationToken cancellationToken)
     {
         var profile =
-            await _userProfilesApplication.ChangeProfileAsync(_callerFactory.Create(), request.UserId,
+            await _userProfilesApplication.ChangeProfileAsync(_callerFactory.Create(), request.UserId!,
                 request.FirstName, request.LastName, request.DisplayName, request.PhoneNumber, request.Timezone,
                 cancellationToken);
 
@@ -64,7 +64,7 @@ public class UserProfilesApi : IWebApiService
         }
 
         var profile =
-            await _userProfilesApplication.ChangeProfileAvatarAsync(_callerFactory.Create(), request.UserId,
+            await _userProfilesApplication.ChangeProfileAvatarAsync(_callerFactory.Create(), request.UserId!,
                 uploaded.Value, cancellationToken);
 
         return () =>
@@ -76,7 +76,7 @@ public class UserProfilesApi : IWebApiService
         DeleteProfileAvatarRequest request, CancellationToken cancellationToken)
     {
         var profile =
-            await _userProfilesApplication.DeleteProfileAvatarAsync(_callerFactory.Create(), request.UserId,
+            await _userProfilesApplication.DeleteProfileAvatarAsync(_callerFactory.Create(), request.UserId!,
                 cancellationToken);
 
         return () =>

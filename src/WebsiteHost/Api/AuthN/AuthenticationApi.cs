@@ -25,7 +25,7 @@ public class AuthenticationApi : IWebApiService
     public async Task<ApiPostResult<AuthenticateTokens, AuthenticateResponse>> Authenticate(
         AuthenticateRequest request, CancellationToken cancellationToken)
     {
-        var tokens = await _authenticationApplication.AuthenticateAsync(_callerFactory.Create(), request.Provider,
+        var tokens = await _authenticationApplication.AuthenticateAsync(_callerFactory.Create(), request.Provider!,
             request.AuthCode, request.Username, request.Password, cancellationToken);
         if (tokens.IsSuccessful)
         {

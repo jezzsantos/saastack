@@ -8,9 +8,9 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 [UsedImplicitly]
 public class FlagsmithCreateEdgeIdentityRequest : IWebRequest<FlagsmithCreateEdgeIdentityResponse>
 {
-    public required string EnvironmentApiKey { get; set; }
+    public string? EnvironmentApiKey { get; set; }
 
-    [JsonPropertyName("identifier")] public required string Identifier { get; set; }
+    [JsonPropertyName("identifier")] public string? Identifier { get; set; }
 
     [JsonPropertyName("traits")] public List<FlagsmithTrait>? Traits { get; set; }
 }

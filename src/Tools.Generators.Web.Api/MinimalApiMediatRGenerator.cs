@@ -1,6 +1,7 @@
 using System.Text;
 using Common.Extensions;
 using Infrastructure.Interfaces;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common;
 using Microsoft.CodeAnalysis;
@@ -123,15 +124,14 @@ namespace {assemblyNamespace}
                 var endPointMethodName = $"Map{routeEndpointMethod}";
                 endpointRegistrations.AppendLine(
                     $"            {groupName}.{endPointMethodName}(\"{registration.RoutePath}\",");
-                if (registration.OperationMethod is OperationMethod.Get or OperationMethod.Search
-                    or OperationMethod.Delete)
+                if (!registration.OperationMethod.CanHaveBody())
                 {
                     endpointRegistrations.AppendLine(
                         $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDto.FullName} request) =>");
                 }
                 else
                 {
-                    if (registration.OperationMethod is OperationMethod.Post or OperationMethod.PutPatch
+                    if (registration.OperationMethod.CanHaveBody()
                         && registration.IsMultipartFormData)
                     {
                         endpointRegistrations.AppendLine(

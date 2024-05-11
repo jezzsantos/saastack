@@ -62,7 +62,8 @@ public class MakeBookingRequestValidatorSpec
     [Fact]
     public void WhenDurationIsTooShort_ThenThrows()
     {
-        _dto.EndUtc = _dto.StartUtc.Add(Validations.Booking.MinimumBookingDuration.Subtract(TimeSpan.FromSeconds(1)));
+        _dto.EndUtc =
+            _dto.StartUtc!.Value.Add(Validations.Booking.MinimumBookingDuration.Subtract(TimeSpan.FromSeconds(1)));
 
         _validator
             .Invoking(x => x.ValidateAndThrow(_dto))
@@ -74,7 +75,7 @@ public class MakeBookingRequestValidatorSpec
     public void WhenDurationIsTooLong_ThenThrows()
     {
         _dto.EndUtc =
-            _dto.StartUtc.Add(Validations.Booking.MaximumBookingDuration.Add(TimeSpan.FromSeconds(1)));
+            _dto.StartUtc!.Value.Add(Validations.Booking.MaximumBookingDuration.Add(TimeSpan.FromSeconds(1)));
 
         _validator
             .Invoking(x => x.ValidateAndThrow(_dto))

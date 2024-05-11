@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.EndUsers;
@@ -6,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.EndUsers;
 [Authorize(Interfaces.Roles.Platform_Operations)]
 public class AssignPlatformRolesRequest : UnTenantedRequest<GetUserResponse>
 {
-    public required string Id { get; set; }
+    [Required] public string? Id { get; set; }
 
     public List<string>? Roles { get; set; }
 }

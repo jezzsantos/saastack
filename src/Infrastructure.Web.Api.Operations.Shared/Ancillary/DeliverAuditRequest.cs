@@ -1,4 +1,5 @@
-﻿using Infrastructure.Web.Api.Interfaces;
+﻿using System.ComponentModel.DataAnnotations;
+using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 
@@ -6,5 +7,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 [Authorize(Roles.Platform_ServiceAccount)]
 public class DeliverAuditRequest : UnTenantedRequest<DeliverMessageResponse>
 {
-    public required string Message { get; set; }
+    [Required] public string? Message { get; set; }
 }

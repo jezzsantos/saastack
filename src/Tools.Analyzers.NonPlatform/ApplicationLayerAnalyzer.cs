@@ -35,7 +35,7 @@ namespace Tools.Analyzers.NonPlatform;
 public class ApplicationLayerAnalyzer : DiagnosticAnalyzer
 {
     internal static readonly SpecialType[] AllowableReadModelPrimitives =
-    {
+    [
         SpecialType.System_Boolean,
         SpecialType.System_String,
         SpecialType.System_UInt64,
@@ -45,7 +45,7 @@ public class ApplicationLayerAnalyzer : DiagnosticAnalyzer
         SpecialType.System_Decimal,
         SpecialType.System_DateTime,
         SpecialType.System_Byte
-    };
+    ];
     internal static readonly SpecialType[] AllowableResourcePrimitives = AllowableReadModelPrimitives;
     internal static readonly DiagnosticDescriptor Rule010 = "SAASAPP010".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Application, nameof(Resources.Diagnostic_Title_ClassMustBePublic),

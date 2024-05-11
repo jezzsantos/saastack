@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
@@ -5,5 +6,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 [Route("/record/page_view", OperationMethod.Post)]
 public class RecordPageViewRequest : UnTenantedEmptyRequest
 {
-    public required string Path { get; set; }
+    [Required] public string? Path { get; set; }
 }

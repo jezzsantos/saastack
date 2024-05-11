@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
@@ -9,5 +10,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
 [Authorize(Roles.Platform_Standard, Features.Platform_PaidTrial)]
 public class CreateOrganizationRequest : UnTenantedRequest<GetOrganizationResponse>
 {
-    public required string Name { get; set; }
+    [Required] public string? Name { get; set; }
 }

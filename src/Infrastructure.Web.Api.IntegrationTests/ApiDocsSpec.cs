@@ -1,4 +1,3 @@
-using ApiHost1;
 using FluentAssertions;
 using HtmlAgilityPack;
 using Infrastructure.Hosting.Common;
@@ -9,9 +8,9 @@ namespace Infrastructure.Web.Api.IntegrationTests;
 
 [Trait("Category", "Integration.API")]
 [Collection("API")]
-public class ApiDocsSpec : WebApiSpec<Program>
+public class ApiDocsSpec : WebApiSpec<ApiHost1.Program>
 {
-    public ApiDocsSpec(WebApiSetup<Program> setup) : base(setup)
+    public ApiDocsSpec(WebApiSetup<ApiHost1.Program> setup) : base(setup)
     {
     }
 

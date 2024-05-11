@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Identities;
@@ -7,15 +8,15 @@ public class RegisterPersonPasswordRequest : UnTenantedRequest<RegisterPersonPas
 {
     public string? CountryCode { get; set; }
 
-    public required string EmailAddress { get; set; }
+    [Required] public string? EmailAddress { get; set; }
 
-    public required string FirstName { get; set; }
+    [Required] public string? FirstName { get; set; }
 
     public string? InvitationToken { get; set; }
 
-    public required string LastName { get; set; }
+    [Required] public string? LastName { get; set; }
 
-    public required string Password { get; set; }
+    [Required] public string? Password { get; set; }
 
     public bool TermsAndConditionsAccepted { get; set; }
 

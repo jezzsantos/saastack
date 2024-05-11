@@ -1703,7 +1703,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Test;
 [Route(""/apath"", OperationMethod.Get)]
 internal class ARequest : IWebRequest
 {
-    public required string AProperty { get; set; }
+    public string? AProperty { get; set; }
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
@@ -1724,7 +1724,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Test;
 [Route(""/apath"", OperationMethod.Get)]
 public class AClass : IWebRequest
 {
-    public required string AProperty { get; set; }
+    public string? AProperty { get; set; }
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
@@ -1745,7 +1745,7 @@ namespace anamespace;
 [Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
-    public required string AProperty { get; set; }
+    public string? AProperty { get; set; }
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
@@ -1766,7 +1766,7 @@ using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
 public class ARequest : IWebRequest
 {
-    public required string AProperty { get; set; }
+    public string AProperty { get; set; }
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
@@ -1792,7 +1792,7 @@ public class ARequest : IWebRequest
         AProperty = value;
     }
 
-    public required string AProperty { get; set; }
+    public string? AProperty { get; set; }
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
@@ -1814,7 +1814,7 @@ public class ARequest : IWebRequest
         AProperty = string.Empty;
     }
 
-    public required string AProperty { get; set; }
+    public string? AProperty { get; set; }
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
@@ -1836,7 +1836,7 @@ public class ARequest : IWebRequest
         AProperty = string.Empty;
     }
 
-    public required string AProperty { get; set; }
+    public string? AProperty { get; set; }
 }";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
@@ -1875,7 +1875,7 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
-[Route(""/apath"", OperationMethod.Get)]
+[Route(""/apath"", OperationMethod.Post)]
 public class ARequest : IWebRequest
 {
     public Optional<string> AProperty { get; set; }
@@ -1899,6 +1899,308 @@ public class ARequest : IWebRequest
 }";
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+            }
+        }
+
+        [Trait("Category", "Unit")]
+        public class GivenRule037
+        {
+            [Fact]
+            public async Task WhenAnyPropertyReferenceTypeIsRequired_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Post)]
+public class ARequest : IWebRequest
+{
+    public required string AProperty { get; set; }
+}";
+
+                await Verify.DiagnosticExists<ApiLayerAnalyzer>(
+                    ApiLayerAnalyzer.Rule037, input, 9, 28, "AProperty");
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyValueTypeIsRequired_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Post)]
+public class ARequest : IWebRequest
+{
+    public required int AProperty { get; set; }
+}";
+
+                await Verify.DiagnosticExists<ApiLayerAnalyzer>(
+                    ApiLayerAnalyzer.Rule037, input, 9, 25, "AProperty");
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyEnumIsRequired_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Post)]
+public class ARequest : IWebRequest
+{
+    public required AnEnum AProperty { get; set; }
+}
+
+public enum AnEnum
+{
+    AValue
+}";
+
+                await Verify.DiagnosticExists<ApiLayerAnalyzer>(
+                    ApiLayerAnalyzer.Rule037, input, 9, 28, "AProperty");
+            }
+        }
+
+        [UsedImplicitly]
+        public class GivenRule038
+        {
+            [Trait("Category", "Unit")]
+            public class GivenAGetRequest
+            {
+                [Fact]
+                public async Task WhenAnyPropertyReferenceTypeIsNullable_ThenNoAlert()
+                {
+                    const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Get)]
+public class ARequest : IWebRequest
+{
+    public string? AProperty { get; set; }
+}";
+
+                    await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+                }
+
+                [Fact]
+                public async Task WhenAnyPropertyReferenceTypeIsNotNullable_ThenAlerts()
+                {
+                    const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Get)]
+public class ARequest : IWebRequest
+{
+    public string AProperty { get; set; }
+}";
+
+                    await Verify.DiagnosticExists<ApiLayerAnalyzer>(
+                        ApiLayerAnalyzer.Rule038, input, 9, 19, "AProperty");
+                }
+
+                [Fact]
+                public async Task WhenAnyPropertyValueTypeIsNullable_ThenNoAlert()
+                {
+                    const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Get)]
+public class ARequest : IWebRequest
+{
+    public int? AProperty { get; set; }
+}";
+
+                    await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+                }
+
+                [Fact]
+                public async Task WhenAnyPropertyValueTypeIsNotNullable_ThenAlerts()
+                {
+                    const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Get)]
+public class ARequest : IWebRequest
+{
+    public int AProperty { get; set; }
+}";
+
+                    await Verify.DiagnosticExists<ApiLayerAnalyzer>(
+                        ApiLayerAnalyzer.Rule038, input, 9, 16, "AProperty");
+                }
+
+                [Fact]
+                public async Task WhenAnyPropertyEnumIsNullable_ThenNoAlert()
+                {
+                    const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Get)]
+public class ARequest : IWebRequest
+{
+    public AnEnum? AProperty { get; set; }
+}
+
+public enum AnEnum
+{
+    AValue
+}";
+
+                    await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+                }
+
+                [Fact]
+                public async Task WhenAnyPropertyEnumIsNotNullable_ThenAlerts()
+                {
+                    const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Get)]
+public class ARequest : IWebRequest
+{
+    public AnEnum AProperty { get; set; }
+}
+
+public enum AnEnum
+{
+    AValue
+}";
+
+                    await Verify.DiagnosticExists<ApiLayerAnalyzer>(
+                        ApiLayerAnalyzer.Rule038, input, 9, 19, "AProperty");
+                }
+            }
+
+            [Trait("Category", "Unit")]
+            public class GivenAPostRequest
+            {
+                [Fact]
+                public async Task WhenAnyPropertyReferenceTypeIsNullable_ThenNoAlert()
+                {
+                    const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Post)]
+public class ARequest : IWebRequest
+{
+    public string? AProperty { get; set; }
+}";
+
+                    await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+                }
+
+                [Fact]
+                public async Task WhenAnyPropertyReferenceTypeIsNotNullable_ThenNoAlert()
+                {
+                    const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Post)]
+public class ARequest : IWebRequest
+{
+    public string AProperty { get; set; }
+}";
+
+                    await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+                }
+
+                [Fact]
+                public async Task WhenAnyPropertyValueTypeIsNullable_ThenNoAlert()
+                {
+                    const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Post)]
+public class ARequest : IWebRequest
+{
+    public int? AProperty { get; set; }
+}";
+
+                    await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+                }
+
+                [Fact]
+                public async Task WhenAnyPropertyValueTypeIsNotNullable_ThenNoAlert()
+                {
+                    const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Post)]
+public class ARequest : IWebRequest
+{
+    public int AProperty { get; set; }
+}";
+
+                    await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+                }
+
+                [Fact]
+                public async Task WhenAnyPropertyEnumIsNullable_ThenNoAlert()
+                {
+                    const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Post)]
+public class ARequest : IWebRequest
+{
+    public AnEnum? AProperty { get; set; }
+}
+
+public enum AnEnum
+{
+    AValue
+}";
+
+                    await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+                }
+
+                [Fact]
+                public async Task WhenAnyPropertyEnumIsNotNullable_ThenNoAlert()
+                {
+                    const string input = @"
+using System;
+using Common;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+[Route(""/apath"", OperationMethod.Post)]
+public class ARequest : IWebRequest
+{
+    public AnEnum AProperty { get; set; }
+}
+
+public enum AnEnum
+{
+    AValue
+}";
+
+                    await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+                }
             }
         }
     }

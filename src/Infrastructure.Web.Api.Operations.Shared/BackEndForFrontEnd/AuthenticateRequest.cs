@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
@@ -9,7 +10,7 @@ public class AuthenticateRequest : UnTenantedRequest<AuthenticateResponse>
 
     public string? Password { get; set; }
 
-    public required string Provider { get; set; }
+    [Required] public string? Provider { get; set; }
 
     public string? Username { get; set; }
 }

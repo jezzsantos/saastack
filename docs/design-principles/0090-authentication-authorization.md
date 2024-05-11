@@ -119,7 +119,7 @@ For example,
 [Authorize(Roles.Tenant_Member, Features.Tenant_Basic)]
 public class GetCarRequest : TenantedRequest<GetCarResponse>
 {
-    public required string Id { get; set; }
+    public string? Id { get; set; }
 }
 ```
 
@@ -198,7 +198,7 @@ For example,
 [Authorize(Roles.Tenant_Member, Features.Tenant_Basic)]
 public class GetCarRequest : TenantedRequest<GetCarResponse>
 {
-    public required string Id { get; set; }
+    public string? Id { get; set; }
 }
 ```
 

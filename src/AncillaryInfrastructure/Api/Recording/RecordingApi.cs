@@ -20,7 +20,7 @@ public sealed class RecordingApi : IWebApiService
     public async Task<ApiEmptyResult> RecordMeasurement(RecordMeasureRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await _recordingApplication.RecordMeasurementAsync(_callerFactory.Create(), request.EventName,
+        var result = await _recordingApplication.RecordMeasurementAsync(_callerFactory.Create(), request.EventName!,
             request.Additional,
             cancellationToken);
 
@@ -31,7 +31,7 @@ public sealed class RecordingApi : IWebApiService
     public async Task<ApiEmptyResult> RecordUsage(RecordUseRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await _recordingApplication.RecordUsageAsync(_callerFactory.Create(), request.EventName,
+        var result = await _recordingApplication.RecordUsageAsync(_callerFactory.Create(), request.EventName!,
             request.Additional,
             cancellationToken);
 

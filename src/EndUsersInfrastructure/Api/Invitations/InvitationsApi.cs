@@ -22,7 +22,7 @@ public class InvitationsApi : IWebApiService
         VerifyGuestInvitationRequest request, CancellationToken cancellationToken)
     {
         var invitation =
-            await _invitationsApplication.VerifyGuestInvitationAsync(_callerFactory.Create(), request.Token,
+            await _invitationsApplication.VerifyGuestInvitationAsync(_callerFactory.Create(), request.Token!,
                 cancellationToken);
 
         return () => invitation.HandleApplicationResult<Invitation, VerifyGuestInvitationResponse>(invite =>
@@ -33,7 +33,7 @@ public class InvitationsApi : IWebApiService
         InviteGuestRequest request, CancellationToken cancellationToken)
     {
         var invitation =
-            await _invitationsApplication.InviteGuestAsync(_callerFactory.Create(), request.Email,
+            await _invitationsApplication.InviteGuestAsync(_callerFactory.Create(), request.Email!,
                 cancellationToken);
 
         return () => invitation.HandleApplicationResult<Invitation, InviteGuestResponse>(invite =>
@@ -44,7 +44,7 @@ public class InvitationsApi : IWebApiService
         ResendGuestInvitationRequest request, CancellationToken cancellationToken)
     {
         var invitation =
-            await _invitationsApplication.ResendGuestInvitationAsync(_callerFactory.Create(), request.Token,
+            await _invitationsApplication.ResendGuestInvitationAsync(_callerFactory.Create(), request.Token!,
                 cancellationToken);
 
         return () => invitation.HandleApplicationResult();

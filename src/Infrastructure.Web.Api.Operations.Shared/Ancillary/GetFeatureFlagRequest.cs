@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
@@ -6,9 +7,9 @@ namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 [Authorize(Roles.Platform_ServiceAccount)]
 public class GetFeatureFlagRequest : UnTenantedRequest<GetFeatureFlagResponse>
 {
-    public required string Name { get; set; }
+    [Required] public string? Name { get; set; }
 
     public string? TenantId { get; set; }
 
-    public required string UserId { get; set; }
+    [Required] public string? UserId { get; set; }
 }

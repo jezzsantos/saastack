@@ -1,6 +1,7 @@
 using System.Reflection;
 using Common;
 using Common.Extensions;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -108,19 +109,19 @@ public sealed class FromFormMultiPartFilter : IOperationFilter
             return Optional<ApiParameterDescription>.None;
         }
 
-        if (!RequestHasBody(context))
+        if (!RequestCouldHaveBody(context))
         {
             return Optional<ApiParameterDescription>.None;
         }
 
         return requestParameters.First();
 
-        static bool RequestHasBody(OperationFilterContext context)
+        static bool RequestCouldHaveBody(OperationFilterContext context)
         {
             var method = context.ApiDescription.HttpMethod;
-            return method == HttpMethod.Post.Method
-                   || method == HttpMethod.Put.Method
-                   || method == HttpMethod.Patch.Method;
+            var httpMethod = new HttpMethod(method ?? HttpMethod.Get.Method);
+
+            return httpMethod.CanHaveBody();
         }
         
         static bool IsFromFormRequest(ApiParameterDescription requestParameter)

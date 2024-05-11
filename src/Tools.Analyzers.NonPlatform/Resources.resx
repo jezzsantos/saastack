@@ -270,6 +270,24 @@
     <data name="SAASWEB033Title" xml:space="preserve">
         <value>Missing '[RouteAttribute]' on request</value>
     </data>
+    <data name="SAASWEB037Description" xml:space="preserve">
+        <value>Property must not be marked as `required`.</value>
+    </data>
+    <data name="SAASWEB037MessageFormat" xml:space="preserve">
+        <value>Property '{0}' must not be marked as `required`</value>
+    </data>
+    <data name="SAASWEB037Title" xml:space="preserve">
+        <value>Wrong return type</value>
+    </data>
+    <data name="SAASWEB038Description" xml:space="preserve">
+        <value>Property must not be nullable.</value>
+    </data>
+    <data name="SAASWEB038MessageFormat" xml:space="preserve">
+        <value>Property '{0}' must be nullable</value>
+    </data>
+    <data name="SAASWEB038Title" xml:space="preserve">
+        <value>Wrong return type</value>
+    </data>
     <data name="SAASWEB041Description" xml:space="preserve">
         <value>The request type should end with the word 'Response'.</value>
     </data>

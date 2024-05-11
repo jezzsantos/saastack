@@ -1302,6 +1302,60 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Property must not be marked as `required`..
+        /// </summary>
+        internal static string SAASWEB037Description {
+            get {
+                return ResourceManager.GetString("SAASWEB037Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must not be marked as `required`.
+        /// </summary>
+        internal static string SAASWEB037MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB037MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong return type.
+        /// </summary>
+        internal static string SAASWEB037Title {
+            get {
+                return ResourceManager.GetString("SAASWEB037Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property must not be nullable..
+        /// </summary>
+        internal static string SAASWEB038Description {
+            get {
+                return ResourceManager.GetString("SAASWEB038Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property &apos;{0}&apos; must be nullable.
+        /// </summary>
+        internal static string SAASWEB038MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB038MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong return type.
+        /// </summary>
+        internal static string SAASWEB038Title {
+            get {
+                return ResourceManager.GetString("SAASWEB038Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The request type should end with the word &apos;Response&apos;..
         /// </summary>
         internal static string SAASWEB041Description {

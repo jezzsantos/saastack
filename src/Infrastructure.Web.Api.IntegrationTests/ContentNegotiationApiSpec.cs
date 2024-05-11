@@ -1,6 +1,5 @@
 #if TESTINGONLY
 using System.Net;
-using ApiHost1;
 using FluentAssertions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
@@ -11,9 +10,9 @@ namespace Infrastructure.Web.Api.IntegrationTests;
 
 [Trait("Category", "Integration.API")]
 [Collection("API")]
-public class ContentNegotiationApiSpec : WebApiSpec<Program>
+public class ContentNegotiationApiSpec : WebApiSpec<ApiHost1.Program>
 {
-    public ContentNegotiationApiSpec(WebApiSetup<Program> setup) : base(setup)
+    public ContentNegotiationApiSpec(WebApiSetup<ApiHost1.Program> setup) : base(setup)
     {
     }
 

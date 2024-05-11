@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
@@ -12,7 +13,7 @@ public class UnassignRolesFromOrganizationRequest : UnTenantedRequest<GetOrganiz
 {
     public List<string> Roles { get; set; } = [];
 
-    public required string UserId { get; set; }
+    [Required] public string? UserId { get; set; }
 
     public string? Id { get; set; }
 }

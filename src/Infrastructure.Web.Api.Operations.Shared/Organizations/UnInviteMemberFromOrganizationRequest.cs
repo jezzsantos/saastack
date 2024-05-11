@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
@@ -10,7 +11,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
 public class UnInviteMemberFromOrganizationRequest : UnTenantedRequest<UnInviteMemberFromOrganizationResponse>,
     IUnTenantedOrganizationRequest
 {
-    public required string UserId { get; set; }
+    [Required] public string? UserId { get; set; }
 
     public string? Id { get; set; }
 }

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Identities;
@@ -6,5 +7,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 [Authorize(Roles.Platform_Standard, Features.Platform_PaidTrial)]
 public class DeleteAPIKeyRequest : UnTenantedDeleteRequest
 {
-    public required string Id { get; set; }
+    [Required] public string? Id { get; set; }
 }

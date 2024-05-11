@@ -25,7 +25,7 @@ public sealed class RecordingApi : IWebApiService
     public async Task<ApiEmptyResult> RecordCrash(RecordCrashRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await _recordingApplication.RecordCrashAsync(_callerFactory.Create(), request.Message,
+        var result = await _recordingApplication.RecordCrashAsync(_callerFactory.Create(), request.Message!,
             cancellationToken);
 
         return () => result.Match(() => new Result<EmptyResponse, Error>(),
@@ -35,7 +35,7 @@ public sealed class RecordingApi : IWebApiService
     public async Task<ApiEmptyResult> RecordMeasurement(RecordMeasureRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await _recordingApplication.RecordMeasurementAsync(_callerFactory.Create(), request.EventName,
+        var result = await _recordingApplication.RecordMeasurementAsync(_callerFactory.Create(), request.EventName!,
             request.Additional, _httpContextAccessor.ToClientDetails(), cancellationToken);
 
         return () => result.Match(() => new Result<EmptyResponse, Error>(),
@@ -45,7 +45,7 @@ public sealed class RecordingApi : IWebApiService
     public async Task<ApiEmptyResult> RecordPageView(RecordPageViewRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await _recordingApplication.RecordPageViewAsync(_callerFactory.Create(), request.Path,
+        var result = await _recordingApplication.RecordPageViewAsync(_callerFactory.Create(), request.Path!,
             _httpContextAccessor.ToClientDetails(), cancellationToken);
 
         return () => result.Match(() => new Result<EmptyResponse, Error>(),
@@ -56,8 +56,8 @@ public sealed class RecordingApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var result = await _recordingApplication.RecordTraceAsync(_callerFactory.Create(),
-            request.Level.ToEnum<RecorderTraceLevel>(),
-            request.MessageTemplate,
+            request.Level!.ToEnum<RecorderTraceLevel>(),
+            request.MessageTemplate!,
             request.Arguments,
             cancellationToken);
 
@@ -68,7 +68,7 @@ public sealed class RecordingApi : IWebApiService
     public async Task<ApiEmptyResult> RecordUsage(RecordUseRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await _recordingApplication.RecordUsageAsync(_callerFactory.Create(), request.EventName,
+        var result = await _recordingApplication.RecordUsageAsync(_callerFactory.Create(), request.EventName!,
             request.Additional, _httpContextAccessor.ToClientDetails(), cancellationToken);
 
         return () => result.Match(() => new Result<EmptyResponse, Error>(),

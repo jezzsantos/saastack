@@ -1,5 +1,4 @@
 using System.Net;
-using ApiHost1;
 using Application.Resources.Shared;
 using CarsDomain;
 using Common.Extensions;
@@ -27,9 +26,9 @@ namespace Infrastructure.Web.Api.IntegrationTests;
 
 [Trait("Category", "Integration.API")]
 [Collection("API")]
-public class MultiTenancySpec : WebApiSpec<Program>
+public class MultiTenancySpec : WebApiSpec<ApiHost1.Program>
 {
-    public MultiTenancySpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
+    public MultiTenancySpec(WebApiSetup<ApiHost1.Program> setup) : base(setup, OverrideDependencies)
     {
         EmptyAllRepositories();
         DeleteAllPreviousTenants(StubTenantSettingsService.GetRepositoryPath(null));

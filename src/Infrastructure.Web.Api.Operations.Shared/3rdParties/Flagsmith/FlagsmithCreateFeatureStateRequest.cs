@@ -8,7 +8,7 @@ public class FlagsmithCreateFeatureStateRequest : IWebRequest<FlagsmithCreateFea
 {
     [JsonPropertyName("enabled")] public bool Enabled { get; set; }
 
-    public required string EnvironmentApiKey { get; set; }
+    public string? EnvironmentApiKey { get; set; }
 
     [JsonPropertyName("feature")] public int Feature { get; set; }
 

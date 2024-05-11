@@ -23,7 +23,7 @@ public sealed class AuditsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var delivered =
-            await _ancillaryApplication.DeliverAuditAsync(_callerFactory.Create(), request.Message, cancellationToken);
+            await _ancillaryApplication.DeliverAuditAsync(_callerFactory.Create(), request.Message!, cancellationToken);
 
         return () => delivered.HandleApplicationResult<bool, DeliverMessageResponse>(_ =>
             new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsDelivered = true }));

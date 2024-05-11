@@ -1,6 +1,5 @@
 #if TESTINGONLY
 using System.Net;
-using ApiHost1;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using IntegrationTesting.WebApi.Common;
@@ -10,9 +9,9 @@ namespace Infrastructure.Web.Api.IntegrationTests;
 
 [Trait("Category", "Integration.API")]
 [Collection("API")]
-public class ErrorApiSpec : WebApiSpec<Program>
+public class ErrorApiSpec : WebApiSpec<ApiHost1.Program>
 {
-    public ErrorApiSpec(WebApiSetup<Program> setup) : base(setup)
+    public ErrorApiSpec(WebApiSetup<ApiHost1.Program> setup) : base(setup)
     {
     }
 

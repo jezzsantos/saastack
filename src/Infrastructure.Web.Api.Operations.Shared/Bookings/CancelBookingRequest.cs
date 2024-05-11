@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Bookings;
@@ -6,5 +7,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Bookings;
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class CancelBookingRequest : TenantedDeleteRequest
 {
-    public required string Id { get; set; }
+    [Required] public string? Id { get; set; }
 }

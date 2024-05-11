@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Text;
 using Common.Extensions;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -42,6 +43,8 @@ namespace Tools.Analyzers.NonPlatform;
 ///     SAASWEB34: Error: Request must have a parameterless constructor
 ///     SAASWEB35: Error: Properties must have public getters and setters
 ///     SAASWEB36: Error: Properties should be nullable not Optional{T} for interoperability
+///     SAASWEB37: Error: Properties should NOT use required modifier
+///     SAASWEB38: Error: Properties for GET/DELETE requests should all be nullable
 ///     Responses:
 ///     SAASWEB40: Error: Response must be public
 ///     SAASWEB41: Error: Response must be named with "Response" suffix
@@ -59,35 +62,31 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
             {
                 {
                     OperationMethod.Post,
-                    new List<Type> { typeof(ApiEmptyResult), typeof(ApiPostResult<,>) }
+                    [typeof(ApiEmptyResult), typeof(ApiPostResult<,>)]
                 },
                 {
                     OperationMethod.Get,
-                    new List<Type>
-                    {
-                        typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>), typeof(ApiStreamResult)
-                    }
+                    [typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>), typeof(ApiStreamResult)]
                 },
                 {
                     OperationMethod.Search,
-                    new List<Type>
-                    {
+                    [
                         typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiGetResult<,>),
                         typeof(ApiSearchResult<,>)
-                    }
+                    ]
                 },
                 {
                     OperationMethod.PutPatch,
-                    new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiPutPatchResult<,>) }
+                    [typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiPutPatchResult<,>)]
                 },
                 {
                     OperationMethod.Delete,
-                    new List<Type> { typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiDeleteResult) }
+                    [typeof(ApiEmptyResult), typeof(ApiResult<,>), typeof(ApiDeleteResult)]
                 }
             };
 
     internal static readonly Type[] AllowableServiceOperationReturnTypes =
-    {
+    [
         typeof(ApiEmptyResult),
         typeof(ApiResult<,>),
         typeof(ApiPostResult<,>),
@@ -96,7 +95,7 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
         typeof(ApiPutPatchResult<,>),
         typeof(ApiDeleteResult),
         typeof(ApiStreamResult)
-    };
+    ];
 
     internal static readonly DiagnosticDescriptor Rule010 = "SAASWEB10".GetDescriptor(DiagnosticSeverity.Warning,
         AnalyzerConstants.Categories.WebApi, nameof(Resources.SAASWEB010Title), nameof(Resources.SAASWEB010Description),
@@ -157,6 +156,12 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
         AnalyzerConstants.Categories.WebApi, nameof(Resources.Diagnostic_Title_PropertyMustBeNullableNotOptional),
         nameof(Resources.Diagnostic_Description_PropertyMustBeNullableNotOptional),
         nameof(Resources.Diagnostic_MessageFormat_PropertyMustBeNullableNotOptional));
+    internal static readonly DiagnosticDescriptor Rule037 = "SAASWEB037".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.WebApi, nameof(Resources.SAASWEB037Title), nameof(Resources.SAASWEB037Description),
+        nameof(Resources.SAASWEB037MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule038 = "SAASWEB038".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.WebApi, nameof(Resources.SAASWEB038Title), nameof(Resources.SAASWEB038Description),
+        nameof(Resources.SAASWEB038MessageFormat));
 
     internal static readonly DiagnosticDescriptor Rule040 = "SAASWEB040".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.WebApi, nameof(Resources.Diagnostic_Title_ClassMustBePublic),
@@ -184,7 +189,7 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(
             Rule010, Rule011, Rule012, Rule013, Rule014, Rule015, Rule016, Rule017, Rule018, Rule019, Rule020,
-            Rule030, Rule031, Rule032, Rule033, Rule034, Rule035, Rule036,
+            Rule030, Rule031, Rule032, Rule033, Rule034, Rule035, Rule036, Rule037, Rule038,
             Rule040, Rule041, Rule042, Rule043, Rule044, Rule045);
 
     public override void Initialize(AnalysisContext context)
@@ -308,6 +313,7 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Rule034, classDeclarationSyntax);
         }
 
+        var operationMethod = GetOperationMethod(context, classDeclarationSyntax);
         var allProperties = classDeclarationSyntax.Members.Where(member => member is PropertyDeclarationSyntax)
             .Cast<PropertyDeclarationSyntax>()
             .ToList();
@@ -323,6 +329,19 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
                 if (!property.IsNullableType(context) && property.IsOptionalType(context))
                 {
                     context.ReportDiagnostic(Rule036, property);
+                }
+
+                if (property.IsRequired())
+                {
+                    context.ReportDiagnostic(Rule037, property);
+                }
+
+                var isGetOrDeleteMethod = operationMethod.Exists()
+                                          && !operationMethod.Value.CanHaveBody();
+                if (isGetOrDeleteMethod
+                    && !property.IsNullableType(context))
+                {
+                    context.ReportDiagnostic(Rule038, property);
                 }
             }
         }
@@ -401,6 +420,26 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
             allowedReturnTypes.ToArray().Stringify());
 
         return true;
+    }
+
+    private static OperationMethod? GetOperationMethod(SyntaxNodeAnalysisContext context,
+        ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        var requestTypeSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
+        var attribute = requestTypeSymbol.GetAttributeOfType<RouteAttribute>(context);
+        if (attribute is null)
+        {
+            return null;
+        }
+
+        var operation = attribute.ConstructorArguments[1].Value!.ToString()!;
+
+        if (!Enum.TryParse<OperationMethod>(operation, true, out var operationMethod))
+        {
+            return null;
+        }
+
+        return operationMethod;
     }
 
     private static bool ReturnTypeIsNotCorrect(SyntaxNodeAnalysisContext context,
@@ -640,7 +679,7 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
         {
             if (routePath.HasValue())
             {
-                RouteSegments = routePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                RouteSegments = routePath.Split(['/'], StringSplitOptions.RemoveEmptyEntries);
             }
         }
     }

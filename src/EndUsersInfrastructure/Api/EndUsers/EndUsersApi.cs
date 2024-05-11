@@ -22,7 +22,7 @@ public class EndUsersApi : IWebApiService
         AssignPlatformRolesRequest request, CancellationToken cancellationToken)
     {
         var user =
-            await _endUsersApplication.AssignPlatformRolesAsync(_callerFactory.Create(), request.Id,
+            await _endUsersApplication.AssignPlatformRolesAsync(_callerFactory.Create(), request.Id!,
                 request.Roles ?? new List<string>(), cancellationToken);
 
         return () => user.HandleApplicationResult<EndUser, GetUserResponse>(usr =>
@@ -33,7 +33,7 @@ public class EndUsersApi : IWebApiService
         UnassignPlatformRolesRequest request, CancellationToken cancellationToken)
     {
         var user =
-            await _endUsersApplication.UnassignPlatformRolesAsync(_callerFactory.Create(), request.Id,
+            await _endUsersApplication.UnassignPlatformRolesAsync(_callerFactory.Create(), request.Id!,
                 request.Roles ?? new List<string>(), cancellationToken);
 
         return () =>

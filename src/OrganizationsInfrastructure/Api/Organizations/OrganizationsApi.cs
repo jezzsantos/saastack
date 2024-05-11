@@ -29,7 +29,7 @@ public class OrganizationsApi : IWebApiService
         AssignRolesToOrganizationRequest request, CancellationToken cancellationToken)
     {
         var organization = await _organizationsApplication.AssignRolesToOrganizationAsync(_callerFactory.Create(),
-            request.Id!, request.UserId, request.Roles, cancellationToken);
+            request.Id!, request.UserId!, request.Roles, cancellationToken);
 
         return () =>
             organization.HandleApplicationResult<Organization, GetOrganizationResponse>(org =>
@@ -72,7 +72,7 @@ public class OrganizationsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var organization =
-            await _organizationsApplication.CreateSharedOrganizationAsync(_callerFactory.Create(), request.Name,
+            await _organizationsApplication.CreateSharedOrganizationAsync(_callerFactory.Create(), request.Name!,
                 cancellationToken);
 
         return () => organization.HandleApplicationResult<Organization, GetOrganizationResponse>(org =>
@@ -160,7 +160,7 @@ public class OrganizationsApi : IWebApiService
         UnassignRolesFromOrganizationRequest request, CancellationToken cancellationToken)
     {
         var organization = await _organizationsApplication.UnassignRolesFromOrganizationAsync(_callerFactory.Create(),
-            request.Id!, request.UserId, request.Roles, cancellationToken);
+            request.Id!, request.UserId!, request.Roles, cancellationToken);
 
         return () =>
             organization.HandleApplicationResult<Organization, GetOrganizationResponse>(org =>
@@ -171,7 +171,7 @@ public class OrganizationsApi : IWebApiService
         UnInviteMemberFromOrganizationRequest request, CancellationToken cancellationToken)
     {
         var organization = await _organizationsApplication.UnInviteMemberFromOrganizationAsync(_callerFactory.Create(),
-            request.Id!, request.UserId, cancellationToken);
+            request.Id!, request.UserId!, cancellationToken);
 
         return () =>
             organization.HandleApplicationResult<Organization, UnInviteMemberFromOrganizationResponse>(org =>

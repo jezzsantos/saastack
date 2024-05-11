@@ -22,7 +22,7 @@ public class MembershipsApi : IWebApiService
         ChangeDefaultOrganizationRequest request, CancellationToken cancellationToken)
     {
         var user = await _endUsersApplication.ChangeDefaultMembershipAsync(_callerFactory.Create(),
-            request.OrganizationId, cancellationToken);
+            request.OrganizationId!, cancellationToken);
 
         return () => user.HandleApplicationResult<EndUser, GetUserResponse>(x => new GetUserResponse { User = x });
     }

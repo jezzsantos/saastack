@@ -60,29 +60,29 @@ namespace ApiHost1 {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The Field1 was either invalid or missing.
-        /// </summary>
-        internal static string GetTestingOnlyValidatedRequestValidator_InvalidField1 {
-            get {
-                return ResourceManager.GetString("GetTestingOnlyValidatedRequestValidator_InvalidField1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The Field2 was either invalid or missing.
-        /// </summary>
-        internal static string GetTestingOnlyValidatedRequestValidator_InvalidField2 {
-            get {
-                return ResourceManager.GetString("GetTestingOnlyValidatedRequestValidator_InvalidField2", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The Id was either invalid or missing.
         /// </summary>
         internal static string GetTestingOnlyValidatedRequestValidator_InvalidId {
             get {
                 return ResourceManager.GetString("GetTestingOnlyValidatedRequestValidator_InvalidId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The OptionalField1 was either invalid or missing.
+        /// </summary>
+        internal static string GetTestingOnlyValidatedRequestValidator_InvalidOptionalField {
+            get {
+                return ResourceManager.GetString("GetTestingOnlyValidatedRequestValidator_InvalidOptionalField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The RequiredField was either invalid or missing.
+        /// </summary>
+        internal static string GetTestingOnlyValidatedRequestValidator_InvalidRequiredField {
+            get {
+                return ResourceManager.GetString("GetTestingOnlyValidatedRequestValidator_InvalidRequiredField", resourceCulture);
             }
         }
     }

@@ -1,6 +1,5 @@
 #if TESTINGONLY
 using System.Net;
-using ApiHost1;
 using Application.Resources.Shared;
 using Common.Configuration;
 using Domain.Interfaces;
@@ -17,12 +16,12 @@ namespace Infrastructure.Web.Api.IntegrationTests;
 
 [Trait("Category", "Integration.API")]
 [Collection("API")]
-public class AuthZApiSpec : WebApiSpec<Program>
+public class AuthZApiSpec : WebApiSpec<ApiHost1.Program>
 {
     private readonly IConfigurationSettings _settings;
     private readonly ITokensService _tokensService;
 
-    public AuthZApiSpec(WebApiSetup<Program> setup) : base(setup)
+    public AuthZApiSpec(WebApiSetup<ApiHost1.Program> setup) : base(setup)
     {
         EmptyAllRepositories();
         _settings = setup.GetRequiredService<IConfigurationSettings>();

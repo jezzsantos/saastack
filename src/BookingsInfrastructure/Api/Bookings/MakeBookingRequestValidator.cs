@@ -25,12 +25,14 @@ public class MakeBookingRequestValidator : AbstractValidator<MakeBookingRequest>
             .WithMessage(Resources.MakeBookingRequestValidator_InvalidEndUtc)
             .When(req => req.EndUtc.HasValue);
         RuleFor(req => req)
-            .Must(req => req.EndUtc?.Subtract(req.StartUtc) >= Validations.Booking.MinimumBookingDuration)
+            .Must(req => req.EndUtc?.Subtract(req.StartUtc.GetValueOrDefault())
+                         >= Validations.Booking.MinimumBookingDuration)
             .WithMessage(Resources.MakeBookingRequestValidator_InvalidEndUtc)
-            .When(req => req.EndUtc.HasValue);
+            .When(req => req.StartUtc.HasValue && req.EndUtc.HasValue);
         RuleFor(req => req)
-            .Must(req => req.EndUtc?.Subtract(req.StartUtc) <= Validations.Booking.MaximumBookingDuration)
+            .Must(req => req.EndUtc?.Subtract(req.StartUtc.GetValueOrDefault())
+                         <= Validations.Booking.MaximumBookingDuration)
             .WithMessage(Resources.MakeBookingRequestValidator_InvalidEndUtc)
-            .When(req => req.EndUtc.HasValue);
+            .When(req => req.StartUtc.HasValue && req.EndUtc.HasValue);
     }
 }

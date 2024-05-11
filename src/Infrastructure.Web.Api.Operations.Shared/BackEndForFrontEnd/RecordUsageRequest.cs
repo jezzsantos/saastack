@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
@@ -7,5 +8,5 @@ public class RecordUseRequest : UnTenantedEmptyRequest
 {
     public Dictionary<string, object?>? Additional { get; set; }
 
-    public required string EventName { get; set; }
+    [Required] public string? EventName { get; set; }
 }

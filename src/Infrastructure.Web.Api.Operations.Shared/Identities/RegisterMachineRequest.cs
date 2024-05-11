@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Identities;
@@ -9,7 +10,7 @@ public class RegisterMachineRequest : UnTenantedRequest<RegisterMachineResponse>
 
     public string? CountryCode { get; set; }
 
-    public required string Name { get; set; }
+    [Required] public string? Name { get; set; }
 
     public string? Timezone { get; set; }
 }

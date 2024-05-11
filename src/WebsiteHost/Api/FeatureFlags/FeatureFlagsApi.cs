@@ -32,7 +32,7 @@ public class FeatureFlagsApi : IWebApiService
         CancellationToken cancellationToken)
     {
         var flag = await _featureFlagsApplication.GetFeatureFlagForCallerAsync(_callerFactory.Create(),
-            request.Name, cancellationToken);
+            request.Name!, cancellationToken);
 
         return () => flag.HandleApplicationResult(f => new GetFeatureFlagResponse { Flag = f });
     }
