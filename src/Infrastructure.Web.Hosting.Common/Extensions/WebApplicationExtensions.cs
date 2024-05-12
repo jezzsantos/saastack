@@ -210,7 +210,7 @@ public static class WebApplicationExtensions
         {
             var prefix = hostOptions.IsBackendForFrontEnd
                 ? WebConstants.BackEndForFrontEndDocsPath.Trim('/')
-                : string.Empty;
+                : string.Empty; //Note: puts the swagger docs at the root of the API
             var url = builder.Configuration.GetValue<string>(WebHostDefaults.ServerUrlsKey);
             var path = prefix.HasValue()
                 ? $"{url}/{prefix}"
@@ -221,10 +221,9 @@ public static class WebApplicationExtensions
                     app.MapSwagger();
                     app.UseSwaggerUI(options =>
                     {
+                        var jsonEndpoint = WebConstants.SwaggerEndpointFormat.Format(hostOptions.HostVersion);
                         options.DocumentTitle = hostOptions.HostName;
-                        var endPoint = $"/swagger/{hostOptions.HostVersion}/swagger.json";
-                        options.SwaggerEndpoint(endPoint, hostOptions.HostName);
-                        //Note: puts the swagger docs at the root of the API
+                        options.SwaggerEndpoint(jsonEndpoint, hostOptions.HostName);
                         options.RoutePrefix = prefix;
                     });
                 }, "Feature: Open API documentation enabled with Swagger UI -> {Path}", path));

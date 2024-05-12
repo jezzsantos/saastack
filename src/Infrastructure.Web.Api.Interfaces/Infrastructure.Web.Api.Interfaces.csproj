@@ -27,11 +27,6 @@
         <ProjectReference Include="..\Tools.Generators.Web.Api.Authorization\Tools.Generators.Web.Api.Authorization.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <!-- Exclude the output of source generators from the compilation -->
         <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
-        <Compile Update="Resources.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Resources.resx</DependentUpon>
-        </Compile>
     </ItemGroup>
 
     <ItemGroup>
@@ -41,6 +36,9 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>Infrastructure.Web.Api.Common.UnitTests</_Parameter1>
         </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>Infrastructure.Web.Api.IntegrationTests</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 
     <ItemGroup>
@@ -48,6 +46,14 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Resources.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
 
 </Project>

@@ -45,6 +45,7 @@ namespace Tools.Analyzers.NonPlatform;
 ///     SAASWEB36: Error: Properties should be nullable not Optional{T} for interoperability
 ///     SAASWEB37: Error: Properties should NOT use required modifier
 ///     SAASWEB38: Error: Properties for GET/DELETE requests should all be nullable
+///     SAASWEB39: Warning: Should have summary for documentation
 ///     Responses:
 ///     SAASWEB40: Error: Response must be public
 ///     SAASWEB41: Error: Response must be named with "Response" suffix
@@ -162,6 +163,9 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
     internal static readonly DiagnosticDescriptor Rule038 = "SAASWEB038".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.WebApi, nameof(Resources.SAASWEB038Title), nameof(Resources.SAASWEB038Description),
         nameof(Resources.SAASWEB038MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule039 = "SAASWEB039".GetDescriptor(DiagnosticSeverity.Warning,
+        AnalyzerConstants.Categories.WebApi, nameof(Resources.SAASWEB039Title), nameof(Resources.SAASWEB039Description),
+        nameof(Resources.SAASWEB039MessageFormat));
 
     internal static readonly DiagnosticDescriptor Rule040 = "SAASWEB040".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.WebApi, nameof(Resources.Diagnostic_Title_ClassMustBePublic),
@@ -189,7 +193,7 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(
             Rule010, Rule011, Rule012, Rule013, Rule014, Rule015, Rule016, Rule017, Rule018, Rule019, Rule020,
-            Rule030, Rule031, Rule032, Rule033, Rule034, Rule035, Rule036, Rule037, Rule038,
+            Rule030, Rule031, Rule032, Rule033, Rule034, Rule035, Rule036, Rule037, Rule038, Rule039,
             Rule040, Rule041, Rule042, Rule043, Rule044, Rule045);
 
     public override void Initialize(AnalysisContext context)
@@ -344,6 +348,22 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
                     context.ReportDiagnostic(Rule038, property);
                 }
             }
+        }
+
+        var docs = classDeclarationSyntax.GetDocumentationCommentTriviaSyntax(context);
+        if (docs is null
+            || !docs.IsLanguageForCSharp())
+        {
+            context.ReportDiagnostic(Rule039, classDeclarationSyntax);
+            return;
+        }
+
+        var xmlContent = docs.Content;
+        var summary = xmlContent.SelectSingleElement(AnalyzerConstants.XmlDocumentation.Elements.Summary);
+        if (summary is null
+            || summary.IsEmptyNode())
+        {
+            context.ReportDiagnostic(Rule039, classDeclarationSyntax);
         }
     }
 

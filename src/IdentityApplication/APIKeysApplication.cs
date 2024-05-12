@@ -96,7 +96,7 @@ public class APIKeysApplication : IAPIKeysApplication
         return user.ToOptional();
     }
 
-    public async Task<Result<SearchResults<APIKey>, Error>> SearchAllAPIKeysAsync(ICallerContext caller,
+    public async Task<Result<SearchResults<APIKey>, Error>> SearchAllAPIKeysForCallerAsync(ICallerContext caller,
         SearchOptions searchOptions, GetOptions getOptions,
         CancellationToken cancellationToken)
     {
@@ -114,7 +114,7 @@ public class APIKeysApplication : IAPIKeysApplication
     }
 
 #if TESTINGONLY
-    public async Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext caller,
+    public async Task<Result<APIKey, Error>> CreateAPIKeyForCallerAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
         return await CreateAPIKeyAsync(caller, caller.CallerId, caller.CallerId, null, cancellationToken);

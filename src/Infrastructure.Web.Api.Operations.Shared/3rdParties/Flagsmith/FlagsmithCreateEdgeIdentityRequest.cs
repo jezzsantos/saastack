@@ -4,6 +4,9 @@ using JetBrains.Annotations;
 
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 
+/// <summary>
+///     Creates a new edge identity
+/// </summary>
 [Route("/environments/{EnvironmentApiKey}/edge-identities/", OperationMethod.Post)]
 [UsedImplicitly]
 public class FlagsmithCreateEdgeIdentityRequest : IWebRequest<FlagsmithCreateEdgeIdentityResponse>

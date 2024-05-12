@@ -12,7 +12,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace Infrastructure.Web.Hosting.Common.Documentation;
 
 /// <summary>
-///     Provides a <see cref="IOperationFilter" /> that fixes the Swagger UI to display tooling for a request that is
+///     Provides a <see cref="IOperationFilter" /> that fixes the Swagger UI to display tooling for operations that are
 ///     marked as <see cref="Microsoft.AspNetCore.Mvc.FromFormAttribute" />,
 ///     that was source generated from a <see cref="IHasMultipartForm" /> request.
 /// </summary>
@@ -48,19 +48,19 @@ public sealed class FromFormMultiPartFilter : IOperationFilter
             FormFilesFieldName
         };
 
-        var requestProperties = parameter.Value.Type.GetProperties()
-            .Select(prop => prop)
-            .ToList();
+        var requestDto = parameter.Value.Type;
+        var requestProperties = requestDto.GetProperties();
         foreach (var property in requestProperties)
         {
-            parts.Add(property.Name, new OpenApiSchema
+            var name = property.Name.ToCamelCase();
+            parts.Add(name, new OpenApiSchema
             {
                 Type = ConvertToSchemaType(context, property)
             });
-            var isRequired = IsPropertyRequired(property);
-            if (isRequired)
+
+            if (property.IsPropertyRequired())
             {
-                requiredParts.Add(property.Name);
+                requiredParts.Add(name);
             }
         }
 
@@ -80,15 +80,6 @@ public sealed class FromFormMultiPartFilter : IOperationFilter
             }
         };
     }
-
-    private static bool IsPropertyRequired(PropertyInfo property)
-    {
-        var nullabilityContext = new NullabilityInfoContext();
-        var nullability = nullabilityContext.Create(property);
-
-        return nullability.ReadState == NullabilityState.NotNull;
-    }
-
 
     /// <summary>
     ///     Converts the <see cref="field" /> into the respective schema type.

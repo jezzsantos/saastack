@@ -3,6 +3,9 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 
+/// <summary>
+///     Releases the car reserved availability for the specified period
+/// </summary>
 [Route("/cars/{Id}/release", OperationMethod.PutPatch, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class ReleaseCarAvailabilityRequest : TenantedRequest<GetCarResponse>

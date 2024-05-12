@@ -10,7 +10,7 @@ public interface IAPIKeysApplication
         DateTime? expiresOn, CancellationToken cancellationToken);
 
 #if TESTINGONLY
-    Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext caller, CancellationToken cancellationToken);
+    Task<Result<APIKey, Error>> CreateAPIKeyForCallerAsync(ICallerContext caller, CancellationToken cancellationToken);
 #endif
 
     Task<Result<Error>> DeleteAPIKeyAsync(ICallerContext caller, string id, CancellationToken cancellationToken);
@@ -19,6 +19,7 @@ public interface IAPIKeysApplication
         string apiKey,
         CancellationToken cancellationToken);
 
-    Task<Result<SearchResults<APIKey>, Error>> SearchAllAPIKeysAsync(ICallerContext caller, SearchOptions searchOptions,
+    Task<Result<SearchResults<APIKey>, Error>> SearchAllAPIKeysForCallerAsync(ICallerContext caller,
+        SearchOptions searchOptions,
         GetOptions getOptions, CancellationToken cancellationToken);
 }

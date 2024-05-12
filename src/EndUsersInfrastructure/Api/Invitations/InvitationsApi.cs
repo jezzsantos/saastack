@@ -18,17 +18,6 @@ public class InvitationsApi : IWebApiService
         _invitationsApplication = invitationsApplication;
     }
 
-    public async Task<ApiResult<Invitation, VerifyGuestInvitationResponse>> AcceptGuestInvitation(
-        VerifyGuestInvitationRequest request, CancellationToken cancellationToken)
-    {
-        var invitation =
-            await _invitationsApplication.VerifyGuestInvitationAsync(_callerFactory.Create(), request.Token!,
-                cancellationToken);
-
-        return () => invitation.HandleApplicationResult<Invitation, VerifyGuestInvitationResponse>(invite =>
-            new VerifyGuestInvitationResponse { Invitation = invite });
-    }
-
     public async Task<ApiPostResult<Invitation, InviteGuestResponse>> InviteGuest(
         InviteGuestRequest request, CancellationToken cancellationToken)
     {
@@ -48,5 +37,16 @@ public class InvitationsApi : IWebApiService
                 cancellationToken);
 
         return () => invitation.HandleApplicationResult();
+    }
+
+    public async Task<ApiResult<Invitation, VerifyGuestInvitationResponse>> VerifyGuestInvitation(
+        VerifyGuestInvitationRequest request, CancellationToken cancellationToken)
+    {
+        var invitation =
+            await _invitationsApplication.VerifyGuestInvitationAsync(_callerFactory.Create(), request.Token!,
+                cancellationToken);
+
+        return () => invitation.HandleApplicationResult<Invitation, VerifyGuestInvitationResponse>(invite =>
+            new VerifyGuestInvitationResponse { Invitation = invite });
     }
 }

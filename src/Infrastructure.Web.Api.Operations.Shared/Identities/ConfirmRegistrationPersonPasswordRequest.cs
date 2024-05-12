@@ -3,6 +3,9 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
+/// <summary>
+///     Confirms the invitation to register a new person (verifying their email address)
+/// </summary>
 [Route("/passwords/confirm-registration", OperationMethod.Post)]
 public class ConfirmRegistrationPersonPasswordRequest : UnTenantedRequest<ConfirmRegistrationPersonPasswordResponse>
 {

@@ -4,7 +4,7 @@ using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Images;
 
 /// <summary>
-///     Downloads the image
+///     Downloads the raw image
 /// </summary>
 [Route("/images/{Id}/download", OperationMethod.Get)]
 public class DownloadImageRequest : UnTenantedStreamRequest

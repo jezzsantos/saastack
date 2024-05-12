@@ -3,6 +3,9 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 
+/// <summary>
+///     Fetches the named feature flag for the current authenticated user
+/// </summary>
 [Route("/flags/{Name}", OperationMethod.Get)]
 public class GetFeatureFlagForCallerRequest : UnTenantedRequest<GetFeatureFlagResponse>
 {

@@ -1599,7 +1599,7 @@ public sealed class AClass : ValueObjectBase<AClass>
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Rule035,
-                    Resources.CodeFix_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod, problem, fix, 40,
+                    Resources.CodeFix_DomainDrivenDesign_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod, problem, fix, 40,
                     17,
                     "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
                     nameof(SkipImmutabilityCheckAttribute));
@@ -1698,7 +1698,7 @@ public sealed class AClass : ValueObjectBase<AClass>
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Rule035,
-                    Resources.CodeFix_Title_ChangeValueObjectMethodReturnType, problem, fix, 40,
+                    Resources.CodeFix_DomainDrivenDesign_Title_ChangeValueObjectMethodReturnType, problem, fix, 40,
                     17,
                     "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
                     nameof(SkipImmutabilityCheckAttribute));

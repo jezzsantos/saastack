@@ -84,7 +84,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
 
         if (diagnostics.Any(d => d.Id == DomainDrivenDesignAnalyzer.Rule014.Id))
         {
-            var title = Resources.CodeFix_Title_AddRehydrateMethod;
+            var title = Resources.CodeFix_DomainDrivenDesign_Title_AddRehydrateMethod;
             context.RegisterCodeFix(
                 CodeAction.Create(title,
                     token => AddRehydrateMethodToAggregateRoot(context.Document, classDeclarationSyntax, token),
@@ -94,7 +94,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
 
         if (diagnostics.Any(d => d.Id == DomainDrivenDesignAnalyzer.Rule023.Id))
         {
-            var title = Resources.CodeFix_Title_AddRehydrateMethod;
+            var title = Resources.CodeFix_DomainDrivenDesign_Title_AddRehydrateMethod;
             context.RegisterCodeFix(
                 CodeAction.Create(title,
                     token => AddRehydrateMethodToEntity(context.Document, classDeclarationSyntax, token),
@@ -104,7 +104,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
 
         if (diagnostics.Any(d => d.Id == DomainDrivenDesignAnalyzer.Rule033.Id))
         {
-            var title = Resources.CodeFix_Title_AddRehydrateMethod;
+            var title = Resources.CodeFix_DomainDrivenDesign_Title_AddRehydrateMethod;
             context.RegisterCodeFix(
                 CodeAction.Create(title,
                     token => AddRehydrateMethodToValueObject(context.Document, classDeclarationSyntax, token),
@@ -115,7 +115,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         if (diagnostics.Any(d =>
                 d.Id == DomainDrivenDesignAnalyzer.Rule015.Id))
         {
-            var title = Resources.CodeFix_Title_AddDehydrateMethodToEntity;
+            var title = Resources.CodeFix_DomainDrivenDesign_Title_AddDehydrateMethodToEntity;
             context.RegisterCodeFix(
                 CodeAction.Create(title,
                     token => AddDehydrateMethodToAggregateRoot(context.Document, classDeclarationSyntax, token),
@@ -129,7 +129,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
                 || d.Id == DomainDrivenDesignAnalyzer.Rule036.Id
                 || d.Id == DomainDrivenDesignAnalyzer.Rule041.Id))
         {
-            var title = Resources.CodeFix_Title_AddSealedToClass;
+            var title = Resources.CodeFix_DomainDrivenDesign_Title_AddSealedToClass;
             context.RegisterCodeFix(
                 CodeAction.Create(title,
                     token => AddSealedToClass(context.Document, classDeclarationSyntax, token),
@@ -140,7 +140,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         if (diagnostics.Any(d =>
                 d.Id == DomainDrivenDesignAnalyzer.Rule024.Id))
         {
-            var title = Resources.CodeFix_Title_AddDehydrateMethodToEntity;
+            var title = Resources.CodeFix_DomainDrivenDesign_Title_AddDehydrateMethodToEntity;
             context.RegisterCodeFix(
                 CodeAction.Create(title,
                     token => AddDehydrateMethodToEntity(context.Document, classDeclarationSyntax, token),
@@ -151,7 +151,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         if (diagnostics.Any(d =>
                 d.Id == DomainDrivenDesignAnalyzer.Rule010.Id))
         {
-            var title = Resources.CodeFix_Title_AddClassFactoryMethodToAggregate;
+            var title = Resources.CodeFix_DomainDrivenDesign_Title_AddClassFactoryMethodToAggregate;
             context.RegisterCodeFix(
                 CodeAction.Create(title,
                     token => AddCreateMethodToAggregateRoot(context.Document, classDeclarationSyntax, token),
@@ -162,7 +162,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         if (diagnostics.Any(d =>
                 d.Id == DomainDrivenDesignAnalyzer.Rule020.Id))
         {
-            var title = Resources.CodeFix_Title_AddClassFactoryMethodToEntity;
+            var title = Resources.CodeFix_DomainDrivenDesign_Title_AddClassFactoryMethodToEntity;
             context.RegisterCodeFix(
                 CodeAction.Create(title,
                     token => AddCreateMethodToEntity(context.Document, classDeclarationSyntax, token),
@@ -173,7 +173,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         if (diagnostics.Any(d =>
                 d.Id == DomainDrivenDesignAnalyzer.Rule030.Id))
         {
-            var title = Resources.CodeFix_Title_AddClassFactoryMethodToValueObject;
+            var title = Resources.CodeFix_DomainDrivenDesign_Title_AddClassFactoryMethodToValueObject;
             context.RegisterCodeFix(
                 CodeAction.Create(title,
                     token => AddCreateMethodToValueObject(context.Document, classDeclarationSyntax, token),
@@ -184,7 +184,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         if (diagnostics.Any(d =>
                 d.Id == DomainDrivenDesignAnalyzer.Rule016.Id || d.Id == DomainDrivenDesignAnalyzer.Rule025.Id))
         {
-            var title = Resources.CodeFix_Title_AddEntityValueAttributeToEntiyOrAggregate;
+            var title = Resources.CodeFix_DomainDrivenDesign_Title_AddEntityValueAttributeToEntiyOrAggregate;
             context.RegisterCodeFix(
                 CodeAction.Create(title,
                     token => AddEntityValueAttribute(context.Document, classDeclarationSyntax, token),
@@ -201,13 +201,14 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
         if (diagnostics.Any(d =>
                 d.Id == DomainDrivenDesignAnalyzer.Rule035.Id))
         {
-            var title1 = Resources.CodeFix_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod;
+            var title1 = Resources
+                .CodeFix_DomainDrivenDesign_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod;
             context.RegisterCodeFix(
                 CodeAction.Create(title1,
                     token => AddSkipImmutabilityCheckAttribute(context.Document, methodDeclarationSyntax, token),
                     title1),
                 diagnostic);
-            var title2 = Resources.CodeFix_Title_ChangeValueObjectMethodReturnType;
+            var title2 = Resources.CodeFix_DomainDrivenDesign_Title_ChangeValueObjectMethodReturnType;
             context.RegisterCodeFix(
                 CodeAction.Create(title2,
                     token => ChangeImmutableReturnType(context.Document, methodDeclarationSyntax, token),

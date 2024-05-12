@@ -3,6 +3,9 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
+/// <summary>
+///     Registers a new person on the platform
+/// </summary>
 [Route("/passwords/register", OperationMethod.Post)]
 public class RegisterPersonPasswordRequest : UnTenantedRequest<RegisterPersonPasswordResponse>
 {

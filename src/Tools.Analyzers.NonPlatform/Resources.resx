@@ -288,6 +288,15 @@
     <data name="SAASWEB038Title" xml:space="preserve">
         <value>Wrong return type</value>
     </data>
+    <data name="SAASWEB039Description" xml:space="preserve">
+        <value>Request should have a summary for documentation.</value>
+    </data>
+    <data name="SAASWEB039MessageFormat" xml:space="preserve">
+        <value>Request '{0}' should have a summary about what it does, used in API documentation</value>
+    </data>
+    <data name="SAASWEB039Title" xml:space="preserve">
+        <value>Missing Documentation</value>
+    </data>
     <data name="SAASWEB041Description" xml:space="preserve">
         <value>The request type should end with the word 'Response'.</value>
     </data>
@@ -455,31 +464,36 @@
         <value>Missing prefix registration</value>
     </data>
 
-    <data name="CodeFix_Title_AddRehydrateMethod" xml:space="preserve">
+    <data name="CodeFix_DomainDrivenDesign_Title_AddRehydrateMethod" xml:space="preserve">
         <value>Add missing 'Rehydrate()' method</value>
     </data>
-    <data name="CodeFix_Title_AddDehydrateMethodToEntity" xml:space="preserve">
+    <data name="CodeFix_DomainDrivenDesign_Title_AddDehydrateMethodToEntity" xml:space="preserve">
         <value>Add missing 'Dehydrate()' method</value>
     </data>
-    <data name="CodeFix_Title_AddClassFactoryMethodToAggregate" xml:space="preserve">
+    <data name="CodeFix_DomainDrivenDesign_Title_AddClassFactoryMethodToAggregate" xml:space="preserve">
         <value>Add missing 'Create' method</value>
     </data>
-    <data name="CodeFix_Title_AddClassFactoryMethodToEntity" xml:space="preserve">
+    <data name="CodeFix_DomainDrivenDesign_Title_AddClassFactoryMethodToEntity" xml:space="preserve">
         <value>Add missing 'Create' method</value>
     </data>
-    <data name="CodeFix_Title_AddClassFactoryMethodToValueObject" xml:space="preserve">
+    <data name="CodeFix_DomainDrivenDesign_Title_AddClassFactoryMethodToValueObject" xml:space="preserve">
         <value>Add missing 'Create' method</value>
     </data>
-    <data name="CodeFix_Title_AddEntityValueAttributeToEntiyOrAggregate" xml:space="preserve">
+    <data name="CodeFix_DomainDrivenDesign_Title_AddEntityValueAttributeToEntiyOrAggregate" xml:space="preserve">
         <value>Add missing '[EntityName]' attribute</value>
     </data>
-    <data name="CodeFix_Title_AddSealedToClass" xml:space="preserve">
+    <data name="CodeFix_DomainDrivenDesign_Title_AddSealedToClass" xml:space="preserve">
         <value>Mark this class as 'sealed'</value>
     </data>
-    <data name="CodeFix_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod" xml:space="preserve">
+    <data name="CodeFix_DomainDrivenDesign_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod"
+          xml:space="preserve">
         <value>Suppress with '[SkipImmutabilityCheck]' attribute</value>
     </data>
-    <data name="CodeFix_Title_ChangeValueObjectMethodReturnType" xml:space="preserve">
+    <data name="CodeFix_DomainDrivenDesign_Title_ChangeValueObjectMethodReturnType" xml:space="preserve">
         <value>Change return type of the method</value>
+    </data>
+
+    <data name="CodeFix_ApiLayer_Title_AddDocumentSummary" xml:space="preserve">
+        <value>Add Documentation</value>
     </data>
 </root>

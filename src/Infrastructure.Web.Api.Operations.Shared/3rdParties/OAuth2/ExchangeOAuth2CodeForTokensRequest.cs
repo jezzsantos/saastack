@@ -3,6 +3,9 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.OAuth2;
 
+/// <summary>
+///     Exchanges an OAuth2 code for tokens
+/// </summary>
 [Route("/auth/token", OperationMethod.Post)]
 public class ExchangeOAuth2CodeForTokensRequest : UnTenantedRequest<ExchangeOAuth2CodeForTokensResponse>
 {

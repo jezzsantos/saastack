@@ -7,7 +7,7 @@ using Infrastructure.Web.Api.Operations.Shared.Identities;
 
 namespace IdentityInfrastructure.Api.APIKeys;
 
-public class CreateAPIKeyRequestValidator : AbstractValidator<CreateAPIKeyRequest>
+public class CreateAPIKeyRequestValidator : AbstractValidator<CreateAPIKeyForCallerRequest>
 {
     public CreateAPIKeyRequestValidator()
     {

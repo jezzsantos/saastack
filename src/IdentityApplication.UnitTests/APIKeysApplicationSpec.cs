@@ -148,7 +148,7 @@ public class APIKeysApplicationSpec
         _caller.Setup(cc => cc.CallerId).Returns("acallerid");
 
         var result =
-            await _application.CreateAPIKeyAsync(_caller.Object, CancellationToken.None);
+            await _application.CreateAPIKeyForCallerAsync(_caller.Object, CancellationToken.None);
 
         result.Value.Id.Should().Be("anid");
         result.Value.Key.Should().Be("anapikey");
@@ -210,7 +210,8 @@ public class APIKeysApplicationSpec
                 }
             ]));
 
-        var result = await _application.SearchAllAPIKeysAsync(_caller.Object, new SearchOptions(), new GetOptions(),
+        var result = await _application.SearchAllAPIKeysForCallerAsync(_caller.Object, new SearchOptions(),
+            new GetOptions(),
             CancellationToken.None);
 
         result.Value.Results.Count.Should().Be(1);

@@ -11,7 +11,6 @@ using NonPlatformAnalyzers::QueryAny;
 using NuGet.Frameworks;
 using AnalyzerConstants = CommonAnalyzers::Tools.Analyzers.Common.AnalyzerConstants;
 using Task = System.Threading.Tasks.Task;
-using ObjectExtensions = NonPlatformAnalyzers::Common.Extensions.ObjectExtensions;
 
 namespace Tools.Analyzers.NonPlatform.UnitTests;
 
@@ -56,29 +55,44 @@ public static class Verify
         await CodeFixed<TAnalyzer, TCodeFix>(descriptor, null, problem, fix, locationX, locationY, arguments);
     }
 
-    public static async Task CodeFixed<TAnalyzer, TCodeFix>(DiagnosticDescriptor descriptor, string? equivalenceKey,
-        string problem, string fix,
-        int locationX, int locationY, params object[] arguments)
+    public static async Task CodeFixed<TAnalyzer, TCodeFix>(DiagnosticDescriptor descriptor, string problem, string fix,
+        int locationX, int locationY, object[] arguments,
+        params (DiagnosticDescriptor descriptor, int locationX, int locationY, string argument, object?[]? messageArgs)
+            [] expected)
         where TAnalyzer : DiagnosticAnalyzer, new()
         where TCodeFix : CodeFixProvider, new()
     {
-        var codeFixTest = new CSharpCodeFixTest<TAnalyzer, TCodeFix, DefaultVerifier>();
-        foreach (var assembly in AdditionalReferences)
-        {
-            codeFixTest.TestState.AdditionalReferences.Add(assembly);
-        }
+        var expectations = new[]
+            {
+                CSharpCodeFixVerifier<TAnalyzer, TCodeFix, DefaultVerifier>.Diagnostic(descriptor)
+                    .WithLocation(locationX, locationY)
+                    .WithArguments(arguments)
+            }.Concat(expected
+                .Select(exp =>
+                {
+                    var args = exp.messageArgs.Exists() && exp.messageArgs.Length != 0
+                        ? new object[] { exp.argument }.Concat(exp.messageArgs)
+                        : new object[] { exp.argument };
+                    return CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>
+                        .Diagnostic(exp.descriptor)
+                        .WithLocation(exp.locationX, exp.locationY)
+                        .WithArguments(args.ToArray()!);
+                }))
+            .ToArray();
 
-        codeFixTest.ReferenceAssemblies = Net80;
-        codeFixTest.TestCode = problem;
-        codeFixTest.FixedCode = fix;
+        await RunCodeFixTest<TAnalyzer, TCodeFix>(problem, fix, null, expectations);
+    }
 
-        var expected = CSharpCodeFixVerifier<TAnalyzer, TCodeFix, DefaultVerifier>.Diagnostic(descriptor)
+    public static async Task CodeFixed<TAnalyzer, TCodeFix>(DiagnosticDescriptor descriptor, string? equivalenceKey,
+        string problem, string fix, int locationX, int locationY, params object[] arguments)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+        where TCodeFix : CodeFixProvider, new()
+    {
+        var expectation = CSharpCodeFixVerifier<TAnalyzer, TCodeFix, DefaultVerifier>.Diagnostic(descriptor)
             .WithLocation(locationX, locationY)
             .WithArguments(arguments);
-        codeFixTest.ExpectedDiagnostics.Add(expected);
-        codeFixTest.CodeActionEquivalenceKey = equivalenceKey;
 
-        await codeFixTest.RunAsync(CancellationToken.None);
+        await RunCodeFixTest<TAnalyzer, TCodeFix>(problem, fix, equivalenceKey, new[] { expectation });
     }
 
     public static async Task DiagnosticExists<TAnalyzer>(DiagnosticDescriptor descriptor, string inputSnippet,
@@ -104,8 +118,7 @@ public static class Verify
 
     public static async Task DiagnosticExists<TAnalyzer>(string inputSnippet,
         params (DiagnosticDescriptor descriptor, int locationX, int locationY, string argument, object?[]? messageArgs)
-            []
-            expected)
+            [] expected)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {
         var expectations = expected
@@ -134,7 +147,7 @@ public static class Verify
         (int locationX, int locationY, string argument) expected1, params object?[]? messageArgs)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {
-        var arguments = ObjectExtensions.Exists(messageArgs) && messageArgs.Any()
+        var arguments = messageArgs.Exists() && messageArgs.Any()
             ? new object[] { expected1.argument }.Concat(messageArgs)
             : new object[] { expected1.argument };
 
@@ -162,5 +175,30 @@ public static class Verify
         }
 
         await analyzerTest.RunAsync(CancellationToken.None);
+    }
+
+    private static async Task RunCodeFixTest<TAnalyzer, TCodeFix>(string problem, string fix, string? equivalenceKey,
+        DiagnosticResult[]? expected)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+        where TCodeFix : CodeFixProvider, new()
+    {
+        var codeFixTest = new CSharpCodeFixTest<TAnalyzer, TCodeFix, DefaultVerifier>();
+        foreach (var assembly in AdditionalReferences)
+        {
+            codeFixTest.TestState.AdditionalReferences.Add(assembly);
+        }
+
+        codeFixTest.ReferenceAssemblies = Net80;
+        codeFixTest.TestCode = problem;
+        codeFixTest.FixedCode = fix;
+
+        if (expected is not null && expected.Any())
+        {
+            codeFixTest.ExpectedDiagnostics.AddRange(expected);
+        }
+
+        codeFixTest.CodeActionEquivalenceKey = equivalenceKey;
+
+        await codeFixTest.RunAsync(CancellationToken.None);
     }
 }

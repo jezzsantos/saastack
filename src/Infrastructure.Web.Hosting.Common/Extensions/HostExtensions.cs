@@ -112,7 +112,7 @@ public static class HostExtensions
         app.EnableMultiTenancy(middlewares, hostOptions.IsMultiTenanted);
         app.EnableEventingPropagation(middlewares, hostOptions.Persistence.UsesEventing);
         app.EnableOtherFeatures(middlewares, hostOptions);
-        
+
         modules.ConfigureMiddleware(app, middlewares);
 
         middlewares
@@ -335,8 +335,15 @@ public static class HostExtensions
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(options =>
             {
+                options.ParameterFilter<DataAnnotationsParameterFilter>();
+                options.SchemaFilter<DataAnnotationsSchemaFilter>();
+                options.OperationFilter<BugFixParameterOperationFilter>(options);
                 options.OperationFilter<FromFormMultiPartFilter>();
+                options
+                    .OperationFilter<
+                        XmlDocumentationOperationFilter>(); // must declare before the DefaultResponsesFilter
                 options.OperationFilter<DefaultResponsesFilter>();
+                options.OperationFilter<SecurityFilter>();
                 options.SwaggerDoc(version, new OpenApiInfo
                 {
                     Version = version,
@@ -357,20 +364,6 @@ public static class HostExtensions
                         Scheme = JwtBearerDefaults.AuthenticationScheme,
                         BearerFormat = "JWT"
                     });
-                    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-                    {
-                        {
-                            new OpenApiSecurityScheme
-                            {
-                                Reference = new OpenApiReference
-                                {
-                                    Type = ReferenceType.SecurityScheme,
-                                    Id = JwtBearerDefaults.AuthenticationScheme
-                                }
-                            },
-                            Array.Empty<string>()
-                        }
-                    });
                 }
 
                 if (hostOptions.Authorization.UsesApiKeys)
@@ -386,20 +379,6 @@ public static class HostExtensions
                             In = ParameterLocation.Query,
                             Scheme = APIKeyAuthenticationHandler.AuthenticationScheme
                         });
-                    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-                    {
-                        {
-                            new OpenApiSecurityScheme
-                            {
-                                Reference = new OpenApiReference
-                                {
-                                    Type = ReferenceType.SecurityScheme,
-                                    Id = APIKeyAuthenticationHandler.AuthenticationScheme
-                                }
-                            },
-                            Array.Empty<string>()
-                        }
-                    });
                 }
             });
         }

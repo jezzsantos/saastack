@@ -3,6 +3,9 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 
+/// <summary>
+///     Registers a new car
+/// </summary>
 [Route("/cars", OperationMethod.Post, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class RegisterCarRequest : TenantedRequest<GetCarResponse>

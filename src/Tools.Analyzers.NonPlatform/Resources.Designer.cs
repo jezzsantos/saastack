@@ -60,83 +60,93 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add missing &apos;Create&apos; method.
+        ///   Looks up a localized string similar to Add Documentation.
         /// </summary>
-        internal static string CodeFix_Title_AddClassFactoryMethodToAggregate {
+        internal static string CodeFix_ApiLayer_Title_AddDocumentSummary {
             get {
-                return ResourceManager.GetString("CodeFix_Title_AddClassFactoryMethodToAggregate", resourceCulture);
+                return ResourceManager.GetString("CodeFix_ApiLayer_Title_AddDocumentSummary", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Add missing &apos;Create&apos; method.
         /// </summary>
-        internal static string CodeFix_Title_AddClassFactoryMethodToEntity {
+        internal static string CodeFix_DomainDrivenDesign_Title_AddClassFactoryMethodToAggregate {
             get {
-                return ResourceManager.GetString("CodeFix_Title_AddClassFactoryMethodToEntity", resourceCulture);
+                return ResourceManager.GetString("CodeFix_DomainDrivenDesign_Title_AddClassFactoryMethodToAggregate", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Add missing &apos;Create&apos; method.
         /// </summary>
-        internal static string CodeFix_Title_AddClassFactoryMethodToValueObject {
+        internal static string CodeFix_DomainDrivenDesign_Title_AddClassFactoryMethodToEntity {
             get {
-                return ResourceManager.GetString("CodeFix_Title_AddClassFactoryMethodToValueObject", resourceCulture);
+                return ResourceManager.GetString("CodeFix_DomainDrivenDesign_Title_AddClassFactoryMethodToEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add missing &apos;Create&apos; method.
+        /// </summary>
+        internal static string CodeFix_DomainDrivenDesign_Title_AddClassFactoryMethodToValueObject {
+            get {
+                return ResourceManager.GetString("CodeFix_DomainDrivenDesign_Title_AddClassFactoryMethodToValueObject", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Add missing &apos;Dehydrate()&apos; method.
         /// </summary>
-        internal static string CodeFix_Title_AddDehydrateMethodToEntity {
+        internal static string CodeFix_DomainDrivenDesign_Title_AddDehydrateMethodToEntity {
             get {
-                return ResourceManager.GetString("CodeFix_Title_AddDehydrateMethodToEntity", resourceCulture);
+                return ResourceManager.GetString("CodeFix_DomainDrivenDesign_Title_AddDehydrateMethodToEntity", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Add missing &apos;[EntityName]&apos; attribute.
         /// </summary>
-        internal static string CodeFix_Title_AddEntityValueAttributeToEntiyOrAggregate {
+        internal static string CodeFix_DomainDrivenDesign_Title_AddEntityValueAttributeToEntiyOrAggregate {
             get {
-                return ResourceManager.GetString("CodeFix_Title_AddEntityValueAttributeToEntiyOrAggregate", resourceCulture);
+                return ResourceManager.GetString("CodeFix_DomainDrivenDesign_Title_AddEntityValueAttributeToEntiyOrAggregate", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Add missing &apos;Rehydrate()&apos; method.
         /// </summary>
-        internal static string CodeFix_Title_AddRehydrateMethod {
+        internal static string CodeFix_DomainDrivenDesign_Title_AddRehydrateMethod {
             get {
-                return ResourceManager.GetString("CodeFix_Title_AddRehydrateMethod", resourceCulture);
+                return ResourceManager.GetString("CodeFix_DomainDrivenDesign_Title_AddRehydrateMethod", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Mark this class as &apos;sealed&apos;.
         /// </summary>
-        internal static string CodeFix_Title_AddSealedToClass {
+        internal static string CodeFix_DomainDrivenDesign_Title_AddSealedToClass {
             get {
-                return ResourceManager.GetString("CodeFix_Title_AddSealedToClass", resourceCulture);
+                return ResourceManager.GetString("CodeFix_DomainDrivenDesign_Title_AddSealedToClass", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Suppress with &apos;[SkipImmutabilityCheck]&apos; attribute.
         /// </summary>
-        internal static string CodeFix_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod {
+        internal static string CodeFix_DomainDrivenDesign_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod {
             get {
-                return ResourceManager.GetString("CodeFix_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod", resourceCulture);
+                return ResourceManager.GetString("CodeFix_DomainDrivenDesign_Title_AddSkipImmutabilityCheckAttributeToValueObjectMe" +
+                        "thod", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Change return type of the method.
         /// </summary>
-        internal static string CodeFix_Title_ChangeValueObjectMethodReturnType {
+        internal static string CodeFix_DomainDrivenDesign_Title_ChangeValueObjectMethodReturnType {
             get {
-                return ResourceManager.GetString("CodeFix_Title_ChangeValueObjectMethodReturnType", resourceCulture);
+                return ResourceManager.GetString("CodeFix_DomainDrivenDesign_Title_ChangeValueObjectMethodReturnType", resourceCulture);
             }
         }
         
@@ -1352,6 +1362,33 @@ namespace Tools.Analyzers.NonPlatform {
         internal static string SAASWEB038Title {
             get {
                 return ResourceManager.GetString("SAASWEB038Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request should have a summary for documentation..
+        /// </summary>
+        internal static string SAASWEB039Description {
+            get {
+                return ResourceManager.GetString("SAASWEB039Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request &apos;{0}&apos; should have a summary about what it does, used in API documentation.
+        /// </summary>
+        internal static string SAASWEB039MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASWEB039MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing Documentation.
+        /// </summary>
+        internal static string SAASWEB039Title {
+            get {
+                return ResourceManager.GetString("SAASWEB039Title", resourceCulture);
             }
         }
         

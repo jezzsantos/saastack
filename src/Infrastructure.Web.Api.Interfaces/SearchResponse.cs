@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Application.Interfaces;
 
 namespace Infrastructure.Web.Api.Interfaces;
@@ -7,5 +8,6 @@ namespace Infrastructure.Web.Api.Interfaces;
 /// </summary>
 public class SearchResponse : IWebSearchResponse
 {
+    [Description("Metadata about the search results")]
     public SearchResultMetadata? Metadata { get; set; }
 }

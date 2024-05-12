@@ -20,9 +20,9 @@ public class APIKeysApi : IWebApiService
 
 #if TESTINGONLY
     public async Task<ApiPostResult<APIKey, CreateAPIKeyResponse>> Create(
-        CreateAPIKeyRequest request, CancellationToken cancellationToken)
+        CreateAPIKeyForCallerRequest request, CancellationToken cancellationToken)
     {
-        var apiKey = await _apiKeysApplication.CreateAPIKeyAsync(_callerFactory.Create(), cancellationToken);
+        var apiKey = await _apiKeysApplication.CreateAPIKeyForCallerAsync(_callerFactory.Create(), cancellationToken);
 
         return () => apiKey.HandleApplicationResult<APIKey, CreateAPIKeyResponse>(x =>
             new PostResult<CreateAPIKeyResponse>(new CreateAPIKeyResponse { ApiKey = x.Key }));
@@ -36,10 +36,11 @@ public class APIKeysApi : IWebApiService
         return () => key.HandleApplicationResult();
     }
 
-    public async Task<ApiSearchResult<APIKey, SearchAllAPIKeysResponse>> SearchAllAPIKeys(
-        SearchAllAPIKeysRequest request, CancellationToken cancellationToken)
+    public async Task<ApiSearchResult<APIKey, SearchAllAPIKeysResponse>> SearchAllAPIKeysForCaller(
+        SearchAllAPIKeysForCallerRequest request, CancellationToken cancellationToken)
     {
-        var keys = await _apiKeysApplication.SearchAllAPIKeysAsync(_callerFactory.Create(), request.ToSearchOptions(),
+        var keys = await _apiKeysApplication.SearchAllAPIKeysForCallerAsync(_callerFactory.Create(),
+            request.ToSearchOptions(),
             request.ToGetOptions(), cancellationToken);
 
         return () => keys.HandleApplicationResult(x => new SearchAllAPIKeysResponse

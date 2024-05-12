@@ -3,6 +3,9 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
+/// <summary>
+///     Register a new machine user on the platform
+/// </summary>
 [Route("/machines/register", OperationMethod.Post)]
 public class RegisterMachineRequest : UnTenantedRequest<RegisterMachineResponse>
 {

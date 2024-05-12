@@ -3,6 +3,9 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 
+/// <summary>
+///     Measures an event in the product
+/// </summary>
 [Route("/record/measure", OperationMethod.Post)]
 public class RecordMeasureRequest : UnTenantedEmptyRequest
 {

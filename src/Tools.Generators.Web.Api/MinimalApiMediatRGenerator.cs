@@ -124,24 +124,17 @@ namespace {assemblyNamespace}
                 var endPointMethodName = $"Map{routeEndpointMethod}";
                 endpointRegistrations.AppendLine(
                     $"            {groupName}.{endPointMethodName}(\"{registration.RoutePath}\",");
-                if (!registration.OperationMethod.CanHaveBody())
+                if (registration.OperationMethod.CanHaveBody())
                 {
                     endpointRegistrations.AppendLine(
-                        $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDto.FullName} request) =>");
+                        registration.IsMultipartFormData
+                            ? $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::{registration.RequestDto.FullName} request) =>"
+                            : $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromBody] global::{registration.RequestDto.FullName} request) =>");
                 }
                 else
                 {
-                    if (registration.OperationMethod.CanHaveBody()
-                        && registration.IsMultipartFormData)
-                    {
-                        endpointRegistrations.AppendLine(
-                            $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::{registration.RequestDto.FullName} request) =>");
-                    }
-                    else
-                    {
-                        endpointRegistrations.AppendLine(
-                            $"                async (global::MediatR.IMediator mediator, global::{registration.RequestDto.FullName} request) =>");
-                    }
+                    endpointRegistrations.AppendLine(
+                        $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDto.FullName} request) =>");
                 }
 
                 endpointRegistrations.Append(
@@ -181,7 +174,6 @@ namespace {assemblyNamespace}
 
                 var requestDtoName = registration.RequestDto;
                 var openApiName = GenerateOpenApiName(requestDtoName, routeEndpointMethod);
-                var openApiSummary = registration.DocumentedSummary;
                 endpointRegistrations.AppendLine(
                     @"                .WithOpenApi(op =>");
                 endpointRegistrations.AppendLine(
@@ -190,29 +182,8 @@ namespace {assemblyNamespace}
                     $@"                        op.OperationId = ""{openApiName}"";");
                 endpointRegistrations.AppendLine(
                     $@"                        op.Description = ""(request type: {requestDtoName.Name})"";");
-                if (openApiSummary.HasValue())
-                {
-                    endpointRegistrations.AppendLine(
-                        $@"                        op.Summary = ""{openApiSummary}"";");
-                }
-
                 endpointRegistrations.AppendLine(
                     @"                        op.Responses.Clear();");
-                if (registration.DocumentedResponseCodes.HasAny())
-                {
-                    foreach (var responseCode in registration.DocumentedResponseCodes)
-                    {
-                        endpointRegistrations.AppendLine(
-                            $@"                        op.Responses.Add(""{responseCode.StatusCode}"", new global::Microsoft.OpenApi.Models.OpenApiResponse");
-                        endpointRegistrations.AppendLine(
-                            @"                        {");
-                        endpointRegistrations.AppendLine(
-                            $@"                            Description = ""{responseCode.Reason}""");
-                        endpointRegistrations.AppendLine(
-                            @"                        });");
-                    }
-                }
-
                 endpointRegistrations.AppendLine(
                     @"                        return op;");
                 endpointRegistrations.AppendLine(

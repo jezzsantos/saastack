@@ -1,13 +1,13 @@
 #if TESTINGONLY
 using System.Net;
 using System.Text.Json;
-using ApiHost1;
 using FluentAssertions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using IntegrationTesting.WebApi.Common;
 using JetBrains.Annotations;
 using Xunit;
+using Resources = ApiHost1.Resources;
 
 namespace Infrastructure.Web.Api.IntegrationTests;
 

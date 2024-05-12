@@ -1700,6 +1700,9 @@ public class AClass : IWebApiService
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Get)]
 internal class ARequest : IWebRequest
 {
@@ -1707,7 +1710,7 @@ internal class ARequest : IWebRequest
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                    ApiLayerAnalyzer.Rule030, input, 6, 16, "ARequest");
+                    ApiLayerAnalyzer.Rule030, input, 9, 16, "ARequest");
             }
         }
 
@@ -1721,6 +1724,9 @@ internal class ARequest : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Get)]
 public class AClass : IWebRequest
 {
@@ -1728,7 +1734,7 @@ public class AClass : IWebRequest
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                    ApiLayerAnalyzer.Rule031, input, 6, 14, "AClass");
+                    ApiLayerAnalyzer.Rule031, input, 9, 14, "AClass");
             }
         }
 
@@ -1742,6 +1748,9 @@ public class AClass : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace anamespace;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
@@ -1749,7 +1758,7 @@ public class ARequest : IWebRequest
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                    ApiLayerAnalyzer.Rule032, input, 6, 14, "ARequest",
+                    ApiLayerAnalyzer.Rule032, input, 9, 14, "ARequest",
                     AnalyzerConstants.ServiceOperationTypesNamespace);
             }
         }
@@ -1764,13 +1773,16 @@ public class ARequest : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 public class ARequest : IWebRequest
 {
     public string AProperty { get; set; }
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                    ApiLayerAnalyzer.Rule033, input, 5, 14, "ARequest");
+                    ApiLayerAnalyzer.Rule033, input, 8, 14, "ARequest");
             }
         }
 
@@ -1784,6 +1796,9 @@ public class ARequest : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
@@ -1796,7 +1811,7 @@ public class ARequest : IWebRequest
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                    ApiLayerAnalyzer.Rule034, input, 6, 14, "ARequest");
+                    ApiLayerAnalyzer.Rule034, input, 9, 14, "ARequest");
             }
 
             [Fact]
@@ -1806,6 +1821,9 @@ public class ARequest : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
@@ -1818,7 +1836,7 @@ public class ARequest : IWebRequest
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                    ApiLayerAnalyzer.Rule034, input, 6, 14, "ARequest");
+                    ApiLayerAnalyzer.Rule034, input, 9, 14, "ARequest");
             }
 
             [Fact]
@@ -1828,6 +1846,9 @@ public class ARequest : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
@@ -1853,6 +1874,9 @@ public class ARequest : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
@@ -1860,7 +1884,7 @@ public class ARequest : IWebRequest
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                    ApiLayerAnalyzer.Rule035, input, 8, 20, "AProperty");
+                    ApiLayerAnalyzer.Rule035, input, 11, 20, "AProperty");
             }
         }
 
@@ -1875,6 +1899,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Post)]
 public class ARequest : IWebRequest
 {
@@ -1882,7 +1909,7 @@ public class ARequest : IWebRequest
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                    ApiLayerAnalyzer.Rule036, input, 9, 29, "AProperty");
+                    ApiLayerAnalyzer.Rule036, input, 12, 29, "AProperty");
             }
 
             [Fact]
@@ -1892,6 +1919,9 @@ public class ARequest : IWebRequest
 using System;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
@@ -1913,6 +1943,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Post)]
 public class ARequest : IWebRequest
 {
@@ -1920,7 +1953,7 @@ public class ARequest : IWebRequest
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                    ApiLayerAnalyzer.Rule037, input, 9, 28, "AProperty");
+                    ApiLayerAnalyzer.Rule037, input, 12, 28, "AProperty");
             }
 
             [Fact]
@@ -1931,6 +1964,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Post)]
 public class ARequest : IWebRequest
 {
@@ -1938,7 +1974,7 @@ public class ARequest : IWebRequest
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                    ApiLayerAnalyzer.Rule037, input, 9, 25, "AProperty");
+                    ApiLayerAnalyzer.Rule037, input, 12, 25, "AProperty");
             }
 
             [Fact]
@@ -1949,6 +1985,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Post)]
 public class ARequest : IWebRequest
 {
@@ -1961,7 +2000,7 @@ public enum AnEnum
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                    ApiLayerAnalyzer.Rule037, input, 9, 28, "AProperty");
+                    ApiLayerAnalyzer.Rule037, input, 12, 28, "AProperty");
             }
         }
 
@@ -1979,6 +2018,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
@@ -1996,6 +2038,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
@@ -2003,7 +2048,7 @@ public class ARequest : IWebRequest
 }";
 
                     await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                        ApiLayerAnalyzer.Rule038, input, 9, 19, "AProperty");
+                        ApiLayerAnalyzer.Rule038, input, 12, 19, "AProperty");
                 }
 
                 [Fact]
@@ -2014,6 +2059,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
@@ -2031,6 +2079,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
@@ -2038,7 +2089,7 @@ public class ARequest : IWebRequest
 }";
 
                     await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                        ApiLayerAnalyzer.Rule038, input, 9, 16, "AProperty");
+                        ApiLayerAnalyzer.Rule038, input, 12, 16, "AProperty");
                 }
 
                 [Fact]
@@ -2049,6 +2100,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
@@ -2071,6 +2125,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Get)]
 public class ARequest : IWebRequest
 {
@@ -2083,7 +2140,7 @@ public enum AnEnum
 }";
 
                     await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                        ApiLayerAnalyzer.Rule038, input, 9, 19, "AProperty");
+                        ApiLayerAnalyzer.Rule038, input, 12, 19, "AProperty");
                 }
             }
 
@@ -2098,6 +2155,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Post)]
 public class ARequest : IWebRequest
 {
@@ -2115,6 +2175,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Post)]
 public class ARequest : IWebRequest
 {
@@ -2132,6 +2195,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Post)]
 public class ARequest : IWebRequest
 {
@@ -2149,6 +2215,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Post)]
 public class ARequest : IWebRequest
 {
@@ -2166,6 +2235,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Post)]
 public class ARequest : IWebRequest
 {
@@ -2188,6 +2260,9 @@ using System;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
+/// <summary>
+/// asummary
+/// </summary>
 [Route(""/apath"", OperationMethod.Post)]
 public class ARequest : IWebRequest
 {

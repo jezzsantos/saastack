@@ -3,6 +3,9 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
+/// <summary>
+///     Revoke a valid refresh_token
+/// </summary>
 [Route("/tokens/{RefreshToken}", OperationMethod.Delete)]
 public class RevokeRefreshTokenRequest : UnTenantedDeleteRequest
 {

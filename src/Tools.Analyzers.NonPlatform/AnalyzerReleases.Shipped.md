@@ -23,6 +23,8 @@
  SAASWEB035 | SaaStackWebApi      | Error    | Properties must have public getters and setters                                                           
  SAASWEB036 | SaaStackWebApi      | Error    | Properties should be nullable not Optional{T} for interoperability                                        
  SAASWEB037 | SaaStackWebApi      | Error    | Properties should NOT use required modifier                                                               
+ SAASWEB038 | SaaStackWebApi      | Error    | Properties for GET/DELETE requests should all be nullable                                                 
+ SAASWEB039 | SaaStackWebApi      | Warning  | Should have summary for documentation                                                                     
  SAASWEB040 | SaaStackWebApi      | Error    | Response must be public                                                                                   
  SAASWEB041 | SaaStackWebApi      | Error    | Response must be named with "Response" suffix                                                             
  SAASWEB042 | SaaStackWebApi      | Error    | Response must be in namespace "Infrastructure.Web.Api.Operations.Shared"                                  

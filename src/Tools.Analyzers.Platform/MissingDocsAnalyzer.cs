@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Common.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -65,13 +66,8 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
         }
 
         var docs = memberDeclarationSyntax.GetDocumentationCommentTriviaSyntax(context);
-        if (docs is null)
-        {
-            context.ReportDiagnostic(Rule001, memberDeclarationSyntax);
-            return;
-        }
-
-        if (!docs.IsLanguageForCSharp())
+        if (docs.NotExists()
+            || !docs.IsLanguageForCSharp())
         {
             context.ReportDiagnostic(Rule001, memberDeclarationSyntax);
             return;
@@ -85,13 +81,8 @@ public class MissingDocsAnalyzer : DiagnosticAnalyzer
         }
 
         var summary = xmlContent.SelectSingleElement(AnalyzerConstants.XmlDocumentation.Elements.Summary);
-        if (summary is null)
-        {
-            context.ReportDiagnostic(Rule001, memberDeclarationSyntax);
-            return;
-        }
-
-        if (summary.IsEmptyNode())
+        if (summary.NotExists()
+            || summary.IsEmptyNode())
         {
             context.ReportDiagnostic(Rule001, memberDeclarationSyntax);
         }

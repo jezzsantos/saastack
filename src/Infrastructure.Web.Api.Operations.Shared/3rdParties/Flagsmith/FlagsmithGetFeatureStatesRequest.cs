@@ -3,10 +3,13 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 
-[Route("/environments/{EnvironmentApiKey}/featurestates/", OperationMethod.Post)]
+/// <summary>
+///     Fetches the feature states
+/// </summary>
+[Route("/environments/{EnvironmentApiKey}/featurestates/", OperationMethod.Get)]
 public class FlagsmithGetFeatureStatesRequest : IWebRequest<FlagsmithGetFeatureStatesResponse>
 {
     public string? EnvironmentApiKey { get; set; }
 
-    [JsonPropertyName("feature")] public int Feature { get; set; }
+    [JsonPropertyName("feature")] public int? Feature { get; set; }
 }

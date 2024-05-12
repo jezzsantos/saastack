@@ -13,7 +13,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace Infrastructure.Web.Hosting.Common.Documentation;
 
 /// <summary>
-///     Provides a <see cref="IOperationFilter" /> that adds the responses for any request.
+///     Provides a <see cref="IOperationFilter" /> that adds the responses for any operation.
 ///     As well as building the default response for the given request type, this filter also inspects the responses that
 ///     are source-generated from the declaration of the respective <see cref="IWebRequest{TResponse}" />, and adds other
 ///     responses that are not defined in the source code.
@@ -23,13 +23,13 @@ public sealed class DefaultResponsesFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        var parameter = GetRequestType(context);
-        if (!parameter.HasValue)
+        var type = GetRequestType(context);
+        if (!type.HasValue)
         {
             return;
         }
 
-        var requestType = parameter.Value;
+        var requestType = type.Value;
         operation.Responses = BuildResponses(context, operation.Responses, requestType);
     }
 
@@ -140,6 +140,7 @@ public sealed class DefaultResponsesFilter : IOperationFilter
         });
 
         var existingErrorResponses = existingResponses
+            .Where(res => res.Key != StatusCode.BadRequest.Numeric.ToString())
             .Where(res => res.Key.StartsWith("4") || res.Key.StartsWith("5"));
         foreach (var existingResponse in existingErrorResponses)
         {
@@ -175,7 +176,10 @@ public sealed class DefaultResponsesFilter : IOperationFilter
             .FirstOrDefault(pair => pair.Key.StartsWith("20"));
         if (declaredResponse.Key.Exists())
         {
-            return $"{defaultResponseCode.Title}: {declaredResponse.Value.Description}";
+            if (declaredResponse.Value.Description.NotEqualsIgnoreCase(defaultResponseCode.Title))
+            {
+                return $"{defaultResponseCode.Title}: {declaredResponse.Value.Description}";
+            }
         }
 
         return $"{defaultResponseCode.Title}";

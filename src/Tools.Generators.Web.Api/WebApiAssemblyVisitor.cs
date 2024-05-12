@@ -1,9 +1,6 @@
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Tools.Analyzers.Common;
-using Tools.Analyzers.Common.Extensions;
 using Tools.Generators.Web.Api.Extensions;
 using SymbolExtensions = Tools.Generators.Web.Api.Extensions.SymbolExtensions;
 
@@ -206,8 +203,6 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             var isAsync = method.IsAsync;
             var hasCancellationToken = method.Parameters.Length == 2;
             var isMultipart = requestType.IsDerivedFrom(_multipartFormSymbol);
-            var documentedSummary = GetDocumentedSummary(requestType);
-            var documentedResponses = GetDocumentedResponses(requestType);
 
             OperationRegistrations.Add(new ServiceOperationRegistration
             {
@@ -224,87 +219,11 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                 HasCancellationToken = hasCancellationToken,
                 MethodName = methodName,
                 MethodBody = methodBody,
-                RoutePath = routePath,
-                DocumentedSummary = documentedSummary,
-                DocumentedResponseCodes = documentedResponses
+                RoutePath = routePath
             });
         }
 
         return;
-
-        string? GetDocumentedSummary(ISymbol requestType)
-        {
-            if (!TryGetDocumentation(requestType, out var trivia))
-            {
-                return null;
-            }
-
-            var xmlContent = trivia.Content;
-            var summary = xmlContent.SelectSingleElement(AnalyzerConstants.XmlDocumentation.Elements.Summary);
-            if (summary.NotExists())
-            {
-                return null;
-            }
-
-            var content = summary.GetContent();
-            return content;
-        }
-
-        List<ApiResponseCode> GetDocumentedResponses(ISymbol requestType)
-        {
-            if (!TryGetDocumentation(requestType, out var trivia))
-            {
-                return [];
-            }
-
-            var xmlContent = trivia.Content;
-            var responses = xmlContent.SelectElements(AnalyzerConstants.XmlDocumentation.Elements.Response);
-            if (responses.HasNone())
-            {
-                return [];
-            }
-
-            return responses
-                .Select<XmlNodeSyntax, ApiResponseCode?>(node =>
-                {
-                    var element = (XmlElementSyntax)node;
-                    var reason = element.GetContent();
-                    if (reason.HasNoValue())
-                    {
-                        return null;
-                    }
-
-                    var attributes = element.StartTag
-                        .Attributes.OfType<XmlTextAttributeSyntax>();
-                    var attribute = attributes
-                        .FirstOrDefault(attr =>
-                            attr.Name.ToString() == AnalyzerConstants.XmlDocumentation.Attributes.Code);
-                    if (attribute.NotExists()
-                        || attribute.TextTokens.HasNone())
-                    {
-                        return null;
-                    }
-
-                    var value = attribute.TextTokens.ToFullString();
-                    if (value.HasNoValue())
-                    {
-                        return null;
-                    }
-
-                    if (!int.TryParse(value, out var statusCode))
-                    {
-                        return null;
-                    }
-
-                    return new ApiResponseCode
-                    {
-                        StatusCode = statusCode,
-                        Reason = reason
-                    };
-                })
-                .Where(response => response.Exists())
-                .ToList()!;
-        }
 
         string? GetBasePath()
         {
@@ -543,43 +462,9 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         }
     }
 
-    private static bool TryGetDocumentation(ISymbol symbol, out DocumentationCommentTriviaSyntax trivia)
-    {
-        trivia = null!;
-        var syntaxes = symbol.DeclaringSyntaxReferences
-            .Select(x => x.GetSyntax())
-            .ToList();
-        if (syntaxes.HasNone())
-        {
-            return false;
-        }
-
-        trivia = syntaxes
-            .SelectMany(syntax => syntax.GetLeadingTrivia())
-            .Select(leadingTrivia => leadingTrivia.GetStructure())
-            .OfType<DocumentationCommentTriviaSyntax>()
-            .FirstOrDefault()!;
-
-        if (trivia.NotExists())
-        {
-            return false;
-        }
-
-        if (!trivia.IsLanguageForCSharp())
-        {
-            return false;
-        }
-
-        return true;
-    }
-
     public record ServiceOperationRegistration
     {
         public ApiServiceClassRegistration Class { get; set; } = null!;
-
-        public List<ApiResponseCode> DocumentedResponseCodes { get; set; } = [];
-
-        public string? DocumentedSummary { get; set; }
 
         public bool HasCancellationToken { get; set; }
 
@@ -685,12 +570,5 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         public TypeName TypeName { get; set; } = null!;
 
         public string VariableName { get; set; } = null!;
-    }
-
-    public record ApiResponseCode
-    {
-        public string? Reason { get; set; }
-
-        public int StatusCode { get; set; }
     }
 }

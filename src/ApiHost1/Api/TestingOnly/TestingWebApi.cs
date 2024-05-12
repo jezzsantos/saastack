@@ -127,6 +127,34 @@ public sealed class TestingWebApi : IWebApiService
         return () => new Result<EmptyResponse, Error>();
     }
 
+    public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> OpenApiGet(
+        OpenApiGetTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () => new Result<StringMessageTestingOnlyResponse, Error>(new StringMessageTestingOnlyResponse
+            { Message = $"amessage{request.RequiredField}" });
+    }
+
+    public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> OpenApiMultiPartForm(
+        OpenApiPostMultiPartFormTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () =>
+            new PostResult<StringMessageTestingOnlyResponse>(
+                new StringMessageTestingOnlyResponse { Message = $"amessage{request.RequiredField}" },
+                "alocation");
+    }
+
+    public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> OpenApiPost(
+        OpenApiPostTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () =>
+            new PostResult<StringMessageTestingOnlyResponse>(
+                new StringMessageTestingOnlyResponse { Message = $"amessage{request.RequiredField}" },
+                "alocation");
+    }
+
     public async Task<ApiEmptyResult> PostInsecure(
         PostInsecureTestingOnlyRequest request, CancellationToken cancellationToken)
     {

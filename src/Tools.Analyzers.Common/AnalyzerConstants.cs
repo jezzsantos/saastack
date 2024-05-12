@@ -40,14 +40,6 @@ public static class AnalyzerConstants
         {
             public const string InheritDoc = "inheritdoc";
             public const string Summary = "summary";
-            public const string Remarks = "remarks";
-            public const string Response = "response";
-        }
-
-        public static class Attributes
-        {
-            public const string Param = "param";
-            public const string Code = "code";
         }
     }
 }

@@ -3,6 +3,9 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 
+/// <summary>
+///     Reserves the availability of the car for the specified period of time
+/// </summary>
 [Route("/cars/{Id}/reserve", OperationMethod.PutPatch, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class ReserveCarIfAvailableRequest : TenantedRequest<ReserveCarIfAvailableResponse>

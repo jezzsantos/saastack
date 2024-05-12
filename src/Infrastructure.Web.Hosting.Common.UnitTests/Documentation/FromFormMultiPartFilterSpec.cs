@@ -1,4 +1,6 @@
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.Documentation;
@@ -83,23 +85,23 @@ public class FromFormMultiPartFilterSpec
         var properties = _operation.RequestBody.Content[HttpConstants.ContentTypes.MultiPartFormData].Schema.Properties;
         properties.Count.Should().Be(4);
         properties[FromFormMultiPartFilter.FormFilesFieldName].Type.Should().Be("array");
-        properties[nameof(TestMultipartFormRequest.AStringProperty)].Type.Should().Be("string");
-        properties[nameof(TestMultipartFormRequest.ADateProperty)].Type.Should().Be("date");
-        properties[nameof(TestMultipartFormRequest.ANumberProperty)].Type.Should().Be("int");
+        properties[nameof(TestMultipartFormRequest.AStringProperty).ToCamelCase()].Type.Should().Be("string");
+        properties[nameof(TestMultipartFormRequest.ADateProperty).ToCamelCase()].Type.Should().Be("date");
+        properties[nameof(TestMultipartFormRequest.ANumberProperty).ToCamelCase()].Type.Should().Be("int");
         var required = _operation.RequestBody.Content[HttpConstants.ContentTypes.MultiPartFormData].Schema.Required
             .ToArray();
         required.Length.Should().Be(3);
         required[0].Should().Be(FromFormMultiPartFilter.FormFilesFieldName);
-        required[1].Should().Be(nameof(TestMultipartFormRequest.ADateProperty));
-        required[2].Should().Be(nameof(TestMultipartFormRequest.ANumberProperty));
+        required[1].Should().Be(nameof(TestMultipartFormRequest.ADateProperty).ToCamelCase());
+        required[2].Should().Be(nameof(TestMultipartFormRequest.ANumberProperty).ToCamelCase());
     }
 }
 
 public class TestMultipartFormRequest : IWebRequest, IHasMultipartForm
 {
-    public required DateTime ADateProperty { get; set; }
+    [Required] public DateTime ADateProperty { get; set; }
 
-    public required int ANumberProperty { get; set; }
+    [Required] public int ANumberProperty { get; set; }
 
     public string? AStringProperty { get; set; }
 }
