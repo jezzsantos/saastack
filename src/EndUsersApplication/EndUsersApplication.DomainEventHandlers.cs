@@ -3,7 +3,6 @@ using Application.Interfaces;
 using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
-using Domain.Common.Events;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Organizations;
 using Domain.Shared;
@@ -30,8 +29,7 @@ partial class EndUsersApplication
     }
 
     public async Task<Result<Error>> HandleOrganizationDeletedAsync(ICallerContext caller,
-        Global.StreamDeleted domainEvent,
-        CancellationToken cancellationToken)
+        Deleted domainEvent, CancellationToken cancellationToken)
     {
         var deleted = await RemoveMembershipFromDeletedOrganizationAsync(caller, domainEvent.RootId.ToId(),
             domainEvent.DeletedById.ToId(), cancellationToken);

@@ -357,7 +357,7 @@ public sealed class OrganizationRoot : AggregateRootBase
             return Error.RuleViolation(Resources.OrganizationRoot_DeleteOrganization_MembersStillExist);
         }
 
-        return RaisePermanentDeleteEvent(deleterId);
+        return RaisePermanentDeleteEvent(OrganizationsDomain.Events.Deleted(Id, deleterId));
     }
 
     public Result<Error> InviteMember(Identifier inviterId, Roles inviterRoles, Optional<Identifier> userId,

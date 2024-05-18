@@ -71,6 +71,9 @@
         <Compile Include="..\Common\Recording\CrashLevel.cs">
             <Link>Reference\Common\Recording\CrashLevel.cs</Link>
         </Compile>
+        <Compile Include="..\Domain.Common\TombstoneDomainEvent.cs">
+            <Link>Reference\Domain.Common\TombstoneDomainEvent.cs</Link>
+        </Compile>
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\ApiResult.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\ApiResult.cs</Link>
         </Compile>
@@ -238,9 +241,6 @@
         </Compile>
         <Compile Include="..\Domain.Common\Resources.Designer.cs">
             <Link>Reference\Domain.Common\Resources.Designer.cs</Link>
-        </Compile>
-        <Compile Include="..\Domain.Common\Events\Global.cs">
-            <Link>Reference\Domain.Common\Events\Global.cs</Link>
         </Compile>
         <Compile Include="..\Domain.Common\Identity\IIdentifierFactory.cs">
             <Link>Reference\Domain.Common\Identity\IIdentifierFactory.cs</Link>

@@ -21,6 +21,11 @@ public static class Events
         };
     }
 
+    public static Deleted Deleted(Identifier id, Identifier deletedById)
+    {
+        return new Deleted(id, deletedById);
+    }
+
     public static DetailsChanged DetailsChanged(Identifier id, string? description, string? filename)
     {
         return new DetailsChanged(id)

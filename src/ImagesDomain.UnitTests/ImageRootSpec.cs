@@ -1,6 +1,5 @@
 using Common;
 using Common.Extensions;
-using Domain.Common.Events;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Images;
@@ -121,9 +120,9 @@ public class ImageRootSpec
     {
         var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "image/jpeg").Value;
 
-        var result = image.Delete();
+        var result = image.Delete("auserid".ToId());
 
         result.Should().BeSuccess();
-        image.Events.Last().Should().BeOfType<Global.StreamDeleted>();
+        image.Events.Last().Should().BeOfType<Deleted>();
     }
 }

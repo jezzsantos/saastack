@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Extensions;
 using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Images;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
@@ -124,9 +125,9 @@ public sealed class ImageRoot : AggregateRootBase
             ImagesDomain.Events.DetailsChanged(Id, description ?? Description, filename ?? Filename));
     }
 
-    public Result<Error> Delete()
+    public Result<Error> Delete(Identifier deletedById)
     {
-        return RaisePermanentDeleteEvent(Id);
+        return RaisePermanentDeleteEvent(ImagesDomain.Events.Deleted(Id, deletedById));
     }
 
     public Result<Error> SetAttributes(long imageSize)

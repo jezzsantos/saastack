@@ -1,5 +1,4 @@
 using Common;
-using Domain.Common.Events;
 using Domain.Events.Shared.Organizations;
 using Domain.Interfaces.Entities;
 using EndUsersApplication;
@@ -26,7 +25,7 @@ public class EndUserNotificationConsumer : IDomainEventNotificationConsumer
     {
         switch (domainEvent)
         {
-            case Global.StreamDeleted deleted:
+            case Deleted deleted:
                 return await _endUsersApplication.HandleOrganizationDeletedAsync(_callerContextFactory.Create(),
                     deleted, cancellationToken);
 

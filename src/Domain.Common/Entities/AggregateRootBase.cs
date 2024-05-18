@@ -3,7 +3,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Common;
 using Common.Extensions;
-using Domain.Common.Events;
 using Domain.Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
@@ -281,7 +280,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
     // ReSharper disable once MemberCanBeMadeStatic.Global
     protected Result<Error> HandleUnKnownStateChangedEvent(IDomainEvent @event)
     {
-        if (@event is Global.StreamDeleted)
+        if (@event is ITombstoneEvent)
         {
             return Result.Ok;
         }
@@ -312,7 +311,7 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
     }
 
     /// <summary>
-    ///     Raises the <see cref="@event" /> to an new instance of the <see cref="childEntityFactory" />
+    ///     Raises the <see cref="@event" /> to a new instance of the <see cref="childEntityFactory" />
     /// </summary>
     protected Result<TEntity, Error> RaiseEventToChildEntity<TEntity, TDomainEvent>(bool isReconstituting,
         TDomainEvent @event,
@@ -361,9 +360,9 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
     /// <summary>
     ///     Raises a tombstone event to permanently delete the whole aggregate.
     /// </summary>
-    protected Result<Error> RaisePermanentDeleteEvent(Identifier deletedById)
+    protected Result<Error> RaisePermanentDeleteEvent(ITombstoneEvent @event)
     {
-        var raised = RaiseEvent(Global.StreamDeleted.Create(Identifier.Create(Id), deletedById), false,
+        var raised = RaiseEvent(@event, false,
             false);
         if (raised.IsFailure)
         {

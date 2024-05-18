@@ -3,7 +3,6 @@ using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
 using Common.Recording;
-using Domain.Common.Events;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
@@ -142,10 +141,7 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
     private static bool IsTombstoned(IEnumerable<EventSourcedChangeEvent> events)
     {
         var lastEvent = events.Last();
-        var eventTypeName = lastEvent.Metadata;
-
-        var tombstoneEventTypeName = typeof(Global.StreamDeleted).AssemblyQualifiedName;
-        return eventTypeName == tombstoneEventTypeName;
+        return lastEvent.IsTombstone;
     }
 
     private TAggregateRoot RehydrateAggregateRoot(ISingleValueObject<string> id, Optional<DateTime> lastPersistedAtUtc)

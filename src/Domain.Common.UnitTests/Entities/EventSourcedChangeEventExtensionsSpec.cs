@@ -14,7 +14,8 @@ public class EventSourcedChangeEventExtensionsSpec
     public void WhenToEvent_ThenReturnsEvent()
     {
         var id = new Mock<ISingleValueObject<string>>();
-        var @event = EventSourcedChangeEvent.Create(id.Object, "anentitytype", "aneventtype", "json", "metadata", 999);
+        var @event =
+            EventSourcedChangeEvent.Create(id.Object, "anentitytype", false, "aneventtype", "json", "metadata", 999);
         var migrator = new Mock<IEventSourcedChangeEventMigrator>();
         migrator.Setup(m => m.Rehydrate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(new TestEvent());

@@ -111,7 +111,7 @@ public sealed class APIKeyRoot : AggregateRootBase
             return Error.RuleViolation(Resources.ApiKeyRoot_NotOwner);
         }
 
-        return RaisePermanentDeleteEvent(deleterId);
+        return RaisePermanentDeleteEvent(IdentityDomain.Events.APIKeys.Deleted(Id, deleterId));
     }
 
     public Result<Error> SetParameters(string description, DateTime expiresOn)

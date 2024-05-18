@@ -1,6 +1,5 @@
 ﻿using Common;
 using Common.Extensions;
-using Domain.Common.Events;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Cars;
@@ -102,7 +101,7 @@ public class CarRootSpec
         var result = _car.Delete("anownerid".ToId());
 
         result.Should().BeSuccess();
-        _car.Events.Last().Should().BeOfType<Global.StreamDeleted>();
+        _car.Events.Last().Should().BeOfType<Deleted>();
     }
 
     [Fact]

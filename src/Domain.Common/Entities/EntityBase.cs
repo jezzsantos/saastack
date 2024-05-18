@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Common;
 using Common.Extensions;
-using Domain.Common.Events;
 using Domain.Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
@@ -221,7 +220,7 @@ public abstract class EntityBase : IEntity, IEventingEntity, IDehydratableEntity
     // ReSharper disable once MemberCanBeMadeStatic.Global
     protected Result<Error> HandleUnKnownStateChangedEvent(IDomainEvent @event)
     {
-        if (@event is Global.StreamDeleted)
+        if (@event is ITombstoneEvent)
         {
             return Result.Ok;
         }

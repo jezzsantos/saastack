@@ -37,7 +37,7 @@ public class ImagesApplication : IImagesApplication
         }
 
         var image = retrieved.Value;
-        var deleted = image.Delete();
+        var deleted = image.Delete(caller.ToCallerId());
         if (deleted.IsFailure)
         {
             return deleted.Error;

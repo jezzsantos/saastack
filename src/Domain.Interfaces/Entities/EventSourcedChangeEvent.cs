@@ -17,26 +17,28 @@ public struct EventSourcedChangeEvent : IIdentifiableEntity, IQueryableEntity
 
     public static Result<EventSourcedChangeEvent, Error> Create(
         Func<IIdentifiableEntity, Result<ISingleValueObject<string>, Error>> idFactory, string entityType,
+        bool isTombstone,
         string eventType, string jsonData, string eventMetadata, int version)
     {
         var identifier = idFactory(new EventSourcedChangeEvent());
         return identifier.Match<Result<EventSourcedChangeEvent, Error>>(id =>
-            new EventSourcedChangeEvent(id.Value.Value, jsonData, entityType, eventType, eventMetadata)
+            new EventSourcedChangeEvent(id.Value.Value, jsonData, entityType, isTombstone, eventType, eventMetadata)
             {
                 Version = version
             }, error => error);
     }
 
-    public static EventSourcedChangeEvent Create(ISingleValueObject<string> id, string entityType,
+    public static EventSourcedChangeEvent Create(ISingleValueObject<string> id, string entityType, bool isTombstone,
         string eventType, string jsonData, string eventMetadata, int version)
     {
-        return new EventSourcedChangeEvent(id.Value, jsonData, entityType, eventType, eventMetadata)
+        return new EventSourcedChangeEvent(id.Value, jsonData, entityType, isTombstone, eventType, eventMetadata)
         {
             Version = version
         };
     }
 
-    private EventSourcedChangeEvent(string id, string data, string entityType, string eventType, string metadata)
+    private EventSourcedChangeEvent(string id, string data, string entityType, bool isTombstone, string eventType,
+        string metadata)
     {
         _identifier = new Identifier(id);
         Id = id;
@@ -44,6 +46,7 @@ public struct EventSourcedChangeEvent : IIdentifiableEntity, IQueryableEntity
         EntityType = entityType;
         EventType = eventType;
         Metadata = metadata;
+        IsTombstone = isTombstone;
     }
 
     public string Data { get; private init; }
@@ -61,6 +64,8 @@ public struct EventSourcedChangeEvent : IIdentifiableEntity, IQueryableEntity
     public string Metadata { get; private init; }
 
     public int Version { get; private init; }
+
+    public bool IsTombstone { get; private init; }
 
     private readonly struct Identifier : ISingleValueObject<string>
     {

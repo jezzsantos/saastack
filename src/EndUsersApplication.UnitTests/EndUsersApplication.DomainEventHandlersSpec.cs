@@ -2,7 +2,6 @@ using Application.Interfaces;
 using Application.Services.Shared;
 using Common;
 using Common.Configuration;
-using Domain.Common.Events;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Authorization;
@@ -182,7 +181,7 @@ public class EndUsersApplicationDomainEventHandlersSpec
             Roles.Create(TenantRoles.Owner).Value, Features.Create(TenantFeatures.Basic).Value);
         _endUserRepository.Setup(rep => rep.LoadAsync("adeleterid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(deleter);
-        var domainEvent = Global.StreamDeleted.Create("anorganizationid".ToId(), "adeleterid".ToId());
+        var domainEvent = Events.Deleted("anorganizationid".ToId(), "adeleterid".ToId());
 
         var result =
             await _application.HandleOrganizationDeletedAsync(_caller.Object, domainEvent, CancellationToken.None);

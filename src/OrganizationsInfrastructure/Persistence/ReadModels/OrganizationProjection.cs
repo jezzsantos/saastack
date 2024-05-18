@@ -1,7 +1,6 @@
 using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
-using Domain.Common.Events;
 using Domain.Events.Shared.Organizations;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
@@ -78,7 +77,7 @@ public class OrganizationProjection : IReadModelProjection
             case RoleUnassigned _:
                 return true;
 
-            case Global.StreamDeleted e:
+            case Deleted e:
                 return await _organizations.HandleDeleteAsync(e.RootId, cancellationToken);
 
             default:

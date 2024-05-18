@@ -1,6 +1,6 @@
 ﻿using Application.Persistence.Interfaces;
 using Common;
-using Domain.Common.Events;
+using Domain.Common;
 using Domain.Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
@@ -186,11 +186,18 @@ public class EventSourcingDddCommandStoreSpec
 
     private static EventSourcedChangeEvent CreateTombstoneEntity(string id, int version)
     {
-        var versioned = Global.StreamDeleted.Create(id.ToId(), id.ToId())
+        var versioned = new TestTombstoneEvent(id.ToId())
             .ToVersioned(new FixedIdentifierFactory(id), "anentitytype", version);
         var eventSourcedChangeEvent = versioned.Value;
         eventSourcedChangeEvent.LastPersistedAtUtc = DateTime.UtcNow;
 
         return eventSourcedChangeEvent;
+    }
+}
+
+public class TestTombstoneEvent : TombstoneDomainEvent
+{
+    public TestTombstoneEvent(Identifier id) : base(id, id)
+    {
     }
 }

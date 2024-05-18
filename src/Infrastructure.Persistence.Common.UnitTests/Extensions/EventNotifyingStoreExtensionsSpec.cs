@@ -52,7 +52,8 @@ public class EventNotifyingStoreExtensionsSpec : IEventNotifyingStore
     {
         var store = new Mock<IEventNotifyingStore>();
         var aggregate = new Mock<IChangeEventProducingAggregateRoot>();
-        var change = EventSourcedChangeEvent.Create("aneventid1".ToId(), "anentitytype", "aneventtype", "jsondata",
+        var change = EventSourcedChangeEvent.Create("aneventid1".ToId(), "anentitytype", false, "aneventtype",
+            "jsondata",
             "metadata", 1);
         aggregate.Setup(a => a.GetChanges())
             .Returns(new Result<List<EventSourcedChangeEvent>, Error>(new List<EventSourcedChangeEvent>
@@ -80,7 +81,8 @@ public class EventNotifyingStoreExtensionsSpec : IEventNotifyingStore
     {
         var store = new Mock<IEventNotifyingStore>();
         var aggregate = new Mock<IChangeEventProducingAggregateRoot>();
-        var change = EventSourcedChangeEvent.Create("aneventid1".ToId(), "anentitytype", "aneventtype", "jsondata",
+        var change = EventSourcedChangeEvent.Create("aneventid1".ToId(), "anentitytype", false, "aneventtype",
+            "jsondata",
             "metadata", 1);
         aggregate.Setup(a => a.GetChanges())
             .Returns(new Result<List<EventSourcedChangeEvent>, Error>(new List<EventSourcedChangeEvent>
@@ -112,11 +114,14 @@ public class EventNotifyingStoreExtensionsSpec : IEventNotifyingStore
     {
         var store = new Mock<IEventNotifyingStore>();
         var aggregate = new Mock<IChangeEventProducingAggregateRoot>();
-        var change1 = EventSourcedChangeEvent.Create("aneventid1".ToId(), "anentitytype", "aneventtype", "jsondata",
+        var change1 = EventSourcedChangeEvent.Create("aneventid1".ToId(), "anentitytype", false, "aneventtype",
+            "jsondata",
             "metadata", 1);
-        var change2 = EventSourcedChangeEvent.Create("aneventid2".ToId(), "anentitytype", "aneventtype", "jsondata",
+        var change2 = EventSourcedChangeEvent.Create("aneventid2".ToId(), "anentitytype", false, "aneventtype",
+            "jsondata",
             "metadata", 1);
-        var change3 = EventSourcedChangeEvent.Create("aneventid3".ToId(), "anentitytype", "aneventtype", "jsondata",
+        var change3 = EventSourcedChangeEvent.Create("aneventid3".ToId(), "anentitytype", false, "aneventtype",
+            "jsondata",
             "metadata", 1);
         aggregate.Setup(a => a.GetChanges())
             .Returns(new Result<List<EventSourcedChangeEvent>, Error>(new List<EventSourcedChangeEvent>

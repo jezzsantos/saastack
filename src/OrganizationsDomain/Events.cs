@@ -3,6 +3,9 @@ using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Organizations;
 using Domain.Shared;
 using Domain.Shared.Organizations;
+using Created = Domain.Events.Shared.Organizations.Created;
+using MembershipAdded = Domain.Events.Shared.Organizations.MembershipAdded;
+using MembershipRemoved = Domain.Events.Shared.Organizations.MembershipRemoved;
 
 namespace OrganizationsDomain;
 
@@ -34,6 +37,11 @@ public static class Events
             Ownership = ownership,
             CreatedById = createdBy
         };
+    }
+
+    public static Deleted Deleted(Identifier id, Identifier deletedById)
+    {
+        return new Deleted(id, deletedById);
     }
 
     public static MemberInvited MemberInvited(Identifier id, Identifier invitedById, Optional<Identifier> userId,

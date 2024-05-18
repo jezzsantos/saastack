@@ -150,6 +150,11 @@ public static class Events
             };
         }
 
+        public static Deleted Deleted(Identifier id, Identifier deletedById)
+        {
+            return new Deleted(id, deletedById);
+        }
+
         public static KeyVerified KeyVerified(Identifier id, bool isVerified)
         {
             return new KeyVerified(id)

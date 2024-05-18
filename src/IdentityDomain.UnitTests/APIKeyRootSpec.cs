@@ -1,5 +1,4 @@
 using Common;
-using Domain.Common.Events;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.APIKeys;
@@ -137,6 +136,6 @@ public class APIKeyRootSpec
         var result = _apiKey.Delete("auserid".ToId());
 
         result.Should().BeSuccess();
-        _apiKey.Events.Last().Should().BeOfType<Global.StreamDeleted>();
+        _apiKey.Events.Last().Should().BeOfType<Deleted>();
     }
 }

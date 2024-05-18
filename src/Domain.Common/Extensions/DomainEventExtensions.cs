@@ -33,11 +33,12 @@ public static class DomainEventExtensions
     {
         var typeName = domainEvent.GetType().Name;
         var typeFullName = domainEvent.GetType().AssemblyQualifiedName!;
+        var isTombstone = domainEvent is ITombstoneEvent;
         return EventSourcedChangeEvent.Create(entity =>
             {
                 var identifier = factory.Create(entity);
                 return identifier.Match<Result<ISingleValueObject<string>, Error>>(id => id.Value, error => error);
-            }, entityType, typeName, ToEventJson(domainEvent),
+            }, entityType, isTombstone, typeName, ToEventJson(domainEvent),
             EventMetadata.Create(typeFullName), version);
     }
 }
