@@ -14,4 +14,6 @@ public class Image : ReadModelEntity
     public Optional<string> Filename { get; set; }
 
     public Optional<long> Size { get; set; }
+
+    public Optional<string> CreatedById { get; set; }
 }

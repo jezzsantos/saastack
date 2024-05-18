@@ -28,7 +28,11 @@ public class ImageProjection : IReadModelProjection
         switch (changeEvent)
         {
             case Created e:
-                return await _images.HandleCreateAsync(e.RootId, dto => { dto.ContentType = e.ContentType; },
+                return await _images.HandleCreateAsync(e.RootId, dto =>
+                    {
+                        dto.ContentType = e.ContentType;
+                        dto.CreatedById = e.CreatedById;
+                    },
                     cancellationToken);
 
             case DetailsChanged e:
@@ -42,6 +46,9 @@ public class ImageProjection : IReadModelProjection
             case AttributesChanged e:
                 return await _images.HandleUpdateAsync(e.RootId, dto => { dto.Size = e.Size; },
                     cancellationToken);
+
+            case Deleted e:
+                return await _images.HandleDeleteAsync(e.RootId, cancellationToken);
 
             default:
                 return false;

@@ -87,11 +87,20 @@ namespace ImagesDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The conten type of this image is missing.
+        ///   Looks up a localized string similar to The content type of this image is missing.
         /// </summary>
         internal static string ImageRoot_MissingContentType {
             get {
                 return ResourceManager.GetString("ImageRoot_MissingContentType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must be the creator of the image to perform this action.
+        /// </summary>
+        internal static string ImageRoot_NotCreator {
+            get {
+                return ResourceManager.GetString("ImageRoot_NotCreator", resourceCulture);
             }
         }
         

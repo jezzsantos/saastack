@@ -10,6 +10,7 @@ using ImagesApplication.Persistence;
 using ImagesDomain;
 using ImagesInfrastructure.Api.Images;
 using ImagesInfrastructure.ApplicationServices;
+using ImagesInfrastructure.Notifications;
 using ImagesInfrastructure.Persistence;
 using ImagesInfrastructure.Persistence.ReadModels;
 using Infrastructure.Hosting.Common.Extensions;
@@ -48,19 +49,20 @@ public class ImagesModule : ISubdomainModule
                 services.AddSingleton<IFileUploadService, FileUploadService>();
                 services.AddPerHttpRequest<IImagesApplication>(c =>
                     new ImagesApplication.ImagesApplication(c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredService<IIdentifierFactory>(),
-                    c.GetRequiredService<IHostSettings>(),
-                    c.GetRequiredService<IImagesRepository>()));
+                        c.GetRequiredService<IIdentifierFactory>(),
+                        c.GetRequiredService<IHostSettings>(),
+                        c.GetRequiredService<IImagesRepository>()));
                 services.AddPerHttpRequest<IImagesRepository>(c =>
                     new ImagesRepository(c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredService<IDomainFactory>(),
-                    c.GetRequiredService<IEventSourcingDddCommandStore<ImageRoot>>(),
-                    c.GetRequiredServiceForPlatform<IBlobStore>(),
-                    c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterEventing<ImageRoot, ImageProjection>(
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<ImageRoot>>(),
+                        c.GetRequiredServiceForPlatform<IBlobStore>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.RegisterEventing<ImageRoot, ImageProjection, ImageNotifier>(
                     c => new ImageProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
-                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                        c.GetRequiredServiceForPlatform<IDataStore>()),
+                    _ => new ImageNotifier());
 
                 services.AddPerHttpRequest<IImagesService, ImagesInProcessServiceClient>();
             };

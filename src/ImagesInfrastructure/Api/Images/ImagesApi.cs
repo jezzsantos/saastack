@@ -41,7 +41,7 @@ public class ImagesApi : IWebApiService
         return () => image.HandleApplicationResult<Image, GetImageResponse>(x => new GetImageResponse { Image = x });
     }
 
-    public async Task<ApiDeleteResult> ImageDelete(DeleteImageRequest request, CancellationToken cancellationToken)
+    public async Task<ApiDeleteResult> DeleteImage(DeleteImageRequest request, CancellationToken cancellationToken)
     {
         var image = await _application.DeleteImageAsync(_callerFactory.Create(), request.Id!, cancellationToken);
 

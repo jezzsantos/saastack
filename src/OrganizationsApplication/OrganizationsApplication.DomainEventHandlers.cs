@@ -4,7 +4,9 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.EndUsers;
+using Domain.Interfaces;
 using Domain.Shared.Organizations;
+using Deleted = Domain.Events.Shared.Images.Deleted;
 
 namespace OrganizationsApplication;
 
@@ -18,6 +20,18 @@ partial class OrganizationsApplication
         var organization = await CreateOrganizationInternalAsync(caller, domainEvent.RootId.ToId(),
             domainEvent.Classification, name,
             OrganizationOwnership.Personal, cancellationToken);
+        if (organization.IsFailure)
+        {
+            return organization.Error;
+        }
+
+        return Result.Ok;
+    }
+
+    public async Task<Result<Error>> HandleImageDeletedAsync(ICallerContext caller, Deleted domainEvent,
+        CancellationToken cancellationToken)
+    {
+        var organization = await HandleDeleteAvatarAsync(caller, domainEvent.RootId, cancellationToken);
         if (organization.IsFailure)
         {
             return organization.Error;
@@ -48,6 +62,41 @@ partial class OrganizationsApplication
         {
             return organization.Error;
         }
+
+        return Result.Ok;
+    }
+
+    private async Task<Result<Error>> HandleDeleteAvatarAsync(ICallerContext caller, string imageId,
+        CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.FindByAvatarIdAsync(imageId.ToId(), cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        if (!retrieved.Value.HasValue)
+        {
+            return Result.Ok;
+        }
+
+        var organization = retrieved.Value.Value;
+        var deleted = organization.ForceRemoveAvatar(CallerConstants.ServiceClientAccountUserId.ToId());
+        if (deleted.IsFailure)
+        {
+            return deleted.Error;
+        }
+
+        var saved = await _repository.SaveAsync(organization, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        organization = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Organization {Id} avatar was removed", organization.Id);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
+            organization.ToUsageEvent(caller));
 
         return Result.Ok;
     }

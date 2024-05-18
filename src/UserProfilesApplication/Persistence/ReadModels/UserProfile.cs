@@ -7,7 +7,7 @@ namespace UserProfilesApplication.Persistence.ReadModels;
 [EntityName("UserProfile")]
 public class UserProfile : ReadModelEntity
 {
-    public Optional<string> AvatarId { get; set; }
+    public Optional<string> AvatarImageId { get; set; }
 
     public Optional<string> AvatarUrl { get; set; }
 

@@ -8,6 +8,7 @@ using Infrastructure.Persistence.Interfaces;
 using OrganizationsApplication.Persistence;
 using OrganizationsApplication.Persistence.ReadModels;
 using OrganizationsDomain;
+using QueryAny;
 
 namespace OrganizationsInfrastructure.Persistence;
 
@@ -53,5 +54,37 @@ public class OrganizationRepository : IOrganizationRepository
         }
 
         return organization;
+    }
+
+    public async Task<Result<Optional<OrganizationRoot>, Error>> FindByAvatarIdAsync(Identifier avatarId,
+        CancellationToken cancellationToken)
+    {
+        var query = Query.From<Organization>()
+            .Where<string>(at => at.AvatarImageId, ConditionOperator.EqualTo, avatarId);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
+    private async Task<Result<Optional<OrganizationRoot>, Error>> FindFirstByQueryAsync(QueryClause<Organization> query,
+        CancellationToken cancellationToken)
+    {
+        var queried = await _organizationQueries.QueryAsync(query, false, cancellationToken);
+        if (queried.IsFailure)
+        {
+            return queried.Error;
+        }
+
+        var matching = queried.Value.Results.FirstOrDefault();
+        if (matching.NotExists())
+        {
+            return Optional<OrganizationRoot>.None;
+        }
+
+        var organizations = await _organizations.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
+        if (organizations.IsFailure)
+        {
+            return organizations.Error;
+        }
+
+        return organizations.Value.ToOptional();
     }
 }

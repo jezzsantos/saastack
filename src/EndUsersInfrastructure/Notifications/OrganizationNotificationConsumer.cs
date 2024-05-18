@@ -7,13 +7,13 @@ using Infrastructure.Interfaces;
 
 namespace EndUsersInfrastructure.Notifications;
 
-public class EndUserNotificationConsumer : IDomainEventNotificationConsumer
+public class OrganizationNotificationConsumer : IDomainEventNotificationConsumer
 {
     private readonly ICallerContextFactory _callerContextFactory;
     private readonly IEndUsersApplication _endUsersApplication;
     private readonly IInvitationsApplication _invitationsApplication;
 
-    public EndUserNotificationConsumer(ICallerContextFactory callerContextFactory,
+    public OrganizationNotificationConsumer(ICallerContextFactory callerContextFactory,
         IEndUsersApplication endUsersApplication, IInvitationsApplication invitationsApplication)
     {
         _callerContextFactory = callerContextFactory;

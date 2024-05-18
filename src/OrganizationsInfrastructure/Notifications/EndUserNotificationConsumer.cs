@@ -7,12 +7,12 @@ using OrganizationsApplication;
 
 namespace OrganizationsInfrastructure.Notifications;
 
-public class OrganizationNotificationConsumer : IDomainEventNotificationConsumer
+public class EndUserNotificationConsumer : IDomainEventNotificationConsumer
 {
     private readonly ICallerContextFactory _callerContextFactory;
     private readonly IOrganizationsApplication _organizationsApplication;
 
-    public OrganizationNotificationConsumer(ICallerContextFactory callerContextFactory,
+    public EndUserNotificationConsumer(ICallerContextFactory callerContextFactory,
         IOrganizationsApplication organizationsApplication)
     {
         _callerContextFactory = callerContextFactory;

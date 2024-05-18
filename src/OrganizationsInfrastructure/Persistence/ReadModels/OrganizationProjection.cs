@@ -54,7 +54,7 @@ public class OrganizationProjection : IReadModelProjection
             case AvatarAdded e:
                 return await _organizations.HandleUpdateAsync(e.RootId, dto =>
                     {
-                        dto.AvatarId = e.AvatarId;
+                        dto.AvatarImageId = e.AvatarId;
                         dto.AvatarUrl = e.AvatarUrl;
                     },
                     cancellationToken);
@@ -62,7 +62,7 @@ public class OrganizationProjection : IReadModelProjection
             case AvatarRemoved e:
                 return await _organizations.HandleUpdateAsync(e.RootId, dto =>
                     {
-                        dto.AvatarId = Optional<string>.None;
+                        dto.AvatarImageId = Optional<string>.None;
                         dto.AvatarUrl = Optional<string>.None;
                     },
                     cancellationToken);

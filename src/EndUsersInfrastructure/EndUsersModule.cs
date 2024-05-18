@@ -75,7 +75,7 @@ public class EndUsersModule : ISubdomainModule
                         c.GetRequiredServiceForPlatform<IDataStore>()));
                 services
                     .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
-                        new EndUserNotificationConsumer(
+                        new OrganizationNotificationConsumer(
                             c.GetRequiredService<ICallerContextFactory>(),
                             c.GetRequiredService<IEndUsersApplication>(),
                             c.GetRequiredService<IInvitationsApplication>()));

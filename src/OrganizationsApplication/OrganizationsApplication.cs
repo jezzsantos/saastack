@@ -81,6 +81,8 @@ public partial class OrganizationsApplication : IOrganizationsApplication
 
         org = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Changed organization: {Id}", org.Id);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
+            org.ToUsageEvent(caller));
 
         return org.ToOrganization();
     }
@@ -467,6 +469,8 @@ public partial class OrganizationsApplication : IOrganizationsApplication
 
         org = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Changed avatar for organization: {Id}", org.Id);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
+            org.ToUsageEvent(caller));
 
         return org.ToOrganization();
     }
@@ -487,7 +491,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         }
 
         var org = retrieved.Value;
-        var deleted = await org.DeleteAvatarAsync(caller.ToCallerId(), deleterRoles.Value, async avatarId =>
+        var deleted = await org.RemoveAvatarAsync(caller.ToCallerId(), deleterRoles.Value, async avatarId =>
         {
             var removed = await _imagesService.DeleteImageAsync(caller, avatarId, cancellationToken);
             return removed.IsFailure
@@ -507,6 +511,8 @@ public partial class OrganizationsApplication : IOrganizationsApplication
 
         org = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Organization {Id} avatar was deleted", org.Id);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
+            org.ToUsageEvent(caller));
 
         return org.ToOrganization();
     }
@@ -675,5 +681,21 @@ internal static class OrganizationConversionExtensions
         });
 
         return new TenantSettings(dictionary);
+    }
+
+    public static Dictionary<string, object> ToUsageEvent(this OrganizationRoot organization, ICallerContext caller)
+    {
+        var context = new Dictionary<string, object>
+        {
+            [UsageConstants.Properties.Name] = organization.Name,
+            [UsageConstants.Properties.Ownership] = organization.Ownership.ToString(),
+            [UsageConstants.Properties.CreatedById] = organization.CreatedById.ToString()
+        };
+        if (organization.Avatar.HasValue)
+        {
+            context[UsageConstants.Properties.AvatarUrl] = organization.Avatar.Value.Url;
+        }
+
+        return context;
     }
 }

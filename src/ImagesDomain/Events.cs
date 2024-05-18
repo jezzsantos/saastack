@@ -13,10 +13,11 @@ public static class Events
         };
     }
 
-    public static Created Created(Identifier id, string contentType)
+    public static Created Created(Identifier id, Identifier createById, string contentType)
     {
         return new Created(id)
         {
+            CreatedById = createById,
             ContentType = contentType
         };
     }

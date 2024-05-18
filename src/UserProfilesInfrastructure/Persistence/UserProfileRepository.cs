@@ -67,6 +67,14 @@ public class UserProfileRepository : IUserProfileRepository
             .ToList();
     }
 
+    public async Task<Result<Optional<UserProfileRoot>, Error>> FindByAvatarIdAsync(Identifier avatarId,
+        CancellationToken cancellationToken)
+    {
+        var query = Query.From<UserProfile>()
+            .Where<string>(at => at.AvatarImageId, ConditionOperator.EqualTo, avatarId);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
     public async Task<Result<Optional<UserProfileRoot>, Error>> FindByUserIdAsync(Identifier userId,
         CancellationToken cancellationToken)
     {

@@ -56,7 +56,8 @@ public class ImagesApplicationSpec
     [Fact]
     public async Task WhenDeleteImageAsync_ThenDeletes()
     {
-        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "image/jpeg");
+        _caller.Setup(cc => cc.CallerId).Returns("auserid");
+        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "image/jpeg");
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(image);
 
@@ -79,7 +80,7 @@ public class ImagesApplicationSpec
     [Fact]
     public async Task WhenDownloadImageAsync_ThenReturnsImage()
     {
-        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "image/jpeg");
+        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "image/jpeg");
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(image);
         var blob = new Blob { ContentType = "image/jpeg" };
@@ -109,7 +110,7 @@ public class ImagesApplicationSpec
     [Fact]
     public async Task WhenGetImageAsync_ThenReturns()
     {
-        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "image/jpeg").Value;
+        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "image/jpeg").Value;
         image.ChangeDetails("adescription", "afilename");
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(image);
@@ -138,7 +139,7 @@ public class ImagesApplicationSpec
     [Fact]
     public async Task WhenUpdateImageAsyncWithNewDescription_ThenReturns()
     {
-        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "image/jpeg").Value;
+        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "image/jpeg").Value;
         image.ChangeDetails("adescription", "afilename");
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(image);
@@ -160,7 +161,7 @@ public class ImagesApplicationSpec
     [Fact]
     public async Task WhenUpdateImageAsyncWithNoDescription_ThenReturns()
     {
-        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "image/jpeg").Value;
+        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "image/jpeg").Value;
         image.ChangeDetails("adescription", "afilename");
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(image);

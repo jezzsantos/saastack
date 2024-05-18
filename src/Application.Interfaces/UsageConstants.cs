@@ -20,6 +20,7 @@ public static class UsageConstants
         public const string CarModel = "Model";
         public const string CarYear = "Year";
         public const string Component = "Component";
+        public const string CreatedById = "CreateBy";
         public const string Duration = "Duration";
         public const string EmailAddress = "EmailAddress";
         public const string EndPoint = "EndPoint";
@@ -31,8 +32,8 @@ public static class UsageConstants
         public const string IpAddress = "IpAddress";
         public const string MetricEventName = "Metric";
         public const string Name = "Name";
+        public const string Ownership = "Ownership";
         public const string Path = "Path";
-        public const string UserIdOverride = "UserIdOverride";
         public const string ReferredBy = "ReferredBy";
         public const string ResourceId = "ResourceId";
         public const string Started = "Started";
@@ -41,6 +42,7 @@ public static class UsageConstants
         public const string Timezone = "Timezone";
         public const string UsedById = "UserId";
         public const string UserAgent = "UserAgent";
+        public const string UserIdOverride = "UserIdOverride";
     }
 
     public static class Events
@@ -69,6 +71,7 @@ public static class UsageConstants
                 public const string UserPasswordForgotten = "User Password Forgotten";
                 public const string UserPasswordReset = "User Password Reset";
                 public const string UserProfileChanged = "User Profile Updated";
+                public const string OrganizationChanged = "Organization Updated";
             }
         }
 

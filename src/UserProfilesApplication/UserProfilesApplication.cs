@@ -84,7 +84,7 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         }
 
         var profile = retrieved.Value.Value;
-        var deleted = await profile.DeleteAvatarAsync(caller.ToCallerId(), async avatarId =>
+        var deleted = await profile.RemoveAvatarAsync(caller.ToCallerId(), async avatarId =>
         {
             var removed = await _imagesService.DeleteImageAsync(caller, avatarId, cancellationToken);
             return removed.IsFailure

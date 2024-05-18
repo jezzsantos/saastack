@@ -5,6 +5,7 @@ using Domain.Interfaces;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Api.Operations.Shared.Images;
 using Infrastructure.Web.Api.Operations.Shared.UserProfiles;
 using Infrastructure.Web.Interfaces.Clients;
 using IntegrationTesting.WebApi.Common;
@@ -184,6 +185,35 @@ public class UserProfileApiSpec : WebApiSpec<Program>
         result.Content.Value.Profile.DisplayName.Should().Be("persona");
         result.Content.Value.Profile.Timezone.Should().Be(Timezones.Default.ToString());
         result.Content.Value.Profile.AvatarUrl.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task WhenDeleteImageBehindTheAvatar_ThenRemovesAvatar()
+    {
+        var login = await LoginUserAsync();
+
+        var profile = await Api.PutAsync(new ChangeProfileAvatarRequest
+            {
+                UserId = login.User.Id
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        var avatarUrl = profile.Content.Value.Profile!.AvatarUrl!;
+        var imageId = avatarUrl
+            .Replace("https://localhost:5001/images/", string.Empty)
+            .Replace("/download", string.Empty);
+
+        await PropagateDomainEventsAsync();
+        await Api.DeleteAsync(new DeleteImageRequest
+        {
+            Id = imageId
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        await PropagateDomainEventsAsync();
+        var result = await Api.GetAsync(new GetProfileForCallerRequest(),
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        result.Content.Value.Profile!.AvatarUrl.Should().BeNull();
     }
 
     private static void OverrideDependencies(IServiceCollection services)

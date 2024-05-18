@@ -7,6 +7,9 @@ namespace OrganizationsApplication.Persistence;
 
 public interface IOrganizationRepository : IApplicationRepository
 {
+    Task<Result<Optional<OrganizationRoot>, Error>> FindByAvatarIdAsync(Identifier imageId,
+        CancellationToken cancellationToken);
+
     Task<Result<OrganizationRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken);
 
     Task<Result<OrganizationRoot, Error>> SaveAsync(OrganizationRoot organization, CancellationToken cancellationToken);

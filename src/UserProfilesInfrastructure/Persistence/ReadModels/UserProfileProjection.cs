@@ -67,7 +67,7 @@ public class UserProfileProjection : IReadModelProjection
             case AvatarAdded e:
                 return await _users.HandleUpdateAsync(e.RootId, dto =>
                     {
-                        dto.AvatarId = e.AvatarId;
+                        dto.AvatarImageId = e.AvatarId;
                         dto.AvatarUrl = e.AvatarUrl;
                     },
                     cancellationToken);
@@ -75,7 +75,7 @@ public class UserProfileProjection : IReadModelProjection
             case AvatarRemoved e:
                 return await _users.HandleUpdateAsync(e.RootId, dto =>
                     {
-                        dto.AvatarId = Optional<string>.None;
+                        dto.AvatarImageId = Optional<string>.None;
                         dto.AvatarUrl = Optional<string>.None;
                     },
                     cancellationToken);

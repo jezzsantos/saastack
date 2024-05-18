@@ -315,29 +315,6 @@ public sealed class OrganizationRoot : AggregateRootBase
         return Result.Ok;
     }
 
-    public async Task<Result<Error>> DeleteAvatarAsync(Identifier deleterId, Roles deleterRoles,
-        RemoveAvatarAction onRemoveOld)
-    {
-        if (!IsOwner(deleterRoles))
-        {
-            return Error.RoleViolation(Resources.OrganizationRoot_UserNotOrgOwner);
-        }
-
-        if (!Avatar.HasValue)
-        {
-            return Error.RuleViolation(Resources.OrganizationRoot_NoAvatar);
-        }
-
-        var avatarId = Avatar.Value.ImageId;
-        var removed = await onRemoveOld(avatarId);
-        if (removed.IsFailure)
-        {
-            return removed.Error;
-        }
-
-        return RaiseChangeEvent(OrganizationsDomain.Events.AvatarRemoved(Id, avatarId));
-    }
-
     public Result<Error> DeleteOrganization(Identifier deleterId, Roles deleterRoles)
     {
         if (!IsOwner(deleterRoles))
@@ -358,6 +335,22 @@ public sealed class OrganizationRoot : AggregateRootBase
         }
 
         return RaisePermanentDeleteEvent(OrganizationsDomain.Events.Deleted(Id, deleterId));
+    }
+
+    public Result<Error> ForceRemoveAvatar(Identifier deleterId)
+    {
+        if (IsNotServiceAccount(deleterId))
+        {
+            return Error.RoleViolation(Resources.OrganizationRoot_UserNotServiceAccount);
+        }
+
+        if (!Avatar.HasValue)
+        {
+            return Result.Ok;
+        }
+
+        var avatarId = Avatar.Value.ImageId;
+        return RaiseChangeEvent(OrganizationsDomain.Events.AvatarRemoved(Id, avatarId));
     }
 
     public Result<Error> InviteMember(Identifier inviterId, Roles inviterRoles, Optional<Identifier> userId,
@@ -382,6 +375,29 @@ public sealed class OrganizationRoot : AggregateRootBase
         return RaiseChangeEvent(OrganizationsDomain.Events.MemberInvited(Id, inviterId, userId, emailAddress));
     }
 
+    public async Task<Result<Error>> RemoveAvatarAsync(Identifier deleterId, Roles deleterRoles,
+        RemoveAvatarAction onRemoveOld)
+    {
+        if (!IsOwner(deleterRoles))
+        {
+            return Error.RoleViolation(Resources.OrganizationRoot_UserNotOrgOwner);
+        }
+
+        if (!Avatar.HasValue)
+        {
+            return Error.RuleViolation(Resources.OrganizationRoot_NoAvatar);
+        }
+
+        var avatarId = Avatar.Value.ImageId;
+        var removed = await onRemoveOld(avatarId);
+        if (removed.IsFailure)
+        {
+            return removed.Error;
+        }
+
+        return RaiseChangeEvent(OrganizationsDomain.Events.AvatarRemoved(Id, avatarId));
+    }
+
     public Result<Error> RemoveMembership(Identifier userId)
     {
         if (!Memberships.HasMember(userId))
@@ -393,6 +409,7 @@ public sealed class OrganizationRoot : AggregateRootBase
     }
 
 #if TESTINGONLY
+
     public void TestingOnly_ChangeOwnership(OrganizationOwnership ownership)
     {
         Ownership = ownership;
@@ -477,6 +494,11 @@ public sealed class OrganizationRoot : AggregateRootBase
         }
 
         return Result.Ok;
+    }
+
+    private static bool IsNotServiceAccount(Identifier deleterId)
+    {
+        return !CallerConstants.IsServiceAccount(deleterId);
     }
 
     private static bool IsOwner(Roles roles)

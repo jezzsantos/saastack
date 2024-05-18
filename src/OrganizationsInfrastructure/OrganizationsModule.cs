@@ -69,7 +69,11 @@ public class OrganizationsModule : ISubdomainModule
                         c.GetRequiredServiceForPlatform<IDataStore>()));
                 services
                     .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
-                        new OrganizationNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
+                        new EndUserNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
+                            c.GetRequiredService<IOrganizationsApplication>()));
+                services
+                    .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
+                        new ImageNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
                             c.GetRequiredService<IOrganizationsApplication>()));
                 services.RegisterEventing<OrganizationRoot, OrganizationProjection, OrganizationNotifier>(
                     c => new OrganizationProjection(c.GetRequiredService<IRecorder>(),

@@ -16,4 +16,6 @@ public sealed class Created : DomainEvent
     }
 
     public required string ContentType { get; set; }
+
+    public required string CreatedById { get; set; }
 }

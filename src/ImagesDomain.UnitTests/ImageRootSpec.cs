@@ -28,7 +28,7 @@ public class ImageRootSpec
     [Fact]
     public void WhenCreateAndContentTypeInvalid_ThenReturnsError()
     {
-        var result = ImageRoot.Create(_recorder.Object, _idFactory.Object, "aninvalidcontenttype");
+        var result = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "aninvalidcontenttype");
 
         result.Should().BeError(ErrorCode.Validation,
             Resources.ImageRoot_UnsupportedContentType.Format("aninvalidcontenttype"));
@@ -37,7 +37,7 @@ public class ImageRootSpec
     [Fact]
     public void WhenCreate_ThenAssigned()
     {
-        var result = ImageRoot.Create(_recorder.Object, _idFactory.Object, "image/jpeg");
+        var result = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "image/jpeg");
 
         result.Value.ContentType.Should().Be("image/jpeg");
         result.Value.Description.Should().BeNone();
@@ -48,7 +48,7 @@ public class ImageRootSpec
     [Fact]
     public void WhenEnsureInvariantsAndNoContentType_ThenReturnsError()
     {
-        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "image/jpeg").Value;
+        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "image/jpeg").Value;
 #if TESTINGONLY
         image.TestingOnly_SetContentType(Optional<string>.None);
 #endif
@@ -61,7 +61,7 @@ public class ImageRootSpec
     [Fact]
     public void WhenChangeDetailsAndDescriptionInvalid_ThenReturnsError()
     {
-        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "image/jpeg").Value;
+        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "image/jpeg").Value;
 
         var result = image.ChangeDetails("aninvaliddescription^");
 
@@ -71,7 +71,7 @@ public class ImageRootSpec
     [Fact]
     public void WhenChangeDetailsAndFilenameInvalid_ThenReturnsError()
     {
-        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "image/jpeg").Value;
+        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "image/jpeg").Value;
 
         var result = image.ChangeDetails(null, "aninvalidfilename^");
 
@@ -81,7 +81,7 @@ public class ImageRootSpec
     [Fact]
     public void WhenChangeDetails_ThenChanges()
     {
-        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "image/jpeg").Value;
+        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "image/jpeg").Value;
 
         var result = image.ChangeDetails("adescription", "afilename");
 
@@ -94,7 +94,7 @@ public class ImageRootSpec
     [Fact]
     public void WhenSetAttributesAndSizeTooLarge_ThenReturnsError()
     {
-        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "image/jpeg").Value;
+        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "image/jpeg").Value;
 
         var size = Validations.Images.MaxSizeInBytes + 1;
         var result = image.SetAttributes(size);
@@ -105,7 +105,7 @@ public class ImageRootSpec
     [Fact]
     public void WhenSetAttributes_ThenAttributed()
     {
-        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "image/jpeg").Value;
+        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "image/jpeg").Value;
 
         var size = Validations.Images.MaxSizeInBytes - 1;
         var result = image.SetAttributes(size);
@@ -116,9 +116,19 @@ public class ImageRootSpec
     }
 
     [Fact]
+    public void WhenDeleteByAnotherUser_ThenReturnsError()
+    {
+        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "image/jpeg").Value;
+
+        var result = image.Delete("anotheruserid".ToId());
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.ImageRoot_NotCreator);
+    }
+    
+    [Fact]
     public void WhenDelete_ThenDeleted()
     {
-        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "image/jpeg").Value;
+        var image = ImageRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId(), "image/jpeg").Value;
 
         var result = image.Delete("auserid".ToId());
 

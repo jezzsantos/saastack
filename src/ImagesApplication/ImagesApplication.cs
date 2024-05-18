@@ -37,12 +37,20 @@ public class ImagesApplication : IImagesApplication
         }
 
         var image = retrieved.Value;
-        var deleted = image.Delete(caller.ToCallerId());
+        var userId = caller.ToCallerId();
+        var deleted = image.Delete(userId);
         if (deleted.IsFailure)
         {
             return deleted.Error;
         }
 
+        var saved = await _repository.SaveAsync(image, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        image = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Image {Id} was deleted", image.Id);
 
         return Result.Ok;
@@ -128,7 +136,8 @@ public class ImagesApplication : IImagesApplication
     public async Task<Result<Image, Error>> UploadImageAsync(ICallerContext caller, FileUpload upload,
         string? description, CancellationToken cancellationToken)
     {
-        var created = ImageRoot.Create(_recorder, _idFactory, upload.ContentType.MediaType!);
+        var userId = caller.ToCallerId();
+        var created = ImageRoot.Create(_recorder, _idFactory, userId, upload.ContentType.MediaType!);
         if (created.IsFailure)
         {
             return created.Error;

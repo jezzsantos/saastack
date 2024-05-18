@@ -39,6 +39,9 @@
     <data name="OrganizationRoot_UserNotOrgOwner" xml:space="preserve">
         <value>Must be an organization owner to perform this action</value>
     </data>
+    <data name="OrganizationRoot_UserNotServiceAccount" xml:space="preserve">
+        <value>Must be a service account to perform this action</value>
+    </data>
     <data name="OrganizationRoot_UserNotMember" xml:space="preserve">
         <value>User must be a member of this organization</value>
     </data>

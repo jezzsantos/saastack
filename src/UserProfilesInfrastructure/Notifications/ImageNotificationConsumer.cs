@@ -1,5 +1,5 @@
 using Common;
-using Domain.Events.Shared.EndUsers;
+using Domain.Events.Shared.Images;
 using Domain.Interfaces.Entities;
 using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Interfaces;
@@ -7,12 +7,12 @@ using UserProfilesApplication;
 
 namespace UserProfilesInfrastructure.Notifications;
 
-public class UserProfileNotificationConsumer : IDomainEventNotificationConsumer
+public class ImageNotificationConsumer : IDomainEventNotificationConsumer
 {
     private readonly ICallerContextFactory _callerContextFactory;
     private readonly IUserProfilesApplication _userProfilesApplication;
 
-    public UserProfileNotificationConsumer(ICallerContextFactory callerContextFactory,
+    public ImageNotificationConsumer(ICallerContextFactory callerContextFactory,
         IUserProfilesApplication userProfilesApplication)
     {
         _callerContextFactory = callerContextFactory;
@@ -23,14 +23,9 @@ public class UserProfileNotificationConsumer : IDomainEventNotificationConsumer
     {
         switch (domainEvent)
         {
-            case Registered registered:
-                return await _userProfilesApplication.HandleEndUserRegisteredAsync(_callerContextFactory.Create(),
-                    registered, cancellationToken);
-
-            case DefaultMembershipChanged changed:
-                return await _userProfilesApplication.HandleEndUserDefaultMembershipChangedAsync(
-                    _callerContextFactory.Create(),
-                    changed, cancellationToken);
+            case Deleted deleted:
+                return await _userProfilesApplication.HandleImageDeletedAsync(_callerContextFactory.Create(),
+                    deleted, cancellationToken);
 
             default:
                 return Result.Ok;

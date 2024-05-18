@@ -7,6 +7,7 @@ using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.EndUsers;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
+using Infrastructure.Web.Api.Operations.Shared.Images;
 using Infrastructure.Web.Api.Operations.Shared.Organizations;
 using Infrastructure.Web.Interfaces.Clients;
 using IntegrationTesting.WebApi.Common;
@@ -634,6 +635,38 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+
+    [Fact]
+    public async Task WhenDeleteImageBehindTheAvatar_ThenRemovesAvatar()
+    {
+        var login = await LoginUserAsync();
+
+        var organizationId = login.DefaultOrganizationId!;
+        var organization = await Api.PutAsync(new ChangeOrganizationAvatarRequest
+            {
+                Id = organizationId
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        var avatarUrl = organization.Content.Value.Organization!.AvatarUrl!;
+        var imageId = avatarUrl
+            .Replace("https://localhost:5001/images/", string.Empty)
+            .Replace("/download", string.Empty);
+
+        await PropagateDomainEventsAsync();
+        await Api.DeleteAsync(new DeleteImageRequest
+        {
+            Id = imageId
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        await PropagateDomainEventsAsync();
+        var result = await Api.GetAsync(new GetOrganizationRequest
+        {
+            Id = organizationId
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        result.Content.Value.Organization!.AvatarUrl.Should().BeNull();
     }
 
     private static string CreateRandomEmailAddress()

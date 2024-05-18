@@ -4,6 +4,7 @@ using Application.Services.Shared;
 using Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Images;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Shared;
@@ -26,6 +27,7 @@ public class OrganizationsApplicationDomainEventHandlersSpec
     private readonly OrganizationsApplication _application;
     private readonly Mock<ICallerContext> _caller;
     private readonly Mock<IIdentifierFactory> _identifierFactory;
+    private readonly Mock<IImagesService> _imagesService;
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IOrganizationRepository> _repository;
     private readonly Mock<ITenantSettingService> _tenantSettingService;
@@ -51,14 +53,14 @@ public class OrganizationsApplicationDomainEventHandlersSpec
         _tenantSettingService.Setup(tss => tss.Decrypt(It.IsAny<string>()))
             .Returns((string value) => value);
         var endUsersService = new Mock<IEndUsersService>();
-        var imagesService = new Mock<IImagesService>();
+        _imagesService = new Mock<IImagesService>();
         _repository = new Mock<IOrganizationRepository>();
         _repository.Setup(ar => ar.SaveAsync(It.IsAny<OrganizationRoot>(), It.IsAny<CancellationToken>()))
             .Returns((OrganizationRoot root, CancellationToken _) =>
                 Task.FromResult<Result<OrganizationRoot, Error>>(root));
 
         _application = new OrganizationsApplication(_recorder.Object, _identifierFactory.Object,
-            _tenantSettingsService.Object, _tenantSettingService.Object, endUsersService.Object, imagesService.Object,
+            _tenantSettingsService.Object, _tenantSettingService.Object, endUsersService.Object, _imagesService.Object,
             _repository.Object);
     }
 
@@ -148,5 +150,28 @@ public class OrganizationsApplicationDomainEventHandlersSpec
         _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(root =>
             root.Memberships.Members.Count == 0
         ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenHandleImageDeletedAsync_ThenRemovesAvatarImage()
+    {
+        var domainEvent = new Deleted("animageid".ToId(), "auserid".ToId());
+        var org = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Shared, "anownerid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
+        _repository.Setup(rep => rep.FindByAvatarIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org.ToOptional());
+
+        var result = await _application.HandleImageDeletedAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(up =>
+            up.Id == "anid".ToId()
+            && !up.Avatar.HasValue
+        ), It.IsAny<CancellationToken>()));
+        _repository.Verify(rep => rep.FindByAvatarIdAsync("animageid".ToId(), It.IsAny<CancellationToken>()));
+        _imagesService.Verify(
+            img => img.DeleteImageAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
     }
 }

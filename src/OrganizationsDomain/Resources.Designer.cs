@@ -150,6 +150,15 @@ namespace OrganizationsDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Must be a service account to perform this action.
+        /// </summary>
+        internal static string OrganizationRoot_UserNotServiceAccount {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_UserNotServiceAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The data type of the value: &apos;{0}&apos; is unsupported.
         /// </summary>
         internal static string Setting_InvalidDataType {

@@ -8,7 +8,7 @@ namespace OrganizationsApplication.Persistence.ReadModels;
 [EntityName("Organization")]
 public class Organization : ReadModelEntity
 {
-    public Optional<string> AvatarId { get; set; }
+    public Optional<string> AvatarImageId { get; set; }
 
     public Optional<string> AvatarUrl { get; set; }
 

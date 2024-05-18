@@ -20,4 +20,7 @@ public interface IUserProfileRepository : IApplicationRepository
 
     Task<Result<List<UserProfileRoot>, Error>> SearchAllByUserIdsAsync(List<Identifier> ids,
         CancellationToken cancellationToken);
+
+    Task<Result<Optional<UserProfileRoot>, Error>> FindByAvatarIdAsync(Identifier avatarId,
+        CancellationToken cancellationToken);
 }

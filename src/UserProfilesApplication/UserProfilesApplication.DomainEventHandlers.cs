@@ -5,8 +5,10 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.EndUsers;
+using Domain.Interfaces;
 using Domain.Shared;
 using UserProfilesDomain;
+using Deleted = Domain.Events.Shared.Images.Deleted;
 using PersonName = Domain.Shared.PersonName;
 
 namespace UserProfilesApplication;
@@ -29,9 +31,20 @@ partial class UserProfilesApplication
         return Result.Ok;
     }
 
-    public async Task<Result<Error>> HandleEndUserDefaultMembershipChangedAsync(ICallerContext caller,
-        DefaultMembershipChanged domainEvent,
+    public async Task<Result<Error>> HandleImageDeletedAsync(ICallerContext caller, Deleted domainEvent,
         CancellationToken cancellationToken)
+    {
+        var profile = await HandleDeleteAvatarAsync(caller, domainEvent.RootId, cancellationToken);
+        if (profile.IsFailure)
+        {
+            return profile.Error;
+        }
+
+        return Result.Ok;
+    }
+
+    public async Task<Result<Error>> HandleEndUserDefaultMembershipChangedAsync(ICallerContext caller,
+        DefaultMembershipChanged domainEvent, CancellationToken cancellationToken)
     {
         var profile = await UpdateDefaultOrganizationAsync(caller, domainEvent.RootId, domainEvent.ToOrganizationId,
             cancellationToken);
@@ -43,10 +56,45 @@ partial class UserProfilesApplication
         return Result.Ok;
     }
 
+    private async Task<Result<Error>> HandleDeleteAvatarAsync(ICallerContext caller, string imageId,
+        CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.FindByAvatarIdAsync(imageId.ToId(), cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        if (!retrieved.Value.HasValue)
+        {
+            return Result.Ok;
+        }
+
+        var profile = retrieved.Value.Value;
+        var deleted = profile.ForceRemoveAvatar(CallerConstants.ServiceClientAccountUserId.ToId());
+        if (deleted.IsFailure)
+        {
+            return deleted.Error;
+        }
+
+        var saved = await _repository.SaveAsync(profile, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        profile = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} avatar was removed for user {UserId}", profile.Id,
+            profile.UserId);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
+            profile.ToUsageEvent(caller));
+
+        return Result.Ok;
+    }
+
     private async Task<Result<UserProfile, Error>> CreateProfileAsync(ICallerContext caller,
         UserProfileClassification classification, string userId, string? emailAddress, string firstName,
-        string? lastName, string? timezone, string? countryCode,
-        CancellationToken cancellationToken)
+        string? lastName, string? timezone, string? countryCode, CancellationToken cancellationToken)
     {
         if (classification == UserProfileClassification.Person && emailAddress.HasNoValue())
         {
@@ -200,8 +248,9 @@ partial class UserProfilesApplication
 
         profile = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Profile {Id} updated its default organization for user {UserId}",
-            profile.Id,
-            profile.UserId);
+            profile.Id, profile.UserId);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
+            profile.ToUsageEvent(caller));
 
         return profile.ToProfile().ToOptional();
     }

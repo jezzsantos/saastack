@@ -96,11 +96,20 @@ namespace UserProfilesDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The profile can only be changed by its owner.
+        ///   Looks up a localized string similar to The profile can only be changed or removed by its owner.
         /// </summary>
         internal static string UserProfileRoot_NotOwner {
             get {
                 return ResourceManager.GetString("UserProfileRoot_NotOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The profile can only be removed by a service account.
+        /// </summary>
+        internal static string UserProfileRoot_NotServiceAccount {
+            get {
+                return ResourceManager.GetString("UserProfileRoot_NotServiceAccount", resourceCulture);
             }
         }
         

@@ -10,6 +10,10 @@ Browse our [Architectural Design Records](decisions/README.md) that describe the
 
 Learn about the [Design Principles and Implementation details](design-principles/README.md) of the code template.
 
+# How-To Guides
+
+Read the [HowTo Guides](how-to-guides/README.md) to help you get started and perform the most common tasks in working with and customizing this codebase template to suit your product needs.
+
 # Tooling
 
 Supporting tooling used to help you be more productive with this template, and code examples.

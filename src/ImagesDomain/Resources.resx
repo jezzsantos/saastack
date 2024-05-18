@@ -31,12 +31,15 @@
         <value>The size of the image '{0}'B is too large</value>
     </data>
     <data name="ImageRoot_MissingContentType" xml:space="preserve">
-        <value>The conten type of this image is missing</value>
+        <value>The content type of this image is missing</value>
     </data>
     <data name="ImageRoot_InvalidDescription" xml:space="preserve">
         <value>The image description is invalid</value>
     </data>
     <data name="ImageRoot_InvalidFilename" xml:space="preserve">
         <value>The image filename is invalid</value>
+    </data>
+    <data name="ImageRoot_NotCreator" xml:space="preserve">
+        <value>Must be the creator of the image to perform this action</value>
     </data>
 </root>

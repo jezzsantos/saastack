@@ -4,6 +4,7 @@ using Application.Services.Shared;
 using Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Events.Shared.Images;
 using Domain.Interfaces.Entities;
 using Domain.Shared;
 using Domain.Shared.EndUsers;
@@ -69,10 +70,10 @@ public class UserProfileApplicationDomainEventHandlersSpec
     [Fact]
     public async Task WhenHandleEndUserRegisteredAsyncForAnyAndExistsForUserId_ThenReturnsError()
     {
-        var user = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
+        var profile = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
             PersonName.Create("afirstname", "alastname").Value).Value;
         _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(user.ToOptional());
+            .ReturnsAsync(profile.ToOptional());
         var domainEvent = Events.Registered("apersonid".ToId(), EndUserProfile.Create("afirstname").Value,
             EmailAddress.Create("auser@company.com").Value, UserClassification.Person, UserAccess.Enabled,
             UserStatus.Registered, Roles.Empty, Features.Empty);
@@ -86,10 +87,10 @@ public class UserProfileApplicationDomainEventHandlersSpec
     [Fact]
     public async Task WhenHandleEndUserRegisteredAsyncForAnyAndExistsForEmailAddress_ThenReturnsError()
     {
-        var user = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
+        var profile = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
             PersonName.Create("afirstname", "alastname").Value).Value;
         _repository.Setup(rep => rep.FindByEmailAddressAsync(It.IsAny<EmailAddress>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(user.ToOptional());
+            .ReturnsAsync(profile.ToOptional());
         var domainEvent = Events.Registered("apersonid".ToId(), EndUserProfile.Create("afirstname").Value,
             EmailAddress.Create("auser@company.com").Value, UserClassification.Person, UserAccess.Enabled,
             UserStatus.Registered, Roles.Empty, Features.Empty);
@@ -226,10 +227,10 @@ public class UserProfileApplicationDomainEventHandlersSpec
     {
         var domainEvent = Events.DefaultMembershipChanged("auserid".ToId(), "amembershipid".ToId(),
             "amembershipid".ToId(), "anorganizationid".ToId(), Roles.Empty, Features.Empty);
-        var user = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
+        var profile = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
             PersonName.Create("afirstname", "alastname").Value).Value;
         _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(user.ToOptional());
+            .ReturnsAsync(profile.ToOptional());
 
         var result = await _application.HandleEndUserDefaultMembershipChangedAsync(_caller.Object,
             domainEvent, CancellationToken.None);
@@ -240,5 +241,27 @@ public class UserProfileApplicationDomainEventHandlersSpec
             && up.DefaultOrganizationId == "anorganizationid".ToId()
         ), It.IsAny<CancellationToken>()));
         _repository.Verify(rep => rep.FindByUserIdAsync("auserid".ToId(), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenHandleImageDeletedAsync_ThenRemovesAvatarImage()
+    {
+        var domainEvent = new Deleted("animageid".ToId(), "auserid".ToId());
+        var profile = UserProfileRoot.Create(_recorder.Object, _idFactory.Object, ProfileType.Person, "auserid".ToId(),
+            PersonName.Create("afirstname", "alastname").Value).Value;
+        _repository.Setup(rep => rep.FindByAvatarIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(profile.ToOptional());
+
+        var result = await _application.HandleImageDeletedAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<UserProfileRoot>(up =>
+            up.UserId == "auserid".ToId()
+            && !up.Avatar.HasValue
+        ), It.IsAny<CancellationToken>()));
+        _repository.Verify(rep => rep.FindByAvatarIdAsync("animageid".ToId(), It.IsAny<CancellationToken>()));
+        _imagesService.Verify(
+            img => img.DeleteImageAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
     }
 }

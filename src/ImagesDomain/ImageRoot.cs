@@ -14,7 +14,7 @@ namespace ImagesDomain;
 public sealed class ImageRoot : AggregateRootBase
 {
     public static Result<ImageRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
-        string contentType)
+        Identifier createdById, string contentType)
     {
         if (contentType.IsInvalidParameter(Validations.Images.ContentTypes,
                 nameof(contentType), Resources.ImageRoot_UnsupportedContentType.Format(contentType), out var error))
@@ -23,7 +23,7 @@ public sealed class ImageRoot : AggregateRootBase
         }
 
         var root = new ImageRoot(recorder, idFactory);
-        root.RaiseCreateEvent(ImagesDomain.Events.Created(root.Id, contentType));
+        root.RaiseCreateEvent(ImagesDomain.Events.Created(root.Id, createdById, contentType));
         return root;
     }
 
@@ -37,6 +37,8 @@ public sealed class ImageRoot : AggregateRootBase
     }
 
     public string ContentType { get; private set; } = string.Empty;
+
+    public Identifier CreatedById { get; private set; } = Identifier.Empty();
 
     public Optional<string> Description { get; private set; }
 
@@ -73,6 +75,7 @@ public sealed class ImageRoot : AggregateRootBase
             case Created created:
             {
                 ContentType = created.ContentType;
+                CreatedById = created.CreatedById.ToId();
                 return Result.Ok;
             }
 
@@ -125,9 +128,14 @@ public sealed class ImageRoot : AggregateRootBase
             ImagesDomain.Events.DetailsChanged(Id, description ?? Description, filename ?? Filename));
     }
 
-    public Result<Error> Delete(Identifier deletedById)
+    public Result<Error> Delete(Identifier deleterId)
     {
-        return RaisePermanentDeleteEvent(ImagesDomain.Events.Deleted(Id, deletedById));
+        if (IsNotCreator(deleterId))
+        {
+            return Error.RuleViolation(Resources.ImageRoot_NotCreator);
+        }
+
+        return RaisePermanentDeleteEvent(ImagesDomain.Events.Deleted(Id, deleterId));
     }
 
     public Result<Error> SetAttributes(long imageSize)
@@ -147,4 +155,9 @@ public sealed class ImageRoot : AggregateRootBase
         ContentType = contentType;
     }
 #endif
+
+    private bool IsNotCreator(Identifier deleterId)
+    {
+        return CreatedById != deleterId;
+    }
 }

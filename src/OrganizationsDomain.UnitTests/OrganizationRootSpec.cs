@@ -3,6 +3,7 @@ using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Organizations;
+using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
@@ -246,31 +247,31 @@ public class OrganizationRootSpec
     }
 
     [Fact]
-    public async Task WhenDeleteAvatarAsyncAndNotOwner_ThenReturnsError()
+    public async Task WhenRemoveAvatarAsyncAndNotOwner_ThenReturnsError()
     {
-        var result = await _org.DeleteAvatarAsync("anotheruserid".ToId(), Roles.Empty, _ => Task.FromResult(Result.Ok));
+        var result = await _org.RemoveAvatarAsync("anotheruserid".ToId(), Roles.Empty, _ => Task.FromResult(Result.Ok));
 
         result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UserNotOrgOwner);
     }
 
     [Fact]
-    public async Task WhenDeleteAvatarAsyncAndNoExistingAvatar_ThenReturnsError()
+    public async Task WhenRemoveAvatarAsyncAndNoExistingAvatar_ThenReturnsError()
     {
-        var result = await _org.DeleteAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+        var result = await _org.RemoveAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value,
             _ => Task.FromResult(Result.Ok));
 
         result.Should().BeError(ErrorCode.RuleViolation, Resources.OrganizationRoot_NoAvatar);
     }
 
     [Fact]
-    public async Task WhenDeleteAvatarAsyncAndHasExistingAvatar_ThenChanges()
+    public async Task WhenRemoveAvatarAsyncAndHasExistingAvatar_ThenRemoves()
     {
         Identifier? imageDeletedId = null;
         await _org.ChangeAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value,
             _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("anoldimageid".ToId(), "aurl").Value),
             _ => Task.FromResult(Result.Ok));
 
-        var result = await _org.DeleteAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value, id =>
+        var result = await _org.RemoveAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value, id =>
         {
             imageDeletedId = id;
             return Task.FromResult(Result.Ok);
@@ -282,6 +283,28 @@ public class OrganizationRootSpec
         _org.Events.Last().Should().BeOfType<AvatarRemoved>();
     }
 
+    [Fact]
+    public void WhenForceRemoveAvatarAsyncAndNotOwner_ThenReturnsError()
+    {
+        var result = _org.ForceRemoveAvatar("anotheruserid".ToId());
+
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UserNotServiceAccount);
+    }
+
+    [Fact]
+    public async Task WhenForceRemoveAvatarByServiceAccountAndHasExistingAvatar_ThenRemoves()
+    {
+        await _org.ChangeAvatarAsync("auserid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            _ => Task.FromResult<Result<Avatar, Error>>(Avatar.Create("anoldimageid".ToId(), "aurl").Value),
+            _ => Task.FromResult(Result.Ok));
+
+        var result = _org.ForceRemoveAvatar(CallerConstants.ServiceClientAccountUserId.ToId());
+
+        result.Should().BeSuccess();
+        _org.Avatar.HasValue.Should().BeFalse();
+        _org.Events.Last().Should().BeOfType<AvatarRemoved>();
+    }
+    
     [Fact]
     public void WhenAddMembershipAndExists_ThenDoesNothing()
     {

@@ -111,6 +111,11 @@ TBD
 
 We provide Swagger UI tooling for both the frontend and backend APIs.
 
-For Backend API: you can find Swagger UI a the root URL of the site `/`
+This includes several extensions to `Swashbuckle.AspNet`, since it is not maintained anymore for .net8.0 compatibility.
+
+> In .net9.0 it is anticipated that some 3rd party libraries (like Swashbuckle/NSwag) will no longer be needed, and strictly speaking, nor will the SwaggerUI.
+> Instead, Microsoft will better support OpenApi themselves, and developers will use various other UIs (like SwaggerUI) to display a UX for their API.
+
+For Backend API: you can find Swagger UI at the root URL of the site `/`
 
 From Frontend API: you can find the swagger UI at : `/swagger`

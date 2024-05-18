@@ -34,7 +34,10 @@
         <value>This profile is for a machine, and must not have an email address</value>
     </data>
     <data name="UserProfileRoot_NotOwner" xml:space="preserve">
-        <value>The profile can only be changed by its owner</value>
+        <value>The profile can only be changed or removed by its owner</value>
+    </data>
+    <data name="UserProfileRoot_NotServiceAccount" xml:space="preserve">
+        <value>The profile can only be removed by a service account</value>
     </data>
     <data name="UserProfileRoot_NotAPerson" xml:space="preserve">
         <value>This kind of profile must not have an email address</value>
