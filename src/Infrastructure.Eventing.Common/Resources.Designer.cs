@@ -60,7 +60,16 @@ namespace Infrastructure.Eventing.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The consumer &apos;{0}&apos; failed to handle the domain event &apos;{1}&apos; with event type &apos;{2}&apos;. Aborting notifications.
+        ///   Looks up a localized string similar to The relay &apos;{0}&apos; failed to handle the domain event &apos;{1}&apos; with event type &apos;{2}&apos;.
+        /// </summary>
+        internal static string AsynchronousConsumerRelay_RelayFailed {
+            get {
+                return ResourceManager.GetString("AsynchronousConsumerRelay_RelayFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The consumer relay &apos;{0}&apos; failed to handle the domain event &apos;{1}&apos; with event type &apos;{2}&apos;. Aborting domain notifications.
         /// </summary>
         internal static string EventNotificationNotifier_ConsumerError {
             get {
@@ -69,7 +78,7 @@ namespace Infrastructure.Eventing.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The message broker &apos;{0}&apos; failed to handle the integration event &apos;{1}&apos; with event type &apos;{2}&apos;. Aborting notifications.
+        ///   Looks up a localized string similar to The message broker &apos;{0}&apos; failed to handle the integration event &apos;{1}&apos; with event type &apos;{2}&apos;. Aborting integration notifications.
         /// </summary>
         internal static string EventNotificationNotifier_MessageBrokerError {
             get {
@@ -83,6 +92,15 @@ namespace Infrastructure.Eventing.Common {
         internal static string EventNotificationNotifier_TranslatorError {
             get {
                 return ResourceManager.GetString("EventNotificationNotifier_TranslatorError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The consumer &apos;{0}&apos; failed to handle the domain event &apos;{1}&apos; with event type &apos;{2}&apos;.
+        /// </summary>
+        internal static string InProcessSynchronousConsumerRelay_ConsumerFailed {
+            get {
+                return ResourceManager.GetString("InProcessSynchronousConsumerRelay_ConsumerFailed", resourceCulture);
             }
         }
         

@@ -78,20 +78,29 @@ namespace IntegrationTesting.Persistence.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Docker is either not started, or there is no &apos;{0}&apos; container running yet - you must start Docker, and may need to initiate a process on the docker image first.
+        /// </summary>
+        internal static string DockerImageEmulator_StartEmulator_ContainerNotRunning {
+            get {
+                return ResourceManager.GetString("DockerImageEmulator_StartEmulator_ContainerNotRunning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to launch LocalStack, the process failed to startup, error: {0}.
         /// </summary>
-        internal static string LocalStackEmulator_StartEmulator_Exited {
+        internal static string DockerImageEmulator_StartEmulator_Exited {
             get {
-                return ResourceManager.GetString("LocalStackEmulator_StartEmulator_Exited", resourceCulture);
+                return ResourceManager.GetString("DockerImageEmulator_StartEmulator_Exited", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Failed to launch LocalStack process, with command: {0} {1}.
         /// </summary>
-        internal static string LocalStackEmulator_StartEmulator_FailedStartup {
+        internal static string DockerImageEmulator_StartEmulator_FailedStartup {
             get {
-                return ResourceManager.GetString("LocalStackEmulator_StartEmulator_FailedStartup", resourceCulture);
+                return ResourceManager.GetString("DockerImageEmulator_StartEmulator_FailedStartup", resourceCulture);
             }
         }
         

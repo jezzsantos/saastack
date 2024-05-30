@@ -4,6 +4,10 @@ namespace Infrastructure.Hosting.Common;
 
 public class HostOptions
 {
+    /// <summary>
+    ///     Is the host for a group of backend APIs, that will have EventNotifications API and Queues, and also the Ancillary
+    ///     API
+    /// </summary>
     public static readonly HostOptions BackEndAncillaryApiHost = new("BackendWithAncillaryAPI")
     {
         IsMultiTenanted = true,
@@ -14,6 +18,10 @@ public class HostOptions
         },
         Recording = RecorderOptions.BackEndAncillaryApiHost
     };
+
+    /// <summary>
+    ///     Is the host for a group of backend APIs, that will also have EventNotifications API and Queues
+    /// </summary>
     public static readonly HostOptions BackEndApiHost = new("BackendAPI")
     {
         IsMultiTenanted = true,
@@ -25,6 +33,9 @@ public class HostOptions
         Recording = RecorderOptions.BackEndApiHost
     };
 
+    /// <summary>
+    ///     Is the host for the Frontend website BEFFE
+    /// </summary>
     public static readonly HostOptions BackEndForFrontEndWebHost = new("FrontendSite")
     {
         IsMultiTenanted = false,
@@ -36,6 +47,9 @@ public class HostOptions
         Recording = RecorderOptions.BackEndForFrontEndWebHost
     };
 
+    /// <summary>
+    ///     Is the host used for testing stubs of 3rd party external services
+    /// </summary>
     public static readonly HostOptions TestingStubsHost = new("TestingStubs")
     {
         IsMultiTenanted = false,

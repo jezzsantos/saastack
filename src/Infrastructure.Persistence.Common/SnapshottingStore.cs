@@ -71,6 +71,7 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
         return Result.Ok;
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         var deleted = await _dataStore.DestroyAllAsync(_containerName, cancellationToken);
@@ -81,6 +82,7 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
 
         return deleted;
     }
+#endif
 
     public async Task<Result<Optional<TDto>, Error>> GetAsync(string id, bool errorIfNotFound = true,
         bool includeDeleted = false, CancellationToken cancellationToken = default)
@@ -179,7 +181,8 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
             return Error.EntityNotFound(Resources.SnapshottingStore_DtoMissingIdentifier);
         }
 
-        var retrieved = await _dataStore.RetrieveAsync(_containerName, dto.Id.Value,
+        var dtoId = dto.Id.Value;
+        var retrieved = await _dataStore.RetrieveAsync(_containerName, dtoId,
             PersistedEntityMetadata.FromType<TDto>(), cancellationToken);
         if (retrieved.IsFailure)
         {
@@ -212,13 +215,13 @@ public sealed class SnapshottingStore<TDto> : ISnapshottingStore<TDto>
             latest.IsDeleted = false;
         }
 
-        var updated = await _dataStore.ReplaceAsync(_containerName, dto.Id.Value, latest, cancellationToken);
+        var updated = await _dataStore.ReplaceAsync(_containerName, dtoId, latest, cancellationToken);
         if (updated.IsFailure)
         {
             return updated.Error;
         }
 
-        _recorder.TraceDebug(null, "Entity {Id} was updated in the {Store} store", dto.Id, _dataStore.GetType().Name);
+        _recorder.TraceDebug(null, "Entity {Id} was updated in the {Store} store", dtoId, _dataStore.GetType().Name);
         return updated.Value.Value.ToDto<TDto>();
     }
 

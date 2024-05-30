@@ -24,13 +24,14 @@ namespace IdentityInfrastructure.IntegrationTests;
 public class PasswordCredentialsApiSpec : WebApiSpec<Program>
 {
     private static int _userCount;
-    private readonly StubNotificationsService _notificationsService;
+    private readonly StubUserNotificationsService _userNotificationsService;
 
     public PasswordCredentialsApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
         EmptyAllRepositories();
-        _notificationsService = setup.GetRequiredService<INotificationsService>().As<StubNotificationsService>();
-        _notificationsService.Reset();
+        _userNotificationsService =
+            setup.GetRequiredService<IUserNotificationsService>().As<StubUserNotificationsService>();
+        _userNotificationsService.Reset();
     }
 
     [Fact]
@@ -53,14 +54,6 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
         result.Content.Value.Credential.User.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
         result.Content.Value.Credential.User.Features.Should()
             .ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
-        result.Content.Value.Credential.User.Profile!.UserId.Should().Be(result.Content.Value.Credential.User.Id);
-        result.Content.Value.Credential.User.Profile!.DefaultOrganizationId.Should().NotBeNullOrEmpty();
-        result.Content.Value.Credential.User.Profile!.Name.FirstName.Should().Be("afirstname");
-        result.Content.Value.Credential.User.Profile!.Name.LastName.Should().Be("alastname");
-        result.Content.Value.Credential.User.Profile!.DisplayName.Should().Be("afirstname");
-        result.Content.Value.Credential.User.Profile!.EmailAddress.Should().Be("auser@company.com");
-        result.Content.Value.Credential.User.Profile!.Timezone.Should().Be(Timezones.Default.ToString());
-        result.Content.Value.Credential.User.Profile!.Address.CountryCode.Should().Be(CountryCodes.Default.ToString());
     }
 
     [Fact]
@@ -75,6 +68,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
+        await PropagateDomainEventsAsync(PropagationRounds.Twice);
         await Api.PostAsync(new RegisterPersonPasswordRequest
         {
             EmailAddress = "auser@company.com",
@@ -84,7 +78,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
-        _notificationsService.LastReRegistrationCourtesyEmailRecipient.Should().Be("auser@company.com");
+        _userNotificationsService.LastReRegistrationCourtesyEmailRecipient.Should().Be("auser@company.com");
     }
 
     [Fact]
@@ -111,7 +105,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
-        var token = NotificationsService.LastRegistrationConfirmationToken;
+        var token = UserNotificationsService.LastRegistrationConfirmationToken;
         await Api.PostAsync(new ConfirmRegistrationPersonPasswordRequest
         {
             Token = token!
@@ -143,7 +137,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
-        var token = NotificationsService.LastRegistrationConfirmationToken;
+        var token = UserNotificationsService.LastRegistrationConfirmationToken;
         await Api.PostAsync(new ConfirmRegistrationPersonPasswordRequest
         {
             Token = token!
@@ -175,7 +169,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
         });
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        _notificationsService.LastPasswordResetCourtesyEmailRecipient.Should().Be("anunknownuser@company.com");
+        _userNotificationsService.LastPasswordResetCourtesyEmailRecipient.Should().Be("anunknownuser@company.com");
     }
 
     [Fact]
@@ -204,15 +198,15 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
     {
         var login = await LoginUserAsync();
 
-        var emailAddress = login.User.Profile!.EmailAddress!;
+        var emailAddress = login.Profile!.EmailAddress!;
         var result = await Api.PostAsync(new InitiatePasswordResetRequest
         {
             EmailAddress = emailAddress
         });
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        _notificationsService.LastPasswordResetEmailRecipient.Should().Be(emailAddress);
-        _notificationsService.LastPasswordResetToken.Should().NotBeNull();
+        _userNotificationsService.LastPasswordResetEmailRecipient.Should().Be(emailAddress);
+        _userNotificationsService.LastPasswordResetToken.Should().NotBeNull();
     }
 
     [Fact]
@@ -222,11 +216,11 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
 
         await Api.PostAsync(new InitiatePasswordResetRequest
         {
-            EmailAddress = login.User.Profile!.EmailAddress!
+            EmailAddress = login.Profile!.EmailAddress!
         });
 
-        var token = _notificationsService.LastPasswordResetToken;
-        _notificationsService.Reset();
+        var token = _userNotificationsService.LastPasswordResetToken;
+        _userNotificationsService.Reset();
 
         var result = await Api.PostAsync(new ResendPasswordResetRequest
         {
@@ -234,8 +228,8 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
         });
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        _notificationsService.LastPasswordResetEmailRecipient.Should().Be(login.User.Profile.EmailAddress);
-        _notificationsService.LastPasswordResetToken.Should().NotBe(token);
+        _userNotificationsService.LastPasswordResetEmailRecipient.Should().Be(login.Profile.EmailAddress);
+        _userNotificationsService.LastPasswordResetToken.Should().NotBe(token);
     }
 
     [Fact]
@@ -245,10 +239,10 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
 
         await Api.PostAsync(new InitiatePasswordResetRequest
         {
-            EmailAddress = login.User.Profile!.EmailAddress!
+            EmailAddress = login.Profile!.EmailAddress!
         });
 
-        var token = _notificationsService.LastPasswordResetToken;
+        var token = _userNotificationsService.LastPasswordResetToken;
         var result = await Api.GetAsync(new VerifyPasswordResetRequest
         {
             Token = token!
@@ -276,20 +270,20 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
         var login = await LoginUserAsync();
         LockAccountWithFailedLogins(login);
 
-        var emailAddress = login.User.Profile!.EmailAddress!;
+        var emailAddress = login.Profile!.EmailAddress!;
         await Api.PostAsync(new InitiatePasswordResetRequest
         {
             EmailAddress = emailAddress
         });
 
-        var token = _notificationsService.LastPasswordResetToken!;
+        var token = _userNotificationsService.LastPasswordResetToken!;
         await Api.PostAsync(new CompletePasswordResetRequest
         {
             Token = token,
             Password = "2Password!"
         });
 
-        var authenticated = await ReAuthenticateUserAsync(login.User, "2Password!");
+        var authenticated = await ReAuthenticateUserAsync(login.User, emailAddress, "2Password!");
 
         authenticated.AccessToken.Should().NotBeNullOrEmpty();
     }
@@ -299,20 +293,20 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
     {
         var login = await LoginUserAsync();
 
-        var emailAddress = login.User.Profile!.EmailAddress!;
+        var emailAddress = login.Profile!.EmailAddress!;
         await Api.PostAsync(new InitiatePasswordResetRequest
         {
             EmailAddress = emailAddress
         });
 
-        var token = _notificationsService.LastPasswordResetToken!;
+        var token = _userNotificationsService.LastPasswordResetToken!;
         await Api.PostAsync(new CompletePasswordResetRequest
         {
             Token = token,
             Password = "2Password!"
         });
 
-        var authenticated = await ReAuthenticateUserAsync(login.User, "2Password!");
+        var authenticated = await ReAuthenticateUserAsync(login.User, emailAddress, "2Password!");
 
         authenticated.AccessToken.Should().NotBeNullOrEmpty();
     }
@@ -320,7 +314,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
     private void LockAccountWithFailedLogins(LoginDetails login,
         int wrongAttempts = Validations.Credentials.Login.DefaultMaxFailedPasswordAttempts)
     {
-        var emailAddress = login.User.Profile!.EmailAddress!;
+        var emailAddress = login.Profile!.EmailAddress!;
         Repeat.Times(() => Try.Safely(() => Api.PostAsync(new AuthenticatePasswordRequest
         {
             Username = emailAddress,

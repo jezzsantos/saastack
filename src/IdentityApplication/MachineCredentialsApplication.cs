@@ -3,7 +3,6 @@ using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
-using Common.Extensions;
 using IdentityApplication.ApplicationServices;
 
 namespace IdentityApplication;
@@ -33,10 +32,7 @@ public class MachineCredentialsApplication : IMachineCredentialsApplication
         }
 
         var machine = registered.Value;
-        var description = (machine.Profile.Exists()
-            ? machine.Profile?.DisplayName
-            : machine.Id) ?? machine.Id;
-        var keys = await _apiKeyService.CreateApiKeyAsync(caller, machine.Id, description, apiKeyExpiresOn,
+        var keys = await _apiKeyService.CreateApiKeyAsync(caller, machine.Id, name, apiKeyExpiresOn,
             cancellationToken);
         if (keys.IsFailure)
         {

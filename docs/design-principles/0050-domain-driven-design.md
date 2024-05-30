@@ -118,7 +118,7 @@ As time goes on, and as you explore your product opportunities further, it is ve
 
 A quick note about [Bounded Contexts](https://martinfowler.com/bliki/BoundedContext.html).
 
-<img alt="DDDConcepts-ecommerce" src="../images/DDDConcepts-ecommerce.png" style="zoom:50%;" /><img alt="ContextMap-Management" src="../images/ContextMap-Management.png" style="zoom:75%;" />
+<img alt="DDDConcepts-ecommerce" src="../images/DDDConcepts-ecommerce.png" style="zoom:50%;" /><img alt="DDDContextMap-Management" src="../images/DDDContextMap-Management.png" style="zoom:75%;" />
 
 Bounded Contexts are another vital concept in Strategic DDD design, and often one that is difficult to implement in code.
 

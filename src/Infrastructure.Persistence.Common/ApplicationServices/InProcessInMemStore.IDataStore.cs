@@ -44,7 +44,7 @@ public partial class InProcessInMemStore : IDataStore
 
     public int MaxQueryResults => 1000;
 
-    public Task<Result<List<QueryEntity>, Error>> QueryAsync<TQueryableEntity>(string containerName,
+    public async Task<Result<List<QueryEntity>, Error>> QueryAsync<TQueryableEntity>(string containerName,
         QueryClause<TQueryableEntity> query, PersistedEntityMetadata metadata,
         CancellationToken cancellationToken)
         where TQueryableEntity : IQueryableEntity
@@ -56,18 +56,19 @@ public partial class InProcessInMemStore : IDataStore
 
         if (query.NotExists() || query.Options.IsEmpty)
         {
-            return Task.FromResult<Result<List<QueryEntity>, Error>>(new List<QueryEntity>());
+            return new List<QueryEntity>();
         }
 
         if (!_documents.ContainsKey(containerName))
         {
-            return Task.FromResult<Result<List<QueryEntity>, Error>>(new List<QueryEntity>());
+            return new List<QueryEntity>();
         }
 
-        var results = query.FetchAllIntoMemory(MaxQueryResults, metadata, () => QueryPrimaryEntities(containerName),
-            QueryJoiningContainer);
+        var results = await query.FetchAllIntoMemoryAsync(MaxQueryResults, metadata,
+            () => QueryPrimaryEntitiesAsync(containerName, cancellationToken),
+            entity => QueryJoiningContainerAsync(entity, cancellationToken));
 
-        return Task.FromResult<Result<List<QueryEntity>, Error>>(results);
+        return results;
     }
 
     public Task<Result<Error>> RemoveAsync(string containerName, string id, CancellationToken cancellationToken)
@@ -118,6 +119,7 @@ public partial class InProcessInMemStore : IDataStore
         return Task.FromResult<Result<Optional<CommandEntity>, Error>>(Optional<CommandEntity>.None);
     }
 
+#if TESTINGONLY
     Task<Result<Error>> IDataStore.DestroyAllAsync(string containerName, CancellationToken cancellationToken)
     {
         containerName.ThrowIfNotValuedParameter(nameof(containerName),
@@ -127,18 +129,20 @@ public partial class InProcessInMemStore : IDataStore
 
         return Task.FromResult(Result.Ok);
     }
+#endif
 
-    private Dictionary<string, HydrationProperties> QueryPrimaryEntities(string containerName)
+    private Task<Dictionary<string, HydrationProperties>> QueryPrimaryEntitiesAsync(string containerName,
+        CancellationToken _)
     {
-        return _documents[containerName];
+        return Task.FromResult(_documents[containerName]);
     }
 
-    private Dictionary<string, HydrationProperties> QueryJoiningContainer(
-        QueriedEntity joinedEntity)
+    private Task<Dictionary<string, HydrationProperties>> QueryJoiningContainerAsync(
+        QueriedEntity joinedEntity, CancellationToken _)
     {
-        return _documents.TryGetValue(joinedEntity.EntityName, out var value)
+        return Task.FromResult(_documents.TryGetValue(joinedEntity.EntityName, out var value)
             ? value.ToDictionary(pair => pair.Key, pair => pair.Value)
-            : new Dictionary<string, HydrationProperties>();
+            : new Dictionary<string, HydrationProperties>());
     }
 }
 #endif

@@ -169,7 +169,8 @@ partial class UserProfilesApplication
         return profile.ToProfile();
     }
 
-    private async Task<Result<UserProfile, Error>> UpdateDefaultOrganizationAsync(ICallerContext caller, string userId,
+    private async Task<Result<Optional<UserProfile>, Error>> UpdateDefaultOrganizationAsync(ICallerContext caller,
+        string userId,
         string defaultOrganizationId, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
@@ -180,7 +181,8 @@ partial class UserProfilesApplication
 
         if (!retrieved.Value.HasValue)
         {
-            return Error.EntityNotFound();
+            // Might be a machine (or not exists)
+            return Optional<UserProfile>.None;
         }
 
         var profile = retrieved.Value.Value;
@@ -201,6 +203,6 @@ partial class UserProfilesApplication
             profile.Id,
             profile.UserId);
 
-        return profile.ToProfile();
+        return profile.ToProfile().ToOptional();
     }
 }

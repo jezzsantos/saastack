@@ -310,8 +310,8 @@ For SaaS products that wish to provision physical infrastructure to implement "I
 
 Consider the following workflow:
 
-1. A new customer signs up for the platform. They register a new user, and that will create a new `Personal` organization for them to use the product. This organization will have a billing subscription that gives them some [limited] access level to the product at this time (i.e., a trial).
-2. At that time, or at some future time (like when they upgrade to a paid plan), a new event (e.g., `Domain.Events.Shared.EndUsers.Registered`) can be subscribed to by adding a new `IEventNotificationRegistration` in one of the subdomains.
+1. A new customer signs up for the platform. They register a new user, and that will create a new `Personal` organization for them to use the product. This organization will have a billing subscription that gives them some \[limited\] access level to the product at this time (i.e., a trial).
+2. At that time, or at some future time (like when they upgrade to a paid plan), a new event (e.g., `Domain.Events.Shared.EndUsers.Registered`) can be subscribed to by adding a new `IDomainEventNotificationConsumer` in one of the subdomains.
 3. This event is then raised at runtime, which triggers an application (in some subdomain) to make some API call to some cloud-based process to provision some specific infrastructure (e.g., via queue message or direct via an API call to an Azure function or AWS Lambda - there are many integration options). Let's assume that this triggers Azure to create a new SQL database in a regional data center physically closer to where this specific customer is signing up.
 4. Let's assume that this cloud provisioning process takes some time to complete (perhaps several minutes), and meanwhile, the customer is starting using the product and try it out for themselves (using their `Personal` organization, which we assume is using shared platform infrastructure at this time.
 5. When the provisioning process is completed (a few minutes later), a new message [containing some data about the provisioning process] is created and dropped on the `provisioning` queue (in Azure or AWS).
@@ -323,5 +323,5 @@ Consider the following workflow:
 Since the `provisioning` queue is already in place, and so is all the handling of messages for that queue, all the way to updating the settings of a specific `Organization`, all that is needed now is:
 
 1. A scripted provisioning process to be defined in some cloud provider. That could be via executing a script that automates the provisioning, or could be an API call direct to the cloud provider with some script already defined in the cloud provider.
-2. Some way to trigger the provisioning process itself, based upon some event in the software. Be that a new customer signup or some action they take. That could be `IEventNotificationRegistration` or another mechanism.
+2. Some way to trigger the provisioning process itself, based upon some event in the software. Be that a new customer signup or some action they take. That could be `IDomainEventNotificationConsumer` or another mechanism.
 3. A way for the provisioning script to construct and deposit a message (in the form of a `ProvisioningMessage`) and deposit it on the `provisioning` queue.

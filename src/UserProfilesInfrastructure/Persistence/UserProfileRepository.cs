@@ -25,12 +25,14 @@ public class UserProfileRepository : IUserProfileRepository
         _profiles = profilesStore;
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         return await Tasks.WhenAllAsync(
             _profileQueries.DestroyAllAsync(cancellationToken),
             _profiles.DestroyAllAsync(cancellationToken));
     }
+#endif
 
     public async Task<Result<UserProfileRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {
@@ -60,8 +62,8 @@ public class UserProfileRepository : IUserProfileRepository
     {
         var tasks = await Task.WhenAll(ids.Select(async id => await FindByUserIdAsync(id, cancellationToken)));
         return tasks.ToList()
-            .Where(task => task is { IsSuccessful: true, HasValue: true })
-            .Select(task => task.Value.Value)
+            .Where(result => result is { IsSuccessful: true, HasValue: true, Value.HasValue: true })
+            .Select(result => result.Value.Value)
             .ToList();
     }
 

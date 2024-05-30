@@ -26,12 +26,14 @@ public class AuditRepository : IAuditRepository
         _audits = auditsStore;
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         return await Tasks.WhenAllAsync(
             _auditQueries.DestroyAllAsync(cancellationToken),
             _audits.DestroyAllAsync(cancellationToken));
     }
+#endif
 
     public async Task<Result<AuditRoot, Error>> SaveAsync(AuditRoot audit, bool reload,
         CancellationToken cancellationToken)

@@ -115,7 +115,7 @@ public class StoreExtensionsSpec
     }
 
     [Fact]
-    public void WhenFetchAllIntoMemory_ThenReturnsResults()
+    public async Task WhenFetchAllIntoMemoryAsync_ThenReturnsResults()
     {
         var query = Query.From<TestDto>().WhereAll();
         var dtoProperties = HydrationProperties.FromDto(new TestDto { Id = "anid" });
@@ -127,7 +127,9 @@ public class StoreExtensionsSpec
         var joinedEntities = new Dictionary<string, HydrationProperties>();
 
         var result =
-            query.FetchAllIntoMemory(10, metadata, () => primaryEntities, _ => joinedEntities);
+            await query.FetchAllIntoMemoryAsync(10, metadata,
+                () => Task.FromResult(primaryEntities),
+                _ => Task.FromResult(joinedEntities));
 
         result.Count.Should().Be(1);
         result[0].Id.Should().Be("anid");

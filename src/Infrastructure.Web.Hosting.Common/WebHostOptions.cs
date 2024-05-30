@@ -7,6 +7,7 @@ namespace Infrastructure.Web.Hosting.Common;
 /// </summary>
 public class WebHostOptions : HostOptions
 {
+    /// <inheritdoc cref="HostOptions.BackEndAncillaryApiHost" />
     public new static readonly WebHostOptions BackEndAncillaryApiHost = new(HostOptions.BackEndAncillaryApiHost)
     {
         CORS = CORSOption.AnyOrigin,
@@ -20,6 +21,7 @@ public class WebHostOptions : HostOptions
         UsesNotifications = true,
         UsesApiDocumentation = true
     };
+    /// <inheritdoc cref="HostOptions.BackEndApiHost" />
     public new static readonly WebHostOptions BackEndApiHost = new(HostOptions.BackEndApiHost)
     {
         CORS = CORSOption.AnyOrigin,
@@ -34,6 +36,7 @@ public class WebHostOptions : HostOptions
         UsesApiDocumentation = true
     };
 
+    /// <inheritdoc cref="HostOptions.BackEndForFrontEndWebHost" />
     public new static readonly WebHostOptions BackEndForFrontEndWebHost = new(HostOptions.BackEndForFrontEndWebHost)
     {
         CORS = CORSOption.SameOrigin,
@@ -48,6 +51,7 @@ public class WebHostOptions : HostOptions
         UsesApiDocumentation = true
     };
 
+    /// <inheritdoc cref="HostOptions.TestingStubsHost" />
     public new static readonly WebHostOptions TestingStubsHost = new(HostOptions.TestingStubsHost)
     {
         CORS = CORSOption.AnyOrigin,

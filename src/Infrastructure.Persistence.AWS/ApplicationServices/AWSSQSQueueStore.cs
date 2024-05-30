@@ -1,3 +1,4 @@
+using Amazon;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 using Common;
@@ -11,13 +12,16 @@ using Task = System.Threading.Tasks.Task;
 namespace Infrastructure.Persistence.AWS.ApplicationServices;
 
 /// <summary>
-///     Provides a queue store for AWS Simple Queue Service (SQS) Queues
+///     Provides a queue store for AWS Simple Queue Service (SQS) Queues.
+///     Note: ContentDeDuplication is turned ON, as message JSON are expected to be unique (by MessageId) even for messages
+///     with the same properties
+///     Note: This store uses FIFO queues, with dead letter queues as backups
 /// </summary>
 public class AWSSQSQueueStore : IQueueStore
 {
     private readonly Dictionary<string, string> _knownQueueUrls;
     private readonly IRecorder _recorder;
-    private readonly IAmazonSQS _serviceClient;
+    private readonly AmazonSQSClient _serviceClient;
 
     public static AWSSQSQueueStore Create(IRecorder recorder, IConfigurationSettings settings)
     {
@@ -29,17 +33,22 @@ public class AWSSQSQueueStore : IQueueStore
         }
 
         var localStackClient = new AmazonSQSClient(credentials,
-            new AmazonSQSConfig { ServiceURL = AWSConstants.LocalStackServiceUrl });
+            new AmazonSQSConfig
+            {
+                ServiceURL = AWSConstants.LocalStackServiceUrl,
+                AuthenticationRegion = RegionEndpoint.USEast1.SystemName
+            });
 
         return new AWSSQSQueueStore(recorder, localStackClient);
     }
 
-    private AWSSQSQueueStore(IRecorder recorder, IAmazonSQS serviceClient)
+    private AWSSQSQueueStore(IRecorder recorder, AmazonSQSClient serviceClient)
     {
         _recorder = recorder;
         _serviceClient = serviceClient;
         _knownQueueUrls = new Dictionary<string, string>();
     }
+#if TESTINGONLY
 
     public async Task<Result<long, Error>> CountAsync(string queueName, CancellationToken cancellationToken)
     {
@@ -74,6 +83,7 @@ public class AWSSQSQueueStore : IQueueStore
             return ex.ToError(ErrorCode.Unexpected);
         }
     }
+#endif
 
     public async Task<Result<Error>> DestroyAllAsync(string queueName, CancellationToken cancellationToken)
     {
@@ -169,7 +179,7 @@ public class AWSSQSQueueStore : IQueueStore
                 return created.Error;
             }
 
-            queueUrl = created.Value;
+            queueUrl = created.Value.QueueUrl;
         }
 
         try
@@ -188,6 +198,61 @@ public class AWSSQSQueueStore : IQueueStore
         return Result.Ok;
     }
 
+    public async Task<Result<QueueIdentifiers, Error>> CreateQueueAsync(string queueName,
+        CancellationToken cancellationToken)
+    {
+        var sanitizedQueueName = queueName.SanitizeAndValidateQueueName();
+        var created = await CreateDeadLetterQueueAsync(sanitizedQueueName, cancellationToken);
+        if (created.IsFailure)
+        {
+            return created.Error;
+        }
+
+        var deadLetterQueueArn = created.Value.QueueArn;
+        var redrivePolicy = new
+        {
+            DeadLetterTargetArn = deadLetterQueueArn,
+            MaxReceiveCount = 10
+        }.ToJson(casing: StringExtensions.JsonCasing.Camel)!;
+
+        try
+        {
+            var queue = await _serviceClient.CreateQueueAsync(new CreateQueueRequest
+            {
+                QueueName = $"{sanitizedQueueName}.fifo",
+                Attributes = new Dictionary<string, string>
+                {
+                    { QueueAttributeName.RedrivePolicy, redrivePolicy },
+                    { QueueAttributeName.FifoQueue, "true" },
+                    { QueueAttributeName.ContentBasedDeduplication, "true" }
+                }
+            }, cancellationToken);
+            var queueUrl = queue.QueueUrl;
+            if (queueUrl.HasNoValue())
+            {
+                throw new InvalidOperationException("Created queue has no QueueUrl");
+            }
+
+            var queueAttributes = await _serviceClient.GetQueueAttributesAsync(queueUrl, ["All"], cancellationToken);
+            var queueArn = queueAttributes.QueueARN;
+            if (queueArn.HasNoValue())
+            {
+                throw new InvalidOperationException("Queue has no QueueARN");
+            }
+
+            _knownQueueUrls.Add(sanitizedQueueName, queueUrl);
+
+            return new QueueIdentifiers(queueUrl, queueArn);
+        }
+        catch (Exception ex)
+        {
+            _recorder.Crash(null,
+                CrashLevel.NonCritical,
+                ex, "Failed to create queue: {Queue}", sanitizedQueueName);
+            return ex.ToError(ErrorCode.Unexpected);
+        }
+    }
+
     private async Task<Optional<string>> GetQueueUrlAsync(string queueName, CancellationToken cancellationToken)
     {
         var sanitizedQueueName = queueName.SanitizeAndValidateQueueName();
@@ -198,7 +263,10 @@ public class AWSSQSQueueStore : IQueueStore
 
         try
         {
-            var response = await _serviceClient.GetQueueUrlAsync(sanitizedQueueName, cancellationToken);
+            var response = await _serviceClient.GetQueueUrlAsync(new GetQueueUrlRequest
+            {
+                QueueName = $"{sanitizedQueueName}.fifo"
+            }, cancellationToken);
             var queueUrl = response.QueueUrl;
             if (queueUrl.HasNoValue())
             {
@@ -220,34 +288,22 @@ public class AWSSQSQueueStore : IQueueStore
         return _serviceClient.SendMessageAsync(new SendMessageRequest
         {
             MessageBody = message,
-            QueueUrl = queueUrl
+            QueueUrl = queueUrl,
+            MessageGroupId = AWSConstants.FifoGroupName
         }, cancellationToken);
     }
 
-    private async Task<Result<string, Error>> CreateQueueAsync(string queueName, CancellationToken cancellationToken)
+    private async Task<Result<QueueIdentifiers, Error>> CreateDeadLetterQueueAsync(string sanitizedQueueName,
+        CancellationToken cancellationToken)
     {
-        var sanitizedQueueName = queueName.SanitizeAndValidateQueueName();
-        var created = await CreateDeadLetterQueueAsync(sanitizedQueueName, cancellationToken);
-        if (created.IsFailure)
-        {
-            return created.Error;
-        }
-
-        var deadLetterQueueArn = created.Value;
-        var redrivePolicy = new
-        {
-            DeadLetterTargetArn = deadLetterQueueArn,
-            MaxReceiveCount = 10
-        }.ToJson(casing: StringExtensions.JsonCasing.Camel)!;
-
         try
         {
             var queue = await _serviceClient.CreateQueueAsync(new CreateQueueRequest
             {
-                QueueName = sanitizedQueueName,
+                QueueName = $"{sanitizedQueueName}-poison.fifo",
                 Attributes = new Dictionary<string, string>
                 {
-                    { "RedrivePolicy", redrivePolicy }
+                    { QueueAttributeName.FifoQueue, "true" }
                 }
             }, cancellationToken);
             var queueUrl = queue.QueueUrl;
@@ -256,38 +312,15 @@ public class AWSSQSQueueStore : IQueueStore
                 throw new InvalidOperationException("Created queue has no QueueUrl");
             }
 
-            _knownQueueUrls.Add(sanitizedQueueName, queue.QueueUrl);
-
-            return queue.QueueUrl;
-        }
-        catch (Exception ex)
-        {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
-                ex, "Failed to create queue: {Queue}", sanitizedQueueName);
-            return ex.ToError(ErrorCode.Unexpected);
-        }
-    }
-
-    private async Task<Result<string, Error>> CreateDeadLetterQueueAsync(string sanitizedQueueName,
-        CancellationToken cancellationToken)
-    {
-        var deadLetterQueueName = $"{sanitizedQueueName}-poison";
-
-        try
-        {
-            var queue = await _serviceClient.CreateQueueAsync(deadLetterQueueName, cancellationToken);
-            var queueAttributes = await _serviceClient.GetQueueAttributesAsync(queue.QueueUrl, new List<string>
-            {
-                "All"
-            }, cancellationToken);
+            var queueAttributes =
+                await _serviceClient.GetQueueAttributesAsync(queueUrl, ["All"], cancellationToken);
             var queueArn = queueAttributes.QueueARN;
             if (queueArn.HasNoValue())
             {
                 throw new InvalidOperationException("Queue has no QueueARN");
             }
 
-            return queueArn;
+            return new QueueIdentifiers(queueUrl, queueArn);
         }
         catch (Exception ex)
         {
@@ -360,3 +393,5 @@ public class AWSSQSQueueStore : IQueueStore
         }
     }
 }
+
+public record QueueIdentifiers(string QueueUrl, string QueueArn);

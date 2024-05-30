@@ -43,6 +43,7 @@ public class AzureStorageAccountQueueStore : IQueueStore
         _recorder = recorder;
         _connectionString = connectionString;
     }
+#if TESTINGONLY
 
     public async Task<Result<long, Error>> CountAsync(string queueName, CancellationToken cancellationToken)
     {
@@ -56,6 +57,9 @@ public class AzureStorageAccountQueueStore : IQueueStore
             ? 0
             : properties.Value.ApproximateMessagesCount;
     }
+#endif
+
+#if TESTINGONLY
 
     public async Task<Result<Error>> DestroyAllAsync(string queueName, CancellationToken cancellationToken)
     {
@@ -75,6 +79,7 @@ public class AzureStorageAccountQueueStore : IQueueStore
 
         return Result.Ok;
     }
+#endif
 
     public async Task<Result<bool, Error>> PopSingleAsync(string queueName,
         Func<string, CancellationToken, Task<Result<Error>>> messageHandlerAsync, CancellationToken cancellationToken)

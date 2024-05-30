@@ -4,7 +4,7 @@ namespace Application.Resources.Shared;
 
 public class PasswordCredential : IIdentifiableResource
 {
-    public required RegisteredEndUser User { get; set; }
+    public required EndUser User { get; set; }
 
     public required string Id { get; set; }
 }

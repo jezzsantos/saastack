@@ -9,7 +9,8 @@ public abstract class StoreSpecSetupBase
     protected StoreSpecSetupBase()
     {
         var configuration = new ConfigurationBuilder()
-            .AddJsonFile(@"appsettings.Testing.json")
+            .AddJsonFile("appsettings.Testing.json", true)
+            .AddJsonFile("appsettings.Testing.local.json", true)
             .Build();
         Settings = new AspNetDynamicConfigurationSettings(configuration);
     }

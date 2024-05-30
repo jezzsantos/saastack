@@ -7,6 +7,7 @@
     <ItemGroup>
         <ProjectReference Include="..\AncillaryInfrastructure\AncillaryInfrastructure.csproj" />
         <ProjectReference Include="..\EndUsersInfrastructure\EndUsersInfrastructure.csproj" />
+        <ProjectReference Include="..\EventNotificationsInfrastructure\EventNotificationsInfrastructure.csproj" />
         <ProjectReference Include="..\IdentityInfrastructure\IdentityInfrastructure.csproj" />
         <ProjectReference Include="..\BookingsInfrastructure\BookingsInfrastructure.csproj" />
         <ProjectReference Include="..\CarsInfrastructure\CarsInfrastructure.csproj" />

@@ -6,5 +6,7 @@ namespace Application.Persistence.Shared;
 
 public interface IEmailMessageQueue : IMessageQueueStore<EmailMessage>, IApplicationRepository
 {
+#if TESTINGONLY
     new Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken);
+#endif
 }

@@ -13,11 +13,11 @@ namespace ImagesInfrastructure.Persistence.ReadModels;
 
 public class ImageProjection : IReadModelProjection
 {
-    private readonly IReadModelProjectionStore<Image> _images;
+    private readonly IReadModelStore<Image> _images;
 
     public ImageProjection(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
-        _images = new ReadModelProjectionStore<Image>(recorder, domainFactory, store);
+        _images = new ReadModelStore<Image>(recorder, domainFactory, store);
     }
 
     public Type RootAggregateType => typeof(ImageRoot);

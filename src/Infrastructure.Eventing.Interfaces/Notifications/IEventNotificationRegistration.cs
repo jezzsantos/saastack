@@ -6,11 +6,6 @@
 public interface IEventNotificationRegistration
 {
     /// <summary>
-    ///     Returns the consumers of domain events
-    /// </summary>
-    List<IDomainEventNotificationConsumer> DomainEventConsumers { get; }
-
-    /// <summary>
     ///     Returns the translator of integration events
     /// </summary>
     IIntegrationEventNotificationTranslator IntegrationEventTranslator { get; }

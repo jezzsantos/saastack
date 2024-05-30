@@ -1,4 +1,6 @@
 using System.Net;
+using Application.Interfaces;
+using Application.Services.Shared;
 using Common;
 using Common.Extensions;
 using Infrastructure.Eventing.Interfaces.Notifications;
@@ -9,7 +11,6 @@ using Infrastructure.Web.Api.Common.Endpoints;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common;
-using Infrastructure.Web.Hosting.Common.ApplicationServices;
 using Infrastructure.Web.Hosting.Common.Pipeline;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -129,7 +130,7 @@ public static class WebApplicationExtensions
     }
 
     /// <summary>
-    ///     Starts the relays for eventing projections and notifications
+    ///     Starts the relays for eventing projections and eventing notifications
     /// </summary>
     public static void EnableEventingPropagation(this WebApplication builder,
         List<MiddlewareRegistration> middlewares, bool usesEventing)
@@ -144,21 +145,28 @@ public static class WebApplicationExtensions
             app.Use(async (context, next) =>
             {
                 var readModelRelay = context.RequestServices.GetRequiredService<IEventNotifyingStoreProjectionRelay>();
-                if (!readModelRelay.IsStarted)
-                {
-                    readModelRelay.Start();
-                }
+                readModelRelay.Start();
 
                 var notificationRelay =
                     context.RequestServices.GetRequiredService<IEventNotifyingStoreNotificationRelay>();
-                if (!notificationRelay.IsStarted)
-                {
-                    notificationRelay.Start();
-                }
+                notificationRelay.Start();
 
                 await next();
+
+                readModelRelay.Stop();
+                notificationRelay.Stop();
             });
         }, "Pipeline: Event Projections/Notifications are enabled"));
+
+        var subscriber = builder.Services.GetService<IDomainEventingSubscriber>();
+        if (subscriber.Exists())
+        {
+            var subscriptionName = subscriber.SubscriptionName;
+            middlewares.Add(new MiddlewareRegistration(CustomMiddlewareIndex + 45,
+                _ => { subscriber.Subscribe(CancellationToken.None).GetAwaiter().GetResult(); },
+                $"Feature: Subscribed to {EventingConstants.Topics.DomainEvents} for -> {{Subscription}}",
+                subscriptionName));
+        }
     }
 
     /// <summary>
@@ -233,30 +241,13 @@ public static class WebApplicationExtensions
         var eventStore = builder.Services.GetRequiredServiceForPlatform<IEventStore>().GetType().Name;
         var queueStore = builder.Services.GetRequiredServiceForPlatform<IQueueStore>().GetType().Name;
         var blobStore = builder.Services.GetRequiredServiceForPlatform<IBlobStore>().GetType().Name;
+        var messageBusStore = builder.Services.GetRequiredServiceForPlatform<IMessageBusStore>().GetType().Name;
         middlewares.Add(new MiddlewareRegistration(-40, _ =>
             {
                 //Nothing to register
             },
-            "Feature: Platform Persistence stores: DataStore -> {DataStore} EventStore -> {EventStore} QueueStore -> {QueueStore} BlobStore -> {BlobStore}",
-            dataStore, eventStore, queueStore, blobStore));
-
-#if TESTINGONLY
-        if (hostOptions.Persistence.UsesQueues)
-        {
-            var stubDrainingServices = builder.Services.GetServices<IHostedService>()
-                .OfType<StubQueueDrainingService>()
-                .ToList();
-            if (stubDrainingServices.HasAny())
-            {
-                var stubDrainingService = stubDrainingServices[0];
-                var queues = stubDrainingService.MonitoredQueues.Join(", ");
-                middlewares.Add(new MiddlewareRegistration(-40, _ =>
-                {
-                    //Nothing to register
-                }, "Feature: Background queue draining on queues -> {Queues}", queues));
-            }
-        }
-#endif
+            "Feature: Platform Persistence stores: DataStore -> {DataStore}, EventStore -> {EventStore}, MessageBusStore -> {messageBusStore}, QueueStore -> {QueueStore}, BlobStore -> {BlobStore}",
+            dataStore, eventStore, messageBusStore, queueStore, blobStore));
 
         middlewares.Add(new MiddlewareRegistration(56, app => { app.UseAntiforgery(); },
             "Pipeline: Anti-forgery detection"));

@@ -39,18 +39,22 @@ public class AzureStorageAccountQueueStoreSpec : AnyQueueStoreBaseSpec
     [Fact]
     public async Task WhenCountWithInvalidQueueName_ThenThrows()
     {
+#if TESTINGONLY
         await _setup.QueueStore
             .Invoking(x => x.CountAsync("^aninvalidqueuename^", CancellationToken.None))
             .Should().ThrowAsync<ArgumentOutOfRangeException>()
             .WithMessageLike(Resources.ValidationExtensions_InvalidStorageAccountResourceName);
+#endif
     }
 
     [Fact]
     public async Task WhenDestroyAllWithInvalidQueueName_ThenThrows()
     {
+#if TESTINGONLY
         await _setup.QueueStore
             .Invoking(x => x.DestroyAllAsync("^aninvalidqueuename^", CancellationToken.None))
             .Should().ThrowAsync<ArgumentOutOfRangeException>()
             .WithMessageLike(Resources.ValidationExtensions_InvalidStorageAccountResourceName);
+#endif
     }
 }

@@ -476,7 +476,7 @@ public class CommandEntitySpec
             AStringValue = "avalue",
             AnIntegerValue = 1,
             ABooleanValue = true,
-            ADateTimeValue = datum
+            ADateTimeValue = datum,
         });
 
         var result = entity.ToDto<TestDto>();
@@ -493,7 +493,33 @@ public class CommandEntitySpec
     }
 
     [Fact]
-    public void WhenToToReadModelDtoWithDefaultValues_ThenReturnsInstance()
+    public void WhenToDtoWithDefaultValues_ThenReturnsInstance()
+    {
+        var datum = DateTime.UtcNow;
+        var entity = CommandEntity.FromType(new TestDto
+        {
+            Id = "anid",
+            AStringValue = "avalue",
+            AnIntegerValue = 1,
+            ABooleanValue = true,
+            ADateTimeValue = datum,
+        });
+
+        var result = entity.ToDto<TestDto>();
+
+        result.Id.Should().Be("anid");
+        result.AStringValue.Should().Be("avalue");
+        result.AnIntegerValue.Should().Be(1);
+        result.ABooleanValue.Should().Be(true);
+        result.ADateTimeValue.Should().Be(datum);
+        result.ANullableString.Should().BeNull();
+        result.ANullableInteger.Should().BeNull();
+        result.ANullableBoolean.Should().BeNull();
+        result.ANullableDateTime.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenToReadModelDtoWithDefaultValues_ThenReturnsInstance()
     {
         var entity = CommandEntity.FromDomainEntity(new TestCommandDomainEntity
         {
@@ -534,7 +560,7 @@ public class CommandEntitySpec
     }
 
     [Fact]
-    public void WhenToToReadModelDto_ThenReturnsInstance()
+    public void WhenToReadModelDto_ThenReturnsInstance()
     {
         var datum = DateTime.UtcNow;
         var valueObject = TestValueObject.Create("avalueobject").Value;
@@ -581,7 +607,7 @@ public class CommandEntitySpec
     }
 
     [Fact]
-    public void WhenToToQueryEntity_ThenReturnsInstance()
+    public void WhenToQueryEntity_ThenReturnsInstance()
     {
         var datum = DateTime.UtcNow;
         var valueObject = TestValueObject.Create("avalueobject").Value;

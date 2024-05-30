@@ -1,4 +1,5 @@
 using Common.Recording;
+using FluentAssertions;
 using Infrastructure.Persistence.AWS.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 using JetBrains.Annotations;
@@ -15,8 +16,17 @@ public class AWSAccountSpecSetup : StoreSpecSetupBase, IDisposable
     public AWSAccountSpecSetup()
     {
         QueueStore = AWSSQSQueueStore.Create(NoOpRecorder.Instance, Settings);
+        MessageBusStore = AWSSNSMessageBusStore.Create(NoOpRecorder.Instance, Settings,
+            new AWSSNSMessageBusStoreOptions(SubscriberType.Queue));
         AWSAccountBase.InitializeAllTests();
+
+        var store = QueueStore.As<AWSSQSQueueStore>();
+        var queue1 = store.CreateQueueAsync("messagebus_queue1", CancellationToken.None).GetAwaiter().GetResult();
+        var queue2 = store.CreateQueueAsync("messagebus_queue2", CancellationToken.None).GetAwaiter().GetResult();
+        MessageBusStoreTestQueues = [queue1.Value.QueueArn, queue2.Value.QueueArn];
     }
+
+    public string[] MessageBusStoreTestQueues { get; }
 
     public void Dispose()
     {
@@ -31,6 +41,8 @@ public class AWSAccountSpecSetup : StoreSpecSetupBase, IDisposable
             AWSAccountBase.CleanupAllTests();
         }
     }
+
+    public IMessageBusStore MessageBusStore { get; }
 
     public IQueueStore QueueStore { get; }
 }

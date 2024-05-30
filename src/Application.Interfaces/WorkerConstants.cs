@@ -6,7 +6,21 @@ public static class WorkerConstants
     {
         public const string Audits = "audits";
         public const string Emails = "emails";
-        public const string Provisionings = "provisioning";
+        public const string Provisionings = "tenant_provisionings";
         public const string Usages = "usages";
+    }
+
+    public static class MessageBuses
+    {
+        public static class Topics
+        {
+            public const string DomainEvents = EventingConstants.Topics.DomainEvents;
+            public const string IntegrationEvents = EventingConstants.Topics.IntegrationEvents;
+        }
+
+        public static class Subscribers
+        {
+            public const string ApiHost1 = "ApiHost1";
+        }
     }
 }

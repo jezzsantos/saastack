@@ -11,7 +11,9 @@ public interface IBlobStore
 {
     Task<Result<Error>> DeleteAsync(string containerName, string blobName, CancellationToken cancellationToken);
 
+#if TESTINGONLY
     Task<Result<Error>> DestroyAllAsync(string containerName, CancellationToken cancellationToken);
+#endif
 
     Task<Result<Optional<Blob>, Error>> DownloadAsync(string containerName, string blobName, Stream stream,
         CancellationToken cancellationToken);

@@ -24,7 +24,7 @@ public class InvitationsApplicationSpec
 {
     private readonly InvitationsApplication _application;
     private readonly Mock<ICallerContext> _caller;
-    private readonly Mock<INotificationsService> _notificationsService;
+    private readonly Mock<IUserNotificationsService> _notificationsService;
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IInvitationRepository> _repository;
     private readonly Mock<ITokensService> _tokensService;
@@ -45,7 +45,7 @@ public class InvitationsApplicationSpec
         _repository.Setup(rep => rep.SaveAsync(It.IsAny<EndUserRoot>(), It.IsAny<CancellationToken>()))
             .Returns((EndUserRoot root, CancellationToken _) => Task.FromResult<Result<EndUserRoot, Error>>(root));
         _userProfilesService = new Mock<IUserProfilesService>();
-        _notificationsService = new Mock<INotificationsService>();
+        _notificationsService = new Mock<IUserNotificationsService>();
         _tokensService = new Mock<ITokensService>();
         _tokensService.Setup(ts => ts.CreateGuestInvitationToken())
             .Returns("aninvitationtoken");

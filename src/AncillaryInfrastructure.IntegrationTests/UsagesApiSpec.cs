@@ -28,7 +28,9 @@ public class UsagesApiSpec : WebApiSpec<Program>
         _usageDeliveryService = setup.GetRequiredService<IUsageDeliveryService>().As<StubUsageDeliveryService>();
         _usageDeliveryService.Reset();
         _usageMessageQueue = setup.GetRequiredService<IUsageMessageQueue>();
+#if TESTINGONLY
         _usageMessageQueue.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
+#endif
     }
 
     [Fact]

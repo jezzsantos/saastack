@@ -105,6 +105,7 @@ public class SnapshottingStoreSpec
         ), CancellationToken.None));
     }
 
+#if TESTINGONLY
     [Fact]
     public async Task WhenDestroyAll_ThenDestroysAllInStore()
     {
@@ -112,6 +113,7 @@ public class SnapshottingStoreSpec
 
         _dataStore.Verify(store => store.DestroyAllAsync("acontainername", CancellationToken.None));
     }
+#endif
 
     [Fact]
     public async Task WhenGetAndNotExistsAndErrorIfNotFound_ThenReturnsError()

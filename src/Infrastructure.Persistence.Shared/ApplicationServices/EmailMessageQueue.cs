@@ -17,15 +17,19 @@ public class EmailMessageQueue : IEmailMessageQueue
         _messageQueue = new MessageQueueStore<EmailMessage>(recorder, messageQueueIdFactory, store);
     }
 
+#if TESTINGONLY
     public Task<Result<long, Error>> CountAsync(CancellationToken cancellationToken)
     {
         return _messageQueue.CountAsync(cancellationToken);
     }
+#endif
 
+#if TESTINGONLY
     public Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         return _messageQueue.DestroyAllAsync(cancellationToken);
     }
+#endif
 
     public Task<Result<bool, Error>> PopSingleAsync(
         Func<EmailMessage, CancellationToken, Task<Result<Error>>> onMessageReceivedAsync,
@@ -40,8 +44,10 @@ public class EmailMessageQueue : IEmailMessageQueue
         return _messageQueue.PushAsync(call, message, cancellationToken);
     }
 
+#if TESTINGONLY
     Task<Result<Error>> IApplicationRepository.DestroyAllAsync(CancellationToken cancellationToken)
     {
         return DestroyAllAsync(cancellationToken);
     }
+#endif
 }

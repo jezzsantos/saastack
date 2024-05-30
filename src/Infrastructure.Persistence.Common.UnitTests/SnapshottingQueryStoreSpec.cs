@@ -33,6 +33,7 @@ public class SnapshottingQueryStoreSpec
 
         _dataStore.Verify(store => store.CountAsync("acontainername", CancellationToken.None));
     }
+#if TESTINGONLY
 
     [Fact]
     public async Task WhenDestroyAll_ThenDestroysAllInStore()
@@ -41,6 +42,7 @@ public class SnapshottingQueryStoreSpec
 
         _dataStore.Verify(store => store.DestroyAllAsync("acontainername", CancellationToken.None));
     }
+#endif
 
     [Fact]
     public async Task WhenQueryWithEmptyQuery_ThenReturnsEmptyResults()

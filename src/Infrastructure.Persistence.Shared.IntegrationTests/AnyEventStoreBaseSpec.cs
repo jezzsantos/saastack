@@ -26,7 +26,9 @@ public abstract class AnyEventStoreBaseSpec
             Store = eventStore,
             ContainerName = $"{typeof(TestDataStoreEntity).GetEntityNameSafe()}"
         };
+#if TESTINGONLY
         _setup.Store.DestroyAllAsync(_setup.ContainerName, CancellationToken.None);
+#endif
     }
 
     [Fact]

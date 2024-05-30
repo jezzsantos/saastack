@@ -26,6 +26,7 @@ public class ImagesRepository : IImagesRepository
         _imageBlobs = new BinaryBlobStore(recorder, ImageContainerName, blobStore);
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         return await Tasks.WhenAllAsync(
@@ -33,6 +34,7 @@ public class ImagesRepository : IImagesRepository
             _images.DestroyAllAsync(cancellationToken),
             _imageBlobs.DestroyAllAsync(cancellationToken));
     }
+#endif
 
     public async Task<Result<ImageRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {

@@ -14,11 +14,11 @@ namespace IdentityInfrastructure.Persistence.ReadModels;
 
 public class APIKeyProjection : IReadModelProjection
 {
-    private readonly IReadModelProjectionStore<APIKey> _apiKeys;
+    private readonly IReadModelStore<APIKey> _apiKeys;
 
     public APIKeyProjection(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
-        _apiKeys = new ReadModelProjectionStore<APIKey>(recorder, domainFactory, store);
+        _apiKeys = new ReadModelStore<APIKey>(recorder, domainFactory, store);
     }
 
     public Type RootAggregateType => typeof(APIKeyRoot);

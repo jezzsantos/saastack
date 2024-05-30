@@ -17,20 +17,20 @@ namespace EndUsersApplication;
 public partial class InvitationsApplication : IInvitationsApplication
 {
     private readonly IIdentifierFactory _idFactory;
-    private readonly INotificationsService _notificationsService;
+    private readonly IUserNotificationsService _userNotificationsService;
     private readonly IRecorder _recorder;
     private readonly IInvitationRepository _repository;
     private readonly ITokensService _tokensService;
     private readonly IUserProfilesService _userProfilesService;
 
     public InvitationsApplication(IRecorder recorder, IIdentifierFactory idFactory, ITokensService tokensService,
-        INotificationsService notificationsService, IUserProfilesService userProfilesService,
+        IUserNotificationsService userNotificationsService, IUserProfilesService userProfilesService,
         IInvitationRepository repository)
     {
         _recorder = recorder;
         _idFactory = idFactory;
         _tokensService = tokensService;
-        _notificationsService = notificationsService;
+        _userNotificationsService = userNotificationsService;
         _userProfilesService = userProfilesService;
         _repository = repository;
     }
@@ -278,7 +278,7 @@ public partial class InvitationsApplication : IInvitationsApplication
         var inviteeName = invitee.GuessGuestInvitationName().FirstName;
         var inviterName = inviterProfile.Value.DisplayName;
         var notified =
-            await _notificationsService.NotifyGuestInvitationToPlatformAsync(caller, token, inviteeEmailAddress,
+            await _userNotificationsService.NotifyGuestInvitationToPlatformAsync(caller, token, inviteeEmailAddress,
                 inviteeName, inviterName, cancellationToken);
         if (notified.IsFailure)
         {

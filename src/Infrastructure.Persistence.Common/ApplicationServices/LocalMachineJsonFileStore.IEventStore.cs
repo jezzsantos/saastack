@@ -10,15 +10,11 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-/// <summary>
-///     Defines a file repository on the local machine, that stores each entity as raw JSON.
-///     store is located in named folders under the <see cref="_rootPath" />
-/// </summary>
 public partial class LocalMachineJsonFileStore : IEventStore
 {
     private const string EventStoreContainerName = "Events";
 
-    public Task<Result<string, Error>> AddEventsAsync(string entityName, string entityId,
+    public async Task<Result<string, Error>> AddEventsAsync(string entityName, string entityId,
         List<EventSourcedChangeEvent> events, CancellationToken cancellationToken)
     {
         entityName.ThrowIfNotValuedParameter(nameof(entityName), Resources.InProcessInMemDataStore_MissingEntityName);
@@ -26,7 +22,7 @@ public partial class LocalMachineJsonFileStore : IEventStore
 
         var streamName = GetEventStreamName(entityName, entityId);
 
-        var latestStoredEvent = GetLatestEvent(entityName, entityId, streamName);
+        var latestStoredEvent = await GetLatestEventAsync(entityName, entityId, streamName, cancellationToken);
         var latestStoredEventVersion = latestStoredEvent.HasValue
             ? latestStoredEvent.Value.Version.ToOptional()
             : Optional<int>.None;
@@ -34,20 +30,21 @@ public partial class LocalMachineJsonFileStore : IEventStore
             this.VerifyConcurrencyCheck(streamName, latestStoredEventVersion, Enumerable.First(events).Version);
         if (concurrencyCheck.IsFailure)
         {
-            return Task.FromResult<Result<string, Error>>(concurrencyCheck.Error);
+            return concurrencyCheck.Error;
         }
 
-        events.ForEach(@event =>
+        foreach (var @event in events)
         {
             var entity = CommandEntity.FromDto(@event.ToTabulated(entityName, streamName));
 
             var container = EnsureContainer(GetEventStoreContainerPath(entityName, entityId));
-            container.Write(entity.Id, entity.ToFileProperties());
-        });
+            await container.WriteAsync(entity.Id, entity.ToFileProperties(), cancellationToken);
+        }
 
-        return Task.FromResult<Result<string, Error>>(streamName);
+        return streamName;
     }
 
+#if TESTINGONLY
     Task<Result<Error>> IEventStore.DestroyAllAsync(string entityName, CancellationToken cancellationToken)
     {
         entityName.ThrowIfNotValuedParameter(nameof(entityName), Resources.InProcessInMemDataStore_MissingEntityName);
@@ -57,8 +54,9 @@ public partial class LocalMachineJsonFileStore : IEventStore
 
         return Task.FromResult(Result.Ok);
     }
+#endif
 
-    public Task<Result<IReadOnlyList<EventSourcedChangeEvent>, Error>> GetEventStreamAsync(string entityName,
+    public async Task<Result<IReadOnlyList<EventSourcedChangeEvent>, Error>> GetEventStreamAsync(string entityName,
         string entityId, CancellationToken cancellationToken)
     {
         entityName.ThrowIfNotValuedParameter(nameof(entityName), Resources.InProcessInMemDataStore_MissingEntityName);
@@ -71,10 +69,11 @@ public partial class LocalMachineJsonFileStore : IEventStore
             .OrderBy(ee => ee.Version);
 
         //HACK: we use QueryEntity.ToDto() here, since EventSourcedChangeEvent can be rehydrated without a IDomainFactory 
-        var events = QueryEventStores(entityName, entityId, query)
+        var queries = await QueryEventStoresAsync(entityName, entityId, query, cancellationToken);
+        var events = queries
             .ConvertAll(entity => entity.ToDto<EventSourcedChangeEvent>());
 
-        return Task.FromResult<Result<IReadOnlyList<EventSourcedChangeEvent>, Error>>(events);
+        return events;
     }
 
     private static string GetEventStoreContainerPath(string containerName, string? entityId = null)
@@ -87,7 +86,8 @@ public partial class LocalMachineJsonFileStore : IEventStore
         return $"{EventStoreContainerName}/{containerName}";
     }
 
-    private Optional<EventStoreEntity> GetLatestEvent(string entityName, string entityId, string streamName)
+    private async Task<Optional<EventStoreEntity>> GetLatestEventAsync(string entityName, string entityId,
+        string streamName, CancellationToken cancellationToken)
     {
         entityId.ThrowIfNotValuedParameter(nameof(entityId));
         streamName.ThrowIfNotValuedParameter(nameof(streamName));
@@ -97,7 +97,8 @@ public partial class LocalMachineJsonFileStore : IEventStore
             .OrderBy(ee => ee.Version, OrderDirection.Descending)
             .Take(1);
 
-        var latest = QueryEventStores(entityName, entityId, query)
+        var queries = await QueryEventStoresAsync(entityName, entityId, query, cancellationToken);
+        var latest = queries
             .FirstOrDefault();
 
         return latest.Exists()
@@ -105,8 +106,8 @@ public partial class LocalMachineJsonFileStore : IEventStore
             : Optional<EventStoreEntity>.None;
     }
 
-    private List<QueryEntity> QueryEventStores<TQueryableEntity>(string entityName, string entityId,
-        QueryClause<TQueryableEntity> query)
+    private async Task<List<QueryEntity>> QueryEventStoresAsync<TQueryableEntity>(string entityName, string entityId,
+        QueryClause<TQueryableEntity> query, CancellationToken cancellationToken)
         where TQueryableEntity : IQueryableEntity
     {
         if (query.NotExists() || query.Options.IsEmpty)
@@ -121,9 +122,9 @@ public partial class LocalMachineJsonFileStore : IEventStore
         }
 
         var metadata = PersistedEntityMetadata.FromType<EventStoreEntity>();
-        var results = query.FetchAllIntoMemory(MaxQueryResults, metadata,
-            () => QueryPrimaryEntities(container, metadata),
-            _ => new Dictionary<string, HydrationProperties>());
+        var results = await query.FetchAllIntoMemoryAsync(MaxQueryResults, metadata,
+            () => QueryPrimaryEntitiesAsync(container, metadata, cancellationToken),
+            _ => Task.FromResult(new Dictionary<string, HydrationProperties>()));
 
         return results;
     }

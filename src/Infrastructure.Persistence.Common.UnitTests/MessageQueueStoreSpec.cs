@@ -28,6 +28,7 @@ public class MessageQueueStoreSpec
             _queueStore.Object);
     }
 
+#if TESTINGONLY
     [Fact]
     public async Task WhenCount_ThenGetsCountFromStore()
     {
@@ -35,7 +36,9 @@ public class MessageQueueStoreSpec
 
         _queueStore.Verify(repo => repo.CountAsync("aqueuename", CancellationToken.None));
     }
+#endif
 
+#if TESTINGONLY
     [Fact]
     public async Task WhenDestroyAll_ThenDestroysAllInStore()
     {
@@ -43,6 +46,7 @@ public class MessageQueueStoreSpec
 
         _queueStore.Verify(repo => repo.DestroyAllAsync("aqueuename", CancellationToken.None));
     }
+#endif
 
     [Fact]
     public async Task WhenPopSingleAndNotExists_ThenDoesNotHandle()

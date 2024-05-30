@@ -202,7 +202,7 @@ This is what we modify and how:
 
   > Which should never ever contain ANY production settings or secrets!
 
-* We then manipulate the DI container (seen in the constructor of your integration testing project) and replace certain dependencies (e.g., the 3rd party adapters like: `INotificationsService,` etc) with their respective hardcoded Stubbed equivalents (found in the `Stubs` directory of your integration testing project).
+* We then manipulate the DI container (seen in the constructor of your integration testing project) and replace certain dependencies (e.g., the 3rd party adapters like: `IUserNotificationsService,` etc) with their respective hardcoded Stubbed equivalents (found in the `Stubs` directory of your integration testing project).
 
 > Note: These integration testing stubs will likely use no configuration settings from `appsettings.json` as their responses and behavior are hardcoded/canned in the hardcoded classes of the integration test project.
 

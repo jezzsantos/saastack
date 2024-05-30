@@ -24,12 +24,14 @@ public class SSOUsersRepository : ISSOUsersRepository
         _users = usersStore;
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         return await Tasks.WhenAllAsync(
             _userQueries.DestroyAllAsync(cancellationToken),
             _users.DestroyAllAsync(cancellationToken));
     }
+#endif
 
     public async Task<Result<Optional<SSOUserRoot>, Error>> FindUserInfoByUserIdAsync(string providerName,
         Identifier userId, CancellationToken cancellationToken)

@@ -7,36 +7,34 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-/// <summary>
-///     Defines a file repository on the local machine, that stores each entity as raw JSON.
-///     store is located in named folders under the <see cref="_rootPath" />
-/// </summary>
 public partial class LocalMachineJsonFileStore : IQueueStore, IQueueStoreTrigger
 {
-    private const string QueueStoreContainerName = "Queues";
+    private const string QueueStoreQueueContainerName = "Queues";
 
+#if TESTINGONLY
     Task<Result<long, Error>> IQueueStore.CountAsync(string queueName, CancellationToken cancellationToken)
     {
         queueName.ThrowIfNotValuedParameter((string)nameof(queueName),
             Resources.InProcessInMemDataStore_MissingQueueName);
 
-        var container = EnsureContainer(GetQueueStoreContainerPath(queueName));
+        var queueStore = EnsureContainer(GetQueueStoreContainerPath(queueName));
 
-        return Task.FromResult<Result<long, Error>>(container.Count);
+        return Task.FromResult<Result<long, Error>>(queueStore.Count);
     }
+#endif
 
+#if TESTINGONLY
     Task<Result<Error>> IQueueStore.DestroyAllAsync(string queueName, CancellationToken cancellationToken)
     {
-#if TESTINGONLY
         queueName.ThrowIfNotValuedParameter((string)nameof(queueName),
             Resources.InProcessInMemDataStore_MissingQueueName);
 
         var queueStore = EnsureContainer(GetQueueStoreContainerPath(queueName));
         queueStore.Erase();
-#endif
 
         return Task.FromResult(Result.Ok);
     }
+#endif
 
     public async Task<Result<bool, Error>> PopSingleAsync(string queueName,
         Func<string, CancellationToken, Task<Result<Error>>> messageHandlerAsync,
@@ -46,36 +44,36 @@ public partial class LocalMachineJsonFileStore : IQueueStore, IQueueStoreTrigger
             Resources.InProcessInMemDataStore_MissingQueueName);
         ArgumentNullException.ThrowIfNull(messageHandlerAsync);
 
-        var container = EnsureContainer(GetQueueStoreContainerPath(queueName));
-        if (!container.IsEmpty())
+        var queueStore = EnsureContainer(GetQueueStoreContainerPath(queueName));
+        if (queueStore.IsEmpty())
         {
-            var fifoMessageId = container
-                .GetEntityIds()
-                .OrderBy(x => x)
-                .First();
-            var firstMessage = container.Read(fifoMessageId);
-            var message = firstMessage["Message"];
-            try
-            {
-                var handled = await messageHandlerAsync(message, cancellationToken);
-                if (handled.IsFailure)
-                {
-                    return handled.Error;
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex.ToError(ErrorCode.Unexpected);
-            }
-
-            container.Remove(fifoMessageId);
-            return true;
+            return false;
         }
 
-        return false;
+        var fifoMessageId = queueStore
+            .GetEntityIds()
+            .OrderBy(x => x)
+            .First();
+        var firstMessage = await queueStore.ReadAsync(fifoMessageId, cancellationToken);
+        var message = firstMessage["Message"];
+        try
+        {
+            var handled = await messageHandlerAsync(message, cancellationToken);
+            if (handled.IsFailure)
+            {
+                return handled.Error;
+            }
+        }
+        catch (Exception ex)
+        {
+            return ex.ToError(ErrorCode.Unexpected);
+        }
+
+        queueStore.Remove(fifoMessageId);
+        return true;
     }
 
-    public Task<Result<Error>> PushAsync(string queueName, string message, CancellationToken cancellationToken)
+    public async Task<Result<Error>> PushAsync(string queueName, string message, CancellationToken cancellationToken)
     {
         queueName.ThrowIfNotValuedParameter((string)nameof(queueName),
             Resources.InProcessInMemDataStore_MissingQueueName);
@@ -83,43 +81,41 @@ public partial class LocalMachineJsonFileStore : IQueueStore, IQueueStoreTrigger
             Resources.InProcessInMemDataStore_MissingQueueMessage);
 
         var messageId = DateTime.UtcNow.Ticks.ToString();
-        var container = EnsureContainer(GetQueueStoreContainerPath(queueName));
-        container.Write(messageId, new Dictionary<string, Optional<string>>
+        var queueStore = EnsureContainer(GetQueueStoreContainerPath(queueName));
+        await queueStore.WriteAsync(messageId, new Dictionary<string, Optional<string>>
         {
             { "Message", message }
-        });
+        }, cancellationToken);
 
-        FireMessageQueueUpdated?.Invoke(this, new MessagesQueueUpdatedArgs(queueName, (int)container.Count));
-
-        return Task.FromResult(Result.Ok);
+        return Result.Ok;
     }
 
-    public event MessageQueueUpdated? FireMessageQueueUpdated;
+    public event MessageQueueUpdated? FireQueueMessage;
 
     private static string GetQueueStoreContainerPath(string? containerName = null, string? entityId = null)
     {
         if (entityId.HasValue())
         {
-            return $"{QueueStoreContainerName}/{containerName}/{entityId}";
+            return $"{QueueStoreQueueContainerName}/{containerName}/{entityId}";
         }
 
         if (containerName.HasValue())
         {
-            return $"{QueueStoreContainerName}/{containerName}";
+            return $"{QueueStoreQueueContainerName}/{containerName}";
         }
 
-        return $"{QueueStoreContainerName}";
+        return $"{QueueStoreQueueContainerName}";
     }
 
-    private void NotifyAllQueuedMessages()
+    private void NotifyPendingQueuedMessages()
     {
         var container = EnsureContainer(GetQueueStoreContainerPath());
-        if (!container.Containers().Any())
+        if (container.Containers().HasNone())
         {
             return;
         }
 
-        if (FireMessageQueueUpdated.NotExists())
+        if (FireQueueMessage.NotExists())
         {
             return;
         }
@@ -129,9 +125,40 @@ public partial class LocalMachineJsonFileStore : IQueueStore, IQueueStoreTrigger
             var messageCount = (int)queue.Count;
             if (messageCount > 0)
             {
-                FireMessageQueueUpdated?.Invoke(this, new MessagesQueueUpdatedArgs(queue.Name, messageCount));
+                FireQueueMessage?.Invoke(this, new MessagesQueueUpdatedArgs(queue.Name, messageCount));
             }
         }
+    }
+
+    private bool TryNotifyQueuedMessage(string createdFilePath)
+    {
+        var container = EnsureContainer(GetQueueStoreContainerPath());
+        if (container.Containers().HasNone())
+        {
+            return false;
+        }
+
+        var file = new FileInfo(createdFilePath);
+        var queuesDirectory = file.Directory!.Parent!.FullName;
+        if (queuesDirectory.HasNoValue())
+        {
+            return false;
+        }
+
+        if (!container.IsPath(queuesDirectory))
+        {
+            return false;
+        }
+
+        var queueName = file.Directory.Name;
+        var queueStore = EnsureContainer(GetQueueStoreContainerPath(queueName));
+        var messageCount = (int)queueStore.Count;
+        if (messageCount > 0)
+        {
+            FireQueueMessage?.Invoke(this, new MessagesQueueUpdatedArgs(queueName, messageCount));
+        }
+
+        return true;
     }
 }
 #endif

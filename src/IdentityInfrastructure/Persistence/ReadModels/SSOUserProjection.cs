@@ -13,11 +13,11 @@ namespace IdentityInfrastructure.Persistence.ReadModels;
 
 public class SSOUserProjection : IReadModelProjection
 {
-    private readonly IReadModelProjectionStore<SSOUser> _users;
+    private readonly IReadModelStore<SSOUser> _users;
 
     public SSOUserProjection(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
-        _users = new ReadModelProjectionStore<SSOUser>(recorder, domainFactory, store);
+        _users = new ReadModelStore<SSOUser>(recorder, domainFactory, store);
     }
 
     public Type RootAggregateType => typeof(SSOUserRoot);

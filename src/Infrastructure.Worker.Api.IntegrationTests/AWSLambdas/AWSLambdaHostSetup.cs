@@ -25,9 +25,12 @@ public class AWSLambdaHostSetup : IApiWorkerSpec, IDisposable
     {
         var settings = new AspNetDynamicConfigurationSettings(new ConfigurationBuilder()
             .AddJsonFile("appsettings.Testing.json", true)
+            .AddJsonFile("appsettings.Testing.local.json", true)
             .Build());
         var recorder = NoOpRecorder.Instance;
         QueueStore = AWSSQSQueueStore.Create(recorder, settings);
+        MessageBusStore =
+            AWSSNSMessageBusStore.Create(recorder, settings, new AWSSNSMessageBusStoreOptions(SubscriberType.Queue));
         AWSAccountBase.InitializeAllTests();
     }
 
@@ -53,7 +56,8 @@ public class AWSLambdaHostSetup : IApiWorkerSpec, IDisposable
             .ConfigureAppConfiguration(builder =>
             {
                 builder
-                    .AddJsonFile("appsettings.Testing.json", true);
+                    .AddJsonFile("appsettings.Testing.json", true)
+                    .AddJsonFile("appsettings.Testing.local.json", true);
             })
             .ConfigureServices((_, services) =>
             {
@@ -67,6 +71,8 @@ public class AWSLambdaHostSetup : IApiWorkerSpec, IDisposable
     }
 
     public IQueueStore QueueStore { get; }
+
+    public IMessageBusStore MessageBusStore { get; }
 
     public void OverrideTestingDependencies(Action<IServiceCollection> overrideDependencies)
     {

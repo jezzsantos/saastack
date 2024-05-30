@@ -25,6 +25,8 @@ public class LocalMachineJsonFileStoreSpecSetup : StoreSpecSetupBase
 
     public IEventStore EventStore => _store;
 
+    public IMessageBusStore MessageBusStore => _store;
+
     public IQueueStore QueueStore => _store;
 }
 
@@ -67,4 +69,16 @@ public class LocalMachineJsonFileEventStoreSpec : AnyEventStoreBaseSpec
     {
     }
 }
+
+[Trait("Category", "Integration.Persistence")]
+[Collection("LocalMachineJsonFileStore")]
+[UsedImplicitly]
+public class LocalMachineJsonFileMessageBusStoreSpec : AnyMessageBusStoreBaseSpec
+{
+    public LocalMachineJsonFileMessageBusStoreSpec(LocalMachineJsonFileStoreSpecSetup setup) : base(
+        setup.MessageBusStore)
+    {
+    }
+}
+
 #endif

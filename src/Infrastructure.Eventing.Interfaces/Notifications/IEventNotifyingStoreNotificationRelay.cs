@@ -11,7 +11,12 @@ public interface IEventNotifyingStoreNotificationRelay : IDisposable
     bool IsStarted { get; }
 
     /// <summary>
-    ///     Starts the service
+    ///     Starts the observer
     /// </summary>
     void Start();
+
+    /// <summary>
+    ///     Stops the observer
+    /// </summary>
+    void Stop();
 }

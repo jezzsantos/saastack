@@ -45,16 +45,15 @@ public class EndUsersInProcessServiceClient : IEndUsersService
             getOptions, cancellationToken);
     }
 
-    public async Task<Result<RegisteredEndUser, Error>> RegisterPersonPrivateAsync(ICallerContext caller,
+    public async Task<Result<EndUser, Error>> RegisterPersonPrivateAsync(ICallerContext caller,
         string? invitationToken, string emailAddress, string firstName, string? lastName, string? timezone,
         string? countryCode, bool termsAndConditionsAccepted, CancellationToken cancellationToken)
     {
         return await _endUsersApplication.RegisterPersonAsync(caller, invitationToken, emailAddress, firstName,
-            lastName, timezone,
-            countryCode, termsAndConditionsAccepted, cancellationToken);
+            lastName, timezone, countryCode, termsAndConditionsAccepted, cancellationToken);
     }
 
-    public async Task<Result<RegisteredEndUser, Error>> RegisterMachinePrivateAsync(ICallerContext caller, string name,
+    public async Task<Result<EndUser, Error>> RegisterMachinePrivateAsync(ICallerContext caller, string name,
         string? timezone, string? countryCode,
         CancellationToken cancellationToken)
     {

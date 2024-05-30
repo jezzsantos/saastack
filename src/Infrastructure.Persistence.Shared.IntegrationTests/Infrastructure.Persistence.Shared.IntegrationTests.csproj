@@ -24,4 +24,11 @@
         </Content>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="appsettings.Testing.local.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>

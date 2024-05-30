@@ -54,6 +54,7 @@ public class MultiTenancyMiddlewareSpec
         private readonly Mock<RequestDelegate> _next;
         private readonly Mock<ITenancyContext> _tenancyContext;
         private readonly Mock<ITenantDetective> _tenantDetective;
+        private readonly Mock<IOrganizationsService> _organizationsService;
 
         public GivenAnyCaller()
         {
@@ -67,8 +68,8 @@ public class MultiTenancyMiddlewareSpec
                 .Returns(false);
             _callerContextFactory.Setup(ccf => ccf.Create())
                 .Returns(caller.Object);
-            var organizationsService = new Mock<IOrganizationsService>();
-            organizationsService.Setup(os =>
+            _organizationsService = new Mock<IOrganizationsService>();
+            _organizationsService.Setup(os =>
                     os.GetSettingsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new TenantSettings());
@@ -80,8 +81,7 @@ public class MultiTenancyMiddlewareSpec
                 .ReturnsAsync(new TenantDetectionResult(false, null));
             _next = new Mock<RequestDelegate>();
 
-            _middleware = new MultiTenancyMiddleware(_next.Object, identifierFactory.Object, _endUsersService.Object,
-                organizationsService.Object);
+            _middleware = new MultiTenancyMiddleware(_next.Object, identifierFactory.Object);
         }
 
         [Fact]
@@ -90,7 +90,7 @@ public class MultiTenancyMiddlewareSpec
             var context = SetupContext(_callerContextFactory.Object, _tenancyContext.Object);
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             _next.Verify(n => n.Invoke(context));
             _tenantDetective.Verify(td =>
@@ -109,7 +109,7 @@ public class MultiTenancyMiddlewareSpec
             context.SetEndpoint(new Endpoint(_ => Task.CompletedTask, EndpointMetadataCollection.Empty, "aroute"));
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             _next.Verify(n => n.Invoke(context));
             _tenantDetective.Verify(td =>
@@ -130,7 +130,7 @@ public class MultiTenancyMiddlewareSpec
             context.SetEndpoint(new Endpoint(_ => Task.CompletedTask, metadata, "aroute"));
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             _next.Verify(n => n.Invoke(context));
             _tenantDetective.Verify(td =>
@@ -151,7 +151,7 @@ public class MultiTenancyMiddlewareSpec
             context.SetEndpoint(new Endpoint(_ => Task.CompletedTask, metadata, "aroute"));
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             _next.Verify(n => n.Invoke(context));
             _tenantDetective.Verify(td =>
@@ -172,7 +172,7 @@ public class MultiTenancyMiddlewareSpec
             context.SetEndpoint(new Endpoint(_ => Task.CompletedTask, metadata, "aroute"));
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             _next.Verify(n => n.Invoke(context));
             _tenantDetective.Verify(td =>
@@ -222,8 +222,7 @@ public class MultiTenancyMiddlewareSpec
                 .ReturnsAsync(new TenantDetectionResult(false, null));
             _next = new Mock<RequestDelegate>();
 
-            _middleware = new MultiTenancyMiddleware(_next.Object, _identifierFactory.Object, _endUsersService.Object,
-                _organizationsService.Object);
+            _middleware = new MultiTenancyMiddleware(_next.Object, _identifierFactory.Object);
         }
 
         [Fact]
@@ -232,7 +231,7 @@ public class MultiTenancyMiddlewareSpec
             var context = SetupContext(_callerContextFactory.Object, _tenancyContext.Object);
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             _next.Verify(n => n.Invoke(context));
             _tenantDetective.Verify(td =>
@@ -254,7 +253,7 @@ public class MultiTenancyMiddlewareSpec
             var context = SetupContext(_callerContextFactory.Object, _tenancyContext.Object);
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             context.Response.Should().BeAProblem(HttpStatusCode.BadRequest,
                 Resources.MultiTenancyMiddleware_MissingDefaultOrganization);
@@ -280,7 +279,7 @@ public class MultiTenancyMiddlewareSpec
             var context = SetupContext(_callerContextFactory.Object, _tenancyContext.Object);
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             context.Response.Should().BeAProblem(HttpStatusCode.BadRequest,
                 Resources.MultiTenancyMiddleware_InvalidTenantId);
@@ -304,7 +303,7 @@ public class MultiTenancyMiddlewareSpec
             var context = SetupContext(_callerContextFactory.Object, _tenancyContext.Object);
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             _tenantDetective.Verify(td =>
                 td.DetectTenantAsync(context, Optional<Type>.None, CancellationToken.None));
@@ -328,7 +327,7 @@ public class MultiTenancyMiddlewareSpec
             var context = SetupContext(_callerContextFactory.Object, _tenancyContext.Object);
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             _tenantDetective.Verify(td =>
                 td.DetectTenantAsync(context, Optional<Type>.None, CancellationToken.None));
@@ -391,8 +390,7 @@ public class MultiTenancyMiddlewareSpec
 
             _next = new Mock<RequestDelegate>();
 
-            _middleware = new MultiTenancyMiddleware(_next.Object, identifierFactory.Object, _endUsersService.Object,
-                _organizationsService.Object);
+            _middleware = new MultiTenancyMiddleware(_next.Object, identifierFactory.Object);
         }
 
         [Fact]
@@ -405,7 +403,7 @@ public class MultiTenancyMiddlewareSpec
             var context = SetupContext(_callerContextFactory.Object, _tenancyContext.Object);
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             context.Response.Should().BeAProblem(HttpStatusCode.Forbidden,
                 Resources.MultiTenancyMiddleware_UserNotAMember.Format("atenantid"));
@@ -443,7 +441,7 @@ public class MultiTenancyMiddlewareSpec
                 });
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             _tenantDetective.Verify(td =>
                 td.DetectTenantAsync(context, Optional<Type>.None, CancellationToken.None));
@@ -465,7 +463,7 @@ public class MultiTenancyMiddlewareSpec
             var context = SetupContext(_callerContextFactory.Object, _tenancyContext.Object);
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             context.Response.Should().BeAProblem(HttpStatusCode.BadRequest,
                 Resources.MultiTenancyMiddleware_MissingDefaultOrganization);
@@ -503,7 +501,7 @@ public class MultiTenancyMiddlewareSpec
                 });
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             context.Response.Should().BeAProblem(HttpStatusCode.BadRequest,
                 Resources.MultiTenancyMiddleware_MissingDefaultOrganization);
@@ -542,7 +540,7 @@ public class MultiTenancyMiddlewareSpec
                 });
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             _next.Verify(n => n.Invoke(It.IsAny<HttpContext>()));
             _tenantDetective.Verify(td =>
@@ -565,7 +563,7 @@ public class MultiTenancyMiddlewareSpec
             var context = SetupContext(_callerContextFactory.Object, _tenancyContext.Object);
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             context.Response.Should().BeAProblem(HttpStatusCode.Forbidden,
                 Resources.MultiTenancyMiddleware_UserNotAMember.Format("atenantid"));
@@ -603,7 +601,7 @@ public class MultiTenancyMiddlewareSpec
                 });
 
             await _middleware.InvokeAsync(context, _tenancyContext.Object, _callerContextFactory.Object,
-                _tenantDetective.Object);
+                _tenantDetective.Object, _endUsersService.Object, _organizationsService.Object);
 
             _next.Verify(n => n.Invoke(It.IsAny<HttpContext>()));
             _tenantDetective.Verify(td =>

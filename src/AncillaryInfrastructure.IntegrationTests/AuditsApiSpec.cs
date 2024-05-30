@@ -23,14 +23,16 @@ public class AuditsApiSpec : WebApiSpec<Program>
     {
         EmptyAllRepositories();
         _auditMessageQueue = setup.GetRequiredService<IAuditMessageQueueRepository>();
+#if TESTINGONLY
         _auditMessageQueue.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
+#endif
     }
 
     [Fact]
     public async Task WhenDeliverAudit_ThenDelivers()
     {
         var login = await LoginUserAsync(LoginUser.Operator);
-        var tenantId = login.User.Profile!.DefaultOrganizationId!;
+        var tenantId = login.DefaultOrganizationId!;
 
         var request = new DeliverAuditRequest
         {
@@ -70,7 +72,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
     public async Task WhenDrainAllAuditsAndNone_ThenDoesNotDrainAny()
     {
         var login = await LoginUserAsync(LoginUser.Operator);
-        var tenantId = login.User.Profile!.DefaultOrganizationId!;
+        var tenantId = login.DefaultOrganizationId!;
 
         var request = new DrainAllAuditsRequest();
         await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
@@ -89,7 +91,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
     public async Task WhenDrainAllAuditsAndSomeWithUnknownTenancies_ThenDrains()
     {
         var login = await LoginUserAsync();
-        var tenantId = login.User.Profile!.DefaultOrganizationId;
+        var tenantId = login.DefaultOrganizationId;
         var call = CallContext.CreateCustom("acallid", "acallerid", tenantId);
         await _auditMessageQueue.PushAsync(call, new AuditMessage
         {

@@ -1,27 +1,30 @@
-﻿using Application.Persistence.Interfaces;
+﻿using Application.Persistence.Common.Extensions;
+using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
-using Domain.Common.Extensions;
 using Domain.Interfaces.Entities;
 using Infrastructure.Eventing.Interfaces.Notifications;
 
 namespace Infrastructure.Eventing.Common.Notifications;
 
 /// <summary>
-///     Provides a round-robin notifier of domain events to registered consumers
+///     Provides a round-robin notifier of domain events to registered consumers, in-process and synchronously
 /// </summary>
 public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDisposable
 {
+    private readonly IDomainEventConsumerRelay _consumerRelay;
     private readonly IEventNotificationMessageBroker _messageBroker;
     private readonly IEventSourcedChangeEventMigrator _migrator;
     private readonly IRecorder _recorder;
 
     public EventNotificationNotifier(IRecorder recorder, IEventSourcedChangeEventMigrator migrator,
-        List<IEventNotificationRegistration> registrations, IEventNotificationMessageBroker messageBroker)
+        List<IEventNotificationRegistration> registrations, IDomainEventConsumerRelay consumerRelay,
+        IEventNotificationMessageBroker messageBroker)
     {
         _recorder = recorder;
         Registrations = registrations;
         _migrator = migrator;
+        _consumerRelay = consumerRelay;
         _messageBroker = messageBroker;
     }
 
@@ -60,35 +63,22 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
     {
         streamName.ThrowIfNotValuedParameter(nameof(streamName));
 
-        if (!eventStream.Any())
+        if (eventStream.HasNone())
         {
             return Result.Ok;
         }
 
-        if (!Registrations.Any())
+        var published = await RelayEventStreamToAllConsumersInOrderAsync(eventStream, cancellationToken);
+        if (published.IsFailure)
         {
-            return Result.Ok;
-        }
-
-        var rootAggregateType = Enumerable.First(eventStream).RootAggregateType;
-        var registrations = GetRegistrationsForStream(Registrations, rootAggregateType);
-        if (registrations.HasNone())
-        {
-            return Result.Ok;
-        }
-
-        var results = await Task.WhenAll(registrations.Select(
-            registration => RelayEventStreamToAllConsumersInOrderAsync(registration, eventStream, cancellationToken)));
-        if (results.Any(r => r.IsFailure))
-        {
-            return results.First(r => r.IsFailure).Error;
+            return published.Error;
         }
 
         return Result.Ok;
     }
 
     private async Task<Result<Error>> RelayEventStreamToAllConsumersInOrderAsync(
-        IEventNotificationRegistration registration, List<EventStreamChangeEvent> eventStream,
+        List<EventStreamChangeEvent> eventStream,
         CancellationToken cancellationToken)
     {
         foreach (var changeEvent in eventStream)
@@ -100,59 +90,49 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
             }
 
             var @event = deserialized.Value;
-            var domainEventsRelayed =
-                await RelayDomainEventToAllConsumersAsync(registration, changeEvent, @event, cancellationToken);
-            if (domainEventsRelayed.IsFailure)
+            var domainEventRelayed =
+                await _consumerRelay.RelayDomainEventAsync(@event, changeEvent, cancellationToken);
+            if (domainEventRelayed.IsFailure)
             {
-                return domainEventsRelayed.Error;
+                return domainEventRelayed.Error
+                    .Wrap(ErrorCode.Unexpected, Resources.EventNotificationNotifier_ConsumerError.Format(
+                        _consumerRelay.GetType().Name, @event.RootId, changeEvent.Metadata.Fqn));
             }
 
-            var integrationEventsRelayed =
-                await RelayIntegrationEventToBrokerAsync(registration, changeEvent, @event, cancellationToken);
-            if (integrationEventsRelayed.IsFailure)
+            var integrationEventRelayed =
+                await RelayIntegrationEventToBrokerAsync(@event, changeEvent, cancellationToken);
+            if (integrationEventRelayed.IsFailure)
             {
-                return integrationEventsRelayed.Error;
+                return integrationEventRelayed.Error;
             }
         }
 
         return Result.Ok;
     }
 
-    private static async Task<Result<Error>> RelayDomainEventToAllConsumersAsync(
-        IEventNotificationRegistration registration,
-        EventStreamChangeEvent changeEvent, IDomainEvent @event, CancellationToken cancellationToken)
+    private async Task<Result<Error>> RelayIntegrationEventToBrokerAsync(IDomainEvent @event,
+        EventStreamChangeEvent changeEvent, CancellationToken cancellationToken)
     {
-        if (registration.DomainEventConsumers.HasNone())
+        if (Registrations.HasNone())
         {
             return Result.Ok;
         }
 
-        foreach (var consumer in registration.DomainEventConsumers)
+        var rootAggregateType = changeEvent.RootAggregateType;
+        var translator = GetTranslatorForStream(Registrations, rootAggregateType);
+        if (translator.NotExists())
         {
-            var result = await consumer.NotifyAsync(@event, cancellationToken);
-            if (result.IsFailure)
-            {
-                return result.Error
-                    .Wrap(ErrorCode.Unexpected, Resources.EventNotificationNotifier_ConsumerError.Format(
-                        consumer.GetType().Name, @event.RootId,
-                        changeEvent.Metadata.Fqn));
-            }
+            // Nothing to publish
+            return Result.Ok;
         }
 
-        return Result.Ok;
-    }
-
-    private async Task<Result<Error>> RelayIntegrationEventToBrokerAsync(
-        IEventNotificationRegistration registration, EventStreamChangeEvent changeEvent, IDomainEvent @event,
-        CancellationToken cancellationToken)
-    {
-        var published = await registration.IntegrationEventTranslator.TranslateAsync(@event, cancellationToken);
+        var published = await translator.TranslateAsync(@event, cancellationToken);
         if (published.IsFailure)
         {
             return published.Error.Wrap(ErrorCode.Unexpected,
                 Resources.EventNotificationNotifier_TranslatorError.Format(
-                registration.IntegrationEventTranslator.GetType().Name,
-                @event.RootId, changeEvent.Metadata.Fqn));
+                    translator.GetType().Name,
+                    @event.RootId, changeEvent.Metadata.Fqn));
         }
 
         var publishedEvent = published.Value;
@@ -160,7 +140,7 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
         {
             _recorder.TraceInformation(null,
                 "The producer '{Producer}' chose not publish the integration event '{Event}' with event type '{Type}'",
-                registration.IntegrationEventTranslator.GetType().Name, changeEvent.Id, changeEvent.Metadata.Fqn);
+                translator.GetType().Name, changeEvent.Id, changeEvent.Metadata.Fqn);
             return Result.Ok;
         }
 
@@ -176,17 +156,20 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
         return Result.Ok;
     }
 
-    private static List<IEventNotificationRegistration> GetRegistrationsForStream(
+    private static IIntegrationEventNotificationTranslator? GetTranslatorForStream(
         IEnumerable<IEventNotificationRegistration> registrations, string rootAggregateType)
     {
-        return registrations
-            .Where(prj => prj.IntegrationEventTranslator.RootAggregateType.Name == rootAggregateType)
-            .ToList();
+        var registration = registrations
+            .FirstOrDefault(prj => prj.IntegrationEventTranslator.RootAggregateType.Name == rootAggregateType);
+
+        return registration.Exists()
+            ? registration.IntegrationEventTranslator
+            : null;
     }
 
     private static Result<IDomainEvent, Error> DeserializeChangeEvent(EventStreamChangeEvent changeEvent,
         IEventSourcedChangeEventMigrator migrator)
     {
-        return changeEvent.Metadata.CreateEventFromJson(changeEvent.Id, changeEvent.Data, migrator);
+        return changeEvent.ToDomainEvent(migrator);
     }
 }

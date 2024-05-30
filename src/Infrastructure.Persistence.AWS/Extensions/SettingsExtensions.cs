@@ -7,7 +7,7 @@ namespace Infrastructure.Persistence.AWS.Extensions;
 
 public static class SettingsExtensions
 {
-    public static (BasicAWSCredentials Credentials, RegionEndpoint? RegionEndPoint) GetConnection(
+    public static (AWSCredentials Credentials, RegionEndpoint? RegionEndPoint) GetConnection(
         this IConfigurationSettings settings)
     {
         var accessKey = settings.GetString(AWSConstants.AccessKeySettingName);
@@ -15,15 +15,14 @@ public static class SettingsExtensions
 
         var credentials = new BasicAWSCredentials(accessKey, secretKey);
 
-        if (accessKey.HasNoValue()
-            || secretKey.HasNoValue())
-        {
-            return (credentials, null);
-        }
-
+        //Note: It is this setting that makes the difference between using LocalStack and using the real AWS
         var region = settings.GetString(AWSConstants.RegionSettingName);
+        if (region.HasNoValue())
+        {
+            return (new AnonymousAWSCredentials(), null);
+        }
+        
         var regionEndpoint = RegionEndpoint.GetBySystemName(region);
-
         return (credentials, regionEndpoint);
     }
 }

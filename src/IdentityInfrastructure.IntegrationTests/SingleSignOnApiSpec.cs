@@ -99,12 +99,14 @@ public class SingleSignOnApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
-        var token = NotificationsService.LastRegistrationConfirmationToken;
+        await PropagateDomainEventsAsync();
+        var token = UserNotificationsService.LastRegistrationConfirmationToken;
         await Api.PostAsync(new ConfirmRegistrationPersonPasswordRequest
         {
             Token = token!
         });
 
+        await PropagateDomainEventsAsync();
         var result = await Api.PostAsync(new AuthenticateSingleSignOnRequest
         {
             Username = "auser@company.com",

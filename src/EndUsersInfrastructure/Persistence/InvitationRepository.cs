@@ -26,12 +26,14 @@ public class InvitationRepository : IInvitationRepository
         _users = usersStore;
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         return await Tasks.WhenAllAsync(
             _invitationQueries.DestroyAllAsync(cancellationToken),
             _users.DestroyAllAsync(cancellationToken));
     }
+#endif
 
     public async Task<Result<Optional<EndUserRoot>, Error>> FindInvitedGuestByEmailAddressAsync(
         EmailAddress emailAddress, CancellationToken cancellationToken)

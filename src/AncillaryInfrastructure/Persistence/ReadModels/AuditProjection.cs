@@ -13,11 +13,11 @@ namespace AncillaryInfrastructure.Persistence.ReadModels;
 
 public class AuditProjection : IReadModelProjection
 {
-    private readonly IReadModelProjectionStore<Audit> _audits;
+    private readonly IReadModelStore<Audit> _audits;
 
     public AuditProjection(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
-        _audits = new ReadModelProjectionStore<Audit>(recorder, domainFactory, store);
+        _audits = new ReadModelStore<Audit>(recorder, domainFactory, store);
     }
 
     public Type RootAggregateType => typeof(AuditRoot);

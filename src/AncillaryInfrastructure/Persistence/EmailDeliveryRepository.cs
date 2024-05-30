@@ -27,12 +27,14 @@ public class EmailDeliveryRepository : IEmailDeliveryRepository
         _deliveries = deliveriesStore;
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         return await Tasks.WhenAllAsync(
             _deliveryQueries.DestroyAllAsync(cancellationToken),
             _deliveries.DestroyAllAsync(cancellationToken));
     }
+#endif
 
     public async Task<Result<Optional<EmailDeliveryRoot>, Error>> FindDeliveryByMessageIdAsync(
         QueuedMessageId messageId, CancellationToken cancellationToken)

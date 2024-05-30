@@ -9,6 +9,8 @@ public interface IApiWorkerSpec
 {
     IQueueStore QueueStore { get; }
 
+    IMessageBusStore MessageBusStore { get; }
+
     public TService GetRequiredService<TService>()
         where TService : notnull;
 

@@ -46,6 +46,7 @@ public sealed class BinaryBlobStore : IBinaryBlobStore
         return Result.Ok;
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         var deleted = await _blobStore.DestroyAllAsync(_containerName, cancellationToken);
@@ -57,6 +58,7 @@ public sealed class BinaryBlobStore : IBinaryBlobStore
 
         return deleted;
     }
+#endif
 
     public async Task<Result<Optional<Blob>, Error>> GetAsync(string blobName, Stream stream,
         CancellationToken cancellationToken)

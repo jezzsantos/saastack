@@ -2,7 +2,6 @@ using System.Net;
 using ApiHost1;
 using Application.Resources.Shared;
 using Application.Services.Shared;
-using Common;
 using Domain.Interfaces.Authorization;
 using FluentAssertions;
 using Infrastructure.Shared.DomainServices;
@@ -21,13 +20,14 @@ namespace EndUsersInfrastructure.IntegrationTests;
 public class InvitationsApiSpec : WebApiSpec<Program>
 {
     private static int _invitationCount;
-    private readonly StubNotificationsService _notificationService;
+    private readonly StubUserNotificationsService _userNotificationService;
 
     public InvitationsApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
         EmptyAllRepositories();
-        _notificationService = setup.GetRequiredService<INotificationsService>().As<StubNotificationsService>();
-        _notificationService.Reset();
+        _userNotificationService =
+            setup.GetRequiredService<IUserNotificationsService>().As<StubUserNotificationsService>();
+        _userNotificationService.Reset();
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         result.Content.Value.Invitation!.EmailAddress.Should().Be(emailAddress);
         result.Content.Value.Invitation!.FirstName.Should().Be("Aninvitee");
         result.Content.Value.Invitation!.LastName.Should().BeNull();
-        _notificationService.LastGuestInvitationEmailRecipient.Should().Be(emailAddress);
+        _userNotificationService.LastGuestInvitationEmailRecipient.Should().Be(emailAddress);
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
 
         // Delay to allow for relevant timestamp checks
         await Task.Delay(TimeSpan.FromSeconds(2));
-        _notificationService.Reset();
+        _userNotificationService.Reset();
 
         var result = await Api.PostAsync(new InviteGuestRequest
         {
@@ -70,7 +70,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         result.Content.Value.Invitation!.EmailAddress.Should().Be(emailAddress);
         result.Content.Value.Invitation!.FirstName.Should().Be("Aninvitee");
         result.Content.Value.Invitation!.LastName.Should().BeNull();
-        _notificationService.LastGuestInvitationEmailRecipient.Should().Be(emailAddress);
+        _userNotificationService.LastGuestInvitationEmailRecipient.Should().Be(emailAddress);
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
 
         // Delay to allow for relevant timestamp checks
         await Task.Delay(TimeSpan.FromSeconds(2));
-        _notificationService.Reset();
+        _userNotificationService.Reset();
 
         var result = await Api.PostAsync(new InviteGuestRequest
         {
@@ -98,7 +98,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         result.Content.Value.Invitation!.EmailAddress.Should().Be(emailAddress);
         result.Content.Value.Invitation!.FirstName.Should().Be("afirstname");
         result.Content.Value.Invitation!.LastName.Should().Be("alastname");
-        _notificationService.LastGuestInvitationEmailRecipient.Should().BeNull();
+        _userNotificationService.LastGuestInvitationEmailRecipient.Should().BeNull();
     }
 
     [Fact]
@@ -111,7 +111,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         {
             Email = emailAddress
         }, req => req.SetJWTBearerToken(login.AccessToken));
-        var token = _notificationService.LastGuestInvitationToken!;
+        var token = _userNotificationService.LastGuestInvitationToken!;
 
         await RegisterUserAsync(emailAddress);
 
@@ -133,7 +133,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         {
             Email = emailAddress
         }, req => req.SetJWTBearerToken(login.AccessToken));
-        var token = _notificationService.LastGuestInvitationToken!;
+        var token = _userNotificationService.LastGuestInvitationToken!;
 
         var result = await Api.GetAsync(new VerifyGuestInvitationRequest
         {
@@ -155,7 +155,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         {
             Email = emailAddress
         }, req => req.SetJWTBearerToken(login.AccessToken));
-        var token = _notificationService.LastGuestInvitationToken!;
+        var token = _userNotificationService.LastGuestInvitationToken!;
 
         await RegisterUserAsync(emailAddress);
 
@@ -177,15 +177,15 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         {
             Email = emailAddress
         }, req => req.SetJWTBearerToken(login.AccessToken));
-        var token = _notificationService.LastGuestInvitationToken!;
-        _notificationService.Reset();
+        var token = _userNotificationService.LastGuestInvitationToken!;
+        _userNotificationService.Reset();
 
         await Api.PostAsync(new ResendGuestInvitationRequest
         {
             Token = token
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        _notificationService.LastGuestInvitationEmailRecipient.Should().Be(emailAddress);
+        _userNotificationService.LastGuestInvitationEmailRecipient.Should().Be(emailAddress);
     }
 
     [Fact]
@@ -211,14 +211,6 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         result.Content.Value.Credential.User.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
         result.Content.Value.Credential.User.Features.Should()
             .ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
-        result.Content.Value.Credential.User.Profile!.UserId.Should().Be(result.Content.Value.Credential.User.Id);
-        result.Content.Value.Credential.User.Profile!.DefaultOrganizationId.Should().NotBeNullOrEmpty();
-        result.Content.Value.Credential.User.Profile!.Name.FirstName.Should().Be("afirstname");
-        result.Content.Value.Credential.User.Profile!.Name.LastName.Should().Be("alastname");
-        result.Content.Value.Credential.User.Profile!.DisplayName.Should().Be("afirstname");
-        result.Content.Value.Credential.User.Profile!.EmailAddress.Should().Be(acceptedEmailAddress);
-        result.Content.Value.Credential.User.Profile!.Timezone.Should().Be(Timezones.Default.ToString());
-        result.Content.Value.Credential.User.Profile!.Address.CountryCode.Should().Be(CountryCodes.Default.ToString());
     }
 
     [Fact]
@@ -231,7 +223,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         {
             Email = invitedEmailAddress
         }, req => req.SetJWTBearerToken(login.AccessToken));
-        var token = _notificationService.LastGuestInvitationToken!;
+        var token = _userNotificationService.LastGuestInvitationToken!;
 
         var result = await Api.PostAsync(new RegisterPersonPasswordRequest
         {
@@ -251,14 +243,6 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         result.Content.Value.Credential.User.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
         result.Content.Value.Credential.User.Features.Should()
             .ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
-        result.Content.Value.Credential.User.Profile!.UserId.Should().Be(result.Content.Value.Credential.User.Id);
-        result.Content.Value.Credential.User.Profile!.DefaultOrganizationId.Should().NotBeNullOrEmpty();
-        result.Content.Value.Credential.User.Profile!.Name.FirstName.Should().Be("afirstname");
-        result.Content.Value.Credential.User.Profile!.Name.LastName.Should().Be("alastname");
-        result.Content.Value.Credential.User.Profile!.DisplayName.Should().Be("afirstname");
-        result.Content.Value.Credential.User.Profile!.EmailAddress.Should().Be(invitedEmailAddress);
-        result.Content.Value.Credential.User.Profile!.Timezone.Should().Be(Timezones.Default.ToString());
-        result.Content.Value.Credential.User.Profile!.Address.CountryCode.Should().Be(CountryCodes.Default.ToString());
     }
 
     [Fact]
@@ -271,7 +255,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         {
             Email = invitedEmailAddress
         }, req => req.SetJWTBearerToken(login.AccessToken));
-        var token = _notificationService.LastGuestInvitationToken!;
+        var token = _userNotificationService.LastGuestInvitationToken!;
 
         var registeredEmailAddress = CreateRandomEmailAddress();
         var result = await Api.PostAsync(new RegisterPersonPasswordRequest
@@ -292,14 +276,6 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         result.Content.Value.Credential.User.Roles.Should().OnlyContain(rol => rol == PlatformRoles.Standard.Name);
         result.Content.Value.Credential.User.Features.Should()
             .ContainSingle(feat => feat == PlatformFeatures.PaidTrial.Name);
-        result.Content.Value.Credential.User.Profile!.UserId.Should().Be(result.Content.Value.Credential.User.Id);
-        result.Content.Value.Credential.User.Profile!.DefaultOrganizationId.Should().NotBeNullOrEmpty();
-        result.Content.Value.Credential.User.Profile!.Name.FirstName.Should().Be("afirstname");
-        result.Content.Value.Credential.User.Profile!.Name.LastName.Should().Be("alastname");
-        result.Content.Value.Credential.User.Profile!.DisplayName.Should().Be("afirstname");
-        result.Content.Value.Credential.User.Profile!.EmailAddress.Should().Be(registeredEmailAddress);
-        result.Content.Value.Credential.User.Profile!.Timezone.Should().Be(Timezones.Default.ToString());
-        result.Content.Value.Credential.User.Profile!.Address.CountryCode.Should().Be(CountryCodes.Default.ToString());
     }
 
     [Fact]
@@ -312,9 +288,9 @@ public class InvitationsApiSpec : WebApiSpec<Program>
         {
             Email = invitedEmailAddress
         }, req => req.SetJWTBearerToken(login.AccessToken));
-        var token = _notificationService.LastGuestInvitationToken!;
+        var token = _userNotificationService.LastGuestInvitationToken!;
 
-        var existingEmailAddress = login.User.Profile!.EmailAddress!;
+        var existingEmailAddress = login.Profile!.EmailAddress!;
         var result = await Api.PostAsync(new RegisterPersonPasswordRequest
         {
             InvitationToken = token,

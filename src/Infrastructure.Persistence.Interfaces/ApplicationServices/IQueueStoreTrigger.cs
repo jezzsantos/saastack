@@ -1,5 +1,4 @@
 #if TESTINGONLY
-using Common;
 using Common.Extensions;
 
 namespace Infrastructure.Persistence.Interfaces.ApplicationServices;
@@ -9,7 +8,7 @@ namespace Infrastructure.Persistence.Interfaces.ApplicationServices;
 /// </summary>
 public interface IQueueStoreTrigger
 {
-    event MessageQueueUpdated FireMessageQueueUpdated;
+    event MessageQueueUpdated FireQueueMessage;
 }
 
 /// <summary>
@@ -32,24 +31,6 @@ public class MessagesQueueUpdatedArgs
     public int MessageCount { get; }
 
     public string QueueName { get; }
-}
-
-/// <summary>
-///     Defines a handler for processing a message queue when new messages arrive on it
-/// </summary>
-public interface IQueueStoreNotificationHandler
-{
-    void HandleMessagesQueueUpdated(string queueName, int messageCount);
-}
-
-/// <summary>
-///     Defines a series of message queues that require monitoring
-/// </summary>
-public interface IMonitoredMessageQueues
-{
-    void AddQueueName(string queueName);
-
-    Optional<string> NextQueueName();
 }
 
 #endif

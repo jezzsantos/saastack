@@ -27,6 +27,7 @@ public partial class InProcessInMemStore : IBlobStore
         return Task.FromResult(Result.Ok);
     }
 
+#if TESTINGONLY
     Task<Result<Error>> IBlobStore.DestroyAllAsync(string containerName, CancellationToken cancellationToken)
     {
         containerName.ThrowIfNotValuedParameter(nameof(containerName),
@@ -39,6 +40,7 @@ public partial class InProcessInMemStore : IBlobStore
 
         return Task.FromResult(Result.Ok);
     }
+#endif
 
     public Task<Result<Optional<Blob>, Error>> DownloadAsync(string containerName, string blobName, Stream stream,
         CancellationToken cancellationToken)

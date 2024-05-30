@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using System.Net;
-using System.Net.Sockets;
 using System.Text.Json;
 using Application.Resources.Shared;
 using Application.Services.Shared;
@@ -9,6 +7,8 @@ using Common.Extensions;
 using Common.FeatureFlags;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Api.Operations.Shared.EventNotifications;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using Infrastructure.Web.Api.Operations.Shared.UserProfiles;
@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Mvc.Testing.Handlers;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
 using UnitTesting.Common;
 using Xunit;
 
@@ -66,17 +67,6 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
         _overridenTestingDependencies = overrideDependencies;
     }
 
-    public TInterface? TryGetService<TInterface>(Type serviceType)
-    {
-        if (_scope.NotExists())
-        {
-            _scope = Services.GetRequiredService<IServiceScopeFactory>()
-                .CreateScope();
-        }
-
-        return (TInterface?)_scope.ServiceProvider.GetService(serviceType);
-    }
-
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder
@@ -84,13 +74,14 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
             {
                 Configuration = new ConfigurationBuilder()
                     .AddJsonFile("appsettings.Testing.json", true)
+                    .AddJsonFile("appsettings.Testing.local.json", true)
                     .Build();
                 config.AddConfiguration(Configuration);
             })
             .ConfigureTestServices(services =>
             {
                 //EXTEND: Add more stubs to 3rd party systems required by all tests 
-                services.AddSingleton<INotificationsService, StubNotificationsService>();
+                services.AddSingleton<IUserNotificationsService, StubUserNotificationsService>();
                 services.AddSingleton<IFeatureFlags, StubFeatureFlags>();
                 services.AddSingleton<IAvatarService, StubAvatarService>();
                 if (_overridenTestingDependencies.Exists())
@@ -102,21 +93,27 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
 }
 
 /// <summary>
-///     Provides an xUnit class fixture for integration testing APIs
+///     Provides an xUnit class fixture for integration testing APIs.
+///     Note: The HTTPClient instance used in tests is a special in-memory instance (by default at http://localhost)
+///     must be used to call any API, since there is no TCP involved between HttpClient and the TestServer.
+///     Note: Any call to any port using this HttpClient instance will reach the TestServer
+///     Note: <see cref="TestingServerUrl" /> can be any port, since the client that is created, and used,
+///     is not a real TCP HttpClient (<see cref="TestServer" /> docs)
 /// </summary>
 public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDisposable
     where THost : class
 {
     private const string DotNetCommandLineWithLaunchProfileArgumentsFormat =
         "run --no-build --configuration {0} --launch-profile {1} --project {2}";
-
     private const string PasswordForPerson = "1Password!";
-    private const string WebServerBaseUrlFormat = "https://localhost:{0}/";
+    private const string TestingServerUrl = "https://localhost";
+    private const int WaitStateRetries = 30;
+    // ReSharper disable once StaticMemberInGenericType
+    private static readonly TimeSpan WaitStateInterval = TimeSpan.FromSeconds(1);
     protected readonly IHttpJsonClient Api;
     protected readonly IHttpClient HttpApi;
-    protected readonly StubNotificationsService NotificationsService;
-
-    private readonly List<int> _additionalServerProcesses = new();
+    protected readonly StubUserNotificationsService UserNotificationsService;
+    private readonly List<int> _additionalServerProcesses = [];
     private readonly WebApplicationFactory<THost> _setup;
 
     protected WebApiSpec(WebApiSetup<THost> setup, Action<IServiceCollection>? overrideDependencies = null)
@@ -127,10 +124,12 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         }
 
         _setup = setup.WithWebHostBuilder(_ => { });
-        var clients = CreateClients(setup);
+        var clients = CreateTestingClients(setup);
+
         HttpApi = clients.HttpApi;
         Api = clients.Api;
-        NotificationsService = setup.GetRequiredService<INotificationsService>().As<StubNotificationsService>();
+        UserNotificationsService =
+            setup.GetRequiredService<IUserNotificationsService>().As<StubUserNotificationsService>();
     }
 
     public void Dispose()
@@ -184,6 +183,9 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         return TestResources.ResourceManager.GetStream("TestImage")!;
     }
 
+    /// <summary>
+    ///     Registers the user and authenticates them
+    /// </summary>
     protected async Task<LoginDetails> LoginUserAsync(LoginUser who = LoginUser.PersonA)
     {
         var emailAddress = GetEmailForPerson(who);
@@ -197,14 +199,35 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 
         var person = await RegisterUserAsync(emailAddress, firstName);
 
-        return await ReAuthenticateUserAsync(person.Credential!.User);
+        var user = person.Credential!.User;
+        return await ReAuthenticateUserAsync(user, emailAddress);
     }
 
-    protected async Task<LoginDetails> ReAuthenticateUserAsync(RegisteredEndUser user,
+    /// <summary>
+    ///     Manually propagates domain_events that are queued and waiting to be processed on the message bus.
+    ///     Flows: <see href="https://github.com/jezzsantos/saastack/blob/main/docs/images/Eventing-Flows-Generic.png" />
+    /// </summary>
+    protected async Task PropagateDomainEventsAsync(PropagationRounds rounds = PropagationRounds.Once)
+    {
+#if TESTINGONLY
+        await Repeat.TimesAsync(async () =>
+        {
+            var request = new DrainAllDomainEventsRequest();
+            await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
+        }, (int)rounds);
+#endif
+    }
+
+    protected async Task<LoginDetails> ReAuthenticateUserAsync(LoginDetails details,
         string password = PasswordForPerson)
     {
-        var emailAddress = user.Profile!.EmailAddress!;
+        return await ReAuthenticateUserAsync(details.User, details.Profile!.EmailAddress!, password);
+    }
 
+    protected async Task<LoginDetails> ReAuthenticateUserAsync(EndUser user,
+        string emailAddress, string password = PasswordForPerson)
+    {
+        await PropagateDomainEventsAsync();
         var login = await Api.PostAsync(new AuthenticatePasswordRequest
         {
             Username = emailAddress,
@@ -214,10 +237,11 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         var accessToken = login.Content.Value.Tokens!.AccessToken.Value;
         var refreshToken = login.Content.Value.Tokens.RefreshToken.Value;
 
-        var profile = await Api.GetAsync(new GetProfileForCallerRequest(), req => req.SetJWTBearerToken(accessToken));
-        user.Profile = profile.Content.Value.Profile;
+        var profile = (await Api.GetAsync(new GetProfileForCallerRequest(),
+            req => req.SetJWTBearerToken(accessToken))).Content.Value.Profile!;
 
-        return new LoginDetails(accessToken, refreshToken, user);
+        var defaultOrganizationId = profile.DefaultOrganizationId!;
+        return new LoginDetails(accessToken, refreshToken, user, profile, defaultOrganizationId);
     }
 
     protected async Task<RegisterPersonPasswordResponse> RegisterUserAsync(string emailAddress,
@@ -232,11 +256,13 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
             TermsAndConditionsAccepted = true
         });
 
-        var token = NotificationsService.LastRegistrationConfirmationToken;
+        var token = UserNotificationsService.LastRegistrationConfirmationToken;
         await Api.PostAsync(new ConfirmRegistrationPersonPasswordRequest
         {
             Token = token!
         });
+
+        await PropagateDomainEventsAsync();
 
         return person.Content.Value;
     }
@@ -276,6 +302,21 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         _additionalServerProcesses.Add(process.Id);
     }
 
+    /// <summary>
+    ///     We retry the specified <see cref="request" />  until the <see cref="predicate" /> of the response is achieved
+    /// </summary>
+    protected async Task<JsonResponse<TResponse>> WaitForGetStateAsync<TResponse>(
+        Predicate<JsonResponse<TResponse>> predicate,
+        IWebRequest<TResponse> request, Action<HttpRequestMessage>? filter = null)
+        where TResponse : IWebResponse, new()
+    {
+        var retryPolicy = Policy
+            .HandleResult<JsonResponse<TResponse>>(res => !predicate(res))
+            .WaitAndRetryAsync(WaitStateRetries, _ => WaitStateInterval);
+
+        return await retryPolicy.ExecuteAsync(async () => await Api.GetAsync(request, filter));
+    }
+
     private static string GetEmailForPerson(LoginUser who)
     {
         return who switch
@@ -296,13 +337,13 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         }
     }
 
-    private static (IHttpJsonClient Api, IHttpClient HttpApi) CreateClients<TAnotherHost>(
+    private static (IHttpJsonClient Api, IHttpClient HttpApi) CreateTestingClients<TAnotherHost>(
         WebApiSetup<TAnotherHost> host)
         where TAnotherHost : class
     {
-        var requestUri = new Uri(WebServerBaseUrlFormat.Format(GetNextAvailablePort()));
+        var uri = new Uri(TestingServerUrl.WithoutTrailingSlash());
         var handler = new CookieContainerHandler();
-        var client = host.CreateDefaultClient(requestUri, handler);
+        var client = host.CreateDefaultClient(uri, handler);
 
         var jsonOptions = host.GetRequiredService<JsonSerializerOptions>();
         var httpApi = new TestingClient(client, jsonOptions, handler);
@@ -311,30 +352,27 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         return (api, httpApi);
     }
 
-    private static int GetNextAvailablePort()
-    {
-        var listener = new TcpListener(IPAddress.Loopback, 0);
-        listener.Start();
-        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
-        listener.Stop();
-
-        return port;
-    }
-
     protected class LoginDetails
     {
-        public LoginDetails(string accessToken, string refreshToken, RegisteredEndUser user)
+        public LoginDetails(string accessToken, string refreshToken, EndUser user, UserProfile? profile,
+            string? defaultOrganizationId)
         {
             AccessToken = accessToken;
             RefreshToken = refreshToken;
             User = user;
+            Profile = profile;
+            DefaultOrganizationId = defaultOrganizationId;
         }
 
         public string AccessToken { get; }
 
+        public string? DefaultOrganizationId { get; }
+
+        public UserProfile? Profile { get; }
+
         public string RefreshToken { get; set; }
 
-        public RegisteredEndUser User { get; }
+        public EndUser User { get; }
     }
 
     protected enum LoginUser
@@ -342,5 +380,11 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         PersonA = 0,
         PersonB = 1,
         Operator = 2
+    }
+
+    protected enum PropagationRounds
+    {
+        Once = 1,
+        Twice = 2
     }
 }

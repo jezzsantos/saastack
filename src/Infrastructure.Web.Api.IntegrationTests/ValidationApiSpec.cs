@@ -74,7 +74,7 @@ public class ValidationApiSpec
             result.Content.Error.Status.Should().Be(400);
             result.Content.Error.Detail.Should().Be("'Required Field' must not be empty.");
             result.Content.Error.Instance.Should()
-                .Match(@"https://localhost:?????/testingonly/validations/validated/1234");
+                .Be(@"https://localhost/testingonly/validations/validated/1234");
             result.Content.Error.Exception.Should().BeNull();
             result.Content.Error.Errors.Should().BeEquivalentTo(new ValidatorProblem[]
             {
@@ -102,8 +102,8 @@ public class ValidationApiSpec
             result.Content.Error.Detail.Should()
                 .Be(Resources.GetTestingOnlyValidatedRequestValidator_InvalidRequiredField);
             result.Content.Error.Instance.Should()
-                .Match(
-                    "https://localhost:?????/testingonly/validations/validated/1234?optionalfield=invalid&requiredfield=invalid");
+                .Be(
+                    "https://localhost/testingonly/validations/validated/1234?optionalfield=invalid&requiredfield=invalid");
             result.Content.Error.Exception.Should().BeNull();
             result.Content.Error.Errors!.Length.Should().Be(2);
             result.Content.Error.Errors[0].Rule.Should().Be("RegularExpressionValidator");
@@ -188,7 +188,7 @@ public class ValidationApiSpec
             result.Content.Error.Status.Should().Be(400);
             result.Content.Error.Detail.Should().Be("'Required Field' must not be empty.");
             result.Content.Error.Instance.Should()
-                .Match(@"https://localhost:?????/testingonly/validations/validated/1234");
+                .Be(@"https://localhost/testingonly/validations/validated/1234");
             result.Content.Error.Exception.Should().BeNull();
             result.Content.Error.Errors.Should().BeEquivalentTo(new ValidatorProblem[]
             {
@@ -216,7 +216,7 @@ public class ValidationApiSpec
             result.Content.Error.Detail.Should()
                 .Be(Resources.GetTestingOnlyValidatedRequestValidator_InvalidRequiredField);
             result.Content.Error.Instance.Should()
-                .Match("https://localhost:?????/testingonly/validations/validated/1234");
+                .Be("https://localhost/testingonly/validations/validated/1234");
             result.Content.Error.Exception.Should().BeNull();
             result.Content.Error.Errors!.Length.Should().Be(2);
             result.Content.Error.Errors[0].Rule.Should().Be("RegularExpressionValidator");

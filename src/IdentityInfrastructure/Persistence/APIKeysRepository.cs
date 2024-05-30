@@ -27,12 +27,14 @@ public class APIKeysRepository : IAPIKeysRepository
         _apiKeys = apiKeyStore;
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         return await Tasks.WhenAllAsync(
             _apiKeyQueries.DestroyAllAsync(cancellationToken),
             _apiKeys.DestroyAllAsync(cancellationToken));
     }
+#endif
 
     public async Task<Result<APIKeyRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {

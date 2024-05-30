@@ -28,9 +28,11 @@ public class AzureFunctionHostSetup : IApiWorkerSpec, IDisposable
     {
         var settings = new AspNetDynamicConfigurationSettings(new ConfigurationBuilder()
             .AddJsonFile("appsettings.Testing.json", true)
+            .AddJsonFile("appsettings.Testing.local.json", true)
             .Build());
         var recorder = NoOpRecorder.Instance;
         QueueStore = AzureStorageAccountQueueStore.Create(recorder, settings);
+        MessageBusStore = AzureServiceBusStore.Create(recorder, settings);
         AzureStorageAccountBase.InitializeAllTests();
     }
 
@@ -60,7 +62,8 @@ public class AzureFunctionHostSetup : IApiWorkerSpec, IDisposable
             .ConfigureAppConfiguration(builder =>
             {
                 builder
-                    .AddJsonFile("appsettings.Testing.json", true);
+                    .AddJsonFile("appsettings.Testing.json", true)
+                    .AddJsonFile("appsettings.Testing.local.json", true);
             })
             .ConfigureAzureFunctionTesting<Program>()
             .ConfigureServices((_, services) =>
@@ -75,6 +78,8 @@ public class AzureFunctionHostSetup : IApiWorkerSpec, IDisposable
     }
 
     public IQueueStore QueueStore { get; }
+
+    public IMessageBusStore MessageBusStore { get; }
 
     public void OverrideTestingDependencies(Action<IServiceCollection> overrideDependencies)
     {

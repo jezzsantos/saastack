@@ -46,23 +46,23 @@ public class ImagesModule : ISubdomainModule
             return (_, services) =>
             {
                 services.AddSingleton<IFileUploadService, FileUploadService>();
-                services.AddSingleton<IImagesApplication>(c => new ImagesApplication.ImagesApplication(
-                    c.GetRequiredService<IRecorder>(),
+                services.AddPerHttpRequest<IImagesApplication>(c =>
+                    new ImagesApplication.ImagesApplication(c.GetRequiredService<IRecorder>(),
                     c.GetRequiredService<IIdentifierFactory>(),
                     c.GetRequiredService<IHostSettings>(),
                     c.GetRequiredService<IImagesRepository>()));
-                services.AddSingleton<IImagesRepository>(c => new ImagesRepository(
-                    c.GetRequiredService<IRecorder>(),
+                services.AddPerHttpRequest<IImagesRepository>(c =>
+                    new ImagesRepository(c.GetRequiredService<IRecorder>(),
                     c.GetRequiredService<IDomainFactory>(),
                     c.GetRequiredService<IEventSourcingDddCommandStore<ImageRoot>>(),
                     c.GetRequiredServiceForPlatform<IBlobStore>(),
                     c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterUnTenantedEventing<ImageRoot, ImageProjection>(
+                services.RegisterEventing<ImageRoot, ImageProjection>(
                     c => new ImageProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
 
-                services.AddSingleton<IImagesService, ImagesInProcessServiceClient>();
+                services.AddPerHttpRequest<IImagesService, ImagesInProcessServiceClient>();
             };
         }
     }

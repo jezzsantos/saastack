@@ -35,11 +35,6 @@ public enum EndUserClassification
     Machine = 1
 }
 
-public class RegisteredEndUser : EndUser
-{
-    public UserProfileWithDefaultMembership? Profile { get; set; }
-}
-
 public class EndUserWithMemberships : EndUser
 {
     public List<Membership> Memberships { get; set; } = new();

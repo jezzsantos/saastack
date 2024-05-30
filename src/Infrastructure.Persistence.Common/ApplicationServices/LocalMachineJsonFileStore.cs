@@ -17,13 +17,14 @@ namespace Infrastructure.Persistence.Common.ApplicationServices;
 ///     The files are located in named folders under the <see cref="rootPath" />
 /// </summary>
 [ExcludeFromCodeCoverage]
-public partial class LocalMachineJsonFileStore
+public sealed partial class LocalMachineJsonFileStore : IDisposable
 {
     public const string PathSettingName = "ApplicationServices:Persistence:LocalMachineJsonFileStore:RootPath";
+    private readonly FileSystemWatcher? _fileSystemWatcher;
     private readonly string _rootPath;
 
     public static LocalMachineJsonFileStore Create(IConfigurationSettings settings,
-        IQueueStoreNotificationHandler? handler = default)
+        IMessageMonitor? handler = default)
     {
         var configPath = settings.GetString(PathSettingName);
         var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -33,7 +34,7 @@ public partial class LocalMachineJsonFileStore
         return new LocalMachineJsonFileStore(path, handler);
     }
 
-    private LocalMachineJsonFileStore(string rootPath, IQueueStoreNotificationHandler? handler = default)
+    private LocalMachineJsonFileStore(string rootPath, IMessageMonitor? monitor = default)
     {
         rootPath.ThrowIfNotValuedParameter(nameof(rootPath));
         if (rootPath.IsInvalidParameter(ValidateRootPath, nameof(rootPath),
@@ -44,14 +45,65 @@ public partial class LocalMachineJsonFileStore
 
         _rootPath = rootPath;
 
-        if (handler.Exists())
+        if (monitor.Exists())
         {
-            FireMessageQueueUpdated += (_, args) =>
+            _fileSystemWatcher = new FileSystemWatcher(_rootPath, "*.json")
             {
-                handler.HandleMessagesQueueUpdated(args.QueueName, args.MessageCount);
+                IncludeSubdirectories = true,
+                EnableRaisingEvents = true
             };
-            NotifyAllQueuedMessages();
+            _fileSystemWatcher.Created += FileSystemWatcherOnCreated;
+            FireQueueMessage += (_, args) =>
+            {
+                monitor.NotifyQueueMessagesChanged(args.QueueName, args.MessageCount);
+            };
+            NotifyPendingQueuedMessages();
+            FireTopicMessage += (_, args) =>
+            {
+                monitor.NotifyTopicMessagesChanged(args.QueueName, args.MessageCount);
+            };
+            NotifyPendingBusTopicMessages();
         }
+    }
+
+    ~LocalMachineJsonFileStore()
+    {
+        Dispose(false);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _fileSystemWatcher?.Dispose();
+        }
+    }
+
+    private void FileSystemWatcherOnCreated(object sender, FileSystemEventArgs e)
+    {
+        if (!e.ChangeType.HasFlag(WatcherChangeTypes.Created))
+        {
+            return;
+        }
+
+        if (TryNotifyQueuedMessage(e.FullPath))
+        {
+            return;
+        }
+
+        if (TryNotifyBusTopicMessage(e.FullPath))
+        {
+            return;
+        }
+
+        // ReSharper disable once RedundantJumpStatement
+        return;
     }
 
     private static void VerifyRootPath(string path)
@@ -103,21 +155,26 @@ public partial class LocalMachineJsonFileStore
         }
     }
 
-    private static Dictionary<string, HydrationProperties> QueryPrimaryEntities(
-        FileContainer container, PersistedEntityMetadata metadata)
+    private static async Task<Dictionary<string, HydrationProperties>> QueryPrimaryEntitiesAsync(
+        FileContainer container, PersistedEntityMetadata metadata, CancellationToken cancellationToken)
     {
-        var primaryEntities = container.GetEntityIds()
-            .ToDictionary(id => id, id => GetEntityFromFile(container, id, metadata));
+        var ids = container.GetEntityIds();
+        var primaryEntities = new Dictionary<string, HydrationProperties>();
+        foreach (var id in ids)
+        {
+            var properties = await GetEntityFromFileAsync(container, id, metadata, cancellationToken);
+            primaryEntities.Add(id, properties);
+        }
 
         return primaryEntities;
     }
 
-    private static HydrationProperties GetEntityFromFile(FileContainer container, string id,
-        PersistedEntityMetadata metadata)
+    private static async Task<HydrationProperties> GetEntityFromFileAsync(FileContainer container, string id,
+        PersistedEntityMetadata metadata, CancellationToken cancellationToken)
     {
         try
         {
-            var containerEntityProperties = container.Read(id);
+            var containerEntityProperties = await container.ReadAsync(id, cancellationToken);
             if (containerEntityProperties.HasNone())
             {
                 return new HydrationProperties();
@@ -152,14 +209,15 @@ public partial class LocalMachineJsonFileStore
 
         public string Name => new DirectoryInfo(_dirPath).Name;
 
-        public void AddBinary(string name, string contentType, Stream stream)
+        public async Task AddBinaryAsync(string name, string contentType, Stream stream,
+            CancellationToken cancellationToken)
         {
-            var data = stream.ReadFully();
-            Write(name, new Dictionary<string, Optional<string>>
+            var data = await stream.ReadFullyAsync(cancellationToken);
+            await WriteAsync(name, new Dictionary<string, Optional<string>>
             {
                 { nameof(BinaryFile.ContentType), contentType },
                 { nameof(BinaryFile.Data), Convert.ToBase64String(data) }
-            });
+            }, cancellationToken);
         }
 
         public IEnumerable<FileContainer> Containers()
@@ -189,9 +247,9 @@ public partial class LocalMachineJsonFileStore
             return File.Exists(filename);
         }
 
-        public Optional<BinaryFile> GetBinary(string name)
+        public async Task<Optional<BinaryFile>> GetBinaryAsync(string name, CancellationToken cancellationToken)
         {
-            var properties = Read(name);
+            var properties = await ReadAsync(name, cancellationToken);
             if (properties.HasNone())
             {
                 return Optional<BinaryFile>.None;
@@ -216,23 +274,25 @@ public partial class LocalMachineJsonFileStore
             return Count == 0;
         }
 
-        public void Overwrite(string entityId, IReadOnlyDictionary<string, Optional<string>> properties)
+        public async Task OverwriteAsync(string entityId, IReadOnlyDictionary<string, Optional<string>> properties,
+            CancellationToken cancellationToken)
         {
             if (Exists(entityId))
             {
-                Write(entityId, properties);
+                await WriteAsync(entityId, properties, cancellationToken);
             }
         }
 
         /// <summary>
         ///     Reads the properties from the JSON data within the file on disk
         /// </summary>
-        public IReadOnlyDictionary<string, Optional<string>> Read(string entityId)
+        public async Task<IReadOnlyDictionary<string, Optional<string>>> ReadAsync(string entityId,
+            CancellationToken cancellationToken)
         {
             if (Exists(entityId))
             {
                 var filename = GetFullFilePathFromId(entityId);
-                var content = File.ReadAllText(filename);
+                var content = await File.ReadAllTextAsync(filename, cancellationToken);
                 return (content.FromJson<Dictionary<string, string>>()
                         ?? new Dictionary<string, string>())
                     .ToDictionary(pair => pair.Key, pair => pair.Value.ToOptional());
@@ -253,24 +313,25 @@ public partial class LocalMachineJsonFileStore
         /// <summary>
         ///     Writes the specified <see cref="properties" /> to JSON to a file on the disk
         /// </summary>
-        public void Write(string entityId, IReadOnlyDictionary<string, Optional<string>> properties)
+        public async Task WriteAsync(string entityId, IReadOnlyDictionary<string, Optional<string>> properties,
+            CancellationToken cancellationToken)
         {
             var retryPolicy = Policy.Handle<IOException>()
-                .WaitAndRetry(3, _ => TimeSpan.FromMilliseconds(300));
+                .WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(300));
 
             var filename = GetFullFilePathFromId(entityId);
-            retryPolicy.Execute(SaveFile);
+            await retryPolicy.ExecuteAsync(SaveFileAsync);
             return;
 
-            void SaveFile()
+            async Task SaveFileAsync()
             {
-                using var file = File.CreateText(filename);
+                await using var file = File.CreateText(filename);
                 var json = properties
                     .Where(pair => pair.Value.HasValue)
                     .ToDictionary(pair => pair.Key, pair => pair.Value.ValueOrDefault)
                     .ToJson();
-                file.Write(json);
-                file.Flush();
+                await file.WriteAsync(json);
+                await file.FlushAsync(cancellationToken);
             }
         }
 
@@ -310,6 +371,12 @@ public partial class LocalMachineJsonFileStore
         {
             // Causes issues on Mac OS - https://en.wikipedia.org/wiki/.DS_Store
             return fileName == ".DS_Store";
+        }
+
+        public bool IsPath(string fullPath)
+        {
+            return Path.GetFullPath(_dirPath).WithoutTrailingSlash()
+                .EqualsIgnoreCase(Path.GetFullPath(fullPath).WithoutTrailingSlash());
         }
     }
 }

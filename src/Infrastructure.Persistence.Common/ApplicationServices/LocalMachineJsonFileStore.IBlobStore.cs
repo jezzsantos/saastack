@@ -11,6 +11,7 @@ public partial class LocalMachineJsonFileStore : IBlobStore
 {
     private const string BlobStoreContainerName = "Blobs";
 
+#if TESTINGONLY
     Task<Result<Error>> IBlobStore.DestroyAllAsync(string containerName, CancellationToken cancellationToken)
     {
         containerName.ThrowIfNotValuedParameter(nameof(containerName),
@@ -21,6 +22,7 @@ public partial class LocalMachineJsonFileStore : IBlobStore
 
         return Task.FromResult(Result.Ok);
     }
+#endif
 
     public Task<Result<Error>> DeleteAsync(string containerName, string blobName, CancellationToken cancellationToken)
     {
@@ -35,7 +37,7 @@ public partial class LocalMachineJsonFileStore : IBlobStore
         return Task.FromResult(Result.Ok);
     }
 
-    public Task<Result<Optional<Blob>, Error>> DownloadAsync(string containerName, string blobName, Stream stream,
+    public async Task<Result<Optional<Blob>, Error>> DownloadAsync(string containerName, string blobName, Stream stream,
         CancellationToken cancellationToken)
     {
         containerName.ThrowIfNotValuedParameter(nameof(containerName),
@@ -46,23 +48,24 @@ public partial class LocalMachineJsonFileStore : IBlobStore
         var container = EnsureContainer(GetBlobStoreContainerPath(containerName, null));
         if (container.Exists(blobName))
         {
-            var file = container.GetBinary(blobName);
+            var file = await container.GetBinaryAsync(blobName, cancellationToken);
             if (!file.HasValue)
             {
-                return Task.FromResult<Result<Optional<Blob>, Error>>(Optional<Blob>.None);
+                return Optional<Blob>.None;
             }
 
             stream.Write(file.Value.Data);
-            return Task.FromResult<Result<Optional<Blob>, Error>>(new Blob
+            return new Blob
             {
                 ContentType = file.Value.ContentType
-            }.ToOptional());
+            }.ToOptional();
         }
 
-        return Task.FromResult<Result<Optional<Blob>, Error>>(Optional<Blob>.None);
+        return Optional<Blob>.None;
     }
 
-    public Task<Result<Error>> UploadAsync(string containerName, string blobName, string contentType, Stream stream,
+    public async Task<Result<Error>> UploadAsync(string containerName, string blobName, string contentType,
+        Stream stream,
         CancellationToken cancellationToken)
     {
         containerName.ThrowIfNotValuedParameter(nameof(containerName),
@@ -74,9 +77,9 @@ public partial class LocalMachineJsonFileStore : IBlobStore
 
         var container = EnsureContainer(GetBlobStoreContainerPath(containerName, null));
 
-        container.AddBinary(blobName, contentType, stream);
+        await container.AddBinaryAsync(blobName, contentType, stream, cancellationToken);
 
-        return Task.FromResult(Result.Ok);
+        return Result.Ok;
     }
 
     private static string GetBlobStoreContainerPath(string containerName, string? entityId)

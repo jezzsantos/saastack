@@ -16,7 +16,9 @@ public interface IDataStore
 
     Task<Result<long, Error>> CountAsync(string containerName, CancellationToken cancellationToken);
 
+#if TESTINGONLY
     Task<Result<Error>> DestroyAllAsync(string containerName, CancellationToken cancellationToken);
+#endif
 
     Task<Result<List<QueryEntity>, Error>> QueryAsync<TQueryableEntity>(string containerName,
         QueryClause<TQueryableEntity> query, PersistedEntityMetadata metadata, CancellationToken cancellationToken)

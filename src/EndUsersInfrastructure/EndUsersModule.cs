@@ -48,44 +48,44 @@ public class EndUsersModule : ISubdomainModule
         {
             return (_, services) =>
             {
-                services.AddSingleton<IEndUsersApplication>(c =>
+                services.AddPerHttpRequest<IEndUsersApplication>(c =>
                     new EndUsersApplication.EndUsersApplication(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IIdentifierFactory>(),
                         c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
-                        c.GetRequiredService<INotificationsService>(),
+                        c.GetRequiredService<IUserNotificationsService>(),
                         c.GetRequiredService<IUserProfilesService>(),
                         c.GetRequiredService<IInvitationRepository>(),
                         c.GetRequiredService<IEndUserRepository>()));
-                services.AddSingleton<IInvitationsApplication>(c =>
+                services.AddPerHttpRequest<IInvitationsApplication>(c =>
                     new InvitationsApplication(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IIdentifierFactory>(),
                         c.GetRequiredService<ITokensService>(),
-                        c.GetRequiredService<INotificationsService>(),
+                        c.GetRequiredService<IUserNotificationsService>(),
                         c.GetRequiredService<IUserProfilesService>(),
                         c.GetRequiredService<IInvitationRepository>()));
-                services.AddSingleton<IEndUserRepository>(c => new EndUserRepository(
-                    c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredService<IDomainFactory>(),
-                    c.GetRequiredService<IEventSourcingDddCommandStore<EndUserRoot>>(),
-                    c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.AddSingleton<IInvitationRepository>(c => new InvitationRepository(
-                    c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredService<IDomainFactory>(),
-                    c.GetRequiredService<IEventSourcingDddCommandStore<EndUserRoot>>(),
-                    c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.AddPerHttpRequest<IEndUserRepository>(c =>
+                    new EndUserRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<EndUserRoot>>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.AddPerHttpRequest<IInvitationRepository>(c =>
+                    new InvitationRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<EndUserRoot>>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
                 services
                     .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
                         new EndUserNotificationConsumer(
                             c.GetRequiredService<ICallerContextFactory>(),
                             c.GetRequiredService<IEndUsersApplication>(),
                             c.GetRequiredService<IInvitationsApplication>()));
-                services.RegisterUnTenantedEventing<EndUserRoot, EndUserProjection, EndUserNotifier>(
+                services.RegisterEventing<EndUserRoot, EndUserProjection, EndUserNotifier>(
                     c => new EndUserProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()),
-                    c => new EndUserNotifier(c.GetRequiredService<IEnumerable<IDomainEventNotificationConsumer>>()));
+                    _ => new EndUserNotifier());
 
-                services.AddSingleton<IEndUsersService, EndUsersInProcessServiceClient>();
+                services.AddPerHttpRequest<IEndUsersService, EndUsersInProcessServiceClient>();
             };
         }
     }

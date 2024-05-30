@@ -30,7 +30,9 @@ public class EmailsApiSpec : WebApiSpec<Program>
         _emailDeliveryService = setup.GetRequiredService<IEmailDeliveryService>().As<StubEmailDeliveryService>();
         _emailDeliveryService.Reset();
         _emailMessageQueue = setup.GetRequiredService<IEmailMessageQueue>();
+#if TESTINGONLY
         _emailMessageQueue.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
+#endif
     }
 
     [Fact]

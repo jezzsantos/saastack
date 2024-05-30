@@ -12,7 +12,9 @@ public interface IEventStore
     Task<Result<string, Error>> AddEventsAsync(string entityName, string entityId, List<EventSourcedChangeEvent> events,
         CancellationToken cancellationToken);
 
+#if TESTINGONLY
     Task<Result<Error>> DestroyAllAsync(string entityName, CancellationToken cancellationToken);
+#endif
 
     Task<Result<IReadOnlyList<EventSourcedChangeEvent>, Error>> GetEventStreamAsync(string entityName, string entityId,
         CancellationToken cancellationToken);

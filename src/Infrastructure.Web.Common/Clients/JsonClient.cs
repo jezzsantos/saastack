@@ -20,7 +20,7 @@ namespace Infrastructure.Web.Common.Clients;
 [ExcludeFromCodeCoverage]
 public class JsonClient : IHttpJsonClient, IDisposable
 {
-    private readonly HttpClient _client;
+    private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
 
     public JsonClient(IHttpClientFactory clientFactory, JsonSerializerOptions jsonOptions) : this(
@@ -28,9 +28,9 @@ public class JsonClient : IHttpJsonClient, IDisposable
     {
     }
 
-    public JsonClient(HttpClient client, JsonSerializerOptions jsonOptions)
+    public JsonClient(HttpClient httpClient, JsonSerializerOptions jsonOptions)
     {
-        _client = client;
+        _httpClient = httpClient;
         _jsonOptions = jsonOptions;
     }
 
@@ -44,7 +44,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
     {
         if (disposing)
         {
-            _client.Dispose();
+            _httpClient.Dispose();
         }
     }
 
@@ -290,7 +290,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
 
     public void SetBaseUrl(string baseUrl)
     {
-        _client.BaseAddress = new Uri(baseUrl.WithTrailingSlash(), UriKind.Absolute);
+        _httpClient.BaseAddress = new Uri(baseUrl.WithTrailingSlash(), UriKind.Absolute);
     }
 
     private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod method, IWebRequest request,
@@ -348,7 +348,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         var request = new HttpRequestMessage
         {
             Method = method,
-            RequestUri = new Uri(_client.BaseAddress!, requestUri.WithoutLeadingSlash()),
+            RequestUri = new Uri(_httpClient.BaseAddress!, requestUri.WithoutLeadingSlash()),
             Content = requestContent,
             Headers = { { HttpConstants.Headers.Accept, HttpConstants.ContentTypes.Json } }
         };
@@ -357,7 +357,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
             requestFilter(request);
         }
 
-        return await _client.SendAsync(request, cancellationToken ?? CancellationToken.None);
+        return await _httpClient.SendAsync(request, cancellationToken ?? CancellationToken.None);
     }
 
     private static bool TryReadRfc7807Error(HttpResponseMessage response, JsonSerializerOptions? jsonOptions,

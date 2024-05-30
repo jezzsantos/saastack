@@ -193,7 +193,7 @@ public class SingleSignOnApplicationSpec
         _endUsersService.Setup(eus => eus.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new RegisteredEndUser
+            .ReturnsAsync(new EndUser
             {
                 Id = "aregistereduserid"
             });

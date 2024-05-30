@@ -53,73 +53,73 @@ public class IdentityModule : ISubdomainModule
             return (_, services) =>
             {
                 services.AddSingleton<ITokensService, TokensService>();
-                services.AddSingleton<IEmailAddressService, EmailAddressService>();
+                services.AddPerHttpRequest<IEmailAddressService, EmailAddressService>();
                 services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
                 services.AddSingleton<IAPIKeyHasherService, APIKeyHasherService>();
                 services.AddSingleton<IJWTTokensService>(c =>
                     new JWTTokensService(c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
                         c.GetRequiredService<ITokensService>()));
-                services.AddSingleton<IAuthTokensService, AuthTokensService>();
-                services.AddSingleton<IEncryptionService>(c => new AesEncryptionService(c
-                    .GetRequiredServiceForPlatform<IConfigurationSettings>()
-                    .GetString("ApplicationServices:SSOProvidersService:SSOUserTokens:AesSecret")));
+                services.AddPerHttpRequest<IAuthTokensService, AuthTokensService>();
+                services.AddSingleton<IEncryptionService>(c =>
+                    new AesEncryptionService(c.GetRequiredServiceForPlatform<IConfigurationSettings>()
+                        .GetString("ApplicationServices:SSOProvidersService:SSOUserTokens:AesSecret")));
 
-                services.AddSingleton<IAPIKeysApplication, APIKeysApplication>();
-                services.AddSingleton<IAuthTokensApplication, AuthTokensApplication>();
-                services.AddSingleton<IPasswordCredentialsApplication>(c => new PasswordCredentialsApplication(
-                    c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredService<IIdentifierFactory>(),
-                    c.GetRequiredService<IEndUsersService>(),
-                    c.GetRequiredService<INotificationsService>(),
-                    c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
-                    c.GetRequiredService<IEmailAddressService>(),
-                    c.GetRequiredService<ITokensService>(),
-                    c.GetRequiredService<IPasswordHasherService>(),
-                    c.GetRequiredService<IAuthTokensService>(),
-                    c.GetRequiredService<IWebsiteUiService>(),
-                    c.GetRequiredService<IPasswordCredentialsRepository>()));
-                services.AddSingleton<IMachineCredentialsApplication, MachineCredentialsApplication>();
-                services.AddSingleton<ISingleSignOnApplication, SingleSignOnApplication>();
-                services.AddSingleton<IPasswordCredentialsRepository>(c => new PasswordCredentialsRepository(
-                    c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredService<IDomainFactory>(),
-                    c.GetRequiredService<IEventSourcingDddCommandStore<PasswordCredentialRoot>>(),
-                    c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterUnTenantedEventing<PasswordCredentialRoot, PasswordCredentialProjection>(
+                services.AddPerHttpRequest<IAPIKeysApplication, APIKeysApplication>();
+                services.AddPerHttpRequest<IAuthTokensApplication, AuthTokensApplication>();
+                services.AddPerHttpRequest<IPasswordCredentialsApplication>(c =>
+                    new PasswordCredentialsApplication(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IIdentifierFactory>(),
+                        c.GetRequiredService<IEndUsersService>(),
+                        c.GetRequiredService<IUserNotificationsService>(),
+                        c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                        c.GetRequiredService<IEmailAddressService>(),
+                        c.GetRequiredService<ITokensService>(),
+                        c.GetRequiredService<IPasswordHasherService>(),
+                        c.GetRequiredService<IAuthTokensService>(),
+                        c.GetRequiredService<IWebsiteUiService>(),
+                        c.GetRequiredService<IPasswordCredentialsRepository>()));
+                services.AddPerHttpRequest<IMachineCredentialsApplication, MachineCredentialsApplication>();
+                services.AddPerHttpRequest<ISingleSignOnApplication, SingleSignOnApplication>();
+                services.AddPerHttpRequest<IPasswordCredentialsRepository>(c =>
+                    new PasswordCredentialsRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<PasswordCredentialRoot>>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.RegisterEventing<PasswordCredentialRoot, PasswordCredentialProjection>(
                     c => new PasswordCredentialProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.AddSingleton<IAuthTokensRepository>(c => new AuthTokensRepository(
-                    c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredService<IDomainFactory>(),
-                    c.GetRequiredService<IEventSourcingDddCommandStore<AuthTokensRoot>>(),
-                    c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterUnTenantedEventing<AuthTokensRoot, AuthTokensProjection>(
+                services.AddPerHttpRequest<IAuthTokensRepository>(c =>
+                    new AuthTokensRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<AuthTokensRoot>>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.RegisterEventing<AuthTokensRoot, AuthTokensProjection>(
                     c => new AuthTokensProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.AddSingleton<IAPIKeysRepository>(c => new APIKeysRepository(
-                    c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredService<IDomainFactory>(),
-                    c.GetRequiredService<IEventSourcingDddCommandStore<APIKeyRoot>>(),
-                    c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterUnTenantedEventing<APIKeyRoot, APIKeyProjection>(
+                services.AddPerHttpRequest<IAPIKeysRepository>(c =>
+                    new APIKeysRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<APIKeyRoot>>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.RegisterEventing<APIKeyRoot, APIKeyProjection>(
                     c => new APIKeyProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.AddSingleton<ISSOUsersRepository>(c => new SSOUsersRepository(
-                    c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredService<IDomainFactory>(),
-                    c.GetRequiredService<IEventSourcingDddCommandStore<SSOUserRoot>>(),
-                    c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterUnTenantedEventing<SSOUserRoot, SSOUserProjection>(
+                services.AddPerHttpRequest<ISSOUsersRepository>(c =>
+                    new SSOUsersRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<SSOUserRoot>>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.RegisterEventing<SSOUserRoot, SSOUserProjection>(
                     c => new SSOUserProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
 
-                services.AddSingleton<IAPIKeysService, APIKeysService>();
-                services.AddSingleton<IIdentityService, IdentityInProcessServiceClient>();
-                services.AddSingleton<ISSOProvidersService, SSOProvidersService>();
+                services.AddPerHttpRequest<IAPIKeysService, APIKeysService>();
+                services.AddPerHttpRequest<IIdentityService, IdentityInProcessServiceClient>();
+                services.AddPerHttpRequest<ISSOProvidersService, SSOProvidersService>();
 #if TESTINGONLY
                 // EXTEND: replace these registrations with your own OAuth2 implementations
                 services.AddSingleton<ISSOAuthenticationProvider, FakeSSOAuthenticationProvider>();

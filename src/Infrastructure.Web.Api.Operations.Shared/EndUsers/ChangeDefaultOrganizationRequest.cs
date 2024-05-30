@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.EndUsers;
 /// </summary>
 [Route("/memberships/me/default", OperationMethod.PutPatch, AccessType.Token)]
 [Authorize(Roles.Platform_Standard, Features.Platform_PaidTrial)]
-public class ChangeDefaultOrganizationRequest : UnTenantedRequest<GetUserResponse>
+public class ChangeDefaultOrganizationRequest : UnTenantedRequest<UpdateUserResponse>
 {
     [Required] public string? OrganizationId { get; set; }
 }

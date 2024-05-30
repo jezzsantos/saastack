@@ -13,11 +13,11 @@ namespace IdentityInfrastructure.Persistence.ReadModels;
 
 public class PasswordCredentialProjection : IReadModelProjection
 {
-    private readonly IReadModelProjectionStore<PasswordCredential> _credentials;
+    private readonly IReadModelStore<PasswordCredential> _credentials;
 
     public PasswordCredentialProjection(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
-        _credentials = new ReadModelProjectionStore<PasswordCredential>(recorder, domainFactory, store);
+        _credentials = new ReadModelStore<PasswordCredential>(recorder, domainFactory, store);
     }
 
     public Type RootAggregateType => typeof(PasswordCredentialRoot);

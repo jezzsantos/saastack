@@ -32,7 +32,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
 
         var result = await Api.GetAsync(new GetOrganizationRequest
         {
-            Id = login.User.Profile?.DefaultOrganizationId!
+            Id = login.DefaultOrganizationId!
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
         result.Content.Value.Organization!.CreatedById.Should().Be(login.User.Id);
@@ -55,8 +55,8 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         result.Content.Value.Organization!.Name.Should().Be("aname");
         result.Content.Value.Organization!.Ownership.Should().Be(OrganizationOwnership.Shared);
 
-        login = await ReAuthenticateUserAsync(login.User);
-        login.User.Profile!.DefaultOrganizationId.Should().Be(organizationId);
+        login = await ReAuthenticateUserAsync(login);
+        login.DefaultOrganizationId.Should().Be(organizationId);
 
         var members = await Api.GetAsync(new ListMembersForOrganizationRequest
         {
@@ -68,7 +68,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         members.Content.Value.Members[0].IsOwner.Should().BeTrue();
         members.Content.Value.Members[0].IsRegistered.Should().BeTrue();
         members.Content.Value.Members[0].UserId.Should().Be(login.User.Id);
-        members.Content.Value.Members[0].EmailAddress.Should().Be(login.User.Profile!.EmailAddress);
+        members.Content.Value.Members[0].EmailAddress.Should().Be(login.Profile!.EmailAddress);
         members.Content.Value.Members[0].Name.FirstName.Should().Be("persona");
         members.Content.Value.Members[0].Name.LastName.Should().Be("alastname");
         members.Content.Value.Members[0].Classification.Should().Be(UserProfileClassification.Person);
@@ -88,26 +88,29 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        loginA = await ReAuthenticateUserAsync(loginA.User);
         var organizationId = organization.Content.Value.Organization!.Id;
+        loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
             Id = organizationId,
-            Email = loginB.User.Profile!.EmailAddress
+            Email = loginB.Profile!.EmailAddress
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
             Id = organizationId,
             Email = loginC
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         //Automatically adds the machine to loginA organization
         var machine = await Api.PostAsync(new RegisterMachineRequest
         {
             Name = "amachinename"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         var members = await Api.GetAsync(new ListMembersForOrganizationRequest
         {
             Id = organizationId
@@ -118,7 +121,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         members.Content.Value.Members[0].IsOwner.Should().BeTrue();
         members.Content.Value.Members[0].IsRegistered.Should().BeTrue();
         members.Content.Value.Members[0].UserId.Should().Be(loginA.User.Id);
-        members.Content.Value.Members[0].EmailAddress.Should().Be(loginA.User.Profile!.EmailAddress);
+        members.Content.Value.Members[0].EmailAddress.Should().Be(loginA.Profile!.EmailAddress);
         members.Content.Value.Members[0].Name.FirstName.Should().Be("persona");
         members.Content.Value.Members[0].Name.LastName.Should().Be("alastname");
         members.Content.Value.Members[0].Classification.Should().Be(UserProfileClassification.Person);
@@ -128,7 +131,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         members.Content.Value.Members[1].IsOwner.Should().BeFalse();
         members.Content.Value.Members[1].IsRegistered.Should().BeTrue();
         members.Content.Value.Members[1].UserId.Should().Be(loginB.User.Id);
-        members.Content.Value.Members[1].EmailAddress.Should().Be(loginB.User.Profile!.EmailAddress);
+        members.Content.Value.Members[1].EmailAddress.Should().Be(loginB.Profile!.EmailAddress);
         members.Content.Value.Members[1].Name.FirstName.Should().Be("personb");
         members.Content.Value.Members[1].Name.LastName.Should().Be("alastname");
         members.Content.Value.Members[1].Classification.Should().Be(UserProfileClassification.Person);
@@ -159,7 +162,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         var loginA = await LoginUserAsync();
         var loginB = await LoginUserAsync(LoginUser.PersonB);
 
-        var organizationId = loginA.User.Profile!.DefaultOrganizationId!;
+        var organizationId = loginA.DefaultOrganizationId!;
         var result = await Api.PutAsync(new ChangeOrganizationAvatarRequest
             {
                 Id = organizationId
@@ -180,14 +183,15 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        loginA = await ReAuthenticateUserAsync(loginA.User);
+        loginA = await ReAuthenticateUserAsync(loginA);
         var organizationId = organization.Content.Value.Organization!.Id;
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
             Id = organizationId,
-            Email = loginB.User.Profile!.EmailAddress
+            Email = loginB.Profile!.EmailAddress
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         var result = await Api.PutAsync(new ChangeOrganizationAvatarRequest
             {
                 Id = organizationId
@@ -202,7 +206,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
     {
         var login = await LoginUserAsync();
 
-        var organizationId = login.User.Profile!.DefaultOrganizationId!;
+        var organizationId = login.DefaultOrganizationId!;
         var result = await Api.PutAsync(new ChangeOrganizationAvatarRequest
             {
                 Id = organizationId
@@ -217,7 +221,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
     {
         var login = await LoginUserAsync();
 
-        var organizationId = login.User.Profile!.DefaultOrganizationId!;
+        var organizationId = login.DefaultOrganizationId!;
         await Api.PutAsync(new ChangeOrganizationAvatarRequest
             {
                 Id = organizationId
@@ -237,7 +241,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
     {
         var login = await LoginUserAsync();
 
-        var organizationId = login.User.Profile!.DefaultOrganizationId!;
+        var organizationId = login.DefaultOrganizationId!;
         var result = await Api.PutAsync(new ChangeOrganizationRequest
         {
             Id = organizationId,
@@ -258,15 +262,15 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        loginA = await ReAuthenticateUserAsync(loginA.User);
         var organizationId = organization.Content.Value.Organization!.Id;
-
+        loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
             Id = organizationId,
             Email = loginC
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         var members = await Api.GetAsync(new ListMembersForOrganizationRequest
         {
             Id = organizationId
@@ -279,6 +283,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             UserId = loginCId
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         members = await Api.GetAsync(new ListMembersForOrganizationRequest
         {
             Id = organizationId
@@ -289,7 +294,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         members.Content.Value.Members[0].IsOwner.Should().BeTrue();
         members.Content.Value.Members[0].IsRegistered.Should().BeTrue();
         members.Content.Value.Members[0].UserId.Should().Be(loginA.User.Id);
-        members.Content.Value.Members[0].EmailAddress.Should().Be(loginA.User.Profile!.EmailAddress);
+        members.Content.Value.Members[0].EmailAddress.Should().Be(loginA.Profile!.EmailAddress);
         members.Content.Value.Members[0].Name.FirstName.Should().Be("persona");
         members.Content.Value.Members[0].Name.LastName.Should().Be("alastname");
         members.Content.Value.Members[0].Classification.Should().Be(UserProfileClassification.Person);
@@ -308,15 +313,15 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        loginA = await ReAuthenticateUserAsync(loginA.User);
         var organizationId = organization.Content.Value.Organization!.Id;
-
+        loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
             Id = organizationId,
-            Email = loginB.User.Profile!.EmailAddress
+            Email = loginB.Profile!.EmailAddress
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         var members = await Api.GetAsync(new ListMembersForOrganizationRequest
         {
             Id = organizationId
@@ -329,6 +334,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             UserId = loginBId
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         members = await Api.GetAsync(new ListMembersForOrganizationRequest
         {
             Id = organizationId
@@ -339,14 +345,14 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         members.Content.Value.Members[0].IsOwner.Should().BeTrue();
         members.Content.Value.Members[0].IsRegistered.Should().BeTrue();
         members.Content.Value.Members[0].UserId.Should().Be(loginA.User.Id);
-        members.Content.Value.Members[0].EmailAddress.Should().Be(loginA.User.Profile!.EmailAddress);
+        members.Content.Value.Members[0].EmailAddress.Should().Be(loginA.Profile!.EmailAddress);
         members.Content.Value.Members[0].Name.FirstName.Should().Be("persona");
         members.Content.Value.Members[0].Name.LastName.Should().Be("alastname");
         members.Content.Value.Members[0].Classification.Should().Be(UserProfileClassification.Person);
         members.Content.Value.Members[0].Roles.Should().ContainInOrder(TenantRoles.BillingAdmin.Name,
             TenantRoles.Owner.Name, TenantRoles.Member.Name);
 
-        loginB = await ReAuthenticateUserAsync(loginB.User);
+        loginB = await ReAuthenticateUserAsync(loginB);
         var memberships = await Api.GetAsync(new ListMembershipsForCallerRequest(),
             req => req.SetJWTBearerToken(loginB.AccessToken));
 
@@ -367,26 +373,29 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        loginA = await ReAuthenticateUserAsync(loginA.User);
         var organizationId = organization.Content.Value.Organization!.Id;
+        loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
             Id = organizationId,
-            Email = loginB.User.Profile!.EmailAddress
+            Email = loginB.Profile!.EmailAddress
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
             Id = organizationId,
             Email = loginC
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         //Automatically adds the machine to loginA organization
         await Api.PostAsync(new RegisterMachineRequest
         {
             Name = "amachinename"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         var members = await Api.GetAsync(new ListMembersForOrganizationRequest
         {
             Id = organizationId
@@ -411,6 +420,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             UserId = machineId
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         members = await Api.GetAsync(new ListMembersForOrganizationRequest
         {
             Id = organizationId
@@ -421,7 +431,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         members.Content.Value.Members[0].IsOwner.Should().BeTrue();
         members.Content.Value.Members[0].IsRegistered.Should().BeTrue();
         members.Content.Value.Members[0].UserId.Should().Be(loginA.User.Id);
-        members.Content.Value.Members[0].EmailAddress.Should().Be(loginA.User.Profile!.EmailAddress);
+        members.Content.Value.Members[0].EmailAddress.Should().Be(loginA.Profile!.EmailAddress);
         members.Content.Value.Members[0].Name.FirstName.Should().Be("persona");
         members.Content.Value.Members[0].Name.LastName.Should().Be("alastname");
         members.Content.Value.Members[0].Classification.Should().Be(UserProfileClassification.Person);
@@ -440,14 +450,15 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        loginA = await ReAuthenticateUserAsync(loginA.User);
         var organizationId = organization.Content.Value.Organization!.Id;
+        loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
             Id = organizationId,
-            Email = loginB.User.Profile!.EmailAddress
+            Email = loginB.Profile!.EmailAddress
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         await Api.PutAsync(new AssignRolesToOrganizationRequest
         {
             Id = organizationId,
@@ -455,6 +466,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Roles = [TenantRoles.Owner.Name]
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         var memberships = await Api.GetAsync(new ListMembershipsForCallerRequest(),
             req => req.SetJWTBearerToken(loginB.AccessToken));
 
@@ -479,14 +491,15 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        loginA = await ReAuthenticateUserAsync(loginA.User);
         var organizationId = organization.Content.Value.Organization!.Id;
+        loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
             Id = organizationId,
-            Email = loginB.User.Profile!.EmailAddress
+            Email = loginB.Profile!.EmailAddress
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         await Api.PutAsync(new AssignRolesToOrganizationRequest
         {
             Id = organizationId,
@@ -494,6 +507,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Roles = [TenantRoles.Owner.Name]
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         await Api.PutAsync(new UnassignRolesFromOrganizationRequest
         {
             Id = organizationId,
@@ -501,6 +515,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Roles = [TenantRoles.Owner.Name]
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         var memberships = await Api.GetAsync(new ListMembershipsForCallerRequest(),
             req => req.SetJWTBearerToken(loginB.AccessToken));
 
@@ -524,14 +539,15 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        loginA = await ReAuthenticateUserAsync(loginA.User);
         var organizationId = organization.Content.Value.Organization!.Id;
+        loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
             Id = organizationId,
-            Email = loginB.User.Profile!.EmailAddress
+            Email = loginB.Profile!.EmailAddress
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         await Api.PutAsync(new AssignRolesToOrganizationRequest
         {
             Id = organizationId,
@@ -539,6 +555,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Roles = [TenantRoles.Owner.Name]
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         var memberships1 = await Api.GetAsync(new ListMembershipsForCallerRequest(),
             req => req.SetJWTBearerToken(loginB.AccessToken));
 
@@ -557,6 +574,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Roles = [TenantRoles.Owner.Name]
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         var memberships2 = await Api.GetAsync(new ListMembershipsForCallerRequest(),
             req => req.SetJWTBearerToken(loginB.AccessToken));
 
@@ -580,15 +598,15 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        loginA = await ReAuthenticateUserAsync(loginA.User);
         var organizationId = organization.Content.Value.Organization!.Id;
-
+        loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
             Id = organizationId,
             Email = loginC
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
+        await PropagateDomainEventsAsync();
         var result = await Api.DeleteAsync(new DeleteOrganizationRequest
         {
             Id = organizationId
@@ -607,7 +625,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        loginA = await ReAuthenticateUserAsync(loginA.User);
+        loginA = await ReAuthenticateUserAsync(loginA);
         var organizationId = organization.Content.Value.Organization!.Id;
 
         var result = await Api.DeleteAsync(new DeleteOrganizationRequest

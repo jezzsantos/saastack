@@ -27,4 +27,7 @@
     <data name="FlagsmithHttpServiceClient_UnknownFeature" xml:space="preserve">
         <value>The feature '{0}' has not be defined in Flagsmith</value>
     </data>
+    <data name="DomainEventConsumerService_ConsumerFailed" xml:space="preserve">
+        <value>Failed to notify consumer: {0}, with event: {1} ({2})</value>
+    </data>
 </root>

@@ -13,11 +13,11 @@ namespace UserProfilesInfrastructure.Persistence.ReadModels;
 
 public class UserProfileProjection : IReadModelProjection
 {
-    private readonly IReadModelProjectionStore<UserProfile> _users;
+    private readonly IReadModelStore<UserProfile> _users;
 
     public UserProfileProjection(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
-        _users = new ReadModelProjectionStore<UserProfile>(recorder, domainFactory, store);
+        _users = new ReadModelStore<UserProfile>(recorder, domainFactory, store);
     }
 
     public Type RootAggregateType => typeof(UserProfileRoot);

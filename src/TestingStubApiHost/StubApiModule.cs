@@ -1,12 +1,37 @@
 #if TESTINGONLY
 using System.Reflection;
+using System.Text.Json;
+using Application.Interfaces;
+using Application.Interfaces.Services;
+using Common.Extensions;
+using Infrastructure.Hosting.Common.Extensions;
+using Infrastructure.Persistence.Common.ApplicationServices;
+using Infrastructure.Persistence.Interfaces.ApplicationServices;
+using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Api.Operations.Shared.Ancillary;
+using Infrastructure.Web.Api.Operations.Shared.EventNotifications;
 using Infrastructure.Web.Hosting.Common;
 using TestingStubApiHost.Api;
+using TestingStubApiHost.Workers;
 
 namespace TestingStubApiHost;
 
 public class StubApiModule : ISubdomainModule
 {
+    private static readonly Dictionary<string, IWebRequest> MessageBusTopicMappings = new()
+    {
+        //EXTEND: add mappings to any new topics here to monitor
+        { WorkerConstants.MessageBuses.Topics.DomainEvents, new DrainAllDomainEventsRequest() }
+    };
+    private static readonly Dictionary<string, IWebRequest> QueuedMappings = new()
+    {
+        //EXTEND: add mappings to any new queues here to monitor
+        { WorkerConstants.Queues.Audits, new DrainAllAuditsRequest() },
+        { WorkerConstants.Queues.Usages, new DrainAllUsagesRequest() },
+        { WorkerConstants.Queues.Emails, new DrainAllEmailsRequest() },
+        { WorkerConstants.Queues.Provisionings, new DrainAllProvisioningsRequest() }
+    };
+
     public Assembly InfrastructureAssembly => typeof(StubHelloApi).Assembly;
 
     public Assembly DomainAssembly => typeof(StubHelloApi).Assembly;
@@ -15,7 +40,32 @@ public class StubApiModule : ISubdomainModule
 
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
     {
-        get { return (app, _) => app.RegisterRoutes(); }
+        get
+        {
+            return (app, middlewares) =>
+            {
+                app.RegisterRoutes();
+
+#if TESTINGONLY
+                var stubDrainingServices = app.Services.GetServices<IHostedService>()
+                    .OfType<StubCloudWorkerService>()
+                    .ToList();
+                if (stubDrainingServices.HasAny())
+                {
+                    var stubDrainingService = stubDrainingServices[0];
+                    var queues = stubDrainingService.MonitoredQueues.Join(", ");
+                    var topics = stubDrainingService.MonitoredBusTopics.Join(", ");
+                    middlewares.Add(new MiddlewareRegistration(-40, _ =>
+                        {
+                            //Nothing to register
+                        },
+                        "Feature: Background worker for message draining is enabled, on: queues -> {Queues}, and bus topics -> {Topics}",
+                        queues,
+                        topics));
+                }
+#endif
+            };
+        }
     }
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
@@ -37,6 +87,17 @@ public class StubApiModule : ISubdomainModule
                     builder.AddDebug();
                     builder.AddEventSourceLogger();
                 });
+
+                services.AddSingleton<IMessageMonitor, StubMessageMonitor>();
+                services.AddHostedService(c =>
+                    new StubCloudWorkerService(c.GetRequiredService<IHostSettings>(),
+                        c.GetRequiredService<IMessageMonitor>(),
+                        c.GetRequiredServiceForPlatform<LocalMachineJsonFileStore>(),
+                        c.GetRequiredService<IHttpClientFactory>(),
+                        c.GetRequiredService<JsonSerializerOptions>(),
+                        c.GetRequiredService<ILogger<StubCloudWorkerService>>(),
+                        QueuedMappings,
+                        MessageBusTopicMappings));
             };
         }
     }

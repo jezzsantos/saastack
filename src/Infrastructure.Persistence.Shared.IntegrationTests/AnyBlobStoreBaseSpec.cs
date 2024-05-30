@@ -16,8 +16,10 @@ public abstract class AnyBlobStoreBaseSpec
     {
         _setup = new BlobStoreInfo
             { Store = blobStore, ContainerName = typeof(TestDataStoreEntity).GetEntityNameSafe() };
+#if TESTINGONLY
         _setup.Store.DestroyAllAsync(_setup.ContainerName, CancellationToken.None).GetAwaiter()
             .GetResult();
+#endif
     }
 
     [Fact]

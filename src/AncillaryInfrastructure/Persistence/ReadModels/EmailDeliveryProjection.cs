@@ -13,11 +13,11 @@ namespace AncillaryInfrastructure.Persistence.ReadModels;
 
 public class EmailDeliveryProjection : IReadModelProjection
 {
-    private readonly IReadModelProjectionStore<EmailDelivery> _deliveries;
+    private readonly IReadModelStore<EmailDelivery> _deliveries;
 
     public EmailDeliveryProjection(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
-        _deliveries = new ReadModelProjectionStore<EmailDelivery>(recorder, domainFactory, store);
+        _deliveries = new ReadModelStore<EmailDelivery>(recorder, domainFactory, store);
     }
 
     public Type RootAggregateType => typeof(EmailDeliveryRoot);

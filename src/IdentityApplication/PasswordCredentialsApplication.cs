@@ -25,7 +25,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         private const double MaxAuthenticateDelayInSecs = 4.0;
 #endif
     private readonly IEndUsersService _endUsersService;
-    private readonly INotificationsService _notificationsService;
+    private readonly IUserNotificationsService _userNotificationsService;
     private readonly IConfigurationSettings _settings;
     private readonly IEmailAddressService _emailAddressService;
     private readonly ITokensService _tokensService;
@@ -38,12 +38,13 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
     private readonly IDelayGenerator _delayGenerator;
 
     public PasswordCredentialsApplication(IRecorder recorder, IIdentifierFactory identifierFactory,
-        IEndUsersService endUsersService, INotificationsService notificationsService, IConfigurationSettings settings,
+        IEndUsersService endUsersService, IUserNotificationsService userNotificationsService,
+        IConfigurationSettings settings,
         IEmailAddressService emailAddressService, ITokensService tokensService,
         IPasswordHasherService passwordHasherService, IAuthTokensService authTokensService,
         IWebsiteUiService websiteUiService,
         IPasswordCredentialsRepository repository) : this(recorder,
-        identifierFactory, endUsersService, notificationsService, settings, emailAddressService, tokensService,
+        identifierFactory, endUsersService, userNotificationsService, settings, emailAddressService, tokensService,
         passwordHasherService, authTokensService, websiteUiService, repository, new DelayGenerator())
     {
         _recorder = recorder;
@@ -52,7 +53,8 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
     }
 
     private PasswordCredentialsApplication(IRecorder recorder, IIdentifierFactory identifierFactory,
-        IEndUsersService endUsersService, INotificationsService notificationsService, IConfigurationSettings settings,
+        IEndUsersService endUsersService, IUserNotificationsService userNotificationsService,
+        IConfigurationSettings settings,
         IEmailAddressService emailAddressService, ITokensService tokensService,
         IPasswordHasherService passwordHasherService, IAuthTokensService authTokensService,
         IWebsiteUiService websiteUiService,
@@ -62,7 +64,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         _recorder = recorder;
         _identifierFactory = identifierFactory;
         _endUsersService = endUsersService;
-        _notificationsService = notificationsService;
+        _userNotificationsService = userNotificationsService;
         _settings = settings;
         _emailAddressService = emailAddressService;
         _tokensService = tokensService;
@@ -200,7 +202,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         if (!retrieved.Value.HasValue)
         {
             var warned =
-                await _notificationsService.NotifyPasswordResetUnknownUserCourtesyAsync(caller, emailAddress,
+                await _userNotificationsService.NotifyPasswordResetUnknownUserCourtesyAsync(caller, emailAddress,
                     cancellationToken);
             if (warned.IsFailure)
             {
@@ -218,7 +220,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         }
 
         var registration = credentials.Registration.Value;
-        var notified = await _notificationsService.NotifyPasswordResetInitiatedAsync(caller, registration.Name,
+        var notified = await _userNotificationsService.NotifyPasswordResetInitiatedAsync(caller, registration.Name,
             emailAddress, credentials.Password.ResetToken, cancellationToken);
         if (notified.IsFailure)
         {
@@ -249,14 +251,14 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         CancellationToken cancellationToken)
     {
         var registered = await _endUsersService.RegisterPersonPrivateAsync(caller, invitationToken, emailAddress,
-            firstName, lastName,
-            timezone, countryCode, termsAndConditionsAccepted, cancellationToken);
+            firstName, lastName, timezone, countryCode, termsAndConditionsAccepted, cancellationToken);
         if (registered.IsFailure)
         {
             return registered.Error;
         }
 
-        return await RegisterPersonInternalAsync(caller, password, registered.Value, cancellationToken);
+        return await RegisterPersonInternalAsync(caller, emailAddress, password, firstName, registered.Value,
+            cancellationToken);
     }
 
     public async Task<Result<Error>> ResendPasswordResetAsync(ICallerContext caller, string token,
@@ -281,7 +283,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         }
 
         var registration = credentials.Registration.Value;
-        var notified = await _notificationsService.NotifyPasswordResetInitiatedAsync(caller, registration.Name,
+        var notified = await _userNotificationsService.NotifyPasswordResetInitiatedAsync(caller, registration.Name,
             registration.EmailAddress, credentials.Password.ResetToken, cancellationToken);
         if (notified.IsFailure)
         {
@@ -435,7 +437,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
     }
 
     private async Task<Result<PasswordCredential, Error>> RegisterPersonInternalAsync(ICallerContext caller,
-        string password, RegisteredEndUser user, CancellationToken cancellationToken)
+        string emailAddress, string password, string displayName, EndUser user, CancellationToken cancellationToken)
     {
         var fetched = await _repository.FindCredentialsByUserIdAsync(user.Id.ToId(), cancellationToken);
         if (fetched.IsFailure)
@@ -455,13 +457,13 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
             return created.Error;
         }
 
-        var emailAddress = EmailAddress.Create(user.Profile!.EmailAddress!);
-        if (emailAddress.IsFailure)
+        var email = EmailAddress.Create(emailAddress);
+        if (email.IsFailure)
         {
-            return emailAddress.Error;
+            return email.Error;
         }
 
-        var name = PersonDisplayName.Create(user.Profile.DisplayName);
+        var name = PersonDisplayName.Create(displayName);
         if (name.IsFailure)
         {
             return name.Error;
@@ -474,7 +476,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
             return credentialed.Error;
         }
 
-        var registered = credentials.SetRegistrationDetails(emailAddress.Value, name.Value);
+        var registered = credentials.SetRegistrationDetails(email.Value, name.Value);
         if (registered.IsFailure)
         {
             return registered.Error;
@@ -486,7 +488,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
             return initiated.Error;
         }
 
-        var notified = await _notificationsService.NotifyPasswordRegistrationConfirmationAsync(caller,
+        var notified = await _userNotificationsService.NotifyPasswordRegistrationConfirmationAsync(caller,
             credentials.Registration.Value.EmailAddress,
             credentials.Registration.Value.Name, credentials.VerificationKeep.Token, cancellationToken);
         if (notified.IsFailure)
@@ -524,7 +526,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
 
 internal static class PasswordCredentialConversionExtensions
 {
-    public static PasswordCredential ToCredential(this PasswordCredentialRoot credential, RegisteredEndUser user)
+    public static PasswordCredential ToCredential(this PasswordCredentialRoot credential, EndUser user)
     {
         return new PasswordCredential
         {

@@ -96,6 +96,15 @@ namespace Infrastructure.Persistence.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to notify new events for: {0}.
+        /// </summary>
+        internal static string EventNotifyingStoreExtensions_OnComplete_FailedToNotify {
+            get {
+                return ResourceManager.GetString("EventNotifyingStoreExtensions_OnComplete_FailedToNotify", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Publishing of changed events for {0} failed..
         /// </summary>
         internal static string EventSourcingDddCommandStore_PublishFailed {
@@ -204,11 +213,47 @@ namespace Infrastructure.Persistence.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SubscriptionName cannot be empty.
+        /// </summary>
+        internal static string InProcessInMemDataStore_MissingSubscriptionName {
+            get {
+                return ResourceManager.GetString("InProcessInMemDataStore_MissingSubscriptionName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TopicName cannot be empty.
+        /// </summary>
+        internal static string InProcessInMemDataStore_MissingTopicName {
+            get {
+                return ResourceManager.GetString("InProcessInMemDataStore_MissingTopicName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The specified root path: {0}, is not a valid path or for some reason cannot be created on this local machine..
         /// </summary>
         internal static string LocalMachineJsonFileStore_VerifyRootPath_CreateFailed {
             get {
                 return ResourceManager.GetString("LocalMachineJsonFileStore_VerifyRootPath_CreateFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entity cannot be updated as it is already deleted.
+        /// </summary>
+        internal static string ReadModelStore_DtoDeleted {
+            get {
+                return ResourceManager.GetString("ReadModelStore_DtoDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entity has an empty identifier.
+        /// </summary>
+        internal static string ReadModelStore_MissingIdentifier {
+            get {
+                return ResourceManager.GetString("ReadModelStore_MissingIdentifier", resourceCulture);
             }
         }
         

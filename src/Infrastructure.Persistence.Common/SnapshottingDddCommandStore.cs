@@ -87,6 +87,7 @@ public sealed class
         return Result.Ok;
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         var deleted = await _dataStore.DestroyAllAsync(_containerName, cancellationToken);
@@ -97,6 +98,7 @@ public sealed class
 
         return deleted;
     }
+#endif
 
     public async Task<Result<Optional<TAggregateRootOrEntity>, Error>> GetAsync(Identifier id,
         bool errorIfNotFound = true, bool includeDeleted = false,

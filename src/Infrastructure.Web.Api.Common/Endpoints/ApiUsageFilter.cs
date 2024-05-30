@@ -8,6 +8,7 @@ using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 using Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
+using Infrastructure.Web.Api.Operations.Shared.EventNotifications;
 using Infrastructure.Web.Api.Operations.Shared.Health;
 using Microsoft.AspNetCore.Http;
 using RecordMeasureRequest = Infrastructure.Web.Api.Operations.Shared.Ancillary.RecordMeasureRequest;
@@ -27,12 +28,16 @@ public class ApiUsageFilter : IEndpointFilter
         typeof(DrainAllAuditsRequest),
         typeof(DrainAllUsagesRequest),
         typeof(DrainAllEmailsRequest),
+        typeof(DrainAllProvisioningsRequest),
+        typeof(DrainAllDomainEventsRequest),
         typeof(SearchAllAuditsRequest),
 #endif
         typeof(HealthCheckRequest),
         typeof(DeliverUsageRequest),
         typeof(DeliverAuditRequest),
         typeof(DeliverEmailRequest),
+        typeof(NotifyProvisioningRequest),
+        typeof(NotifyDomainEventRequest),
 
         // Exclude these or we will get a Stackoverflow!
         typeof(RecordUseRequest),

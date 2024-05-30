@@ -18,8 +18,10 @@ public abstract class DeliverEmailSpecBase<TSetup> : ApiWorkerSpec<TSetup>
 
     protected DeliverEmailSpecBase(TSetup setup) : base(setup, OverrideDependencies)
     {
+#if TESTINGONLY
         setup.QueueStore.DestroyAllAsync(WorkerConstants.Queues.Emails, CancellationToken.None).GetAwaiter()
             .GetResult();
+#endif
         _serviceClient = setup.GetRequiredService<IServiceClient>().As<StubServiceClient>();
         _serviceClient.Reset();
     }
@@ -32,8 +34,10 @@ public abstract class DeliverEmailSpecBase<TSetup> : ApiWorkerSpec<TSetup>
 
         Setup.WaitForQueueProcessingToComplete();
 
+#if TESTINGONLY
         (await Setup.QueueStore.CountAsync(WorkerConstants.Queues.Emails, CancellationToken.None))
             .Should().Be(0);
+#endif
         _serviceClient.LastPostedMessage.Should().BeNone();
     }
 
@@ -54,8 +58,10 @@ public abstract class DeliverEmailSpecBase<TSetup> : ApiWorkerSpec<TSetup>
 
         Setup.WaitForQueueProcessingToComplete();
 
+#if TESTINGONLY
         (await Setup.QueueStore.CountAsync(WorkerConstants.Queues.Emails, CancellationToken.None))
             .Should().Be(0);
+#endif
         _serviceClient.LastPostedMessage.Value.Should()
             .BeEquivalentTo(new DeliverEmailRequest { Message = message });
     }

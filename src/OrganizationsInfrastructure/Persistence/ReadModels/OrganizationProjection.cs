@@ -13,11 +13,11 @@ namespace OrganizationsInfrastructure.Persistence.ReadModels;
 
 public class OrganizationProjection : IReadModelProjection
 {
-    private readonly IReadModelProjectionStore<Organization> _organizations;
+    private readonly IReadModelStore<Organization> _organizations;
 
     public OrganizationProjection(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
-        _organizations = new ReadModelProjectionStore<Organization>(recorder, domainFactory, store);
+        _organizations = new ReadModelStore<Organization>(recorder, domainFactory, store);
     }
 
     public Type RootAggregateType => typeof(OrganizationRoot);

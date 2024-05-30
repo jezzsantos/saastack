@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Website.IntegrationTests;
 
 [Trait("Category", "Integration.Website")]
 [Collection("API")]
-public class HealthCheckApiSpec : WebApiSpec<Program>
+public class HealthCheckApiSpec : WebsiteSpec<Program>
 {
     public HealthCheckApiSpec(WebApiSetup<Program> setup) : base(setup)
     {

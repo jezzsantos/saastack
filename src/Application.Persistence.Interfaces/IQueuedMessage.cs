@@ -1,7 +1,7 @@
 namespace Application.Persistence.Interfaces;
 
 /// <summary>
-///     Defines a message that is queued on a queue
+///     Defines a message that is queued on a queue or a bus
 /// </summary>
 public interface IQueuedMessage
 {

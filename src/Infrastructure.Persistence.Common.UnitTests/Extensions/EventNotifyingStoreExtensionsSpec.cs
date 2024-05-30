@@ -153,7 +153,9 @@ public class EventNotifyingStoreExtensionsSpec : IEventNotifyingStore
     {
         if (_failHandler)
         {
-            args.CreateTasksAsync(_ => Task.FromResult<Result<Error>>(Error.RuleViolation("amessage")));
+            var tasks = new List<Task<Result<Error>>>
+                { Task.FromResult<Result<Error>>(Error.RuleViolation("amessage")) };
+            args.AddTasks(_ => tasks);
             return;
         }
 

@@ -15,8 +15,10 @@ public abstract class AnyQueueStoreBaseSpec
     {
         _setup = new QueueStoreInfo
             { Store = queueStore, QueueName = typeof(TestDataStoreEntity).GetEntityNameSafe() };
+#if TESTINGONLY
         _setup.Store.DestroyAllAsync(_setup.QueueName, CancellationToken.None).GetAwaiter()
             .GetResult();
+#endif
     }
 
     [Fact]
@@ -36,7 +38,7 @@ public abstract class AnyQueueStoreBaseSpec
     }
 
     [Fact]
-    public async Task WhenPopSingleAndNoMessage_ThenDoesNothing()
+    public async Task WhenPopSingleAndNoMessage_ThenReturnsFalse()
     {
         var wasCalled = false;
         var result = await _setup.Store.PopSingleAsync(_setup.QueueName,
@@ -66,8 +68,43 @@ public abstract class AnyQueueStoreBaseSpec
         result.Value.Should().BeTrue();
         message.Should().Be("amessage");
 
+#if TESTINGONLY
         var count = await _setup.Store.CountAsync(_setup.QueueName, CancellationToken.None);
         count.Value.Should().Be(0);
+#endif
+    }
+
+    [Fact]
+    public async Task WhenPopSingleAgainOnLastMessage_ThenReturnsFalse()
+    {
+        await _setup.Store.PushAsync(_setup.QueueName, "amessage", CancellationToken.None);
+
+        string? message = null;
+        var result1 = await _setup.Store.PopSingleAsync(_setup.QueueName,
+            (msg, _) =>
+            {
+                message = msg;
+                return Task.FromResult(Result.Ok);
+            }, CancellationToken.None);
+
+        result1.Value.Should().BeTrue();
+        message.Should().Be("amessage");
+
+        message = null!;
+        var result2 = await _setup.Store.PopSingleAsync(_setup.QueueName,
+            (msg, _) =>
+            {
+                message = msg;
+                return Task.FromResult(Result.Ok);
+            }, CancellationToken.None);
+
+        result2.Value.Should().BeFalse();
+        message.Should().BeNull();
+
+#if TESTINGONLY
+        var count = await _setup.Store.CountAsync(_setup.QueueName, CancellationToken.None);
+        count.Value.Should().Be(0);
+#endif
     }
 
     [Fact]
@@ -81,9 +118,11 @@ public abstract class AnyQueueStoreBaseSpec
 
         result1.Should().BeError(ErrorCode.RuleViolation, "amessage");
 
+#if TESTINGONLY
         var count = await _setup.Store.CountAsync(_setup.QueueName,
             CancellationToken.None);
         count.Value.Should().Be(1);
+#endif
 
         string? remainingMessage = null;
         var result2 = await _setup.Store.PopSingleAsync(_setup.QueueName,
@@ -107,9 +146,11 @@ public abstract class AnyQueueStoreBaseSpec
 
         result1.Should().BeError(ErrorCode.Unexpected, "amessage");
 
+#if TESTINGONLY
         var count = await _setup.Store.CountAsync(_setup.QueueName,
             CancellationToken.None);
         count.Value.Should().Be(1);
+#endif
 
         string? remainingMessage = null;
         var result2 = await _setup.Store.PopSingleAsync(_setup.QueueName,

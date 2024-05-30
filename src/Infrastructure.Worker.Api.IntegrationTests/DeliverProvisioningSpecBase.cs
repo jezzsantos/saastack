@@ -19,8 +19,10 @@ public abstract class DeliverProvisioningSpecBase<TSetup> : ApiWorkerSpec<TSetup
 
     protected DeliverProvisioningSpecBase(TSetup setup) : base(setup, OverrideDependencies)
     {
+#if TESTINGONLY
         setup.QueueStore.DestroyAllAsync(WorkerConstants.Queues.Provisionings, CancellationToken.None).GetAwaiter()
             .GetResult();
+#endif
         _serviceClient = setup.GetRequiredService<IServiceClient>().As<StubServiceClient>();
         _serviceClient.Reset();
     }
@@ -33,8 +35,10 @@ public abstract class DeliverProvisioningSpecBase<TSetup> : ApiWorkerSpec<TSetup
 
         Setup.WaitForQueueProcessingToComplete();
 
+#if TESTINGONLY
         (await Setup.QueueStore.CountAsync(WorkerConstants.Queues.Provisionings, CancellationToken.None))
             .Should().Be(0);
+#endif
         _serviceClient.LastPostedMessage.Should().BeNone();
     }
 
@@ -55,8 +59,10 @@ public abstract class DeliverProvisioningSpecBase<TSetup> : ApiWorkerSpec<TSetup
 
         Setup.WaitForQueueProcessingToComplete();
 
+#if TESTINGONLY
         (await Setup.QueueStore.CountAsync(WorkerConstants.Queues.Provisionings, CancellationToken.None))
             .Should().Be(0);
+#endif
         _serviceClient.LastPostedMessage.Value.Should()
             .BeEquivalentTo(new NotifyProvisioningRequest { Message = message });
     }

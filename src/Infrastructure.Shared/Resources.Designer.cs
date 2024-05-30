@@ -60,6 +60,15 @@ namespace Infrastructure.Shared {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to notify consumer: {0}, with event: {1} ({2}).
+        /// </summary>
+        internal static string DomainEventConsumerService_ConsumerFailed {
+            get {
+                return ResourceManager.GetString("DomainEventConsumerService_ConsumerFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The feature &apos;{0}&apos; has not be defined in Flagsmith.
         /// </summary>
         internal static string FlagsmithHttpServiceClient_UnknownFeature {

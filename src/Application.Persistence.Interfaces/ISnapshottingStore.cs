@@ -22,10 +22,12 @@ public interface ISnapshottingStore<TDto>
     /// </summary>
     Task<Result<Error>> DeleteAsync(string id, bool destroy = true, CancellationToken cancellationToken = default);
 
+#if TESTINGONLY
     /// <summary>
     ///     Permanently destroys all records in the store
     /// </summary>
     Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken);
+#endif
 
     /// <summary>
     ///     Retrieves the existing record from the store.

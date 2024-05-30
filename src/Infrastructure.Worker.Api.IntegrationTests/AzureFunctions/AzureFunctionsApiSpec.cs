@@ -41,4 +41,13 @@ public class AzureFunctionsApiSpec
         {
         }
     }
+
+    [Trait("Category", "Integration.External")]
+    [Collection("AzureFunctions")]
+    public class DeliverDomainEventApiHost1Spec : DeliverDomainEventSpecBase<AzureFunctionHostSetup>
+    {
+        public DeliverDomainEventApiHost1Spec(AzureFunctionHostSetup setup) : base(setup)
+        {
+        }
+    }
 }

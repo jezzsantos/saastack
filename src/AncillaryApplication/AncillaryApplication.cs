@@ -155,7 +155,7 @@ public class AncillaryApplication : IAncillaryApplication
 #if TESTINGONLY
     public async Task<Result<Error>> DrainAllEmailsAsync(ICallerContext caller, CancellationToken cancellationToken)
     {
-        await DrainAllAsync(_emailMessageQueue,
+        await DrainAllOnQueueAsync(_emailMessageQueue,
             message => DeliverEmailInternalAsync(caller, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(caller.ToCall(), "Drained all email messages");
@@ -168,7 +168,7 @@ public class AncillaryApplication : IAncillaryApplication
     public async Task<Result<Error>> DrainAllProvisioningsAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
-        await DrainAllAsync(_provisioningMessageQueue,
+        await DrainAllOnQueueAsync(_provisioningMessageQueue,
             message => NotifyProvisioningInternalAsync(caller, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(caller.ToCall(), "Drained all provisioning messages");
@@ -180,7 +180,7 @@ public class AncillaryApplication : IAncillaryApplication
 #if TESTINGONLY
     public async Task<Result<Error>> DrainAllUsagesAsync(ICallerContext caller, CancellationToken cancellationToken)
     {
-        await DrainAllAsync(_usageMessageQueue,
+        await DrainAllOnQueueAsync(_usageMessageQueue,
             message => DeliverUsageInternalAsync(caller, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(caller.ToCall(), "Drained all usage messages");
@@ -192,7 +192,7 @@ public class AncillaryApplication : IAncillaryApplication
 #if TESTINGONLY
     public async Task<Result<Error>> DrainAllAuditsAsync(ICallerContext caller, CancellationToken cancellationToken)
     {
-        await DrainAllAsync(_auditMessageQueueRepository,
+        await DrainAllOnQueueAsync(_auditMessageQueueRepository,
             message => DeliverAuditInternalAsync(caller, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(caller.ToCall(), "Drained all audit messages");
@@ -458,12 +458,12 @@ public class AncillaryApplication : IAncillaryApplication
 
                 return new TenantSetting(value);
             }));
-        var delivered =
+        var notified =
             await _provisioningNotificationService.NotifyAsync(caller, message.TenantId!, tenantSettings,
                 cancellationToken);
-        if (delivered.IsFailure)
+        if (notified.IsFailure)
         {
-            return delivered.Error;
+            return notified.Error;
         }
 
         _recorder.TraceInformation(caller.ToCall(), "Notified provisioning for {Tenant}", message.TenantId!);
@@ -472,21 +472,26 @@ public class AncillaryApplication : IAncillaryApplication
     }
 
 #if TESTINGONLY
-    private static async Task DrainAllAsync<TQueuedMessage>(IMessageQueueStore<TQueuedMessage> repository,
-        Func<TQueuedMessage, Task<Result<bool, Error>>> handler,
-        CancellationToken cancellationToken)
+    private static async Task DrainAllOnQueueAsync<TQueuedMessage>(IMessageQueueStore<TQueuedMessage> repository,
+        Func<TQueuedMessage, Task<Result<bool, Error>>> handler, CancellationToken cancellationToken)
         where TQueuedMessage : IQueuedMessage, new()
     {
         var found = new Result<bool, Error>(true);
         while (found.Value)
         {
+            found = await repository.PopSingleAsync(OnMessageReceivedAsync, cancellationToken);
+            continue;
+
             async Task<Result<Error>> OnMessageReceivedAsync(TQueuedMessage message, CancellationToken _)
             {
                 var handled = await handler(message);
-                return handled.Match(_ => Result.Ok, error => error);
-            }
+                if (handled.IsFailure)
+                {
+                    handled.Error.Throw();
+                }
 
-            found = await repository.PopSingleAsync(OnMessageReceivedAsync, cancellationToken);
+                return Result.Ok;
+            }
         }
     }
 #endif

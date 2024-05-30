@@ -122,6 +122,7 @@ public class SnapshottingDddCommandStoreSpec
             ce.IsDeleted == true
         ), CancellationToken.None));
     }
+#if TESTINGONLY
 
     [Fact]
     public async Task WhenDestroyAll_ThenDestroysAllInStore()
@@ -130,6 +131,7 @@ public class SnapshottingDddCommandStoreSpec
 
         _dataStore.Verify(store => store.DestroyAllAsync("acontainername", CancellationToken.None));
     }
+#endif
 
     [Fact]
     public async Task WhenGetAndNotExistsAndErrorIfNotFound_ThenReturnsError()

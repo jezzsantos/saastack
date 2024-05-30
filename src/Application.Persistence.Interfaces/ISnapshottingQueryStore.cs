@@ -15,10 +15,12 @@ public interface ISnapshottingQueryStore<TQueryableEntity>
     /// </summary>
     Task<Result<long, Error>> CountAsync(CancellationToken cancellationToken);
 
+#if TESTINGONLY
     /// <summary>
     ///     Permanently destroys all entities in the store
     /// </summary>
     Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken);
+#endif
 
     /// <summary>
     ///     Retrieves the existing entity from the store.

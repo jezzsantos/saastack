@@ -18,8 +18,10 @@ public abstract class DeliverUsageSpecBase<TSetup> : ApiWorkerSpec<TSetup>
 
     protected DeliverUsageSpecBase(TSetup setup) : base(setup, OverrideDependencies)
     {
+#if TESTINGONLY
         setup.QueueStore.DestroyAllAsync(WorkerConstants.Queues.Usages, CancellationToken.None).GetAwaiter()
             .GetResult();
+#endif
         _serviceClient = setup.GetRequiredService<IServiceClient>().As<StubServiceClient>();
         _serviceClient.Reset();
     }
@@ -32,8 +34,10 @@ public abstract class DeliverUsageSpecBase<TSetup> : ApiWorkerSpec<TSetup>
 
         Setup.WaitForQueueProcessingToComplete();
 
+#if TESTINGONLY
         (await Setup.QueueStore.CountAsync(WorkerConstants.Queues.Usages, CancellationToken.None))
             .Should().Be(0);
+#endif
         _serviceClient.LastPostedMessage.Should().BeNone();
     }
 
@@ -49,8 +53,10 @@ public abstract class DeliverUsageSpecBase<TSetup> : ApiWorkerSpec<TSetup>
 
         Setup.WaitForQueueProcessingToComplete();
 
+#if TESTINGONLY
         (await Setup.QueueStore.CountAsync(WorkerConstants.Queues.Usages, CancellationToken.None))
             .Should().Be(0);
+#endif
         _serviceClient.LastPostedMessage.Value.Should()
             .BeEquivalentTo(new DeliverUsageRequest { Message = message });
     }

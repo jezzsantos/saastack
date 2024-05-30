@@ -1,5 +1,4 @@
 using System.Net;
-using System.Text.Json;
 using Common.Extensions;
 using FluentAssertions;
 using HtmlAgilityPack;
@@ -19,17 +18,10 @@ public class CSRFApiSpec
 {
     [Trait("Category", "Integration.Website")]
     [Collection("API")]
-    public class GivenNoContext : WebApiSpec<Program>
+    public class GivenNoContext : WebsiteSpec<Program>
     {
         public GivenNoContext(WebApiSetup<Program> setup) : base(setup)
         {
-            StartupServer<ApiHost1.Program>();
-            var csrfService = setup.GetRequiredService<CSRFMiddleware.ICSRFService>();
-#if TESTINGONLY
-            HttpApi.PostEmptyJsonAsync(new DestroyAllRepositoriesRequest().MakeApiRoute(),
-                    (message, cookies) => message.WithCSRF(cookies, csrfService)).GetAwaiter()
-                .GetResult();
-#endif
         }
 
         [Fact]
@@ -63,21 +55,10 @@ public class CSRFApiSpec
 
     [Trait("Category", "Integration.Website")]
     [Collection("API")]
-    public class GivenAnInsecureGetRequest : WebApiSpec<Program>
+    public class GivenAnInsecureGetRequest : WebsiteSpec<Program>
     {
-        private readonly CSRFMiddleware.ICSRFService _csrfService;
-        private readonly JsonSerializerOptions _jsonOptions;
-
         public GivenAnInsecureGetRequest(WebApiSetup<Program> setup) : base(setup)
         {
-            StartupServer<ApiHost1.Program>();
-            _csrfService = setup.GetRequiredService<CSRFMiddleware.ICSRFService>();
-#if TESTINGONLY
-            HttpApi.PostEmptyJsonAsync(new DestroyAllRepositoriesRequest().MakeApiRoute(),
-                    (message, cookies) => message.WithCSRF(cookies, _csrfService)).GetAwaiter()
-                .GetResult();
-#endif
-            _jsonOptions = setup.GetRequiredService<JsonSerializerOptions>();
         }
 
         [Fact]
@@ -95,7 +76,7 @@ public class CSRFApiSpec
         {
 #if TESTINGONLY
             var result = await HttpApi.GetAsync(new GetInsecureTestingOnlyRequest().MakeApiRoute(),
-                (message, cookies) => message.WithCSRF(cookies, _csrfService));
+                (message, cookies) => message.WithCSRF(cookies, CSRFService));
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 #endif
@@ -104,11 +85,11 @@ public class CSRFApiSpec
         [Fact]
         public async Task WhenRequestedForUserWithCSRFToken_ThenSucceeds()
         {
-            var (userId, _) = await HttpApi.LoginUserFromBrowserAsync(_jsonOptions, _csrfService);
+            var (userId, _) = await HttpApi.LoginUserFromBrowserAsync(JsonOptions, CSRFService);
 
 #if TESTINGONLY
             var result = await HttpApi.GetAsync(new GetInsecureTestingOnlyRequest().MakeApiRoute(),
-                (message, cookies) => message.WithCSRF(cookies, _csrfService, userId));
+                (message, cookies) => message.WithCSRF(cookies, CSRFService, userId));
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 #endif
@@ -117,21 +98,10 @@ public class CSRFApiSpec
 
     [Trait("Category", "Integration.Website")]
     [Collection("API")]
-    public class GivenAnInsecurePostRequestByAnonymousUser : WebApiSpec<Program>
+    public class GivenAnInsecurePostRequestByAnonymousUser : WebsiteSpec<Program>
     {
-        private readonly CSRFMiddleware.ICSRFService _csrfService;
-        private readonly JsonSerializerOptions _jsonOptions;
-
         public GivenAnInsecurePostRequestByAnonymousUser(WebApiSetup<Program> setup) : base(setup)
         {
-            StartupServer<ApiHost1.Program>();
-            _csrfService = setup.GetRequiredService<CSRFMiddleware.ICSRFService>();
-#if TESTINGONLY
-            HttpApi.PostEmptyJsonAsync(new DestroyAllRepositoriesRequest().MakeApiRoute(),
-                    (message, cookies) => message.WithCSRF(cookies, _csrfService)).GetAwaiter()
-                .GetResult();
-#endif
-            _jsonOptions = setup.GetRequiredService<JsonSerializerOptions>();
         }
 
         [Fact]
@@ -141,7 +111,7 @@ public class CSRFApiSpec
             var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute());
 
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-            var problem = await result.AsProblemAsync(_jsonOptions);
+            var problem = await result.AsProblemAsync(JsonOptions);
             problem!.Detail.Should().Be(Resources.CSRFMiddleware_MissingCSRFHeaderValue);
 #endif
         }
@@ -151,7 +121,7 @@ public class CSRFApiSpec
         {
 #if TESTINGONLY
             var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
-                (message, cookies) => message.WithCSRF(cookies, _csrfService));
+                (message, cookies) => message.WithCSRF(cookies, CSRFService));
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 #endif
@@ -164,8 +134,8 @@ public class CSRFApiSpec
             var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
                 (message, cookies) =>
                 {
-                    var anonymous1 = _csrfService.CreateTokens(null);
-                    var anonymous2 = _csrfService.CreateTokens(null);
+                    var anonymous1 = CSRFService.CreateTokens(null);
+                    var anonymous2 = CSRFService.CreateTokens(null);
 
                     message.WithCSRF(cookies, anonymous1.Token, anonymous2.Signature);
                 });
@@ -181,14 +151,14 @@ public class CSRFApiSpec
             var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
                 (message, cookies) =>
                 {
-                    var anonymous = _csrfService.CreateTokens(null);
-                    var user = _csrfService.CreateTokens("auserid");
+                    var anonymous = CSRFService.CreateTokens(null);
+                    var user = CSRFService.CreateTokens("auserid");
 
                     message.WithCSRF(cookies, anonymous.Token, user.Signature);
                 });
 
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-            var problem = await result.AsProblemAsync(_jsonOptions);
+            var problem = await result.AsProblemAsync(JsonOptions);
             problem!.Detail.Should().Be(Resources.CSRFMiddleware_InvalidSignature.Format("None"));
 #endif
         }
@@ -200,14 +170,14 @@ public class CSRFApiSpec
             var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
                 (message, cookies) =>
                 {
-                    var anonymous = _csrfService.CreateTokens(null);
-                    var user = _csrfService.CreateTokens("auserid");
+                    var anonymous = CSRFService.CreateTokens(null);
+                    var user = CSRFService.CreateTokens("auserid");
 
                     message.WithCSRF(cookies, user.Token, anonymous.Signature);
                 });
 
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-            var problem = await result.AsProblemAsync(_jsonOptions);
+            var problem = await result.AsProblemAsync(JsonOptions);
             problem!.Detail.Should().Be(Resources.CSRFMiddleware_InvalidSignature.Format("None"));
 #endif
         }
@@ -217,10 +187,10 @@ public class CSRFApiSpec
         {
 #if TESTINGONLY
             var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
-                (message, cookies) => message.WithCSRF(cookies, _csrfService, "auserid"));
+                (message, cookies) => message.WithCSRF(cookies, CSRFService, "auserid"));
 
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-            var problem = await result.AsProblemAsync(_jsonOptions);
+            var problem = await result.AsProblemAsync(JsonOptions);
             problem!.Detail.Should().Be(Resources.CSRFMiddleware_InvalidSignature.Format("None"));
 #endif
         }
@@ -228,24 +198,13 @@ public class CSRFApiSpec
 
     [Trait("Category", "Integration.Website")]
     [Collection("API")]
-    public class GivenAnInsecurePostRequestByAuthenticatedUser : WebApiSpec<Program>
+    public class GivenAnInsecurePostRequestByAuthenticatedUser : WebsiteSpec<Program>
     {
-        private readonly CSRFMiddleware.ICSRFService _csrfService;
-        private readonly JsonSerializerOptions _jsonOptions;
         private readonly string _userId;
 
         public GivenAnInsecurePostRequestByAuthenticatedUser(WebApiSetup<Program> setup) : base(setup)
         {
-            StartupServer<ApiHost1.Program>();
-            _csrfService = setup.GetRequiredService<CSRFMiddleware.ICSRFService>();
-#if TESTINGONLY
-            HttpApi.PostEmptyJsonAsync(new DestroyAllRepositoriesRequest().MakeApiRoute(),
-                    (message, cookies) => message.WithCSRF(cookies, _csrfService)).GetAwaiter()
-                .GetResult();
-#endif
-            _jsonOptions = setup.GetRequiredService<JsonSerializerOptions>();
-
-            var (userId, _) = HttpApi.LoginUserFromBrowserAsync(_jsonOptions, _csrfService).GetAwaiter().GetResult();
+            var (userId, _) = HttpApi.LoginUserFromBrowserAsync(JsonOptions, CSRFService).GetAwaiter().GetResult();
             _userId = userId;
         }
 
@@ -254,10 +213,10 @@ public class CSRFApiSpec
         {
 #if TESTINGONLY
             var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
-                (message, cookies) => message.WithCSRF(cookies, _csrfService));
+                (message, cookies) => message.WithCSRF(cookies, CSRFService));
 
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-            var problem = await result.AsProblemAsync(_jsonOptions);
+            var problem = await result.AsProblemAsync(JsonOptions);
             problem!.Detail.Should().Be(Resources.CSRFMiddleware_InvalidSignature.Format(_userId));
 #endif
         }
@@ -267,7 +226,7 @@ public class CSRFApiSpec
         {
 #if TESTINGONLY
             var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
-                (message, cookies) => message.WithCSRF(cookies, _csrfService, _userId));
+                (message, cookies) => message.WithCSRF(cookies, CSRFService, _userId));
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
 #endif
@@ -280,14 +239,14 @@ public class CSRFApiSpec
             var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
                 (message, cookies) =>
                 {
-                    var user1 = _csrfService.CreateTokens(_userId);
-                    var user2 = _csrfService.CreateTokens("anotheruserid");
+                    var user1 = CSRFService.CreateTokens(_userId);
+                    var user2 = CSRFService.CreateTokens("anotheruserid");
 
                     message.WithCSRF(cookies, user1.Token, user2.Signature);
                 });
 
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-            var problem = await result.AsProblemAsync(_jsonOptions);
+            var problem = await result.AsProblemAsync(JsonOptions);
             problem!.Detail.Should().Be(Resources.CSRFMiddleware_InvalidSignature.Format(_userId));
 #endif
         }
@@ -299,8 +258,8 @@ public class CSRFApiSpec
             var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
                 (message, cookies) =>
                 {
-                    var user1 = _csrfService.CreateTokens(_userId);
-                    var user2 = _csrfService.CreateTokens(_userId);
+                    var user1 = CSRFService.CreateTokens(_userId);
+                    var user2 = CSRFService.CreateTokens(_userId);
 
                     message.WithCSRF(cookies, user1.Token, user2.Signature);
                 });

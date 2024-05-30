@@ -6,6 +6,9 @@ using OperatingSystem = System.OperatingSystem;
 
 namespace IntegrationTesting.Persistence.Common;
 
+/// <summary>
+///     An emulator for running Azurite Storage Emulator for integration testing.
+/// </summary>
 public static class AzuriteStorageEmulator
 {
     private const string AzuriteJsName = @"azurite";

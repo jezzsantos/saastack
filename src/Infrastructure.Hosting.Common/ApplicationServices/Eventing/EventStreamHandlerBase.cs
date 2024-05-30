@@ -15,9 +15,12 @@ public abstract class EventStreamHandlerBase : IDisposable
 
     protected EventStreamHandlerBase(IRecorder recorder, params IEventNotifyingStore[] eventingStores)
     {
+        InstanceId = Guid.NewGuid();
         _recorder = recorder;
         _eventingStores = eventingStores;
     }
+
+    public Guid InstanceId { get; }
 
     public void Dispose()
     {
@@ -32,30 +35,40 @@ public abstract class EventStreamHandlerBase : IDisposable
             return;
         }
 
-        if (IsStarted)
-        {
-            foreach (var storage in _eventingStores)
-            {
-                storage.OnEventStreamChanged -= OnEventStreamStateChanged;
-            }
-        }
+        Stop();
     }
 
     public IReadOnlyList<IEventNotifyingStore> EventingStores => _eventingStores;
 
     public bool IsStarted { get; private set; }
 
-    public void Start()
+    public virtual void Start()
     {
         if (!IsStarted)
         {
             foreach (var storage in _eventingStores)
             {
                 storage.OnEventStreamChanged += OnEventStreamStateChanged;
-                _recorder.TraceDebug(null, "Subscribed to events for {Storage}", storage.GetType().Name);
+                _recorder.TraceDebug(null, "Subscribed {Instance} to events for {Storage}", InstanceId,
+                    storage.GetType().ToString());
             }
 
             IsStarted = true;
+        }
+    }
+
+    public virtual void Stop()
+    {
+        if (IsStarted)
+        {
+            foreach (var storage in _eventingStores)
+            {
+                storage.OnEventStreamChanged -= OnEventStreamStateChanged;
+                _recorder.TraceDebug(null, "Unsubscribed {Instance} from events for {Storage}", InstanceId,
+                    storage.GetType().ToString());
+            }
+
+            IsStarted = false;
         }
     }
 
@@ -70,12 +83,14 @@ public abstract class EventStreamHandlerBase : IDisposable
             return;
         }
 
-        args.CreateTasksAsync(async events =>
+        args.AddTasks(events =>
         {
             var eventsStreams = events.GroupBy(e => e.StreamName)
                 .Select(grp => grp.AsEnumerable())
-                .Select(grp => grp.OrderBy(e => e.Version).ToList());
+                .Select(grp => grp.OrderBy(e => e.Version).ToList())
+                .ToList();
 
+            var tasks = new List<Task<Result<Error>>>();
             foreach (var eventStream in eventsStreams)
             {
                 var firstEvent = Enumerable.First(eventStream);
@@ -84,26 +99,25 @@ public abstract class EventStreamHandlerBase : IDisposable
                 var ensured = EnsureContiguousVersions(streamName, eventStream);
                 if (ensured.IsFailure)
                 {
-                    return ensured.Error;
+                    tasks.Add(Task.FromResult<Result<Error>>(ensured.Error));
+                    continue;
                 }
 
                 try
                 {
-                    var handled = await HandleStreamEventsAsync(streamName, eventStream, CancellationToken.None);
-                    if (handled.IsFailure)
-                    {
-                        return handled.Error;
-                    }
+                    var handleTask = HandleStreamEventsAsync(streamName, eventStream, CancellationToken.None);
+                    tasks.Add(handleTask);
                 }
                 catch (Exception ex)
                 {
                     throw new InvalidOperationException(
-                        Resources.EventStreamHandlerBase_OnEventStreamStateChanged_FailedToProject.Format(streamName),
+                        Resources.EventStreamHandlerBase_OnEventStreamStateChanged_FailedToHandle.Format(streamName),
                         ex);
                 }
+
             }
 
-            return Result.Ok;
+            return tasks;
         });
     }
 

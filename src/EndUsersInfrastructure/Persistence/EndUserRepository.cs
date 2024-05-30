@@ -30,6 +30,7 @@ public class EndUserRepository : IEndUserRepository
         _users = usersStore;
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         return await Tasks.WhenAllAsync(
@@ -37,6 +38,7 @@ public class EndUserRepository : IEndUserRepository
             _membershipUserQueries.DestroyAllAsync(cancellationToken),
             _users.DestroyAllAsync(cancellationToken));
     }
+#endif
 
     public async Task<Result<EndUserRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {

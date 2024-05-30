@@ -18,18 +18,30 @@ public class EndUsersApi : IWebApiService
         _endUsersApplication = endUsersApplication;
     }
 
-    public async Task<ApiPostResult<EndUser, GetUserResponse>> AssignPlatformRoles(
+    public async Task<ApiPostResult<EndUser, UpdateUserResponse>> AssignPlatformRoles(
         AssignPlatformRolesRequest request, CancellationToken cancellationToken)
     {
         var user =
             await _endUsersApplication.AssignPlatformRolesAsync(_callerFactory.Create(), request.Id!,
                 request.Roles ?? new List<string>(), cancellationToken);
 
-        return () => user.HandleApplicationResult<EndUser, GetUserResponse>(usr =>
-            new PostResult<GetUserResponse>(new GetUserResponse { User = usr }));
+        return () => user.HandleApplicationResult<EndUser, UpdateUserResponse>(usr =>
+            new PostResult<UpdateUserResponse>(new UpdateUserResponse { User = usr }));
     }
 
-    public async Task<ApiResult<EndUser, GetUserResponse>> UnassignPlatformRoles(
+#if TESTINGONLY
+    public async Task<ApiGetResult<EndUserWithMemberships, GetUserResponse>> GetUserWithMemberships(
+        GetUserRequest request, CancellationToken cancellationToken)
+    {
+        var user =
+            await _endUsersApplication.GetMembershipsAsync(_callerFactory.Create(), request.Id!, cancellationToken);
+
+        return () => user.HandleApplicationResult<EndUserWithMemberships, GetUserResponse>(usr =>
+            new GetUserResponse { User = usr });
+    }
+#endif
+
+    public async Task<ApiResult<EndUser, UpdateUserResponse>> UnassignPlatformRoles(
         UnassignPlatformRolesRequest request, CancellationToken cancellationToken)
     {
         var user =
@@ -37,7 +49,7 @@ public class EndUsersApi : IWebApiService
                 request.Roles ?? new List<string>(), cancellationToken);
 
         return () =>
-            user.HandleApplicationResult<EndUser, GetUserResponse>(usr => new GetUserResponse
+            user.HandleApplicationResult<EndUser, UpdateUserResponse>(usr => new UpdateUserResponse
                 { User = usr });
     }
 }

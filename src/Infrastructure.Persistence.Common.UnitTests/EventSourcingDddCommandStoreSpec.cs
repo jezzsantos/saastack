@@ -36,6 +36,7 @@ public class EventSourcingDddCommandStoreSpec
         _store.OnEventStreamChanged += (_, args, _) => { _eventStreamChangedArgs = args; };
     }
 
+#if TESTINGONLY
     [Fact]
     public async Task WhenDestroyAll_ThenDestroysAllInStore()
     {
@@ -43,6 +44,7 @@ public class EventSourcingDddCommandStoreSpec
 
         _eventStore.Verify(store => store.DestroyAllAsync("acontainername", CancellationToken.None));
     }
+#endif
 
     [Fact]
     public async Task WhenLoadAndNoEventsFound_ThenReturnsError()

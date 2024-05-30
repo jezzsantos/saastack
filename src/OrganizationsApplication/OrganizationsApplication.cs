@@ -14,6 +14,7 @@ using Domain.Shared.EndUsers;
 using OrganizationsApplication.Persistence;
 using OrganizationsDomain;
 using OrganizationOwnership = Domain.Shared.Organizations.OrganizationOwnership;
+using PersonName = Application.Resources.Shared.PersonName;
 
 namespace OrganizationsApplication;
 
@@ -597,10 +598,17 @@ internal static class OrganizationConversionExtensions
             IsOwner = membership.Roles.Contains(TenantRoles.Owner.Name),
             Roles = membership.Roles,
             Features = membership.Features,
-            EmailAddress = membership.Profile.EmailAddress,
-            Name = membership.Profile.Name,
-            Classification = membership.Profile.Classification
+            EmailAddress = null,
+            Name = new PersonName { FirstName = membership.UserId },
+            // must assume machine as default, unless they have profile (below)!
+            Classification = UserProfileClassification.Machine
         };
+        if (membership.Profile.Exists())
+        {
+            dto.EmailAddress = membership.Profile.EmailAddress;
+            dto.Name = membership.Profile.Name;
+            dto.Classification = membership.Profile.Classification;
+        }
 
         return dto;
     }

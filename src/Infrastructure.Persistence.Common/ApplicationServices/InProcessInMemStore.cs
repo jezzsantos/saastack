@@ -13,20 +13,25 @@ namespace Infrastructure.Persistence.Common.ApplicationServices;
 [ExcludeFromCodeCoverage]
 public sealed partial class InProcessInMemStore
 {
-    public static InProcessInMemStore Create(IQueueStoreNotificationHandler? handler = default)
+    public static InProcessInMemStore Create(IMessageMonitor? monitor = default)
     {
-        return new InProcessInMemStore(handler);
+        return new InProcessInMemStore(monitor);
     }
 
-    private InProcessInMemStore(IQueueStoreNotificationHandler? handler = default)
+    private InProcessInMemStore(IMessageMonitor? monitor = default)
     {
-        if (handler.Exists())
+        if (monitor.Exists())
         {
-            FireMessageQueueUpdated += (_, args) =>
+            FireQueueMessage += (_, args) =>
             {
-                handler.HandleMessagesQueueUpdated(args.QueueName, args.MessageCount);
+                monitor.NotifyQueueMessagesChanged(args.QueueName, args.MessageCount);
             };
-            NotifyAllQueuedMessages();
+            NotifyPendingQueuedMessages();
+            FireTopicMessage += (_, args) =>
+            {
+                monitor.NotifyTopicMessagesChanged(args.QueueName, args.MessageCount);
+            };
+            NotifyPendingBusTopicMessages();
         }
     }
 }

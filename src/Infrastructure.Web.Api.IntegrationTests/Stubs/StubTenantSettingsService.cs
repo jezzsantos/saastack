@@ -6,6 +6,9 @@ using Infrastructure.Persistence.Common.ApplicationServices;
 
 namespace Infrastructure.Web.Api.IntegrationTests.Stubs;
 
+/// <summary>
+///     Writes tenant's data to the: ./saastack/testing/apis/tenants/{tenantId} folder on disk
+/// </summary>
 public class StubTenantSettingsService : ITenantSettingsService
 {
     public async Task<Result<TenantSettings, Error>> CreateForTenantAsync(ICallerContext caller, string tenantId,
@@ -25,7 +28,10 @@ public class StubTenantSettingsService : ITenantSettingsService
 
     public static string GetRepositoryPath(string? tenantId)
     {
-        //Copy this value from the appsettings.Testing.json file
-        return $"./saastack/testing/apis/tenants/{tenantId}".WithoutTrailingSlash();
+        // Match this value with the one in the appsettings.Testing.json file
+        var path = "./saastack/testing/apis";
+        return tenantId.HasValue()
+            ? $"{path}/tenants/{tenantId}".WithoutTrailingSlash()
+            : path;
     }
 }

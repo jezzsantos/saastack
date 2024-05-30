@@ -31,7 +31,7 @@ public class AuthTokensApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
-        var token = NotificationsService.LastRegistrationConfirmationToken;
+        var token = UserNotificationsService.LastRegistrationConfirmationToken;
         await Api.PostAsync(new ConfirmRegistrationPersonPasswordRequest
         {
             Token = token!

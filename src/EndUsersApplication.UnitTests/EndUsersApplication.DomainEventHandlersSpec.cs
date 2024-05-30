@@ -54,7 +54,7 @@ public class EndUsersApplicationDomainEventHandlersSpec
             .Returns((EndUserRoot root, CancellationToken _) => Task.FromResult<Result<EndUserRoot, Error>>(root));
         var invitationRepository = new Mock<IInvitationRepository>();
         var userProfilesService = new Mock<IUserProfilesService>();
-        var notificationsService = new Mock<INotificationsService>();
+        var notificationsService = new Mock<IUserNotificationsService>();
 
         _application =
             new EndUsersApplication(_recorder.Object, _idFactory.Object, settings.Object, notificationsService.Object,

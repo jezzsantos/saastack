@@ -22,27 +22,24 @@ namespace Infrastructure.Web.Hosting.Common.Pipeline;
 /// </summary>
 public class MultiTenancyMiddleware
 {
-    private readonly IEndUsersService _endUsersService;
     private readonly IIdentifierFactory _identifierFactory;
     private readonly RequestDelegate _next;
-    private readonly IOrganizationsService _organizationsService;
 
-    public MultiTenancyMiddleware(RequestDelegate next, IIdentifierFactory identifierFactory,
-        IEndUsersService endUsersService, IOrganizationsService organizationsService)
+    public MultiTenancyMiddleware(RequestDelegate next, IIdentifierFactory identifierFactory)
     {
         _next = next;
         _identifierFactory = identifierFactory;
-        _endUsersService = endUsersService;
-        _organizationsService = organizationsService;
     }
 
     public async Task InvokeAsync(HttpContext context, ITenancyContext tenancyContext,
-        ICallerContextFactory callerContextFactory, ITenantDetective tenantDetective)
+        ICallerContextFactory callerContextFactory, ITenantDetective tenantDetective, IEndUsersService endUsersService,
+        IOrganizationsService organizationsService)
     {
         var caller = callerContextFactory.Create();
         var cancellationToken = context.RequestAborted;
 
-        var result = await VerifyRequestAsync(caller, context, tenancyContext, tenantDetective, cancellationToken);
+        var result = await VerifyRequestAsync(caller, context, tenancyContext, tenantDetective, endUsersService,
+            organizationsService, cancellationToken);
         if (result.IsFailure)
         {
             var httpError = result.Error.ToHttpError();
@@ -56,7 +53,8 @@ public class MultiTenancyMiddleware
     }
 
     private async Task<Result<Error>> VerifyRequestAsync(ICallerContext caller, HttpContext httpContext,
-        ITenancyContext tenancyContext, ITenantDetective tenantDetective, CancellationToken cancellationToken)
+        ITenancyContext tenancyContext, ITenantDetective tenantDetective, IEndUsersService endUsersService,
+        IOrganizationsService organizationsService, CancellationToken cancellationToken)
     {
         var requestDtoType = GetRequestDtoType(httpContext);
         var detected = await tenantDetective.DetectTenantAsync(httpContext, requestDtoType, cancellationToken);
@@ -71,7 +69,8 @@ public class MultiTenancyMiddleware
         if (MissingRequiredTenantIdFromRequest(detectedResult))
         {
             var defaultOrganizationId =
-                await VerifyDefaultOrganizationIdForCallerAsync(caller, memberships, cancellationToken);
+                await VerifyDefaultOrganizationIdForCallerAsync(caller, endUsersService, memberships,
+                    cancellationToken);
             if (defaultOrganizationId.IsFailure)
             {
                 return defaultOrganizationId.Error;
@@ -88,13 +87,14 @@ public class MultiTenancyMiddleware
             return Result.Ok;
         }
 
-        var isMember = await VerifyCallerMembershipAsync(caller, memberships, tenantId, cancellationToken);
+        var isMember =
+            await VerifyCallerMembershipAsync(caller, endUsersService, memberships, tenantId, cancellationToken);
         if (isMember.IsFailure)
         {
             return isMember.Error;
         }
 
-        var set = await SetTenantIdAsync(caller, _identifierFactory, tenancyContext, _organizationsService, tenantId,
+        var set = await SetTenantIdAsync(caller, _identifierFactory, tenancyContext, organizationsService, tenantId,
             cancellationToken);
         return set.IsSuccessful
             ? Result.Ok
@@ -107,7 +107,7 @@ public class MultiTenancyMiddleware
     }
 
     private async Task<Result<string?, Error>> VerifyDefaultOrganizationIdForCallerAsync(ICallerContext caller,
-        List<Membership>? memberships, CancellationToken cancellationToken)
+        IEndUsersService endUsersService, List<Membership>? memberships, CancellationToken cancellationToken)
     {
         if (!caller.IsAuthenticated)
         {
@@ -116,7 +116,7 @@ public class MultiTenancyMiddleware
 
         if (memberships.NotExists())
         {
-            var retrievedMemberships = await GetMembershipsForCallerAsync(caller, cancellationToken);
+            var retrievedMemberships = await GetMembershipsForCallerAsync(caller, endUsersService, cancellationToken);
             if (retrievedMemberships.IsFailure)
             {
                 return retrievedMemberships.Error;
@@ -134,7 +134,8 @@ public class MultiTenancyMiddleware
         return Error.Validation(Resources.MultiTenancyMiddleware_MissingDefaultOrganization);
     }
 
-    private async Task<Result<Error>> VerifyCallerMembershipAsync(ICallerContext caller, List<Membership>? memberships,
+    private async Task<Result<Error>> VerifyCallerMembershipAsync(ICallerContext caller,
+        IEndUsersService endUsersService, List<Membership>? memberships,
         string tenantId, CancellationToken cancellationToken)
     {
         if (!IsTenantedUser(caller))
@@ -144,7 +145,7 @@ public class MultiTenancyMiddleware
 
         if (memberships.NotExists())
         {
-            var retrievedMemberships = await GetMembershipsForCallerAsync(caller, cancellationToken);
+            var retrievedMemberships = await GetMembershipsForCallerAsync(caller, endUsersService, cancellationToken);
             if (retrievedMemberships.IsFailure)
             {
                 return retrievedMemberships.Error;
@@ -216,14 +217,14 @@ public class MultiTenancyMiddleware
     }
 
     private async Task<Result<List<Membership>, Error>> GetMembershipsForCallerAsync(ICallerContext caller,
-        CancellationToken cancellationToken)
+        IEndUsersService endUsersService, CancellationToken cancellationToken)
     {
         if (!IsTenantedUser(caller))
         {
             return new List<Membership>();
         }
 
-        var memberships = await _endUsersService.GetMembershipsPrivateAsync(caller, caller.CallerId, cancellationToken);
+        var memberships = await endUsersService.GetMembershipsPrivateAsync(caller, caller.CallerId, cancellationToken);
         if (memberships.IsFailure)
         {
             return memberships.Error;

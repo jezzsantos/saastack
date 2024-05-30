@@ -1,10 +1,10 @@
 # Eventing
 
-Eventing is the gateway to Event Driven Architecture (EDA), but it starts in the Domain Layer of the software.
+Eventing is the gateway to Event Driven Architecture (EDA), but it starts in the Domain Layer of the software, with domain events.
 
 ## Design Principles
 
-1. We want all DDD aggregates to utilize domain events to drive use cases, irrespective of whether we are sourcing/capturing their current state from events (a.k.a Event Sourcing) or sourcing/capturing their current state from data snapshots.
+1. We want all DDD aggregates to utilize "domain events" to drive use cases, irrespective of whether we are sourcing/capturing their current state from events (a.k.a Event Sourcing) or sourcing/capturing their current state from data snapshots (i.e. traditional record persistence).
 2. For [event-sourcing persistence schemes](0070-persistence.md) (that are by definition "write models" only), we need to build associated "read models" so that we can query domain aggregates.
 3. We want the flexibility to change our "read models" at any time, as the software changes, and ideally not have lost any data.
 4. We may want denormalized data models to query for maximum efficiency.
@@ -15,7 +15,9 @@ Eventing is the gateway to Event Driven Architecture (EDA), but it starts in the
 
 ## Implementation
 
-In the design of most distributed systems, of the nature of this system or of systems that are expected to evolve into distributed systems later, it is common to decouple each of the subdomains from each other. De-coupling effectively is absolutely vital to allowing the system to change, grow, and evolve over time.
+In the design of most distributed systems, of the nature of this system (or of systems that are expected to evolve into distributed systems later) it is common practice to decouple each of the subdomains from each other. De-coupling effectively is absolutely vital to allowing the system to change independently, grow, and evolve over time.
+
+> This is the whole point of having a single direction of dependencies, from: Infrastructure components -> Domain components.
 
 Lack of effective de-coupling (at the technical level) is the main reason most software systems devolve into big-balls-of-mud, simply because of the coupling of many components to many other components often striving for maximum data and code reuse.
 
@@ -43,27 +45,57 @@ In SaaStack:
 
 The diagram above illustrates the "logical" process that is triggered when an aggregate state is updated.
 
-> The implementation details of this "logical" process can be different depending on the specific "relay" mechanisms in place.
+> The implementation details of this "logical" process can be different depending on the specific "relay" mechanisms in place. See the [runtime](0170-eventing.md#runtime) details later.
 
 ### Consistency
 
 Read model projections and notifications (one or more of them) are created by publishing "domain events" raised by aggregates from a specific subdomain.
 
-In a typical stateless API, this publication and subsequent updating of read models and notifications can occur synchronously or asynchronously with respect to the aggregates producing the "domain events" in a specific subdomain.
+In a typical stateless API, the publication of these events, and the subsequent updating of read models and notification handlers can occur synchronously or asynchronously with respect to the aggregates producing the "domain events" in a specific subdomain.
 
-Projections and Notifications should try to be "consistent" as possible with updating the aggregates that produce the change events as much as possible, although "eventually consistent" is also possible, and likely in highly distributed systems.
+Projections and Notifications should try to be as "consistent" as possible with updating the aggregates that produce the change events as much as possible, although "eventually consistent" is more likely and more common in distributed systems.
 
-Consistency requires "reliable" implementations (e.g., Outbox Pattern), and these implementations must guarantee the delivery of the "domain events" in order (e.g., FIFO Queues). If either of these technical requirements cannot be guaranteed then there is a high probability that when the system comes under load or stress, that downstream consumers of these change events will be permanently out of date, affecting the data integrity of downstream dependent systems.
+Consistency requires "reliable" implementations (e.g., Outbox Pattern), and these implementations must guarantee the delivery of the "domain events" in order (e.g., FIFO Queues/Buses). If either of these technical requirements cannot be guaranteed, then there is a high probability that when the system comes under load or stress, downstream consumers of these change events will be permanently out of date, affecting the data integrity of downstream dependent systems.
 
-Eventual consistency can cause problems for clients who are making changes in synchronous "commands" and then shortly after, expecting that changed data in subsequent "queries".
+Eventual consistency can cause problems for clients who are making changes in synchronous "commands" and then shortly after, expecting that changed data in subsequent "queries" is immediately up to date.
 
-> By default, the mechanism of updating read models should be done reliably and asynchronously after a source aggregate is changed, such that the collective system is eventually consistent. This asynchronous update (typically expected to take anywhere between ~100ms-500ms) means that read model data and consumers of notifications can be "immediately" out of date with the subdomains that update their source aggregates.
->
-> When this update process is synchronous (and in-process), that part of the system will achieve 100% consistency, which is convenient, but this is not a true reality for when the system is eventually split up and becomes a distributed system. (as is the goal of all modular monoliths). In distributed systems that are eventually consistent, API clients are required to employ different strategies to handle this eventual consistency, which are disruptive when switching later when a monolithic backend becomes distributed.
->
+By default, the mechanism of updating read models should be done reliably and asynchronously after a source aggregate is changed, such that the collective system is "eventually consistent". This asynchronous update (typically expected to take anywhere between ~100ms-5s) means that read model data and consumers of notifications can be "immediately" out of date with the subdomains that update their source aggregates.
+
+> When this update process is synchronous (and in-process), that part of the system will achieve 100% consistency, which is convenient, but this is not a true reality for when the system is eventually split up and becomes a distributed system. (as is the goal of all modular monoliths).
+
+In distributed systems that are "eventually consistent", API clients are required to employ different strategies to handle this eventual consistency, which can be disruptive and problematic when switching later when a monolithic backend becomes distributed, and clients are expecting data that has not changed yet.
+
 > For example, if a client calls a command API and then after receiving a response, immediately calls a query API that would include the changed data, the queried data may have not yet been updated yet. This is one reason why commands can return changed data synchronously in their responses, to help clients predict the changed data, and avoid the subsequent querying of it.
->
-> Because of this constraint, it is better to start the modular monolith on an eventually consistent model rather than start a fully consistent model since these client strategies should be established sooner rather than later being re-engineered.
+
+Because of this constraint, it is better to start the modular monolith on an eventually consistent model rather than start a fully consistent model since these client strategies should be established sooner rather than later being re-engineered.
+
+### Runtime
+
+With Eventing, and the need to handle either "domain events" or "integration events" published from other subdomains, in the context of a modular monolithic backend, we now have a couple of ways that data is provided directly to the subdomain.
+
+1. Either in the request of an HTTP request of a REST API, or
+2. In the data of an "integration event" or "domain event" delivered to us via some external Message Broker.
+
+Either channel is viable.
+
+As we do with all asynchronous workloads that use FIFO queues, and due to [this design decision](../decisions/0025-runtime-environment.md), we have chosen to rationalize all of these kinds of workloads, ultimately, into API calls.
+
+> Note: With message broking, as opposed to FIFO queues, we typically have to manage the delivery of a single "domain/integration event" to one or more consumers. Whereas, in FIFO queues we only expect one consumer.
+
+This means that for any message broker infrastructure, we expect the message to be delivered via an API call to a specific deployed ApiHost (i.e. an IP address), as opposed to making an API call to a unified (load-balanced) endpoint (i.e. a URL).
+Then, this API call (`EventNotifications`) can be handled by any number of registered `IDomainEventNotficationConsumers` (in the API process) and routed to (one or more) Application Layers for further processing.
+
+In Azure, for example, this can be achieved with an Azure function trigger set on an Azure Service Bus topic with a specific subscription.
+
+> As with all FIFO queues (Azure Storage Queue + Azure Function + Trigger), this specific API call will also be "private".
+
+![Azure Brokering](../images/Eventing-Brokering-Azure.png)
+
+In AWS, for example, this can be achieved with a Lambda trigger set on an SNS topic with a specific subscription.
+
+> As with all FIFO queues (AWS SQS queue + Trigger), this specific API call will also be "private".
+
+![AWS Brokering](../images/Eventing-Brokering-AWS.png)
 
 ### Read Model Projections
 
@@ -97,7 +129,7 @@ The coupling of the imperative method/API call is eliminated.
 
 > This is particularly useful when you have highly inter-dependent subdomains, that require that their data be in sync with each other (i.e., `EndUser` memberships with `Organizations` and `UserProfiles`. As seen below.
 
-![Generic Subdomains](../images/Event Flows - Generic.png)
+![Generic Subdomains](../images/Eventing-Flows-Generic.png)
 
 This eventing capability is particularly necessary in distributed deployments, where direct calls between separately deployed components are realized as HTTP calls (requiring both the source and target subdomains to be synchronously responsive and consistent to each other).
 

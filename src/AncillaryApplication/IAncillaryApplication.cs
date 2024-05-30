@@ -39,6 +39,7 @@ public interface IAncillaryApplication
     Task<Result<SearchResults<Audit>, Error>> SearchAllAuditsAsync(ICallerContext caller, string organizationId,
         SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken);
 #endif
+
     Task<Result<SearchResults<DeliveredEmail>, Error>> SearchAllEmailDeliveriesAsync(ICallerContext caller,
         DateTime? sinceUtc, SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken);
 }

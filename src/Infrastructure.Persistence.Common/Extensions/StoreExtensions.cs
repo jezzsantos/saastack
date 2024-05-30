@@ -78,10 +78,11 @@ public static class StoreExtensions
     ///     This operation will perform the joins (if any) in memory.
     ///     HACK: this operation is not recommended for use in large production workloads
     /// </summary>
-    public static List<QueryEntity> FetchAllIntoMemory<TQueryableEntity>(this QueryClause<TQueryableEntity> query,
+    public static async Task<List<QueryEntity>> FetchAllIntoMemoryAsync<TQueryableEntity>(
+        this QueryClause<TQueryableEntity> query,
         int maxQueryResults, PersistedEntityMetadata metadata,
-        Func<Dictionary<string, HydrationProperties>> getPrimaryEntities,
-        Func<QueriedEntity, Dictionary<string, HydrationProperties>> getJoinedEntities)
+        Func<Task<Dictionary<string, HydrationProperties>>> getPrimaryEntitiesAsync,
+        Func<QueriedEntity, Task<Dictionary<string, HydrationProperties>>> getJoinedEntitiesAsync)
         where TQueryableEntity : IQueryableEntity
     {
         var take = query.GetDefaultTake(maxQueryResults);
@@ -90,19 +91,22 @@ public static class StoreExtensions
             return new List<QueryEntity>();
         }
 
-        var primaryEntities = getPrimaryEntities();
+        var primaryEntities = await getPrimaryEntitiesAsync();
         if (!primaryEntities.HasAny())
         {
             return new List<QueryEntity>();
         }
 
-        var joinedContainers = query.JoinedEntities
-            .Where(je => je.Join.Exists())
-            .ToDictionary(je => je.EntityName, je => new
+        var joinedContainers =
+            new Dictionary<string, (Dictionary<string, HydrationProperties> Collection, QueriedEntity JoinedEntity)>();
+        foreach (var entity in query.JoinedEntities)
+        {
+            if (entity.Join.Exists())
             {
-                Collection = getJoinedEntities(je),
-                JoinedEntity = je
-            });
+                var entities = await getJoinedEntitiesAsync(entity);
+                joinedContainers.Add(entity.EntityName, (entities, entity));
+            }
+        }
 
         var joinedEntities = new List<KeyValuePair<string, HydrationProperties>>();
         if (!joinedContainers.Any())

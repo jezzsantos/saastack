@@ -23,12 +23,14 @@ public class OrganizationRepository : IOrganizationRepository
         _organizations = organizationsStore;
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         return await Tasks.WhenAllAsync(
             _organizationQueries.DestroyAllAsync(cancellationToken),
             _organizations.DestroyAllAsync(cancellationToken));
     }
+#endif
 
     public async Task<Result<OrganizationRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {

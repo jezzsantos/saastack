@@ -22,6 +22,11 @@ public interface IHostSettings
     string GetApiHost1BaseUrl();
 
     /// <summary>
+    ///     Returns the subscribing hosts for event notifications
+    /// </summary>
+    IReadOnlyList<SubscriberHost> GetEventNotificationSubscriberHosts();
+
+    /// <summary>
     ///     Returns the URL of the Website host
     /// </summary>
     string GetWebsiteHostBaseUrl();
@@ -41,3 +46,8 @@ public interface IHostSettings
     /// </summary>
     string MakeImagesApiGetUrl(string imageId);
 }
+
+/// <summary>
+///     Defines an event notification subscriber host
+/// </summary>
+public record SubscriberHost(string Id, string BaseUrl, string HmacSecret);

@@ -50,11 +50,11 @@ public class OrganizationsModule : ISubdomainModule
             return (_, services) =>
             {
                 services.AddSingleton<ITenantSettingsService, AspNetHostLocalFileTenantSettingsService>();
-                services.AddSingleton<ITenantSettingService>(c => new TenantSettingService(
-                    new AesEncryptionService(c
+                services.AddSingleton<ITenantSettingService>(c =>
+                    new TenantSettingService(new AesEncryptionService(c
                         .GetRequiredServiceForPlatform<IConfigurationSettings>()
                         .GetString(TenantSettingService.EncryptionServiceSecretSettingName))));
-                services.AddSingleton<IOrganizationsApplication>(c =>
+                services.AddPerHttpRequest<IOrganizationsApplication>(c =>
                     new OrganizationsApplication.OrganizationsApplication(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IIdentifierFactory>(),
                         c.GetRequiredService<ITenantSettingsService>(),
@@ -62,23 +62,22 @@ public class OrganizationsModule : ISubdomainModule
                         c.GetRequiredService<IEndUsersService>(),
                         c.GetRequiredService<IImagesService>(),
                         c.GetRequiredService<IOrganizationRepository>()));
-                services.AddSingleton<IOrganizationRepository>(c => new OrganizationRepository(
-                    c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredService<IDomainFactory>(),
-                    c.GetRequiredService<IEventSourcingDddCommandStore<OrganizationRoot>>(),
-                    c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.AddPerHttpRequest<IOrganizationRepository>(c =>
+                    new OrganizationRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<OrganizationRoot>>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
                 services
                     .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
                         new OrganizationNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
                             c.GetRequiredService<IOrganizationsApplication>()));
-                services.RegisterUnTenantedEventing<OrganizationRoot, OrganizationProjection, OrganizationNotifier>(
+                services.RegisterEventing<OrganizationRoot, OrganizationProjection, OrganizationNotifier>(
                     c => new OrganizationProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()),
-                    c => new OrganizationNotifier(c
-                        .GetRequiredService<IEnumerable<IDomainEventNotificationConsumer>>()));
+                    _ => new OrganizationNotifier());
 
-                services.AddSingleton<IOrganizationsService>(c =>
+                services.AddPerHttpRequest<IOrganizationsService>(c =>
                     new OrganizationsInProcessServiceClient(c.LazyGetRequiredService<IOrganizationsApplication>()));
             };
         }

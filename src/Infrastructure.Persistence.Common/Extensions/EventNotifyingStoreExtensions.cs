@@ -85,11 +85,22 @@ public static class EventNotifyingStoreExtensions
     {
         var args = new EventStreamChangedArgs(changeEvents);
         eventHandler.Invoke(store, args, cancellationToken);
-        var completed = await args.CompleteAsync();
 
-        if (completed.IsSuccessful)
+        Result<Error> completed;
+        try
         {
-            return Result.Ok;
+            completed = await args.CompleteAsync();
+            if (completed.IsSuccessful)
+            {
+                return Result.Ok;
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                Resources.EventNotifyingStoreExtensions_OnComplete_FailedToNotify.Format(streamName),
+                ex);
+
         }
 
         var error = completed.Error;

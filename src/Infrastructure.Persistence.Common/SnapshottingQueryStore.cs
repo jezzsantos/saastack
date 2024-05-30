@@ -8,7 +8,7 @@ using QueryAny;
 namespace Infrastructure.Persistence.Common;
 
 /// <summary>
-///     Provides read/write access to individual/collection of <see cref="IQueryableEntity" /> for [CQRS] queries that use
+///     Provides read only access to individual/collection of <see cref="IQueryableEntity" /> for [CQRS] queries that use
 ///     snapshotting persistence
 /// </summary>
 public sealed class SnapshottingQueryStore<TQueryableEntity> : ISnapshottingQueryStore<TQueryableEntity>
@@ -35,6 +35,7 @@ public sealed class SnapshottingQueryStore<TQueryableEntity> : ISnapshottingQuer
         return await _dataStore.CountAsync(_containerName, cancellationToken);
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         var deleted = await _dataStore.DestroyAllAsync(_containerName, cancellationToken);
@@ -45,6 +46,7 @@ public sealed class SnapshottingQueryStore<TQueryableEntity> : ISnapshottingQuer
 
         return deleted;
     }
+#endif
 
     public async Task<Result<Optional<TEntityWithId>, Error>> GetAsync<TEntityWithId>(Identifier id,
         bool errorIfNotFound = true, bool includeDeleted = false,

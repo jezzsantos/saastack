@@ -18,8 +18,10 @@ public abstract class DeliverAuditSpecBase<TSetup> : ApiWorkerSpec<TSetup>
 
     protected DeliverAuditSpecBase(TSetup setup) : base(setup, OverrideDependencies)
     {
+#if TESTINGONLY
         setup.QueueStore.DestroyAllAsync(WorkerConstants.Queues.Audits, CancellationToken.None).GetAwaiter()
             .GetResult();
+#endif
         _serviceClient = setup.GetRequiredService<IServiceClient>().As<StubServiceClient>();
         _serviceClient.Reset();
     }
@@ -31,9 +33,11 @@ public abstract class DeliverAuditSpecBase<TSetup> : ApiWorkerSpec<TSetup>
             CancellationToken.None);
 
         Setup.WaitForQueueProcessingToComplete();
+#if TESTINGONLY
 
         (await Setup.QueueStore.CountAsync(WorkerConstants.Queues.Audits, CancellationToken.None))
             .Should().Be(0);
+#endif
         _serviceClient.LastPostedMessage.Should().BeNone();
     }
 
@@ -49,8 +53,10 @@ public abstract class DeliverAuditSpecBase<TSetup> : ApiWorkerSpec<TSetup>
 
         Setup.WaitForQueueProcessingToComplete();
 
+#if TESTINGONLY
         (await Setup.QueueStore.CountAsync(WorkerConstants.Queues.Audits, CancellationToken.None))
             .Should().Be(0);
+#endif
         _serviceClient.LastPostedMessage.Value.Should()
             .BeEquivalentTo(new DeliverAuditRequest { Message = message });
     }

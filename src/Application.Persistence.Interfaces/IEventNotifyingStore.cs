@@ -38,18 +38,19 @@ public sealed class EventStreamChangedArgs : EventArgs
     public IReadOnlyList<Task<Result<Error>>> Tasks => _tasks;
 
     /// <summary>
+    ///     Adds a list of tasks to perform
+    /// </summary>
+    public void AddTasks(Func<IReadOnlyList<EventStreamChangeEvent>, IReadOnlyList<Task<Result<Error>>>> onEvents)
+    {
+        var tasks = onEvents(Events);
+        _tasks.AddRange(tasks);
+    }
+
+    /// <summary>
     ///     Completes all the tasks
     /// </summary>
     public async Task<Result<Error>> CompleteAsync()
     {
         return await Common.Extensions.Tasks.WhenAllAsync(_tasks.ToArray());
-    }
-
-    /// <summary>
-    ///     Creates a list of tasks to perform
-    /// </summary>
-    public void CreateTasksAsync(Func<IReadOnlyList<EventStreamChangeEvent>, Task<Result<Error>>> func)
-    {
-        _tasks.Add(func(Events));
     }
 }

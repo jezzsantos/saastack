@@ -18,13 +18,14 @@ public class MembershipsApi : IWebApiService
         _endUsersApplication = endUsersApplication;
     }
 
-    public async Task<ApiPutPatchResult<EndUser, GetUserResponse>> ChangeDefaultOrganization(
+    public async Task<ApiPutPatchResult<EndUser, UpdateUserResponse>> ChangeDefaultOrganization(
         ChangeDefaultOrganizationRequest request, CancellationToken cancellationToken)
     {
         var user = await _endUsersApplication.ChangeDefaultMembershipAsync(_callerFactory.Create(),
             request.OrganizationId!, cancellationToken);
 
-        return () => user.HandleApplicationResult<EndUser, GetUserResponse>(x => new GetUserResponse { User = x });
+        return () =>
+            user.HandleApplicationResult<EndUser, UpdateUserResponse>(x => new UpdateUserResponse { User = x });
     }
 
     public async Task<ApiSearchResult<Membership, ListMembershipsForCallerResponse>> ListMembershipsForCaller(

@@ -1,4 +1,3 @@
-using Application.Common;
 using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Resources.Shared;
@@ -26,20 +25,20 @@ public partial class EndUsersApplication : IEndUsersApplication
     private readonly IEndUserRepository _endUserRepository;
     private readonly IIdentifierFactory _idFactory;
     private readonly IInvitationRepository _invitationRepository;
-    private readonly INotificationsService _notificationsService;
     private readonly IRecorder _recorder;
     private readonly IConfigurationSettings _settings;
+    private readonly IUserNotificationsService _userNotificationsService;
     private readonly IUserProfilesService _userProfilesService;
 
     public EndUsersApplication(IRecorder recorder, IIdentifierFactory idFactory, IConfigurationSettings settings,
-        INotificationsService notificationsService, IUserProfilesService userProfilesService,
+        IUserNotificationsService userNotificationsService, IUserProfilesService userProfilesService,
         IInvitationRepository invitationRepository,
         IEndUserRepository endUserRepository)
     {
         _recorder = recorder;
         _idFactory = idFactory;
         _settings = settings;
-        _notificationsService = notificationsService;
+        _userNotificationsService = userNotificationsService;
         _userProfilesService = userProfilesService;
         _invitationRepository = invitationRepository;
         _endUserRepository = endUserRepository;
@@ -118,7 +117,7 @@ public partial class EndUsersApplication : IEndUsersApplication
         return user.ToUserWithMemberships();
     }
 
-    public async Task<Result<RegisteredEndUser, Error>> RegisterMachineAsync(ICallerContext caller, string name,
+    public async Task<Result<EndUser, Error>> RegisterMachineAsync(ICallerContext caller, string name,
         string? timezone, string? countryCode, CancellationToken cancellationToken)
     {
         var created = EndUserRoot.Create(_recorder, _idFactory, UserClassification.Machine);
@@ -188,18 +187,10 @@ public partial class EndUsersApplication : IEndUsersApplication
             }
         }
 
-        var defaultOrganizationId = machine.DefaultMembership.OrganizationId;
-        var serviceCaller = Caller.CreateAsMaintenance(caller.CallId);
-        var profile = await _userProfilesService.GetProfilePrivateAsync(serviceCaller, machine.Id, cancellationToken);
-        if (profile.IsFailure)
-        {
-            return profile.Error;
-        }
-
-        return machine.ToRegisteredUser(defaultOrganizationId, profile.Value);
+        return machine.ToUser();
     }
 
-    public async Task<Result<RegisteredEndUser, Error>> RegisterPersonAsync(ICallerContext caller,
+    public async Task<Result<EndUser, Error>> RegisterPersonAsync(ICallerContext caller,
         string? invitationToken, string emailAddress, string firstName, string? lastName, string? timezone,
         string? countryCode, bool termsAndConditionsAccepted, CancellationToken cancellationToken)
     {
@@ -280,7 +271,7 @@ public partial class EndUsersApplication : IEndUsersApplication
                     return Error.EntityNotFound(Resources.EndUsersApplication_NotPersonProfile);
                 }
 
-                var notified = await _notificationsService.NotifyPasswordRegistrationRepeatCourtesyAsync(caller,
+                var notified = await _userNotificationsService.NotifyPasswordRegistrationRepeatCourtesyAsync(caller,
                     unregisteredUser.Id, unregisteredUserProfile.EmailAddress, unregisteredUserProfile.DisplayName,
                     unregisteredUserProfile.Timezone, unregisteredUserProfile.Address.CountryCode, cancellationToken);
                 if (notified.IsFailure)
@@ -297,8 +288,7 @@ public partial class EndUsersApplication : IEndUsersApplication
                         { UsageConstants.Properties.EmailAddress, email }
                     });
 
-                return unregisteredUser.ToRegisteredUser(unregisteredUser.DefaultMembership.Id,
-                    unregisteredUserProfile);
+                return unregisteredUser.ToUser();
             }
         }
         else
@@ -341,15 +331,7 @@ public partial class EndUsersApplication : IEndUsersApplication
             "EndUser {Id} accepted their terms and conditions", person.Id);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.PersonRegistrationCreated);
 
-        var defaultOrganizationId = person.DefaultMembership.OrganizationId;
-        var serviceCaller = Caller.CreateAsMaintenance(caller.CallId);
-        var profile = await _userProfilesService.GetProfilePrivateAsync(serviceCaller, person.Id, cancellationToken);
-        if (profile.IsFailure)
-        {
-            return profile.Error;
-        }
-
-        return person.ToRegisteredUser(defaultOrganizationId, profile.Value);
+        return person.ToUser();
     }
 
     public async Task<Result<Optional<EndUser>, Error>> FindPersonByEmailAddressAsync(ICallerContext caller,
@@ -518,11 +500,14 @@ public partial class EndUsersApplication : IEndUsersApplication
 
         return memberships.ConvertAll(membership =>
         {
+            // These can be a person with a profile, or a machine without a profile
             var member = membership.ToMembership();
-            member.Profile = membership.Status.Value.ToEnumOrDefault(EndUserStatus.Unregistered)
-                             == EndUserStatus.Unregistered
+            var status = membership.Status.Value.ToEnumOrDefault(EndUserStatus.Unregistered);
+            var profile = profiles.FirstOrDefault(profile => profile.UserId == membership.UserId);
+
+            member.Profile = (status == EndUserStatus.Unregistered
                 ? membership.ToUnregisteredUserProfile()
-                : profiles.First(profile => profile.UserId == membership.UserId);
+                : profile)!;
 
             return member;
         });
@@ -669,17 +654,6 @@ internal static class EndUserConversionExtensions
             Features = membership.Features.Denormalize(),
             Roles = membership.Roles.Denormalize()
         };
-    }
-
-    public static RegisteredEndUser ToRegisteredUser(this EndUserRoot user, Identifier defaultOrganizationId,
-        UserProfile profile)
-    {
-        var endUser = ToUser(user);
-        var registeredUser = endUser.Convert<EndUser, RegisteredEndUser>();
-        registeredUser.Profile = profile.Convert<UserProfile, UserProfileWithDefaultMembership>();
-        registeredUser.Profile.DefaultOrganizationId = defaultOrganizationId;
-
-        return registeredUser;
     }
 
     public static UserProfile ToUnregisteredUserProfile(this MembershipJoinInvitation membership)

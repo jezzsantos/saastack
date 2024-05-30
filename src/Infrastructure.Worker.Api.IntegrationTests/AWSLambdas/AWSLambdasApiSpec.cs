@@ -41,4 +41,13 @@ public class AWSLambdasApiSpec
         {
         }
     }
+
+    [Trait("Category", "Integration.External")]
+    [Collection("AWSLambdas")]
+    public class DeliverDomainEventApiHost1Spec : DeliverDomainEventSpecBase<AWSLambdaHostSetup>
+    {
+        public DeliverDomainEventApiHost1Spec(AWSLambdaHostSetup setup) : base(setup)
+        {
+        }
+    }
 }

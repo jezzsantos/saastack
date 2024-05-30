@@ -20,6 +20,8 @@ public class InProcessInMemStoreSpecSetup : StoreSpecSetupBase
 
     public IEventStore EventStore => _store;
 
+    public IMessageBusStore MessageBusStore => _store;
+
     public IQueueStore QueueStore => _store;
 }
 
@@ -59,6 +61,16 @@ public class InProcessInMemQueueStoreSpec : AnyQueueStoreBaseSpec
 public class InProcessInMemEventStoreSpec : AnyEventStoreBaseSpec
 {
     public InProcessInMemEventStoreSpec(InProcessInMemStoreSpecSetup setup) : base(setup.EventStore)
+    {
+    }
+}
+
+[Trait("Category", "Integration.Persistence")]
+[Collection("InProcessInMemStore")]
+[UsedImplicitly]
+public class InProcessInMemMessageBusStoreSpec : AnyMessageBusStoreBaseSpec
+{
+    public InProcessInMemMessageBusStoreSpec(InProcessInMemStoreSpecSetup setup) : base(setup.MessageBusStore)
     {
     }
 }

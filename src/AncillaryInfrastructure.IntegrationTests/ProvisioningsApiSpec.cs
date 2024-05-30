@@ -25,14 +25,16 @@ public class ProvisioningsApiSpec : WebApiSpec<Program>
     {
         EmptyAllRepositories();
         _provisioningMessageQueue = setup.GetRequiredService<IProvisioningMessageQueue>();
+#if TESTINGONLY
         _provisioningMessageQueue.DestroyAllAsync(CancellationToken.None).GetAwaiter().GetResult();
+#endif
     }
 
     [Fact]
-    public async Task WhenDeliverProvisioning_ThenDelivers()
+    public async Task WhenNotifyProvisioning_ThenNotifies()
     {
         var login = await LoginUserAsync(LoginUser.Operator);
-        var tenantId = login.User.Profile!.DefaultOrganizationId!;
+        var tenantId = login.DefaultOrganizationId!;
 
         var request = new NotifyProvisioningRequest
         {
@@ -72,7 +74,7 @@ public class ProvisioningsApiSpec : WebApiSpec<Program>
     public async Task WhenDrainAllProvisioningsAndSomeWithUnknownTenancies_ThenDrains()
     {
         var login = await LoginUserAsync();
-        var tenantId = login.User.Profile!.DefaultOrganizationId;
+        var tenantId = login.DefaultOrganizationId;
         var call = CallContext.CreateCustom("acallid", "acallerid", tenantId);
         await _provisioningMessageQueue.PushAsync(call, new ProvisioningMessage
         {

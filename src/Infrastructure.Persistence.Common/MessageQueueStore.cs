@@ -8,7 +8,7 @@ using QueryAny;
 namespace Infrastructure.Persistence.Common;
 
 /// <summary>
-///     Provides read/write access to messages on a queue
+///     Provides read/write access to messages on a FIFO queue
 /// </summary>
 public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
     where TMessage : IQueuedMessage, new()
@@ -29,11 +29,14 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
 
     public Guid InstanceId { get; }
 
+#if TESTINGONLY
     public async Task<Result<long, Error>> CountAsync(CancellationToken cancellationToken)
     {
         return await _queueStore.CountAsync(_queueName, cancellationToken);
     }
+#endif
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         var deleted = await _queueStore.DestroyAllAsync(_queueName, cancellationToken);
@@ -45,6 +48,7 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
 
         return deleted;
     }
+#endif
 
     public async Task<Result<bool, Error>> PopSingleAsync(
         Func<TMessage, CancellationToken, Task<Result<Error>>> onMessageReceivedAsync,

@@ -25,10 +25,12 @@ public class BookingRepository : IBookingRepository
         _bookingQueries = new SnapshottingQueryStore<Booking>(recorder, domainFactory, store);
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         return await _bookings.DestroyAllAsync(cancellationToken);
     }
+#endif
 
     public async Task<Result<Error>> DeleteBookingAsync(Identifier organizationId, Identifier id,
         CancellationToken cancellationToken)

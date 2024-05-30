@@ -10,10 +10,12 @@ namespace Application.Persistence.Interfaces;
 public interface IEventSourcingDddCommandStore<TAggregateRoot> : IEventNotifyingStore
     where TAggregateRoot : IEventingAggregateRoot
 {
+#if TESTINGONLY
     /// <summary>
     ///     Permanently destroys all aggregates in the store
     /// </summary>
     Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken);
+#endif
 
     /// <summary>
     ///     Loads the existing aggregate, by left-folding the stream of events in the store

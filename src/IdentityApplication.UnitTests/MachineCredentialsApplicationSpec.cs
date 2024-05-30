@@ -32,13 +32,13 @@ public class MachineCredentialsApplicationSpec
     [Fact]
     public async Task WhenRegisterMachine_ThenRegistersMachine()
     {
-        var user = new RegisteredEndUser
+        var user = new EndUser
         {
             Id = "amachineid"
         };
         _endUsersService.Setup(eus => eus.RegisterMachinePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<RegisteredEndUser, Error>>(user));
+            .Returns(Task.FromResult<Result<EndUser, Error>>(user));
         var expiresOn = DateTime.UtcNow.AddDays(1);
         var apiKey = new APIKey
         {

@@ -23,10 +23,12 @@ public interface ISnapshottingDddCommandStore<TAggregateRootOrEntity> : IEventNo
     /// </summary>
     Task<Result<Error>> DeleteAsync(Identifier id, bool destroy = true, CancellationToken cancellationToken = default);
 
+#if TESTINGONLY
     /// <summary>
     ///     Permanently destroys all entities in the store
     /// </summary>
     Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken);
+#endif
 
     /// <summary>
     ///     Retrieves the existing entity from the store.

@@ -21,11 +21,11 @@ Thus, we need to take advantage of all these facts and engineer a reliable mecha
 
 Any API Host (any subdomain) may want to send notifications to users.
 
-They do this by calling very specific `INotificationsService.NotifyXXXAsync()` methods.
+They do this by calling very specific `IUserNotificationsService.NotifyXXXAsync()` methods.
 
-Injected into the runtime will be an instance of the `INotificationService`, which can then deliver notifications to new and existing users based on communication preferences that those users have set up in the system.
+Injected into the runtime will be an instance of the `IUserNotificationService`, which can then deliver notifications to new and existing users based on communication preferences that those users have set up in the system.
 
-Without such information present in the system (as is the present case), a simple default implementation of the `INotificaitonsService` is being used called the `EmailNotificationService`. This simple implementation is simply going to send an email notification to a user based on the email address. (future implementations may behave differently).
+Without such information present in the system (as is the present case), a simple default implementation of the `IUserNotificaitonsService` is being used called the `EmailNotificationService`. This simple implementation is simply going to send an email notification to a user based on the email address. (future implementations may behave differently).
 
 ### Sending emails
 

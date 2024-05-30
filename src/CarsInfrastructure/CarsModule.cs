@@ -43,7 +43,7 @@ public class CarsModule : ISubdomainModule
             {
                 services.AddPerHttpRequest<ICarsApplication, CarsApplication.CarsApplication>();
                 services.AddPerHttpRequest<ICarRepository, CarRepository>();
-                services.RegisterTenantedEventing<CarRoot, CarProjection>(
+                services.RegisterEventing<CarRoot, CarProjection>(
                     c => new CarProjection(c.GetRequiredService<IRecorder>(), c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredService<IDataStore>())
                 );

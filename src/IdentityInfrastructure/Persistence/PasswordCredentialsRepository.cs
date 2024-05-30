@@ -24,12 +24,14 @@ public class PasswordCredentialsRepository : IPasswordCredentialsRepository
         _credentials = credentialsStore;
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         return await Tasks.WhenAllAsync(
             _credentialQueries.DestroyAllAsync(cancellationToken),
             _credentials.DestroyAllAsync(cancellationToken));
     }
+#endif
 
     public async Task<Result<Optional<PasswordCredentialRoot>, Error>> FindCredentialsByPasswordResetTokenAsync(
         string token, CancellationToken cancellationToken)

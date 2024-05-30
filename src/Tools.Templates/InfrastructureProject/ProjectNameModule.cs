@@ -34,9 +34,9 @@ public class {SubDomainName}sModule : ISubDomainModule
         {
             return (_, services) =>
             {
-                services.RegisterTenanted<I{SubDomainName}sApplication, {SubDomainName}sApplication.{SubDomainName}sApplication>();
-                services.RegisterTenanted<I{SubDomainName}Repository, {SubDomainName}Repository>();
-                services.RegisterTenantedEventing<{SubDomainName}Root, {SubDomainName}Projection>(
+                services.AddPerHttpRequest<I{SubDomainName}sApplication, {SubDomainName}sApplication.{SubDomainName}sApplication>();
+                services.AddPerHttpRequest<I{SubDomainName}Repository, {SubDomainName}Repository>();
+                services.RegisterEventing<{SubDomainName}Root, {SubDomainName}Projection>(
                     c => new {SubDomainName}Projection(c.GetRequiredService<IRecorder>(), c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredService<IDataStore>())
                 );

@@ -53,14 +53,14 @@ public class UserProfilesModule : ISubdomainModule
                         c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
                         c.GetRequiredService<IHttpClientFactory>()));
 
-                services.AddSingleton<IUserProfilesApplication>(c =>
+                services.AddPerHttpRequest<IUserProfilesApplication>(c =>
                     new UserProfilesApplication.UserProfilesApplication(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IIdentifierFactory>(),
                         c.GetRequiredService<IImagesService>(),
                         c.GetRequiredService<IAvatarService>(),
                         c.GetRequiredService<IUserProfileRepository>()));
-                services.AddSingleton<IUserProfileRepository>(c => new UserProfileRepository(
-                    c.GetRequiredService<IRecorder>(),
+                services.AddPerHttpRequest<IUserProfileRepository>(c =>
+                    new UserProfileRepository(c.GetRequiredService<IRecorder>(),
                     c.GetRequiredService<IDomainFactory>(),
                     c.GetRequiredService<IEventSourcingDddCommandStore<UserProfileRoot>>(),
                     c.GetRequiredServiceForPlatform<IDataStore>()));
@@ -68,14 +68,13 @@ public class UserProfilesModule : ISubdomainModule
                     .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
                         new UserProfileNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
                             c.GetRequiredService<IUserProfilesApplication>()));
-                services.RegisterUnTenantedEventing<UserProfileRoot, UserProfileProjection, UserProfileNotifier>(
+                services.RegisterEventing<UserProfileRoot, UserProfileProjection, UserProfileNotifier>(
                     c => new UserProfileProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()),
-                    c => new UserProfileNotifier(c
-                        .GetRequiredService<IEnumerable<IDomainEventNotificationConsumer>>()));
+                    _ => new UserProfileNotifier());
 
-                services.AddSingleton<IUserProfilesService, UserProfilesInProcessServiceClient>();
+                services.AddPerHttpRequest<IUserProfilesService, UserProfilesInProcessServiceClient>();
             };
         }
     }

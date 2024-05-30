@@ -205,6 +205,23 @@ public class UserProfileApplicationDomainEventHandlersSpec
     }
 
     [Fact]
+    public async Task WhenHandleEndUserDefaultOrganizationChangedForMachineAsync_ThenDoesNothing()
+    {
+        var domainEvent = Events.DefaultMembershipChanged("auserid".ToId(), "amembershipid".ToId(),
+            "amembershipid".ToId(), "anorganizationid".ToId(), Roles.Empty, Features.Empty);
+        _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Optional<UserProfileRoot>.None);
+
+        var result = await _application.HandleEndUserDefaultMembershipChangedAsync(_caller.Object,
+            domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.IsAny<UserProfileRoot>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _repository.Verify(rep => rep.FindByUserIdAsync("auserid".ToId(), It.IsAny<CancellationToken>()));
+    }
+    
+    [Fact]
     public async Task WhenHandleEndUserDefaultOrganizationChangedAsync_ThenSetsDefaultOrganization()
     {
         var domainEvent = Events.DefaultMembershipChanged("auserid".ToId(), "amembershipid".ToId(),

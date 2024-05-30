@@ -37,7 +37,7 @@ public class BookingsModule : ISubdomainModule
             {
                 services.AddPerHttpRequest<IBookingsApplication, BookingsApplication.BookingsApplication>();
                 services.AddPerHttpRequest<IBookingRepository, BookingRepository>();
-                services.RegisterTenantedEventing<BookingRoot>();
+                services.RegisterEventing<BookingRoot>();
             };
         }
     }

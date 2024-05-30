@@ -33,4 +33,23 @@
     <data name="ValidationExtensions_InvalidStorageAccountResourceName" xml:space="preserve">
         <value>The Azure Storage Table/Blob/Queue name: '{0}' contains illegal characters or is not the correct length</value>
     </data>
+    <data name="AzureServiceBusStore_MissingTopicName" xml:space="preserve">
+        <value>TopicName cannot be empty</value>
+    </data>
+    <data name="AzureServiceBusStore_MissingSubscriptionName" xml:space="preserve">
+        <value>SubscriptionName cannot be empty</value>
+    </data>
+    <data name="AzureServiceBusStore_MissingSentMessage" xml:space="preserve">
+        <value>Message cannot be empty</value>
+    </data>
+    <data name="ValidationExtensions_InvalidMessageBusTopicName" xml:space="preserve">
+        <value>The Azure Service Bus topic name: '{0}' contains illegal characters or is not the correct length</value>
+    </data>
+    <data name="ValidationExtensions_InvalidMessageBusSubscriptionName" xml:space="preserve">
+        <value>The Azure Service Bus subscription name: '{0}' contains illegal characters or is not the correct length</value>
+    </data>
+    <data name="AzureServiceBusStore_MessageTooLarge" xml:space="preserve">
+        <value>The message is too large to send in a batch for an Azure Service Bus</value>
+    </data>
+
 </root>

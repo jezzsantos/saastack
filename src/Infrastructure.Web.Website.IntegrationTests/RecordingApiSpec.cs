@@ -6,8 +6,6 @@ using Common;
 using Common.Recording;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
-using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
-using Infrastructure.Web.Hosting.Common.Pipeline;
 using IntegrationTesting.WebApi.Common;
 using IntegrationTesting.WebApi.Common.Stubs;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,20 +17,12 @@ namespace Infrastructure.Web.Website.IntegrationTests;
 
 [Trait("Category", "Integration.Website")]
 [Collection("API")]
-public class RecordingApiSpec : WebApiSpec<Program>
+public class RecordingApiSpec : WebsiteSpec<Program>
 {
-    private readonly CSRFMiddleware.ICSRFService _csrfService;
     private readonly StubRecorder _recorder;
 
     public RecordingApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
-        StartupServer<ApiHost1.Program>();
-        _csrfService = setup.GetRequiredService<CSRFMiddleware.ICSRFService>();
-#if TESTINGONLY
-        HttpApi.PostEmptyJsonAsync(new DestroyAllRepositoriesRequest().MakeApiRoute(),
-                (msg, cookies) => msg.WithCSRF(cookies, _csrfService)).GetAwaiter()
-            .GetResult();
-#endif
         _recorder = setup.GetRequiredService<IRecorder>().As<StubRecorder>();
         _recorder.Reset();
     }
@@ -45,7 +35,7 @@ public class RecordingApiSpec : WebApiSpec<Program>
             Path = "apath"
         };
         await HttpApi.PostAsync(request.MakeApiRoute(), JsonContent.Create(request),
-            (msg, cookies) => msg.WithCSRF(cookies, _csrfService));
+            (msg, cookies) => msg.WithCSRF(cookies, CSRFService));
 
         _recorder.LastUsageEventName.Should().Be(UsageConstants.Events.Web.WebPageVisit);
         _recorder.LastUsageAdditional!.Count.Should().Be(6);
@@ -71,7 +61,7 @@ public class RecordingApiSpec : WebApiSpec<Program>
             }
         };
         await HttpApi.PostAsync(request.MakeApiRoute(), JsonContent.Create(request),
-            (msg, cookies) => msg.WithCSRF(cookies, _csrfService));
+            (msg, cookies) => msg.WithCSRF(cookies, CSRFService));
 
         _recorder.LastUsageEventName.Should().Be("aneventname");
         _recorder.LastUsageAdditional!.Count.Should().Be(6);
@@ -93,7 +83,7 @@ public class RecordingApiSpec : WebApiSpec<Program>
             Message = "amessage"
         };
         await HttpApi.PostAsync(request.MakeApiRoute(), JsonContent.Create(request),
-            (msg, cookies) => msg.WithCSRF(cookies, _csrfService));
+            (msg, cookies) => msg.WithCSRF(cookies, CSRFService));
 
         _recorder.LastCrashLevel.Should().Be(CrashLevel.Critical);
         _recorder.LastCrashException.Should().BeOfType<Exception>();
@@ -113,7 +103,7 @@ public class RecordingApiSpec : WebApiSpec<Program>
             }
         };
         await HttpApi.PostAsync(request.MakeApiRoute(), JsonContent.Create(request),
-            (msg, cookies) => msg.WithCSRF(cookies, _csrfService));
+            (msg, cookies) => msg.WithCSRF(cookies, CSRFService));
 
         _recorder.LastTraceLevel.Should().Be(StubRecorderTraceLevel.Warning);
         _recorder.LastTraceMessageTemplate.Should().Be("amessage {aparam}");
@@ -132,7 +122,7 @@ public class RecordingApiSpec : WebApiSpec<Program>
             }
         };
         await HttpApi.PostAsync(request.MakeApiRoute(), JsonContent.Create(request),
-            (msg, cookies) => msg.WithCSRF(cookies, _csrfService));
+            (msg, cookies) => msg.WithCSRF(cookies, CSRFService));
 
         _recorder.LastMeasureEventName.Should().Be("aneventname");
         _recorder.LastMeasureAdditional!.Count.Should().Be(6);

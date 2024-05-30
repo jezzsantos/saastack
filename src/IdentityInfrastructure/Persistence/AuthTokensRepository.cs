@@ -24,12 +24,14 @@ public class AuthTokensRepository : IAuthTokensRepository
         _tokens = tokensStore;
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         return await Tasks.WhenAllAsync(
             _tokenQueries.DestroyAllAsync(cancellationToken),
             _tokens.DestroyAllAsync(cancellationToken));
     }
+#endif
 
     public async Task<Result<Optional<AuthTokensRoot>, Error>> FindByRefreshTokenAsync(string refreshToken,
         CancellationToken cancellationToken)

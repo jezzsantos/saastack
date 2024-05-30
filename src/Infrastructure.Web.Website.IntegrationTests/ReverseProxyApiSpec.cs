@@ -1,11 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Text.Json;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.Health;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using Infrastructure.Web.Common;
-using Infrastructure.Web.Hosting.Common.Pipeline;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.Extensions.DependencyInjection;
 using WebsiteHost;
@@ -15,21 +13,10 @@ namespace Infrastructure.Web.Website.IntegrationTests;
 
 [Trait("Category", "Integration.Website")]
 [Collection("API")]
-public class ReverseProxyApiSpec : WebApiSpec<Program>
+public class ReverseProxyApiSpec : WebsiteSpec<Program>
 {
-    private readonly CSRFMiddleware.ICSRFService _csrfService;
-    private readonly JsonSerializerOptions _jsonOptions;
-
     public ReverseProxyApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
-        StartupServer<ApiHost1.Program>();
-        _csrfService = setup.GetRequiredService<CSRFMiddleware.ICSRFService>();
-#if TESTINGONLY
-        HttpApi.PostEmptyJsonAsync(new DestroyAllRepositoriesRequest().MakeApiRoute(),
-                (msg, cookies) => msg.WithCSRF(cookies, _csrfService)).GetAwaiter()
-            .GetResult();
-#endif
-        _jsonOptions = setup.GetRequiredService<JsonSerializerOptions>();
     }
 
     [Fact]
@@ -54,7 +41,7 @@ public class ReverseProxyApiSpec : WebApiSpec<Program>
         var result = await HttpApi.GetAsync(new HealthCheckRequest().MakeApiRoute());
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        var name = (await result.Content.ReadFromJsonAsync<HealthCheckResponse>(_jsonOptions))!.Name;
+        var name = (await result.Content.ReadFromJsonAsync<HealthCheckResponse>(JsonOptions))!.Name;
         name.Should().Be("WebsiteHost");
     }
 
@@ -89,18 +76,19 @@ public class ReverseProxyApiSpec : WebApiSpec<Program>
     [Fact]
     public async Task WhenRequestASecureRemoteWebApiAndAuthenticated_ThenReturnsResponse()
     {
-        var (userId, _) = await HttpApi.LoginUserFromBrowserAsync(_jsonOptions, _csrfService);
+        var (userId, _) = await HttpApi.LoginUserFromBrowserAsync(JsonOptions, CSRFService);
 
 #if TESTINGONLY
         var result = await HttpApi.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest().MakeApiRoute());
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        var callerId = (await result.Content.ReadFromJsonAsync<GetCallerTestingOnlyResponse>(_jsonOptions))!.CallerId;
+        var callerId = (await result.Content.ReadFromJsonAsync<GetCallerTestingOnlyResponse>(JsonOptions))!.CallerId;
         callerId.Should().Be(userId);
 #endif
     }
 
     private static void OverrideDependencies(IServiceCollection services)
     {
+        //do nothing
     }
 }

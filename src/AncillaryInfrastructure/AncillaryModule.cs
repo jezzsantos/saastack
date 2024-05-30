@@ -43,14 +43,14 @@ public class AncillaryModule : ISubdomainModule
         {
             return (_, services) =>
             {
-                services.AddSingleton<IRecordingApplication, RecordingApplication>();
-                services.AddSingleton<IFeatureFlagsApplication, FeatureFlagsApplication>();
-                services.AddSingleton<IAncillaryApplication, AncillaryApplication.AncillaryApplication>();
+                services.AddPerHttpRequest<IRecordingApplication, RecordingApplication>();
+                services.AddPerHttpRequest<IFeatureFlagsApplication, FeatureFlagsApplication>();
+                services.AddPerHttpRequest<IAncillaryApplication, AncillaryApplication.AncillaryApplication>();
                 services.AddSingleton<IUsageMessageQueue>(c =>
                     new UsageMessageQueue(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IMessageQueueIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
-                services.AddSingleton<IAuditMessageQueueRepository>(c =>
+                services.AddPerHttpRequest<IAuditMessageQueueRepository>(c =>
                     new AuditMessageQueueRepository(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IMessageQueueIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
@@ -58,19 +58,21 @@ public class AncillaryModule : ISubdomainModule
                     new EmailMessageQueue(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IMessageQueueIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
-                services.AddSingleton<IAuditRepository>(c => new AuditRepository(c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredService<IDomainFactory>(),
-                    c.GetRequiredService<IEventSourcingDddCommandStore<AuditRoot>>(),
-                    c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterUnTenantedEventing<AuditRoot, AuditProjection>(
-                    c => new AuditProjection(c.GetRequiredService<IRecorder>(), c.GetRequiredService<IDomainFactory>(),
+                services.AddPerHttpRequest<IAuditRepository>(c =>
+                    new AuditRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<AuditRoot>>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.AddSingleton<IEmailDeliveryRepository>(c => new EmailDeliveryRepository(
-                    c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredService<IDomainFactory>(),
-                    c.GetRequiredService<IEventSourcingDddCommandStore<EmailDeliveryRoot>>(),
-                    c.GetRequiredServiceForPlatform<IDataStore>()));
-                services.RegisterUnTenantedEventing<EmailDeliveryRoot, EmailDeliveryProjection>(
+                services.RegisterEventing<AuditRoot, AuditProjection>(
+                    c => new AuditProjection(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.AddPerHttpRequest<IEmailDeliveryRepository>(c =>
+                    new EmailDeliveryRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<EmailDeliveryRoot>>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.RegisterEventing<EmailDeliveryRoot, EmailDeliveryProjection>(
                     c => new EmailDeliveryProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
@@ -81,7 +83,8 @@ public class AncillaryModule : ISubdomainModule
 
                 services.AddSingleton<IUsageDeliveryService, NoOpUsageDeliveryService>();
                 services.AddSingleton<IEmailDeliveryService, NoOpEmailDeliveryService>();
-                services.AddSingleton<IProvisioningNotificationService, OrganizationProvisioningNotificationService>();
+                services
+                    .AddPerHttpRequest<IProvisioningNotificationService, OrganizationProvisioningNotificationService>();
             };
         }
     }

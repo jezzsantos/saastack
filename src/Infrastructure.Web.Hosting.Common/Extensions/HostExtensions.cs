@@ -1,7 +1,6 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Application.Interfaces;
 using Application.Interfaces.Services;
 using Application.Persistence.Shared;
 using Application.Services.Shared;
@@ -25,7 +24,6 @@ using Infrastructure.Hosting.Common;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Hosting.Common.Recording;
 using Infrastructure.Interfaces;
-using Infrastructure.Persistence.Common.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Shared.ApplicationServices;
 using Infrastructure.Shared.ApplicationServices;
@@ -34,7 +32,6 @@ using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Common.Validation;
 using Infrastructure.Web.Api.Interfaces;
-using Infrastructure.Web.Hosting.Common.ApplicationServices;
 using Infrastructure.Web.Hosting.Common.Auth;
 using Infrastructure.Web.Hosting.Common.Documentation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -45,11 +42,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-#if TESTINGONLY
-using Infrastructure.Persistence.Interfaces.ApplicationServices;
-using Infrastructure.Web.Api.Operations.Shared.Ancillary;
-
-#else
+#if !TESTINGONLY
+using Infrastructure.Persistence.Common.ApplicationServices;
 #if HOSTEDONAZURE
 using Microsoft.ApplicationInsights.Extensibility;
 #elif HOSTEDONAWS
@@ -66,16 +60,6 @@ public static class HostExtensions
     private const string CheckPointAggregatePrefix = "check";
     private const string LoggingSettingName = "Logging";
     private static readonly char[] AllowedCORSOriginsDelimiters = [',', ';', ' '];
-#if TESTINGONLY
-    private static readonly Dictionary<string, IWebRequest> StubQueueDrainingServiceQueuedApiMappings = new()
-    {
-        { WorkerConstants.Queues.Audits, new DrainAllAuditsRequest() },
-        { WorkerConstants.Queues.Usages, new DrainAllUsagesRequest() },
-        { WorkerConstants.Queues.Emails, new DrainAllEmailsRequest() },
-        { WorkerConstants.Queues.Provisionings, new DrainAllProvisioningsRequest() }
-        //     { "events", new DrainAllEventsRequest() }, 
-    };
-#endif
 
     /// <summary>
     ///     Configures a WebHost
@@ -95,8 +79,8 @@ public static class HostExtensions
         RegisterNotifications(hostOptions.UsesNotifications);
         modules.RegisterServices(appBuilder.Configuration, services);
         RegisterApplicationServices(hostOptions.IsMultiTenanted);
-        RegisterEventing(hostOptions.Persistence.UsesEventing);
         RegisterPersistence(hostOptions.Persistence.UsesQueues, hostOptions.IsMultiTenanted);
+        RegisterEventing(hostOptions.Persistence.UsesEventing);
         RegisterCors(hostOptions.CORS);
 
         var app = appBuilder.Build();
@@ -393,8 +377,8 @@ public static class HostExtensions
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services.AddSingleton<IEmailSchedulingService, QueuingEmailSchedulingService>();
                 services.AddSingleton<IWebsiteUiService, WebsiteUiService>();
-                services.AddSingleton<INotificationsService>(c =>
-                    new EmailNotificationsService(c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                services.AddSingleton<IUserNotificationsService>(c =>
+                    new EmailUserNotificationsService(c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
                         c.GetRequiredService<IHostSettings>(), c.GetRequiredService<IWebsiteUiService>(),
                         c.GetRequiredService<IEmailSchedulingService>()));
             }
@@ -445,14 +429,6 @@ public static class HostExtensions
             }
         }
 
-        void RegisterEventing(bool usesEventing)
-        {
-            if (usesEventing)
-            {
-                services.AddPerHttpRequest<IEventNotificationMessageBroker, NoOpEventNotificationMessageBroker>();
-            }
-        }
-
         void RegisterPersistence(bool usesQueues, bool isMultiTenanted)
         {
             var domainAssemblies = modules.SubdomainAssemblies
@@ -463,34 +439,49 @@ public static class HostExtensions
             if (isMultiTenanted)
             {
                 services.AddPerHttpRequest<IDependencyContainer, DotNetDependencyContainer>();
+                services.AddPerHttpRequest<IDomainFactory>(c => DomainFactory.CreateRegistered(
+                    c.GetRequiredService<IDependencyContainer>(), domainAssemblies));
             }
             else
             {
                 services.AddSingleton<IDependencyContainer, DotNetDependencyContainer>();
+                services.AddSingleton<IDomainFactory>(c => DomainFactory.CreateRegistered(
+                    c.GetRequiredServiceForPlatform<IDependencyContainer>(), domainAssemblies));
             }
 
             services.AddSingleton<IMessageQueueIdFactory, MessageQueueIdFactory>();
-            services.AddSingleton<IDomainFactory>(c => DomainFactory.CreateRegistered(
-                c.GetRequiredServiceForPlatform<IDependencyContainer>(), domainAssemblies));
             services.AddSingleton<IEventSourcedChangeEventMigrator, ChangeEventTypeMigrator>();
 
 #if TESTINGONLY
-            RegisterStoreForTestingOnly(services, usesQueues, isMultiTenanted);
+            TestingOnlyHostExtensions.RegisterStoreForTestingOnly(services, usesQueues, isMultiTenanted);
 #else
-            //HACK: we need a reasonable value for production here like SQLServerDataStore
-            services.AddForPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, NoOpStore>(_ =>
+            //HACK: we need a reasonable value for production here like SQLServerDataStore or DynamoDbDataStore
+            services.AddForPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, IMessageBusStore, NoOpStore>(_ =>
                 NoOpStore.Instance);
             if (isMultiTenanted)
             {
-                services.AddPerHttpRequest<IDataStore, IEventStore, IBlobStore, IQueueStore, NoOpStore>(_ =>
+                services.AddPerHttpRequest<IDataStore, IEventStore, IBlobStore, IQueueStore, IMessageBusStore, NoOpStore>(_ =>
                     NoOpStore.Instance);
             }
             else
             {
-                services.AddSingleton<IDataStore, IEventStore, IBlobStore, IQueueStore, NoOpStore>(_ =>
+                services.AddSingleton<IDataStore, IEventStore, IBlobStore, IQueueStore, IMessageBusStore, NoOpStore>(_ =>
                     NoOpStore.Instance);
             }
 #endif
+        }
+
+        void RegisterEventing(bool usesEventing)
+        {
+            if (usesEventing)
+            {
+                //EXTEND: Add support for other eventing mechanisms
+                // Note: we are sending "domain events" via a message bus back to each ApiHost,
+                // and sending "integration events" to some external message broker
+
+                services.AddPerHttpRequest<IDomainEventConsumerRelay, AsynchronousQueueConsumerRelay>();
+                services.AddPerHttpRequest<IEventNotificationMessageBroker, NoOpEventNotificationMessageBroker>();
+            }
         }
 
         void RegisterCors(CORSOption cors)
@@ -536,51 +527,5 @@ public static class HostExtensions
                 }
             });
         }
-#if TESTINGONLY
-        static void RegisterStoreForTestingOnly(IServiceCollection services, bool usesQueues, bool isMultiTenanted)
-        {
-            services
-                .AddForPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
-                    LocalMachineJsonFileStore.Create(c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
-                        usesQueues
-                            ? c.GetRequiredService<IQueueStoreNotificationHandler>()
-                            : null));
-            if (isMultiTenanted)
-            {
-                services
-                    .AddPerHttpRequest<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
-                        LocalMachineJsonFileStore.Create(c.GetRequiredService<IConfigurationSettings>(),
-                            usesQueues
-                                ? c.GetRequiredService<IQueueStoreNotificationHandler>()
-                                : null));
-            }
-            else
-            {
-                services
-                    .AddSingleton<IDataStore, IEventStore, IBlobStore, IQueueStore, LocalMachineJsonFileStore>(c =>
-                        LocalMachineJsonFileStore.Create(c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
-                            usesQueues
-                                ? c.GetRequiredService<IQueueStoreNotificationHandler>()
-                                : null));
-            }
-
-            if (usesQueues)
-            {
-                RegisterStubMessageQueueDrainingService(services);
-            }
-        }
-
-        static void RegisterStubMessageQueueDrainingService(IServiceCollection services)
-        {
-            services.AddSingleton<IMonitoredMessageQueues, MonitoredMessageQueues>();
-            services.AddSingleton<IQueueStoreNotificationHandler, StubQueueStoreNotificationHandler>();
-            services.AddHostedService(c =>
-                new StubQueueDrainingService(c.GetRequiredService<IHttpClientFactory>(),
-                    c.GetRequiredService<JsonSerializerOptions>(),
-                    c.GetRequiredService<IHostSettings>(),
-                    c.GetRequiredService<ILogger<StubQueueDrainingService>>(),
-                    c.GetRequiredService<IMonitoredMessageQueues>(), StubQueueDrainingServiceQueuedApiMappings));
-        }
-#endif
     }
 }

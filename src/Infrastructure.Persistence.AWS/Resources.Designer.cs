@@ -62,6 +62,33 @@ namespace Infrastructure.Persistence.AWS {
         /// <summary>
         ///   Looks up a localized string similar to Message cannot be empty.
         /// </summary>
+        internal static string AWSSNSMessageBusStore_MissingSentMessage {
+            get {
+                return ResourceManager.GetString("AWSSNSMessageBusStore_MissingSentMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SubscriptionName cannot be empty.
+        /// </summary>
+        internal static string AWSSNSMessageBusStore_MissingSubscriptionName {
+            get {
+                return ResourceManager.GetString("AWSSNSMessageBusStore_MissingSubscriptionName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TopicName cannot be empty.
+        /// </summary>
+        internal static string AWSSNSMessageBusStore_MissingTopicName {
+            get {
+                return ResourceManager.GetString("AWSSNSMessageBusStore_MissingTopicName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Message cannot be empty.
+        /// </summary>
         internal static string AWSSQSQueueStore_MissingMessage {
             get {
                 return ResourceManager.GetString("AWSSQSQueueStore_MissingMessage", resourceCulture);
@@ -74,6 +101,24 @@ namespace Infrastructure.Persistence.AWS {
         internal static string AWSSQSQueueStore_MissingQueueName {
             get {
                 return ResourceManager.GetString("AWSSQSQueueStore_MissingQueueName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Simple Notification Service subscription name: &apos;{0}&apos; contains illegal characters or is not the correct length.
+        /// </summary>
+        internal static string ValidationExtensions_InvalidMessageBusSubscriptionName {
+            get {
+                return ResourceManager.GetString("ValidationExtensions_InvalidMessageBusSubscriptionName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Simple Notification Service topic name: &apos;{0}&apos; contains illegal characters or is not the correct length.
+        /// </summary>
+        internal static string ValidationExtensions_InvalidMessageBusTopicName {
+            get {
+                return ResourceManager.GetString("ValidationExtensions_InvalidMessageBusTopicName", resourceCulture);
             }
         }
         

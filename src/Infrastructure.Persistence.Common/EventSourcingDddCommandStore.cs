@@ -39,6 +39,7 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
 
     public Guid InstanceId { get; }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         var deleted = await _eventStore.DestroyAllAsync(_entityName, cancellationToken);
@@ -50,6 +51,7 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
 
         return deleted;
     }
+#endif
 
     public async Task<Result<TAggregateRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {

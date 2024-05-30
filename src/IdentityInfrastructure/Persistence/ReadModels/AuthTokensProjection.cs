@@ -13,11 +13,11 @@ namespace IdentityInfrastructure.Persistence.ReadModels;
 
 public class AuthTokensProjection : IReadModelProjection
 {
-    private readonly IReadModelProjectionStore<AuthToken> _authTokens;
+    private readonly IReadModelStore<AuthToken> _authTokens;
 
     public AuthTokensProjection(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
-        _authTokens = new ReadModelProjectionStore<AuthToken>(recorder, domainFactory, store);
+        _authTokens = new ReadModelStore<AuthToken>(recorder, domainFactory, store);
     }
 
     public Type RootAggregateType => typeof(AuthTokensRoot);

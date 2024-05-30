@@ -9,7 +9,6 @@ using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Eventing.Interfaces.Projections;
 using Infrastructure.Hosting.Common.ApplicationServices.Eventing.Notifications;
 using Infrastructure.Hosting.Common.ApplicationServices.Eventing.Projections;
-using Infrastructure.Interfaces;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,18 +32,17 @@ public static class EventingExtensions
     ///     <see cref="TAggregateRoot" /> and raised by both
     ///     <see cref="Application.Persistence.Interfaces.IEventSourcingDddCommandStore{TAggregateRoot}" /> and
     ///     <see cref="Application.Persistence.Interfaces.ISnapshottingDddCommandStore{TAggregateRootOrEntity}" />, and
-    ///     consumed by the specified
-    ///     <see cref="projectionFactory" /> and <see cref="notificationFactory" />
+    ///     consumed by the specified <see cref="projectionFactory" /> and <see cref="notificationFactory" />
     /// </summary>
-    public static IServiceCollection RegisterTenantedEventing<TAggregateRoot, TProjection, TNotificationRegistration>(
+    public static IServiceCollection RegisterEventing<TAggregateRoot, TProjection, TNotificationRegistration>(
         this IServiceCollection services, Func<IServiceProvider, TProjection> projectionFactory,
         Func<IServiceProvider, TNotificationRegistration> notificationFactory)
         where TAggregateRoot : IEventingAggregateRoot, IDehydratableAggregateRoot
         where TProjection : class, IReadModelProjection
         where TNotificationRegistration : class, IEventNotificationRegistration
     {
-        return AddEventing<TAggregateRoot, TProjection, TNotificationRegistration>(services, DependencyScope.Tenanted,
-            projectionFactory, notificationFactory);
+        return AddEventing<TAggregateRoot, TProjection, TNotificationRegistration>(services, projectionFactory,
+            notificationFactory);
     }
 
     /// <summary>
@@ -52,15 +50,14 @@ public static class EventingExtensions
     ///     <see cref="TAggregateRoot" /> and raised by both
     ///     <see cref="Application.Persistence.Interfaces.IEventSourcingDddCommandStore{TAggregateRoot}" /> and
     ///     <see cref="Application.Persistence.Interfaces.ISnapshottingDddCommandStore{TAggregateRootOrEntity}" />, and
-    ///     consumed by the specified
-    ///     <see cref="projectionFactory" />
+    ///     consumed by the specified <see cref="projectionFactory" />
     /// </summary>
-    public static IServiceCollection RegisterTenantedEventing<TAggregateRoot, TProjection>(
+    public static IServiceCollection RegisterEventing<TAggregateRoot, TProjection>(
         this IServiceCollection services, Func<IServiceProvider, TProjection> projectionFactory)
         where TAggregateRoot : IEventingAggregateRoot, IDehydratableAggregateRoot
         where TProjection : class, IReadModelProjection
     {
-        return AddEventing<TAggregateRoot, TProjection>(services, DependencyScope.Tenanted, projectionFactory);
+        return AddEventing<TAggregateRoot, TProjection>(services, projectionFactory);
     }
 
     /// <summary>
@@ -69,96 +66,46 @@ public static class EventingExtensions
     ///     <see cref="Application.Persistence.Interfaces.IEventSourcingDddCommandStore{TAggregateRoot}" /> and
     ///     <see cref="Application.Persistence.Interfaces.ISnapshottingDddCommandStore{TAggregateRootOrEntity}" />
     /// </summary>
-    public static IServiceCollection RegisterTenantedEventing<TAggregateRoot>(
+    public static IServiceCollection RegisterEventing<TAggregateRoot>(
         this IServiceCollection services)
         where TAggregateRoot : IEventingAggregateRoot, IDehydratableAggregateRoot
     {
-        return AddEventing<TAggregateRoot>(services, DependencyScope.Tenanted);
-    }
-
-    /// <summary>
-    ///     Configures event projection and event notification of events produced by the specified
-    ///     <see cref="TAggregateRoot" /> and raised by both
-    ///     <see cref="Application.Persistence.Interfaces.IEventSourcingDddCommandStore{TAggregateRoot}" /> and
-    ///     <see cref="Application.Persistence.Interfaces.ISnapshottingDddCommandStore{TAggregateRootOrEntity}" />, and
-    ///     consumed by the specified
-    ///     <see cref="projectionFactory" /> and <see cref="notificationFactory" />
-    /// </summary>
-    public static IServiceCollection RegisterUnTenantedEventing<TAggregateRoot, TProjection,
-        TNotificationRegistration>(this IServiceCollection services,
-        Func<IServiceProvider, TProjection> projectionFactory,
-        Func<IServiceProvider, TNotificationRegistration> notificationFactory)
-        where TAggregateRoot : IEventingAggregateRoot, IDehydratableAggregateRoot
-        where TProjection : class, IReadModelProjection
-        where TNotificationRegistration : class, IEventNotificationRegistration
-    {
-        return AddEventing<TAggregateRoot, TProjection, TNotificationRegistration>(services, DependencyScope.UnTenanted,
-            projectionFactory, notificationFactory);
-    }
-
-    /// <summary>
-    ///     Configures event projection and event notification of events produced by the specified
-    ///     <see cref="TAggregateRoot" /> and raised by both
-    ///     <see cref="Application.Persistence.Interfaces.IEventSourcingDddCommandStore{TAggregateRoot}" /> and
-    ///     <see cref="Application.Persistence.Interfaces.ISnapshottingDddCommandStore{TAggregateRootOrEntity}" />, and
-    ///     consumed by the specified
-    ///     <see cref="projectionFactory" />
-    /// </summary>
-    public static IServiceCollection RegisterUnTenantedEventing<TAggregateRoot, TProjection>(
-        this IServiceCollection services, Func<IServiceProvider, TProjection> projectionFactory)
-        where TAggregateRoot : IEventingAggregateRoot, IDehydratableAggregateRoot
-        where TProjection : class, IReadModelProjection
-    {
-        return AddEventing<TAggregateRoot, TProjection>(services, DependencyScope.UnTenanted,
-            projectionFactory);
-    }
-
-    /// <summary>
-    ///     Configures event projection and event notification of events produced by the specified
-    ///     <see cref="TAggregateRoot" /> and raised by both
-    ///     <see cref="Application.Persistence.Interfaces.IEventSourcingDddCommandStore{TAggregateRoot}" /> and
-    ///     <see cref="Application.Persistence.Interfaces.ISnapshottingDddCommandStore{TAggregateRootOrEntity}" />
-    /// </summary>
-    public static IServiceCollection RegisterUnTenantedEventing<TAggregateRoot>(
-        this IServiceCollection services)
-        where TAggregateRoot : IEventingAggregateRoot, IDehydratableAggregateRoot
-    {
-        return AddEventing<TAggregateRoot>(services, DependencyScope.UnTenanted);
+        return AddEventing<TAggregateRoot>(services);
     }
 
     private static IServiceCollection AddEventing<TAggregateRoot, TProjection, TNotificationRegistration>(
-        this IServiceCollection services, DependencyScope scope,
+        this IServiceCollection services,
         Func<IServiceProvider, TProjection> projectionFactory,
         Func<IServiceProvider, TNotificationRegistration> notificationFactory)
         where TAggregateRoot : IEventingAggregateRoot, IDehydratableAggregateRoot
         where TProjection : class, IReadModelProjection
         where TNotificationRegistration : class, IEventNotificationRegistration
     {
-        AddEventing<TAggregateRoot, TProjection>(services, scope, projectionFactory);
+        AddEventing<TAggregateRoot, TProjection>(services, projectionFactory);
         Eventing.AddNotificationFactory<TAggregateRoot, TNotificationRegistration>();
         services.AddPerHttpRequest(notificationFactory);
         return services;
     }
 
     private static IServiceCollection AddEventing<TAggregateRoot, TProjection>(
-        this IServiceCollection services, DependencyScope scope,
+        this IServiceCollection services,
         Func<IServiceProvider, TProjection> projectionFactory)
         where TAggregateRoot : IEventingAggregateRoot, IDehydratableAggregateRoot
         where TProjection : class, IReadModelProjection
     {
-        AddEventing<TAggregateRoot>(services, scope);
+        AddEventing<TAggregateRoot>(services);
         Eventing.AddProjectionFactory<TAggregateRoot, TProjection>();
-        services.AddWithLifetime(scope, projectionFactory);
+        services.AddPerHttpRequest(projectionFactory);
         return services;
     }
 
     private static IServiceCollection AddEventing<TAggregateRoot>(
-        this IServiceCollection services, DependencyScope scope)
+        this IServiceCollection services)
         where TAggregateRoot : IEventingAggregateRoot, IDehydratableAggregateRoot
     {
         if (!services.IsRegistered<IProjectionCheckpointRepository>())
         {
-            services.AddSingleton<IProjectionCheckpointRepository>(c => new ProjectionCheckpointRepository(
+            services.AddPerHttpRequest<IProjectionCheckpointRepository>(c => new ProjectionCheckpointRepository(
                 c.GetRequiredService<IRecorder>(), c.GetRequiredService<IIdentifierFactory>(),
                 c.GetRequiredService<IDomainFactory>(), c.GetRequiredServiceForPlatform<IDataStore>()));
         }
@@ -166,52 +113,33 @@ public static class EventingExtensions
         Eventing.AddEventingStorageTypes<TAggregateRoot>();
         if (!services.IsRegistered<IEventSourcingDddCommandStore<TAggregateRoot>>())
         {
-            if (scope == DependencyScope.UnTenanted)
-            {
-                services.AddSingleton<IEventSourcingDddCommandStore<TAggregateRoot>>(c =>
-                    new EventSourcingDddCommandStore<TAggregateRoot>(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IDomainFactory>(),
-                        c.GetRequiredService<IEventSourcedChangeEventMigrator>(),
-                        c.GetRequiredServiceForPlatform<IEventStore>()));
-            }
-
-            if (scope == DependencyScope.Tenanted)
-            {
-                services.AddPerHttpRequest<IEventSourcingDddCommandStore<TAggregateRoot>>(c =>
-                    new EventSourcingDddCommandStore<TAggregateRoot>(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IDomainFactory>(),
-                        c.GetRequiredService<IEventSourcedChangeEventMigrator>(),
-                        c.GetRequiredService<IEventStore>()));
-            }
+            services.AddPerHttpRequest<IEventSourcingDddCommandStore<TAggregateRoot>>(c =>
+                new EventSourcingDddCommandStore<TAggregateRoot>(c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredService<IDomainFactory>(),
+                    c.GetRequiredService<IEventSourcedChangeEventMigrator>(),
+                    c.GetRequiredService<IEventStore>()));
         }
 
         if (!services.IsRegistered<ISnapshottingDddCommandStore<TAggregateRoot>>())
         {
-            IDataStore DataStoreFactory(IServiceProvider c)
-            {
-                return scope switch
-                {
-                    DependencyScope.Tenanted => c.GetRequiredService<IDataStore>(),
-                    _ => c.GetRequiredServiceForPlatform<IDataStore>()
-                };
-            }
-
-            services.AddWithLifetime<ISnapshottingDddCommandStore<TAggregateRoot>>(scope,
-                c => new SnapshottingDddCommandStore<TAggregateRoot>(c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredService<IDomainFactory>(), DataStoreFactory(c)));
+            services.AddPerHttpRequest<ISnapshottingDddCommandStore<TAggregateRoot>>(c =>
+                new SnapshottingDddCommandStore<TAggregateRoot>(c.GetRequiredService<IRecorder>(),
+                    c.GetRequiredService<IDomainFactory>(),
+                    c.GetRequiredService<IDataStore>()));
         }
 
         services.AddPerHttpRequest<IEventNotifyingStoreProjectionRelay>(c =>
-            new InProcessSynchronousProjectionRelay(
+            new InProcessEventNotifyingStoreProjectionRelay(
                 c.GetRequiredService<IRecorder>(),
                 c.GetRequiredService<IEventSourcedChangeEventMigrator>(),
                 c.GetRequiredService<IProjectionCheckpointRepository>(),
                 Eventing.ResolveProjections(c),
                 Eventing.ResolveProjectionStores(c).ToArray()));
         services.AddPerHttpRequest<IEventNotifyingStoreNotificationRelay>(c =>
-            new InProcessSynchronousNotificationRelay(
+            new InProcessEventNotifyingStoreNotificationRelay(
                 c.GetRequiredService<IRecorder>(),
                 c.GetRequiredService<IEventSourcedChangeEventMigrator>(),
+                c.GetRequiredService<IDomainEventConsumerRelay>(),
                 c.GetRequiredService<IEventNotificationMessageBroker>(),
                 Eventing.ResolveNotificationRegistrations(c),
                 Eventing.ResolveNotificationStores(c).ToArray()));
@@ -229,11 +157,10 @@ public static class EventingExtensions
             where TAggregateRoot : IEventingAggregateRoot, IDehydratableEntity
         {
             var aggregateType = typeof(TAggregateRoot);
-            _eventingStorageTypes.TryAdd(aggregateType, new List<Type>
-            {
+            _eventingStorageTypes.TryAdd(aggregateType, [
                 typeof(IEventSourcingDddCommandStore<TAggregateRoot>),
                 typeof(ISnapshottingDddCommandStore<TAggregateRoot>)
-            });
+            ]);
         }
 
         public void AddNotificationFactory<TAggregateRoot, TNotificationRegistration>()

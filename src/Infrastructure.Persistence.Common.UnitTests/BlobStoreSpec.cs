@@ -37,6 +37,7 @@ public class BlobStoreSpec
         _blobStore.Verify(store => store.DeleteAsync("acontainername", "ablobname", CancellationToken.None));
     }
 
+#if TESTINGONLY
     [Fact]
     public async Task WhenDestroyAll_ThenDestroysAllInStore()
     {
@@ -44,6 +45,7 @@ public class BlobStoreSpec
 
         _blobStore.Verify(store => store.DestroyAllAsync("acontainername", CancellationToken.None));
     }
+#endif
 
     [Fact]
     public async Task WhenGetAndEmptyBlobName_ThenReturnsError()

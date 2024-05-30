@@ -34,6 +34,7 @@ public abstract class AnyDataStoreBaseSpec
     {
         Setup = new DataStoreInfo
             { Store = dataStore, ContainerName = typeof(TestDataStoreEntity).GetEntityNameSafe() };
+#if TESTINGONLY
         Setup.Store.DestroyAllAsync(Setup.ContainerName, CancellationToken.None).GetAwaiter()
             .GetResult();
         _firstJoiningSetup = new DataStoreInfo
@@ -49,6 +50,7 @@ public abstract class AnyDataStoreBaseSpec
         _secondJoiningSetup.Store
             .DestroyAllAsync(_secondJoiningSetup.ContainerName, CancellationToken.None).GetAwaiter()
             .GetResult();
+#endif
     }
 
     [Fact]
@@ -111,9 +113,11 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenDestroyAllWithNullContainer_ThenThrows()
     {
+#if TESTINGONLY
         await Setup.Store
             .Invoking(x => x.DestroyAllAsync(null!, CancellationToken.None))
             .Should().ThrowAsync<ArgumentOutOfRangeException>();
+#endif
     }
 
     [Fact]

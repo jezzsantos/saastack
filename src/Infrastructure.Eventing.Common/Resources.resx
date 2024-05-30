@@ -40,9 +40,15 @@
         <value>The translator '{0}' failed to handle the domain event '{1}' with event type '{2}'. Aborting notifications</value>
     </data>
     <data name="EventNotificationNotifier_ConsumerError" xml:space="preserve">
-        <value>The consumer '{0}' failed to handle the domain event '{1}' with event type '{2}'. Aborting notifications</value>
+        <value>The consumer relay '{0}' failed to handle the domain event '{1}' with event type '{2}'. Aborting domain notifications</value>
     </data>
     <data name="EventNotificationNotifier_MessageBrokerError" xml:space="preserve">
-        <value>The message broker '{0}' failed to handle the integration event '{1}' with event type '{2}'. Aborting notifications</value>
+        <value>The message broker '{0}' failed to handle the integration event '{1}' with event type '{2}'. Aborting integration notifications</value>
+    </data>
+    <data name="InProcessSynchronousConsumerRelay_ConsumerFailed" xml:space="preserve">
+        <value>The consumer '{0}' failed to handle the domain event '{1}' with event type '{2}'</value>
+    </data>
+    <data name="AsynchronousConsumerRelay_RelayFailed" xml:space="preserve">
+        <value>The relay '{0}' failed to handle the domain event '{1}' with event type '{2}'</value>
     </data>
 </root>

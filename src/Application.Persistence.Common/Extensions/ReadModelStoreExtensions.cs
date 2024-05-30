@@ -5,9 +5,9 @@ namespace Application.Persistence.Common.Extensions;
 
 public static class ReadModelStoreExtensions
 {
-    /// <inheritdoc cref="IReadModelProjectionStore{TReadModelEntity}.CreateAsync" />
+    /// <inheritdoc cref="IReadModelStore{TReadModelEntity}.CreateAsync" />
     public static async Task<Result<bool, Error>> HandleCreateAsync<TReadModelEntity>(
-        this IReadModelProjectionStore<TReadModelEntity> store,
+        this IReadModelStore<TReadModelEntity> store,
         string id, Action<TReadModelEntity> action, CancellationToken cancellationToken)
         where TReadModelEntity : IReadModelEntity, new()
     {
@@ -15,9 +15,9 @@ public static class ReadModelStoreExtensions
             .Match<Result<bool, Error>>(_ => true, error => error);
     }
 
-    /// <inheritdoc cref="IReadModelProjectionStore{TReadModelEntity}.DeleteAsync" />
+    /// <inheritdoc cref="IReadModelStore{TReadModelEntity}.DeleteAsync" />
     public static async Task<Result<bool, Error>> HandleDeleteAsync<TReadModelEntity>(
-        this IReadModelProjectionStore<TReadModelEntity> store,
+        this IReadModelStore<TReadModelEntity> store,
         string id, CancellationToken cancellationToken)
         where TReadModelEntity : IReadModelEntity, new()
     {
@@ -25,9 +25,9 @@ public static class ReadModelStoreExtensions
             .Match<Result<bool, Error>>(() => true, error => error);
     }
 
-    /// <inheritdoc cref="IReadModelProjectionStore{TReadModelEntity}.UpdateAsync" />
+    /// <inheritdoc cref="IReadModelStore{TReadModelEntity}.UpdateAsync" />
     public static async Task<Result<bool, Error>> HandleUpdateAsync<TReadModelEntity>(
-        this IReadModelProjectionStore<TReadModelEntity> store,
+        this IReadModelStore<TReadModelEntity> store,
         string id, Action<TReadModelEntity> action, CancellationToken cancellationToken)
         where TReadModelEntity : IReadModelEntity, new()
     {

@@ -2,6 +2,7 @@ using AncillaryInfrastructure;
 using BookingsInfrastructure;
 using CarsInfrastructure;
 using EndUsersInfrastructure;
+using EventNotificationsInfrastructure;
 using IdentityInfrastructure;
 using ImagesInfrastructure;
 using Infrastructure.Web.Hosting.Common;
@@ -21,6 +22,7 @@ public static class HostedModules
         modules.Register(new EndUsersModule());
         modules.Register(new OrganizationsModule());
         modules.Register(new IdentityModule());
+        modules.Register(new EventNotificationsModule());
         modules.Register(new AncillaryModule());
 #if TESTINGONLY
         modules.Register(new TestingOnlyApiModule());

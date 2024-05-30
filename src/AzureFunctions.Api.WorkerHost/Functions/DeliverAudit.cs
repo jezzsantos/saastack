@@ -1,10 +1,12 @@
 ﻿using Application.Interfaces;
 using Application.Persistence.Shared.ReadModels;
 using Infrastructure.Workers.Api;
+using JetBrains.Annotations;
 using Microsoft.Azure.Functions.Worker;
 
 namespace AzureFunctions.Api.WorkerHost.Functions;
 
+[UsedImplicitly]
 public sealed class DeliverAudit
 {
     private readonly IQueueMonitoringApiRelayWorker<AuditMessage> _worker;

@@ -60,6 +60,42 @@ namespace Infrastructure.Persistence.Azure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The message is too large to send in a batch for an Azure Service Bus.
+        /// </summary>
+        internal static string AzureServiceBusStore_MessageTooLarge {
+            get {
+                return ResourceManager.GetString("AzureServiceBusStore_MessageTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Message cannot be empty.
+        /// </summary>
+        internal static string AzureServiceBusStore_MissingSentMessage {
+            get {
+                return ResourceManager.GetString("AzureServiceBusStore_MissingSentMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SubscriptionName cannot be empty.
+        /// </summary>
+        internal static string AzureServiceBusStore_MissingSubscriptionName {
+            get {
+                return ResourceManager.GetString("AzureServiceBusStore_MissingSubscriptionName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TopicName cannot be empty.
+        /// </summary>
+        internal static string AzureServiceBusStore_MissingTopicName {
+            get {
+                return ResourceManager.GetString("AzureServiceBusStore_MissingTopicName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Message cannot be empty.
         /// </summary>
         internal static string AzureStorageAccountQueueStore_MissingMessage {
@@ -74,6 +110,24 @@ namespace Infrastructure.Persistence.Azure {
         internal static string AzureStorageAccountQueueStore_MissingQueueName {
             get {
                 return ResourceManager.GetString("AzureStorageAccountQueueStore_MissingQueueName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Azure Service Bus subscription name: &apos;{0}&apos; contains illegal characters or is not the correct length.
+        /// </summary>
+        internal static string ValidationExtensions_InvalidMessageBusSubscriptionName {
+            get {
+                return ResourceManager.GetString("ValidationExtensions_InvalidMessageBusSubscriptionName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Azure Service Bus topic name: &apos;{0}&apos; contains illegal characters or is not the correct length.
+        /// </summary>
+        internal static string ValidationExtensions_InvalidMessageBusTopicName {
+            get {
+                return ResourceManager.GetString("ValidationExtensions_InvalidMessageBusTopicName", resourceCulture);
             }
         }
         

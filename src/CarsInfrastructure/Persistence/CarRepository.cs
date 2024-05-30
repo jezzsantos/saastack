@@ -30,6 +30,7 @@ public class CarRepository : ICarRepository
         _unavailabilitiesQueries = new SnapshottingQueryStore<Unavailability>(recorder, domainFactory, store);
     }
 
+#if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
         return await Tasks.WhenAllAsync(
@@ -37,6 +38,7 @@ public class CarRepository : ICarRepository
             _cars.DestroyAllAsync(cancellationToken),
             _unavailabilitiesQueries.DestroyAllAsync(cancellationToken));
     }
+#endif
 
     public async Task<Result<CarRoot, Error>> LoadAsync(Identifier organizationId, Identifier id,
         CancellationToken cancellationToken)

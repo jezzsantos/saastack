@@ -10,7 +10,7 @@ namespace Infrastructure.Web.Website.IntegrationTests;
 
 [Trait("Category", "Integration.Website")]
 [Collection("API")]
-public class ApiDocsSpec : WebApiSpec<Program>
+public class ApiDocsSpec : WebsiteSpec<Program>
 {
     public ApiDocsSpec(WebApiSetup<Program> setup) : base(setup)
     {

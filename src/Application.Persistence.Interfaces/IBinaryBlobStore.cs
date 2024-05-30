@@ -7,10 +7,12 @@ namespace Application.Persistence.Interfaces;
 /// </summary>
 public interface IBinaryBlobStore
 {
+#if TESTINGONLY
     /// <summary>
     ///     Permanently destroys all blobs in the store
     /// </summary>
     Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken);
+#endif
 
     /// <summary>
     ///     Permanently destroys the existing blob from the store.

@@ -20,15 +20,15 @@ namespace EndUsersInfrastructure.Persistence.ReadModels;
 
 public class EndUserProjection : IReadModelProjection
 {
-    private readonly IReadModelProjectionStore<Invitation> _invitations;
-    private readonly IReadModelProjectionStore<Membership> _memberships;
-    private readonly IReadModelProjectionStore<EndUser> _users;
+    private readonly IReadModelStore<Invitation> _invitations;
+    private readonly IReadModelStore<Membership> _memberships;
+    private readonly IReadModelStore<EndUser> _users;
 
     public EndUserProjection(IRecorder recorder, IDomainFactory domainFactory, IDataStore store)
     {
-        _users = new ReadModelProjectionStore<EndUser>(recorder, domainFactory, store);
-        _invitations = new ReadModelProjectionStore<Invitation>(recorder, domainFactory, store);
-        _memberships = new ReadModelProjectionStore<Membership>(recorder, domainFactory, store);
+        _users = new ReadModelStore<EndUser>(recorder, domainFactory, store);
+        _invitations = new ReadModelStore<Invitation>(recorder, domainFactory, store);
+        _memberships = new ReadModelStore<Membership>(recorder, domainFactory, store);
     }
 
     public Type RootAggregateType => typeof(EndUserRoot);
