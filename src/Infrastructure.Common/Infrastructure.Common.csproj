@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AWSSDK.CloudWatch" Version="3.7.301.10" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
+        <PackageReference Include="AWSSDK.CloudWatch" Version="3.7.304.21" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
         <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.302.9" Condition="'$(HostingPlatform)' == 'HOSTEDONAWS'" />
         <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" Condition="'$(HostingPlatform)' == 'HOSTEDONAZURE'" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
