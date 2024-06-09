@@ -449,7 +449,7 @@ internal static class UserProfileConversionExtensions
         var context = new Dictionary<string, object>
         {
             [UsageConstants.Properties.UserIdOverride] = profile.UserId,
-            [UsageConstants.Properties.Name] = profile.Name.ToName(),
+            [UsageConstants.Properties.Name] = profile.Name.Value.FullName,
             [UsageConstants.Properties.Timezone] = profile.Timezone.Code.ToString()
         };
         if (profile.EmailAddress.HasValue)

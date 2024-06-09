@@ -5,6 +5,7 @@ using Common.Recording;
 using Domain.Interfaces;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
+using Colors = Infrastructure.Common.ConsoleConstants.Colors;
 
 namespace Infrastructure.Hosting.Common.Recording;
 
@@ -25,47 +26,74 @@ public class TracingOnlyRecorder : IRecorder
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
-        var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, $"Audit: {messageTemplate}", templateArgs);
-        TraceInformation(context, augmentedMessageTemplate, augmentedArguments);
+        if (auditCode.HasNoValue())
+        {
+            return;
+        }
+
+        var againstId = context.Exists()
+            ? context.CallerId
+            : null;
+        if (againstId.HasValue())
+        {
+            AuditAgainst(context, againstId, auditCode, messageTemplate, templateArgs);
+        }
+        else
+        {
+            TraceInformation(context, $"Audit: {auditCode}, with message: {messageTemplate}", templateArgs);
+        }
     }
 
     public virtual void AuditAgainst(ICallContext? context, string againstId, string auditCode,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
-        var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, $"Audit, for '{againstId}': {messageTemplate}", templateArgs);
-        TraceInformation(context, augmentedMessageTemplate, augmentedArguments);
+        if (auditCode.HasNoValue())
+        {
+            return;
+        }
+
+        TraceInformation(context, $"Audit: {auditCode}, against {againstId}, with message: {messageTemplate}",
+            templateArgs);
     }
 
     public virtual void Crash(ICallContext? context, CrashLevel level, Exception exception)
     {
-        TraceError(context, exception, "Crash");
+        Crash(context, level, exception, exception.Message);
     }
 
     public virtual void Crash(ICallContext? context, CrashLevel level, Exception exception,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
+        var logLevel = level == CrashLevel.Critical
+            ? LogLevel.Critical
+            : LogLevel.Error;
         var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, $"Crash: {messageTemplate}", templateArgs);
-        TraceError(context, exception, augmentedMessageTemplate, augmentedArguments);
+            AugmentMessageTemplateAndArguments(context, $"Crash ({level}): {messageTemplate}", templateArgs);
+        _logger.Log(logLevel, exception,
+            $"{Colors.Reverse}{Colors.Red}{augmentedMessageTemplate}{Colors.Normal}{Colors.NoReverse}",
+            augmentedArguments);
     }
 
     public virtual void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
     {
-        var additionalAsJson = additional.Exists()
-            ? additional.ToJson()!
-            : string.Empty;
-        var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, $"Measure, '{eventName}':", additionalAsJson.ToArray());
-        TraceInformation(context, augmentedMessageTemplate, augmentedArguments);
+        if (eventName.HasNoValue())
+        {
+            return;
+        }
+
+        TraceInformation(context, $"Measure: {eventName}, with context: {additional.DumpSafely()}");
     }
 
     public virtual void TraceDebug(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
+        if (messageTemplate.HasNoValue())
+        {
+            return;
+        }
+
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
         _logger.LogDebug(augmentedMessageTemplate, augmentedArguments);
@@ -83,6 +111,11 @@ public class TracingOnlyRecorder : IRecorder
     public virtual void TraceError(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
+        if (messageTemplate.HasNoValue())
+        {
+            return;
+        }
+
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
         _logger.LogError(augmentedMessageTemplate, augmentedArguments);
@@ -100,6 +133,11 @@ public class TracingOnlyRecorder : IRecorder
     public virtual void TraceInformation(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
+        if (messageTemplate.HasNoValue())
+        {
+            return;
+        }
+
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
         _logger.LogInformation(augmentedMessageTemplate, augmentedArguments);
@@ -117,6 +155,11 @@ public class TracingOnlyRecorder : IRecorder
     public virtual void TraceWarning(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
+        if (messageTemplate.HasNoValue())
+        {
+            return;
+        }
+
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
         _logger.LogWarning(augmentedMessageTemplate, augmentedArguments);
@@ -125,24 +168,33 @@ public class TracingOnlyRecorder : IRecorder
     public virtual void TrackUsage(ICallContext? context, string eventName,
         Dictionary<string, object>? additional = null)
     {
-        var additionalAsJson = additional.Exists()
-            ? additional.ToJson()!
-            : string.Empty;
-        var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, $"Usage, '{eventName}':", additionalAsJson.ToArray());
-        TraceInformation(context, augmentedMessageTemplate, augmentedArguments);
+        if (eventName.HasNoValue())
+        {
+            return;
+        }
+
+        var forId = context.Exists()
+            ? context.CallerId
+            : null;
+        if (forId.HasValue())
+        {
+            TrackUsageFor(context, forId, eventName, additional);
+        }
+        else
+        {
+            TraceInformation(context, $"Usage: {eventName}, with context: {additional.DumpSafely()}");
+        }
     }
 
     public virtual void TrackUsageFor(ICallContext? context, string forId, string eventName,
         Dictionary<string, object>? additional = null)
     {
-        var additionalAsJson = additional.Exists()
-            ? additional.ToJson()!
-            : string.Empty;
-        var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, $"Usage, '{eventName}', for '{forId}':",
-                additionalAsJson.ToArray());
-        TraceInformation(context, augmentedMessageTemplate, augmentedArguments);
+        if (eventName.HasNoValue())
+        {
+            return;
+        }
+
+        TraceInformation(context, $"Usage: {eventName}, for: {forId}, with context: {additional.DumpSafely()}");
     }
 
     private static (string MessageTemplate, object[] Arguments) AugmentMessageTemplateAndArguments(
@@ -154,14 +206,14 @@ public class TracingOnlyRecorder : IRecorder
         {
             builder.Append("Request: {Request} ");
             arguments.Insert(0, context.CallId.HasValue()
-                ? context.CallId
-                : "Uncorrelated");
+                ? $"{context.CallId},"
+                : $"{CallConstants.UncorrelatedCallId},");
 
             var isAuthenticatedCaller =
                 context.CallerId.HasValue() && context.CallerId != CallerConstants.AnonymousUserId;
             builder.Append(isAuthenticatedCaller
                 ? "(by {Caller}) "
-                : "(anonymously) ");
+                : "(by anonymous) ");
             if (isAuthenticatedCaller)
             {
                 arguments.Insert(1, context.CallerId);

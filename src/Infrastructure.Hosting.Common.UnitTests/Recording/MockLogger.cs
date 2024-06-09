@@ -26,6 +26,11 @@ public class MockLogger : ILogger
     {
         return null;
     }
+
+    public void Reset()
+    {
+        _items.Clear();
+    }
 }
 
 public class LogItem

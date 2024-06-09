@@ -105,9 +105,10 @@ public class RecordingApiSpec : WebsiteSpec<Program>
         await HttpApi.PostAsync(request.MakeApiRoute(), JsonContent.Create(request),
             (msg, cookies) => msg.WithCSRF(cookies, CSRFService));
 
-        _recorder.LastTraceLevel.Should().Be(StubRecorderTraceLevel.Warning);
-        _recorder.LastTraceMessageTemplate.Should().Be("amessage {aparam}");
-        _recorder.LastTraceArguments.Should().ContainInOrder("avalue");
+        _recorder.LastTraceMessages.Should().Contain(msg =>
+            msg.Message == "amessage {aparam}"
+            && msg.Level == StubRecorderTraceLevel.Warning
+            && msg.Arguments!.Length == 1 && (string)msg.Arguments[0] == "avalue");
     }
 
     [Fact]

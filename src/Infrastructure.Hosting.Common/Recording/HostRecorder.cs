@@ -4,9 +4,11 @@ using Common;
 using Common.Configuration;
 using Common.Extensions;
 using Common.Recording;
+using Domain.Interfaces;
 using Domain.Interfaces.Services;
 using Infrastructure.Common.Recording;
 using Microsoft.Extensions.Logging;
+using Colors = Infrastructure.Common.ConsoleConstants.Colors;
 
 namespace Infrastructure.Hosting.Common.Recording;
 
@@ -74,6 +76,11 @@ public sealed class HostRecorder : IRecorder, IDisposable
 
     public void TraceDebug(ICallContext? context, string messageTemplate, params object[] templateArgs)
     {
+        if (messageTemplate.HasNoValue())
+        {
+            return;
+        }
+
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
         _logger.LogDebug(augmentedMessageTemplate, augmentedArguments);
@@ -89,6 +96,11 @@ public sealed class HostRecorder : IRecorder, IDisposable
 
     public void TraceInformation(ICallContext? context, string messageTemplate, params object[] templateArgs)
     {
+        if (messageTemplate.HasNoValue())
+        {
+            return;
+        }
+
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
         _logger.LogInformation(augmentedMessageTemplate, augmentedArguments);
@@ -104,6 +116,11 @@ public sealed class HostRecorder : IRecorder, IDisposable
 
     public void TraceWarning(ICallContext? context, string messageTemplate, params object[] templateArgs)
     {
+        if (messageTemplate.HasNoValue())
+        {
+            return;
+        }
+
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
         _logger.LogWarning(augmentedMessageTemplate, augmentedArguments);
@@ -119,6 +136,11 @@ public sealed class HostRecorder : IRecorder, IDisposable
 
     public void TraceError(ICallContext? context, string messageTemplate, params object[] templateArgs)
     {
+        if (messageTemplate.HasNoValue())
+        {
+            return;
+        }
+
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
         _logger.LogError(augmentedMessageTemplate, augmentedArguments);
@@ -132,78 +154,111 @@ public sealed class HostRecorder : IRecorder, IDisposable
     public void Crash(ICallContext? context, CrashLevel level, Exception exception, string messageTemplate,
         params object[] templateArgs)
     {
-        var safeContext = context ?? CallContext.CreateUnknown();
         var logLevel = level == CrashLevel.Critical
             ? LogLevel.Critical
             : LogLevel.Error;
         var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, $"Crash: {messageTemplate}", templateArgs);
-        _logger.Log(logLevel, exception, augmentedMessageTemplate, augmentedArguments);
+            AugmentMessageTemplateAndArguments(context, $"Crash ({level}): {messageTemplate}", templateArgs);
+        _logger.Log(logLevel, exception,
+            $"{Colors.Reverse}{Colors.Red}{augmentedMessageTemplate}{Colors.Normal}{Colors.NoReverse}",
+            augmentedArguments);
 
         var errorSourceId = exception.GetBaseException().TargetSite?.ToString();
         if (errorSourceId.Exists())
         {
-            _metricsReporter.Measure(safeContext, $"Exceptions: {errorSourceId}");
+            _metricsReporter.Measure(context, $"Exceptions: {errorSourceId}");
         }
 
-        _crashReporter.Crash(safeContext, level, exception, messageTemplate, templateArgs);
+        _crashReporter.Crash(context, level, exception, messageTemplate, templateArgs);
     }
 
     public void Audit(ICallContext? context, string auditCode, string messageTemplate, params object[] templateArgs)
     {
-        var safeContext = context ?? CallContext.CreateUnknown();
-        var againstId = safeContext.CallerId;
-        AuditAgainst(safeContext, againstId, auditCode, messageTemplate, templateArgs);
+        if (auditCode.HasNoValue())
+        {
+            return;
+        }
+
+        var againstId = context.Exists()
+            ? context.CallerId
+            : null;
+        if (againstId.HasValue())
+        {
+            AuditAgainst(context, againstId, auditCode, messageTemplate, templateArgs);
+        }
+        else
+        {
+            TraceInformation(context, $"Audit: {auditCode}, with message: {messageTemplate}", templateArgs);
+        }
     }
 
     public void AuditAgainst(ICallContext? context, string againstId, string auditCode, string messageTemplate,
         params object[] templateArgs)
     {
-        var safeContext = context ?? CallContext.CreateUnknown();
-        var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, $"Audit: {auditCode}, against {againstId}, {messageTemplate}",
-                templateArgs);
-        TraceInformation(safeContext, augmentedMessageTemplate, augmentedArguments);
-        TrackUsageFor(safeContext, againstId, UsageConstants.Events.UsageScenarios.Generic.Audit,
+        if (auditCode.HasNoValue())
+        {
+            return;
+        }
+
+        TraceInformation(context, $"Audit: {auditCode}, against: {againstId}, with message: {messageTemplate}",
+            templateArgs);
+        TrackUsageFor(context, againstId, UsageConstants.Events.UsageScenarios.Generic.Audit,
             new Dictionary<string, object>
             {
                 { UsageConstants.Properties.UsedById, againstId },
                 { UsageConstants.Properties.AuditCode, auditCode.ToLowerInvariant() }
             });
-        _auditReporter.Audit(safeContext, againstId, auditCode, messageTemplate, templateArgs);
+        _auditReporter.Audit(context, againstId, auditCode, messageTemplate, templateArgs);
     }
 
     public void TrackUsage(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
     {
-        var safeContext = context ?? CallContext.CreateUnknown();
-        var forId = safeContext.CallerId;
-        TrackUsageFor(safeContext, forId, eventName, additional);
+        if (eventName.HasNoValue())
+        {
+            return;
+        }
+
+        var forId = context.Exists()
+            ? context.CallerId
+            : null;
+        if (forId.HasValue())
+        {
+            TrackUsageFor(context, forId, eventName, additional);
+        }
+        else
+        {
+            TraceInformation(context, $"Usage: {eventName}, with context: {additional.DumpSafely()}");
+        }
     }
 
     public void TrackUsageFor(ICallContext? context, string forId, string eventName,
         Dictionary<string, object>? additional = null)
     {
-        ArgumentException.ThrowIfNullOrEmpty(eventName);
-        ArgumentException.ThrowIfNullOrEmpty(forId);
+        if (eventName.HasNoValue())
+        {
+            return;
+        }
 
-        var safeContext = context ?? CallContext.CreateUnknown();
-        var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, $"Usage: {eventName}, for {forId}");
-        TraceInformation(context, augmentedMessageTemplate, augmentedArguments);
+        TraceInformation(context, $"Usage: {eventName}, for: {forId}, with context: {additional.DumpSafely()}");
 
         var properties = additional ?? new Dictionary<string, object>();
         properties.TryAdd(UsageConstants.Properties.Component, _usageComponentName);
-        _usageReporter.Track(safeContext, forId, eventName, properties);
+        _usageReporter.Track(context, forId, eventName, properties);
     }
 
     public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
     {
-        var safeContext = context ?? CallContext.CreateUnknown();
-        TraceInformation(safeContext, $"Measure: {eventName}");
+        if (eventName.HasNoValue())
+        {
+            return;
+        }
+
+        TraceInformation(context, $"Measure: {eventName}, with context: {additional.DumpSafely()}");
+
         var usageContext = additional ?? new Dictionary<string, object>();
         usageContext.Add(UsageConstants.Properties.MetricEventName, eventName.ToLowerInvariant());
-        TrackUsage(safeContext, UsageConstants.Events.UsageScenarios.Generic.Measurement, usageContext);
-        _metricsReporter.Measure(safeContext, eventName, additional ?? new Dictionary<string, object>());
+        TrackUsage(context, UsageConstants.Events.UsageScenarios.Generic.Measurement, usageContext);
+        _metricsReporter.Measure(context, eventName, additional ?? new Dictionary<string, object>());
     }
 
     public override string ToString()
@@ -279,25 +334,61 @@ public sealed class HostRecorder : IRecorder, IDisposable
     {
         var arguments = new List<object>(templateArgs);
         var builder = new StringBuilder();
-
-        var unknownCall = CallContext.CreateUnknown();
-        var currentCall = context ?? unknownCall;
-
-        builder.Append("Request: {Request}");
-        arguments.Insert(0, currentCall.CallId.HasValue()
-            ? currentCall.CallId
-            : unknownCall.CallId);
-
-        builder.Append(" By: {Caller}");
-        arguments.Insert(1, currentCall.CallerId.HasValue()
-            ? currentCall.CallerId
-            : unknownCall.CallerId);
-
-        if (messageTemplate.HasValue())
+        if (context.Exists())
         {
-            builder.Append($": {messageTemplate}");
+            builder.Append("Request: {Request} ");
+            arguments.Insert(0, context.CallId.HasValue()
+                ? $"{context.CallId},"
+                : $"{CallConstants.UncorrelatedCallId},");
+
+            var isAuthenticatedCaller =
+                context.CallerId.HasValue() && context.CallerId != CallerConstants.AnonymousUserId;
+            builder.Append(isAuthenticatedCaller
+                ? "(by {Caller}) "
+                : "(by anonymous) ");
+            if (isAuthenticatedCaller)
+            {
+                arguments.Insert(1, context.CallerId);
+            }
+
+            builder.Append(' ');
         }
 
+        builder.Append(messageTemplate);
+
         return (builder.ToString(), arguments.ToArray());
+    }
+}
+
+internal static class RecorderExtensions
+{
+    public static string DumpSafely(this Dictionary<string, object>? additional)
+    {
+        if (additional.NotExists() || additional.HasNone())
+        {
+            return "none";
+        }
+
+        var builder = new StringBuilder();
+        builder.Append("<");
+        var counter = -1;
+        foreach (var (key, value) in additional)
+        {
+            if (++counter > 0)
+            {
+                builder.Append(", ");
+            }
+
+            var safeValue = value.Exists()
+                ? value.ToString() ?? string.Empty
+                : string.Empty;
+            var escapedValue = safeValue
+                .Replace("{", @"{{").Replace("}", @"}}");
+            builder.Append($"\"{key}\": {escapedValue}");
+        }
+
+        builder.Append(">");
+
+        return builder.ToString();
     }
 }

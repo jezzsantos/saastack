@@ -78,13 +78,14 @@ public static class WebApplicationExtensions
             {
                 var exceptionMessage = string.Empty;
                 var exceptionStackTrace = string.Empty;
+                var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
                 if (app.Environment.IsTestingOnly())
                 {
-                    var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
-                    if (contextFeature is not null)
+                    if (contextFeature.Exists())
                     {
-                        exceptionMessage = contextFeature.Error.Message;
-                        exceptionStackTrace = contextFeature.Error.ToString();
+                        var exception = contextFeature.Error;
+                        exceptionMessage = exception.Message;
+                        exceptionStackTrace = exception.ToString();
                     }
                 }
 
@@ -191,6 +192,9 @@ public static class WebApplicationExtensions
     public static void EnableOtherFeatures(this WebApplication builder,
         List<MiddlewareRegistration> middlewares, WebHostOptions hostOptions)
     {
+        middlewares.Add(new MiddlewareRegistration(-100, app => { app.UseMiddleware<ResultRecordingMiddleware>(); },
+            "Feature: Result logging"));
+
         var loggers = builder.Services.GetServices<ILoggerProvider>()
             .Select(logger => logger.GetType().Name).Join(", ");
         middlewares.Add(new MiddlewareRegistration(-80, _ =>

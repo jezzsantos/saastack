@@ -285,7 +285,7 @@ public partial class EndUsersApplication : IEndUsersApplication
                     new Dictionary<string, object>
                     {
                         { UsageConstants.Properties.Id, unregisteredUser.Id },
-                        { UsageConstants.Properties.EmailAddress, email }
+                        { UsageConstants.Properties.EmailAddress, username.Address }
                     });
 
                 return unregisteredUser.ToUser();

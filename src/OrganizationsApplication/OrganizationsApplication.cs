@@ -687,9 +687,9 @@ internal static class OrganizationConversionExtensions
     {
         var context = new Dictionary<string, object>
         {
-            [UsageConstants.Properties.Name] = organization.Name,
-            [UsageConstants.Properties.Ownership] = organization.Ownership.ToString(),
-            [UsageConstants.Properties.CreatedById] = organization.CreatedById.ToString()
+            [UsageConstants.Properties.Name] = organization.Name.Name,
+            [UsageConstants.Properties.Ownership] = organization.Ownership,
+            [UsageConstants.Properties.CreatedById] = organization.CreatedById
         };
         if (organization.Avatar.HasValue)
         {

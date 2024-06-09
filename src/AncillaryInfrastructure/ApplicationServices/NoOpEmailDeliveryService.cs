@@ -24,8 +24,8 @@ public class NoOpEmailDeliveryService : IEmailDeliveryService
         string toEmailAddress, string? toDisplayName,
         string fromEmailAddress, string? fromDisplayName, CancellationToken cancellationToken = default)
     {
-        _recorder.TraceInformation(caller.ToCall(),
-            $"{nameof(NoOpUsageDeliveryService)} delivers email event {{Event}} for {{For}} with properties: {{Properties}}",
+        _recorder.TraceDebug(caller.ToCall(),
+            $"{nameof(NoOpUsageDeliveryService)} would have delivered email event {{Event}} for {{For}} with properties: {{Properties}}",
             subject, toEmailAddress, new
             {
                 To = toEmailAddress,

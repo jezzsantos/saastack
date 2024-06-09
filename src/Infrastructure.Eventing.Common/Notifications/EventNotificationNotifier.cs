@@ -138,7 +138,7 @@ public sealed class EventNotificationNotifier : IEventNotificationNotifier, IDis
         var publishedEvent = published.Value;
         if (!publishedEvent.HasValue)
         {
-            _recorder.TraceInformation(null,
+            _recorder.TraceDebug(null,
                 "The producer '{Producer}' chose not publish the integration event '{Event}' with event type '{Type}'",
                 translator.GetType().Name, changeEvent.Id, changeEvent.Metadata.Fqn);
             return Result.Ok;

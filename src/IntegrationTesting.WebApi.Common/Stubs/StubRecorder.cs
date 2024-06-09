@@ -28,6 +28,8 @@ public class StubRecorder : IRecorder
 
     public string? LastTraceMessageTemplate { get; private set; }
 
+    public List<TraceMessage> LastTraceMessages { get; } = new();
+
     public Dictionary<string, object>? LastUsageAdditional { get; private set; }
 
     public string? LastUsageEventName { get; private set; }
@@ -37,6 +39,7 @@ public class StubRecorder : IRecorder
         LastTraceLevel = StubRecorderTraceLevel.Debug;
         LastTraceMessageTemplate = messageTemplate;
         LastTraceArguments = templateArgs;
+        LastTraceMessages.Add(new TraceMessage(StubRecorderTraceLevel.Debug, messageTemplate, templateArgs));
     }
 
     public void TraceInformation(ICallContext? context, Exception exception, string messageTemplate,
@@ -45,6 +48,7 @@ public class StubRecorder : IRecorder
         LastTraceLevel = StubRecorderTraceLevel.Information;
         LastTraceMessageTemplate = messageTemplate;
         LastTraceArguments = templateArgs;
+        LastTraceMessages.Add(new TraceMessage(StubRecorderTraceLevel.Information, messageTemplate, templateArgs));
     }
 
     public void TraceInformation(ICallContext? context, string messageTemplate, params object[] templateArgs)
@@ -52,6 +56,7 @@ public class StubRecorder : IRecorder
         LastTraceLevel = StubRecorderTraceLevel.Information;
         LastTraceMessageTemplate = messageTemplate;
         LastTraceArguments = templateArgs;
+        LastTraceMessages.Add(new TraceMessage(StubRecorderTraceLevel.Information, messageTemplate, templateArgs));
     }
 
     public void TraceWarning(ICallContext? context, Exception exception, string messageTemplate,
@@ -60,6 +65,7 @@ public class StubRecorder : IRecorder
         LastTraceLevel = StubRecorderTraceLevel.Warning;
         LastTraceMessageTemplate = messageTemplate;
         LastTraceArguments = templateArgs;
+        LastTraceMessages.Add(new TraceMessage(StubRecorderTraceLevel.Warning, messageTemplate, templateArgs));
     }
 
     public void TraceWarning(ICallContext? context, string messageTemplate, params object[] templateArgs)
@@ -67,6 +73,7 @@ public class StubRecorder : IRecorder
         LastTraceLevel = StubRecorderTraceLevel.Warning;
         LastTraceMessageTemplate = messageTemplate;
         LastTraceArguments = templateArgs;
+        LastTraceMessages.Add(new TraceMessage(StubRecorderTraceLevel.Warning, messageTemplate, templateArgs));
     }
 
     public void TraceError(ICallContext? context, Exception exception, string messageTemplate,
@@ -75,6 +82,7 @@ public class StubRecorder : IRecorder
         LastTraceLevel = StubRecorderTraceLevel.Error;
         LastTraceMessageTemplate = messageTemplate;
         LastTraceArguments = templateArgs;
+        LastTraceMessages.Add(new TraceMessage(StubRecorderTraceLevel.Error, messageTemplate, templateArgs));
     }
 
     public void TraceError(ICallContext? context, string messageTemplate, params object[] templateArgs)
@@ -82,6 +90,7 @@ public class StubRecorder : IRecorder
         LastTraceLevel = StubRecorderTraceLevel.Error;
         LastTraceMessageTemplate = messageTemplate;
         LastTraceArguments = templateArgs;
+        LastTraceMessages.Add(new TraceMessage(StubRecorderTraceLevel.Error, messageTemplate, templateArgs));
     }
 
     public void Crash(ICallContext? context, CrashLevel level, Exception exception)
@@ -136,6 +145,7 @@ public class StubRecorder : IRecorder
         LastTraceLevel = null;
         LastTraceMessageTemplate = null;
         LastTraceArguments = null;
+        LastTraceMessages.Clear();
         LastCrashLevel = null;
         LastCrashException = null;
         LastCrashMessageTemplate = null;
@@ -146,10 +156,10 @@ public class StubRecorder : IRecorder
         LastUsageAdditional = null;
         LastAuditAuditCode = null;
     }
-}
 
+}
 /// <summary>
-///     Defines the trace level of the recorder
+/// A trace level
 /// </summary>
 public enum StubRecorderTraceLevel
 {
@@ -158,3 +168,8 @@ public enum StubRecorderTraceLevel
     Warning = 2,
     Error = 3
 }
+
+/// <summary>
+///     A trace
+/// </summary>
+public record TraceMessage(StubRecorderTraceLevel Level, string Message, object[]? Arguments = null);

@@ -1,8 +1,7 @@
-﻿using Common;
+using Common;
 using Common.Recording;
 using Domain.Common.ValueObjects;
 using FluentAssertions;
-using Infrastructure.Common.Recording;
 using Infrastructure.Hosting.Common.Recording;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -11,43 +10,22 @@ using Xunit;
 namespace Infrastructure.Hosting.Common.UnitTests.Recording;
 
 [Trait("Category", "Unit")]
-public sealed class HostRecorderSpec : IDisposable
+public class TracingOnlyRecorderSpec
 {
     private readonly Mock<ICallContext> _call;
     private readonly MockLogger _logger;
-    private readonly HostRecorder _recorder;
+    private readonly TracingOnlyRecorder _recorder;
 
-    public HostRecorderSpec()
+    public TracingOnlyRecorderSpec()
     {
+        var loggerFactory = new Mock<ILoggerFactory>();
         _logger = new MockLogger();
-        var crasher = new Mock<ICrashReporter>();
-        var auditor = new Mock<IAuditReporter>();
-        var measurer = new Mock<IMetricReporter>();
-        var follower = new Mock<IUsageReporter>();
+        loggerFactory.Setup(x => x.CreateLogger(It.IsAny<string>()))
+            .Returns(_logger);
         _call = new Mock<ICallContext>();
 
-        _recorder = new HostRecorder(_logger, new RecorderOptions(), crasher.Object,
-            auditor.Object, measurer.Object, follower.Object);
+        _recorder = new TracingOnlyRecorder("acategoryname", loggerFactory.Object);
         _logger.Reset();
-    }
-
-    ~HostRecorderSpec()
-    {
-        Dispose(false);
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            _recorder.Dispose();
-        }
     }
 
     [Fact]
@@ -208,15 +186,11 @@ public sealed class HostRecorderSpec : IDisposable
 
         _recorder.Audit(_call.Object, "anAuditCode", "amessagetemplate{Arg1}{Arg2}", "anarg1", "anarg2");
 
-        _logger.Items.Count.Should().Be(2);
-        _logger.Items[0].Level.Should().Be(LogLevel.Information);
-        _logger.Items[0].Message.Should()
+        var item = _logger.Items.Single();
+        item.Level.Should().Be(LogLevel.Information);
+        item.Message.Should()
             .Be(
-                "Request: uncorrelated, (by acallerid)  Audit: anAuditCode, against: acallerid, with message: amessagetemplateanarg1anarg2");
-        _logger.Items[1].Level.Should().Be(LogLevel.Information);
-        _logger.Items[1].Message.Should()
-            .Be(
-                "Request: uncorrelated, (by acallerid)  Usage: Audited, for: acallerid, with context: <\"UserId\": acallerid, \"Code\": anauditcode>");
+                $"Request: {CallConstants.UncorrelatedCallId}, (by acallerid)  Audit: anAuditCode, against acallerid, with message: amessagetemplateanarg1anarg2");
     }
 
     [Fact]
@@ -232,15 +206,11 @@ public sealed class HostRecorderSpec : IDisposable
     {
         _recorder.AuditAgainst(null, "anid", "anAuditCode", "amessagetemplate{Arg1}{Arg2}", "anarg1", "anarg2");
 
-        _logger.Items.Count.Should().Be(2);
-        _logger.Items[0].Level.Should().Be(LogLevel.Information);
-        _logger.Items[0].Message.Should()
+        var item = _logger.Items.Single();
+        item.Level.Should().Be(LogLevel.Information);
+        item.Message.Should()
             .Be(
-                "Audit: anAuditCode, against: anid, with message: amessagetemplateanarg1anarg2");
-        _logger.Items[1].Level.Should().Be(LogLevel.Information);
-        _logger.Items[1].Message.Should()
-            .Be(
-                "Usage: Audited, for: anid, with context: <\"UserId\": anid, \"Code\": anauditcode>");
+                "Audit: anAuditCode, against anid, with message: amessagetemplateanarg1anarg2");
     }
 
     [Fact]
@@ -285,15 +255,10 @@ public sealed class HostRecorderSpec : IDisposable
             { "aname2", "avalue2" }
         });
 
-        _logger.Items.Count.Should().Be(2);
-        _logger.Items[0].Level.Should().Be(LogLevel.Information);
-        _logger.Items[0].Message.Should()
-            .Be(
-                "Measure: aneventname, with context: <\"aname1\": avalue1, \"aname2\": avalue2>");
-        _logger.Items[1].Level.Should().Be(LogLevel.Information);
-        _logger.Items[1].Message.Should()
-            .Be(
-                "Usage: Measured, with context: <\"aname1\": avalue1, \"aname2\": avalue2, \"Metric\": aneventname>");
+        var item = _logger.Items.Single();
+        item.Level.Should().Be(LogLevel.Information);
+        item.Message.Should()
+            .Be("Measure: aneventname, with context: <\"aname1\": avalue1, \"aname2\": avalue2>");
     }
 
     [Fact]

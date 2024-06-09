@@ -26,8 +26,8 @@ public class NoOpUsageDeliveryService : IUsageDeliveryService
         var properties = additional.Exists()
             ? additional.ToJson(false)!
             : "none";
-        _recorder.TraceInformation(caller.ToCall(),
-            $"{nameof(NoOpUsageDeliveryService)} delivers usage event {{Event}} for {{For}} with properties: {{Properties}}",
+        _recorder.TraceDebug(caller.ToCall(),
+            $"{nameof(NoOpUsageDeliveryService)} would have delivered usage event: {{Event}}, for: {{For}}, with properties: {{Properties}}",
             eventName, forId, properties);
 
         return Task.FromResult(Result.Ok);
