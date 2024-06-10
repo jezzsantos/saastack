@@ -1,14 +1,12 @@
 using Application.Common.Extensions;
 using Application.Interfaces;
-using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Organizations;
 using Domain.Shared;
-using Domain.Shared.EndUsers;
+using Domain.Shared.Organizations;
 using EndUsersDomain;
-using Membership = Application.Resources.Shared.Membership;
 
 namespace EndUsersApplication;
 
@@ -18,7 +16,7 @@ partial class EndUsersApplication
         CancellationToken cancellationToken)
     {
         var ownership = domainEvent.Ownership.ToEnumOrDefault(OrganizationOwnership.Shared);
-        var membership = await CreateMembershipAsync(caller, domainEvent.CreatedById.ToId(), domainEvent.RootId.ToId(),
+        var membership = await CreateMembershipsAsync(caller, domainEvent.CreatedById.ToId(), domainEvent.RootId.ToId(),
             ownership, cancellationToken);
         if (membership.IsFailure)
         {
@@ -100,51 +98,68 @@ partial class EndUsersApplication
         return Result.Ok;
     }
 
-    private async Task<Result<Membership, Error>> CreateMembershipAsync(ICallerContext caller,
+    private async Task<Result<Error>> CreateMembershipsAsync(ICallerContext caller,
         Identifier createdById, Identifier organizationId, OrganizationOwnership ownership,
         CancellationToken cancellationToken)
     {
-        var retrievedInviter = await _endUserRepository.LoadAsync(createdById, cancellationToken);
-        if (retrievedInviter.IsFailure)
+        var retrievedOwner = await _endUserRepository.LoadAsync(createdById, cancellationToken);
+        if (retrievedOwner.IsFailure)
         {
-            return retrievedInviter.Error;
+            return retrievedOwner.Error;
         }
 
-        var inviter = retrievedInviter.Value;
+        var owner = retrievedOwner.Value;
         var useCase = ownership switch
         {
             OrganizationOwnership.Shared => RolesAndFeaturesUseCase.CreatingOrg,
-            OrganizationOwnership.Personal => inviter.Classification == UserClassification.Person
+            OrganizationOwnership.Personal => owner.IsPerson
                 ? RolesAndFeaturesUseCase.CreatingPerson
                 : RolesAndFeaturesUseCase.CreatingMachine,
             _ => RolesAndFeaturesUseCase.CreatingOrg
         };
         var (_, _, tenantRoles, tenantFeatures) =
             EndUserRoot.GetInitialRolesAndFeatures(useCase, caller.IsAuthenticated);
-        var inviterOwnership = ownership.ToEnumOrDefault(Domain.Shared.Organizations.OrganizationOwnership.Shared);
-        var membered = inviter.AddMembership(inviter, inviterOwnership, organizationId, tenantRoles, tenantFeatures);
+        var membered = owner.AddMembership(owner, ownership, organizationId, tenantRoles, tenantFeatures);
         if (membered.IsFailure)
         {
             return membered.Error;
         }
 
-        var saved = await _endUserRepository.SaveAsync(inviter, cancellationToken);
+        var saved = await _endUserRepository.SaveAsync(owner, true, cancellationToken);
         if (saved.IsFailure)
         {
             return saved.Error;
         }
 
-        inviter = saved.Value;
+        owner = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "EndUser {Id} has become a member of organization {Organization}",
-            inviter.Id, organizationId);
+            owner.Id, organizationId);
 
-        var membership = inviter.FindMembership(organizationId);
-        if (!membership.HasValue)
+        if (owner.IsMachine)
         {
-            return Error.EntityNotFound(Resources.EndUsersApplication_MembershipNotFound);
+            var previousMembership = owner.Memberships.FirstOrDefault(m => m.OrganizationId != organizationId);
+            if (previousMembership.Exists())
+            {
+                var changed = owner.ChangeDefaultMembership(previousMembership.OrganizationId);
+                if (changed.IsFailure)
+                {
+                    return changed.Error;
+                }
+
+                saved = await _endUserRepository.SaveAsync(owner, cancellationToken);
+                if (saved.IsFailure)
+                {
+                    return saved.Error;
+                }
+
+                owner = saved.Value;
+                _recorder.TraceInformation(caller.ToCall(),
+                    "Machine {Id} has become a member of organization {Organization}",
+                    owner.Id, previousMembership.OrganizationId);
+            }
         }
 
-        return membership.Value.ToMembership();
+        return Result.Ok;
     }
 
     private async Task<Result<Error>> AssignTenantRolesAsync(ICallerContext caller, Identifier assignerId,

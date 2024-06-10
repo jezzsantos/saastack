@@ -475,10 +475,15 @@ public class EndUsersApplicationSpec
         result.Value.Classification.Should().Be(EndUserClassification.Machine);
         result.Value.Roles.Should().OnlyContain(role => role == PlatformRoles.Standard.Name);
         result.Value.Features.Should().OnlyContain(feat => feat == PlatformFeatures.Basic.Name);
+        _endUserRepository.Verify(rep => rep.SaveAsync(It.Is<EndUserRoot>(eur =>
+            eur.Memberships.Count == 0
+            && eur.Roles == Roles.Create(PlatformRoles.Standard).Value
+            && eur.Features == Features.Create(PlatformFeatures.Basic).Value
+        ), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
     }
 
     [Fact]
-    public async Task WhenRegisterMachineAsyncByAuthenticatedUser_ThenRegistersWithBasicFeatures()
+    public async Task WhenRegisterMachineAsyncByAuthenticatedUser_ThenRegistersAndInvites()
     {
         _caller.Setup(cc => cc.IsAuthenticated)
             .Returns(true);
@@ -520,7 +525,15 @@ public class EndUsersApplicationSpec
         result.Value.Status.Should().Be(EndUserStatus.Registered);
         result.Value.Classification.Should().Be(EndUserClassification.Machine);
         result.Value.Roles.Should().OnlyContain(role => role == PlatformRoles.Standard.Name);
-        result.Value.Features.Should().ContainInOrder(TenantFeatures.PaidTrial.Name, TenantFeatures.Basic.Name);
+        result.Value.Features.Should().ContainInOrder(PlatformFeatures.PaidTrial.Name, PlatformFeatures.Basic.Name);
+        _endUserRepository.Verify(rep => rep.SaveAsync(It.Is<EndUserRoot>(eur =>
+            eur.Memberships.Count == 1
+            && eur.Memberships[0].OrganizationId == "anotherorganizationid".ToId()
+            && eur.Memberships[0].Roles == Roles.Create(TenantRoles.Member).Value
+            && eur.Memberships[0].Features == Features.Create(TenantFeatures.PaidTrial, TenantFeatures.Basic).Value
+            && eur.Roles == Roles.Create(PlatformRoles.Standard).Value
+            && eur.Features == Features.Create(PlatformFeatures.PaidTrial, PlatformFeatures.Basic).Value
+        ), It.IsAny<CancellationToken>()));
     }
 
 #if TESTINGONLY

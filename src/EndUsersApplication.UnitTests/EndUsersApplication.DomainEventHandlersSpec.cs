@@ -52,6 +52,10 @@ public class EndUsersApplicationDomainEventHandlersSpec
         _endUserRepository = new Mock<IEndUserRepository>();
         _endUserRepository.Setup(rep => rep.SaveAsync(It.IsAny<EndUserRoot>(), It.IsAny<CancellationToken>()))
             .Returns((EndUserRoot root, CancellationToken _) => Task.FromResult<Result<EndUserRoot, Error>>(root));
+        _endUserRepository.Setup(rep =>
+                rep.SaveAsync(It.IsAny<EndUserRoot>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .Returns((EndUserRoot root, bool _, CancellationToken _) =>
+                Task.FromResult<Result<EndUserRoot, Error>>(root));
         var invitationRepository = new Mock<IInvitationRepository>();
         var userProfilesService = new Mock<IUserProfilesService>();
         var notificationsService = new Mock<IUserNotificationsService>();
@@ -76,7 +80,7 @@ public class EndUsersApplicationDomainEventHandlersSpec
     }
 
     [Fact]
-    public async Task HandleOrganizationCreatedAsync_ThenAddsMembership()
+    public async Task HandleOrganizationCreatedAsyncForPerson_ThenAddsMembership()
     {
         var user = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
         user.Register(Roles.Create(PlatformRoles.Standard).Value, Features.Create(PlatformFeatures.Basic).Value,
@@ -91,10 +95,41 @@ public class EndUsersApplicationDomainEventHandlersSpec
 
         result.Should().BeSuccess();
         _endUserRepository.Verify(rep => rep.SaveAsync(It.Is<EndUserRoot>(eu =>
-            eu.Memberships[0].IsDefault
+            eu.Memberships.Count == 1
+            && eu.Memberships[0].IsDefault
             && eu.Memberships[0].OrganizationId == "anorganizationid".ToId()
             && eu.Memberships[0].Roles.HasRole(TenantRoles.Member)
             && eu.Memberships[0].Features.HasFeature(TenantFeatures.Basic)
+        ), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task HandleOrganizationCreatedAsyncForAnInvitedMachine_ThenAddsMemberships()
+    {
+        var machine = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Machine).Value;
+        machine.Register(Roles.Create(PlatformRoles.Standard).Value, Features.Create(PlatformFeatures.Basic).Value,
+            EndUserProfile.Create("afirstname").Value, EmailAddress.Create("auser@company.com").Value);
+        machine.AddMembership(machine, OrganizationOwnership.Shared, "anorganizationid2".ToId(),
+            Roles.Create(TenantRoles.Member).Value, Features.Create(TenantFeatures.Basic).Value);
+        _endUserRepository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(machine);
+        var domainEvent = Events.Created("anorganizationid1".ToId(), OrganizationOwnership.Shared,
+            "auserid".ToId(), DisplayName.Create("adisplayname").Value);
+
+        var result =
+            await _application.HandleOrganizationCreatedAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _endUserRepository.Verify(rep => rep.SaveAsync(It.Is<EndUserRoot>(eu =>
+            eu.Memberships.Count == 2
+            && eu.Memberships[0].IsDefault
+            && eu.Memberships[0].OrganizationId == "anorganizationid2".ToId()
+            && eu.Memberships[0].Roles.HasRole(TenantRoles.Member)
+            && eu.Memberships[0].Features.HasFeature(TenantFeatures.Basic)
+            && !eu.Memberships[1].IsDefault
+            && eu.Memberships[1].OrganizationId == "anorganizationid1".ToId()
+            && eu.Memberships[1].Roles == Roles.Create(TenantRoles.BillingAdmin).Value
+            && eu.Memberships[1].Features == Features.Create(TenantFeatures.PaidTrial).Value
         ), It.IsAny<CancellationToken>()));
     }
 

@@ -19,7 +19,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
 
     public static Result<Roles, Error> Create(string role)
     {
-        return Create(new RoleLevel(role));
+        return Create(role.ToRoleLevel());
     }
 
     public static Result<Roles, Error> Create(RoleLevel role)
@@ -29,7 +29,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
 
     public static Result<Roles, Error> Create(params string[] roles)
     {
-        return Create(roles.Select(role => new RoleLevel(role)).ToArray());
+        return Create(roles.Select(role => role.ToRoleLevel()).ToArray());
     }
 
     public static Result<Roles, Error> Create(params RoleLevel[] roles)
@@ -72,7 +72,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
 
     public Result<Roles, Error> Add(string role)
     {
-        var rol = Role.Create(new RoleLevel(role));
+        var rol = Role.Create(role.ToRoleLevel());
         if (rol.IsFailure)
         {
             return rol.Error;
@@ -142,7 +142,7 @@ public sealed class Roles : SingleValueObjectBase<Roles, List<Role>>
 
     public Roles Remove(string role)
     {
-        return Remove(new RoleLevel(role));
+        return Remove(role.ToRoleLevel());
     }
 
     public Roles Remove(RoleLevel role)

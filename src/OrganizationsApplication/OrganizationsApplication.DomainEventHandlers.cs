@@ -18,8 +18,7 @@ partial class OrganizationsApplication
         var name =
             $"{domainEvent.UserProfile.FirstName}{(domainEvent.UserProfile.LastName.HasValue() ? " " + domainEvent.UserProfile.LastName : string.Empty)}";
         var organization = await CreateOrganizationInternalAsync(caller, domainEvent.RootId.ToId(),
-            domainEvent.Classification, name,
-            OrganizationOwnership.Personal, cancellationToken);
+            domainEvent.Classification, name, OrganizationOwnership.Personal, cancellationToken);
         if (organization.IsFailure)
         {
             return organization.Error;

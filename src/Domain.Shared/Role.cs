@@ -43,15 +43,26 @@ public sealed class Role : SingleValueObjectBase<Role, string>
     [SkipImmutabilityCheck]
     public RoleLevel AsLevel()
     {
-        var knownPlatform = PlatformRoles.FindRoleByName(Identifier);
-        if (knownPlatform.Exists())
+        return Identifier.ToRoleLevel();
+    }
+}
+
+public static class RoleExtensions
+{
+    public static RoleLevel ToRoleLevel(this string name)
+    {
+        var platform = PlatformRoles.FindRoleByName(name);
+        if (platform.Exists())
         {
-            return knownPlatform;
+            return platform;
         }
 
-        var knownTenant = TenantRoles.FindRoleByName(Identifier);
-        return knownTenant.Exists()
-            ? knownTenant
-            : new RoleLevel(Identifier);
+        var tenant = TenantRoles.FindRoleByName(name);
+        if (tenant.Exists())
+        {
+            return tenant;
+        }
+
+        return new RoleLevel(name);
     }
 }

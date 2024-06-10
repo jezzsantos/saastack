@@ -19,7 +19,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
 
     public static Result<Features, Error> Create(string feature)
     {
-        return Create(new FeatureLevel(feature));
+        return Create(feature.ToFeatureLevel());
     }
 
     public static Result<Features, Error> Create(FeatureLevel feature)
@@ -29,7 +29,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
 
     public static Result<Features, Error> Create(params string[] features)
     {
-        return Create(features.Select(feature => new FeatureLevel(feature)).ToArray());
+        return Create(features.Select(feature => feature.ToFeatureLevel()).ToArray());
     }
 
     public static Result<Features, Error> Create(params FeatureLevel[] features)
@@ -72,7 +72,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
 
     public Result<Features, Error> Add(string feature)
     {
-        var featureLevel = Feature.Create(new FeatureLevel(feature));
+        var featureLevel = Feature.Create(feature.ToFeatureLevel());
         if (featureLevel.IsFailure)
         {
             return featureLevel.Error;
@@ -142,7 +142,7 @@ public sealed class Features : SingleValueObjectBase<Features, List<Feature>>
 
     public Features Remove(string feature)
     {
-        return Remove(new FeatureLevel(feature));
+        return Remove(feature.ToFeatureLevel());
     }
 
     public Features Remove(FeatureLevel feature)

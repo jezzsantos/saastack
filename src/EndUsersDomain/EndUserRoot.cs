@@ -46,7 +46,7 @@ public sealed class EndUserRoot : AggregateRootBase
 
     public GuestInvitation GuestInvitation { get; private set; } = GuestInvitation.Empty;
 
-    private bool IsMachine => Classification == UserClassification.Machine;
+    public bool IsMachine => Classification == UserClassification.Machine;
 
     public bool IsPerson => Classification == UserClassification.Person;
 

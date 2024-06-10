@@ -43,15 +43,26 @@ public sealed class Feature : SingleValueObjectBase<Feature, string>
     [SkipImmutabilityCheck]
     public FeatureLevel AsLevel()
     {
-        var knownPlatform = PlatformFeatures.FindFeatureByName(Identifier);
-        if (knownPlatform.Exists())
+        return Identifier.ToFeatureLevel();
+    }
+}
+
+public static class FeatureExtensions
+{
+    public static FeatureLevel ToFeatureLevel(this string name)
+    {
+        var platform = PlatformFeatures.FindFeatureByName(name);
+        if (platform.Exists())
         {
-            return knownPlatform;
+            return platform;
         }
 
-        var knownTenant = TenantFeatures.FindFeatureByName(Identifier);
-        return knownTenant.Exists()
-            ? knownTenant
-            : new FeatureLevel(Identifier);
+        var tenant = TenantFeatures.FindFeatureByName(name);
+        if (tenant.Exists())
+        {
+            return tenant;
+        }
+
+        return new FeatureLevel(name);
     }
 }

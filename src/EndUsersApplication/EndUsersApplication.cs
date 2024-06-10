@@ -159,7 +159,7 @@ public partial class EndUsersApplication : IEndUsersApplication
             {
                 return retrievedAdder.Error;
             }
-
+        
             var adder = retrievedAdder.Value;
             var adderDefaultMembership = adder.DefaultMembership;
             if (adderDefaultMembership.IsShared)
@@ -173,13 +173,13 @@ public partial class EndUsersApplication : IEndUsersApplication
                 {
                     return adderEnrolled.Error;
                 }
-
+        
                 saved = await _endUserRepository.SaveAsync(machine, cancellationToken);
                 if (saved.IsFailure)
                 {
                     return saved.Error;
                 }
-
+        
                 machine = saved.Value;
                 _recorder.TraceInformation(caller.ToCall(),
                     "Machine {Id} has become a member of {User} organization {Organization}",
