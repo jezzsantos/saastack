@@ -1,37 +1,10 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Tools.Analyzers.Common.Extensions;
 
 public static class SymbolExtensions
 {
-    public static ExpressionSyntax? GetGetterExpression(this ISymbol method)
-    {
-        var syntaxReference = method.DeclaringSyntaxReferences.FirstOrDefault();
-
-        var syntax = syntaxReference?.GetSyntax();
-        if (syntax is ArrowExpressionClauseSyntax arrowExpressionClauseSyntax)
-        {
-            return arrowExpressionClauseSyntax.Expression;
-        }
-
-        return null;
-    }
-
-    public static string GetMethodBody(this ISymbol method)
-    {
-        var syntaxReference = method.DeclaringSyntaxReferences.FirstOrDefault();
-
-        var syntax = syntaxReference?.GetSyntax();
-        if (syntax is MethodDeclarationSyntax methodDeclarationSyntax)
-        {
-            return methodDeclarationSyntax.Body?.ToFullString() ?? string.Empty;
-        }
-
-        return string.Empty;
-    }
-
     public static bool HasParameterlessConstructor(this INamedTypeSymbol symbol)
     {
         var constructors = symbol.InstanceConstructors;
@@ -117,6 +90,25 @@ public static class SymbolExtensions
         return IsOfType(symbol, taskType);
     }
 
+    public static AttributeData? GetAttributeOfType<TAttribute>(this ISymbol? symbol,
+        SyntaxNodeAnalysisContext context)
+    {
+        return GetAttributeOfType<TAttribute>(symbol, context.Compilation);
+    }
+
+    public static AttributeData? GetAttributeOfType<TAttribute>(this ISymbol? symbol,
+        Compilation compilation)
+    {
+        if (symbol is null)
+        {
+            return null;
+        }
+
+        var attributeMetadata = compilation.GetTypeByMetadataName(typeof(TAttribute).FullName!)!;
+        var attributes = symbol.GetAttributes();
+
+        return attributes.FirstOrDefault(attr => attr.AttributeClass!.IsOfType(attributeMetadata));
+    }
     public static ITypeSymbol WithoutNullable(this ITypeSymbol symbol, SyntaxNodeAnalysisContext context)
     {
         if (symbol.IsNullable(context))

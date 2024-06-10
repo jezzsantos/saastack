@@ -107,7 +107,7 @@ That documentation is intended to be part of the template itself that users of t
 
 ## Developer Environment
 
-* Windows or MacOS.
+* Windows or macOS.
 * Jetbrains Rider or Visual Studio (There is most support for JetBrains dotUltimate)
 * Install the .NET8.0 SDK (specifically version 8.0.2). Available for [download here](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 *

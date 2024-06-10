@@ -14,7 +14,9 @@ namespace Infrastructure.Persistence.Common.ApplicationServices;
 
 /// <summary>
 ///     Provides a combined store that persists all data to individual files of JSON on the local hard drive.
-///     The files are located in named folders under the <see cref="rootPath" />
+///     The files are located in named folders under <see cref="_rootPath" />,
+///         on Windows that is: %LOCALAPPDATA%\saastack\{containerName},
+///         on macOS that is: /Users/username/.local/share/saastack/{containerName}
 /// </summary>
 [ExcludeFromCodeCoverage]
 public sealed partial class LocalMachineJsonFileStore : IDisposable
@@ -47,7 +49,7 @@ public sealed partial class LocalMachineJsonFileStore : IDisposable
 
         if (monitor.Exists())
         {
-            _fileSystemWatcher = new FileSystemWatcher(_rootPath, "*.json")
+            _fileSystemWatcher = new FileSystemWatcher(_rootPath, $"*.{FileContainer.FileExtension}")
             {
                 IncludeSubdirectories = true,
                 EnableRaisingEvents = true
@@ -190,7 +192,7 @@ public sealed partial class LocalMachineJsonFileStore : IDisposable
 
     private sealed class FileContainer
     {
-        private const string FileExtension = "json";
+        internal const string FileExtension = "json";
         private readonly string _dirPath;
         private readonly string _rootPath;
 

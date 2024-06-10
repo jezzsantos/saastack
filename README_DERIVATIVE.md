@@ -8,7 +8,7 @@
 
 You will need the following development tools to build, run, and test this project:
 
-* Windows or MacOS.
+* Windows or macOS.
 * JetBrains Rider (recommended) or Visual Studio
    * Note: Using JetBrains Rider is recommended since the codebase includes more comprehensive customized tooling (coding standards, live templates, etc.)
    * Note: If using Visual Studio, you will need to install the additional component `.NET Compiler Platform SDK` in order to run the built-in Roslyn source generators.
@@ -227,7 +227,7 @@ You will notice that in local debugging, we have switched out the currently conf
 The `LocalMachineFileDataStore` is configured to place your files in `Environment.SpecialFolder.LocalApplicationData`, which resolves to these folders:
 
 * On Windows: `%appdata%`
-* On MacOS: `/home/<you>/.local/share`
+* On macOS: `/home/<you>/.local/share`
 
 ## Running The Code
 

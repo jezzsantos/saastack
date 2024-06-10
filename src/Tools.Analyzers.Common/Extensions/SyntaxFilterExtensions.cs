@@ -25,12 +25,6 @@ public static class SyntaxFilterExtensions
         return symbol.GetAttributeOfType<TAttribute>(compilation);
     }
 
-    public static AttributeData? GetAttributeOfType<TAttribute>(this ISymbol? symbol,
-        SyntaxNodeAnalysisContext context)
-    {
-        return GetAttributeOfType<TAttribute>(symbol, context.Compilation);
-    }
-
     public static ITypeSymbol? GetBaseOfType<TType>(this ParameterSyntax parameterSyntax,
         SyntaxNodeAnalysisContext context)
     {
@@ -562,20 +556,6 @@ public static class SyntaxFilterExtensions
         }
 
         return false;
-    }
-
-    private static AttributeData? GetAttributeOfType<TAttribute>(this ISymbol? symbol,
-        Compilation compilation)
-    {
-        if (symbol is null)
-        {
-            return null;
-        }
-
-        var attributeMetadata = compilation.GetTypeByMetadataName(typeof(TAttribute).FullName!)!;
-        var attributes = symbol.GetAttributes();
-
-        return attributes.FirstOrDefault(attr => attr.AttributeClass!.IsOfType(attributeMetadata));
     }
 }
 

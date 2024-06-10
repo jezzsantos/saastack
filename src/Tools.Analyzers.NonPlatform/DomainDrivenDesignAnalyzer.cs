@@ -411,7 +411,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
         {
             context.ReportDiagnostic(Rule036, classDeclarationSyntax);
         }
-        
+
         var allMethods = classDeclarationSyntax.Members.Where(member => member is MethodDeclarationSyntax)
             .Cast<MethodDeclarationSyntax>()
             .ToList();
@@ -480,7 +480,6 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                     nameof(SkipImmutabilityCheckAttribute));
             }
         }
-
     }
 
     private static void AnalyzeDomainEvent(SyntaxNodeAnalysisContext context)
@@ -717,14 +716,8 @@ internal static class DomainDrivenDesignExtensions
     public static bool IsMissingContent(this SyntaxNodeAnalysisContext context,
         MethodDeclarationSyntax methodDeclarationSyntax, string match)
     {
-        var methodSymbol = context.SemanticModel.GetDeclaredSymbol(methodDeclarationSyntax);
-        if (methodSymbol is null)
-        {
-            return true;
-        }
-
-        var body = methodSymbol.GetMethodBody();
-        return !body.Contains(match);
+        return !methodDeclarationSyntax.GetBody()
+            .Contains(match);
     }
 
     public static bool IsNamedInPastTense(this SyntaxNodeAnalysisContext context,
@@ -753,6 +746,23 @@ internal static class DomainDrivenDesignExtensions
 
         var singleValueObject = compilation.GetTypeByMetadataName(typeof(ISingleValueObject<>).FullName!)!;
         return symbol.AllInterfaces.Any(@interface => @interface.OriginalDefinition.IsOfType(singleValueObject));
+    }
+
+    private static string GetBody(this MethodDeclarationSyntax methodDeclarationSyntax)
+    {
+        var body = methodDeclarationSyntax.Body;
+        if (body.Exists())
+        {
+            return body.ToFullString();
+        }
+
+        var expressionBody = methodDeclarationSyntax.ExpressionBody;
+        if (expressionBody.Exists())
+        {
+            return expressionBody.ToFullString();
+        }
+
+        return string.Empty;
     }
 
     private static DehydratableStatus IsDehydratableEntity(this SemanticModel semanticModel, Compilation compilation,

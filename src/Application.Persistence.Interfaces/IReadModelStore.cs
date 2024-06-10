@@ -20,10 +20,10 @@ public interface IReadModelStore<TReadModelEntity>
     /// </summary>
     Task<Result<Error>> DeleteAsync(string id, CancellationToken cancellationToken);
 
+#if TESTINGONLY
     /// <summary>
     ///     Permanently destroys all entities in the store
     /// </summary>
-#if TESTINGONLY
     Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken);
 #endif
 

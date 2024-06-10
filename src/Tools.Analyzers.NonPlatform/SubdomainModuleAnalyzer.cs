@@ -130,7 +130,7 @@ internal static class SubdomainModuleAnalyzerExtensions
             return null;
         }
 
-        var body = getter.GetGetterExpression();
+        var body = property.GetGetterBody();
         if (body is null)
         {
             return null;
@@ -164,7 +164,7 @@ internal static class SubdomainModuleAnalyzerExtensions
             return new List<INamedTypeSymbol>();
         }
 
-        var body = getter.GetGetterExpression();
+        var body = property.GetGetterBody();
         if (body is null)
         {
             return new List<INamedTypeSymbol>();
@@ -183,5 +183,16 @@ internal static class SubdomainModuleAnalyzerExtensions
             .Select(someType => context.SemanticModel.GetSymbolInfo(someType).Symbol)
             .OfType<INamedTypeSymbol>()
             .ToList();
+    }
+
+    private static ExpressionSyntax? GetGetterBody(this PropertyDeclarationSyntax property)
+    {
+        var body = property.ExpressionBody;
+        if (body.Exists())
+        {
+            return body.Expression;
+        }
+
+        return null;
     }
 }
