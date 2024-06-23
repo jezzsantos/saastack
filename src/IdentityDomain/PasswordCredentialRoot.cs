@@ -8,7 +8,7 @@ using Domain.Events.Shared.Identities.PasswordCredentials;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 using Domain.Shared;
 using IdentityDomain.DomainServices;
 

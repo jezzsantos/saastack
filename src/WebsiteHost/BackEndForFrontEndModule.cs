@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
 using Application.Interfaces.Services;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 using Infrastructure.Common.DomainServices;
 using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Hosting.Common;

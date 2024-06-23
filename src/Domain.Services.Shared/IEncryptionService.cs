@@ -1,4 +1,4 @@
-namespace Domain.Services.Shared.DomainServices;
+namespace Domain.Services.Shared;
 
 public interface IEncryptionService
 {

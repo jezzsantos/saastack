@@ -6,7 +6,7 @@ using Common;
 using Common.Configuration;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 using Domain.Shared;
 using IdentityApplication.ApplicationServices;
 using IdentityApplication.Persistence;
@@ -380,7 +380,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         {
             return Error.EntityNotFound();
         }
-        
+
         var credential = retrieved.Value.Value;
         var token = credential.VerificationKeep.Token;
 

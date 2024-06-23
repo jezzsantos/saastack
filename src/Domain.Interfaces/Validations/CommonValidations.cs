@@ -12,7 +12,7 @@ public static class CommonValidations
     public static readonly Validation CountryCode = new(CountryCodes.Exists);
     public static readonly Validation EmailAddress = new(
         @"^(?:[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+\.)*[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+@(?:(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!\.)){0,61}[a-zA-Z0-9]?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!$)){0,61}[a-zA-Z0-9]?)|(?:\[(?:(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\]))$");
-    public static readonly Validation FeatureLevel = new(@"^[\w\d]{4,30}$", 4, 30);
+    public static readonly Validation FeatureLevel = new(@"^[\w\d]{4,60}$", 4, 60);
     public static readonly Validation Identifier = new(@"^[\w]{1,20}_[\d\w]{10,22}$", 12, 43);
     public static readonly Validation IdentifierPrefix = new(@"^[^\W_]*$", 1, 20);
 

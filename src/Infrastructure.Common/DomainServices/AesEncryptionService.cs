@@ -1,5 +1,5 @@
 using System.Security.Cryptography;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 
 namespace Infrastructure.Common.DomainServices;
 

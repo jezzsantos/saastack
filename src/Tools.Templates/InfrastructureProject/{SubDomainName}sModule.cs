@@ -1,24 +1,25 @@
 using System.Reflection;
-using Application.Interfaces.Services;
-using Infrastructure.Web.Hosting.Common;
-using Common;
 using Domain.Interfaces;
+using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Web.Hosting.Common;
-using Infrastructure.Web.Hosting.Common.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ProjectName.Api.Subscriptions;
+using ProjectName.Persistence;
+using ProjectName.Persistence.Notifications;
+using ProjectName.Persistence.ReadModels;
 
 namespace ProjectName;
 
-public class {SubDomainName}sModule : ISubDomainModule
+public class {SubDomainName}sModule : ISubdomainModule
 {
-    public Assembly ApiAssembly => typeof({SubDomainName}sApi).Assembly;
+    public Assembly InfrastructureAssembly => typeof({SubDomainName}sApi).Assembly;
 
     public Assembly? DomainAssembly => typeof({SubDomainName}Root).Assembly;
 
-    public Dictionary<Type, string> AggregatePrefixes => new()
+    public Dictionary<Type, string> EntityPrefixes => new()
     {
         { typeof({SubDomainName}Root), "{SubDomainNameLower}" }
     };
@@ -38,7 +39,8 @@ public class {SubDomainName}sModule : ISubDomainModule
                 services.AddPerHttpRequest<I{SubDomainName}Repository, {SubDomainName}Repository>();
                 services.RegisterEventing<{SubDomainName}Root, {SubDomainName}Projection>(
                     c => new {SubDomainName}Projection(c.GetRequiredService<IRecorder>(), c.GetRequiredService<IDomainFactory>(),
-                        c.GetRequiredService<IDataStore>())
+                        c.GetRequiredService<IDataStore>()),
+                    _ => new {SubDomainName}Notifier()
                 );
             };
         }

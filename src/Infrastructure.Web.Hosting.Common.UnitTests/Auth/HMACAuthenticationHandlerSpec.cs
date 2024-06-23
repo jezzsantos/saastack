@@ -105,7 +105,7 @@ public class HMACAuthenticationHandlerSpec
             && claim.Value == $"Platform_{PlatformRoles.ServiceAccount.Name}");
         result.Ticket.Principal.Claims.Should().Contain(claim =>
             claim.Type == AuthenticationConstants.Claims.ForFeature
-            && claim.Value == "Platform_basic_features");
+            && claim.Value == $"Platform_{PlatformFeatures.Basic.Name}");
     }
 
     [Fact]
@@ -146,7 +146,7 @@ public class HMACAuthenticationHandlerSpec
             && claim.Value == $"Platform_{PlatformRoles.ServiceAccount.Name}");
         result.Ticket.Principal.Claims.Should().Contain(claim =>
             claim.Type == AuthenticationConstants.Claims.ForFeature
-            && claim.Value == "Platform_basic_features");
+            && claim.Value == $"Platform_{PlatformFeatures.Basic.Name}");
         _recorder.Verify(rec => rec.Audit(It.IsAny<ICallContext>(), It.IsAny<string>(), It.IsAny<string>()),
             Times.Never);
     }

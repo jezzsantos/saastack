@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using Common;
 using Domain.Interfaces.Validations;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 using Domain.Shared.Identities;
 
 namespace Infrastructure.Shared.DomainServices;

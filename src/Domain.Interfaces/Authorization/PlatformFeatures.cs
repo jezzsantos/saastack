@@ -8,12 +8,15 @@ namespace Domain.Interfaces.Authorization;
 /// </summary>
 public static class PlatformFeatures
 {
-    public static readonly FeatureLevel Basic = new("basic_features"); // Free/Basic features, everyone can use
-    public static readonly FeatureLevel PaidTrial = new("paidtrial_features", Basic); // a.k.a Standard plan features
-    public static readonly FeatureLevel Paid2 = new("paid2_features", PaidTrial); // a.k.a Professional plan features
-    public static readonly FeatureLevel Paid3 = new("paid3_features", Paid2); // a.k.a Enterprise plan features
-    public static readonly FeatureLevel TestingOnly = new("testingonly_platform");
-    public static readonly FeatureLevel TestingOnlySuperUser = new("testingonly_platform_super", TestingOnly);
+    public static readonly FeatureLevel
+        Basic = new("platform_basic_features"); // Free/Basic limited features, everyone can use
+    public static readonly FeatureLevel
+        PaidTrial = new("platform_paidtrial_features", Basic); // a.k.a Standard plan features
+    public static readonly FeatureLevel
+        Paid2 = new("platform_paid2_features", PaidTrial); // a.k.a Professional plan features
+    public static readonly FeatureLevel Paid3 = new("platform_paid3_features", Paid2); // a.k.a Enterprise plan features
+    public static readonly FeatureLevel TestingOnly = new("platform_testingonly_platform");
+    public static readonly FeatureLevel TestingOnlySuperUser = new("platform_testingonly_platform_super", TestingOnly);
     public static readonly Dictionary<string, FeatureLevel> AllFeatures = new()
     {
         { Basic.Name, Basic },

@@ -69,11 +69,29 @@ namespace Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Numeric &apos;{0}&apos; must be a 3 decimal number between 1 and 1000.
+        /// </summary>
+        internal static string CurrencyIso4217_InvalidNumeric {
+            get {
+                return ResourceManager.GetString("CurrencyIso4217_InvalidNumeric", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The value of the optional variable is null.
         /// </summary>
         internal static string Optional_NullValue {
             get {
                 return ResourceManager.GetString("Optional_NullValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This action is not allowed.
+        /// </summary>
+        internal static string Permission_Disallowed {
+            get {
+                return ResourceManager.GetString("Permission_Disallowed", resourceCulture);
             }
         }
         

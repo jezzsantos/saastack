@@ -1,7 +1,7 @@
 using Common;
 using Domain.Shared.Identities;
 
-namespace Domain.Services.Shared.DomainServices;
+namespace Domain.Services.Shared;
 
 public interface ITokensService
 {

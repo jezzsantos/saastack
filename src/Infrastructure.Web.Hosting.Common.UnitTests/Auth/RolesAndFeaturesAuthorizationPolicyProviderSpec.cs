@@ -24,7 +24,7 @@ public class RolesAndFeaturesAuthorizationPolicyProviderSpec
     public async Task WhenGetPolicyAsyncAndNotCachedAndUnknown_ThenBuildsPolicy()
     {
         var policyName =
-            $"POLICY:{{|Features|:{{|Platform|:[|basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}";
+            $"POLICY:{{|Features|:{{|Platform|:[|platform_basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}";
 
         var result = await _provider.GetPolicyAsync(policyName);
 

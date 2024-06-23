@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Common.Extensions;
 using Domain.Interfaces.ValueObjects;
 
@@ -13,6 +14,7 @@ public abstract partial class SingleValueObjectBase<TValueObject, TValue> : Valu
     ISingleValueObject<TValue>
     where TValue : notnull
 {
+    [DebuggerStepThrough]
     protected SingleValueObjectBase(TValue value)
     {
         Value = value;
@@ -27,6 +29,7 @@ public abstract partial class SingleValueObjectBase<TValueObject, TValue> : Valu
 
     TValue ISingleValueObject<TValue>.Value => Value;
 
+    [DebuggerStepThrough]
     public static implicit operator TValue(SingleValueObjectBase<TValueObject, TValue> valueObject)
     {
         return valueObject.NotExists() || valueObject.Value.NotExists()

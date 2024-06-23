@@ -4,7 +4,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.SSOUsers;
 using Domain.Interfaces.Entities;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 using Domain.Shared;
 using FluentAssertions;
 using Moq;

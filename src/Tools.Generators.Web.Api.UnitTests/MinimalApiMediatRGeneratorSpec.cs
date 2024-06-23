@@ -774,7 +774,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}POLICY:{|Features|:{|Platform|:[|paidtrial_features|]},|Roles|:{|Platform|:[|platform_operations|]}}")
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|platform_basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}POLICY:{|Features|:{|Platform|:[|platform_paidtrial_features|]},|Roles|:{|Platform|:[|platform_operations|]}}")
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -865,7 +865,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|platform_basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -957,7 +957,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|platform_basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -1044,7 +1044,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|platform_basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
                                 .DisableAntiforgery()
                                 .WithOpenApi(op =>
                                     {
@@ -1132,7 +1132,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|platform_basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
                                 .DisableAntiforgery()
                                 .WithOpenApi(op =>
                                     {
@@ -1145,7 +1145,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|platform_basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
                                 .DisableAntiforgery()
                                 .WithOpenApi(op =>
                                     {
@@ -1235,7 +1235,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
                                      await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
-                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
+                                .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|platform_basic_features|]},|Roles|:{|Platform|:[|platform_standard|]}}")
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";

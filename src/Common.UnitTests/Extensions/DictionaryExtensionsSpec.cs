@@ -177,7 +177,7 @@ public class DictionaryExtensionsSpec
     [Fact]
     public void WhenToObjectDictionaryWithNullInstance_ThenReturnsEmpty()
     {
-        var result = ((TestMappingClass)null!).ToObjectDictionary();
+        var result = ((TestMappingClass?)null).ToObjectDictionary();
 
         result.Should().BeEmpty();
     }
@@ -222,6 +222,59 @@ public class DictionaryExtensionsSpec
         result[nameof(TestMappingClass.AnOptionalNullableStringProperty)].Should().Be(Optional<string?>.None);
         result[nameof(TestMappingClass.AnOptionalDateTimeProperty)].Should().Be(Optional<DateTime>.None);
         result[nameof(TestMappingClass.AnOptionalNullableDateTimeProperty)].Should().Be(Optional<DateTime?>.None);
+    }
+
+    [Fact]
+    public void WhenToStringDictionaryWithNullInstance_ThenreturnsEmpty()
+    {
+        var result = ((TestMappingClass?)null).ToStringDictionary();
+
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenToStringDictionaryWithInstanceWithValues_ThenReturnsProperties()
+    {
+        var datum = DateTime.UtcNow;
+        var result = new TestMappingClass
+        {
+            ADateTimeProperty = datum,
+            AnOptionalStringProperty = "avalue",
+            AnOptionalNullableStringProperty = "avalue",
+            AnOptionalDateTimeProperty = datum,
+            AnOptionalNullableDateTimeProperty = datum
+        }.ToStringDictionary();
+
+        result.Count.Should().Be(8);
+        result[nameof(TestMappingClass.AStringProperty)].Should().Be("adefaultvalue");
+        result[nameof(TestMappingClass.AnIntProperty)].Should().Be("1");
+        result[nameof(TestMappingClass.AnBoolProperty)].Should().Be("True");
+        result[nameof(TestMappingClass.ADateTimeProperty)].Should().Be(datum.ToIso8601());
+        result[nameof(TestMappingClass.AnOptionalStringProperty)].Should().Be("avalue");
+        result[nameof(TestMappingClass.AnOptionalNullableStringProperty)].Should().Be("avalue");
+        result[nameof(TestMappingClass.AnOptionalDateTimeProperty)].Should().Be(datum.ToIso8601());
+        result[nameof(TestMappingClass.AnOptionalNullableDateTimeProperty)].Should().Be(datum.ToIso8601());
+    }
+
+    [Fact]
+    public void WhenToStringDictionaryWithInstanceWithDefaultValues_ThenReturnsProperties()
+    {
+        var result = new TestMappingClass
+        {
+            AStringProperty = default!,
+            AnIntProperty = default,
+            AnBoolProperty = default,
+            ADateTimeProperty = default,
+            AnOptionalStringProperty = default,
+            AnOptionalNullableStringProperty = default,
+            AnOptionalDateTimeProperty = default,
+            AnOptionalNullableDateTimeProperty = default
+        }.ToStringDictionary();
+
+        result.Count.Should().Be(3);
+        result[nameof(TestMappingClass.AnIntProperty)].Should().Be("0");
+        result[nameof(TestMappingClass.AnBoolProperty)].Should().Be("False");
+        result[nameof(TestMappingClass.ADateTimeProperty)].Should().Be("0001-01-01T00:00:00");
     }
 }
 

@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces.Services;
 using Common;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 
 namespace Infrastructure.Web.Hosting.Common.Pipeline;
 

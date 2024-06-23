@@ -7,7 +7,7 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 using Domain.Shared;
 using Domain.Shared.EndUsers;
 using EndUsersApplication.Persistence;

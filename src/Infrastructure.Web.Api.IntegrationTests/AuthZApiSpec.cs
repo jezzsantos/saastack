@@ -4,7 +4,7 @@ using Application.Resources.Shared;
 using Common.Configuration;
 using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 using FluentAssertions;
 using IdentityInfrastructure.ApplicationServices;
 using Infrastructure.Web.Api.Common.Extensions;

@@ -3,7 +3,7 @@ using System.Text;
 using Application.Resources.Shared;
 using Common;
 using Common.Configuration;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 using IdentityApplication.ApplicationServices;
 using Infrastructure.Common.Extensions;
 using Infrastructure.Interfaces;

@@ -36,4 +36,23 @@ public static class DictionaryExtensions
 
         return mapper.Map<Dictionary<string, object?>>(instance);
     }
+
+    /// <summary>
+    ///     Converts the instance of the <see cref="TObject" /> to a <see cref="IReadOnlyDictionary{String,String}" />,
+    ///     where null properties are removed
+    /// </summary>
+    public static IReadOnlyDictionary<string, string> ToStringDictionary<TObject>(this TObject instance)
+    {
+        var objectJson = instance.ToJson(false) ?? "{}";
+
+        var properties = objectJson.FromJson<Dictionary<string, object?>>();
+        if (properties.NotExists())
+        {
+            return new Dictionary<string, string>();
+        }
+
+        return properties
+            .Where(entry => entry.Value.Exists() && entry.Value.ToString().Exists())
+            .ToDictionary(entry => entry.Key, entry => entry.Value!.ToString()!);
+    }
 }

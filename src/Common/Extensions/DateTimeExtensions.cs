@@ -38,6 +38,24 @@ public static class DateTimeExtensions
     }
 
     /// <summary>
+    ///     Converts the <see cref="value" /> to a UTC date only,
+    ///     but only if the <see cref="value" /> is in the
+    ///     <see href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO8601</see> format.
+    /// </summary>
+    public static DateOnly FromIso8601DateOnly(this string? value)
+    {
+        if (value.HasNoValue())
+        {
+            return DateOnly.MinValue;
+        }
+
+        var dateOnly = DateOnly.Parse(value);
+        return dateOnly.HasValue()
+            ? dateOnly
+            : DateOnly.MinValue;
+    }
+
+    /// <summary>
     ///     Converts the <see cref="value" /> to a UTC date,
     ///     but only if the <see cref="value" /> is in the UNIX Timestamp format.
     /// </summary>
@@ -211,6 +229,24 @@ public static class DateTimeExtensions
         }
 
         return value.Value.ToIso8601();
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="value" /> to UTC and then to
+    ///     <see href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO8601</see>
+    /// </summary>
+    public static string? ToIso8601(this DateOnly? date)
+    {
+        return date?.ToIso8601();
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="value" /> to UTC and then to
+    ///     <see href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO8601</see>
+    /// </summary>
+    public static string ToIso8601(this DateOnly date)
+    {
+        return date.ToString("O");
     }
 
     /// <summary>

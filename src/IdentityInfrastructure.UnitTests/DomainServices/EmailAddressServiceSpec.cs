@@ -1,7 +1,7 @@
 ﻿using Common;
 using Common.Configuration;
 using Domain.Common.ValueObjects;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 using Domain.Shared;
 using FluentAssertions;
 using IdentityApplication.Persistence;

@@ -20,8 +20,9 @@
       "type": "parameter",
       "datatype": "string",
       "isRequired": true,
-      "description": "Name of the subdomain (singular, Title-cased)",
-      "replaces": "{SubDomainName}"
+      "description": "Name of the subdomain (Singular, Title-cased)",
+      "replaces": "{SubDomainName}",
+      "fileRename": "{SubDomainName}"
     },
     "SubDomainNameLower": {
       "type": "generated",

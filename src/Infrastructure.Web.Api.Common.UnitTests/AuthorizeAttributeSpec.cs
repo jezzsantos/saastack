@@ -254,7 +254,7 @@ public class AuthorizeAttributeSpec
 
             result.Should()
                 .Be(
-                    $"POLICY:{{|Features|:{{|Platform|:[|basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
+                    $"POLICY:{{|Features|:{{|Platform|:[|{PlatformFeatures.Basic.Name}|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
         }
 
         [Fact]
@@ -273,7 +273,7 @@ public class AuthorizeAttributeSpec
 
             result.Should()
                 .Be(
-                    $"POLICY:{{|Features|:{{|Platform|:[|basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
+                    $"POLICY:{{|Features|:{{|Platform|:[|{PlatformFeatures.Basic.Name}|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
         }
 
         [Fact]
@@ -291,7 +291,7 @@ public class AuthorizeAttributeSpec
 
             result.Should()
                 .Be(
-                    $"POLICY:{{|Features|:{{|Platform|:[|basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
+                    $"POLICY:{{|Features|:{{|Platform|:[|{PlatformFeatures.Basic.Name}|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
         }
 
         [Fact]
@@ -309,7 +309,7 @@ public class AuthorizeAttributeSpec
 
             result.Should()
                 .Be(
-                    $"POLICY:{{|Features|:{{|Platform|:[|paidtrial_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
+                    $"POLICY:{{|Features|:{{|Platform|:[|{PlatformFeatures.PaidTrial.Name}|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
         }
 
         [Fact]
@@ -328,7 +328,7 @@ public class AuthorizeAttributeSpec
 
             result.Should()
                 .Be(
-                    $"POLICY:{{|Features|:{{|Platform|:[|paidtrial_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
+                    $"POLICY:{{|Features|:{{|Platform|:[|{PlatformFeatures.PaidTrial.Name}|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
         }
 
         [Fact]
@@ -352,9 +352,9 @@ public class AuthorizeAttributeSpec
 
             result.Should()
                 .Be(
-                    $"POLICY:{{|Features|:{{|Platform|:[|paidtrial_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}"
+                    $"POLICY:{{|Features|:{{|Platform|:[|{PlatformFeatures.PaidTrial.Name}|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}"
                     +
-                    $"POLICY:{{|Features|:{{|Platform|:[|paidtrial_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
+                    $"POLICY:{{|Features|:{{|Platform|:[|{PlatformFeatures.PaidTrial.Name}|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
         }
 
         [Fact]
@@ -378,9 +378,9 @@ public class AuthorizeAttributeSpec
 
             result.Should()
                 .Be(
-                    $"POLICY:{{|Features|:{{|Tenant|:[|basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}"
+                    $"POLICY:{{|Features|:{{|Tenant|:[|{TenantFeatures.Basic.Name}|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}"
                     +
-                    $"POLICY:{{|Features|:{{|Tenant|:[|paidtrial_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
+                    $"POLICY:{{|Features|:{{|Tenant|:[|{TenantFeatures.PaidTrial.Name}|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
         }
 
         [Fact]
@@ -401,7 +401,7 @@ public class AuthorizeAttributeSpec
 
             result.Should()
                 .Be(
-                    $"POLICY:{{|Features|:{{|Tenant|:[|paidtrial_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
+                    $"POLICY:{{|Features|:{{|Tenant|:[|{TenantFeatures.PaidTrial.Name}|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
         }
     }
 
@@ -444,7 +444,7 @@ public class AuthorizeAttributeSpec
         public void WhenParsePolicyNameAndHasRoleAndFeature_ThenReturnsRoleAndFeature()
         {
             var result = AuthorizeAttribute.ParsePolicyName(
-                $"POLICY:{{|Features|:{{|Platform|:[|basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
+                $"POLICY:{{|Features|:{{|Platform|:[|{PlatformFeatures.Basic.Name}|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
 
             result.Count.Should().Be(1);
             result[0].Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
@@ -459,23 +459,23 @@ public class AuthorizeAttributeSpec
         public void WhenParsePolicyNameAndHasMultiplePolicies_ThenReturnsRolesAndFeatures()
         {
             var result = AuthorizeAttribute.ParsePolicyName(
-                $"POLICY:{{|Features|:{{|Tenant|:[|basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}"
+                $"POLICY:{{|Features|:{{|Tenant|:[|{TenantFeatures.Basic.Name}|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}"
                 +
-                $"POLICY:{{|Features|:{{|Tenant|:[|paidtrial_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
+                $"POLICY:{{|Features|:{{|Tenant|:[|{TenantFeatures.PaidTrial.Name}|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}");
 
             result.Count.Should().Be(2);
             result[0].Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
             result[0].Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Standard);
             result[0].Roles.Tenant.Should().BeEmpty();
-            result[0].Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
+            result[0].Features.All.Should().OnlyContain(feat => feat == TenantFeatures.Basic);
             result[0].Features.Platform.Should().BeEmpty();
-            result[0].Features.Tenant.Should().OnlyContain(feat => feat == PlatformFeatures.Basic);
+            result[0].Features.Tenant.Should().OnlyContain(feat => feat == TenantFeatures.Basic);
             result[1].Roles.All.Should().OnlyContain(rol => rol == PlatformRoles.Operations);
             result[1].Roles.Platform.Should().OnlyContain(rol => rol == PlatformRoles.Operations);
             result[1].Roles.Tenant.Should().BeEmpty();
-            result[1].Features.All.Should().OnlyContain(feat => feat == PlatformFeatures.PaidTrial);
+            result[1].Features.All.Should().OnlyContain(feat => feat == TenantFeatures.PaidTrial);
             result[1].Features.Platform.Should().BeEmpty();
-            result[1].Features.Tenant.Should().OnlyContain(feat => feat == PlatformFeatures.PaidTrial);
+            result[1].Features.Tenant.Should().OnlyContain(feat => feat == TenantFeatures.PaidTrial);
         }
     }
 }

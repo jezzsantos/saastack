@@ -5,7 +5,7 @@ using Common;
 using Common.Configuration;
 using Domain.Common.Identity;
 using Domain.Interfaces;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 using EndUsersApplication;
 using EndUsersApplication.Persistence;
 using EndUsersDomain;

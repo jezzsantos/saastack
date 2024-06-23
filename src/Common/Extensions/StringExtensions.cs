@@ -82,7 +82,11 @@ public static class StringExtensions
 
         return JsonSerializer.Deserialize<TResult>(json, new JsonSerializerOptions
         {
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            Converters =
+            {
+                new OptionalConverterFactory()
+            }
         });
     }
 #elif GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
@@ -283,7 +287,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    ///     Converts the <see cref="value" /> to a integer value
+    ///     Converts the <see cref="value" /> to an integer value
     /// </summary>
     public static int ToInt(this string? value)
     {
@@ -296,7 +300,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    ///     Converts the <see cref="value" /> to a integer value,
+    ///     Converts the <see cref="value" /> to an integer value,
     ///     and in the case where the value cannot be converted, uses the <see cref="defaultValue" />
     /// </summary>
     public static int ToIntOrDefault(this string? value, int defaultValue)
@@ -307,6 +311,38 @@ public static class StringExtensions
         }
 
         if (int.TryParse(value, out var converted))
+        {
+            return converted;
+        }
+
+        return defaultValue;
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="value" /> to a decimal value
+    /// </summary>
+    public static decimal ToDecimal(this string? value)
+    {
+        if (value.HasNoValue())
+        {
+            return -1;
+        }
+
+        return decimal.Parse(value);
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="value" /> to a decimal value,
+    ///     and in the case where the value cannot be converted, uses the <see cref="defaultValue" />
+    /// </summary>
+    public static decimal ToDecimalOrDefault(this string? value, decimal defaultValue)
+    {
+        if (value.HasNoValue())
+        {
+            return defaultValue;
+        }
+
+        if (decimal.TryParse(value, out var converted))
         {
             return converted;
         }
@@ -370,7 +406,11 @@ public static class StringExtensions
             PropertyNamingPolicy = namingPolicy,
             DefaultIgnoreCondition = includeNulls
                 ? JsonIgnoreCondition.Never
-                : JsonIgnoreCondition.WhenWritingNull
+                : JsonIgnoreCondition.WhenWritingNull,
+            Converters =
+            {
+                new OptionalConverterFactory()
+            }
         });
     }
 #elif GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_NONPLATFORM

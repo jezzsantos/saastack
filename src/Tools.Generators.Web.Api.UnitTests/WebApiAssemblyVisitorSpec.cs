@@ -466,7 +466,7 @@ public class WebApiAssemblyVisitorSpec
                 registration.MethodName.Should().Be("AMethod");
                 registration.OperationMethod.Should().Be(OperationMethod.Get);
                 registration.OperationAuthorization!.PolicyName.Should().Be(
-                    $"POLICY:{{|Features|:{{|Platform|:[|basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
+                    $"POLICY:{{|Features|:{{|Platform|:[|platform_basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
                 registration.RoutePath.Should().Be("aroute");
                 registration.IsTestingOnly.Should().BeFalse();
                 registration.RequestDto.Name.Should().Be("ARequest");
@@ -523,8 +523,8 @@ public class WebApiAssemblyVisitorSpec
                 registration.MethodName.Should().Be("AMethod");
                 registration.OperationMethod.Should().Be(OperationMethod.Get);
                 registration.OperationAuthorization!.PolicyName.Should().Be(
-                    $"POLICY:{{|Features|:{{|Platform|:[|paid2_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}"
-                    + $"POLICY:{{|Features|:{{|Platform|:[|basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
+                    $"POLICY:{{|Features|:{{|Platform|:[|platform_paid2_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Operations.Name}|]}}}}"
+                    + $"POLICY:{{|Features|:{{|Platform|:[|platform_basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}");
                 registration.RoutePath.Should().Be("aroute");
                 registration.IsTestingOnly.Should().BeFalse();
                 registration.RequestDto.Name.Should().Be("ARequest");

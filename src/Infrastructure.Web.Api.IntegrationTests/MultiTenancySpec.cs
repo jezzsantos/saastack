@@ -167,7 +167,7 @@ public class MultiTenancySpec
         {
 #if TESTINGONLY
             services.AddSingleton<ITenantSettingsService, StubTenantSettingsService>();
-            // Replace the store to use different settings
+            // Replace the tenanted IDataStore to use fake settings
             services.AddPerHttpRequest<IDataStore>(c =>
                 LocalMachineJsonFileStore.Create(
                     new FakeConfigurationSettings(c.GetRequiredService<ITenancyContext>().Current)));

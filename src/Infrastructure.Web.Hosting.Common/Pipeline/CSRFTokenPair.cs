@@ -1,7 +1,7 @@
 ﻿using Common;
 using Common.Extensions;
 using Domain.Interfaces;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 using Infrastructure.Web.Api.Common;
 
 namespace Infrastructure.Web.Hosting.Common.Pipeline;

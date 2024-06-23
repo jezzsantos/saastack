@@ -54,5 +54,10 @@
     <data name="TimezoneIana_InvalidDaylightSavingsCode" xml:space="preserve">
         <value>The DaylightSavingsCode '{0}' must be a three or four letter code, or the offset in hrs</value>
     </data>
-
+    <data name="CurrencyIso4217_InvalidNumeric" xml:space="preserve">
+        <value>The Numeric '{0}' must be a 3 decimal number between 1 and 1000</value>
+    </data>
+    <data name="Permission_Disallowed" xml:space="preserve">
+        <value>This action is not allowed</value>
+    </data>
 </root>

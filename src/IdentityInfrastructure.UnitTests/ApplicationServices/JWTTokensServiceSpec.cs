@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Application.Resources.Shared;
 using Common.Configuration;
 using Domain.Interfaces.Authorization;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 using FluentAssertions;
 using IdentityInfrastructure.ApplicationServices;
 using Infrastructure.Common.Extensions;
@@ -84,11 +84,11 @@ public class JWTTokensServiceSpec
                               == $"Tenant_{TenantRoles.Member.Name}{ClaimExtensions.TenantIdDelimiter}anorganizationid");
         token.Claims.Should()
             .Contain(claim => claim.Type == AuthenticationConstants.Claims.ForFeature
-                              && claim.Value == "Platform_basic_features");
+                              && claim.Value == "Platform_platform_basic_features");
         token.Claims.Should()
             .Contain(claim => claim.Type == AuthenticationConstants.Claims.ForFeature
                               && claim.Value
-                              == $"Tenant_basic_features{ClaimExtensions.TenantIdDelimiter}anorganizationid");
+                              == $"Tenant_tenant_basic_features{ClaimExtensions.TenantIdDelimiter}anorganizationid");
         _tokensService.Verify(ts => ts.CreateJWTRefreshToken());
     }
 }

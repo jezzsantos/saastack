@@ -1,5 +1,5 @@
 using Domain.Interfaces.Services;
-using Domain.Services.Shared.DomainServices;
+using Domain.Services.Shared;
 
 namespace Infrastructure.Common.DomainServices;
 

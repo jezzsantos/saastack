@@ -138,11 +138,11 @@ public readonly struct Error
     }
 
     /// <summary>
-    ///     Creates a <see cref="ErrorCode.NotSubscribed" /> error
+    ///     Creates a <see cref="ErrorCode.FeatureViolation" /> error
     /// </summary>
-    public static Error NotSubscribed(string? message = null)
+    public static Error FeatureViolation(string? message = null)
     {
-        return new Error(ErrorCode.NotSubscribed, message);
+        return new Error(ErrorCode.FeatureViolation, message);
     }
 
     /// <summary>
@@ -176,14 +176,14 @@ public enum ErrorCode
     // EXTEND: add other kinds of errors you want to support in Result<TError>
     NoError = -1,
     Validation,
-    RuleViolation,
+    RuleViolation, 
     RoleViolation,
-    PreconditionViolation,
+    PreconditionViolation, // the resource is not in a valid state to begin with
     EntityNotFound,
     EntityExists,
+    EntityDeleted,
     NotAuthenticated,
     ForbiddenAccess,
-    NotSubscribed,
+    FeatureViolation,
     Unexpected,
-    EntityDeleted
 }

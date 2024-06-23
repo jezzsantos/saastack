@@ -341,7 +341,7 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=8284009d_002De743_002D4d89_002D9402_002Da5bf9a89b657/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Any" AccessRightKinds="Any" Description="Methods"&gt;&lt;ElementKinds&gt;&lt;Kind Name="METHOD" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="When" Suffix="" Style="AaBb_AaBb"&gt;&lt;ExtraRule Prefix="" Suffix="" Style="AaBb" /&gt;&lt;ExtraRule Prefix="Setup" Suffix="" Style="AaBb" /&gt;&lt;ExtraRule Prefix="Configure" Suffix="" Style="AaBb" /&gt;&lt;/Policy&gt;&lt;/Policy&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=8b8504e3_002Df0be_002D4c14_002D9103_002Dc732f2bddc15/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Any" AccessRightKinds="Any" Description="Enum members"&gt;&lt;ElementKinds&gt;&lt;Kind Name="ENUM_MEMBER" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb"&gt;&lt;ExtraRule Prefix="" Suffix="" Style="AaBb_AaBb" /&gt;&lt;/Policy&gt;&lt;/Policy&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=a0b4bc4d_002Dd13b_002D4a37_002Db37e_002Dc9c6864e4302/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Any" AccessRightKinds="Any" Description="Types and namespaces"&gt;&lt;ElementKinds&gt;&lt;Kind Name="NAMESPACE" /&gt;&lt;Kind Name="CLASS" /&gt;&lt;Kind Name="STRUCT" /&gt;&lt;Kind Name="ENUM" /&gt;&lt;Kind Name="DELEGATE" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;&lt;/Policy&gt;</s:String>
-	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=c85a0503_002D4de2_002D40f1_002D9cd6_002Da4054c05d384/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Any" AccessRightKinds="Any" Description="Properties"&gt;&lt;ElementKinds&gt;&lt;Kind Name="PROPERTY" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb"&gt;&lt;ExtraRule Prefix="Configure" Suffix="" Style="AaBb" /&gt;&lt;/Policy&gt;&lt;/Policy&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=c85a0503_002D4de2_002D40f1_002D9cd6_002Da4054c05d384/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Any" AccessRightKinds="Any" Description="Properties"&gt;&lt;ElementKinds&gt;&lt;Kind Name="PROPERTY" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb"&gt;&lt;ExtraRule Prefix="Configure" Suffix="" Style="AaBb" /&gt;&lt;ExtraRule Prefix="Setup" Suffix="" Style="AaBb" /&gt;&lt;/Policy&gt;&lt;/Policy&gt;</s:String>
 	<s:Boolean x:Key="/Default/Environment/Filtering/FileMasksToExclude/=src_002FApplication_002EInterfaces_002FResources_002F_002A_002E_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/FileMasksToExclude/=src_002FCommon_002FAnnotations_002Ecs/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/HideAutoProperties/@EntryValue">True</s:Boolean>
@@ -610,7 +610,7 @@ public sealed class $name$ : SingleValueObjectBase&lt;$name$, $datatype$&gt;
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Text/@EntryValue">public async Task&lt;ApiDeleteResult&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
 {$END$$SELECTION$
-    var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
+    var $resource$ = await _application.$Action$$Resource$Async(_callerFactory.Create(), request.Id, cancellationToken);
 
     return () =&gt; $resource$.HandleApplicationResult();
 }</s:String>
@@ -766,7 +766,7 @@ public class $Action$$Resource$RequestValidator : AbstractValidator&lt;$Action$$
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Text/@EntryValue">public async Task&lt;ApiPostResult&lt;$Resource$, $Action$$Resource$Response&gt;&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
 {$END$$SELECTION$
-    var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
+    var $resource$ = await _application.$Action$$Resource$Async(_callerFactory.Create(), request.Id, cancellationToken);
 
     return () =&gt; $resource$.HandleApplicationResult&lt;$Resource$, $Action$$Resource$Response&gt;(x =&gt; new PostResult&lt;$Action$$Resource$Response&gt;(new $Action$$Resource$Response { $Resource$ = x }));
 }</s:String>
@@ -829,7 +829,7 @@ public sealed class $class$ : DomainEvent
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Text/@EntryValue">public async Task&lt;ApiSearchResult&lt;$Resource$, $Action$$Resource$sResponse&gt;&gt; $Action$$Resource$s($Action$$Resource$sRequest request, CancellationToken cancellationToken)
 {$END$$SELECTION$
-    var $resource$s = await _application.$Action$$Resource$sAsync(_contextFactory.Create(), request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
+    var $resource$s = await _application.$Action$$Resource$sAsync(_callerFactory.Create(), request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
 
     return () =&gt; $resource$s.HandleApplicationResult(x =&gt; new $Action$$Resource$sResponse { $Resource$s = x.Results, Metadata = x.Metadata });
 }</s:String>
@@ -902,11 +902,14 @@ public sealed class $class$ : IntegrationEvent
 
 namespace $ns$;
 
+/// &lt;summary&gt;
+///
+/// &lt;/summary&gt;
 [Route("/$route$/{Id}", OperationMethod.Get, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class $Action$$Resource$Request : TenantedRequest&lt;$Action$$Resource$Response&gt;
 {
-    public required string Id { get; set; }
+    public string? Id { get; set; }
 }
 
 //TODO: move to its own file
@@ -943,11 +946,14 @@ public class $Action$$Resource$Response : IWebResponse
 
 namespace $ns$;
 
+/// &lt;summary&gt;
+///
+/// &lt;/summary&gt;
 [Route("/$route$/{Id}", OperationMethod.Delete, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class $Action$$Resource$Request : TenantedDeleteRequest
 {
-    public required string Id { get; set; }
+    public string? Id { get; set; }
 }</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=786FF241DEF61F4093B63A31755FFF7C/UITag/@EntryValue">SaaStack</s:String>
 	
@@ -1128,11 +1134,14 @@ public class $Action$$Resource$Response : SearchResponse
 
 namespace $ns$;
 
+/// &lt;summary&gt;
+///
+/// &lt;/summary&gt;
 [Route("/$route$", OperationMethod.Post, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class $Action$$Resource$Request : TenantedRequest&lt;$Action$$Resource$Response&gt;
 {
-    public required string $Property$ { get; set; }
+    public string? $Property$ { get; set; }
 }
 
 //TODO: move to its own file
@@ -1171,13 +1180,16 @@ public class $Action$$Resource$Response : IWebResponse
 
 namespace $ns$;
 
+/// &lt;summary&gt;
+///
+/// &lt;/summary&gt;
 [Route("/$route$/{Id}", OperationMethod.PutPatch, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class $Action$$Resource$Request : TenantedRequest&lt;$Action$$Resource$Response&gt;
 {
-    public required string Id { get; set; }
+    public string? Id { get; set; }
     
-    public required string $Property$ { get; set; }
+    public string? $Property$ { get; set; }
 }
 
 //TODO: move to its own file
@@ -1224,7 +1236,7 @@ public class $Action$$Resource$Response : IWebResponse
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Text/@EntryValue">public async Task&lt;ApiGetResult&lt;$Resource$, $Action$$Resource$Response&gt;&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
 {$END$$SELECTION$
-    var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
+    var $resource$ = await _application.$Action$$Resource$Async(_callerFactory.Create(), request.Id, cancellationToken);
 
     return () =&gt; $resource$.HandleApplicationResult&lt;$Resource$, $Action$$Resource$Response&gt;(x =&gt; new $Action$$Resource$Response { $Resource$ = x });
 }</s:String>
@@ -1382,7 +1394,7 @@ public sealed class $name$Root : AggregateRootBase
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Text/@EntryValue">public async Task&lt;ApiPutPatchResult&lt;$Resource$, $Action$$Resource$Response&gt;&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
 {$END$$SELECTION$
-    var $resource$ = await _application.$Action$$Resource$Async(_contextFactory.Create(), request.Id, cancellationToken);
+    var $resource$ = await _application.$Action$$Resource$Async(_callerFactory.Create(), request.Id, cancellationToken);
 
     return () =&gt; $resource$.HandleApplicationResult&lt;$Resource$, $Action$$Resource$Response&gt;(x =&gt; new $Action$$Resource$Response { $Resource$ = x });
 }</s:String>

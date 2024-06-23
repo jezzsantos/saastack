@@ -90,9 +90,10 @@ public static class HttpConstants
         /// </summary>
         public static readonly Dictionary<HttpStatusCode, IReadOnlyList<ErrorCode>> SupportedErrorCodesMap = new()
         {
+            //EXTEND: other HTTP status codes to error maps
             { HttpStatusCode.BadRequest, new List<ErrorCode> { ErrorCode.Validation, ErrorCode.RuleViolation } },
             { HttpStatusCode.Unauthorized, new List<ErrorCode> { ErrorCode.NotAuthenticated } },
-            { HttpStatusCode.PaymentRequired, new List<ErrorCode> { ErrorCode.NotSubscribed } },
+            { HttpStatusCode.PaymentRequired, new List<ErrorCode> { ErrorCode.FeatureViolation } },
             { HttpStatusCode.Forbidden, new List<ErrorCode> { ErrorCode.RoleViolation, ErrorCode.ForbiddenAccess } },
             { HttpStatusCode.NotFound, new List<ErrorCode> { ErrorCode.EntityNotFound } },
             {
