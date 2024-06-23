@@ -34,13 +34,7 @@ partial class UserProfilesApplication
     public async Task<Result<Error>> HandleImageDeletedAsync(ICallerContext caller, Deleted domainEvent,
         CancellationToken cancellationToken)
     {
-        var profile = await HandleDeleteAvatarAsync(caller, domainEvent.RootId, cancellationToken);
-        if (profile.IsFailure)
-        {
-            return profile.Error;
-        }
-
-        return Result.Ok;
+        return await HandleDeleteAvatarAsync(caller, domainEvent.RootId, cancellationToken);
     }
 
     public async Task<Result<Error>> HandleEndUserDefaultMembershipChangedAsync(ICallerContext caller,

@@ -12,6 +12,10 @@ public class Organization : ReadModelEntity
 
     public Optional<string> AvatarUrl { get; set; }
 
+    public Optional<string> BillingSubscriberId { get; set; }
+
+    public Optional<string> BillingSubscriptionId { get; set; }
+
     public Optional<string> CreatedById { get; set; }
 
     public Optional<string> Name { get; set; }

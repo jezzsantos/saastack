@@ -61,6 +61,7 @@ public class OrganizationsModule : ISubdomainModule
                         c.GetRequiredService<ITenantSettingService>(),
                         c.GetRequiredService<IEndUsersService>(),
                         c.GetRequiredService<IImagesService>(),
+                        c.GetRequiredService<ISubscriptionsService>(),
                         c.GetRequiredService<IOrganizationRepository>()));
                 services.AddPerHttpRequest<IOrganizationRepository>(c =>
                     new OrganizationRepository(c.GetRequiredService<IRecorder>(),
@@ -75,6 +76,10 @@ public class OrganizationsModule : ISubdomainModule
                     .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
                         new ImageNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
                             c.GetRequiredService<IOrganizationsApplication>()));
+                services
+                    .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
+                        new SubscriptionNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),
+                            c.GetRequiredService<IOrganizationsApplication>()));
                 services.RegisterEventing<OrganizationRoot, OrganizationProjection, OrganizationNotifier>(
                     c => new OrganizationProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
@@ -82,6 +87,8 @@ public class OrganizationsModule : ISubdomainModule
                     _ => new OrganizationNotifier());
 
                 services.AddPerHttpRequest<IOrganizationsService>(c =>
+                    new OrganizationsInProcessServiceClient(c.LazyGetRequiredService<IOrganizationsApplication>()));
+                services.AddPerHttpRequest<ISubscriptionOwningEntityService>(c =>
                     new OrganizationsInProcessServiceClient(c.LazyGetRequiredService<IOrganizationsApplication>()));
             };
         }

@@ -114,6 +114,25 @@ public sealed class Membership : EntityBase
                 return Result.Ok;
             }
 
+            case MembershipFeatureUnassigned unassigned:
+            {
+                var features = Features.Remove(unassigned.Feature);
+                Features = features;
+                return Result.Ok;
+            }
+
+            case MembershipFeaturesReset reset:
+            {
+                var features = Features.Create(reset.Features.ToArray());
+                if (features.IsFailure)
+                {
+                    return features.Error;
+                }
+
+                Features = features.Value;
+                return Result.Ok;
+            }
+
             default:
                 return HandleUnKnownStateChangedEvent(@event);
         }

@@ -1,4 +1,6 @@
-﻿using Application.Common.Extensions;
+﻿#region
+
+using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
@@ -7,6 +9,8 @@ using BookingsDomain;
 using Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+
+#endregion
 
 namespace BookingsApplication;
 
@@ -56,8 +60,8 @@ public class BookingsApplication : IBookingsApplication
             return deleted.Error;
         }
 
-        _recorder.TraceInformation(caller.ToCall(), "Booking {Id} was cancelled", booking.Id);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Core.BookingCancelled,
+        _recorder.TraceInformation(caller.ToCall(), "Booking {Id} was canceled", booking.Id);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Core.BookingCanceled,
             new Dictionary<string, object>
             {
                 { UsageConstants.Properties.Id, booking.Id },

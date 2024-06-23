@@ -10,6 +10,7 @@ using Domain.Interfaces.Services;
 using Domain.Shared;
 using Domain.Shared.EndUsers;
 using Domain.Shared.Organizations;
+using Domain.Shared.Subscriptions;
 using FluentAssertions;
 using Moq;
 using UnitTesting.Common;
@@ -57,6 +58,7 @@ public class OrganizationRootSpec
     {
         _org.Name.Name.Should().Be("aname");
         _org.CreatedById.Should().Be("acreatorid".ToId());
+        _org.BillingSubscriber.Should().Be(Optional<BillingSubscriber>.None);
         _org.Ownership.Should().Be(OrganizationOwnership.Shared);
         _org.Settings.Should().Be(Settings.Empty);
     }
@@ -156,6 +158,17 @@ public class OrganizationRootSpec
         var result = _org.UnInviteMember("aremoverid".ToId(), Roles.Empty, "auserid".ToId());
 
         result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UserNotOrgOwner);
+    }
+
+    [Fact]
+    public void WhenUnInviteMemberAndBillingSubscriber_ThenReturnsError()
+    {
+        _org.SubscribeBilling("asubscriptionid".ToId(), "asubscriberid".ToId());
+
+        var result = _org.UnInviteMember("aremoverid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            "asubscriberid".ToId());
+
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UninviteMember_BillingSubscriber);
     }
 
     [Fact]
@@ -304,7 +317,7 @@ public class OrganizationRootSpec
         _org.Avatar.HasValue.Should().BeFalse();
         _org.Events.Last().Should().BeOfType<AvatarRemoved>();
     }
-    
+
     [Fact]
     public void WhenAddMembershipAndExists_ThenDoesNothing()
     {
@@ -432,30 +445,208 @@ public class OrganizationRootSpec
     }
 
     [Fact]
-    public void WhenDeleteOrganizationAndNotOwner_ThenReturnsError()
+    public async Task WhenDeleteOrganizationAndNotOwner_ThenReturnsError()
     {
-        var result = _org.DeleteOrganization("adeleterid".ToId(), Roles.Empty);
+        var result = await _org.DeleteOrganizationAsync("adeleterid".ToId(), Roles.Empty, true,
+            _ => Task.FromResult(Result.Ok), CancellationToken.None);
 
         result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UserNotOrgOwner);
     }
+    
+    [Fact]
+    public async Task WhenDeleteOrganizationAndNotBillingSubscriber_ThenReturnsError()
+    {
+        _org.SubscribeBilling("asubscriptionid".ToId(), "asubscriberid".ToId());
+
+        var result = await _org.DeleteOrganizationAsync("adeleterid".ToId(),
+            Roles.Create(TenantRoles.BillingAdmin).Value, true, _ => Task.FromResult(Result.Ok),
+            CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UserNotBillingSubscriber);
+    }
 
     [Fact]
-    public void WhenDeleteOrganizationAndHasOtherMembers_ThenReturnsError()
+    public async Task WhenDeleteOrganizationAndHasOtherMembers_ThenReturnsError()
     {
         _org.AddMembership("auserid1".ToId());
+        _org.SubscribeBilling("asubscriptionid".ToId(), "asubscriberid".ToId());
 
-        var result = _org.DeleteOrganization("adeleterid".ToId(), Roles.Create(TenantRoles.Owner).Value);
+        var result = await _org.DeleteOrganizationAsync("asubscriberid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            true, _ => Task.FromResult(Result.Ok), CancellationToken.None);
 
         result.Should().BeError(ErrorCode.RuleViolation,
             Resources.OrganizationRoot_DeleteOrganization_MembersStillExist);
     }
+    
+    [Fact]
+    public async Task WhenDeleteOrganizationAndCannotBeUnsubscribed_ThenReturnsError()
+    {
+        _org.SubscribeBilling("asubscriptionid".ToId(), "asubscriberid".ToId());
+
+        var result = await _org.DeleteOrganizationAsync("asubscriberid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            false, _ => Task.FromResult(Result.Ok), CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.RuleViolation,
+            Resources.OrganizationRoot_DeleteOrganization_BillingSubscriptionCannotBeUnsubscribed);
+    }
 
     [Fact]
-    public void WhenDeleteOrganization_ThenDeletes()
+    public async Task WhenDeleteOrganization_ThenDeletes()
     {
-        var result = _org.DeleteOrganization("adeleterid".ToId(), Roles.Create(TenantRoles.Owner).Value);
+        _org.SubscribeBilling("asubscriptionid".ToId(), "asubscriberid".ToId());
+
+        var result = await _org.DeleteOrganizationAsync("asubscriberid".ToId(), Roles.Create(TenantRoles.Owner).Value,
+            true, _ => Task.FromResult(Result.Ok), CancellationToken.None);
 
         result.Should().BeSuccess();
         _org.IsDeleted.Value.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenTransferBillingSubscriberByOther_ThenReturnsError()
+    {
+        var result = _org.TransferBillingSubscriber("atransfererid".ToId(), "atransfereeid".ToId());
+
+        result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UserNotBillingSubscriber);
+    }
+
+    [Fact]
+    public void WhenTransferBillingSubscriberByBillingSubscriber_ThenTransfers()
+    {
+        _org.SubscribeBilling("asubscriptionid".ToId(), "asubscriberid".ToId());
+
+        var result = _org.TransferBillingSubscriber("asubscriberid".ToId(), "atransfereeid".ToId());
+
+        result.Should().BeSuccess();
+        _org.BillingSubscriber.Value.SubscriberId.Should().Be("atransfereeid".ToId());
+        _org.Events.Last().Should().BeOfType<BillingSubscriberChanged>();
+    }
+
+    [Fact]
+    public void WhenCanCancelBillingSubscriptionAndNotBillingSubscriber_ThenDenies()
+    {
+        var result = _org.CanCancelBillingSubscription("acancellerid".ToId(), Roles.Empty);
+
+        result.Value.IsDenied.Should().BeTrue();
+        result.Value.DisallowedReason.Should().Be(Resources.OrganizationRoot_UserNotBillingSubscriber);
+    }
+
+    [Fact]
+    public void WhenCanCancelBillingSubscriptionAndBillingSubscriber_ThenAllows()
+    {
+        _org.SubscribeBilling("asubscriptionid".ToId(), "acancellerid".ToId());
+
+        var result = _org.CanCancelBillingSubscription("acancellerid".ToId(), Roles.Empty);
+
+        result.Value.IsAllowed.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenCanChangeBillingSubscriptionPlanAndNotBillingSubscriber_ThenDenies()
+    {
+        var result = _org.CanChangeBillingSubscriptionPlan("amodifierid".ToId(), Roles.Empty);
+
+        result.Value.IsDenied.Should().BeTrue();
+        result.Value.DisallowedReason.Should().Be(Resources.OrganizationRoot_NotBillingSubscriberNorBillingAdmin);
+    }
+
+    [Fact]
+    public void WhenCanChangeBillingSubscriptionPlanAndBillingAdmin_ThenAllows()
+    {
+        var result =
+            _org.CanChangeBillingSubscriptionPlan("amodifierid".ToId(), Roles.Create(TenantRoles.BillingAdmin).Value);
+
+        result.Value.IsAllowed.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenCanChangeBillingSubscriptionPlanAndBillingSubscriber_ThenAllows()
+    {
+        _org.TransferBillingSubscriber("acreatorid".ToId(), "amodifierid".ToId());
+
+        var result =
+            _org.CanChangeBillingSubscriptionPlan("amodifierid".ToId(), Roles.Create(TenantRoles.BillingAdmin).Value);
+
+        result.Value.IsAllowed.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenCanTransferBillingSubscriberAndNotBillingSubscriber_ThenDenies()
+    {
+        var result = _org.CanTransferBillingSubscription("atransfererid".ToId(), "atransfereeid".ToId(), Roles.Empty);
+
+        result.Value.IsDenied.Should().BeTrue();
+        result.Value.DisallowedReason.Should().Be(Resources.OrganizationRoot_UserNotBillingSubscriber);
+    }
+
+    [Fact]
+    public void WhenCanTransferBillingSubscriberAndTransfereeNotBillingAdmin_ThenDenies()
+    {
+        _org.SubscribeBilling("asubscriptionid".ToId(), "asubscriberid".ToId());
+
+        var result = _org.CanTransferBillingSubscription("asubscriberid".ToId(), "atransfereeid".ToId(), Roles.Empty);
+
+        result.Value.IsDenied.Should().BeTrue();
+        result.Value.DisallowedReason.Should()
+            .Be(Resources.OrganizationRoot_CanTransferBillingSubscription_TransfereeNotBillingAdmin);
+    }
+
+    [Fact]
+    public void WhenCanTransferBillingSubscriberAndTransfereeIsBillingAdmin_ThenAllows()
+    {
+        _org.SubscribeBilling("asubscriptionid".ToId(), "asubscriberid".ToId());
+
+        var result = _org.CanTransferBillingSubscription("asubscriberid".ToId(), "atransfereeid".ToId(),
+            Roles.Create(TenantRoles.BillingAdmin).Value);
+
+        result.Value.IsAllowed.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenCanUnsubscribeSubscriptionAndNotBillingSubscriber_ThenDenies()
+    {
+        var result = _org.CanUnsubscribeBillingSubscription("anunsubscriberid".ToId());
+
+        result.Value.IsDenied.Should().BeTrue();
+        result.Value.DisallowedReason.Should().Be(Resources.OrganizationRoot_UserNotBillingSubscriber);
+    }
+
+    [Fact]
+    public void WhenCanUnsubscribeBillingSubscription_ThenAllows()
+    {
+        _org.SubscribeBilling("asubscriptionid".ToId(), "anunsubscriberid".ToId());
+
+        var result = _org.CanUnsubscribeBillingSubscription("anunsubscriberid".ToId());
+
+        result.Value.IsAllowed.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenCanViewBillingSubscriptionAndNotBillingSubscriber_ThenDenies()
+    {
+        var result = _org.CanViewBillingSubscription("aviewerid".ToId(), Roles.Empty);
+
+        result.Value.IsDenied.Should().BeTrue();
+        result.Value.DisallowedReason.Should().Be(Resources.OrganizationRoot_NotBillingSubscriberNorBillingAdmin);
+    }
+
+    [Fact]
+    public void WhenCanViewBillingSubscriptionAndBillingAdmin_ThenAllows()
+    {
+        var result =
+            _org.CanViewBillingSubscription("aviewerid".ToId(), Roles.Create(TenantRoles.BillingAdmin).Value);
+
+        result.Value.IsAllowed.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenCanViewBillingSubscriptionAndBillingSubscriber_ThenAllows()
+    {
+        _org.TransferBillingSubscriber("acreatorid".ToId(), "aviewerid".ToId());
+
+        var result =
+            _org.CanViewBillingSubscription("aviewerid".ToId(), Roles.Create(TenantRoles.BillingAdmin).Value);
+
+        result.Value.IsAllowed.Should().BeTrue();
     }
 }

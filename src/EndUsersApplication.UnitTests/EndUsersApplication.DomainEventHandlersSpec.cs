@@ -1,15 +1,18 @@
 using Application.Interfaces;
+using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
 using Common.Configuration;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
+using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Shared;
 using Domain.Shared.EndUsers;
-using Domain.Shared.Organizations;
+using Domain.Shared.Subscriptions;
 using EndUsersApplication.Persistence;
+using EndUsersApplication.Persistence.ReadModels;
 using EndUsersDomain;
 using Moq;
 using OrganizationsDomain;
@@ -17,6 +20,7 @@ using UnitTesting.Common;
 using Xunit;
 using Events = OrganizationsDomain.Events;
 using Membership = EndUsersDomain.Membership;
+using OrganizationOwnership = Domain.Shared.Organizations.OrganizationOwnership;
 
 namespace EndUsersApplication.UnitTests;
 
@@ -28,6 +32,7 @@ public class EndUsersApplicationDomainEventHandlersSpec
     private readonly Mock<IEndUserRepository> _endUserRepository;
     private readonly Mock<IIdentifierFactory> _idFactory;
     private readonly Mock<IRecorder> _recorder;
+    private readonly Mock<ISubscriptionsService> _subscriptionsService;
 
     public EndUsersApplicationDomainEventHandlersSpec()
     {
@@ -59,10 +64,12 @@ public class EndUsersApplicationDomainEventHandlersSpec
         var invitationRepository = new Mock<IInvitationRepository>();
         var userProfilesService = new Mock<IUserProfilesService>();
         var notificationsService = new Mock<IUserNotificationsService>();
+        _subscriptionsService = new Mock<ISubscriptionsService>();
 
         _application =
             new EndUsersApplication(_recorder.Object, _idFactory.Object, settings.Object, notificationsService.Object,
-                userProfilesService.Object, invitationRepository.Object, _endUserRepository.Object);
+                userProfilesService.Object, _subscriptionsService.Object, invitationRepository.Object,
+                _endUserRepository.Object);
     }
 
     [Fact]
@@ -164,7 +171,7 @@ public class EndUsersApplicationDomainEventHandlersSpec
             && eu.Memberships[0].Roles.HasRole(TenantRoles.TestingOnly)
         ), It.IsAny<CancellationToken>()));
         _recorder.Verify(rec => rec.AuditAgainst(It.IsAny<ICallContext>(), "anid",
-            Audits.EndUserApplication_TenantRolesAssigned, It.IsAny<string>(),
+            Audits.EndUsersApplication_TenantRolesAssigned, It.IsAny<string>(),
             It.IsAny<object[]>()));
     }
 
@@ -186,7 +193,7 @@ public class EndUsersApplicationDomainEventHandlersSpec
             Roles.Create(TenantRoles.Member).Value,
             Features.Create(TenantFeatures.Basic).Value);
         assignee.AssignMembershipRoles(assigner, "anorganizationid".ToId(),
-            Roles.Create(TenantRoles.TestingOnly).Value);
+            Roles.Create(TenantRoles.TestingOnly).Value, (_, _, _, _) => Result.Ok);
         _endUserRepository.Setup(rep => rep.LoadAsync("anassigneeid".ToId(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(assignee);
         var domainEvent = Events.RoleUnassigned("anorganizationid".ToId(), "anassignerid".ToId(), "anassigneeid".ToId(),
@@ -202,7 +209,7 @@ public class EndUsersApplicationDomainEventHandlersSpec
             && !eu.Memberships[0].Roles.HasRole(TenantRoles.TestingOnly)
         ), It.IsAny<CancellationToken>()));
         _recorder.Verify(rec => rec.AuditAgainst(It.IsAny<ICallContext>(), "anid",
-            Audits.EndUserApplication_TenantRolesUnassigned, It.IsAny<string>(),
+            Audits.EndUsersApplication_TenantRolesUnassigned, It.IsAny<string>(),
             It.IsAny<object[]>()));
     }
 
@@ -224,6 +231,65 @@ public class EndUsersApplicationDomainEventHandlersSpec
         result.Should().BeSuccess();
         _endUserRepository.Verify(rep => rep.SaveAsync(It.Is<EndUserRoot>(eu =>
             eu.Memberships.Count == 0
+        ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenHandleSubscriptionPlanChangedAsync_ThenReconcilesMemberships()
+    {
+        _caller.Setup(c => c.CallerId)
+            .Returns(CallerConstants.MaintenanceAccountUserId);
+        _subscriptionsService.Setup(ss =>
+                ss.GetSubscriptionAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SubscriptionWithPlan
+            {
+                Invoice = new InvoiceSummary
+                {
+                    Currency = "acurrency"
+                },
+                PaymentMethod = new SubscriptionPaymentMethod(),
+                Period = new PlanPeriod(),
+                Plan = new SubscriptionPlan
+                {
+                    Id = "aplanid"
+                },
+                SubscriptionReference = "asubscriptionid",
+                BuyerId = "abuyerid",
+                OwningEntityId = "anowningentityid",
+                Id = "asubscriptionid"
+            });
+        _endUserRepository.Setup(rep => rep.SearchAllMembershipsByOrganizationAsync(It.IsAny<Identifier>(),
+                It.IsAny<SearchOptions>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<MembershipJoinInvitation>
+            {
+                new()
+                {
+                    UserId = "auserid"
+                }
+            });
+        var member = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
+        _endUserRepository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(member);
+        member.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Create(PlatformFeatures.Basic).Value,
+            EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
+        member.AddMembership(member, OrganizationOwnership.Shared, "anowningentityid".ToId(),
+            Roles.Create(TenantRoles.Owner).Value, Features.Create(TenantFeatures.Basic).Value);
+        var domainEvent = SubscriptionsDomain.Events.SubscriptionPlanChanged("asubscriptionid".ToId(),
+            "anowningentityid".ToId(), "aplanid".ToId(),
+            BillingProvider.Create("aprovidername", new SubscriptionMetadata { { "aname", "avalue" } }).Value,
+            "abuyerreference", "asubscriptionreference");
+
+        var result =
+            await _application.HandleSubscriptionPlanChangedAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _subscriptionsService.Verify(ss =>
+            ss.GetSubscriptionAsync(_caller.Object, "asubscriptionid".ToId(), It.IsAny<CancellationToken>()));
+        _endUserRepository.Verify(rep => rep.SearchAllMembershipsByOrganizationAsync("anowningentityid".ToId(),
+            It.IsAny<SearchOptions>(), It.IsAny<CancellationToken>()));
+        _endUserRepository.Verify(eur => eur.SaveAsync(It.Is<EndUserRoot>(root =>
+            root.Id == "anid".ToId()
         ), It.IsAny<CancellationToken>()));
     }
 }

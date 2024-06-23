@@ -25,12 +25,13 @@ public partial class OrganizationsApplication : IOrganizationsApplication
     private readonly IImagesService _imagesService;
     private readonly IRecorder _recorder;
     private readonly IOrganizationRepository _repository;
+    private readonly ISubscriptionsService _subscriptionService;
     private readonly ITenantSettingService _tenantSettingService;
     private readonly ITenantSettingsService _tenantSettingsService;
 
     public OrganizationsApplication(IRecorder recorder, IIdentifierFactory identifierFactory,
         ITenantSettingsService tenantSettingsService, ITenantSettingService tenantSettingService,
-        IEndUsersService endUsersService, IImagesService imagesService,
+        IEndUsersService endUsersService, IImagesService imagesService, ISubscriptionsService subscriptionService,
         IOrganizationRepository repository)
     {
         _recorder = recorder;
@@ -38,6 +39,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         _tenantSettingService = tenantSettingService;
         _endUsersService = endUsersService;
         _imagesService = imagesService;
+        _subscriptionService = subscriptionService;
         _tenantSettingsService = tenantSettingsService;
         _repository = repository;
     }
@@ -151,15 +153,25 @@ public partial class OrganizationsApplication : IOrganizationsApplication
             return retrieved.Error;
         }
 
+        var org = retrieved.Value;
+        var subscription =
+            await _subscriptionService.GetSubscriptionAsync(caller, org.BillingSubscriber.Value.SubscriptionId,
+                cancellationToken);
+        if (subscription.IsFailure)
+        {
+            return subscription.Error;
+        }
+
+        var canBillingSubscriptionBeUnsubscribed = subscription.Value.CanBeUnsubscribed;
         var deleterRoles = Roles.Create(caller.Roles.Tenant);
         if (deleterRoles.IsFailure)
         {
             return deleterRoles.Error;
         }
 
-        var org = retrieved.Value;
         var deleterId = caller.ToCallerId();
-        var deleted = org.DeleteOrganization(deleterId, deleterRoles.Value);
+        var deleted = await org.DeleteOrganizationAsync(deleterId, deleterRoles.Value,
+            canBillingSubscriptionBeUnsubscribed, OnDelete, cancellationToken);
         if (deleted.IsFailure)
         {
             return deleted.Error;
@@ -175,6 +187,14 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         _recorder.TraceInformation(caller.ToCall(), "Deleted organization: {Id}", org.Id);
 
         return Result.Ok;
+
+        Task<Result<Error>> OnDelete(Identifier deleterId1)
+        {
+            _recorder.Audit(caller.ToCall(),
+                Audits.OrganizationsApplication_OrganizationDeleted,
+                "Organization {Id} was permanently deleted by {DeleterId}", org.Id, deleterId);
+            return Task.FromResult(Result.Ok);
+        }
     }
 
     public async Task<Result<Organization, Error>> GetOrganizationAsync(ICallerContext caller, string id,
@@ -552,8 +572,6 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         {
             return configured.Error;
         }
-
-        //TODO: Get the billing details for the creator and add the billing subscription for them
 
         var saved = await _repository.SaveAsync(org, cancellationToken);
         if (saved.IsFailure)

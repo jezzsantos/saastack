@@ -63,4 +63,26 @@
     <data name="OrganizationRoot_DeleteOrganization_MembersStillExist" xml:space="preserve">
         <value>Cannot delete this organization while any others members still exist. They must be removed from the organization first</value>
     </data>
+    <data name="OrganizationRoot_NotBillingAdmin" xml:space="preserve">
+        <value>Must be an billing administrator to perform this action</value>
+    </data>
+    <data name="OrganizationRoot_CanTransferBillingSubscription_TransfereeNotBillingAdmin" xml:space="preserve">
+        <value>Must be an billing administrator to have the subscription transferred</value>
+    </data>
+    <data name="OrganizationRoot_UserNotBillingSubscriber" xml:space="preserve">
+        <value>Must be the subscriber of the billing subscription to perform this action</value>
+    </data>
+    <data name="OrganizationRoot_UninviteMember_BillingSubscriber" xml:space="preserve">
+        <value>Cannot remove the subscriber of the billing subscription from the organization</value>
+    </data>
+    <data name="OrganizationRoot_NotBillingSubscriberNorBillingAdmin" xml:space="preserve">
+        <value>Must be the owner of the billing subscription or be an billing administrator to perform this action</value>
+    </data>
+    <data name="OrganizationRoot_DeleteOrganization_BillingSubscriptionCannotBeUnsubscribed" xml:space="preserve">
+        <value>Cannot delete this organization as the billing subscription cannot be terminated in its current state</value>
+    </data>
+    <data name="OrganizationRoot_NoSubscriber" xml:space="preserve">
+        <value>This organization has no billing subscriber</value>
+    </data>
+
 </root>

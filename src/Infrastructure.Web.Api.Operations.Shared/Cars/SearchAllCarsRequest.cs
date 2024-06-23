@@ -6,5 +6,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 ///     Lists all the cars
 /// </summary>
 [Route("/cars", OperationMethod.Search, AccessType.Token)]
-[Authorize(Roles.Tenant_Member, Features.Tenant_Basic)]
+[Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
 public class SearchAllCarsRequest : TenantedSearchRequest<SearchAllCarsResponse>;

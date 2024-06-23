@@ -10,6 +10,7 @@
         <ProjectReference Include="..\Domain.Common\Domain.Common.csproj" />
         <ProjectReference Include="..\EndUsersDomain\EndUsersDomain.csproj" />
         <ProjectReference Include="..\OrganizationsApplication\OrganizationsApplication.csproj" />
+        <ProjectReference Include="..\SubscriptionsDomain\SubscriptionsDomain.csproj" />
         <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
     </ItemGroup>
 

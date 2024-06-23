@@ -60,6 +60,24 @@ namespace Infrastructure.Shared {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The {0} was not found for {1} in the state of the provider.
+        /// </summary>
+        internal static string BillingProvider_PropertyNotFound {
+            get {
+                return ResourceManager.GetString("BillingProvider_PropertyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ProviderName does not match this provider.
+        /// </summary>
+        internal static string BillingProvider_ProviderNameNotMatch {
+            get {
+                return ResourceManager.GetString("BillingProvider_ProviderNameNotMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to notify consumer: {0}, with event: {1} ({2}).
         /// </summary>
         internal static string DomainEventConsumerService_ConsumerFailed {
@@ -74,6 +92,42 @@ namespace Infrastructure.Shared {
         internal static string FlagsmithHttpServiceClient_UnknownFeature {
             get {
                 return ResourceManager.GetString("FlagsmithHttpServiceClient_UnknownFeature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For everyone. Forever..
+        /// </summary>
+        internal static string InProcessInMemBillingGatewayService_BasicPlan_Description {
+            get {
+                return ResourceManager.GetString("InProcessInMemBillingGatewayService_BasicPlan_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Free.
+        /// </summary>
+        internal static string InProcessInMemBillingGatewayService_BasicPlan_DisplayName {
+            get {
+                return ResourceManager.GetString("InProcessInMemBillingGatewayService_BasicPlan_DisplayName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All features.
+        /// </summary>
+        internal static string InProcessInMemBillingGatewayService_BasicPlan_Feature1_Description {
+            get {
+                return ResourceManager.GetString("InProcessInMemBillingGatewayService_BasicPlan_Feature1_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This plan cannot be changed, nor cancelled..
+        /// </summary>
+        internal static string InProcessInMemBillingGatewayService_BasicPlan_Notes {
+            get {
+                return ResourceManager.GetString("InProcessInMemBillingGatewayService_BasicPlan_Notes", resourceCulture);
             }
         }
     }

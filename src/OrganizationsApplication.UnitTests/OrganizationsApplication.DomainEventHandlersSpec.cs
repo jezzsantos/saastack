@@ -9,6 +9,7 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Shared;
 using Domain.Shared.EndUsers;
+using Domain.Shared.Subscriptions;
 using EndUsersDomain;
 using FluentAssertions;
 using Moq;
@@ -58,14 +59,15 @@ public class OrganizationsApplicationDomainEventHandlersSpec
         _repository.Setup(ar => ar.SaveAsync(It.IsAny<OrganizationRoot>(), It.IsAny<CancellationToken>()))
             .Returns((OrganizationRoot root, CancellationToken _) =>
                 Task.FromResult<Result<OrganizationRoot, Error>>(root));
+        var subscriptionService = new Mock<ISubscriptionsService>();
 
         _application = new OrganizationsApplication(_recorder.Object, _identifierFactory.Object,
             _tenantSettingsService.Object, _tenantSettingService.Object, endUsersService.Object, _imagesService.Object,
-            _repository.Object);
+            subscriptionService.Object, _repository.Object);
     }
 
     [Fact]
-    public async Task WhenHandleEndUserRegisteredForPersonAsync_ThenReturnsOrganization()
+    public async Task WhenHandleEndUserRegisteredForPersonAsync_ThenCreatesOrganization()
     {
         var domainEvent = Events.Registered("auserid".ToId(), EndUserProfile.Create("afirstname", "alastname").Value,
             EmailAddress.Create("auser@company.com").Value, UserClassification.Person, UserAccess.Enabled,
@@ -75,20 +77,20 @@ public class OrganizationsApplicationDomainEventHandlersSpec
             await _application.HandleEndUserRegisteredAsync(_caller.Object, domainEvent, CancellationToken.None);
 
         result.Should().BeSuccess();
-        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(org =>
-            org.Name == "afirstname alastname"
-            && org.Ownership == OrganizationOwnership.Personal
-            && org.CreatedById == "auserid"
-            && org.Settings.Properties.Count == 1
-            && org.Settings.Properties["aname"].Value.As<string>() == "avalue"
-            && org.Settings.Properties["aname"].IsEncrypted == false
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(root =>
+            root.Name == "afirstname alastname"
+            && root.Ownership == OrganizationOwnership.Personal
+            && root.CreatedById == "auserid"
+            && root.Settings.Properties.Count == 1
+            && root.Settings.Properties["aname"].Value.As<string>() == "avalue"
+            && root.Settings.Properties["aname"].IsEncrypted == false
         ), It.IsAny<CancellationToken>()));
         _tenantSettingsService.Verify(tss =>
             tss.CreateForTenantAsync(_caller.Object, "anid", It.IsAny<CancellationToken>()));
     }
 
     [Fact]
-    public async Task WhenHandleEndUserRegisteredForMachineAsync_ThenReturnsOrganization()
+    public async Task WhenHandleEndUserRegisteredForMachineAsync_ThenCreatesOrganization()
     {
         var domainEvent = Events.Registered("auserid".ToId(), EndUserProfile.Create("amachinename").Value,
             EmailAddress.Create("auser@company.com").Value, UserClassification.Machine, UserAccess.Enabled,
@@ -98,13 +100,13 @@ public class OrganizationsApplicationDomainEventHandlersSpec
             await _application.HandleEndUserRegisteredAsync(_caller.Object, domainEvent, CancellationToken.None);
 
         result.Should().BeSuccess();
-        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(org =>
-            org.Name == "amachinename"
-            && org.Ownership == OrganizationOwnership.Personal
-            && org.CreatedById == "auserid"
-            && org.Settings.Properties.Count == 1
-            && org.Settings.Properties["aname"].Value.As<string>() == "avalue"
-            && org.Settings.Properties["aname"].IsEncrypted == false
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(root =>
+            root.Name == "amachinename"
+            && root.Ownership == OrganizationOwnership.Personal
+            && root.CreatedById == "auserid"
+            && root.Settings.Properties.Count == 1
+            && root.Settings.Properties["aname"].Value.As<string>() == "avalue"
+            && root.Settings.Properties["aname"].IsEncrypted == false
         ), It.IsAny<CancellationToken>()));
         _tenantSettingsService.Verify(tss =>
             tss.CreateForTenantAsync(_caller.Object, "anid", It.IsAny<CancellationToken>()));
@@ -173,5 +175,50 @@ public class OrganizationsApplicationDomainEventHandlersSpec
         _imagesService.Verify(
             img => img.DeleteImageAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
             Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenHandleSubscriptionCreatedAsyncAsync_ThenTransfersBillingSubscriber()
+    {
+        var domainEvent = SubscriptionsDomain.Events.Created("asubscriptionid".ToId(),
+            "anowningentityid".ToId(), "abuyerid".ToId(), "aprovidername".ToId());
+        var org = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Shared, "anownerid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+
+        var result =
+            await _application.HandleSubscriptionCreatedAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(root =>
+            root.BillingSubscriber.Value.SubscriberId == "abuyerid"
+            && root.BillingSubscriber.Value.SubscriptionId == "asubscriptionid"
+        ), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenHandleSubscriptionTransferredAsync_ThenTransfersBillingSubscriber()
+    {
+        var domainEvent = SubscriptionsDomain.Events.SubscriptionTransferred("asubscriptionid".ToId(),
+            "anowningentityid".ToId(), "atransfererid".ToId(), "atransfereeid".ToId(), "aplanid",
+            BillingProvider.Create("aprovidername", new SubscriptionMetadata { { "aname", "avalue" } }).Value,
+            "abuyerreference", "asubscriptionreference");
+        var org = OrganizationRoot.Create(_recorder.Object, _identifierFactory.Object, _tenantSettingService.Object,
+            OrganizationOwnership.Shared, "anownerid".ToId(), UserClassification.Person,
+            DisplayName.Create("aname").Value).Value;
+        org.SubscribeBilling("asubscriptionid".ToId(), "atransfererid".ToId());
+        _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(org);
+
+        var result =
+            await _application.HandleSubscriptionTransferredAsync(_caller.Object, domainEvent, CancellationToken.None);
+
+        result.Should().BeSuccess();
+        _repository.Verify(rep => rep.SaveAsync(It.Is<OrganizationRoot>(root =>
+            root.BillingSubscriber.Value.SubscriberId == "atransfereeid"
+            && root.BillingSubscriber.Value.SubscriptionId == "asubscriptionid"
+        ), It.IsAny<CancellationToken>()));
     }
 }

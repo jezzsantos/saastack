@@ -14,7 +14,7 @@ public interface ITenantedRequest
 
 /// <summary>
 ///     Defines a request for a specific tenant, for Organization requests that are untenanted
-///     Only to be used by the Organizations subdomain
+///     Only to be used by the Organizations/Subscriptions subdomain
 /// </summary>
 public interface IUnTenantedOrganizationRequest
 {

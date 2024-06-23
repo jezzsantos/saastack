@@ -28,6 +28,15 @@ public static class Events
         };
     }
 
+    public static BillingSubscribed BillingSubscribed(Identifier id, Identifier subscriptionId, Identifier subscriberId)
+    {
+        return new BillingSubscribed(id)
+        {
+            SubscriptionId = subscriptionId,
+            SubscriberId = subscriberId
+        };
+    }
+
     public static Created Created(Identifier id, OrganizationOwnership ownership, Identifier createdBy,
         DisplayName name)
     {
@@ -44,13 +53,13 @@ public static class Events
         return new Deleted(id, deletedById);
     }
 
-    public static MemberInvited MemberInvited(Identifier id, Identifier invitedById, Optional<Identifier> userId,
+    public static MemberInvited MemberInvited(Identifier id, Identifier invitedById, Optional<Identifier> invitedId,
         Optional<EmailAddress> userEmailAddress)
     {
         return new MemberInvited(id)
         {
             InvitedById = invitedById,
-            UserId = userId.ValueOrDefault!,
+            InvitedId = invitedId.ValueOrDefault!,
             EmailAddress = userEmailAddress.ValueOrDefault?.Address
         };
     }
@@ -71,12 +80,12 @@ public static class Events
         };
     }
 
-    public static MemberUnInvited MemberUnInvited(Identifier id, Identifier unInvitedById, Identifier userId)
+    public static MemberUnInvited MemberUnInvited(Identifier id, Identifier uninvitedById, Identifier uninvitedId)
     {
         return new MemberUnInvited(id)
         {
-            UninvitedById = unInvitedById,
-            UserId = userId
+            UninvitedById = uninvitedById,
+            UninvitedId = uninvitedId
         };
     }
 
@@ -131,6 +140,16 @@ public static class Events
             To = to,
             ToType = toType,
             IsEncrypted = isEncrypted
+        };
+    }
+
+    public static BillingSubscriberChanged BillingSubscriberChanged(Identifier id, Identifier transfererId,
+        Identifier transfereeId)
+    {
+        return new BillingSubscriberChanged(id)
+        {
+            FromSubscriberId = transfererId,
+            ToSubscriberId = transfereeId
         };
     }
 }

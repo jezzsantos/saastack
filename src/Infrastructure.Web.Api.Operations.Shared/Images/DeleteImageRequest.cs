@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Images;
 ///     Deletes the image
 /// </summary>
 [Route("/images/{Id}", OperationMethod.Delete, AccessType.Token)]
-[Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
+[Authorize(Roles.Platform_Standard, Features.Platform_PaidTrial)]
 public class DeleteImageRequest : UnTenantedDeleteRequest
 {
     [Required] public string? Id { get; set; }

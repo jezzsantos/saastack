@@ -21,6 +21,31 @@ public static class Optional
     }
 
     /// <summary>
+    ///     Converts the specified <see cref="value" /> to an <see cref="Optional{TOut}" />
+    ///     using the optional <see cref="converter" /> to convert the value (if any)
+    /// </summary>
+    public static Optional<TOut> FromValueOrNone<TIn, TOut>(this TIn? value, Func<TIn, TOut>? converter = null)
+    {
+        if (value is null)
+        {
+            return Optional<TOut>.None;
+        }
+
+        if (converter is null)
+        {
+            var changed = Convert.ChangeType(value, typeof(TOut));
+            if (changed.NotExists())
+            {
+                return Optional<TOut>.None;
+            }
+
+            return ((TOut)changed).ToOptional();
+        }
+
+        return converter(value).ToOptional();
+    }
+
+    /// <summary>
     ///     Whether the <see cref="value" /> is of type <see cref="Optional{T}" />, and if so returns the contained value
     /// </summary>
     public static bool IsOptional(this object? value, out object? contained)
@@ -185,18 +210,23 @@ public readonly struct Optional<TValue> : IEquatable<Optional<TValue>>
     public Optional(TValue? value)
     {
         ValueOrDefault = value;
+        ValueOrNull = value is null
+            ? null
+            : value;
         HasValue = value is not null;
     }
 
     public Optional(Optional<TValue> value)
     {
         ValueOrDefault = value.ValueOrDefault;
+        ValueOrNull = value;
         HasValue = value.HasValue;
     }
 
     public Optional(Optional<Optional<TValue>> value)
     {
         ValueOrDefault = value.ValueOrDefault.ValueOrDefault;
+        ValueOrNull = value.ValueOrNull;
         HasValue = value.ValueOrDefault.HasValue;
     }
 
@@ -226,6 +256,21 @@ public readonly struct Optional<TValue> : IEquatable<Optional<TValue>>
     ///     Returns the contained value
     /// </summary>
     public TValue? ValueOrDefault { get; }
+
+    /// <summary>
+    ///     Returns either the contained value, or null
+    /// </summary>
+    public object? ValueOrNull { get; }
+
+    /// <summary>
+    ///     Returns either the contained value, or null
+    /// </summary>
+    public object? ToValueOrNull(Func<TValue, object?> converter)
+    {
+        return HasValue
+            ? converter(Value)
+            : ValueOrNull;
+    }
 
     /// <summary>
     ///     Tries to obtain the value

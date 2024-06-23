@@ -141,6 +141,32 @@ public class EndUserProjection : IReadModelProjection
                     dto.Features = features.Value;
                 }, cancellationToken);
 
+            case MembershipFeatureUnassigned e:
+                return await _memberships.HandleUpdateAsync(e.RootId, dto =>
+                {
+                    var features = dto.Features.HasValue
+                        ? dto.Features.Value.Remove(e.Feature)
+                        : new Result<Features, Error>(Features.Empty);
+                    if (features.IsFailure)
+                    {
+                        return;
+                    }
+
+                    dto.Features = features.Value;
+                }, cancellationToken);
+
+            case MembershipFeaturesReset e:
+                return await _memberships.HandleUpdateAsync(e.RootId, dto =>
+                {
+                    var features = Features.Create(e.Features.ToArray());
+                    if (features.IsFailure)
+                    {
+                        return;
+                    }
+
+                    dto.Features = features.Value;
+                }, cancellationToken);
+
             case PlatformRoleAssigned e:
                 return await _users.HandleUpdateAsync(e.RootId, dto =>
                 {
@@ -175,6 +201,32 @@ public class EndUserProjection : IReadModelProjection
                     var features = dto.Features.HasValue
                         ? dto.Features.Value.Add(e.Feature)
                         : Features.Create(e.Feature);
+                    if (features.IsFailure)
+                    {
+                        return;
+                    }
+
+                    dto.Features = features.Value;
+                }, cancellationToken);
+
+            case PlatformFeatureUnassigned e:
+                return await _users.HandleUpdateAsync(e.RootId, dto =>
+                {
+                    var features = dto.Features.HasValue
+                        ? dto.Features.Value.Remove(e.Feature)
+                        : new Result<Features, Error>(Features.Empty);
+                    if (features.IsFailure)
+                    {
+                        return;
+                    }
+
+                    dto.Features = features.Value;
+                }, cancellationToken);
+
+            case PlatformFeaturesReset e:
+                return await _users.HandleUpdateAsync(e.RootId, dto =>
+                {
+                    var features = Features.Create(e.Features.ToArray());
                     if (features.IsFailure)
                     {
                         return;

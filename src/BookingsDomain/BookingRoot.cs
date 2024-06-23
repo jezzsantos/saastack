@@ -1,4 +1,6 @@
-﻿using Common;
+﻿#region
+
+using Common;
 using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Extensions;
@@ -10,6 +12,8 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
 using QueryAny;
+
+#endregion
 
 namespace BookingsDomain;
 
@@ -41,7 +45,7 @@ public sealed class BookingRoot : AggregateRootBase
 
     public Optional<Identifier> BorrowerId { get; private set; }
 
-    private bool CanBeCancelled => Start.HasValue && Start.Value > DateTime.UtcNow;
+    private bool CanBeCanceled => Start.HasValue && Start.Value > DateTime.UtcNow;
 
     public Optional<Identifier> CarId { get; private set; }
 
@@ -147,7 +151,7 @@ public sealed class BookingRoot : AggregateRootBase
 
     public Result<Error> Cancel()
     {
-        if (!CanBeCancelled)
+        if (!CanBeCanceled)
         {
             return Error.RuleViolation(Resources.BookingRoot_BookingAlreadyStarted);
         }

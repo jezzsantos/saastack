@@ -147,6 +147,67 @@ public class OptionalSpec
 
         result.Should().BeSome("avalue");
     }
+
+    [Fact]
+    public void WhenFromValueOrNoneAndInputIsNullReferenceTypeAndNoConverter_ThenReturnsNone()
+    {
+        var result = ((string?)null).FromValueOrNone<string, string>();
+
+        result.Should().BeNone();
+    }
+
+    [Fact]
+    public void WhenFromValueOrNoneAndInputHasValueReferenceTypeAndNoConverter_ThenReturnsSome()
+    {
+        var result = "avalue".FromValueOrNone<string, string>();
+
+        result.Should().BeSome("avalue");
+    }
+
+    [Fact]
+    public void WhenFromValueOrNoneAndInputIsNullReferenceTypeAndConverter_ThenReturnsNone()
+    {
+        var result = ((string?)null).FromValueOrNone<string, string>(_ => "anewvalue");
+
+        result.Should().BeNone();
+    }
+
+    [Fact]
+    public void WhenFromValueOrNoneAndInputHasValueReferenceTypeAndConverter_ThenReturnsConvertedSome()
+    {
+        var result = "avalue".FromValueOrNone<string, string>(_ => "anewvalue");
+
+        result.Should().BeSome("anewvalue");
+    }
+
+    [Fact]
+    public void WhenFromValueOrNoneAndInputIsNullValueTypeAndNoConverter_ThenReturnsNone()
+    {
+        var result = ((DateTime?)null).FromValueOrNone<DateTime?, DateTime>();
+
+        result.Should().BeNone();
+    }
+
+    [Fact]
+    public void WhenFromValueOrNoneAndInputHasValueValueTypeAndNoConverter_ThenReturnsSome()
+    {
+        var date = DateTime.UtcNow;
+
+        var result = date.FromValueOrNone<DateTime, DateTime>();
+
+        result.Should().BeSome(date);
+    }
+
+    [Fact]
+    public void WhenFromValueOrNoneAndInputHasValueValueTypeAndConverter_ThenReturnsConvertedSome()
+    {
+        var date = DateTime.UtcNow;
+        var newDate = DateTime.UtcNow;
+
+        var result = date.FromValueOrNone(_ => newDate);
+
+        result.Should().BeSome(newDate);
+    }
 }
 
 [Trait("Category", "Unit")]
@@ -662,6 +723,75 @@ public class OptionalOfTSpec
         var result = (DateTime)new Optional<DateTime>(datum);
 
         result.Should().Be(datum);
+    }
+
+    [Fact]
+    public void WhenValueOrNullAndNoneReferenceType_ThenReturnsNull()
+    {
+        var result = Optional<string>.None.ValueOrNull;
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenValueOrNullAndSomeReferenceType_ThenReturnsValue()
+    {
+        var result = Optional.Some("avalue").ValueOrNull;
+
+        result.Should().Be("avalue");
+    }
+
+    [Fact]
+    public void WhenValueOrNullAndNoneValueType_ThenReturnsNull()
+    {
+        var result = Optional<DateTime>.None.ValueOrNull;
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenValueOrNullAndSomeValueType_ThenReturnsValue()
+    {
+        var date = DateTime.UtcNow;
+
+        var result = Optional.Some(date).ValueOrNull;
+
+        result.Should().Be(date);
+    }
+
+    [Fact]
+    public void WhenToValueOrNullAndNoneReferenceType_ThenReturnsNull()
+    {
+        var result = Optional<string>.None.ToValueOrNull(_ => "anewvalue");
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenToValueOrNullAndSomeReferenceType_ThenReturnsValue()
+    {
+        var result = Optional.Some("avalue").ToValueOrNull(_ => "anewvalue");
+
+        result.Should().Be("anewvalue");
+    }
+
+    [Fact]
+    public void WhenToValueOrNullAndNoneValueType_ThenReturnsNull()
+    {
+        var result = Optional<DateTime>.None.ToValueOrNull(_ => DateTime.UtcNow);
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenToValueOrNullAndSomeValueType_ThenReturnsValue()
+    {
+        var date = DateTime.UtcNow;
+        var newDate = DateTime.UtcNow.AddDays(1);
+
+        var result = Optional.Some(date).ToValueOrNull(_ => newDate);
+
+        result.Should().Be(newDate);
     }
 }
 

@@ -42,16 +42,16 @@
     <data name="EndUsersApplication_User_Registered_TermsAccepted" xml:space="preserve">
         <value>EndUser.Registered.TermsAccepted</value>
     </data>
-    <data name="EndUserApplication_TenantRolesAssigned" xml:space="preserve">
+    <data name="EndUsersApplication_TenantRolesAssigned" xml:space="preserve">
         <value>EndUser.TenantRolesAssigned</value>
     </data>
-    <data name="EndUserApplication_TenantRolesUnassigned" xml:space="preserve">
+    <data name="EndUsersApplication_TenantRolesUnassigned" xml:space="preserve">
         <value>EndUser.TenantRolesUnassigned</value>
     </data>
-    <data name="EndUserApplication_PlatformRolesAssigned" xml:space="preserve">
+    <data name="EndUsersApplication_PlatformRolesAssigned" xml:space="preserve">
         <value>EndUser.PlatformRolesAssigned</value>
     </data>
-    <data name="EndUserApplication_PlatformRolesUnassigned" xml:space="preserve">
+    <data name="EndUsersApplication_PlatformRolesUnassigned" xml:space="preserve">
         <value>EndUser.PlatformRolesUnassigned</value>
     </data>
     <data name="SingleSignOnApplication_Authenticate_AccountOnboarded" xml:space="preserve">
@@ -66,16 +66,22 @@
     <data name="CSRFMiddleware_CSRFProtection_Failed" xml:space="preserve">
         <value>CSRFProtection.Failed</value>
     </data>
-    <data name="EndUserApplication_PlatformFeatureAssigned" xml:space="preserve">
-        <value>EndUser.PlatformFeatureAssigned</value>
+    <data name="EndUsersApplication_PlatformFeaturesAssigned" xml:space="preserve">
+        <value>EndUser.PlatformFeaturesAssigned</value>
     </data>
-    <data name="EndUserApplication_PlatformFeatureUnassigned" xml:space="preserve">
-        <value>EndUser.PlatformFeatureUnassigned</value>
+    <data name="EndUsersApplication_PlatformFeaturesUnassigned" xml:space="preserve">
+        <value>EndUser.PlatformFeaturesUnassigned</value>
     </data>
-    <data name="EndUserApplication_TenantFeatureAssigned" xml:space="preserve">
-        <value>EndUser.TenantFeatureAssigned</value>
+    <data name="EndUsersApplication_TenantFeaturesAssigned" xml:space="preserve">
+        <value>EndUser.TenantFeaturesAssigned</value>
     </data>
-    <data name="EndUserApplication_TenantFeatureUnassigned" xml:space="preserve">
-        <value>EndUser.TenantFeatureUnassigned</value>
+    <data name="EndUsersApplication_TenantFeaturesUnassigned" xml:space="preserve">
+        <value>EndUser.TenantFeaturesUnassigned</value>
+    </data>
+    <data name="SubscriptionsApplication_BuyerTransferred" xml:space="preserve">
+        <value>Subscription.BuyerTransferred</value>
+    </data>
+    <data name="OrganizationsApplication_OrganizationDeleted" xml:space="preserve">
+        <value>Organization.Deleted</value>
     </data>
 </root>

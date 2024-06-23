@@ -36,23 +36,23 @@
     <data name="EndUserRoot_MissingMembership" xml:space="preserve">
         <value>The membership does not exist</value>
     </data>
-    <data name="EndUserRoot_NotAssignableTenantRole" xml:space="preserve">
+    <data name="EndUserRoot_UnassignableTenantRole" xml:space="preserve">
         <value>The role '{0}' is not a supported tenant role</value>
     </data>
-    <data name="EndUserRoot_NotAssignablePlatformRole" xml:space="preserve">
+    <data name="EndUserRoot_UnassignablePlatformRole" xml:space="preserve">
         <value>The role '{0}' is not a supported platform role</value>
-    </data>
-    <data name="EndUserRoot_NotAssignablePlatformFeature" xml:space="preserve">
-        <value>The feature '{0}' is not a supported platform feature</value>
     </data>
     <data name="EndUserRoot_UnassignableTenantFeature" xml:space="preserve">
         <value>The feature '{0}' is not a supported tenant feature</value>
     </data>
+    <data name="EndUserRoot_UnassignablePlatformFeature" xml:space="preserve">
+        <value>The feature '{0}' is not a supported platform feature</value>
+    </data>
     <data name="EndUserRoot_CannotUnassignBaselinePlatformRole" xml:space="preserve">
         <value>The platform role '{0}' must always exist</value>
     </data>
-    <data name="EndUserRoot_CannotUnassignUnassignedRole" xml:space="preserve">
-        <value>The platform role '{0}' cannot be removed, since it does not exist for this user</value>
+    <data name="EndUserRoot_CannotUnassignBaselinePlatformFeature" xml:space="preserve">
+        <value>The platform feature '{0}' must always exist</value>
     </data>
     <data name="Memberships_NoDefault" xml:space="preserve">
         <value>At least one of the memberships must be the default membership</value>
@@ -119,5 +119,8 @@
     </data>
     <data name="Memberships_MissingNextDefaultMembership" xml:space="preserve">
         <value>There are no more remaining memberships for this user</value>
+    </data>
+    <data name="EndUserRoot_NotServiceAccount" xml:space="preserve">
+        <value>Only the service account can perform this action</value>
     </data>
 </root>

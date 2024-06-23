@@ -54,6 +54,7 @@ public class EndUsersModule : ISubdomainModule
                         c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
                         c.GetRequiredService<IUserNotificationsService>(),
                         c.GetRequiredService<IUserProfilesService>(),
+                        c.GetRequiredService<ISubscriptionsService>(),
                         c.GetRequiredService<IInvitationRepository>(),
                         c.GetRequiredService<IEndUserRepository>()));
                 services.AddPerHttpRequest<IInvitationsApplication>(c =>
@@ -79,6 +80,11 @@ public class EndUsersModule : ISubdomainModule
                             c.GetRequiredService<ICallerContextFactory>(),
                             c.GetRequiredService<IEndUsersApplication>(),
                             c.GetRequiredService<IInvitationsApplication>()));
+                services
+                    .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
+                        new SubscriptionNotificationConsumer(
+                            c.GetRequiredService<ICallerContextFactory>(),
+                            c.GetRequiredService<IEndUsersApplication>()));
                 services.RegisterEventing<EndUserRoot, EndUserProjection, EndUserNotifier>(
                     c => new EndUserProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),

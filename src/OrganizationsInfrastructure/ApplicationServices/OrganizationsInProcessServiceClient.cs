@@ -7,7 +7,7 @@ using OrganizationsApplication;
 
 namespace OrganizationsInfrastructure.ApplicationServices;
 
-public class OrganizationsInProcessServiceClient : IOrganizationsService
+public class OrganizationsInProcessServiceClient : IOrganizationsService, ISubscriptionOwningEntityService
 {
     private readonly Func<IOrganizationsApplication> _organizationsApplicationFactory;
     private IOrganizationsApplication? _application;
@@ -34,6 +34,38 @@ public class OrganizationsInProcessServiceClient : IOrganizationsService
         CancellationToken cancellationToken)
     {
         return await GetApplication().GetSettingsAsync(caller, id, cancellationToken);
+    }
+
+    public async Task<Result<Permission, Error>> CanCancelSubscriptionAsync(ICallerContext caller, string id,
+        string cancellerId,
+        CancellationToken cancellationToken)
+    {
+        return await GetApplication().CanCancelSubscriptionAsync(caller, id, cancellerId, cancellationToken);
+    }
+
+    public async Task<Result<Permission, Error>> CanChangeSubscriptionPlanAsync(ICallerContext caller, string id,
+        string modifierId, CancellationToken cancellationToken)
+    {
+        return await GetApplication().CanChangeSubscriptionPlanAsync(caller, id, modifierId, cancellationToken);
+    }
+
+    public async Task<Result<Permission, Error>> CanTransferSubscriptionAsync(ICallerContext caller, string id,
+        string transfererId, string transfereeId, CancellationToken cancellationToken)
+    {
+        return await GetApplication()
+            .CanTransferSubscriptionAsync(caller, id, transfererId, transfereeId, cancellationToken);
+    }
+
+    public async Task<Result<Permission, Error>> CanUnsubscribeAsync(ICallerContext caller, string id,
+        string unsubscriberId, CancellationToken cancellationToken)
+    {
+        return await GetApplication().CanUnsubscribeAsync(caller, id, unsubscriberId, cancellationToken);
+    }
+
+    public async Task<Result<Permission, Error>> CanViewSubscriptionAsync(ICallerContext caller, string id,
+        string viewerId, CancellationToken cancellationToken)
+    {
+        return await GetApplication().CanViewSubscriptionAsync(caller, id, viewerId, cancellationToken);
     }
 
     private IOrganizationsApplication GetApplication()

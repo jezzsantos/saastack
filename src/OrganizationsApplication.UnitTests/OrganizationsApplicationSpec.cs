@@ -33,6 +33,7 @@ public class OrganizationsApplicationSpec
     private readonly Mock<IOrganizationRepository> _repository;
     private readonly Mock<ITenantSettingService> _tenantSettingService;
     private readonly Mock<ITenantSettingsService> _tenantSettingsService;
+    private readonly Mock<ISubscriptionsService> _subscriptionsService;
 
     public OrganizationsApplicationSpec()
     {
@@ -55,13 +56,14 @@ public class OrganizationsApplicationSpec
             .Returns((string value) => value);
         _endUsersService = new Mock<IEndUsersService>();
         _imagesService = new Mock<IImagesService>();
+        _subscriptionsService = new Mock<ISubscriptionsService>();
         _repository = new Mock<IOrganizationRepository>();
         _repository.Setup(ar => ar.SaveAsync(It.IsAny<OrganizationRoot>(), It.IsAny<CancellationToken>()))
             .Returns((OrganizationRoot root, CancellationToken _) =>
                 Task.FromResult<Result<OrganizationRoot, Error>>(root));
 
         _application = new OrganizationsApplication(_recorder.Object, _idFactory.Object, _tenantSettingsService.Object,
-            _tenantSettingService.Object, _endUsersService.Object, _imagesService.Object,
+            _tenantSettingService.Object, _endUsersService.Object, _imagesService.Object, _subscriptionsService.Object,
             _repository.Object);
     }
 
@@ -776,11 +778,34 @@ public class OrganizationsApplicationSpec
     {
         _caller.Setup(cc => cc.Roles)
             .Returns(new ICallerContext.CallerRoles([], new[] { TenantRoles.Owner }));
+        _caller.Setup(cc => cc.CallerId)
+            .Returns("acallerid");
         var org = OrganizationRoot.Create(_recorder.Object, _idFactory.Object, _tenantSettingService.Object,
             OrganizationOwnership.Personal, "auserid".ToId(), UserClassification.Person,
             DisplayName.Create("aname").Value).Value;
+        org.SubscribeBilling("asubscriptionid".ToId(), "acallerid".ToId());
         _repository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(org);
+        _subscriptionsService.Setup(ss =>
+                ss.GetSubscriptionAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SubscriptionWithPlan
+            {
+                Id = "asubscriptionid",
+                Invoice = new InvoiceSummary
+                {
+                    Currency = "acurrency"
+                },
+                PaymentMethod = new SubscriptionPaymentMethod(),
+                Period = new PlanPeriod(),
+                Plan = new SubscriptionPlan
+                {
+                    Id = "aplanid"
+                },
+                SubscriptionReference = "asubscriptionid",
+                BuyerId = "abuyerid",
+                OwningEntityId = "anowningentityid",
+                CanBeUnsubscribed = true
+            });
 
         var result =
             await _application.DeleteOrganizationAsync(_caller.Object, "anorganizationid", CancellationToken.None);

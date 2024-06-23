@@ -69,6 +69,42 @@ namespace Domain.Shared {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Amount is invalid.
+        /// </summary>
+        internal static string BillingInvoice_InvalidAmount {
+            get {
+                return ResourceManager.GetString("BillingInvoice_InvalidAmount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The frequency must be positive.
+        /// </summary>
+        internal static string BillingPeriod_InvalidFrequency {
+            get {
+                return ResourceManager.GetString("BillingPeriod_InvalidFrequency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to State of the provider is empty or invalid.
+        /// </summary>
+        internal static string BillingProvider_InvalidMetadata {
+            get {
+                return ResourceManager.GetString("BillingProvider_InvalidMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name of the provider is not invalid.
+        /// </summary>
+        internal static string BillingProvider_InvalidName {
+            get {
+                return ResourceManager.GetString("BillingProvider_InvalidName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Mr or Mrs.
         /// </summary>
         internal static string EmailAddress_FallbackGuessedFirstName {
@@ -101,6 +137,24 @@ namespace Domain.Shared {
         internal static string PhoneNumber_InvalidPhoneNumber {
             get {
                 return ResourceManager.GetString("PhoneNumber_InvalidPhoneNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PlanId is empty.
+        /// </summary>
+        internal static string ProviderPlan_InvalidPlanId {
+            get {
+                return ResourceManager.GetString("ProviderPlan_InvalidPlanId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SubscriptionId is empty.
+        /// </summary>
+        internal static string ProviderSubscription_InvalidSubscriptionId {
+            get {
+                return ResourceManager.GetString("ProviderSubscription_InvalidSubscriptionId", resourceCulture);
             }
         }
         

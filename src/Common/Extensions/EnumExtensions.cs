@@ -1,3 +1,6 @@
+using System.Reflection;
+using System.Runtime.Serialization;
+
 namespace Common.Extensions;
 
 public static class EnumExtensions
@@ -56,5 +59,29 @@ public static class EnumExtensions
         }
 
         return defaultValue;
+    }
+
+    /// <summary>
+    ///     Converts the value to its string representation, or
+    ///     to teh value of the <see cref="EnumMemberAttribute" /> if it exists
+    /// </summary>
+    public static string ToString<TEnum>(this TEnum value, bool useEnumMember = false)
+        where TEnum : Enum
+    {
+        if (useEnumMember)
+        {
+            var enumType = typeof(TEnum);
+            var member = enumType.GetMember(value.ToString());
+            if (member.Length > 0)
+            {
+                var attribute = member[0].GetCustomAttribute<EnumMemberAttribute>(false);
+                if (attribute.Exists())
+                {
+                    return attribute.Value ?? value.ToString();
+                }
+            }
+        }
+
+        return value.ToString();
     }
 }

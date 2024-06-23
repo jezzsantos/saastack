@@ -69,74 +69,74 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to EndUser.PlatformFeatureAssigned.
+        ///   Looks up a localized string similar to EndUser.PlatformFeaturesAssigned.
         /// </summary>
-        public static string EndUserApplication_PlatformFeatureAssigned {
+        public static string EndUsersApplication_PlatformFeaturesAssigned {
             get {
-                return ResourceManager.GetString("EndUserApplication_PlatformFeatureAssigned", resourceCulture);
+                return ResourceManager.GetString("EndUsersApplication_PlatformFeaturesAssigned", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to EndUser.PlatformFeatureUnassigned.
+        ///   Looks up a localized string similar to EndUser.PlatformFeaturesUnassigned.
         /// </summary>
-        public static string EndUserApplication_PlatformFeatureUnassigned {
+        public static string EndUsersApplication_PlatformFeaturesUnassigned {
             get {
-                return ResourceManager.GetString("EndUserApplication_PlatformFeatureUnassigned", resourceCulture);
+                return ResourceManager.GetString("EndUsersApplication_PlatformFeaturesUnassigned", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to EndUser.PlatformRolesAssigned.
         /// </summary>
-        public static string EndUserApplication_PlatformRolesAssigned {
+        public static string EndUsersApplication_PlatformRolesAssigned {
             get {
-                return ResourceManager.GetString("EndUserApplication_PlatformRolesAssigned", resourceCulture);
+                return ResourceManager.GetString("EndUsersApplication_PlatformRolesAssigned", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to EndUser.PlatformRolesUnassigned.
         /// </summary>
-        public static string EndUserApplication_PlatformRolesUnassigned {
+        public static string EndUsersApplication_PlatformRolesUnassigned {
             get {
-                return ResourceManager.GetString("EndUserApplication_PlatformRolesUnassigned", resourceCulture);
+                return ResourceManager.GetString("EndUsersApplication_PlatformRolesUnassigned", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to EndUser.TenantFeatureAssigned.
+        ///   Looks up a localized string similar to EndUser.TenantFeaturesAssigned.
         /// </summary>
-        public static string EndUserApplication_TenantFeatureAssigned {
+        public static string EndUsersApplication_TenantFeaturesAssigned {
             get {
-                return ResourceManager.GetString("EndUserApplication_TenantFeatureAssigned", resourceCulture);
+                return ResourceManager.GetString("EndUsersApplication_TenantFeaturesAssigned", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to EndUser.TenantFeatureUnassigned.
+        ///   Looks up a localized string similar to EndUser.TenantFeaturesUnassigned.
         /// </summary>
-        public static string EndUserApplication_TenantFeatureUnassigned {
+        public static string EndUsersApplication_TenantFeaturesUnassigned {
             get {
-                return ResourceManager.GetString("EndUserApplication_TenantFeatureUnassigned", resourceCulture);
+                return ResourceManager.GetString("EndUsersApplication_TenantFeaturesUnassigned", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to EndUser.TenantRolesAssigned.
         /// </summary>
-        public static string EndUserApplication_TenantRolesAssigned {
+        public static string EndUsersApplication_TenantRolesAssigned {
             get {
-                return ResourceManager.GetString("EndUserApplication_TenantRolesAssigned", resourceCulture);
+                return ResourceManager.GetString("EndUsersApplication_TenantRolesAssigned", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to EndUser.TenantRolesUnassigned.
         /// </summary>
-        public static string EndUserApplication_TenantRolesUnassigned {
+        public static string EndUsersApplication_TenantRolesUnassigned {
             get {
-                return ResourceManager.GetString("EndUserApplication_TenantRolesUnassigned", resourceCulture);
+                return ResourceManager.GetString("EndUsersApplication_TenantRolesUnassigned", resourceCulture);
             }
         }
         
@@ -146,6 +146,15 @@ namespace Application.Interfaces {
         public static string EndUsersApplication_User_Registered_TermsAccepted {
             get {
                 return ResourceManager.GetString("EndUsersApplication_User_Registered_TermsAccepted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Organization.Deleted.
+        /// </summary>
+        public static string OrganizationsApplication_OrganizationDeleted {
+            get {
+                return ResourceManager.GetString("OrganizationsApplication_OrganizationDeleted", resourceCulture);
             }
         }
         
@@ -218,6 +227,15 @@ namespace Application.Interfaces {
         public static string SingleSignOnApplication_Authenticate_Succeeded {
             get {
                 return ResourceManager.GetString("SingleSignOnApplication_Authenticate_Succeeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subscription.BuyerTransferred.
+        /// </summary>
+        public static string SubscriptionsApplication_BuyerTransferred {
+            get {
+                return ResourceManager.GetString("SubscriptionsApplication_BuyerTransferred", resourceCulture);
             }
         }
     }

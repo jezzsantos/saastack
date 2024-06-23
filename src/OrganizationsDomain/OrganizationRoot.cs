@@ -12,8 +12,11 @@ using Domain.Interfaces.ValueObjects;
 using Domain.Shared;
 using Domain.Shared.EndUsers;
 using Domain.Shared.Organizations;
+using Domain.Shared.Subscriptions;
 
 namespace OrganizationsDomain;
+
+public delegate Task<Result<Error>> DeleteAction(Identifier deleterId);
 
 public sealed class OrganizationRoot : AggregateRootBase
 {
@@ -50,6 +53,8 @@ public sealed class OrganizationRoot : AggregateRootBase
     }
 
     public Optional<Avatar> Avatar { get; private set; }
+
+    public Optional<BillingSubscriber> BillingSubscriber { get; private set; }
 
     public Identifier CreatedById { get; private set; } = Identifier.Empty();
 
@@ -161,13 +166,13 @@ public sealed class OrganizationRoot : AggregateRootBase
                 Recorder.TraceDebug(null, "Organization {Id} invited member {User}", Id,
                     (invited.EmailAddress.HasValue()
                         ? invited.EmailAddress
-                        : invited.UserId)!);
+                        : invited.InvitedId)!);
                 return Result.Ok;
             }
 
             case MemberUnInvited unInvited:
             {
-                Recorder.TraceDebug(null, "Organization {Id} uninvited member {User}", Id, unInvited.UserId);
+                Recorder.TraceDebug(null, "Organization {Id} uninvited member {User}", Id, unInvited.UninvitedId);
                 return Result.Ok;
             }
 
@@ -218,6 +223,34 @@ public sealed class OrganizationRoot : AggregateRootBase
                 return Result.Ok;
             }
 
+            case BillingSubscribed changed:
+            {
+                var subscriber =
+                    Domain.Shared.Subscriptions.BillingSubscriber.Create(changed.SubscriptionId, changed.SubscriberId);
+                if (subscriber.IsFailure)
+                {
+                    return subscriber.Error;
+                }
+
+                BillingSubscriber = subscriber.Value;
+                Recorder.TraceDebug(null, "Organization {Id} subscribed to billing for {Subscriber}", Id,
+                    changed.SubscriberId);
+                return Result.Ok;
+            }
+
+            case BillingSubscriberChanged changed:
+            {
+                if (!BillingSubscriber.HasValue)
+                {
+                    return Error.RuleViolation(Resources.OrganizationRoot_NoSubscriber);
+                }
+
+                BillingSubscriber = BillingSubscriber.Value.ChangeSubscriber(changed.ToSubscriberId.ToId());
+                Recorder.TraceDebug(null, "Organization {Id} changed billing subscriber from {From} to {To}", Id,
+                    changed.FromSubscriberId, changed.ToSubscriberId);
+                return Result.Ok;
+            }
+
             default:
                 return HandleUnKnownStateChangedEvent(@event);
         }
@@ -260,6 +293,63 @@ public sealed class OrganizationRoot : AggregateRootBase
         }
 
         return Result.Ok;
+    }
+
+    public Result<Permission, Error> CanCancelBillingSubscription(Identifier cancellerId, Roles cancellerRoles)
+    {
+        if (IsBillingSubscriber(cancellerId))
+        {
+            return Permission.Allowed;
+        }
+
+        return Permission.Denied_Role(Resources.OrganizationRoot_UserNotBillingSubscriber);
+    }
+
+    public Result<Permission, Error> CanChangeBillingSubscriptionPlan(Identifier modifierId, Roles modifierRoles)
+    {
+        if (IsBillingAdminOrBillingSubscriber(modifierId, modifierRoles))
+        {
+            return Permission.Allowed;
+        }
+
+        return Permission.Denied_Role(Resources.OrganizationRoot_NotBillingSubscriberNorBillingAdmin);
+    }
+
+    public Result<Permission, Error> CanTransferBillingSubscription(Identifier transfererId, Identifier transfereeId,
+        Roles transfereeRoles)
+    {
+        if (!IsBillingSubscriber(transfererId))
+        {
+            return Permission.Denied_Role(Resources.OrganizationRoot_UserNotBillingSubscriber);
+        }
+
+        if (IsBillingAdminAndNotBillingSubscriber(transfereeId, transfereeRoles))
+        {
+            return Permission.Allowed;
+        }
+
+        return Permission.Denied_Rule(
+            Resources.OrganizationRoot_CanTransferBillingSubscription_TransfereeNotBillingAdmin);
+    }
+
+    public Result<Permission, Error> CanUnsubscribeBillingSubscription(Identifier unsubscriberId)
+    {
+        if (IsBillingSubscriber(unsubscriberId))
+        {
+            return Permission.Allowed;
+        }
+
+        return Permission.Denied_Role(Resources.OrganizationRoot_UserNotBillingSubscriber);
+    }
+
+    public Result<Permission, Error> CanViewBillingSubscription(Identifier viewerId, Roles viewerRoles)
+    {
+        if (IsBillingAdminOrBillingSubscriber(viewerId, viewerRoles))
+        {
+            return Permission.Allowed;
+        }
+
+        return Permission.Denied_Role(Resources.OrganizationRoot_NotBillingSubscriberNorBillingAdmin);
     }
 
     public async Task<Result<Error>> ChangeAvatarAsync(Identifier modifierId, Roles modifierRoles,
@@ -315,15 +405,24 @@ public sealed class OrganizationRoot : AggregateRootBase
         return Result.Ok;
     }
 
-    public Result<Error> DeleteOrganization(Identifier deleterId, Roles deleterRoles)
+    public async Task<Result<Error>> DeleteOrganizationAsync(Identifier deleterId, Roles deleterRoles,
+        bool canBillingSubscriptionBeUnsubscribed, DeleteAction onDelete, CancellationToken cancellationToken)
     {
         if (!IsOwner(deleterRoles))
         {
             return Error.RoleViolation(Resources.OrganizationRoot_UserNotOrgOwner);
         }
 
-        //TODO: Must be the BillingBuyer
-        //TODO: BillingBuyer.CanBeUnsubscribed must be true
+        if (!IsBillingSubscriber(deleterId))
+        {
+            return Error.RoleViolation(Resources.OrganizationRoot_UserNotBillingSubscriber);
+        }
+
+        if (!canBillingSubscriptionBeUnsubscribed)
+        {
+            return Error.RuleViolation(Resources
+                .OrganizationRoot_DeleteOrganization_BillingSubscriptionCannotBeUnsubscribed);
+        }
 
         var otherMembers = Memberships.Members
             .Select(m => m.UserId)
@@ -334,7 +433,13 @@ public sealed class OrganizationRoot : AggregateRootBase
             return Error.RuleViolation(Resources.OrganizationRoot_DeleteOrganization_MembersStillExist);
         }
 
-        return RaisePermanentDeleteEvent(OrganizationsDomain.Events.Deleted(Id, deleterId));
+        var deleted = RaisePermanentDeleteEvent(OrganizationsDomain.Events.Deleted(Id, deleterId));
+        if (deleted.IsFailure)
+        {
+            return deleted.Error;
+        }
+
+        return await onDelete(deleterId);
     }
 
     public Result<Error> ForceRemoveAvatar(Identifier deleterId)
@@ -408,6 +513,11 @@ public sealed class OrganizationRoot : AggregateRootBase
         return RaiseChangeEvent(OrganizationsDomain.Events.MembershipRemoved(Id, userId));
     }
 
+    public Result<Error> SubscribeBilling(Identifier subscriptionId, Identifier subscriberId)
+    {
+        return RaiseChangeEvent(OrganizationsDomain.Events.BillingSubscribed(Id, subscriptionId, subscriberId));
+    }
+
 #if TESTINGONLY
 
     public void TestingOnly_ChangeOwnership(OrganizationOwnership ownership)
@@ -415,6 +525,21 @@ public sealed class OrganizationRoot : AggregateRootBase
         Ownership = ownership;
     }
 #endif
+
+    public Result<Error> TransferBillingSubscriber(Identifier transfererId, Identifier transfereeId)
+    {
+        if (!IsBillingSubscriber(transfererId))
+        {
+            return Error.RoleViolation(Resources.OrganizationRoot_UserNotBillingSubscriber);
+        }
+
+        if (!BillingSubscriber.HasValue)
+        {
+            return Error.RuleViolation(Resources.OrganizationRoot_NoSubscriber);
+        }
+
+        return RaiseChangeEvent(OrganizationsDomain.Events.BillingSubscriberChanged(Id, transfererId, transfereeId));
+    }
 
     public Result<Error> UnassignRoles(Identifier assignerId, Roles assignerRoles, Identifier userId,
         Roles rolesToUnassign)
@@ -446,11 +571,16 @@ public sealed class OrganizationRoot : AggregateRootBase
         return Result.Ok;
     }
 
-    public Result<Error> UnInviteMember(Identifier removerId, Roles removerRoles, Identifier userId)
+    public Result<Error> UnInviteMember(Identifier removerId, Roles removerRoles, Identifier uninvitedId)
     {
         if (!IsOwner(removerRoles))
         {
             return Error.RoleViolation(Resources.OrganizationRoot_UserNotOrgOwner);
+        }
+
+        if (IsBillingSubscriber(uninvitedId))
+        {
+            return Error.RoleViolation(Resources.OrganizationRoot_UninviteMember_BillingSubscriber);
         }
 
         if (Ownership == OrganizationOwnership.Personal)
@@ -458,14 +588,12 @@ public sealed class OrganizationRoot : AggregateRootBase
             return Error.RuleViolation(Resources.OrganizationRoot_UnInviteMember_PersonalOrg);
         }
 
-        if (!Memberships.HasMember(userId))
+        if (!Memberships.HasMember(uninvitedId))
         {
             return Result.Ok;
         }
 
-        //TODO: cannot remove if BillingBuyer
-
-        return RaiseChangeEvent(OrganizationsDomain.Events.MemberUnInvited(Id, removerId, userId));
+        return RaiseChangeEvent(OrganizationsDomain.Events.MemberUnInvited(Id, removerId, uninvitedId));
     }
 
     public Result<Error> UpdateSettings(Settings settings)
@@ -509,5 +637,27 @@ public sealed class OrganizationRoot : AggregateRootBase
     private bool IsMember(Identifier userId)
     {
         return Memberships.HasMember(userId);
+    }
+
+    private bool IsBillingSubscriber(Identifier userId)
+    {
+        if (!BillingSubscriber.HasValue)
+        {
+            return false;
+        }
+
+        return userId == BillingSubscriber.Value.SubscriberId;
+    }
+
+    private bool IsBillingAdminAndNotBillingSubscriber(Identifier userId, Roles roles)
+    {
+        return !IsBillingSubscriber(userId)
+               && roles.HasRole(TenantRoles.BillingAdmin);
+    }
+
+    private bool IsBillingAdminOrBillingSubscriber(Identifier userId, Roles roles)
+    {
+        return IsBillingSubscriber(userId)
+               || roles.HasRole(TenantRoles.BillingAdmin);
     }
 }

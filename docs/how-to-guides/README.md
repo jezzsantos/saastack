@@ -10,3 +10,4 @@
 * (coming soon) Define a use case in an Root Aggregate
 * (coming soon) Create an child Entity of a Root Aggregate
 * (coming soon) Create a ValueObject
+* [Migrating a Billing Provider](900-migrate-billing-provider.md) how to upgrade from the `SimpleBillingProvider` to another one specific to your chosen Billing Management System.

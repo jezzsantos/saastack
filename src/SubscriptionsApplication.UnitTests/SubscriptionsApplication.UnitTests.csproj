@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
+        <ProjectReference Include="..\OrganizationsDomain\OrganizationsDomain.csproj" />
+        <ProjectReference Include="..\SubscriptionsApplication\SubscriptionsApplication.csproj" />
+        <ProjectReference Include="..\UnitTesting.Common\UnitTesting.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    </ItemGroup>
+
+</Project>

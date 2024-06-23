@@ -1,14 +1,14 @@
 # All Use cases
 
-Take a look at all the [public API use cases](design-principles/0000-all-use-cases.md) for this software
+Take a look at all the [public API use cases](design-principles/0000-all-use-cases.md) for this software, there are already over 75 public APIs defined, that you don't have to build over again.
 
 # Architecture Design Records
 
-Browse our [Architectural Design Records](decisions/README.md) that describe the key assumptions and decisions made behind the design of this code template.
+Browse our [Architectural Design Records](decisions/README.md) that describe the key assumptions and decisions made behind some of the bigger decisions made in this code template.
 
 # Design Principles
 
-Learn about the [Design Principles and Implementation details](design-principles/README.md) of the code template.
+Learn about the [Design Principles and Implementation details](design-principles/README.md) of the code template. What we aimed to achieve, and how we go about doing it.
 
 # How-To Guides
 
@@ -16,7 +16,7 @@ Read the [HowTo Guides](how-to-guides/README.md) to help you get started and per
 
 # Tooling
 
-Supporting tooling used to help you be more productive with this template, and code examples.
+As well as a code template, there is custom tooling (tailored to this codebase) to guide you to being more productive with using this template.
 
 We make extensive use Roslyn Analyzers, Code Fixes and Source Generators and Architecture tests to help you and your team be highly productive in following the established patterns this codebase. And more importantly detect and fix when those principles are violated.
 

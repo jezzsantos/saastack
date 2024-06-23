@@ -51,7 +51,7 @@ public static class UsageConstants
         {
             public static class Core
             {
-                public const string BookingCancelled = "Booking Cancelled";
+                public const string BookingCanceled = "Booking Canceled";
                 public const string BookingCreated = "Booking Created";
                 public const string CarRegistered = "Car Registered";
             }

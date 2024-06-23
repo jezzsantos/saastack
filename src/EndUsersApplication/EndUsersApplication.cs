@@ -29,17 +29,19 @@ public partial class EndUsersApplication : IEndUsersApplication
     private readonly IConfigurationSettings _settings;
     private readonly IUserNotificationsService _userNotificationsService;
     private readonly IUserProfilesService _userProfilesService;
+    private readonly ISubscriptionsService _subscriptionsService;
 
     public EndUsersApplication(IRecorder recorder, IIdentifierFactory idFactory, IConfigurationSettings settings,
         IUserNotificationsService userNotificationsService, IUserProfilesService userProfilesService,
-        IInvitationRepository invitationRepository,
-        IEndUserRepository endUserRepository)
+        ISubscriptionsService subscriptionsService,
+        IInvitationRepository invitationRepository, IEndUserRepository endUserRepository)
     {
         _recorder = recorder;
         _idFactory = idFactory;
         _settings = settings;
         _userNotificationsService = userNotificationsService;
         _userProfilesService = userProfilesService;
+        _subscriptionsService = subscriptionsService;
         _invitationRepository = invitationRepository;
         _endUserRepository = endUserRepository;
     }
@@ -378,7 +380,7 @@ public partial class EndUsersApplication : IEndUsersApplication
             return assigneeRoles.Error;
         }
 
-        var assigned = assignee.AssignPlatformRoles(assigner, assigneeRoles.Value);
+        var assigned = assignee.AssignPlatformRoles(assigner, assigneeRoles.Value, OnAssign);
         if (assigned.IsFailure)
         {
             return assigned.Error;
@@ -394,12 +396,17 @@ public partial class EndUsersApplication : IEndUsersApplication
         _recorder.TraceInformation(caller.ToCall(),
             "EndUser {Id} has been assigned platform roles {Roles}",
             assignee.Id, roles.JoinAsOredChoices());
-        _recorder.AuditAgainst(caller.ToCall(), assignee.Id,
-            Audits.EndUserApplication_PlatformRolesAssigned,
-            "EndUser {AssignerId} assigned the platform roles {Roles} to assignee {AssigneeId}",
-            assigner.Id, roles.JoinAsOredChoices(), assignee.Id);
 
         return assignee.ToUser();
+
+        Result<Error> OnAssign(Roles assignedRoles, Identifier assignerId, Identifier assigneeId)
+        {
+            _recorder.AuditAgainst(caller.ToCall(), assigneeId,
+                Audits.EndUsersApplication_PlatformRolesAssigned,
+                "EndUser {AssignerId} assigned the platform roles {Roles} to assignee {AssigneeId}",
+                assigner.Id, assignedRoles.Items.Select(rol => rol.Identifier).JoinAsOredChoices(), assigneeId);
+            return Result.Ok;
+        }
     }
 
     public async Task<Result<EndUser, Error>> UnassignPlatformRolesAsync(ICallerContext caller, string id,
@@ -425,7 +432,7 @@ public partial class EndUsersApplication : IEndUsersApplication
             return assigneeRoles.Error;
         }
 
-        var unassigned = assignee.UnassignPlatformRoles(assigner, assigneeRoles.Value);
+        var unassigned = assignee.UnassignPlatformRoles(assigner, assigneeRoles.Value, OnUnassign);
         if (unassigned.IsFailure)
         {
             return unassigned.Error;
@@ -441,12 +448,17 @@ public partial class EndUsersApplication : IEndUsersApplication
         _recorder.TraceInformation(caller.ToCall(),
             "EndUser {Id} has been unassigned platform roles {Roles}",
             assignee.Id, roles.JoinAsOredChoices());
-        _recorder.AuditAgainst(caller.ToCall(), assignee.Id,
-            Audits.EndUserApplication_PlatformRolesUnassigned,
-            "EndUser {AssignerId} unassigned the platform roles {Roles} from assignee {AssigneeId}",
-            assigner.Id, roles.JoinAsOredChoices(), assignee.Id);
 
         return assignee.ToUser();
+
+        Result<Error> OnUnassign(Roles unassignedRoles, Identifier unassignerId, Identifier unassigneeId)
+        {
+            _recorder.AuditAgainst(caller.ToCall(), unassigneeId,
+                Audits.EndUsersApplication_PlatformRolesUnassigned,
+                "EndUser {AssignerId} unassigned the platform roles {Roles} from assignee {AssigneeId}",
+                assigner.Id, unassignedRoles.Items.Select(rol => rol.Identifier).JoinAsOredChoices(), unassigneeId);
+            return Result.Ok;
+        }
     }
 
     public async Task<Result<EndUser, Error>> ChangeDefaultMembershipAsync(ICallerContext caller, string organizationId,

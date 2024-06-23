@@ -19,5 +19,5 @@ public sealed class MemberInvited : DomainEvent
 
     public required string InvitedById { get; set; }
 
-    public string? UserId { get; set; }
+    public string? InvitedId { get; set; }
 }

@@ -30,4 +30,23 @@
     <data name="DomainEventConsumerService_ConsumerFailed" xml:space="preserve">
         <value>Failed to notify consumer: {0}, with event: {1} ({2})</value>
     </data>
+    <data name="BillingProvider_ProviderNameNotMatch" xml:space="preserve">
+        <value>The ProviderName does not match this provider</value>
+    </data>
+    <data name="BillingProvider_PropertyNotFound" xml:space="preserve">
+        <value>The {0} was not found for {1} in the state of the provider</value>
+    </data>
+    <data name="InProcessInMemBillingGatewayService_BasicPlan_DisplayName" xml:space="preserve">
+        <value>Free</value>
+    </data>
+    <data name="InProcessInMemBillingGatewayService_BasicPlan_Description" xml:space="preserve">
+        <value>For everyone. Forever.</value>
+    </data>
+    <data name="InProcessInMemBillingGatewayService_BasicPlan_Notes" xml:space="preserve">
+        <value>This plan cannot be changed, nor cancelled.</value>
+    </data>
+    <data name="InProcessInMemBillingGatewayService_BasicPlan_Feature1_Description" xml:space="preserve">
+        <value>All features</value>
+    </data>
+
 </root>

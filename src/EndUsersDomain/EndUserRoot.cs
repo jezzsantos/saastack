@@ -15,9 +15,9 @@ using Domain.Shared.Organizations;
 
 namespace EndUsersDomain;
 
-public delegate Task<Result<Error>> InvitationCallback(Identifier inviterId, string token);
+public delegate Task<Result<Error>> InviteAction(Identifier inviterId, string token);
 
-public sealed class EndUserRoot : AggregateRootBase
+public sealed partial class EndUserRoot : AggregateRootBase
 {
     public static Result<EndUserRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
         UserClassification classification)
@@ -266,8 +266,49 @@ public sealed class EndUserRoot : AggregateRootBase
                     return forwarded.Error;
                 }
 
-                Recorder.TraceDebug(null, "EndUser {Id} assigned feature {Role} to membership {MembershipId}", Id,
+                Recorder.TraceDebug(null, "EndUser {Id} assigned feature {Feature} to membership {MembershipId}", Id,
                     assigned.Feature, membershipId);
+                return Result.Ok;
+            }
+
+            case MembershipFeatureUnassigned unassigned:
+            {
+                var membershipId = unassigned.MembershipId.ToId();
+                var membership = Memberships.FindByMembershipId(membershipId);
+                if (!membership.HasValue)
+                {
+                    return Error.RuleViolation(Resources.EndUserRoot_NoMembership);
+                }
+
+                var forwarded = RaiseEventToChildEntity(unassigned, membership.Value);
+                if (forwarded.IsFailure)
+                {
+                    return forwarded.Error;
+                }
+
+                Recorder.TraceDebug(null, "EndUser {Id} unassigned feature {Feature} from membership {MembershipId}",
+                    Id,
+                    unassigned.Feature, membershipId);
+                return Result.Ok;
+            }
+
+            case MembershipFeaturesReset reset:
+            {
+                var membershipId = reset.MembershipId.ToId();
+                var membership = Memberships.FindByMembershipId(membershipId);
+                if (!membership.HasValue)
+                {
+                    return Error.RuleViolation(Resources.EndUserRoot_NoMembership);
+                }
+
+                var forwarded = RaiseEventToChildEntity(reset, membership.Value);
+                if (forwarded.IsFailure)
+                {
+                    return forwarded.Error;
+                }
+
+                Recorder.TraceDebug(null, "EndUser {Id} reset features {Features} to membership {MembershipId}", Id,
+                    reset.Features.JoinAsOredChoices(), membershipId);
                 return Result.Ok;
             }
 
@@ -302,6 +343,28 @@ public sealed class EndUserRoot : AggregateRootBase
 
                 Features = features.Value;
                 Recorder.TraceDebug(null, "EndUser {Id} assigned feature {Feature}", Id, assigned.Feature);
+                return Result.Ok;
+            }
+
+            case PlatformFeatureUnassigned unassigned:
+            {
+                var features = Features.Remove(unassigned.Feature);
+                Features = features;
+                Recorder.TraceDebug(null, "EndUser {Id} unassigned feature {Feature}", Id, unassigned.Feature);
+                return Result.Ok;
+            }
+
+            case PlatformFeaturesReset reset:
+            {
+                var features = Features.Create(reset.Features.ToArray());
+                if (features.IsFailure)
+                {
+                    return features.Error;
+                }
+
+                Features = features.Value;
+                Recorder.TraceDebug(null, "EndUser {Id} reset features {Features}", Id,
+                    reset.Features.JoinAsOredChoices());
                 return Result.Ok;
             }
 
@@ -372,7 +435,7 @@ public sealed class EndUserRoot : AggregateRootBase
         var skipOwnershipCheck = adder.Id == Id;
         if (!skipOwnershipCheck)
         {
-            if (!IsOrganizationOwner(adder, organizationId))
+            if (!IsAnOrganizationOwner(adder, organizationId))
             {
                 return Error.RoleViolation(Resources.EndUserRoot_NotOrganizationOwner);
             }
@@ -412,162 +475,6 @@ public sealed class EndUserRoot : AggregateRootBase
             addedMembership.Value.Id, addedMembership.Value.OrganizationId, tenantRoles, tenantFeatures));
     }
 
-    public Result<Error> AssignMembershipFeatures(EndUserRoot assigner, Identifier organizationId,
-        Features featuresToAssign)
-    {
-        if (!IsOrganizationOwner(assigner, organizationId))
-        {
-            return Error.RoleViolation(Resources.EndUserRoot_NotOrganizationOwner);
-        }
-
-        var membership = Memberships.FindByOrganizationId(organizationId);
-        if (!membership.HasValue)
-        {
-            return Error.RuleViolation(Resources.EndUserRoot_NoMembership.Format(organizationId));
-        }
-
-        if (featuresToAssign.HasAny())
-        {
-            foreach (var feature in featuresToAssign.Items)
-            {
-                if (!TenantFeatures.IsTenantAssignableFeature(feature.Identifier))
-                {
-                    return Error.RuleViolation(
-                        Resources.EndUserRoot_UnassignableTenantFeature.Format(feature.Identifier));
-                }
-
-                if (membership.Value.Features.HasFeature(feature))
-                {
-                    return Result.Ok;
-                }
-
-                var addedFeature =
-                    RaiseChangeEvent(
-                        EndUsersDomain.Events.MembershipFeatureAssigned(Id, organizationId, membership.Value.Id,
-                            feature));
-                if (addedFeature.IsFailure)
-                {
-                    return addedFeature.Error;
-                }
-            }
-        }
-
-        return Result.Ok;
-    }
-
-    public Result<Membership, Error> AssignMembershipRoles(EndUserRoot assigner, Identifier organizationId,
-        Roles rolesToAssign)
-    {
-        if (!IsOrganizationOwner(assigner, organizationId))
-        {
-            return Error.RoleViolation(Resources.EndUserRoot_NotOrganizationOwner);
-        }
-
-        var membership = Memberships.FindByOrganizationId(organizationId);
-        if (!membership.HasValue)
-        {
-            return Error.RuleViolation(Resources.EndUserRoot_NoMembership.Format(organizationId));
-        }
-
-        if (rolesToAssign.HasNone())
-        {
-            return membership.Value;
-        }
-
-        foreach (var role in rolesToAssign.Items)
-        {
-            if (!TenantRoles.IsTenantAssignableRole(role.Identifier))
-            {
-                return Error.RuleViolation(Resources.EndUserRoot_NotAssignableTenantRole.Format(role.Identifier));
-            }
-
-            if (membership.Value.Roles.HasRole(role))
-            {
-                return membership.Value;
-            }
-
-            var addedRole =
-                RaiseChangeEvent(
-                    EndUsersDomain.Events.MembershipRoleAssigned(Id, organizationId, membership.Value.Id,
-                        role));
-            if (addedRole.IsFailure)
-            {
-                return addedRole.Error;
-            }
-        }
-
-        return membership.Value;
-    }
-
-    public Result<Error> AssignPlatformFeatures(EndUserRoot assigner, Features featuresToAssign)
-    {
-        if (!IsPlatformOperator(assigner))
-        {
-            return Error.RuleViolation(Resources.EndUserRoot_NotOperator);
-        }
-
-        if (featuresToAssign.HasAny())
-        {
-            foreach (var feature in featuresToAssign.Items)
-            {
-                if (!PlatformFeatures.IsPlatformAssignableFeature(feature.Identifier))
-                {
-                    return Error.RuleViolation(
-                        Resources.EndUserRoot_NotAssignablePlatformFeature.Format(feature.Identifier));
-                }
-
-                if (Features.HasFeature(feature))
-                {
-                    return Result.Ok;
-                }
-
-                var addedFeature =
-                    RaiseChangeEvent(
-                        EndUsersDomain.Events.PlatformFeatureAssigned(Id, feature));
-                if (addedFeature.IsFailure)
-                {
-                    return addedFeature.Error;
-                }
-            }
-        }
-
-        return Result.Ok;
-    }
-
-    public Result<Error> AssignPlatformRoles(EndUserRoot assigner, Roles rolesToAssign)
-    {
-        if (!IsPlatformOperator(assigner))
-        {
-            return Error.RuleViolation(Resources.EndUserRoot_NotOperator);
-        }
-
-        if (rolesToAssign.HasAny())
-        {
-            foreach (var role in rolesToAssign.Items)
-            {
-                if (!PlatformRoles.IsPlatformAssignableRole(role.Identifier))
-                {
-                    return Error.RuleViolation(Resources.EndUserRoot_NotAssignablePlatformRole.Format(role.Identifier));
-                }
-
-                if (Roles.HasRole(role))
-                {
-                    return Result.Ok;
-                }
-
-                var addedRole =
-                    RaiseChangeEvent(
-                        EndUsersDomain.Events.PlatformRoleAssigned(Id, role));
-                if (addedRole.IsFailure)
-                {
-                    return addedRole.Error;
-                }
-            }
-        }
-
-        return Result.Ok;
-    }
-
     public Result<Error> ChangeDefaultMembership(Identifier organizationId)
     {
         var targetMembership = Memberships.FindByOrganizationId(organizationId);
@@ -592,73 +499,13 @@ public sealed class EndUserRoot : AggregateRootBase
         return Memberships.FindByOrganizationId(organizationId);
     }
 
-    /// <summary>
-    ///     EXTEND: change this to assign initial roles and features for persons and machines
-    /// </summary>
-    public static (Roles PlatformRoles, Features PlatformFeatures, Roles TenantRoles, Features TenantFeatures)
-        GetInitialRolesAndFeatures(RolesAndFeaturesUseCase useCase, bool isAuthenticated,
-            EmailAddress? username = null, List<EmailAddress>? permittedOperators = null)
-    {
-        var platformRoles = Roles.Empty;
-        platformRoles = platformRoles.Add(PlatformRoles.Standard).Value;
-        if (username.Exists() && permittedOperators.Exists())
-        {
-            if (permittedOperators
-                .Select(x => x.Address)
-                .ContainsIgnoreCase(username))
-            {
-                platformRoles = platformRoles.Add(PlatformRoles.Operations).Value;
-            }
-        }
-
-        var platformFeatures = Features.Empty;
-        Roles tenantRoles;
-        var tenantFeatures = Features.Empty;
-        switch (useCase)
-        {
-            case RolesAndFeaturesUseCase.CreatingMachine:
-                platformFeatures = platformFeatures.Add(isAuthenticated
-                    ? PlatformFeatures.PaidTrial
-                    : PlatformFeatures.Basic).Value;
-                tenantRoles = Roles.Create(TenantRoles.Owner, TenantRoles.Member).Value;
-                tenantFeatures = tenantFeatures.Add(isAuthenticated
-                    ? TenantFeatures.PaidTrial
-                    : TenantFeatures.Basic).Value;
-                break;
-
-            case RolesAndFeaturesUseCase.CreatingPerson:
-            case RolesAndFeaturesUseCase.CreatingOrg:
-                platformFeatures = platformFeatures.Add(PlatformFeatures.PaidTrial).Value;
-                tenantRoles = Roles.Create(TenantRoles.BillingAdmin, TenantRoles.Owner, TenantRoles.Member).Value;
-                tenantFeatures = tenantFeatures.Add(TenantFeatures.PaidTrial).Value;
-                break;
-
-            case RolesAndFeaturesUseCase.InvitingMemberToOrg:
-                platformFeatures = platformFeatures.Add(PlatformFeatures.PaidTrial).Value;
-                tenantFeatures = tenantFeatures.Add(TenantFeatures.PaidTrial).Value;
-                tenantRoles = Roles.Create(TenantRoles.Member).Value;
-                break;
-
-            case RolesAndFeaturesUseCase.InvitingMachineToCreatorOrg:
-                platformFeatures = platformFeatures.Add(PlatformFeatures.PaidTrial).Value;
-                tenantRoles = Roles.Create(TenantRoles.Member).Value;
-                tenantFeatures = tenantFeatures.Add(TenantFeatures.PaidTrial).Value;
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(useCase), useCase, null);
-        }
-
-        return (platformRoles, platformFeatures, tenantRoles, tenantFeatures);
-    }
-
     public PersonName GuessGuestInvitationName()
     {
         return GuestInvitation.InviteeEmailAddress!.GuessPersonFullName();
     }
 
     public async Task<Result<Error>> InviteGuestAsync(ITokensService tokensService, Identifier inviterId,
-        EmailAddress inviteeEmailAddress, InvitationCallback onInvited)
+        EmailAddress inviteeEmailAddress, InviteAction onInvited)
     {
         if (IsRegistered)
         {
@@ -701,7 +548,7 @@ public sealed class EndUserRoot : AggregateRootBase
     }
 
     public async Task<Result<Error>> ReInviteGuestAsync(ITokensService tokensService, Identifier inviterId,
-        InvitationCallback onInvited)
+        InviteAction onInvited)
     {
         if (!GuestInvitation.IsInvited)
         {
@@ -718,7 +565,7 @@ public sealed class EndUserRoot : AggregateRootBase
 
     public Result<Error> RemoveMembership(EndUserRoot remover, Identifier organizationId)
     {
-        if (!IsOrganizationOwner(remover, organizationId))
+        if (!IsAnOrganizationOwner(remover, organizationId))
         {
             return Error.RoleViolation(Resources.EndUserRoot_NotOrganizationOwner);
         }
@@ -770,89 +617,6 @@ public sealed class EndUserRoot : AggregateRootBase
     }
 #endif
 
-    public Result<Membership, Error> UnassignMembershipRoles(EndUserRoot unassigner, Identifier organizationId,
-        Roles rolesToUnassign)
-    {
-        if (!IsOrganizationOwner(unassigner, organizationId))
-        {
-            return Error.RoleViolation(Resources.EndUserRoot_NotOrganizationOwner);
-        }
-
-        var membership = Memberships.FindByOrganizationId(organizationId);
-        if (!membership.HasValue)
-        {
-            return Error.RuleViolation(Resources.EndUserRoot_NoMembership.Format(organizationId));
-        }
-
-        if (rolesToUnassign.HasNone())
-        {
-            return membership.Value;
-        }
-
-        foreach (var role in rolesToUnassign.Items)
-        {
-            if (!TenantRoles.IsTenantAssignableRole(role.Identifier))
-            {
-                return Error.RuleViolation(Resources.EndUserRoot_NotAssignableTenantRole.Format(role.Identifier));
-            }
-
-            if (!membership.Value.Roles.HasRole(role))
-            {
-                return membership.Value;
-            }
-
-            var removedRole =
-                RaiseChangeEvent(
-                    EndUsersDomain.Events.MembershipRoleUnassigned(Id, organizationId, membership.Value.Id,
-                        role));
-            if (removedRole.IsFailure)
-            {
-                return removedRole.Error;
-            }
-        }
-
-        return membership.Value;
-    }
-
-    public Result<Error> UnassignPlatformRoles(EndUserRoot assigner, Roles rolesToUnassign)
-    {
-        if (!IsPlatformOperator(assigner))
-        {
-            return Error.RuleViolation(Resources.EndUserRoot_NotOperator);
-        }
-
-        if (rolesToUnassign.HasAny())
-        {
-            foreach (var role in rolesToUnassign.Items)
-            {
-                if (!PlatformRoles.IsPlatformAssignableRole(role.Identifier))
-                {
-                    return Error.RuleViolation(Resources.EndUserRoot_NotAssignablePlatformRole.Format(role.Identifier));
-                }
-
-                if (role.Identifier == PlatformRoles.Standard.Name)
-                {
-                    return Error.RuleViolation(
-                        Resources.EndUserRoot_CannotUnassignBaselinePlatformRole
-                            .Format(PlatformRoles.Standard.Name));
-                }
-
-                if (!Roles.HasRole(role))
-                {
-                    return Result.Ok;
-                }
-
-                var removedRole = RaiseChangeEvent(EndUsersDomain.Events.PlatformRoleUnassigned(Id, role));
-                if (removedRole.IsFailure)
-                {
-                    return removedRole.Error;
-                }
-            }
-        }
-
-        return Result.Ok;
-    }
-
     public Result<Error> VerifyGuestInvitation()
     {
         if (IsRegistered)
@@ -873,12 +637,17 @@ public sealed class EndUserRoot : AggregateRootBase
         return Result.Ok;
     }
 
-    private static bool IsPlatformOperator(EndUserRoot assigner)
+    private static bool IsServiceAccount(Identifier userId)
     {
-        return assigner.Roles.HasRole(PlatformRoles.Operations);
+        return CallerConstants.IsServiceAccount(userId);
     }
 
-    private static bool IsOrganizationOwner(EndUserRoot assigner, Identifier organizationId)
+    private static bool IsPlatformOperator(Roles roles)
+    {
+        return roles.HasRole(PlatformRoles.Operations);
+    }
+
+    private static bool IsAnOrganizationOwner(EndUserRoot assigner, Identifier organizationId)
     {
         var retrieved = assigner.Memberships.FindByOrganizationId(organizationId);
         if (!retrieved.HasValue)

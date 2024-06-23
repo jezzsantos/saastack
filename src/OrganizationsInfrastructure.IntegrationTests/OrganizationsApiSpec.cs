@@ -9,6 +9,7 @@ using Infrastructure.Web.Api.Operations.Shared.EndUsers;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.Images;
 using Infrastructure.Web.Api.Operations.Shared.Organizations;
+using Infrastructure.Web.Api.Operations.Shared.Subscriptions;
 using Infrastructure.Web.Interfaces.Clients;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
@@ -635,6 +636,14 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        await PropagateDomainEventsAsync();
+        var subscription = await Api.GetAsync(new GetSubscriptionRequest
+        {
+            Id = organizationId
+        }, req => req.SetJWTBearerToken(loginA.AccessToken));
+
+        subscription.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]

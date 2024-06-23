@@ -17,5 +17,5 @@ public sealed class MemberUnInvited : DomainEvent
 
     public required string UninvitedById { get; set; }
 
-    public required string UserId { get; set; }
+    public required string UninvitedId { get; set; }
 }

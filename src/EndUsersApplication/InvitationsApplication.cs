@@ -17,10 +17,10 @@ namespace EndUsersApplication;
 public partial class InvitationsApplication : IInvitationsApplication
 {
     private readonly IIdentifierFactory _idFactory;
-    private readonly IUserNotificationsService _userNotificationsService;
     private readonly IRecorder _recorder;
     private readonly IInvitationRepository _repository;
     private readonly ITokensService _tokensService;
+    private readonly IUserNotificationsService _userNotificationsService;
     private readonly IUserProfilesService _userProfilesService;
 
     public InvitationsApplication(IRecorder recorder, IIdentifierFactory idFactory, ITokensService tokensService,

@@ -114,20 +114,20 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The platform feature &apos;{0}&apos; must always exist.
+        /// </summary>
+        internal static string EndUserRoot_CannotUnassignBaselinePlatformFeature {
+            get {
+                return ResourceManager.GetString("EndUserRoot_CannotUnassignBaselinePlatformFeature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The platform role &apos;{0}&apos; must always exist.
         /// </summary>
         internal static string EndUserRoot_CannotUnassignBaselinePlatformRole {
             get {
                 return ResourceManager.GetString("EndUserRoot_CannotUnassignBaselinePlatformRole", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The platform role &apos;{0}&apos; cannot be removed, since it does not exist for this user.
-        /// </summary>
-        internal static string EndUserRoot_CannotUnassignUnassignedRole {
-            get {
-                return ResourceManager.GetString("EndUserRoot_CannotUnassignUnassignedRole", resourceCulture);
             }
         }
         
@@ -195,33 +195,6 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The feature &apos;{0}&apos; is not a supported platform feature.
-        /// </summary>
-        internal static string EndUserRoot_NotAssignablePlatformFeature {
-            get {
-                return ResourceManager.GetString("EndUserRoot_NotAssignablePlatformFeature", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The role &apos;{0}&apos; is not a supported platform role.
-        /// </summary>
-        internal static string EndUserRoot_NotAssignablePlatformRole {
-            get {
-                return ResourceManager.GetString("EndUserRoot_NotAssignablePlatformRole", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The role &apos;{0}&apos; is not a supported tenant role.
-        /// </summary>
-        internal static string EndUserRoot_NotAssignableTenantRole {
-            get {
-                return ResourceManager.GetString("EndUserRoot_NotAssignableTenantRole", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The assigner is not a member of the operations team.
         /// </summary>
         internal static string EndUserRoot_NotOperator {
@@ -249,6 +222,15 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Only the service account can perform this action.
+        /// </summary>
+        internal static string EndUserRoot_NotServiceAccount {
+            get {
+                return ResourceManager.GetString("EndUserRoot_NotServiceAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The remover cannot remove a membership from a &apos;Personal&apos; organization.
         /// </summary>
         internal static string EndUserRoot_RemoveMembership_SharedOwnershipRequired {
@@ -258,11 +240,38 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The feature &apos;{0}&apos; is not a supported platform feature.
+        /// </summary>
+        internal static string EndUserRoot_UnassignablePlatformFeature {
+            get {
+                return ResourceManager.GetString("EndUserRoot_UnassignablePlatformFeature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The role &apos;{0}&apos; is not a supported platform role.
+        /// </summary>
+        internal static string EndUserRoot_UnassignablePlatformRole {
+            get {
+                return ResourceManager.GetString("EndUserRoot_UnassignablePlatformRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The feature &apos;{0}&apos; is not a supported tenant feature.
         /// </summary>
         internal static string EndUserRoot_UnassignableTenantFeature {
             get {
                 return ResourceManager.GetString("EndUserRoot_UnassignableTenantFeature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The role &apos;{0}&apos; is not a supported tenant role.
+        /// </summary>
+        internal static string EndUserRoot_UnassignableTenantRole {
+            get {
+                return ResourceManager.GetString("EndUserRoot_UnassignableTenantRole", resourceCulture);
             }
         }
         

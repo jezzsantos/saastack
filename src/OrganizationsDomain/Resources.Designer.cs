@@ -69,11 +69,29 @@ namespace OrganizationsDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Must be an billing administrator to have the subscription transferred.
+        /// </summary>
+        internal static string OrganizationRoot_CanTransferBillingSubscription_TransfereeNotBillingAdmin {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_CanTransferBillingSubscription_TransfereeNotBillingAdmin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Must be a person to create a &apos;Shared&apos; organization.
         /// </summary>
         internal static string OrganizationRoot_Create_SharedRequiresPerson {
             get {
                 return ResourceManager.GetString("OrganizationRoot_Create_SharedRequiresPerson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot delete this organization as the billing subscription cannot be terminated in its current state.
+        /// </summary>
+        internal static string OrganizationRoot_DeleteOrganization_BillingSubscriptionCannotBeUnsubscribed {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_DeleteOrganization_BillingSubscriptionCannotBeUnsubscribed", resourceCulture);
             }
         }
         
@@ -114,6 +132,33 @@ namespace OrganizationsDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This organization has no billing subscriber.
+        /// </summary>
+        internal static string OrganizationRoot_NoSubscriber {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_NoSubscriber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must be an billing administrator to perform this action.
+        /// </summary>
+        internal static string OrganizationRoot_NotBillingAdmin {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_NotBillingAdmin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must be the owner of the billing subscription or be an billing administrator to perform this action.
+        /// </summary>
+        internal static string OrganizationRoot_NotBillingSubscriberNorBillingAdmin {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_NotBillingSubscriberNorBillingAdmin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Role &apos;{0}&apos; is not assignable to a user.
         /// </summary>
         internal static string OrganizationRoot_RoleNotAssignable {
@@ -123,11 +168,29 @@ namespace OrganizationsDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot remove the subscriber of the billing subscription from the organization.
+        /// </summary>
+        internal static string OrganizationRoot_UninviteMember_BillingSubscriber {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_UninviteMember_BillingSubscriber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot remove any members from a &apos;Personal&apos; organization.
         /// </summary>
         internal static string OrganizationRoot_UnInviteMember_PersonalOrg {
             get {
                 return ResourceManager.GetString("OrganizationRoot_UnInviteMember_PersonalOrg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must be the subscriber of the billing subscription to perform this action.
+        /// </summary>
+        internal static string OrganizationRoot_UserNotBillingSubscriber {
+            get {
+                return ResourceManager.GetString("OrganizationRoot_UserNotBillingSubscriber", resourceCulture);
             }
         }
         

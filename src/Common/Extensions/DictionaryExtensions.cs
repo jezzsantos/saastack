@@ -55,4 +55,37 @@ public static class DictionaryExtensions
             .Where(entry => entry.Value.Exists() && entry.Value.ToString().Exists())
             .ToDictionary(entry => entry.Key, entry => entry.Value!.ToString()!);
     }
+
+    /// <summary>
+    ///     Adds the result of the specified <see cref="converter" /> to the dictionary, only if the specified
+    ///     <see cref="condition" />
+    ///     resolves to true
+    /// </summary>
+    public static void TryAddIfTrue<TExpression, TKey, TValue>(this Dictionary<TKey, TValue> dictionary,
+        TKey key,
+        TExpression value,
+        Predicate<TExpression> condition, Func<TExpression, TValue> converter)
+        where TKey : notnull
+    {
+        var isTrue = condition(value);
+        if (isTrue)
+        {
+            dictionary.TryAdd(key, converter(value));
+        }
+    }
+
+    /// <summary>
+    ///     Adds the specified <see cref="value" /> to the dictionary, only if the specified <see cref="condition" />
+    ///     resolves to true
+    /// </summary>
+    public static void TryAddIfTrue<TKey, TValue>(this Dictionary<TKey, TValue> dictionary,
+        TKey key, TValue value, Predicate<TValue> condition)
+        where TKey : notnull
+    {
+        var isTrue = condition(value);
+        if (isTrue)
+        {
+            dictionary.TryAdd(key, value);
+        }
+    }
 }

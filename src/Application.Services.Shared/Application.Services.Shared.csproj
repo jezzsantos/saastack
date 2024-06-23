@@ -8,6 +8,7 @@
         <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
         <ProjectReference Include="..\Application.Persistence.Interfaces\Application.Persistence.Interfaces.csproj" />
         <ProjectReference Include="..\Application.Resources.Shared\Application.Resources.Shared.csproj" />
+        <ProjectReference Include="..\Domain.Services.Shared\Domain.Services.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

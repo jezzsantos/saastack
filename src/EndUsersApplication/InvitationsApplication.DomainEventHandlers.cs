@@ -16,7 +16,7 @@ partial class InvitationsApplication
         MemberInvited domainEvent, CancellationToken cancellationToken)
     {
         var membership = await InviteMemberToOrganizationAsync(caller, domainEvent.RootId.ToId(),
-            domainEvent.InvitedById, domainEvent.UserId, domainEvent.EmailAddress, cancellationToken);
+            domainEvent.InvitedById, domainEvent.InvitedId, domainEvent.EmailAddress, cancellationToken);
         if (membership.IsFailure)
         {
             return membership.Error;
@@ -30,7 +30,7 @@ partial class InvitationsApplication
         CancellationToken cancellationToken)
     {
         var membership = await UnInviteMemberFromOrganizationAsync(caller, domainEvent.RootId.ToId(),
-            domainEvent.UninvitedById, domainEvent.UserId, cancellationToken);
+            domainEvent.UninvitedById, domainEvent.UninvitedId, cancellationToken);
         if (membership.IsFailure)
         {
             return membership.Error;

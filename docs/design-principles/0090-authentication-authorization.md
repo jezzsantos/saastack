@@ -185,9 +185,9 @@ API keys do not support refreshing issued API keys. When issuing the API key the
 
 ### Declarative Authorization Syntax
 
-Authorization is both declarative (at the API layer), and enforced programmatically downstream in other layers.
+Authorization is enforced at a coarse-grained level declaratively in the API layer, as well as being enforced at fine-grained level downstream in the Domain Layer.
 
-> In the Application layer, the current users authorization can be viewed and checked using data on the `ICallerContext` object.
+> In the Application layer, the current users' roles and features can be accessed through the `ICallerContext` object.
 
 In the API layer, authorization is declarative, using the `[Authorize]` attribute.
 
@@ -202,11 +202,13 @@ public class GetCarRequest : TenantedRequest<GetCarResponse>
 }
 ```
 
+> Incidentally, the syntax used here, uses `enums` that are source generated for you at compile time.
+
 There are two kinds of aspects to authorize, Roles and Features.
 
 ### Role-Based Authorization
 
-In this system, there are two sets of "roles" to manage access to any APIs and underlying subdomains.
+In this mechanism, there are two sets of "roles" to manage access to any APIs and underlying subdomains.
 
 This is commonly referred to as [RBAC](https://en.wikipedia.org/wiki/Role-based_access_control).
 

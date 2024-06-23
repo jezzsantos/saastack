@@ -56,14 +56,20 @@ public sealed class VerificationKeep : ValueObjectBase<VerificationKeep>
         return (property, _) =>
         {
             var parts = RehydrateToList(property, false);
-            return new VerificationKeep(parts[0].ToOptional(), parts[1].FromIso8601().ToOptional(),
-                parts[2].FromIso8601().ToOptional());
+            return new VerificationKeep(
+                parts[0].FromValueOrNone<string, string>(),
+                parts[1].FromValueOrNone(val => val.FromIso8601()),
+                parts[2].FromValueOrNone(val => val.FromIso8601()));
         };
     }
 
-    protected override IEnumerable<object> GetAtomicValues()
+    protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object[] { Token, ExpiresUtc, VerifiedUtc };
+        return new[]
+        {
+            Token.ValueOrNull, ExpiresUtc.ToValueOrNull(val => val.ToIso8601()),
+            VerifiedUtc.ToValueOrNull(val => val.ToIso8601())
+        };
     }
 
 #pragma warning disable CA1822

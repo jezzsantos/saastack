@@ -45,4 +45,22 @@
     <data name="Avatar_InvalidUrl" xml:space="preserve">
         <value>The URL is invalid</value>
     </data>
+    <data name="BillingInvoice_InvalidAmount" xml:space="preserve">
+        <value>The Amount is invalid</value>
+    </data>
+    <data name="BillingPeriod_InvalidFrequency" xml:space="preserve">
+        <value>The frequency must be positive</value>
+    </data>
+    <data name="BillingProvider_InvalidName" xml:space="preserve">
+        <value>Name of the provider is not invalid</value>
+    </data>
+    <data name="BillingProvider_InvalidMetadata" xml:space="preserve">
+        <value>State of the provider is empty or invalid</value>
+    </data>
+    <data name="ProviderSubscription_InvalidSubscriptionId" xml:space="preserve">
+        <value>SubscriptionId is empty</value>
+    </data>
+    <data name="ProviderPlan_InvalidPlanId" xml:space="preserve">
+        <value>PlanId is empty</value>
+    </data>
 </root>

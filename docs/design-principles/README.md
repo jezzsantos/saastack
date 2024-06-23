@@ -19,3 +19,4 @@
 * [Multi-Tenancy](0130-multitenancy.md) how we support multiple tenants in our system (both logical and physical infrastructure)
 * [Developer Tooling](0140-developer-tooling.md) all the tooling that is included in this codebase to help developers use this codebase effectively, and consistently
 * [User Lifecycle](0160-user-lifecycle.md) how are users managed on the platform, and the relationship to their organizations
+* [Billing Integration](0180-billing-integration.md) how the integration between the billing management and the product works to enable self-serve plan management 

@@ -7,6 +7,7 @@ using IdentityInfrastructure;
 using ImagesInfrastructure;
 using Infrastructure.Web.Hosting.Common;
 using OrganizationsInfrastructure;
+using SubscriptionsInfrastructure;
 using UserProfilesInfrastructure;
 
 namespace ApiHost1;
@@ -21,6 +22,7 @@ public static class HostedModules
         modules.Register(new UserProfilesModule());
         modules.Register(new EndUsersModule());
         modules.Register(new OrganizationsModule());
+        modules.Register(new SubscriptionsModule());
         modules.Register(new IdentityModule());
         modules.Register(new EventNotificationsModule());
         modules.Register(new AncillaryModule());

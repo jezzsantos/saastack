@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Images;
 ///     Changes the image details
 /// </summary>
 [Route("/images/{Id}", OperationMethod.PutPatch, AccessType.Token)]
-[Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
+[Authorize(Roles.Platform_Standard, Features.Platform_PaidTrial)]
 public class UpdateImageRequest : UnTenantedRequest<UpdateImageResponse>
 {
     public string? Description { get; set; }

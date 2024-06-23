@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="ChangeSubscriptionPlanRequestValidator_InvalidPlanId" xml:space="preserve">
+        <value>The PlanId is either missing or invalid</value>
+    </data>
+    <data name="SearchSubscriptionHistoryRequestValidator_FromUtc_TooPast" xml:space="preserve">
+        <value>The FromUtc is too far in the past, only dates after '{0:yyyy-MM-dd} UTC' are permitted</value>
+    </data>
+    <data name="SearchSubscriptionHistoryRequestValidator_ToUtc_TooPast" xml:space="preserve">
+        <value>The ToUtc is too far in the past, only dates after '{0:yyyy-MM-dd} UTC' are permitted</value>
+    </data>
+    <data name="SearchSubscriptionHistoryRequestValidator_FromUtc_TooFuture" xml:space="preserve">
+        <value>The FromUtc is too far in the future, only dates before '{0:yyyy-MM-dd} UTC' are permitted</value>
+    </data>
+    <data name="SearchSubscriptionHistoryRequestValidator_ToUtc_TooFuture" xml:space="preserve">
+        <value>The ToUtc is too far in the future, only dates before '{0:yyyy-MM-dd} UTC' are permitted</value>
+    </data>
+    <data name="SearchSubscriptionHistoryRequestValidator_FromUtc_StartAfterEnd" xml:space="preserve">
+        <value>The FromUtc is after the ToUtc</value>
+    </data>
+    <data name="SearchSubscriptionHistoryRequestValidator_ToUtc_EndBeforeStart" xml:space="preserve">
+        <value>The ToUtc is before the FromUtc</value>
+    </data>
+    <data name="MigrateSubscriptionRequestValidator_InvalidProviderName" xml:space="preserve">
+        <value>The ProviderName is either missing or invalid</value>
+    </data>
+    <data name="MigrateSubscriptionRequestValidator_InvalidProviderState" xml:space="preserve">
+        <value>The ProviderState is empty, and must contain some state</value>
+    </data>
+</root>

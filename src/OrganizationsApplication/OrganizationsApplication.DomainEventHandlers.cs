@@ -4,8 +4,10 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.EndUsers;
+using Domain.Events.Shared.Subscriptions;
 using Domain.Interfaces;
 using Domain.Shared.Organizations;
+using Created = Domain.Events.Shared.Subscriptions.Created;
 using Deleted = Domain.Events.Shared.Images.Deleted;
 
 namespace OrganizationsApplication;
@@ -30,45 +32,102 @@ partial class OrganizationsApplication
     public async Task<Result<Error>> HandleImageDeletedAsync(ICallerContext caller, Deleted domainEvent,
         CancellationToken cancellationToken)
     {
-        var organization = await HandleDeleteAvatarAsync(caller, domainEvent.RootId, cancellationToken);
-        if (organization.IsFailure)
-        {
-            return organization.Error;
-        }
+        return await HandleDeleteAvatarAsync(caller, domainEvent.RootId.ToId(), cancellationToken);
+    }
 
-        return Result.Ok;
+    public async Task<Result<Error>> HandleSubscriptionCreatedAsync(ICallerContext caller,
+        Created domainEvent, CancellationToken cancellationToken)
+    {
+        return await HandleCreatedSubscriptionAsync(caller,
+            domainEvent.RootId.ToId(), domainEvent.OwningEntityId.ToId(), domainEvent.BuyerId.ToId(),
+            cancellationToken);
+    }
+
+    public async Task<Result<Error>> HandleSubscriptionTransferredAsync(ICallerContext caller,
+        SubscriptionTransferred domainEvent, CancellationToken cancellationToken)
+    {
+        return await HandleTransferSubscriptionAsync(caller, domainEvent.OwningEntityId.ToId(),
+            domainEvent.FromBuyerId.ToId(), domainEvent.ToBuyerId.ToId(), cancellationToken);
     }
 
     public async Task<Result<Error>> HandleEndUserMembershipAddedAsync(ICallerContext caller,
         MembershipAdded domainEvent, CancellationToken cancellationToken)
     {
-        var organization = await AddMembershipInternalAsync(caller, domainEvent.RootId.ToId(),
+        return await AddMembershipInternalAsync(caller, domainEvent.RootId.ToId(),
             domainEvent.OrganizationId.ToId(), cancellationToken);
-        if (organization.IsFailure)
-        {
-            return organization.Error;
-        }
-
-        return Result.Ok;
     }
 
     public async Task<Result<Error>> HandleEndUserMembershipRemovedAsync(ICallerContext caller,
         MembershipRemoved domainEvent, CancellationToken cancellationToken)
     {
-        var organization = await RemoveMembershipInternalAsync(caller, domainEvent.RootId.ToId(),
+        return await RemoveMembershipInternalAsync(caller, domainEvent.RootId.ToId(),
             domainEvent.OrganizationId.ToId(), cancellationToken);
-        if (organization.IsFailure)
+    }
+
+    private async Task<Result<Error>> HandleCreatedSubscriptionAsync(ICallerContext caller, Identifier subscriptionId,
+        Identifier organizationId, Identifier billingSubscriberId, CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(organizationId, cancellationToken);
+        if (retrieved.IsFailure)
         {
-            return organization.Error;
+            return retrieved.Error;
         }
+
+        var org = retrieved.Value;
+        var subscribed = org.SubscribeBilling(subscriptionId, billingSubscriberId);
+        if (subscribed.IsFailure)
+        {
+            return subscribed.Error;
+        }
+
+        var saved = await _repository.SaveAsync(org, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        org = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(),
+            "Organization {Id} has subscribed to billing with {Subscriber}", org.Id, billingSubscriberId);
 
         return Result.Ok;
     }
 
-    private async Task<Result<Error>> HandleDeleteAvatarAsync(ICallerContext caller, string imageId,
+    private async Task<Result<Error>> HandleTransferSubscriptionAsync(ICallerContext caller,
+        Identifier organizationId, Identifier transfererId, Identifier transfereeId,
         CancellationToken cancellationToken)
     {
-        var retrieved = await _repository.FindByAvatarIdAsync(imageId.ToId(), cancellationToken);
+        var retrieved = await _repository.LoadAsync(organizationId, cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        var org = retrieved.Value;
+        var transferred = org.TransferBillingSubscriber(transfererId, transfereeId);
+        if (transferred.IsFailure)
+        {
+            return transferred.Error;
+        }
+
+        var saved = await _repository.SaveAsync(org, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        org = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(),
+            "Organization {Id} had its subscription owner transferred from {From}, to {To}", org.Id, transfererId,
+            transfereeId);
+
+        return Result.Ok;
+    }
+
+    private async Task<Result<Error>> HandleDeleteAvatarAsync(ICallerContext caller, Identifier imageId,
+        CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.FindByAvatarIdAsync(imageId, cancellationToken);
         if (retrieved.IsFailure)
         {
             return retrieved.Error;
@@ -79,23 +138,23 @@ partial class OrganizationsApplication
             return Result.Ok;
         }
 
-        var organization = retrieved.Value.Value;
-        var deleted = organization.ForceRemoveAvatar(CallerConstants.ServiceClientAccountUserId.ToId());
+        var org = retrieved.Value.Value;
+        var deleted = org.ForceRemoveAvatar(CallerConstants.ServiceClientAccountUserId.ToId());
         if (deleted.IsFailure)
         {
             return deleted.Error;
         }
 
-        var saved = await _repository.SaveAsync(organization, cancellationToken);
+        var saved = await _repository.SaveAsync(org, cancellationToken);
         if (saved.IsFailure)
         {
             return saved.Error;
         }
 
-        organization = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Organization {Id} avatar was removed", organization.Id);
+        org = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Organization {Id} avatar was removed", org.Id);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
-            organization.ToUsageEvent(caller));
+            org.ToUsageEvent(caller));
 
         return Result.Ok;
     }

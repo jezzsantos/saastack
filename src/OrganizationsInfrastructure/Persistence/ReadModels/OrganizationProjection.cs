@@ -33,6 +33,7 @@ public class OrganizationProjection : IReadModelProjection
                         dto.Name = e.Name;
                         dto.Ownership = e.Ownership;
                         dto.CreatedById = e.CreatedById;
+                        dto.BillingSubscriberId = e.CreatedById; // a useful intermediary default
                     },
                     cancellationToken);
 
@@ -76,6 +77,20 @@ public class OrganizationProjection : IReadModelProjection
 
             case RoleUnassigned _:
                 return true;
+
+            case BillingSubscribed e:
+                return await _organizations.HandleUpdateAsync(e.RootId,
+                    dto =>
+                    {
+                        dto.BillingSubscriberId = e.SubscriberId;
+                        dto.BillingSubscriptionId = e.SubscriptionId;
+                    },
+                    cancellationToken);
+
+            case BillingSubscriberChanged e:
+                return await _organizations.HandleUpdateAsync(e.RootId,
+                    dto => { dto.BillingSubscriberId = e.ToSubscriberId; },
+                    cancellationToken);
 
             case Deleted e:
                 return await _organizations.HandleDeleteAsync(e.RootId, cancellationToken);

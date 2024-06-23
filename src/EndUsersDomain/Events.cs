@@ -80,6 +80,30 @@ public static class Events
         };
     }
 
+    public static MembershipFeaturesReset MembershipFeaturesReset(Identifier id, Identifier assignerId,
+        Identifier organizationId,
+        Identifier membershipId, Features features)
+    {
+        return new MembershipFeaturesReset(id)
+        {
+            AssignedById = assignerId,
+            OrganizationId = organizationId,
+            MembershipId = membershipId,
+            Features = features.Items.Select(x => x.Identifier).ToList()
+        };
+    }
+
+    public static MembershipFeatureUnassigned MembershipFeatureUnassigned(Identifier id, Identifier organizationId,
+        Identifier membershipId, Feature feature)
+    {
+        return new MembershipFeatureUnassigned(id)
+        {
+            OrganizationId = organizationId,
+            MembershipId = membershipId,
+            Feature = feature.Identifier
+        };
+    }
+
     public static MembershipRemoved MembershipRemoved(Identifier id, Identifier membershipId, Identifier organizationId,
         Identifier uninviterId)
     {
@@ -116,6 +140,23 @@ public static class Events
     public static PlatformFeatureAssigned PlatformFeatureAssigned(Identifier id, Feature feature)
     {
         return new PlatformFeatureAssigned(id)
+        {
+            Feature = feature.Identifier
+        };
+    }
+
+    public static PlatformFeaturesReset PlatformFeaturesReset(Identifier id, Identifier assignerId, Features features)
+    {
+        return new PlatformFeaturesReset(id)
+        {
+            AssignedById = assignerId,
+            Features = features.Items.Select(x => x.Identifier).ToList()
+        };
+    }
+
+    public static PlatformFeatureUnassigned PlatformFeatureUnassigned(Identifier id, Feature feature)
+    {
+        return new PlatformFeatureUnassigned(id)
         {
             Feature = feature.Identifier
         };

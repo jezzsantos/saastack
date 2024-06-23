@@ -10,6 +10,7 @@ using Domain.Services.Shared;
 using Domain.Shared;
 using Domain.Shared.EndUsers;
 using Domain.Shared.Organizations;
+using Domain.Shared.Subscriptions;
 using FluentAssertions;
 using JetBrains.Annotations;
 using Moq;
@@ -394,26 +395,10 @@ public class EndUserRootSpec
 
 #if TESTINGONLY
         [Fact]
-        public void WhenAssignMembershipFeaturesAndAssignerNotOwner_ThenReturnsError()
-        {
-            var assigner = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
-                .Value;
-
-            var result = _user.AssignMembershipFeatures(assigner, "anorganizationid".ToId(),
-                Features.Create(TenantFeatures.TestingOnly).Value);
-
-            result.Should().BeError(ErrorCode.RoleViolation, Resources.EndUserRoot_NotOrganizationOwner);
-        }
-#endif
-
-#if TESTINGONLY
-        [Fact]
         public void WhenAssignMembershipFeaturesAndNoMembership_ThenReturnsError()
         {
-            var assigner = CreateOrgOwner(_recorder, "anorganizationid");
-
-            var result = _user.AssignMembershipFeatures(assigner, "anorganizationid".ToId(),
-                Features.Create(TenantFeatures.TestingOnly).Value);
+            var result = _user.AssignMembershipFeatures("anassignerid".ToId(), "anorganizationid".ToId(),
+                Features.Create(TenantFeatures.TestingOnly).Value, (_, _, _, _) => Result.Ok);
 
             result.Should().BeError(ErrorCode.RuleViolation,
                 Resources.EndUserRoot_NoMembership.Format("anorganizationid"));
@@ -431,8 +416,8 @@ public class EndUserRootSpec
                 Roles.Create(TenantRoles.Member).Value,
                 Features.Create(TenantFeatures.Basic).Value);
 
-            var result = _user.AssignMembershipFeatures(assigner, "anorganizationid".ToId(),
-                Features.Create("anunknownfeature").Value);
+            var result = _user.AssignMembershipFeatures("anassignerid".ToId(), "anorganizationid".ToId(),
+                Features.Create("anunknownfeature").Value, (_, _, _, _) => Result.Ok);
 
             result.Should().BeError(ErrorCode.RuleViolation,
                 Resources.EndUserRoot_UnassignableTenantFeature.Format("anunknownfeature"));
@@ -450,8 +435,8 @@ public class EndUserRootSpec
                 Roles.Create(TenantRoles.Member).Value,
                 Features.Create(TenantFeatures.Basic, TenantFeatures.TestingOnly).Value);
 
-            var result = _user.AssignMembershipFeatures(assigner, "anorganizationid".ToId(),
-                Features.Create(TenantFeatures.TestingOnly).Value);
+            var result = _user.AssignMembershipFeatures("anassignerid".ToId(), "anorganizationid".ToId(),
+                Features.Create(TenantFeatures.TestingOnly).Value, (_, _, _, _) => Result.Ok);
 
             result.Should().BeSuccess();
             _user.Memberships[0].Roles.Should()
@@ -474,14 +459,80 @@ public class EndUserRootSpec
                 Roles.Create(TenantRoles.Member).Value,
                 Features.Create(TenantFeatures.Basic).Value);
 
-            var result = _user.AssignMembershipFeatures(assigner, "anorganizationid".ToId(),
-                Features.Create(TenantFeatures.TestingOnly).Value);
+            var result = _user.AssignMembershipFeatures("anassignerid".ToId(), "anorganizationid".ToId(),
+                Features.Create(TenantFeatures.TestingOnly).Value, (_, _, _, _) => Result.Ok);
 
             result.Should().BeSuccess();
             _user.Memberships[0].Roles.Should().Be(Roles.Create(TenantRoles.Member).Value);
             _user.Memberships[0].Features.Should()
                 .Be(Features.Create(TenantFeatures.Basic, TenantFeatures.TestingOnly).Value);
             _user.Events.Last().Should().BeOfType<MembershipFeatureAssigned>();
+        }
+#endif
+
+        [Fact]
+        public void WhenUnassignMembershipFeaturesAndFeatureNotAssignable_ThenReturnsError()
+        {
+            var assigner = CreateOrgOwner(_recorder, "anorganizationid");
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
+                EmailAddress.Create("auser@company.com").Value);
+            _user.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Member).Value,
+                Features.Create(TenantFeatures.Basic).Value);
+
+            var result = _user.UnassignMembershipFeatures("anunassignerid".ToId(), "anorganizationid".ToId(),
+                Features.Create("anunknownfeature").Value, (_, _, _, _) => Result.Ok);
+
+            result.Should().BeError(ErrorCode.RuleViolation,
+                Resources.EndUserRoot_UnassignableTenantFeature.Format("anunknownfeature"));
+        }
+
+#if TESTINGONLY
+        [Fact]
+        public void WhenUnassignMembershipFeaturesAndNotHaveFeature_ThenDoesNothing()
+        {
+            var assigner = CreateOrgOwner(_recorder, "anorganizationid");
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
+                EmailAddress.Create("auser@company.com").Value);
+            _user.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Member).Value,
+                Features.Create(TenantFeatures.Basic).Value);
+
+            var result = _user.UnassignMembershipFeatures("anunassignerid".ToId(), "anorganizationid".ToId(),
+                Features.Create(TenantFeatures.TestingOnly).Value, (_, _, _, _) => Result.Ok);
+
+            result.Should().BeSuccess();
+            _user.Memberships[0].Roles.Should()
+                .Be(Roles.Create(TenantRoles.Member).Value);
+            _user.Memberships[0].Features.Should()
+                .Be(Features.Create(TenantFeatures.Basic).Value);
+            _user.Events.Should().NotContainItemsAssignableTo<MembershipFeatureUnassigned>();
+        }
+#endif
+
+#if TESTINGONLY
+        [Fact]
+        public void WhenUnassignMembershipFeatures_ThenUnassigns()
+        {
+            var assigner = CreateOrgOwner(_recorder, "anorganizationid");
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
+                EmailAddress.Create("auser@company.com").Value);
+            _user.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Member).Value,
+                Features.Create(TenantFeatures.Basic, TenantFeatures.TestingOnly).Value);
+
+            var result = _user.UnassignMembershipFeatures("anunassignerid".ToId(), "anorganizationid".ToId(),
+                Features.Create(TenantFeatures.TestingOnly).Value, (_, _, _, _) => Result.Ok);
+
+            result.Should().BeSuccess();
+            _user.Memberships[0].Roles.Should()
+                .Be(Roles.Create(TenantRoles.Member).Value);
+            _user.Memberships[0].Features.Should()
+                .Be(Features.Create(TenantFeatures.Basic).Value);
+            _user.Events.Last().Should().BeOfType<MembershipFeatureUnassigned>();
         }
 #endif
 
@@ -493,7 +544,7 @@ public class EndUserRootSpec
                 .Value;
 
             var result = _user.AssignMembershipRoles(assigner, "anorganizationid".ToId(),
-                Roles.Create(TenantRoles.TestingOnly).Value);
+                Roles.Create(TenantRoles.TestingOnly).Value, (_, _, _, _) => Result.Ok);
 
             result.Should().BeError(ErrorCode.RoleViolation, Resources.EndUserRoot_NotOrganizationOwner);
         }
@@ -511,10 +562,10 @@ public class EndUserRootSpec
                 Features.Create(TenantFeatures.Basic).Value);
 
             var result = _user.AssignMembershipRoles(assigner, "anorganizationid".ToId(),
-                Roles.Create("anunknownrole").Value);
+                Roles.Create("anunknownrole").Value, (_, _, _, _) => Result.Ok);
 
             result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_NotAssignableTenantRole.Format("anunknownrole"));
+                Resources.EndUserRoot_UnassignableTenantRole.Format("anunknownrole"));
         }
 
 #if TESTINGONLY
@@ -530,7 +581,7 @@ public class EndUserRootSpec
                 Features.Create(TenantFeatures.Basic).Value);
 
             var result = _user.AssignMembershipRoles(assigner, "anorganizationid".ToId(),
-                Roles.Create(TenantRoles.TestingOnly).Value);
+                Roles.Create(TenantRoles.TestingOnly).Value, (_, _, _, _) => Result.Ok);
 
             result.Should().BeSuccess();
             _user.Memberships[0].Roles.Should()
@@ -554,7 +605,7 @@ public class EndUserRootSpec
                 Features.Create(TenantFeatures.Basic).Value);
 
             var result = _user.AssignMembershipRoles(assigner, "anorganizationid".ToId(),
-                Roles.Create(TenantRoles.TestingOnly).Value);
+                Roles.Create(TenantRoles.TestingOnly).Value, (_, _, _, _) => Result.Ok);
 
             result.Should().BeSuccess();
             _user.Memberships[0].Roles.Should()
@@ -573,7 +624,7 @@ public class EndUserRootSpec
                 .Value;
 
             var result = _user.UnassignMembershipRoles(assigner, "anorganizationid".ToId(),
-                Roles.Create(TenantRoles.TestingOnly).Value);
+                Roles.Create(TenantRoles.TestingOnly).Value, (_, _, _, _) => Result.Ok);
 
             result.Should().BeError(ErrorCode.RoleViolation, Resources.EndUserRoot_NotOrganizationOwner);
         }
@@ -591,10 +642,10 @@ public class EndUserRootSpec
                 Features.Create(TenantFeatures.Basic).Value);
 
             var result = _user.UnassignMembershipRoles(assigner, "anorganizationid".ToId(),
-                Roles.Create("anunknownrole").Value);
+                Roles.Create("anunknownrole").Value, (_, _, _, _) => Result.Ok);
 
             result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_NotAssignableTenantRole.Format("anunknownrole"));
+                Resources.EndUserRoot_UnassignableTenantRole.Format("anunknownrole"));
         }
 
 #if TESTINGONLY
@@ -610,7 +661,7 @@ public class EndUserRootSpec
                 Features.Create(TenantFeatures.Basic).Value);
 
             var result = _user.UnassignMembershipRoles(assigner, "anorganizationid".ToId(),
-                Roles.Create(TenantRoles.TestingOnly).Value);
+                Roles.Create(TenantRoles.TestingOnly).Value, (_, _, _, _) => Result.Ok);
 
             result.Should().BeSuccess();
             _user.Memberships[0].Roles.Should()
@@ -634,7 +685,7 @@ public class EndUserRootSpec
                 Features.Create(TenantFeatures.Basic).Value);
 
             var result = _user.UnassignMembershipRoles(assigner, "anorganizationid".ToId(),
-                Roles.Create(TenantRoles.TestingOnly).Value);
+                Roles.Create(TenantRoles.TestingOnly).Value, (_, _, _, _) => Result.Ok);
 
             result.Should().BeSuccess();
             _user.Memberships[0].Roles.Should()
@@ -645,38 +696,25 @@ public class EndUserRootSpec
         }
 #endif
 
-#if TESTINGONLY
-        [Fact]
-        public void WhenAssignPlatformFeaturesAndAssignerNotOperator_ThenReturnsError()
-        {
-            var assigner = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
-                .Value;
-
-            var result = _user.AssignPlatformFeatures(assigner, Features.Create(PlatformFeatures.TestingOnly).Value);
-
-            result.Should().BeError(ErrorCode.RuleViolation, Resources.EndUserRoot_NotOperator);
-        }
-#endif
-
         [Fact]
         public void WhenAssignPlatformFeaturesAndFeatureNotAssignable_ThenReturnsError()
         {
-            var assigner = CreateOperator(_recorder, _identifierFactory);
-
-            var result = _user.AssignPlatformFeatures(assigner, Features.Create("anunknownfeature").Value);
+            var result = _user.AssignPlatformFeatures("anassignerid".ToId(), Features.Create("anunknownfeature").Value,
+                (_, _, _) => Result.Ok);
 
             result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_NotAssignablePlatformFeature.Format("anunknownfeature"));
+                Resources.EndUserRoot_UnassignablePlatformFeature.Format("anunknownfeature"));
         }
 
 #if TESTINGONLY
         [Fact]
         public void WhenAssignPlatformFeaturesAndHasFeature_ThenDoesNothing()
         {
-            var assigner = CreateOperator(_recorder, _identifierFactory);
-            _user.AssignPlatformFeatures(assigner, Features.Create(PlatformFeatures.TestingOnly).Value);
+            _user.AssignPlatformFeatures("anassignerid".ToId(), Features.Create(PlatformFeatures.TestingOnly).Value,
+                (_, _, _) => Result.Ok);
 
-            var result = _user.AssignPlatformFeatures(assigner, Features.Create(PlatformFeatures.TestingOnly).Value);
+            var result = _user.AssignPlatformFeatures("anassignerid".ToId(),
+                Features.Create(PlatformFeatures.TestingOnly).Value, (_, _, _) => Result.Ok);
 
             result.Should().BeSuccess();
             _user.Roles.HasNone().Should().BeTrue();
@@ -688,9 +726,8 @@ public class EndUserRootSpec
         [Fact]
         public void WhenAssignPlatformFeatures_ThenAssigns()
         {
-            var assigner = CreateOperator(_recorder, _identifierFactory);
-
-            var result = _user.AssignPlatformFeatures(assigner, Features.Create(PlatformFeatures.TestingOnly).Value);
+            var result = _user.AssignPlatformFeatures("anassignerid".ToId(),
+                Features.Create(PlatformFeatures.TestingOnly).Value, (_, _, _) => Result.Ok);
 
             result.Should().BeSuccess();
             _user.Roles.HasNone().Should().BeTrue();
@@ -706,7 +743,8 @@ public class EndUserRootSpec
             var assigner = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
                 .Value;
 
-            var result = _user.AssignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value);
+            var result = _user.AssignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value,
+                (_, _, _) => Result.Ok);
 
             result.Should().BeError(ErrorCode.RuleViolation, Resources.EndUserRoot_NotOperator);
         }
@@ -717,10 +755,11 @@ public class EndUserRootSpec
         {
             var assigner = CreateOperator(_recorder, _identifierFactory);
 
-            var result = _user.AssignPlatformRoles(assigner, Roles.Create("anunknownrole").Value);
+            var result =
+                _user.AssignPlatformRoles(assigner, Roles.Create("anunknownrole").Value, (_, _, _) => Result.Ok);
 
             result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_NotAssignablePlatformRole.Format("anunknownrole"));
+                Resources.EndUserRoot_UnassignablePlatformRole.Format("anunknownrole"));
         }
 
 #if TESTINGONLY
@@ -728,23 +767,25 @@ public class EndUserRootSpec
         public void WhenAssignPlatformRolesAndHasRole_ThenDoesNothing()
         {
             var assigner = CreateOperator(_recorder, _identifierFactory);
-            _user.AssignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value);
+            _user.AssignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value, (_, _, _) => Result.Ok);
 
-            var result = _user.AssignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value);
+            var result = _user.AssignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value,
+                (_, _, _) => Result.Ok);
 
             result.Should().BeSuccess();
             _user.Roles.Should().Be(Roles.Create(PlatformRoles.TestingOnly).Value);
             _user.Features.HasNone().Should().BeTrue();
         }
 #endif
-        
+
 #if TESTINGONLY
         [Fact]
         public void WhenAssignPlatformRoles_ThenAssigns()
         {
             var assigner = CreateOperator(_recorder, _identifierFactory);
 
-            var result = _user.AssignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value);
+            var result = _user.AssignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value,
+                (_, _, _) => Result.Ok);
 
             result.Should().BeSuccess();
             _user.Roles.Should().Be(Roles.Create(PlatformRoles.TestingOnly).Value);
@@ -760,7 +801,8 @@ public class EndUserRootSpec
             var assigner = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person)
                 .Value;
 
-            var result = _user.UnassignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value);
+            var result = _user.UnassignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value,
+                (_, _, _) => Result.Ok);
 
             result.Should().BeError(ErrorCode.RuleViolation, Resources.EndUserRoot_NotOperator);
         }
@@ -771,10 +813,11 @@ public class EndUserRootSpec
         {
             var assigner = CreateOperator(_recorder, _identifierFactory);
 
-            var result = _user.UnassignPlatformRoles(assigner, Roles.Create("anunknownrole").Value);
+            var result =
+                _user.UnassignPlatformRoles(assigner, Roles.Create("anunknownrole").Value, (_, _, _) => Result.Ok);
 
             result.Should().BeError(ErrorCode.RuleViolation,
-                Resources.EndUserRoot_NotAssignablePlatformRole.Format("anunknownrole"));
+                Resources.EndUserRoot_UnassignablePlatformRole.Format("anunknownrole"));
         }
 
 #if TESTINGONLY
@@ -783,7 +826,8 @@ public class EndUserRootSpec
         {
             var assigner = CreateOperator(_recorder, _identifierFactory);
 
-            var result = _user.UnassignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value);
+            var result = _user.UnassignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value,
+                (_, _, _) => Result.Ok);
 
             result.Should().BeSuccess();
             _user.Events.Should().NotContainItemsAssignableTo<PlatformRoleUnassigned>();
@@ -796,7 +840,8 @@ public class EndUserRootSpec
         {
             var assigner = CreateOperator(_recorder, _identifierFactory);
 
-            var result = _user.UnassignPlatformRoles(assigner, Roles.Create(PlatformRoles.Standard).Value);
+            var result = _user.UnassignPlatformRoles(assigner, Roles.Create(PlatformRoles.Standard).Value,
+                (_, _, _) => Result.Ok);
 
             result.Should().BeError(ErrorCode.RuleViolation,
                 Resources.EndUserRoot_CannotUnassignBaselinePlatformRole.Format(PlatformRoles.Standard));
@@ -808,14 +853,66 @@ public class EndUserRootSpec
         public void WhenUnassignPlatformRoles_ThenUnassigns()
         {
             var assigner = CreateOperator(_recorder, _identifierFactory);
-            _user.AssignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value);
+            _user.AssignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value, (_, _, _) => Result.Ok);
 
-            var result = _user.UnassignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value);
+            var result = _user.UnassignPlatformRoles(assigner, Roles.Create(PlatformRoles.TestingOnly).Value,
+                (_, _, _) => Result.Ok);
 
             result.Should().BeSuccess();
             _user.Roles.HasNone().Should().BeTrue();
             _user.Features.HasNone().Should().BeTrue();
             _user.Events.Last().Should().BeOfType<PlatformRoleUnassigned>();
+        }
+#endif
+
+        [Fact]
+        public void WhenUnassignPlatformFeaturesAndFeatureNotAssignable_ThenReturnsError()
+        {
+            var result = _user.UnassignPlatformFeatures("anunassignerid".ToId(),
+                Features.Create("anunknownfeature").Value, (_, _, _) => Result.Ok);
+
+            result.Should().BeError(ErrorCode.RuleViolation,
+                Resources.EndUserRoot_UnassignablePlatformFeature.Format("anunknownfeature"));
+        }
+
+#if TESTINGONLY
+        [Fact]
+        public void WhenUnassignPlatformFeaturesAndUserNotAssignedFeature_ThenDoesNothing()
+        {
+            var result = _user.UnassignPlatformFeatures("anunassignerid".ToId(),
+                Features.Create(PlatformFeatures.TestingOnly).Value, (_, _, _) => Result.Ok);
+
+            result.Should().BeSuccess();
+            _user.Events.Should().NotContainItemsAssignableTo<PlatformFeatureUnassigned>();
+        }
+#endif
+
+#if TESTINGONLY
+        [Fact]
+        public void WhenUnassignPlatformFeaturesAndStandardFeature_ThenReturnsError()
+        {
+            var result = _user.UnassignPlatformFeatures("anunassignerid".ToId(),
+                Features.Create(PlatformFeatures.Basic).Value, (_, _, _) => Result.Ok);
+
+            result.Should().BeError(ErrorCode.RuleViolation,
+                Resources.EndUserRoot_CannotUnassignBaselinePlatformFeature.Format(PlatformFeatures.Basic));
+        }
+#endif
+
+#if TESTINGONLY
+        [Fact]
+        public void WhenUnassignPlatformFeatures_ThenUnassigns()
+        {
+            _user.AssignPlatformFeatures("anassignerid".ToId(), Features.Create(PlatformFeatures.TestingOnly).Value,
+                (_, _, _) => Result.Ok);
+
+            var result = _user.UnassignPlatformFeatures("anunassignerid".ToId(),
+                Features.Create(PlatformFeatures.TestingOnly).Value, (_, _, _) => Result.Ok);
+
+            result.Should().BeSuccess();
+            _user.Roles.HasNone().Should().BeTrue();
+            _user.Features.HasNone().Should().BeTrue();
+            _user.Events.Last().Should().BeOfType<PlatformFeatureUnassigned>();
         }
 #endif
 
@@ -1150,6 +1247,50 @@ public class EndUserRootSpec
             _user.Events[4].Should().BeOfType<DefaultMembershipChanged>();
             _user.Events[5].Should().BeOfType<DefaultMembershipChanged>();
             _user.Events.Last().Should().BeOfType<MembershipRemoved>();
+        }
+
+        [Fact]
+        public void WhenResetMembershipFeaturesFromEnterpriseToUnsubscribed_ThenUnassigns()
+        {
+            var assigner = CreateOrgOwner(_recorder, "anorganizationid");
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Paid3).Value, EndUserProfile.Create("afirstname").Value,
+                EmailAddress.Create("auser@company.com").Value);
+            _user.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Member).Value,
+                Features.Create(TenantFeatures.Paid3).Value);
+
+            var result = _user.ResetMembershipFeatures(CallerConstants.MaintenanceAccountUserId.ToId(),
+                "anorganizationid".ToId(), BillingSubscriptionTier.Unsubscribed, "aplanid",
+                (_, _, _) => Result.Ok, (_, _, _, _) => Result.Ok);
+
+            result.Should().BeSuccess();
+            _user.Features.Items.Should().OnlyContain(feat => feat == Feature.Create(PlatformFeatures.Basic).Value);
+            _user.Memberships[0].Features.Items.Should()
+                .OnlyContain(feat => feat == Feature.Create(TenantFeatures.Basic).Value);
+            _user.Events.Last().Should().BeOfType<MembershipFeaturesReset>();
+        }
+
+        [Fact]
+        public void WhenResetMembershipFeaturesFromBasicToEnterprise_ThenAssigns()
+        {
+            var assigner = CreateOrgOwner(_recorder, "anorganizationid");
+            _user.Register(Roles.Create(PlatformRoles.Standard).Value,
+                Features.Create(PlatformFeatures.Basic).Value, EndUserProfile.Create("afirstname").Value,
+                EmailAddress.Create("auser@company.com").Value);
+            _user.AddMembership(assigner, OrganizationOwnership.Shared, "anorganizationid".ToId(),
+                Roles.Create(TenantRoles.Member).Value,
+                Features.Create(TenantFeatures.Basic).Value);
+
+            var result = _user.ResetMembershipFeatures(CallerConstants.MaintenanceAccountUserId.ToId(),
+                "anorganizationid".ToId(), BillingSubscriptionTier.Enterprise, "aplanid",
+                (_, _, _) => Result.Ok, (_, _, _, _) => Result.Ok);
+
+            result.Should().BeSuccess();
+            _user.Features.Items.Should().OnlyContain(feat => feat == Feature.Create(PlatformFeatures.Paid3).Value);
+            _user.Memberships[0].Features.Items.Should()
+                .OnlyContain(feat => feat == Feature.Create(TenantFeatures.Paid3).Value);
+            _user.Events.Last().Should().BeOfType<MembershipFeaturesReset>();
         }
     }
 
