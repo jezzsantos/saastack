@@ -8,7 +8,7 @@ using Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 namespace TestingStubApiHost.Api;
 
 [WebService("/flagsmith")]
-public class StubFlagsmithApi : StubApiBase
+public sealed class StubFlagsmithApi : StubApiBase
 {
     private static readonly List<FlagsmithFlag> Flags = GetAllFlags();
 

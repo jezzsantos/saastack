@@ -10,18 +10,17 @@ public static class CurrencyCodes
 {
     public static readonly CurrencyCodeIso4217 ChileanFomento =
         CurrencyCodeIso4217.Create("Unidad de Fomento", "CLF", "990", CurrencyDecimalKind.FourDecimal);
-    public static readonly CurrencyCodeIso4217 NewZealandDollar =
-        CurrencyCodeIso4217.Create("New Zealand dollar", "NZD", "554", CurrencyDecimalKind.TwoDecimal);
-    public static readonly CurrencyCodeIso4217 Default = NewZealandDollar;
+    public static readonly CurrencyCodeIso4217 UnitedStatesDollar =
+        CurrencyCodeIso4217.Create("United States dollar", "USD", "840", CurrencyDecimalKind.TwoDecimal);
+    public static readonly CurrencyCodeIso4217 Default = UnitedStatesDollar;
     public static readonly CurrencyCodeIso4217 KuwaitiDinar =
         CurrencyCodeIso4217.Create("Kuwaiti dinar", "KWD", "414", CurrencyDecimalKind.ThreeDecimal);
-
+    public static readonly CurrencyCodeIso4217 NewZealandDollar =
+        CurrencyCodeIso4217.Create("New Zealand dollar", "NZD", "554", CurrencyDecimalKind.TwoDecimal);
 #if TESTINGONLY
     public static readonly CurrencyCodeIso4217 Test =
         CurrencyCodeIso4217.Create("Test", "XXX", "001", CurrencyDecimalKind.TwoDecimal);
 #endif
-    public static readonly CurrencyCodeIso4217 UnitedStatesDollar =
-        CurrencyCodeIso4217.Create("United States dollar", "USD", "840", CurrencyDecimalKind.TwoDecimal);
 
     /// <summary>
     ///     Whether the specified currency by its <see cref="currencyCodeOrNumber" /> exists
@@ -79,23 +78,40 @@ public static class CurrencyCodes
     }
 
     /// <summary>
-    ///     Converts the amount in cents to a currency
+    ///     Converts the amount in the minor unit of currency to the amount in the currency
+    ///     For example, the minor unit of the USDollar is the number of cents, and 100 cents is 1 USDollar
     /// </summary>
-    public static decimal ToCurrency(string code, int amountInCents)
+    public static decimal FromMinorUnit(string code, int amountInMinorUnit)
     {
         var currency = Find(code);
         if (currency.NotExists())
         {
-            return amountInCents;
+            return amountInMinorUnit;
         }
 
         return currency.Kind switch
         {
-            CurrencyDecimalKind.ZeroDecimal => amountInCents,
-            CurrencyDecimalKind.TwoDecimal => (decimal)amountInCents / 100,
-            CurrencyDecimalKind.ThreeDecimal => (decimal)amountInCents / 1000,
-            CurrencyDecimalKind.FourDecimal => (decimal)amountInCents / 10000,
-            _ => amountInCents
+            CurrencyDecimalKind.ZeroDecimal => amountInMinorUnit,
+            CurrencyDecimalKind.TwoDecimal => (decimal)amountInMinorUnit / 100,
+            CurrencyDecimalKind.ThreeDecimal => (decimal)amountInMinorUnit / 1000,
+            CurrencyDecimalKind.FourDecimal => (decimal)amountInMinorUnit / 10000,
+            _ => amountInMinorUnit
+        };
+    }
+
+    /// <summary>
+    ///     Converts the amount in the currency to the minor unit of currency.
+    ///     For example, the minor unit of the USDollar is the number of cents, and 1 dollar is 100 cents
+    /// </summary>
+    public static long ToMinorUnit(CurrencyCodeIso4217 currency, decimal amount)
+    {
+        return currency.Kind switch
+        {
+            CurrencyDecimalKind.ZeroDecimal => decimal.ToInt64(amount),
+            CurrencyDecimalKind.TwoDecimal => decimal.ToInt64(amount * 100),
+            CurrencyDecimalKind.ThreeDecimal => decimal.ToInt64(amount * 1000),
+            CurrencyDecimalKind.FourDecimal => decimal.ToInt64(amount * 10000),
+            _ => decimal.ToInt64(amount)
         };
     }
 }

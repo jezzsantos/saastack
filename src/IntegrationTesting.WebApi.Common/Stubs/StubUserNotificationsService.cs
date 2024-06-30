@@ -7,7 +7,7 @@ namespace IntegrationTesting.WebApi.Common.Stubs;
 /// <summary>
 ///     Provides a stub for testing <see cref="IUserNotificationsService" />
 /// </summary>
-public class StubUserNotificationsService : IUserNotificationsService
+public sealed class StubUserNotificationsService : IUserNotificationsService
 {
     public string? LastEmailChangeConfirmationToken { get; private set; }
 
@@ -46,6 +46,14 @@ public class StubUserNotificationsService : IUserNotificationsService
         return Task.FromResult(Result.Ok);
     }
 
+    public Task<Result<Error>> NotifyPasswordRegistrationRepeatCourtesyAsync(ICallerContext caller, string userId,
+        string emailAddress, string name,
+        string? timezone, string? countryCode, CancellationToken cancellationToken)
+    {
+        LastReRegistrationCourtesyEmailRecipient = emailAddress;
+        return Task.FromResult(Result.Ok);
+    }
+
     public Task<Result<Error>> NotifyPasswordResetInitiatedAsync(ICallerContext caller, string name,
         string emailAddress, string token,
         CancellationToken cancellationToken)
@@ -59,14 +67,6 @@ public class StubUserNotificationsService : IUserNotificationsService
         CancellationToken cancellationToken)
     {
         LastPasswordResetCourtesyEmailRecipient = emailAddress;
-        return Task.FromResult(Result.Ok);
-    }
-
-    public Task<Result<Error>> NotifyPasswordRegistrationRepeatCourtesyAsync(ICallerContext caller, string userId,
-        string emailAddress, string name,
-        string? timezone, string? countryCode, CancellationToken cancellationToken)
-    {
-        LastReRegistrationCourtesyEmailRecipient = emailAddress;
         return Task.FromResult(Result.Ok);
     }
 

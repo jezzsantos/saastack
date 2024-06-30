@@ -1,10 +1,6 @@
-#region
-
 using Domain.Common;
 using Domain.Common.ValueObjects;
 using JetBrains.Annotations;
-
-#endregion
 
 namespace Domain.Events.Shared.Subscriptions;
 

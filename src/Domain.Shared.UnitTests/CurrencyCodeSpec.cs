@@ -27,7 +27,7 @@ public class CurrencyCodeSpec
     }
 
     [Fact]
-    public void WhenCreateWithCurrencyCode_ThenReturnsCurrency()
+    public void WhenCreateWithKnownCurrencyCode_ThenReturnsCurrency()
     {
         var result = CurrencyCode.Create(CurrencyCodes.NewZealandDollar);
 

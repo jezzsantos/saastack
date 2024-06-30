@@ -1,5 +1,3 @@
-#region
-
 using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
@@ -17,8 +15,6 @@ using SubscriptionsDomain;
 using UnitTesting.Common;
 using Xunit;
 using Subscription = SubscriptionsApplication.Persistence.ReadModels.Subscription;
-
-#endregion
 
 namespace SubscriptionsApplication.UnitTests;
 

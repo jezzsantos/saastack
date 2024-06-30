@@ -1,5 +1,3 @@
-#region
-
 using ApiHost1;
 using Application.Resources.Shared;
 using Application.Services.Shared;
@@ -10,8 +8,6 @@ using IntegrationTesting.WebApi.Common;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-
-#endregion
 
 namespace SubscriptionsInfrastructure.IntegrationTests;
 

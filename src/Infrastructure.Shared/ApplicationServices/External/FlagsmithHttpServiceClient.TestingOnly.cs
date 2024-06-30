@@ -1,4 +1,5 @@
 #if TESTINGONLY
+
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 using Infrastructure.Web.Interfaces.Clients;
@@ -6,7 +7,7 @@ using Flag = Common.FeatureFlags.Flag;
 
 namespace Infrastructure.Shared.ApplicationServices.External;
 
-/// <inheritdoc />
+/// <inheritdoc cref="FlagsmithHttpServiceClient" />
 partial class FlagsmithHttpServiceClient
 {
     private const string TestingOnlyApiTokenSettingName = "ApplicationServices:Flagsmith:TestingOnly:ApiToken";

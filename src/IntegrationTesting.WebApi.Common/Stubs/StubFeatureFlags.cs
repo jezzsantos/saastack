@@ -6,7 +6,7 @@ namespace IntegrationTesting.WebApi.Common.Stubs;
 /// <summary>
 ///     Provides a stub for testing <see cref="IFeatureFlags" />
 /// </summary>
-public class StubFeatureFlags : IFeatureFlags
+public sealed class StubFeatureFlags : IFeatureFlags
 {
     public string? LastGetFlag { get; private set; }
 

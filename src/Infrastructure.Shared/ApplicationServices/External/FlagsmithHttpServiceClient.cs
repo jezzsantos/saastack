@@ -32,7 +32,7 @@ namespace Infrastructure.Shared.ApplicationServices.External;
 ///     3. When we ask for a flag for a userId, we create the identity with its respective traits
 ///     (if they don't already exist), and use the result.
 /// </summary>
-public partial class FlagsmithHttpServiceClient : IFeatureFlags
+public sealed partial class FlagsmithHttpServiceClient : IFeatureFlags
 {
     private const string BaseUrlSettingName = "ApplicationServices:Flagsmith:BaseUrl";
     private const string EnvironmentKeySettingName = "ApplicationServices:Flagsmith:EnvironmentKey";

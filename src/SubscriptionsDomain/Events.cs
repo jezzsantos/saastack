@@ -1,12 +1,8 @@
-#region
-
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Subscriptions;
 using Domain.Shared.Subscriptions;
 using Created = Domain.Events.Shared.Subscriptions.Created;
 using Deleted = Domain.Events.Shared.Subscriptions.Deleted;
-
-#endregion
 
 namespace SubscriptionsDomain;
 

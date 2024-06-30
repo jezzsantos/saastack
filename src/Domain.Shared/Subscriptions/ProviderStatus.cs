@@ -1,11 +1,7 @@
-#region
-
 using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
-
-#endregion
 
 namespace Domain.Shared.Subscriptions;
 

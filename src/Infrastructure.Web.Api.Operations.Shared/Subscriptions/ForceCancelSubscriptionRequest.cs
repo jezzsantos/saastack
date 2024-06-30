@@ -1,8 +1,4 @@
-#region
-
 using Infrastructure.Web.Api.Interfaces;
-
-#endregion
 
 namespace Infrastructure.Web.Api.Operations.Shared.Subscriptions;
 

@@ -1,5 +1,3 @@
-#region
-
 using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
@@ -8,8 +6,6 @@ using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Services.Shared;
 using Domain.Shared.Subscriptions;
-
-#endregion
 
 namespace Infrastructure.Shared.ApplicationServices;
 
@@ -38,7 +34,17 @@ public sealed class SimpleBillingProvider : IBillingProvider
 /// </summary>
 public sealed class SinglePlanBillingStateInterpreter : IBillingStateInterpreter
 {
-    public string ProviderName => Constants.ProviderName;
+    public Result<string, Error> GetBuyerReference(BillingProvider current)
+    {
+        if (current.State.TryGetValue(Constants.MetadataProperties.BuyerId, out var reference))
+        {
+            return reference;
+        }
+
+        return Error.RuleViolation(
+            Resources.BillingProvider_PropertyNotFound.Format(Constants.MetadataProperties.BuyerId,
+                GetType().FullName!));
+    }
 
     /// <summary>
     ///     Either the subscription is unsubscribed, or the plan is fixed, and does not vary.
@@ -98,18 +104,6 @@ public sealed class SinglePlanBillingStateInterpreter : IBillingStateInterpreter
         }
     }
 
-    public Result<string, Error> GetBuyerReference(BillingProvider current)
-    {
-        if (current.State.TryGetValue(Constants.MetadataProperties.BuyerId, out var reference))
-        {
-            return reference;
-        }
-
-        return Error.RuleViolation(
-            Resources.BillingProvider_PropertyNotFound.Format(Constants.MetadataProperties.BuyerId,
-                GetType().FullName!));
-    }
-
     public Result<Optional<string>, Error> GetSubscriptionReference(BillingProvider current)
     {
         if (!current.State.TryGetValue(Constants.MetadataProperties.SubscriptionId, out var reference))
@@ -119,6 +113,8 @@ public sealed class SinglePlanBillingStateInterpreter : IBillingStateInterpreter
 
         return reference.ToOptional();
     }
+
+    public string ProviderName => Constants.ProviderName;
 
     public Result<BillingProvider, Error> SetInitialProviderState(BillingProvider provider)
     {
@@ -202,6 +198,62 @@ public class InProcessInMemSimpleBillingGatewayService : IBillingGatewayService
     }
 
     /// <summary>
+    ///     There is only one fixed plan, at zero-cost
+    /// </summary>
+    public Task<Result<PricingPlans, Error>> ListAllPricingPlansAsync(ICallerContext caller,
+        CancellationToken cancellationToken)
+    {
+        return Task.FromResult<Result<PricingPlans, Error>>(new PricingPlans
+        {
+            Eternally =
+            [
+                new PricingPlan
+                {
+                    Id = SinglePlanBillingStateInterpreter.Constants.DefaultPlanId,
+                    IsRecommended = true,
+                    DisplayName = Resources.InProcessInMemBillingGatewayService_BasicPlan_DisplayName,
+                    Description = Resources.InProcessInMemBillingGatewayService_BasicPlan_Description,
+                    Notes = Resources.InProcessInMemBillingGatewayService_BasicPlan_Notes,
+                    SetupCost = 0M,
+                    Cost = 0M,
+                    Currency = CurrencyCodes.Default.Code,
+                    Period = new PlanPeriod
+                    {
+                        Frequency = 1,
+                        Unit = PeriodFrequencyUnit.Eternity
+                    },
+                    Trial = new SubscriptionTrialPeriod
+                    {
+                        HasTrial = false,
+                        Frequency = 0,
+                        Unit = PeriodFrequencyUnit.Eternity
+                    },
+                    FeatureSection =
+                    [
+                        new PricingFeatureSection
+                        {
+                            Description = "",
+                            Features =
+                            [
+                                new PricingFeatureItem
+                                {
+                                    Description = Resources
+                                        .InProcessInMemBillingGatewayService_BasicPlan_Feature1_Description,
+                                    IsIncluded = true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            Annually = [],
+            Monthly = [],
+            Weekly = [],
+            Daily = []
+        });
+    }
+
+    /// <summary>
     ///     Returns a zero-invoice for every 1st of the month in the date range
     /// </summary>
     public Task<Result<List<Invoice>, Error>> SearchAllInvoicesAsync(ICallerContext caller, BillingProvider provider,
@@ -277,62 +329,6 @@ public class InProcessInMemSimpleBillingGatewayService : IBillingGatewayService
                 PeriodStartUtc = date.AddMonths(-1)
             };
         }
-    }
-
-    /// <summary>
-    ///     There is only one fixed plan, at zero-cost
-    /// </summary>
-    public Task<Result<PricingPlans, Error>> ListAllPricingPlansAsync(ICallerContext caller,
-        CancellationToken cancellationToken)
-    {
-        return Task.FromResult<Result<PricingPlans, Error>>(new PricingPlans
-        {
-            Eternally =
-            [
-                new PricingPlan
-                {
-                    Id = SinglePlanBillingStateInterpreter.Constants.DefaultPlanId,
-                    IsRecommended = true,
-                    DisplayName = Resources.InProcessInMemBillingGatewayService_BasicPlan_DisplayName,
-                    Description = Resources.InProcessInMemBillingGatewayService_BasicPlan_Description,
-                    Notes = Resources.InProcessInMemBillingGatewayService_BasicPlan_Notes,
-                    SetupCost = 0M,
-                    Cost = 0M,
-                    Currency = CurrencyCodes.Default.Code,
-                    Period = new PlanPeriod
-                    {
-                        Frequency = 1,
-                        Unit = PeriodFrequencyUnit.Eternity
-                    },
-                    Trial = new SubscriptionTrialPeriod
-                    {
-                        HasTrial = false,
-                        Frequency = 0,
-                        Unit = PeriodFrequencyUnit.Eternity
-                    },
-                    FeatureSection =
-                    [
-                        new PricingFeatureSection
-                        {
-                            Description = "",
-                            Features =
-                            [
-                                new PricingFeatureItem
-                                {
-                                    Description = Resources
-                                        .InProcessInMemBillingGatewayService_BasicPlan_Feature1_Description,
-                                    IsIncluded = true
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ],
-            Annually = [],
-            Monthly = [],
-            Weekly = [],
-            Daily = []
-        });
     }
 
     /// <summary>

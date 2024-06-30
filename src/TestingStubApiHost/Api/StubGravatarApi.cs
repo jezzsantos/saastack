@@ -6,7 +6,7 @@ using Infrastructure.Web.Api.Operations.Shared._3rdParties.Gravatar;
 namespace TestingStubApiHost.Api;
 
 [WebService("/gravatar")]
-public class StubGravatarApi : StubApiBase
+public sealed class StubGravatarApi : StubApiBase
 {
     public StubGravatarApi(IRecorder recorder, IConfigurationSettings settings) : base(recorder, settings)
     {

@@ -1,5 +1,3 @@
-#region
-
 using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
@@ -12,8 +10,6 @@ using Infrastructure.Persistence.Interfaces;
 using SubscriptionsApplication.Persistence.ReadModels;
 using SubscriptionsDomain;
 
-#endregion
-
 namespace SubscriptionsInfrastructure.Persistence.ReadModels;
 
 public class SubscriptionProjection : IReadModelProjection
@@ -24,8 +20,6 @@ public class SubscriptionProjection : IReadModelProjection
     {
         _subscriptions = new ReadModelStore<Subscription>(recorder, domainFactory, store);
     }
-
-    public Type RootAggregateType => typeof(SubscriptionRoot);
 
     public async Task<Result<bool, Error>> ProjectEventAsync(IDomainEvent changeEvent,
         CancellationToken cancellationToken)
@@ -93,4 +87,6 @@ public class SubscriptionProjection : IReadModelProjection
                 return false;
         }
     }
+
+    public Type RootAggregateType => typeof(SubscriptionRoot);
 }

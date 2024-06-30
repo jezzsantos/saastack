@@ -1,6 +1,4 @@
-﻿#region
-
-using Application.Common.Extensions;
+﻿using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
@@ -9,8 +7,6 @@ using BookingsDomain;
 using Common;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
-
-#endregion
 
 namespace BookingsApplication;
 
@@ -143,7 +139,7 @@ public class BookingsApplication : IBookingsApplication
 
         var bookings = searched.Value;
         _recorder.TraceInformation(caller.ToCall(), "All bookings were fetched");
-        
+
         return searchOptions.ApplyWithMetadata(
             bookings.Select(booking => booking.ToBooking()));
     }

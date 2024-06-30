@@ -6,12 +6,15 @@ namespace Common;
 public static class CountryCodes
 {
     public static readonly CountryCodeIso3166 Australia = CountryCodeIso3166.Create("Australia", "AU", "AUS", "036");
+    public static readonly CountryCodeIso3166 UnitedStates =
+        CountryCodeIso3166.Create("United States of America", "US", "USA", "840");
+    public static readonly CountryCodeIso3166 Default = UnitedStates;
     public static readonly CountryCodeIso3166 NewZealand = CountryCodeIso3166.Create("New Zealand", "NZ", "NZL", "554");
-    public static readonly CountryCodeIso3166 Default = NewZealand;
 
 #if TESTINGONLY
     public static readonly CountryCodeIso3166 Test = CountryCodeIso3166.Create("Test", "XX", "XXX", "001");
 #endif
+
     /// <summary>
     ///     Whether the specified timezone by its <see cref="countryCodeAlpha3" /> exists
     /// </summary>

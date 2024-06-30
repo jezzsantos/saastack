@@ -18,7 +18,7 @@ namespace Infrastructure.Shared.UnitTests.ApplicationServices.External;
 public class GravatarClientSpec
 {
     private readonly Mock<ICallerContext> _caller;
-    private readonly GravatarHttpServiceClient.GravatarClient _client;
+    private readonly GravatarClient _client;
     private readonly Mock<IServiceClient> _serviceClient;
 
     public GravatarClientSpec()
@@ -28,7 +28,7 @@ public class GravatarClientSpec
         _serviceClient = new Mock<IServiceClient>();
         var retryPolicy = Policy.NoOpAsync().As<IAsyncPolicy>();
 
-        _client = new GravatarHttpServiceClient.GravatarClient(recorder.Object, _serviceClient.Object, retryPolicy);
+        _client = new GravatarClient(recorder.Object, _serviceClient.Object, retryPolicy);
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public class GravatarClientSpec
         result.Value.Value.Filename.Should().BeNull();
         result.Value.Value.Size.Should().Be(999);
         _serviceClient.Verify(sc => sc.GetBinaryAsync(_caller.Object, It.Is<GravatarGetImageRequest>(req =>
-            req.Default == GravatarHttpServiceClient.GravatarClient.DefaultImageBehaviour
+            req.Default == GravatarClient.DefaultImageBehaviour
         ), null, It.IsAny<CancellationToken>()));
     }
 }

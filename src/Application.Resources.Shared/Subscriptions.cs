@@ -1,8 +1,4 @@
-#region
-
 using Application.Interfaces.Resources;
-
-#endregion
 
 namespace Application.Resources.Shared;
 
@@ -42,13 +38,13 @@ public class SubscriptionWithPlan : Subscription
 
 public class SubscriptionPlan
 {
+    public string? Id { get; set; }
+
     public bool IsTrial { get; set; }
 
     public SubscriptionTier Tier { get; set; }
 
     public DateTime? TrialEndDateUtc { get; set; }
-
-    public string? Id { get; set; }
 }
 
 public class PlanPeriod
@@ -200,8 +196,6 @@ public class PricingPlans
 
 public class PricingPlan : IIdentifiableResource
 {
-    public required PlanPeriod Period { get; set; }
-
     public decimal Cost { get; set; } // In the denomination of the Currency
 
     public required string Currency { get; set; } // ISO4217
@@ -215,6 +209,8 @@ public class PricingPlan : IIdentifiableResource
     public bool IsRecommended { get; set; }
 
     public string? Notes { get; set; }
+
+    public required PlanPeriod Period { get; set; }
 
     public decimal SetupCost { get; set; } // In the denomination of the Currency
 

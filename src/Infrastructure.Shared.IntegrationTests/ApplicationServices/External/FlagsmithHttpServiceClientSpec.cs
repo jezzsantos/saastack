@@ -31,7 +31,7 @@ public class FlagsmithHttpServiceClientSpec : ExternalApiSpec
         if (!_isInitialized)
         {
             _isInitialized = true;
-            SetupEnvironmentAsync().GetAwaiter().GetResult();
+            SetupTestingSandboxAsync().GetAwaiter().GetResult();
         }
     }
 
@@ -233,7 +233,7 @@ public class FlagsmithHttpServiceClientSpec : ExternalApiSpec
         //Do nothing
     }
 
-    private async Task SetupEnvironmentAsync()
+    private async Task SetupTestingSandboxAsync()
     {
 #if TESTINGONLY
         await _serviceClient.DestroyAllFeaturesAsync();

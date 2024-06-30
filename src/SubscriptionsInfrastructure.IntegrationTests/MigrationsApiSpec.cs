@@ -46,7 +46,7 @@ public class MigrationsApiSpec
             result[0].Buyer[nameof(SubscriptionBuyer.EmailAddress)].Should().Be(login.Profile!.EmailAddress);
             result[0].Buyer[nameof(SubscriptionBuyer.CompanyReference)].Should().Be(login.DefaultOrganizationId);
             result[0].Buyer[nameof(SubscriptionBuyer.Address)].Should().Be(
-                "{\"City\":\"\",\"CountryCode\":\"NZL\",\"Line1\":\"\",\"Line2\":\"\",\"Line3\":\"\",\"State\":\"\",\"Zip\":\"\"}");
+                "{\"City\":\"\",\"CountryCode\":\"USA\",\"Line1\":\"\",\"Line2\":\"\",\"Line3\":\"\",\"State\":\"\",\"Zip\":\"\"}");
         }
 
         [Fact]

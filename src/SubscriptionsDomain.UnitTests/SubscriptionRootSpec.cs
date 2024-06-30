@@ -1,5 +1,3 @@
-#region
-
 using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
@@ -15,8 +13,6 @@ using FluentAssertions;
 using Moq;
 using UnitTesting.Common;
 using Xunit;
-
-#endregion
 
 namespace SubscriptionsDomain.UnitTests;
 

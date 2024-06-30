@@ -114,7 +114,7 @@ public class CurrencyCodesSpec
     public void WhenToCurrencyWithAThousandAndOne_ThenReturnsUnitedStatesDollars()
     {
         var code = CurrencyCodes.UnitedStatesDollar.Code;
-        var result = CurrencyCodes.ToCurrency(code, 1001);
+        var result = CurrencyCodes.FromMinorUnit(code, 1001);
 
         result.Should().Be(10.01M);
     }
@@ -123,7 +123,7 @@ public class CurrencyCodesSpec
     public void WhenToCurrencyWithAThousandAndOne_ThenReturnsKuwaitiDinars()
     {
         var code = CurrencyCodes.KuwaitiDinar.Code;
-        var result = CurrencyCodes.ToCurrency(code, 1001);
+        var result = CurrencyCodes.FromMinorUnit(code, 1001);
 
         result.Should().Be(1.001M);
     }
@@ -132,7 +132,7 @@ public class CurrencyCodesSpec
     public void WhenToCurrencyWithAThousandAndOne_ThenReturnsChileanFomentos()
     {
         var code = CurrencyCodes.ChileanFomento.Code;
-        var result = CurrencyCodes.ToCurrency(code, 1001);
+        var result = CurrencyCodes.FromMinorUnit(code, 1001);
 
         result.Should().Be(0.1001M);
     }

@@ -1,5 +1,3 @@
-#region
-
 using Common;
 using Common.Extensions;
 using Domain.Common.Entities;
@@ -13,8 +11,6 @@ using Domain.Interfaces.ValueObjects;
 using Domain.Services.Shared;
 using Domain.Shared;
 using Domain.Shared.Subscriptions;
-
-#endregion
 
 namespace SubscriptionsDomain;
 
@@ -275,11 +271,6 @@ public sealed class SubscriptionRoot : AggregateRootBase
         }
     }
 
-    private bool IsOperations(Roles roles)
-    {
-        return roles.HasRole(PlatformRoles.Operations);
-    }
-
     public async Task<Result<Error>> ChangePaymentMethodForBuyerAsync(IBillingStateInterpreter interpreter,
         Identifier modifierId, ChangePaymentMethodAction onChangePaymentMethod)
     {
@@ -509,6 +500,11 @@ public sealed class SubscriptionRoot : AggregateRootBase
         }
 
         return providerSubscription.Value;
+    }
+
+    private bool IsOperations(Roles roles)
+    {
+        return roles.HasRole(PlatformRoles.Operations);
     }
 
     private static bool IsServiceAccount(Identifier userId)

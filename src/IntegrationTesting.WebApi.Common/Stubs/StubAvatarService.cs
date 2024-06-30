@@ -8,7 +8,7 @@ namespace IntegrationTesting.WebApi.Common.Stubs;
 /// <summary>
 ///     Provides a stub for testing <see cref="IAvatarService" />
 /// </summary>
-public class StubAvatarService : IAvatarService
+public sealed class StubAvatarService : IAvatarService
 {
     public async Task<Result<Optional<FileUpload>, Error>> FindAvatarAsync(ICallerContext caller, string emailAddress,
         CancellationToken cancellationToken)

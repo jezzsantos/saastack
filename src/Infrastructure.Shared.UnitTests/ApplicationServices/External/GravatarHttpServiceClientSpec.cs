@@ -13,14 +13,14 @@ namespace Infrastructure.Shared.UnitTests.ApplicationServices.External;
 public class GravatarHttpServiceClientSpec
 {
     private readonly Mock<ICallerContext> _caller;
-    private readonly Mock<GravatarHttpServiceClient.IGravatarClient> _client;
+    private readonly Mock<IGravatarClient> _client;
     private readonly GravatarHttpServiceClient _serviceClient;
 
     public GravatarHttpServiceClientSpec()
     {
         var recorder = new Mock<IRecorder>();
         _caller = new Mock<ICallerContext>();
-        _client = new Mock<GravatarHttpServiceClient.IGravatarClient>();
+        _client = new Mock<IGravatarClient>();
 
         _serviceClient = new GravatarHttpServiceClient(recorder.Object, _client.Object);
     }

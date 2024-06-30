@@ -1,12 +1,8 @@
-#region
-
 using Common;
 using Domain.Shared.Subscriptions;
 using FluentAssertions;
 using UnitTesting.Common;
 using Xunit;
-
-#endregion
 
 namespace Domain.Shared.UnitTests.Subscriptions;
 
@@ -36,6 +32,7 @@ public class ProviderStatusSpec
         result.CanBeCanceled.Should().BeFalse();
         result.CanBeUnsubscribed.Should().BeFalse();
     }
+
     [Fact]
     public void WhenActive_ThenCanBeCanceled()
     {

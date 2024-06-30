@@ -1,11 +1,7 @@
-#region
-
 using Application.Interfaces;
 using Application.Resources.Shared;
 using Common;
 using Domain.Shared.Subscriptions;
-
-#endregion
 
 namespace Application.Services.Shared;
 
@@ -119,10 +115,13 @@ public class SubscribeOptions
     public static readonly SubscribeOptions Immediately = new()
     {
         StartWhen = StartSubscriptionSchedule.Immediately,
-        FutureTime = null
+        FutureTime = null,
+        PlanId = null
     };
 
     public DateTime? FutureTime { get; set; }
+
+    public string? PlanId { get; set; }
 
     public StartSubscriptionSchedule StartWhen { get; set; }
 
@@ -131,7 +130,8 @@ public class SubscribeOptions
         return new SubscribeOptions
         {
             StartWhen = StartSubscriptionSchedule.Scheduled,
-            FutureTime = time
+            FutureTime = time,
+            PlanId = null
         };
     }
 }

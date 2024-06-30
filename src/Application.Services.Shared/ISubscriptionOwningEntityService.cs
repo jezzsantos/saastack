@@ -1,9 +1,5 @@
-#region
-
 using Application.Interfaces;
 using Common;
-
-#endregion
 
 namespace Application.Services.Shared;
 

@@ -1,6 +1,4 @@
-﻿#region
-
-using Common;
+﻿using Common;
 using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Extensions;
@@ -12,8 +10,6 @@ using Domain.Interfaces.Entities;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.ValueObjects;
 using QueryAny;
-
-#endregion
 
 namespace BookingsDomain;
 

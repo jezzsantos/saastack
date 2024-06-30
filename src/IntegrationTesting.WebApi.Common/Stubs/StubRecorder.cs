@@ -6,7 +6,7 @@ namespace IntegrationTesting.WebApi.Common.Stubs;
 /// <summary>
 ///     Provides a stub for testing <see cref="IRecorder" />
 /// </summary>
-public class StubRecorder : IRecorder
+public sealed class StubRecorder : IRecorder
 {
     public string? LastAuditAuditCode { get; private set; }
 
@@ -26,13 +26,47 @@ public class StubRecorder : IRecorder
 
     public StubRecorderTraceLevel? LastTraceLevel { get; private set; }
 
-    public string? LastTraceMessageTemplate { get; private set; }
-
     public List<TraceMessage> LastTraceMessages { get; } = new();
+
+    public string? LastTraceMessageTemplate { get; private set; }
 
     public Dictionary<string, object>? LastUsageAdditional { get; private set; }
 
     public string? LastUsageEventName { get; private set; }
+
+    public void Audit(ICallContext? context, string auditCode, string messageTemplate, params object[] templateArgs)
+    {
+        LastAuditAuditCode = auditCode;
+    }
+
+    public void AuditAgainst(ICallContext? context, string againstId, string auditCode, string messageTemplate,
+        params object[] templateArgs)
+    {
+        LastAuditAuditCode = auditCode;
+    }
+
+    public void Crash(ICallContext? context, CrashLevel level, Exception exception)
+    {
+        LastCrashLevel = level;
+        LastCrashException = exception;
+        LastCrashMessageTemplate = null;
+        LastCrashArguments = null;
+    }
+
+    public void Crash(ICallContext? context, CrashLevel level, Exception exception, string messageTemplate,
+        params object[] templateArgs)
+    {
+        LastCrashLevel = level;
+        LastCrashException = exception;
+        LastCrashMessageTemplate = messageTemplate;
+        LastCrashArguments = templateArgs;
+    }
+
+    public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
+    {
+        LastMeasureEventName = eventName;
+        LastMeasureAdditional = additional;
+    }
 
     public void TraceDebug(ICallContext? context, string messageTemplate, params object[] templateArgs)
     {
@@ -40,6 +74,23 @@ public class StubRecorder : IRecorder
         LastTraceMessageTemplate = messageTemplate;
         LastTraceArguments = templateArgs;
         LastTraceMessages.Add(new TraceMessage(StubRecorderTraceLevel.Debug, messageTemplate, templateArgs));
+    }
+
+    public void TraceError(ICallContext? context, Exception exception, string messageTemplate,
+        params object[] templateArgs)
+    {
+        LastTraceLevel = StubRecorderTraceLevel.Error;
+        LastTraceMessageTemplate = messageTemplate;
+        LastTraceArguments = templateArgs;
+        LastTraceMessages.Add(new TraceMessage(StubRecorderTraceLevel.Error, messageTemplate, templateArgs));
+    }
+
+    public void TraceError(ICallContext? context, string messageTemplate, params object[] templateArgs)
+    {
+        LastTraceLevel = StubRecorderTraceLevel.Error;
+        LastTraceMessageTemplate = messageTemplate;
+        LastTraceArguments = templateArgs;
+        LastTraceMessages.Add(new TraceMessage(StubRecorderTraceLevel.Error, messageTemplate, templateArgs));
     }
 
     public void TraceInformation(ICallContext? context, Exception exception, string messageTemplate,
@@ -76,51 +127,6 @@ public class StubRecorder : IRecorder
         LastTraceMessages.Add(new TraceMessage(StubRecorderTraceLevel.Warning, messageTemplate, templateArgs));
     }
 
-    public void TraceError(ICallContext? context, Exception exception, string messageTemplate,
-        params object[] templateArgs)
-    {
-        LastTraceLevel = StubRecorderTraceLevel.Error;
-        LastTraceMessageTemplate = messageTemplate;
-        LastTraceArguments = templateArgs;
-        LastTraceMessages.Add(new TraceMessage(StubRecorderTraceLevel.Error, messageTemplate, templateArgs));
-    }
-
-    public void TraceError(ICallContext? context, string messageTemplate, params object[] templateArgs)
-    {
-        LastTraceLevel = StubRecorderTraceLevel.Error;
-        LastTraceMessageTemplate = messageTemplate;
-        LastTraceArguments = templateArgs;
-        LastTraceMessages.Add(new TraceMessage(StubRecorderTraceLevel.Error, messageTemplate, templateArgs));
-    }
-
-    public void Crash(ICallContext? context, CrashLevel level, Exception exception)
-    {
-        LastCrashLevel = level;
-        LastCrashException = exception;
-        LastCrashMessageTemplate = null;
-        LastCrashArguments = null;
-    }
-
-    public void Crash(ICallContext? context, CrashLevel level, Exception exception, string messageTemplate,
-        params object[] templateArgs)
-    {
-        LastCrashLevel = level;
-        LastCrashException = exception;
-        LastCrashMessageTemplate = messageTemplate;
-        LastCrashArguments = templateArgs;
-    }
-
-    public void Audit(ICallContext? context, string auditCode, string messageTemplate, params object[] templateArgs)
-    {
-        LastAuditAuditCode = auditCode;
-    }
-
-    public void AuditAgainst(ICallContext? context, string againstId, string auditCode, string messageTemplate,
-        params object[] templateArgs)
-    {
-        LastAuditAuditCode = auditCode;
-    }
-
     public void TrackUsage(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
     {
         LastUsageEventName = eventName;
@@ -132,12 +138,6 @@ public class StubRecorder : IRecorder
     {
         LastUsageEventName = eventName;
         LastUsageAdditional = additional;
-    }
-
-    public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
-    {
-        LastMeasureEventName = eventName;
-        LastMeasureAdditional = additional;
     }
 
     public void Reset()
@@ -156,10 +156,10 @@ public class StubRecorder : IRecorder
         LastUsageAdditional = null;
         LastAuditAuditCode = null;
     }
-
 }
+
 /// <summary>
-/// A trace level
+///     A trace level
 /// </summary>
 public enum StubRecorderTraceLevel
 {

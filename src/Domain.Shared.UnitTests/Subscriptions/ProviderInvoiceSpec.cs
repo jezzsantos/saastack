@@ -26,7 +26,7 @@ public class ProviderInvoiceSpec
         var result = ProviderInvoice.Create(1, CurrencyCode.Create(CurrencyCodes.NewZealandDollar).Value, next);
 
         result.Value.Amount.Should().Be(1);
-        result.Value.CurrencyCode.Currency.Should().Be(CurrencyCodes.NewZealandDollar);
+        result.Value.CurrencyCode.Currency.Should().Be(CurrencyCodes.UnitedStatesDollar);
         result.Value.NextUtc.Should().Be(next);
     }
 }

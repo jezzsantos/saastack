@@ -1,5 +1,3 @@
-#region
-
 using System.Net;
 using ApiHost1;
 using Application.Resources.Shared;
@@ -16,8 +14,6 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using SubscriptionsDomain;
 using Xunit;
-
-#endregion
 
 namespace SubscriptionsInfrastructure.IntegrationTests;
 
@@ -152,7 +148,7 @@ public class SubscriptionsApiSpec
             result.ProviderName.Should().Be(SinglePlanBillingStateInterpreter.Constants.ProviderName);
             result.Status.Should().Be(SubscriptionStatus.Unsubscribed);
             result.CanceledDateUtc.Should().BeNull();
-            result.Plan.Id.Should().Be(string.Empty);
+            result.Plan.Id.Should().BeNull();
             result.Plan.IsTrial.Should().BeFalse();
             result.Plan.TrialEndDateUtc.Should().BeNull();
             result.Plan.Tier.Should().Be(SubscriptionTier.Unsubscribed);
@@ -179,7 +175,7 @@ public class SubscriptionsApiSpec
             result.ProviderName.Should().Be(SinglePlanBillingStateInterpreter.Constants.ProviderName);
             result.Status.Should().Be(SubscriptionStatus.Unsubscribed);
             result.CanceledDateUtc.Should().BeNull();
-            result.Plan.Id.Should().Be(string.Empty);
+            result.Plan.Id.Should().BeNull();
             result.Plan.IsTrial.Should().BeFalse();
             result.Plan.TrialEndDateUtc.Should().BeNull();
             result.Plan.Tier.Should().Be(SubscriptionTier.Unsubscribed);

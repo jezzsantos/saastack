@@ -1,5 +1,3 @@
-#region
-
 using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
@@ -8,8 +6,6 @@ using FluentAssertions;
 using Infrastructure.Shared.ApplicationServices;
 using UnitTesting.Common;
 using Xunit;
-
-#endregion
 
 namespace Infrastructure.Shared.UnitTests.ApplicationServices;
 
