@@ -13,6 +13,8 @@ public class UserProfile : ReadModelEntity
 
     public Optional<string> CountryCode { get; set; }
 
+    public Optional<string> DefaultOrganizationId { get; set; }
+
     public Optional<string> DisplayName { get; set; }
 
     public Optional<string> EmailAddress { get; set; }
@@ -28,6 +30,4 @@ public class UserProfile : ReadModelEntity
     public Optional<string> Type { get; set; }
 
     public Optional<string> UserId { get; set; }
-
-    public Optional<string> DefaultOrganizationId { get; set; }
 }

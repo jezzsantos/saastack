@@ -9,9 +9,9 @@ namespace Domain.Interfaces.Authorization;
 public static class PlatformRoles
 {
     public static readonly RoleLevel ExternalWebhookService = new("platform_external_webhook_service");
-    public static readonly RoleLevel ServiceAccount = new("platform_internal_service");
     public static readonly RoleLevel Standard = new("platform_standard");
     public static readonly RoleLevel Operations = new("platform_operations", Standard);
+    public static readonly RoleLevel ServiceAccount = new("platform_internal_service");
     public static readonly RoleLevel TestingOnly = new("platform_testingonly");
     public static readonly RoleLevel TestingOnlySuperUser = new("platform_super_testingonly", TestingOnly);
     public static readonly Dictionary<string, RoleLevel> AllRoles = new()

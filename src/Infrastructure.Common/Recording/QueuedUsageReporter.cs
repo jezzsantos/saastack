@@ -34,9 +34,9 @@ public class QueuedUsageReporter : IUsageReporter
         : this(new UsageMessageQueue(NoOpRecorder.Instance, container.GetRequiredService<IMessageQueueIdFactory>(),
 #if !TESTINGONLY
 #if HOSTEDONAZURE
-                AzureStorageAccountQueueStore.Create(NoOpRecorder.Instance, settings)
+            AzureStorageAccountQueueStore.Create(NoOpRecorder.Instance, settings)
 #elif HOSTEDONAWS
-                AWSSQSQueueStore.Create(NoOpRecorder.Instance, settings)
+            AWSSQSQueueStore.Create(NoOpRecorder.Instance, settings)
 #endif
 #else
             container.GetRequiredServiceForPlatform<IQueueStore>()

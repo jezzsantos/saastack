@@ -33,10 +33,10 @@ public static class HostExtensions
         services.AddSingleton<ICrashReporter>(new NoOpCrashReporter());
 #else
 #if HOSTEDONAZURE
-            //Note: ApplicationInsights TelemetryClient is not added by default by the runtime V4
-            services.AddApplicationInsightsTelemetryWorkerService();
-            services.AddSingleton<ICrashReporter>(c =>
-                new ApplicationInsightsCrashReporter(c.GetRequiredService<TelemetryClient>()));
+        //Note: ApplicationInsights TelemetryClient is not added by default by the runtime V4
+        services.AddApplicationInsightsTelemetryWorkerService();
+        services.AddSingleton<ICrashReporter>(c =>
+            new ApplicationInsightsCrashReporter(c.GetRequiredService<TelemetryClient>()));
 #endif
 #endif
 

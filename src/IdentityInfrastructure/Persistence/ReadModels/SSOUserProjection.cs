@@ -20,8 +20,6 @@ public class SSOUserProjection : IReadModelProjection
         _users = new ReadModelStore<SSOUser>(recorder, domainFactory, store);
     }
 
-    public Type RootAggregateType => typeof(SSOUserRoot);
-
     public async Task<Result<bool, Error>> ProjectEventAsync(IDomainEvent changeEvent,
         CancellationToken cancellationToken)
     {
@@ -50,4 +48,6 @@ public class SSOUserProjection : IReadModelProjection
                 return false;
         }
     }
+
+    public Type RootAggregateType => typeof(SSOUserRoot);
 }

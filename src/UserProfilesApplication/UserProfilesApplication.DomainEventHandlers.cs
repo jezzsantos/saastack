@@ -15,6 +15,19 @@ namespace UserProfilesApplication;
 
 partial class UserProfilesApplication
 {
+    public async Task<Result<Error>> HandleEndUserDefaultMembershipChangedAsync(ICallerContext caller,
+        DefaultMembershipChanged domainEvent, CancellationToken cancellationToken)
+    {
+        var profile = await UpdateDefaultOrganizationAsync(caller, domainEvent.RootId, domainEvent.ToOrganizationId,
+            cancellationToken);
+        if (profile.IsFailure)
+        {
+            return profile.Error;
+        }
+
+        return Result.Ok;
+    }
+
     public async Task<Result<Error>> HandleEndUserRegisteredAsync(ICallerContext caller, Registered domainEvent,
         CancellationToken cancellationToken)
     {
@@ -35,19 +48,6 @@ partial class UserProfilesApplication
         CancellationToken cancellationToken)
     {
         return await HandleDeleteAvatarAsync(caller, domainEvent.RootId, cancellationToken);
-    }
-
-    public async Task<Result<Error>> HandleEndUserDefaultMembershipChangedAsync(ICallerContext caller,
-        DefaultMembershipChanged domainEvent, CancellationToken cancellationToken)
-    {
-        var profile = await UpdateDefaultOrganizationAsync(caller, domainEvent.RootId, domainEvent.ToOrganizationId,
-            cancellationToken);
-        if (profile.IsFailure)
-        {
-            return profile.Error;
-        }
-
-        return Result.Ok;
     }
 
     private async Task<Result<Error>> HandleDeleteAvatarAsync(ICallerContext caller, string imageId,

@@ -20,8 +20,6 @@ public class ImageProjection : IReadModelProjection
         _images = new ReadModelStore<Image>(recorder, domainFactory, store);
     }
 
-    public Type RootAggregateType => typeof(ImageRoot);
-
     public async Task<Result<bool, Error>> ProjectEventAsync(IDomainEvent changeEvent,
         CancellationToken cancellationToken)
     {
@@ -54,4 +52,6 @@ public class ImageProjection : IReadModelProjection
                 return false;
         }
     }
+
+    public Type RootAggregateType => typeof(ImageRoot);
 }

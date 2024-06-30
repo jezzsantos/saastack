@@ -122,7 +122,7 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
                     title),
                 diagnostic);
         }
-        
+
         if (diagnostics.Any(d =>
                 d.Id == DomainDrivenDesignAnalyzer.Rule018.Id
                 || d.Id == DomainDrivenDesignAnalyzer.Rule027.Id
@@ -527,7 +527,8 @@ public class DomainDrivenDesignCodeFix : CodeFixProvider
             return document.Project.Solution;
         }
 
-        var modifiedClassDeclaration = classDeclarationSyntax.AddModifiers(SyntaxFactory.Token(SyntaxKind.SealedKeyword));
+        var modifiedClassDeclaration =
+            classDeclarationSyntax.AddModifiers(SyntaxFactory.Token(SyntaxKind.SealedKeyword));
         var newRoot = root.ReplaceNode(classDeclarationSyntax, modifiedClassDeclaration);
         var newDocument = document.WithSyntaxRoot(newRoot);
 

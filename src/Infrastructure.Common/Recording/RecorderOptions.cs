@@ -99,7 +99,7 @@ public class RecorderOptions
 #if TESTINGONLY
             return Testing;
 #else
-                return Production;
+            return Production;
 #endif
         }
     }

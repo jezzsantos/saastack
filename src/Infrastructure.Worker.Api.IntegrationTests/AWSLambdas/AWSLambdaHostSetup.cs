@@ -50,6 +50,26 @@ public class AWSLambdaHostSetup : IApiWorkerSpec, IDisposable
         }
     }
 
+    public TService GetRequiredService<TService>()
+        where TService : notnull
+    {
+        if (_host.NotExists())
+        {
+            throw new InvalidOperationException("Host has not be started yet!");
+        }
+
+        return _host.Services.GetRequiredService<TService>();
+    }
+
+    public IMessageBusStore MessageBusStore { get; }
+
+    public void OverrideTestingDependencies(Action<IServiceCollection> overrideDependencies)
+    {
+        _overridenTestingDependencies = overrideDependencies;
+    }
+
+    public IQueueStore QueueStore { get; }
+
     public void Start()
     {
         _host = new HostBuilder()
@@ -70,29 +90,9 @@ public class AWSLambdaHostSetup : IApiWorkerSpec, IDisposable
         _host.Start();
     }
 
-    public IQueueStore QueueStore { get; }
-
-    public IMessageBusStore MessageBusStore { get; }
-
-    public void OverrideTestingDependencies(Action<IServiceCollection> overrideDependencies)
-    {
-        _overridenTestingDependencies = overrideDependencies;
-    }
-
     // ReSharper disable once MemberCanBeMadeStatic.Global
     public void WaitForQueueProcessingToComplete()
     {
         Thread.Sleep(LambdaTriggerWaitLatency);
-    }
-
-    public TService GetRequiredService<TService>()
-        where TService : notnull
-    {
-        if (_host.NotExists())
-        {
-            throw new InvalidOperationException("Host has not be started yet!");
-        }
-
-        return _host.Services.GetRequiredService<TService>();
     }
 }

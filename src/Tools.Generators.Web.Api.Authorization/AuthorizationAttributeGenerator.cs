@@ -15,11 +15,6 @@ public class AuthorizationAttributeGenerator : ISourceGenerator
 {
     private const string Filename = "AuthorizeAttribute.g.cs";
 
-    public void Initialize(GeneratorInitializationContext context)
-    {
-        // No initialization
-    }
-
     public void Execute(GeneratorExecutionContext context)
     {
         var assemblyNamespace = context.Compilation.AssemblyName;
@@ -269,6 +264,11 @@ internal static class AuthorizationAttributeExtensions
 }}
 ";
         }
+    }
+
+    public void Initialize(GeneratorInitializationContext context)
+    {
+        // No initialization
     }
 }
 

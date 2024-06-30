@@ -124,7 +124,7 @@ public class ImageRootSpec
 
         result.Should().BeError(ErrorCode.RuleViolation, Resources.ImageRoot_NotCreator);
     }
-    
+
     [Fact]
     public void WhenDelete_ThenDeleted()
     {

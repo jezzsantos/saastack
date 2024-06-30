@@ -307,6 +307,27 @@ public sealed class UserProfileRoot : AggregateRootBase
         return RaiseChangeEvent(UserProfilesDomain.Events.PhoneNumberChanged(Id, UserId, number));
     }
 
+    public Result<Error> ForceRemoveAvatar(Identifier deleterId)
+    {
+        if (IsNotServiceAccount(deleterId))
+        {
+            return Error.RoleViolation(Resources.UserProfileRoot_NotServiceAccount);
+        }
+
+        if (Type != ProfileType.Person)
+        {
+            return Error.RuleViolation(Resources.UserProfileRoot_NotAPerson);
+        }
+
+        if (!Avatar.HasValue)
+        {
+            return Result.Ok;
+        }
+
+        var avatarId = Avatar.Value.ImageId;
+        return RaiseChangeEvent(UserProfilesDomain.Events.AvatarRemoved(Id, UserId, avatarId));
+    }
+
     public async Task<Result<Error>> RemoveAvatarAsync(Identifier deleterId, RemoveAvatarAction onRemoveOld)
     {
         if (IsNotOwner(deleterId))
@@ -331,27 +352,6 @@ public sealed class UserProfileRoot : AggregateRootBase
             return removed.Error;
         }
 
-        return RaiseChangeEvent(UserProfilesDomain.Events.AvatarRemoved(Id, UserId, avatarId));
-    }
-
-    public Result<Error> ForceRemoveAvatar(Identifier deleterId)
-    {
-        if (IsNotServiceAccount(deleterId))
-        {
-            return Error.RoleViolation(Resources.UserProfileRoot_NotServiceAccount);
-        }
-
-        if (Type != ProfileType.Person)
-        {
-            return Error.RuleViolation(Resources.UserProfileRoot_NotAPerson);
-        }
-
-        if (!Avatar.HasValue)
-        {
-            return Result.Ok;
-        }
-
-        var avatarId = Avatar.Value.ImageId;
         return RaiseChangeEvent(UserProfilesDomain.Events.AvatarRemoved(Id, UserId, avatarId));
     }
 

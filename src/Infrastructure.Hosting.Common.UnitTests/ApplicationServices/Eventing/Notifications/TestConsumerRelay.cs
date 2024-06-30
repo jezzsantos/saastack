@@ -12,7 +12,7 @@ internal class TestConsumerRelay : IDomainEventConsumerRelay
     public IDomainEvent[] NotifiedEvents => _notifiedEvents.ToArray();
 
     public Task<Result<Error>> RelayDomainEventAsync(IDomainEvent @event,
-        EventStreamChangeEvent changeEvent, 
+        EventStreamChangeEvent changeEvent,
         CancellationToken cancellationToken)
     {
         _notifiedEvents.Add(@event);

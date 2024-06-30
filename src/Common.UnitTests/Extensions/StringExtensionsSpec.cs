@@ -425,7 +425,7 @@ public class StringExtensionsSpec
 
         result.Should().Be(9.009D);
     }
-    
+
     [Fact]
     public void WhenWithoutTrailingSlashWithSlash_ThenReturnsPathWithoutSlash()
     {

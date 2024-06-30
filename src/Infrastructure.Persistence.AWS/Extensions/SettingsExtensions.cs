@@ -21,7 +21,7 @@ public static class SettingsExtensions
         {
             return (new AnonymousAWSCredentials(), null);
         }
-        
+
         var regionEndpoint = RegionEndpoint.GetBySystemName(region);
         return (credentials, regionEndpoint);
     }

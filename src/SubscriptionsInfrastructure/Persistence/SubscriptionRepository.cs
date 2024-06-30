@@ -27,12 +27,32 @@ public class SubscriptionRepository : ISubscriptionRepository
         _subscriptions = subscriptionsStore;
     }
 
+#if TESTINGONLY
+    public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
+    {
+        return await Tasks.WhenAllAsync(
+            _subscriptionQueries.DestroyAllAsync(cancellationToken),
+            _subscriptions.DestroyAllAsync(cancellationToken));
+    }
+#endif
+
     public async Task<Result<Optional<SubscriptionRoot>, Error>> FindByOwningEntityIdAsync(Identifier owningEntityId,
         CancellationToken cancellationToken)
     {
         var query = Query.From<Subscription>()
             .Where<string>(at => at.OwningEntityId, ConditionOperator.EqualTo, owningEntityId);
         return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
+    public async Task<Result<SubscriptionRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
+    {
+        var subscription = await _subscriptions.LoadAsync(id, cancellationToken);
+        if (subscription.IsFailure)
+        {
+            return subscription.Error;
+        }
+
+        return subscription;
     }
 
     public async Task<Result<SubscriptionRoot, Error>> SaveAsync(SubscriptionRoot subscription,
@@ -61,26 +81,6 @@ public class SubscriptionRepository : ISubscriptionRepository
 
         return queried.Value.Results;
     }
-
-    public async Task<Result<SubscriptionRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
-    {
-        var subscription = await _subscriptions.LoadAsync(id, cancellationToken);
-        if (subscription.IsFailure)
-        {
-            return subscription.Error;
-        }
-
-        return subscription;
-    }
-
-#if TESTINGONLY
-    public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
-    {
-        return await Tasks.WhenAllAsync(
-            _subscriptionQueries.DestroyAllAsync(cancellationToken),
-            _subscriptions.DestroyAllAsync(cancellationToken));
-    }
-#endif
 
     private async Task<Result<Optional<SubscriptionRoot>, Error>> FindFirstByQueryAsync(QueryClause<Subscription> query,
         CancellationToken cancellationToken)

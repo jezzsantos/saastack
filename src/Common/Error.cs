@@ -176,7 +176,7 @@ public enum ErrorCode
     // EXTEND: add other kinds of errors you want to support in Result<TError>
     NoError = -1,
     Validation,
-    RuleViolation, 
+    RuleViolation,
     RoleViolation,
     PreconditionViolation, // the resource is not in a valid state to begin with
     EntityNotFound,
@@ -185,5 +185,5 @@ public enum ErrorCode
     NotAuthenticated,
     ForbiddenAccess,
     FeatureViolation,
-    Unexpected,
+    Unexpected
 }

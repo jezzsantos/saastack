@@ -29,7 +29,10 @@ namespace OrganizationsInfrastructure;
 
 public class OrganizationsModule : ISubdomainModule
 {
-    public Assembly InfrastructureAssembly => typeof(OrganizationsModule).Assembly;
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
 
     public Assembly DomainAssembly => typeof(OrganizationRoot).Assembly;
 
@@ -38,10 +41,7 @@ public class OrganizationsModule : ISubdomainModule
         { typeof(OrganizationRoot), "org" }
     };
 
-    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
-    {
-        get { return (app, _) => app.RegisterRoutes(); }
-    }
+    public Assembly InfrastructureAssembly => typeof(OrganizationsModule).Assembly;
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {

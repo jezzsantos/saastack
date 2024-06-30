@@ -59,38 +59,6 @@ public class CarsApplication : ICarsApplication
         return car.ToCar();
     }
 
-    public async Task<Result<Car, Error>> ScheduleMaintenanceCarAsync(ICallerContext caller, string organizationId,
-        string id,
-        DateTime fromUtc, DateTime toUtc, CancellationToken cancellationToken)
-    {
-        var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!retrieved.Exists)
-        {
-            return retrieved.Error;
-        }
-
-        var car = retrieved.Value;
-        var timeSlot = TimeSlot.Create(fromUtc, toUtc);
-        if (timeSlot.IsFailure)
-        {
-            return timeSlot.Error;
-        }
-
-        var changed = car.ScheduleMaintenance(timeSlot.Value);
-        if (changed.IsFailure)
-        {
-            return changed.Error;
-        }
-
-        var saved = await _repository.SaveAsync(car, cancellationToken);
-        return saved.Match<Result<Car, Error>>(c =>
-        {
-            _recorder.TraceInformation(caller.ToCall(), "Car {Id} was scheduled for maintenance from {From} until {To}",
-                car.Id, fromUtc, toUtc);
-            return c.Value.ToCar();
-        }, error => error);
-    }
-
     public async Task<Result<Car, Error>> RegisterCarAsync(ICallerContext caller, string organizationId, string make,
         string model, int year, string location, string plate, CancellationToken cancellationToken)
     {
@@ -230,6 +198,38 @@ public class CarsApplication : ICarsApplication
             _recorder.TraceInformation(caller.ToCall(), "Car {Id} was reserved from {From} until {To}",
                 car.Id, fromUtc, toUtc);
             return true;
+        }, error => error);
+    }
+
+    public async Task<Result<Car, Error>> ScheduleMaintenanceCarAsync(ICallerContext caller, string organizationId,
+        string id,
+        DateTime fromUtc, DateTime toUtc, CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
+        if (!retrieved.Exists)
+        {
+            return retrieved.Error;
+        }
+
+        var car = retrieved.Value;
+        var timeSlot = TimeSlot.Create(fromUtc, toUtc);
+        if (timeSlot.IsFailure)
+        {
+            return timeSlot.Error;
+        }
+
+        var changed = car.ScheduleMaintenance(timeSlot.Value);
+        if (changed.IsFailure)
+        {
+            return changed.Error;
+        }
+
+        var saved = await _repository.SaveAsync(car, cancellationToken);
+        return saved.Match<Result<Car, Error>>(c =>
+        {
+            _recorder.TraceInformation(caller.ToCall(), "Car {Id} was scheduled for maintenance from {From} until {To}",
+                car.Id, fromUtc, toUtc);
+            return c.Value.ToCar();
         }, error => error);
     }
 

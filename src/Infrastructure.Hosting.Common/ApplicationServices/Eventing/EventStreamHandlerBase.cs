@@ -20,8 +20,6 @@ public abstract class EventStreamHandlerBase : IDisposable
         _eventingStores = eventingStores;
     }
 
-    public Guid InstanceId { get; }
-
     public void Dispose()
     {
         Dispose(true);
@@ -39,6 +37,8 @@ public abstract class EventStreamHandlerBase : IDisposable
     }
 
     public IReadOnlyList<IEventNotifyingStore> EventingStores => _eventingStores;
+
+    public Guid InstanceId { get; }
 
     public bool IsStarted { get; private set; }
 
@@ -114,7 +114,6 @@ public abstract class EventStreamHandlerBase : IDisposable
                         Resources.EventStreamHandlerBase_OnEventStreamStateChanged_FailedToHandle.Format(streamName),
                         ex);
                 }
-
             }
 
             return tasks;

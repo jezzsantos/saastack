@@ -61,9 +61,9 @@ This starter template is NOT for everyone, nor for EVERY software project, nor f
 
 * The tech stack is a .NET core backend (LTS version 8.0 or later) written in C#, using (a few) but very popular and well-supported 3rd party libraries. (We've worked very hard to find a balance between too few and far too many).
 * This starter template deliberately makes engineering trade-offs that are optimized for situations where:
-  1. High maintainability is super important to you over long periods of time (e.g., long-lived codebases)
+   1. High maintainability is super important to you over long periods of time (e.g., long-lived codebases)
    2. Managing complexity over long periods of time is non-negotiable (~1-10 years), and avoiding big balls of mud (BBOMs) is paramount to you,
-  3. Where many hands will touch the codebase (i.e., over the course of its entire life). Of course, if you are working alone on a project, you will have personal preferences, free from the practical constraints of working in teams.
+   3. Where many hands will touch the codebase (i.e., over the course of its entire life). Of course, if you are working alone on a project, you will have personal preferences, free from the practical constraints of working in teams.
 
 ## What is it for?
 
@@ -152,7 +152,7 @@ The starter template also takes care of these specific kinds of things:
    * Applications are aligned to audiences and subdomains
 * Others
    * It provides documented code examples for the most common use cases. Simply follow and learn from the existing patterns in the codebase
-  * It provides [how-to guides](docs/how-to-guides/README.md) for performing the most common things on a codebase like this, until you've learned the patterns.
+   * It provides [how-to guides](docs/how-to-guides/README.md) for performing the most common things on a codebase like this, until you've learned the patterns.
    * It provides a [decision log](docs/decisions/README.md) so you can see why certain design decisions were made.
    * It provides documentation about the [design principles](docs/design-principles/README.md) behind the codebase so you can learn about them and why they exist.
    * It \[will\] provide an eco-system/marketplace of common adapters that other people can build and share with the community.

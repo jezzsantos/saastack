@@ -100,7 +100,6 @@ public static class EventNotifyingStoreExtensions
             throw new InvalidOperationException(
                 Resources.EventNotifyingStoreExtensions_OnComplete_FailedToNotify.Format(streamName),
                 ex);
-
         }
 
         var error = completed.Error;

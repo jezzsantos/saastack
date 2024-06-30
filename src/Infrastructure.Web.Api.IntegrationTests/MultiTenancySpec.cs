@@ -209,8 +209,6 @@ public class MultiTenancySpec
                 _path = StubTenantSettingsService.GetRepositoryPath(tenantId);
             }
 
-            public bool IsConfigured => true;
-
             public bool GetBool(string key, bool? defaultValue = null)
             {
                 throw new NotImplementedException();
@@ -232,6 +230,8 @@ public class MultiTenancySpec
 
                 return null!;
             }
+
+            public bool IsConfigured => true;
 
             public ISettings Platform => this;
 

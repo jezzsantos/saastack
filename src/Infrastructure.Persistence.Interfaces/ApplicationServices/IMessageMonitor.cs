@@ -7,11 +7,11 @@ namespace Infrastructure.Persistence.Interfaces.ApplicationServices;
 /// </summary>
 public interface IMessageMonitor
 {
-    void NotifyQueueMessagesChanged(string queueName, int messageCount);
-
-    void NotifyTopicMessagesChanged(string topicName, int messageCount);
-
     Optional<string> NextQueueName();
 
     Optional<string> NextTopicName();
+
+    void NotifyQueueMessagesChanged(string queueName, int messageCount);
+
+    void NotifyTopicMessagesChanged(string topicName, int messageCount);
 }

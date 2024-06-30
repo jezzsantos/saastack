@@ -43,6 +43,8 @@ public sealed class GuestInvitation : ValueObjectBase<GuestInvitation>
 
     public EmailAddress? AcceptedEmailAddress { get; }
 
+    public bool CanAccept => IsInvited && !IsAccepted;
+
     public DateTime? ExpiresOnUtc { get; }
 
     public DateTime? InvitedAtUtc { get; }
@@ -58,8 +60,6 @@ public sealed class GuestInvitation : ValueObjectBase<GuestInvitation>
     public bool IsStillOpen => IsInvited && ExpiresOnUtc.HasValue() && ExpiresOnUtc > DateTime.UtcNow;
 
     public string? Token { get; }
-
-    public bool CanAccept => IsInvited && !IsAccepted;
 
     public static ValueObjectFactory<GuestInvitation> Rehydrate()
     {

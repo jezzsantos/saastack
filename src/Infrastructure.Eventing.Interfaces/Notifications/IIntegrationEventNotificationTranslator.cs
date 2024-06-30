@@ -14,7 +14,8 @@ public interface IIntegrationEventNotificationTranslator
     Type RootAggregateType { get; }
 
     /// <summary>
-    ///     Handles the notification of a new <see cref="IDomainEvent" />, and returns an optional <see cref="IIntegrationEvent" />
+    ///     Handles the notification of a new <see cref="IDomainEvent" />, and returns an optional
+    ///     <see cref="IIntegrationEvent" />
     ///     event to be published to downstream consumers of integration events
     /// </summary>
     Task<Result<Optional<IIntegrationEvent>, Error>> TranslateAsync(IDomainEvent domainEvent,

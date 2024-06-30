@@ -14,7 +14,10 @@ namespace BookingsInfrastructure;
 
 public class BookingsModule : ISubdomainModule
 {
-    public Assembly InfrastructureAssembly => typeof(BookingsApi).Assembly;
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
 
     public Assembly DomainAssembly => typeof(BookingRoot).Assembly;
 
@@ -24,10 +27,7 @@ public class BookingsModule : ISubdomainModule
         { typeof(Trip), "trip" }
     };
 
-    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
-    {
-        get { return (app, _) => app.RegisterRoutes(); }
-    }
+    public Assembly InfrastructureAssembly => typeof(BookingsApi).Assembly;
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {

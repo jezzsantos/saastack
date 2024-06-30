@@ -21,20 +21,20 @@ public class AnonymousCallerContext : ICallerContext
             : Caller.GenerateCallId();
     }
 
+    public Optional<ICallerContext.CallerAuthorization> Authorization =>
+        Optional<ICallerContext.CallerAuthorization>.None;
+
     public string CallerId => CallerConstants.AnonymousUserId;
 
     public string CallId { get; init; }
 
-    public string? TenantId => null;
-
-    public ICallerContext.CallerRoles Roles => new();
-
     public ICallerContext.CallerFeatures Features => new(new[] { PlatformFeatures.Basic }, null);
-
-    public Optional<ICallerContext.CallerAuthorization> Authorization =>
-        Optional<ICallerContext.CallerAuthorization>.None;
 
     public bool IsAuthenticated => false;
 
     public bool IsServiceAccount => false;
+
+    public ICallerContext.CallerRoles Roles => new();
+
+    public string? TenantId => null;
 }

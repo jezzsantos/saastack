@@ -37,9 +37,9 @@ public class Startup
             builder.AddDebug();
 #else
 #if HOSTEDONAWS
-                AWSXRayRecorder.InitializeInstance(configuration);
-                AWSSDKHandler.RegisterXRayForAllServices();
-                builder.AddLambdaLogger();
+            AWSXRayRecorder.InitializeInstance(configuration);
+            AWSSDKHandler.RegisterXRayForAllServices();
+            builder.AddLambdaLogger();
 #endif
 #endif
             builder.AddEventSourceLogger();

@@ -17,10 +17,10 @@ public class ApiHostDomainEventingSubscriber : IDomainEventingSubscriber
         SubscriptionName = settings.Platform.GetString(EventingSubscriberNameSettingName);
     }
 
-    public string SubscriptionName { get; }
-
     public async Task<Result<Error>> Subscribe(CancellationToken cancellationToken)
     {
         return await _store.SubscribeAsync(EventingConstants.Topics.DomainEvents, SubscriptionName, cancellationToken);
     }
+
+    public string SubscriptionName { get; }
 }

@@ -145,13 +145,13 @@ public class HasSearchOptionsExtensionsSpec
 
 public class SearchOptionsDto : IHasSearchOptions
 {
+    public string? Embed { get; set; }
+
+    public string? Filter { get; set; }
+
     public int? Limit { get; set; }
 
     public int? Offset { get; set; }
 
     public string? Sort { get; set; }
-
-    public string? Filter { get; set; }
-
-    public string? Embed { get; set; }
 }

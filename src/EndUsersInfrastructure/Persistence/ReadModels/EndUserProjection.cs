@@ -31,8 +31,6 @@ public class EndUserProjection : IReadModelProjection
         _memberships = new ReadModelStore<Membership>(recorder, domainFactory, store);
     }
 
-    public Type RootAggregateType => typeof(EndUserRoot);
-
     public async Task<Result<bool, Error>> ProjectEventAsync(IDomainEvent changeEvent,
         CancellationToken cancellationToken)
     {
@@ -256,4 +254,6 @@ public class EndUserProjection : IReadModelProjection
                 return false;
         }
     }
+
+    public Type RootAggregateType => typeof(EndUserRoot);
 }

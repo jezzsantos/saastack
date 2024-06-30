@@ -20,8 +20,6 @@ public class AuthTokensProjection : IReadModelProjection
         _authTokens = new ReadModelStore<AuthToken>(recorder, domainFactory, store);
     }
 
-    public Type RootAggregateType => typeof(AuthTokensRoot);
-
     public async Task<Result<bool, Error>> ProjectEventAsync(IDomainEvent changeEvent,
         CancellationToken cancellationToken)
     {
@@ -62,4 +60,6 @@ public class AuthTokensProjection : IReadModelProjection
                 return false;
         }
     }
+
+    public Type RootAggregateType => typeof(AuthTokensRoot);
 }

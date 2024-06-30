@@ -22,16 +22,16 @@ namespace EventNotificationsInfrastructure;
 
 public class EventNotificationsModule : ISubdomainModule
 {
-    public Assembly InfrastructureAssembly => typeof(DomainEventsApi).Assembly;
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
 
     public Assembly? DomainAssembly => null;
 
     public Dictionary<Type, string> EntityPrefixes => new();
 
-    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
-    {
-        get { return (app, _) => app.RegisterRoutes(); }
-    }
+    public Assembly InfrastructureAssembly => typeof(DomainEventsApi).Assembly;
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {

@@ -15,8 +15,8 @@ namespace Infrastructure.Persistence.Common.ApplicationServices;
 /// <summary>
 ///     Provides a combined store that persists all data to individual files of JSON on the local hard drive.
 ///     The files are located in named folders under <see cref="_rootPath" />,
-///         on Windows that is: %LOCALAPPDATA%\saastack\{containerName},
-///         on macOS that is: /Users/username/.local/share/saastack/{containerName}
+///     on Windows that is: %LOCALAPPDATA%\saastack\{containerName},
+///     on macOS that is: /Users/username/.local/share/saastack/{containerName}
 /// </summary>
 [ExcludeFromCodeCoverage]
 public sealed partial class LocalMachineJsonFileStore : IDisposable
@@ -55,15 +55,9 @@ public sealed partial class LocalMachineJsonFileStore : IDisposable
                 EnableRaisingEvents = true
             };
             _fileSystemWatcher.Created += FileSystemWatcherOnCreated;
-            FireQueueMessage += (_, args) =>
-            {
-                monitor.NotifyQueueMessagesChanged(args.QueueName, args.MessageCount);
-            };
+            FireQueueMessage += (_, args) => { monitor.NotifyQueueMessagesChanged(args.QueueName, args.MessageCount); };
             NotifyPendingQueuedMessages();
-            FireTopicMessage += (_, args) =>
-            {
-                monitor.NotifyTopicMessagesChanged(args.QueueName, args.MessageCount);
-            };
+            FireTopicMessage += (_, args) => { monitor.NotifyTopicMessagesChanged(args.QueueName, args.MessageCount); };
             NotifyPendingBusTopicMessages();
         }
     }
@@ -276,6 +270,12 @@ public sealed partial class LocalMachineJsonFileStore : IDisposable
             return Count == 0;
         }
 
+        public bool IsPath(string fullPath)
+        {
+            return Path.GetFullPath(_dirPath).WithoutTrailingSlash()
+                .EqualsIgnoreCase(Path.GetFullPath(fullPath).WithoutTrailingSlash());
+        }
+
         public async Task OverwriteAsync(string entityId, IReadOnlyDictionary<string, Optional<string>> properties,
             CancellationToken cancellationToken)
         {
@@ -373,12 +373,6 @@ public sealed partial class LocalMachineJsonFileStore : IDisposable
         {
             // Causes issues on Mac OS - https://en.wikipedia.org/wiki/.DS_Store
             return fileName == ".DS_Store";
-        }
-
-        public bool IsPath(string fullPath)
-        {
-            return Path.GetFullPath(_dirPath).WithoutTrailingSlash()
-                .EqualsIgnoreCase(Path.GetFullPath(fullPath).WithoutTrailingSlash());
         }
     }
 }

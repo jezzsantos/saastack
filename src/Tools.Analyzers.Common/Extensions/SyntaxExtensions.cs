@@ -33,10 +33,10 @@ public static class SyntaxExtensions
         return trivia;
     }
 
-    public static XmlNodeSyntax? SelectSingleElement(this SyntaxList<XmlNodeSyntax> content, string elementName)
+    public static ClassDeclarationSyntax InsertMember(this ClassDeclarationSyntax classDeclarationSyntax, int index,
+        MemberDeclarationSyntax newMember)
     {
-        return SelectElements(content, elementName)
-            .FirstOrDefault();
+        return classDeclarationSyntax.WithMembers(classDeclarationSyntax.Members.Insert(index, newMember));
     }
 
     public static List<XmlNodeSyntax> SelectElements(this SyntaxList<XmlNodeSyntax> content, string elementName)
@@ -45,10 +45,10 @@ public static class SyntaxExtensions
             .ToList();
     }
 
-    public static ClassDeclarationSyntax InsertMember(this ClassDeclarationSyntax classDeclarationSyntax, int index,
-        MemberDeclarationSyntax newMember)
+    public static XmlNodeSyntax? SelectSingleElement(this SyntaxList<XmlNodeSyntax> content, string elementName)
     {
-        return classDeclarationSyntax.WithMembers(classDeclarationSyntax.Members.Insert(index, newMember));
+        return SelectElements(content, elementName)
+            .FirstOrDefault();
     }
 
     private static IEnumerable<XmlNodeSyntax> GetXmlElements(this SyntaxList<XmlNodeSyntax> content, string elementName)

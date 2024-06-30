@@ -20,6 +20,21 @@ public class FeatureFlagsApplication : IFeatureFlagsApplication
         _hmacSecret = hostSettings.GetAncillaryApiHostHmacAuthSecret();
     }
 
+    public async Task<Result<List<FeatureFlag>, Error>> GetAllFeatureFlagsAsync(ICallerContext caller,
+        CancellationToken cancellationToken)
+    {
+        var request = new GetAllFeatureFlagsRequest();
+
+        var retrieved = await _serviceClient.GetAsync(caller, request, req => req.SetHMACAuth(request, _hmacSecret),
+            cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error.ToError();
+        }
+
+        return retrieved.Value.Flags;
+    }
+
     public async Task<Result<FeatureFlag, Error>> GetFeatureFlagForCallerAsync(ICallerContext caller, string name,
         CancellationToken cancellationToken)
     {
@@ -35,20 +50,5 @@ public class FeatureFlagsApplication : IFeatureFlagsApplication
         }
 
         return retrieved.Value.Flag!;
-    }
-
-    public async Task<Result<List<FeatureFlag>, Error>> GetAllFeatureFlagsAsync(ICallerContext caller,
-        CancellationToken cancellationToken)
-    {
-        var request = new GetAllFeatureFlagsRequest();
-
-        var retrieved = await _serviceClient.GetAsync(caller, request, req => req.SetHMACAuth(request, _hmacSecret),
-            cancellationToken);
-        if (retrieved.IsFailure)
-        {
-            return retrieved.Error.ToError();
-        }
-
-        return retrieved.Value.Flags;
     }
 }

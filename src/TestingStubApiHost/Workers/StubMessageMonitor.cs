@@ -12,12 +12,14 @@ public class StubMessageMonitor : IMessageMonitor
     private readonly ConcurrentQueue<string> _queueNames = new();
     private readonly ConcurrentQueue<string> _topicNames = new();
 
-    public void NotifyTopicMessagesChanged(string topicName, int messageCount)
+    public Optional<string> NextQueueName()
     {
-        if (!_topicNames.Contains(topicName))
+        if (!_queueNames.TryDequeue(out var queueName))
         {
-            _topicNames.Enqueue(topicName);
+            return Optional<string>.None;
         }
+
+        return queueName;
     }
 
     public Optional<string> NextTopicName()
@@ -38,13 +40,11 @@ public class StubMessageMonitor : IMessageMonitor
         }
     }
 
-    public Optional<string> NextQueueName()
+    public void NotifyTopicMessagesChanged(string topicName, int messageCount)
     {
-        if (!_queueNames.TryDequeue(out var queueName))
+        if (!_topicNames.Contains(topicName))
         {
-            return Optional<string>.None;
+            _topicNames.Enqueue(topicName);
         }
-
-        return queueName;
     }
 }

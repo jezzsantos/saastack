@@ -35,23 +35,6 @@ public class AspNetDynamicConfigurationSettings : IConfigurationSettings
 
     private bool IsTenanted => _tenantSettings.HasValue;
 
-    public ISettings Platform => _platform;
-
-    public ISettings Tenancy
-    {
-        get
-        {
-            if (!IsTenanted)
-            {
-                throw new InvalidOperationException(Resources.AspNetDynamicConfigurationSettings_NoTenantSettings);
-            }
-
-            return _tenantSettings.Value;
-        }
-    }
-
-    bool ISettings.IsConfigured => true;
-
     public bool GetBool(string key, bool? defaultValue = null)
     {
         if (IsTenanted)
@@ -121,6 +104,23 @@ public class AspNetDynamicConfigurationSettings : IConfigurationSettings
         return Platform.GetString(key, defaultValue);
     }
 
+    bool ISettings.IsConfigured => true;
+
+    public ISettings Platform => _platform;
+
+    public ISettings Tenancy
+    {
+        get
+        {
+            if (!IsTenanted)
+            {
+                throw new InvalidOperationException(Resources.AspNetDynamicConfigurationSettings_NoTenantSettings);
+            }
+
+            return _tenantSettings.Value;
+        }
+    }
+
     private interface ISettingsSafely : ISettings
     {
         Optional<bool> GetBoolSafely(string key, bool? defaultValue = null);
@@ -152,34 +152,6 @@ public class AspNetDynamicConfigurationSettings : IConfigurationSettings
                 .Format(key));
         }
 
-        public double GetNumber(string key, double? defaultValue = null)
-        {
-            var value = GetNumberSafely(key, defaultValue);
-            if (value.HasValue)
-            {
-                return value.Value;
-            }
-
-            throw new InvalidOperationException(Resources
-                .AspNetDynamicConfigurationSettings_PlatformSettings_KeyNotFound
-                .Format(key));
-        }
-
-        public string GetString(string key, string? defaultValue = null)
-        {
-            var value = GetStringSafely(key, defaultValue);
-            if (value.HasValue)
-            {
-                return value.Value;
-            }
-
-            throw new InvalidOperationException(Resources
-                .AspNetDynamicConfigurationSettings_PlatformSettings_KeyNotFound
-                .Format(key));
-        }
-
-        public bool IsConfigured => true;
-
         public Optional<bool> GetBoolSafely(string key, bool? defaultValue = null)
         {
             var value = _configuration.GetValue<string>(key);
@@ -200,6 +172,19 @@ public class AspNetDynamicConfigurationSettings : IConfigurationSettings
             }
 
             return boolean;
+        }
+
+        public double GetNumber(string key, double? defaultValue = null)
+        {
+            var value = GetNumberSafely(key, defaultValue);
+            if (value.HasValue)
+            {
+                return value.Value;
+            }
+
+            throw new InvalidOperationException(Resources
+                .AspNetDynamicConfigurationSettings_PlatformSettings_KeyNotFound
+                .Format(key));
         }
 
         public Optional<double> GetNumberSafely(string key, double? defaultValue = null)
@@ -224,6 +209,19 @@ public class AspNetDynamicConfigurationSettings : IConfigurationSettings
             return number;
         }
 
+        public string GetString(string key, string? defaultValue = null)
+        {
+            var value = GetStringSafely(key, defaultValue);
+            if (value.HasValue)
+            {
+                return value.Value;
+            }
+
+            throw new InvalidOperationException(Resources
+                .AspNetDynamicConfigurationSettings_PlatformSettings_KeyNotFound
+                .Format(key));
+        }
+
         public Optional<string> GetStringSafely(string key, string? defaultValue = null)
         {
             var value = _configuration.GetValue<string>(key);
@@ -239,6 +237,8 @@ public class AspNetDynamicConfigurationSettings : IConfigurationSettings
 
             return value;
         }
+
+        public bool IsConfigured => true;
     }
 
     private sealed class TenantSettings : ISettingsSafely
@@ -261,32 +261,6 @@ public class AspNetDynamicConfigurationSettings : IConfigurationSettings
             throw new InvalidOperationException(Resources.AspNetDynamicConfigurationSettings_TenantSettings_KeyNotFound
                 .Format(key));
         }
-
-        public double GetNumber(string key, double? defaultValue = null)
-        {
-            var value = GetNumberSafely(key, defaultValue);
-            if (value.HasValue)
-            {
-                return value.Value;
-            }
-
-            throw new InvalidOperationException(Resources.AspNetDynamicConfigurationSettings_TenantSettings_KeyNotFound
-                .Format(key));
-        }
-
-        public string GetString(string key, string? defaultValue = null)
-        {
-            var value = GetStringSafely(key, defaultValue);
-            if (value.HasValue)
-            {
-                return value.Value;
-            }
-
-            throw new InvalidOperationException(Resources.AspNetDynamicConfigurationSettings_TenantSettings_KeyNotFound
-                .Format(key));
-        }
-
-        public bool IsConfigured => _tenancy.Current.HasValue();
 
         public Optional<bool> GetBoolSafely(string key, bool? defaultValue = null)
         {
@@ -318,6 +292,18 @@ public class AspNetDynamicConfigurationSettings : IConfigurationSettings
             }
 
             return boolean;
+        }
+
+        public double GetNumber(string key, double? defaultValue = null)
+        {
+            var value = GetNumberSafely(key, defaultValue);
+            if (value.HasValue)
+            {
+                return value.Value;
+            }
+
+            throw new InvalidOperationException(Resources.AspNetDynamicConfigurationSettings_TenantSettings_KeyNotFound
+                .Format(key));
         }
 
         public Optional<double> GetNumberSafely(string key, double? defaultValue = null)
@@ -352,6 +338,18 @@ public class AspNetDynamicConfigurationSettings : IConfigurationSettings
             return number;
         }
 
+        public string GetString(string key, string? defaultValue = null)
+        {
+            var value = GetStringSafely(key, defaultValue);
+            if (value.HasValue)
+            {
+                return value.Value;
+            }
+
+            throw new InvalidOperationException(Resources.AspNetDynamicConfigurationSettings_TenantSettings_KeyNotFound
+                .Format(key));
+        }
+
         public Optional<string> GetStringSafely(string key, string? defaultValue = null)
         {
             var settings = _tenancy.Settings;
@@ -377,5 +375,7 @@ public class AspNetDynamicConfigurationSettings : IConfigurationSettings
 
             return value.Value.ToString() ?? string.Empty;
         }
+
+        public bool IsConfigured => _tenancy.Current.HasValue();
     }
 }

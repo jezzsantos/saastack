@@ -11,16 +11,16 @@ namespace Infrastructure.Web.Hosting.Common;
 /// </summary>
 public class SubdomainModules
 {
-    private readonly Dictionary<Type, string> _entityPrefixes = new();
     private readonly List<Assembly> _apiAssemblies = new();
-    private readonly List<Assembly> _subdomainAssemblies = new();
+    private readonly Dictionary<Type, string> _entityPrefixes = new();
     private readonly List<Action<WebApplication, List<MiddlewareRegistration>>>
         _minimalApiRegistrationFunctions = new();
     private readonly List<Action<ConfigurationManager, IServiceCollection>> _serviceCollectionFunctions = new();
-
-    public IDictionary<Type, string> EntityPrefixes => _entityPrefixes;
+    private readonly List<Assembly> _subdomainAssemblies = new();
 
     public IReadOnlyList<Assembly> ApiAssemblies => _apiAssemblies;
+
+    public IDictionary<Type, string> EntityPrefixes => _entityPrefixes;
 
     public IReadOnlyList<Assembly> SubdomainAssemblies => _subdomainAssemblies;
 

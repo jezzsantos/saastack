@@ -33,6 +33,14 @@ public class OrganizationRepository : IOrganizationRepository
     }
 #endif
 
+    public async Task<Result<Optional<OrganizationRoot>, Error>> FindByAvatarIdAsync(Identifier avatarId,
+        CancellationToken cancellationToken)
+    {
+        var query = Query.From<Organization>()
+            .Where<string>(at => at.AvatarImageId, ConditionOperator.EqualTo, avatarId);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
     public async Task<Result<OrganizationRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {
         var organization = await _organizations.LoadAsync(id, cancellationToken);
@@ -54,14 +62,6 @@ public class OrganizationRepository : IOrganizationRepository
         }
 
         return organization;
-    }
-
-    public async Task<Result<Optional<OrganizationRoot>, Error>> FindByAvatarIdAsync(Identifier avatarId,
-        CancellationToken cancellationToken)
-    {
-        var query = Query.From<Organization>()
-            .Where<string>(at => at.AvatarImageId, ConditionOperator.EqualTo, avatarId);
-        return await FindFirstByQueryAsync(query, cancellationToken);
     }
 
     private async Task<Result<Optional<OrganizationRoot>, Error>> FindFirstByQueryAsync(QueryClause<Organization> query,

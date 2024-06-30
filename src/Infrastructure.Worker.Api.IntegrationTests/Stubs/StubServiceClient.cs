@@ -9,6 +9,13 @@ public class StubServiceClient : IServiceClient
 {
     public Optional<IWebRequest> LastPostedMessage { get; private set; } = Optional<IWebRequest>.None;
 
+    public Task<Result<string?, ResponseProblem>> DeleteAsync(ICallerContext? context,
+        IWebRequest request, Action<HttpRequestMessage>? requestFilter = null,
+        CancellationToken? cancellationToken = null)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task FireAsync(ICallerContext? context, IWebRequestVoid request,
         Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)
@@ -20,13 +27,6 @@ public class StubServiceClient : IServiceClient
         Action<HttpRequestMessage>? requestFilter,
         CancellationToken? cancellationToken = null)
         where TResponse : IWebResponse
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<Result<string?, ResponseProblem>> DeleteAsync(ICallerContext? context,
-        IWebRequest request, Action<HttpRequestMessage>? requestFilter = null,
-        CancellationToken? cancellationToken = null)
     {
         throw new NotImplementedException();
     }

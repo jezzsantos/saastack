@@ -6,6 +6,8 @@ public class Trips : IReadOnlyList<Trip>
 {
     private readonly List<Trip> _trips = new();
 
+    public int Count => _trips.Count;
+
     public IEnumerator<Trip> GetEnumerator()
     {
         return _trips.GetEnumerator();
@@ -15,8 +17,6 @@ public class Trips : IReadOnlyList<Trip>
     {
         return GetEnumerator();
     }
-
-    public int Count => _trips.Count;
 
     public Trip this[int index] => _trips[index];
 

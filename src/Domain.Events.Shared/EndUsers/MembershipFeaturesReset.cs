@@ -19,9 +19,9 @@ public sealed class MembershipFeaturesReset : DomainEvent
 
     public required string AssignedById { get; set; }
 
-    public required string OrganizationId { get; set; }
+    public required List<string> Features { get; set; }
 
     public required string MembershipId { get; set; }
 
-    public required List<string> Features { get; set; }
+    public required string OrganizationId { get; set; }
 }

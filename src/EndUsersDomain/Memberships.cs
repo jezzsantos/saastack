@@ -48,6 +48,8 @@ public class Memberships : IReadOnlyList<Membership>
         return Result.Ok;
     }
 
+    public int Count => _memberships.Count;
+
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
@@ -57,8 +59,6 @@ public class Memberships : IReadOnlyList<Membership>
     {
         return _memberships.GetEnumerator();
     }
-
-    public int Count => _memberships.Count;
 
     public Membership this[int index] => _memberships[index];
 

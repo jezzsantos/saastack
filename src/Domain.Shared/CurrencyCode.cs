@@ -6,8 +6,6 @@ namespace Domain.Shared;
 
 public sealed class CurrencyCode : SingleValueObjectBase<CurrencyCode, string>
 {
-    public static CurrencyCode Default => new(CurrencyCodes.Default.ToString()!);
-    
     public static Result<CurrencyCode, Error> Create(CurrencyCodeIso4217 code)
     {
         return new CurrencyCode(code);
@@ -27,6 +25,8 @@ public sealed class CurrencyCode : SingleValueObjectBase<CurrencyCode, string>
     }
 
     public CurrencyCodeIso4217 Currency => CurrencyCodes.FindOrDefault(Value);
+
+    public static CurrencyCode Default => new(CurrencyCodes.Default.ToString()!);
 
     public static ValueObjectFactory<CurrencyCode> Rehydrate()
     {

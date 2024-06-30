@@ -40,21 +40,21 @@ internal sealed class AspNetCallerContext : ICallerContext
                           || (Authorization.HasValue && !CallerConstants.IsAnonymousUser(CallerId));
     }
 
+    public Optional<ICallerContext.CallerAuthorization> Authorization { get; }
+
     public string CallerId { get; }
 
     public string CallId { get; }
 
-    public string? TenantId { get; }
-
-    public ICallerContext.CallerRoles Roles { get; }
-
     public ICallerContext.CallerFeatures Features { get; }
-
-    public Optional<ICallerContext.CallerAuthorization> Authorization { get; }
 
     public bool IsAuthenticated { get; }
 
     public bool IsServiceAccount { get; }
+
+    public ICallerContext.CallerRoles Roles { get; }
+
+    public string? TenantId { get; }
 
     private static string? GetTenantId(ITenancyContext? tenancyContext)
     {

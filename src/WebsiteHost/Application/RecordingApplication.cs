@@ -55,20 +55,6 @@ public class RecordingApplication : IRecordingApplication
         return Task.FromResult(Result.Ok);
     }
 
-    public Task<Result<Error>> RecordUsageAsync(ICallerContext caller, string eventName,
-        Dictionary<string, object?>? additional, ClientDetails clientDetails,
-        CancellationToken cancellationToken)
-    {
-        var more = AddClientContext(clientDetails, (additional.Exists()
-            ? additional
-                .Where(pair => pair.Value.Exists())
-                .ToDictionary(pair => pair.Key, pair => pair.Value)
-            : null)!);
-        _recorder.TrackUsage(caller.ToCall(), eventName, more);
-
-        return Task.FromResult(Result.Ok);
-    }
-
     public Task<Result<Error>> RecordTraceAsync(ICallerContext caller, RecorderTraceLevel level,
         string messageTemplate, List<string>? arguments,
         CancellationToken cancellationToken)
@@ -99,6 +85,20 @@ public class RecordingApplication : IRecordingApplication
                 _recorder.TraceInformation(caller.ToCall(), messageTemplate, args);
                 return Task.FromResult(Result.Ok);
         }
+    }
+
+    public Task<Result<Error>> RecordUsageAsync(ICallerContext caller, string eventName,
+        Dictionary<string, object?>? additional, ClientDetails clientDetails,
+        CancellationToken cancellationToken)
+    {
+        var more = AddClientContext(clientDetails, (additional.Exists()
+            ? additional
+                .Where(pair => pair.Value.Exists())
+                .ToDictionary(pair => pair.Key, pair => pair.Value)
+            : null)!);
+        _recorder.TrackUsage(caller.ToCall(), eventName, more);
+
+        return Task.FromResult(Result.Ok);
     }
 
     private static Dictionary<string, object> AddClientContext(ClientDetails clientDetails,

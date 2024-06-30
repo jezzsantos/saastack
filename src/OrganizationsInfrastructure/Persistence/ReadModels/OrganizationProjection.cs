@@ -20,8 +20,6 @@ public class OrganizationProjection : IReadModelProjection
         _organizations = new ReadModelStore<Organization>(recorder, domainFactory, store);
     }
 
-    public Type RootAggregateType => typeof(OrganizationRoot);
-
     public async Task<Result<bool, Error>> ProjectEventAsync(IDomainEvent changeEvent,
         CancellationToken cancellationToken)
     {
@@ -99,4 +97,6 @@ public class OrganizationProjection : IReadModelProjection
                 return false;
         }
     }
+
+    public Type RootAggregateType => typeof(OrganizationRoot);
 }

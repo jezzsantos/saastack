@@ -22,7 +22,10 @@ namespace AncillaryInfrastructure;
 
 public class AncillaryModule : ISubdomainModule
 {
-    public Assembly InfrastructureAssembly => typeof(UsagesApi).Assembly;
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
 
     public Assembly DomainAssembly => typeof(AuditRoot).Assembly;
 
@@ -32,10 +35,7 @@ public class AncillaryModule : ISubdomainModule
         { typeof(EmailDeliveryRoot), "emaildelivery" }
     };
 
-    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
-    {
-        get { return (app, _) => app.RegisterRoutes(); }
-    }
+    public Assembly InfrastructureAssembly => typeof(UsagesApi).Assembly;
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {

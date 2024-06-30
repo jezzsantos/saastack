@@ -36,8 +36,8 @@ public sealed class TestEntity : EntityBase
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public string? APropertyName { get; set; }
 
-        public string RootId { get; set; } = "anentityid";
-
         public DateTime OccurredUtc { get; set; }
+
+        public string RootId { get; set; } = "anentityid";
     }
 }

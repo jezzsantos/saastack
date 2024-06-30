@@ -31,9 +31,9 @@ public class OrganizationsApplicationSpec
     private readonly Mock<IImagesService> _imagesService;
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IOrganizationRepository> _repository;
+    private readonly Mock<ISubscriptionsService> _subscriptionsService;
     private readonly Mock<ITenantSettingService> _tenantSettingService;
     private readonly Mock<ITenantSettingsService> _tenantSettingsService;
-    private readonly Mock<ISubscriptionsService> _subscriptionsService;
 
     public OrganizationsApplicationSpec()
     {

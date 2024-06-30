@@ -23,8 +23,6 @@ public class CarProjection : IReadModelProjection
         _unavailabilities = new ReadModelStore<Unavailability>(recorder, domainFactory, store);
     }
 
-    public Type RootAggregateType => typeof(CarRoot);
-
     public async Task<Result<bool, Error>> ProjectEventAsync(IDomainEvent changeEvent,
         CancellationToken cancellationToken)
     {
@@ -78,4 +76,6 @@ public class CarProjection : IReadModelProjection
                 return false;
         }
     }
+
+    public Type RootAggregateType => typeof(CarRoot);
 }

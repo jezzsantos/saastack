@@ -20,8 +20,6 @@ public class EmailDeliveryProjection : IReadModelProjection
         _deliveries = new ReadModelStore<EmailDelivery>(recorder, domainFactory, store);
     }
 
-    public Type RootAggregateType => typeof(EmailDeliveryRoot);
-
     public async Task<Result<bool, Error>> ProjectEventAsync(IDomainEvent changeEvent,
         CancellationToken cancellationToken)
     {
@@ -77,4 +75,6 @@ public class EmailDeliveryProjection : IReadModelProjection
                 return false;
         }
     }
+
+    public Type RootAggregateType => typeof(EmailDeliveryRoot);
 }

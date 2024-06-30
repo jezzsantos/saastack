@@ -20,8 +20,6 @@ public class UserProfileProjection : IReadModelProjection
         _users = new ReadModelStore<UserProfile>(recorder, domainFactory, store);
     }
 
-    public Type RootAggregateType => typeof(UserProfileRoot);
-
     public async Task<Result<bool, Error>> ProjectEventAsync(IDomainEvent changeEvent,
         CancellationToken cancellationToken)
     {
@@ -89,4 +87,6 @@ public class UserProfileProjection : IReadModelProjection
                 return false;
         }
     }
+
+    public Type RootAggregateType => typeof(UserProfileRoot);
 }

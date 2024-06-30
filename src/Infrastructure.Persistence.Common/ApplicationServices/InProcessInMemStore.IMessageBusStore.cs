@@ -60,50 +60,6 @@ public partial class InProcessInMemStore : IMessageBusStore, IMessageBusStoreTri
     }
 #endif
 
-    public Task<Result<Error>> SendAsync(string topicName, string message, CancellationToken cancellationToken)
-    {
-        topicName.ThrowIfNotValuedParameter(nameof(topicName), Resources.InProcessInMemDataStore_MissingTopicName);
-        message.ThrowIfNotValuedParameter(nameof(message), Resources.InProcessInMemDataStore_MissingQueueMessage);
-
-        if (!_topics.TryGetValue(topicName, out _))
-        {
-            _topics.Add(topicName, new Dictionary<long, HydrationProperties>());
-        }
-
-        var messages = _topics[topicName];
-
-        // Note: queue message with timestamp
-        var messageId = DateTime.UtcNow.Ticks;
-        messages.Add(messageId, new HydrationProperties
-        {
-            { "Message", message }
-        });
-
-        FireTopicMessage?.Invoke(this, new MessagesQueueUpdatedArgs(topicName, messages.Count));
-
-        return Task.FromResult(Result.Ok);
-    }
-
-    public Task<Result<Error>> SubscribeAsync(string topicName, string subscriptionName,
-        CancellationToken cancellationToken)
-    {
-        topicName.ThrowIfNotValuedParameter(nameof(topicName), Resources.InProcessInMemDataStore_MissingTopicName);
-        subscriptionName.ThrowIfNotValuedParameter(nameof(subscriptionName),
-            Resources.InProcessInMemDataStore_MissingSubscriptionName);
-
-        if (!_topics.TryGetValue(topicName, out _))
-        {
-            _topics.Add(topicName, new Dictionary<long, HydrationProperties>());
-        }
-
-        if (!_subscriptions.TryGetValue(subscriptionName, out _))
-        {
-            _subscriptions.Add(subscriptionName, new SubscriptionPosition(topicName));
-        }
-
-        return Task.FromResult(Result.Ok);
-    }
-
 #if TESTINGONLY
     public async Task<Result<bool, Error>> ReceiveSingleAsync(string topicName, string subscriptionName,
         Func<string, CancellationToken, Task<Result<Error>>> messageHandlerAsync,
@@ -158,6 +114,50 @@ public partial class InProcessInMemStore : IMessageBusStore, IMessageBusStoreTri
         return true;
     }
 #endif
+
+    public Task<Result<Error>> SendAsync(string topicName, string message, CancellationToken cancellationToken)
+    {
+        topicName.ThrowIfNotValuedParameter(nameof(topicName), Resources.InProcessInMemDataStore_MissingTopicName);
+        message.ThrowIfNotValuedParameter(nameof(message), Resources.InProcessInMemDataStore_MissingQueueMessage);
+
+        if (!_topics.TryGetValue(topicName, out _))
+        {
+            _topics.Add(topicName, new Dictionary<long, HydrationProperties>());
+        }
+
+        var messages = _topics[topicName];
+
+        // Note: queue message with timestamp
+        var messageId = DateTime.UtcNow.Ticks;
+        messages.Add(messageId, new HydrationProperties
+        {
+            { "Message", message }
+        });
+
+        FireTopicMessage?.Invoke(this, new MessagesQueueUpdatedArgs(topicName, messages.Count));
+
+        return Task.FromResult(Result.Ok);
+    }
+
+    public Task<Result<Error>> SubscribeAsync(string topicName, string subscriptionName,
+        CancellationToken cancellationToken)
+    {
+        topicName.ThrowIfNotValuedParameter(nameof(topicName), Resources.InProcessInMemDataStore_MissingTopicName);
+        subscriptionName.ThrowIfNotValuedParameter(nameof(subscriptionName),
+            Resources.InProcessInMemDataStore_MissingSubscriptionName);
+
+        if (!_topics.TryGetValue(topicName, out _))
+        {
+            _topics.Add(topicName, new Dictionary<long, HydrationProperties>());
+        }
+
+        if (!_subscriptions.TryGetValue(subscriptionName, out _))
+        {
+            _subscriptions.Add(subscriptionName, new SubscriptionPosition(topicName));
+        }
+
+        return Task.FromResult(Result.Ok);
+    }
 
     public event MessageQueueUpdated? FireTopicMessage;
 

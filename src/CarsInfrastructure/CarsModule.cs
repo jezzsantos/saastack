@@ -20,7 +20,10 @@ namespace CarsInfrastructure;
 
 public class CarsModule : ISubdomainModule
 {
-    public Assembly InfrastructureAssembly => typeof(CarsApi).Assembly;
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
 
     public Assembly DomainAssembly => typeof(CarRoot).Assembly;
 
@@ -30,10 +33,7 @@ public class CarsModule : ISubdomainModule
         { typeof(Unavailability), "unavail" }
     };
 
-    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
-    {
-        get { return (app, _) => app.RegisterRoutes(); }
-    }
+    public Assembly InfrastructureAssembly => typeof(CarsApi).Assembly;
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {

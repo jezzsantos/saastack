@@ -15,18 +15,32 @@ public sealed class NoOpRecorder : IRecorder
     {
     }
 
-    public void TraceDebug(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+    public void Audit(ICallContext? context, string auditCode, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
     }
 
-    public void TraceInformation(ICallContext? context, Exception exception,
+    public void AuditAgainst(ICallContext? context, string againstId, string auditCode,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
     }
 
-    public void TraceInformation(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+    public void Crash(ICallContext? context, CrashLevel level, Exception exception)
+    {
+    }
+
+    public void Crash(ICallContext? context, CrashLevel level, Exception exception,
+        [StructuredMessageTemplate] string messageTemplate,
+        params object[] templateArgs)
+    {
+    }
+
+    public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
+    {
+    }
+
+    public void TraceDebug(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
     {
     }
@@ -42,6 +56,17 @@ public sealed class NoOpRecorder : IRecorder
     {
     }
 
+    public void TraceInformation(ICallContext? context, Exception exception,
+        [StructuredMessageTemplate] string messageTemplate,
+        params object[] templateArgs)
+    {
+    }
+
+    public void TraceInformation(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
+        params object[] templateArgs)
+    {
+    }
+
     public void TraceWarning(ICallContext? context, Exception exception,
         [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
@@ -50,31 +75,6 @@ public sealed class NoOpRecorder : IRecorder
 
     public void TraceWarning(ICallContext? context, [StructuredMessageTemplate] string messageTemplate,
         params object[] templateArgs)
-    {
-    }
-
-    public void Crash(ICallContext? context, CrashLevel level, Exception exception)
-    {
-    }
-
-    public void Crash(ICallContext? context, CrashLevel level, Exception exception,
-        [StructuredMessageTemplate] string messageTemplate,
-        params object[] templateArgs)
-    {
-    }
-
-    public void Audit(ICallContext? context, string auditCode, [StructuredMessageTemplate] string messageTemplate,
-        params object[] templateArgs)
-    {
-    }
-
-    public void AuditAgainst(ICallContext? context, string againstId, string auditCode,
-        [StructuredMessageTemplate] string messageTemplate,
-        params object[] templateArgs)
-    {
-    }
-
-    public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
     {
     }
 

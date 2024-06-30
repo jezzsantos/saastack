@@ -40,12 +40,6 @@ public class TestCommandDomainEntity : IDehydratableEntity
 
     public required string Id { get; set; }
 
-    ISingleValueObject<string> IIdentifiableEntity.Id => Identifier.Create(Id);
-
-    public Optional<bool> IsDeleted { get; } = Optional<bool>.None;
-
-    public Optional<DateTime> LastPersistedAtUtc { get; } = Optional<DateTime>.None;
-
     public HydrationProperties Dehydrate()
     {
         var properties = new HydrationProperties
@@ -65,4 +59,10 @@ public class TestCommandDomainEntity : IDehydratableEntity
 
         return properties;
     }
+
+    ISingleValueObject<string> IIdentifiableEntity.Id => Identifier.Create(Id);
+
+    public Optional<bool> IsDeleted { get; } = Optional<bool>.None;
+
+    public Optional<DateTime> LastPersistedAtUtc { get; } = Optional<DateTime>.None;
 }

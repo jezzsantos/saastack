@@ -8,6 +8,9 @@ namespace UserProfilesApplication.Persistence;
 
 public interface IUserProfileRepository : IApplicationRepository
 {
+    Task<Result<Optional<UserProfileRoot>, Error>> FindByAvatarIdAsync(Identifier avatarId,
+        CancellationToken cancellationToken);
+
     Task<Result<Optional<UserProfileRoot>, Error>> FindByEmailAddressAsync(EmailAddress emailAddress,
         CancellationToken cancellationToken);
 
@@ -19,8 +22,5 @@ public interface IUserProfileRepository : IApplicationRepository
     Task<Result<UserProfileRoot, Error>> SaveAsync(UserProfileRoot profile, CancellationToken cancellationToken);
 
     Task<Result<List<UserProfileRoot>, Error>> SearchAllByUserIdsAsync(List<Identifier> ids,
-        CancellationToken cancellationToken);
-
-    Task<Result<Optional<UserProfileRoot>, Error>> FindByAvatarIdAsync(Identifier avatarId,
         CancellationToken cancellationToken);
 }

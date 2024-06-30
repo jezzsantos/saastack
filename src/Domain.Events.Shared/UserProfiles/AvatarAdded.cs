@@ -15,9 +15,9 @@ public sealed class AvatarAdded : DomainEvent
     {
     }
 
-    public required string UserId { get; set; }
-
     public required string AvatarId { get; set; }
 
     public required string AvatarUrl { get; set; }
+
+    public required string UserId { get; set; }
 }

@@ -221,7 +221,7 @@ public class UserProfileApplicationDomainEventHandlersSpec
             Times.Never);
         _repository.Verify(rep => rep.FindByUserIdAsync("auserid".ToId(), It.IsAny<CancellationToken>()));
     }
-    
+
     [Fact]
     public async Task WhenHandleEndUserDefaultOrganizationChangedAsync_ThenSetsDefaultOrganization()
     {

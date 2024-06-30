@@ -7,6 +7,11 @@ namespace Infrastructure.Persistence.Shared.IntegrationTests;
 
 internal class GuidIdentifierFactory : IIdentifierFactory
 {
+    public Result<Identifier, Error> Create(IIdentifiableEntity entity)
+    {
+        return Guid.NewGuid().ToString("D").ToId();
+    }
+
     public bool IsValid(Identifier value)
     {
         if (!value.HasValue())
@@ -25,10 +30,5 @@ internal class GuidIdentifierFactory : IIdentifierFactory
         }
 
         return true;
-    }
-
-    public Result<Identifier, Error> Create(IIdentifiableEntity entity)
-    {
-        return Guid.NewGuid().ToString("D").ToId();
     }
 }

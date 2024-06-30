@@ -74,6 +74,86 @@ public sealed class HostRecorder : IRecorder, IDisposable
         }
     }
 
+    public void Audit(ICallContext? context, string auditCode, string messageTemplate, params object[] templateArgs)
+    {
+        if (auditCode.HasNoValue())
+        {
+            return;
+        }
+
+        var againstId = context.Exists()
+            ? context.CallerId
+            : null;
+        if (againstId.HasValue())
+        {
+            AuditAgainst(context, againstId, auditCode, messageTemplate, templateArgs);
+        }
+        else
+        {
+            TraceInformation(context, $"Audit: {auditCode}, with message: {messageTemplate}", templateArgs);
+        }
+    }
+
+    public void AuditAgainst(ICallContext? context, string againstId, string auditCode, string messageTemplate,
+        params object[] templateArgs)
+    {
+        if (auditCode.HasNoValue())
+        {
+            return;
+        }
+
+        TraceInformation(context, $"Audit: {auditCode}, against: {againstId}, with message: {messageTemplate}",
+            templateArgs);
+        TrackUsageFor(context, againstId, UsageConstants.Events.UsageScenarios.Generic.Audit,
+            new Dictionary<string, object>
+            {
+                { UsageConstants.Properties.UsedById, againstId },
+                { UsageConstants.Properties.AuditCode, auditCode.ToLowerInvariant() }
+            });
+        _auditReporter.Audit(context, againstId, auditCode, messageTemplate, templateArgs);
+    }
+
+    public void Crash(ICallContext? context, CrashLevel level, Exception exception)
+    {
+        Crash(context, level, exception, exception.Message);
+    }
+
+    public void Crash(ICallContext? context, CrashLevel level, Exception exception, string messageTemplate,
+        params object[] templateArgs)
+    {
+        var logLevel = level == CrashLevel.Critical
+            ? LogLevel.Critical
+            : LogLevel.Error;
+        var (augmentedMessageTemplate, augmentedArguments) =
+            AugmentMessageTemplateAndArguments(context, $"Crash ({level}): {messageTemplate}", templateArgs);
+        _logger.Log(logLevel, exception,
+            $"{Colors.Reverse}{Colors.Red}{augmentedMessageTemplate}{Colors.Normal}{Colors.NoReverse}",
+            augmentedArguments);
+
+        var errorSourceId = exception.GetBaseException().TargetSite?.ToString();
+        if (errorSourceId.Exists())
+        {
+            _metricsReporter.Measure(context, $"Exceptions: {errorSourceId}");
+        }
+
+        _crashReporter.Crash(context, level, exception, messageTemplate, templateArgs);
+    }
+
+    public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
+    {
+        if (eventName.HasNoValue())
+        {
+            return;
+        }
+
+        TraceInformation(context, $"Measure: {eventName}, with context: {additional.DumpSafely()}");
+
+        var usageContext = additional ?? new Dictionary<string, object>();
+        usageContext.Add(UsageConstants.Properties.MetricEventName, eventName.ToLowerInvariant());
+        TrackUsage(context, UsageConstants.Events.UsageScenarios.Generic.Measurement, usageContext);
+        _metricsReporter.Measure(context, eventName, additional ?? new Dictionary<string, object>());
+    }
+
     public void TraceDebug(ICallContext? context, string messageTemplate, params object[] templateArgs)
     {
         if (messageTemplate.HasNoValue())
@@ -84,6 +164,26 @@ public sealed class HostRecorder : IRecorder, IDisposable
         var (augmentedMessageTemplate, augmentedArguments) =
             AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
         _logger.LogDebug(augmentedMessageTemplate, augmentedArguments);
+    }
+
+    public void TraceError(ICallContext? context, Exception exception, string messageTemplate,
+        params object[] templateArgs)
+    {
+        var (augmentedMessageTemplate, augmentedArguments) =
+            AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
+        _logger.LogError(exception, augmentedMessageTemplate, augmentedArguments);
+    }
+
+    public void TraceError(ICallContext? context, string messageTemplate, params object[] templateArgs)
+    {
+        if (messageTemplate.HasNoValue())
+        {
+            return;
+        }
+
+        var (augmentedMessageTemplate, augmentedArguments) =
+            AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
+        _logger.LogError(augmentedMessageTemplate, augmentedArguments);
     }
 
     public void TraceInformation(ICallContext? context, Exception exception, string messageTemplate,
@@ -126,91 +226,6 @@ public sealed class HostRecorder : IRecorder, IDisposable
         _logger.LogWarning(augmentedMessageTemplate, augmentedArguments);
     }
 
-    public void TraceError(ICallContext? context, Exception exception, string messageTemplate,
-        params object[] templateArgs)
-    {
-        var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
-        _logger.LogError(exception, augmentedMessageTemplate, augmentedArguments);
-    }
-
-    public void TraceError(ICallContext? context, string messageTemplate, params object[] templateArgs)
-    {
-        if (messageTemplate.HasNoValue())
-        {
-            return;
-        }
-
-        var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, messageTemplate, templateArgs);
-        _logger.LogError(augmentedMessageTemplate, augmentedArguments);
-    }
-
-    public void Crash(ICallContext? context, CrashLevel level, Exception exception)
-    {
-        Crash(context, level, exception, exception.Message);
-    }
-
-    public void Crash(ICallContext? context, CrashLevel level, Exception exception, string messageTemplate,
-        params object[] templateArgs)
-    {
-        var logLevel = level == CrashLevel.Critical
-            ? LogLevel.Critical
-            : LogLevel.Error;
-        var (augmentedMessageTemplate, augmentedArguments) =
-            AugmentMessageTemplateAndArguments(context, $"Crash ({level}): {messageTemplate}", templateArgs);
-        _logger.Log(logLevel, exception,
-            $"{Colors.Reverse}{Colors.Red}{augmentedMessageTemplate}{Colors.Normal}{Colors.NoReverse}",
-            augmentedArguments);
-
-        var errorSourceId = exception.GetBaseException().TargetSite?.ToString();
-        if (errorSourceId.Exists())
-        {
-            _metricsReporter.Measure(context, $"Exceptions: {errorSourceId}");
-        }
-
-        _crashReporter.Crash(context, level, exception, messageTemplate, templateArgs);
-    }
-
-    public void Audit(ICallContext? context, string auditCode, string messageTemplate, params object[] templateArgs)
-    {
-        if (auditCode.HasNoValue())
-        {
-            return;
-        }
-
-        var againstId = context.Exists()
-            ? context.CallerId
-            : null;
-        if (againstId.HasValue())
-        {
-            AuditAgainst(context, againstId, auditCode, messageTemplate, templateArgs);
-        }
-        else
-        {
-            TraceInformation(context, $"Audit: {auditCode}, with message: {messageTemplate}", templateArgs);
-        }
-    }
-
-    public void AuditAgainst(ICallContext? context, string againstId, string auditCode, string messageTemplate,
-        params object[] templateArgs)
-    {
-        if (auditCode.HasNoValue())
-        {
-            return;
-        }
-
-        TraceInformation(context, $"Audit: {auditCode}, against: {againstId}, with message: {messageTemplate}",
-            templateArgs);
-        TrackUsageFor(context, againstId, UsageConstants.Events.UsageScenarios.Generic.Audit,
-            new Dictionary<string, object>
-            {
-                { UsageConstants.Properties.UsedById, againstId },
-                { UsageConstants.Properties.AuditCode, auditCode.ToLowerInvariant() }
-            });
-        _auditReporter.Audit(context, againstId, auditCode, messageTemplate, templateArgs);
-    }
-
     public void TrackUsage(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
     {
         if (eventName.HasNoValue())
@@ -244,21 +259,6 @@ public sealed class HostRecorder : IRecorder, IDisposable
         var properties = additional ?? new Dictionary<string, object>();
         properties.TryAdd(UsageConstants.Properties.Component, _usageComponentName);
         _usageReporter.Track(context, forId, eventName, properties);
-    }
-
-    public void Measure(ICallContext? context, string eventName, Dictionary<string, object>? additional = null)
-    {
-        if (eventName.HasNoValue())
-        {
-            return;
-        }
-
-        TraceInformation(context, $"Measure: {eventName}, with context: {additional.DumpSafely()}");
-
-        var usageContext = additional ?? new Dictionary<string, object>();
-        usageContext.Add(UsageConstants.Properties.MetricEventName, eventName.ToLowerInvariant());
-        TrackUsage(context, UsageConstants.Events.UsageScenarios.Generic.Measurement, usageContext);
-        _metricsReporter.Measure(context, eventName, additional ?? new Dictionary<string, object>());
     }
 
     public override string ToString()

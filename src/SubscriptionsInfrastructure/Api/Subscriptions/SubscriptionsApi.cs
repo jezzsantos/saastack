@@ -42,6 +42,18 @@ public class SubscriptionsApi : IWebApiService
                     { Subscription = x });
     }
 
+    public async Task<ApiResult<SubscriptionWithPlan, GetSubscriptionResponse>> ForceCancelSubscription(
+        ForceCancelSubscriptionRequest request, CancellationToken cancellationToken)
+    {
+        var subscription = await _subscriptionsApplication.ForceCancelSubscriptionAsync(_callerFactory.Create(),
+            request.Id!, cancellationToken);
+
+        return () =>
+            subscription.HandleApplicationResult<SubscriptionWithPlan, GetSubscriptionResponse>(x =>
+                new GetSubscriptionResponse
+                    { Subscription = x });
+    }
+
     public async Task<ApiGetResult<SubscriptionWithPlan, GetSubscriptionResponse>> GetSubscription(
         GetSubscriptionRequest request, CancellationToken cancellationToken)
     {
@@ -75,17 +87,5 @@ public class SubscriptionsApi : IWebApiService
         return () =>
             subscription.HandleApplicationResult<SubscriptionWithPlan, GetSubscriptionResponse>(x =>
                 new GetSubscriptionResponse { Subscription = x });
-    }
-
-    public async Task<ApiResult<SubscriptionWithPlan, GetSubscriptionResponse>> ForceCancelSubscription(
-        ForceCancelSubscriptionRequest request, CancellationToken cancellationToken)
-    {
-        var subscription = await _subscriptionsApplication.ForceCancelSubscriptionAsync(_callerFactory.Create(),
-            request.Id!, cancellationToken);
-
-        return () =>
-            subscription.HandleApplicationResult<SubscriptionWithPlan, GetSubscriptionResponse>(x =>
-                new GetSubscriptionResponse
-                    { Subscription = x });
     }
 }

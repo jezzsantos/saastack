@@ -5,6 +5,26 @@ namespace Tools.Analyzers.Common.Extensions;
 
 public static class SymbolExtensions
 {
+    public static AttributeData? GetAttributeOfType<TAttribute>(this ISymbol? symbol,
+        SyntaxNodeAnalysisContext context)
+    {
+        return GetAttributeOfType<TAttribute>(symbol, context.Compilation);
+    }
+
+    public static AttributeData? GetAttributeOfType<TAttribute>(this ISymbol? symbol,
+        Compilation compilation)
+    {
+        if (symbol is null)
+        {
+            return null;
+        }
+
+        var attributeMetadata = compilation.GetTypeByMetadataName(typeof(TAttribute).FullName!)!;
+        var attributes = symbol.GetAttributes();
+
+        return attributes.FirstOrDefault(attr => attr.AttributeClass!.IsOfType(attributeMetadata));
+    }
+
     public static bool HasParameterlessConstructor(this INamedTypeSymbol symbol)
     {
         var constructors = symbol.InstanceConstructors;
@@ -90,25 +110,6 @@ public static class SymbolExtensions
         return IsOfType(symbol, taskType);
     }
 
-    public static AttributeData? GetAttributeOfType<TAttribute>(this ISymbol? symbol,
-        SyntaxNodeAnalysisContext context)
-    {
-        return GetAttributeOfType<TAttribute>(symbol, context.Compilation);
-    }
-
-    public static AttributeData? GetAttributeOfType<TAttribute>(this ISymbol? symbol,
-        Compilation compilation)
-    {
-        if (symbol is null)
-        {
-            return null;
-        }
-
-        var attributeMetadata = compilation.GetTypeByMetadataName(typeof(TAttribute).FullName!)!;
-        var attributes = symbol.GetAttributes();
-
-        return attributes.FirstOrDefault(attr => attr.AttributeClass!.IsOfType(attributeMetadata));
-    }
     public static ITypeSymbol WithoutNullable(this ITypeSymbol symbol, SyntaxNodeAnalysisContext context)
     {
         if (symbol.IsNullable(context))

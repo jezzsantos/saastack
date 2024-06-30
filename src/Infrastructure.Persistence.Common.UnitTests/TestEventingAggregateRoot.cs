@@ -21,38 +21,38 @@ public class TestEventingAggregateRoot : IEventingAggregateRoot, IDehydratableAg
 
     public IEnumerable<EventSourcedChangeEvent> LoadedChangeEvents { get; set; } = new List<EventSourcedChangeEvent>();
 
-    public Optional<bool> IsDeleted { get; } = Optional<bool>.None;
-
     public HydrationProperties Dehydrate()
     {
         throw new NotImplementedException();
     }
 
-    public DateTime CreatedAtUtc { get; } = DateTime.UtcNow;
-
-    public DateTime LastModifiedAtUtc { get; } = DateTime.UtcNow;
-
-    public IReadOnlyList<IDomainEvent> Events { get; } = new List<IDomainEvent>();
-
-    public Optional<DateTime> LastPersistedAtUtc { get; } = Optional<DateTime>.None;
-
-    public ISingleValueObject<string> Id { get; }
-
-    public Result<Error> HandleStateChanged(IDomainEvent @event)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Result<List<EventSourcedChangeEvent>, Error> GetChanges()
-    {
-        return ChangeEvents.ToList();
-    }
+    public Optional<bool> IsDeleted { get; } = Optional<bool>.None;
 
     public Result<Error> ClearChanges()
     {
         ClearedChanges = true;
         return Result.Ok;
     }
+
+    public DateTime CreatedAtUtc { get; } = DateTime.UtcNow;
+
+    public IReadOnlyList<IDomainEvent> Events { get; } = new List<IDomainEvent>();
+
+    public Result<List<EventSourcedChangeEvent>, Error> GetChanges()
+    {
+        return ChangeEvents.ToList();
+    }
+
+    public Result<Error> HandleStateChanged(IDomainEvent @event)
+    {
+        throw new NotImplementedException();
+    }
+
+    public ISingleValueObject<string> Id { get; }
+
+    public DateTime LastModifiedAtUtc { get; } = DateTime.UtcNow;
+
+    public Optional<DateTime> LastPersistedAtUtc { get; } = Optional<DateTime>.None;
 
     public Result<Error> LoadChanges(IEnumerable<EventSourcedChangeEvent> history,
         IEventSourcedChangeEventMigrator migrator)

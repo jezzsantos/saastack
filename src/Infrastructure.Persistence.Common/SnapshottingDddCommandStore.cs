@@ -131,6 +131,8 @@ public sealed class
             entity.ToDomainEntity<TAggregateRootOrEntity>(_domainFactory));
     }
 
+    public event EventStreamChangedAsync<EventStreamChangedArgs>? OnEventStreamChanged;
+
     public async Task<Result<TAggregateRootOrEntity, Error>> ResurrectDeletedAsync(Identifier id,
         CancellationToken cancellationToken)
     {
@@ -233,8 +235,6 @@ public sealed class
 
         return updated;
     }
-
-    public event EventStreamChangedAsync<EventStreamChangedArgs>? OnEventStreamChanged;
 
     private CommandEntity MergeEntities(TAggregateRootOrEntity updated, CommandEntity persisted)
     {

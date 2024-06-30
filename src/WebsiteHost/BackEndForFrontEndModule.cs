@@ -14,12 +14,6 @@ namespace WebsiteHost;
 
 public class BackEndForFrontEndModule : ISubdomainModule
 {
-    public Assembly InfrastructureAssembly => typeof(RecordingApi).Assembly;
-
-    public Assembly? DomainAssembly => null;
-
-    public Dictionary<Type, string> EntityPrefixes => new();
-
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
     {
         get
@@ -42,6 +36,12 @@ public class BackEndForFrontEndModule : ISubdomainModule
             };
         }
     }
+
+    public Assembly? DomainAssembly => null;
+
+    public Dictionary<Type, string> EntityPrefixes => new();
+
+    public Assembly InfrastructureAssembly => typeof(RecordingApi).Assembly;
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {

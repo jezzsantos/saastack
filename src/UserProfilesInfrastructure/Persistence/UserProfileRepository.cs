@@ -34,6 +34,31 @@ public class UserProfileRepository : IUserProfileRepository
     }
 #endif
 
+    public async Task<Result<Optional<UserProfileRoot>, Error>> FindByAvatarIdAsync(Identifier avatarId,
+        CancellationToken cancellationToken)
+    {
+        var query = Query.From<UserProfile>()
+            .Where<string>(at => at.AvatarImageId, ConditionOperator.EqualTo, avatarId);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
+    public async Task<Result<Optional<UserProfileRoot>, Error>> FindByEmailAddressAsync(EmailAddress emailAddress,
+        CancellationToken cancellationToken)
+    {
+        var query = Query.From<UserProfile>()
+            .Where<string>(at => at.EmailAddress, ConditionOperator.EqualTo, emailAddress.Address)
+            .AndWhere<string>(at => at.Type, ConditionOperator.EqualTo, ProfileType.Person.ToString());
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
+    public async Task<Result<Optional<UserProfileRoot>, Error>> FindByUserIdAsync(Identifier userId,
+        CancellationToken cancellationToken)
+    {
+        var query = Query.From<UserProfile>()
+            .Where<string>(at => at.UserId, ConditionOperator.EqualTo, userId);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
     public async Task<Result<UserProfileRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {
         var user = await _profiles.LoadAsync(id, cancellationToken);
@@ -65,31 +90,6 @@ public class UserProfileRepository : IUserProfileRepository
             .Where(result => result is { IsSuccessful: true, HasValue: true, Value.HasValue: true })
             .Select(result => result.Value.Value)
             .ToList();
-    }
-
-    public async Task<Result<Optional<UserProfileRoot>, Error>> FindByAvatarIdAsync(Identifier avatarId,
-        CancellationToken cancellationToken)
-    {
-        var query = Query.From<UserProfile>()
-            .Where<string>(at => at.AvatarImageId, ConditionOperator.EqualTo, avatarId);
-        return await FindFirstByQueryAsync(query, cancellationToken);
-    }
-
-    public async Task<Result<Optional<UserProfileRoot>, Error>> FindByUserIdAsync(Identifier userId,
-        CancellationToken cancellationToken)
-    {
-        var query = Query.From<UserProfile>()
-            .Where<string>(at => at.UserId, ConditionOperator.EqualTo, userId);
-        return await FindFirstByQueryAsync(query, cancellationToken);
-    }
-
-    public async Task<Result<Optional<UserProfileRoot>, Error>> FindByEmailAddressAsync(EmailAddress emailAddress,
-        CancellationToken cancellationToken)
-    {
-        var query = Query.From<UserProfile>()
-            .Where<string>(at => at.EmailAddress, ConditionOperator.EqualTo, emailAddress.Address)
-            .AndWhere<string>(at => at.Type, ConditionOperator.EqualTo, ProfileType.Person.ToString());
-        return await FindFirstByQueryAsync(query, cancellationToken);
     }
 
     private async Task<Result<Optional<UserProfileRoot>, Error>> FindFirstByQueryAsync(QueryClause<UserProfile> query,

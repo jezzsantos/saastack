@@ -36,6 +36,24 @@ public class ImagesRepository : IImagesRepository
     }
 #endif
 
+    public async Task<Result<Blob, Error>> DownloadImageAsync(Identifier id, Stream content,
+        CancellationToken cancellationToken)
+    {
+        var blobName = id.ToString();
+        var blob = await _imageBlobs.GetAsync(blobName, content, cancellationToken);
+        if (blob.IsFailure)
+        {
+            return blob.Error;
+        }
+
+        if (!blob.Value.HasValue)
+        {
+            return Error.EntityNotFound();
+        }
+
+        return blob.Value.Value;
+    }
+
     public async Task<Result<ImageRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {
         var image = await _images.LoadAsync(id, cancellationToken);
@@ -57,24 +75,6 @@ public class ImagesRepository : IImagesRepository
         }
 
         return profile;
-    }
-
-    public async Task<Result<Blob, Error>> DownloadImageAsync(Identifier id, Stream content,
-        CancellationToken cancellationToken)
-    {
-        var blobName = id.ToString();
-        var blob = await _imageBlobs.GetAsync(blobName, content, cancellationToken);
-        if (blob.IsFailure)
-        {
-            return blob.Error;
-        }
-
-        if (!blob.Value.HasValue)
-        {
-            return Error.EntityNotFound();
-        }
-
-        return blob.Value.Value;
     }
 
     public async Task<Result<Error>> UploadImageAsync(Identifier id, string contentType, Stream content,

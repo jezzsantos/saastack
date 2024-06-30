@@ -14,6 +14,20 @@ namespace OrganizationsApplication;
 
 partial class OrganizationsApplication
 {
+    public async Task<Result<Error>> HandleEndUserMembershipAddedAsync(ICallerContext caller,
+        MembershipAdded domainEvent, CancellationToken cancellationToken)
+    {
+        return await AddMembershipInternalAsync(caller, domainEvent.RootId.ToId(),
+            domainEvent.OrganizationId.ToId(), cancellationToken);
+    }
+
+    public async Task<Result<Error>> HandleEndUserMembershipRemovedAsync(ICallerContext caller,
+        MembershipRemoved domainEvent, CancellationToken cancellationToken)
+    {
+        return await RemoveMembershipInternalAsync(caller, domainEvent.RootId.ToId(),
+            domainEvent.OrganizationId.ToId(), cancellationToken);
+    }
+
     public async Task<Result<Error>> HandleEndUserRegisteredAsync(ICallerContext caller, Registered domainEvent,
         CancellationToken cancellationToken)
     {
@@ -48,20 +62,6 @@ partial class OrganizationsApplication
     {
         return await HandleTransferSubscriptionAsync(caller, domainEvent.OwningEntityId.ToId(),
             domainEvent.FromBuyerId.ToId(), domainEvent.ToBuyerId.ToId(), cancellationToken);
-    }
-
-    public async Task<Result<Error>> HandleEndUserMembershipAddedAsync(ICallerContext caller,
-        MembershipAdded domainEvent, CancellationToken cancellationToken)
-    {
-        return await AddMembershipInternalAsync(caller, domainEvent.RootId.ToId(),
-            domainEvent.OrganizationId.ToId(), cancellationToken);
-    }
-
-    public async Task<Result<Error>> HandleEndUserMembershipRemovedAsync(ICallerContext caller,
-        MembershipRemoved domainEvent, CancellationToken cancellationToken)
-    {
-        return await RemoveMembershipInternalAsync(caller, domainEvent.RootId.ToId(),
-            domainEvent.OrganizationId.ToId(), cancellationToken);
     }
 
     private async Task<Result<Error>> HandleCreatedSubscriptionAsync(ICallerContext caller, Identifier subscriptionId,

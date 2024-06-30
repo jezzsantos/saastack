@@ -29,14 +29,14 @@ public class TestCommandEntity : IDehydratableEntity
         this.PopulateWith(properties.ToObjectDictionary());
     }
 
-    public Optional<DateTime> LastPersistedAtUtc { get; } = Optional<DateTime>.None;
-
-    public Optional<bool> IsDeleted { get; set; } = Optional<bool>.None;
-
-    public ISingleValueObject<string> Id { get; }
-
     public HydrationProperties Dehydrate()
     {
         return HydrationProperties.FromDto(this);
     }
+
+    public ISingleValueObject<string> Id { get; }
+
+    public Optional<bool> IsDeleted { get; set; } = Optional<bool>.None;
+
+    public Optional<DateTime> LastPersistedAtUtc { get; } = Optional<DateTime>.None;
 }

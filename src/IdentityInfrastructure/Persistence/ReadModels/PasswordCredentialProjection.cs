@@ -20,8 +20,6 @@ public class PasswordCredentialProjection : IReadModelProjection
         _credentials = new ReadModelStore<PasswordCredential>(recorder, domainFactory, store);
     }
 
-    public Type RootAggregateType => typeof(PasswordCredentialRoot);
-
     public async Task<Result<bool, Error>> ProjectEventAsync(IDomainEvent changeEvent,
         CancellationToken cancellationToken)
     {
@@ -83,4 +81,6 @@ public class PasswordCredentialProjection : IReadModelProjection
                 return false;
         }
     }
+
+    public Type RootAggregateType => typeof(PasswordCredentialRoot);
 }

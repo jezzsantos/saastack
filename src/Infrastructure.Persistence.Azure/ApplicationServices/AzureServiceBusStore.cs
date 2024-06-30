@@ -89,42 +89,6 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
     }
 #endif
 
-    public async Task<Result<Error>> SendAsync(string topicName, string message, CancellationToken cancellationToken)
-    {
-        topicName.ThrowIfNotValuedParameter((string)nameof(topicName), Resources.AzureServiceBusStore_MissingTopicName);
-        message.ThrowIfNotValuedParameter((string)nameof(message), Resources.AzureServiceBusStore_MissingSentMessage);
-
-        try
-        {
-            var sent = await SendMessageInternalAsync(topicName, message, cancellationToken);
-            if (sent.IsFailure)
-            {
-                return sent.Error;
-            }
-        }
-        catch (ArgumentException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
-                ex, "Failed to send message: {Message} to the topic: {Topic}", message, topicName);
-            return ex.ToError(ErrorCode.Unexpected);
-        }
-
-        return Result.Ok;
-    }
-
-    public async Task<Result<Error>> SubscribeAsync(string topicName, string subscriptionName,
-        CancellationToken cancellationToken)
-    {
-        await CreateSubscriptionAsync(topicName, subscriptionName, cancellationToken);
-
-        return Result.Ok;
-    }
-
 #if TESTINGONLY
     public async Task<Result<bool, Error>> ReceiveSingleAsync(string topicName, string subscriptionName,
         Func<string, CancellationToken, Task<Result<Error>>> messageHandlerAsync,
@@ -189,6 +153,42 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         return true;
     }
 #endif
+
+    public async Task<Result<Error>> SendAsync(string topicName, string message, CancellationToken cancellationToken)
+    {
+        topicName.ThrowIfNotValuedParameter((string)nameof(topicName), Resources.AzureServiceBusStore_MissingTopicName);
+        message.ThrowIfNotValuedParameter((string)nameof(message), Resources.AzureServiceBusStore_MissingSentMessage);
+
+        try
+        {
+            var sent = await SendMessageInternalAsync(topicName, message, cancellationToken);
+            if (sent.IsFailure)
+            {
+                return sent.Error;
+            }
+        }
+        catch (ArgumentException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _recorder.Crash(null,
+                CrashLevel.NonCritical,
+                ex, "Failed to send message: {Message} to the topic: {Topic}", message, topicName);
+            return ex.ToError(ErrorCode.Unexpected);
+        }
+
+        return Result.Ok;
+    }
+
+    public async Task<Result<Error>> SubscribeAsync(string topicName, string subscriptionName,
+        CancellationToken cancellationToken)
+    {
+        await CreateSubscriptionAsync(topicName, subscriptionName, cancellationToken);
+
+        return Result.Ok;
+    }
 
     private async Task<Result<ServiceBusReceivedMessage?, Error>> RetrieveNextMessageInternalAsync(string topicName,
         string subscriptionName, ServiceBusReceiver receiver, CancellationToken cancellationToken)

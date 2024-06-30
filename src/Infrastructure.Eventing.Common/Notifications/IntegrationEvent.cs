@@ -19,7 +19,7 @@ public class IntegrationEvent : IIntegrationEvent
         OccurredUtc = DateTime.UtcNow;
     }
 
-    public string RootId { get; set; }
-
     public DateTime OccurredUtc { get; set; }
+
+    public string RootId { get; set; }
 }

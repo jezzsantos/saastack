@@ -452,7 +452,7 @@ public class OrganizationRootSpec
 
         result.Should().BeError(ErrorCode.RoleViolation, Resources.OrganizationRoot_UserNotOrgOwner);
     }
-    
+
     [Fact]
     public async Task WhenDeleteOrganizationAndNotBillingSubscriber_ThenReturnsError()
     {
@@ -477,7 +477,7 @@ public class OrganizationRootSpec
         result.Should().BeError(ErrorCode.RuleViolation,
             Resources.OrganizationRoot_DeleteOrganization_MembersStillExist);
     }
-    
+
     [Fact]
     public async Task WhenDeleteOrganizationAndCannotBeUnsubscribed_ThenReturnsError()
     {

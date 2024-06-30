@@ -32,6 +32,13 @@ public class AuditMessageQueueRepository : IAuditMessageQueueRepository
     }
 #endif
 
+#if TESTINGONLY
+    Task<Result<Error>> IApplicationRepository.DestroyAllAsync(CancellationToken cancellationToken)
+    {
+        return DestroyAllAsync(cancellationToken);
+    }
+#endif
+
     public Task<Result<bool, Error>> PopSingleAsync(
         Func<AuditMessage, CancellationToken, Task<Result<Error>>> onMessageReceivedAsync,
         CancellationToken cancellationToken)
@@ -44,11 +51,4 @@ public class AuditMessageQueueRepository : IAuditMessageQueueRepository
     {
         return _messageQueue.PushAsync(call, message, cancellationToken);
     }
-
-#if TESTINGONLY
-    Task<Result<Error>> IApplicationRepository.DestroyAllAsync(CancellationToken cancellationToken)
-    {
-        return DestroyAllAsync(cancellationToken);
-    }
-#endif
 }

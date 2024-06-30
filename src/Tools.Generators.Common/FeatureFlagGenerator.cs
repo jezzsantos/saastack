@@ -15,11 +15,6 @@ public class FeatureFlagGenerator : ISourceGenerator
 {
     private const string Filename = "FeatureFlags\\Flag.g.cs";
 
-    public void Initialize(GeneratorInitializationContext context)
-    {
-        // No initialization
-    }
-
     public void Execute(GeneratorExecutionContext context)
     {
         var assemblyNamespace = $"{typeof(Flag).Namespace}";
@@ -91,5 +86,10 @@ partial class {className}
 }}
 ";
         }
+    }
+
+    public void Initialize(GeneratorInitializationContext context)
+    {
+        // No initialization
     }
 }

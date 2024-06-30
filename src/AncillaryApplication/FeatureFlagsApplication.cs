@@ -28,6 +28,20 @@ public class FeatureFlagsApplication : IFeatureFlagsApplication
         return flags.Value.ToList();
     }
 
+    public async Task<Result<FeatureFlag, Error>> GetFeatureFlagAsync(ICallerContext caller, string name,
+        string? tenantId, string userId, CancellationToken cancellationToken)
+    {
+        var flag = await _featureFlags.GetFlagAsync(new Flag(name), tenantId, userId, cancellationToken);
+        if (flag.IsFailure)
+        {
+            return flag.Error;
+        }
+
+        _recorder.TraceInformation(caller.ToCall(), "Feature flag {Name} was retrieved for user {User}", name, userId);
+
+        return flag.Value;
+    }
+
     public async Task<Result<FeatureFlag, Error>> GetFeatureFlagForCallerAsync(ICallerContext caller, string name,
         CancellationToken cancellationToken)
     {
@@ -40,20 +54,6 @@ public class FeatureFlagsApplication : IFeatureFlagsApplication
         _recorder.TraceInformation(caller.ToCall(),
             "Feature flag {Name} was retrieved for user {User} in tenant {Tenant}", name, caller.CallerId,
             caller.TenantId ?? "none");
-
-        return flag.Value;
-    }
-
-    public async Task<Result<FeatureFlag, Error>> GetFeatureFlagAsync(ICallerContext caller, string name,
-        string? tenantId, string userId, CancellationToken cancellationToken)
-    {
-        var flag = await _featureFlags.GetFlagAsync(new Flag(name), tenantId, userId, cancellationToken);
-        if (flag.IsFailure)
-        {
-            return flag.Error;
-        }
-
-        _recorder.TraceInformation(caller.ToCall(), "Feature flag {Name} was retrieved for user {User}", name, userId);
 
         return flag.Value;
     }

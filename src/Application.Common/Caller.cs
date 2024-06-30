@@ -103,20 +103,20 @@ public static class Caller
             Features = new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Basic }, null);
         }
 
-        public ICallerContext.CallerRoles Roles { get; }
-
-        public ICallerContext.CallerFeatures Features { get; }
-
         public Optional<ICallerContext.CallerAuthorization> Authorization =>
             Optional<ICallerContext.CallerAuthorization>.None;
+
+        public string CallerId => CallerConstants.AnonymousUserId;
+
+        public string CallId => GenerateCallId();
+
+        public ICallerContext.CallerFeatures Features { get; }
 
         public bool IsAuthenticated => false;
 
         public bool IsServiceAccount => false;
 
-        public string CallId => GenerateCallId();
-
-        public string CallerId => CallerConstants.AnonymousUserId;
+        public ICallerContext.CallerRoles Roles { get; }
 
         public string? TenantId { get; }
     }
@@ -136,20 +136,20 @@ public static class Caller
                     new[] { PlatformFeatures.Paid2 }, null);
         }
 
-        public ICallerContext.CallerRoles Roles { get; }
-
-        public ICallerContext.CallerFeatures Features { get; }
-
         public Optional<ICallerContext.CallerAuthorization> Authorization =>
             Optional<ICallerContext.CallerAuthorization>.None;
+
+        public string CallerId => CallerConstants.MaintenanceAccountUserId;
+
+        public string CallId { get; }
+
+        public ICallerContext.CallerFeatures Features { get; }
 
         public bool IsAuthenticated => true;
 
         public bool IsServiceAccount => CallerConstants.IsServiceAccount(CallerId);
 
-        public string CallId { get; }
-
-        public string CallerId => CallerConstants.MaintenanceAccountUserId;
+        public ICallerContext.CallerRoles Roles { get; }
 
         public string? TenantId { get; }
     }
@@ -159,21 +159,21 @@ public static class Caller
     /// </summary>
     private sealed class ServiceClientAccountCaller : ICallerContext
     {
-        public ICallerContext.CallerRoles Roles { get; } = new(new[] { PlatformRoles.ServiceAccount }, null);
+        public Optional<ICallerContext.CallerAuthorization> Authorization =>
+            Optional<ICallerContext.CallerAuthorization>.None;
+
+        public string CallerId => CallerConstants.ServiceClientAccountUserId;
+
+        public string CallId => GenerateCallId();
 
         public ICallerContext.CallerFeatures Features { get; } = new(
             new[] { PlatformFeatures.Paid2 }, null);
-
-        public Optional<ICallerContext.CallerAuthorization> Authorization =>
-            Optional<ICallerContext.CallerAuthorization>.None;
 
         public bool IsAuthenticated => true;
 
         public bool IsServiceAccount => CallerConstants.IsServiceAccount(CallerId);
 
-        public string CallId => GenerateCallId();
-
-        public string CallerId => CallerConstants.ServiceClientAccountUserId;
+        public ICallerContext.CallerRoles Roles { get; } = new(new[] { PlatformRoles.ServiceAccount }, null);
 
         public string? TenantId => null;
     }
@@ -190,20 +190,20 @@ public static class Caller
             Features = new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Basic }, null);
         }
 
-        public ICallerContext.CallerRoles Roles { get; }
-
-        public ICallerContext.CallerFeatures Features { get; }
-
         public Optional<ICallerContext.CallerAuthorization> Authorization =>
             Optional<ICallerContext.CallerAuthorization>.None;
+
+        public string CallerId => CallerConstants.ExternalWebhookAccountUserId;
+
+        public string CallId { get; }
+
+        public ICallerContext.CallerFeatures Features { get; }
 
         public bool IsAuthenticated => true;
 
         public bool IsServiceAccount => CallerConstants.IsServiceAccount(CallerId);
 
-        public string CallId { get; }
-
-        public string CallerId => CallerConstants.ExternalWebhookAccountUserId;
+        public ICallerContext.CallerRoles Roles { get; }
 
         public string? TenantId => null;
     }
@@ -222,20 +222,20 @@ public static class Caller
             Features = new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Basic }, null);
         }
 
-        public ICallerContext.CallerRoles Roles { get; }
-
-        public ICallerContext.CallerFeatures Features { get; }
-
         public Optional<ICallerContext.CallerAuthorization> Authorization =>
             Optional<ICallerContext.CallerAuthorization>.None;
+
+        public string CallerId { get; }
+
+        public string CallId { get; }
+
+        public ICallerContext.CallerFeatures Features { get; }
 
         public bool IsAuthenticated => false;
 
         public bool IsServiceAccount => false;
 
-        public string CallId { get; }
-
-        public string CallerId { get; }
+        public ICallerContext.CallerRoles Roles { get; }
 
         public string? TenantId { get; }
     }

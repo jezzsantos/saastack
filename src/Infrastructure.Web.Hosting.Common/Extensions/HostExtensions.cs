@@ -44,8 +44,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 #if !TESTINGONLY
 using Infrastructure.Persistence.Common.ApplicationServices;
+
 #if HOSTEDONAZURE
 using Microsoft.ApplicationInsights.Extensibility;
+
 #elif HOSTEDONAWS
 using Amazon.XRay.Recorder.Core;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
@@ -358,7 +360,8 @@ public static class HostExtensions
                             Type = SecuritySchemeType.ApiKey,
                             Name = HttpConstants.QueryParams.APIKey,
                             Description =
-                                Resources.HostExtensions_ApiDocumentation_APIKeyQueryDescription.Format(HttpConstants.QueryParams
+                                Resources.HostExtensions_ApiDocumentation_APIKeyQueryDescription.Format(HttpConstants
+                                    .QueryParams
                                     .APIKey),
                             In = ParameterLocation.Query,
                             Scheme = APIKeyAuthenticationHandler.AuthenticationScheme

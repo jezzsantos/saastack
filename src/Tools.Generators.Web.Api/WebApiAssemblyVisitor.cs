@@ -2,7 +2,6 @@ using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Microsoft.CodeAnalysis;
 using Tools.Generators.Web.Api.Extensions;
-using SymbolExtensions = Tools.Generators.Web.Api.Extensions.SymbolExtensions;
 
 namespace Tools.Generators.Web.Api;
 
@@ -198,7 +197,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             var responseType = GetResponseType(method.Parameters[0].Type);
             var responseTypeName = responseType.Name;
             var responseTypeNamespace = responseType.ContainingNamespace.ToDisplayString();
-            var methodBody = SymbolExtensions.GetMethodBody(method);
+            var methodBody = method.GetMethodBody();
             var methodName = method.Name;
             var isAsync = method.IsAsync;
             var hasCancellationToken = method.Parameters.Length == 2;
@@ -282,7 +281,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                     {
                         var value = p.Value!.ToString();
                         var typeName = p.Type!.Name;
-                        var isRole = SymbolExtensions.IsOfType(p.Type!, _authorizeAttributeRolesSymbol);
+                        var isRole = p.Type!.IsOfType(_authorizeAttributeRolesSymbol);
                         if (isRole)
                         {
                             if (Enum.TryParse(value, true, out Roles role))
@@ -291,7 +290,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                             }
                         }
 
-                        var isFeature = SymbolExtensions.IsOfType(p.Type!, _authorizeAttributeFeaturesSymbol);
+                        var isFeature = p.Type!.IsOfType(_authorizeAttributeFeaturesSymbol);
                         if (isFeature)
                         {
                             if (Enum.TryParse(value, true, out Features feature))
@@ -345,7 +344,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                     }
                 }
 
-                var body = SymbolExtensions.GetMethodBody(constructor);
+                var body = constructor.GetMethodBody();
                 ctors.Add(new Constructor
                 {
                     IsInjectionCtor = isInjectionCtor,
@@ -391,7 +390,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         // We assume that the return type is anything but void
         bool IsCorrectReturnType(IMethodSymbol method)
         {
-            return !SymbolExtensions.IsOfType(method.ReturnType, _voidSymbol);
+            return !method.ReturnType.IsOfType(_voidSymbol);
         }
 
         // We assume that the method one or two params:
@@ -414,7 +413,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             if (parameters.Length == 2)
             {
                 var secondParameter = parameters[1];
-                if (!SymbolExtensions.IsOfType(secondParameter.Type, _cancellationTokenSymbol))
+                if (!secondParameter.Type.IsOfType(_cancellationTokenSymbol))
                 {
                     return true;
                 }

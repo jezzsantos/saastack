@@ -7,9 +7,9 @@ namespace Infrastructure.Worker.Api.IntegrationTests;
 
 public interface IApiWorkerSpec
 {
-    IQueueStore QueueStore { get; }
-
     IMessageBusStore MessageBusStore { get; }
+
+    IQueueStore QueueStore { get; }
 
     public TService GetRequiredService<TService>()
         where TService : notnull;

@@ -11,19 +11,6 @@ public partial class LocalMachineJsonFileStore : IBlobStore
 {
     private const string BlobStoreContainerName = "Blobs";
 
-#if TESTINGONLY
-    Task<Result<Error>> IBlobStore.DestroyAllAsync(string containerName, CancellationToken cancellationToken)
-    {
-        containerName.ThrowIfNotValuedParameter(nameof(containerName),
-            Resources.AnyStore_MissingContainerName);
-
-        var blobStore = EnsureContainer(GetBlobStoreContainerPath(containerName, null));
-        blobStore.Erase();
-
-        return Task.FromResult(Result.Ok);
-    }
-#endif
-
     public Task<Result<Error>> DeleteAsync(string containerName, string blobName, CancellationToken cancellationToken)
     {
         containerName.ThrowIfNotValuedParameter(nameof(containerName),
@@ -36,6 +23,19 @@ public partial class LocalMachineJsonFileStore : IBlobStore
 
         return Task.FromResult(Result.Ok);
     }
+
+#if TESTINGONLY
+    Task<Result<Error>> IBlobStore.DestroyAllAsync(string containerName, CancellationToken cancellationToken)
+    {
+        containerName.ThrowIfNotValuedParameter(nameof(containerName),
+            Resources.AnyStore_MissingContainerName);
+
+        var blobStore = EnsureContainer(GetBlobStoreContainerPath(containerName, null));
+        blobStore.Erase();
+
+        return Task.FromResult(Result.Ok);
+    }
+#endif
 
     public async Task<Result<Optional<Blob>, Error>> DownloadAsync(string containerName, string blobName, Stream stream,
         CancellationToken cancellationToken)

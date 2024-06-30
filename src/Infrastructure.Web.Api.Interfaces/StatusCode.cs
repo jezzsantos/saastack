@@ -8,30 +8,6 @@ namespace Infrastructure.Web.Api.Interfaces;
 /// </summary>
 public record StatusCode
 {
-    public static StatusCode Accepted => new(HttpStatusCode.Accepted);
-
-    public static StatusCode BadRequest => new(HttpStatusCode.BadRequest);
-
-    public static StatusCode Conflict => new(HttpStatusCode.Conflict);
-
-    public static StatusCode Created => new(HttpStatusCode.Created);
-
-    public static StatusCode Forbidden => new(HttpStatusCode.Forbidden);
-
-    public static StatusCode InternalServerError => new(HttpStatusCode.InternalServerError);
-
-    public static StatusCode MethodNotAllowed => new(HttpStatusCode.MethodNotAllowed);
-
-    public static StatusCode NoContent => new(HttpStatusCode.NoContent);
-
-    public static StatusCode NotFound => new(HttpStatusCode.NotFound);
-
-    public static StatusCode Ok => new(HttpStatusCode.OK);
-
-    public static StatusCode PaymentRequired => new(HttpStatusCode.PaymentRequired);
-
-    public static StatusCode Unauthorized => new(HttpStatusCode.Unauthorized);
-
     public StatusCode(HttpStatusCode code)
     {
         Code = code;
@@ -47,15 +23,39 @@ public record StatusCode
         ErrorCodes = HttpConstants.StatusCodes.SupportedErrorCodesMap.GetValueOrDefault(code);
     }
 
+    public static StatusCode Accepted => new(HttpStatusCode.Accepted);
+
+    public static StatusCode BadRequest => new(HttpStatusCode.BadRequest);
+
     public HttpStatusCode Code { get; }
+
+    public static StatusCode Conflict => new(HttpStatusCode.Conflict);
+
+    public static StatusCode Created => new(HttpStatusCode.Created);
 
     public IReadOnlyList<ErrorCode>? ErrorCodes { get; }
 
+    public static StatusCode Forbidden => new(HttpStatusCode.Forbidden);
+
     public HttpErrorCode? HttpErrorCode { get; }
 
+    public static StatusCode InternalServerError => new(HttpStatusCode.InternalServerError);
+
+    public static StatusCode MethodNotAllowed => new(HttpStatusCode.MethodNotAllowed);
+
+    public static StatusCode NoContent => new(HttpStatusCode.NoContent);
+
+    public static StatusCode NotFound => new(HttpStatusCode.NotFound);
+
     public int Numeric { get; }
+
+    public static StatusCode Ok => new(HttpStatusCode.OK);
+
+    public static StatusCode PaymentRequired => new(HttpStatusCode.PaymentRequired);
 
     public string Reason { get; }
 
     public string Title { get; }
+
+    public static StatusCode Unauthorized => new(HttpStatusCode.Unauthorized);
 }

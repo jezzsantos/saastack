@@ -71,12 +71,12 @@ public class HomeController : CSRFController
 #if TESTINGONLY
             scriptToAdd.Append("var isTestingOnly=true;");
 #else
-                scriptToAdd.Append("var isTestingOnly=false;");
+            scriptToAdd.Append("var isTestingOnly=false;");
 #endif
 #if HOSTEDONAZURE
             scriptToAdd.Append("var isHostedOn=\"AZURE\";");
 #elif HOSTEDONAWS
-                scriptToAdd.Append("var isHostedOn=\"AWS\";");
+            scriptToAdd.Append("var isHostedOn=\"AWS\";");
 #endif
 
             scriptToAdd.Append("</script>");

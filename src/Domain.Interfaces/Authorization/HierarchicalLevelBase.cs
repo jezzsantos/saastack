@@ -11,10 +11,6 @@ public abstract class HierarchicalLevelBase<TLevel> : IHierarchicalLevel<Hierarc
         Children = children;
     }
 
-    public IReadOnlyList<HierarchicalLevelBase<TLevel>> Children { get; }
-
-    public string Name { get; }
-
     /// <summary>
     ///     Returns all the names of all the descendants in the hierarchy, including the name of the this level
     /// </summary>
@@ -23,6 +19,8 @@ public abstract class HierarchicalLevelBase<TLevel> : IHierarchicalLevel<Hierarc
         return GetDescendantNames(this, false);
     }
 
+    public IReadOnlyList<HierarchicalLevelBase<TLevel>> Children { get; }
+
     /// <summary>
     ///     Whether the specified <see cref="level" /> exists in this hierarchy
     /// </summary>
@@ -30,6 +28,8 @@ public abstract class HierarchicalLevelBase<TLevel> : IHierarchicalLevel<Hierarc
     {
         return FindDescendant(this, lvl => lvl == level);
     }
+
+    public string Name { get; }
 
     public override bool Equals(object? obj)
     {

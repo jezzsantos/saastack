@@ -10,12 +10,12 @@ public class TestProjection : IReadModelProjection
 
     public IDomainEvent[] ProjectedEvents => _projectedEvents.ToArray();
 
-    public Type RootAggregateType => typeof(TestEventingAggregateRoot);
-
     public Task<Result<bool, Error>> ProjectEventAsync(IDomainEvent changeEvent, CancellationToken cancellationToken)
     {
         _projectedEvents.Add(changeEvent);
 
         return Task.FromResult<Result<bool, Error>>(true);
     }
+
+    public Type RootAggregateType => typeof(TestEventingAggregateRoot);
 }

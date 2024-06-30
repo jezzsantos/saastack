@@ -36,6 +36,14 @@ public class APIKeysRepository : IAPIKeysRepository
     }
 #endif
 
+    public async Task<Result<Optional<APIKeyRoot>, Error>> FindByAPIKeyTokenAsync(string keyToken,
+        CancellationToken cancellationToken)
+    {
+        var query = Query.From<APIKey>()
+            .Where<string>(at => at.KeyToken, ConditionOperator.EqualTo, keyToken);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
     public async Task<Result<APIKeyRoot, Error>> LoadAsync(Identifier id, CancellationToken cancellationToken)
     {
         var apiKey = await _apiKeys.LoadAsync(id, cancellationToken);
@@ -66,14 +74,6 @@ public class APIKeysRepository : IAPIKeysRepository
             .WithSearchOptions(options);
 
         return await _apiKeyQueries.QueryAsync(query, false, cancellationToken);
-    }
-
-    public async Task<Result<Optional<APIKeyRoot>, Error>> FindByAPIKeyTokenAsync(string keyToken,
-        CancellationToken cancellationToken)
-    {
-        var query = Query.From<APIKey>()
-            .Where<string>(at => at.KeyToken, ConditionOperator.EqualTo, keyToken);
-        return await FindFirstByQueryAsync(query, cancellationToken);
     }
 
     private async Task<Result<Optional<APIKeyRoot>, Error>> FindFirstByQueryAsync(QueryClause<APIKey> query,

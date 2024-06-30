@@ -50,19 +50,19 @@ public class PasswordCredentialsRepository : IPasswordCredentialsRepository
         return await FindFirstByQueryAsync(query, cancellationToken);
     }
 
-    public async Task<Result<Optional<PasswordCredentialRoot>, Error>> FindCredentialsByUsernameAsync(string username,
-        CancellationToken cancellationToken)
-    {
-        var query = Query.From<PasswordCredential>()
-            .Where<string>(pc => pc.UserEmailAddress, ConditionOperator.EqualTo, username);
-        return await FindFirstByQueryAsync(query, cancellationToken);
-    }
-
     public async Task<Result<Optional<PasswordCredentialRoot>, Error>> FindCredentialsByUserIdAsync(Identifier userId,
         CancellationToken cancellationToken)
     {
         var query = Query.From<PasswordCredential>()
             .Where<string>(pc => pc.UserId, ConditionOperator.EqualTo, userId);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
+    public async Task<Result<Optional<PasswordCredentialRoot>, Error>> FindCredentialsByUsernameAsync(string username,
+        CancellationToken cancellationToken)
+    {
+        var query = Query.From<PasswordCredential>()
+            .Where<string>(pc => pc.UserEmailAddress, ConditionOperator.EqualTo, username);
         return await FindFirstByQueryAsync(query, cancellationToken);
     }
 

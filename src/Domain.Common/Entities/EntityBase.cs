@@ -143,14 +143,14 @@ public abstract class EntityBase : IEntity, IEventingEntity, IDehydratableEntity
 
     public DateTime CreatedAtUtc { get; }
 
-    public DateTime LastModifiedAtUtc { get; private set; }
-
-    ISingleValueObject<string> IIdentifiableEntity.Id => Id;
-
     Result<Error> IDomainEventConsumingEntity.HandleStateChanged(IDomainEvent @event)
     {
         return OnStateChanged(@event);
     }
+
+    ISingleValueObject<string> IIdentifiableEntity.Id => Id;
+
+    public DateTime LastModifiedAtUtc { get; private set; }
 
     /// <summary>
     ///     Raises an @event, and then validates the invariants

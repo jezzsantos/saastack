@@ -476,7 +476,7 @@ public class CommandEntitySpec
             AStringValue = "avalue",
             AnIntegerValue = 1,
             ABooleanValue = true,
-            ADateTimeValue = datum,
+            ADateTimeValue = datum
         });
 
         var result = entity.ToDto<TestDto>();
@@ -502,7 +502,7 @@ public class CommandEntitySpec
             AStringValue = "avalue",
             AnIntegerValue = 1,
             ABooleanValue = true,
-            ADateTimeValue = datum,
+            ADateTimeValue = datum
         });
 
         var result = entity.ToDto<TestDto>();

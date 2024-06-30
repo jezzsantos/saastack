@@ -8,8 +8,6 @@ public static class Validations
     public static class Images
     {
         public const long MaxSizeInBytes = 134_217_728; //approx 100MB
-        public static readonly Validation Description = CommonValidations.FreeformText(1, 250);
-        public static readonly Validation Filename = new(@"^[\d\w\.]*$", 1, 100);
         public static readonly IReadOnlyList<string> AllowableContentTypes = new[]
         {
             "image/jpeg",
@@ -25,5 +23,7 @@ public static class Validations
 
             return AllowableContentTypes.ContainsIgnoreCase(val);
         });
+        public static readonly Validation Description = CommonValidations.FreeformText(1, 250);
+        public static readonly Validation Filename = new(@"^[\d\w\.]*$", 1, 100);
     }
 }

@@ -34,10 +34,10 @@ public static class CallContext
             TenantId = tenantId;
         }
 
-        public string? TenantId { get; }
-
         public string CallerId { get; }
 
         public string CallId { get; }
+
+        public string? TenantId { get; }
     }
 }

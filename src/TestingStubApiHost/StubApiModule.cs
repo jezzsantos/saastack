@@ -32,12 +32,6 @@ public class StubApiModule : ISubdomainModule
         { WorkerConstants.Queues.Provisionings, new DrainAllProvisioningsRequest() }
     };
 
-    public Assembly InfrastructureAssembly => typeof(StubHelloApi).Assembly;
-
-    public Assembly DomainAssembly => typeof(StubHelloApi).Assembly;
-
-    public Dictionary<Type, string> EntityPrefixes => new();
-
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
     {
         get
@@ -67,6 +61,12 @@ public class StubApiModule : ISubdomainModule
             };
         }
     }
+
+    public Assembly DomainAssembly => typeof(StubHelloApi).Assembly;
+
+    public Dictionary<Type, string> EntityPrefixes => new();
+
+    public Assembly InfrastructureAssembly => typeof(StubHelloApi).Assembly;
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {

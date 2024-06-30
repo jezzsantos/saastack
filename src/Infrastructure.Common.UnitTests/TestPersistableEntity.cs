@@ -24,13 +24,6 @@ public class TestPersistableEntity : IDehydratableEntity
         return (_, _, properties) => new TestPersistableEntity(properties);
     }
 
-    public ISingleValueObject<string> Id { get; private set; }
-
-    public Optional<DateTime> LastPersistedAtUtc { get; private set; }
-
-    // ReSharper disable once UnassignedGetOnlyAutoProperty
-    public Optional<bool> IsDeleted { get; }
-
     public HydrationProperties Dehydrate()
     {
         return new HydrationProperties
@@ -40,4 +33,11 @@ public class TestPersistableEntity : IDehydratableEntity
             { nameof(APropertyValue), APropertyValue }
         };
     }
+
+    public ISingleValueObject<string> Id { get; private set; }
+
+    // ReSharper disable once UnassignedGetOnlyAutoProperty
+    public Optional<bool> IsDeleted { get; }
+
+    public Optional<DateTime> LastPersistedAtUtc { get; private set; }
 }

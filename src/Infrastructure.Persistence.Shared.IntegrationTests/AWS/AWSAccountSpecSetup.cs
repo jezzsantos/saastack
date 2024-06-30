@@ -26,8 +26,6 @@ public class AWSAccountSpecSetup : StoreSpecSetupBase, IDisposable
         MessageBusStoreTestQueues = [queue1.Value.QueueArn, queue2.Value.QueueArn];
     }
 
-    public string[] MessageBusStoreTestQueues { get; }
-
     public void Dispose()
     {
         Dispose(true);
@@ -43,6 +41,8 @@ public class AWSAccountSpecSetup : StoreSpecSetupBase, IDisposable
     }
 
     public IMessageBusStore MessageBusStore { get; }
+
+    public string[] MessageBusStoreTestQueues { get; }
 
     public IQueueStore QueueStore { get; }
 }

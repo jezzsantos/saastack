@@ -10,11 +10,11 @@ public class SimpleTenancyContext : ITenancyContext
 {
     public string? Current { get; private set; }
 
-    public TenantSettings Settings { get; private set; } = new();
-
     public void Set(string id, TenantSettings settings)
     {
         Current = id;
         Settings = settings;
     }
+
+    public TenantSettings Settings { get; private set; } = new();
 }

@@ -72,43 +72,6 @@ public partial class LocalMachineJsonFileStore : IMessageBusStore, IMessageBusSt
     }
 #endif
 
-    public async Task<Result<Error>> SendAsync(string topicName, string message, CancellationToken cancellationToken)
-    {
-        topicName.ThrowIfNotValuedParameter((string)nameof(topicName),
-            Resources.InProcessInMemDataStore_MissingTopicName);
-        message.ThrowIfNotValuedParameter((string)nameof(message),
-            Resources.InProcessInMemDataStore_MissingQueueMessage);
-
-        // Note: queue message with timestamp
-        var topicStore = EnsureContainer(GetTopicStoreContainerPath(topicName));
-        var messageId = DateTime.UtcNow.Ticks.ToString();
-        await topicStore.WriteAsync(messageId, new Dictionary<string, Optional<string>>
-        {
-            { "Message", message }
-        }, cancellationToken);
-
-        return Result.Ok;
-    }
-
-    public async Task<Result<Error>> SubscribeAsync(string topicName, string subscriptionName,
-        CancellationToken cancellationToken)
-    {
-        topicName.ThrowIfNotValuedParameter((string)nameof(topicName),
-            Resources.InProcessInMemDataStore_MissingTopicName);
-        subscriptionName.ThrowIfNotValuedParameter((string)nameof(subscriptionName),
-            Resources.InProcessInMemDataStore_MissingSubscriptionName);
-
-        EnsureContainer(GetTopicStoreContainerPath(topicName));
-        var subscriptionsStore = EnsureContainer(GetSubscriptionStoreContainerPath(topicName));
-        if (!subscriptionsStore.Exists(subscriptionName))
-        {
-            await SaveSubscriptionAsync(subscriptionsStore, new SubscriptionPosition(subscriptionName, topicName),
-                cancellationToken);
-        }
-
-        return Result.Ok;
-    }
-
 #if TESTINGONLY
     public async Task<Result<bool, Error>> ReceiveSingleAsync(string topicName, string subscriptionName,
         Func<string, CancellationToken, Task<Result<Error>>> messageHandlerAsync,
@@ -182,6 +145,43 @@ public partial class LocalMachineJsonFileStore : IMessageBusStore, IMessageBusSt
         return true;
     }
 #endif
+
+    public async Task<Result<Error>> SendAsync(string topicName, string message, CancellationToken cancellationToken)
+    {
+        topicName.ThrowIfNotValuedParameter((string)nameof(topicName),
+            Resources.InProcessInMemDataStore_MissingTopicName);
+        message.ThrowIfNotValuedParameter((string)nameof(message),
+            Resources.InProcessInMemDataStore_MissingQueueMessage);
+
+        // Note: queue message with timestamp
+        var topicStore = EnsureContainer(GetTopicStoreContainerPath(topicName));
+        var messageId = DateTime.UtcNow.Ticks.ToString();
+        await topicStore.WriteAsync(messageId, new Dictionary<string, Optional<string>>
+        {
+            { "Message", message }
+        }, cancellationToken);
+
+        return Result.Ok;
+    }
+
+    public async Task<Result<Error>> SubscribeAsync(string topicName, string subscriptionName,
+        CancellationToken cancellationToken)
+    {
+        topicName.ThrowIfNotValuedParameter((string)nameof(topicName),
+            Resources.InProcessInMemDataStore_MissingTopicName);
+        subscriptionName.ThrowIfNotValuedParameter((string)nameof(subscriptionName),
+            Resources.InProcessInMemDataStore_MissingSubscriptionName);
+
+        EnsureContainer(GetTopicStoreContainerPath(topicName));
+        var subscriptionsStore = EnsureContainer(GetSubscriptionStoreContainerPath(topicName));
+        if (!subscriptionsStore.Exists(subscriptionName))
+        {
+            await SaveSubscriptionAsync(subscriptionsStore, new SubscriptionPosition(subscriptionName, topicName),
+                cancellationToken);
+        }
+
+        return Result.Ok;
+    }
 
     public event MessageQueueUpdated? FireTopicMessage;
 
@@ -268,7 +268,7 @@ public partial class LocalMachineJsonFileStore : IMessageBusStore, IMessageBusSt
 
         return true;
     }
-    
+
     private static string GetTopicStoreContainerPath(string? containerName = null, string? entityId = null)
     {
         if (entityId.HasValue())

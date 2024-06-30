@@ -33,7 +33,7 @@ public sealed class DeliverDomainEventingRelayWorker : IMessageBusMonitoringApiR
         }
 
         var serviceClient = _serviceClientFactory.CreateServiceClient(subscriber.BaseUrl);
-        
+
         await serviceClient.PostQueuedMessageToApiOrThrowAsync(_recorder,
             message, new NotifyDomainEventRequest
             {

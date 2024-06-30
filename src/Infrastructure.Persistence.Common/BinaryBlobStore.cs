@@ -26,6 +26,20 @@ public sealed class BinaryBlobStore : IBinaryBlobStore
 
     public Guid InstanceId { get; }
 
+#if TESTINGONLY
+    public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
+    {
+        var deleted = await _blobStore.DestroyAllAsync(_containerName, cancellationToken);
+        if (deleted.IsSuccessful)
+        {
+            _recorder.TraceDebug(null, "All blobs were deleted from the container {Container} in the {Store} store",
+                _containerName, _blobStore.GetType().Name);
+        }
+
+        return deleted;
+    }
+#endif
+
     public async Task<Result<Error>> DestroyAsync(string blobName, CancellationToken cancellationToken)
     {
         if (blobName.IsNotValuedParameter(nameof(blobName), out var error))
@@ -45,20 +59,6 @@ public sealed class BinaryBlobStore : IBinaryBlobStore
 
         return Result.Ok;
     }
-
-#if TESTINGONLY
-    public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
-    {
-        var deleted = await _blobStore.DestroyAllAsync(_containerName, cancellationToken);
-        if (deleted.IsSuccessful)
-        {
-            _recorder.TraceDebug(null, "All blobs were deleted from the container {Container} in the {Store} store",
-                _containerName, _blobStore.GetType().Name);
-        }
-
-        return deleted;
-    }
-#endif
 
     public async Task<Result<Optional<Blob>, Error>> GetAsync(string blobName, Stream stream,
         CancellationToken cancellationToken)

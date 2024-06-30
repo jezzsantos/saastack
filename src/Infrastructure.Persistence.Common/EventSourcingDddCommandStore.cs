@@ -93,6 +93,8 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
         }
     }
 
+    public event EventStreamChangedAsync<EventStreamChangedArgs>? OnEventStreamChanged;
+
     public async Task<Result<Error>> SaveAsync(TAggregateRoot aggregate, CancellationToken cancellationToken)
     {
         if (aggregate.Id.IsEmpty())
@@ -110,8 +112,6 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
 
         return Result.Ok;
     }
-
-    public event EventStreamChangedAsync<EventStreamChangedArgs>? OnEventStreamChanged;
 
     private static string GetEntityName()
     {

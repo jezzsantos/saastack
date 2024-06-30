@@ -22,6 +22,8 @@ public class Unavailabilities : IReadOnlyList<Unavailability>
         return Result.Ok;
     }
 
+    public int Count => _unavailabilities.Count;
+
     public IEnumerator<Unavailability> GetEnumerator()
     {
         return _unavailabilities.GetEnumerator();
@@ -31,8 +33,6 @@ public class Unavailabilities : IReadOnlyList<Unavailability>
     {
         return GetEnumerator();
     }
-
-    public int Count => _unavailabilities.Count;
 
     public Unavailability this[int index] => _unavailabilities[index];
 

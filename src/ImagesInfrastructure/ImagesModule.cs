@@ -26,6 +26,11 @@ namespace ImagesInfrastructure;
 
 public class ImagesModule : ISubdomainModule
 {
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
+
     public Assembly DomainAssembly => typeof(ImageRoot).Assembly;
 
     public Dictionary<Type, string> EntityPrefixes => new()
@@ -34,11 +39,6 @@ public class ImagesModule : ISubdomainModule
     };
 
     public Assembly InfrastructureAssembly => typeof(ImagesApi).Assembly;
-
-    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
-    {
-        get { return (app, _) => app.RegisterRoutes(); }
-    }
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {

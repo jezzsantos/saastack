@@ -33,6 +33,156 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         _repository = repository;
     }
 
+    public async Task<Result<UserProfile, Error>> ChangeContactAddressAsync(ICallerContext caller, string userId,
+        string? line1, string? line2,
+        string? line3, string? city, string? state, string? countryCode, string? zipCode,
+        CancellationToken cancellationToken)
+    {
+        if (userId != caller.CallerId)
+        {
+            return Error.ForbiddenAccess();
+        }
+
+        var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        if (!retrieved.Value.HasValue)
+        {
+            return Error.EntityNotFound();
+        }
+
+        var profile = retrieved.Value.Value;
+
+        var address = Address.Create(
+            line1 ?? profile.Address.Line1,
+            line2 ?? profile.Address.Line2,
+            line3 ?? profile.Address.Line3,
+            city ?? profile.Address.City,
+            state ?? profile.Address.State,
+            CountryCodes.FindOrDefault(countryCode ?? profile.Address.CountryCode.ToString()),
+            zipCode ?? profile.Address.Zip);
+        if (address.IsFailure)
+        {
+            return address.Error;
+        }
+
+        var contacted = profile.SetContactAddress(caller.ToCallerId(), address.Value);
+        if (contacted.IsFailure)
+        {
+            return contacted.Error;
+        }
+
+        var saved = await _repository.SaveAsync(profile, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        profile = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} contact address was updated for user {UserId}",
+            profile.Id, userId);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
+            profile.ToUsageEvent(caller));
+
+        return profile.ToProfile();
+    }
+
+    public async Task<Result<UserProfile, Error>> ChangeProfileAsync(ICallerContext caller, string userId,
+        string? firstName, string? lastName, string? displayName, string? phoneNumber, string? timezone,
+        CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        if (!retrieved.Value.HasValue)
+        {
+            return Error.EntityNotFound();
+        }
+
+        var profile = retrieved.Value.Value;
+        if (firstName.HasValue() || lastName.HasValue())
+        {
+            var backupFirstname = profile.Name.Value.FirstName;
+            var backupLastname = profile.Name.Value.LastName.ValueOrDefault?.Text;
+            var name = PersonName.Create(firstName ?? backupFirstname, lastName ?? backupLastname);
+            if (name.IsFailure)
+            {
+                return name.Error;
+            }
+
+            var named = profile.ChangeName(caller.ToCallerId(), name.Value);
+            if (named.IsFailure)
+            {
+                return named.Error;
+            }
+        }
+
+        if (displayName.HasValue())
+        {
+            var display = PersonDisplayName.Create(displayName);
+            if (display.IsFailure)
+            {
+                return display.Error;
+            }
+
+            var displayed = profile.ChangeDisplayName(caller.ToCallerId(), display.Value);
+            if (displayed.IsFailure)
+            {
+                return displayed.Error;
+            }
+        }
+
+        if (phoneNumber.HasValue())
+        {
+            var phone = PhoneNumber.Create(phoneNumber);
+            if (phone.IsFailure)
+            {
+                return phone.Error;
+            }
+
+            var phoned = profile.ChangePhoneNumber(caller.ToCallerId(), phone.Value);
+            if (phoned.IsFailure)
+            {
+                return phoned.Error;
+            }
+        }
+
+        if (timezone.HasValue())
+        {
+            var tz = Timezone.Create(Timezones.FindOrDefault(timezone));
+            if (tz.IsFailure)
+            {
+                return tz.Error;
+            }
+
+            var timezoned = profile.SetTimezone(caller.ToCallerId(), tz.Value);
+            if (timezoned.IsFailure)
+            {
+                return timezoned.Error;
+            }
+        }
+
+        var saved = await _repository.SaveAsync(profile, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        profile = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was updated for user {UserId}", profile.Id,
+            profile.UserId);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
+            profile.ToUsageEvent(caller));
+
+        return profile.ToProfile();
+    }
+
     public async Task<Result<UserProfile, Error>> ChangeProfileAvatarAsync(ICallerContext caller, string userId,
         FileUpload upload, CancellationToken cancellationToken)
     {
@@ -135,6 +285,36 @@ public partial class UserProfilesApplication : IUserProfilesApplication
         return Optional<UserProfile>.None;
     }
 
+    public async Task<Result<List<UserProfile>, Error>> GetAllProfilesAsync(ICallerContext caller, List<string> ids,
+        GetOptions options, CancellationToken cancellationToken)
+    {
+        if (ids.HasNone())
+        {
+            return new List<UserProfile>();
+        }
+
+        var retrieved =
+            await _repository.SearchAllByUserIdsAsync(ids.Select(id => id.ToId()).ToList(), cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        var profiles = retrieved.Value;
+        if (profiles.HasNone())
+        {
+            return new List<UserProfile>();
+        }
+
+        _recorder.TraceInformation(caller.ToCall(),
+            "Profiles were retrieved for {ExpectedCount} users, and returned {ActualCount} profiles", ids.Count,
+            profiles.Count);
+
+        return profiles
+            .ConvertAll(profile => profile.ToProfile())
+            .ToList();
+    }
+
     public async Task<Result<UserProfileForCaller, Error>> GetCurrentUserProfileAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
@@ -208,186 +388,6 @@ public partial class UserProfilesApplication : IUserProfilesApplication
             profile.UserId);
 
         return profile.ToProfile();
-    }
-
-    public async Task<Result<UserProfile, Error>> ChangeProfileAsync(ICallerContext caller, string userId,
-        string? firstName, string? lastName, string? displayName, string? phoneNumber, string? timezone,
-        CancellationToken cancellationToken)
-    {
-        var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
-        if (retrieved.IsFailure)
-        {
-            return retrieved.Error;
-        }
-
-        if (!retrieved.Value.HasValue)
-        {
-            return Error.EntityNotFound();
-        }
-
-        var profile = retrieved.Value.Value;
-        if (firstName.HasValue() || lastName.HasValue())
-        {
-            var backupFirstname = profile.Name.Value.FirstName;
-            var backupLastname = profile.Name.Value.LastName.ValueOrDefault?.Text;
-            var name = PersonName.Create(firstName ?? backupFirstname, lastName ?? backupLastname);
-            if (name.IsFailure)
-            {
-                return name.Error;
-            }
-
-            var named = profile.ChangeName(caller.ToCallerId(), name.Value);
-            if (named.IsFailure)
-            {
-                return named.Error;
-            }
-        }
-
-        if (displayName.HasValue())
-        {
-            var display = PersonDisplayName.Create(displayName);
-            if (display.IsFailure)
-            {
-                return display.Error;
-            }
-
-            var displayed = profile.ChangeDisplayName(caller.ToCallerId(), display.Value);
-            if (displayed.IsFailure)
-            {
-                return displayed.Error;
-            }
-        }
-
-        if (phoneNumber.HasValue())
-        {
-            var phone = PhoneNumber.Create(phoneNumber);
-            if (phone.IsFailure)
-            {
-                return phone.Error;
-            }
-
-            var phoned = profile.ChangePhoneNumber(caller.ToCallerId(), phone.Value);
-            if (phoned.IsFailure)
-            {
-                return phoned.Error;
-            }
-        }
-
-        if (timezone.HasValue())
-        {
-            var tz = Timezone.Create(Timezones.FindOrDefault(timezone));
-            if (tz.IsFailure)
-            {
-                return tz.Error;
-            }
-
-            var timezoned = profile.SetTimezone(caller.ToCallerId(), tz.Value);
-            if (timezoned.IsFailure)
-            {
-                return timezoned.Error;
-            }
-        }
-
-        var saved = await _repository.SaveAsync(profile, cancellationToken);
-        if (saved.IsFailure)
-        {
-            return saved.Error;
-        }
-
-        profile = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} was updated for user {UserId}", profile.Id,
-            profile.UserId);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
-            profile.ToUsageEvent(caller));
-
-        return profile.ToProfile();
-    }
-
-    public async Task<Result<UserProfile, Error>> ChangeContactAddressAsync(ICallerContext caller, string userId,
-        string? line1, string? line2,
-        string? line3, string? city, string? state, string? countryCode, string? zipCode,
-        CancellationToken cancellationToken)
-    {
-        if (userId != caller.CallerId)
-        {
-            return Error.ForbiddenAccess();
-        }
-
-        var retrieved = await _repository.FindByUserIdAsync(userId.ToId(), cancellationToken);
-        if (retrieved.IsFailure)
-        {
-            return retrieved.Error;
-        }
-
-        if (!retrieved.Value.HasValue)
-        {
-            return Error.EntityNotFound();
-        }
-
-        var profile = retrieved.Value.Value;
-
-        var address = Address.Create(
-            line1 ?? profile.Address.Line1,
-            line2 ?? profile.Address.Line2,
-            line3 ?? profile.Address.Line3,
-            city ?? profile.Address.City,
-            state ?? profile.Address.State,
-            CountryCodes.FindOrDefault(countryCode ?? profile.Address.CountryCode.ToString()),
-            zipCode ?? profile.Address.Zip);
-        if (address.IsFailure)
-        {
-            return address.Error;
-        }
-
-        var contacted = profile.SetContactAddress(caller.ToCallerId(), address.Value);
-        if (contacted.IsFailure)
-        {
-            return contacted.Error;
-        }
-
-        var saved = await _repository.SaveAsync(profile, cancellationToken);
-        if (saved.IsFailure)
-        {
-            return saved.Error;
-        }
-
-        profile = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Profile {Id} contact address was updated for user {UserId}",
-            profile.Id, userId);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
-            profile.ToUsageEvent(caller));
-
-        return profile.ToProfile();
-    }
-
-    public async Task<Result<List<UserProfile>, Error>> GetAllProfilesAsync(ICallerContext caller, List<string> ids,
-        GetOptions options, CancellationToken cancellationToken)
-    {
-        if (ids.HasNone())
-        {
-            return new List<UserProfile>();
-        }
-
-        var retrieved =
-            await _repository.SearchAllByUserIdsAsync(ids.Select(id => id.ToId()).ToList(), cancellationToken);
-        if (retrieved.IsFailure)
-        {
-            return retrieved.Error;
-        }
-
-        var profiles = retrieved.Value;
-        if (profiles.HasNone())
-        {
-            return new List<UserProfile>();
-        }
-
-        _recorder.TraceInformation(caller.ToCall(),
-            "Profiles were retrieved for {ExpectedCount} users, and returned {ActualCount} profiles", ids.Count,
-            profiles.Count);
-
-        return profiles
-            .ConvertAll(profile => profile.ToProfile())
-            .ToList();
     }
 
     private async Task<Result<Error>> ChangeAvatarInternalAsync(ICallerContext caller, Identifier modifierId,

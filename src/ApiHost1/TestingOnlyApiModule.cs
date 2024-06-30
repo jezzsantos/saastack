@@ -7,16 +7,16 @@ namespace ApiHost1;
 
 public class TestingOnlyApiModule : ISubdomainModule
 {
-    public Assembly InfrastructureAssembly => typeof(TestingWebApi).Assembly;
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
 
     public Assembly? DomainAssembly => null;
 
     public Dictionary<Type, string> EntityPrefixes => new();
 
-    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
-    {
-        get { return (app, _) => app.RegisterRoutes(); }
-    }
+    public Assembly InfrastructureAssembly => typeof(TestingWebApi).Assembly;
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {

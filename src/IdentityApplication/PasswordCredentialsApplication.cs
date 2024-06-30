@@ -21,8 +21,8 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
     private const double MinAuthenticateDelayInSecs = 0;
     private const double MaxAuthenticateDelayInSecs = 0;
 #else
-        private const double MinAuthenticateDelayInSecs = 1.5;
-        private const double MaxAuthenticateDelayInSecs = 4.0;
+    private const double MinAuthenticateDelayInSecs = 1.5;
+    private const double MaxAuthenticateDelayInSecs = 4.0;
 #endif
     private readonly IEndUsersService _endUsersService;
     private readonly IUserNotificationsService _userNotificationsService;

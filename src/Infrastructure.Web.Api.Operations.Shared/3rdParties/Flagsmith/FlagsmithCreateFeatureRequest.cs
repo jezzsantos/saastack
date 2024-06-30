@@ -10,5 +10,6 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 public class FlagsmithCreateFeatureRequest : IWebRequest<FlagsmithCreateFeatureResponse>
 {
     [JsonPropertyName("name")] public string? Name { get; set; }
+
     public int ProjectId { get; set; }
 }

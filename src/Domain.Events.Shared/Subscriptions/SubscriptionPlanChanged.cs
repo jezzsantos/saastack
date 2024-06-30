@@ -15,15 +15,15 @@ public sealed class SubscriptionPlanChanged : DomainEvent
     {
     }
 
+    public required string BuyerReference { get; set; }
+
     public required string OwningEntityId { get; set; }
 
-    public required string BuyerReference { get; set; }
+    public required string PlanId { get; set; }
 
     public required string ProviderName { get; set; }
 
     public required Dictionary<string, string> ProviderState { get; set; }
 
     public required string SubscriptionReference { get; set; }
-
-    public required string PlanId { get; set; }
 }

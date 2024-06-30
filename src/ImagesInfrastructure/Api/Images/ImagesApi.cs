@@ -25,6 +25,13 @@ public class ImagesApi : IWebApiService
         _application = application;
     }
 
+    public async Task<ApiDeleteResult> DeleteImage(DeleteImageRequest request, CancellationToken cancellationToken)
+    {
+        var image = await _application.DeleteImageAsync(_callerFactory.Create(), request.Id!, cancellationToken);
+
+        return () => image.HandleApplicationResult();
+    }
+
     public async Task<ApiStreamResult> DownloadImage(DownloadImageRequest request,
         CancellationToken cancellationToken)
     {
@@ -39,13 +46,6 @@ public class ImagesApi : IWebApiService
         var image = await _application.GetImageAsync(_callerFactory.Create(), request.Id!, cancellationToken);
 
         return () => image.HandleApplicationResult<Image, GetImageResponse>(x => new GetImageResponse { Image = x });
-    }
-
-    public async Task<ApiDeleteResult> DeleteImage(DeleteImageRequest request, CancellationToken cancellationToken)
-    {
-        var image = await _application.DeleteImageAsync(_callerFactory.Create(), request.Id!, cancellationToken);
-
-        return () => image.HandleApplicationResult();
     }
 
     public async Task<ApiPutPatchResult<Image, UpdateImageResponse>> UpdateImage(UpdateImageRequest request,

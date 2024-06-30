@@ -20,8 +20,6 @@ public class AuditProjection : IReadModelProjection
         _audits = new ReadModelStore<Audit>(recorder, domainFactory, store);
     }
 
-    public Type RootAggregateType => typeof(AuditRoot);
-
     public async Task<Result<bool, Error>> ProjectEventAsync(IDomainEvent changeEvent,
         CancellationToken cancellationToken)
     {
@@ -41,4 +39,6 @@ public class AuditProjection : IReadModelProjection
                 return false;
         }
     }
+
+    public Type RootAggregateType => typeof(AuditRoot);
 }

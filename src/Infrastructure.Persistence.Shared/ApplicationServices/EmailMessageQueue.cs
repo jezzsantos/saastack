@@ -31,6 +31,13 @@ public class EmailMessageQueue : IEmailMessageQueue
     }
 #endif
 
+#if TESTINGONLY
+    Task<Result<Error>> IApplicationRepository.DestroyAllAsync(CancellationToken cancellationToken)
+    {
+        return DestroyAllAsync(cancellationToken);
+    }
+#endif
+
     public Task<Result<bool, Error>> PopSingleAsync(
         Func<EmailMessage, CancellationToken, Task<Result<Error>>> onMessageReceivedAsync,
         CancellationToken cancellationToken)
@@ -43,11 +50,4 @@ public class EmailMessageQueue : IEmailMessageQueue
     {
         return _messageQueue.PushAsync(call, message, cancellationToken);
     }
-
-#if TESTINGONLY
-    Task<Result<Error>> IApplicationRepository.DestroyAllAsync(CancellationToken cancellationToken)
-    {
-        return DestroyAllAsync(cancellationToken);
-    }
-#endif
 }

@@ -35,6 +35,13 @@ public class DomainEventingMessageBusTopic : IDomainEventingMessageBusTopic
 #endif
 
 #if TESTINGONLY
+    Task<Result<Error>> IApplicationRepository.DestroyAllAsync(CancellationToken cancellationToken)
+    {
+        return DestroyAllAsync(cancellationToken);
+    }
+#endif
+
+#if TESTINGONLY
     public Task<Result<bool, Error>> ReceiveSingleAsync(string subscriptionName,
         Func<DomainEventingMessage, CancellationToken, Task<Result<Error>>> onMessageReceivedAsync,
         CancellationToken cancellationToken)
@@ -48,11 +55,4 @@ public class DomainEventingMessageBusTopic : IDomainEventingMessageBusTopic
     {
         return _messageBusTopic.SendAsync(call, message, cancellationToken);
     }
-
-#if TESTINGONLY
-    Task<Result<Error>> IApplicationRepository.DestroyAllAsync(CancellationToken cancellationToken)
-    {
-        return DestroyAllAsync(cancellationToken);
-    }
-#endif
 }

@@ -42,6 +42,18 @@ public partial class InProcessInMemStore : IDataStore
             : 0);
     }
 
+#if TESTINGONLY
+    Task<Result<Error>> IDataStore.DestroyAllAsync(string containerName, CancellationToken cancellationToken)
+    {
+        containerName.ThrowIfNotValuedParameter(nameof(containerName),
+            Resources.AnyStore_MissingContainerName);
+
+        _documents.Remove(containerName);
+
+        return Task.FromResult(Result.Ok);
+    }
+#endif
+
     public int MaxQueryResults => 1000;
 
     public async Task<Result<List<QueryEntity>, Error>> QueryAsync<TQueryableEntity>(string containerName,
@@ -118,18 +130,6 @@ public partial class InProcessInMemStore : IDataStore
 
         return Task.FromResult<Result<Optional<CommandEntity>, Error>>(Optional<CommandEntity>.None);
     }
-
-#if TESTINGONLY
-    Task<Result<Error>> IDataStore.DestroyAllAsync(string containerName, CancellationToken cancellationToken)
-    {
-        containerName.ThrowIfNotValuedParameter(nameof(containerName),
-            Resources.AnyStore_MissingContainerName);
-
-        _documents.Remove(containerName);
-
-        return Task.FromResult(Result.Ok);
-    }
-#endif
 
     private Task<Dictionary<string, HydrationProperties>> QueryPrimaryEntitiesAsync(string containerName,
         CancellationToken _)

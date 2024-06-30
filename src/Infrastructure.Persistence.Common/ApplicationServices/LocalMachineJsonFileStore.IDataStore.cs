@@ -14,8 +14,6 @@ public partial class LocalMachineJsonFileStore : IDataStore
     public const string NullToken = @"null";
     private const string DocumentStoreContainerName = "Documents";
 
-    public int MaxQueryResults => 1000;
-
     public async Task<Result<CommandEntity, Error>> AddAsync(string containerName, CommandEntity entity,
         CancellationToken cancellationToken)
     {
@@ -42,6 +40,21 @@ public partial class LocalMachineJsonFileStore : IDataStore
 
         return Task.FromResult<Result<long, Error>>(container.Count);
     }
+
+#if TESTINGONLY
+    Task<Result<Error>> IDataStore.DestroyAllAsync(string containerName, CancellationToken cancellationToken)
+    {
+        containerName.ThrowIfNotValuedParameter(nameof(containerName),
+            Resources.AnyStore_MissingContainerName);
+
+        var documentStore = EnsureContainer(GetDocumentStoreContainerPath(containerName));
+        documentStore.Erase();
+
+        return Task.FromResult(Result.Ok);
+    }
+#endif
+
+    public int MaxQueryResults => 1000;
 
     public async Task<Result<List<QueryEntity>, Error>> QueryAsync<TQueryableEntity>(string containerName,
         QueryClause<TQueryableEntity> query, PersistedEntityMetadata metadata,
@@ -122,19 +135,6 @@ public partial class LocalMachineJsonFileStore : IDataStore
 
         return Optional<CommandEntity>.None;
     }
-
-#if TESTINGONLY
-    Task<Result<Error>> IDataStore.DestroyAllAsync(string containerName, CancellationToken cancellationToken)
-    {
-        containerName.ThrowIfNotValuedParameter(nameof(containerName),
-            Resources.AnyStore_MissingContainerName);
-
-        var documentStore = EnsureContainer(GetDocumentStoreContainerPath(containerName));
-        documentStore.Erase();
-
-        return Task.FromResult(Result.Ok);
-    }
-#endif
 
     private static string GetDocumentStoreContainerPath(string containerName, string? entityId = null)
     {

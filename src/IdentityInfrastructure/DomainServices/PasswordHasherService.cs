@@ -13,6 +13,18 @@ public class PasswordHasherService : IPasswordHasherService
         return passwordHash;
     }
 
+    public bool ValidatePassword(string password, bool isStrict)
+    {
+        return isStrict
+            ? CommonValidations.Passwords.Password.Strict.Matches(password)
+            : CommonValidations.Passwords.Password.Loose.Matches(password);
+    }
+
+    public bool ValidatePasswordHash(string passwordHash)
+    {
+        return CommonValidations.Passwords.PasswordHash.Matches(passwordHash);
+    }
+
     public bool VerifyPassword(string password, string passwordHash)
     {
         try
@@ -27,17 +39,5 @@ public class PasswordHasherService : IPasswordHasherService
         {
             return false;
         }
-    }
-
-    public bool ValidatePasswordHash(string passwordHash)
-    {
-        return CommonValidations.Passwords.PasswordHash.Matches(passwordHash);
-    }
-
-    public bool ValidatePassword(string password, bool isStrict)
-    {
-        return isStrict
-            ? CommonValidations.Passwords.Password.Strict.Matches(password)
-            : CommonValidations.Passwords.Password.Loose.Matches(password);
     }
 }

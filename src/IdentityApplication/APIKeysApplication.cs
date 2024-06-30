@@ -34,6 +34,43 @@ public class APIKeysApplication : IAPIKeysApplication
         _repository = repository;
     }
 
+    public async Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext caller, string userId,
+        string description, DateTime? expiresOn, CancellationToken cancellationToken)
+    {
+        var keyToken = _tokensService.CreateAPIKey();
+
+        var created = APIKeyRoot.Create(_recorder, _identifierFactory, _apiKeyHasherService, userId.ToId(), keyToken);
+        if (created.IsFailure)
+        {
+            return created.Error;
+        }
+
+        var apiKey = created.Value;
+        var parameterized = apiKey.SetParameters(description,
+            expiresOn ?? DateTime.UtcNow.ToNearestMinute().Add(DefaultAPIKeyExpiry));
+        if (parameterized.IsFailure)
+        {
+            return parameterized.Error;
+        }
+
+        var saved = await _repository.SaveAsync(apiKey, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        apiKey = saved.Value;
+        return apiKey.ToApiKey(keyToken.ApiKey, description);
+    }
+
+#if TESTINGONLY
+    public async Task<Result<APIKey, Error>> CreateAPIKeyForCallerAsync(ICallerContext caller,
+        CancellationToken cancellationToken)
+    {
+        return await CreateAPIKeyAsync(caller, caller.CallerId, caller.CallerId, null, cancellationToken);
+    }
+#endif
+
     public async Task<Result<Error>> DeleteAPIKeyAsync(ICallerContext caller, string id,
         CancellationToken cancellationToken)
     {
@@ -111,43 +148,6 @@ public class APIKeysApplication : IAPIKeysApplication
         _recorder.TraceInformation(caller.ToCall(), "All keys were fetched for user {User}", userId);
 
         return searchOptions.ApplyWithMetadata(apiKeys.Select(key => key.ToApiKey()));
-    }
-
-#if TESTINGONLY
-    public async Task<Result<APIKey, Error>> CreateAPIKeyForCallerAsync(ICallerContext caller,
-        CancellationToken cancellationToken)
-    {
-        return await CreateAPIKeyAsync(caller, caller.CallerId, caller.CallerId, null, cancellationToken);
-    }
-#endif
-
-    public async Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext caller, string userId,
-        string description, DateTime? expiresOn, CancellationToken cancellationToken)
-    {
-        var keyToken = _tokensService.CreateAPIKey();
-
-        var created = APIKeyRoot.Create(_recorder, _identifierFactory, _apiKeyHasherService, userId.ToId(), keyToken);
-        if (created.IsFailure)
-        {
-            return created.Error;
-        }
-
-        var apiKey = created.Value;
-        var parameterized = apiKey.SetParameters(description,
-            expiresOn ?? DateTime.UtcNow.ToNearestMinute().Add(DefaultAPIKeyExpiry));
-        if (parameterized.IsFailure)
-        {
-            return parameterized.Error;
-        }
-
-        var saved = await _repository.SaveAsync(apiKey, cancellationToken);
-        if (saved.IsFailure)
-        {
-            return saved.Error;
-        }
-
-        apiKey = saved.Value;
-        return apiKey.ToApiKey(keyToken.ApiKey, description);
     }
 }
 

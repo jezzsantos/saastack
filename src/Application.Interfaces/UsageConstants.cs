@@ -62,6 +62,7 @@ public static class UsageConstants
                 public const string GuestInvited = "User Guest Invited";
                 public const string MachineRegistered = "Machine Registered";
                 public const string Measurement = "Measured";
+                public const string OrganizationChanged = "Organization Updated";
                 public const string PersonRegistrationConfirmed = "User Registered";
                 public const string PersonRegistrationCreated = "User Registration Created";
                 public const string PersonReRegistered = "User Registration ReAttempted";
@@ -71,7 +72,6 @@ public static class UsageConstants
                 public const string UserPasswordForgotten = "User Password Forgotten";
                 public const string UserPasswordReset = "User Password Reset";
                 public const string UserProfileChanged = "User Profile Updated";
-                public const string OrganizationChanged = "Organization Updated";
             }
         }
 

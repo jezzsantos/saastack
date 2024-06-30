@@ -27,7 +27,10 @@ namespace EndUsersInfrastructure;
 
 public class EndUsersModule : ISubdomainModule
 {
-    public Assembly InfrastructureAssembly => typeof(EndUsersApi).Assembly;
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
 
     public Assembly DomainAssembly => typeof(EndUserRoot).Assembly;
 
@@ -37,10 +40,7 @@ public class EndUsersModule : ISubdomainModule
         { typeof(Membership), "mship" }
     };
 
-    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
-    {
-        get { return (app, _) => app.RegisterRoutes(); }
-    }
+    public Assembly InfrastructureAssembly => typeof(EndUsersApi).Assembly;
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {

@@ -27,7 +27,10 @@ namespace UserProfilesInfrastructure;
 
 public class UserProfilesModule : ISubdomainModule
 {
-    public Assembly InfrastructureAssembly => typeof(UserProfilesApi).Assembly;
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
 
     public Assembly DomainAssembly => typeof(UserProfileRoot).Assembly;
 
@@ -36,10 +39,7 @@ public class UserProfilesModule : ISubdomainModule
         { typeof(UserProfileRoot), "profile" }
     };
 
-    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
-    {
-        get { return (app, _) => app.RegisterRoutes(); }
-    }
+    public Assembly InfrastructureAssembly => typeof(UserProfilesApi).Assembly;
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {
@@ -61,9 +61,9 @@ public class UserProfilesModule : ISubdomainModule
                         c.GetRequiredService<IUserProfileRepository>()));
                 services.AddPerHttpRequest<IUserProfileRepository>(c =>
                     new UserProfileRepository(c.GetRequiredService<IRecorder>(),
-                    c.GetRequiredService<IDomainFactory>(),
-                    c.GetRequiredService<IEventSourcingDddCommandStore<UserProfileRoot>>(),
-                    c.GetRequiredServiceForPlatform<IDataStore>()));
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<UserProfileRoot>>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
                 services
                     .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>
                         new EndUserNotificationConsumer(c.GetRequiredService<ICallerContextFactory>(),

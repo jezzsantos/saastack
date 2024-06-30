@@ -2,10 +2,10 @@ namespace Tools.Analyzers.Common;
 
 public static class AnalyzerConstants
 {
-    public const string ServiceOperationTypesNamespace = "Infrastructure.Web.Api.Operations.Shared";
-    public const string ResourceTypesNamespace = "Application.Resources.Shared";
     public const string RequestTypeSuffix = "Request";
+    public const string ResourceTypesNamespace = "Application.Resources.Shared";
     public const string ResponseTypeSuffix = "Response";
+    public const string ServiceOperationTypesNamespace = "Infrastructure.Web.Api.Operations.Shared";
     public static readonly string[] PlatformNamespaces =
     {
 #if TESTINGONLY
@@ -27,11 +27,11 @@ public static class AnalyzerConstants
     {
         public const string Application = "SaaStackApplication";
         public const string Ddd = "SaaStackDDD";
-        public const string Eventing = "SaaStackEventing";
         // ReSharper disable once MemberHidesStaticFromOuterClass
         public const string Documentation = "SaaStackDocumentation";
-        public const string WebApi = "SaaStackWebApi";
+        public const string Eventing = "SaaStackEventing";
         public const string Host = "SaaStackHosts";
+        public const string WebApi = "SaaStackWebApi";
     }
 
     public static class XmlDocumentation

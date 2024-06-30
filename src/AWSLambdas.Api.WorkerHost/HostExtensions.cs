@@ -30,8 +30,8 @@ public static class HostExtensions
         services.AddSingleton<ICrashReporter>(new NoOpCrashReporter());
 #else
 #if HOSTEDONAWS
-            services.AddSingleton<ICrashReporter>(c =>
-                new AWSCloudWatchCrashReporter(c.GetRequiredService<ILoggerFactory>()));
+        services.AddSingleton<ICrashReporter>(c =>
+            new AWSCloudWatchCrashReporter(c.GetRequiredService<ILoggerFactory>()));
 #endif
 #endif
 

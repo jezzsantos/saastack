@@ -25,7 +25,10 @@ namespace SubscriptionsInfrastructure;
 
 public class SubscriptionsModule : ISubdomainModule
 {
-    public Assembly InfrastructureAssembly => typeof(SubscriptionsApi).Assembly;
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
 
     public Assembly DomainAssembly => typeof(SubscriptionRoot).Assembly;
 
@@ -34,10 +37,7 @@ public class SubscriptionsModule : ISubdomainModule
         { typeof(SubscriptionRoot), "billsub" }
     };
 
-    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
-    {
-        get { return (app, _) => app.RegisterRoutes(); }
-    }
+    public Assembly InfrastructureAssembly => typeof(SubscriptionsApi).Assembly;
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {

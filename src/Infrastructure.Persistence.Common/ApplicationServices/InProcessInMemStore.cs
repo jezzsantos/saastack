@@ -22,15 +22,9 @@ public sealed partial class InProcessInMemStore
     {
         if (monitor.Exists())
         {
-            FireQueueMessage += (_, args) =>
-            {
-                monitor.NotifyQueueMessagesChanged(args.QueueName, args.MessageCount);
-            };
+            FireQueueMessage += (_, args) => { monitor.NotifyQueueMessagesChanged(args.QueueName, args.MessageCount); };
             NotifyPendingQueuedMessages();
-            FireTopicMessage += (_, args) =>
-            {
-                monitor.NotifyTopicMessagesChanged(args.QueueName, args.MessageCount);
-            };
+            FireTopicMessage += (_, args) => { monitor.NotifyTopicMessagesChanged(args.QueueName, args.MessageCount); };
             NotifyPendingBusTopicMessages();
         }
     }

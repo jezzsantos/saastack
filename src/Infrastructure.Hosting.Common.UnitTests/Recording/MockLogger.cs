@@ -9,11 +9,10 @@ public class MockLogger : ILogger
 
     public IReadOnlyList<LogItem> Items => _items;
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
-        Func<TState, Exception?, string> formatter)
+    public IDisposable? BeginScope<TState>(TState state)
+        where TState : notnull
     {
-        _items.Add(new LogItem
-            { Level = logLevel, Exception = exception, Message = formatter(state, exception) });
+        return null;
     }
 
     public bool IsEnabled(LogLevel logLevel)
@@ -21,10 +20,11 @@ public class MockLogger : ILogger
         return true;
     }
 
-    public IDisposable? BeginScope<TState>(TState state)
-        where TState : notnull
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
+        Func<TState, Exception?, string> formatter)
     {
-        return null;
+        _items.Add(new LogItem
+            { Level = logLevel, Exception = exception, Message = formatter(state, exception) });
     }
 
     public void Reset()

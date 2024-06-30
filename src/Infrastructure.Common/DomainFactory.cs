@@ -46,55 +46,6 @@ public class DomainFactory : IDomainFactory
     public IReadOnlyDictionary<Type, ValueObjectFactory<IDehydratableValueObject>> ValueObjectFactories =>
         _valueObjectFactories;
 
-    public IDehydratableAggregateRoot RehydrateAggregateRoot(Type aggregateType,
-        HydrationProperties rehydratingPropertyValues)
-    {
-        ArgumentNullException.ThrowIfNull(rehydratingPropertyValues);
-
-        if (!_aggregateRootFactories.ContainsKey(aggregateType))
-        {
-            throw new InvalidOperationException(
-                Resources.DomainFactory_AggregateTypeNotFound.Format(aggregateType.Name));
-        }
-
-        var identifier =
-            rehydratingPropertyValues.GetValueOrDefault<Identifier>(nameof(IIdentifiableEntity.Id));
-        var factory = _aggregateRootFactories[aggregateType];
-        return factory(identifier.Value, _container, rehydratingPropertyValues);
-    }
-
-    public IDehydratableEntity RehydrateEntity(Type entityType,
-        HydrationProperties rehydratingPropertyValues)
-    {
-        ArgumentNullException.ThrowIfNull(rehydratingPropertyValues);
-
-        var baseEntityType = GetBaseType(entityType);
-        if (!_persistableEntityFactories.ContainsKey(baseEntityType))
-        {
-            throw new InvalidOperationException(Resources.DomainFactory_EntityTypeNotFound.Format(entityType.Name));
-        }
-
-        var identifier =
-            rehydratingPropertyValues.GetValueOrDefault<Identifier>(nameof(IIdentifiableEntity.Id));
-        var factory = _persistableEntityFactories[baseEntityType];
-        return factory(identifier.Value, _container, rehydratingPropertyValues);
-    }
-
-    public IDehydratableValueObject RehydrateValueObject(Type valueObjectType, string rehydratingPropertyValue)
-    {
-        ArgumentNullException.ThrowIfNull(valueObjectType);
-        ArgumentNullException.ThrowIfNull(rehydratingPropertyValue);
-
-        var baseValueObjectType = GetBaseType(valueObjectType);
-        if (!_valueObjectFactories.ContainsKey(baseValueObjectType))
-        {
-            throw new InvalidOperationException(
-                Resources.DomainFactory_ValueObjectTypeNotFound.Format(valueObjectType.Name));
-        }
-
-        return _valueObjectFactories[baseValueObjectType](rehydratingPropertyValue, _container);
-    }
-
     [AssertionMethod]
     public void RegisterDomainTypesFromAssemblies(params Assembly[] assembliesContainingFactories)
     {
@@ -160,6 +111,55 @@ public class DomainFactory : IDomainFactory
 
             return methodInfo.Invoke(null, null)!;
         }
+    }
+
+    public IDehydratableAggregateRoot RehydrateAggregateRoot(Type aggregateType,
+        HydrationProperties rehydratingPropertyValues)
+    {
+        ArgumentNullException.ThrowIfNull(rehydratingPropertyValues);
+
+        if (!_aggregateRootFactories.ContainsKey(aggregateType))
+        {
+            throw new InvalidOperationException(
+                Resources.DomainFactory_AggregateTypeNotFound.Format(aggregateType.Name));
+        }
+
+        var identifier =
+            rehydratingPropertyValues.GetValueOrDefault<Identifier>(nameof(IIdentifiableEntity.Id));
+        var factory = _aggregateRootFactories[aggregateType];
+        return factory(identifier.Value, _container, rehydratingPropertyValues);
+    }
+
+    public IDehydratableEntity RehydrateEntity(Type entityType,
+        HydrationProperties rehydratingPropertyValues)
+    {
+        ArgumentNullException.ThrowIfNull(rehydratingPropertyValues);
+
+        var baseEntityType = GetBaseType(entityType);
+        if (!_persistableEntityFactories.ContainsKey(baseEntityType))
+        {
+            throw new InvalidOperationException(Resources.DomainFactory_EntityTypeNotFound.Format(entityType.Name));
+        }
+
+        var identifier =
+            rehydratingPropertyValues.GetValueOrDefault<Identifier>(nameof(IIdentifiableEntity.Id));
+        var factory = _persistableEntityFactories[baseEntityType];
+        return factory(identifier.Value, _container, rehydratingPropertyValues);
+    }
+
+    public IDehydratableValueObject RehydrateValueObject(Type valueObjectType, string rehydratingPropertyValue)
+    {
+        ArgumentNullException.ThrowIfNull(valueObjectType);
+        ArgumentNullException.ThrowIfNull(rehydratingPropertyValue);
+
+        var baseValueObjectType = GetBaseType(valueObjectType);
+        if (!_valueObjectFactories.ContainsKey(baseValueObjectType))
+        {
+            throw new InvalidOperationException(
+                Resources.DomainFactory_ValueObjectTypeNotFound.Format(valueObjectType.Name));
+        }
+
+        return _valueObjectFactories[baseValueObjectType](rehydratingPropertyValue, _container);
     }
 
     public static DomainFactory CreateRegistered(IDependencyContainer container,

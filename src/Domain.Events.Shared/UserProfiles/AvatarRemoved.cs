@@ -15,7 +15,7 @@ public sealed class AvatarRemoved : DomainEvent
     {
     }
 
-    public required string UserId { get; set; }
-
     public required string AvatarId { get; set; }
+
+    public required string UserId { get; set; }
 }

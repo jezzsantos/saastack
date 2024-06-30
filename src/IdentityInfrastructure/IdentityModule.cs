@@ -29,7 +29,10 @@ namespace IdentityInfrastructure;
 
 public class IdentityModule : ISubdomainModule
 {
-    public Assembly InfrastructureAssembly => typeof(PasswordCredentialsApi).Assembly;
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
+    {
+        get { return (app, _) => app.RegisterRoutes(); }
+    }
 
     public Assembly DomainAssembly => typeof(PasswordCredentialRoot).Assembly;
 
@@ -41,10 +44,7 @@ public class IdentityModule : ISubdomainModule
         { typeof(SSOUserRoot), "ssocred_" }
     };
 
-    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
-    {
-        get { return (app, _) => app.RegisterRoutes(); }
-    }
+    public Assembly InfrastructureAssembly => typeof(PasswordCredentialsApi).Assembly;
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {

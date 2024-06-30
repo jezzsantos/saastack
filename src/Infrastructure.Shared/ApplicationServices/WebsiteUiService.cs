@@ -18,15 +18,15 @@ public sealed class WebsiteUiService : IWebsiteUiService
         return $"{PasswordRegistrationConfirmationPageRoute}?token={escapedToken}";
     }
 
-    public string CreateRegistrationPageUrl(string token)
-    {
-        var escapedToken = Uri.EscapeDataString(token);
-        return $"{RegistrationPageRoute}?token={escapedToken}";
-    }
-
     public string ConstructPasswordResetConfirmationPageUrl(string token)
     {
         var escapedToken = Uri.EscapeDataString(token);
         return $"{PasswordResetConfirmationPageRoute}?token={escapedToken}";
+    }
+
+    public string CreateRegistrationPageUrl(string token)
+    {
+        var escapedToken = Uri.EscapeDataString(token);
+        return $"{RegistrationPageRoute}?token={escapedToken}";
     }
 }

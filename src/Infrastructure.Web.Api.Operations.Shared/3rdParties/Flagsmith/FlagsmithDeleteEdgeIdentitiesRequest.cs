@@ -9,5 +9,6 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 public class FlagsmithDeleteEdgeIdentitiesRequest : IWebRequest<EmptyResponse>
 {
     public string? EnvironmentApiKey { get; set; }
+
     public string? IdentityUuid { get; set; }
 }

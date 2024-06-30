@@ -52,9 +52,9 @@ public class MultiTenancyMiddlewareSpec
         private readonly Mock<IEndUsersService> _endUsersService;
         private readonly MultiTenancyMiddleware _middleware;
         private readonly Mock<RequestDelegate> _next;
+        private readonly Mock<IOrganizationsService> _organizationsService;
         private readonly Mock<ITenancyContext> _tenancyContext;
         private readonly Mock<ITenantDetective> _tenantDetective;
-        private readonly Mock<IOrganizationsService> _organizationsService;
 
         public GivenAnyCaller()
         {

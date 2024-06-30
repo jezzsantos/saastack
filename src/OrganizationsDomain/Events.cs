@@ -37,6 +37,16 @@ public static class Events
         };
     }
 
+    public static BillingSubscriberChanged BillingSubscriberChanged(Identifier id, Identifier transfererId,
+        Identifier transfereeId)
+    {
+        return new BillingSubscriberChanged(id)
+        {
+            FromSubscriberId = transfererId,
+            ToSubscriberId = transfereeId
+        };
+    }
+
     public static Created Created(Identifier id, OrganizationOwnership ownership, Identifier createdBy,
         DisplayName name)
     {
@@ -140,16 +150,6 @@ public static class Events
             To = to,
             ToType = toType,
             IsEncrypted = isEncrypted
-        };
-    }
-
-    public static BillingSubscriberChanged BillingSubscriberChanged(Identifier id, Identifier transfererId,
-        Identifier transfereeId)
-    {
-        return new BillingSubscriberChanged(id)
-        {
-            FromSubscriberId = transfererId,
-            ToSubscriberId = transfereeId
         };
     }
 }

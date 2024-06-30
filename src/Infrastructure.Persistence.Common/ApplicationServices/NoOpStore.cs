@@ -48,8 +48,6 @@ public class NoOpStore : IDataStore, IBlobStore, IQueueStore, IMessageBusStore, 
         return Task.FromResult(Result.Ok);
     }
 
-    public int MaxQueryResults => 0;
-
     public Task<Result<CommandEntity, Error>> AddAsync(string containerName, CommandEntity entity,
         CancellationToken cancellationToken)
     {
@@ -67,6 +65,8 @@ public class NoOpStore : IDataStore, IBlobStore, IQueueStore, IMessageBusStore, 
         return Task.FromResult(Result.Ok);
     }
 #endif
+
+    public int MaxQueryResults => 0;
 
     public Task<Result<List<QueryEntity>, Error>> QueryAsync<TQueryableEntity>(string containerName,
         QueryClause<TQueryableEntity> query, PersistedEntityMetadata metadata,
@@ -115,6 +115,14 @@ public class NoOpStore : IDataStore, IBlobStore, IQueueStore, IMessageBusStore, 
     }
 
 #if TESTINGONLY
+    Task<Result<long, Error>> IMessageBusStore.CountAsync(string topicName, string subscriptionName,
+        CancellationToken cancellationToken)
+    {
+        return Task.FromResult(Result<long, Error>.FromResult(0));
+    }
+#endif
+
+#if TESTINGONLY
     Task<Result<Error>> IMessageBusStore.DestroyAllAsync(string topicName, CancellationToken cancellationToken)
     {
         return Task.FromResult(Result.Ok);
@@ -122,10 +130,11 @@ public class NoOpStore : IDataStore, IBlobStore, IQueueStore, IMessageBusStore, 
 #endif
 
 #if TESTINGONLY
-    Task<Result<long, Error>> IMessageBusStore.CountAsync(string topicName, string subscriptionName,
+    Task<Result<bool, Error>> IMessageBusStore.ReceiveSingleAsync(string topicName, string subscriptionName,
+        Func<string, CancellationToken, Task<Result<Error>>> messageHandlerAsync,
         CancellationToken cancellationToken)
     {
-        return Task.FromResult(Result<long, Error>.FromResult(0));
+        return Task.FromResult(Result<bool, Error>.FromResult(false));
     }
 #endif
 
@@ -142,11 +151,9 @@ public class NoOpStore : IDataStore, IBlobStore, IQueueStore, IMessageBusStore, 
     }
 
 #if TESTINGONLY
-    Task<Result<bool, Error>> IMessageBusStore.ReceiveSingleAsync(string topicName, string subscriptionName,
-        Func<string, CancellationToken, Task<Result<Error>>> messageHandlerAsync,
-        CancellationToken cancellationToken)
+    Task<Result<long, Error>> IQueueStore.CountAsync(string queueName, CancellationToken cancellationToken)
     {
-        return Task.FromResult(Result<bool, Error>.FromResult(false));
+        return Task.FromResult(Result<long, Error>.FromResult(0));
     }
 #endif
 
@@ -168,13 +175,6 @@ public class NoOpStore : IDataStore, IBlobStore, IQueueStore, IMessageBusStore, 
     {
         return Task.FromResult(Result.Ok);
     }
-
-#if TESTINGONLY
-    Task<Result<long, Error>> IQueueStore.CountAsync(string queueName, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(Result<long, Error>.FromResult(0));
-    }
-#endif
 
 #if TESTINGONLY
 #pragma warning disable CS0067 // Event is never used

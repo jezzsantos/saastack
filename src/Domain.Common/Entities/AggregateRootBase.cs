@@ -137,18 +137,20 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
 
     public Optional<bool> IsDeleted { get; private set; }
 
-    public Optional<DateTime> LastPersistedAtUtc { get; private set; }
+    /// <summary>
+    ///     Clears the recent changes to the aggregate
+    /// </summary>
+    public Result<Error> ClearChanges()
+    {
+        LastPersistedAtUtc = DateTime.UtcNow;
+        _events.Clear();
+        EventStream = EventStream.Create();
+        return Result.Ok;
+    }
 
     public DateTime CreatedAtUtc { get; }
 
-    public DateTime LastModifiedAtUtc { get; private set; }
-
-    ISingleValueObject<string> IIdentifiableEntity.Id => Id;
-
-    Result<Error> IDomainEventConsumingEntity.HandleStateChanged(IDomainEvent @event)
-    {
-        return OnStateChanged(@event, false);
-    }
+    public IReadOnlyList<IDomainEvent> Events => _events;
 
     /// <summary>
     ///     Returns the recent changes to the aggregate
@@ -181,16 +183,16 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
         return changes;
     }
 
-    /// <summary>
-    ///     Clears the recent changes to the aggregate
-    /// </summary>
-    public Result<Error> ClearChanges()
+    Result<Error> IDomainEventConsumingEntity.HandleStateChanged(IDomainEvent @event)
     {
-        LastPersistedAtUtc = DateTime.UtcNow;
-        _events.Clear();
-        EventStream = EventStream.Create();
-        return Result.Ok;
+        return OnStateChanged(@event, false);
     }
+
+    ISingleValueObject<string> IIdentifiableEntity.Id => Id;
+
+    public DateTime LastModifiedAtUtc { get; private set; }
+
+    public Optional<DateTime> LastPersistedAtUtc { get; private set; }
 
     /// <summary>
     ///     Reconstitutes the aggregates in-memory state from the past <see cref="history" /> of events,
@@ -243,8 +245,6 @@ public abstract class AggregateRootBase : IAggregateRoot, IEventingAggregateRoot
     {
         return RaiseEvent(@event, validate, true);
     }
-
-    public IReadOnlyList<IDomainEvent> Events => _events;
 
     public override bool Equals(object? other)
     {

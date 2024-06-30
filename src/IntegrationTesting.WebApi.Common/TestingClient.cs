@@ -30,6 +30,8 @@ public sealed class TestingClient : IHttpClient, IDisposable
         _handler.Dispose();
     }
 
+    public Uri? BaseAddress => _httpClient.BaseAddress;
+
     public async Task<HttpResponseMessage> GetAsync(string route,
         Action<HttpRequestMessage, CookieContainer>? requestFilter = null)
     {
@@ -98,8 +100,6 @@ public sealed class TestingClient : IHttpClient, IDisposable
 
         return response;
     }
-
-    public Uri? BaseAddress => _httpClient.BaseAddress;
 
     private static async Task<Exception> ToExceptionAsync(HttpResponseMessage response,
         JsonSerializerOptions jsonOptions)

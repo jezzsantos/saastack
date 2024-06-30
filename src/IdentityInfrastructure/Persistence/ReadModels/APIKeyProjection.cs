@@ -21,8 +21,6 @@ public class APIKeyProjection : IReadModelProjection
         _apiKeys = new ReadModelStore<APIKey>(recorder, domainFactory, store);
     }
 
-    public Type RootAggregateType => typeof(APIKeyRoot);
-
     public async Task<Result<bool, Error>> ProjectEventAsync(IDomainEvent changeEvent,
         CancellationToken cancellationToken)
     {
@@ -53,4 +51,6 @@ public class APIKeyProjection : IReadModelProjection
                 return false;
         }
     }
+
+    public Type RootAggregateType => typeof(APIKeyRoot);
 }

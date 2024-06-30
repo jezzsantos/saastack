@@ -32,7 +32,7 @@ public class DomainEventsApplication : IDomainEventsApplication
     }
 #else
     public DomainEventsApplication(IRecorder recorder,
-        IDomainEventRepository domainEventRepository, 
+        IDomainEventRepository domainEventRepository,
         // ReSharper disable once UnusedParameter.Local
         IDomainEventingMessageBusTopic domainEventMessageBusTopic,
         // ReSharper disable once UnusedParameter.Local
@@ -40,7 +40,7 @@ public class DomainEventsApplication : IDomainEventsApplication
     {
         _recorder = recorder;
         _domainEventRepository = domainEventRepository;
-        _domainEventConsumerService = domainEventConsumerService;   
+        _domainEventConsumerService = domainEventConsumerService;
     }
 #endif
 

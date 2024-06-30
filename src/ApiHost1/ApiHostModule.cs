@@ -9,12 +9,6 @@ namespace ApiHost1;
 /// </summary>
 public class ApiHostModule : ISubdomainModule
 {
-    public Assembly InfrastructureAssembly => typeof(HealthApi).Assembly;
-
-    public Assembly? DomainAssembly => null;
-
-    public Dictionary<Type, string> EntityPrefixes => new();
-
     public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware
     {
         get
@@ -25,6 +19,12 @@ public class ApiHostModule : ISubdomainModule
             };
         }
     }
+
+    public Assembly? DomainAssembly => null;
+
+    public Dictionary<Type, string> EntityPrefixes => new();
+
+    public Assembly InfrastructureAssembly => typeof(HealthApi).Assembly;
 
     public Action<ConfigurationManager, IServiceCollection> RegisterServices
     {

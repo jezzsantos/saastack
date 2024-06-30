@@ -5,6 +5,20 @@ namespace Infrastructure.Persistence.Azure.Extensions;
 public static class ValidationExtensions
 {
     /// <summary>
+    ///     Sanitizes and validates the storage account resource name.
+    ///     Limitations here:
+    ///     <see
+    ///         href="https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers--blobs--and-metadata#container-names" />
+    /// </summary>
+    public static string SanitizeAndValidateStorageAccountResourceName(this string name)
+    {
+        var lowercased = name.ToLowerInvariant();
+        ValidateStorageAccountResourceName(lowercased);
+
+        return lowercased;
+    }
+
+    /// <summary>
     ///     Sanitizes and validates the service bus subscription name.
     ///     Limitations here:
     ///     <see
@@ -28,20 +42,6 @@ public static class ValidationExtensions
     {
         var lowercased = name.ToLowerInvariant();
         ValidateServiceBusTopicName(lowercased);
-
-        return lowercased;
-    }
-
-    /// <summary>
-    ///     Sanitizes and validates the storage account resource name.
-    ///     Limitations here:
-    ///     <see
-    ///         href="https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers--blobs--and-metadata#container-names" />
-    /// </summary>
-    public static string SanitizeAndValidateStorageAccountResourceName(this string name)
-    {
-        var lowercased = name.ToLowerInvariant();
-        ValidateStorageAccountResourceName(lowercased);
 
         return lowercased;
     }

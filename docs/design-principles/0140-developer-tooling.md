@@ -56,9 +56,9 @@ These settings are all saved in the codebase for the whole team to use (team-set
 In general, SaaStack is compliant with many of the defaults in JetBrains Rider, with a few minor exceptions, and these notable exceptions:
 
 * Formatting Rules:
-  * Member variables are always prefixed with an underscore (i.e., `private string _name;`)
-  * `if` statements are always enclosed in braces.
-  * Various other common formatting rules to increase readability.
+   * Member variables are always prefixed with an underscore (i.e., `private string _name;`)
+   * `if` statements are always enclosed in braces.
+   * Various other common formatting rules to increase readability.
 * File Ordering: We have changed the order of fields, constants, constructors, factories, methods, and other known kinds of methods to make it easier to find various common things, for specific file types.
 
 ## Project Templates

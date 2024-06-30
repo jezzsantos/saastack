@@ -114,7 +114,7 @@ public sealed class FromFormMultiPartFilter : IOperationFilter
 
             return httpMethod.CanHaveBody();
         }
-        
+
         static bool IsFromFormRequest(ApiParameterDescription requestParameter)
         {
             var type = requestParameter.Type;

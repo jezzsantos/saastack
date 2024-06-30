@@ -28,11 +28,6 @@ public class MinimalApiMediatRGenerator : ISourceGenerator
         "Microsoft.Extensions.DependencyInjection", "Infrastructure.Web.Api.Common.Extensions"
     };
 
-    public void Initialize(GeneratorInitializationContext context)
-    {
-        // No initialization
-    }
-
     public void Execute(GeneratorExecutionContext context)
     {
         var assemblyNamespace = context.Compilation.AssemblyName;
@@ -75,6 +70,11 @@ namespace {assemblyNamespace}
 
 {allHandlerClasses}";
         }
+    }
+
+    public void Initialize(GeneratorInitializationContext context)
+    {
+        // No initialization
     }
 
     private static string BuildUsingList(

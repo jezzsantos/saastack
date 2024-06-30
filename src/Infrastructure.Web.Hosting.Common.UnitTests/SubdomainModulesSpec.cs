@@ -140,13 +140,13 @@ public class SubdomainModulesSpec
 
 public class TestModule : ISubdomainModule
 {
-    public Assembly InfrastructureAssembly { get; init; } = null!;
+    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware { get; init; } = null!;
 
     public Assembly? DomainAssembly { get; set; }
 
     public Dictionary<Type, string> EntityPrefixes { get; init; } = null!;
 
-    public Action<WebApplication, List<MiddlewareRegistration>> ConfigureMiddleware { get; init; } = null!;
+    public Assembly InfrastructureAssembly { get; init; } = null!;
 
     public Action<ConfigurationManager, IServiceCollection>? RegisterServices { get; init; }
 }

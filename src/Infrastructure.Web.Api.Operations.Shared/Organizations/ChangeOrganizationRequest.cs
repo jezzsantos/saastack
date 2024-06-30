@@ -10,7 +10,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
 public class ChangeOrganizationRequest : UnTenantedRequest<GetOrganizationResponse>,
     IUnTenantedOrganizationRequest
 {
-    public string? Id { get; set; }
-
     public string? Name { get; set; }
+
+    public string? Id { get; set; }
 }

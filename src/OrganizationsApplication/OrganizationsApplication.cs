@@ -44,6 +44,84 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         _repository = repository;
     }
 
+    public async Task<Result<Organization, Error>> AssignRolesToOrganizationAsync(ICallerContext caller, string id,
+        string userId, List<string> roles, CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        var assignerRoles = Roles.Create(caller.Roles.Tenant);
+        if (assignerRoles.IsFailure)
+        {
+            return assignerRoles.Error;
+        }
+
+        var rolesToAssign = Roles.Create(roles.ToArray());
+        if (rolesToAssign.IsFailure)
+        {
+            return rolesToAssign.Error;
+        }
+
+        var org = retrieved.Value;
+        var assignerId = caller.ToCallerId();
+        var assigned = org.AssignRoles(assignerId, assignerRoles.Value, userId.ToId(), rolesToAssign.Value);
+        if (assigned.IsFailure)
+        {
+            return assigned.Error;
+        }
+
+        var saved = await _repository.SaveAsync(org, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        org = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Organization {Id} assigned roles for {User}", org.Id, userId);
+
+        return org.ToOrganization();
+    }
+
+    public async Task<Result<Organization, Error>> ChangeAvatarAsync(ICallerContext caller, string id,
+        FileUpload upload, CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        var modifierRoles = Roles.Create(caller.Roles.Tenant);
+        if (modifierRoles.IsFailure)
+        {
+            return modifierRoles.Error;
+        }
+
+        var org = retrieved.Value;
+        var avatared = await ChangeAvatarInternalAsync(caller, caller.ToCallerId(), modifierRoles.Value, org, upload,
+            cancellationToken);
+        if (avatared.IsFailure)
+        {
+            return avatared.Error;
+        }
+
+        var saved = await _repository.SaveAsync(org, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        org = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Changed avatar for organization: {Id}", org.Id);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
+            org.ToUsageEvent(caller));
+
+        return org.ToOrganization();
+    }
+
     public async Task<Result<Organization, Error>> ChangeDetailsAsync(ICallerContext caller, string id,
         string? name, CancellationToken cancellationToken)
     {
@@ -142,6 +220,48 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         }
 
         return created.Value;
+    }
+
+    public async Task<Result<Organization, Error>> DeleteAvatarAsync(ICallerContext caller, string id,
+        CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        var deleterRoles = Roles.Create(caller.Roles.Tenant);
+        if (deleterRoles.IsFailure)
+        {
+            return deleterRoles.Error;
+        }
+
+        var org = retrieved.Value;
+        var deleted = await org.RemoveAvatarAsync(caller.ToCallerId(), deleterRoles.Value, async avatarId =>
+        {
+            var removed = await _imagesService.DeleteImageAsync(caller, avatarId, cancellationToken);
+            return removed.IsFailure
+                ? removed.Error
+                : Result.Ok;
+        });
+        if (deleted.IsFailure)
+        {
+            return deleted.Error;
+        }
+
+        var saved = await _repository.SaveAsync(org, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        org = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Organization {Id} avatar was deleted", org.Id);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
+            org.ToUsageEvent(caller));
+
+        return org.ToOrganization();
     }
 
     public async Task<Result<Error>> DeleteOrganizationAsync(ICallerContext caller, string? id,
@@ -317,41 +437,6 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         return Error.RuleViolation(Resources.OrganizationApplication_InvitedNoUserNorEmail);
     }
 
-    public async Task<Result<Organization, Error>> UnInviteMemberFromOrganizationAsync(ICallerContext caller, string id,
-        string userId, CancellationToken cancellationToken)
-    {
-        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (retrieved.IsFailure)
-        {
-            return retrieved.Error;
-        }
-
-        var removerRoles = Roles.Create(caller.Roles.Tenant);
-        if (removerRoles.IsFailure)
-        {
-            return removerRoles.Error;
-        }
-
-        var org = retrieved.Value;
-        var uninvited = org.UnInviteMember(caller.ToCallerId(), removerRoles.Value, userId.ToId());
-        if (uninvited.IsFailure)
-        {
-            return uninvited.Error;
-        }
-
-        var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (saved.IsFailure)
-        {
-            return saved.Error;
-        }
-
-        org = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Uninvited member {UserId} from organization: {Id}", userId,
-            org.Id);
-
-        return org.ToOrganization();
-    }
-
     public async Task<Result<SearchResults<OrganizationMember>, Error>> ListMembersForOrganizationAsync(
         ICallerContext caller, string? id, SearchOptions searchOptions,
         GetOptions getOptions, CancellationToken cancellationToken)
@@ -374,47 +459,6 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         _recorder.TraceInformation(caller.ToCall(), "Organization {Id} listed its members", org.Id);
 
         return searchOptions.ApplyWithMetadata(memberships.Value.Results.ConvertAll(x => x.ToMember()));
-    }
-
-    public async Task<Result<Organization, Error>> AssignRolesToOrganizationAsync(ICallerContext caller, string id,
-        string userId, List<string> roles, CancellationToken cancellationToken)
-    {
-        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (retrieved.IsFailure)
-        {
-            return retrieved.Error;
-        }
-
-        var assignerRoles = Roles.Create(caller.Roles.Tenant);
-        if (assignerRoles.IsFailure)
-        {
-            return assignerRoles.Error;
-        }
-
-        var rolesToAssign = Roles.Create(roles.ToArray());
-        if (rolesToAssign.IsFailure)
-        {
-            return rolesToAssign.Error;
-        }
-
-        var org = retrieved.Value;
-        var assignerId = caller.ToCallerId();
-        var assigned = org.AssignRoles(assignerId, assignerRoles.Value, userId.ToId(), rolesToAssign.Value);
-        if (assigned.IsFailure)
-        {
-            return assigned.Error;
-        }
-
-        var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (saved.IsFailure)
-        {
-            return saved.Error;
-        }
-
-        org = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Organization {Id} assigned roles for {User}", org.Id, userId);
-
-        return org.ToOrganization();
     }
 
     public async Task<Result<Organization, Error>> UnassignRolesFromOrganizationAsync(ICallerContext caller, string id,
@@ -458,8 +502,8 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         return org.ToOrganization();
     }
 
-    public async Task<Result<Organization, Error>> ChangeAvatarAsync(ICallerContext caller, string id,
-        FileUpload upload, CancellationToken cancellationToken)
+    public async Task<Result<Organization, Error>> UnInviteMemberFromOrganizationAsync(ICallerContext caller, string id,
+        string userId, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
         if (retrieved.IsFailure)
@@ -467,18 +511,17 @@ public partial class OrganizationsApplication : IOrganizationsApplication
             return retrieved.Error;
         }
 
-        var modifierRoles = Roles.Create(caller.Roles.Tenant);
-        if (modifierRoles.IsFailure)
+        var removerRoles = Roles.Create(caller.Roles.Tenant);
+        if (removerRoles.IsFailure)
         {
-            return modifierRoles.Error;
+            return removerRoles.Error;
         }
 
         var org = retrieved.Value;
-        var avatared = await ChangeAvatarInternalAsync(caller, caller.ToCallerId(), modifierRoles.Value, org, upload,
-            cancellationToken);
-        if (avatared.IsFailure)
+        var uninvited = org.UnInviteMember(caller.ToCallerId(), removerRoles.Value, userId.ToId());
+        if (uninvited.IsFailure)
         {
-            return avatared.Error;
+            return uninvited.Error;
         }
 
         var saved = await _repository.SaveAsync(org, cancellationToken);
@@ -488,51 +531,8 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         }
 
         org = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Changed avatar for organization: {Id}", org.Id);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
-            org.ToUsageEvent(caller));
-
-        return org.ToOrganization();
-    }
-
-    public async Task<Result<Organization, Error>> DeleteAvatarAsync(ICallerContext caller, string id,
-        CancellationToken cancellationToken)
-    {
-        var retrieved = await _repository.LoadAsync(id.ToId(), cancellationToken);
-        if (retrieved.IsFailure)
-        {
-            return retrieved.Error;
-        }
-
-        var deleterRoles = Roles.Create(caller.Roles.Tenant);
-        if (deleterRoles.IsFailure)
-        {
-            return deleterRoles.Error;
-        }
-
-        var org = retrieved.Value;
-        var deleted = await org.RemoveAvatarAsync(caller.ToCallerId(), deleterRoles.Value, async avatarId =>
-        {
-            var removed = await _imagesService.DeleteImageAsync(caller, avatarId, cancellationToken);
-            return removed.IsFailure
-                ? removed.Error
-                : Result.Ok;
-        });
-        if (deleted.IsFailure)
-        {
-            return deleted.Error;
-        }
-
-        var saved = await _repository.SaveAsync(org, cancellationToken);
-        if (saved.IsFailure)
-        {
-            return saved.Error;
-        }
-
-        org = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Organization {Id} avatar was deleted", org.Id);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
-            org.ToUsageEvent(caller));
+        _recorder.TraceInformation(caller.ToCall(), "Uninvited member {UserId} from organization: {Id}", userId,
+            org.Id);
 
         return org.ToOrganization();
     }

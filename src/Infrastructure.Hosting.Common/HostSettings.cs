@@ -42,6 +42,30 @@ public class HostSettings : IHostSettings
             Resources.HostSettings_MissingSetting.Format(AncillaryApiHostBaseUrlSettingName));
     }
 
+    public string GetAncillaryApiHostHmacAuthSecret()
+    {
+        var secret = _settings.Platform.GetString(AncillaryApiHmacSecretSettingName);
+        if (secret.HasValue())
+        {
+            return secret;
+        }
+
+        throw new InvalidOperationException(
+            Resources.HostSettings_MissingSetting.Format(AncillaryApiHmacSecretSettingName));
+    }
+
+    public virtual string GetApiHost1BaseUrl()
+    {
+        var baseUrl = _settings.Platform.GetString(ApiHost1BaseUrlSettingName);
+        if (baseUrl.HasValue())
+        {
+            return baseUrl.WithoutTrailingSlash();
+        }
+
+        throw new InvalidOperationException(
+            Resources.HostSettings_MissingSetting.Format(ApiHost1BaseUrlSettingName));
+    }
+
     public virtual IReadOnlyList<SubscriberHost> GetEventNotificationSubscriberHosts()
     {
         var ids = _settings.Platform.GetString(EventNotificationSubscriberSettingName, string.Empty);
@@ -71,6 +95,18 @@ public class HostSettings : IHostSettings
             Resources.HostSettings_MissingSetting.Format(WebsiteHostBaseUrlSettingName));
     }
 
+    public string GetWebsiteHostCSRFEncryptionSecret()
+    {
+        var secret = _settings.Platform.GetString(WebsiteHostCSRFEncryptionSettingName);
+        if (secret.HasValue())
+        {
+            return secret;
+        }
+
+        throw new InvalidOperationException(
+            Resources.HostSettings_MissingSetting.Format(WebsiteHostCSRFEncryptionSettingName));
+    }
+
     public string GetWebsiteHostCSRFSigningSecret()
     {
         var secret = _settings.Platform.GetString(WebsiteHostCSRFSigningSettingName);
@@ -91,42 +127,6 @@ public class HostSettings : IHostSettings
             .WithoutLeadingSlash();
 
         return new Uri(new Uri(baseUrl), requestUrl).AbsoluteUri;
-    }
-
-    public virtual string GetApiHost1BaseUrl()
-    {
-        var baseUrl = _settings.Platform.GetString(ApiHost1BaseUrlSettingName);
-        if (baseUrl.HasValue())
-        {
-            return baseUrl.WithoutTrailingSlash();
-        }
-
-        throw new InvalidOperationException(
-            Resources.HostSettings_MissingSetting.Format(ApiHost1BaseUrlSettingName));
-    }
-
-    public string GetAncillaryApiHostHmacAuthSecret()
-    {
-        var secret = _settings.Platform.GetString(AncillaryApiHmacSecretSettingName);
-        if (secret.HasValue())
-        {
-            return secret;
-        }
-
-        throw new InvalidOperationException(
-            Resources.HostSettings_MissingSetting.Format(AncillaryApiHmacSecretSettingName));
-    }
-
-    public string GetWebsiteHostCSRFEncryptionSecret()
-    {
-        var secret = _settings.Platform.GetString(WebsiteHostCSRFEncryptionSettingName);
-        if (secret.HasValue())
-        {
-            return secret;
-        }
-
-        throw new InvalidOperationException(
-            Resources.HostSettings_MissingSetting.Format(WebsiteHostCSRFEncryptionSettingName));
     }
 
     protected virtual string GetImagesApiHostBaseUrl()
