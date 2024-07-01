@@ -15,12 +15,13 @@ using UnitTesting.Common;
 using UnitTesting.Common.Validation;
 using Xunit;
 using Constants = Infrastructure.Shared.ApplicationServices.External.ChargebeeStateInterpreter.Constants;
+using Subscription = ChargeBee.Models.Subscription;
 
 namespace Infrastructure.Shared.IntegrationTests.ApplicationServices.External;
 
 public abstract class ChargebeeHttpServiceClientSetupSpec : ExternalApiSpec
 {
-    private const string TestCustomerIdPrefix = "testcustomerid";
+    private const string TestCustomerIdPrefix = "testorganizationid";
     private const string TestUserIdPrefix = "testuserid";
     protected static readonly TestPlan SetupPlan = new("SetupFee", 10M, "A setup fee", false, false, false);
     protected static readonly TestFeature TestFeature1 = new("Feature1", "A feature1");
@@ -74,7 +75,7 @@ public abstract class ChargebeeHttpServiceClientSetupSpec : ExternalApiSpec
     protected async Task<(SubscriptionBuyer Buyer, Customer customer, BillingProvider Provider)> CreateCustomerAsync()
     {
 #if TESTINGONLY
-             var buyer = CreateBuyer();
+        var buyer = CreateBuyer();
         var customer = (await ServiceClient.CreateCustomerAsync(Caller, buyer, CancellationToken.None)).Value;
         var provider = BillingProvider
             .Create(Constants.ProviderName, customer.ToCustomerState())
@@ -94,20 +95,27 @@ public abstract class ChargebeeHttpServiceClientSetupSpec : ExternalApiSpec
     {
         var (buyer, customer, _) = await CreateCustomerAsync();
 #if TESTINGONLY
-             (await ServiceClient.CreateCustomerPaymentMethod(Caller, customer.Id, CancellationToken.None))
+        (await ServiceClient.CreateCustomerPaymentMethod(Caller, customer.Id, CancellationToken.None))
             .ThrowOnError();
 #endif
 
         var options = SubscribeOptions.Immediately;
+#if TESTINGONLY
         if (planId.HasValue())
         {
             options.PlanId = planId;
         }
+#endif
 
         var subscribed = await ServiceClient.SubscribeAsync(Caller, buyer,
             options, CancellationToken.None);
         return BillingProvider.Create(Constants.ProviderName, subscribed.Value)
             .Value;
+    }
+
+    protected static string ToBillingAmount(TestPlan plan, CurrencyCodeIso4217? currency = null)
+    {
+        return CurrencyCodes.ToMinorUnit(currency ?? CurrencyCodes.Default, plan.Price).ToString();
     }
 
     private async Task SetupTestingSandboxAsync()
@@ -125,6 +133,17 @@ public abstract class ChargebeeHttpServiceClientSetupSpec : ExternalApiSpec
                 .ThrowOnError();
             (await ServiceClient.DeleteCustomerAsync(caller, subscription.CustomerId, CancellationToken.None))
                 .ThrowOnError();
+        }
+
+        // Cleanup any orphaned customers
+        var customers =
+            (await ServiceClient.SearchAllCustomersAsync(caller, new SearchOptions(), CancellationToken.None))
+            .Value;
+        foreach (var customer in customers.Where(c => c.Id.StartsWith(TestCustomerIdPrefix)
+                                                      && c.Deleted == false))
+        {
+            // Ignore errors (e.g. customer has already been scheduled for delete)
+            await ServiceClient.DeleteCustomerAsync(caller, customer.Id, CancellationToken.None);
         }
 
         var plans = (await ServiceClient.SearchAllPlansAsync(caller, new SearchOptions(), CancellationToken.None))
@@ -153,7 +172,7 @@ public abstract class ChargebeeHttpServiceClientSetupSpec : ExternalApiSpec
                 .ThrowOnError();
         }
 
-        // Create new test data (reactivated archived items if necessary)
+        // Create new test data (reactivate archived items if necessary)
         await ServiceClient.CreateProductFamilySafelyAsync(caller, ProductFamilyId, CancellationToken.None);
         var feature1 = (await ServiceClient.CreateFeatureSafelyAsync(caller, TestFeature1.Name,
             TestFeature1.Description, CancellationToken.None)).Value;
@@ -236,14 +255,14 @@ public class ChargebeeHttpServiceClientSpec
             result.Value.Daily.Should().BeEmpty();
             result.Value.Monthly.Count.Should().Be(3);
             var monthlyPlan1 = result.Value.Monthly[0];
-            monthlyPlan1.Id.Should().Be("Trial-USD-Monthly");
-            monthlyPlan1.Cost.Should().Be(50M);
-            monthlyPlan1.Currency.Should().Be("USD");
-            monthlyPlan1.Description.Should().Be("Trial plan");
-            monthlyPlan1.DisplayName.Should().Be("Trial");
+            monthlyPlan1.Id.Should().Be(TestPlans[0].PlanId);
+            monthlyPlan1.Cost.Should().Be(TestPlans[0].Price);
+            monthlyPlan1.Currency.Should().Be(CurrencyCodes.Default.Code);
+            monthlyPlan1.Description.Should().Be(TestPlans[0].Description);
+            monthlyPlan1.DisplayName.Should().Be(TestPlans[0].Name);
             monthlyPlan1.FeatureSection.Count.Should().Be(0);
             monthlyPlan1.IsRecommended.Should().BeFalse();
-            monthlyPlan1.Notes.Should().Be("Trial plan");
+            monthlyPlan1.Notes.Should().Be(TestPlans[0].Description);
             monthlyPlan1.Period.Unit.Should().Be(PeriodFrequencyUnit.Month);
             monthlyPlan1.Period.Frequency.Should().Be(1);
             monthlyPlan1.SetupCost.Should().Be(0);
@@ -252,36 +271,36 @@ public class ChargebeeHttpServiceClientSpec
             monthlyPlan1.Trial.Unit.Should().Be(PeriodFrequencyUnit.Day);
 
             var monthlyPlan2 = result.Value.Monthly[1];
-            monthlyPlan2.Id.Should().Be("PaidWithSetup-USD-Monthly");
-            monthlyPlan2.Cost.Should().Be(100M);
-            monthlyPlan2.Currency.Should().Be("USD");
-            monthlyPlan2.Description.Should().Be("PaidWithSetup plan");
-            monthlyPlan2.DisplayName.Should().Be("PaidWithSetup");
+            monthlyPlan2.Id.Should().Be(TestPlans[2].PlanId);
+            monthlyPlan2.Cost.Should().Be(TestPlans[2].Price);
+            monthlyPlan2.Currency.Should().Be(CurrencyCodes.Default.Code);
+            monthlyPlan2.Description.Should().Be(TestPlans[2].Description);
+            monthlyPlan2.DisplayName.Should().Be(TestPlans[2].Name);
             monthlyPlan2.FeatureSection.Count.Should().Be(1);
             monthlyPlan2.FeatureSection[0].Description.Should().BeNull();
             monthlyPlan2.FeatureSection[0].Features.Count.Should().Be(1);
             monthlyPlan2.FeatureSection[0].Features[0].IsIncluded.Should().BeTrue();
-            monthlyPlan2.FeatureSection[0].Features[0].Description.Should().Be("A feature1");
+            monthlyPlan2.FeatureSection[0].Features[0].Description.Should().Be(TestFeature1.Description);
             monthlyPlan2.IsRecommended.Should().BeFalse();
-            monthlyPlan2.Notes.Should().Be("PaidWithSetup plan");
+            monthlyPlan2.Notes.Should().Be(TestPlans[2].Description);
             monthlyPlan2.Period.Unit.Should().Be(PeriodFrequencyUnit.Month);
             monthlyPlan2.Period.Frequency.Should().Be(1);
-            monthlyPlan2.SetupCost.Should().Be(10);
+            monthlyPlan2.SetupCost.Should().Be(SetupPlan.Price);
             monthlyPlan2.Trial.Should().BeNull();
 
             var monthlyPlan3 = result.Value.Monthly[2];
-            monthlyPlan3.Id.Should().Be("Paid-USD-Monthly");
-            monthlyPlan3.Cost.Should().Be(100M);
-            monthlyPlan3.Currency.Should().Be("USD");
-            monthlyPlan3.Description.Should().Be("Paid plan");
-            monthlyPlan3.DisplayName.Should().Be("Paid");
+            monthlyPlan3.Id.Should().Be(TestPlans[1].PlanId);
+            monthlyPlan3.Cost.Should().Be(TestPlans[1].Price);
+            monthlyPlan3.Currency.Should().Be(CurrencyCodes.Default.Code);
+            monthlyPlan3.Description.Should().Be(TestPlans[1].Description);
+            monthlyPlan3.DisplayName.Should().Be(TestPlans[1].Name);
             monthlyPlan3.FeatureSection.Count.Should().Be(1);
             monthlyPlan3.FeatureSection[0].Description.Should().BeNull();
             monthlyPlan3.FeatureSection[0].Features.Count.Should().Be(1);
             monthlyPlan3.FeatureSection[0].Features[0].IsIncluded.Should().BeTrue();
-            monthlyPlan3.FeatureSection[0].Features[0].Description.Should().Be("A feature1");
+            monthlyPlan3.FeatureSection[0].Features[0].Description.Should().Be(TestFeature1.Description);
             monthlyPlan3.IsRecommended.Should().BeFalse();
-            monthlyPlan3.Notes.Should().Be("Paid plan");
+            monthlyPlan3.Notes.Should().Be(TestPlans[1].Description);
             monthlyPlan3.Period.Unit.Should().Be(PeriodFrequencyUnit.Month);
             monthlyPlan3.Period.Frequency.Should().Be(1);
             monthlyPlan3.SetupCost.Should().Be(0);
@@ -289,7 +308,7 @@ public class ChargebeeHttpServiceClientSpec
         }
 
         [Fact]
-        public async Task WhenSearchAllInvoicesAsyncForCustomer_ThenReturnsNoInvoices()
+        public async Task WhenSearchAllInvoicesAsyncForUnsubscribedCustomer_ThenReturnsNoInvoices()
         {
             var (_, _, provider) = await CreateCustomerAsync();
             var from = DateTime.UtcNow.SubtractDays(30).ToNearestMinute();
@@ -303,7 +322,7 @@ public class ChargebeeHttpServiceClientSpec
         }
 
         [Fact]
-        public async Task WhenSubscribeNewCustomer_ThenSubscribes()
+        public async Task WhenSubscribeNewCustomerToTrialPlanImmediately_ThenSubscribesImmediately()
         {
             var buyer = CreateBuyer();
             var result =
@@ -311,25 +330,147 @@ public class ChargebeeHttpServiceClientSpec
 
             var endOfTrial = DateTime.UtcNow.ToNearestSecond().AddDays(7);
             result.Should().BeSuccess();
-            result.Value.Should().Contain(Constants.MetadataProperties.BillingAmount, "5000");
-            result.Value.Should().Contain(Constants.MetadataProperties.BillingPeriodUnit, "Month");
+            result.Value.Count.Should().Be(11);
+            result.Value.Should().Contain(Constants.MetadataProperties.BillingAmount, ToBillingAmount(TestPlans[0]));
+            result.Value.Should().Contain(Constants.MetadataProperties.BillingPeriodUnit,
+                Subscription.BillingPeriodUnitEnum.Month.ToString());
             result.Value.Should().Contain(Constants.MetadataProperties.BillingPeriodValue, "1");
             result.Value.Should().NotContainKey(Constants.MetadataProperties.CanceledAt);
-            result.Value.Should().Contain(Constants.MetadataProperties.CurrencyCode, "USD");
+            result.Value.Should().Contain(Constants.MetadataProperties.CurrencyCode, CurrencyCodes.Default.Code);
             result.Value.Should().Contain(Constants.MetadataProperties.CustomerId, buyer.CompanyReference);
             result.Value.Should().ContainKey(Constants.MetadataProperties.NextBillingAt)
-                .WhoseValue.Should().Match(value =>
-                    value.ToLong().FromUnixTimestamp().IsNear(endOfTrial, TimeSpan.FromMinutes(1)));
+                .WhoseValue.Should().Match(value => value.IsNear(endOfTrial));
             result.Value.Should().NotContainKey(Constants.MetadataProperties.PaymentMethodStatus);
             result.Value.Should().NotContainKey(Constants.MetadataProperties.PaymentMethodType);
-            result.Value.Should().Contain(Constants.MetadataProperties.PlanId, "Trial-USD-Monthly");
+            result.Value.Should().Contain(Constants.MetadataProperties.PlanId, TestPlans[0].PlanId);
             result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionDeleted, "False");
             result.Value.Should().ContainKey(Constants.MetadataProperties.SubscriptionId)
                 .WhoseValue.Should().StartWith(buyer.CompanyReference);
-            result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionStatus, "InTrial");
+            result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionStatus,
+                Subscription.StatusEnum.InTrial.ToString());
             result.Value.Should().ContainKey(Constants.MetadataProperties.TrialEnd)
-                .WhoseValue.Should().Match(value =>
-                    value.ToLong().FromUnixTimestamp().IsNear(endOfTrial, TimeSpan.FromMinutes(1)));
+                .WhoseValue.Should().Match(value => value.IsNear(endOfTrial));
+        }
+
+        [Fact]
+        public async Task WhenSubscribeExistingCustomerToTrialPlanImmediately_ThenSubscribesImmediately()
+        {
+            var buyer = CreateBuyer();
+            (await ServiceClient.CreateCustomerAsync(Caller, buyer, CancellationToken.None)).ThrowOnError();
+
+            var result =
+                await ServiceClient.SubscribeAsync(Caller, buyer, SubscribeOptions.Immediately, CancellationToken.None);
+
+            var endOfTrial = DateTime.UtcNow.ToNearestSecond().AddDays(7);
+            result.Should().BeSuccess();
+            result.Value.Count.Should().Be(11);
+            result.Value.Should().Contain(Constants.MetadataProperties.BillingAmount, ToBillingAmount(TestPlans[0]));
+            result.Value.Should().Contain(Constants.MetadataProperties.BillingPeriodUnit,
+                Subscription.BillingPeriodUnitEnum.Month.ToString());
+            result.Value.Should().Contain(Constants.MetadataProperties.BillingPeriodValue, "1");
+            result.Value.Should().NotContainKey(Constants.MetadataProperties.CanceledAt);
+            result.Value.Should().Contain(Constants.MetadataProperties.CurrencyCode, CurrencyCodes.Default.Code);
+            result.Value.Should().Contain(Constants.MetadataProperties.CustomerId, buyer.CompanyReference);
+            result.Value.Should().ContainKey(Constants.MetadataProperties.NextBillingAt)
+                .WhoseValue.Should().Match(value => value.IsNear(endOfTrial));
+            result.Value.Should().NotContainKey(Constants.MetadataProperties.PaymentMethodStatus);
+            result.Value.Should().NotContainKey(Constants.MetadataProperties.PaymentMethodType);
+            result.Value.Should().Contain(Constants.MetadataProperties.PlanId, TestPlans[0].PlanId);
+            result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionDeleted, "False");
+            result.Value.Should().ContainKey(Constants.MetadataProperties.SubscriptionId)
+                .WhoseValue.Should().StartWith(buyer.CompanyReference);
+            result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionStatus,
+                Subscription.StatusEnum.InTrial.ToString());
+            result.Value.Should().ContainKey(Constants.MetadataProperties.TrialEnd)
+                .WhoseValue.Should().Match(value => value.IsNear(endOfTrial));
+        }
+
+        [Fact]
+        public async Task WhenSubscribeToTrialPlanInFuture_ThenSubscribesToStartInFuture()
+        {
+            var start = DateTime.UtcNow.ToNearestSecond().AddDays(1);
+            var buyer = CreateBuyer();
+            var result =
+                await ServiceClient.SubscribeAsync(Caller, buyer, SubscribeOptions.AtScheduledTime(start),
+                    CancellationToken.None);
+
+            var endOfTrial = start.AddDays(7);
+            result.Should().BeSuccess();
+            result.Value.Count.Should().Be(11);
+            result.Value.Should().Contain(Constants.MetadataProperties.BillingAmount, ToBillingAmount(TestPlans[0]));
+            result.Value.Should().Contain(Constants.MetadataProperties.BillingPeriodUnit,
+                Subscription.BillingPeriodUnitEnum.Month.ToString());
+            result.Value.Should().Contain(Constants.MetadataProperties.BillingPeriodValue, "1");
+            result.Value.Should().NotContainKey(Constants.MetadataProperties.CanceledAt);
+            result.Value.Should().Contain(Constants.MetadataProperties.CurrencyCode, CurrencyCodes.Default.Code);
+            result.Value.Should().Contain(Constants.MetadataProperties.CustomerId, buyer.CompanyReference);
+            result.Value.Should().ContainKey(Constants.MetadataProperties.NextBillingAt)
+                .WhoseValue.Should().Match(value => value.IsNear(endOfTrial));
+            result.Value.Should().NotContainKey(Constants.MetadataProperties.PaymentMethodStatus);
+            result.Value.Should().NotContainKey(Constants.MetadataProperties.PaymentMethodType);
+            result.Value.Should().Contain(Constants.MetadataProperties.PlanId, TestPlans[0].PlanId);
+            result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionDeleted, "False");
+            result.Value.Should().ContainKey(Constants.MetadataProperties.SubscriptionId)
+                .WhoseValue.Should().StartWith(buyer.CompanyReference);
+            result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionStatus,
+                Subscription.StatusEnum.Future.ToString());
+            result.Value.Should().ContainKey(Constants.MetadataProperties.TrialEnd)
+                .WhoseValue.Should().Match(value => value.IsNear(endOfTrial));
+        }
+
+        [Fact]
+        public async Task WhenSubscribeToPaidPlanWithoutPaymentSource_ThenReturnsError()
+        {
+            var options = SubscribeOptions.Immediately;
+#if TESTINGONLY
+            options.PlanId = TestPlans[1].PlanId;
+#endif
+            var buyer = CreateBuyer();
+            var result =
+                await ServiceClient.SubscribeAsync(Caller, buyer, options, CancellationToken.None);
+
+            result.Should().BeError(ErrorCode.PreconditionViolation,
+                msg => msg.Contains("payment_method_not_present"));
+        }
+
+        [Fact]
+        public async Task WhenSubscribeToPaidPlanWithPaymentSource_ThenSubscribes()
+        {
+            var options = SubscribeOptions.Immediately;
+#if TESTINGONLY
+            options.PlanId = TestPlans[1].PlanId;
+#endif
+            var buyer = CreateBuyer();
+            var customer = (await ServiceClient.CreateCustomerAsync(Caller, buyer, CancellationToken.None)).Value;
+            (await ServiceClient.CreateCustomerPaymentMethod(Caller, customer.Id, CancellationToken.None))
+                .ThrowOnError();
+
+            var result =
+                await ServiceClient.SubscribeAsync(Caller, buyer, options, CancellationToken.None);
+
+            var nextBilling = DateTime.UtcNow.ToNearestSecond().AddMonths(1);
+            result.Should().BeSuccess();
+            result.Value.Count.Should().Be(12);
+            result.Value.Should().Contain(Constants.MetadataProperties.BillingAmount, ToBillingAmount(TestPlans[1]));
+            result.Value.Should().Contain(Constants.MetadataProperties.BillingPeriodUnit,
+                Subscription.BillingPeriodUnitEnum.Month.ToString());
+            result.Value.Should().Contain(Constants.MetadataProperties.BillingPeriodValue, "1");
+            result.Value.Should().NotContainKey(Constants.MetadataProperties.CanceledAt);
+            result.Value.Should().Contain(Constants.MetadataProperties.CurrencyCode, CurrencyCodes.Default.Code);
+            result.Value.Should().Contain(Constants.MetadataProperties.CustomerId, buyer.CompanyReference);
+            result.Value.Should().ContainKey(Constants.MetadataProperties.NextBillingAt)
+                .WhoseValue.Should().Match(value => value.IsNear(nextBilling));
+            result.Value.Should().Contain(Constants.MetadataProperties.PaymentMethodStatus,
+                PaymentSource.StatusEnum.Valid.ToString());
+            result.Value.Should().Contain(Constants.MetadataProperties.PaymentMethodType,
+                Customer.CustomerPaymentMethod.TypeEnum.Card.ToString());
+            result.Value.Should().Contain(Constants.MetadataProperties.PlanId, "Paid-USD-Monthly");
+            result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionDeleted, "False");
+            result.Value.Should().ContainKey(Constants.MetadataProperties.SubscriptionId)
+                .WhoseValue.Should().StartWith(buyer.CompanyReference);
+            result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionStatus,
+                Subscription.StatusEnum.Active.ToString());
+            result.Value.Should().NotContainKey(Constants.MetadataProperties.TrialEnd);
         }
     }
 
@@ -344,10 +485,10 @@ public class ChargebeeHttpServiceClientSpec
         [Fact]
         public async Task WhenSearchAllInvoicesAsyncForSubscribedCustomer_ThenReturnsOneInvoice()
         {
-            var provider = await SubscribeCustomerWithCardAsync(TestPlans[1].PlanId);
             var now = DateTime.UtcNow.ToNearestSecond();
-            var from = now.SubtractDays(30).ToNearestMinute();
-            var to = from.AddDays(30).ToNearestMinute();
+            var from = now.ToNearestMinute();
+            var to = from.AddMonths(1).ToNearestMinute();
+            var provider = await SubscribeCustomerWithCardAsync(TestPlans[1].PlanId);
 
             var result = await ServiceClient.SearchAllInvoicesAsync(Caller, provider, from, to,
                 new SearchOptions(), CancellationToken.None);
@@ -356,12 +497,12 @@ public class ChargebeeHttpServiceClientSpec
             result.Value.Count.Should().Be(1);
             result.Value[0].Id.Should().NotBeEmpty();
             result.Value[0].Amount.Should().Be(100);
-            result.Value[0].Currency.Should().Be("USD");
+            result.Value[0].Currency.Should().Be(CurrencyCodes.Default.Code);
             result.Value[0].IncludesTax.Should().BeFalse();
-            result.Value[0].InvoicedOnUtc!.Value.ToUniversalTime().Should().BeNear(now, TimeSpan.FromMinutes(1));
+            result.Value[0].InvoicedOnUtc!.Value.Should().BeNear(now, TimeSpan.FromMinutes(1));
             result.Value[0].LineItems.Count.Should().Be(1);
             result.Value[0].LineItems[0].Amount.Should().Be(100);
-            result.Value[0].LineItems[0].Currency.Should().Be("USD");
+            result.Value[0].LineItems[0].Currency.Should().Be(CurrencyCodes.Default.Code);
             result.Value[0].LineItems[0].Description.Should().Be("Paid");
             result.Value[0].LineItems[0].IsTaxed.Should().BeFalse();
             result.Value[0].LineItems[0].Reference.Should().NotBeEmpty();
@@ -369,14 +510,26 @@ public class ChargebeeHttpServiceClientSpec
             result.Value[0].Notes.Count.Should().Be(1);
             result.Value[0].Notes[0].Description.Should().Be("Paid plan");
             result.Value[0].Payment!.Amount.Should().Be(100);
-            result.Value[0].Payment!.Currency.Should().Be("USD");
-            result.Value[0].Payment!.PaidOnUtc!.Value.ToUniversalTime().Should().BeNear(now, TimeSpan.FromMinutes(1));
+            result.Value[0].Payment!.Currency.Should().Be(CurrencyCodes.Default.Code);
+            result.Value[0].Payment!.PaidOnUtc!.Value.Should().BeNear(now, TimeSpan.FromMinutes(1));
             result.Value[0].Payment!.Reference.Should().NotBeEmpty();
-            result.Value[0].PeriodEndUtc!.Value.ToUniversalTime().Should()
-                .BeNear(now.AddMonths(1), TimeSpan.FromMinutes(1));
-            result.Value[0].PeriodStartUtc!.Value.ToUniversalTime().Should().BeNear(now, TimeSpan.FromMinutes(1));
+            result.Value[0].PeriodEndUtc!.Value.Should().BeNear(to, TimeSpan.FromMinutes(1));
+            result.Value[0].PeriodStartUtc!.Value.Should().BeNear(from, TimeSpan.FromMinutes(1));
             result.Value[0].Status.Should().Be(InvoiceStatus.Paid);
             result.Value[0].TaxAmount.Should().Be(0);
         }
+
+        //TODO: Change subscription tests
+        //TODO: Cancel subscription tests
+        //TODO: Transfer subscription tests
+        
+    }
+}
+
+internal static class TestingExtensions
+{
+    public static bool IsNear(this string value, DateTime comparedTo)
+    {
+        return value.FromIso8601().IsNear(comparedTo, TimeSpan.FromMinutes(1));
     }
 }

@@ -205,6 +205,12 @@ public interface IChargebeeClient
         CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Returns all the customers
+    /// </summary>
+    Task<Result<IReadOnlyList<Customer>, Error>> SearchAllCustomersAsync(ICallerContext caller,
+        SearchOptions searchOptions, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Returns all the families
     /// </summary>
     Task<Result<IReadOnlyList<ItemFamily>, Error>> SearchAllFamiliesAsync(ICallerContext caller,
@@ -634,8 +640,7 @@ public sealed class ChargebeeClient : IChargebeeClient
 
     public async Task<Result<Subscription, Error>> CreateSubscriptionForCustomerAsync(ICallerContext caller,
         string customerId, string subscriptionReference, string planId, Optional<long> start,
-        Optional<long> trialEnds,
-        CancellationToken cancellationToken)
+        Optional<long> trialEnds, CancellationToken cancellationToken)
     {
         try
         {
@@ -670,9 +675,15 @@ public sealed class ChargebeeClient : IChargebeeClient
         {
             _recorder.TraceError(caller.ToCall(),
                 "Chargebee Client: Creating subscription for customer {Customer} failed with {Code}",
-                customerId,
-                ex.ApiErrorCode);
-            return ChargebeeError(ex);
+                customerId, ex.ApiErrorCode);
+            var error = ChargebeeError(ex);
+
+            if (ex.ApiErrorCode == "payment_method_not_present")
+            {
+                return Error.PreconditionViolation(error.Message);
+            }
+
+            return error;
         }
     }
 
@@ -1012,8 +1023,7 @@ public sealed class ChargebeeClient : IChargebeeClient
     }
 
     public async Task<Result<Error>> RemoveFeatureEntitlementAsync(ICallerContext caller, string planId,
-        string featureId,
-        CancellationToken cancellationToken)
+        string featureId, CancellationToken cancellationToken)
     {
         try
         {
@@ -1062,9 +1072,7 @@ public sealed class ChargebeeClient : IChargebeeClient
     }
 
     public async Task<Result<IReadOnlyList<Item>, Error>> SearchActiveItemsAsync(ICallerContext caller,
-        Item.TypeEnum type,
-        SearchOptions searchOptions,
-        CancellationToken cancellationToken)
+        Item.TypeEnum type, SearchOptions searchOptions, CancellationToken cancellationToken)
     {
         try
         {
@@ -1102,6 +1110,7 @@ public sealed class ChargebeeClient : IChargebeeClient
                 : 100;
             var request = await Invoice.List()
                 .CustomerId().Is(customerId)
+                .Date().Between(fromUtc, toUtc)
                 .Limit(limit)
                 .SortByDate(SortOrderEnum.Asc)
                 .RequestAsync();
@@ -1116,6 +1125,30 @@ public sealed class ChargebeeClient : IChargebeeClient
             _recorder.TraceError(caller.ToCall(),
                 "Chargebee Client: Searching for all invoices for {Customer} failed with {Code}", customerId,
                 ex.ApiErrorCode);
+            return ChargebeeError(ex);
+        }
+    }
+
+    public async Task<Result<IReadOnlyList<Customer>, Error>> SearchAllCustomersAsync(ICallerContext caller,
+        SearchOptions searchOptions, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var limit = searchOptions.Limit != 0
+                ? searchOptions.Limit
+                : 100;
+            var request = await Customer.List()
+                .Limit(limit)
+                .RequestAsync();
+
+            _recorder.TraceDebug(caller.ToCall(),
+                "Chargebee Client: Searched for all customers, and found {Count}", request.List.Count);
+            return request.List.Select(entry => entry.Customer).ToList();
+        }
+        catch (ApiException ex)
+        {
+            _recorder.TraceError(caller.ToCall(),
+                "Chargebee Client: Searching for all customers failed with {Code}", ex.ApiErrorCode);
             return ChargebeeError(ex);
         }
     }
@@ -1224,8 +1257,7 @@ public sealed class ChargebeeClient : IChargebeeClient
     }
 
     public async Task<Result<IReadOnlyList<Subscription>, Error>> SearchAllSubscriptionsAsync(ICallerContext caller,
-        SearchOptions searchOptions,
-        CancellationToken cancellationToken)
+        SearchOptions searchOptions, CancellationToken cancellationToken)
     {
         try
         {

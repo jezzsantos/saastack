@@ -112,16 +112,20 @@ public class TransferSubscriptionOptions
 /// </summary>
 public class SubscribeOptions
 {
-    public static readonly SubscribeOptions Immediately = new()
+    public static SubscribeOptions Immediately => new()
     {
         StartWhen = StartSubscriptionSchedule.Immediately,
         FutureTime = null,
+#if TESTINGONLY
         PlanId = null
+#endif
     };
 
     public DateTime? FutureTime { get; set; }
+#if TESTINGONLY
 
     public string? PlanId { get; set; }
+#endif
 
     public StartSubscriptionSchedule StartWhen { get; set; }
 
@@ -131,7 +135,9 @@ public class SubscribeOptions
         {
             StartWhen = StartSubscriptionSchedule.Scheduled,
             FutureTime = time,
+#if TESTINGONLY
             PlanId = null
+#endif
         };
     }
 }

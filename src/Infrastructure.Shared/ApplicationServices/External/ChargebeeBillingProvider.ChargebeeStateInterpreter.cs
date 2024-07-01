@@ -198,7 +198,7 @@ internal static class ChargebeeInterpreterConversionExtensions
                 : 0M;
         var nextUtc =
             state.TryGetValue(ChargebeeStateInterpreter.Constants.MetadataProperties.NextBillingAt, out var value2)
-                ? value2.ToLongOrDefault(0).FromUnixTimestamp().ToOptional()
+                ? value2.FromIso8601().ToOptional()
                 : Optional<DateTime>.None;
 
         return ProviderInvoice.Create(amount, currencyCode, nextUtc);
@@ -376,9 +376,8 @@ internal static class ChargebeeInterpreterConversionExtensions
             return Optional<DateTime>.None;
         }
 
-        var seconds = trialEnd.ToLongOrDefault(0);
-        return seconds > 0
-            ? seconds.FromUnixTimestamp()
+        return trialEnd.FromIso8601().HasValue()
+            ? trialEnd.FromIso8601()
             : Optional<DateTime>.None;
     }
 
@@ -401,14 +400,19 @@ internal static class ChargebeeInterpreterConversionExtensions
 
     private static Optional<DateTime> ToCanceledDate(this SubscriptionMetadata state)
     {
-        var canceledSecs = state.GetValueOrDefault(ChargebeeStateInterpreter.Constants.MetadataProperties.CanceledAt)
-            .ToLongOrDefault(0);
-        if (canceledSecs > 0)
+        if (!state.TryGetValue(ChargebeeStateInterpreter.Constants.MetadataProperties.CanceledAt, out var canceledAt))
         {
-            return canceledSecs.FromUnixTimestamp();
+            return Optional<DateTime>.None;
         }
 
-        return Optional<DateTime>.None;
+        if (canceledAt.HasNoValue())
+        {
+            return Optional<DateTime>.None;
+        }
+
+        return canceledAt.FromIso8601().HasValue()
+            ? canceledAt.FromIso8601()
+            : Optional<DateTime>.None;
     }
 
     private static bool ToCanBeUnsubscribed(this SubscriptionMetadata state, BillingSubscriptionStatus status)

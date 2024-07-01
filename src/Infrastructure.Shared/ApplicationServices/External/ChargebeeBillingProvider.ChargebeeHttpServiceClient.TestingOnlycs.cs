@@ -453,5 +453,19 @@ partial class ChargebeeHttpServiceClient
         _recorder.TraceInformation(caller.ToCall(), "Retrieved all Chargebee subscriptions");
         return new Result<IReadOnlyList<Subscription>, Error>(retrievedSubscriptions.Value);
     }
+
+    public async Task<Result<IReadOnlyList<Customer>, Error>> SearchAllCustomersAsync(ICallerContext caller,
+        SearchOptions searchOptions, CancellationToken cancellationToken)
+    {
+        var retrievedCustomers =
+            await _serviceClient.SearchAllCustomersAsync(caller, searchOptions, cancellationToken);
+        if (retrievedCustomers.IsFailure)
+        {
+            return retrievedCustomers.Error;
+        }
+
+        _recorder.TraceInformation(caller.ToCall(), "Retrieved all Chargebee customers");
+        return new Result<IReadOnlyList<Customer>, Error>(retrievedCustomers.Value);
+    }
 }
 #endif

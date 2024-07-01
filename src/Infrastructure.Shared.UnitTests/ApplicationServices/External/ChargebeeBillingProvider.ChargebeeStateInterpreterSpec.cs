@@ -256,7 +256,7 @@ public class ChargebeeStateInterpreterSpec
         result.Value.Plan.PlanId.Should().Be("astandardplanid");
         result.Value.Plan.IsTrial.Should().BeFalse();
         result.Value.Plan.Tier.Should().Be(BillingSubscriptionTier.Standard);
-        result.Value.Plan.TrialEndDateUtc.Should().BeSome(1L.FromUnixTimestamp());
+        result.Value.Plan.TrialEndDateUtc.Should().BeNone();
         result.Value.Period.Should().Be(ProviderPlanPeriod.Empty);
         result.Value.PaymentMethod.Should().Be(ProviderPaymentMethod.Empty);
         result.Value.Invoice.Should().Be(ProviderInvoice.Default);
@@ -288,7 +288,7 @@ public class ChargebeeStateInterpreterSpec
         result.Value.Plan.PlanId.Should().Be("astandardplanid");
         result.Value.Plan.IsTrial.Should().BeTrue();
         result.Value.Plan.Tier.Should().Be(BillingSubscriptionTier.Standard);
-        result.Value.Plan.TrialEndDateUtc.Should().BeSome(1L.FromUnixTimestamp());
+        result.Value.Plan.TrialEndDateUtc.Should().BeNone();
         result.Value.Period.Should().Be(ProviderPlanPeriod.Empty);
         result.Value.PaymentMethod.Should().Be(ProviderPaymentMethod.Empty);
         result.Value.Invoice.Should().Be(ProviderInvoice.Default);
@@ -305,7 +305,7 @@ public class ChargebeeStateInterpreterSpec
                     { Constants.MetadataProperties.TrialEnd, "1" },
                     { Constants.MetadataProperties.CustomerId, "acustomerid" },
                     { Constants.MetadataProperties.SubscriptionStatus, Subscription.StatusEnum.NonRenewing.ToString() },
-                    { Constants.MetadataProperties.CanceledAt, canceledAt.ToUnixSeconds().ToString() },
+                    { Constants.MetadataProperties.CanceledAt, canceledAt.ToIso8601() },
                     { Constants.MetadataProperties.SubscriptionDeleted, "false" },
                     { Constants.MetadataProperties.PlanId, "astandardplanid" }
                 })
@@ -322,7 +322,7 @@ public class ChargebeeStateInterpreterSpec
         result.Value.Plan.PlanId.Should().Be("astandardplanid");
         result.Value.Plan.IsTrial.Should().BeFalse();
         result.Value.Plan.Tier.Should().Be(BillingSubscriptionTier.Standard);
-        result.Value.Plan.TrialEndDateUtc.Should().BeSome(1L.FromUnixTimestamp());
+        result.Value.Plan.TrialEndDateUtc.Should().BeNone();
         result.Value.Period.Should().Be(ProviderPlanPeriod.Empty);
         result.Value.PaymentMethod.Should().Be(ProviderPaymentMethod.Empty);
         result.Value.Invoice.Should().Be(ProviderInvoice.Default);
@@ -339,7 +339,7 @@ public class ChargebeeStateInterpreterSpec
                     { Constants.MetadataProperties.TrialEnd, "1" },
                     { Constants.MetadataProperties.CustomerId, "acustomerid" },
                     { Constants.MetadataProperties.SubscriptionStatus, Subscription.StatusEnum.Cancelled.ToString() },
-                    { Constants.MetadataProperties.CanceledAt, canceledAt.ToUnixSeconds().ToString() },
+                    { Constants.MetadataProperties.CanceledAt, canceledAt.ToIso8601() },
                     { Constants.MetadataProperties.SubscriptionDeleted, "false" },
                     { Constants.MetadataProperties.PlanId, "astandardplanid" }
                 })
@@ -356,7 +356,7 @@ public class ChargebeeStateInterpreterSpec
         result.Value.Plan.PlanId.Should().Be("astandardplanid");
         result.Value.Plan.IsTrial.Should().BeFalse();
         result.Value.Plan.Tier.Should().Be(BillingSubscriptionTier.Unsubscribed);
-        result.Value.Plan.TrialEndDateUtc.Should().BeSome(1L.FromUnixTimestamp());
+        result.Value.Plan.TrialEndDateUtc.Should().BeNone();
         result.Value.Period.Should().Be(ProviderPlanPeriod.Empty);
         result.Value.PaymentMethod.Should().Be(ProviderPaymentMethod.Empty);
         result.Value.Invoice.Should().Be(ProviderInvoice.Default);
@@ -381,7 +381,7 @@ public class ChargebeeStateInterpreterSpec
         result.Value.Plan.PlanId.Should().Be("astandardplanid");
         result.Value.Plan.IsTrial.Should().BeFalse();
         result.Value.Plan.Tier.Should().Be(BillingSubscriptionTier.Standard);
-        result.Value.Plan.TrialEndDateUtc.Should().BeSome(1L.FromUnixTimestamp());
+        result.Value.Plan.TrialEndDateUtc.Should().BeNone();
     }
 
     [Fact]
@@ -412,7 +412,7 @@ public class ChargebeeStateInterpreterSpec
                 new SubscriptionMetadata
                 {
                     { Constants.MetadataProperties.SubscriptionId, "asubscriptionid" },
-                    { Constants.MetadataProperties.NextBillingAt, nextBilling.ToUnixSeconds().ToString() },
+                    { Constants.MetadataProperties.NextBillingAt, nextBilling.ToIso8601() },
                     { Constants.MetadataProperties.CurrencyCode, CurrencyCodes.Default.Code },
                     { Constants.MetadataProperties.BillingAmount, "3" }
                 })

@@ -135,9 +135,9 @@ public class ChargebeeHttpServiceClientSpec
         result.Value[Constants.MetadataProperties.CurrencyCode].Should().Be("USD");
         result.Value[Constants.MetadataProperties.PlanId].Should().Be("aplanid");
         result.Value[Constants.MetadataProperties.BillingAmount].Should().Be("0");
-        result.Value[Constants.MetadataProperties.TrialEnd].Should().Be(datum.ToUnixSeconds().ToString());
-        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToUnixSeconds().ToString());
-        result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToUnixSeconds().ToString());
+        result.Value[Constants.MetadataProperties.TrialEnd].Should().Be(datum.ToIso8601());
+        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToIso8601());
+        result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToIso8601());
         _serviceClient.Verify(x =>
             x.FindCustomerByIdAsync(_caller.Object, "acompanyreference", It.IsAny<CancellationToken>()));
         _serviceClient.Verify(
@@ -199,9 +199,9 @@ public class ChargebeeHttpServiceClientSpec
         result.Value[Constants.MetadataProperties.CurrencyCode].Should().Be("USD");
         result.Value[Constants.MetadataProperties.PlanId].Should().Be("aplanid");
         result.Value[Constants.MetadataProperties.BillingAmount].Should().Be("0");
-        result.Value[Constants.MetadataProperties.TrialEnd].Should().Be(datum.ToUnixSeconds().ToString());
-        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToUnixSeconds().ToString());
-        result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToUnixSeconds().ToString());
+        result.Value[Constants.MetadataProperties.TrialEnd].Should().Be(datum.ToIso8601());
+        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToIso8601());
+        result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToIso8601());
         _serviceClient.Verify(x =>
             x.FindCustomerByIdAsync(_caller.Object, "acompanyreference", It.IsAny<CancellationToken>()));
         _serviceClient.Verify(
@@ -258,9 +258,9 @@ public class ChargebeeHttpServiceClientSpec
         result.Value[Constants.MetadataProperties.CurrencyCode].Should().Be("USD");
         result.Value[Constants.MetadataProperties.PlanId].Should().Be("aplanid");
         result.Value[Constants.MetadataProperties.BillingAmount].Should().Be("0");
-        result.Value[Constants.MetadataProperties.TrialEnd].Should().Be(datum.ToUnixSeconds().ToString());
-        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToUnixSeconds().ToString());
-        result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToUnixSeconds().ToString());
+        result.Value[Constants.MetadataProperties.TrialEnd].Should().Be(datum.ToIso8601());
+        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToIso8601());
+        result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToIso8601());
         _serviceClient.Verify(x =>
             x.FindCustomerByIdAsync(_caller.Object, "acompanyreference", It.IsAny<CancellationToken>()));
         _serviceClient.Verify(x => x.CreateCustomerForBuyerAsync(_caller.Object, "acompanyreference",
@@ -475,8 +475,8 @@ public class ChargebeeHttpServiceClientSpec
         result.Value[Constants.MetadataProperties.CurrencyCode].Should().Be("USD");
         result.Value[Constants.MetadataProperties.PlanId].Should().Be("aplanid2");
         result.Value[Constants.MetadataProperties.BillingAmount].Should().Be("0");
-        result.Value[Constants.MetadataProperties.TrialEnd].Should().Be(datum.ToUnixSeconds().ToString());
-        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToUnixSeconds().ToString());
+        result.Value[Constants.MetadataProperties.TrialEnd].Should().Be(datum.ToIso8601());
+        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToIso8601());
         _serviceClient.Verify(x =>
             x.FindSubscriptionByIdAsync(_caller.Object, "asubscriptionid", It.IsAny<CancellationToken>()));
         _serviceClient.Verify(
@@ -527,8 +527,8 @@ public class ChargebeeHttpServiceClientSpec
         result.Value[Constants.MetadataProperties.CurrencyCode].Should().Be("USD");
         result.Value[Constants.MetadataProperties.PlanId].Should().Be("aplanid2");
         result.Value[Constants.MetadataProperties.BillingAmount].Should().Be("0");
-        result.Value[Constants.MetadataProperties.TrialEnd].Should().Be(datum.ToUnixSeconds().ToString());
-        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToUnixSeconds().ToString());
+        result.Value[Constants.MetadataProperties.TrialEnd].Should().Be(datum.ToIso8601());
+        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToIso8601());
         _serviceClient.Verify(x =>
             x.FindSubscriptionByIdAsync(_caller.Object, "asubscriptionid", It.IsAny<CancellationToken>()));
         _serviceClient.Setup(sc =>
@@ -582,8 +582,8 @@ public class ChargebeeHttpServiceClientSpec
         result.Value[Constants.MetadataProperties.CurrencyCode].Should().Be("USD");
         result.Value[Constants.MetadataProperties.PlanId].Should().Be("aplanid2");
         result.Value[Constants.MetadataProperties.BillingAmount].Should().Be("0");
-        result.Value[Constants.MetadataProperties.TrialEnd].Should().Be(datum.ToUnixSeconds().ToString());
-        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToUnixSeconds().ToString());
+        result.Value[Constants.MetadataProperties.TrialEnd].Should().Be(datum.ToIso8601());
+        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToIso8601());
         _serviceClient.Verify(x =>
             x.FindSubscriptionByIdAsync(_caller.Object, "asubscriptionid", It.IsAny<CancellationToken>()));
         _serviceClient.Setup(sc => sc.ReactivateSubscriptionAsync(_caller.Object, "asubscriptionid",
@@ -637,8 +637,8 @@ public class ChargebeeHttpServiceClientSpec
         result.Value[Constants.MetadataProperties.CurrencyCode].Should().Be("USD");
         result.Value[Constants.MetadataProperties.PlanId].Should().Be("aplanid2");
         result.Value[Constants.MetadataProperties.BillingAmount].Should().Be("0");
-        result.Value[Constants.MetadataProperties.TrialEnd].Should().Be(datum.ToUnixSeconds().ToString());
-        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToUnixSeconds().ToString());
+        result.Value[Constants.MetadataProperties.TrialEnd].Should().Be(datum.ToIso8601());
+        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToIso8601());
         _serviceClient.Verify(x =>
             x.FindSubscriptionByIdAsync(_caller.Object, "asubscriptionid", It.IsAny<CancellationToken>()));
         _serviceClient.Setup(sc => sc.CreateSubscriptionForCustomerAsync(_caller.Object, "acustomerid",
@@ -730,8 +730,8 @@ public class ChargebeeHttpServiceClientSpec
         result.Value[Constants.MetadataProperties.CurrencyCode].Should().Be("USD");
         result.Value[Constants.MetadataProperties.PlanId].Should().Be("aplanid");
         result.Value[Constants.MetadataProperties.BillingAmount].Should().Be("0");
-        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToUnixSeconds().ToString());
-        result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToUnixSeconds().ToString());
+        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToIso8601());
+        result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToIso8601());
         _serviceClient.Verify(x =>
             x.FindSubscriptionByIdAsync(_caller.Object, "asubscriptionid", It.IsAny<CancellationToken>()));
         _serviceClient.Verify(sc => sc.CancelSubscriptionAsync(_caller.Object, "asubscriptionid", false,
@@ -776,8 +776,8 @@ public class ChargebeeHttpServiceClientSpec
         result.Value[Constants.MetadataProperties.CurrencyCode].Should().Be("USD");
         result.Value[Constants.MetadataProperties.PlanId].Should().Be("aplanid");
         result.Value[Constants.MetadataProperties.BillingAmount].Should().Be("0");
-        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToUnixSeconds().ToString());
-        result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToUnixSeconds().ToString());
+        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToIso8601());
+        result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToIso8601());
         _serviceClient.Verify(x =>
             x.FindSubscriptionByIdAsync(_caller.Object, "asubscriptionid", It.IsAny<CancellationToken>()));
         _serviceClient.Verify(sc => sc.CancelSubscriptionAsync(_caller.Object, "asubscriptionid", true,
@@ -823,8 +823,8 @@ public class ChargebeeHttpServiceClientSpec
         result.Value[Constants.MetadataProperties.CurrencyCode].Should().Be("USD");
         result.Value[Constants.MetadataProperties.PlanId].Should().Be("aplanid");
         result.Value[Constants.MetadataProperties.BillingAmount].Should().Be("0");
-        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToUnixSeconds().ToString());
-        result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToUnixSeconds().ToString());
+        result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToIso8601());
+        result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToIso8601());
         _serviceClient.Verify(x =>
             x.FindSubscriptionByIdAsync(_caller.Object, "asubscriptionid", It.IsAny<CancellationToken>()));
         _serviceClient.Verify(sc => sc.CancelSubscriptionAsync(_caller.Object, "asubscriptionid", false,

@@ -22,7 +22,7 @@ namespace Infrastructure.Shared.ApplicationServices.External;
 public sealed partial class ChargebeeHttpServiceClient : IBillingGatewayService
 {
     internal const string BuyerMetadataId = "BuyerId";
-    internal const string OwningEntityMetadataId = nameof(SubscriptionBuyer.CompanyReference);
+    internal const string OwningEntityMetadataId = "OrganizationId";
     internal const string ProductFamilyIdSettingName = "ApplicationServices:Chargebee:ProductFamilyId";
     private const string StartingPlanIdSettingName = "ApplicationServices:Chargebee:Plans:StartingPlanId";
     private static readonly TimeSpan CachedPlansTimeToLive = TimeSpan.FromHours(1);
@@ -367,8 +367,7 @@ public sealed partial class ChargebeeHttpServiceClient : IBillingGatewayService
         }
 
         var retrievedInvoices = await _serviceClient.SearchAllCustomerInvoicesAsync(caller, customerId.Value, fromUtc,
-            toUtc,
-            searchOptions, cancellationToken);
+            toUtc, searchOptions, cancellationToken);
         if (retrievedInvoices.IsFailure)
         {
             return retrievedInvoices.Error;
@@ -403,9 +402,14 @@ public sealed partial class ChargebeeHttpServiceClient : IBillingGatewayService
             return updatedCustomer.Error;
         }
 
-        var planId = options.PlanId.HasValue()
-            ? options.PlanId
-            : _initialPlanId;
+        var planId =
+#if TESTINGONLY
+            options.PlanId.HasValue()
+                ? options.PlanId
+                : _initialPlanId;
+#else
+            _initialPlanId;
+#endif
         var updatedState = updatedCustomer.Value;
         var createdSubscription = await CreateSubscriptionForCustomerInternalAsync(caller, updatedState,
             buyer.CompanyReference, planId, options, Optional<DateTime>.None, cancellationToken);
@@ -912,7 +916,7 @@ internal static class ChargebeeServiceClientConversionExtensions
             Amount = invoice.Total.ToCurrency(invoice.CurrencyCode),
             Currency = invoice.CurrencyCode,
             IncludesTax = invoice.PriceType == PriceTypeEnum.TaxInclusive,
-            InvoicedOnUtc = invoice.Date,
+            InvoicedOnUtc = invoice.Date?.ToUniversalTime(),
             LineItems = invoice.LineItems.Select(item => new InvoiceLineItem
             {
                 Reference = item.Id,
@@ -935,12 +939,12 @@ internal static class ChargebeeServiceClientConversionExtensions
                 {
                     Amount = invoice.AmountPaid.ToCurrency(invoice.CurrencyCode),
                     Currency = invoice.CurrencyCode,
-                    PaidOnUtc = invoice.PaidAt,
+                    PaidOnUtc = invoice.PaidAt?.ToUniversalTime(),
                     Reference = invoice.LinkedPayments.First().TxnId
                 }
                 : null,
-            PeriodEndUtc = periodEnd,
-            PeriodStartUtc = periodStart
+            PeriodEndUtc = periodEnd?.ToUniversalTime(),
+            PeriodStartUtc = periodStart?.ToUniversalTime()
         };
 
         (DateTime? periodStart, DateTime? periodEnd) GetSpanningPeriod()
@@ -1087,7 +1091,7 @@ internal static class ChargebeeServiceClientConversionExtensions
         metadata[Constants.MetadataProperties.SubscriptionDeleted] = subscription.Deleted.ToString();
         metadata.AppendPlan(subscription);
         metadata.TryAddIfTrue(Constants.MetadataProperties.CanceledAt, subscription.CancelledAt, time => time.HasValue,
-            time => time!.Value.ToUnixSeconds().ToString());
+            time => time!.Value.ToIso8601());
         metadata.AppendInvoice(subscription);
     }
 
@@ -1108,7 +1112,7 @@ internal static class ChargebeeServiceClientConversionExtensions
         }
 
         metadata.TryAddIfTrue(Constants.MetadataProperties.TrialEnd, subscription.TrialEnd, time => time.HasValue,
-            time => time!.Value.ToUnixSeconds().ToString());
+            time => time!.Value.ToIso8601());
     }
 
     private static void AppendInvoice(this SubscriptionMetadata metadata, Subscription subscription)
@@ -1121,7 +1125,7 @@ internal static class ChargebeeServiceClientConversionExtensions
 
         metadata[Constants.MetadataProperties.CurrencyCode] = subscription.CurrencyCode;
         metadata.TryAddIfTrue(Constants.MetadataProperties.NextBillingAt, subscription.NextBillingAt,
-            time => time.HasValue, time => time!.Value.ToUnixSeconds().ToString());
+            time => time.HasValue, time => time!.Value.ToIso8601());
     }
 
     private static void AppendPaymentMethod(this SubscriptionMetadata metadata, Customer customer)
