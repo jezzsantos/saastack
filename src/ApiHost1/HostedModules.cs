@@ -7,6 +7,7 @@ using IdentityInfrastructure;
 using ImagesInfrastructure;
 using Infrastructure.Web.Hosting.Common;
 using OrganizationsInfrastructure;
+using SigningsInfrastructure;
 using SubscriptionsInfrastructure;
 using UserProfilesInfrastructure;
 
@@ -33,6 +34,7 @@ public static class HostedModules
         // NOTE: The order of these registrations might matter for some dependencies 
         modules.Register(new CarsModule());
         modules.Register(new BookingsModule());
+        modules.Register(new SigningModule());
 
         return modules;
     }
