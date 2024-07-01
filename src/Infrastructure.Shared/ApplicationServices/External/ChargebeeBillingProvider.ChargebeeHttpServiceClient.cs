@@ -22,7 +22,6 @@ namespace Infrastructure.Shared.ApplicationServices.External;
 public sealed partial class ChargebeeHttpServiceClient : IBillingGatewayService
 {
     internal const string BuyerMetadataId = "BuyerId";
-    internal const string OwningEntityMetadataId = "OrganizationId";
     internal const string ProductFamilyIdSettingName = "ApplicationServices:Chargebee:ProductFamilyId";
     private const string StartingPlanIdSettingName = "ApplicationServices:Chargebee:Plans:StartingPlanId";
     private static readonly TimeSpan CachedPlansTimeToLive = TimeSpan.FromHours(1);
@@ -178,8 +177,9 @@ public sealed partial class ChargebeeHttpServiceClient : IBillingGatewayService
 
             case BillingSubscriptionStatus.Unsubscribed:
             {
+                var subscriber = options.Subscriber;
                 modifiedSubscription = await CreateSubscriptionForCustomerInternalAsync(caller, updatedState,
-                    subscriptionId.Value, _initialPlanId, SubscribeOptions.Immediately, DateTime.UnixEpoch,
+                    subscriber, _initialPlanId, SubscribeOptions.Immediately, DateTime.UnixEpoch,
                     cancellationToken);
                 break;
             }
@@ -412,7 +412,7 @@ public sealed partial class ChargebeeHttpServiceClient : IBillingGatewayService
 #endif
         var updatedState = updatedCustomer.Value;
         var createdSubscription = await CreateSubscriptionForCustomerInternalAsync(caller, updatedState,
-            buyer.CompanyReference, planId, options, Optional<DateTime>.None, cancellationToken);
+            buyer.Subscriber, planId, options, Optional<DateTime>.None, cancellationToken);
         if (createdSubscription.IsFailure)
         {
             return createdSubscription.Error;
@@ -487,7 +487,7 @@ public sealed partial class ChargebeeHttpServiceClient : IBillingGatewayService
                     ? options.PlanId
                     : _initialPlanId;
                 modifiedSubscription = await CreateSubscriptionForCustomerInternalAsync(caller, updatedState,
-                    options.TransfereeBuyer.CompanyReference, planId, SubscribeOptions.Immediately, DateTime.UnixEpoch,
+                    options.TransfereeBuyer.Subscriber, planId, SubscribeOptions.Immediately, DateTime.UnixEpoch,
                     cancellationToken);
                 break;
             }
@@ -513,7 +513,8 @@ public sealed partial class ChargebeeHttpServiceClient : IBillingGatewayService
 
         bool HasBuyerReference(TransferSubscriptionOptions opts)
         {
-            return opts.TransfereeBuyer.CompanyReference.HasValue();
+            return opts.TransfereeBuyer.Subscriber.Exists()
+                   && opts.TransfereeBuyer.Subscriber.EntityId.HasValue();
         }
     }
 
@@ -664,18 +665,12 @@ public sealed partial class ChargebeeHttpServiceClient : IBillingGatewayService
         return Error.Validation(Resources.ChargebeeHttpServiceClient_InvalidSubscriptionId);
     }
 
-    /// <summary>
-    ///     Creates a new subscription for the specified customer.
-    ///     Note: AutoCollection="on" so that the subscription automatically cancels after any trial period ends (if any).
-    /// </summary>
     private async Task<Result<SubscriptionMetadata, Error>> CreateSubscriptionForCustomerInternalAsync(
-        ICallerContext caller, SubscriptionMetadata state, string subscriptionReference, string planId,
+        ICallerContext caller, SubscriptionMetadata state, Subscriber subscriber, string planId,
         SubscribeOptions options, Optional<DateTime> forceEndTrial, CancellationToken cancellationToken)
     {
-        subscriptionReference.ThrowIfNotValuedParameter(nameof(subscriptionReference),
-            Resources.ChargebeeHttpServiceClient_InvalidSubscriptionReference);
-        planId.ThrowIfNotValuedParameter(nameof(planId),
-            Resources.ChargebeeHttpServiceClient_InvalidPlanId);
+        subscriber.ThrowIfNullParameter(nameof(subscriber), Resources.ChargebeeHttpServiceClient_InvalidSubscriber);
+        planId.ThrowIfNotValuedParameter(nameof(planId), Resources.ChargebeeHttpServiceClient_InvalidPlanId);
         if (options.IsInvalidParameter(IsScheduledOrImmediate, nameof(options),
                 Resources.ChargebeeHttpServiceClient_Subscribe_ScheduleInvalid, out var error))
         {
@@ -692,7 +687,7 @@ public sealed partial class ChargebeeHttpServiceClient : IBillingGatewayService
         var trialEnds = GetTrialEndDate();
         var created =
             await _serviceClient.CreateSubscriptionForCustomerAsync(caller, customerId.Value,
-                subscriptionReference, planId, start, trialEnds, cancellationToken);
+                subscriber, planId, start, trialEnds, cancellationToken);
         if (created.IsFailure)
         {
             return created.Error;
@@ -867,10 +862,10 @@ public sealed partial class ChargebeeHttpServiceClient : IBillingGatewayService
 
 internal static class ChargebeeServiceClientConversionExtensions
 {
-    public static string GetCompanyName(this SubscriptionBuyer buyer, string customerId)
+    public static string GetSubscriberId(this SubscriptionBuyer buyer, string customerId)
     {
-        return buyer.CompanyReference.HasValue()
-            ? buyer.CompanyReference
+        return buyer.Subscriber.EntityId.HasValue()
+            ? buyer.Subscriber.EntityId
             : customerId;
     }
 
@@ -880,17 +875,18 @@ internal static class ChargebeeServiceClientConversionExtensions
     /// </summary>
     public static string MakeCustomerId(this SubscriptionBuyer buyer)
     {
-        return buyer.CompanyReference[..Math.Min(buyer.CompanyReference.Length, 50)];
+        var entityId = buyer.Subscriber.EntityId;
+        return entityId[..Math.Min(entityId.Length, 50)];
     }
 
     /// <summary>
     ///     Returns a Subscription ID that is valid in Chargebee.
     ///     Note: Must be no more than 50 chars long.
     /// </summary>
-    public static string MakeSubscriptionId(this string subscriptionReference)
+    public static string MakeSubscriptionId(this string customerId)
     {
         var random = Guid.NewGuid().ToString("N");
-        var id = $"{subscriptionReference}.{random}";
+        var id = $"{customerId}.{random}";
         return id[..Math.Min(id.Length, 50)];
     }
 

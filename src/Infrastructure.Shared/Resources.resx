@@ -57,8 +57,8 @@
     <data name="ChargebeeHttpServiceClient_InvalidPlanId" xml:space="preserve">
         <value>The PlanId is missing</value>
     </data>
-    <data name="ChargebeeHttpServiceClient_InvalidSubscriptionReference" xml:space="preserve">
-        <value>The SubscriptionReference is missing</value>
+    <data name="ChargebeeHttpServiceClient_InvalidSubscriber" xml:space="preserve">
+        <value>The Subscriber is missing</value>
     </data>
     <data name="ChargebeeHttpServiceClient_Subscribe_ScheduleInvalid" xml:space="preserve">
         <value>Cannot create a subscription for a customer that is not immediate or scheduled to start in the past</value>

@@ -105,20 +105,20 @@ namespace Infrastructure.Shared {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Subscriber is missing.
+        /// </summary>
+        internal static string ChargebeeHttpServiceClient_InvalidSubscriber {
+            get {
+                return ResourceManager.GetString("ChargebeeHttpServiceClient_InvalidSubscriber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The SubscriptionId is missing.
         /// </summary>
         internal static string ChargebeeHttpServiceClient_InvalidSubscriptionId {
             get {
                 return ResourceManager.GetString("ChargebeeHttpServiceClient_InvalidSubscriptionId", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The SubscriptionReference is missing.
-        /// </summary>
-        internal static string ChargebeeHttpServiceClient_InvalidSubscriptionReference {
-            get {
-                return ResourceManager.GetString("ChargebeeHttpServiceClient_InvalidSubscriptionReference", resourceCulture);
             }
         }
         

@@ -55,7 +55,7 @@ public class ChargebeeHttpServiceClientSpec
                 It.IsAny<SubscriptionBuyer>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(CreateCustomer("acustomerid"));
         _serviceClient.Setup(x => x.CreateSubscriptionForCustomerAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
+                It.IsAny<Subscriber>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(CreateSubscription(CreateCustomer("acustomerid"), "asubscriptionid"));
 
@@ -80,7 +80,7 @@ public class ChargebeeHttpServiceClientSpec
                 It.IsAny<SubscriptionBuyer>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(CreateCustomer("acustomerid"));
         _serviceClient.Setup(x => x.CreateSubscriptionForCustomerAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
+                It.IsAny<Subscriber>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(CreateSubscription(CreateCustomer("acustomerid"), "asubscriptionid"));
 
@@ -113,7 +113,7 @@ public class ChargebeeHttpServiceClientSpec
                 It.IsAny<SubscriptionBuyer>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(customer);
         _serviceClient.Setup(x => x.CreateSubscriptionForCustomerAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
+                It.IsAny<Subscriber>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(subscription);
 
@@ -139,16 +139,19 @@ public class ChargebeeHttpServiceClientSpec
         result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToIso8601());
         result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToIso8601());
         _serviceClient.Verify(x =>
-            x.FindCustomerByIdAsync(_caller.Object, "acompanyreference", It.IsAny<CancellationToken>()));
+            x.FindCustomerByIdAsync(_caller.Object, "anentityid", It.IsAny<CancellationToken>()));
         _serviceClient.Verify(
             x => x.CreateCustomerForBuyerAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<SubscriptionBuyer>(), It.IsAny<CancellationToken>()), Times.Never);
-        _serviceClient.Verify(x => x.UpdateCustomerForBuyerAsync(_caller.Object, "acompanyreference",
+        _serviceClient.Verify(x => x.UpdateCustomerForBuyerAsync(_caller.Object, "anentityid",
             buyer, It.IsAny<CancellationToken>()));
-        _serviceClient.Verify(x => x.UpdateCustomerForBuyerBillingAddressAsync(_caller.Object, "acompanyreference",
+        _serviceClient.Verify(x => x.UpdateCustomerForBuyerBillingAddressAsync(_caller.Object, "anentityid",
             buyer, It.IsAny<CancellationToken>()));
         _serviceClient.Verify(x => x.CreateSubscriptionForCustomerAsync(_caller.Object, "acustomerid",
-            "acompanyreference", "aninitialplanid", Optional<long>.None, Optional<long>.None,
+            It.Is<Subscriber>(sub =>
+                sub.EntityId == "anentityid"
+                && sub.EntityType == "anentitytype"
+            ), "aninitialplanid", Optional<long>.None, Optional<long>.None,
             It.IsAny<CancellationToken>()));
     }
 
@@ -177,7 +180,7 @@ public class ChargebeeHttpServiceClientSpec
                 It.IsAny<SubscriptionBuyer>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(customer);
         _serviceClient.Setup(x => x.CreateSubscriptionForCustomerAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
+                It.IsAny<Subscriber>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(subscription);
 
@@ -203,16 +206,19 @@ public class ChargebeeHttpServiceClientSpec
         result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToIso8601());
         result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToIso8601());
         _serviceClient.Verify(x =>
-            x.FindCustomerByIdAsync(_caller.Object, "acompanyreference", It.IsAny<CancellationToken>()));
+            x.FindCustomerByIdAsync(_caller.Object, "anentityid", It.IsAny<CancellationToken>()));
         _serviceClient.Verify(
             x => x.CreateCustomerForBuyerAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<SubscriptionBuyer>(), It.IsAny<CancellationToken>()), Times.Never);
-        _serviceClient.Verify(x => x.UpdateCustomerForBuyerAsync(_caller.Object, "acompanyreference",
+        _serviceClient.Verify(x => x.UpdateCustomerForBuyerAsync(_caller.Object, "anentityid",
             buyer, It.IsAny<CancellationToken>()));
-        _serviceClient.Verify(x => x.UpdateCustomerForBuyerBillingAddressAsync(_caller.Object, "acompanyreference",
+        _serviceClient.Verify(x => x.UpdateCustomerForBuyerBillingAddressAsync(_caller.Object, "anentityid",
             buyer, It.IsAny<CancellationToken>()));
         _serviceClient.Verify(x => x.CreateSubscriptionForCustomerAsync(_caller.Object, "acustomerid",
-            "acompanyreference", "aninitialplanid", starts.ToUnixSeconds(), Optional<long>.None,
+            It.Is<Subscriber>(sub =>
+                sub.EntityId == "anentityid"
+                && sub.EntityType == "anentitytype"
+            ), "aninitialplanid", starts.ToUnixSeconds(), Optional<long>.None,
             It.IsAny<CancellationToken>()));
     }
 
@@ -236,7 +242,7 @@ public class ChargebeeHttpServiceClientSpec
                 It.IsAny<SubscriptionBuyer>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(customer);
         _serviceClient.Setup(x => x.CreateSubscriptionForCustomerAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
+                It.IsAny<Subscriber>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(subscription);
 
@@ -262,8 +268,8 @@ public class ChargebeeHttpServiceClientSpec
         result.Value[Constants.MetadataProperties.NextBillingAt].Should().Be(datum.ToIso8601());
         result.Value[Constants.MetadataProperties.CanceledAt].Should().Be(datum.ToIso8601());
         _serviceClient.Verify(x =>
-            x.FindCustomerByIdAsync(_caller.Object, "acompanyreference", It.IsAny<CancellationToken>()));
-        _serviceClient.Verify(x => x.CreateCustomerForBuyerAsync(_caller.Object, "acompanyreference",
+            x.FindCustomerByIdAsync(_caller.Object, "anentityid", It.IsAny<CancellationToken>()));
+        _serviceClient.Verify(x => x.CreateCustomerForBuyerAsync(_caller.Object, "anentityid",
             It.IsAny<SubscriptionBuyer>(), It.IsAny<CancellationToken>()));
         _serviceClient.Verify(
             x => x.UpdateCustomerForBuyerAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
@@ -272,7 +278,10 @@ public class ChargebeeHttpServiceClientSpec
             x => x.UpdateCustomerForBuyerBillingAddressAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<SubscriptionBuyer>(), It.IsAny<CancellationToken>()), Times.Never);
         _serviceClient.Verify(x => x.CreateSubscriptionForCustomerAsync(_caller.Object, "acustomerid",
-            "acompanyreference", "aninitialplanid", starts.ToUnixSeconds(), Optional<long>.None,
+            It.Is<Subscriber>(sub =>
+                sub.EntityId == "anentityid"
+                && sub.EntityType == "anentitytype"
+            ), "aninitialplanid", starts.ToUnixSeconds(), Optional<long>.None,
             It.IsAny<CancellationToken>()));
     }
 
@@ -407,8 +416,8 @@ public class ChargebeeHttpServiceClientSpec
             new SearchOptions(), CancellationToken.None);
 
         result.Should().BeSuccess();
-        var today = DateTime.Today;
-        var yesterday = DateTime.Today.SubtractDays(1);
+        var today = DateTime.Today.ToUniversalTime();
+        var yesterday = today.SubtractDays(1);
         result.Value.Should().ContainSingle(invoice =>
             invoice.Id == "aninvoiceid"
             && invoice.Amount == 0.09M
@@ -460,7 +469,11 @@ public class ChargebeeHttpServiceClientSpec
         var result = await _client.ChangeSubscriptionPlanAsync(_caller.Object, new ChangePlanOptions
         {
             PlanId = "aplanid",
-            OwningEntityId = "anowningentityid"
+            Subscriber = new Subscriber
+            {
+                EntityId = "anentityid",
+                EntityType = "anentitytype"
+            }
         }, provider, CancellationToken.None);
 
         result.Should().BeSuccess();
@@ -512,7 +525,11 @@ public class ChargebeeHttpServiceClientSpec
         var result = await _client.ChangeSubscriptionPlanAsync(_caller.Object, new ChangePlanOptions
         {
             PlanId = "aplanid",
-            OwningEntityId = "anowningentityid"
+            Subscriber = new Subscriber
+            {
+                EntityId = "anentityid",
+                EntityType = "anentitytype"
+            }
         }, provider, CancellationToken.None);
 
         result.Should().BeSuccess();
@@ -567,7 +584,11 @@ public class ChargebeeHttpServiceClientSpec
         var result = await _client.ChangeSubscriptionPlanAsync(_caller.Object, new ChangePlanOptions
         {
             PlanId = "aplanid",
-            OwningEntityId = "anowningentityid"
+            Subscriber = new Subscriber
+            {
+                EntityId = "anentityid",
+                EntityType = "anentitytype"
+            }
         }, provider, CancellationToken.None);
 
         result.Should().BeSuccess();
@@ -612,7 +633,7 @@ public class ChargebeeHttpServiceClientSpec
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(subscription.ToOptional());
         _serviceClient.Setup(sc => sc.CreateSubscriptionForCustomerAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
+                It.IsAny<Subscriber>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(removedSubscription);
         _serviceClient.Setup(sc => sc.ChangeSubscriptionPlanAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
@@ -622,7 +643,11 @@ public class ChargebeeHttpServiceClientSpec
         var result = await _client.ChangeSubscriptionPlanAsync(_caller.Object, new ChangePlanOptions
         {
             PlanId = "aplanid",
-            OwningEntityId = "anowningentityid"
+            Subscriber = new Subscriber
+            {
+                EntityId = "anentityid",
+                EntityType = "anentitytype"
+            }
         }, provider, CancellationToken.None);
 
         result.Should().BeSuccess();
@@ -642,7 +667,10 @@ public class ChargebeeHttpServiceClientSpec
         _serviceClient.Verify(x =>
             x.FindSubscriptionByIdAsync(_caller.Object, "asubscriptionid", It.IsAny<CancellationToken>()));
         _serviceClient.Setup(sc => sc.CreateSubscriptionForCustomerAsync(_caller.Object, "acustomerid",
-            "asubscriptionid", "aplanid", Optional<long>.None, Optional<long>.None, It.IsAny<CancellationToken>()));
+            It.Is<Subscriber>(sub =>
+                sub.EntityId == "anentityid"
+                && sub.EntityType == "anentitytype"
+            ), "aplanid", Optional<long>.None, Optional<long>.None, It.IsAny<CancellationToken>()));
         _serviceClient.Verify(
             x => x.ChangeSubscriptionPlanAsync(_caller.Object, "asubscriptionid", "aplanid", Optional<long>.None,
                 It.IsAny<CancellationToken>()));
@@ -832,7 +860,7 @@ public class ChargebeeHttpServiceClientSpec
     }
 
     [Fact]
-    public async Task WhenTransferSubscriptionAsyncWithEmptyBuyerCompanyReference_ThenReturnsError()
+    public async Task WhenTransferSubscriptionAsyncWithEmptyBuyerSubscriber_ThenReturnsError()
     {
         var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
         {
@@ -843,7 +871,11 @@ public class ChargebeeHttpServiceClientSpec
         {
             TransfereeBuyer = new SubscriptionBuyer
             {
-                CompanyReference = string.Empty,
+                Subscriber = new Subscriber
+                {
+                    EntityId = string.Empty,
+                    EntityType = string.Empty
+                },
                 Address = new ProfileAddress
                 {
                     CountryCode = "acountrycode"
@@ -879,7 +911,11 @@ public class ChargebeeHttpServiceClientSpec
         }).Value;
         var buyer = new SubscriptionBuyer
         {
-            CompanyReference = "acompanyreference",
+            Subscriber = new Subscriber
+            {
+                EntityId = "anentityid",
+                EntityType = "anentitytype"
+            },
             Address = new ProfileAddress
             {
                 CountryCode = "acountrycode"
@@ -904,7 +940,7 @@ public class ChargebeeHttpServiceClientSpec
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(subscription.ToOptional());
         _serviceClient.Setup(sc => sc.CreateSubscriptionForCustomerAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
+                It.IsAny<Subscriber>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(subscription);
         _serviceClient.Setup(sc => sc.UpdateCustomerForBuyerAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
@@ -920,13 +956,16 @@ public class ChargebeeHttpServiceClientSpec
         _serviceClient.Verify(sc =>
             sc.FindSubscriptionByIdAsync(_caller.Object, "asubscriptionid", It.IsAny<CancellationToken>()));
         _serviceClient.Verify(sc => sc.CreateSubscriptionForCustomerAsync(_caller.Object,
-            "acustomerid", "acompanyreference", "aninitialplanid", Optional<long>.None, 0,
+            "acustomerid", It.Is<Subscriber>(sub =>
+                sub.EntityId == "anentityid"
+                && sub.EntityType == "anentitytype"
+            ), "aninitialplanid", Optional<long>.None, 0,
             It.IsAny<CancellationToken>()));
         _serviceClient.Verify(
-            sc => sc.UpdateCustomerForBuyerAsync(It.IsAny<ICallerContext>(), "acompanyreference", buyer,
+            sc => sc.UpdateCustomerForBuyerAsync(It.IsAny<ICallerContext>(), "anentityid", buyer,
                 It.IsAny<CancellationToken>()));
         _serviceClient.Verify(
-            sc => sc.UpdateCustomerForBuyerBillingAddressAsync(It.IsAny<ICallerContext>(), "acompanyreference", buyer,
+            sc => sc.UpdateCustomerForBuyerBillingAddressAsync(It.IsAny<ICallerContext>(), "anentityid", buyer,
                 It.IsAny<CancellationToken>()));
     }
 
@@ -941,7 +980,11 @@ public class ChargebeeHttpServiceClientSpec
         }).Value;
         var buyer = new SubscriptionBuyer
         {
-            CompanyReference = "acompanyreference",
+            Subscriber = new Subscriber
+            {
+                EntityId = "anentityid",
+                EntityType = "anentitytype"
+            },
             Address = new ProfileAddress
             {
                 CountryCode = "acountrycode"
@@ -967,7 +1010,7 @@ public class ChargebeeHttpServiceClientSpec
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(subscription.ToOptional());
         _serviceClient.Setup(sc => sc.CreateSubscriptionForCustomerAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
+                It.IsAny<Subscriber>(), It.IsAny<string>(), It.IsAny<Optional<long>>(), It.IsAny<Optional<long>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(subscription);
         _serviceClient.Setup(sc => sc.UpdateCustomerForBuyerAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
@@ -983,20 +1026,23 @@ public class ChargebeeHttpServiceClientSpec
         _serviceClient.Verify(sc =>
             sc.FindSubscriptionByIdAsync(_caller.Object, "asubscriptionid", It.IsAny<CancellationToken>()));
         _serviceClient.Verify(sc => sc.CreateSubscriptionForCustomerAsync(_caller.Object,
-            "acustomerid", "acompanyreference", "anotherplanid", Optional<long>.None, 0,
+            "acustomerid", It.Is<Subscriber>(sub =>
+                sub.EntityId == "anentityid"
+                && sub.EntityType == "anentitytype"
+            ), "anotherplanid", Optional<long>.None, 0,
             It.IsAny<CancellationToken>()));
         _serviceClient.Verify(
-            sc => sc.UpdateCustomerForBuyerAsync(It.IsAny<ICallerContext>(), "acompanyreference", buyer,
+            sc => sc.UpdateCustomerForBuyerAsync(It.IsAny<ICallerContext>(), "anentityid", buyer,
                 It.IsAny<CancellationToken>()));
         _serviceClient.Verify(
-            sc => sc.UpdateCustomerForBuyerBillingAddressAsync(It.IsAny<ICallerContext>(), "acompanyreference", buyer,
+            sc => sc.UpdateCustomerForBuyerBillingAddressAsync(It.IsAny<ICallerContext>(), "anentityid", buyer,
                 It.IsAny<CancellationToken>()));
     }
 
     private static Invoice CreateInvoice(string customerId)
     {
-        var today = DateTime.Today.ToUnixSeconds();
-        var yesterday = DateTime.Today.SubtractDays(1).ToUnixSeconds();
+        var today = DateTime.Today.ToUniversalTime();
+        var yesterday = today.SubtractDays(1);
         var invoice = new
         {
             id = "aninvoiceid",
@@ -1004,8 +1050,8 @@ public class ChargebeeHttpServiceClientSpec
             total = 9,
             currency_code = "USD",
             price_type = PriceTypeEnum.TaxInclusive.ToString(true),
-            date = today,
-            paid_at = today,
+            date = today.ToUnixSeconds(),
+            paid_at = today.ToUnixSeconds(),
             line_items = new[]
             {
                 new
@@ -1016,8 +1062,8 @@ public class ChargebeeHttpServiceClientSpec
                     currency_code = "USD",
                     is_taxed = true,
                     tax_amount = 8,
-                    date_from = yesterday,
-                    date_to = today
+                    date_from = yesterday.ToUnixSeconds(),
+                    date_to = today.ToUnixSeconds()
                 }
             },
             notes = new[]
@@ -1178,7 +1224,11 @@ public class ChargebeeHttpServiceClientSpec
                 LastName = "alastname"
             },
             EmailAddress = "anemailaddress",
-            CompanyReference = "acompanyreference",
+            Subscriber = new Subscriber
+            {
+                EntityId = "anentityid",
+                EntityType = "anentitytype"
+            },
             PhoneNumber = "aphonenumber",
             Address = new ProfileAddress
             {

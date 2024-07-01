@@ -60,7 +60,11 @@ public abstract class ChargebeeHttpServiceClientSetupSpec : ExternalApiSpec
             {
                 CountryCode = CountryCodes.Default.ToString()
             },
-            CompanyReference = GenerateRandomOrganizationId(),
+            Subscriber = new Subscriber
+            {
+                EntityId = TestCustomerIdPrefix,
+                EntityType = nameof(Organization)
+            },
             EmailAddress = "auser@company.com",
             Id = TestUserIdPrefix,
             Name = new PersonName
@@ -203,12 +207,6 @@ public abstract class ChargebeeHttpServiceClientSetupSpec : ExternalApiSpec
 #endif
     }
 
-    private static string GenerateRandomOrganizationId()
-    {
-        var random = Guid.NewGuid().ToString("N").Substring(0, 16).ToLowerInvariant();
-        return $"{TestCustomerIdPrefix}_{random}";
-    }
-
     protected record TestPlan(
         string Name,
         decimal Price,
@@ -337,7 +335,7 @@ public class ChargebeeHttpServiceClientSpec
             result.Value.Should().Contain(Constants.MetadataProperties.BillingPeriodValue, "1");
             result.Value.Should().NotContainKey(Constants.MetadataProperties.CanceledAt);
             result.Value.Should().Contain(Constants.MetadataProperties.CurrencyCode, CurrencyCodes.Default.Code);
-            result.Value.Should().Contain(Constants.MetadataProperties.CustomerId, buyer.CompanyReference);
+            result.Value.Should().Contain(Constants.MetadataProperties.CustomerId, buyer.Subscriber.EntityId);
             result.Value.Should().ContainKey(Constants.MetadataProperties.NextBillingAt)
                 .WhoseValue.Should().Match(value => value.IsNear(endOfTrial));
             result.Value.Should().NotContainKey(Constants.MetadataProperties.PaymentMethodStatus);
@@ -345,7 +343,7 @@ public class ChargebeeHttpServiceClientSpec
             result.Value.Should().Contain(Constants.MetadataProperties.PlanId, TestPlans[0].PlanId);
             result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionDeleted, "False");
             result.Value.Should().ContainKey(Constants.MetadataProperties.SubscriptionId)
-                .WhoseValue.Should().StartWith(buyer.CompanyReference);
+                .WhoseValue.Should().StartWith(buyer.Subscriber.EntityId);
             result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionStatus,
                 Subscription.StatusEnum.InTrial.ToString());
             result.Value.Should().ContainKey(Constants.MetadataProperties.TrialEnd)
@@ -370,7 +368,7 @@ public class ChargebeeHttpServiceClientSpec
             result.Value.Should().Contain(Constants.MetadataProperties.BillingPeriodValue, "1");
             result.Value.Should().NotContainKey(Constants.MetadataProperties.CanceledAt);
             result.Value.Should().Contain(Constants.MetadataProperties.CurrencyCode, CurrencyCodes.Default.Code);
-            result.Value.Should().Contain(Constants.MetadataProperties.CustomerId, buyer.CompanyReference);
+            result.Value.Should().Contain(Constants.MetadataProperties.CustomerId, buyer.Subscriber.EntityId);
             result.Value.Should().ContainKey(Constants.MetadataProperties.NextBillingAt)
                 .WhoseValue.Should().Match(value => value.IsNear(endOfTrial));
             result.Value.Should().NotContainKey(Constants.MetadataProperties.PaymentMethodStatus);
@@ -378,7 +376,7 @@ public class ChargebeeHttpServiceClientSpec
             result.Value.Should().Contain(Constants.MetadataProperties.PlanId, TestPlans[0].PlanId);
             result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionDeleted, "False");
             result.Value.Should().ContainKey(Constants.MetadataProperties.SubscriptionId)
-                .WhoseValue.Should().StartWith(buyer.CompanyReference);
+                .WhoseValue.Should().StartWith(buyer.Subscriber.EntityId);
             result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionStatus,
                 Subscription.StatusEnum.InTrial.ToString());
             result.Value.Should().ContainKey(Constants.MetadataProperties.TrialEnd)
@@ -403,7 +401,7 @@ public class ChargebeeHttpServiceClientSpec
             result.Value.Should().Contain(Constants.MetadataProperties.BillingPeriodValue, "1");
             result.Value.Should().NotContainKey(Constants.MetadataProperties.CanceledAt);
             result.Value.Should().Contain(Constants.MetadataProperties.CurrencyCode, CurrencyCodes.Default.Code);
-            result.Value.Should().Contain(Constants.MetadataProperties.CustomerId, buyer.CompanyReference);
+            result.Value.Should().Contain(Constants.MetadataProperties.CustomerId, buyer.Subscriber.EntityId);
             result.Value.Should().ContainKey(Constants.MetadataProperties.NextBillingAt)
                 .WhoseValue.Should().Match(value => value.IsNear(endOfTrial));
             result.Value.Should().NotContainKey(Constants.MetadataProperties.PaymentMethodStatus);
@@ -411,7 +409,7 @@ public class ChargebeeHttpServiceClientSpec
             result.Value.Should().Contain(Constants.MetadataProperties.PlanId, TestPlans[0].PlanId);
             result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionDeleted, "False");
             result.Value.Should().ContainKey(Constants.MetadataProperties.SubscriptionId)
-                .WhoseValue.Should().StartWith(buyer.CompanyReference);
+                .WhoseValue.Should().StartWith(buyer.Subscriber.EntityId);
             result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionStatus,
                 Subscription.StatusEnum.Future.ToString());
             result.Value.Should().ContainKey(Constants.MetadataProperties.TrialEnd)
@@ -457,7 +455,7 @@ public class ChargebeeHttpServiceClientSpec
             result.Value.Should().Contain(Constants.MetadataProperties.BillingPeriodValue, "1");
             result.Value.Should().NotContainKey(Constants.MetadataProperties.CanceledAt);
             result.Value.Should().Contain(Constants.MetadataProperties.CurrencyCode, CurrencyCodes.Default.Code);
-            result.Value.Should().Contain(Constants.MetadataProperties.CustomerId, buyer.CompanyReference);
+            result.Value.Should().Contain(Constants.MetadataProperties.CustomerId, buyer.Subscriber.EntityId);
             result.Value.Should().ContainKey(Constants.MetadataProperties.NextBillingAt)
                 .WhoseValue.Should().Match(value => value.IsNear(nextBilling));
             result.Value.Should().Contain(Constants.MetadataProperties.PaymentMethodStatus,
@@ -467,7 +465,7 @@ public class ChargebeeHttpServiceClientSpec
             result.Value.Should().Contain(Constants.MetadataProperties.PlanId, "Paid-USD-Monthly");
             result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionDeleted, "False");
             result.Value.Should().ContainKey(Constants.MetadataProperties.SubscriptionId)
-                .WhoseValue.Should().StartWith(buyer.CompanyReference);
+                .WhoseValue.Should().StartWith(buyer.Subscriber.EntityId);
             result.Value.Should().Contain(Constants.MetadataProperties.SubscriptionStatus,
                 Subscription.StatusEnum.Active.ToString());
             result.Value.Should().NotContainKey(Constants.MetadataProperties.TrialEnd);

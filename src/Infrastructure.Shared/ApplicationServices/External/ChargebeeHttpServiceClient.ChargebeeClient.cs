@@ -87,9 +87,10 @@ public interface IChargebeeClient
 
     /// <summary>
     ///     Returns a new <see cref="Subscription" /> for the specified <see cref="Customer" />
+    ///     Note: AutoCollection="on" so that the subscription automatically cancels after any trial period ends (if any).
     /// </summary>
     Task<Result<Subscription, Error>> CreateSubscriptionForCustomerAsync(ICallerContext caller, string customerId,
-        string subscriptionReference, string planId, Optional<long> start, Optional<long> trialEnds,
+        Subscriber subscriber, string planId, Optional<long> start, Optional<long> trialEnds,
         CancellationToken cancellationToken);
 
     /// <summary>
@@ -440,13 +441,16 @@ public sealed class ChargebeeClient : IChargebeeClient
     {
         try
         {
+            var subscriberType = $"{buyer.Subscriber.EntityType}Id";
+            var subscriberId = buyer.Subscriber.EntityId;
+
             var request = Customer.Create()
                 .Id(customerId)
                 .FirstName(buyer.Name.FirstName)
                 .LastName(buyer.Name.LastName)
                 .Email(buyer.EmailAddress)
                 .Phone(buyer.PhoneNumber)
-                .Company(buyer.GetCompanyName(customerId))
+                .Company(buyer.GetSubscriberId(customerId))
                 .BillingAddressFirstName(buyer.Name.FirstName)
                 .BillingAddressLastName(buyer.Name.LastName)
                 .BillingAddressEmail(buyer.EmailAddress)
@@ -459,7 +463,7 @@ public sealed class ChargebeeClient : IChargebeeClient
                 .BillingAddressCountry(CountryCodes.FindOrDefault(buyer.Address.CountryCode).Alpha2)
                 .MetaData(JToken.FromObject(new Dictionary<string, string>
                 {
-                    { ChargebeeHttpServiceClient.OwningEntityMetadataId, customerId },
+                    { subscriberType, subscriberId },
                     { ChargebeeHttpServiceClient.BuyerMetadataId, buyer.Id }
                 }));
 
@@ -639,12 +643,14 @@ public sealed class ChargebeeClient : IChargebeeClient
     }
 
     public async Task<Result<Subscription, Error>> CreateSubscriptionForCustomerAsync(ICallerContext caller,
-        string customerId, string subscriptionReference, string planId, Optional<long> start,
+        string customerId, Subscriber subscriber, string planId, Optional<long> start,
         Optional<long> trialEnds, CancellationToken cancellationToken)
     {
         try
         {
-            var subscriptionId = subscriptionReference.MakeSubscriptionId();
+            var subscriberType = $"{subscriber.EntityType}Id";
+            var subscriberId = subscriber.EntityId;
+            var subscriptionId = customerId.MakeSubscriptionId();
             var request = Subscription.CreateWithItems(customerId)
                 .Id(subscriptionId)
                 .AutoCollection(AutoCollectionEnum.On)
@@ -652,7 +658,7 @@ public sealed class ChargebeeClient : IChargebeeClient
                 .SubscriptionItemQuantity(0, 1)
                 .MetaData(JToken.FromObject(new Dictionary<string, string>
                 {
-                    { ChargebeeHttpServiceClient.OwningEntityMetadataId, subscriptionReference }
+                    { subscriberType, subscriberId }
                 }));
             if (trialEnds.HasValue)
             {
@@ -1285,15 +1291,18 @@ public sealed class ChargebeeClient : IChargebeeClient
     {
         try
         {
+            var subscriberType = $"{buyer.Subscriber.EntityType}Id";
+            var subscriberId = buyer.Subscriber.EntityId;
+            
             var request = Customer.Update(customerId)
                 .FirstName(buyer.Name.FirstName)
                 .LastName(buyer.Name.LastName)
                 .Email(buyer.EmailAddress)
                 .Phone(buyer.PhoneNumber)
-                .Company(buyer.GetCompanyName(customerId))
+                .Company(buyer.GetSubscriberId(customerId))
                 .MetaData(JToken.FromObject(new Dictionary<string, string>
                 {
-                    { ChargebeeHttpServiceClient.OwningEntityMetadataId, customerId },
+                    { subscriberType, subscriberId },
                     { ChargebeeHttpServiceClient.BuyerMetadataId, buyer.Id }
                 }));
 
