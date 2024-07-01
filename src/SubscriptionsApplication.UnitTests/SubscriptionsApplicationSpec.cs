@@ -176,7 +176,8 @@ public class SubscriptionsApplicationSpec
                 It.IsAny<CancellationToken>()), Times.Never);
         _billingProvider.Verify(bp => bp.GatewayService.ChangeSubscriptionPlanAsync(It.IsAny<ICallerContext>(),
             It.Is<ChangePlanOptions>(options =>
-                options.OwningEntityId == "anowningentityid"
+                options.Subscriber.EntityId == "anowningentityid"
+                && options.Subscriber.EntityType == "Organization"
                 && options.PlanId == "aplanid"),
             It.IsAny<BillingProvider>(), It.IsAny<CancellationToken>()));
         _billingProvider.Verify(
@@ -227,7 +228,8 @@ public class SubscriptionsApplicationSpec
                 It.IsAny<CancellationToken>()), Times.Never);
         _billingProvider.Verify(bp => bp.GatewayService.ChangeSubscriptionPlanAsync(It.IsAny<ICallerContext>(),
             It.Is<ChangePlanOptions>(options =>
-                options.OwningEntityId == "anowningentityid"
+                options.Subscriber.EntityId == "anowningentityid"
+                && options.Subscriber.EntityType == "Organization"
                 && options.PlanId == "aplanid"),
             It.IsAny<BillingProvider>(), It.IsAny<CancellationToken>()));
         _billingProvider.Verify(
@@ -300,7 +302,8 @@ public class SubscriptionsApplicationSpec
                     options.TransfereeBuyer.Id == "acallerid"
                     && options.TransfereeBuyer.Name.FirstName == "afirstname"
                     && options.PlanId == "aplanid"
-                    && options.TransfereeBuyer.CompanyReference == "anowningentityid"
+                    && options.TransfereeBuyer.Subscriber.EntityId == "anowningentityid"
+                    && options.TransfereeBuyer.Subscriber.EntityType == "Organization"
                 ),
                 It.IsAny<BillingProvider>(), It.IsAny<CancellationToken>()));
     }
@@ -523,7 +526,8 @@ public class SubscriptionsApplicationSpec
         result.Value.Results[0].Buyer[nameof(SubscriptionBuyer.PhoneNumber)].Should().Be("aphonenumber");
         result.Value.Results[0].Buyer[nameof(SubscriptionBuyer.Address)].Should()
             .Be("{\"CountryCode\":\"acountrycode\"}");
-        result.Value.Results[0].Buyer[nameof(SubscriptionBuyer.CompanyReference)].Should().Be("anowningentityid");
+        result.Value.Results[0].Buyer[nameof(SubscriptionBuyer.Subscriber)].Should()
+            .Be("{\"EntityId\":\"anowningentityid\",\"EntityType\":\"Organization\"}");
         _userProfilesService.Verify(usp =>
             usp.GetProfilePrivateAsync(_caller.Object, "abuyerid", It.IsAny<CancellationToken>()));
     }

@@ -44,7 +44,8 @@ public class MigrationsApiSpec
             result[0].Buyer[nameof(SubscriptionBuyer.Name)].Should()
                 .Be("{\"FirstName\":\"persona\",\"LastName\":\"alastname\"}");
             result[0].Buyer[nameof(SubscriptionBuyer.EmailAddress)].Should().Be(login.Profile!.EmailAddress);
-            result[0].Buyer[nameof(SubscriptionBuyer.CompanyReference)].Should().Be(login.DefaultOrganizationId);
+            result[0].Buyer[nameof(SubscriptionBuyer.Subscriber)].Should()
+                .Be($"{{\"EntityId\":\"{login.DefaultOrganizationId}\",\"EntityType\":\"Organization\"}}");
             result[0].Buyer[nameof(SubscriptionBuyer.Address)].Should().Be(
                 "{\"City\":\"\",\"CountryCode\":\"USA\",\"Line1\":\"\",\"Line2\":\"\",\"Line3\":\"\",\"State\":\"\",\"Zip\":\"\"}");
         }

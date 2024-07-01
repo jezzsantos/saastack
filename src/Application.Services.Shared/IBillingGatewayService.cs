@@ -52,7 +52,7 @@ public interface IBillingGatewayService
 /// </summary>
 public class ChangePlanOptions
 {
-    public required string OwningEntityId { get; set; }
+    public required Subscriber Subscriber { get; set; }
 
     public required string PlanId { get; set; }
 }
@@ -152,7 +152,7 @@ public class SubscriptionBuyer
 {
     public required ProfileAddress Address { get; set; }
 
-    public required string CompanyReference { get; set; }
+    public required Subscriber Subscriber { get; set; }
 
     public required string EmailAddress { get; set; }
 
@@ -161,4 +161,14 @@ public class SubscriptionBuyer
     public required PersonName Name { get; set; }
 
     public string? PhoneNumber { get; set; }
+}
+
+/// <summary>
+///     Defines the subscriber
+/// </summary>
+public class Subscriber
+{
+    public required string EntityId { get; set; }
+
+    public required string EntityType { get; set; }
 }

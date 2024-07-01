@@ -31,7 +31,11 @@ public class InProcessInMemSimpleBillingGatewayServiceSpec
             EmailAddress = "auser@company.com",
             Id = "abuyerid",
             Name = new PersonName { FirstName = "afirstname" },
-            CompanyReference = "anorganizationid",
+            Subscriber = new Subscriber
+            {
+                EntityId = "anentityid",
+                EntityType = "anentitytype"
+            },
             PhoneNumber = "aphonenumber"
         };
 

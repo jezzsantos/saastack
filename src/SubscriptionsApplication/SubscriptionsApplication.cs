@@ -151,7 +151,11 @@ public partial class SubscriptionsApplication : ISubscriptionsApplication
             var options = new ChangePlanOptions
             {
                 PlanId = planId1,
-                OwningEntityId = owningEntityId
+                Subscriber = new Subscriber
+                {
+                    EntityId = owningEntityId,
+                    EntityType = nameof(Organization)
+                }
             };
 
             var planChanged = _billingProvider.GatewayService.ChangeSubscriptionPlanAsync(caller, options,
@@ -466,7 +470,11 @@ public partial class SubscriptionsApplication : ISubscriptionsApplication
             PhoneNumber = profile.PhoneNumber,
             EmailAddress = profile.EmailAddress!,
             Address = profile.Address,
-            CompanyReference = owningEntityId.ToString()
+            Subscriber = new Subscriber
+            {
+                EntityId = owningEntityId.ToString(),
+                EntityType = nameof(Organization)
+            }
         };
 
         return buyer;
