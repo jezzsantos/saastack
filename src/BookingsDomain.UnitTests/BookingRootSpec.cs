@@ -29,6 +29,7 @@ public class BookingRootSpec
     [Fact]
     public void WhenCreate_ThenNotReserved()
     {
+        _booking.OrganizationId.Should().Be("anorganizationid".ToId());
         _booking.CarId.Should().BeNone();
         _booking.BorrowerId.Should().BeNone();
         _booking.Start.Should().BeNone();

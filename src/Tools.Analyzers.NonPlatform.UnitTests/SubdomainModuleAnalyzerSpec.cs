@@ -11,7 +11,7 @@ public class SubdomainModuleAnalyzerSpec
     [UsedImplicitly]
     public class GivenAnySubdomainModule
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenAnyRule
         {
             [Fact]
@@ -36,7 +36,7 @@ public class AClass : ISubdomainModule
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule010
         {
             [Fact]

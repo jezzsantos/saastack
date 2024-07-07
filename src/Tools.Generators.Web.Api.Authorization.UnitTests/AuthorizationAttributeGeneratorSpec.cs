@@ -38,7 +38,7 @@ public class AuthorizationAttributeGeneratorSpec
         return compilation;
     }
 
-    [Trait("Category", "Unit")]
+    [Trait("Category", "Unit.Tooling")]
     public class GivenAuthorizationClasses
     {
         private GeneratorDriver _driver;

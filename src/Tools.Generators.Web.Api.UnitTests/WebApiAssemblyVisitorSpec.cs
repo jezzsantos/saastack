@@ -44,7 +44,7 @@ public class WebApiAssemblyVisitorSpec
         return compilation;
     }
 
-    [Trait("Category", "Unit")]
+    [Trait("Category", "Unit.Tooling")]
     public class GivenAnyClass
     {
         private readonly WebApiAssemblyVisitor _visitor;
@@ -205,7 +205,7 @@ public class WebApiAssemblyVisitorSpec
         }
     }
 
-    [Trait("Category", "Unit")]
+    [Trait("Category", "Unit.Tooling")]
     public class GivenAServiceClass
     {
         private readonly CSharpCompilation _compilation;
@@ -362,7 +362,7 @@ public class WebApiAssemblyVisitorSpec
             _visitor.OperationRegistrations.Should().BeEmpty();
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenAServiceOperation
         {
             [Fact]

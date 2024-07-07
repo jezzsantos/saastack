@@ -39,6 +39,7 @@ public class CarRootSpec
     [Fact]
     public void WhenCreate_ThenUnregistered()
     {
+        _car.OrganizationId.Should().Be("anorganizationid".ToId());
         _car.Status.Should().Be(CarStatus.Unregistered);
     }
 

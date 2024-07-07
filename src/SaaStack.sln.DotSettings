@@ -682,7 +682,7 @@ public sealed class $name$ : SingleValueObjectBase&lt;$name$, $datatype$&gt;
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2194DC7C98AEB441A5CB73D0A1C06C9A/Text/@EntryValue">public async Task&lt;ApiDeleteResult&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
 {$END$$SELECTION$
-    var $resource$ = await _application.$Action$$Resource$Async(_callerFactory.Create(), request.Id, cancellationToken);
+    var $resource$ = await _$resource$sapplication.$Action$$Resource$Async(_callerFactory.Create(), request.Id, cancellationToken);
 
     return () =&gt; $resource$.HandleApplicationResult();
 }</s:String>
@@ -838,9 +838,9 @@ public class $Action$$Resource$RequestValidator : AbstractValidator&lt;$Action$$
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=3CDAB09349AE2E4E872BEA2E20659E7E/Text/@EntryValue">public async Task&lt;ApiPostResult&lt;$Resource$, $Action$$Resource$Response&gt;&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
 {$END$$SELECTION$
-    var $resource$ = await _application.$Action$$Resource$Async(_callerFactory.Create(), request.Id, cancellationToken);
+    var $resource$ = await _$resource$sapplication.$Action$$Resource$Async(_callerFactory.Create(), request.Id, cancellationToken);
 
-    return () =&gt; $resource$.HandleApplicationResult&lt;$Resource$, $Action$$Resource$Response&gt;(x =&gt; new PostResult&lt;$Action$$Resource$Response&gt;(new $Action$$Resource$Response { $Resource$ = x }));
+    return () =&gt; $resource$.HandleApplicationResult&lt;$Resource$, $Action$$Resource$Response&gt;(x =&gt; new PostResult&lt;$Action$$Resource$Response&gt;(new $Action$$Resource$Response { $Resource$ = x }), new $Action$$Resource$Request { Id = c.Id }.ToUrl());
 }</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=518DB9880AD5ED449C104E766AB6FAF0/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=518DB9880AD5ED449C104E766AB6FAF0/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
@@ -901,7 +901,7 @@ public sealed class $class$ : DomainEvent
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=54F143DE866C37488736B6E2A49A08CE/Text/@EntryValue">public async Task&lt;ApiSearchResult&lt;$Resource$, $Action$$Resource$sResponse&gt;&gt; $Action$$Resource$s($Action$$Resource$sRequest request, CancellationToken cancellationToken)
 {$END$$SELECTION$
-    var $resource$s = await _application.$Action$$Resource$sAsync(_callerFactory.Create(), request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
+    var $resource$s = await _$resource$sapplication.$Action$$Resource$sAsync(_callerFactory.Create(), request.ToSearchOptions(), request.ToGetOptions(), cancellationToken);
 
     return () =&gt; $resource$s.HandleApplicationResult(x =&gt; new $Action$$Resource$sResponse { $Resource$s = x.Results, Metadata = x.Metadata });
 }</s:String>
@@ -1139,9 +1139,6 @@ public class $filename$ : ReadModelEntity
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=Action/@KeyIndexDefined">True</s:Boolean>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=Action/Order/@EntryValue">2</s:Int64>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=Filename/@KeyIndexDefined">False</s:Boolean>
-	
-	
-	
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=ns/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=ns/Expression/@EntryValue">fileDefaultNamespace()</s:String>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B0386A533680FE4090B457E8A2CFCD60/Field/=ns/InitialRange/@EntryValue">-1</s:Int64>
@@ -1308,7 +1305,7 @@ public class $Action$$Resource$Response : IWebResponse
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CCFA069D5A4DB543BFF4C38EBC8078C0/Text/@EntryValue">public async Task&lt;ApiGetResult&lt;$Resource$, $Action$$Resource$Response&gt;&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
 {$END$$SELECTION$
-    var $resource$ = await _application.$Action$$Resource$Async(_callerFactory.Create(), request.Id, cancellationToken);
+    var $resource$ = await _$resource$sapplication.$Action$$Resource$Async(_callerFactory.Create(), request.Id, cancellationToken);
 
     return () =&gt; $resource$.HandleApplicationResult&lt;$Resource$, $Action$$Resource$Response&gt;(x =&gt; new $Action$$Resource$Response { $Resource$ = x });
 }</s:String>
@@ -1436,17 +1433,6 @@ public sealed class $name$Root : AggregateRootBase
     public Identifier OrganizationId { get; private set; } = Identifier.Empty();
 }</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DC365433BC93AB4496DE555A7E296182/@KeyIndexDefined">False</s:Boolean>
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Description/@EntryValue">A PUTPATCH API definition</s:String>
@@ -1466,7 +1452,7 @@ public sealed class $name$Root : AggregateRootBase
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F1AE888C0ED9904FA7B3CE76D2DA2551/Text/@EntryValue">public async Task&lt;ApiPutPatchResult&lt;$Resource$, $Action$$Resource$Response&gt;&gt; $Action$$Resource$($Action$$Resource$Request request, CancellationToken cancellationToken)
 {$END$$SELECTION$
-    var $resource$ = await _application.$Action$$Resource$Async(_callerFactory.Create(), request.Id, cancellationToken);
+    var $resource$ = await _$resource$sapplication.$Action$$Resource$Async(_callerFactory.Create(), request.Id, cancellationToken);
 
     return () =&gt; $resource$.HandleApplicationResult&lt;$Resource$, $Action$$Resource$Response&gt;(x =&gt; new $Action$$Resource$Response { $Resource$ = x });
 }</s:String>

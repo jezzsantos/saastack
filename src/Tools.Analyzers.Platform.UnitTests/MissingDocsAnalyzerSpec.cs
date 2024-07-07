@@ -8,7 +8,7 @@ namespace Tools.Analyzers.Platform.UnitTests;
 [UsedImplicitly]
 public class MissingDocsAnalyzerSpec
 {
-    [Trait("Category", "Unit")]
+    [Trait("Category", "Unit.Tooling")]
     public class GivenRule001
     {
         [Fact]
@@ -476,7 +476,7 @@ public partial class AClass
         }
     }
 
-    [Trait("Category", "Unit")]
+    [Trait("Category", "Unit.Tooling")]
     public class GivenRule002
     {
         [Fact]

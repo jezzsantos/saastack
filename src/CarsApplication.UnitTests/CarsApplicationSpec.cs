@@ -35,7 +35,7 @@ public class CarsApplicationSpec
             .Returns(true);
         _repository = new Mock<ICarRepository>();
         _repository.Setup(rep => rep.SaveAsync(It.IsAny<CarRoot>(), It.IsAny<CancellationToken>()))
-            .Returns((CarRoot car, CancellationToken _) => Task.FromResult<Result<CarRoot, Error>>(car));
+            .ReturnsAsync((CarRoot root, CancellationToken _) => root);
         _caller = new Mock<ICallerContext>();
         _caller.Setup(c => c.CallerId).Returns("acallerid");
         _application = new CarsApplication(_recorder.Object, _idFactory.Object,

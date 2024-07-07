@@ -7,6 +7,7 @@ using FluentAssertions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Cars;
 using IntegrationTesting.WebApi.Common;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace CarsInfrastructure.IntegrationTests;
@@ -15,7 +16,7 @@ namespace CarsInfrastructure.IntegrationTests;
 [Collection("API")]
 public class CarsApiSpec : WebApiSpec<Program>
 {
-    public CarsApiSpec(WebApiSetup<Program> setup) : base(setup)
+    public CarsApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
         EmptyAllRepositories();
     }
@@ -175,6 +176,11 @@ public class CarsApiSpec : WebApiSpec<Program>
         unavailabilities[0].CausedByReason.Should().Be(UnavailabilityCausedBy.Maintenance.ToString());
         unavailabilities[0].CausedByReference.Should().BeNull();
 #endif
+    }
+
+    private static void OverrideDependencies(IServiceCollection services)
+    {
+        // do nothing
     }
 
     private async Task<Car> RegisterNewCarAsync(LoginDetails login)

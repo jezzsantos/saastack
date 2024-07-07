@@ -41,7 +41,7 @@ public class MinimalApiMediatRGeneratorSpec
         return compilation;
     }
 
-    [Trait("Category", "Unit")]
+    [Trait("Category", "Unit.Tooling")]
     public class GivenAServiceClass
     {
         private GeneratorDriver _driver;

@@ -7,6 +7,7 @@ using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Bookings;
 using Infrastructure.Web.Api.Operations.Shared.Cars;
 using IntegrationTesting.WebApi.Common;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Task = System.Threading.Tasks.Task;
 
@@ -16,7 +17,7 @@ namespace BookingsInfrastructure.IntegrationTests;
 [Collection("API")]
 public class BookingsApiSpec : WebApiSpec<Program>
 {
-    public BookingsApiSpec(WebApiSetup<Program> setup) : base(setup)
+    public BookingsApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
     {
         EmptyAllRepositories();
     }
@@ -101,6 +102,11 @@ public class BookingsApiSpec : WebApiSpec<Program>
 
         unavailabilities.Count.Should().Be(0);
 #endif
+    }
+
+    private static void OverrideDependencies(IServiceCollection services)
+    {
+        // do nothing
     }
 
     private async Task<Car> RegisterNewCarAsync(LoginDetails login)

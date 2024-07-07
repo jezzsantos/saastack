@@ -50,6 +50,7 @@ public class BookingsApplication : IBookingsApplication
             return released.Error;
         }
 
+        //Note: we don't need to call SaveAsync() here since the snapshot record is gone already
         var deleted = await _repository.DeleteBookingAsync(organizationId.ToId(), booking.Id, cancellationToken);
         if (deleted.IsFailure)
         {

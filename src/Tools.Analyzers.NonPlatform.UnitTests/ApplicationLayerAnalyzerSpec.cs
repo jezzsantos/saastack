@@ -13,7 +13,7 @@ public class ApplicationLayerAnalyzerSpec
     [UsedImplicitly]
     public class GivenAResource
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenAnyResource
         {
             [Fact]
@@ -32,7 +32,7 @@ public class AClass : IIdentifiableResource
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule010
         {
             [Fact]
@@ -52,7 +52,7 @@ internal class AClass : IIdentifiableResource
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule011
         {
             [Fact]
@@ -118,7 +118,7 @@ public class AClass : IIdentifiableResource
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule012
         {
             [Fact]
@@ -140,7 +140,7 @@ public class AClass : IIdentifiableResource
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule013
         {
             [Fact]
@@ -184,7 +184,7 @@ public class AClass : IIdentifiableResource
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule014
         {
             public const string AllTypes =
@@ -720,7 +720,7 @@ namespace AnotherNamespace
     [UsedImplicitly]
     public class GivenAReadModel
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenAnyReadModel
         {
             [Fact]
@@ -742,7 +742,7 @@ public class AClass : ReadModelEntity
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule020
         {
             [Fact]
@@ -765,7 +765,7 @@ internal class AClass : ReadModelEntity
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule021
         {
             [Fact]
@@ -787,7 +787,7 @@ public class AClass : ReadModelEntity
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule022
         {
             [Fact]
@@ -862,7 +862,7 @@ public class AClass : ReadModelEntity
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule023
         {
             [Fact]
@@ -885,7 +885,7 @@ public class AClass : ReadModelEntity
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule024
         {
             [Fact]
@@ -946,7 +946,7 @@ public class AClass : ReadModelEntity
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule025
         {
             private const string AllTypes =

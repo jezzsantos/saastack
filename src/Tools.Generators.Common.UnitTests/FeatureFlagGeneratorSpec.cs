@@ -40,7 +40,7 @@ public class FeatureFlagGeneratorSpec
         return compilation;
     }
 
-    [Trait("Category", "Unit")]
+    [Trait("Category", "Unit.Tooling")]
     public class GivenFeatureFlagsResources
     {
         private GeneratorDriver _driver;

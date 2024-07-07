@@ -9,7 +9,7 @@ namespace Tools.Analyzers.NonPlatform.UnitTests;
 [UsedImplicitly]
 public class DomainDrivenDesignAnalyzerSpec
 {
-    [Trait("Category", "Unit")]
+    [Trait("Category", "Unit.Tooling")]
     public class GivenAnyRule
     {
         [Fact]
@@ -65,7 +65,7 @@ public sealed class AClass
     [UsedImplicitly]
     public class GivenARootAggregate
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule010
         {
             [Fact]
@@ -216,7 +216,7 @@ public sealed class EventOccurred : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule011
         {
             [Fact]
@@ -469,7 +469,7 @@ public sealed class EventOccurred : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule012
         {
             [Fact]
@@ -580,7 +580,7 @@ public sealed class EventOccurred : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule013
         {
             [Fact]
@@ -708,7 +708,7 @@ public sealed class EventOccurred : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule014
         {
             [Fact]
@@ -824,7 +824,7 @@ public sealed class EventOccurred : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule015
         {
             [Fact]
@@ -962,7 +962,7 @@ public sealed class EventOccurred : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule016
         {
             [Fact]
@@ -1106,7 +1106,7 @@ public sealed class EventOccurred : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule017
         {
             [Fact]
@@ -1364,7 +1364,7 @@ public sealed class EventOccurred : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule018
         {
             [Fact]
@@ -1500,7 +1500,7 @@ public sealed class EventOccurred : IDomainEvent
     [UsedImplicitly]
     public class GivenAnEntity
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule020
         {
             [Fact]
@@ -1597,7 +1597,7 @@ public sealed class AClass : EntityBase
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule021
         {
             [Fact]
@@ -1732,7 +1732,7 @@ public sealed class AClass : EntityBase
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule022
         {
             [Fact]
@@ -1802,7 +1802,7 @@ public sealed class AClass : EntityBase
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule023
         {
             [Fact]
@@ -1907,7 +1907,7 @@ public sealed class AClass : EntityBase
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule024
         {
             [Fact]
@@ -2011,7 +2011,7 @@ public sealed class AClass : EntityBase
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule025
         {
             [Fact]

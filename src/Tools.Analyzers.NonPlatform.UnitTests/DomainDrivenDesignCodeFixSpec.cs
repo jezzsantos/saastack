@@ -14,7 +14,7 @@ public class DomainDrivenDesignCodeFixSpec
     [UsedImplicitly]
     public class GivenARootAggregate
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRuleRule010
         {
             [Fact]
@@ -135,7 +135,7 @@ public sealed class Created : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRuleRule014
         {
             [Fact]
@@ -375,7 +375,7 @@ public sealed class EventOccurred : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRuleRule015
         {
             [Fact]
@@ -508,7 +508,7 @@ public sealed class EventOccurred : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRuleRule016
         {
             [Fact]
@@ -647,7 +647,7 @@ public sealed class EventOccurred : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRuleRule018
         {
             [Fact]
@@ -792,7 +792,7 @@ public sealed class EventOccurred : IDomainEvent
     [UsedImplicitly]
     public class GivenAnEntity
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRuleRule020
         {
             [Fact]
@@ -875,7 +875,7 @@ public sealed class AClass : EntityBase
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRuleRule023
         {
             [Fact]
@@ -973,7 +973,7 @@ public sealed class AClass : EntityBase
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRuleRule025
         {
             [Fact]
@@ -1076,7 +1076,7 @@ public sealed class AClass : EntityBase
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRuleRule027
         {
             [Fact]
@@ -1185,7 +1185,7 @@ public sealed class AClass : EntityBase
     [UsedImplicitly]
     public class GivenAValueObject
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRuleRule030
         {
             [Fact]
@@ -1353,7 +1353,7 @@ public sealed class AClass : ValueObjectBase<AClass>
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRuleRule033
         {
             [Fact]
@@ -1503,7 +1503,7 @@ public sealed class AClass : ValueObjectBase<AClass>
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRuleRule035
         {
             [Fact(Skip = "see: https://github.com/dotnet/roslyn/issues/72535")]
@@ -1705,7 +1705,7 @@ public sealed class AClass : ValueObjectBase<AClass>
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRuleRule036
         {
             [Fact]

@@ -33,6 +33,21 @@ In Rider, 'Search Everywhere' for the action `change memory settings`, and set `
 
 Open a terminal and run: `dotnet dev-certs https --trust`
 
+## Install the Project Templates
+
+In Rider, right-click on the solution node in the Explorer, and choose Add -> New Project.
+
+In the bottom left corner, click the link "Manage Templates"
+
+Click "Install Template..." and select the directory: `C:\...\SaaStack\src\Tools.Templates\AnyProject`
+
+Repeat for these directories:
+
+* `C:\...\SaaStack\src\Tools.Templates\HostProject`
+* `C:\...\SaaStack\src\Tools.Templates\InfrastructureProject`
+* `C:\...\SaaStack\src\Tools.Templates\IntegrationTestProject`
+* `C:\...\SaaStack\src\Tools.Templates\UnitTestProject`
+
 ## Optional Local Infrastructure
 
 You only need the tools below installed if you are going to run specific `Integration.Persistence` tests, for the persistence technology adapters you need to use in your codebase.
@@ -130,17 +145,17 @@ When pushed, all branches will be built and tested with GitHub actions
 
 2. Run these tests:
 
-   In Rider, run all C# tests with Category= `Unit`, `Unit.Architecture`, `Integration.API` and`Integration.Website`
+   In Rider, run all C# tests with Category= `Unit`, `Unit.Tooling`, `Unit.Architecture`, `Integration.API` and `Integration.Website`
 
    > Note: Use `Group By > Category` in Rider's unit test explorer to view these three categories easily.
 
    OR, in a terminal:
 
-   - `dotnet test --filter:"Category=Unit|Category=Unit.Architecture" src\SaaStack.sln`
+   - `dotnet test --filter:"Category=Unit|Category=Unit.Tooling|Category=Unit.Architecture" src\SaaStack.sln`
 
    - `dotnet test --filter:"Category=Integration.API|Category=Integration.Website" src\SaaStack.sln`
 
-3. Configure your "Commit " window to select the "Cleanup with 'Full Cleanup' profile".
+3. Configure your "Commit " window to select the "Cleanup with 'SaaStack Full' profile".
 
    ![Automatic Code Cleanup](docs/images/Rider-Commit-Settings.png)
 
@@ -272,7 +287,7 @@ Run all C# tests with Category= `Unit`, `Unit.Architecture`, `Integration.API` a
 
 OR, in a terminal:
 
-- `dotnet test --filter:"Category=Unit|Category=Unit.Architecture" src\SaaStack.sln`
+- `dotnet test --filter:"Category=Unit|Category=Unit.Tooling|Category=Unit.Architecture" src\SaaStack.sln`
 
 - `dotnet test --filter:"Category=Integration.API|Category=Integration.Website" src\SaaStack.sln`
 

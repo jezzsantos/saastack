@@ -11,7 +11,7 @@ public class ApiLayerCodeFixSpec
     [UsedImplicitly]
     public class GivenARequest
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRuleRule039
         {
             [Fact]

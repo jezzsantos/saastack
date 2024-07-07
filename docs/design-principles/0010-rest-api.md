@@ -12,13 +12,13 @@ The primary influence of these design principles has been these:
 
 * [RESTful Best Practices](https://github.com/tfredrich/RestApiTutorial.com/raw/master/media/RESTful%20Best%20Practices-v1_2.pdf)
 
-* [REST API design and escaping CRUD](https://www.thoughtworks.com/insights/blog/rest-api-design-resource-modeling), from Thoughtworks
+* [REST API design and escaping CRUD](https://www.thoughtworks.com/insights/blog/rest-api-design-resource-modeling), from Thoughtworks.com
 
 The goal is to adopt REST principles as far as they make sense, and at the pace we can adopt them.
 
 Level 3 of the [Richardson Maturity Model](http://restcookbook.com/Miscellaneous/richardsonmaturitymodel/) is sufficient for us right now.
 
-> The key point is that, no matter what design decision we make, whether it is right/wrong best practice or just what you like most, the main principle that over-arches all others is to be consistent (right across the codebase), and remain highly maintainable and testable at all times.
+> The key point is that, no matter what design decision we make, whether it is right/wrong best practice or just what you like most, the main principle that over-arches all others is to be consistent (right across the codebase) and remain highly maintainable and testable at all times.
 
 ### REST versus CRUD
 
@@ -30,7 +30,7 @@ Even though most web APIs are defined by the HTTP methods: `POST`, `GET`, `PUT`,
 
 Designing a REST API for web interop is not to be confused with designing a database API with CRUD.
 
-> REST and CRUD are two different design styles for two different parts of the system, that ultimately must mesh together. But keeping them separate is important for usability.
+> REST and CRUD are two different design styles for two different parts of the system that ultimately must mesh together at some layer in the code. But keeping them separate is important for increasing the usability of of your API.
 
 #### A little history about CRUD
 
@@ -44,7 +44,7 @@ Once relational databases (RMDBS) were invented (1970-1990s) and then later obje
 
 > Beyond the 2000s, the tooling has become so good that we actually no longer needed developers to write that kind of code. But today so many still do, just for the fun of it, so it seems.
 >
-> It also seems evident that if a developer has only ever \[professionally\] built software using a relational database, they have no other tools than ORMs to access any data. Today, relational databases are not the only tool to store data, and ORMs not the only tool to access it.
+> It also seems evident that if a developer has only ever \[professionally\] built software using a relational database, they have no other tools than ORMs to access any data. Today, relational databases are not the only tools to store data, and ORMs are not the only tools to access it.
 
 With RMDBS and ORMs being so prevalent, developers building CRUD systems only really then need to focus on two things:
 
@@ -104,16 +104,22 @@ where `{resource}` is the pluralized name of the resource
 
 ### Resource Base URLs
 
-2 base URL's for each resource: one for collections, the other for elements
+2 base URLs for each resource: one for collections, the other for elements
 
 For example:
 
 `/cars`   for several cars (a collection)
 `/cars/{carid}`  for a specific car (an element)
 
-> Resource names are always lowercased, and pluralized
+> Resource names are always lower cased, and pluralized
 
-### Verb Schemes
+Multi-word resources use a hyphen in the name
+
+For example:
+
+`/delivery-vans` for several delivery vans (a collection)
+
+### Method Schemes
 
 There are a number of popular schemes for REST APIs today.
 
@@ -157,7 +163,7 @@ Use `DELETE` to delete a resource, or for any reductive action on the resource (
 
 This is the current scheme in use for this API.
 
-### Verbs
+### Methods
 
 * No methods are permitted in the URL.
 
@@ -642,7 +648,7 @@ These are the common HTTP status codes for errors:
 * `404 - NotFound` (a resource does not exist)
    * The resource does not exist
    * [May decide to throw 404 instead of a 403 if the caller is not allowed access to this resource to obscure the resource rather than admit it exists but the authenticated user does not have access to it]
-* `405 - MethodNotAllowed` (Verb/API cannot be called at this time)
+* `405 - MethodNotAllowed` (Method/API cannot be called at this time)
    * i.e. It is invalid to call it for this resource at this time.
    * i.e. It no longer exists for this resource at this time, or it never existed for this resource (not implemented yet).
 * `409 - Conflict` (conflict with the current state of the target resource)

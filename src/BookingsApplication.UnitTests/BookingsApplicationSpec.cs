@@ -35,7 +35,7 @@ public class BookingsApplicationSpec
             .Returns(true);
         _repository = new Mock<IBookingRepository>();
         _repository.Setup(rep => rep.SaveAsync(It.IsAny<BookingRoot>(), It.IsAny<CancellationToken>()))
-            .Returns((BookingRoot car, CancellationToken _) => Task.FromResult<Result<BookingRoot, Error>>(car));
+            .ReturnsAsync((BookingRoot root, CancellationToken _) => root);
         _caller = new Mock<ICallerContext>();
         _caller.Setup(c => c.CallerId).Returns("acallerid");
         _carsService = new Mock<ICarsService>();

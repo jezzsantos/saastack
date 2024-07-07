@@ -8,7 +8,7 @@ namespace Tools.Analyzers.NonPlatform.UnitTests;
 [UsedImplicitly]
 public class EventingAnalyzerSpec
 {
-    [Trait("Category", "Unit")]
+    [Trait("Category", "Unit.Tooling")]
     public class GivenAnyRule
     {
         [Fact]
@@ -28,7 +28,7 @@ public sealed class AClass : IWebApiService
     [UsedImplicitly]
     public class GivenAnIntegrationEvent
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenAnyIntegrationEvent
         {
             [Fact]
@@ -49,7 +49,7 @@ public sealed class AClass : IIntegrationEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule010
         {
             [Fact]
@@ -71,7 +71,7 @@ internal sealed class AClass : IIntegrationEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule011
         {
             [Fact]
@@ -93,7 +93,7 @@ public class AClass : IIntegrationEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule012
         {
             [Fact]
@@ -168,7 +168,7 @@ public sealed class AClass : IIntegrationEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule013
         {
             [Fact]
@@ -192,7 +192,7 @@ public sealed class AClass : IIntegrationEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule014
         {
             [Fact]
@@ -540,7 +540,7 @@ public sealed class AClass : IIntegrationEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule015
         {
             [Fact]
@@ -585,7 +585,7 @@ public sealed class AClass : IIntegrationEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule016
         {
             public const string AllTypes =

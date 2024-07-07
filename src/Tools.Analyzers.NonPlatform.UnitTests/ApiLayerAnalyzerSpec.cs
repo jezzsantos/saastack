@@ -20,7 +20,7 @@ public class ApiLayerAnalyzerSpec
     [UsedImplicitly]
     public class GivenAWebApiService
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenAnyRule
         {
             [Fact]
@@ -90,7 +90,7 @@ public class AClass : IWebApiService
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule010
         {
             [Fact]
@@ -446,7 +446,7 @@ public class AClass : IWebApiService
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule011And012
         {
             [Fact]
@@ -575,7 +575,7 @@ public class AClass : IWebApiService
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule013AndRule017
         {
             [Fact]
@@ -644,7 +644,7 @@ public class AClass : IWebApiService
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule014
         {
             [Fact]
@@ -749,7 +749,7 @@ public class AClass : IWebApiService
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule015
         {
             [Fact]
@@ -805,7 +805,7 @@ public class AClass : IWebApiService
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule016
         {
             [Fact]
@@ -1547,7 +1547,7 @@ public class AClass : IWebApiService
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule018AndRule019
         {
             [Fact]
@@ -1631,7 +1631,7 @@ public class AClass : IWebApiService
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule020
         {
             [Fact]
