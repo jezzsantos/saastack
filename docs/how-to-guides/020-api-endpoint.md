@@ -787,13 +787,17 @@ public class RegisterCarRequestValidatorSpec
 
 Lastly, we strongly recommend writing at lest one integration test per service operation that you define.
 
-You NEED at least one integration test to cover and verify that all your layers ae wired up correctly, and that they are defined correctly.
+You NEED at least one integration test to cover and verify that all your layers are wired up correctly and that they are working together.
 
-Then we recommend, that you write a handful of integration tests, to make sure that known common use cases you designed for, work as you expected. This is the best way to build confidence that your API works end to end. Without which you are manually testing by hand.
+Then we recommend that you write a handful of integration tests to make sure that the known common use cases you designed for work as you expected.
+
+This is the best approach to build your confidence that your API works end to end.
+
+It is more effort for you, until you hit a production issue, and have to debug something simple that could have easily been avoided with an integration test.
 
 > Once you get used to this process, you will find that you no longer need to run HTTP testing tools like Postman, and can just rely on running integration tests. You will also spend significantly less time running the code locally in the debugger and identifying issues. You will literally save hours of work in your day this way.
 
-The number of additional integration tests, that you will write here will depend on the complexity of each API call.
+The number of additional integration tests that you will write here will depend on the complexity of each API call.
 
 > Note: It is these integration tests that you will start writing more of to cover these cases when you encounter a bug in production. The process goes like this: You learn about the bug, you write a new integration test for the API that is the source of the bug, and you use production data if necessary to reproduce the bug. Then you debug and identify the root cause, and then you replace the production data with regular test data to reproduce the error. Now you are left with an extra integration test to verify that you actually fixed the issue. And it stays there for years.
 
@@ -807,7 +811,13 @@ The last benefit here, is that when you finish the implementation of the Applica
 
 Your integration tests should be written into the `Infrastructure.IntegrationTests` project in your subdomain. For example, the `CarsInfrastructure.IntegrationTests` project for the `CarsApi`.
 
-These tests follow a common pattern also, that runs your entire codebase in a testing host (ASPNET `TestServer`) and gives you access to a typed testing client for calling your API easily.
+Create that project in the `Tests` solution folder, using the `SaaStack Integration Test` project template.
+
+Then rename the included tests class to reflect the name of your API class.
+
+For example, `CarsApiSpec.cs`
+
+These tests follow a common pattern that runs your entire codebase in a testing host (ASPNET `TestServer`) and gives you access to a typed testing client for calling your API very easily.
 
 For example,
 

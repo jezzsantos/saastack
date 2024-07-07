@@ -1211,5 +1211,63 @@ public class AClass : ReadModelEntity
                 await Verify.NoDiagnosticExists<ApplicationLayerAnalyzer>(input);
             }
         }
+
+        [Trait("Category", "Unit.Tooling")]
+        public class GivenRule030
+        {
+            [Fact]
+            public async Task WhenRepositoryInterfaceIsNotDerivedInApplicationNamespace_ThenAlerts()
+            {
+                const string input = @"
+using System;
+namespace AnNamespaceEndingWithApplication;
+public interface IARepository
+{
+}";
+
+                await Verify.DiagnosticExists<ApplicationLayerAnalyzer>(
+                    ApplicationLayerAnalyzer.Rule030, input, 4, 18, "IARepository");
+            }
+
+            [Fact]
+            public async Task WhenRepositoryInterfaceIsNotDerivedNotInApplicationNamespace_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+namespace ANamespace;
+public interface IARepository
+{
+}";
+
+                await Verify.NoDiagnosticExists<ApplicationLayerAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenNonRepositoryInterfaceIsNotDerived_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+namespace AnNamespaceEndingWithApplication;
+public interface IAInterface
+{
+}";
+
+                await Verify.NoDiagnosticExists<ApplicationLayerAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenRepositoryInterfaceIsDerived_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Application.Persistence.Interfaces;
+namespace AnNamespaceEndingWithApplication;
+public interface IARepository : IApplicationRepository
+{
+}";
+
+                await Verify.NoDiagnosticExists<ApplicationLayerAnalyzer>(input);
+            }
+        }
     }
 }

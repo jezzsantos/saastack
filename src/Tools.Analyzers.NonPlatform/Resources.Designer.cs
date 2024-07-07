@@ -583,6 +583,33 @@ namespace Tools.Analyzers.NonPlatform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Repository must be an IApplicationRepository.
+        /// </summary>
+        internal static string SAASAPP030Description {
+            get {
+                return ResourceManager.GetString("SAASAPP030Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Interface &apos;{0}&apos; must derive from &apos;{1}&apos;.
+        /// </summary>
+        internal static string SAASAPP030MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASAPP030MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing base type.
+        /// </summary>
+        internal static string SAASAPP030Title {
+            get {
+                return ResourceManager.GetString("SAASAPP030Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Aggregate roots must have at least one &apos;Create()&apos; class factory method..
         /// </summary>
         internal static string SAASDDD010Description {
@@ -714,6 +741,60 @@ namespace Tools.Analyzers.NonPlatform {
         internal static string SAASDDD035Title {
             get {
                 return ResourceManager.GetString("SAASDDD035Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property could be Optional&lt;T&gt;, rather than handling nulls..
+        /// </summary>
+        internal static string SAASDDD037Description {
+            get {
+                return ResourceManager.GetString("SAASDDD037Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Consider making property &apos;{0}&apos; an Optional&lt;{1}&gt;, rather than a nullable ({1}?), to avoid handling nulls.
+        /// </summary>
+        internal static string SAASDDD037MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASDDD037MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nullable declaration.
+        /// </summary>
+        internal static string SAASDDD037Title {
+            get {
+                return ResourceManager.GetString("SAASDDD037Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All properties must be returned in this collection..
+        /// </summary>
+        internal static string SAASDDD038Description {
+            get {
+                return ResourceManager.GetString("SAASDDD038Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method &apos;{0}&apos; is missing property &apos;{1}&apos; from this collection.
+        /// </summary>
+        internal static string SAASDDD038MessageFormat {
+            get {
+                return ResourceManager.GetString("SAASDDD038MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing property assignment.
+        /// </summary>
+        internal static string SAASDDD038Title {
+            get {
+                return ResourceManager.GetString("SAASDDD038Title", resourceCulture);
             }
         }
         

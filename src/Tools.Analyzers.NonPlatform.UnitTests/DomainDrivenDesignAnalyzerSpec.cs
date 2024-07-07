@@ -2119,7 +2119,7 @@ public sealed class AClass : EntityBase
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule026
         {
             [Fact]
@@ -2265,7 +2265,7 @@ public sealed class AClass : EntityBase
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule027
         {
             [Fact]
@@ -2345,7 +2345,7 @@ public sealed class AClass : EntityBase
     [UsedImplicitly]
     public class GivenAValueObject
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule030
         {
             [Fact]
@@ -2472,7 +2472,7 @@ public sealed class AClass : ValueObjectBase<AClass>
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule031
         {
             [Fact]
@@ -2647,7 +2647,7 @@ public sealed class AClass : ValueObjectBase<AClass>
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule032
         {
             [Fact]
@@ -2737,7 +2737,7 @@ public sealed class AClass : ValueObjectBase<AClass>
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule033
         {
             [Fact]
@@ -2823,7 +2823,7 @@ public sealed class AClass : ValueObjectBase<AClass>
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule034
         {
             [Fact]
@@ -3000,7 +3000,7 @@ public sealed class AClass : ValueObjectBase<AClass>
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule035
         {
             [Fact]
@@ -3301,7 +3301,7 @@ public sealed class AClass : ValueObjectBase<AClass>
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule036
         {
             [Fact]
@@ -3402,12 +3402,600 @@ public sealed class AClass : ValueObjectBase<AClass>
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
             }
         }
+
+        [Trait("Category", "Unit.Tooling")]
+        public class GivenRule037
+        {
+            [Fact]
+            public async Task WhenPropertyIsNullable_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue)
+    {
+        AProperty = avalue;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new object[] { AProperty, AnotherProperty };
+    }
+
+    public static ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) => new AClass(null!);
+    }
+
+    public string AProperty { get; }
+
+    public string? AnotherProperty { get; }
+
+    public Result<AClass, Error> AMethod()
+    {
+        return null!;
+    }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Rule037, input, 37,
+                    20, "AnotherProperty", "String");
+            }
+
+            [Fact]
+            public async Task WhenPropertyIsOptional_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue)
+    {
+        AProperty = avalue;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new object[] { AProperty, AnotherProperty  };
+    }
+
+    public static ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) => new AClass(null!);
+    }
+
+    public string AProperty { get; }
+
+    public Optional<string> AnotherProperty { get; }
+
+    public Result<AClass, Error> AMethod()
+    {
+        return null!;
+    }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+        }
+
+        [Trait("Category", "Unit.Tooling")]
+        public class GivenRule038
+        {
+            [Fact]
+            public async Task WhenSingleValueObject_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : SingleValueObjectBase<AClass, string>
+{
+    public static Result<AClass, Error> Create(string avalue)
+    {
+        return new AClass(avalue);
+    }
+
+    private AClass(string avalue) : base(avalue)
+    {
+        AProperty = avalue;
+    }
+
+    public string Name => Value;
+
+    public string AProperty { get; }
+
+    public static ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, _) =>
+        {
+            var parts = RehydrateToList(property, true);
+            return new AClass(parts[0]!);
+        };
+    }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenGetAtomicValuesWithGetterBody_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue)
+    {
+        AProperty = avalue;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new[] { AProperty };
+    }
+
+    public static ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) => new AClass(null!);
+    }
+
+    public string AProperty { get; }
+
+    public string AnotherProperty 
+    { 
+        get
+        {
+            return ""avalue"";
+        }
+    }
+
+    public Result<AClass, Error> AMethod()
+    {
+        return null!;
+    }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenGetAtomicValuesWithGetterArrow_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue)
+    {
+        AProperty = avalue;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new[] { AProperty };
+    }
+
+    public static ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) => new AClass(null!);
+    }
+
+    public string AProperty { get; }
+
+    public string AnotherProperty => ""avalue"";
+
+    public Result<AClass, Error> AMethod()
+    {
+        return null!;
+    }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenGetAtomicValuesIsMissingProperty_ThenAlerts()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue)
+    {
+        AProperty = avalue;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new[] { AProperty };
+    }
+
+    public static ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) => new AClass(null!);
+    }
+
+    public string AProperty { get; }
+
+    public string AnotherProperty { get; }
+
+    public Result<AClass, Error> AMethod()
+    {
+        return null!;
+    }
+}";
+
+                await Verify.DiagnosticExists<DomainDrivenDesignAnalyzer>(
+                    DomainDrivenDesignAnalyzer.Rule038, input, 25,
+                    45, "GetAtomicValues", "AnotherProperty");
+            }
+
+            [Fact]
+            public async Task WhenGetAtomicValuesHasAllPropertiesWithMemberFunction_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue)
+    {
+        AProperty = avalue;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new[] { AnotherProperty.ToString(), AProperty, AnEnum.ToString() };
+    }
+
+    public static ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) => new AClass(null!);
+    }
+
+    public string AProperty { get; }
+
+    public string AnotherProperty { get; }
+
+    public AnEnum AnEnum { get; }
+
+    public Result<AClass, Error> AMethod()
+    {
+        return null!;
+    }
+}
+public enum AnEnum
+{
+    AValue
+}
+";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenGetAtomicValuesHasAllPropertiesWithExtensionMethod_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue)
+    {
+        AProperty = avalue;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new[] { AnotherProperty.Convert(), AProperty };
+    }
+
+    public static ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) => new AClass(null!);
+    }
+
+    public string AProperty { get; }
+
+    public string AnotherProperty { get; }
+
+    public Result<AClass, Error> AMethod()
+    {
+        return null!;
+    }
+}
+public static class ExtensionMethods
+{
+    public static string Convert(this string value)
+    {
+        return ""avalue"";
+    }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenGetAtomicValuesHasAllPropertiesWithStaticMethod_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue)
+    {
+        AProperty = avalue;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new[] { StaticMethods.Convert(AnotherProperty), AProperty };
+    }
+
+    public static ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) => new AClass(null!);
+    }
+
+    public string AProperty { get; }
+
+    public string AnotherProperty { get; }
+
+    public Result<AClass, Error> AMethod()
+    {
+        return null!;
+    }
+}
+public static class StaticMethods
+{
+    public static string Convert(string value)
+    {
+        return ""avalue"";
+    }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenGetAtomicValuesHasAllPropertiesWithMemberAccess_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue)
+    {
+        AProperty = avalue;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new[] { AnotherProperty.AValue, AProperty };
+    }
+
+    public static ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) => new AClass(null!);
+    }
+
+    public string AProperty { get; }
+
+    public AType AnotherProperty { get; }
+
+    public Result<AClass, Error> AMethod()
+    {
+        return null!;
+    }
+}
+public class AType
+{
+    public string AValue { get;set; }
+}
+";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenGetAtomicValuesHasAllPropertiesAsRaw_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Common;
+using Domain.Common;
+using Domain.Common.Entities;
+using Domain.Common.Identity;
+using Domain.Common.ValueObjects;
+using Domain.Interfaces;
+using Domain.Interfaces.Entities;
+using Domain.Interfaces.Services;
+namespace ANamespace;
+public sealed class AClass : ValueObjectBase<AClass>
+{
+    private AClass(string avalue)
+    {
+        AProperty = avalue;
+    }
+
+    public static AClass Create()
+    {
+        return new AClass(null!);
+    }
+
+    protected override IEnumerable<object?> GetAtomicValues()
+    {
+        return new[] { AProperty, AnotherProperty };
+    }
+
+    public static ValueObjectFactory<AClass> Rehydrate()
+    {
+        return (property, container) => new AClass(null!);
+    }
+
+    public string AProperty { get; }
+
+    public string AnotherProperty { get; }
+
+    public Result<AClass, Error> AMethod()
+    {
+        return null!;
+    }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+        }
     }
 
     [UsedImplicitly]
     public class GivenADomainEvent
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenAnyDomainEvent
         {
             [Fact]
@@ -3437,7 +4025,7 @@ public sealed class AClassed : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule040
         {
             [Fact]
@@ -3468,7 +4056,7 @@ internal sealed class AClassed : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule041
         {
             [Fact]
@@ -3499,7 +4087,7 @@ public class AClassed : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule042
         {
             [Fact]
@@ -3601,7 +4189,7 @@ public sealed class AClassed : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule043
         {
             [Fact]
@@ -3658,7 +4246,7 @@ public sealed class AClassed : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule045
         {
             [Fact]
@@ -3685,7 +4273,7 @@ public sealed class AClassed : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule046
         {
             [Fact]
@@ -3718,7 +4306,7 @@ public sealed class AClassed : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule047
         {
             [Fact]
@@ -4528,7 +5116,7 @@ public enum AnEnum
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule048
         {
             [Fact]
@@ -4593,7 +5181,7 @@ public sealed class AClassed : IDomainEvent
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule049
         {
             public const string AllTypes =
@@ -4839,6 +5427,82 @@ public sealed class AClassed : IDomainEvent
     public required DateTime OccurredUtc { get; set; }
 
     public required Dictionary<string, int> AProperty { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyIsSupportedListOfDomainEventType_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Domain.Interfaces.Entities;
+namespace ANamespace
+{
+    public sealed class AClassed : IDomainEvent
+    {
+        public static AClassed Create()
+        {
+            return new AClassed
+            {
+                AProperty = new List<Domain.Events.Shared.AType>(),
+                RootId = string.Empty,
+                OccurredUtc = DateTime.UtcNow
+            };
+        }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
+
+        public required List<Domain.Events.Shared.AType> AProperty { get; set; }
+    }
+}
+namespace Domain.Events.Shared
+{
+    public class AType
+    {
+    }
+}";
+
+                await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);
+            }
+
+            [Fact]
+            public async Task WhenAnyPropertyIsSupportedDictionaryOfDomainEventType_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using System.Collections.Generic;
+using Domain.Interfaces.Entities;
+namespace ANamespace
+{
+    public sealed class AClassed : IDomainEvent
+    {
+        public static AClassed Create()
+        {
+            return new AClassed
+            {
+                AProperty = new Dictionary<string, Domain.Events.Shared.AType>(),
+                RootId = string.Empty,
+                OccurredUtc = DateTime.UtcNow
+            };
+        }
+
+        public required string RootId { get; set; }
+
+        public required DateTime OccurredUtc { get; set; }
+
+        public required Dictionary<string, Domain.Events.Shared.AType> AProperty { get; set; }
+    }
+}
+namespace Domain.Events.Shared
+{
+    public class AType
+    {
+    }
 }";
 
                 await Verify.NoDiagnosticExists<DomainDrivenDesignAnalyzer>(input);

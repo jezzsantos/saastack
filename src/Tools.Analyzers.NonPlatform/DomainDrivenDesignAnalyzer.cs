@@ -46,6 +46,8 @@ namespace Tools.Analyzers.NonPlatform;
 ///     SAASDDD035: Error: ValueObjects must only have immutable methods (or be overridden by the
 ///     <see cref="SkipImmutabilityCheckAttribute" />)
 ///     SAASDDD036: Warning: ValueObjects should be marked as sealed
+///     SAASDDD037: Info: Properties should be Optional{T} not nullable,
+///     SAASDDD038: Error: Properties are all assigned in ValueObjectBase{T}.GetAtomicValues(),
 ///     DomainEvents:
 ///     SAASDDD040: Error: DomainEvents must be public
 ///     SAASDDD041: Warning: DomainEvents should be sealed
@@ -63,7 +65,12 @@ namespace Tools.Analyzers.NonPlatform;
 public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
 {
     public const string ClassFactoryMethodName = "Create";
-    public const string ConstructorMethodCall = "RaiseCreateEvent"; // AggregateRootBase<T>.RaiseCreateEvent
+    public const string
+        ConstructorMethodCall =
+            "RaiseCreateEvent"; // HACK: cannot use nameof() for AggregateRootBase<T>.RaiseCreateEvent (protected)
+    public const string
+        GetAtomicValuesMethodName =
+            "GetAtomicValues"; // HACK: cannot use nameof() for ValueObjectBase<T>.GetAtomicValues (protected)
     internal static readonly SpecialType[] AllowableDomainEventPrimitives =
     [
         SpecialType.System_Boolean,
@@ -167,6 +174,12 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassShouldBeSealed),
         nameof(Resources.Diagnostic_Description_ClassShouldBeSealed),
         nameof(Resources.Diagnostic_MessageFormat_ClassShouldBeSealed));
+    internal static readonly DiagnosticDescriptor Rule037 = "SAASDDD037".GetDescriptor(DiagnosticSeverity.Info,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD037Title), nameof(Resources.SAASDDD037Description),
+        nameof(Resources.SAASDDD037MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule038 = "SAASDDD038".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.Ddd, nameof(Resources.SAASDDD038Title), nameof(Resources.SAASDDD038Description),
+        nameof(Resources.SAASDDD038MessageFormat));
     internal static readonly DiagnosticDescriptor Rule040 = "SAASDDD040".GetDescriptor(DiagnosticSeverity.Error,
         AnalyzerConstants.Categories.Ddd, nameof(Resources.Diagnostic_Title_ClassMustBePublic),
         nameof(Resources.Diagnostic_Description_ClassMustBePublic),
@@ -205,7 +218,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
         ImmutableArray.Create(
             Rule010, Rule011, Rule012, Rule013, Rule014, Rule015, Rule016, Rule017, Rule018,
             Rule020, Rule021, Rule022, Rule023, Rule024, Rule025, Rule026, Rule027,
-            Rule030, Rule031, Rule032, Rule033, Rule034, Rule035, Rule036,
+            Rule030, Rule031, Rule032, Rule033, Rule034, Rule035, Rule036, Rule037, Rule038,
             Rule040, Rule041, Rule042, Rule043, Rule045, Rule046, Rule047, Rule048, Rule049);
 
     public override void Initialize(AnalysisContext context)
@@ -458,6 +471,97 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
                 {
                     context.ReportDiagnostic(Rule034, property);
                 }
+
+                if (property.IsNullableType(context))
+                {
+                    var returnType = property.GetGetterReturnType(context);
+                    if (returnType.Exists())
+                    {
+                        var propertyType = returnType.Name;
+                        context.ReportDiagnostic(Rule037, property, propertyType);
+                    }
+                }
+            }
+        }
+
+        var getAtomicValuesMethod = classDeclarationSyntax.Members
+            .Where(member => member is MethodDeclarationSyntax)
+            .Cast<MethodDeclarationSyntax>()
+            .Where(method => method.Modifiers.Any(mod => mod.IsKind(SyntaxKind.OverrideKeyword)))
+            .FirstOrDefault(method => method.Identifier.Text == GetAtomicValuesMethodName);
+        if (getAtomicValuesMethod.Exists())
+        {
+            var declaredProperties = classDeclarationSyntax.Members
+                .Where(member => member is PropertyDeclarationSyntax)
+                .Cast<PropertyDeclarationSyntax>()
+                .Where(property => property.HasPublicGetterOnly())
+                .Select(property => property.Identifier)
+                .ToList();
+
+            var body = getAtomicValuesMethod.Body;
+            var initializedProperties = new List<SyntaxToken>();
+            if (body.Exists())
+            {
+                var explicitExpressions = body.Statements
+                    .OfType<ReturnStatementSyntax>()
+                    .Select(rs => rs.Expression)
+                    .OfType<ArrayCreationExpressionSyntax>()
+                    .Select(acs => acs.Initializer)
+                    .OfType<InitializerExpressionSyntax>()
+                    .SelectMany(ies => ies.Expressions)
+                    .ToList();
+                var implicitExpressions = body.Statements
+                    .OfType<ReturnStatementSyntax>()
+                    .Select(rs => rs.Expression)
+                    .OfType<ImplicitArrayCreationExpressionSyntax>()
+                    .Select(acs => acs.Initializer)
+                    .SelectMany(ies => ies.Expressions)
+                    .ToList();
+                var expressions = explicitExpressions
+                    .Concat(implicitExpressions)
+                    .ToList();
+
+                var directAccess = expressions
+                    .OfType<IdentifierNameSyntax>()
+                    .Select(ins => ins.Identifier);
+                var memberAccessedProperties = expressions
+                    .OfType<MemberAccessExpressionSyntax>()
+                    .Select(mae => mae.Expression)
+                    .OfType<IdentifierNameSyntax>()
+                    .Select(ins => ins.Identifier);
+                var memberFunctionProperties = expressions
+                    .OfType<InvocationExpressionSyntax>()
+                    .Select(ies => ies.Expression)
+                    .OfType<MemberAccessExpressionSyntax>()
+                    .Select(mae => mae.Expression)
+                    .OfType<IdentifierNameSyntax>()
+                    .Select(ins => ins.Identifier);
+                var extensionMethodFunctionProperties = expressions
+                    .OfType<PostfixUnaryExpressionSyntax>()
+                    .Select(ies => ies.Operand)
+                    .OfType<InvocationExpressionSyntax>()
+                    .Select(ies => ies.Expression)
+                    .OfType<MemberAccessExpressionSyntax>()
+                    .Select(mae => mae.Expression)
+                    .OfType<IdentifierNameSyntax>()
+                    .Select(ins => ins.Identifier);
+
+                initializedProperties = directAccess
+                    .Concat(memberAccessedProperties)
+                    .Concat(memberFunctionProperties)
+                    .Concat(extensionMethodFunctionProperties)
+                    .ToList();
+            }
+
+            if (initializedProperties.Count < declaredProperties.Count)
+            {
+                foreach (var declaredProperty in declaredProperties)
+                {
+                    if (initializedProperties.NotContains(prop => prop.Text == declaredProperty.Text))
+                    {
+                        context.ReportDiagnostic(Rule038, getAtomicValuesMethod, declaredProperty.Text);
+                    }
+                }
             }
         }
 
@@ -569,6 +673,7 @@ public class DomainDrivenDesignAnalyzer : DiagnosticAnalyzer
 
                 var allowedReturnTypes = context.GetAllowableDomainEventPropertyReturnTypes();
                 if (context.HasIncorrectReturnType(property, allowedReturnTypes)
+                    && !property.IsReturnTypeInNamespace(context, AnalyzerConstants.DomainEventTypesNamespace)
                     && !property.IsEnumOrNullableEnumType(context)
                     && !property.IsDtoOrNullableDto(context, allowedReturnTypes.ToList()))
                 {
@@ -595,7 +700,7 @@ internal static class DomainDrivenDesignExtensions
         var classSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
         if (classSymbol is null)
         {
-            return Array.Empty<INamedTypeSymbol>();
+            return [];
         }
 
         var errorType = context.Compilation.GetTypeByMetadataName(typeof(Error).FullName!)!;
@@ -611,7 +716,7 @@ internal static class DomainDrivenDesignExtensions
         var classSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
         if (classSymbol is null)
         {
-            return Array.Empty<INamedTypeSymbol>();
+            return [];
         }
 
         return [classSymbol];
@@ -654,7 +759,7 @@ internal static class DomainDrivenDesignExtensions
         var classSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
         if (classSymbol is null)
         {
-            return Array.Empty<INamedTypeSymbol>();
+            return [];
         }
 
         var errorType = context.Compilation.GetTypeByMetadataName(typeof(Error).FullName!)!;
@@ -867,7 +972,7 @@ internal static class DomainDrivenDesignExtensions
         var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax);
         if (classSymbol is null)
         {
-            return Array.Empty<INamedTypeSymbol>();
+            return [];
         }
 
         var propertiesType = compilation.GetTypeByMetadataName(typeof(HydrationProperties).FullName!)!;
@@ -921,7 +1026,7 @@ internal static class DomainDrivenDesignExtensions
         var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax);
         if (classSymbol is null)
         {
-            return Array.Empty<INamedTypeSymbol>();
+            return [];
         }
 
         var factoryType = compilation.GetTypeByMetadataName(typeof(AggregateRootFactory<>).FullName!)!;
@@ -936,7 +1041,7 @@ internal static class DomainDrivenDesignExtensions
         var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax);
         if (classSymbol is null)
         {
-            return Array.Empty<INamedTypeSymbol>();
+            return [];
         }
 
         var factoryType = compilation.GetTypeByMetadataName(typeof(EntityFactory<>).FullName!)!;
@@ -951,7 +1056,7 @@ internal static class DomainDrivenDesignExtensions
         var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax);
         if (classSymbol is null)
         {
-            return Array.Empty<INamedTypeSymbol>();
+            return [];
         }
 
         var factoryType = compilation.GetTypeByMetadataName(typeof(ValueObjectFactory<>).FullName!)!;

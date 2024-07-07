@@ -4,6 +4,7 @@ public static class AnalyzerConstants
 {
     public const string RequestTypeSuffix = "Request";
     public const string ResourceTypesNamespace = "Application.Resources.Shared";
+    public const string DomainEventTypesNamespace = "Domain.Events.Shared";
     public const string ResponseTypeSuffix = "Response";
     public const string ServiceOperationTypesNamespace = "Infrastructure.Web.Api.Operations.Shared";
     public static readonly string[] PlatformNamespaces =

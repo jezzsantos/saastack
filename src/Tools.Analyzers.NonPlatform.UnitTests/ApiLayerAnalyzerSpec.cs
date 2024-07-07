@@ -1690,7 +1690,7 @@ public class AClass : IWebApiService
     [UsedImplicitly]
     public class GivenARequest
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule030
         {
             [Fact]
@@ -1714,7 +1714,7 @@ internal class ARequest : IWebRequest
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule031
         {
             [Fact]
@@ -1738,7 +1738,7 @@ public class AClass : IWebRequest
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule032
         {
             [Fact]
@@ -1763,7 +1763,7 @@ public class ARequest : IWebRequest
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule033
         {
             [Fact]
@@ -1786,7 +1786,7 @@ public class ARequest : IWebRequest
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule034
         {
             [Fact]
@@ -1864,7 +1864,7 @@ public class ARequest : IWebRequest
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule035
         {
             [Fact]
@@ -1888,7 +1888,7 @@ public class ARequest : IWebRequest
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule036
         {
             [Fact]
@@ -1932,7 +1932,7 @@ public class ARequest : IWebRequest
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule037
         {
             [Fact]
@@ -2007,7 +2007,7 @@ public enum AnEnum
         [UsedImplicitly]
         public class GivenRule038
         {
-            [Trait("Category", "Unit")]
+            [Trait("Category", "Unit.Tooling")]
             public class GivenAGetRequest
             {
                 [Fact]
@@ -2144,7 +2144,7 @@ public enum AnEnum
                 }
             }
 
-            [Trait("Category", "Unit")]
+            [Trait("Category", "Unit.Tooling")]
             public class GivenAPostRequest
             {
                 [Fact]
@@ -2283,7 +2283,7 @@ public enum AnEnum
     [UsedImplicitly]
     public class GivenAResponse
     {
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule040
         {
             [Fact]
@@ -2303,7 +2303,7 @@ internal class AResponse : IWebResponse
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule041
         {
             [Fact]
@@ -2323,7 +2323,7 @@ public class AClass : IWebResponse
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule042
         {
             [Fact]
@@ -2344,8 +2344,8 @@ public class AResponse : IWebResponse
             }
         }
 
-        [Trait("Category", "Unit")]
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule043
         {
             [Fact]
@@ -2411,7 +2411,7 @@ public class AResponse : IWebResponse
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule044
         {
             [Fact]
@@ -2431,7 +2431,7 @@ public class AResponse : IWebResponse
             }
         }
 
-        [Trait("Category", "Unit")]
+        [Trait("Category", "Unit.Tooling")]
         public class GivenRule045
         {
             [Fact]

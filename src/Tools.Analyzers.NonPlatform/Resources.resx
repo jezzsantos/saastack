@@ -361,6 +361,24 @@
     <data name="SAASDDD035Title" xml:space="preserve">
         <value>Method mutates ValueObject state</value>
     </data>
+    <data name="SAASDDD037Description" xml:space="preserve">
+        <value>Property could be Optional&lt;T&gt;, rather than handling nulls.</value>
+    </data>
+    <data name="SAASDDD037MessageFormat" xml:space="preserve">
+        <value>Consider making property '{0}' an Optional&lt;{1}&gt;, rather than a nullable ({1}?), to avoid handling nulls</value>
+    </data>
+    <data name="SAASDDD037Title" xml:space="preserve">
+        <value>Nullable declaration</value>
+    </data>
+    <data name="SAASDDD038Description" xml:space="preserve">
+        <value>All properties must be returned in this collection.</value>
+    </data>
+    <data name="SAASDDD038MessageFormat" xml:space="preserve">
+        <value>Method '{0}' is missing property '{1}' from this collection</value>
+    </data>
+    <data name="SAASDDD038Title" xml:space="preserve">
+        <value>Missing property assignment</value>
+    </data>
     <data name="SAASDDD043Description" xml:space="preserve">
         <value>Domain Event must be named in the past tense, as they occured in the past.</value>
     </data>
@@ -452,6 +470,15 @@
     </data>
     <data name="SAASAPP025Title" xml:space="preserve">
         <value>Wrong return type</value>
+    </data>
+    <data name="SAASAPP030Description" xml:space="preserve">
+        <value>Repository must be an IApplicationRepository</value>
+    </data>
+    <data name="SAASAPP030MessageFormat" xml:space="preserve">
+        <value>Interface '{0}' must derive from '{1}'</value>
+    </data>
+    <data name="SAASAPP030Title" xml:space="preserve">
+        <value>Missing base type</value>
     </data>
 
     <data name="SAASHST010Description" xml:space="preserve">

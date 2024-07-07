@@ -41,23 +41,31 @@ public static class CollectionExtensions
     /// <summary>
     ///     Joins all values separated by the <see cref="separator" />
     /// </summary>
-    public static string Join<T>(this IEnumerable<T> values, string separator)
+    public static string Join<T>(this IEnumerable<T> collection, string separator)
     {
         var stringBuilder = new StringBuilder();
-        foreach (var value in values)
+        foreach (var item in collection)
         {
             if (stringBuilder.Length > 0)
             {
                 stringBuilder.Append(separator);
             }
 
-            stringBuilder.Append(value);
+            stringBuilder.Append(item);
         }
 
         return stringBuilder.ToString();
     }
 #endif
 #if COMMON_PROJECT || ANALYZERS_NONPLATFORM
+    /// <summary>
+    ///     Whether the specified collection contains an item that matched the specified <see cref="predicate" />
+    /// </summary>
+    public static bool NotContains<T>(this IEnumerable<T> collection, Predicate<T> predicate)
+    {
+        return !collection.Any(item => predicate(item));
+    }
+
     /// <summary>
     ///     Whether the <see cref="target" /> string does not exist in the <see cref="collection" />
     /// </summary>
@@ -95,17 +103,17 @@ public static class CollectionExtensions
     /// <summary>
     ///     Returns a string value for all the items in the list, separated by the specified <see cref="orKeyword" />
     /// </summary>
-    public static string JoinAsOredChoices(this IEnumerable<string> list, string orKeyword = ",")
+    public static string JoinAsOredChoices(this IEnumerable<string> collection, string orKeyword = ",")
     {
-        return list.Join($"{orKeyword} ");
+        return collection.Join($"{orKeyword} ");
     }
 
     /// <summary>
     ///     Returns the last item in the collection
     /// </summary>
-    public static TResult Last<TResult>(this IReadOnlyList<TResult> list)
+    public static TResult Last<TResult>(this IReadOnlyList<TResult> collection)
     {
-        return list[^1];
+        return collection[^1];
     }
 #endif
 }

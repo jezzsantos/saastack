@@ -693,7 +693,7 @@ public class ApiLayerAnalyzer : DiagnosticAnalyzer
 
         public ITypeSymbol RequestType { get; }
 
-        public IEnumerable<string> RouteSegments { get; private set; } = Enumerable.Empty<string>();
+        public IEnumerable<string> RouteSegments { get; private set; } = [];
 
         public void SetRouteSegments(string? routePath)
         {

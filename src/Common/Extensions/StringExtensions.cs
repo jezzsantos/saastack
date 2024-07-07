@@ -15,6 +15,7 @@ using JetBrains.Annotations;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 #endif
 
 #if GENERATORS_COMMON_PROJECT
@@ -39,7 +40,7 @@ public static class StringExtensions
         Camel
     }
 #endif
-#if COMMON_PROJECT
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
     private static readonly TimeSpan DefaultRegexTimeout = TimeSpan.FromSeconds(10);
 #endif
 #if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM
@@ -160,7 +161,7 @@ public static class StringExtensions
         return !string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value);
     }
 #endif
-#if COMMON_PROJECT
+#if COMMON_PROJECT || ANALYZERS_NONPLATFORM
     /// <summary>
     ///     Whether the <see cref="value" /> matches the <see cref="pattern" />
     ///     Avoid potential DOS attacks where the regex may timeout if too complex
@@ -175,7 +176,8 @@ public static class StringExtensions
         var timeoutSafe = timeout ?? DefaultRegexTimeout;
         return Regex.IsMatch(value, pattern, RegexOptions.None, timeoutSafe);
     }
-
+#endif
+#if COMMON_PROJECT
     /// <summary>
     ///     Whether the <see cref="other" /> is not the same as the value (case-insensitive)
     /// </summary>
@@ -439,7 +441,7 @@ public static class StringExtensions
 #endif
 #if COMMON_PROJECT || GENERATORS_COMMON_PROJECT
     /// <summary>
-    ///     Returns the specified <see cref="value" /> in snake_case. i.e. lower case with underscores for upper cased
+    ///     Returns the specified <see cref="value" /> in snake_case. i.e. lower case with underscores for uppercased
     ///     letters
     /// </summary>
     public static string ToSnakeCase(this string value)

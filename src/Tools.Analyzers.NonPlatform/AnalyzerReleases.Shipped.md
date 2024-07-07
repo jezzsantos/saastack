@@ -56,6 +56,8 @@
  SAASDDD035 | SaaStackDDD         | Error    | ValueObjects must only have immutable methods                                                             
  SAASDDD036 | SaaStackDDD         | Warning  | ValueObjects should be marked as sealed.                                                                  
  SAASDDD036 | SaaStackDDD         | Warning  | ValueObjects should be marked as sealed.                                                                  
+ SAASDDD037 | SaaStackDDD         | Info     | Properties should be Optional{T} not nullable                                                             
+ SAASDDD038 | SaaStackDDD         | Error    | Properties are all assigned in ValueObjectBase{T}.GetAtomicValues()                                       
  SAASDDD040 | SaaStackDDD         | Error    | DomainEvents must be public                                                                               
  SAASDDD041 | SaaStackDDD         | Warning  | DomainEvents should be sealed                                                                             
  SAASDDD042 | SaaStackDDD         | Error    | DomainEvents must have a parameterless constructor                                                        
@@ -83,4 +85,5 @@
  SAASAPP023 | SaaStackApplication | Error    | Properties must have public getters and setters                                                           
  SAASAPP024 | SaaStackApplication | Warning  | Properties must be Optional{T} not nullable                                                               
  SAASAPP025 | SaaStackApplication | Error    | Properties must of correct type                                                                           
+ SAASAPP030 | SaaStackApplication | Error    | Repositories should derive from IApplicationRepository                                                    
  SAASHST010 | SaaStackHosts       | Error    | Aggregate root or Entity should register an identity prefix                                               

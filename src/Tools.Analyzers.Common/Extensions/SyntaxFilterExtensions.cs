@@ -7,77 +7,6 @@ namespace Tools.Analyzers.Common.Extensions;
 
 public static class SyntaxFilterExtensions
 {
-    public static AttributeData? GetAttributeOfType<TAttribute>(this MemberDeclarationSyntax memberDeclarationSyntax,
-        SyntaxNodeAnalysisContext context)
-    {
-        return GetAttributeOfType<TAttribute>(memberDeclarationSyntax, context.SemanticModel, context.Compilation);
-    }
-
-    public static AttributeData? GetAttributeOfType<TAttribute>(this MemberDeclarationSyntax memberDeclarationSyntax,
-        SemanticModel semanticModel, Compilation compilation)
-    {
-        var symbol = semanticModel.GetDeclaredSymbol(memberDeclarationSyntax);
-        if (symbol is null)
-        {
-            return null;
-        }
-
-        return symbol.GetAttributeOfType<TAttribute>(compilation);
-    }
-
-    public static ITypeSymbol? GetBaseOfType<TType>(this ParameterSyntax parameterSyntax,
-        SyntaxNodeAnalysisContext context)
-    {
-        var symbol = context.SemanticModel.GetDeclaredSymbol(parameterSyntax);
-        if (symbol is null)
-        {
-            return null;
-        }
-
-        var parameterMetadata = context.Compilation.GetTypeByMetadataName(typeof(TType).FullName!)!;
-        var isOfType = symbol.Type.IsOfType(parameterMetadata);
-        if (isOfType)
-        {
-            return null;
-        }
-
-        var isDerivedFrom = symbol.Type.AllInterfaces.Any(@interface => @interface.IsOfType(parameterMetadata));
-        if (isDerivedFrom)
-        {
-            return symbol.Type;
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    ///     Returns all the content in the XML node, and replaces newlines with spaces
-    /// </summary>
-    public static string? GetContent(this XmlNodeSyntax? nodeSyntax)
-    {
-        if (nodeSyntax is null)
-        {
-            return null;
-        }
-
-        if (nodeSyntax is XmlTextSyntax textSyntax)
-        {
-            var content = string.Join(string.Empty, textSyntax.TextTokens
-                .Where(tok => !string.IsNullOrWhiteSpace(tok.ToFullString()))
-                .Select(tok => tok.ToString()));
-
-            return content.TrimStart(['\t', ' ']).TrimEnd(['\t', ' ']);
-        }
-
-        if (nodeSyntax is XmlElementSyntax xmlElementSyntax)
-        {
-            var content = xmlElementSyntax.Content;
-            return string.Join(" ", content.Select(GetContent));
-        }
-
-        return null;
-    }
-
     public static bool HasParameterlessConstructor(this ClassDeclarationSyntax classDeclarationSyntax)
     {
         var allConstructors = classDeclarationSyntax.Members.Where(member => member is ConstructorDeclarationSyntax)
@@ -98,9 +27,6 @@ public static class SyntaxFilterExtensions
 
     public static bool HasPublicGetterAndSetter(this PropertyDeclarationSyntax propertyDeclarationSyntax)
     {
-        var propertyAccessibility = new Accessibility(propertyDeclarationSyntax.Modifiers);
-        var isPublicProperty = propertyAccessibility.IsPublic;
-
         var accessors = propertyDeclarationSyntax.AccessorList;
         if (accessors is null)
         {
@@ -114,13 +40,48 @@ public static class SyntaxFilterExtensions
             return false;
         }
 
-        if (!setter.Modifiers.Any())
+        if (setter.Body is not null)
         {
-            return isPublicProperty;
+            return false;
         }
 
-        var setterAccessibility = new Accessibility(setter.Modifiers);
-        if (setterAccessibility is { IsPublic: true, IsStatic: false })
+        if (setter.Modifiers.Any())
+        {
+            var setterAccessibility = new Accessibility(setter.Modifiers);
+            if (!setterAccessibility.IsPublic || setterAccessibility.IsStatic)
+            {
+                return false;
+            }
+        }
+
+        var getter = accessors.Accessors.FirstOrDefault(accessor =>
+            accessor.IsKind(SyntaxKind.GetAccessorDeclaration));
+        if (getter is null)
+        {
+            return false;
+        }
+
+        if (getter.Body is not null)
+        {
+            return false;
+        }
+
+        if (getter.Modifiers.Any())
+        {
+            var getterAccessibility = new Accessibility(getter.Modifiers);
+            if (!getterAccessibility.IsPublic || getterAccessibility.IsStatic)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static bool HasPublicGetterOnly(this PropertyDeclarationSyntax propertyDeclarationSyntax)
+    {
+        var accessors = propertyDeclarationSyntax.AccessorList;
+        if (accessors is null)
         {
             return false;
         }
@@ -132,25 +93,41 @@ public static class SyntaxFilterExtensions
             return false;
         }
 
-        if (!getter.Modifiers.Any())
-        {
-            return isPublicProperty;
-        }
-
-        var getterAccessibility = new Accessibility(setter.Modifiers);
-        if (getterAccessibility is { IsPublic: true, IsStatic: false })
+        if (getter.Body is not null)
         {
             return false;
         }
 
-        return true;
+        if (getter.Modifiers.Any())
+        {
+            var getterAccessibility = new Accessibility(getter.Modifiers);
+            if (!getterAccessibility.IsPublic || getterAccessibility.IsStatic)
+            {
+                return false;
+            }
+        }
+
+        var setter = accessors.Accessors.FirstOrDefault(accessor =>
+            accessor.IsKind(SyntaxKind.SetAccessorDeclaration));
+        if (setter is null)
+        {
+            return true;
+        }
+
+        if (setter.Modifiers.Any())
+        {
+            var setterAccessibility = new Accessibility(setter.Modifiers);
+            if (setterAccessibility is { IsPrivate: true, IsStatic: false })
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static bool HasPublicSetter(this PropertyDeclarationSyntax propertyDeclarationSyntax)
     {
-        var propertyAccessibility = new Accessibility(propertyDeclarationSyntax.Modifiers);
-        var isPublicProperty = propertyAccessibility.IsPublic;
-
         var accessors = propertyDeclarationSyntax.AccessorList;
         if (accessors is null)
         {
@@ -164,13 +141,16 @@ public static class SyntaxFilterExtensions
             return false;
         }
 
-        if (!setter.Modifiers.Any())
+        if (setter.Modifiers.Any())
         {
-            return isPublicProperty;
+            var setterAccessibility = new Accessibility(setter.Modifiers);
+            if (!setterAccessibility.IsPublic || setterAccessibility.IsStatic)
+            {
+                return false;
+            }
         }
 
-        var setterAccessibility = new Accessibility(setter.Modifiers);
-        return setterAccessibility is { IsPublic: true, IsStatic: false };
+        return true;
     }
 
     public static bool IsDtoOrNullableDto(this PropertyDeclarationSyntax propertyDeclarationSyntax,
@@ -314,6 +294,7 @@ public static class SyntaxFilterExtensions
         var memberNamespace = symbol.ContainingNamespace.ToDisplayString();
         return includedNamespaces.Any(ns => memberNamespace.StartsWith(ns));
     }
+    
 
     public static bool IsInitialized(this PropertyDeclarationSyntax propertyDeclarationSyntax)
     {
@@ -384,6 +365,20 @@ public static class SyntaxFilterExtensions
         }
 
         return false;
+    }
+
+    public static bool IsNotType<TParent>(this InterfaceDeclarationSyntax interfaceDeclarationSyntax,
+        SyntaxNodeAnalysisContext context)
+    {
+        var symbol = context.SemanticModel.GetDeclaredSymbol(interfaceDeclarationSyntax);
+        if (symbol is null)
+        {
+            return false;
+        }
+
+        var parentMetadata = context.Compilation.GetTypeByMetadataName(typeof(TParent).FullName!)!;
+
+        return !symbol.AllInterfaces.Any(@interface => @interface.IsOfType(parentMetadata));
     }
 
     public static bool IsNotType<TParent>(this ClassDeclarationSyntax classDeclarationSyntax,

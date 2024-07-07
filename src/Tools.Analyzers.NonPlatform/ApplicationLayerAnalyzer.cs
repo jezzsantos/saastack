@@ -30,10 +30,14 @@ namespace Tools.Analyzers.NonPlatform;
 ///     SAASAPP024: Warning: Properties should be Optional{T} not nullable
 ///     SAASAPP025: Error: Properties must have return type of primitives, any ValueObject,
 ///     Optional{TPrimitive}, Optional{TValueObject}, List{TPrimitive}, Dictionary{string,TPrimitive}, or be enums
+///     ApplicationServices
+///     SAASAPP030: Error: Repositories should derive from IApplicationRepository
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class ApplicationLayerAnalyzer : DiagnosticAnalyzer
 {
+    private const string ApplicationRepositoryExpression = @"^I[\w\d]+Repository$";
+    private const string ApplicationRepositoryNamespaceSubstring = "Application";
     internal static readonly SpecialType[] AllowableReadModelPrimitives =
     [
         SpecialType.System_Boolean,
@@ -93,11 +97,16 @@ public class ApplicationLayerAnalyzer : DiagnosticAnalyzer
         AnalyzerConstants.Categories.Application, nameof(Resources.SAASAPP025Title),
         nameof(Resources.SAASAPP025Description),
         nameof(Resources.SAASAPP025MessageFormat));
+    internal static readonly DiagnosticDescriptor Rule030 = "SAASAPP030".GetDescriptor(DiagnosticSeverity.Error,
+        AnalyzerConstants.Categories.Application, nameof(Resources.SAASAPP030Title),
+        nameof(Resources.SAASAPP030Description),
+        nameof(Resources.SAASAPP030MessageFormat));
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(
             Rule010, Rule011, Rule012, Rule013, Rule014,
-            Rule020, Rule021, Rule022, Rule023, Rule024, Rule025);
+            Rule020, Rule021, Rule022, Rule023, Rule024, Rule025,
+            Rule030);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -105,6 +114,7 @@ public class ApplicationLayerAnalyzer : DiagnosticAnalyzer
         context.EnableConcurrentExecution();
         context.RegisterSyntaxNodeAction(AnalyzeResource, SyntaxKind.ClassDeclaration);
         context.RegisterSyntaxNodeAction(AnalyzeReadModel, SyntaxKind.ClassDeclaration);
+        context.RegisterSyntaxNodeAction(AnalyzeRepository, SyntaxKind.InterfaceDeclaration);
     }
 
     private static void AnalyzeResource(SyntaxNodeAnalysisContext context)
@@ -233,6 +243,37 @@ public class ApplicationLayerAnalyzer : DiagnosticAnalyzer
                     context.ReportDiagnostic(Rule025, property, acceptableReturnTypes);
                 }
             }
+        }
+    }
+
+    private static void AnalyzeRepository(SyntaxNodeAnalysisContext context)
+    {
+        var methodSyntax = context.Node;
+        if (methodSyntax is not InterfaceDeclarationSyntax interfaceDeclarationSyntax)
+        {
+            return;
+        }
+
+        if (context.IsExcludedInNamespace(interfaceDeclarationSyntax, AnalyzerConstants.PlatformNamespaces))
+        {
+            return;
+        }
+
+        var name = interfaceDeclarationSyntax.Identifier.Text;
+        if (!name.IsMatchWith(ApplicationRepositoryExpression))
+        {
+            return;
+        }
+
+        var containingNamespace = interfaceDeclarationSyntax.GetContainingNamespace(context);
+        if (!containingNamespace.EndsWith(ApplicationRepositoryNamespaceSubstring))
+        {
+            return;
+        }
+
+        if (interfaceDeclarationSyntax.IsNotType<IApplicationRepository>(context))
+        {
+            context.ReportDiagnostic(Rule030, interfaceDeclarationSyntax);
         }
     }
 }
@@ -417,6 +458,13 @@ internal static class ApplicationLayerExtensions
         var dictionaryType = context.Compilation.GetTypeByMetadataName(typeof(Dictionary<,>).FullName!)!;
         if (returnType.OriginalDefinition.IsOfType(dictionaryType))
         {
+            var stringType = context.Compilation.GetSpecialType(SpecialType.System_String);
+            var firstArgument = ((INamedTypeSymbol)returnType).TypeArguments[0];
+            if (!firstArgument.IsOfType(stringType))
+            {
+                return false;
+            }
+
             returnType = ((INamedTypeSymbol)returnType).TypeArguments[1].WithoutNullable(context);
         }
 

@@ -38,4 +38,38 @@ public class CollectionExtensionsSpec
 
         result.Should().BeTrue();
     }
+
+    [Fact]
+    public void WhenNotContainsAndEmpty_ThenReturnsTrue()
+    {
+        var result = new List<string>().NotContains(item => item == "avalue");
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenNotContainsAndNotMatches_ThenReturnsTrue()
+    {
+        var result = new List<string>
+        {
+            "avalue1",
+            "avalue2",
+            "avalue3"
+        }.NotContains(item => item == "avalue9");
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenNotContainsAndMatches_ThenReturnsFalse()
+    {
+        var result = new List<string>
+        {
+            "avalue1",
+            "avalue2",
+            "avalue3"
+        }.NotContains(item => item == "avalue2");
+
+        result.Should().BeFalse();
+    }
 }

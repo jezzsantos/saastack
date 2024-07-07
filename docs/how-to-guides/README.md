@@ -4,11 +4,11 @@
 * [Add a new API](020-api-endpoint.md)
 * [Define your application](030-application-layer.md)
 * [Define your domain](040-domain-layer.md)
-* (coming soon) Create a new application repository
-* (coming soon) Define a use case in a Root Aggregate
-* (coming soon) Create a child Entity of a Root Aggregate
-* (coming soon) Create a ValueObject
-* (coming soon) Make a cross-domain call
+* (coming soon) [Create a new application Repository](110-application-repository.md)
+* (coming soon) [Define a use case in an Aggregate Root](120-aggregates.md)
+* (coming soon) [Create a child Entity of an Aggregate Root](130-child-entities.md)
+* (coming soon) [Create a ValueObject](140-valueobjects.md)
+* (coming soon) [Make a cross-domain call](150-application-services.md)
 * [Handle Domain Events](090-handle-domain-events.md) raised by other subdomains
 * [Build an adapter](100-build-adapter-third-party.md) to implement an integration to a 3rd party service (over HTTP)
 * (coming soon) Build a new technology adapter (i.e. database persistence)
