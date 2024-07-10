@@ -47,7 +47,7 @@ public class PasswordCredentialRootSpec
             .Returns(5);
         _emailAddressService = new Mock<IEmailAddressService>();
         _emailAddressService.Setup(eas => eas.EnsureUniqueAsync(It.IsAny<EmailAddress>(), It.IsAny<Identifier>()))
-            .Returns(Task.FromResult(true));
+            .ReturnsAsync(true);
 
         _credential = PasswordCredentialRoot.Create(recorder.Object, idFactory.Object,
             settings.Object, _emailAddressService.Object, _tokensService.Object, _passwordHasherService.Object,
@@ -409,7 +409,7 @@ public class PasswordCredentialRootSpec
         _credential.SetRegistrationDetails(EmailAddress.Create("auser@company.com").Value,
             PersonDisplayName.Create("adisplayname").Value);
         _emailAddressService.Setup(eas => eas.EnsureUniqueAsync(It.IsAny<EmailAddress>(), It.IsAny<Identifier>()))
-            .Returns(Task.FromResult(false));
+            .ReturnsAsync(false);
 
         var result = _credential.EnsureInvariants();
 

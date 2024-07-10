@@ -47,7 +47,7 @@ public class AuthenticationApplicationSpec
         var refreshTokenExpiresOn = DateTime.UtcNow.AddMinutes(1);
         _serviceClient.Setup(sc => sc.PostAsync(It.IsAny<ICallerContext>(), It.IsAny<AuthenticatePasswordRequest>(),
                 null, It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<AuthenticateResponse, ResponseProblem>>(new AuthenticateResponse
+            .ReturnsAsync(new AuthenticateResponse
             {
                 Tokens = new AuthenticateTokens
                 {
@@ -63,7 +63,7 @@ public class AuthenticationApplicationSpec
                         ExpiresOn = refreshTokenExpiresOn
                     }
                 }
-            }));
+            });
 
         var result = await _application.AuthenticateAsync(_caller.Object, AuthenticationConstants.Providers.Credentials,
             null, "ausername", "apassword", CancellationToken.None);
@@ -88,7 +88,7 @@ public class AuthenticationApplicationSpec
         var refreshTokenExpiresOn = DateTime.UtcNow.AddMinutes(1);
         _serviceClient.Setup(sc => sc.PostAsync(It.IsAny<ICallerContext>(), It.IsAny<AuthenticateSingleSignOnRequest>(),
                 null, It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<AuthenticateResponse, ResponseProblem>>(new AuthenticateResponse
+            .ReturnsAsync(new AuthenticateResponse
             {
                 Tokens = new AuthenticateTokens
                 {
@@ -104,7 +104,7 @@ public class AuthenticationApplicationSpec
                         ExpiresOn = refreshTokenExpiresOn
                     }
                 }
-            }));
+            });
 
         var result = await _application.AuthenticateAsync(_caller.Object, "aprovider", "anauthcode", null, null,
             CancellationToken.None);
@@ -141,7 +141,7 @@ public class AuthenticationApplicationSpec
         var refreshTokenExpiresOn = DateTime.UtcNow.AddMinutes(1);
         _serviceClient.Setup(sc => sc.PostAsync(It.IsAny<ICallerContext>(), It.IsAny<RefreshTokenRequest>(),
                 null, It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<RefreshTokenResponse, ResponseProblem>>(new RefreshTokenResponse
+            .ReturnsAsync(new RefreshTokenResponse
             {
                 Tokens = new AuthenticateTokens
                 {
@@ -157,7 +157,7 @@ public class AuthenticationApplicationSpec
                         ExpiresOn = refreshTokenExpiresOn
                     }
                 }
-            }));
+            });
 
         var result = await _application.RefreshTokenAsync(_caller.Object, "arefreshtoken", CancellationToken.None);
 

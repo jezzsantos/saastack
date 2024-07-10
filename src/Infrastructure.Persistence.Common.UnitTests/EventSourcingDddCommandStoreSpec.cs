@@ -52,8 +52,7 @@ public class EventSourcingDddCommandStoreSpec
         var aggregate = new TestEventingAggregateRoot("anid".ToId());
         _eventStore.Setup(store =>
                 store.GetEventStreamAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<IReadOnlyList<EventSourcedChangeEvent>, Error>>(
-                new List<EventSourcedChangeEvent>()));
+            .ReturnsAsync(new List<EventSourcedChangeEvent>());
         _domainFactory.Setup(df =>
                 df.RehydrateAggregateRoot(It.IsAny<Type>(), It.IsAny<HydrationProperties>()))
             .Returns(aggregate);
@@ -80,7 +79,7 @@ public class EventSourcingDddCommandStoreSpec
         };
         _eventStore.Setup(store =>
                 store.GetEventStreamAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<IReadOnlyList<EventSourcedChangeEvent>, Error>>(events));
+            .ReturnsAsync(events);
         _domainFactory.Setup(df =>
                 df.RehydrateAggregateRoot(It.IsAny<Type>(), It.IsAny<HydrationProperties>()))
             .Returns(aggregate);
@@ -115,7 +114,7 @@ public class EventSourcingDddCommandStoreSpec
         };
         _eventStore.Setup(store =>
                 store.GetEventStreamAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<IReadOnlyList<EventSourcedChangeEvent>, Error>>(events));
+            .ReturnsAsync(events);
 
         var result = await _store.LoadAsync("anid".ToId(), CancellationToken.None);
 
@@ -161,7 +160,7 @@ public class EventSourcingDddCommandStoreSpec
         };
         _eventStore.Setup(store => store.AddEventsAsync(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<List<EventSourcedChangeEvent>>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<string, Error>>("astreamname"));
+            .ReturnsAsync("astreamname");
 
         await _store.SaveAsync(aggregate, CancellationToken.None);
 

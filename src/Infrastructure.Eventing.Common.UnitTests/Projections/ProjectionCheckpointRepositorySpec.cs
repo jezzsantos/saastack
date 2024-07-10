@@ -32,7 +32,7 @@ public class ProjectionCheckpointRepositorySpec
         _store = new Mock<IDataStore>();
         _store.Setup(repo => repo.QueryAsync(It.IsAny<string>(), It.IsAny<QueryClause<Checkpoint>>(),
                 It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<List<QueryEntity>, Error>>(new List<QueryEntity>()));
+            .ReturnsAsync(new List<QueryEntity>());
         _repository = new ProjectionCheckpointRepository(recorder.Object, _idFactory.Object,
             domainFactory.Object, _store.Object);
     }
@@ -50,10 +50,10 @@ public class ProjectionCheckpointRepositorySpec
     {
         _store.Setup(repo => repo.QueryAsync(It.IsAny<string>(), It.IsAny<QueryClause<Checkpoint>>(),
                 It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<List<QueryEntity>, Error>>(new List<QueryEntity>
+            .ReturnsAsync(new List<QueryEntity>
             {
                 QueryEntity.FromType(new Checkpoint { Position = 10 })
-            }));
+            });
 
         var result = await _repository.LoadCheckpointAsync("astreamname", CancellationToken.None);
 
@@ -82,10 +82,10 @@ public class ProjectionCheckpointRepositorySpec
         var existing = new Checkpoint { Id = "anid", Position = 1 };
         _store.Setup(repo => repo.QueryAsync(It.IsAny<string>(), It.IsAny<QueryClause<Checkpoint>>(),
                 It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<List<QueryEntity>, Error>>(new List<QueryEntity>
+            .ReturnsAsync(new List<QueryEntity>
             {
                 QueryEntity.FromType(existing)
-            }));
+            });
 
         await _repository.SaveCheckpointAsync("astreamname", 10, CancellationToken.None);
 

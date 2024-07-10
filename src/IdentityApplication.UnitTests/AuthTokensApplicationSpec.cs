@@ -55,10 +55,10 @@ public class AuthTokensApplicationSpec
         };
         var expiresOn = DateTime.UtcNow.AddMinutes(1);
         _jwtTokensService.Setup(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()))
-            .Returns(Task.FromResult<Result<AccessTokens, Error>>(
-                new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn)));
+            .ReturnsAsync(
+                new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn));
         _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<AuthTokensRoot>, Error>>(Optional<AuthTokensRoot>.None));
+            .ReturnsAsync(Optional<AuthTokensRoot>.None);
 
         var result = await _application.IssueTokensAsync(_caller.Object, user, CancellationToken.None);
 
@@ -85,10 +85,10 @@ public class AuthTokensApplicationSpec
         var authTokens = AuthTokensRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId()).Value;
         var expiresOn = DateTime.UtcNow.AddMinutes(1);
         _jwtTokensService.Setup(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()))
-            .Returns(Task.FromResult<Result<AccessTokens, Error>>(
-                new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn)));
+            .ReturnsAsync(
+                new AccessTokens("anaccesstoken", expiresOn, "arefreshtoken", expiresOn));
         _repository.Setup(rep => rep.FindByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<AuthTokensRoot>, Error>>(authTokens.ToOptional()));
+            .ReturnsAsync(authTokens.ToOptional());
 
         var result = await _application.IssueTokensAsync(_caller.Object, user, CancellationToken.None);
 
@@ -109,7 +109,7 @@ public class AuthTokensApplicationSpec
     public async Task WhenRefreshTokenAsyncAndTokensNotExist_ThenReturnsError()
     {
         _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<AuthTokensRoot>, Error>>(Optional<AuthTokensRoot>.None));
+            .ReturnsAsync(Optional<AuthTokensRoot>.None);
 
         var result = await _application.RefreshTokenAsync(_caller.Object, "arefreshtoken", CancellationToken.None);
 
@@ -131,14 +131,14 @@ public class AuthTokensApplicationSpec
         var authTokens = AuthTokensRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId()).Value;
         authTokens.SetTokens("anaccesstoken1", "arefreshtoken1", expiresOn1, expiresOn1);
         _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<AuthTokensRoot>, Error>>(authTokens.ToOptional()));
+            .ReturnsAsync(authTokens.ToOptional());
         _endUsersService.Setup(eus =>
                 eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUserWithMemberships, Error>>(user));
+            .ReturnsAsync(user);
         _jwtTokensService.Setup(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()))
-            .Returns(Task.FromResult<Result<AccessTokens, Error>>(
-                new AccessTokens("anaccesstoken2", expiresOn2, "arefreshtoken2", expiresOn2)));
+            .ReturnsAsync(
+                new AccessTokens("anaccesstoken2", expiresOn2, "arefreshtoken2", expiresOn2));
 
         var result = await _application.RefreshTokenAsync(_caller.Object, "arefreshtoken1", CancellationToken.None);
 
@@ -160,7 +160,7 @@ public class AuthTokensApplicationSpec
     public async Task WhenRevokeTokenAsyncAndTokensNotExist_ThenReturnsError()
     {
         _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<AuthTokensRoot>, Error>>(Optional<AuthTokensRoot>.None));
+            .ReturnsAsync(Optional<AuthTokensRoot>.None);
 
         var result =
             await _application.RevokeRefreshTokenAsync(_caller.Object, "arefreshtoken", CancellationToken.None);
@@ -177,7 +177,7 @@ public class AuthTokensApplicationSpec
         var authTokens = AuthTokensRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId()).Value;
         authTokens.SetTokens("anaccesstoken", "arefreshtoken", expiresOn, expiresOn);
         _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<AuthTokensRoot>, Error>>(authTokens.ToOptional()));
+            .ReturnsAsync(authTokens.ToOptional());
 
         await _application.RevokeRefreshTokenAsync(_caller.Object, "arefreshtoken", CancellationToken.None);
 

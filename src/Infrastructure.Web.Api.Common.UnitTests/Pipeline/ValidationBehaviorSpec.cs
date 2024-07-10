@@ -38,7 +38,7 @@ public class ValidationBehaviorSpec
         var request = new TestRequest();
         var wasNextCalled = false;
         _validator.Setup(val => val.ValidateAsync(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(new ValidationResult()));
+            .ReturnsAsync(new ValidationResult());
 
         var result = await _behavior.Handle(request, () =>
         {
@@ -58,7 +58,7 @@ public class ValidationBehaviorSpec
         var wasNextCalled = false;
         var errors = new ValidationResult(new List<ValidationFailure> { new("aproperty", "anerror") });
         _validator.Setup(val => val.ValidateAsync(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(errors));
+            .ReturnsAsync(errors);
 
         var result = await _behavior.Handle(request, () =>
         {

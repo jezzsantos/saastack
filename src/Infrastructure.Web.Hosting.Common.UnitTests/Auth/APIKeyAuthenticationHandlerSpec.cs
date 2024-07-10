@@ -87,8 +87,7 @@ public class APIKeyAuthenticationHandlerSpec
         _identityService.Setup(ids =>
                 ids.FindMembershipsForAPIKeyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<EndUserWithMemberships>, Error>>(Optional<EndUserWithMemberships>
-                .None));
+            .ReturnsAsync(Optional<EndUserWithMemberships>.None);
         _httpContext.Request.QueryString = QueryString.Create(HttpConstants.QueryParams.APIKey, "anapikey");
         await _handler.InitializeAsync(new AuthenticationScheme(APIKeyAuthenticationHandler.AuthenticationScheme, null,
             typeof(APIKeyAuthenticationHandler)), _httpContext);
@@ -115,7 +114,7 @@ public class APIKeyAuthenticationHandlerSpec
         _identityService.Setup(ids =>
                 ids.FindMembershipsForAPIKeyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<EndUserWithMemberships>, Error>>(user.ToOptional()));
+            .ReturnsAsync(user.ToOptional());
         _httpContext.Request.QueryString = QueryString.Create(HttpConstants.QueryParams.APIKey, "anapikey");
         await _handler.InitializeAsync(new AuthenticationScheme(APIKeyAuthenticationHandler.AuthenticationScheme, null,
             typeof(APIKeyAuthenticationHandler)), _httpContext);
@@ -142,7 +141,7 @@ public class APIKeyAuthenticationHandlerSpec
         _identityService.Setup(ids =>
                 ids.FindMembershipsForAPIKeyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<EndUserWithMemberships>, Error>>(user.ToOptional()));
+            .ReturnsAsync(user.ToOptional());
         _httpContext.Request.Headers[HttpConstants.Headers.Authorization] =
             $"Basic {Convert.ToBase64String("anapikey:"u8.ToArray())}";
         await _handler.InitializeAsync(new AuthenticationScheme(APIKeyAuthenticationHandler.AuthenticationScheme, null,

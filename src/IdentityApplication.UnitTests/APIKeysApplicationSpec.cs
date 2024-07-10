@@ -79,7 +79,7 @@ public class APIKeysApplicationSpec
         _tokensService.Setup(ts => ts.ParseApiKey(It.IsAny<string>()))
             .Returns(Optional<APIKeyToken>.None);
         _repository.Setup(rep => rep.FindByAPIKeyTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<APIKeyRoot>, Error>>(Optional<APIKeyRoot>.None));
+            .ReturnsAsync(Optional<APIKeyRoot>.None);
 
         var result =
             await _application.FindMembershipsForAPIKeyAsync(_caller.Object, "anapikey", CancellationToken.None);
@@ -91,7 +91,7 @@ public class APIKeysApplicationSpec
     public async Task WhenFindUserForAPIKeyAsyncAndApiKeyNotExist_ThenReturnsNone()
     {
         _repository.Setup(rep => rep.FindByAPIKeyTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<APIKeyRoot>, Error>>(Optional<APIKeyRoot>.None));
+            .ReturnsAsync(Optional<APIKeyRoot>.None);
 
         var result =
             await _application.FindMembershipsForAPIKeyAsync(_caller.Object, "anapikey", CancellationToken.None);
@@ -104,11 +104,11 @@ public class APIKeysApplicationSpec
     {
         var apiKey = CreateApiKey();
         _repository.Setup(rep => rep.FindByAPIKeyTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<APIKeyRoot>, Error>>(apiKey.ToOptional()));
+            .ReturnsAsync(apiKey.ToOptional());
         _endUsersService.Setup(eus =>
                 eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUserWithMemberships, Error>>(Error.EntityNotFound()));
+            .ReturnsAsync(Error.EntityNotFound());
 
         var result =
             await _application.FindMembershipsForAPIKeyAsync(_caller.Object, "anapikey", CancellationToken.None);
@@ -123,7 +123,7 @@ public class APIKeysApplicationSpec
     {
         var apiKey = CreateApiKey();
         _repository.Setup(rep => rep.FindByAPIKeyTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<APIKeyRoot>, Error>>(apiKey.ToOptional()));
+            .ReturnsAsync(apiKey.ToOptional());
         var user = new EndUserWithMemberships
         {
             Id = "auserid"
@@ -131,7 +131,7 @@ public class APIKeysApplicationSpec
         _endUsersService.Setup(eus =>
                 eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUserWithMemberships, Error>>(user));
+            .ReturnsAsync(user);
 
         var result =
             await _application.FindMembershipsForAPIKeyAsync(_caller.Object, "anapikey", CancellationToken.None);

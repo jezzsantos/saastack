@@ -34,7 +34,7 @@ public class InProcessEventNotifyingStoreNotificationRelaySpec
         var store = new Mock<IEventStore>();
         store.Setup(s => s.AddEventsAsync(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<List<EventSourcedChangeEvent>>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<string, Error>>("astreamname"));
+            .ReturnsAsync("astreamname");
         _eventSourcingStore =
             new EventSourcingDddCommandStore<TestEventingAggregateRoot>(recorder.Object, domainFactory.Object,
                 migrator.Object, store.Object);

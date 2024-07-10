@@ -55,7 +55,7 @@ public class MessageQueueStoreSpec
                 repo.PopSingleAsync("aqueuename", It.IsAny<Func<string, CancellationToken, Task<Result<Error>>>>(),
                     It.IsAny<CancellationToken>()))
             .Callback((string _, Func<string, CancellationToken, Task<Result<Error>>> _, CancellationToken _) => { })
-            .Returns(Task.FromResult<Result<bool, Error>>(false));
+            .ReturnsAsync(false);
 
         var wasCalled = false;
         var result = await _store.PopSingleAsync((_, _) =>
@@ -82,7 +82,7 @@ public class MessageQueueStoreSpec
             {
                 action(message.ToJson()!, CancellationToken.None);
             })
-            .Returns(Task.FromResult<Result<bool, Error>>(true));
+            .ReturnsAsync(true);
 
         var wasCalled = false;
         IQueuedMessage? calledMessage = null;

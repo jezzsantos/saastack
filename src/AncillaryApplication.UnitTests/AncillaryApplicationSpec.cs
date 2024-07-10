@@ -257,11 +257,11 @@ public class AncillaryApplicationSpec
         root.SucceededDelivery("atransactionid");
         _emailDeliveryRepository.Setup(edr =>
                 edr.FindDeliveryByMessageIdAsync(It.IsAny<QueuedMessageId>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<EmailDeliveryRoot>, Error>>(root.ToOptional()));
+            .ReturnsAsync(root.ToOptional());
         _emailDeliveryService.Setup(eds => eds.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EmailDeliveryReceipt, Error>>(new EmailDeliveryReceipt()));
+            .ReturnsAsync(new EmailDeliveryReceipt());
 
         var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
 
@@ -296,7 +296,7 @@ public class AncillaryApplicationSpec
         _emailDeliveryService.Setup(eds => eds.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EmailDeliveryReceipt, Error>>(Error.Unexpected()));
+            .ReturnsAsync(Error.Unexpected());
 
         var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
 
@@ -335,7 +335,7 @@ public class AncillaryApplicationSpec
         _emailDeliveryService.Setup(eds => eds.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EmailDeliveryReceipt, Error>>(new EmailDeliveryReceipt()));
+            .ReturnsAsync(new EmailDeliveryReceipt());
 
         var result = await _application.DeliverEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
 
@@ -437,7 +437,7 @@ public class AncillaryApplicationSpec
         _emailDeliveryRepository.Setup(edr =>
                 edr.SearchAllDeliveriesAsync(It.IsAny<DateTime>(), It.IsAny<SearchOptions>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<List<EmailDelivery>, Error>>(new List<EmailDelivery> { delivery }));
+            .ReturnsAsync(new List<EmailDelivery> { delivery });
 
         var result = await _application.SearchAllEmailDeliveriesAsync(_caller.Object, null, new SearchOptions(),
             new GetOptions(), CancellationToken.None);
@@ -464,7 +464,7 @@ public class AncillaryApplicationSpec
         _usageMessageQueue.Setup(umr =>
                 umr.PopSingleAsync(It.IsAny<Func<UsageMessage, CancellationToken, Task<Result<Error>>>>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<bool, Error>>(false));
+            .ReturnsAsync(false);
 
         var result = await _application.DrainAllUsagesAsync(_caller.Object, CancellationToken.None);
 
@@ -535,7 +535,7 @@ public class AncillaryApplicationSpec
         _auditMessageRepository.Setup(umr =>
                 umr.PopSingleAsync(It.IsAny<Func<AuditMessage, CancellationToken, Task<Result<Error>>>>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<bool, Error>>(false));
+            .ReturnsAsync(false);
 
         var result = await _application.DrainAllAuditsAsync(_caller.Object, CancellationToken.None);
 
@@ -603,7 +603,7 @@ public class AncillaryApplicationSpec
         _emailMessageQueue.Setup(umr =>
                 umr.PopSingleAsync(It.IsAny<Func<EmailMessage, CancellationToken, Task<Result<Error>>>>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<bool, Error>>(false));
+            .ReturnsAsync(false);
 
         var result = await _application.DrainAllEmailsAsync(_caller.Object, CancellationToken.None);
 
@@ -697,7 +697,7 @@ public class AncillaryApplicationSpec
         _provisioningMessageQueue.Setup(umr =>
                 umr.PopSingleAsync(It.IsAny<Func<ProvisioningMessage, CancellationToken, Task<Result<Error>>>>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<bool, Error>>(false));
+            .ReturnsAsync(false);
 
         var result = await _application.DrainAllProvisioningsAsync(_caller.Object, CancellationToken.None);
 

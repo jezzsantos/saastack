@@ -63,7 +63,7 @@ public class BlobStoreSpec
         var stream = new MemoryStream();
         _blobStore.Setup(blo => blo.DownloadAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Stream>(),
                 It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<Blob>, Error>>(Optional<Blob>.None));
+            .ReturnsAsync(Optional<Blob>.None);
 
         var result = await _store.GetAsync("ablobname", stream, CancellationToken.None);
 
@@ -77,8 +77,7 @@ public class BlobStoreSpec
         var stream = new MemoryStream();
         _blobStore.Setup(blo => blo.DownloadAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Stream>(),
                 It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<Blob>, Error>>(
-                new Blob { ContentType = "acontenttype" }.ToOptional()));
+            .ReturnsAsync(new Blob { ContentType = "acontenttype" }.ToOptional());
 
         var result = await _store.GetAsync("ablobname", stream, CancellationToken.None);
 

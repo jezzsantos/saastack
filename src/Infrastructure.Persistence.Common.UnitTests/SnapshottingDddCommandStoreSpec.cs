@@ -52,7 +52,7 @@ public class SnapshottingDddCommandStoreSpec
     {
         _dataStore.Setup(store => store.RetrieveAsync(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(Error.EntityNotFound()));
+            .ReturnsAsync(Error.EntityNotFound());
 
         await _store.DeleteAsync("anid".ToId(), false, CancellationToken.None);
 
@@ -74,7 +74,7 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<PersistedEntityMetadata>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid").ToOptional()));
+            .ReturnsAsync(new CommandEntity("anid").ToOptional());
 
         await _store.DeleteAsync("anid".ToId());
 
@@ -90,10 +90,10 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<PersistedEntityMetadata>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid")
+            .ReturnsAsync(new CommandEntity("anid")
             {
                 IsDeleted = true
-            }.ToOptional()));
+            }.ToOptional());
 
         await _store.DeleteAsync("anid".ToId(), false, CancellationToken.None);
 
@@ -111,7 +111,7 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<PersistedEntityMetadata>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid").ToOptional()));
+            .ReturnsAsync(new CommandEntity("anid").ToOptional());
 
         await _store.DeleteAsync("anid".ToId(), false, CancellationToken.None);
 
@@ -139,7 +139,7 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(Optional<CommandEntity>.None));
+            .ReturnsAsync(Optional<CommandEntity>.None);
 
         var result = await _store.GetAsync("anid".ToId());
 
@@ -155,7 +155,7 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(Optional<CommandEntity>.None));
+            .ReturnsAsync(Optional<CommandEntity>.None);
 
         var result = await _store.GetAsync("anid".ToId(), false);
 
@@ -171,10 +171,10 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid")
+            .ReturnsAsync(new CommandEntity("anid")
             {
                 IsDeleted = true
-            }.ToOptional()));
+            }.ToOptional());
 
         var result = await _store.GetAsync("anid".ToId(), true, false, CancellationToken.None);
 
@@ -190,10 +190,10 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid")
+            .ReturnsAsync(new CommandEntity("anid")
             {
                 IsDeleted = true
-            }.ToOptional()));
+            }.ToOptional());
 
         var result = await _store.GetAsync("anid".ToId(), false, false, CancellationToken.None);
 
@@ -209,10 +209,10 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid")
+            .ReturnsAsync(new CommandEntity("anid")
             {
                 IsDeleted = true
-            }.ToOptional()));
+            }.ToOptional());
 
         var result = await _store.GetAsync("anid".ToId(), true, true, CancellationToken.None);
 
@@ -228,7 +228,7 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid").ToOptional()));
+            .ReturnsAsync(new CommandEntity("anid").ToOptional());
 
         var result = await _store.GetAsync("anid".ToId(), true, false, CancellationToken.None);
 
@@ -244,7 +244,7 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(Optional<CommandEntity>.None));
+            .ReturnsAsync(Optional<CommandEntity>.None);
 
         var result = await _store.ResurrectDeletedAsync("anid".ToId(), CancellationToken.None);
 
@@ -263,7 +263,7 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid").ToOptional()));
+            .ReturnsAsync(new CommandEntity("anid").ToOptional());
 
         var result = await _store.ResurrectDeletedAsync("anid".ToId(), CancellationToken.None);
 
@@ -282,10 +282,10 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid")
+            .ReturnsAsync(new CommandEntity("anid")
             {
                 IsDeleted = true
-            }.ToOptional()));
+            }.ToOptional());
 
         var result = await _store.ResurrectDeletedAsync("anid".ToId(), CancellationToken.None);
 
@@ -314,10 +314,10 @@ public class SnapshottingDddCommandStoreSpec
         var addedEntity = new CommandEntity("anid");
         _dataStore.Setup(store => store.RetrieveAsync("acontainername", "anid",
                 It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(Optional<CommandEntity>.None));
+            .ReturnsAsync(Optional<CommandEntity>.None);
         _dataStore.Setup(store =>
                 store.AddAsync(It.IsAny<string>(), It.IsAny<CommandEntity>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<CommandEntity, Error>>(addedEntity));
+            .ReturnsAsync(addedEntity);
 
         await _store.UpsertAsync(entity, false, CancellationToken.None);
 
@@ -334,10 +334,10 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid")
+            .ReturnsAsync(new CommandEntity("anid")
             {
                 IsDeleted = true
-            }.ToOptional()));
+            }.ToOptional());
 
         var result =
             await _store.UpsertAsync(new TestCommandEntity("anid".ToId()), false, CancellationToken.None);
@@ -351,10 +351,10 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid")
+            .ReturnsAsync(new CommandEntity("anid")
             {
                 IsDeleted = true
-            }.ToOptional()));
+            }.ToOptional());
         _dataStore.Setup(store =>
                 store.ReplaceAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CommandEntity>(),
                     It.IsAny<CancellationToken>()))
@@ -388,11 +388,11 @@ public class SnapshottingDddCommandStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", It.IsAny<string>(),
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(fetchedEntity.ToOptional()));
+            .ReturnsAsync(fetchedEntity.ToOptional());
         _dataStore.Setup(store =>
                 store.ReplaceAsync("acontainername", It.IsAny<string>(), It.IsAny<CommandEntity>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(updatedEntity.ToOptional()));
+            .ReturnsAsync(updatedEntity.ToOptional());
         _domainFactory.Setup(df =>
                 df.RehydrateEntity(It.IsAny<Type>(),
                     It.IsAny<HydrationProperties>()))

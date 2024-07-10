@@ -48,7 +48,7 @@ public class BookingsApplicationSpec
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<BookingRoot, Error>>(Error.EntityNotFound()));
+            .ReturnsAsync(Error.EntityNotFound());
 
         var result =
             await _application.CancelBookingAsync(_caller.Object, "anorganizationid", "anid", CancellationToken.None);
@@ -71,10 +71,10 @@ public class BookingsApplicationSpec
         booking.Value.MakeReservation("aborrowerid".ToId(), start, end);
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(booking));
+            .ReturnsAsync(booking);
         _carsService.Setup(cs => cs.ReleaseCarAvailabilityAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Car, Error>>(Error.RuleViolation("notreserved")));
+            .ReturnsAsync(Error.RuleViolation("notreserved"));
 
         var result =
             await _application.CancelBookingAsync(_caller.Object, "anorganizationid", "anid", CancellationToken.None);
@@ -99,10 +99,10 @@ public class BookingsApplicationSpec
         booking.Value.MakeReservation("aborrowerid".ToId(), start, end);
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(booking));
+            .ReturnsAsync(booking);
         _carsService.Setup(cs => cs.ReleaseCarAvailabilityAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Car, Error>>(new Car
+            .ReturnsAsync(new Car
             {
                 Id = "acarid",
                 Managers = new List<CarManager>(),
@@ -115,7 +115,7 @@ public class BookingsApplicationSpec
                 Owner = new CarOwner { Id = "anownerid" },
                 Plate = new CarLicensePlate { Jurisdiction = "ajurisdiction", Number = "anumber" },
                 Status = "astatus"
-            }));
+            });
 
         var result =
             await _application.CancelBookingAsync(_caller.Object, "anorganizationid", "anid", CancellationToken.None);
@@ -132,7 +132,7 @@ public class BookingsApplicationSpec
     {
         _carsService.Setup(cs => cs.GetCarAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Car, Error>>(Error.EntityNotFound()));
+            .ReturnsAsync(Error.EntityNotFound());
 
         var result =
             await _application.MakeBookingAsync(_caller.Object, "anorganizationid", "anid", DateTime.UtcNow,
@@ -150,7 +150,7 @@ public class BookingsApplicationSpec
     {
         _carsService.Setup(cs => cs.GetCarAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Car, Error>>(new Car
+            .ReturnsAsync(new Car
             {
                 Id = "acarid",
                 Managers = null,
@@ -158,13 +158,13 @@ public class BookingsApplicationSpec
                 Owner = null,
                 Plate = null,
                 Status = "astatus"
-            }));
+            });
         var start = DateTime.UtcNow;
         var end = start.AddHours(1);
         _carsService.Setup(
                 cs => cs.ReserveCarIfAvailableAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<bool, Error>>(false));
+            .ReturnsAsync(false);
 
         var result =
             await _application.MakeBookingAsync(_caller.Object, "anorganizationid", "acarid", start,
@@ -183,7 +183,7 @@ public class BookingsApplicationSpec
     {
         _carsService.Setup(cs => cs.GetCarAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Car, Error>>(new Car
+            .ReturnsAsync(new Car
             {
                 Id = "acarid",
                 Managers = null,
@@ -191,13 +191,13 @@ public class BookingsApplicationSpec
                 Owner = null,
                 Plate = null,
                 Status = "astatus"
-            }));
+            });
         var start = DateTime.UtcNow;
         var end = start.AddHours(1);
         _carsService.Setup(
                 cs => cs.ReserveCarIfAvailableAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<bool, Error>>(true));
+            .ReturnsAsync(true);
 
         var result =
             await _application.MakeBookingAsync(_caller.Object, "anorganizationid", "acarid", start,
@@ -228,7 +228,7 @@ public class BookingsApplicationSpec
     {
         _carsService.Setup(cs => cs.GetCarAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Car, Error>>(new Car
+            .ReturnsAsync(new Car
             {
                 Id = "acarid",
                 Managers = null,
@@ -236,12 +236,12 @@ public class BookingsApplicationSpec
                 Owner = null,
                 Plate = null,
                 Status = "astatus"
-            }));
+            });
         var start = DateTime.UtcNow;
         _carsService.Setup(
                 cs => cs.ReserveCarIfAvailableAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<bool, Error>>(true));
+            .ReturnsAsync(true);
 
         var result =
             await _application.MakeBookingAsync(_caller.Object, "anorganizationid", "acarid", start, null,
@@ -275,7 +275,7 @@ public class BookingsApplicationSpec
         var end = start.AddHours(1);
         _repository.Setup(rep => rep.SearchAllBookingsAsync(It.IsAny<Identifier>(), It.IsAny<DateTime>(),
                 It.IsAny<DateTime>(), It.IsAny<SearchOptions>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<IReadOnlyList<Booking>, Error>>(new List<Booking>
+            .ReturnsAsync(new List<Booking>
             {
                 new()
                 {
@@ -286,7 +286,7 @@ public class BookingsApplicationSpec
                     OrganizationId = "anorganizationid",
                     Start = start
                 }
-            }));
+            });
 
         var result = await _application.SearchAllBookingsAsync(_caller.Object, "anorganizationid", start, end,
             new SearchOptions(), new GetOptions(), CancellationToken.None);

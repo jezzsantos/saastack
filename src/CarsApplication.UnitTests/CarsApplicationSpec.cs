@@ -47,7 +47,7 @@ public class CarsApplicationSpec
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<CarRoot, Error>>(Error.EntityNotFound()));
+            .ReturnsAsync(Error.EntityNotFound());
 
         var result =
             await _application.DeleteCarAsync(_caller.Object, "anorganizationid", "anid", CancellationToken.None);
@@ -63,7 +63,7 @@ public class CarsApplicationSpec
         car.Value.SetOwnership(VehicleOwner.Create("acallerid").Value);
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(car));
+            .ReturnsAsync(car);
 
         var result =
             await _application.DeleteCarAsync(_caller.Object, "anorganizationid", "anid", CancellationToken.None);
@@ -76,7 +76,7 @@ public class CarsApplicationSpec
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<CarRoot, Error>>(Error.EntityNotFound()));
+            .ReturnsAsync(Error.EntityNotFound());
 
         var result =
             await _application.GetCarAsync(_caller.Object, "anorganizationid", "anid", CancellationToken.None);
@@ -93,7 +93,7 @@ public class CarsApplicationSpec
             .Value);
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(car));
+            .ReturnsAsync(car);
 
         var result =
             await _application.GetCarAsync(_caller.Object, "anorganizationid", "anid", CancellationToken.None);
@@ -110,7 +110,7 @@ public class CarsApplicationSpec
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<CarRoot, Error>>(Error.EntityNotFound()));
+            .ReturnsAsync(Error.EntityNotFound());
 
         var result =
             await _application.ScheduleMaintenanceCarAsync(_caller.Object, "anorganizationid", "anid", DateTime.UtcNow,
@@ -125,7 +125,7 @@ public class CarsApplicationSpec
         var car = SetupRegisteredCar();
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(car));
+            .ReturnsAsync(car);
         var fromUtc = DateTime.UtcNow.AddDays(2);
         var toUtc = fromUtc.AddHours(1);
 
@@ -183,7 +183,7 @@ public class CarsApplicationSpec
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<CarRoot, Error>>(Error.EntityNotFound()));
+            .ReturnsAsync(Error.EntityNotFound());
 
         var result =
             await _application.ReleaseCarAvailabilityAsync(_caller.Object, "anorganizationid", "anid", DateTime.UtcNow,
@@ -202,7 +202,7 @@ public class CarsApplicationSpec
             .Value);
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(car));
+            .ReturnsAsync(car);
         var fromUtc = DateTime.UtcNow.SubtractHours(1);
         var toUtc = fromUtc.AddHours(1);
         car.Value.TestingOnly_AddUnavailability(TimeSlot.Create(fromUtc, toUtc).Value,
@@ -229,7 +229,7 @@ public class CarsApplicationSpec
             .Value);
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(car));
+            .ReturnsAsync(car);
         var fromUtc = DateTime.UtcNow.SubtractHours(1);
         var toUtc = fromUtc.AddHours(1);
 
@@ -249,7 +249,7 @@ public class CarsApplicationSpec
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<CarRoot, Error>>(Error.EntityNotFound()));
+            .ReturnsAsync(Error.EntityNotFound());
 
         var result =
             await _application.ReserveCarIfAvailableAsync(_caller.Object, "anorganizationid", "anid", DateTime.UtcNow,
@@ -268,7 +268,7 @@ public class CarsApplicationSpec
             .Value);
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(car));
+            .ReturnsAsync(car);
         var fromUtc = DateTime.UtcNow.AddHours(1);
         var toUtc = fromUtc.AddHours(1);
         car.Value.TestingOnly_AddUnavailability(TimeSlot.Create(fromUtc, toUtc).Value,
@@ -290,7 +290,7 @@ public class CarsApplicationSpec
         var car = SetupRegisteredCar();
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(car));
+            .ReturnsAsync(car);
         var fromUtc = DateTime.UtcNow.AddHours(1);
         var toUtc = fromUtc.AddHours(1);
 
@@ -317,7 +317,7 @@ public class CarsApplicationSpec
         _repository.Setup(rep =>
                 rep.SearchAllAvailableCarsAsync(It.IsAny<Identifier>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(),
                     It.IsAny<SearchOptions>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<IReadOnlyList<Car>, Error>>(new List<Car>
+            .ReturnsAsync(new List<Car>
             {
                 new()
                 {
@@ -332,7 +332,7 @@ public class CarsApplicationSpec
                     Status = CarStatus.Registered,
                     VehicleOwnerId = "anownerid"
                 }
-            }));
+            });
 
         var result =
             await _application.SearchAllAvailableCarsAsync(_caller.Object, "anorganizationid", DateTime.UtcNow,
@@ -357,7 +357,7 @@ public class CarsApplicationSpec
         _repository.Setup(rep =>
                 rep.SearchAllCarsAsync(It.IsAny<Identifier>(), It.IsAny<SearchOptions>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<IReadOnlyList<Car>, Error>>(new List<Car>
+            .ReturnsAsync(new List<Car>
             {
                 new()
                 {
@@ -372,7 +372,7 @@ public class CarsApplicationSpec
                     Status = CarStatus.Registered,
                     VehicleOwnerId = "anownerid"
                 }
-            }));
+            });
 
         var result =
             await _application.SearchAllCarsAsync(_caller.Object, "anorganizationid", new SearchOptions(),
@@ -396,7 +396,7 @@ public class CarsApplicationSpec
     {
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<CarRoot, Error>>(Error.EntityNotFound()));
+            .ReturnsAsync(Error.EntityNotFound());
 
         var result =
             await _application.TakeOfflineCarAsync(_caller.Object, "anorganizationid", "anid", null, null,
@@ -411,7 +411,7 @@ public class CarsApplicationSpec
         var car = SetupRegisteredCar();
         _repository.Setup(s =>
                 s.LoadAsync(It.IsAny<Identifier>(), It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(car));
+            .ReturnsAsync(car);
         var fromUtc = DateTime.UtcNow.AddHours(1);
         var toUtc = fromUtc.AddHours(1);
 

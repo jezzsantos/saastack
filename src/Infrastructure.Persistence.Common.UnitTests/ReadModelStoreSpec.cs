@@ -76,7 +76,7 @@ public class ReadModelStoreSpec
         _dataStore.Setup(repo =>
                 repo.RetrieveAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<PersistedEntityMetadata>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(Optional<CommandEntity>.None));
+            .ReturnsAsync(Optional<CommandEntity>.None);
 
         var result = await _store.DeleteAsync("anid", CancellationToken.None);
 
@@ -89,7 +89,7 @@ public class ReadModelStoreSpec
         _dataStore.Setup(repo =>
                 repo.RetrieveAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<PersistedEntityMetadata>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid").ToOptional()));
+            .ReturnsAsync(new CommandEntity("anid").ToOptional());
 
         await _store.DeleteAsync("anid", CancellationToken.None);
 
@@ -112,7 +112,7 @@ public class ReadModelStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(Optional<CommandEntity>.None));
+            .ReturnsAsync(Optional<CommandEntity>.None);
 
         var result = await _store.GetAsync("anid");
 
@@ -128,7 +128,7 @@ public class ReadModelStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(Optional<CommandEntity>.None));
+            .ReturnsAsync(Optional<CommandEntity>.None);
 
         var result = await _store.GetAsync("anid", false);
 
@@ -144,10 +144,10 @@ public class ReadModelStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid")
+            .ReturnsAsync(new CommandEntity("anid")
             {
                 IsDeleted = true
-            }.ToOptional()));
+            }.ToOptional());
 
         var result = await _store.GetAsync("anid", true, false, CancellationToken.None);
 
@@ -163,10 +163,10 @@ public class ReadModelStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid")
+            .ReturnsAsync(new CommandEntity("anid")
             {
                 IsDeleted = true
-            }.ToOptional()));
+            }.ToOptional());
 
         var result = await _store.GetAsync("anid", false, false, CancellationToken.None);
 
@@ -182,10 +182,10 @@ public class ReadModelStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid")
+            .ReturnsAsync(new CommandEntity("anid")
             {
                 IsDeleted = true
-            }.ToOptional()));
+            }.ToOptional());
 
         var result = await _store.GetAsync("anid", true, true, CancellationToken.None);
 
@@ -201,7 +201,7 @@ public class ReadModelStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid").ToOptional()));
+            .ReturnsAsync(new CommandEntity("anid").ToOptional());
 
         var result = await _store.GetAsync("anid", true, false, CancellationToken.None);
 
@@ -233,10 +233,10 @@ public class ReadModelStoreSpec
         _dataStore.Setup(
                 store => store.QueryAsync(It.IsAny<string>(), It.IsAny<QueryClause<TestReadModel>>(),
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<List<QueryEntity>, Error>>(new List<QueryEntity>
+            .ReturnsAsync(new List<QueryEntity>
             {
                 entity
-            }));
+            });
 
         var result = await _store.QueryAsync(query, false, CancellationToken.None);
 
@@ -259,10 +259,10 @@ public class ReadModelStoreSpec
         _dataStore.Setup(
                 store => store.QueryAsync(It.IsAny<string>(), It.IsAny<QueryClause<TestReadModel>>(),
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<List<QueryEntity>, Error>>(new List<QueryEntity>
+            .ReturnsAsync(new List<QueryEntity>
             {
                 entity
-            }));
+            });
 
         var result = await _store.QueryAsync(query, false, CancellationToken.None);
 
@@ -284,10 +284,10 @@ public class ReadModelStoreSpec
         _dataStore.Setup(
                 store => store.QueryAsync(It.IsAny<string>(), It.IsAny<QueryClause<TestReadModel>>(),
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<List<QueryEntity>, Error>>(new List<QueryEntity>
+            .ReturnsAsync(new List<QueryEntity>
             {
                 entity
-            }));
+            });
 
         var result = await _store.QueryAsync(query, true, CancellationToken.None);
 
@@ -312,7 +312,7 @@ public class ReadModelStoreSpec
         _dataStore.Setup(repo =>
                 repo.RetrieveAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<PersistedEntityMetadata>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(Optional<CommandEntity>.None));
+            .ReturnsAsync(Optional<CommandEntity>.None);
 
         var result =
             await _store.UpdateAsync("anid", entity => entity.AStringValue = "avalue",
@@ -327,11 +327,11 @@ public class ReadModelStoreSpec
         _dataStore.Setup(repo =>
                 repo.RetrieveAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<PersistedEntityMetadata>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid").ToOptional()));
+            .ReturnsAsync(new CommandEntity("anid").ToOptional());
         _dataStore.Setup(repo =>
                 repo.ReplaceAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CommandEntity>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid").ToOptional()));
+            .ReturnsAsync(new CommandEntity("anid").ToOptional());
 
         var result =
             await _store.UpdateAsync("anid", entity => entity.AStringValue = "avalue",
@@ -360,10 +360,10 @@ public class ReadModelStoreSpec
         var addedEntity = new CommandEntity("anid");
         _dataStore.Setup(store => store.RetrieveAsync("acontainername", "anid",
                 It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(Optional<CommandEntity>.None));
+            .ReturnsAsync(Optional<CommandEntity>.None);
         _dataStore.Setup(store =>
                 store.AddAsync(It.IsAny<string>(), It.IsAny<CommandEntity>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<CommandEntity, Error>>(addedEntity));
+            .ReturnsAsync(addedEntity);
 
         await _store.UpsertAsync(dto, false, CancellationToken.None);
 
@@ -379,10 +379,10 @@ public class ReadModelStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid")
+            .ReturnsAsync(new CommandEntity("anid")
             {
                 IsDeleted = true
-            }.ToOptional()));
+            }.ToOptional());
 
         var result = await _store.UpsertAsync(new TestReadModel { Id = "anid" }, false, CancellationToken.None);
 
@@ -395,10 +395,10 @@ public class ReadModelStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", "anid",
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(new CommandEntity("anid")
+            .ReturnsAsync(new CommandEntity("anid")
             {
                 IsDeleted = true
-            }.ToOptional()));
+            }.ToOptional());
         _dataStore.Setup(store =>
                 store.ReplaceAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CommandEntity>(),
                     It.IsAny<CancellationToken>()))
@@ -425,11 +425,11 @@ public class ReadModelStoreSpec
         _dataStore.Setup(store =>
                 store.RetrieveAsync("acontainername", It.IsAny<string>(),
                     It.IsAny<PersistedEntityMetadata>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(fetchedEntity.ToOptional()));
+            .ReturnsAsync(fetchedEntity.ToOptional());
         _dataStore.Setup(store =>
                 store.ReplaceAsync("acontainername", It.IsAny<string>(), It.IsAny<CommandEntity>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<CommandEntity>, Error>>(updatedEntity.ToOptional()));
+            .ReturnsAsync(updatedEntity.ToOptional());
 
         var result = await _store.UpsertAsync(dto, false, CancellationToken.None);
 

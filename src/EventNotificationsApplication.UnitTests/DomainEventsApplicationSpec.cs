@@ -106,7 +106,7 @@ public class DomainEventsApplicationSpec
                 umr.ReceiveSingleAsync(It.IsAny<string>(),
                     It.IsAny<Func<DomainEventingMessage, CancellationToken, Task<Result<Error>>>>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<bool, Error>>(false));
+            .ReturnsAsync(false);
 
         var result = await _application.DrainAllDomainEventsAsync(_caller.Object, CancellationToken.None);
 

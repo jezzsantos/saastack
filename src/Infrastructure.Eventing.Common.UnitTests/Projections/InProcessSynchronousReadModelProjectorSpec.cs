@@ -30,7 +30,7 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
         _projection.Setup(prj => prj.RootAggregateType)
             .Returns(typeof(string));
         _projection.Setup(prj => prj.ProjectEventAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<bool, Error>>(true));
+            .ReturnsAsync(true);
         var projections = new List<IReadModelProjection> { _projection.Object };
         _projector = new InProcessSynchronousReadModelProjector(recorder.Object, _checkpointRepository.Object,
             changeEventTypeMigrator, projections.ToArray());
@@ -107,7 +107,7 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
     public async Task WhenWriteEventStreamAsyncAndEventVersionGreaterThanCheckpoint_ThenReturnsError()
     {
         _checkpointRepository.Setup(cs => cs.LoadCheckpointAsync("astreamname", It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<int, Error>>(5));
+            .ReturnsAsync(5);
 
         _projection.Setup(prj => prj.RootAggregateType)
             .Returns(typeof(string));
@@ -134,7 +134,7 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
     public async Task WhenWriteEventStreamAsyncAndEventVersionLessThanCheckpoint_ThenSkipsPreviousVersions()
     {
         _checkpointRepository.Setup(cs => cs.LoadCheckpointAsync("astreamname", It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<int, Error>>(5));
+            .ReturnsAsync(5);
 
         await _projector.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
         {
@@ -190,7 +190,7 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
     public async Task WhenWriteEventStreamAsyncAndDeserializationOfEventsFails_ThenReturnsError()
     {
         _checkpointRepository.Setup(cs => cs.LoadCheckpointAsync("astreamname", It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<int, Error>>(3));
+            .ReturnsAsync(3);
 
         var result = await _projector.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
         {
@@ -218,7 +218,7 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
     {
         const int startingCheckpoint = ProjectionCheckpointRepository.StartingCheckpointVersion;
         _checkpointRepository.Setup(cs => cs.LoadCheckpointAsync("astreamname", It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<int, Error>>(startingCheckpoint));
+            .ReturnsAsync(startingCheckpoint);
 
         await _projector.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
         {
@@ -275,9 +275,9 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
     public async Task WhenWriteEventStreamAsyncAndEventNotHandledByProjection_ThenReturnsError()
     {
         _checkpointRepository.Setup(cs => cs.LoadCheckpointAsync("astreamname", It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<int, Error>>(3));
+            .ReturnsAsync(3);
         _projection.Setup(prj => prj.ProjectEventAsync(It.IsAny<IDomainEvent>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<bool, Error>>(false));
+            .ReturnsAsync(false);
 
         var result = await _projector.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
         {
@@ -310,7 +310,7 @@ public sealed class InProcessSynchronousReadModelProjectorSpec : IDisposable
     public async Task WhenWriteEventStreamAsync_ThenProjectsEvents()
     {
         _checkpointRepository.Setup(cs => cs.LoadCheckpointAsync("astreamname", It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<int, Error>>(3));
+            .ReturnsAsync(3);
 
         await _projector.WriteEventStreamAsync("astreamname", new List<EventStreamChangeEvent>
         {

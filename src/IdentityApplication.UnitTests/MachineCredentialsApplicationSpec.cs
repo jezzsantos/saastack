@@ -38,7 +38,7 @@ public class MachineCredentialsApplicationSpec
         };
         _endUsersService.Setup(eus => eus.RegisterMachinePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<EndUser, Error>>(user));
+            .ReturnsAsync(user);
         var expiresOn = DateTime.UtcNow.AddDays(1);
         var apiKey = new APIKey
         {
@@ -52,7 +52,7 @@ public class MachineCredentialsApplicationSpec
                 aks.CreateApiKeyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<DateTime?>(),
                     It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<APIKey, Error>>(apiKey));
+            .ReturnsAsync(apiKey);
 
         var result = await _application.RegisterMachineAsync(_caller.Object, "aname", Timezones.Default.ToString(),
             CountryCodes.Default.ToString(), expiresOn, CancellationToken.None);

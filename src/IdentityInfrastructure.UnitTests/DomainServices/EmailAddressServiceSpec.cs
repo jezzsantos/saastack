@@ -30,7 +30,7 @@ public class EmailAddressServiceSpec
         _recorder = new Mock<IRecorder>();
         _emailAddressService = new Mock<IEmailAddressService>();
         _emailAddressService.Setup(es => es.EnsureUniqueAsync(It.IsAny<EmailAddress>(), It.IsAny<Identifier>()))
-            .Returns(Task.FromResult(true));
+            .ReturnsAsync(true);
         _tokensService = new Mock<ITokensService>();
         _passwordHasherService = new Mock<IPasswordHasherService>();
         _settings = new Mock<IConfigurationSettings>();
@@ -46,8 +46,8 @@ public class EmailAddressServiceSpec
     public async Task WhenEnsureUniqueAsyncAndNoEmailMatch_ThenReturnsTrue()
     {
         _repository.Setup(s => s.FindCredentialsByUsernameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<PasswordCredentialRoot>, Error>>(Optional<PasswordCredentialRoot>
-                .None));
+            .ReturnsAsync(Optional<PasswordCredentialRoot>
+                .None);
 
         var result = await _service.EnsureUniqueAsync(EmailAddress.Create("auser@company.com").Value, "auserid".ToId());
 
@@ -59,7 +59,7 @@ public class EmailAddressServiceSpec
     {
         var credential = CreateCredential("auserid");
         _repository.Setup(s => s.FindCredentialsByUsernameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<PasswordCredentialRoot>, Error>>(credential.ToOptional()));
+            .ReturnsAsync(credential.ToOptional());
 
         var result = await _service.EnsureUniqueAsync(EmailAddress.Create("auser@company.com").Value, "auserid".ToId());
 
@@ -71,7 +71,7 @@ public class EmailAddressServiceSpec
     {
         var credential = CreateCredential("anotheruserid");
         _repository.Setup(s => s.FindCredentialsByUsernameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<Optional<PasswordCredentialRoot>, Error>>(credential.ToOptional()));
+            .ReturnsAsync(credential.ToOptional());
 
         var result = await _service.EnsureUniqueAsync(EmailAddress.Create("auser@company.com").Value, "auserid".ToId());
 

@@ -31,12 +31,12 @@ public class InProcessEventNotifyingStoreProjectionRelaySpec
             });
         var checkpointStore = new Mock<IProjectionCheckpointRepository>();
         checkpointStore.Setup(cs => cs.LoadCheckpointAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<int, Error>>(1));
+            .ReturnsAsync(1);
         var domainFactory = new Mock<IDomainFactory>();
         var store = new Mock<IEventStore>();
         store.Setup(s => s.AddEventsAsync(It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<List<EventSourcedChangeEvent>>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult<Result<string, Error>>("astreamname"));
+            .ReturnsAsync("astreamname");
         _eventSourcingStore =
             new EventSourcingDddCommandStore<TestEventingAggregateRoot>(recorder.Object, domainFactory.Object,
                 migrator.Object, store.Object);
