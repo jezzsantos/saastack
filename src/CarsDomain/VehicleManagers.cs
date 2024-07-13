@@ -5,9 +5,9 @@ using Domain.Interfaces;
 
 namespace CarsDomain;
 
-public sealed class VehicleManagers : ValueObjectBase<VehicleManagers>
+public sealed class VehicleManagers : SingleValueObjectBase<VehicleManagers, List<Identifier>>
 {
-    private readonly List<Identifier> _managers;
+    public static readonly VehicleManagers Empty = new([]);
 
     public static Result<VehicleManagers, Error> Create(string managerId)
     {
@@ -16,45 +16,27 @@ public sealed class VehicleManagers : ValueObjectBase<VehicleManagers>
             return error;
         }
 
-        return new VehicleManagers(new List<Identifier> { managerId.ToId() });
+        return new VehicleManagers([managerId.ToId()]);
     }
 
-    public static VehicleManagers Create()
-    {
-        return new VehicleManagers(new List<Identifier>());
-    }
-
-    private VehicleManagers() : this(new List<Identifier>())
+    private VehicleManagers(List<Identifier> managerIds) : base(managerIds)
     {
     }
 
-    private VehicleManagers(List<Identifier> managerIds)
-    {
-        _managers = managerIds;
-    }
-
-    public IReadOnlyList<Identifier> Managers => _managers;
-
-    public override string Dehydrate()
-    {
-        return _managers
-            .Select(man => man)
-            .Join(";");
-    }
+    public IReadOnlyList<Identifier> Ids => Value;
 
     public static ValueObjectFactory<VehicleManagers> Rehydrate()
     {
-        return (_, _) => new VehicleManagers();
-    }
-
-    protected override IEnumerable<object?> GetAtomicValues()
-    {
-        return new[] { Managers };
+        return (property, _) =>
+        {
+            var items = RehydrateToList(property, true, true);
+            return new VehicleManagers(items.Select(item => item.ToId()).ToList());
+        };
     }
 
     public VehicleManagers Append(Identifier id)
     {
-        var ids = new List<Identifier>(_managers);
+        var ids = new List<Identifier>(Value);
         if (!ids.Contains(id))
         {
             ids.Add(id);

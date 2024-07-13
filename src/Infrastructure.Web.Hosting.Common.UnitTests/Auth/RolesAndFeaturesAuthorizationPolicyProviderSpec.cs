@@ -24,7 +24,7 @@ public class RolesAndFeaturesAuthorizationPolicyProviderSpec
     public async Task WhenGetPolicyAsyncAndNotCachedAndUnknown_ThenBuildsPolicy()
     {
         var policyName =
-            $"POLICY:{{|Features|:{{|Platform|:[|platform_basic_features|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}";
+            $"POLICY:{{|Features|:{{|Platform|:[|{PlatformFeatures.Basic.Name}|]}},|Roles|:{{|Platform|:[|{PlatformRoles.Standard.Name}|]}}}}";
 
         var result = await _provider.GetPolicyAsync(policyName);
 
@@ -46,7 +46,7 @@ public class RolesAndFeaturesAuthorizationPolicyProviderSpec
         var builder = new AuthorizationPolicyBuilder()
             .RequireAuthenticatedUser().Build();
         var policyName =
-            "POLICY:{|Features|:{|Platform|:[|basic_features|]},|Roles|:{|Platform|:[|{platform_standard}|]}}";
+            $"POLICY:{{|Features|:{{|Platform|:[|basic_features|]}},|Roles|:{{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}}}";
 #if TESTINGONLY
         _provider.CachePolicy(policyName, builder);
 #endif

@@ -32,7 +32,7 @@ public sealed class CarRoot : AggregateRootBase
 
     public Optional<LicensePlate> License { get; private set; }
 
-    public VehicleManagers Managers { get; private set; } = VehicleManagers.Create();
+    public VehicleManagers Managers { get; private set; } = VehicleManagers.Empty;
 
     public Optional<Manufacturer> Manufacturer { get; private set; }
 

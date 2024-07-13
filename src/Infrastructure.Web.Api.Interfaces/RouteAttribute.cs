@@ -29,12 +29,28 @@ public class RouteAttribute : Attribute
         IsTestingOnly = isTestingOnly;
     }
 
+    /// <summary>
+    ///     Access to the request.
+    /// </summary>
     public AccessType Access { get; }
 
+    /// <summary>
+    ///     Whether this request is used only in testing, and not in production code
+    /// </summary>
     public bool IsTestingOnly { get; }
 
+    /// <summary>
+    ///     The HTTP method used
+    /// </summary>
     public OperationMethod Method { get; }
 
+    /// <summary>
+    ///     The route template. Supports substitutions from properties in the request class, in the format: {Property}
+    ///     (case-insensitive)
+    /// </summary>
+#if !NETSTANDARD2_0
+    [StringSyntax("Route")]
+#endif
     public string RouteTemplate { get; }
 }
 
@@ -43,7 +59,19 @@ public class RouteAttribute : Attribute
 /// </summary>
 public enum AccessType
 {
+    /// <summary>
+    ///     No authentication required
+    /// </summary>
     Anonymous = 0,
+
+    /// <summary>
+    ///     Authenticated with Token authentication (e.g., a JWT Bearer token, in the HTTP Authorization header)
+    /// </summary>
     Token = 1,
+
+    /// <summary>
+    ///     Authenticated with HMAC authentication, only used between hosts for "private" API access, for service account
+    ///     machine-to-machine access
+    /// </summary>
     HMAC = 2
 }

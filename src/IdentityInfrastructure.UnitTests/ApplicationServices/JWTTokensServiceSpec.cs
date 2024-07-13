@@ -84,11 +84,11 @@ public class JWTTokensServiceSpec
                               == $"Tenant_{TenantRoles.Member.Name}{ClaimExtensions.TenantIdDelimiter}anorganizationid");
         token.Claims.Should()
             .Contain(claim => claim.Type == AuthenticationConstants.Claims.ForFeature
-                              && claim.Value == "Platform_platform_basic_features");
+                              && claim.Value == $"Platform_{PlatformFeatures.Basic.Name}");
         token.Claims.Should()
             .Contain(claim => claim.Type == AuthenticationConstants.Claims.ForFeature
                               && claim.Value
-                              == $"Tenant_tenant_basic_features{ClaimExtensions.TenantIdDelimiter}anorganizationid");
+                              == $"Tenant_{TenantFeatures.Basic.Name}{ClaimExtensions.TenantIdDelimiter}anorganizationid");
         _tokensService.Verify(ts => ts.CreateJWTRefreshToken());
     }
 }

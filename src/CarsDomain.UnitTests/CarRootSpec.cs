@@ -62,7 +62,7 @@ public class CarRootSpec
         _car.SetOwnership(owner);
 
         _car.Owner.Should().Be(VehicleOwner.Create(owner.OwnerId).Value);
-        _car.Managers.Managers.Single().Should().Be("anownerid".ToId());
+        _car.Managers.Ids.Single().Should().Be("anownerid".ToId());
         _car.Events.Last().Should().BeOfType<OwnershipChanged>();
     }
 

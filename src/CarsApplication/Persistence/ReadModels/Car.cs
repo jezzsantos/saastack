@@ -13,7 +13,7 @@ public class Car : ReadModelEntity
 
     public Optional<string> LicenseNumber { get; set; }
 
-    public VehicleManagers ManagerIds { get; set; } = VehicleManagers.Create();
+    public VehicleManagers ManagerIds { get; set; } = VehicleManagers.Empty;
 
     public Optional<string> ManufactureMake { get; set; }
 

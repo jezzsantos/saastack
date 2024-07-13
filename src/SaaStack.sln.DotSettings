@@ -466,8 +466,8 @@
 	
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0C41D02830B426419B2E0D9AF25191F6/Field/=name/@KeyIndexDefined">True</s:Boolean>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0C41D02830B426419B2E0D9AF25191F6/Field/=name/Order/@EntryValue">0</s:Int64>
-	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0C41D02830B426419B2E0D9AF25191F6/Field/=propertyname/@KeyIndexDefined">True</s:Boolean>
-	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0C41D02830B426419B2E0D9AF25191F6/Field/=propertyname/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0C41D02830B426419B2E0D9AF25191F6/Field/=propertyname/@KeyIndexDefined">False</s:Boolean>
+	
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0C41D02830B426419B2E0D9AF25191F6/Reformat/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0C41D02830B426419B2E0D9AF25191F6/Scope/=C3001E7C0DA78E4487072B7E050D86C5/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0C41D02830B426419B2E0D9AF25191F6/Scope/=C3001E7C0DA78E4487072B7E050D86C5/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
@@ -485,31 +485,30 @@ using QueryAny;
 
 // TODO: delete this attribute if your root aggregate is using event sourcing, instead of snapshotting 
 [EntityName("$name$")]
-public sealed class $name$Entity : EntityBase
+public sealed class $name$ : EntityBase
 {
-    public static Result&lt;$name$Entity, Error&gt; Create(IRecorder recorder, IIdentifierFactory idFactory,
+    public static Result&lt;$name$, Error&gt; Create(IRecorder recorder, IIdentifierFactory idFactory,
         RootEventHandler rootEventHandler)
     {
-        return new $name$Entity(recorder, idFactory, rootEventHandler);
+        return new $name$(recorder, idFactory, rootEventHandler);
     }
 
-    private $name$Entity(IRecorder recorder, IIdentifierFactory idFactory,
+    private $name$(IRecorder recorder, IIdentifierFactory idFactory,
         RootEventHandler rootEventHandler) : base(recorder, idFactory, rootEventHandler)
     {
     }
 
     // TODO: delete this constructor if your root aggregate is using event sourcing, instead of snapshotting 
-    private $name$Entity(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary&lt;string, object?&gt; rehydratingProperties) : base(identifier, container, rehydratingProperties)
+    private $name$(Identifier identifier, IDependencyContainer container, IReadOnlyDictionary&lt;string, object?&gt; rehydratingProperties) : base(identifier, container, rehydratingProperties)
     {
         RootId = rehydratingProperties.GetValueOrDefault&lt;Identifier&gt;(nameof(RootId))!;
         OrganizationId = rehydratingProperties.GetValueOrDefault&lt;Identifier&gt;(nameof(OrganizationId))!;
-        $propertyname$ = rehydratingProperties.GetValueOrDefault&lt;string&gt;(nameof($propertyname$));
     }
 
     // TODO: delete this method if your root aggregate is using event sourcing, instead of snapshotting 
-    public static EntityFactory&lt;$name$Entity&gt; Rehydrate()
+    public static Factory&lt;$name$&gt; Rehydrate()
     {
-        return (identifier, container, properties) =&gt; new $name$Entity(identifier, container, properties);
+        return (identifier, container, properties) =&gt; new $name$(identifier, container, properties);
     }
 
     // TODO: delete this method if you are using event sourcing, instead of snapshotting 
@@ -518,7 +517,6 @@ public sealed class $name$Entity : EntityBase
         var properties = base.Dehydrate();
         properties.Add(nameof(RootId), RootId);
         properties.Add(nameof(OrganizationId), OrganizationId);
-        properties.Add(nameof($propertyname$), $propertyname$);
         return properties;
     }
 
@@ -554,8 +552,6 @@ public sealed class $name$Entity : EntityBase
     public Optional&lt;Identifier&gt; OrganizationId { get; private set; } = Optional&lt;Identifier&gt;.None;
 
     public Optional&lt;Identifier&gt; RootId { get; private set; } = Optional&lt;Identifier&gt;.None;
-    
-    public string? $propertyname$ { get; private set; }
 }$END$$SELECTION$</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=0F0850FC1FE1104DB503D10E2A76D620/Applicability/=File/@EntryIndexedValue">True</s:Boolean>

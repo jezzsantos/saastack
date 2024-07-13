@@ -98,6 +98,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseForDeploy|AnyCPU'">
+        <NoWarn>$(NoWarn),436,NU5125,CS1998,CS0649,CS8618,CS8604</NoWarn>
         <DebugType>pdbonly</DebugType>
         <Optimize>true</Optimize>
         <OutputPath>bin\$(Configuration)\</OutputPath>

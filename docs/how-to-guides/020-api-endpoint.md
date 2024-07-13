@@ -1,8 +1,12 @@
-# Add an REST API Endpoint
+# Add an API Endpoint
 
 ## Why?
 
-You want to expose your subdomain with a new REST endpoint
+You want to expose your subdomain with a new API endpoint.
+
+> We will refer to REST here because we intend to design and build REST endpoint (maturity level 4). That is, REST sans HATEOS.
+>
+> REST endpoints model workflows and processes, they are not intended to model database tables and CRUD. These design concepts should be avoided.
 
 ## What is the mechanism?
 
@@ -14,13 +18,15 @@ We are using minimal APIs to define our endpoints (ultimately, as opposed to Con
 
 > We actually use a source generator to do most of the heavy lifting of writing the code that produces the minimal API definitions, given a strongly typed declarative syntax of our own. Which makes your job much easier and less error-prone.
 
+Furthermore, we are designing using the [REPR design pattern](https://deviq.com/design-patterns/repr-design-pattern).
+
 ### The general approach
 
 The general approach to building a new API is to start "outside-in", that is start from the design of the API and work inwards from there to the implementation details.
 
 > Building a new API requires all the layers of the subdomain in place before you start (or create them as you go). You will need a project for each layer (Infrastructure, Application and Domain), and projects containing all the relevant tests.
 
-We strongly recommend that before you start, you have an idea of an API to build, and that it is not based upon a CRUD data-model, and it considers the entire lifecycle of a RES "resource".
+We strongly recommend that before you start, you have some idea of the contract of an API to build and that it is not based upon a CRUD data-model, and it considers the entire lifecycle of a REST "resource".
 
 A simple psuedo-description like:
 
@@ -389,7 +395,11 @@ We have simplified the choices of methods you can choose from:
 
 If your endpoint is intended to only allow authenticated users to have access to it, and if you want to ensure that those users have the correct roles and billing subscription levels, then you can enforce those coarse grained authorization checks at the API level (as well as in the domain layer).
 
-To make this take effect, you need to specify the 3rd parameter of the `[Route]` attribute to be something other than `Anonymous`
+To make this take effect, you need to specify the 3rd parameter of the `[Route]` attribute to be something other than `Anonymous`, to indicate the endpoint can only be called by an authenticated caller.
+
+* `Token` - means the calling user is identified by a token in the request. i.e., a JWT bearer token in teh `Autheorixation` header of the request.
+* `HMAC` - means that the request will use HMAC authentication to identifiy the calling user. This is only used for private API calls, not intended for the public to use.
+* `Anonymous` - means no authentication mechanism is required. (even is a token is included in the request)
 
 For example,
 

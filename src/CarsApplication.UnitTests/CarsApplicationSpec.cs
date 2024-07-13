@@ -170,8 +170,8 @@ public class CarsApplicationSpec
             && c.Manufacturer.Value.Year == 2023
             && c.Unavailabilities.Count == 0
             && c.Owner.Value.OwnerId == "acallerid"
-            && c.Managers.Managers.Count == 1
-            && c.Managers.Managers[0] == "acallerid"
+            && c.Managers.Ids.Count == 1
+            && c.Managers.Ids[0] == "acallerid"
             && c.License.Value.Jurisdiction == Jurisdiction.AllowedCountries[0]
             && c.License.Value.Number == "aplate"
             && c.Status == CarStatus.Registered

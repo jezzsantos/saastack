@@ -13,7 +13,7 @@ public class VehicleManagersSpec
 
     public VehicleManagersSpec()
     {
-        _managers = VehicleManagers.Create();
+        _managers = VehicleManagers.Empty;
     }
 
     [Fact]
@@ -29,13 +29,13 @@ public class VehicleManagersSpec
     {
         var result = VehicleManagers.Create("amanagerid").Value;
 
-        result.Managers.First().Should().Be("amanagerid".ToId());
+        result.Ids.First().Should().Be("amanagerid".ToId());
     }
 
     [Fact]
     public void WhenCreate_ThenHasNoManagers()
     {
-        _managers.Managers.Should().BeEmpty();
+        _managers.Ids.Should().BeEmpty();
     }
 
     [Fact]
@@ -44,8 +44,8 @@ public class VehicleManagersSpec
         var result = _managers.Append("amanagerid".ToId());
 
         result.Should().NotBeSameAs(_managers);
-        result.Managers.Count.Should().Be(1);
-        result.Managers[0].Should().Be("amanagerid".ToId());
+        result.Ids.Count.Should().Be(1);
+        result.Ids[0].Should().Be("amanagerid".ToId());
     }
 
     [Fact]
@@ -56,8 +56,8 @@ public class VehicleManagersSpec
         var result3 = result2.Append("amanagerid3".ToId());
 
         result3.Should().NotBeSameAs(_managers);
-        result3.Managers.Count.Should().Be(3);
-        result3.Managers.Should().ContainInOrder("amanagerid1".ToId(), "amanagerid2".ToId(),
+        result3.Ids.Count.Should().Be(3);
+        result3.Ids.Should().ContainInOrder("amanagerid1".ToId(), "amanagerid2".ToId(),
             "amanagerid3".ToId());
     }
 
@@ -69,7 +69,7 @@ public class VehicleManagersSpec
         var result3 = result2.Append("amanagerid1".ToId());
 
         result3.Should().NotBeSameAs(_managers);
-        result3.Managers.Count.Should().Be(2);
-        result3.Managers.Should().ContainInOrder("amanagerid1".ToId(), "amanagerid2".ToId());
+        result3.Ids.Count.Should().Be(2);
+        result3.Ids.Should().ContainInOrder("amanagerid1".ToId(), "amanagerid2".ToId());
     }
 }

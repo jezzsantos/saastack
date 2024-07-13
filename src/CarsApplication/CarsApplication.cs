@@ -342,7 +342,7 @@ internal static class CarConversionExtensions
             Id = car.Id,
             Owner = new CarOwner { Id = car.VehicleOwnerId },
             Managers = car.ManagerIds.Exists()
-                ? car.ManagerIds.Managers.Select(id => new CarManager { Id = id }).ToList()
+                ? car.ManagerIds.Ids.Select(id => new CarManager { Id = id }).ToList()
                 : new List<CarManager>(),
             Manufacturer = new CarManufacturer
             {
@@ -395,7 +395,7 @@ internal static class CarConversionExtensions
     private static List<CarManager> ToManagers(this VehicleManagers managers)
     {
         return managers.HasValue()
-            ? new List<CarManager>(managers.Managers.Select(id => new CarManager { Id = id }))
+            ? new List<CarManager>(managers.Ids.Select(id => new CarManager { Id = id }))
             : new List<CarManager>();
     }
 

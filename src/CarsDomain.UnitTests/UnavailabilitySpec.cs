@@ -26,9 +26,25 @@ public class UnavailabilitySpec
         _idFactory = new Mock<IIdentifierFactory>();
         _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns("anid".ToId());
-        _start = DateTime.UtcNow;
+        _start = DateTime.UtcNow.ToNearestSecond();
         _end = _start.AddHours(1);
         _unavailability = Unavailability.Create(_recorder.Object, _idFactory.Object, _ => Result.Ok).Value;
+    }
+
+    [Fact]
+    public void WhenInitialized_ThenInitialized()
+    {
+        var timeSlot = TimeSlot.Create(_start, _end).Value;
+        var causedBy = CausedBy.Create(UnavailabilityCausedBy.Maintenance, Optional<string>.None).Value;
+
+        _unavailability.RaiseChangeEvent(Events.UnavailabilitySlotAdded("acarid".ToId(), "anorganizationid".ToId(),
+            timeSlot, causedBy));
+
+        _unavailability.Id.Should().Be("anid".ToId());
+        _unavailability.OrganizationId.Should().Be("anorganizationid".ToId());
+        _unavailability.CarId.Should().Be("acarid".ToId());
+        _unavailability.Slot.Should().Be(timeSlot);
+        _unavailability.CausedBy.Should().Be(causedBy);
     }
 
     [Fact]
