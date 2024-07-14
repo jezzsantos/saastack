@@ -193,6 +193,50 @@ public class JsonClientSpec
             result.Error.Exception.Should().BeNull();
             result.Error.Errors.Should().BeNull();
         }
+
+        [Fact]
+        public async Task WhenGetTypedResponseAsyncAndContentTypeIsTextForSuccess_ThenReturnsEmptyResponse()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent("acontent", new MediaTypeHeaderValue(HttpConstants.ContentTypes.Text))
+            };
+
+            var result =
+                await JsonClient.GetTypedResponseAsync<TestResponse>(response, null, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeTrue();
+            result.Value.AStringProperty.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task WhenGetTypedResponseAsyncAndContentTypeIsTextForFailure_ThenReturnsEmptyResponse()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content =
+                {
+                    Headers =
+                    {
+                        ContentType = new MediaTypeHeaderValue(HttpConstants.ContentTypes.Text)
+                    }
+                }
+            };
+
+            var result =
+                await JsonClient.GetTypedResponseAsync<TestResponse>(response, null, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeFalse();
+            result.Error.Status.Should().Be(500);
+            result.Error.Title.Should().Be("Internal Server Error");
+            result.Error.Detail.Should().BeNull();
+            result.Error.Type.Should().BeNull();
+            result.Error.Instance.Should().BeNull();
+            result.Error.Exception.Should().BeNull();
+            result.Error.Errors.Should().BeNull();
+        }
     }
 
     [Trait("Category", "Unit")]
