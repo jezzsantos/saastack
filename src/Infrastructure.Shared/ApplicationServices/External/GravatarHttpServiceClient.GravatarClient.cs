@@ -67,7 +67,7 @@ internal class GravatarClient : IGravatarClient
         }
         catch (HttpRequestException)
         {
-            _recorder.TraceInformation(caller.ToCall(),
+            _recorder.TraceError(caller.ToCall(),
                 "Error retrieving gravatar for {EmailAddress}", emailAddress);
             return Optional<FileUpload>.None;
         }

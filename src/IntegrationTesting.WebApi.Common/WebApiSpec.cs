@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using Application.Persistence.Shared;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
@@ -84,6 +85,7 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
                 services.AddSingleton<IUserNotificationsService, StubUserNotificationsService>();
                 services.AddSingleton<IFeatureFlags, StubFeatureFlags>();
                 services.AddSingleton<IAvatarService, StubAvatarService>();
+                services.AddSingleton<IUsageDeliveryService, StubUsageDeliveryService>();
                 if (_overridenTestingDependencies.Exists())
                 {
                     _overridenTestingDependencies.Invoke(services);

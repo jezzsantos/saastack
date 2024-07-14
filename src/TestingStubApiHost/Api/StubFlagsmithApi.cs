@@ -20,7 +20,7 @@ public sealed class StubFlagsmithApi : StubApiBase
         FlagsmithCreateIdentityRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
-        Recorder.TraceInformation(null, "StubFlagsmith: CreateIdentity");
+        Recorder.TraceInformation(null, "StubFlagsmith: CreateIdentity for {Identifier}", request.Identifier ?? "none");
         return () =>
             new PostResult<FlagsmithCreateIdentityResponse>(new FlagsmithCreateIdentityResponse
             {
