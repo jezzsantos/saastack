@@ -16,8 +16,7 @@ public abstract class WebsiteSpec<THost> : WebApiSpec<THost>
     protected readonly JsonSerializerOptions JsonOptions;
 
     protected WebsiteSpec(WebApiSetup<THost> setup, Action<IServiceCollection>? overrideDependencies = null) : base(
-        setup,
-        OverrideDependencies(overrideDependencies))
+        setup, OverrideDependencies(overrideDependencies))
     {
         StartupServer<Program>();
         CSRFService = setup.GetRequiredService<CSRFMiddleware.ICSRFService>();

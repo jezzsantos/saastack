@@ -147,5 +147,6 @@ public class SingleSignOnApiSpec : WebApiSpec<Program>
 
     private static void OverrideDependencies(IServiceCollection services)
     {
+        // do nothing
     }
 }

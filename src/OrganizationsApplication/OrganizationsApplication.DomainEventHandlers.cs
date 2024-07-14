@@ -154,7 +154,7 @@ partial class OrganizationsApplication
         org = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Organization {Id} avatar was removed", org.Id);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
-            org.ToUsageEvent(caller));
+            org.ToOrganizationChangedUsageEvent(caller));
 
         return Result.Ok;
     }

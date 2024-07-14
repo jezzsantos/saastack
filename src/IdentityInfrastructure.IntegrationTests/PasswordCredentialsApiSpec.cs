@@ -105,12 +105,14 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
+        await PropagateDomainEventsAsync();
         var token = UserNotificationsService.LastRegistrationConfirmationToken;
         await Api.PostAsync(new ConfirmRegistrationPersonPasswordRequest
         {
             Token = token!
         });
 
+        await PropagateDomainEventsAsync();
         var result = await Api.PostAsync(new AuthenticatePasswordRequest
         {
             Username = "auser@company.com",
@@ -137,12 +139,14 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
+        await PropagateDomainEventsAsync();
         var token = UserNotificationsService.LastRegistrationConfirmationToken;
         await Api.PostAsync(new ConfirmRegistrationPersonPasswordRequest
         {
             Token = token!
         });
 
+        await PropagateDomainEventsAsync();
         var authenticate = await Api.PostAsync(new AuthenticatePasswordRequest
         {
             Username = "auser@company.com",

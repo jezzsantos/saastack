@@ -60,6 +60,24 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Authentication.Failed.AccountSuspended.
+        /// </summary>
+        public static string APIKeysApplication_Authenticate_AccountSuspended {
+            get {
+                return ResourceManager.GetString("APIKeysApplication_Authenticate_AccountSuspended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authentication.Passed.
+        /// </summary>
+        public static string APIKeysApplication_Authenticate_Succeeded {
+            get {
+                return ResourceManager.GetString("APIKeysApplication_Authenticate_Succeeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CSRFProtection.Failed.
         /// </summary>
         public static string CSRFMiddleware_CSRFProtection_Failed {

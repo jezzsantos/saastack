@@ -84,4 +84,10 @@
     <data name="OrganizationsApplication_OrganizationDeleted" xml:space="preserve">
         <value>Organization.Deleted</value>
     </data>
+    <data name="APIKeysApplication_Authenticate_AccountSuspended" xml:space="preserve">
+        <value>Authentication.Failed.AccountSuspended</value>
+    </data>
+    <data name="APIKeysApplication_Authenticate_Succeeded" xml:space="preserve">
+        <value>Authentication.Passed</value>
+    </data>
 </root>

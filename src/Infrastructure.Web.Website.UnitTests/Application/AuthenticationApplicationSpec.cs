@@ -77,8 +77,6 @@ public class AuthenticationApplicationSpec
             req.Username == "ausername"
             && req.Password == "apassword"
         ), null, It.IsAny<CancellationToken>()));
-        _recorder.Verify(rec =>
-            rec.TrackUsage(It.IsAny<ICallContext>(), UsageConstants.Events.UsageScenarios.Generic.UserLogin, null));
     }
 
     [Fact]
@@ -117,8 +115,6 @@ public class AuthenticationApplicationSpec
         _serviceClient.Verify(sc => sc.PostAsync(_caller.Object, It.Is<AuthenticateSingleSignOnRequest>(req =>
             req.AuthCode == "anauthcode"
         ), null, It.IsAny<CancellationToken>()));
-        _recorder.Verify(rec =>
-            rec.TrackUsage(It.IsAny<ICallContext>(), UsageConstants.Events.UsageScenarios.Generic.UserLogin, null));
     }
 
     [Fact]

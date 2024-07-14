@@ -680,6 +680,8 @@ public class EndUsersApplicationSpec
     [Fact]
     public async Task WhenChangeDefaultMembershipAsync_ThenChanges()
     {
+        _caller.Setup(cc => cc.CallId)
+            .Returns("acallid");
         var user = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
         user.Register(Roles.Create(PlatformRoles.Operations).Value, Features.Empty,
             EndUserProfile.Create("afirstname").Value, Optional<EmailAddress>.None);
@@ -688,10 +690,26 @@ public class EndUsersApplicationSpec
             Features.Create(TenantFeatures.Basic).Value);
         _endUserRepository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
-
+        _userProfilesService.Setup(ups =>
+                ups.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserProfile
+            {
+                Id = "aprofileid",
+                UserId = "auserid",
+                DisplayName = "adisplayname",
+                Name = new PersonName
+                {
+                    FirstName = "afirstname"
+                }
+            });
+        
         var result = await _application.ChangeDefaultMembershipAsync(_caller.Object, "anorganizationid",
             CancellationToken.None);
 
         result.Value.Id.Should().Be("anid");
+        _userProfilesService.Verify(ups =>
+            ups.GetProfilePrivateAsync(It.Is<ICallerContext>(cc => cc.CallId == "acallid"), "anid",
+                It.IsAny<CancellationToken>()));
     }
 }

@@ -6,6 +6,9 @@ namespace IdentityApplication;
 
 public interface IAPIKeysApplication
 {
+    Task<Result<EndUserWithMemberships, Error>> AuthenticateAsync(ICallerContext caller, string apiKey,
+        CancellationToken cancellationToken);
+
     Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext caller, string userId, string description,
         DateTime? expiresOn, CancellationToken cancellationToken);
 
@@ -14,10 +17,6 @@ public interface IAPIKeysApplication
 #endif
 
     Task<Result<Error>> DeleteAPIKeyAsync(ICallerContext caller, string id, CancellationToken cancellationToken);
-
-    Task<Result<Optional<EndUserWithMemberships>, Error>> FindMembershipsForAPIKeyAsync(ICallerContext caller,
-        string apiKey,
-        CancellationToken cancellationToken);
 
     Task<Result<SearchResults<APIKey>, Error>> SearchAllAPIKeysForCallerAsync(ICallerContext caller,
         SearchOptions searchOptions,

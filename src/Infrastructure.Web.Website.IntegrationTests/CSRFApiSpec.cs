@@ -204,7 +204,8 @@ public class CSRFApiSpec
 
         public GivenAnInsecurePostRequestByAuthenticatedUser(WebApiSetup<Program> setup) : base(setup)
         {
-            var (userId, _) = HttpApi.LoginUserFromBrowserAsync(JsonOptions, CSRFService).GetAwaiter().GetResult();
+            var (userId, _) = HttpApi.LoginUserFromBrowserAsync(JsonOptions, CSRFService).GetAwaiter()
+                .GetResult();
             _userId = userId;
         }
 

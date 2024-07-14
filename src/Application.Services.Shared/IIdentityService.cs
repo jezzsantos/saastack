@@ -6,7 +6,6 @@ namespace Application.Services.Shared;
 
 public interface IIdentityService
 {
-    Task<Result<Optional<EndUserWithMemberships>, Error>> FindMembershipsForAPIKeyAsync(ICallerContext caller,
-        string apiKey,
-        CancellationToken cancellationToken);
+    Task<Result<EndUserWithMemberships, Error>> AuthenticateApiKeyAsync(ICallerContext caller,
+        string apiKey, CancellationToken cancellationToken);
 }

@@ -14,13 +14,16 @@ public static class UsageConstants
     public static class Properties
     {
         public const string AuditCode = "Code";
+        public const string AuthProvider = "AuthProvider";
         public const string AvatarUrl = "AvatarUrl";
         public const string CallId = "CallId";
         public const string CarMake = "Make";
         public const string CarModel = "Model";
         public const string CarYear = "Year";
+        public const string Classification = "Classification";
         public const string Component = "Component";
         public const string CreatedById = "CreateBy";
+        public const string DefaultOrganizationId = "DefaultOrganizationId";
         public const string Duration = "Duration";
         public const string EmailAddress = "EmailAddress";
         public const string EndPoint = "EndPoint";
@@ -38,6 +41,7 @@ public static class UsageConstants
         public const string ResourceId = "ResourceId";
         public const string Started = "Started";
         public const string TenantId = "TenantId";
+        public const string TenantIdOverride = "TenantIdOverride";
         public const string Timestamp = "Timestamp";
         public const string Timezone = "Timezone";
         public const string UsedById = "UserId";
@@ -62,7 +66,10 @@ public static class UsageConstants
                 public const string GuestInvited = "User Guest Invited";
                 public const string MachineRegistered = "Machine Registered";
                 public const string Measurement = "Measured";
+                public const string MembershipAdded = "Membership Added";
+                public const string MembershipChanged = "Membership Changed";
                 public const string OrganizationChanged = "Organization Updated";
+                public const string OrganizationCreated = "Organization Created";
                 public const string PersonRegistrationConfirmed = "User Registered";
                 public const string PersonRegistrationCreated = "User Registration Created";
                 public const string PersonReRegistered = "User Registration ReAttempted";

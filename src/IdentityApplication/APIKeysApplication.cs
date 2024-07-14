@@ -1,3 +1,4 @@
+using Application.Common;
 using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Resources.Shared;
@@ -15,6 +16,7 @@ namespace IdentityApplication;
 
 public class APIKeysApplication : IAPIKeysApplication
 {
+    private const string ProviderName = "apikey";
     public static readonly TimeSpan DefaultAPIKeyExpiry = TimeSpan.FromHours(1);
     private readonly IAPIKeyHasherService _apiKeyHasherService;
     private readonly IEndUsersService _endUsersService;
@@ -22,16 +24,78 @@ public class APIKeysApplication : IAPIKeysApplication
     private readonly IRecorder _recorder;
     private readonly IAPIKeysRepository _repository;
     private readonly ITokensService _tokensService;
+    private readonly IUserProfilesService _userProfilesService;
 
     public APIKeysApplication(IRecorder recorder, IIdentifierFactory identifierFactory, ITokensService tokensService,
-        IAPIKeyHasherService apiKeyHasherService, IEndUsersService endUsersService, IAPIKeysRepository repository)
+        IAPIKeyHasherService apiKeyHasherService, IEndUsersService endUsersService,
+        IUserProfilesService userProfilesService, IAPIKeysRepository repository)
     {
         _recorder = recorder;
         _identifierFactory = identifierFactory;
         _tokensService = tokensService;
         _apiKeyHasherService = apiKeyHasherService;
         _endUsersService = endUsersService;
+        _userProfilesService = userProfilesService;
         _repository = repository;
+    }
+
+    public async Task<Result<EndUserWithMemberships, Error>> AuthenticateAsync(
+        ICallerContext caller, string apiKey, CancellationToken cancellationToken)
+    {
+        var keyToken = _tokensService.ParseApiKey(apiKey);
+        if (!keyToken.HasValue)
+        {
+            return Error.NotAuthenticated();
+        }
+
+        var retrievedApiKey = await _repository.FindByAPIKeyTokenAsync(keyToken.Value.Token, cancellationToken);
+        if (retrievedApiKey.IsFailure)
+        {
+            return retrievedApiKey.Error;
+        }
+
+        if (!retrievedApiKey.Value.HasValue)
+        {
+            return Error.NotAuthenticated();
+        }
+
+        var retrievedUser =
+            await _endUsersService.GetMembershipsPrivateAsync(caller, retrievedApiKey.Value.Value.UserId,
+                cancellationToken);
+        if (retrievedUser.IsFailure)
+        {
+            return Error.NotAuthenticated();
+        }
+
+        var user = retrievedUser.Value;
+        if (user.Status != EndUserStatus.Registered)
+        {
+            return Error.NotAuthenticated();
+        }
+
+        if (user.Access == EndUserAccess.Suspended)
+        {
+            _recorder.AuditAgainst(caller.ToCall(), user.Id,
+                Audits.APIKeysApplication_Authenticate_AccountSuspended,
+                "User {Id} tried to authenticate a APIKey with a suspended account", user.Id);
+            return Error.EntityExists(Resources.APIKeysApplication_AccountSuspended);
+        }
+
+        var maintenance = Caller.CreateAsMaintenance(caller.CallId);
+        var profiled = await _userProfilesService.GetProfilePrivateAsync(maintenance, user.Id, cancellationToken);
+        if (profiled.IsFailure)
+        {
+            return profiled.Error;
+        }
+
+        var profile = profiled.Value;
+        _recorder.AuditAgainst(caller.ToCall(), user.Id,
+            Audits.APIKeysApplication_Authenticate_Succeeded,
+            "User {Id} succeeded to authenticate with APIKey", user.Id);
+        _recorder.TrackUsageFor(caller.ToCall(), user.Id, UsageConstants.Events.UsageScenarios.Generic.UserLogin,
+            user.ToLoginUserUsage(ProviderName, profile));
+
+        return user;
     }
 
     public async Task<Result<APIKey, Error>> CreateAPIKeyAsync(ICallerContext caller, string userId,
@@ -100,39 +164,6 @@ public class APIKeysApplication : IAPIKeysApplication
         return Result.Ok;
     }
 
-    public async Task<Result<Optional<EndUserWithMemberships>, Error>> FindMembershipsForAPIKeyAsync(
-        ICallerContext caller, string apiKey,
-        CancellationToken cancellationToken)
-    {
-        var keyToken = _tokensService.ParseApiKey(apiKey);
-        if (!keyToken.HasValue)
-        {
-            return Error.EntityNotFound();
-        }
-
-        var retrievedApiKey = await _repository.FindByAPIKeyTokenAsync(keyToken.Value.Token, cancellationToken);
-        if (retrievedApiKey.IsFailure)
-        {
-            return retrievedApiKey.Error;
-        }
-
-        if (!retrievedApiKey.Value.HasValue)
-        {
-            return Optional<EndUserWithMemberships>.None;
-        }
-
-        var retrievedUser =
-            await _endUsersService.GetMembershipsPrivateAsync(caller, retrievedApiKey.Value.Value.UserId,
-                cancellationToken);
-        if (retrievedUser.IsFailure)
-        {
-            return Optional<EndUserWithMemberships>.None;
-        }
-
-        var user = retrievedUser.Value;
-        return user.ToOptional();
-    }
-
     public async Task<Result<SearchResults<APIKey>, Error>> SearchAllAPIKeysForCallerAsync(ICallerContext caller,
         SearchOptions searchOptions, GetOptions getOptions,
         CancellationToken cancellationToken)
@@ -176,4 +207,5 @@ internal static class APIKeyConversionExtensions
             Id = apiKey.Id
         };
     }
+    
 }

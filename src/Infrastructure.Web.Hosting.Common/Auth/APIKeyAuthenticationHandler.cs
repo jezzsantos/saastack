@@ -43,22 +43,19 @@ public class APIKeyAuthenticationHandler : AuthenticationHandler<APIKeyOptions>
 
         var caller = Context.RequestServices.GetRequiredService<ICallerContextFactory>().Create();
         var identityService = Context.RequestServices.GetRequiredService<IIdentityService>();
-        var lookup = await identityService.FindMembershipsForAPIKeyAsync(caller, apiKey, CancellationToken.None);
-        if (lookup.IsFailure)
-        {
-            return AuthenticateResult.Fail(Resources.AuthenticationHandler_Failed);
-        }
-
-        var isAuthenticated = lookup.Value.HasValue;
-        if (!isAuthenticated)
+        var authenticated = await identityService.AuthenticateApiKeyAsync(caller, apiKey, CancellationToken.None);
+        if (authenticated.IsFailure)
         {
             var recorder = Context.RequestServices.GetRequiredService<IRecorder>();
             recorder.Audit(caller.ToCall(), AuditingConstants.APIKeyAuthenticationFailed,
                 Resources.APIKeyAuthenticationHandler_FailedAuthentication);
-            return AuthenticateResult.Fail(Resources.AuthenticationHandler_Failed);
+            var message = authenticated.Error.Code == ErrorCode.NotAuthenticated
+                ? Resources.AuthenticationHandler_Failed
+                : authenticated.Error.Message;
+            return AuthenticateResult.Fail(message);
         }
 
-        var user = lookup.Value.Value;
+        var user = authenticated.Value;
         return AuthenticateResult.Success(IssueTicket());
 
         AuthenticationTicket IssueTicket()

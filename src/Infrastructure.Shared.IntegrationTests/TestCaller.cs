@@ -5,6 +5,11 @@ namespace Infrastructure.Shared.IntegrationTests;
 
 public class TestCaller : ICallerContext
 {
+    public TestCaller(string? tenantId = null)
+    {
+        TenantId = tenantId;
+    }
+    
     public Optional<ICallerContext.CallerAuthorization> Authorization =>
         Optional<ICallerContext.CallerAuthorization>.None;
 
@@ -20,5 +25,5 @@ public class TestCaller : ICallerContext
 
     public ICallerContext.CallerRoles Roles => new();
 
-    public string? TenantId => null;
+    public string? TenantId { get; }
 }

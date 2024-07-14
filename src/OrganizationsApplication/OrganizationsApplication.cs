@@ -117,7 +117,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         org = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Changed avatar for organization: {Id}", org.Id);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
-            org.ToUsageEvent(caller));
+            org.ToOrganizationChangedUsageEvent(caller));
 
         return org.ToOrganization();
     }
@@ -162,7 +162,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         org = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Changed organization: {Id}", org.Id);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
-            org.ToUsageEvent(caller));
+            org.ToOrganizationChangedUsageEvent(caller));
 
         return org.ToOrganization();
     }
@@ -259,7 +259,7 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         org = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Organization {Id} avatar was deleted", org.Id);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.OrganizationChanged,
-            org.ToUsageEvent(caller));
+            org.ToOrganizationChangedUsageEvent(caller));
 
         return org.ToOrganization();
     }
@@ -582,6 +582,15 @@ public partial class OrganizationsApplication : IOrganizationsApplication
         org = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Created organization: {Id}, by {CreatedBy}", org.Id,
             org.CreatedById);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.OrganizationCreated,
+            new Dictionary<string, object>
+            {
+                { UsageConstants.Properties.Id, org.Id },
+                { UsageConstants.Properties.Name, org.Name.Name },
+                { UsageConstants.Properties.Ownership, ownership },
+                { UsageConstants.Properties.CreatedById, org.CreatedById },
+                { UsageConstants.Properties.UserIdOverride, org.CreatedById }
+            });
 
         return org.ToOrganization();
     }
@@ -701,13 +710,16 @@ internal static class OrganizationConversionExtensions
         return new TenantSettings(dictionary);
     }
 
-    public static Dictionary<string, object> ToUsageEvent(this OrganizationRoot organization, ICallerContext caller)
+    public static Dictionary<string, object> ToOrganizationChangedUsageEvent(this OrganizationRoot organization,
+        ICallerContext caller)
     {
         var context = new Dictionary<string, object>
         {
+            [UsageConstants.Properties.Id] = organization.Id,
             [UsageConstants.Properties.Name] = organization.Name.Name,
             [UsageConstants.Properties.Ownership] = organization.Ownership,
-            [UsageConstants.Properties.CreatedById] = organization.CreatedById
+            [UsageConstants.Properties.CreatedById] = organization.CreatedById,
+            [UsageConstants.Properties.UserIdOverride] = organization.CreatedById
         };
         if (organization.Avatar.HasValue)
         {

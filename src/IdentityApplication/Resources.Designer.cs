@@ -60,6 +60,15 @@ namespace IdentityApplication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The user account is suspended.
+        /// </summary>
+        internal static string APIKeysApplication_AccountSuspended {
+            get {
+                return ResourceManager.GetString("APIKeysApplication_AccountSuspended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user account is locked out.
         /// </summary>
         internal static string PasswordCredentialsApplication_AccountLocked {

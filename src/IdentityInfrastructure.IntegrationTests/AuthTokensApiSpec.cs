@@ -31,12 +31,14 @@ public class AuthTokensApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
+        await PropagateDomainEventsAsync();
         var token = UserNotificationsService.LastRegistrationConfirmationToken;
         await Api.PostAsync(new ConfirmRegistrationPersonPasswordRequest
         {
             Token = token!
         });
 
+        await PropagateDomainEventsAsync();
         var oldTokens = await Api.PostAsync(new AuthenticatePasswordRequest
         {
             Username = "auser@company.com",

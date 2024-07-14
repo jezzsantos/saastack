@@ -81,7 +81,7 @@ partial class UserProfilesApplication
         _recorder.TraceInformation(caller.ToCall(), "Profile {Id} avatar was removed for user {UserId}", profile.Id,
             profile.UserId);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
-            profile.ToUsageEvent(caller));
+            profile.ToUserProfileChangedUsageEvent(caller));
 
         return Result.Ok;
     }
@@ -244,7 +244,7 @@ partial class UserProfilesApplication
         _recorder.TraceInformation(caller.ToCall(), "Profile {Id} updated its default organization for user {UserId}",
             profile.Id, profile.UserId);
         _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserProfileChanged,
-            profile.ToUsageEvent(caller));
+            profile.ToUserProfileChangedUsageEvent(caller));
 
         return profile.ToProfile().ToOptional();
     }

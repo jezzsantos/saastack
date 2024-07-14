@@ -65,8 +65,9 @@ public class MachineCredentialsApiSpec : WebApiSpec<Program>
             Name = "amachinename"
         });
 
-#if TESTINGONLY
+        await PropagateDomainEventsAsync(PropagationRounds.Twice);
         var apiKey = machine.Content.Value.Machine!.ApiKey;
+#if TESTINGONLY
         var result = await Api.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest(),
             req => req.SetAPIKey(apiKey));
 

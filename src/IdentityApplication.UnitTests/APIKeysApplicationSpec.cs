@@ -32,6 +32,7 @@ public class APIKeysApplicationSpec
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IAPIKeysRepository> _repository;
     private readonly Mock<ITokensService> _tokensService;
+    private readonly Mock<IUserProfilesService> _userProfilesService;
 
     public APIKeysApplicationSpec()
     {
@@ -65,16 +66,17 @@ public class APIKeysApplicationSpec
         _apiKeyHasherService.Setup(khs => khs.ValidateAPIKeyHash(It.IsAny<string>()))
             .Returns(true);
         _endUsersService = new Mock<IEndUsersService>();
+        _userProfilesService = new Mock<IUserProfilesService>();
         _repository = new Mock<IAPIKeysRepository>();
         _repository.Setup(rep => rep.SaveAsync(It.IsAny<APIKeyRoot>(), It.IsAny<CancellationToken>()))
             .Returns((APIKeyRoot root, CancellationToken _) => Task.FromResult<Result<APIKeyRoot, Error>>(root));
 
         _application = new APIKeysApplication(_recorder.Object, _idFactory.Object, _tokensService.Object,
-            _apiKeyHasherService.Object, _endUsersService.Object, _repository.Object);
+            _apiKeyHasherService.Object, _endUsersService.Object, _userProfilesService.Object, _repository.Object);
     }
 
     [Fact]
-    public async Task WhenFindUserForAPIKeyAsyncAndNotAValidApiKey_ThenReturnsError()
+    public async Task WhenAuthenticateAsyncAndNotAValidApiKey_ThenReturnsError()
     {
         _tokensService.Setup(ts => ts.ParseApiKey(It.IsAny<string>()))
             .Returns(Optional<APIKeyToken>.None);
@@ -82,25 +84,25 @@ public class APIKeysApplicationSpec
             .ReturnsAsync(Optional<APIKeyRoot>.None);
 
         var result =
-            await _application.FindMembershipsForAPIKeyAsync(_caller.Object, "anapikey", CancellationToken.None);
+            await _application.AuthenticateAsync(_caller.Object, "anapikey", CancellationToken.None);
 
-        result.Should().BeError(ErrorCode.EntityNotFound);
+        result.Should().BeError(ErrorCode.NotAuthenticated);
     }
 
     [Fact]
-    public async Task WhenFindUserForAPIKeyAsyncAndApiKeyNotExist_ThenReturnsNone()
+    public async Task WhenAuthenticateAsyncAndApiKeyNotExist_ThenReturnsError()
     {
         _repository.Setup(rep => rep.FindByAPIKeyTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Optional<APIKeyRoot>.None);
 
         var result =
-            await _application.FindMembershipsForAPIKeyAsync(_caller.Object, "anapikey", CancellationToken.None);
+            await _application.AuthenticateAsync(_caller.Object, "anapikey", CancellationToken.None);
 
-        result.Value.Should().BeNone();
+        result.Should().BeError(ErrorCode.NotAuthenticated);
     }
 
     [Fact]
-    public async Task WhenFindUserForAPIKeyAsyncAndUserNotExist_ThenReturnsNone()
+    public async Task WhenAuthenticateAsyncAndUserNotExist_ThenReturnsError()
     {
         var apiKey = CreateApiKey();
         _repository.Setup(rep => rep.FindByAPIKeyTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -111,22 +113,23 @@ public class APIKeysApplicationSpec
             .ReturnsAsync(Error.EntityNotFound());
 
         var result =
-            await _application.FindMembershipsForAPIKeyAsync(_caller.Object, "anapikey", CancellationToken.None);
+            await _application.AuthenticateAsync(_caller.Object, "anapikey", CancellationToken.None);
 
-        result.Value.Should().BeNone();
+        result.Should().BeError(ErrorCode.NotAuthenticated);
         _endUsersService.Verify(
             eus => eus.GetMembershipsPrivateAsync(_caller.Object, "auserid", CancellationToken.None));
     }
 
     [Fact]
-    public async Task WhenFindUserForAPIKeyAsync_ThenReturnsApiKey()
+    public async Task WhenAuthenticateAsyncAndUserNotRegistered_ThenReturnsError()
     {
         var apiKey = CreateApiKey();
         _repository.Setup(rep => rep.FindByAPIKeyTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(apiKey.ToOptional());
         var user = new EndUserWithMemberships
         {
-            Id = "auserid"
+            Id = "auserid",
+            Status = EndUserStatus.Unregistered
         };
         _endUsersService.Setup(eus =>
                 eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
@@ -134,11 +137,94 @@ public class APIKeysApplicationSpec
             .ReturnsAsync(user);
 
         var result =
-            await _application.FindMembershipsForAPIKeyAsync(_caller.Object, "anapikey", CancellationToken.None);
+            await _application.AuthenticateAsync(_caller.Object, "anapikey", CancellationToken.None);
 
-        result.Value.Value.Id.Should().Be("auserid");
+        result.Should().BeError(ErrorCode.NotAuthenticated);
         _endUsersService.Verify(
             eus => eus.GetMembershipsPrivateAsync(_caller.Object, "auserid", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task WhenAuthenticateAsyncAndUserIsSuspended_ThenReturnsError()
+    {
+        var apiKey = CreateApiKey();
+        _repository.Setup(rep => rep.FindByAPIKeyTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(apiKey.ToOptional());
+        var user = new EndUserWithMemberships
+        {
+            Id = "auserid",
+            Status = EndUserStatus.Registered,
+            Access = EndUserAccess.Suspended
+        };
+        _endUsersService.Setup(eus =>
+                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        var result =
+            await _application.AuthenticateAsync(_caller.Object, "anapikey", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityExists, Resources.APIKeysApplication_AccountSuspended);
+        _endUsersService.Verify(
+            eus => eus.GetMembershipsPrivateAsync(_caller.Object, "auserid", CancellationToken.None));
+        _recorder.Verify(rec => rec.AuditAgainst(It.IsAny<ICallContext>(), "auserid",
+            Audits.APIKeysApplication_Authenticate_AccountSuspended, It.IsAny<string>(),
+            It.IsAny<object[]>()));
+    }
+
+    [Fact]
+    public async Task WhenAuthenticateAsync_ThenAuthenticates()
+    {
+        _caller.Setup(cc => cc.CallId)
+            .Returns("acallid");
+        var apiKey = CreateApiKey();
+        _repository.Setup(rep => rep.FindByAPIKeyTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(apiKey.ToOptional());
+        var user = new EndUserWithMemberships
+        {
+            Id = "auserid",
+            Status = EndUserStatus.Registered,
+            Access = EndUserAccess.Enabled,
+            Memberships =
+            [
+                new Membership
+                {
+                    Id = "amembershipid",
+                    IsDefault = true,
+                    OrganizationId = "anorganizationid",
+                    UserId = "auserid"
+                }
+            ]
+        };
+        _endUsersService.Setup(eus =>
+                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _userProfilesService.Setup(ups =>
+                ups.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserProfile
+            {
+                Id = "aprofileid",
+                UserId = "auserid",
+                Name = new PersonName
+                {
+                    FirstName = "afirstname",
+                    LastName = "alastname"
+                },
+                DisplayName = "adisplayname"
+            });
+
+        var result =
+            await _application.AuthenticateAsync(_caller.Object, "anapikey", CancellationToken.None);
+
+        result.Value.Id.Should().Be("auserid");
+        _endUsersService.Verify(
+            eus => eus.GetMembershipsPrivateAsync(_caller.Object, "auserid", CancellationToken.None));
+        _userProfilesService.Verify(ups =>
+            ups.GetProfilePrivateAsync(It.Is<ICallerContext>(cc =>
+                cc.CallId == "acallid"
+            ), "auserid", It.IsAny<CancellationToken>()));
     }
 
 #if TESTINGONLY

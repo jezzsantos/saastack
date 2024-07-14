@@ -21,6 +21,7 @@ using Xunit;
 using Events = OrganizationsDomain.Events;
 using Membership = EndUsersDomain.Membership;
 using OrganizationOwnership = Domain.Shared.Organizations.OrganizationOwnership;
+using PersonName = Application.Resources.Shared.PersonName;
 
 namespace EndUsersApplication.UnitTests;
 
@@ -33,6 +34,7 @@ public class EndUsersApplicationDomainEventHandlersSpec
     private readonly Mock<IIdentifierFactory> _idFactory;
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<ISubscriptionsService> _subscriptionsService;
+    private readonly Mock<IUserProfilesService> _userProfilesService;
 
     public EndUsersApplicationDomainEventHandlersSpec()
     {
@@ -62,13 +64,13 @@ public class EndUsersApplicationDomainEventHandlersSpec
             .Returns((EndUserRoot root, bool _, CancellationToken _) =>
                 Task.FromResult<Result<EndUserRoot, Error>>(root));
         var invitationRepository = new Mock<IInvitationRepository>();
-        var userProfilesService = new Mock<IUserProfilesService>();
+        _userProfilesService = new Mock<IUserProfilesService>();
         var notificationsService = new Mock<IUserNotificationsService>();
         _subscriptionsService = new Mock<ISubscriptionsService>();
 
         _application =
             new EndUsersApplication(_recorder.Object, _idFactory.Object, settings.Object, notificationsService.Object,
-                userProfilesService.Object, _subscriptionsService.Object, invitationRepository.Object,
+                _userProfilesService.Object, _subscriptionsService.Object, invitationRepository.Object,
                 _endUserRepository.Object);
     }
 
@@ -94,6 +96,19 @@ public class EndUsersApplicationDomainEventHandlersSpec
             EndUserProfile.Create("afirstname").Value, EmailAddress.Create("auser@company.com").Value);
         _endUserRepository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
+        _userProfilesService.Setup(ups =>
+                ups.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserProfile
+            {
+                Id = "aprofileid",
+                UserId = "auserid",
+                DisplayName = "adisplayname",
+                Name = new PersonName
+                {
+                    FirstName = "afirstname"
+                }
+            });
         var domainEvent = Events.Created("anorganizationid".ToId(), OrganizationOwnership.Shared,
             "auserid".ToId(), DisplayName.Create("adisplayname").Value);
 
@@ -108,11 +123,16 @@ public class EndUsersApplicationDomainEventHandlersSpec
             && eu.Memberships[0].Roles.HasRole(TenantRoles.Member)
             && eu.Memberships[0].Features.HasFeature(TenantFeatures.Basic)
         ), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
+        _userProfilesService.Verify(
+            ups => ups.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
     public async Task HandleOrganizationCreatedAsyncForAnInvitedMachine_ThenAddsMemberships()
     {
+        _caller.Setup(cc => cc.CallId)
+            .Returns("acallid");
         var machine = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Machine).Value;
         machine.Register(Roles.Create(PlatformRoles.Standard).Value, Features.Create(PlatformFeatures.Basic).Value,
             EndUserProfile.Create("afirstname").Value, EmailAddress.Create("auser@company.com").Value);
@@ -120,6 +140,19 @@ public class EndUsersApplicationDomainEventHandlersSpec
             Roles.Create(TenantRoles.Member).Value, Features.Create(TenantFeatures.Basic).Value);
         _endUserRepository.Setup(rep => rep.LoadAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(machine);
+        _userProfilesService.Setup(ups =>
+                ups.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserProfile
+            {
+                Id = "aprofileid",
+                UserId = "auserid",
+                DisplayName = "adisplayname",
+                Name = new PersonName
+                {
+                    FirstName = "afirstname"
+                }
+            });
         var domainEvent = Events.Created("anorganizationid1".ToId(), OrganizationOwnership.Shared,
             "auserid".ToId(), DisplayName.Create("adisplayname").Value);
 
@@ -138,6 +171,9 @@ public class EndUsersApplicationDomainEventHandlersSpec
             && eu.Memberships[1].Roles == Roles.Create(TenantRoles.BillingAdmin).Value
             && eu.Memberships[1].Features == Features.Create(TenantFeatures.PaidTrial).Value
         ), It.IsAny<CancellationToken>()));
+        _userProfilesService.Verify(ups =>
+            ups.GetProfilePrivateAsync(It.Is<ICallerContext>(cc => cc.CallId == "acallid"), "anid",
+                It.IsAny<CancellationToken>()));
     }
 
     [Fact]

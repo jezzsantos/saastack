@@ -204,7 +204,17 @@ public class SingleSignOnApplicationSpec
             {
                 Id = "amembershipsuserid",
                 Status = EndUserStatus.Registered,
-                Access = EndUserAccess.Enabled
+                Access = EndUserAccess.Enabled,
+                Memberships =
+                [
+                    new Membership
+                    {
+                        Id = "amembershipid",
+                        IsDefault = true,
+                        OrganizationId = "anorganizationid",
+                        UserId = "auserid"
+                    }
+                ]
             });
         var expiresOn = DateTime.UtcNow;
         _authTokensService.Setup(ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(),
@@ -258,7 +268,17 @@ public class SingleSignOnApplicationSpec
             {
                 Id = "amembershipsuserid",
                 Status = EndUserStatus.Registered,
-                Access = EndUserAccess.Enabled
+                Access = EndUserAccess.Enabled,
+                Memberships =
+                [
+                    new Membership
+                    {
+                        Id = "amembershipid",
+                        IsDefault = true,
+                        OrganizationId = "anorganizationid",
+                        UserId = "auserid"
+                    }
+                ]
             });
         var expiresOn = DateTime.UtcNow;
         _authTokensService.Setup(ats => ats.IssueTokensAsync(It.IsAny<ICallerContext>(),

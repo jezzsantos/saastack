@@ -100,6 +100,8 @@ partial class InvitationsApplication
         invitee = saved.Value;
         _recorder.TraceInformation(caller.ToCall(),
             "EndUser {Id} has been invited to organization {Organization}", invitee.Id, organizationId);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.MembershipAdded,
+            invitee.ToMembershipAddedUsageEvent(membership.Value));
 
         return membership.Value.ToMembership();
     }

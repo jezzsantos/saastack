@@ -1,6 +1,8 @@
+using Application.Common;
 using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Resources.Shared;
+using Application.Resources.Shared.Extensions;
 using Application.Services.Shared;
 using Common;
 using Common.Configuration;
@@ -121,9 +123,19 @@ public partial class EndUsersApplication : IEndUsersApplication
             return saved.Error;
         }
 
+        var profiled = await GetUserProfileAsync(caller, user.Id, cancellationToken);
+        if (profiled.IsFailure)
+        {
+            return profiled.Error;
+        }
+
+        var profile = profiled.Value;
         user = saved.Value;
+        var membership = user.DefaultMembership;
         _recorder.TraceInformation(caller.ToCall(), "Default membership changed for user {Id} to {OrganizationId}",
             user.Id, organizationId);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.MembershipChanged,
+            user.ToMembershipChangeUsageEvent(membership, profile));
 
         return user.ToUser();
     }
@@ -255,7 +267,13 @@ public partial class EndUsersApplication : IEndUsersApplication
 
         machine = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "Registered machine: {Id}", machine.Id);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.MachineRegistered);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.MachineRegistered,
+            new Dictionary<string, object>
+            {
+                { UsageConstants.Properties.Id, machine.Id },
+                { UsageConstants.Properties.Name, userProfile.Value.Name.FullName.Text },
+                { UsageConstants.Properties.UserIdOverride, machine.Id }
+            });
 
         if (caller.IsAuthenticated)
         {
@@ -289,6 +307,9 @@ public partial class EndUsersApplication : IEndUsersApplication
                 _recorder.TraceInformation(caller.ToCall(),
                     "Machine {Id} has become a member of {User} organization {Organization}",
                     machine.Id, adder.Id, adderDefaultMembership.OrganizationId);
+                var membership = machine.DefaultMembership;
+                _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.MembershipAdded,
+                    machine.ToMembershipAddedUsageEvent(membership));
             }
         }
 
@@ -434,7 +455,14 @@ public partial class EndUsersApplication : IEndUsersApplication
         _recorder.AuditAgainst(caller.ToCall(), person.Id,
             Audits.EndUsersApplication_User_Registered_TermsAccepted,
             "EndUser {Id} accepted their terms and conditions", person.Id);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.PersonRegistrationCreated);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.PersonRegistrationCreated,
+            new Dictionary<string, object>
+            {
+                { UsageConstants.Properties.Id, person.Id },
+                { UsageConstants.Properties.Name, userProfile.Value.Name.FullName.Text },
+                { UsageConstants.Properties.EmailAddress, email.Value.Address },
+                { UsageConstants.Properties.UserIdOverride, person.Id }
+            });
 
         return person.ToUser();
     }
@@ -585,6 +613,13 @@ public partial class EndUsersApplication : IEndUsersApplication
         return Optional<EndUserWithProfile>.None;
     }
 
+    private async Task<Result<UserProfile, Error>> GetUserProfileAsync(ICallerContext caller, Identifier userId,
+        CancellationToken cancellationToken)
+    {
+        var maintenance = Caller.CreateAsMaintenance(caller.CallId);
+        return await _userProfilesService.GetProfilePrivateAsync(maintenance, userId, cancellationToken);
+    }
+
     private async Task<Result<Optional<EndUserWithProfile>, Error>> FindInvitedGuestWithEmailAddressAsync(
         EmailAddress emailAddress, CancellationToken cancellationToken)
     {
@@ -666,6 +701,41 @@ internal static class EndUserConversionExtensions
             Features = membership.Features.Denormalize(),
             Roles = membership.Roles.Denormalize()
         };
+    }
+
+    public static Dictionary<string, object> ToMembershipAddedUsageEvent(this EndUserRoot user,
+        EndUsersDomain.Membership membership, string? organizationName = null)
+    {
+        var context = new Dictionary<string, object>
+        {
+            { UsageConstants.Properties.Id, membership.Id },
+            { UsageConstants.Properties.UserIdOverride, user.Id },
+            { UsageConstants.Properties.TenantIdOverride, membership.OrganizationId.Value }
+        };
+        if (organizationName.HasValue())
+        {
+            context.Add(UsageConstants.Properties.Name, organizationName);
+        }
+
+        return context;
+    }
+
+    public static Dictionary<string, object> ToMembershipChangeUsageEvent(this EndUserRoot user,
+        EndUsersDomain.Membership membership, UserProfile profile)
+    {
+        var context = new Dictionary<string, object>
+        {
+            { UsageConstants.Properties.Id, membership.Id },
+            { UsageConstants.Properties.Name, profile.Name.FullName() },
+            { UsageConstants.Properties.UserIdOverride, user.Id },
+            { UsageConstants.Properties.TenantIdOverride, membership.OrganizationId.Value }
+        };
+        if (profile.EmailAddress.HasValue())
+        {
+            context.Add(UsageConstants.Properties.EmailAddress, profile.EmailAddress);
+        }
+
+        return context;
     }
 
     public static UserProfile ToUnregisteredUserProfile(this MembershipJoinInvitation membership)

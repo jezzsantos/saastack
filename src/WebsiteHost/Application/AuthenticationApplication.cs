@@ -50,8 +50,6 @@ public class AuthenticationApplication : IAuthenticationApplication
             return authenticated.Error.ToError();
         }
 
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserLogin);
-
         return authenticated.Value.ToTokens();
     }
 

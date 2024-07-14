@@ -1,9 +1,12 @@
+using Application.Common;
 using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Resources.Shared;
+using Application.Resources.Shared.Extensions;
 using Application.Services.Shared;
 using Common;
 using Common.Configuration;
+using Common.Extensions;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Services.Shared;
@@ -17,6 +20,7 @@ namespace IdentityApplication;
 
 public class PasswordCredentialsApplication : IPasswordCredentialsApplication
 {
+    private const string ProviderName = "credentials";
 #if TESTINGONLY
     private const double MinAuthenticateDelayInSecs = 0;
     private const double MaxAuthenticateDelayInSecs = 0;
@@ -36,15 +40,17 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
     private readonly IIdentifierFactory _identifierFactory;
     private readonly IPasswordCredentialsRepository _repository;
     private readonly IDelayGenerator _delayGenerator;
+    private readonly IUserProfilesService _userProfilesService;
 
     public PasswordCredentialsApplication(IRecorder recorder, IIdentifierFactory identifierFactory,
-        IEndUsersService endUsersService, IUserNotificationsService userNotificationsService,
+        IEndUsersService endUsersService, IUserProfilesService userProfilesService,
+        IUserNotificationsService userNotificationsService,
         IConfigurationSettings settings,
         IEmailAddressService emailAddressService, ITokensService tokensService,
         IPasswordHasherService passwordHasherService, IAuthTokensService authTokensService,
         IWebsiteUiService websiteUiService,
-        IPasswordCredentialsRepository repository) : this(recorder,
-        identifierFactory, endUsersService, userNotificationsService, settings, emailAddressService, tokensService,
+        IPasswordCredentialsRepository repository) : this(recorder, identifierFactory, endUsersService,
+        userProfilesService, userNotificationsService, settings, emailAddressService, tokensService,
         passwordHasherService, authTokensService, websiteUiService, repository, new DelayGenerator())
     {
         _recorder = recorder;
@@ -53,7 +59,8 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
     }
 
     private PasswordCredentialsApplication(IRecorder recorder, IIdentifierFactory identifierFactory,
-        IEndUsersService endUsersService, IUserNotificationsService userNotificationsService,
+        IEndUsersService endUsersService, IUserProfilesService userProfilesService,
+        IUserNotificationsService userNotificationsService,
         IConfigurationSettings settings,
         IEmailAddressService emailAddressService, ITokensService tokensService,
         IPasswordHasherService passwordHasherService, IAuthTokensService authTokensService,
@@ -64,6 +71,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         _recorder = recorder;
         _identifierFactory = identifierFactory;
         _endUsersService = endUsersService;
+        _userProfilesService = userProfilesService;
         _userNotificationsService = userNotificationsService;
         _settings = settings;
         _emailAddressService = emailAddressService;
@@ -80,27 +88,32 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
     {
         await DelayForRandomPeriodAsync(MinAuthenticateDelayInSecs, MaxAuthenticateDelayInSecs, cancellationToken);
 
-        var retrieved = await _repository.FindCredentialsByUsernameAsync(username, cancellationToken);
-        if (retrieved.IsFailure)
+        var retrievedCredentials = await _repository.FindCredentialsByUsernameAsync(username, cancellationToken);
+        if (retrievedCredentials.IsFailure)
         {
             return Error.NotAuthenticated();
         }
 
-        if (!retrieved.Value.HasValue)
+        if (!retrievedCredentials.Value.HasValue)
         {
             return Error.NotAuthenticated();
         }
 
-        var credentials = retrieved.Value.Value;
-        var registered =
+        var credentials = retrievedCredentials.Value.Value;
+        var retrievedUser =
             await _endUsersService.GetMembershipsPrivateAsync(caller, credentials.UserId, cancellationToken);
-        if (registered.IsFailure)
+        if (retrievedUser.IsFailure)
         {
             return Error.NotAuthenticated();
         }
 
-        var user = registered.Value;
+        var user = retrievedUser.Value;
         if (user.Status != EndUserStatus.Registered)
+        {
+            return Error.NotAuthenticated();
+        }
+
+        if (user.Classification != EndUserClassification.Person)
         {
             return Error.NotAuthenticated();
         }
@@ -144,9 +157,19 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
             return Error.PreconditionViolation(Resources.PasswordCredentialsApplication_RegistrationNotVerified);
         }
 
+        var maintenance = Caller.CreateAsMaintenance(caller.CallId);
+        var profiled = await _userProfilesService.GetProfilePrivateAsync(maintenance, user.Id, cancellationToken);
+        if (profiled.IsFailure)
+        {
+            return profiled.Error;
+        }
+
+        var profile = profiled.Value;
         _recorder.AuditAgainst(caller.ToCall(), user.Id,
             Audits.PasswordCredentialsApplication_Authenticate_Succeeded,
             "User {Id} succeeded to authenticate with a password", user.Id);
+        _recorder.TrackUsageFor(caller.ToCall(), user.Id, UsageConstants.Events.UsageScenarios.Generic.UserLogin,
+            user.ToLoginUserUsage(ProviderName, profile));
 
         var issued = await _authTokensService.IssueTokensAsync(caller, user, cancellationToken);
         if (issued.IsFailure)
@@ -533,5 +556,28 @@ internal static class PasswordCredentialConversionExtensions
             Id = credential.Id,
             User = user
         };
+    }
+
+    public static Dictionary<string, object> ToLoginUserUsage(this EndUserWithMemberships user, string providerName,
+        UserProfile profile)
+    {
+        var context = new Dictionary<string, object>
+        {
+            { UsageConstants.Properties.AuthProvider, providerName },
+            { UsageConstants.Properties.UserIdOverride, user.Id },
+            { UsageConstants.Properties.Name, profile.Name.FullName() }
+        };
+        if (profile.EmailAddress.HasValue())
+        {
+            context.Add(UsageConstants.Properties.EmailAddress, profile.EmailAddress);
+        }
+
+        var defaultMembership = user.Memberships.FirstOrDefault(ms => ms.IsDefault);
+        if (defaultMembership.Exists())
+        {
+            context.Add(UsageConstants.Properties.DefaultOrganizationId, defaultMembership.Id);
+        }
+
+        return context;
     }
 }

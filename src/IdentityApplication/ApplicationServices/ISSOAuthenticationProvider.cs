@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Application.Resources.Shared;
 using Common;
+using Common.Extensions;
 
 namespace IdentityApplication.ApplicationServices;
 
@@ -42,4 +43,8 @@ public class SSOUserInfo
     public TimezoneIANA Timezone { get; }
 
     public IReadOnlyList<AuthToken> Tokens { get; }
+
+    public string FullName => LastName.HasValue()
+        ? $"{FirstName} {LastName}"
+        : FirstName;
 }

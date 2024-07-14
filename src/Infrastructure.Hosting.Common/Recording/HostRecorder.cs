@@ -258,7 +258,7 @@ public sealed class HostRecorder : IRecorder, IDisposable
 
         var properties = additional ?? new Dictionary<string, object>();
         properties.TryAdd(UsageConstants.Properties.Component, _usageComponentName);
-        _usageReporter.Track(context, forId, eventName, properties);
+        _usageReporter.TrackAsync(context, forId, eventName, properties).GetAwaiter().GetResult();
     }
 
     public override string ToString()

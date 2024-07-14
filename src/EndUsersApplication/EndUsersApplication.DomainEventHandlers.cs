@@ -20,8 +20,8 @@ partial class EndUsersApplication
         CancellationToken cancellationToken)
     {
         var ownership = domainEvent.Ownership.ToEnumOrDefault(OrganizationOwnership.Shared);
-        return await CreateMembershipsAsync(caller, domainEvent.CreatedById.ToId(), domainEvent.RootId.ToId(),
-            ownership, cancellationToken);
+        return await AddMembershipAsync(caller, domainEvent.CreatedById.ToId(), domainEvent.RootId.ToId(),
+            ownership, domainEvent.Name, cancellationToken);
     }
 
     public async Task<Result<Error>> HandleOrganizationDeletedAsync(ICallerContext caller,
@@ -92,9 +92,9 @@ partial class EndUsersApplication
         return Result.Ok;
     }
 
-    private async Task<Result<Error>> CreateMembershipsAsync(ICallerContext caller,
+    private async Task<Result<Error>> AddMembershipAsync(ICallerContext caller,
         Identifier createdById, Identifier organizationId, OrganizationOwnership ownership,
-        CancellationToken cancellationToken)
+        string organizationName, CancellationToken cancellationToken)
     {
         var retrievedOwner = await _endUserRepository.LoadAsync(createdById, cancellationToken);
         if (retrievedOwner.IsFailure)
@@ -128,6 +128,9 @@ partial class EndUsersApplication
         owner = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "EndUser {Id} has become a member of organization {Organization}",
             owner.Id, organizationId);
+        var membership = owner.DefaultMembership;
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.MembershipAdded,
+            owner.ToMembershipAddedUsageEvent(membership, organizationName));
 
         if (owner.IsMachine)
         {
@@ -146,10 +149,19 @@ partial class EndUsersApplication
                     return saved.Error;
                 }
 
+                var profiled = await GetUserProfileAsync(caller, owner.Id, cancellationToken);
+                if (profiled.IsFailure)
+                {
+                    return profiled.Error;
+                }
+
+                var profile = profiled.Value;
                 owner = saved.Value;
                 _recorder.TraceInformation(caller.ToCall(),
                     "Machine {Id} has become a member of organization {Organization}",
                     owner.Id, previousMembership.OrganizationId);
+                _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.MembershipChanged,
+                    owner.ToMembershipChangeUsageEvent(previousMembership, profile));
             }
         }
 

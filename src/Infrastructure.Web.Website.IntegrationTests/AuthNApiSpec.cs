@@ -55,7 +55,8 @@ public class AuthNApiSpec : WebsiteSpec<Program>
     [Fact]
     public async Task WhenAuthenticateAndWrongCredentials_ThenReturnsError()
     {
-        await HttpApi.RegisterPersonUserFromBrowserAsync(JsonOptions, CSRFService, "auser@company.com", "1Password!");
+        await HttpApi.RegisterPersonUserFromBrowserAsync(JsonOptions, CSRFService, "auser@company.com",
+            "1Password!");
 
         var result =
             await HttpApi.AuthenticateUserFromBrowserAsync(JsonOptions, CSRFService, "auser@company.com",

@@ -48,4 +48,7 @@
     <data name="SSOProvidersService_UnknownProvider" xml:space="preserve">
       <value>The '{0}' is not registered</value>
     </data>
+    <data name="APIKeysApplication_AccountSuspended" xml:space="preserve">
+      <value>The user account is suspended</value>
+    </data>
 </root>

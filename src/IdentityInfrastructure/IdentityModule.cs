@@ -70,6 +70,7 @@ public class IdentityModule : ISubdomainModule
                     new PasswordCredentialsApplication(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IIdentifierFactory>(),
                         c.GetRequiredService<IEndUsersService>(),
+                        c.GetRequiredService<IUserProfilesService>(),
                         c.GetRequiredService<IUserNotificationsService>(),
                         c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
                         c.GetRequiredService<IEmailAddressService>(),

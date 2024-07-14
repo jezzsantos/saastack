@@ -15,10 +15,9 @@ public class IdentityInProcessServiceClient : IIdentityService
         _apiKeysApplication = apiKeysApplication;
     }
 
-    public async Task<Result<Optional<EndUserWithMemberships>, Error>> FindMembershipsForAPIKeyAsync(
-        ICallerContext caller, string apiKey,
-        CancellationToken cancellationToken)
+    public async Task<Result<EndUserWithMemberships, Error>> AuthenticateApiKeyAsync(ICallerContext caller,
+        string apiKey, CancellationToken cancellationToken)
     {
-        return await _apiKeysApplication.FindMembershipsForAPIKeyAsync(caller, apiKey, cancellationToken);
+        return await _apiKeysApplication.AuthenticateAsync(caller, apiKey, cancellationToken);
     }
 }
