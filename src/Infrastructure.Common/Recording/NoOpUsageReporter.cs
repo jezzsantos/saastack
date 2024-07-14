@@ -10,8 +10,9 @@ namespace Infrastructure.Common.Recording;
 [ExcludeFromCodeCoverage]
 public class NoOpUsageReporter : IUsageReporter
 {
-    public void Track(ICallContext? context, string forId, string eventName,
-        Dictionary<string, object>? additional = null)
+    public Task<Result<Error>> TrackAsync(ICallContext? call, string forId, string eventName,
+        Dictionary<string, object>? additional = null, CancellationToken cancellationToken = default)
     {
+        return Task.FromResult(Result.Ok);
     }
 }

@@ -50,17 +50,17 @@ public class QueuedUsageReporter : IUsageReporter
         _queue = queue;
     }
 
-    public void Track(ICallContext? context, string forId, string eventName,
-        Dictionary<string, object>? additional = null)
+    public async Task<Result<Error>> TrackAsync(ICallContext? call, string forId, string eventName,
+        Dictionary<string, object>? additional = null, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrEmpty(forId);
         ArgumentException.ThrowIfNullOrEmpty(eventName);
 
-        var call = context ?? CallContext.CreateUnknown();
+        var safeCall = call ?? CallContext.CreateUnknown();
         var properties = additional ?? new Dictionary<string, object>();
 
-        properties[UsageConstants.Properties.CallId] = call.CallId;
-        properties[UsageConstants.Properties.TenantId] = call.TenantId!;
+        properties[UsageConstants.Properties.CallId] = safeCall.CallId;
+        properties[UsageConstants.Properties.TenantId] = safeCall.TenantId!;
 
         var message = new UsageMessage
         {
@@ -71,6 +71,12 @@ public class QueuedUsageReporter : IUsageReporter
                 : string.Empty)
         };
 
-        _queue.PushAsync(call, message, CancellationToken.None).GetAwaiter().GetResult();
+        var queued = await _queue.PushAsync(safeCall, message, cancellationToken);
+        if (queued.IsFailure)
+        {
+            return queued.Error;
+        }
+
+        return Result.Ok;
     }
 }

@@ -5,5 +5,9 @@ namespace Common.Recording;
 /// </summary>
 public interface IUsageReporter
 {
-    void Track(ICallContext? context, string forId, string eventName, Dictionary<string, object>? additional = null);
+    /// <summary>
+    ///     Tracks the usage
+    /// </summary>
+    Task<Result<Error>> TrackAsync(ICallContext? call, string forId, string eventName,
+        Dictionary<string, object>? additional = null, CancellationToken cancellationToken = default);
 }
