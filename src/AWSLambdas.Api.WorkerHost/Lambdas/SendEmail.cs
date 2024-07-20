@@ -7,11 +7,11 @@ using Infrastructure.Workers.Api;
 
 namespace AWSLambdas.Api.WorkerHost.Lambdas;
 
-public class DeliverEmail
+public class SendEmail
 {
     private readonly IQueueMonitoringApiRelayWorker<EmailMessage> _worker;
 
-    public DeliverEmail(IQueueMonitoringApiRelayWorker<EmailMessage> worker)
+    public SendEmail(IQueueMonitoringApiRelayWorker<EmailMessage> worker)
     {
         _worker = worker;
     }

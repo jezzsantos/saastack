@@ -49,7 +49,7 @@ public class UsagesApiSpec : WebApiSpec<Program>
         };
         var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
-        result.Content.Value.IsDelivered.Should().BeTrue();
+        result.Content.Value.IsSent.Should().BeTrue();
         _usageDeliveryService.LastEventName.Should().Be("aneventname");
     }
 

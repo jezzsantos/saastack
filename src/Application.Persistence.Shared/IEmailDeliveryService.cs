@@ -4,20 +4,20 @@ using Common;
 namespace Application.Persistence.Shared;
 
 /// <summary>
-///     Defines a service to which we can deliver email events
+///     Defines a service to which we can send email events.
+///     Delivery of the message can be confirmed by the service later
 /// </summary>
 public interface IEmailDeliveryService
 {
     /// <summary>
-    ///     Delivers the email
+    ///     Sends the email for delivery
     /// </summary>
-    Task<Result<EmailDeliveryReceipt, Error>> DeliverAsync(ICallerContext caller, string subject, string htmlBody,
-        string toEmailAddress,
-        string? toDisplayName, string fromEmailAddress, string? fromDisplayName,
+    Task<Result<EmailDeliveryReceipt, Error>> SendAsync(ICallerContext caller, string subject, string htmlBody,
+        string toEmailAddress, string? toDisplayName, string fromEmailAddress, string? fromDisplayName,
         CancellationToken cancellationToken = default);
 }
 
 public class EmailDeliveryReceipt
 {
-    public string? TransactionId { get; set; }
+    public string? ReceiptId { get; set; }
 }

@@ -33,16 +33,22 @@
     <data name="EmailDeliveryRoot_MissingEmailBody" xml:space="preserve">
         <value>The email message is missing a 'HtmlBody'</value>
     </data>
-    <data name="DeliveryAttempts_LatestAttemptNotAfterLastAttempt" xml:space="preserve">
+    <data name="SendingAttempts_LatestAttemptNotAfterLastAttempt" xml:space="preserve">
         <value>The latest attempt must be after the last attempt</value>
     </data>
-    <data name="DeliveryAttempts_PreviousAttemptsNotInOrder" xml:space="preserve">
+    <data name="SendingAttempts_PreviousAttemptsNotInOrder" xml:space="preserve">
         <value>All attempts must in chronological order</value>
+    </data>
+    <data name="EmailDeliveryRoot_AlreadySent" xml:space="preserve">
+        <value>The email has already been sent for delivery</value>
+    </data>
+    <data name="EmailDeliveryRoot_NotAttempted" xml:space="preserve">
+        <value>The email sending has not yet been attempted</value>
+    </data>
+    <data name="EmailDeliveryRoot_NotSent" xml:space="preserve">
+        <value>The email has not yet been sent</value>
     </data>
     <data name="EmailDeliveryRoot_AlreadyDelivered" xml:space="preserve">
         <value>The email has already been delivered</value>
-    </data>
-    <data name="EmailDeliveryRoot_NotAttempted" xml:space="preserve">
-        <value>The email delivery has not yet been attempted</value>
     </data>
 </root>

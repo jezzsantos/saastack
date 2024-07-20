@@ -2,27 +2,33 @@
 
 ## Why?
 
-You have defined a port in the code to a 3rd party remote service that is outside of your codebase (likely in the cloud). You now want to build and test an adapter to that 3rd party service, and make sure it works.
+You have defined a port in the code to a 3rd party remote service that is outside of your codebase (likely in the cloud).
+
+You now want to build and test an adapter to that 3rd party service.
 
 ## What is the mechanism?
 
-An "external" adapter is what implements a port that adds custom behavior that integrates directly with the 3rd party service.
+An "external" adapter is what implements a "port" (an abstraction already defined in your code) that adds custom behavior that integrates directly with the 3rd party service.
 
-For example, you may wish to send email using a 3rd party service like MailGun, or SendGrid/Twilio. Or you may wish to use a new kind of database like MongoDB or DynamoDB.
+For example, you may wish to send email using a 3rd party service like: Mailgun, or SendGrid/Twilio.
+
+Or you may wish to store data in a new database technology, like: Azure SQL, MongoDB or DynamoDB.
 
 ## Where to start?
 
-All "external" adapters are created in the `Infrastructure.Shared` project in the folder: `ApplicationServices/External`. Here you will find other adapters to 3rd party services.
+All "external" adapters are created in the `Infrastructure.Shared` project in the folder: `ApplicationServices/External`.
+
+> Here you will find the other adapters to 3rd party services.
 
 Automated unit and integration tests for the adapter will go in the `Infrastucture.Shared.UnitTests` and `Infrastucture.Shared.IntegrationTests` projects.
 
-Some integrations with 3rd party services require that you also build webhook APIs yourself to handle changes communicated by 3rd party systems. Those API's would likely be hosted in one of the ApiHost projects, in an existing subdomain, or in a new subdomain. The choice is dependent on the integration, and what subdomain consumes it.
+> Some integrations with 3rd party services require that you also build webhook APIs yourself to handle changes communicated by 3rd party systems. Those API's would likely be hosted in one of the ApiHost projects, in an existing subdomain, or in a new subdomain. The choice is dependent on the integration, and what subdomain consumes it.
 
-Most of these adapters will require static configuration settings. These will live with all the other configuration settings in the `appsettngs.json` files of the ApiHost project of the subdomains that ultimately use the adapter.
+Most of these adapters will require static configuration settings. Static configuration will live (with all the other 3rd party configuration settings) in the `appsettings.json` files of the ApiHost project of the subdomains that ultimately will use the adapter.
 
 ## Before you build the adapter
 
-3rd party adapters are unique integrations that require extra levels of testing to ensure that they operate as you expect and that they keep operating over time as things change.
+A word about design and testing goals. 3rd party adapters are unique integrations that require extra levels of testing to ensure that they operate as you expect and that they keep operating over time as things change.
 
 Depending on the vendor of the 3rd party technology you are integrating with, you will want to be sure that changes that they make over time do not break your integration.
 
@@ -42,28 +48,33 @@ Start by creating a new `sealed class` in the `Infrastructure.Shared` project in
 
 If the 3rd party service you are integrating with is a cloud service, then you are likely building a class of adapter called a `HttpServiceClient`. So use that suffix for the name of your class.
 
-Implement the interface of the port, and provide the methods from that interface.
+Implement the interface of the "port" you want to service, and implement the methods from that interface.
 
-## Use an SDK
+Next you will create a constructor. You will likely need to inject at least these dependencies:
 
-In many cases, you will likely be using a public SDK that has been provided by the vendor to access their service remotely using HTTP. These SDKS are usually available as NuGet packages, and you can add them to your project.
+* `IRecorder` - to do tracing of success and errors (logging)
+* `IConfigurationSettings` - to read static configuration settings, specific to the current environment. They will live under the "ApplicationServices" section of the configuration.
+* `IHttpClientFactory` - you may need this depending on whether you use a vendor SDK, or not (see next section).
 
-> Warning: Make sure that you choose the nuget package carefully, from a trusted publisher, ideally the vendor themselves.
+### Use a vendor SDK
+
+In many cases, you will likely be using a public SDK that has been provided by the vendor to access their service remotely using HTTP. These SDKS are usually available as NuGet packages, and you can add them to only the `Infrastructure.Shared` project.
+
+> Warning: Make sure that you choose the Nuget package carefully, and only from a trusted publisher - ideally the vendor themselves. Check their developer documentation. If there is not one for C#.NET, then you might have to build one yourself.
 
 If you do not wish to use an SDK from a vendor, you can easily build your own HTTP service client using the `IServiceClient` port and `ApiServiceClient` adapter.
 
 > You can see an example of an adapter that does exactly that with the `GravatarHttpServiceClient`.
 
-A note about testing.
+We recommend that you do not inject instances from the vendor's SDK into your class, but instead only inject the dependencies that it requires to create those types in your adapter. Otherwise you are coupling the vendors SDK to your modules, which should be avoided if possible.
 
-Not only will you want to integration-test your adapter against the real 3rd party service (or a sandbox version of it) to ensure that it does as you designed it to do (against a real service in the cloud). You will also want unit-test it as well (particularly if it is simpler than the most trivial of all adapters)
+A note about testability.
 
-If you are using a 3rd party SDK library, you will likely have trouble mocking the service client in that library.
+Not only will you ultimately want to integration-test your adapter against the real 3rd party service (or a sandbox version of it) to ensure that it does as you designed it to do (against a real service in the cloud). You will also want unit-test it as well (particularly if it is simpler than the most trivial of all adapters)
 
-If that is the case, we recommend that you build an abstraction of the HTTP service client of that SDK, which you can mock in unit testing.
+If you are using a 3rd party SDK library, you will likely have trouble mocking the service client that your adapter will use from that library. If that is the case, we recommend that you build an abstraction of the service client from that library, which you can mock in unit testing.
 
-This means that you need to do some extra work.
-This will be worth it in the long run for a couple of reasons:
+This means that you need to do some extra work, but this will be worth it in the long run for a couple of reasons:
 
 1. You can easily unit-test your adapter now, and not worry about HTTP concerns.
 2. You can focus on the processing logic and mapping in your adapter (which most adapters will have).
@@ -73,6 +84,101 @@ This will be worth it in the long run for a couple of reasons:
 
 > Notice that the `FlagsmithHttpServiceClient` is an example of an adapter that is not using a custom service client abstraction, and you can also see that there are no unit tests for it either. Arguably it should have some unit tests as well, since it is not trivial code, and if it did, a custom service client would need to be built for it to be able to do that.
 
+### Build custom service client
+
+If you are going to build an abstraction around the service client of the vendor's library for testing purposes, then define an interface for the service client in another file along side your adapter class that is named like this: `MyAdapterHttpServiceClient.VendorClient.cs`.
+
+In that file, add your interface called: `IVendorClient`, and create a derived `internal sealed class VendorClient : IVendorClient`
+
+In this `VendorClient` class, create a new constructor, and inject the following dependencies:
+
+* `IRecorder recorder`, `IConfigurationSettings settings` and `IHttpClientFactory httpClientFactory`
+
+Create an `internal` constructor, and inject the following:
+
+* `IRecorder recorder`, `IServiceClient serviceClient` and `IAsyncPolicy retryPolicy`
+
+From this constructor, set fields of the class with the values.
+
+Create a `private` constructor, and inject the following:
+
+* `IRecorder recorder`, `string baseUrl`, `IAsyncPolicy retryPolicy` and `IHttpClientFactory httpClientFactory`
+
+From the `private` constructor, call the `internal` constructor, and instantiate an instance of the `ApiServiceClient` class
+
+From the `public` constructor, call the `private` constructor, and pass the `baseUrl` from `settings`, and create a retry policy from `ApiClientRetryPolicies.CreateRetryWithExponentialBackoffAndJitter()`
+
+For example, the `GravatarClient` looks like this,
+
+```c#
+internal class GravatarClient : IGravatarClient
+{
+    private const string BaseUrlSettingName = "ApplicationServices:Gravatar:BaseUrl";
+    private readonly IRecorder _recorder;
+    private readonly IAsyncPolicy _retryPolicy;
+    private readonly IServiceClient _serviceClient;
+
+    public GravatarClient(IRecorder recorder, IConfigurationSettings settings, IHttpClientFactory httpClientFactory)
+        : this(recorder, settings.GetString(BaseUrlSettingName),
+            ApiClientRetryPolicies.CreateRetryWithExponentialBackoffAndJitter(), httpClientFactory)
+    {
+    }
+
+    internal GravatarClient(IRecorder recorder, IServiceClient serviceClient, IAsyncPolicy retryPolicy)
+    {
+        _recorder = recorder;
+        _serviceClient = serviceClient;
+        _retryPolicy = retryPolicy;
+    }
+
+    private GravatarClient(IRecorder recorder, string baseUrl, IAsyncPolicy retryPolicy,
+        IHttpClientFactory httpClientFactory) : this(recorder,
+        new ApiServiceClient(httpClientFactory, JsonSerializerOptions.Default, baseUrl), retryPolicy)
+    {
+    }
+
+    ... other methods
+}
+```
+
+Now, back in your adapter class, create an `internal` constructor, that takes the following dependencies:
+
+* `IRecorder recorder`, and `IVendorClient serviceClient`
+
+From this constructor, set fields of the class with the values.
+
+In the `public` constructor, call this `internal` constructor, and instantiate an instance of the `VendorClient` class using the other dependencies, and pass this instance into the `internal` constructor.
+
+For example, the `GravatarHttpServiceClient` class looks like this,
+
+```c#
+public sealed class GravatarHttpServiceClient : IAvatarService
+{
+    private readonly IRecorder _recorder;
+    private readonly IGravatarClient _serviceClient;
+
+    public GravatarHttpServiceClient(IRecorder recorder, IConfigurationSettings settings,
+        IHttpClientFactory httpClientFactory) : this(recorder,
+        new GravatarClient(recorder, settings, httpClientFactory))
+    {
+    }
+
+    internal GravatarHttpServiceClient(IRecorder recorder, IGravatarClient serviceClient)
+    {
+        _recorder = recorder;
+        _serviceClient = serviceClient;
+    }
+
+    ... other methods
+}
+```
+
+> You can now use the `internal` constructors for unit testing, and the `public` constructors can be used at runtime.
+
+### Build your adapter
+
+Now you can implement your methods of the port, and make your requests through your custom `IVendorClient` interface.
+
 ## How to test the adapter
 
 ### Unit testing
@@ -80,6 +186,12 @@ This will be worth it in the long run for a couple of reasons:
 Write your unit tests in the `Infrastructure.Shared.UnitTests` project, and verify the behavior of your adapter.
 
 > Unit tests are always marked with the `Category=Unit` trait, and these tests are run very frequently and in every build.
+
+You should test all public methods of your adapter (according to the "port" you have implemented). You are aiming for 100% coverage here.
+
+If you have implemented a custom vendor client, you should also unit test parts of that adapter to ensure that requests are being prepared in the correct ways.
+
+> Many vendors have very strict and specific ways to construct requests to their APIs, and handle specific error responses, and these constraints should be tested here.
 
 ### Integration testing
 

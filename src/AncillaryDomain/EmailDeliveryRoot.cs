@@ -30,17 +30,25 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
     {
     }
 
-    public DeliveryAttempts Attempts { get; private set; } = DeliveryAttempts.Empty;
+    public SendingAttempts Attempts { get; private set; } = SendingAttempts.Empty;
 
     public Optional<DateTime> Delivered { get; private set; } = Optional<DateTime>.None;
+
+    public Optional<DateTime> FailedDelivery { get; private set; } = Optional<DateTime>.None;
 
     public bool IsAttempted => Attempts.HasBeenAttempted;
 
     public bool IsDelivered => Delivered.HasValue;
 
+    public bool IsFailedDelivery => FailedDelivery.HasValue;
+
+    public bool IsSent => Sent.HasValue;
+
     public QueuedMessageId MessageId { get; private set; } = QueuedMessageId.Empty;
 
     public Optional<EmailRecipient> Recipient { get; private set; } = Optional<EmailRecipient>.None;
+
+    public Optional<DateTime> Sent { get; private set; } = Optional<DateTime>.None;
 
     public static AggregateRootFactory<EmailDeliveryRoot> Rehydrate()
     {
@@ -94,7 +102,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case DeliveryAttempted changed:
+            case SendingAttempted changed:
             {
                 var attempted = Attempts.Attempt(changed.When);
                 if (attempted.IsFailure)
@@ -107,16 +115,33 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case DeliveryFailed _:
+            case SendingFailed _:
             {
                 Recorder.TraceDebug(null, "EmailDelivery {Id} failed a delivery", Id);
                 return Result.Ok;
             }
 
-            case DeliverySucceeded changed:
+            case SendingSucceeded changed:
             {
-                Delivered = changed.When;
-                Recorder.TraceDebug(null, "EmailDelivery {Id} succeeded delivery", Id);
+                Sent = changed.When;
+                Delivered = Optional<DateTime>.None;
+                Recorder.TraceDebug(null, "EmailDelivery {Id} succeeded sending", Id);
+                return Result.Ok;
+            }
+
+            case DeliveryConfirmed confirmed:
+            {
+                Delivered = confirmed.When;
+                FailedDelivery = Optional<DateTime>.None;
+                Recorder.TraceDebug(null, "EmailDelivery {Id} confirmed delivery", Id);
+                return Result.Ok;
+            }
+
+            case DeliveryFailureConfirmed confirmed:
+            {
+                Delivered = Optional<DateTime>.None;
+                FailedDelivery = confirmed.When;
+                Recorder.TraceDebug(null, "EmailDelivery {Id} confirmed failed delivery", Id);
                 return Result.Ok;
             }
 
@@ -125,15 +150,15 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
         }
     }
 
-    public Result<bool, Error> AttemptDelivery()
+    public Result<bool, Error> AttemptSending()
     {
-        if (IsDelivered)
+        if (IsSent)
         {
             return true;
         }
 
         var when = DateTime.UtcNow;
-        var attempted = RaiseChangeEvent(AncillaryDomain.Events.EmailDelivery.DeliveryAttempted(Id, when));
+        var attempted = RaiseChangeEvent(AncillaryDomain.Events.EmailDelivery.SendingAttempted(Id, when));
         if (attempted.IsFailure)
         {
             return attempted.Error;
@@ -142,11 +167,47 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
         return false;
     }
 
-    public Result<Error> FailedDelivery()
+    public Result<Error> ConfirmDelivery(string receiptId, DateTime when)
     {
+        if (!IsSent)
+        {
+            return Error.RuleViolation(Resources.EmailDeliveryRoot_NotSent);
+        }
+
         if (IsDelivered)
         {
             return Error.RuleViolation(Resources.EmailDeliveryRoot_AlreadyDelivered);
+        }
+
+        return RaiseChangeEvent(AncillaryDomain.Events.EmailDelivery.DeliveryConfirmed(Id, receiptId, when));
+    }
+
+    public Result<Error> ConfirmDeliveryFailed(string receiptId, DateTime when, string reason)
+    {
+        if (!IsSent)
+        {
+            return Error.RuleViolation(Resources.EmailDeliveryRoot_NotSent);
+        }
+
+        if (IsDelivered)
+        {
+            return Error.RuleViolation(Resources.EmailDeliveryRoot_AlreadyDelivered);
+        }
+
+        if (IsFailedDelivery)
+        {
+            return Result.Ok;
+        }
+
+        return RaiseChangeEvent(
+            AncillaryDomain.Events.EmailDelivery.DeliveryFailureConfirmed(Id, receiptId, when, reason));
+    }
+
+    public Result<Error> FailedSending()
+    {
+        if (IsSent)
+        {
+            return Error.RuleViolation(Resources.EmailDeliveryRoot_AlreadySent);
         }
 
         if (!IsAttempted)
@@ -155,8 +216,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
         }
 
         var when = DateTime.UtcNow;
-        return RaiseChangeEvent(
-            AncillaryDomain.Events.EmailDelivery.DeliveryFailed(Id, when));
+        return RaiseChangeEvent(AncillaryDomain.Events.EmailDelivery.SendingFailed(Id, when));
     }
 
     public Result<Error> SetEmailDetails(string? subject, string? body, EmailRecipient recipient)
@@ -177,11 +237,11 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
             AncillaryDomain.Events.EmailDelivery.EmailDetailsChanged(Id, subject!, body!, recipient));
     }
 
-    public Result<Error> SucceededDelivery(Optional<string> transactionId)
+    public Result<Error> SucceededSending(Optional<string> receiptId)
     {
-        if (IsDelivered)
+        if (IsSent)
         {
-            return Error.RuleViolation(Resources.EmailDeliveryRoot_AlreadyDelivered);
+            return Error.RuleViolation(Resources.EmailDeliveryRoot_AlreadySent);
         }
 
         if (!IsAttempted)
@@ -190,14 +250,13 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
         }
 
         var when = DateTime.UtcNow;
-        return RaiseChangeEvent(
-            AncillaryDomain.Events.EmailDelivery.DeliverySucceeded(Id, when));
+        return RaiseChangeEvent(AncillaryDomain.Events.EmailDelivery.SendingSucceeded(Id, receiptId, when));
     }
 
 #if TESTINGONLY
     public void TestingOnly_DeliverEmail()
     {
-        Delivered = DateTime.UtcNow;
+        Sent = DateTime.UtcNow;
     }
 #endif
 }

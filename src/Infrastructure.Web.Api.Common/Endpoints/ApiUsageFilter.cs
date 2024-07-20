@@ -35,7 +35,7 @@ public class ApiUsageFilter : IEndpointFilter
         typeof(HealthCheckRequest),
         typeof(DeliverUsageRequest),
         typeof(DeliverAuditRequest),
-        typeof(DeliverEmailRequest),
+        typeof(SendEmailRequest),
         typeof(NotifyProvisioningRequest),
         typeof(NotifyDomainEventRequest),
 

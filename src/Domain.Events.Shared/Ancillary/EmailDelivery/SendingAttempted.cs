@@ -4,14 +4,14 @@ using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.Ancillary.EmailDelivery;
 
-public sealed class DeliveryFailed : DomainEvent
+public sealed class SendingAttempted : DomainEvent
 {
-    public DeliveryFailed(Identifier id) : base(id)
+    public SendingAttempted(Identifier id) : base(id)
     {
     }
 
     [UsedImplicitly]
-    public DeliveryFailed()
+    public SendingAttempted()
     {
     }
 

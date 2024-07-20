@@ -8,15 +8,15 @@ using Xunit;
 namespace AncillaryInfrastructure.UnitTests.Api.Emails;
 
 [Trait("Category", "Unit")]
-public class DeliverEmailRequestValidatorSpec
+public class SendEmailRequestValidatorSpec
 {
-    private readonly DeliverEmailRequest _dto;
-    private readonly DeliverEmailRequestValidator _validator;
+    private readonly SendEmailRequest _dto;
+    private readonly SendEmailRequestValidator _validator;
 
-    public DeliverEmailRequestValidatorSpec()
+    public SendEmailRequestValidatorSpec()
     {
-        _validator = new DeliverEmailRequestValidator();
-        _dto = new DeliverEmailRequest
+        _validator = new SendEmailRequestValidator();
+        _dto = new SendEmailRequest
         {
             Message = "amessage"
         };

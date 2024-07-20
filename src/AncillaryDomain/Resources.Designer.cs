@@ -60,29 +60,20 @@ namespace AncillaryDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The latest attempt must be after the last attempt.
-        /// </summary>
-        internal static string DeliveryAttempts_LatestAttemptNotAfterLastAttempt {
-            get {
-                return ResourceManager.GetString("DeliveryAttempts_LatestAttemptNotAfterLastAttempt", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to All attempts must in chronological order.
-        /// </summary>
-        internal static string DeliveryAttempts_PreviousAttemptsNotInOrder {
-            get {
-                return ResourceManager.GetString("DeliveryAttempts_PreviousAttemptsNotInOrder", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The email has already been delivered.
         /// </summary>
         internal static string EmailDeliveryRoot_AlreadyDelivered {
             get {
                 return ResourceManager.GetString("EmailDeliveryRoot_AlreadyDelivered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email has already been sent for delivery.
+        /// </summary>
+        internal static string EmailDeliveryRoot_AlreadySent {
+            get {
+                return ResourceManager.GetString("EmailDeliveryRoot_AlreadySent", resourceCulture);
             }
         }
         
@@ -105,11 +96,20 @@ namespace AncillaryDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email delivery has not yet been attempted.
+        ///   Looks up a localized string similar to The email sending has not yet been attempted.
         /// </summary>
         internal static string EmailDeliveryRoot_NotAttempted {
             get {
                 return ResourceManager.GetString("EmailDeliveryRoot_NotAttempted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email has not yet been sent.
+        /// </summary>
+        internal static string EmailDeliveryRoot_NotSent {
+            get {
+                return ResourceManager.GetString("EmailDeliveryRoot_NotSent", resourceCulture);
             }
         }
         
@@ -119,6 +119,24 @@ namespace AncillaryDomain {
         internal static string QueuedMessageId_InvalidId {
             get {
                 return ResourceManager.GetString("QueuedMessageId_InvalidId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The latest attempt must be after the last attempt.
+        /// </summary>
+        internal static string SendingAttempts_LatestAttemptNotAfterLastAttempt {
+            get {
+                return ResourceManager.GetString("SendingAttempts_LatestAttemptNotAfterLastAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All attempts must in chronological order.
+        /// </summary>
+        internal static string SendingAttempts_PreviousAttemptsNotInOrder {
+            get {
+                return ResourceManager.GetString("SendingAttempts_PreviousAttemptsNotInOrder", resourceCulture);
             }
         }
     }

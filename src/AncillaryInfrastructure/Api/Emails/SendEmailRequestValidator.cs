@@ -5,9 +5,9 @@ using JetBrains.Annotations;
 namespace AncillaryInfrastructure.Api.Emails;
 
 [UsedImplicitly]
-public class DeliverEmailRequestValidator : AbstractValidator<DeliverEmailRequest>
+public class SendEmailRequestValidator : AbstractValidator<SendEmailRequest>
 {
-    public DeliverEmailRequestValidator()
+    public SendEmailRequestValidator()
     {
         RuleFor(req => req.Message)
             .NotEmpty()

@@ -36,11 +36,20 @@ public class EmailDeliveryRepository : IEmailDeliveryRepository
     }
 #endif
 
-    public async Task<Result<Optional<EmailDeliveryRoot>, Error>> FindDeliveryByMessageIdAsync(
+    public async Task<Result<Optional<EmailDeliveryRoot>, Error>> FindByMessageIdAsync(
         QueuedMessageId messageId, CancellationToken cancellationToken)
     {
         var query = Query.From<EmailDelivery>()
             .Where<string>(at => at.MessageId, ConditionOperator.EqualTo, messageId);
+
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
+    public async Task<Result<Optional<EmailDeliveryRoot>, Error>> FindByReceiptIdAsync(string receiptId,
+        CancellationToken cancellationToken)
+    {
+        var query = Query.From<EmailDelivery>()
+            .Where<string>(at => at.ReceiptId, ConditionOperator.EqualTo, receiptId);
 
         return await FindFirstByQueryAsync(query, cancellationToken);
     }

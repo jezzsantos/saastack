@@ -35,12 +35,12 @@ public class DomainEventsApi : IWebApiService
     public async Task<ApiPostResult<bool, DeliverMessageResponse>> Notify(NotifyDomainEventRequest request,
         CancellationToken cancellationToken)
     {
-        var delivered =
+        var notified =
             await _domainEventsApplication.NotifyDomainEventAsync(_callerFactory.Create(), request.Message!,
                 cancellationToken);
 
-        return () => delivered.HandleApplicationResult<bool, DeliverMessageResponse>(_ =>
-            new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsDelivered = true }));
+        return () => notified.HandleApplicationResult<bool, DeliverMessageResponse>(nt =>
+            new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsSent = nt }));
     }
 
 #if TESTINGONLY

@@ -4,16 +4,18 @@ using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.Ancillary.EmailDelivery;
 
-public sealed class DeliverySucceeded : DomainEvent
+public sealed class SendingSucceeded : DomainEvent
 {
-    public DeliverySucceeded(Identifier id) : base(id)
+    public SendingSucceeded(Identifier id) : base(id)
     {
     }
 
     [UsedImplicitly]
-    public DeliverySucceeded()
+    public SendingSucceeded()
     {
     }
 
     public required DateTime When { get; set; }
+
+    public required string? ReceiptId { get; set; }
 }

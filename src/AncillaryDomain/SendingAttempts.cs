@@ -5,16 +5,16 @@ using Domain.Interfaces;
 
 namespace AncillaryDomain;
 
-public sealed class DeliveryAttempts : SingleValueObjectBase<DeliveryAttempts, List<DateTime>>
+public sealed class SendingAttempts : SingleValueObjectBase<SendingAttempts, List<DateTime>>
 {
-    public static readonly DeliveryAttempts Empty = new(new List<DateTime>());
+    public static readonly SendingAttempts Empty = new(new List<DateTime>());
 
-    public static Result<DeliveryAttempts, Error> Create(DateTime when)
+    public static Result<SendingAttempts, Error> Create(DateTime when)
     {
-        return new DeliveryAttempts(new List<DateTime> { when });
+        return new SendingAttempts([when]);
     }
 
-    public static Result<DeliveryAttempts, Error> Create(List<DateTime> previousAttempts)
+    public static Result<SendingAttempts, Error> Create(List<DateTime> previousAttempts)
     {
         if (previousAttempts.HasAny())
         {
@@ -29,17 +29,17 @@ public sealed class DeliveryAttempts : SingleValueObjectBase<DeliveryAttempts, L
 
                 if (attempt.IsBefore(last.Value))
                 {
-                    return Error.Validation(Resources.DeliveryAttempts_PreviousAttemptsNotInOrder);
+                    return Error.Validation(Resources.SendingAttempts_PreviousAttemptsNotInOrder);
                 }
 
                 last = attempt;
             }
         }
 
-        return new DeliveryAttempts(previousAttempts);
+        return new SendingAttempts(previousAttempts);
     }
 
-    public static Result<DeliveryAttempts, Error> Create(List<DateTime> previousAttempts, DateTime attempt)
+    public static Result<SendingAttempts, Error> Create(List<DateTime> previousAttempts, DateTime attempt)
     {
         var allAttempts = previousAttempts
             .Concat(new[] { attempt })
@@ -48,7 +48,7 @@ public sealed class DeliveryAttempts : SingleValueObjectBase<DeliveryAttempts, L
         return Create(allAttempts);
     }
 
-    private DeliveryAttempts(List<DateTime> value) : base(value)
+    private SendingAttempts(List<DateTime> value) : base(value)
     {
     }
 
@@ -56,21 +56,21 @@ public sealed class DeliveryAttempts : SingleValueObjectBase<DeliveryAttempts, L
 
     public bool HasBeenAttempted => Attempts.HasAny();
 
-    public static ValueObjectFactory<DeliveryAttempts> Rehydrate()
+    public static ValueObjectFactory<SendingAttempts> Rehydrate()
     {
         return (property, _) =>
         {
             var items = RehydrateToList(property, true, true);
-            return new DeliveryAttempts(items.Select(item => item.FromIso8601()).ToList());
+            return new SendingAttempts(items.Select(item => item.FromIso8601()).ToList());
         };
     }
 
-    public Result<DeliveryAttempts, Error> Attempt(DateTime when)
+    public Result<SendingAttempts, Error> Attempt(DateTime when)
     {
         if (Value.HasAny())
         {
             if (when.IsInvalidParameter(w => w > Value.Max(), nameof(when),
-                    Resources.DeliveryAttempts_LatestAttemptNotAfterLastAttempt, out var error1))
+                    Resources.SendingAttempts_LatestAttemptNotAfterLastAttempt, out var error1))
             {
                 return error1;
             }

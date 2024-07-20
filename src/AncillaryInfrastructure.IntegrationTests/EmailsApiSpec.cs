@@ -12,6 +12,7 @@ using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.Extensions.DependencyInjection;
 using UnitTesting.Common;
+using UnitTesting.Common.Validation;
 using Xunit;
 using Task = System.Threading.Tasks.Task;
 
@@ -36,10 +37,10 @@ public class EmailsApiSpec : WebApiSpec<Program>
     }
 
     [Fact]
-    public async Task WhenDeliverEmailAndDeliverySucceeds_ThenDelivered()
+    public async Task WhenSendEmailAndDeliverySucceeds_ThenDelivered()
     {
-        _emailDeliveryService.DeliverySucceeds = true;
-        var request = new DeliverEmailRequest
+        _emailDeliveryService.SendingSucceeds = true;
+        var request = new SendEmailRequest
         {
             Message = new EmailMessage
             {
@@ -59,13 +60,14 @@ public class EmailsApiSpec : WebApiSpec<Program>
         };
         var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
-        result.Content.Value.IsDelivered.Should().BeTrue();
+        result.Content.Value.IsSent.Should().BeTrue();
         _emailDeliveryService.LastSubject.Should().Be("asubject");
 
         var login = await LoginUserAsync(LoginUser.Operator);
         var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
+        var now = DateTime.UtcNow;
         deliveries.Content.Value.Emails!.Count.Should().Be(1);
         deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
         deliveries.Content.Value.Emails[0].Body.Should().Be("anhtmlbody");
@@ -73,14 +75,19 @@ public class EmailsApiSpec : WebApiSpec<Program>
         deliveries.Content.Value.Emails[0].ToDisplayName.Should().Be("atodisplayname");
         deliveries.Content.Value.Emails[0].Attempts.Should()
             .ContainSingle(x => x.IsNear(DateTime.UtcNow, TimeSpan.FromMinutes(1)));
-        deliveries.Content.Value.Emails[0].IsDelivered.Should().BeTrue();
+        deliveries.Content.Value.Emails[0].IsSent.Should().BeTrue();
+        deliveries.Content.Value.Emails[0].SentAt.Should().BeNear(now, TimeSpan.FromMinutes(1));
+        deliveries.Content.Value.Emails[0].IsDelivered.Should().BeFalse();
+        deliveries.Content.Value.Emails[0].DeliveredAt.Should().BeNull();
+        deliveries.Content.Value.Emails[0].IsDeliveryFailed.Should().BeFalse();
+        deliveries.Content.Value.Emails[0].FailedDeliveryAt.Should().BeNull();
     }
 
     [Fact]
-    public async Task WhenDeliverEmailAndDeliveryFails_ThenNotDelivered()
+    public async Task WhenSendEmailAndDeliveryFails_ThenNotDelivered()
     {
-        _emailDeliveryService.DeliverySucceeds = false;
-        var request = new DeliverEmailRequest
+        _emailDeliveryService.SendingSucceeds = false;
+        var request = new SendEmailRequest
         {
             Message = new EmailMessage
             {
@@ -107,21 +114,27 @@ public class EmailsApiSpec : WebApiSpec<Program>
         var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
+        var now = DateTime.UtcNow;
         deliveries.Content.Value.Emails!.Count.Should().Be(1);
         deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
         deliveries.Content.Value.Emails[0].Body.Should().Be("anhtmlbody");
         deliveries.Content.Value.Emails[0].ToEmailAddress.Should().Be("arecipient@company.com");
         deliveries.Content.Value.Emails[0].ToDisplayName.Should().Be("atodisplayname");
         deliveries.Content.Value.Emails[0].Attempts.Should()
-            .ContainSingle(x => x.IsNear(DateTime.UtcNow, TimeSpan.FromMinutes(1)));
+            .ContainSingle(x => x.IsNear(now, TimeSpan.FromMinutes(1)));
+        deliveries.Content.Value.Emails[0].IsSent.Should().BeFalse();
+        deliveries.Content.Value.Emails[0].SentAt.Should().BeNull();
         deliveries.Content.Value.Emails[0].IsDelivered.Should().BeFalse();
+        deliveries.Content.Value.Emails[0].DeliveredAt.Should().BeNull();
+        deliveries.Content.Value.Emails[0].IsDeliveryFailed.Should().BeFalse();
+        deliveries.Content.Value.Emails[0].FailedDeliveryAt.Should().BeNull();
     }
 
     [Fact]
-    public async Task WhenDeliverEmailAndDeliveryFailsFirstTimeAndSucceedsSecondTime_ThenDelivered()
+    public async Task WhenSendEmailAndDeliveryFailsFirstTimeAndSucceedsSecondTime_ThenDelivered()
     {
-        _emailDeliveryService.DeliverySucceeds = false;
-        var request = new DeliverEmailRequest
+        _emailDeliveryService.SendingSucceeds = false;
+        var request = new SendEmailRequest
         {
             Message = new EmailMessage
             {
@@ -143,22 +156,140 @@ public class EmailsApiSpec : WebApiSpec<Program>
 
         firstAttempt.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
 
-        _emailDeliveryService.DeliverySucceeds = true;
+        _emailDeliveryService.SendingSucceeds = true;
         var secondAttempt = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
-        secondAttempt.Content.Value.IsDelivered.Should().BeTrue();
+        secondAttempt.Content.Value.IsSent.Should().BeTrue();
 
         var login = await LoginUserAsync(LoginUser.Operator);
         var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
+        var now = DateTime.UtcNow;
         deliveries.Content.Value.Emails!.Count.Should().Be(1);
         deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
         deliveries.Content.Value.Emails[0].Body.Should().Be("anhtmlbody");
         deliveries.Content.Value.Emails[0].ToEmailAddress.Should().Be("arecipient@company.com");
         deliveries.Content.Value.Emails[0].ToDisplayName.Should().Be("atodisplayname");
         deliveries.Content.Value.Emails[0].Attempts.Should().HaveCount(2);
+        deliveries.Content.Value.Emails[0].IsSent.Should().BeTrue();
+        deliveries.Content.Value.Emails[0].SentAt.Should().BeNear(now, TimeSpan.FromMinutes(1));
+        deliveries.Content.Value.Emails[0].IsDelivered.Should().BeFalse();
+        deliveries.Content.Value.Emails[0].DeliveredAt.Should().BeNull();
+        deliveries.Content.Value.Emails[0].IsDeliveryFailed.Should().BeFalse();
+        deliveries.Content.Value.Emails[0].FailedDeliveryAt.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task WhenConfirmDelivery_ThenDelivered()
+    {
+        _emailDeliveryService.SendingSucceeds = true;
+        var request = new SendEmailRequest
+        {
+            Message = new EmailMessage
+            {
+                MessageId = CreateMessageId(),
+                CallId = "acallid",
+                CallerId = "acallerid",
+                Html = new QueuedEmailHtmlMessage
+                {
+                    Subject = "asubject",
+                    HtmlBody = "anhtmlbody",
+                    ToEmailAddress = "arecipient@company.com",
+                    ToDisplayName = "atodisplayname",
+                    FromEmailAddress = "asender@company.com",
+                    FromDisplayName = "afromdisplayname"
+                }
+            }.ToJson()!
+        };
+        var sent = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
+
+        sent.Content.Value.IsSent.Should().BeTrue();
+        _emailDeliveryService.LastSubject.Should().Be("asubject");
+        var receiptId = _emailDeliveryService.LastReceiptId;
+
+#if TESTINGONLY
+        await Api.PostAsync(new ConfirmEmailDeliveredRequest
+        {
+            ReceiptId = receiptId
+        });
+#endif
+
+        var login = await LoginUserAsync(LoginUser.Operator);
+        var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        var now = DateTime.UtcNow;
+        deliveries.Content.Value.Emails!.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
+        deliveries.Content.Value.Emails[0].Body.Should().Be("anhtmlbody");
+        deliveries.Content.Value.Emails[0].ToEmailAddress.Should().Be("arecipient@company.com");
+        deliveries.Content.Value.Emails[0].ToDisplayName.Should().Be("atodisplayname");
+        deliveries.Content.Value.Emails[0].Attempts.Should()
+            .ContainSingle(x => x.IsNear(now, TimeSpan.FromMinutes(1)));
+        deliveries.Content.Value.Emails[0].IsSent.Should().BeTrue();
+        deliveries.Content.Value.Emails[0].SentAt.Should().BeNear(now, TimeSpan.FromMinutes(1));
         deliveries.Content.Value.Emails[0].IsDelivered.Should().BeTrue();
+        deliveries.Content.Value.Emails[0].DeliveredAt.Should().BeNear(now, TimeSpan.FromMinutes(1));
+        deliveries.Content.Value.Emails[0].IsDeliveryFailed.Should().BeFalse();
+        deliveries.Content.Value.Emails[0].FailedDeliveryAt.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task WhenConfirmDeliveryFailed_ThenFailsDelivery()
+    {
+        _emailDeliveryService.SendingSucceeds = true;
+        var request = new SendEmailRequest
+        {
+            Message = new EmailMessage
+            {
+                MessageId = CreateMessageId(),
+                CallId = "acallid",
+                CallerId = "acallerid",
+                Html = new QueuedEmailHtmlMessage
+                {
+                    Subject = "asubject",
+                    HtmlBody = "anhtmlbody",
+                    ToEmailAddress = "arecipient@company.com",
+                    ToDisplayName = "atodisplayname",
+                    FromEmailAddress = "asender@company.com",
+                    FromDisplayName = "afromdisplayname"
+                }
+            }.ToJson()!
+        };
+        var sent = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
+
+        sent.Content.Value.IsSent.Should().BeTrue();
+        _emailDeliveryService.LastSubject.Should().Be("asubject");
+        var receiptId = _emailDeliveryService.LastReceiptId;
+
+#if TESTINGONLY
+        await Api.PostAsync(new ConfirmEmailDeliveryFailedRequest
+        {
+            ReceiptId = receiptId,
+            Reason = "areason"
+        });
+#endif
+
+        var login = await LoginUserAsync(LoginUser.Operator);
+        var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        var now = DateTime.UtcNow;
+        deliveries.Content.Value.Emails!.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
+        deliveries.Content.Value.Emails[0].Body.Should().Be("anhtmlbody");
+        deliveries.Content.Value.Emails[0].ToEmailAddress.Should().Be("arecipient@company.com");
+        deliveries.Content.Value.Emails[0].ToDisplayName.Should().Be("atodisplayname");
+        deliveries.Content.Value.Emails[0].Attempts.Should()
+            .ContainSingle(x => x.IsNear(now, TimeSpan.FromMinutes(1)));
+        deliveries.Content.Value.Emails[0].IsSent.Should().BeTrue();
+        deliveries.Content.Value.Emails[0].SentAt.Should().BeNear(now, TimeSpan.FromMinutes(1));
+        deliveries.Content.Value.Emails[0].IsDelivered.Should().BeFalse();
+        deliveries.Content.Value.Emails[0].DeliveredAt.Should().BeNull();
+        deliveries.Content.Value.Emails[0].IsDeliveryFailed.Should().BeTrue();
+        deliveries.Content.Value.Emails[0].FailedDeliveryAt.Should().BeNear(now, TimeSpan.FromMinutes(1));
+        deliveries.Content.Value.Emails[0].FailedDeliveryReason.Should().Be("areason");
     }
 
 #if TESTINGONLY

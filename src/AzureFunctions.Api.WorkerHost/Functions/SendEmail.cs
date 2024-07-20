@@ -7,16 +7,16 @@ using Microsoft.Azure.Functions.Worker;
 namespace AzureFunctions.Api.WorkerHost.Functions;
 
 [UsedImplicitly]
-public sealed class DeliverEmail
+public sealed class SendEmail
 {
     private readonly IQueueMonitoringApiRelayWorker<EmailMessage> _worker;
 
-    public DeliverEmail(IQueueMonitoringApiRelayWorker<EmailMessage> worker)
+    public SendEmail(IQueueMonitoringApiRelayWorker<EmailMessage> worker)
     {
         _worker = worker;
     }
 
-    [Function(nameof(DeliverEmail))]
+    [Function(nameof(SendEmail))]
     public Task Run([QueueTrigger(WorkerConstants.Queues.Emails)] EmailMessage message,
         FunctionContext context)
     {

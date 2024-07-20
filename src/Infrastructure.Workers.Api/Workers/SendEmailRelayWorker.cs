@@ -8,13 +8,13 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Workers.Api.Workers;
 
-public sealed class DeliverEmailRelayWorker : IQueueMonitoringApiRelayWorker<EmailMessage>
+public sealed class SendEmailRelayWorker : IQueueMonitoringApiRelayWorker<EmailMessage>
 {
     private readonly IRecorder _recorder;
     private readonly IServiceClient _serviceClient;
     private readonly IHostSettings _settings;
 
-    public DeliverEmailRelayWorker(IRecorder recorder, IHostSettings settings, IServiceClient serviceClient)
+    public SendEmailRelayWorker(IRecorder recorder, IHostSettings settings, IServiceClient serviceClient)
     {
         _recorder = recorder;
         _settings = settings;
@@ -24,7 +24,7 @@ public sealed class DeliverEmailRelayWorker : IQueueMonitoringApiRelayWorker<Ema
     public async Task RelayMessageOrThrowAsync(EmailMessage message, CancellationToken cancellationToken)
     {
         await _serviceClient.PostQueuedMessageToApiOrThrowAsync(_recorder,
-            message, new DeliverEmailRequest
+            message, new SendEmailRequest
             {
                 Message = message.ToJson()!
             }, _settings.GetAncillaryApiHostHmacAuthSecret(), cancellationToken);

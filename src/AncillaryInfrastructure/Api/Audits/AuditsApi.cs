@@ -26,7 +26,7 @@ public sealed class AuditsApi : IWebApiService
             await _ancillaryApplication.DeliverAuditAsync(_callerFactory.Create(), request.Message!, cancellationToken);
 
         return () => delivered.HandleApplicationResult<bool, DeliverMessageResponse>(_ =>
-            new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsDelivered = true }));
+            new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsSent = true }));
     }
 
 #if TESTINGONLY

@@ -52,7 +52,7 @@ public static class HostExtensions
                 c.GetRequiredService<JsonSerializerOptions>()));
         services.AddSingleton<IQueueMonitoringApiRelayWorker<UsageMessage>, DeliverUsageRelayWorker>();
         services.AddSingleton<IQueueMonitoringApiRelayWorker<AuditMessage>, DeliverAuditRelayWorker>();
-        services.AddSingleton<IQueueMonitoringApiRelayWorker<EmailMessage>, DeliverEmailRelayWorker>();
+        services.AddSingleton<IQueueMonitoringApiRelayWorker<EmailMessage>, SendEmailRelayWorker>();
         services.AddSingleton<IQueueMonitoringApiRelayWorker<ProvisioningMessage>, DeliverProvisioningRelayWorker>();
         services
             .AddSingleton<IMessageBusMonitoringApiRelayWorker<DomainEventingMessage>,

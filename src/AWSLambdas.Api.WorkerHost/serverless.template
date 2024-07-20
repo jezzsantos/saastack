@@ -37,23 +37,6 @@
         "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverAudit_Run_Generated::Run"
       }
     },
-    "AWSLambdasApiWorkerHostLambdasDeliverEmailRunGenerated": {
-      "Type": "AWS::Serverless::Function",
-      "Metadata": {
-        "Tool": "Amazon.Lambda.Annotations"
-      },
-      "Properties": {
-        "Runtime": "dotnet6",
-        "CodeUri": ".",
-        "MemorySize": 256,
-        "Timeout": 30,
-        "Policies": [
-          "AWSLambdaBasicExecutionRole"
-        ],
-        "PackageType": "Zip",
-        "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverEmail_Run_Generated::Run"
-      }
-    },
     "AWSLambdasApiWorkerHostLambdasDeliverProvisioningRunGenerated": {
       "Type": "AWS::Serverless::Function",
       "Metadata": {
@@ -86,6 +69,23 @@
         ],
         "PackageType": "Zip",
         "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.DeliverDomainEventApiHost1_Run_Generated::Run"
+      }
+    },
+    "AWSLambdasApiWorkerHostLambdasSendEmailRunGenerated": {
+      "Type": "AWS::Serverless::Function",
+      "Metadata": {
+        "Tool": "Amazon.Lambda.Annotations"
+      },
+      "Properties": {
+        "Runtime": "dotnet6",
+        "CodeUri": ".",
+        "MemorySize": 256,
+        "Timeout": 30,
+        "Policies": [
+          "AWSLambdaBasicExecutionRole"
+        ],
+        "PackageType": "Zip",
+        "Handler": "AWSLambdas.Api.WorkerHost::AWSLambdas.Api.WorkerHost.Lambdas.SendEmail_Run_Generated::Run"
       }
     }
   }

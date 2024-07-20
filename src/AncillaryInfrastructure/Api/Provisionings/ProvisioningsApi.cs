@@ -38,6 +38,6 @@ public sealed class ProvisioningsApi : IWebApiService
                 cancellationToken);
 
         return () => delivered.HandleApplicationResult<bool, DeliverMessageResponse>(_ =>
-            new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsDelivered = true }));
+            new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsSent = true }));
     }
 }

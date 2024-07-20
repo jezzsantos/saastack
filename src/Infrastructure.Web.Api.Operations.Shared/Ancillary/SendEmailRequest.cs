@@ -4,11 +4,11 @@ using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 
 /// <summary>
-///     Delivers an email message
+///     Sends an email message for delivery
 /// </summary>
-[Route("/emails/deliver", OperationMethod.Post, AccessType.HMAC)]
+[Route("/emails/send", OperationMethod.Post, AccessType.HMAC)]
 [Authorize(Roles.Platform_ServiceAccount)]
-public class DeliverEmailRequest : UnTenantedRequest<DeliverMessageResponse>
+public class SendEmailRequest : UnTenantedRequest<DeliverMessageResponse>
 {
     [Required] public string? Message { get; set; }
 }

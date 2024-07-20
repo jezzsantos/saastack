@@ -19,7 +19,7 @@ public class NoOpEmailDeliveryService : IEmailDeliveryService
         _recorder = recorder;
     }
 
-    public Task<Result<EmailDeliveryReceipt, Error>> DeliverAsync(ICallerContext caller, string subject,
+    public Task<Result<EmailDeliveryReceipt, Error>> SendAsync(ICallerContext caller, string subject,
         string htmlBody,
         string toEmailAddress, string? toDisplayName,
         string fromEmailAddress, string? fromDisplayName, CancellationToken cancellationToken = default)

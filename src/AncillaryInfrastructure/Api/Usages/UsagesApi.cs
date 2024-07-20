@@ -25,7 +25,7 @@ public sealed class UsagesApi : IWebApiService
             await _ancillaryApplication.DeliverUsageAsync(_callerFactory.Create(), request.Message!, cancellationToken);
 
         return () => delivered.HandleApplicationResult<bool, DeliverMessageResponse>(_ =>
-            new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsDelivered = true }));
+            new PostResult<DeliverMessageResponse>(new DeliverMessageResponse { IsSent = true }));
     }
 
 #if TESTINGONLY

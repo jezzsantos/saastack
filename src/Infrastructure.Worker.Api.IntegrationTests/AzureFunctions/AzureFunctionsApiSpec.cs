@@ -26,9 +26,9 @@ public class AzureFunctionsApiSpec
 
     [Trait("Category", "Integration.External")]
     [Collection("AzureFunctions")]
-    public class DeliverEmailSpec : DeliverEmailSpecBase<AzureFunctionHostSetup>
+    public class SendEmailSpec : SendEmailSpecBase<AzureFunctionHostSetup>
     {
-        public DeliverEmailSpec(AzureFunctionHostSetup setup) : base(setup)
+        public SendEmailSpec(AzureFunctionHostSetup setup) : base(setup)
         {
         }
     }

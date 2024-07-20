@@ -18,27 +18,23 @@ public static class Events
             };
         }
 
-        public static DeliveryAttempted DeliveryAttempted(Identifier id, DateTime when)
+        public static DeliveryConfirmed DeliveryConfirmed(Identifier id, string receiptId, DateTime when)
         {
-            return new DeliveryAttempted(id)
+            return new DeliveryConfirmed(id)
             {
-                When = when
+                When = when,
+                ReceiptId = receiptId
             };
         }
 
-        public static DeliveryFailed DeliveryFailed(Identifier id, DateTime when)
+        public static DeliveryFailureConfirmed DeliveryFailureConfirmed(Identifier id, string receiptId, DateTime when,
+            string reason)
         {
-            return new DeliveryFailed(id)
+            return new DeliveryFailureConfirmed(id)
             {
-                When = when
-            };
-        }
-
-        public static DeliverySucceeded DeliverySucceeded(Identifier id, DateTime when)
-        {
-            return new DeliverySucceeded(id)
-            {
-                When = when
+                When = when,
+                ReceiptId = receiptId,
+                Reason = reason
             };
         }
 
@@ -51,6 +47,33 @@ public static class Events
                 Body = body,
                 ToEmailAddress = to.EmailAddress,
                 ToDisplayName = to.DisplayName
+            };
+        }
+
+        public static SendingAttempted SendingAttempted(Identifier id, DateTime when)
+        {
+            return new SendingAttempted(id)
+            {
+                When = when
+            };
+        }
+
+        public static SendingFailed SendingFailed(Identifier id, DateTime when)
+        {
+            return new SendingFailed(id)
+            {
+                When = when
+            };
+        }
+
+        public static SendingSucceeded SendingSucceeded(Identifier id, Optional<string> receiptId, DateTime when)
+        {
+            return new SendingSucceeded(id)
+            {
+                When = when,
+                ReceiptId = receiptId.HasValue
+                    ? receiptId.Value
+                    : null
             };
         }
     }

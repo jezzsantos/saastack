@@ -29,10 +29,10 @@ public class EmailDeliveryProjection : IReadModelProjection
                 return await _deliveries.HandleCreateAsync(e.RootId, dto =>
                     {
                         dto.MessageId = e.MessageId;
-                        dto.Attempts = DeliveryAttempts.Empty;
+                        dto.Attempts = SendingAttempts.Empty;
                         dto.LastAttempted = Optional<DateTime?>.None;
-                        dto.Failed = Optional<DateTime?>.None;
-                        dto.Delivered = Optional<DateTime?>.None;
+                        dto.SendFailed = Optional<DateTime?>.None;
+                        dto.Sent = Optional<DateTime?>.None;
                     },
                     cancellationToken);
 
@@ -45,30 +45,52 @@ public class EmailDeliveryProjection : IReadModelProjection
                     dto.ToDisplayName = e.ToDisplayName;
                 }, cancellationToken);
 
-            case DeliveryAttempted e:
+            case SendingAttempted e:
                 return await _deliveries.HandleUpdateAsync(e.RootId, dto =>
                 {
                     var attempts = dto.Attempts.HasValue
                         ? dto.Attempts.Value.Attempt(e.When)
-                        : DeliveryAttempts.Create(e.When);
+                        : SendingAttempts.Create(e.When);
                     if (attempts.IsSuccessful)
                     {
                         dto.Attempts = attempts.Value;
                     }
                     else
                     {
-                        dto.Attempts = DeliveryAttempts.Empty;
+                        dto.Attempts = SendingAttempts.Empty;
                     }
 
                     dto.LastAttempted = e.When;
                 }, cancellationToken);
 
-            case DeliveryFailed e:
-                return await _deliveries.HandleUpdateAsync(e.RootId, dto => { dto.Failed = e.When; },
+            case SendingFailed e:
+                return await _deliveries.HandleUpdateAsync(e.RootId, dto => { dto.SendFailed = e.When; },
                     cancellationToken);
 
-            case DeliverySucceeded e:
-                return await _deliveries.HandleUpdateAsync(e.RootId, dto => { dto.Delivered = e.When; },
+            case SendingSucceeded e:
+                return await _deliveries.HandleUpdateAsync(e.RootId, dto =>
+                    {
+                        dto.Sent = e.When;
+                        dto.ReceiptId = e.ReceiptId;
+                    },
+                    cancellationToken);
+
+            case DeliveryConfirmed e:
+                return await _deliveries.HandleUpdateAsync(e.RootId, dto =>
+                    {
+                        dto.Delivered = e.When;
+                        dto.DeliveryFailed = Optional<DateTime?>.None;
+                        dto.DeliveryFailedReason = Optional<string>.None;
+                    },
+                    cancellationToken);
+
+            case DeliveryFailureConfirmed e:
+                return await _deliveries.HandleUpdateAsync(e.RootId, dto =>
+                    {
+                        dto.DeliveryFailed = e.When;
+                        dto.Delivered = Optional<DateTime?>.None;
+                        dto.DeliveryFailedReason = e.Reason;
+                    },
                     cancellationToken);
 
             default:

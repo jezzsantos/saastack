@@ -26,9 +26,9 @@ public class AWSLambdasApiSpec
 
     [Trait("Category", "Integration.External")]
     [Collection("AWSLambdas")]
-    public class DeliverEmailSpec : DeliverEmailSpecBase<AWSLambdaHostSetup>
+    public class SendEmailSpec : SendEmailSpecBase<AWSLambdaHostSetup>
     {
-        public DeliverEmailSpec(AWSLambdaHostSetup setup) : base(setup)
+        public SendEmailSpec(AWSLambdaHostSetup setup) : base(setup)
         {
         }
     }

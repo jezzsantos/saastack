@@ -6,12 +6,12 @@ using Xunit;
 namespace AncillaryDomain.UnitTests;
 
 [Trait("Category", "Unit")]
-public class DeliveryAttemptsSpec
+public class SendingAttemptsSpec
 {
     [Fact]
     public void WhenEmpty_ThenHasNoAttempts()
     {
-        var result = DeliveryAttempts.Empty;
+        var result = SendingAttempts.Empty;
 
         result.Attempts.Should().BeEmpty();
         result.HasBeenAttempted.Should().BeFalse();
@@ -22,7 +22,7 @@ public class DeliveryAttemptsSpec
     {
         var datum = DateTime.UtcNow;
 
-        var result = DeliveryAttempts.Create(new List<DateTime> { datum }).Value;
+        var result = SendingAttempts.Create(new List<DateTime> { datum }).Value;
 
         result.Attempts.Should().ContainInOrder(datum);
         result.HasBeenAttempted.Should().BeTrue();
@@ -34,9 +34,9 @@ public class DeliveryAttemptsSpec
         var datum1 = DateTime.UtcNow;
         var datum2 = datum1.AddSeconds(1);
 
-        var result = DeliveryAttempts.Create(new List<DateTime> { datum2, datum1 });
+        var result = SendingAttempts.Create(new List<DateTime> { datum2, datum1 });
 
-        result.Should().BeError(ErrorCode.Validation, Resources.DeliveryAttempts_PreviousAttemptsNotInOrder);
+        result.Should().BeError(ErrorCode.Validation, Resources.SendingAttempts_PreviousAttemptsNotInOrder);
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public class DeliveryAttemptsSpec
         var datum1 = DateTime.UtcNow;
         var datum2 = datum1.AddSeconds(1);
 
-        var result = DeliveryAttempts.Create(new List<DateTime> { datum1, datum2 });
+        var result = SendingAttempts.Create(new List<DateTime> { datum1, datum2 });
 
         result.Should().BeSuccess();
         result.Value.Attempts.Should().ContainInOrder(datum1, datum2);
@@ -57,11 +57,11 @@ public class DeliveryAttemptsSpec
     {
         var datum1 = DateTime.UtcNow;
         var datum2 = datum1.AddSeconds(1);
-        var attempts = DeliveryAttempts.Create(new List<DateTime> { datum1, datum2 }).Value;
+        var attempts = SendingAttempts.Create(new List<DateTime> { datum1, datum2 }).Value;
 
         var result = attempts.Attempt(datum1);
 
-        result.Should().BeError(ErrorCode.Validation, Resources.DeliveryAttempts_LatestAttemptNotAfterLastAttempt);
+        result.Should().BeError(ErrorCode.Validation, Resources.SendingAttempts_LatestAttemptNotAfterLastAttempt);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class DeliveryAttemptsSpec
     {
         var datum1 = DateTime.UtcNow;
         var datum2 = datum1.AddSeconds(1);
-        var attempts = DeliveryAttempts.Create(new List<DateTime> { datum1, datum2 }).Value;
+        var attempts = SendingAttempts.Create(new List<DateTime> { datum1, datum2 }).Value;
         var datum3 = datum2.AddSeconds(1);
 
         var result = attempts.Attempt(datum3);

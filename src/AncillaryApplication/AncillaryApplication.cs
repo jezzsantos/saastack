@@ -76,7 +76,7 @@ public class AncillaryApplication : IAncillaryApplication
     }
 #endif
 
-    public async Task<Result<bool, Error>> DeliverEmailAsync(ICallerContext caller, string messageAsJson,
+    public async Task<Result<bool, Error>> SendEmailAsync(ICallerContext caller, string messageAsJson,
         CancellationToken cancellationToken)
     {
         var rehydrated = RehydrateMessage<EmailMessage>(messageAsJson);
@@ -85,13 +85,13 @@ public class AncillaryApplication : IAncillaryApplication
             return rehydrated.Error;
         }
 
-        var delivered = await DeliverEmailInternalAsync(caller, rehydrated.Value, cancellationToken);
-        if (delivered.IsFailure)
+        var sent = await SendEmailInternalAsync(caller, rehydrated.Value, cancellationToken);
+        if (sent.IsFailure)
         {
-            return delivered.Error;
+            return sent.Error;
         }
 
-        _recorder.TraceInformation(caller.ToCall(), "Delivered email message: {Message}", messageAsJson);
+        _recorder.TraceInformation(caller.ToCall(), "Sent email message: {Message}", messageAsJson);
         return true;
     }
 
@@ -133,6 +133,45 @@ public class AncillaryApplication : IAncillaryApplication
         return true;
     }
 
+    public async Task<Result<Error>> ConfirmEmailDeliveryFailedAsync(ICallerContext caller, string receiptId,
+        DateTime failedAt, string reason, CancellationToken cancellationToken)
+    {
+        var retrieved = await _emailDeliveryRepository.FindByReceiptIdAsync(receiptId, cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        if (!retrieved.Value.HasValue)
+        {
+            return Result.Ok;
+        }
+
+        var email = retrieved.Value.Value;
+        var delivered = email.ConfirmDeliveryFailed(receiptId, failedAt, reason);
+        if (delivered.IsFailure)
+        {
+            if (delivered.Error.Is(ErrorCode.RuleViolation))
+            {
+                return Result.Ok;
+            }
+
+            return delivered.Error;
+        }
+
+        var saved = await _emailDeliveryRepository.SaveAsync(email, false, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        email = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Email {Receipt} confirmed delivery failed for {For}",
+            receiptId, email.Recipient.Value.EmailAddress.Address);
+
+        return Result.Ok;
+    }
+
     public async Task<Result<bool, Error>> DeliverAuditAsync(ICallerContext caller, string messageAsJson,
         CancellationToken cancellationToken)
     {
@@ -156,7 +195,7 @@ public class AncillaryApplication : IAncillaryApplication
     public async Task<Result<Error>> DrainAllEmailsAsync(ICallerContext caller, CancellationToken cancellationToken)
     {
         await DrainAllOnQueueAsync(_emailMessageQueue,
-            message => DeliverEmailInternalAsync(caller, message, cancellationToken), cancellationToken);
+            message => SendEmailInternalAsync(caller, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(caller.ToCall(), "Drained all email messages");
 
@@ -237,7 +276,46 @@ public class AncillaryApplication : IAncillaryApplication
             deliveries.Select(delivery => delivery.ToDeliveredEmail()));
     }
 
-    private async Task<Result<bool, Error>> DeliverEmailInternalAsync(ICallerContext caller, EmailMessage message,
+    public async Task<Result<Error>> ConfirmEmailDeliveredAsync(ICallerContext caller, string receiptId,
+        DateTime deliveredAt, CancellationToken cancellationToken)
+    {
+        var retrieved = await _emailDeliveryRepository.FindByReceiptIdAsync(receiptId, cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        if (!retrieved.Value.HasValue)
+        {
+            return Result.Ok;
+        }
+
+        var email = retrieved.Value.Value;
+        var delivered = email.ConfirmDelivery(receiptId, deliveredAt);
+        if (delivered.IsFailure)
+        {
+            if (delivered.Error.Is(ErrorCode.RuleViolation))
+            {
+                return Result.Ok;
+            }
+
+            return delivered.Error;
+        }
+
+        var saved = await _emailDeliveryRepository.SaveAsync(email, false, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        email = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Email {Receipt} confirmed delivered for {For}",
+            receiptId, email.Recipient.Value.EmailAddress.Address);
+
+        return Result.Ok;
+    }
+
+    private async Task<Result<bool, Error>> SendEmailInternalAsync(ICallerContext caller, EmailMessage message,
         CancellationToken cancellationToken)
     {
         if (message.Html.IsInvalidParameter(x => x.Exists(), nameof(EmailMessage.Html), out _))
@@ -251,7 +329,7 @@ public class AncillaryApplication : IAncillaryApplication
             return messageId.Error;
         }
 
-        var retrieved = await _emailDeliveryRepository.FindDeliveryByMessageIdAsync(messageId.Value, cancellationToken);
+        var retrieved = await _emailDeliveryRepository.FindByMessageIdAsync(messageId.Value, cancellationToken);
         if (retrieved.IsFailure)
         {
             return retrieved.Error;
@@ -285,11 +363,11 @@ public class AncillaryApplication : IAncillaryApplication
             return sender.Error;
         }
 
-        EmailDeliveryRoot delivery;
+        EmailDeliveryRoot email;
         var found = retrieved.Value.HasValue;
         if (found)
         {
-            delivery = retrieved.Value.Value;
+            email = retrieved.Value.Value;
         }
         else
         {
@@ -299,16 +377,16 @@ public class AncillaryApplication : IAncillaryApplication
                 return created.Error;
             }
 
-            delivery = created.Value;
+            email = created.Value;
 
-            var detailed = delivery.SetEmailDetails(subject, body, recipient.Value);
+            var detailed = email.SetEmailDetails(subject, body, recipient.Value);
             if (detailed.IsFailure)
             {
                 return detailed.Error;
             }
         }
 
-        var makeAttempt = delivery.AttemptDelivery();
+        var makeAttempt = email.AttemptSending();
         if (makeAttempt.IsFailure)
         {
             return makeAttempt.Error;
@@ -317,57 +395,56 @@ public class AncillaryApplication : IAncillaryApplication
         var isAlreadyDelivered = makeAttempt.Value;
         if (isAlreadyDelivered)
         {
-            _recorder.TraceInformation(caller.ToCall(), "Email for {For} is already delivered",
-                delivery.Recipient.Value.EmailAddress.Address);
+            _recorder.TraceInformation(caller.ToCall(), "Email for {For} is already sent",
+                email.Recipient.Value.EmailAddress.Address);
             return true;
         }
 
-        var saved = await _emailDeliveryRepository.SaveAsync(delivery, true, cancellationToken);
+        var saved = await _emailDeliveryRepository.SaveAsync(email, true, cancellationToken);
         if (saved.IsFailure)
         {
             return saved.Error;
         }
 
-        var deliveryBefore = saved.Value;
-        var delivered = await _emailDeliveryService.DeliverAsync(caller, subject!, body!,
-            recipient.Value.EmailAddress, recipient.Value.DisplayName, sender.Value.EmailAddress,
-            sender.Value.DisplayName,
-            cancellationToken);
-        if (delivered.IsFailure)
+        email = saved.Value;
+        var sent = await _emailDeliveryService.SendAsync(caller, subject!, body!, recipient.Value.EmailAddress,
+            recipient.Value.DisplayName, sender.Value.EmailAddress,
+            sender.Value.DisplayName, cancellationToken);
+        if (sent.IsFailure)
         {
-            var failed = deliveryBefore.FailedDelivery();
+            var failed = email.FailedSending();
             if (failed.IsFailure)
             {
                 return failed.Error;
             }
 
-            var savedFailure = await _emailDeliveryRepository.SaveAsync(deliveryBefore, false, cancellationToken);
+            var savedFailure = await _emailDeliveryRepository.SaveAsync(email, false, cancellationToken);
             if (savedFailure.IsFailure)
             {
                 return savedFailure.Error;
             }
 
-            _recorder.TraceInformation(caller.ToCall(), "Delivery of email for {For}, failed",
+            _recorder.TraceInformation(caller.ToCall(), "Sending of email for delivery for {For}, failed",
                 savedFailure.Value.Recipient.Value.EmailAddress.Address);
 
-            return delivered.Error;
+            return sent.Error;
         }
 
-        var succeeded = deliveryBefore.SucceededDelivery(delivered.Value.TransactionId.ToOptional());
+        var succeeded = email.SucceededSending(sent.Value.ReceiptId.ToOptional());
         if (succeeded.IsFailure)
         {
             return succeeded.Error;
         }
 
-        var updated = await _emailDeliveryRepository.SaveAsync(deliveryBefore, false, cancellationToken);
+        var updated = await _emailDeliveryRepository.SaveAsync(email, false, cancellationToken);
         if (updated.IsFailure)
         {
             return updated.Error;
         }
 
-        deliveryBefore = updated.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Delivered email for {For}",
-            deliveryBefore.Recipient.Value.EmailAddress.Address);
+        email = updated.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Sent email for delivery for {For}",
+            email.Recipient.Value.EmailAddress.Address);
 
         return true;
     }
@@ -542,11 +619,25 @@ public static class AncillaryConversionExtensions
                 ? email.Attempts.Value.Attempts.ToList()
                 : new List<DateTime>(),
             Body = email.Body,
-            IsDelivered = email.Delivered.HasValue,
+            IsSent = email.Sent.HasValue,
+            SentAt = email.Sent.HasValue
+                ? email.Sent.Value
+                : null,
             Subject = email.Subject,
             ToDisplayName = email.ToDisplayName,
             ToEmailAddress = email.ToEmailAddress,
-            Id = email.Id
+            Id = email.Id,
+            IsDelivered = email.Delivered.HasValue,
+            DeliveredAt = email.Delivered.HasValue
+                ? email.Delivered.Value
+                : null,
+            IsDeliveryFailed = email.DeliveryFailed.HasValue,
+            FailedDeliveryAt = email.DeliveryFailed.HasValue
+                ? email.DeliveryFailed.Value
+                : null,
+            FailedDeliveryReason = email.DeliveryFailedReason.HasValue
+                ? email.DeliveryFailedReason.Value
+                : null
         };
     }
 }

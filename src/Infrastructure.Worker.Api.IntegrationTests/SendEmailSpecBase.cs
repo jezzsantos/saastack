@@ -11,12 +11,12 @@ using StringExtensions = Common.Extensions.StringExtensions;
 
 namespace Infrastructure.Worker.Api.IntegrationTests;
 
-public abstract class DeliverEmailSpecBase<TSetup> : ApiWorkerSpec<TSetup>
+public abstract class SendEmailSpecBase<TSetup> : ApiWorkerSpec<TSetup>
     where TSetup : class, IApiWorkerSpec
 {
     private readonly StubServiceClient _serviceClient;
 
-    protected DeliverEmailSpecBase(TSetup setup) : base(setup, OverrideDependencies)
+    protected SendEmailSpecBase(TSetup setup) : base(setup, OverrideDependencies)
     {
 #if TESTINGONLY
         setup.QueueStore.DestroyAllAsync(WorkerConstants.Queues.Emails, CancellationToken.None).GetAwaiter()
@@ -63,7 +63,7 @@ public abstract class DeliverEmailSpecBase<TSetup> : ApiWorkerSpec<TSetup>
             .Should().Be(0);
 #endif
         _serviceClient.LastPostedMessage.Value.Should()
-            .BeEquivalentTo(new DeliverEmailRequest { Message = message });
+            .BeEquivalentTo(new SendEmailRequest { Message = message });
     }
 
     private static void OverrideDependencies(IServiceCollection services)

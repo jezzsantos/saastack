@@ -57,7 +57,7 @@ public static class DateTimeExtensions
 
     /// <summary>
     ///     Converts the <see cref="value" /> to a UTC date,
-    ///     but only if the <see cref="value" /> is in the UNIX Timestamp format.
+    ///     but only if the <see cref="value" /> is in the UNIX Timestamp seconds format.
     /// </summary>
     public static DateTime FromUnixTimestamp(this long? value)
     {
@@ -71,9 +71,32 @@ public static class DateTimeExtensions
 
     /// <summary>
     ///     Converts the <see cref="value" /> to a UTC date,
-    ///     but only if the <see cref="value" /> is in the UNIX Timestamp format (in secs).
+    ///     but only if the <see cref="value" /> is in the UNIX Timestamp seconds format.
     /// </summary>
     public static DateTime FromUnixTimestamp(this long value)
+    {
+        return DateTime.UnixEpoch.AddSeconds(value);
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="value" /> to a UTC date,
+    ///     but only if the <see cref="value" /> is in the UNIX Timestamp seconds format.
+    /// </summary>
+    public static DateTime FromUnixTimestamp(this double? value)
+    {
+        if (value is null)
+        {
+            return default;
+        }
+
+        return value.Value.FromUnixTimestamp();
+    }
+
+    /// <summary>
+    ///     Converts the <see cref="value" /> to a UTC date,
+    ///     but only if the <see cref="value" /> is in the UNIX Timestamp seconds format.
+    /// </summary>
+    public static DateTime FromUnixTimestamp(this double value)
     {
         return DateTime.UnixEpoch.AddSeconds(value);
     }

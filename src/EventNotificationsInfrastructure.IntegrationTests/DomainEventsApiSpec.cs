@@ -68,7 +68,7 @@ public class DomainEventsApiSpec : WebApiSpec<Program>
         };
         var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
-        result.Content.Value.IsDelivered.Should().BeTrue();
+        result.Content.Value.IsSent.Should().BeTrue();
         _consumerService.LastEventId.Should().Be("aneventid");
 #endif
     }

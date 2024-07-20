@@ -31,7 +31,19 @@ public class DeliveredEmail : IIdentifiableResource
 
     public required string Body { get; set; }
 
+    public DateTime? DeliveredAt { get; set; }
+
+    public DateTime? FailedDeliveryAt { get; set; }
+
+    public string? FailedDeliveryReason { get; set; }
+
     public bool IsDelivered { get; set; }
+
+    public bool IsDeliveryFailed { get; set; }
+
+    public bool IsSent { get; set; }
+
+    public DateTime? SentAt { get; set; }
 
     public required string Subject { get; set; }
 
