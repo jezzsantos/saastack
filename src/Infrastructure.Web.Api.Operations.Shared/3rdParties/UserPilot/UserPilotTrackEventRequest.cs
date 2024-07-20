@@ -4,7 +4,7 @@ using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.UserPilot;
 
 /// <summary>
-///     Identifies the user
+///     Tracks the event
 /// </summary>
 [Route("/track", OperationMethod.Post)]
 public class UserPilotTrackEventRequest : IWebRequest<EmptyResponse>

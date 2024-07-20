@@ -10,7 +10,9 @@ using Infrastructure.Persistence.Interfaces.ApplicationServices;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 using Infrastructure.Web.Api.Operations.Shared.EventNotifications;
+using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Hosting.Common;
+using Infrastructure.Web.Interfaces.Clients;
 using TestingStubApiHost.Api;
 using TestingStubApiHost.Workers;
 
@@ -88,6 +90,10 @@ public class StubApiModule : ISubdomainModule
                     builder.AddEventSourceLogger();
                 });
 
+                services.AddSingleton<IServiceClient>(c =>
+                    new InterHostServiceClient(c.GetRequiredService<IHttpClientFactory>(),
+                        c.GetRequiredService<JsonSerializerOptions>(),
+                        c.GetRequiredService<IHostSettings>().GetAncillaryApiHostBaseUrl()));
                 services.AddSingleton<IMessageMonitor, StubMessageMonitor>();
                 services.AddHostedService(c =>
                     new StubCloudWorkerService(c.GetRequiredService<IHostSettings>(),

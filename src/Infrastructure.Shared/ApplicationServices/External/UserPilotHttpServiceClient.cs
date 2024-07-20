@@ -214,8 +214,7 @@ public sealed class UserPilotHttpServiceClient : IUsageDeliveryService
     }
 
     private async Task<Result<Error>> TrackEventAsync(ICallerContext caller, string userId,
-        string eventName,
-        Dictionary<string, string> metadata, CancellationToken cancellationToken)
+        string eventName, Dictionary<string, string> metadata, CancellationToken cancellationToken)
     {
         _recorder.TraceInformation(caller.ToCall(), "Tracking event {Event} in UserPilot for {User}", eventName,
             userId);

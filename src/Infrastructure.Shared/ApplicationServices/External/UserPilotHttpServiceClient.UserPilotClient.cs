@@ -64,7 +64,7 @@ public sealed class UserPilotClient : IUserPilotClient
                     UserId = userId,
                     Metadata = metadata,
                     Company = company
-                }, req => req.PrepareRequest(_apiKey), cancellationToken));
+                }, req => PrepareRequest(req, _apiKey), cancellationToken));
             if (response.IsFailure)
             {
                 return response.Error.ToError();
@@ -92,7 +92,7 @@ public sealed class UserPilotClient : IUserPilotClient
                     UserId = userId,
                     EventName = eventName,
                     Metadata = metadata
-                }, req => req.PrepareRequest(_apiKey), cancellationToken));
+                }, req => PrepareRequest(req, _apiKey), cancellationToken));
             if (response.IsFailure)
             {
                 return response.Error.ToError();
@@ -107,13 +107,10 @@ public sealed class UserPilotClient : IUserPilotClient
             return ex.ToError(ErrorCode.Unexpected);
         }
     }
-}
 
-internal static class UserPilotHttpClientExtensions
-{
-    public static void PrepareRequest(this HttpRequestMessage message, string apiKey)
+    private static void PrepareRequest(HttpRequestMessage message, string apiKey)
     {
         message.Headers.Add(HttpConstants.Headers.Authorization, $"token {apiKey}");
-        message.Headers.Add(UserPilotClient.APIVersionHeaderName, "2020-09-22");
+        message.Headers.Add(APIVersionHeaderName, "2020-09-22");
     }
 }
