@@ -66,7 +66,7 @@ public static class DateTimeExtensions
             return default;
         }
 
-        return value.FromUnixTimestamp();
+        return value.Value.FromUnixTimestamp();
     }
 
     /// <summary>

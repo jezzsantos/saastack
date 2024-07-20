@@ -4,9 +4,13 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common.Clients;
+using Infrastructure.Web.Interfaces.Clients;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
+using Moq.Protected;
 using Xunit;
+using HttpClient = System.Net.Http.HttpClient;
 
 namespace Infrastructure.Web.Common.UnitTests.Clients;
 
@@ -236,6 +240,124 @@ public class JsonClientSpec
             result.Error.Instance.Should().BeNull();
             result.Error.Exception.Should().BeNull();
             result.Error.Errors.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task WhenSendRequestAsyncAndGetMethod_ThenContentIsEmpty()
+        {
+            var response = new HttpResponseMessage();
+            var handler = new Mock<HttpMessageHandler>();
+            handler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(response);
+            var client = new HttpClient(handler.Object)
+            {
+                BaseAddress = new Uri("http://localhost")
+            };
+            var request = new TestRequest();
+
+            var result =
+                await JsonClient.SendRequestAsync(client, HttpMethod.Get, request, null, null,
+                    CancellationToken.None);
+
+            result.Should().Be(response);
+            handler.Protected()
+                .Verify("SendAsync", Times.Once(),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Get
+                        && req.Content == null
+                    ),
+                    ItExpr.IsAny<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task WhenSendRequestAsyncAndPostMethodWithJsonRequest_ThenContentIsStringContent()
+        {
+            var response = new HttpResponseMessage();
+            var handler = new Mock<HttpMessageHandler>();
+            handler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(response);
+            var client = new HttpClient(handler.Object)
+            {
+                BaseAddress = new Uri("http://localhost")
+            };
+            var request = new TestRequest();
+
+            var result =
+                await JsonClient.SendRequestAsync(client, HttpMethod.Post, request, null, null,
+                    CancellationToken.None);
+
+            result.Should().Be(response);
+            handler.Protected()
+                .Verify("SendAsync", Times.Once(),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Post
+                        && req.Content is StringContent
+                    ),
+                    ItExpr.IsAny<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task WhenSendRequestAsyncAndPostMethodWithIMultiPartRequest_ThenContentIsMultiPartForm()
+        {
+            var response = new HttpResponseMessage();
+            var handler = new Mock<HttpMessageHandler>();
+            handler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(response);
+            var client = new HttpClient(handler.Object)
+            {
+                BaseAddress = new Uri("http://localhost")
+            };
+            var request = new TestMultiPartFormRequest();
+            var file = new PostFile(new MemoryStream(), HttpConstants.ContentTypes.Json, "afilename");
+
+            var result =
+                await JsonClient.SendRequestAsync(client, HttpMethod.Post, request, file, null,
+                    CancellationToken.None);
+
+            result.Should().Be(response);
+            handler.Protected()
+                .Verify("SendAsync", Times.Once(),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Post
+                        && req.Content is MultipartContent
+                    ),
+                    ItExpr.IsAny<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task WhenSendRequestAsyncAndPostMethodWithFile_ThenContentIsMultiPartFormWithFile()
+        {
+            var response = new HttpResponseMessage();
+            var handler = new Mock<HttpMessageHandler>();
+            handler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(response);
+            var client = new HttpClient(handler.Object)
+            {
+                BaseAddress = new Uri("http://localhost")
+            };
+            var request = new TestRequest();
+            var file = new PostFile(new MemoryStream(), HttpConstants.ContentTypes.Json, "afilename");
+
+            var result =
+                await JsonClient.SendRequestAsync(client, HttpMethod.Post, request, file, null,
+                    CancellationToken.None);
+
+            result.Should().Be(response);
+            handler.Protected()
+                .Verify("SendAsync", Times.Once(),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Post
+                        && req.Content is MultipartContent
+                    ),
+                    ItExpr.IsAny<CancellationToken>());
         }
     }
 
@@ -484,6 +606,18 @@ public class JsonClientSpec
             result.HasValue.Should().BeFalse();
         }
     }
+}
+
+[Api.Interfaces.Route("/test", OperationMethod.Get)]
+public class TestRequest : IWebRequest
+{
+    public string AProperty { get; set; } = "avalue";
+}
+
+[Api.Interfaces.Route("/test", OperationMethod.Post)]
+public class TestMultiPartFormRequest : IWebRequest, IHasMultipartForm
+{
+    public string AProperty { get; set; } = "avalue";
 }
 
 public class TestResponse : IWebResponse

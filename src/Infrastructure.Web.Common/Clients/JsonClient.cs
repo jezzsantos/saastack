@@ -52,7 +52,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default)
         where TResponse : IWebResponse, new()
     {
-        var response = await SendRequestAsync(HttpMethod.Delete, request, null, requestFilter, cancellationToken);
+        var response = await SendRequestAsync(_httpClient, HttpMethod.Delete, request, null, requestFilter,
+            cancellationToken);
         var content = await GetTypedResponseAsync<TResponse>(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);
@@ -61,7 +62,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
     public async Task<JsonResponse> DeleteAsync(IWebRequest request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default)
     {
-        var response = await SendRequestAsync(HttpMethod.Delete, request, null, requestFilter, cancellationToken);
+        var response = await SendRequestAsync(_httpClient, HttpMethod.Delete, request, null, requestFilter,
+            cancellationToken);
         var content = await GetStringResponseAsync(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);
@@ -72,7 +74,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
         CancellationToken? cancellationToken = default)
         where TResponse : IWebResponse, new()
     {
-        var response = await SendRequestAsync(HttpMethod.Get, request, null, requestFilter, cancellationToken);
+        var response =
+            await SendRequestAsync(_httpClient, HttpMethod.Get, request, null, requestFilter, cancellationToken);
         var content = await GetTypedResponseAsync<TResponse>(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);
@@ -82,7 +85,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
         Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = default)
     {
-        var response = await SendRequestAsync(HttpMethod.Get, request, null, requestFilter, cancellationToken);
+        var response =
+            await SendRequestAsync(_httpClient, HttpMethod.Get, request, null, requestFilter, cancellationToken);
         var content = await GetStringResponseAsync(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);
@@ -93,7 +97,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
         CancellationToken? cancellationToken = default)
         where TResponse : IWebResponse, new()
     {
-        var response = await SendRequestAsync(HttpMethod.Patch, request, null, requestFilter, cancellationToken);
+        var response = await SendRequestAsync(_httpClient, HttpMethod.Patch, request, null, requestFilter,
+            cancellationToken);
         var content = await GetTypedResponseAsync<TResponse>(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);
@@ -103,7 +108,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
         Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = default)
     {
-        var response = await SendRequestAsync(HttpMethod.Patch, request, null, requestFilter, cancellationToken);
+        var response = await SendRequestAsync(_httpClient, HttpMethod.Patch, request, null, requestFilter,
+            cancellationToken);
         var content = await GetStringResponseAsync(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);
@@ -114,7 +120,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
         CancellationToken? cancellationToken = default)
         where TResponse : IWebResponse, new()
     {
-        var response = await SendRequestAsync(HttpMethod.Post, request, null, requestFilter, cancellationToken);
+        var response =
+            await SendRequestAsync(_httpClient, HttpMethod.Post, request, null, requestFilter, cancellationToken);
         var content = await GetTypedResponseAsync<TResponse>(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);
@@ -124,7 +131,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
         Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = default)
     {
-        var response = await SendRequestAsync(HttpMethod.Post, request, null, requestFilter, cancellationToken);
+        var response =
+            await SendRequestAsync(_httpClient, HttpMethod.Post, request, null, requestFilter, cancellationToken);
         var content = await GetStringResponseAsync(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);
@@ -135,7 +143,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
         CancellationToken? cancellationToken = default)
         where TResponse : IWebResponse, new()
     {
-        var response = await SendRequestAsync(HttpMethod.Post, request, file, requestFilter, cancellationToken);
+        var response =
+            await SendRequestAsync(_httpClient, HttpMethod.Post, request, file, requestFilter, cancellationToken);
         var content = await GetTypedResponseAsync<TResponse>(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);
@@ -145,7 +154,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
         Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = default)
     {
-        var response = await SendRequestAsync(HttpMethod.Post, request, file, requestFilter, cancellationToken);
+        var response =
+            await SendRequestAsync(_httpClient, HttpMethod.Post, request, file, requestFilter, cancellationToken);
         var content = await GetStringResponseAsync(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);
@@ -156,7 +166,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
         CancellationToken? cancellationToken = default)
         where TResponse : IWebResponse, new()
     {
-        var response = await SendRequestAsync(HttpMethod.Put, request, null, requestFilter, cancellationToken);
+        var response =
+            await SendRequestAsync(_httpClient, HttpMethod.Put, request, null, requestFilter, cancellationToken);
         var content = await GetTypedResponseAsync<TResponse>(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);
@@ -167,7 +178,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
         CancellationToken? cancellationToken = default)
         where TResponse : IWebResponse, new()
     {
-        var response = await SendRequestAsync(HttpMethod.Put, request, file, requestFilter, cancellationToken);
+        var response =
+            await SendRequestAsync(_httpClient, HttpMethod.Put, request, file, requestFilter, cancellationToken);
         var content = await GetTypedResponseAsync<TResponse>(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);
@@ -177,7 +189,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
         Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = default)
     {
-        var response = await SendRequestAsync(HttpMethod.Put, request, null, requestFilter, cancellationToken);
+        var response =
+            await SendRequestAsync(_httpClient, HttpMethod.Put, request, null, requestFilter, cancellationToken);
         var content = await GetStringResponseAsync(response, _jsonOptions, cancellationToken);
 
         return CreateResponse(response, content);
@@ -295,37 +308,21 @@ public class JsonClient : IHttpJsonClient, IDisposable
     public async Task SendOneWayAsync(IWebRequest request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = default)
     {
-        await SendRequestAsync(HttpMethod.Put, request, null, requestFilter, cancellationToken);
+        await SendRequestAsync(_httpClient, HttpMethod.Put, request, null, requestFilter, cancellationToken);
     }
 
-    public void SetBaseUrl(string baseUrl)
-    {
-        _httpClient.BaseAddress = new Uri(baseUrl.WithTrailingSlash(), UriKind.Absolute);
-    }
-
-    private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod method, IWebRequest request,
-        PostFile? file, Action<HttpRequestMessage>? requestFilter, CancellationToken? cancellationToken = default)
+    internal static async Task<HttpResponseMessage> SendRequestAsync(HttpClient httpClient, HttpMethod method,
+        IWebRequest request, PostFile? file, Action<HttpRequestMessage>? requestFilter,
+        CancellationToken? cancellationToken = default)
     {
         var requestUri = request.GetRequestInfo().Route;
 
         HttpContent? content = null;
         try
         {
-            if (file.Exists())
+            if (method.CanHaveBody() && file.Exists())
             {
-                var multipart = new MultipartFormDataContent();
-                var requestFields =
-                    request.SerializeToJson()
-                        .FromJson<Dictionary<string, string>>()
-                    !; //HACK: really need these values to be serialized as QueryString parameters
-                if (requestFields.HasAny())
-                {
-                    foreach (var field in requestFields)
-                    {
-                        multipart.Add(new StringContent(field.Value), field.Key);
-                    }
-                }
-
+                var multipart = ToFormData(request);
                 var streamContent = new StreamContent(file.Stream);
                 if (file.ContentType.HasValue())
                 {
@@ -333,6 +330,11 @@ public class JsonClient : IHttpJsonClient, IDisposable
                 }
 
                 multipart.Add(streamContent, "file", file.Filename);
+                content = multipart;
+            }
+            else if (method.CanHaveBody() && request is IHasMultipartForm)
+            {
+                var multipart = ToFormData(request);
                 content = multipart;
             }
             else
@@ -343,22 +345,46 @@ public class JsonClient : IHttpJsonClient, IDisposable
                     : null;
             }
 
-            return await SendRequestAsync(method, requestUri, content, requestFilter, cancellationToken);
+            return await SendRequestAsync(httpClient, method, requestUri, content, requestFilter, cancellationToken);
         }
         finally
         {
             (content as IDisposable)?.Dispose();
         }
+
+        static MultipartFormDataContent ToFormData(IWebRequest request)
+        {
+            var content = new MultipartFormDataContent();
+            var requestFields =
+                request.SerializeToJson()
+                    .FromJson<Dictionary<string, string>>()
+                !; //HACK: really need these values to be serialized as QueryString parameters
+            if (requestFields.HasAny())
+            {
+                foreach (var field in requestFields)
+                {
+                    content.Add(new StringContent(field.Value), field.Key);
+                }
+            }
+
+            return content;
+        }
     }
 
-    private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod method, string requestUri,
+    public void SetBaseUrl(string baseUrl)
+    {
+        _httpClient.BaseAddress = new Uri(baseUrl.WithTrailingSlash(), UriKind.Absolute);
+    }
+
+    private static async Task<HttpResponseMessage> SendRequestAsync(HttpClient httpClient, HttpMethod method,
+        string requestUri,
         HttpContent? requestContent, Action<HttpRequestMessage>? requestFilter,
         CancellationToken? cancellationToken = default)
     {
         var request = new HttpRequestMessage
         {
             Method = method,
-            RequestUri = new Uri(_httpClient.BaseAddress!, requestUri.WithoutLeadingSlash()),
+            RequestUri = new Uri(httpClient.BaseAddress!, requestUri.WithoutLeadingSlash()),
             Content = requestContent,
             Headers = { { HttpConstants.Headers.Accept, HttpConstants.ContentTypes.Json } }
         };
@@ -367,7 +393,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
             requestFilter(request);
         }
 
-        return await _httpClient.SendAsync(request, cancellationToken ?? CancellationToken.None);
+        return await httpClient.SendAsync(request, cancellationToken ?? CancellationToken.None);
     }
 
     private static bool TryReadRfc7807Error(HttpResponseMessage response, JsonSerializerOptions? jsonOptions,
@@ -435,7 +461,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
             ContentHeaders = response.Content.Headers,
             Headers = response.Headers,
             RequestId = response.GetOrCreateRequestId(),
-            RawContent = content.IsSuccessful && !content.HasValue
+            RawContent = content is { IsSuccessful: true, HasValue: false }
                 ? response.Content.ReadAsStream()
                 : null
         };
