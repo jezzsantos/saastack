@@ -15,4 +15,10 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Include="..\Common\RuntimeConstants.cs">
+            <Link>Reference\Common\RuntimeConstants.cs</Link>
+        </Compile>
+    </ItemGroup>
+
 </Project>

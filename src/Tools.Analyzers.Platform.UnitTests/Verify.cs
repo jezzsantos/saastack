@@ -1,14 +1,15 @@
 extern alias CommonAnalyzers;
 extern alias PlatformAnalyzers;
 using System.Reflection;
+using Common;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
+using PlatformAnalyzers::Common.Extensions;
 using NuGet.Frameworks;
 using AnalyzerConstants = CommonAnalyzers::Tools.Analyzers.Common.AnalyzerConstants;
 using Task = System.Threading.Tasks.Task;
-using PlatformAnalyzers::Common.Extensions;
 
 namespace Tools.Analyzers.Platform.UnitTests;
 
@@ -28,8 +29,8 @@ public static class Verify
     // does not contain a value for this framework  
     private static readonly Lazy<ReferenceAssemblies> LazyNet80 = new(() =>
     {
-        const string version = "net8.0";
-        const string sdkVersion = "8.0.2";
+        const string version = $"net{RuntimeConstants.Dotnet.Version}";
+        const string sdkVersion = RuntimeConstants.Dotnet.RuntimeVersion;
         if (!NuGetFramework.Parse(version)
                 .IsPackageBased)
         {

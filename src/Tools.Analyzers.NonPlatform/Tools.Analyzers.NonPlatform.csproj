@@ -331,7 +331,7 @@
      -->
     <PropertyGroup>
         <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
-        <_TargetFramework>8.0.2</_TargetFramework>
+        <_TargetFramework>$(RoslynTargetFramework)</_TargetFramework>
         <_AspNetFrameworkInstallFolder>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\$(_TargetFramework)</_AspNetFrameworkInstallFolder>
         <_FrameworkInstallFolder>C:\Program Files\dotnet\shared\Microsoft.NETCore.App\$(_TargetFramework)</_FrameworkInstallFolder>
     </PropertyGroup>
