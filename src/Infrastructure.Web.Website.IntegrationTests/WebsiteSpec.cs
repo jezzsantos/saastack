@@ -15,10 +15,19 @@ public abstract class WebsiteSpec<THost> : WebApiSpec<THost>
     protected readonly CSRFMiddleware.ICSRFService CSRFService;
     protected readonly JsonSerializerOptions JsonOptions;
 
-    protected WebsiteSpec(WebApiSetup<THost> setup, Action<IServiceCollection>? overrideDependencies = null) : base(
-        setup, OverrideDependencies(overrideDependencies))
+    protected WebsiteSpec(WebApiSetup<THost> setup, Action<IServiceCollection>? overrideDependencies = null,
+        Action<WebApiSpec<THost>>? runOnceBeforeAllTests = null,
+        Action<WebApiSpec<THost>>? runOnceAfterAllTests = null) : base(
+        setup, OverrideDependencies(overrideDependencies), spec =>
+        {
+            spec.StartupAdditionalServer<Program>();
+            runOnceBeforeAllTests?.Invoke(spec);
+        }, spec =>
+        {
+            runOnceAfterAllTests?.Invoke(spec);
+            spec.ShutdownAllAdditionalServers();
+        })
     {
-        StartupServer<Program>();
         CSRFService = setup.GetRequiredService<CSRFMiddleware.ICSRFService>();
 #if TESTINGONLY
         HttpApi.PostEmptyJsonAsync(new DestroyAllRepositoriesRequest().MakeApiRoute(),

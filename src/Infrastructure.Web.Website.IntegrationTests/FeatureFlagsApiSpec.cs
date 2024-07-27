@@ -16,9 +16,9 @@ namespace Infrastructure.Web.Website.IntegrationTests;
 [Collection("API")]
 public class FeatureFlagsApiSpec : WebsiteSpec<Program>
 {
-    public FeatureFlagsApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
+    public FeatureFlagsApiSpec(WebApiSetup<Program> setup) : base(setup, OverrideDependencies,
+        spec => spec.StartupAdditionalServer<TestingStubApiHost.Program>())
     {
-        StartupServer<TestingStubApiHost.Program>();
     }
 
     [Fact]

@@ -37,6 +37,9 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
     where THost : class
 {
     private Action<IServiceCollection>? _overridenTestingDependencies;
+    private Action<WebApiSpec<THost>>? _runOnceAfterAllTests;
+    private Action<WebApiSpec<THost>>? _runOnceBeforeAllTests;
+    private WebApiSpec<THost>? _runOnceSpec;
     private IServiceScope? _scope;
 
     protected override void Dispose(bool disposing)
@@ -47,6 +50,10 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
         }
 
         base.Dispose(disposing);
+        if (_runOnceAfterAllTests.Exists())
+        {
+            _runOnceAfterAllTests(_runOnceSpec!);
+        }
     }
 
     private IConfiguration? Configuration { get; set; }
@@ -66,6 +73,14 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
     public void OverrideTestingDependencies(Action<IServiceCollection> overrideDependencies)
     {
         _overridenTestingDependencies = overrideDependencies;
+    }
+
+    public void RunOnceForAllTests(Action<WebApiSpec<THost>> runOnceBeforeAllTests,
+        Action<WebApiSpec<THost>>? runOnceAfterAllTests, WebApiSpec<THost> spec)
+    {
+        _runOnceSpec = spec;
+        _runOnceBeforeAllTests = runOnceBeforeAllTests;
+        _runOnceAfterAllTests = runOnceAfterAllTests;
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -91,6 +106,11 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
                     _overridenTestingDependencies.Invoke(services);
                 }
             });
+
+        if (_runOnceBeforeAllTests.Exists())
+        {
+            _runOnceBeforeAllTests(_runOnceSpec!);
+        }
     }
 }
 
@@ -118,8 +138,14 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
     private readonly List<int> _additionalServerProcesses = [];
     private readonly WebApplicationFactory<THost> _setup;
 
-    protected WebApiSpec(WebApiSetup<THost> setup, Action<IServiceCollection>? overrideDependencies = null)
+    protected WebApiSpec(WebApiSetup<THost> setup, Action<IServiceCollection>? overrideDependencies = null,
+        Action<WebApiSpec<THost>>? runOnceBeforeAllTests = null, Action<WebApiSpec<THost>>? runOnceAfterAllTests = null)
     {
+        if (runOnceBeforeAllTests.Exists())
+        {
+            setup.RunOnceForAllTests(runOnceBeforeAllTests, runOnceAfterAllTests, this);
+        }
+
         if (overrideDependencies.Exists())
         {
             setup.OverrideTestingDependencies(overrideDependencies);
@@ -146,7 +172,6 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         {
             (HttpApi as IDisposable)?.Dispose();
             _setup.Dispose();
-            _additionalServerProcesses.ForEach(ShutdownProcess);
         }
     }
 
@@ -171,6 +196,56 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 
             throw new InvalidOperationException("Unsupported Platform");
         }
+    }
+
+    public void ShutdownAllAdditionalServers()
+    {
+        _additionalServerProcesses.ForEach(processId =>
+        {
+            if (processId != 0)
+            {
+                Try.Safely(() =>
+                {
+                    var process = Process.GetProcessById(processId);
+                    process.Kill();
+                });
+            }
+        });
+    }
+
+    public void StartupAdditionalServer<TAnotherHost>()
+        where TAnotherHost : class
+    {
+        var assembly = typeof(TAnotherHost).Assembly;
+        var projectName = assembly.GetName().Name!;
+        var projectPath = Path.Combine(Solution.NavigateUpToSolutionDirectoryPath(), projectName);
+
+        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+        var launchProfileName = $"{projectName}-{env}";
+        const string configuration = "Debug";
+        var arguments =
+            DotNetCommandLineWithLaunchProfileArgumentsFormat.Format(configuration, launchProfileName, projectPath);
+        var executable = Environment.ExpandEnvironmentVariables(DotNetExe);
+        var process = Process.Start(new ProcessStartInfo
+        {
+            Arguments = arguments,
+            FileName = executable,
+            RedirectStandardError = false,
+            RedirectStandardOutput = false,
+            WindowStyle = ProcessWindowStyle.Hidden,
+            UseShellExecute = true
+        });
+        if (process.NotExists())
+        {
+            throw new InvalidOperationException($"Failed to launch Server {projectName}");
+        }
+
+        if (process.HasExited)
+        {
+            throw new InvalidOperationException($"Failed to launch Server {projectName}, failed to startup");
+        }
+
+        _additionalServerProcesses.Add(process.Id);
     }
 
     protected void EmptyAllRepositories()
@@ -269,41 +344,6 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
         return person.Content.Value;
     }
 
-    protected void StartupServer<TAnotherHost>()
-        where TAnotherHost : class
-    {
-        var assembly = typeof(TAnotherHost).Assembly;
-        var projectName = assembly.GetName().Name!;
-        var projectPath = Path.Combine(Solution.NavigateUpToSolutionDirectoryPath(), projectName);
-
-        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-        var launchProfileName = $"{projectName}-{env}";
-        const string configuration = "Debug";
-        var arguments =
-            DotNetCommandLineWithLaunchProfileArgumentsFormat.Format(configuration, launchProfileName, projectPath);
-        var executable = Environment.ExpandEnvironmentVariables(DotNetExe);
-        var process = Process.Start(new ProcessStartInfo
-        {
-            Arguments = arguments,
-            FileName = executable,
-            RedirectStandardError = false,
-            RedirectStandardOutput = false,
-            WindowStyle = ProcessWindowStyle.Hidden,
-            UseShellExecute = true
-        });
-        if (process.NotExists())
-        {
-            throw new InvalidOperationException($"Failed to launch Server {projectName}");
-        }
-
-        if (process.HasExited)
-        {
-            throw new InvalidOperationException($"Failed to launch Server {projectName}, failed to startup");
-        }
-
-        _additionalServerProcesses.Add(process.Id);
-    }
-
     /// <summary>
     ///     We retry the specified <see cref="request" />  until the <see cref="predicate" /> of the response is achieved
     /// </summary>
@@ -328,15 +368,6 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
             LoginUser.Operator => "operator@company.com",
             _ => throw new ArgumentOutOfRangeException(nameof(who), who, null)
         };
-    }
-
-    private static void ShutdownProcess(int processId)
-    {
-        if (processId != 0)
-        {
-            var process = Process.GetProcessById(processId);
-            Try.Safely(() => process.Kill());
-        }
     }
 
     private static (IHttpJsonClient Api, IHttpClient HttpApi) CreateTestingClients<TAnotherHost>(
