@@ -18,7 +18,7 @@ public class GeneralApiSpec : WebApiSpec<ApiHost1.Program>
     }
 
     [Fact]
-    public async Task WhenGetError_ThenReturnsError()
+    public async Task WhenPostWithEnum_ThenReturns()
     {
         var result = await Api.PostAsync(new PostWithEnumTestingOnlyRequest
         {
@@ -28,6 +28,15 @@ public class GeneralApiSpec : WebApiSpec<ApiHost1.Program>
 
         result.StatusCode.Should().Be(HttpStatusCode.Created);
         result.Content.Value.Message.Should().Be("amessageValue1");
+    }
+
+    [Fact]
+    public async Task WhenPostWithEmptyBody_ThenReturns()
+    {
+        var result = await Api.PostAsync(new PostWithEmptyBodyTestingOnlyRequest());
+
+        result.StatusCode.Should().Be(HttpStatusCode.Created);
+        result.Content.Value.Message.Should().Be("amessage");
     }
 }
 #endif
