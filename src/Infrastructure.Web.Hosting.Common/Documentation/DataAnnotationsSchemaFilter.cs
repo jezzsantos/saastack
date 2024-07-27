@@ -17,11 +17,11 @@ public class DataAnnotationsSchemaFilter : ISchemaFilter
     {
         if (context.MemberInfo.Exists())
         {
-            // we deal with each of the properties of a schema component
             var member = context.MemberInfo;
             var declaringType = member.DeclaringType;
             if (declaringType.IsAnnotatable())
             {
+                // we only deal with each member of a request and responses types
                 schema.SetDescription(member);
             }
 
@@ -30,17 +30,18 @@ public class DataAnnotationsSchemaFilter : ISchemaFilter
 
         if (context.ParameterInfo.Exists())
         {
-            // we deal with parameters in the DataAnnotationsParameterFilter , not here
+            // Parameters are dealt with in the DataAnnotationsParameterFilter , not here
             return;
         }
 
+        // we deal with other schemas in general
         if (context.Type.IsAnnotatable())
         {
-            // we deal with the schema component
             var requestDto = context.Type;
             var properties = requestDto.GetProperties();
             foreach (var property in properties)
             {
+                // we have to add all required properties to the request collection
                 if (property.IsPropertyRequired())
                 {
                     var name = property.Name.ToCamelCase();
@@ -52,6 +53,11 @@ public class DataAnnotationsSchemaFilter : ISchemaFilter
                     }
                 }
             }
+        }
+
+        if (context.Type.IsEnum)
+        {
+            schema.SetEnumValues(context.Type);
         }
     }
 }

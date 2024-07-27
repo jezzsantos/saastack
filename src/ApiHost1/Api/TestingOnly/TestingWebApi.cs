@@ -119,6 +119,16 @@ public sealed class TestingWebApi : IWebApiService
         });
     }
 
+    public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> GeneralEnumPost(
+        PostWithEnumTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () =>
+            new PostResult<StringMessageTestingOnlyResponse>(
+                new StringMessageTestingOnlyResponse { Message = $"amessage{request.AnEnum}" },
+                "alocation");
+    }
+
     public async Task<ApiEmptyResult> GetInsecure(
         GetInsecureTestingOnlyRequest request, CancellationToken cancellationToken)
     {

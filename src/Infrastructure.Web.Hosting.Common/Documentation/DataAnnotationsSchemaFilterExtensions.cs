@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -37,25 +38,46 @@ internal static class DataAnnotationsSchemaFilterExtensions
 
     public static void SetDescription(this OpenApiSchema schema, MemberInfo member)
     {
-        var description = member.GetCustomAttribute<DescriptionAttribute>();
-        if (description.Exists())
+        var descriptionAttribute = member.GetCustomAttribute<DescriptionAttribute>();
+        if (descriptionAttribute.Exists())
         {
-            if (description.Description.HasValue())
+            if (descriptionAttribute.Description.HasValue())
             {
-                schema.Description = description.Description;
+                schema.Description = descriptionAttribute.Description;
             }
         }
     }
 
     public static void SetDescription(this OpenApiParameter parameter, ParameterInfo parameterInfo)
     {
-        var description = parameterInfo.GetCustomAttribute<DescriptionAttribute>();
-        if (description.Exists())
+        var descriptionAttribute = parameterInfo.GetCustomAttribute<DescriptionAttribute>();
+        if (descriptionAttribute.Exists())
         {
-            if (description.Description.HasValue())
+            if (descriptionAttribute.Description.HasValue())
             {
-                parameter.Description = description.Description;
+                parameter.Description = descriptionAttribute.Description;
             }
+        }
+    }
+
+    public static void SetEnumValues(this OpenApiSchema schema, Type type)
+    {
+        var names = Enum.GetNames(type).ToList();
+        schema.Enum.Clear();
+        schema.Type = "string";
+        schema.Format = null;
+        foreach (var name in names)
+        {
+            schema.Enum.Add(new OpenApiString(name));
+        }
+    }
+
+    public static void SetRequired(this OpenApiParameter parameter, ParameterInfo parameterInfo)
+    {
+        if (parameter.In == ParameterLocation.Path
+            || parameterInfo.GetCustomAttribute<RequiredAttribute>().Exists())
+        {
+            parameter.Required = true;
         }
     }
 

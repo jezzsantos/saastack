@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 using Common.Extensions;
 using JetBrains.Annotations;
 using Microsoft.OpenApi.Models;
@@ -22,12 +20,7 @@ public class DataAnnotationsParameterFilter : IParameterFilter
             var declaringType = parameterInfo.Member.DeclaringType;
             if (declaringType.IsAnnotatable())
             {
-                if (parameter.In == ParameterLocation.Path
-                    || parameterInfo.GetCustomAttribute<RequiredAttribute>().Exists())
-                {
-                    parameter.Required = true;
-                }
-
+                parameter.SetRequired(parameterInfo);
                 parameter.SetDescription(parameterInfo);
             }
         }
