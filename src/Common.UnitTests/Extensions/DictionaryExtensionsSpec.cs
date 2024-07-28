@@ -30,7 +30,7 @@ public class DictionaryExtensionsSpec
         source.Merge(new Dictionary<string, string>());
 
         source.Count.Should().Be(1);
-        source.Should().OnlyContain(pair => pair.Key == "aname");
+        source.Should().OnlyContain(pair => pair.Key == "aname" && pair.Value == "avalue");
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class DictionaryExtensionsSpec
         });
 
         source.Count.Should().Be(1);
-        source.Should().OnlyContain(pair => pair.Key == "aname");
+        source.Should().OnlyContain(pair => pair.Key == "aname" && pair.Value == "avalue");
     }
 
     [Fact]
@@ -61,8 +61,8 @@ public class DictionaryExtensionsSpec
         });
 
         source.Count.Should().Be(2);
-        source.Should().Contain(pair => pair.Key == "aname1");
-        source.Should().Contain(pair => pair.Key == "aname2");
+        source.Should().Contain(pair => pair.Key == "aname1" && pair.Value == "avalue1");
+        source.Should().Contain(pair => pair.Key == "aname2" && pair.Value == "avalue2");
     }
 
     [Fact]
@@ -76,14 +76,14 @@ public class DictionaryExtensionsSpec
 
         source.Merge(new Dictionary<string, string>
         {
-            { "aname2", "avalue2" },
+            { "aname2", "avalue4" },
             { "aname3", "avalue3" }
         });
 
         source.Count.Should().Be(3);
-        source.Should().Contain(pair => pair.Key == "aname1");
-        source.Should().Contain(pair => pair.Key == "aname2");
-        source.Should().Contain(pair => pair.Key == "aname3");
+        source.Should().Contain(pair => pair.Key == "aname1" && pair.Value == "avalue1");
+        source.Should().Contain(pair => pair.Key == "aname2" && pair.Value == "avalue4");
+        source.Should().Contain(pair => pair.Key == "aname3" && pair.Value == "avalue3");
     }
 
     [Fact]
