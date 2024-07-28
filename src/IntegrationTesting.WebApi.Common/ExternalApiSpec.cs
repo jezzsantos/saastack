@@ -22,7 +22,11 @@ public class AllExternalSpecs : ICollectionFixture<ExternalApiSetup>;
 public class ExternalApiSetup : IDisposable
 {
     private IHost? _host;
+    private bool _isStarted;
     private Action<IServiceCollection>? _overridenTestingDependencies;
+    private Action<ExternalApiSpec>? _runOnceAfterAllTests;
+    private Action<ExternalApiSpec>? _runOnceBeforeAllTests;
+    private ExternalApiSpec? _runOnceSpec;
 
     public void Dispose()
     {
@@ -34,11 +38,50 @@ public class ExternalApiSetup : IDisposable
     {
         if (disposing)
         {
+            if (_runOnceAfterAllTests.Exists())
+            {
+                _runOnceAfterAllTests(_runOnceSpec!);
+            }
+
             if (_host.Exists())
             {
                 _host.StopAsync().GetAwaiter().GetResult();
                 _host.Dispose();
             }
+        }
+    }
+
+    public void EnsureStarted()
+    {
+        if (_isStarted)
+        {
+            return;
+        }
+
+        _isStarted = true;
+
+        _host = new HostBuilder()
+            .ConfigureAppConfiguration(builder =>
+            {
+                builder
+                    .AddJsonFile("appsettings.Testing.json", true)
+                    .AddJsonFile("appsettings.Testing.local.json", true);
+            })
+            .ConfigureServices((context, services) =>
+            {
+                services.AddSingleton<IConfigurationSettings>(
+                    new AspNetDynamicConfigurationSettings(context.Configuration));
+                if (_overridenTestingDependencies.Exists())
+                {
+                    _overridenTestingDependencies.Invoke(services);
+                }
+            })
+            .Build();
+        _host.Start();
+
+        if (_runOnceBeforeAllTests.Exists())
+        {
+            _runOnceBeforeAllTests(_runOnceSpec!);
         }
     }
 
@@ -58,61 +101,33 @@ public class ExternalApiSetup : IDisposable
         _overridenTestingDependencies = overrideDependencies;
     }
 
-    public void Start()
+    public void RunOnceForAllTests(Action<ExternalApiSpec> runOnceBeforeAllTests,
+        Action<ExternalApiSpec>? runOnceAfterAllTests, ExternalApiSpec spec)
     {
-        _host = new HostBuilder()
-            .ConfigureAppConfiguration(builder =>
-            {
-                builder
-                    .AddJsonFile("appsettings.Testing.json", true)
-                    .AddJsonFile("appsettings.Testing.local.json", true);
-            })
-            .ConfigureServices((context, services) =>
-            {
-                services.AddSingleton<IConfigurationSettings>(
-                    new AspNetDynamicConfigurationSettings(context.Configuration));
-                if (_overridenTestingDependencies.Exists())
-                {
-                    _overridenTestingDependencies.Invoke(services);
-                }
-            })
-            .Build();
-        _host.Start();
+        _runOnceSpec = spec;
+        _runOnceBeforeAllTests = runOnceBeforeAllTests;
+        _runOnceAfterAllTests = runOnceAfterAllTests;
     }
 }
 
 /// <summary>
 ///     Provides an xUnit class fixture for external integration testing APIs
 /// </summary>
-public abstract class ExternalApiSpec : IClassFixture<ExternalApiSetup>, IDisposable
+public abstract class ExternalApiSpec : IClassFixture<ExternalApiSetup>
 {
-    protected readonly ExternalApiSetup Setup;
-
-    protected ExternalApiSpec(ExternalApiSetup setup, Action<IServiceCollection>? overrideDependencies = null)
+    protected ExternalApiSpec(ExternalApiSetup setup, Action<IServiceCollection>? overrideDependencies = null,
+        Action<ExternalApiSpec>? runOnceBeforeAllTests = null, Action<ExternalApiSpec>? runOnceAfterAllTests = null)
     {
+        if (runOnceBeforeAllTests.Exists())
+        {
+            setup.RunOnceForAllTests(runOnceBeforeAllTests, runOnceAfterAllTests, this);
+        }
+
         if (overrideDependencies.Exists())
         {
             setup.OverrideTestingDependencies(overrideDependencies);
         }
 
-        setup.Start();
-        Setup = setup;
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            if (Setup is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-        }
+        setup.EnsureStarted();
     }
 }

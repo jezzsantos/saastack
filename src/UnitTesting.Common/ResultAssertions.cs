@@ -97,6 +97,31 @@ public class ResultAssertions<TValue> : ObjectAssertions<Result<TValue, Error>, 
 
         return new AndConstraint<ResultAssertions<TValue>>(this);
     }
+    public AndConstraint<ResultAssertions<TValue>> BeError(ErrorCode code,
+        Predicate<string> predicate, string because = "", params object[] becauseArgs)
+    {
+        Execute.Assertion
+            .BecauseOf(because, becauseArgs)
+            .Given(() => Subject)
+            .ForCondition(result => result.IsFailure)
+            .FailWith(
+                "Expected {context:result} to return an Error with code {0}{reason}, but it returned a Successful value.",
+                _ => code)
+            .Then
+            .Given(_ => Subject.Error)
+            .ForCondition(result => result.Code == code)
+            .FailWith("Expected {context:result} to contain code {0}{reason}, but found {1}.",
+                _ => code, error => error.Code);
+
+            Execute.Assertion
+                .BecauseOf(because, becauseArgs)
+                .Given(() => Subject)
+                .ForCondition(result => predicate(result.Error.Message))
+                .FailWith("Expected {context:result} to match condition {reason}, but {0} didn't match.",
+                    result => result.Error.Message);
+
+        return new AndConstraint<ResultAssertions<TValue>>(this);
+    }
 
     public AndConstraint<ResultAssertions<TValue>> BeSuccess(string because = "", params object[] becauseArgs)
     {

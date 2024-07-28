@@ -46,14 +46,15 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
     {
         if (disposing)
         {
+            if (_runOnceAfterAllTests.Exists())
+            {
+                _runOnceAfterAllTests(_runOnceSpec!);
+            }
+
             _scope?.Dispose();
         }
 
         base.Dispose(disposing);
-        if (_runOnceAfterAllTests.Exists())
-        {
-            _runOnceAfterAllTests(_runOnceSpec!);
-        }
     }
 
     private IConfiguration? Configuration { get; set; }
