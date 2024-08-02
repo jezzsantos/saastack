@@ -19,7 +19,8 @@ public class WebHostOptions : HostOptions
         },
         IsBackendForFrontEnd = false,
         UsesNotifications = true,
-        UsesApiDocumentation = true
+        UsesApiDocumentation = true,
+        ReceivesWebhooks = true
     };
     /// <inheritdoc cref="HostOptions.BackEndApiHost" />
     public new static readonly WebHostOptions BackEndApiHost = new(HostOptions.BackEndApiHost)
@@ -33,7 +34,8 @@ public class WebHostOptions : HostOptions
         },
         IsBackendForFrontEnd = false,
         UsesNotifications = true,
-        UsesApiDocumentation = true
+        UsesApiDocumentation = true,
+        ReceivesWebhooks = false
     };
 
     /// <inheritdoc cref="HostOptions.BackEndForFrontEndWebHost" />
@@ -48,7 +50,8 @@ public class WebHostOptions : HostOptions
         },
         IsBackendForFrontEnd = true,
         UsesNotifications = false,
-        UsesApiDocumentation = true
+        UsesApiDocumentation = true,
+        ReceivesWebhooks = false
     };
 
     /// <inheritdoc cref="HostOptions.TestingStubsHost" />
@@ -63,7 +66,8 @@ public class WebHostOptions : HostOptions
         },
         IsBackendForFrontEnd = false,
         UsesNotifications = false,
-        UsesApiDocumentation = false
+        UsesApiDocumentation = false,
+        ReceivesWebhooks = false
     };
 
     private WebHostOptions(HostOptions options) : base(options)
@@ -84,6 +88,8 @@ public class WebHostOptions : HostOptions
     public bool UsesApiDocumentation { get; set; }
 
     public bool UsesNotifications { get; set; }
+
+    public bool ReceivesWebhooks { get; set; }
 }
 
 /// <summary>

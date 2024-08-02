@@ -80,7 +80,7 @@ public static class HostExtensions
         RegisterApiDocumentation(hostOptions.HostName, hostOptions.HostVersion, hostOptions.UsesApiDocumentation);
         RegisterNotifications(hostOptions.UsesNotifications);
         modules.RegisterServices(appBuilder.Configuration, services);
-        RegisterApplicationServices(hostOptions.IsMultiTenanted);
+        RegisterApplicationServices(hostOptions.IsMultiTenanted, hostOptions.ReceivesWebhooks);
         RegisterPersistence(hostOptions.Persistence.UsesQueues, hostOptions.IsMultiTenanted);
         RegisterEventing(hostOptions.Persistence.UsesEventing);
         RegisterCors(hostOptions.CORS);
@@ -112,6 +112,8 @@ public static class HostExtensions
         {
             services.AddAntiforgery();
             services.AddHttpContextAccessor();
+
+            // EXTEND: Default technology adapters
             services.AddSingleton<IFeatureFlags>(c =>
                 new FlagsmithHttpServiceClient(c.GetRequiredService<IRecorder>(),
                     c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
@@ -360,8 +362,7 @@ public static class HostExtensions
                             Type = SecuritySchemeType.ApiKey,
                             Name = HttpConstants.QueryParams.APIKey,
                             Description =
-                                Resources.HostExtensions_ApiDocumentation_APIKeyQueryDescription.Format(HttpConstants
-                                    .QueryParams
+                                Resources.HostExtensions_ApiDocumentation_APIKeyQueryDescription.Format(HttpConstants.QueryParams
                                     .APIKey),
                             In = ParameterLocation.Query,
                             Scheme = APIKeyAuthenticationHandler.AuthenticationScheme
@@ -415,7 +416,7 @@ public static class HostExtensions
             services.ConfigureHttpXmlOptions(options => { options.SerializerOptions.WriteIndented = false; });
         }
 
-        void RegisterApplicationServices(bool isMultiTenanted)
+        void RegisterApplicationServices(bool isMultiTenanted, bool receivesWebhooks)
         {
             services.AddHttpClient();
             var prefixes = modules.EntityPrefixes;
@@ -425,10 +426,21 @@ public static class HostExtensions
             if (isMultiTenanted)
             {
                 services.AddPerHttpRequest<ICallerContextFactory, AspNetCallerContextFactory>();
+                if (receivesWebhooks)
+                {
+                    services
+                        .AddPerHttpRequest<IWebhookNotificationAuditRepository, WebhookNotificationAuditRepository>();
+                    services.AddPerHttpRequest<IWebhookNotificationAuditService, WebhookNotificationAuditService>();
+                }
             }
             else
             {
                 services.AddSingleton<ICallerContextFactory, AspNetCallerContextFactory>();
+                if (receivesWebhooks)
+                {
+                    services.AddSingleton<IWebhookNotificationAuditRepository, WebhookNotificationAuditRepository>();
+                    services.AddSingleton<IWebhookNotificationAuditService, WebhookNotificationAuditService>();
+                }
             }
         }
 

@@ -22,11 +22,27 @@ public class SubscriptionsApiSpec
 {
     [Trait("Category", "Integration.API")]
     [Collection("API")]
-    public class GivenBasicBillingProvider : WebApiSpec<Program>
+    public class GivenSimpleBillingProvider : WebApiSpec<Program>
     {
-        public GivenBasicBillingProvider(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
+        public GivenSimpleBillingProvider(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
         {
             EmptyAllRepositories();
+        }
+
+        [Fact]
+        public async Task WhenListPricingPlans_ThenReturnsPlans()
+        {
+            var result = (await Api.GetAsync(new ListPricingPlansRequest())).Content.Value.Plans!;
+
+            result.Eternally.Count.Should().Be(1);
+            result.Eternally[0].Id.Should().Be(SinglePlanBillingStateInterpreter.Constants.DefaultPlanId);
+            result.Eternally[0].Cost.Should().Be(0);
+            result.Eternally[0].Period.Frequency.Should().Be(1);
+            result.Eternally[0].Period.Unit.Should().Be(PeriodFrequencyUnit.Eternity);
+            result.Eternally[0].Trial!.HasTrial.Should().BeFalse();
+            result.Eternally[0].FeatureSection.Count.Should().Be(1);
+            result.Eternally[0].FeatureSection[0].Features.Count.Should().Be(1);
+            result.Eternally[0].FeatureSection[0].Features[0].IsIncluded.Should().BeTrue();
         }
 
         [Fact]
@@ -42,6 +58,8 @@ public class SubscriptionsApiSpec
             result.BuyerId.Should().Be(login.Profile!.UserId);
             result.ProviderName.Should().Be(SinglePlanBillingStateInterpreter.Constants.ProviderName);
             result.OwningEntityId.Should().Be(login.DefaultOrganizationId);
+            result.BuyerReference.Should().Be(login.User.Id);
+            result.SubscriptionReference.Should().StartWith("simplesub_");
             result.ProviderState.Should().NotBeEmpty();
         }
 
@@ -59,6 +77,8 @@ public class SubscriptionsApiSpec
 
             result.BuyerId.Should().Be(login.User.Id);
             result.OwningEntityId.Should().Be(organizationId);
+            result.BuyerReference.Should().Be(login.User.Id);
+            result.SubscriptionReference.Should().StartWith("simplesub_");
             result.ProviderName.Should().Be(SinglePlanBillingStateInterpreter.Constants.ProviderName);
             result.Status.Should().Be(SubscriptionStatus.Activated);
             result.CanceledDateUtc.Should().BeNull();
@@ -118,6 +138,8 @@ public class SubscriptionsApiSpec
 
             result.BuyerId.Should().Be(loginB.User.Id);
             result.OwningEntityId.Should().Be(organizationId);
+            result.BuyerReference.Should().Be(loginB.User.Id);
+            result.SubscriptionReference.Should().StartWith("simplesub_");
             result.ProviderName.Should().Be(SinglePlanBillingStateInterpreter.Constants.ProviderName);
             result.Status.Should().Be(SubscriptionStatus.Activated);
             result.CanceledDateUtc.Should().BeNull();
@@ -145,6 +167,8 @@ public class SubscriptionsApiSpec
             }, req => req.SetJWTBearerToken(loginA.AccessToken))).Content.Value.Subscription!;
 
             result.OwningEntityId.Should().Be(organizationId);
+            result.BuyerReference.Should().Be(login.User.Id);
+            result.SubscriptionReference.Should().BeNull();
             result.ProviderName.Should().Be(SinglePlanBillingStateInterpreter.Constants.ProviderName);
             result.Status.Should().Be(SubscriptionStatus.Unsubscribed);
             result.CanceledDateUtc.Should().BeNull();
@@ -162,8 +186,8 @@ public class SubscriptionsApiSpec
         [Fact]
         public async Task WhenForceCancel_ThenUnsubscribes()
         {
-            var loginA = await LoginUserAsync();
-            var (_, organizationId) = await SetupOrganization(loginA);
+            var login = await LoginUserAsync();
+            var (_, organizationId) = await SetupOrganization(login);
 
             var @operator = await LoginUserAsync(LoginUser.Operator);
             var result = (await Api.DeleteAsync(new ForceCancelSubscriptionRequest
@@ -172,6 +196,8 @@ public class SubscriptionsApiSpec
             }, req => req.SetJWTBearerToken(@operator.AccessToken))).Content.Value.Subscription!;
 
             result.OwningEntityId.Should().Be(organizationId);
+            result.BuyerReference.Should().Be(login.User.Id);
+            result.SubscriptionReference.Should().BeNull();
             result.ProviderName.Should().Be(SinglePlanBillingStateInterpreter.Constants.ProviderName);
             result.Status.Should().Be(SubscriptionStatus.Unsubscribed);
             result.CanceledDateUtc.Should().BeNull();
@@ -230,6 +256,8 @@ public class SubscriptionsApiSpec
 
             result.BuyerId.Should().Be(loginB.User.Id);
             result.OwningEntityId.Should().Be(organizationId);
+            result.BuyerReference.Should().Be(loginB.User.Id);
+            result.SubscriptionReference.Should().StartWith("simplesub_");
             result.ProviderName.Should().Be(SinglePlanBillingStateInterpreter.Constants.ProviderName);
             result.Status.Should().Be(SubscriptionStatus.Activated);
             result.CanceledDateUtc.Should().BeNull();

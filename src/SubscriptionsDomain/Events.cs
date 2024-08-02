@@ -1,3 +1,4 @@
+using Common;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Subscriptions;
 using Domain.Shared.Subscriptions;
@@ -8,6 +9,21 @@ namespace SubscriptionsDomain;
 
 public static class Events
 {
+    public static BuyerRestored BuyerRestored(Identifier id, Identifier owningEntityId,
+        BillingProvider provider, string buyerReference, Optional<string> subscriptionReference)
+    {
+        return new BuyerRestored(id)
+        {
+            OwningEntityId = owningEntityId,
+            ProviderName = provider.Name,
+            ProviderState = provider.State,
+            BuyerReference = buyerReference,
+            SubscriptionReference = subscriptionReference.HasValue
+                ? subscriptionReference.Value
+                : null
+        };
+    }
+
     public static Created Created(Identifier id, Identifier owningEntityId, Identifier buyerId, string providerName)
     {
         return new Created(id)
@@ -35,7 +51,7 @@ public static class Events
     }
 
     public static ProviderChanged ProviderChanged(Identifier id, Identifier owningEntityId, string? fromProviderName,
-        BillingProvider provider, string buyerReference, string subscriptionReference)
+        BillingProvider provider, string buyerReference, Optional<string> subscriptionReference)
     {
         return new ProviderChanged(id)
         {
@@ -44,7 +60,9 @@ public static class Events
             ToProviderName = provider.Name,
             ProviderState = provider.State,
             BuyerReference = buyerReference,
-            SubscriptionReference = subscriptionReference
+            SubscriptionReference = subscriptionReference.HasValue
+                ? subscriptionReference.Value
+                : null
         };
     }
 
@@ -60,7 +78,7 @@ public static class Events
     }
 
     public static SubscriptionPlanChanged SubscriptionPlanChanged(Identifier id, Identifier owningEntityId,
-        string planId, BillingProvider provider, string buyerReference, string subscriptionReference)
+        string planId, BillingProvider provider, string buyerReference, Optional<string> subscriptionReference)
     {
         return new SubscriptionPlanChanged(id)
         {
@@ -68,14 +86,16 @@ public static class Events
             ProviderName = provider.Name,
             ProviderState = provider.State,
             BuyerReference = buyerReference,
-            SubscriptionReference = subscriptionReference,
+            SubscriptionReference = subscriptionReference.HasValue
+                ? subscriptionReference.Value
+                : null,
             PlanId = planId
         };
     }
 
     public static SubscriptionTransferred SubscriptionTransferred(Identifier id, Identifier owningEntityId,
         Identifier transfererId, Identifier transfereeId, string planId, BillingProvider provider,
-        string buyerReference, string subscriptionReference)
+        string buyerReference, Optional<string> subscriptionReference)
     {
         return new SubscriptionTransferred(id)
         {
@@ -83,7 +103,9 @@ public static class Events
             ProviderName = provider.Name,
             ProviderState = provider.State,
             BuyerReference = buyerReference,
-            SubscriptionReference = subscriptionReference,
+            SubscriptionReference = subscriptionReference.HasValue
+                ? subscriptionReference.Value
+                : null,
             PlanId = planId,
             FromBuyerId = transfererId,
             ToBuyerId = transfereeId

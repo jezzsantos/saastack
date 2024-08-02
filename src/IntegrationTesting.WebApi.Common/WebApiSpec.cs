@@ -102,6 +102,7 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
                 services.AddSingleton<IFeatureFlags, StubFeatureFlags>();
                 services.AddSingleton<IAvatarService, StubAvatarService>();
                 services.AddSingleton<IUsageDeliveryService, StubUsageDeliveryService>();
+                services.AddSingleton<IBillingProvider, StubBillingProvider>();
                 if (_overridenTestingDependencies.Exists())
                 {
                     _overridenTestingDependencies.Invoke(services);

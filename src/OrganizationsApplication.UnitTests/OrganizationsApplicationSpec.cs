@@ -801,7 +801,8 @@ public class OrganizationsApplicationSpec
                 {
                     Id = "aplanid"
                 },
-                SubscriptionReference = "asubscriptionid",
+                SubscriptionReference = "asubscriptionreference",
+                BuyerReference = "abuyerreference",
                 BuyerId = "abuyerid",
                 OwningEntityId = "anowningentityid",
                 CanBeUnsubscribed = true

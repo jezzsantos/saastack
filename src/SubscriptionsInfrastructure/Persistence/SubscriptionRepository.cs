@@ -36,11 +36,27 @@ public class SubscriptionRepository : ISubscriptionRepository
     }
 #endif
 
+    public async Task<Result<Optional<SubscriptionRoot>, Error>> FindByBuyerReferenceAsync(string buyerReference,
+        CancellationToken cancellationToken)
+    {
+        var query = Query.From<Subscription>()
+            .Where<string>(at => at.BuyerReference, ConditionOperator.EqualTo, buyerReference);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
     public async Task<Result<Optional<SubscriptionRoot>, Error>> FindByOwningEntityIdAsync(Identifier owningEntityId,
         CancellationToken cancellationToken)
     {
         var query = Query.From<Subscription>()
             .Where<string>(at => at.OwningEntityId, ConditionOperator.EqualTo, owningEntityId);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
+
+    public async Task<Result<Optional<SubscriptionRoot>, Error>> FindBySubscriptionReferenceAsync(
+        string subscriptionReference, CancellationToken cancellationToken)
+    {
+        var query = Query.From<Subscription>()
+            .Where<string>(at => at.SubscriptionReference, ConditionOperator.EqualTo, subscriptionReference);
         return await FindFirstByQueryAsync(query, cancellationToken);
     }
 

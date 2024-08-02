@@ -290,7 +290,8 @@ public class EndUsersApplicationDomainEventHandlersSpec
                 {
                     Id = "aplanid"
                 },
-                SubscriptionReference = "asubscriptionid",
+                SubscriptionReference = "asubscriptionreference",
+                BuyerReference = "abuyerreference",
                 BuyerId = "abuyerid",
                 OwningEntityId = "anowningentityid",
                 Id = "asubscriptionid"

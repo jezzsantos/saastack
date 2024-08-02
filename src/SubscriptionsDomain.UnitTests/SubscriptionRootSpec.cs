@@ -112,7 +112,7 @@ public class SubscriptionRootSpec
         var result = _subscription.SetProvider(provider, "abuyerid".ToId(),
             _interpreter.Object);
 
-        result.Should().BeError(ErrorCode.RuleViolation, Resources.SubscriptionRoot_ProviderMismatch);
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.SubscriptionRoot_InstalledProviderMismatch);
     }
 
     [Fact]
@@ -135,6 +135,7 @@ public class SubscriptionRootSpec
     {
         var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata { { "aname", "avalue" } })
             .Value;
+
         var result = _subscription.ChangeProvider(provider, "auserid".ToId(),
             _interpreter.Object);
 
@@ -165,7 +166,7 @@ public class SubscriptionRootSpec
         var result = _subscription.ChangeProvider(provider, CallerConstants.MaintenanceAccountUserId.ToId(),
             _interpreter.Object);
 
-        result.Should().BeError(ErrorCode.RuleViolation, Resources.SubscriptionRoot_ProviderMismatch);
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.SubscriptionRoot_InstalledProviderMismatch);
     }
 
     [Fact]
@@ -904,6 +905,7 @@ public class SubscriptionRootSpec
 
         result.Should().BeSuccess();
         _subscription.BuyerId.Should().Be("abuyerid".ToId());
+        _subscription.ProviderSubscriptionReference.Should().BeNone();
         _subscription.Events.Last().Should().BeOfType<SubscriptionUnsubscribed>();
         _interpreter.Verify(sp => sp.GetSubscriptionDetails(provider));
     }
@@ -947,7 +949,7 @@ public class SubscriptionRootSpec
             _ => Task.FromResult<Result<SubscriptionMetadata, Error>>(new SubscriptionMetadata()));
 
         result.Should().BeError(ErrorCode.RoleViolation,
-            Resources.SubscriptionRoot_ChangeBuyerPaymentMethod_NotAuthorized);
+            Resources.SubscriptionRoot_ChangeBuyerPaymentMethodFromProvider_NotAuthorized);
     }
 
     [Fact]
@@ -997,5 +999,515 @@ public class SubscriptionRootSpec
         result.Should().BeSuccess();
         _subscription.BuyerId.Should().Be("abuyerid".ToId());
         _subscription.Events.Last().Should().BeOfType<PaymentMethodChanged>();
+    }
+
+    [Fact]
+    public void WhenChangePaymentMethodForBuyerFromProviderAndNotInstalledProvider_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("anotherprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _interpreter.Setup(sp => sp.ProviderName)
+            .Returns("anotherprovidername");
+
+        var result =
+            _subscription.ChangePaymentMethodForBuyerFromProvider(_interpreter.Object, "amodifierid".ToId(), provider);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.SubscriptionRoot_InstalledProviderMismatch);
+    }
+
+    [Fact]
+    public void WhenChangePaymentMethodForBuyerFromProviderWithDifferentProvider_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("anotherprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+
+        var result =
+            _subscription.ChangePaymentMethodForBuyerFromProvider(_interpreter.Object, "amodifierid".ToId(), provider);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.SubscriptionRoot_ProviderMismatch);
+    }
+
+    [Fact]
+    public void WhenChangePaymentMethodForBuyerFromProviderByAnyUser_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+
+        var result =
+            _subscription.ChangePaymentMethodForBuyerFromProvider(_interpreter.Object, "amodifierid".ToId(), provider);
+
+        result.Should().BeError(ErrorCode.RoleViolation,
+            Resources.SubscriptionRoot_ChangeBuyerPaymentMethodFromProvider_NotAuthorized);
+    }
+
+    [Fact]
+    public void WhenChangePaymentMethodForBuyerFromProviderAndSameState_ThenDoesNotChange()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+
+        var result = _subscription.ChangePaymentMethodForBuyerFromProvider(_interpreter.Object,
+            CallerConstants.ExternalWebhookAccountUserId.ToId(), provider);
+
+        result.Should().BeSuccess();
+        _subscription.Provider.Should().Be(initialProvider);
+        _subscription.Events.Last().Should().BeOfType<ProviderChanged>();
+    }
+
+    [Fact]
+    public void WhenChangePaymentMethodForBuyerFromProvider_ThenChanges()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname1", "avalue1" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname2", "avalue2" }
+        }).Value;
+
+        var result = _subscription.ChangePaymentMethodForBuyerFromProvider(_interpreter.Object,
+            CallerConstants.ExternalWebhookAccountUserId.ToId(), provider);
+
+        result.Should().BeSuccess();
+        _subscription.Provider.Should().Be(provider);
+        _subscription.Events.Last().Should().BeOfType<PaymentMethodChanged>();
+    }
+
+    [Fact]
+    public void WhenCancelSubscriptionFromProviderAndNotInstalledProvider_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("anotherprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _interpreter.Setup(sp => sp.ProviderName)
+            .Returns("anotherprovidername");
+
+        var result =
+            _subscription.CancelSubscriptionFromProvider(_interpreter.Object, "amodifierid".ToId(), provider);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.SubscriptionRoot_InstalledProviderMismatch);
+    }
+
+    [Fact]
+    public void WhenCancelSubscriptionFromProviderWithDifferentProvider_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("anotherprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+
+        var result =
+            _subscription.CancelSubscriptionFromProvider(_interpreter.Object, "amodifierid".ToId(), provider);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.SubscriptionRoot_ProviderMismatch);
+    }
+
+    [Fact]
+    public void WhenCancelSubscriptionFromProviderByAnyUser_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+
+        var result =
+            _subscription.CancelSubscriptionFromProvider(_interpreter.Object, "amodifierid".ToId(), provider);
+
+        result.Should().BeError(ErrorCode.RoleViolation,
+            Resources.SubscriptionRoot_CancelSubscriptionFromProvider_NotAuthorized);
+    }
+
+    [Fact]
+    public void WhenCancelSubscriptionFromProviderAndSameState_ThenDoesNotChange()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+
+        var result = _subscription.CancelSubscriptionFromProvider(_interpreter.Object,
+            CallerConstants.ExternalWebhookAccountUserId.ToId(), provider);
+
+        result.Should().BeSuccess();
+        _subscription.Provider.Should().Be(initialProvider);
+        _subscription.Events.Last().Should().BeOfType<ProviderChanged>();
+    }
+
+    [Fact]
+    public void WhenCancelSubscriptionFromProvider_ThenChanges()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname1", "avalue1" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname2", "avalue2" }
+        }).Value;
+
+        var result = _subscription.CancelSubscriptionFromProvider(_interpreter.Object,
+            CallerConstants.ExternalWebhookAccountUserId.ToId(), provider);
+
+        result.Should().BeSuccess();
+        _subscription.Provider.Should().Be(provider);
+        _subscription.Events.Last().Should().BeOfType<SubscriptionCanceled>();
+    }
+
+    [Fact]
+    public void WhenChangeSubscriptionPlanFromProviderAndNotInstalledProvider_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("anotherprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _interpreter.Setup(sp => sp.ProviderName)
+            .Returns("anotherprovidername");
+
+        var result =
+            _subscription.ChangeSubscriptionPlanFromProvider(_interpreter.Object, "amodifierid".ToId(), provider);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.SubscriptionRoot_InstalledProviderMismatch);
+    }
+
+    [Fact]
+    public void WhenChangeSubscriptionPlanFromProviderWithDifferentProvider_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("anotherprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+
+        var result =
+            _subscription.ChangeSubscriptionPlanFromProvider(_interpreter.Object, "amodifierid".ToId(), provider);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.SubscriptionRoot_ProviderMismatch);
+    }
+
+    [Fact]
+    public void WhenChangeSubscriptionPlanFromProviderByAnyUser_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+
+        var result =
+            _subscription.ChangeSubscriptionPlanFromProvider(_interpreter.Object, "amodifierid".ToId(), provider);
+
+        result.Should().BeError(ErrorCode.RoleViolation,
+            Resources.SubscriptionRoot_ChangeSubscriptionPlanFromProvider_NotAuthorized);
+    }
+
+    [Fact]
+    public void WhenChangeSubscriptionPlanFromProviderAndSameState_ThenDoesNotChange()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+
+        var result = _subscription.ChangeSubscriptionPlanFromProvider(_interpreter.Object,
+            CallerConstants.ExternalWebhookAccountUserId.ToId(), provider);
+
+        result.Should().BeSuccess();
+        _subscription.Provider.Should().Be(initialProvider);
+        _subscription.Events.Last().Should().BeOfType<ProviderChanged>();
+    }
+
+    [Fact]
+    public void WhenChangeSubscriptionPlanFromProvider_ThenChanges()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname1", "avalue1" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname2", "avalue2" }
+        }).Value;
+        _interpreter.Setup(p => p.GetSubscriptionDetails(It.IsAny<BillingProvider>()))
+            .Returns(ProviderSubscription.Create("asubscriptionid".ToId(), ProviderStatus.Empty,
+                ProviderPlan.Create("aplanid", BillingSubscriptionTier.Standard).Value,
+                ProviderPlanPeriod.Empty, ProviderInvoice.Default, ProviderPaymentMethod.Empty));
+
+        var result = _subscription.ChangeSubscriptionPlanFromProvider(_interpreter.Object,
+            CallerConstants.ExternalWebhookAccountUserId.ToId(), provider);
+
+        result.Should().BeSuccess();
+        _subscription.Provider.Should().Be(provider);
+        _subscription.ProviderBuyerReference.Should().Be("abuyerreference");
+        _subscription.ProviderSubscriptionReference.Should().Be("asubscriptionreference");
+        _subscription.Events.Last().Should().BeOfType<SubscriptionPlanChanged>();
+    }
+
+    [Fact]
+    public void WhenDeleteSubscriptionFromProviderAndNotInstalledProvider_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("anotherprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _interpreter.Setup(sp => sp.ProviderName)
+            .Returns("anotherprovidername");
+
+        var result =
+            _subscription.DeleteSubscriptionFromProvider(_interpreter.Object, "amodifierid".ToId(), provider);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.SubscriptionRoot_InstalledProviderMismatch);
+    }
+
+    [Fact]
+    public void WhenDeleteSubscriptionFromProviderWithDifferentProvider_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("anotherprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+
+        var result =
+            _subscription.DeleteSubscriptionFromProvider(_interpreter.Object, "amodifierid".ToId(), provider);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.SubscriptionRoot_ProviderMismatch);
+    }
+
+    [Fact]
+    public void WhenDeleteSubscriptionFromProviderByAnyUser_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+
+        var result =
+            _subscription.DeleteSubscriptionFromProvider(_interpreter.Object, "amodifierid".ToId(), provider);
+
+        result.Should().BeError(ErrorCode.RoleViolation,
+            Resources.SubscriptionRoot_DeleteSubscriptionFromProvider_NotAuthorized);
+    }
+
+    [Fact]
+    public void WhenDeleteSubscriptionFromProviderAndSameState_ThenDoesNotChange()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+
+        var result = _subscription.DeleteSubscriptionFromProvider(_interpreter.Object,
+            CallerConstants.ExternalWebhookAccountUserId.ToId(), provider);
+
+        result.Should().BeSuccess();
+        _subscription.Provider.Should().Be(initialProvider);
+        _subscription.Events.Last().Should().BeOfType<ProviderChanged>();
+    }
+
+    [Fact]
+    public void WhenDeleteSubscriptionFromProvider_ThenChanges()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname1", "avalue1" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname2", "avalue2" }
+        }).Value;
+        _interpreter.Setup(p => p.GetSubscriptionDetails(It.IsAny<BillingProvider>()))
+            .Returns(ProviderSubscription.Create("asubscriptionid".ToId(), ProviderStatus.Empty,
+                ProviderPlan.Create("aplanid", BillingSubscriptionTier.Standard).Value,
+                ProviderPlanPeriod.Empty, ProviderInvoice.Default, ProviderPaymentMethod.Empty));
+
+        var result = _subscription.DeleteSubscriptionFromProvider(_interpreter.Object,
+            CallerConstants.ExternalWebhookAccountUserId.ToId(), provider);
+
+        result.Should().BeSuccess();
+        _subscription.Provider.Should().Be(provider);
+        _subscription.ProviderBuyerReference.Should().Be("abuyerreference");
+        _subscription.ProviderSubscriptionReference.Should().BeNone();
+        _subscription.Events.Last().Should().BeOfType<SubscriptionUnsubscribed>();
+    }
+
+    [Fact]
+    public async Task WhenRestoreBuyerAfterDeletedFromProviderAndNotInstalledProvider_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("anotherprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _interpreter.Setup(sp => sp.ProviderName)
+            .Returns("anotherprovidername");
+
+        var result =
+            await _subscription.RestoreBuyerAfterDeletedFromProviderAsync(_interpreter.Object, "amodifierid".ToId(),
+                provider, _ => Task.FromResult<Result<SubscriptionMetadata, Error>>(new SubscriptionMetadata()));
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.SubscriptionRoot_InstalledProviderMismatch);
+    }
+
+    [Fact]
+    public async Task WhenRestoreBuyerAfterDeletedFromProviderAsyncWithDifferentProvider_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("anotherprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+
+        var result =
+            await _subscription.RestoreBuyerAfterDeletedFromProviderAsync(_interpreter.Object, "amodifierid".ToId(),
+                provider, _ => Task.FromResult<Result<SubscriptionMetadata, Error>>(new SubscriptionMetadata()));
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.SubscriptionRoot_ProviderMismatch);
+    }
+
+    [Fact]
+    public async Task WhenRestoreBuyerAfterDeletedFromProviderAsyncByAnyUser_ThenReturnsError()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname", "avalue" }
+        }).Value;
+
+        var result =
+            await _subscription.RestoreBuyerAfterDeletedFromProviderAsync(_interpreter.Object, "amodifierid".ToId(),
+                provider, _ => Task.FromResult<Result<SubscriptionMetadata, Error>>(new SubscriptionMetadata()));
+
+        result.Should().BeError(ErrorCode.RoleViolation,
+            Resources.SubscriptionRoot_RestoreBuyerAfterDeletedFromProvider_NotAuthorized);
+    }
+
+    [Fact]
+    public async Task WhenRestoreBuyerAfterDeletedFromProviderAsync_ThenRestoresBuyer()
+    {
+        var initialProvider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname1", "avalue1" }
+        }).Value;
+        _subscription.SetProvider(initialProvider, "abuyerid".ToId(), _interpreter.Object);
+        var provider = BillingProvider.Create("aprovidername", new SubscriptionMetadata
+        {
+            { "aname2", "avalue2" }
+        }).Value;
+
+        var result = await _subscription.RestoreBuyerAfterDeletedFromProviderAsync(_interpreter.Object,
+            CallerConstants.ExternalWebhookAccountUserId.ToId(), provider,
+            _ => Task.FromResult<Result<SubscriptionMetadata, Error>>(new SubscriptionMetadata
+            {
+                { "aname2", "avalue2" }
+            }));
+
+        result.Should().BeSuccess();
+        _subscription.Provider.Should().Be(provider);
+        _subscription.ProviderBuyerReference.Should().Be("abuyerreference");
+        _subscription.ProviderSubscriptionReference.Should().Be("asubscriptionreference");
+        _subscription.Events.Last().Should().BeOfType<BuyerRestored>();
     }
 }

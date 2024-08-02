@@ -378,6 +378,75 @@ public class SubscriptionsApplicationSpec
     }
 
     [Fact]
+    public async Task WhenForceCancelSubscriptionAsyncWithUnknownOwningEntity_ThenReturnsError()
+    {
+        _repository.Setup(rep => rep.FindByOwningEntityIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Optional<SubscriptionRoot>.None);
+
+        var result =
+            await _application.ForceCancelSubscriptionAsync(_caller.Object, "anowningentityid", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityNotFound);
+        _repository.Verify(rep => rep.SaveAsync(It.IsAny<SubscriptionRoot>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _owningEntityService.Verify(
+            oes => oes.CanCancelSubscriptionAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+        _billingProvider.Verify(bp => bp.GatewayService.CancelSubscriptionAsync(It.IsAny<ICallerContext>(),
+                It.IsAny<CancelSubscriptionOptions>(), It.IsAny<BillingProvider>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenForceCancelSubscriptionAsyncByOperations_ThenCancelsSubscription()
+    {
+        var metadata = new SubscriptionMetadata(new Dictionary<string, string> { { "aname", "avalue" } });
+        _caller.Setup(cc => cc.CallerId)
+            .Returns("abuyerid");
+        _caller.Setup(cc => cc.Roles)
+            .Returns(new ICallerContext.CallerRoles());
+        var subscription = SubscriptionRoot
+            .Create(_recorder.Object, _identifierFactory.Object, "anowningentityid".ToId(), "abuyerid".ToId(),
+                _billingProvider.Object.StateInterpreter).Value;
+        subscription.SetProvider(BillingProvider.Create("aprovidername", metadata).Value,
+            "abuyerid".ToId(), _billingProvider.Object.StateInterpreter);
+        _repository.Setup(rep => rep.FindByOwningEntityIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(subscription.ToOptional());
+        _billingProvider.Setup(bp => bp.StateInterpreter.GetSubscriptionDetails(It.IsAny<BillingProvider>()))
+            .Returns(ProviderSubscription.Create(
+                ProviderStatus.Create(BillingSubscriptionStatus.Activated, Optional<DateTime>.None, true).Value,
+                ProviderPaymentMethod.Create(BillingPaymentMethodType.Card, BillingPaymentMethodStatus.Valid,
+                        Optional<DateOnly>.None)
+                    .Value).Value);
+        _billingProvider.Setup(bp => bp.GatewayService.CancelSubscriptionAsync(It.IsAny<ICallerContext>(),
+                It.IsAny<CancelSubscriptionOptions>(), It.IsAny<BillingProvider>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(metadata);
+        _owningEntityService.Setup(oes => oes.CanCancelSubscriptionAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Permission.Allowed);
+
+        var result =
+            await _application.ForceCancelSubscriptionAsync(_caller.Object, "anowningentityid", CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.Id.Should().Be("anid".ToId());
+        result.Value.BuyerId.Should().Be("abuyerid".ToId());
+        result.Value.OwningEntityId.Should().Be("anowningentityid".ToId());
+        result.Value.ProviderName.Should().Be("aprovidername".ToId());
+        _repository.Verify(rep => rep.SaveAsync(It.Is<SubscriptionRoot>(root =>
+            root.BuyerId == "abuyerid".ToId()
+        ), It.IsAny<CancellationToken>()));
+        _owningEntityService.Verify(oes =>
+            oes.CanCancelSubscriptionAsync(_caller.Object, "anowningentityid", "abuyerid",
+                It.IsAny<CancellationToken>()));
+        _billingProvider.Verify(bp => bp.GatewayService.CancelSubscriptionAsync(It.IsAny<ICallerContext>(),
+            It.Is<CancelSubscriptionOptions>(options =>
+                options.CancelWhen == CancelSubscriptionSchedule.Immediately),
+            It.IsAny<BillingProvider>(), It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
     public async Task WhenListPricingPlans_ThenReturnsPlans()
     {
         var plans = new PricingPlans();

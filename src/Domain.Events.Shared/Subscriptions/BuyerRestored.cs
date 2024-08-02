@@ -4,26 +4,24 @@ using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.Subscriptions;
 
-public sealed class SubscriptionPlanChanged : DomainEvent
+public sealed class BuyerRestored : DomainEvent
 {
-    public SubscriptionPlanChanged(Identifier id) : base(id)
+    public BuyerRestored(Identifier id) : base(id)
     {
     }
 
     [UsedImplicitly]
-    public SubscriptionPlanChanged()
+    public BuyerRestored()
     {
     }
 
-    public required string BuyerReference { get; set; }
-
     public required string OwningEntityId { get; set; }
-
-    public required string PlanId { get; set; }
 
     public required string ProviderName { get; set; }
 
     public required Dictionary<string, string> ProviderState { get; set; }
+
+    public required string BuyerReference { get; set; }
 
     public string? SubscriptionReference { get; set; }
 }

@@ -16,9 +16,9 @@ public class PricingApiSpec
 {
     [Trait("Category", "Integration.API")]
     [Collection("API")]
-    public class GivenBasicBillingProvider : WebApiSpec<Program>
+    public class GivenSimpleBillingProvider : WebApiSpec<Program>
     {
-        public GivenBasicBillingProvider(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
+        public GivenSimpleBillingProvider(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
         {
             EmptyAllRepositories();
         }

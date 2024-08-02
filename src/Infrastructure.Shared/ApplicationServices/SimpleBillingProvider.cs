@@ -253,6 +253,16 @@ public class InProcessInMemSimpleBillingGatewayService : IBillingGatewayService
         });
     }
 
+    public Task<Result<SubscriptionMetadata, Error>> RestoreBuyerAsync(ICallerContext caller, SubscriptionBuyer buyer,
+        CancellationToken cancellationToken)
+    {
+        return Task.FromResult<Result<SubscriptionMetadata, Error>>(new SubscriptionMetadata
+        {
+            { SinglePlanBillingStateInterpreter.Constants.MetadataProperties.BuyerId, buyer.Id },
+            { SinglePlanBillingStateInterpreter.Constants.MetadataProperties.SubscriptionId, GenerateSubscriptionId() }
+        });
+    }
+
     /// <summary>
     ///     Returns a zero-invoice for every 1st of the month in the date range
     /// </summary>

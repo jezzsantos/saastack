@@ -1,7 +1,6 @@
 using System.Reflection;
 using Application.Services.Shared;
 using Common;
-using Domain.Common.Identity;
 using Domain.Interfaces;
 using Infrastructure.Eventing.Interfaces.Notifications;
 using Infrastructure.Hosting.Common.Extensions;
@@ -48,13 +47,7 @@ public class SubscriptionsModule : ISubdomainModule
                 services.AddSingleton<IBillingProvider, SimpleBillingProvider>();
 
                 services
-                    .AddPerHttpRequest<ISubscriptionsApplication>(c =>
-                        new SubscriptionsApplication.SubscriptionsApplication(c.GetRequiredService<IRecorder>(),
-                            c.GetRequiredService<IIdentifierFactory>(),
-                            c.GetRequiredService<IUserProfilesService>(),
-                            c.GetRequiredService<IBillingProvider>(),
-                            c.GetRequiredService<ISubscriptionOwningEntityService>(),
-                            c.GetRequiredService<ISubscriptionRepository>()));
+                    .AddPerHttpRequest<ISubscriptionsApplication, SubscriptionsApplication.SubscriptionsApplication>();
                 services.AddPerHttpRequest<ISubscriptionRepository, SubscriptionRepository>();
                 services
                     .AddPerHttpRequest<IDomainEventNotificationConsumer>(c =>

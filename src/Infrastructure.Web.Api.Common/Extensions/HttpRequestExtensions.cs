@@ -183,8 +183,7 @@ public static class HttpRequestExtensions
             return;
         }
 
-        message.Headers.Add(HttpConstants.Headers.Authorization,
-            $"Basic {Convert.ToBase64String(Encoding.UTF8.GetBytes($"{apiKey}:"))}");
+        message.SetBasicAuth(apiKey);
     }
 
     /// <summary>
@@ -214,6 +213,21 @@ public static class HttpRequestExtensions
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    /// <summary>
+    ///     Sets the <see cref="ICallerContext.Authorization" /> to Basic with <see cref="username" />, and
+    ///     <see cref="password" />
+    /// </summary>
+    public static void SetBasicAuth(this HttpRequestMessage message, string username, string? password = null)
+    {
+        if (username.HasNoValue())
+        {
+            return;
+        }
+
+        message.Headers.Add(HttpConstants.Headers.Authorization,
+            $"Basic {Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{(password.HasValue() ? password : string.Empty)}"))}");
     }
 
     /// <summary>

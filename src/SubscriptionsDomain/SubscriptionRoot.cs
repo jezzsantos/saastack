@@ -26,6 +26,8 @@ public delegate Task<Result<SubscriptionMetadata, Error>> UnsubscribeAction(Subs
 
 public delegate Task<Result<SubscriptionMetadata, Error>> ChangePaymentMethodAction(SubscriptionRoot subscription);
 
+public delegate Task<Result<SubscriptionMetadata, Error>> RestoreBuyerAction(SubscriptionRoot subscription);
+
 public delegate Task<Permission> CanChangePlanCheck(SubscriptionRoot subscription, Identifier modifierId);
 
 public delegate Task<Permission> CanCancelSubscriptionCheck(SubscriptionRoot subscription, Identifier cancellerId);
@@ -193,6 +195,7 @@ public sealed class SubscriptionRoot : AggregateRootBase
                 }
 
                 Provider = provider.Value;
+                ProviderSubscriptionReference = Optional<string>.None;
                 Recorder.TraceDebug(null, "Subscription {Id} was unsubscribed for {Buyer}", Id, BuyerId);
                 return Result.Ok;
             }
@@ -208,6 +211,22 @@ public sealed class SubscriptionRoot : AggregateRootBase
 
                 Provider = provider.Value;
                 Recorder.TraceDebug(null, "Subscription {Id} changed its payment method for {Buyer}", Id, BuyerId);
+                return Result.Ok;
+            }
+
+            case BuyerRestored restored:
+            {
+                var provider = BillingProvider.Create(restored.ProviderName,
+                    new SubscriptionMetadata(restored.ProviderState));
+                if (provider.IsFailure)
+                {
+                    return provider.Error;
+                }
+
+                Provider = provider.Value;
+                ProviderBuyerReference = restored.BuyerReference;
+                ProviderSubscriptionReference = restored.SubscriptionReference;
+                Recorder.TraceDebug(null, "Subscription {Id} restored its {Buyer}", Id, BuyerId);
                 return Result.Ok;
             }
 
@@ -271,6 +290,35 @@ public sealed class SubscriptionRoot : AggregateRootBase
         }
     }
 
+    public Result<Error> CancelSubscriptionFromProvider(IBillingStateInterpreter interpreter,
+        Identifier cancellerId, BillingProvider changed)
+    {
+        var verified = VerifyProviderIsSameAsInstalled(interpreter);
+        if (verified.IsFailure)
+        {
+            return verified.Error;
+        }
+
+        if (!IsProviderSameAsCurrent(changed))
+        {
+            return Error.RuleViolation(Resources.SubscriptionRoot_ProviderMismatch);
+        }
+
+        if (!IsExecutedOnBehalfOfBuyer(cancellerId))
+        {
+            return Error.RoleViolation(Resources.SubscriptionRoot_CancelSubscriptionFromProvider_NotAuthorized);
+        }
+
+        if (changed.Equals(Provider.Value))
+        {
+            Recorder.TraceInformation(null, "Provider cancellation ignored since provider state has not changed");
+            return Result.Ok;
+        }
+
+        return RaiseChangeEvent(
+            SubscriptionsDomain.Events.SubscriptionCanceled(Id, OwningEntityId, changed));
+    }
+
     public async Task<Result<Error>> ChangePaymentMethodForBuyerAsync(IBillingStateInterpreter interpreter,
         Identifier modifierId, ChangePaymentMethodAction onChangePaymentMethod)
     {
@@ -283,7 +331,7 @@ public sealed class SubscriptionRoot : AggregateRootBase
         if (!IsBuyer(modifierId)
             && !IsServiceAccountOrWebhookAccount(modifierId))
         {
-            return Error.RoleViolation(Resources.SubscriptionRoot_ChangeBuyerPaymentMethod_NotAuthorized);
+            return Error.RoleViolation(Resources.SubscriptionRoot_ChangeBuyerPaymentMethodFromProvider_NotAuthorized);
         }
 
         var changed = await onChangePaymentMethod(this);
@@ -296,6 +344,36 @@ public sealed class SubscriptionRoot : AggregateRootBase
 
         return RaiseChangeEvent(
             SubscriptionsDomain.Events.PaymentMethodChanged(Id, OwningEntityId, provider));
+    }
+
+    public Result<Error> ChangePaymentMethodForBuyerFromProvider(IBillingStateInterpreter interpreter,
+        Identifier modifierId, BillingProvider changed)
+    {
+        var verified = VerifyProviderIsSameAsInstalled(interpreter);
+        if (verified.IsFailure)
+        {
+            return verified.Error;
+        }
+
+        if (!IsProviderSameAsCurrent(changed))
+        {
+            return Error.RuleViolation(Resources.SubscriptionRoot_ProviderMismatch);
+        }
+
+        if (!IsExecutedOnBehalfOfBuyer(modifierId))
+        {
+            return Error.RoleViolation(Resources.SubscriptionRoot_ChangeBuyerPaymentMethodFromProvider_NotAuthorized);
+        }
+
+        if (changed.Equals(Provider.Value))
+        {
+            Recorder.TraceInformation(null,
+                "Provider payment method change ignored since provider state has not changed");
+            return Result.Ok;
+        }
+
+        return RaiseChangeEvent(
+            SubscriptionsDomain.Events.PaymentMethodChanged(Id, OwningEntityId, changed));
     }
 
     public async Task<Result<ProviderSubscription, Error>> ChangePlanAsync(IBillingStateInterpreter interpreter,
@@ -362,6 +440,56 @@ public sealed class SubscriptionRoot : AggregateRootBase
         return interpreter.GetSubscriptionDetails(Provider.Value);
     }
 
+    public Result<Error> ChangeSubscriptionPlanFromProvider(IBillingStateInterpreter interpreter, Identifier modifierId,
+        BillingProvider changed)
+    {
+        var verified = VerifyProviderIsSameAsInstalled(interpreter);
+        if (verified.IsFailure)
+        {
+            return verified.Error;
+        }
+
+        if (!IsProviderSameAsCurrent(changed))
+        {
+            return Error.RuleViolation(Resources.SubscriptionRoot_ProviderMismatch);
+        }
+
+        if (!IsExecutedOnBehalfOfBuyer(modifierId))
+        {
+            return Error.RoleViolation(Resources.SubscriptionRoot_ChangeSubscriptionPlanFromProvider_NotAuthorized);
+        }
+
+        if (changed.Equals(Provider.Value))
+        {
+            Recorder.TraceInformation(null, "Provider plan change ignored since provider state has not changed");
+            return Result.Ok;
+        }
+
+        var buyerReference = interpreter.GetBuyerReference(changed);
+        if (buyerReference.IsFailure)
+        {
+            return buyerReference.Error;
+        }
+
+        var subscriptionReference = interpreter.GetSubscriptionReference(changed);
+        if (subscriptionReference.IsFailure)
+        {
+            return subscriptionReference.Error;
+        }
+
+        var details = interpreter.GetSubscriptionDetails(changed);
+        if (details.IsFailure)
+        {
+            return details.Error;
+        }
+
+        var planId = details.Value.Plan.PlanId.Value;
+
+        return RaiseChangeEvent(
+            SubscriptionsDomain.Events.SubscriptionPlanChanged(Id, OwningEntityId, planId,
+                changed, buyerReference.Value, subscriptionReference.Value));
+    }
+
     public Result<Error> DeleteSubscription(Identifier deleterId, Identifier owningEntityId)
     {
         if (!IsOwningEntityId(owningEntityId))
@@ -370,6 +498,80 @@ public sealed class SubscriptionRoot : AggregateRootBase
         }
 
         return RaisePermanentDeleteEvent(SubscriptionsDomain.Events.Deleted(Id, deleterId));
+    }
+
+    public Result<Error> DeleteSubscriptionFromProvider(IBillingStateInterpreter interpreter, Identifier deleterId,
+        BillingProvider changed)
+    {
+        var verified = VerifyProviderIsSameAsInstalled(interpreter);
+        if (verified.IsFailure)
+        {
+            return verified.Error;
+        }
+
+        if (!IsProviderSameAsCurrent(changed))
+        {
+            return Error.RuleViolation(Resources.SubscriptionRoot_ProviderMismatch);
+        }
+
+        if (!IsExecutedOnBehalfOfBuyer(deleterId))
+        {
+            return Error.RoleViolation(Resources.SubscriptionRoot_DeleteSubscriptionFromProvider_NotAuthorized);
+        }
+
+        if (changed.Equals(Provider.Value))
+        {
+            Recorder.TraceInformation(null,
+                "Provider subscription deletion ignored since provider state has not changed");
+            return Result.Ok;
+        }
+
+        return RaiseChangeEvent(
+            SubscriptionsDomain.Events.SubscriptionUnsubscribed(Id, OwningEntityId, changed));
+    }
+
+    public async Task<Result<Error>> RestoreBuyerAfterDeletedFromProviderAsync(IBillingStateInterpreter interpreter,
+        Identifier deleterId, BillingProvider changed, RestoreBuyerAction onRestore)
+    {
+        var verified = VerifyProviderIsSameAsInstalled(interpreter);
+        if (verified.IsFailure)
+        {
+            return verified.Error;
+        }
+
+        if (!IsProviderSameAsCurrent(changed))
+        {
+            return Error.RuleViolation(Resources.SubscriptionRoot_ProviderMismatch);
+        }
+
+        if (!IsExecutedOnBehalfOfBuyer(deleterId))
+        {
+            return Error.RoleViolation(Resources.SubscriptionRoot_RestoreBuyerAfterDeletedFromProvider_NotAuthorized);
+        }
+
+        var restored = await onRestore(this);
+        if (restored.IsFailure)
+        {
+            return restored.Error;
+        }
+
+        var provider = Provider.Value.ChangeState(restored.Value);
+
+        var buyerReference = interpreter.GetBuyerReference(provider);
+        if (buyerReference.IsFailure)
+        {
+            return buyerReference.Error;
+        }
+
+        var subscriptionReference = interpreter.GetSubscriptionReference(provider);
+        if (subscriptionReference.IsFailure)
+        {
+            return subscriptionReference.Error;
+        }
+
+        return RaiseChangeEvent(
+            SubscriptionsDomain.Events.BuyerRestored(Id, OwningEntityId, provider, buyerReference.Value,
+                subscriptionReference.Value));
     }
 
     public Result<Error> SetProvider(BillingProvider provider, Identifier modifierId,
@@ -500,6 +702,16 @@ public sealed class SubscriptionRoot : AggregateRootBase
         }
 
         return providerSubscription.Value;
+    }
+
+    private bool IsProviderSameAsCurrent(BillingProvider provider)
+    {
+        if (!Provider.HasValue)
+        {
+            return false;
+        }
+
+        return Provider.Value.Name == provider.Name;
     }
 
     private bool IsOperations(Roles roles)
@@ -633,8 +845,7 @@ public sealed class SubscriptionRoot : AggregateRootBase
             ? Provider.Value.Name
             : null;
         return RaiseChangeEvent(SubscriptionsDomain.Events.ProviderChanged(Id, OwningEntityId, fromProviderName,
-            translatedProvider.Value,
-            buyerReference.Value, subscriptionReference.Value));
+            translatedProvider.Value, buyerReference.Value, subscriptionReference.Value));
     }
 
     private Result<Error> VerifyProviderIsSameAsInstalled(IBillingStateInterpreter interpreter)
@@ -652,7 +863,7 @@ public sealed class SubscriptionRoot : AggregateRootBase
         var installedProviderName = interpreter.ProviderName;
         if (!Provider.Value.IsCurrentProvider(installedProviderName))
         {
-            return Error.RuleViolation(Resources.SubscriptionRoot_ProviderMismatch);
+            return Error.RuleViolation(Resources.SubscriptionRoot_InstalledProviderMismatch);
         }
 
         return Result.Ok;
@@ -671,7 +882,7 @@ public sealed class SubscriptionRoot : AggregateRootBase
         var installedProviderName = interpreter.ProviderName;
         if (!provider.IsCurrentProvider(installedProviderName))
         {
-            return Error.RuleViolation(Resources.SubscriptionRoot_ProviderMismatch);
+            return Error.RuleViolation(Resources.SubscriptionRoot_InstalledProviderMismatch);
         }
 
         return Result.Ok;

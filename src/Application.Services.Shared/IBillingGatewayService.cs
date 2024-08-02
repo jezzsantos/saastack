@@ -29,6 +29,12 @@ public interface IBillingGatewayService
         CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Restores a previously existing buyer (that has been deleted)
+    /// </summary>
+    Task<Result<SubscriptionMetadata, Error>> RestoreBuyerAsync(ICallerContext caller, SubscriptionBuyer buyer,
+        CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Lists all invoices for the subscription, given the specified date range, and options
     /// </summary>
     Task<Result<List<Invoice>, Error>> SearchAllInvoicesAsync(ICallerContext caller, BillingProvider provider,
@@ -52,9 +58,9 @@ public interface IBillingGatewayService
 /// </summary>
 public class ChangePlanOptions
 {
-    public required Subscriber Subscriber { get; set; }
-
     public required string PlanId { get; set; }
+
+    public required Subscriber Subscriber { get; set; }
 }
 
 /// <summary>
@@ -112,16 +118,20 @@ public class TransferSubscriptionOptions
 /// </summary>
 public class SubscribeOptions
 {
-    public static readonly SubscribeOptions Immediately = new()
+    public DateTime? FutureTime { get; set; }
+
+    public static SubscribeOptions Immediately => new()
     {
         StartWhen = StartSubscriptionSchedule.Immediately,
         FutureTime = null,
+#if TESTINGONLY
         PlanId = null
+#endif
     };
-
-    public DateTime? FutureTime { get; set; }
+#if TESTINGONLY
 
     public string? PlanId { get; set; }
+#endif
 
     public StartSubscriptionSchedule StartWhen { get; set; }
 
@@ -131,7 +141,9 @@ public class SubscribeOptions
         {
             StartWhen = StartSubscriptionSchedule.Scheduled,
             FutureTime = time,
+#if TESTINGONLY
             PlanId = null
+#endif
         };
     }
 }
@@ -152,8 +164,6 @@ public class SubscriptionBuyer
 {
     public required ProfileAddress Address { get; set; }
 
-    public required Subscriber Subscriber { get; set; }
-
     public required string EmailAddress { get; set; }
 
     public required string Id { get; set; }
@@ -161,6 +171,8 @@ public class SubscriptionBuyer
     public required PersonName Name { get; set; }
 
     public string? PhoneNumber { get; set; }
+
+    public required Subscriber Subscriber { get; set; }
 }
 
 /// <summary>

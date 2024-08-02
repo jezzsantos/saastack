@@ -47,56 +47,8 @@ public partial class SubscriptionsApplication : ISubscriptionsApplication
         }
 
         var subscription = retrieved.Value;
-        var cancellerId = caller.ToCallerId();
-        var cancellerRoles = Roles.Create(caller.Roles.All);
-        if (cancellerRoles.IsFailure)
-        {
-            return cancellerRoles.Error;
-        }
-
-        var canceled =
-            await subscription.CancelSubscriptionAsync(_billingProvider.StateInterpreter, cancellerId,
-                cancellerRoles.Value, CanCancel,
-                OnCancel,
-                false);
-        if (canceled.IsFailure)
-        {
-            return canceled.Error;
-        }
-
-        var saved = await _repository.SaveAsync(subscription, cancellationToken);
-        if (saved.IsFailure)
-        {
-            return saved.Error;
-        }
-
-        subscription = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Canceled subscription: {Id} for entity: {OwningEntity}",
-            subscription.Id, subscription.OwningEntityId);
-
-        var providerSubscription = _billingProvider.StateInterpreter.GetSubscriptionDetails(subscription.Provider);
-        if (providerSubscription.IsFailure)
-        {
-            return providerSubscription.Error;
-        }
-
-        return subscription.ToSubscription(providerSubscription.Value);
-
-        Task<Result<SubscriptionMetadata, Error>> OnCancel(SubscriptionRoot subscription1)
-        {
-            var canceledSubscription = _billingProvider.GatewayService.CancelSubscriptionAsync(caller,
-                CancelSubscriptionOptions.EndOfTerm,
-                subscription1.Provider.Value, cancellationToken);
-            return Task.FromResult(canceledSubscription.Result);
-        }
-
-        async Task<Permission> CanCancel(SubscriptionRoot subscription1, Identifier cancellerId1)
-        {
-            return (await _subscriptionOwningEntityService.CanCancelSubscriptionAsync(caller,
-                    subscription1.OwningEntityId,
-                    cancellerId1, cancellationToken))
-                .Match(optional => optional.Value, Permission.Denied_Evaluating);
-        }
+        return await CancelSubscriptionInternalAsync(caller, subscription, CancelSubscriptionOptions.EndOfTerm,
+            cancellationToken);
     }
 
     public async Task<Result<SubscriptionWithPlan, Error>> ChangePlanAsync(ICallerContext caller, string owningEntityId,
@@ -109,83 +61,7 @@ public partial class SubscriptionsApplication : ISubscriptionsApplication
         }
 
         var subscription = retrieved.Value;
-        var buyerIdBeforeChange = subscription.BuyerId;
-        var modifierId = caller.ToCallerId();
-        var changed = await subscription.ChangePlanAsync(_billingProvider.StateInterpreter, modifierId, planId,
-            CanChange, OnChange, OnTransfer);
-        if (changed.IsFailure)
-        {
-            return changed.Error;
-        }
-
-        var saved = await _repository.SaveAsync(subscription, cancellationToken);
-        if (saved.IsFailure)
-        {
-            return saved.Error;
-        }
-
-        subscription = saved.Value;
-        var buyerIdAfterChange = subscription.BuyerId;
-        if (buyerIdAfterChange != buyerIdBeforeChange)
-        {
-            _recorder.TraceInformation(caller.ToCall(),
-                "Subscription {Id} has been transferred from {FromBuyer} to {ToBuyer}", subscription.Id,
-                buyerIdBeforeChange, buyerIdAfterChange);
-        }
-        else
-        {
-            _recorder.TraceInformation(caller.ToCall(), "Subscription {Id} changed its plan: {Plan}",
-                subscription.Id, planId);
-        }
-
-        var providerSubscription = _billingProvider.StateInterpreter.GetSubscriptionDetails(subscription.Provider);
-        if (providerSubscription.IsFailure)
-        {
-            return providerSubscription.Error;
-        }
-
-        return subscription.ToSubscription(providerSubscription.Value);
-
-        Task<Result<SubscriptionMetadata, Error>> OnChange(SubscriptionRoot subscription1, string planId1)
-        {
-            var options = new ChangePlanOptions
-            {
-                PlanId = planId1,
-                Subscriber = new Subscriber
-                {
-                    EntityId = owningEntityId,
-                    EntityType = nameof(Organization)
-                }
-            };
-
-            var planChanged = _billingProvider.GatewayService.ChangeSubscriptionPlanAsync(caller, options,
-                subscription1.Provider.Value, cancellationToken);
-            return Task.FromResult(planChanged.Result);
-        }
-
-        async Task<Permission> CanChange(SubscriptionRoot subscription1, Identifier modifierId1)
-        {
-            return (await _subscriptionOwningEntityService.CanChangeSubscriptionPlanAsync(caller,
-                    subscription1.OwningEntityId,
-                    modifierId1, cancellationToken))
-                .Match(optional => optional.Value, Permission.Denied_Evaluating);
-        }
-
-        Task<Result<SubscriptionMetadata, Error>> OnTransfer(BillingProvider provider, Identifier transfereeId)
-        {
-            var transferee = CreateBuyerAsync(caller, transfereeId, owningEntityId.ToId(),
-                cancellationToken);
-            if (transferee.Result.IsFailure)
-            {
-                return Task.FromResult<Result<SubscriptionMetadata, Error>>(transferee.Result.Error);
-            }
-
-            return _billingProvider.GatewayService.TransferSubscriptionAsync(caller, new TransferSubscriptionOptions
-            {
-                TransfereeBuyer = transferee.Result.Value,
-                PlanId = planId
-            }, provider, cancellationToken);
-        }
+        return await ChangeSubscriptionPlanInternalAsync(caller, subscription, planId, cancellationToken);
     }
 
     public async Task<Result<SearchResults<SubscriptionToMigrate>, Error>> ExportSubscriptionsToMigrateAsync(
@@ -217,7 +93,15 @@ public partial class SubscriptionsApplication : ISubscriptionsApplication
     public async Task<Result<SubscriptionWithPlan, Error>> ForceCancelSubscriptionAsync(ICallerContext caller,
         string owningEntityId, CancellationToken cancellationToken)
     {
-        return await CancelSubscriptionAsync(caller, owningEntityId, cancellationToken);
+        var retrieved = await GetSubscriptionByOwningEntityAsync(owningEntityId.ToId(), cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        var subscription = retrieved.Value;
+        return await CancelSubscriptionInternalAsync(caller, subscription, CancelSubscriptionOptions.Immediately,
+            cancellationToken);
     }
 
     public async Task<Result<SubscriptionWithPlan, Error>> GetSubscriptionAsync(ICallerContext caller,
@@ -396,6 +280,139 @@ public partial class SubscriptionsApplication : ISubscriptionsApplication
         }
     }
 
+    private async Task<Result<SubscriptionWithPlan, Error>> ChangeSubscriptionPlanInternalAsync(ICallerContext caller,
+        SubscriptionRoot subscription, string planId, CancellationToken cancellationToken)
+    {
+        var buyerIdBeforeChange = subscription.BuyerId;
+        var modifierId = caller.ToCallerId();
+        var changed = await subscription.ChangePlanAsync(_billingProvider.StateInterpreter, modifierId, planId,
+            CanChange, OnChange, OnTransfer);
+        if (changed.IsFailure)
+        {
+            return changed.Error;
+        }
+
+        var saved = await _repository.SaveAsync(subscription, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        subscription = saved.Value;
+        var buyerIdAfterChange = subscription.BuyerId;
+        if (buyerIdAfterChange != buyerIdBeforeChange)
+        {
+            _recorder.TraceInformation(caller.ToCall(),
+                "Subscription {Id} has been transferred from {FromBuyer} to {ToBuyer}", subscription.Id,
+                buyerIdBeforeChange, buyerIdAfterChange);
+        }
+        else
+        {
+            _recorder.TraceInformation(caller.ToCall(), "Subscription {Id} changed its plan: {Plan}",
+                subscription.Id, planId);
+        }
+
+        var providerSubscription = _billingProvider.StateInterpreter.GetSubscriptionDetails(subscription.Provider);
+        if (providerSubscription.IsFailure)
+        {
+            return providerSubscription.Error;
+        }
+
+        return subscription.ToSubscription(providerSubscription.Value);
+
+        Task<Result<SubscriptionMetadata, Error>> OnChange(SubscriptionRoot subscription1, string planId1)
+        {
+            var options = new ChangePlanOptions
+            {
+                PlanId = planId1,
+                Subscriber = new Subscriber
+                {
+                    EntityId = subscription.OwningEntityId.ToString(),
+                    EntityType = nameof(Organization)
+                }
+            };
+
+            var planChanged = _billingProvider.GatewayService.ChangeSubscriptionPlanAsync(caller, options,
+                subscription1.Provider.Value, cancellationToken);
+            return Task.FromResult(planChanged.Result);
+        }
+
+        async Task<Permission> CanChange(SubscriptionRoot subscription1, Identifier modifierId1)
+        {
+            return (await _subscriptionOwningEntityService.CanChangeSubscriptionPlanAsync(caller,
+                    subscription1.OwningEntityId,
+                    modifierId1, cancellationToken))
+                .Match(optional => optional.Value, Permission.Denied_Evaluating);
+        }
+
+        Task<Result<SubscriptionMetadata, Error>> OnTransfer(BillingProvider provider, Identifier transfereeId)
+        {
+            var transferee = CreateBuyerAsync(caller, transfereeId, subscription.OwningEntityId,
+                cancellationToken);
+            if (transferee.Result.IsFailure)
+            {
+                return Task.FromResult<Result<SubscriptionMetadata, Error>>(transferee.Result.Error);
+            }
+
+            return _billingProvider.GatewayService.TransferSubscriptionAsync(caller, new TransferSubscriptionOptions
+            {
+                TransfereeBuyer = transferee.Result.Value,
+                PlanId = planId
+            }, provider, cancellationToken);
+        }
+    }
+
+    private async Task<Result<SubscriptionWithPlan, Error>> CancelSubscriptionInternalAsync(ICallerContext caller,
+        SubscriptionRoot subscription, CancelSubscriptionOptions options, CancellationToken cancellationToken)
+    {
+        var cancellerId = caller.ToCallerId();
+        var cancellerRoles = Roles.Create(caller.Roles.All);
+        if (cancellerRoles.IsFailure)
+        {
+            return cancellerRoles.Error;
+        }
+
+        var canceled =
+            await subscription.CancelSubscriptionAsync(_billingProvider.StateInterpreter, cancellerId,
+                cancellerRoles.Value, CanCancel, OnCancel, false);
+        if (canceled.IsFailure)
+        {
+            return canceled.Error;
+        }
+
+        var saved = await _repository.SaveAsync(subscription, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        subscription = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Canceled subscription: {Id} for entity: {OwningEntity}",
+            subscription.Id, subscription.OwningEntityId);
+
+        var providerSubscription = _billingProvider.StateInterpreter.GetSubscriptionDetails(subscription.Provider);
+        if (providerSubscription.IsFailure)
+        {
+            return providerSubscription.Error;
+        }
+
+        return subscription.ToSubscription(providerSubscription.Value);
+
+        Task<Result<SubscriptionMetadata, Error>> OnCancel(SubscriptionRoot subscription1)
+        {
+            var canceledSubscription = _billingProvider.GatewayService.CancelSubscriptionAsync(caller,
+                options, subscription1.Provider.Value, cancellationToken);
+            return Task.FromResult(canceledSubscription.Result);
+        }
+
+        async Task<Permission> CanCancel(SubscriptionRoot subscription1, Identifier cancellerId1)
+        {
+            return (await _subscriptionOwningEntityService.CanCancelSubscriptionAsync(caller,
+                    subscription1.OwningEntityId, cancellerId1, cancellationToken))
+                .Match(optional => optional.Value, Permission.Denied_Evaluating);
+        }
+    }
+
     private async Task<Result<SubscriptionWithPlan, Error>> GetSubscriptionInternalAsync(ICallerContext caller,
         SubscriptionRoot subscription, CancellationToken cancellationToken)
     {
@@ -497,7 +514,10 @@ internal static class SubscriptionConversionExtensions
             ProviderState = subscription.Provider.HasValue
                 ? subscription.Provider.Value.State
                 : new Dictionary<string, string>(),
-            SubscriptionReference = providerSubscription.SubscriptionReference.ValueOrNull as string,
+            SubscriptionReference = providerSubscription.SubscriptionReference.HasValue
+                ? providerSubscription.SubscriptionReference.Value.ToString()
+                : null,
+            BuyerReference = subscription.ProviderBuyerReference.ValueOrDefault!,
             Status = providerSubscription.Status.Status.ToEnumOrDefault(SubscriptionStatus.Unsubscribed),
             CanceledDateUtc = providerSubscription.Status.CanceledDateUtc.HasValue
                 ? providerSubscription.Status.CanceledDateUtc.Value

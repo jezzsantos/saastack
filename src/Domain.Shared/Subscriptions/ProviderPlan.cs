@@ -10,6 +10,17 @@ public sealed class ProviderPlan : ValueObjectBase<ProviderPlan>
     public static readonly ProviderPlan Empty =
         new(Optional<string>.None, false, Optional<DateTime>.None, BillingSubscriptionTier.Unsubscribed);
 
+    public static Result<ProviderPlan, Error> Create(string planId, BillingSubscriptionTier tier)
+    {
+        if (planId.IsInvalidParameter(id => id.HasValue(), nameof(planId), Resources.ProviderPlan_InvalidPlanId,
+                out var error))
+        {
+            return error;
+        }
+
+        return Create(planId, false, Optional<DateTime>.None, tier);
+    }
+
     public static Result<ProviderPlan, Error> Create(string planId, bool isTrial, Optional<DateTime> trialEndDateUtc,
         BillingSubscriptionTier tier)
     {

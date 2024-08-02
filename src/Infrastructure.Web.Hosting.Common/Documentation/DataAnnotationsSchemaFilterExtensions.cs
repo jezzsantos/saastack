@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Microsoft.OpenApi.Any;
@@ -62,13 +63,24 @@ internal static class DataAnnotationsSchemaFilterExtensions
 
     public static void SetEnumValues(this OpenApiSchema schema, Type type)
     {
-        var names = Enum.GetNames(type).ToList();
         schema.Enum.Clear();
         schema.Type = "string";
         schema.Format = null;
+        var names = Enum.GetNames(type).ToList();
         foreach (var name in names)
         {
-            schema.Enum.Add(new OpenApiString(name));
+            var bestName = name;
+            var memberInfo = type.GetMember(name).FirstOrDefault(m => m.DeclaringType == type);
+            if (memberInfo.Exists())
+            {
+                var enumMemberAttribute = memberInfo.GetCustomAttribute<EnumMemberAttribute>();
+                if (enumMemberAttribute.Exists())
+                {
+                    bestName = enumMemberAttribute.Value ?? name;
+                }
+            }
+
+            schema.Enum.Add(new OpenApiString(bestName));
         }
     }
 

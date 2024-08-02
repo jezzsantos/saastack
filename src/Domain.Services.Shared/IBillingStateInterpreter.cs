@@ -31,5 +31,5 @@ public interface IBillingStateInterpreter
     /// <summary>
     ///     Creates the initial state of the newly subscribed provider
     /// </summary>
-    Result<BillingProvider, Error> SetInitialProviderState(BillingProvider provider); //KEEP: SetInitialProviderState
+    Result<BillingProvider, Error> SetInitialProviderState(BillingProvider provider);
 }

@@ -23,7 +23,7 @@ public sealed class ProviderChanged : DomainEvent
 
     public required Dictionary<string, string> ProviderState { get; set; }
 
-    public required string SubscriptionReference { get; set; }
+    public string? SubscriptionReference { get; set; }
 
     public required string ToProviderName { get; set; }
 }

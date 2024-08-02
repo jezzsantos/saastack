@@ -34,6 +34,8 @@ public class SubscriptionWithPlan : Subscription
     public SubscriptionStatus Status { get; set; }
 
     public string? SubscriptionReference { get; set; }
+
+    public required string BuyerReference { get; set; }
 }
 
 public class SubscriptionPlan
