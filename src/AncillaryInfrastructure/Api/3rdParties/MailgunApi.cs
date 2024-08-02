@@ -1,4 +1,8 @@
 using AncillaryApplication;
+using Application.Common;
+using Application.Common.Extensions;
+using Application.Interfaces;
+using Application.Resources.Shared;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
@@ -7,88 +11,78 @@ using Infrastructure.Shared.ApplicationServices.External;
 using Infrastructure.Web.Api.Common;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.Mailgun;
+using Microsoft.AspNetCore.Http;
 
 namespace AncillaryInfrastructure.Api._3rdParties;
 
 public class MailgunApi : IWebApiService
 {
-    private readonly IAncillaryApplication _ancillaryApplication;
     private readonly ICallerContextFactory _callerFactory;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IMailgunApplication _mailgunApplication;
+    private readonly IRecorder _recorder;
     private readonly string _webhookSigningKey;
 
-    public MailgunApi(ICallerContextFactory callerFactory, IAncillaryApplication ancillaryApplication,
-        IConfigurationSettings settings)
+    public MailgunApi(IRecorder recorder, IHttpContextAccessor httpContextAccessor, ICallerContextFactory callerFactory,
+        IConfigurationSettings settings, IMailgunApplication mailgunApplication)
     {
+        _recorder = recorder;
+        _httpContextAccessor = httpContextAccessor;
         _callerFactory = callerFactory;
-        _ancillaryApplication = ancillaryApplication;
-        _webhookSigningKey = settings.Platform.GetString(MailgunConstants.WebhookSigningKeySettingName);
+        _mailgunApplication = mailgunApplication;
+        _webhookSigningKey = settings.Platform.GetString(MailgunClient.Constants.WebhookSigningKeySettingName);
     }
 
-    public async Task<ApiEmptyResult> NotifyEmailDeliveryReceipt(MailgunNotifyWebhookEventRequest request,
+    public async Task<ApiEmptyResult> NotifyWebhookEvent(MailgunNotifyWebhookEventRequest request,
         CancellationToken cancellationToken)
     {
-        var authenticated = AuthenticateRequest(request.Signature, _webhookSigningKey);
+        var caller = _callerFactory.Create();
+        var authenticated =
+            AuthenticateRequest(_recorder, caller, _httpContextAccessor, request.Signature, _webhookSigningKey);
         if (authenticated.IsFailure)
         {
             return () => authenticated.Error;
         }
 
-        if (!request.EventData.Exists())
+        if (request.EventData.NotExists()
+            || request.EventData.Event.HasNoValue())
         {
             return () => new EmptyResponse();
         }
 
-        if (request.EventData.Event == MailgunConstants.Events.Delivered)
-        {
-            var deliveredAt = request.EventData.Timestamp.FromUnixTimestamp();
-            var receiptId = request.EventData.Message?.Headers?.MessageId;
-            if (receiptId.HasNoValue())
-            {
-                return () => new EmptyResponse();
-            }
+        var maintenance = Caller.CreateAsMaintenance(caller.CallId);
+        var notified =
+            await _mailgunApplication.NotifyWebhookEvent(maintenance, request.EventData, cancellationToken);
 
-            var delivered = await _ancillaryApplication.ConfirmEmailDeliveredAsync(_callerFactory.Create(),
-                receiptId, deliveredAt, cancellationToken);
-
-            return () => delivered.Match(() => new EmptyResponse(),
-                error => new Result<EmptyResponse, Error>(error));
-        }
-
-        if (request.EventData.Event == MailgunConstants.Events.Failed)
-        {
-            var severity = request.EventData.Severity ?? MailgunConstants.Values.PermanentSeverity;
-            if (severity.NotEqualsIgnoreCase(MailgunConstants.Values.PermanentSeverity))
-            {
-                return () => new EmptyResponse();
-            }
-
-            var failedAt = request.EventData.Timestamp.FromUnixTimestamp();
-            var reason = request.EventData.DeliveryStatus?.Description ?? request.EventData.Reason ?? "none";
-            var receiptId = request.EventData.Message?.Headers?.MessageId;
-            if (receiptId.HasNoValue())
-            {
-                return () => new EmptyResponse();
-            }
-
-            var delivered = await _ancillaryApplication.ConfirmEmailDeliveryFailedAsync(_callerFactory.Create(),
-                receiptId, failedAt, reason, cancellationToken);
-
-            return () => delivered.Match(() => new EmptyResponse(),
-                error => new Result<EmptyResponse, Error>(error));
-        }
-
-        return () => new EmptyResponse();
+        return () => notified.Match(() => new EmptyResponse(),
+            error => new Result<EmptyResponse, Error>(error));
     }
 
     /// <summary>
     ///     Authenticates the request with Mailgun HMAC auth
     ///     See <see href="https://documentation.mailgun.com/docs/mailgun/user-manual/tracking-messages/#securing-webhooks" />
     /// </summary>
-    private static Result<Error> AuthenticateRequest(MailgunSignature? parameters, string webhookSigningKey)
+    internal static Result<Error> AuthenticateRequest(IRecorder recorder, ICallerContext caller,
+        IHttpContextAccessor httpContextAccessor, MailgunSignature? parameters, string webhookSigningKey)
     {
+        var httpContext = httpContextAccessor.HttpContext!;
+        if (!httpContext.Request.IsHttps)
+        {
+            recorder.TraceWarning(caller.ToCall(), "MailgunApi authentication is not secured with HTTPS");
+            return Error.NotAuthenticated();
+        }
+
+        if (webhookSigningKey.HasNoValue())
+        {
+            recorder.TraceWarning(caller.ToCall(), "MailgunApi authentication is misconfigured");
+            return Error.NotAuthenticated();
+        }
+
         if (parameters.NotExists()
             || parameters.Signature.HasNoValue())
         {
+            recorder.Audit(caller.ToCall(), Application.Interfaces.Audits.MailgunApi_WebhookAuthentication_Failed,
+                "Mailgun webhook failed authentication");
             return Error.NotAuthenticated();
         }
 
@@ -100,6 +94,8 @@ public class MailgunApi : IWebApiService
         var verified = verifier.Verify(signature);
         if (!verified)
         {
+            recorder.Audit(caller.ToCall(), Application.Interfaces.Audits.MailgunApi_WebhookAuthentication_Failed,
+                "Mailgun webhook failed authentication");
             return Error.NotAuthenticated();
         }
 

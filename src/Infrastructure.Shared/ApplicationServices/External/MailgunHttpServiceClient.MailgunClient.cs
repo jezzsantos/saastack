@@ -41,7 +41,7 @@ public class MailGunRecipient
     }
 }
 
-internal class MailgunClient : IMailgunClient
+public class MailgunClient : IMailgunClient
 {
     private readonly string _apiKey;
     private readonly string _domainName;
@@ -50,9 +50,9 @@ internal class MailgunClient : IMailgunClient
     private readonly IServiceClient _serviceClient;
 
     public MailgunClient(IRecorder recorder, IConfigurationSettings settings, IHttpClientFactory httpClientFactory)
-        : this(recorder, settings.GetString(MailgunConstants.BaseUrlSettingName),
-            settings.GetString(MailgunConstants.APIKeySettingName),
-            settings.GetString(MailgunConstants.DomainNameSettingName),
+        : this(recorder, settings.GetString(Constants.BaseUrlSettingName),
+            settings.GetString(Constants.APIKeySettingName),
+            settings.GetString(Constants.DomainNameSettingName),
             ApiClientRetryPolicies.CreateRetryWithExponentialBackoffAndJitter(), httpClientFactory)
     {
     }
@@ -128,5 +128,13 @@ internal class MailgunClient : IMailgunClient
     {
         message.Headers.Add(HttpConstants.Headers.Authorization,
             $"Basic {Convert.ToBase64String(Encoding.ASCII.GetBytes($"api:{apiKey}"))}");
+    }
+
+    public static class Constants
+    {
+        public const string WebhookSigningKeySettingName = "ApplicationServices:Mailgun:WebhookSigningKey";
+        public const string APIKeySettingName = "ApplicationServices:Mailgun:ApiKey";
+        public const string BaseUrlSettingName = "ApplicationServices:Mailgun:BaseUrl";
+        public const string DomainNameSettingName = "ApplicationServices:Mailgun:DomainName";
     }
 }

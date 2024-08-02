@@ -90,4 +90,7 @@
     <data name="APIKeysApplication_Authenticate_Succeeded" xml:space="preserve">
         <value>Authentication.Passed</value>
     </data>
+    <data name="MailgunApi_WebhookAuthentication_Failed" xml:space="preserve">
+        <value>Mailgun.Authentication.Failed</value>
+    </data>
 </root>

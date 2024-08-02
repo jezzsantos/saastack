@@ -168,6 +168,15 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mailgun.Authentication.Failed.
+        /// </summary>
+        public static string MailgunApi_WebhookAuthentication_Failed {
+            get {
+                return ResourceManager.GetString("MailgunApi_WebhookAuthentication_Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Organization.Deleted.
         /// </summary>
         public static string OrganizationsApplication_OrganizationDeleted {

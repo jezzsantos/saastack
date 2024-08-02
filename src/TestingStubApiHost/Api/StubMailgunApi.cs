@@ -1,8 +1,8 @@
 using Application.Common;
+using Application.Resources.Shared;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
-using Infrastructure.Shared.ApplicationServices.External;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.Mailgun;
 using Infrastructure.Web.Interfaces.Clients;
@@ -43,7 +43,7 @@ public class StubMailgunApi : StubApiBase
                 },
                 EventData = new MailgunEventData
                 {
-                    Event = MailgunConstants.Events.Delivered,
+                    Event = MailgunEventType.Delivered.ToString(),
                     Timestamp = DateTime.UtcNow.ToUnixSeconds(),
                     Message = new MailgunMessage
                     {

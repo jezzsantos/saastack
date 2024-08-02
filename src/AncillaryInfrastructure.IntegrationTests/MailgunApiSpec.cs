@@ -3,10 +3,10 @@ using AncillaryInfrastructure.IntegrationTests.Stubs;
 using ApiHost1;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
+using Application.Resources.Shared;
 using Common.Extensions;
 using Domain.Common;
 using FluentAssertions;
-using Infrastructure.Shared.ApplicationServices.External;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.Mailgun;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
@@ -65,7 +65,7 @@ public class MailgunApiSpec : WebApiSpec<Program>
             },
             EventData = new MailgunEventData
             {
-                Event = MailgunConstants.Events.Delivered,
+                Event = MailgunEventType.Delivered.ToString(),
                 Timestamp = deliveredAt,
                 Message = new MailgunMessage
                 {
@@ -107,7 +107,7 @@ public class MailgunApiSpec : WebApiSpec<Program>
             },
             EventData = new MailgunEventData
             {
-                Event = MailgunConstants.Events.Failed,
+                Event = MailgunEventType.Failed.ToString(),
                 Severity = MailgunConstants.Values.TemporarySeverity,
                 DeliveryStatus = new MailgunDeliveryStatus
                 {
@@ -154,7 +154,7 @@ public class MailgunApiSpec : WebApiSpec<Program>
             },
             EventData = new MailgunEventData
             {
-                Event = MailgunConstants.Events.Failed,
+                Event = MailgunEventType.Failed.ToString(),
                 Severity = MailgunConstants.Values.PermanentSeverity,
                 DeliveryStatus = new MailgunDeliveryStatus
                 {
