@@ -26,7 +26,7 @@ public sealed class EmailAddress : SingleValueObjectBase<EmailAddress, string>
         return new EmailAddress(emailAddress);
     }
 
-    private EmailAddress(string emailAddress) : base(emailAddress)
+    private EmailAddress(string emailAddress) : base(emailAddress.ToLowerInvariant())
     {
     }
 

@@ -9,7 +9,7 @@ namespace Domain.Shared.UnitTests;
 public class EmailAddressSpec
 {
     [Fact]
-    public void WhenConstructedAndEmptyEmail_ThenReturnsError()
+    public void WhenCreateAndEmptyEmail_ThenReturnsError()
     {
         var result = EmailAddress.Create(string.Empty);
 
@@ -17,11 +17,27 @@ public class EmailAddressSpec
     }
 
     [Fact]
-    public void WhenConstructedAndInvalidEmail_ThenReturnsError()
+    public void WhenCreateAndInvalidEmail_ThenReturnsError()
     {
         var result = EmailAddress.Create("notanemail");
 
         result.Should().BeError(ErrorCode.Validation, Resources.EmailAddress_InvalidAddress);
+    }
+
+    [Fact]
+    public void WhenCreate_ThenCreated()
+    {
+        var result = EmailAddress.Create("AUSER@company.com");
+
+        result.Value.Address.Should().Be("auser@company.com");
+    }
+
+    [Fact]
+    public void WhenEqualAndCaseVariantEmail_ThenReturnsTrue()
+    {
+        var result = EmailAddress.Create("auser@company.com").Equals(EmailAddress.Create("AUSER@company.com"));
+
+        result.Should().BeTrue();
     }
 
     [Fact]
