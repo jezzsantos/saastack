@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="chargebee" Version="3.18.1" />
         <PackageReference Include="Flagsmith" Version="5.2.2" />
         <PackageReference Include="Microsoft.Identity.Client" Version="4.63.0" />
     </ItemGroup>

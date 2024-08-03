@@ -11,7 +11,7 @@ There are two pieces of this mechanism:
 1. An implementation of an `IBillingProvider` specific to the BMS.
 2. Webhooks, or custom syncing mechanisms to ensure that changes in the BMS reach this product.
 
-> We highly recommend using Webhooks notifications where possible; otherwise, you really must poll the BMS on a frequent basis, and risk being rate-limited.
+> We highly recommend using Webhooks notifications where possible; otherwise, you must poll the BMS frequently and you risk being rate-limited.
 
 ## Where to start?
 
@@ -41,7 +41,7 @@ Other BMS will have slightly different conceptual models, and you will need to u
 
 You will also need to configure the basic rules and other policies in the BMS first, before you start configuring your customer data.
 
-For example, configure API Keys, Webhooks etc.
+For example, configure API Keys, Webhooks, etc.
 
 The last thing will be to explore whether the BMS supports a "sandbox" environment for you to play around with and test your migration. You don't want to be adding test data to your production customer data.
 
@@ -55,7 +55,7 @@ Use the API endpoint `GET /subscriptions/export` to view the data available for 
 
 This data represents all the subscriptions created in the product so far.
 
-This is the data you will need to import into your chosen BMS, during the migration.
+This is the data you will need to import into your chosen BMS during the migration.
 
 > Note: some of the values are simply encoded JSON values
 
@@ -91,7 +91,7 @@ This is the data you will need to import into your chosen BMS, during the migrat
 }
 ```
 
-### Build Your Scripts
+### Build Your Migration Scripts
 
 You will likely need to build some scripts that translate the raw data above and automate the creation of various related data structures in the new BMS.
 
@@ -99,7 +99,7 @@ For example, in Chargebee:
 
 1. You would create a Chargebee Customer record using the data in the `buyer` property. You would save the `buyer.id` in the metadata of the Chargebee Customer record.
 2. You would create a Chargebee Subscription for the Chargebee Customer. You would also save the `id` and `owningEntityId` as metadata in the Chargebee Subscription.
-3. You would define some Chargebee Plans, and assign one of those plans to the Chargebee subscription.
+3. You would define some Chargebee Plans and assign one of those plans to the Chargebee Subscription.
 
 Next, during the migration, once you have automated the creation of the BMS records, you will also need a collection of metadata of those BMS records back into the data of the `IBillingProvider` for when it is being used.
 
@@ -131,7 +131,7 @@ In the product, by default, we have defined the following tiers (see: `Subscript
 * Professional
 * Enterprise
 
-You are free to rename, add, or remove these tiers (in the code) to whatever you would like to support in your future pricing plans in your new BMS. Essentially, we have 3 paid tiers, where `Standard` may have a trial, and is generally the default plan for new users.
+You are free to rename, add, or remove these tiers (in the code) to whatever you would like to support in your future pricing plans in your new BMS. Essentially, we have 3 paid tiers, where `Standard` may have a trial and is generally the default plan for new users.
 
 > Remember, if you modify these tiers, you will also need to modify the mapping between these tiers and the feature levels you will be supporting in your pricing plans. see the `EndUserRoot` for details.
 
@@ -146,7 +146,7 @@ In your BMS, we recommend defining at least the following plans:
 
 You will need to define all the parameters for each of these new plans, including pricing, limits, frequency of billing, etc.
 
-### Configure the BillingProvider
+### Configure the Billing Provider
 
 Your newly chosen BMS will require a built and tested implementation of the `IBillingProvider` to work with it.
 
@@ -160,7 +160,7 @@ To swap out the existing `IBillingProvider` (e.g. `SimpleBillingProvider`) with 
 
 You will also need to make sure that you provide all the necessary configuration settings for your new `IBillingProvider` in the relevant `appsettings.json` files for the host project where the `Subscriptions` subdomain is deployed.
 
-You might also consider updating your web/mobile apps to support the self-serve of capturing credit cards (payment methods), and support self-serve for changing plans. However, the built-in pricing page in the `WebsiteHost` should be already updated with your new plans.
+You might also consider updating your web/mobile apps to support the self-serve of capturing credit cards (payment methods), and support self-serve for changing plans. However, the built-in pricing page in the `WebsiteHost` should already be updated with your new plans.
 
 > None of the BMS-specific UX is built in when using the `SimpleBillingProvider` as this provider neither allows you to select from a list of plans nor captures payment methods.
 

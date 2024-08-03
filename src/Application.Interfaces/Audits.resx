@@ -114,4 +114,7 @@
     <data name="AuthTokensApplication_Refresh_AccountSuspended" xml:space="preserve">
         <value>Authentication.Any.Refreshed.Failed.AccountSuspended</value>
     </data>
+    <data name="ChargebeeApi_WebhookAuthentication_Failed" xml:space="preserve">
+        <value>Chargebee.Authentication.Failed</value>
+    </data>
 </root>

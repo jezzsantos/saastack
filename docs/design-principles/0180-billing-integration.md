@@ -76,7 +76,7 @@ There is much that will change over time with both active subscriptions and the 
 
 Instead of building our own system, SaaStack has been designed to be fully two-way integrated with established 3rd party billing providers (e.g.,  [Chargebee](https://www.chargebee.com), [Maxio](https://www.chargify.com/), or [Stripe Billing](https://www.stripe.com/billing)).
 
-All these providers offer APIs for integration as well as management portals and tools for handling subscriptions, plans, pricing, trials, discounts, and coupons. The API interface (and webhooks) provided by the BMS becomes the user interface of your product that your customers can self-serve with. The management portal the BMS provides becomes an administrative tool your business (product, support & success, etc) can use to manage customers, billing and pricing changes long term.
+All these providers offer APIs for integration as well as management portals and tools for handling subscriptions, plans, pricing, trials, discounts, and coupons. The API interface (and webhooks) provided by the BMS becomes the user interface of your product that your customers can self-serve with. The management portal the BMS provides becomes an administrative tool your business (product, support & success, etc) can use to manage customers, billing, and pricing changes long term.
 
 This bidirectional approach introduces a need for seamless synchronization between your SaaS product and third-party services, as changes can occur in both systems independently (due to different actors). Therefore, the product's backend API will be needed (via webhooks) to modify and synchronize subscriptions from the BMS and ensure consistency between the two systems. Eventual consistency is completely tolerable in this scenario.
 
@@ -137,11 +137,11 @@ The default set of tiers (`SubscriptionTier`), modeled in SaaStack, has been des
 The progression through these tiers represents a variant of a very common "Freemium" model, where:
 
 1. The end-new user starts on the `Standard` tier, which is initially a "free" tier (with or without a Trial period)
-2. If Trials are supported by the BMS, the end-user gets to try out `Standard` tier features for a period of time before the trial ends, at which point the subscription will require payment of some kind (a valid `PaymentMethod`). If payment is received (in time), the end-user keeps `Standard` tier access from that point in time (and the Trial ends). If no payment is received (in time), the end-user is automatically downgraded to the `Unsubscribed` tier, which has permanent "free" access to a limited set of basic features.
+2. If Trials are supported by the BMS, the end-user gets to try out `Standard` tier features for a period of time before the trial ends, at which point the subscription will require payment of some kind (a valid payment method). If payment is received (in time), the end-user keeps `Standard` tier access from that point in time (and the Trial ends). If no payment is received (in time), the end-user is automatically downgraded to the `Unsubscribed` tier, which has permanent "free" access to a limited set of basic features.
 3. At any time during the trial (or outside a trial period), at any tier, the end-user can upgrade to any other tier. They can also cancel their subscription and will be automatically reverted to the `Unsubscribed` tier.
-4. Lastly, in some rare cases, if a subscription in the BMS system itself is "deleted/destroyed" (by a business "administrator" of some kind), the subscription will be reverted to the `Unsubscribed` tier again, as a fallback.
+4. Lastly, in some rare cases, if a subscription in the BMS system itself is "deleted/destroyed" (by a business "administrator" of some kind), the subscription will be reverted to the `Unsubscribed` tier again as a fallback.
 
-Bottom line, is that this is flexible strategy to get started for most SaaS businesses, that will, no doubt adapt this default workflow moving forward.
+The bottom line is that this is a flexible strategy to get started for most SaaS businesses that will, no doubt, adapt this default workflow moving forward.
 
 > You are free to change these default tiers and add or remove your own. The details that drive the restrictions will come from the plan configuration in the BMS and need to be synchronized in the code, too.
 
@@ -216,7 +216,7 @@ Through this API, end-users (members of an organization, by default) can perform
 
 The API itself, will interact with the `IBillingProvider` to achieve those things. In that way, it delegates some of those [transactional] commands directly with the BMS. But at the same time, it maintains a cache of relevant metadata (about the subscription and plan from the BMS) in the API, so that the API does not have to contact the BMS for all non-transactional activities.
 
-Lastly, in order to maintain eventual consistency between data changing in the BMS, which can change quite independently in the BMS (from other actors), the `Subscription` subdomain needs to handle webhook events originating from the BMS, or use polling techniques to obtain those changes.
+Lastly, in order to maintain eventual consistency between data changing in the BMS, which can change quite independently in the BMS (from other actors), the `Subscription` subdomain needs to handle webhook events originating from the BMS or use polling techniques to obtain those changes.
 
 > The webhooks will be different for different BMSs.
 
@@ -267,7 +267,7 @@ In any SaaS product, it is common to restrict access to certain features and fun
 
 Some plans define access to whole feature sets, while others put limits and quotas on the usage of those features.
 
-> Some features of a SaaS product may not be "tenanted" and will require access to be granted to individual users, rather than to specific members of organizations.
+> Some features of a SaaS product may not be "tenanted" and will require access to be granted to individual users rather than to specific members of organizations.
 
 Since a plan can be changed at any time during the use of the SaaS product, and since the features of the product cannot be deployed to each user on-demand instantly, access to features is required to be *dynamically* controlled by the software itself, as it is being used by specific end-users.
 
@@ -360,11 +360,11 @@ As no credit card would be provided, when a `Subscription` is first created, the
 
 When a new `Subscription` is created (for an `Organization`), it automatically assigns the "creator" of the organization to the "buyer" of the subscription.
 
-As a "buyer" of the subscription, they have full payment authority, and they are responsible for paying any charges for the subscription (e.g. setup fees and/or monthly/annual subscription fees). Charging will happen on a frequency defined by the subscription plan and any other terms of service. But there will not be any `PaymentMethod` at this point in time to charge.
+As a "buyer" of the subscription, they have full payment authority, and they are responsible for paying any charges for the subscription (e.g. setup fees and/or monthly/annual subscription fees). Charging will happen on a frequency defined by the subscription plan and any other terms of service. But there will not be any payment method at this point in time to charge.
 
 In order to be charged, the "buyer" will have needed to register a valid `PaymentMethod` for the subscription, that can be used to charge when that time comes.
 
-> By default, the `SimpleBillingProvider` will never require any charges, and therefore never requires a valid `PaymentMethod`
+> By default, the `SimpleBillingProvider` will never require any charges and therefore, never requires a valid `PaymentMethod`
 
 Once there are charges, there are generally restrictions on feature access associated with the "tier" of the subscription (e.g., "Basic" versus "Premium").
 
@@ -454,7 +454,7 @@ By default, there are a number of constraints and rules placed on `Subscriptions
 
 #### Role Access
 
-These are the roles and rules with respect to billing, and organizations.
+These are the roles and rules with respect to billing and organizations.
 
 | End User                                | Is Creator | Is Current Buyer             | Roles                      |
 |-----------------------------------------|------------|------------------------------|----------------------------|
@@ -463,7 +463,7 @@ These are the roles and rules with respect to billing, and organizations.
 | An (Organization) Owner                 | never      | never                        | `TenantRoles.Owner`        |
 | An (Organization) Member                | never      | never                        | `TenantRoles.Member`       |
 
-> Note: the roles `TenantRoles.BillingAdmin` and `TenantRoles.Owner` are hierarchical and supersets of other roles (like `TenantRoles.Member`).
+> Note: the roles `TenantRoles.BillingAdmin` and `TenantRoles.Owner` are hierarchical and are supersets of other roles (like `TenantRoles.Member`).
 
 Rules:
 
@@ -575,6 +575,6 @@ Either defining limits or quotas for specific kinds of plans.
 
 ### Grandfathering
 
-Subscription pricing for SaaS businesses can change frequently, and existing subscriptions are bound by legal agreements. "Grandfathering" allows past purchasers to retain their original terms, or be moved to equivalent new plans in the new pricing model.
+Subscription pricing for SaaS businesses can change frequently, and existing subscriptions are bound by legal agreements. "Grandfathering" allows past purchasers to retain their original terms or be moved to equivalent new plans in the new pricing model.
 
 While third-party BMSs (e.g.,  [Chargebee](https://www.chargebee.com), [Maxio](https://www.chargify.com/), or [Stripe Billing](https://www.stripe.com/billing), etc.) provide support for grandfathering, supporting it fully may require some additional work in each `IBillingProvider`, depending on the extent of it.

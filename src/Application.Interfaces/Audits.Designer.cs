@@ -96,6 +96,15 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Chargebee.Authentication.Failed.
+        /// </summary>
+        public static string ChargebeeApi_WebhookAuthentication_Failed {
+            get {
+                return ResourceManager.GetString("ChargebeeApi_WebhookAuthentication_Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CSRFProtection.Failed.
         /// </summary>
         public static string CSRFMiddleware_CSRFProtection_Failed {
