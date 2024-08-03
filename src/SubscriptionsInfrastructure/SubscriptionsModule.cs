@@ -46,6 +46,7 @@ public class SubscriptionsModule : ISubdomainModule
             {
                 services.AddSingleton<IBillingProvider, SimpleBillingProvider>();
 
+                services.AddPerHttpRequest<IChargebeeApplication, ChargebeeApplication>();
                 services
                     .AddPerHttpRequest<ISubscriptionsApplication, SubscriptionsApplication.SubscriptionsApplication>();
                 services.AddPerHttpRequest<ISubscriptionRepository, SubscriptionRepository>();
