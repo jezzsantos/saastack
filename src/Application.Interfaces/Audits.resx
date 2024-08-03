@@ -102,4 +102,7 @@
     <data name="SingleSignOnApplication_Refresh_AccountSuspended" xml:space="preserve">
         <value>Authentication.SSO.Refreshed.Failed.AccountSuspended</value>
     </data>
+    <data name="ChargebeeApi_WebhookAuthentication_Failed" xml:space="preserve">
+        <value>Chargebee.Authentication.Failed</value>
+    </data>
 </root>

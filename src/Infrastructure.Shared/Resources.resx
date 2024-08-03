@@ -43,10 +43,34 @@
         <value>For everyone. Forever.</value>
     </data>
     <data name="InProcessInMemBillingGatewayService_BasicPlan_Notes" xml:space="preserve">
-        <value>This plan cannot be changed, nor cancelled.</value>
+        <value>This plan cannot be changed, nor canceled.</value>
     </data>
     <data name="InProcessInMemBillingGatewayService_BasicPlan_Feature1_Description" xml:space="preserve">
         <value>All features</value>
+    </data>
+    <data name="ChargebeeHttpServiceClient_InvalidCustomerId" xml:space="preserve">
+        <value>The CustomerId is missing</value>
+    </data>
+    <data name="ChargebeeHttpServiceClient_InvalidSubscriptionId" xml:space="preserve">
+        <value>The SubscriptionId is missing</value>
+    </data>
+    <data name="ChargebeeHttpServiceClient_InvalidPlanId" xml:space="preserve">
+        <value>The PlanId is missing</value>
+    </data>
+    <data name="ChargebeeHttpServiceClient_InvalidSubscriber" xml:space="preserve">
+        <value>The Subscriber is missing</value>
+    </data>
+    <data name="ChargebeeHttpServiceClient_Subscribe_ScheduleInvalid" xml:space="preserve">
+        <value>Cannot create a subscription for a customer that is not immediate or scheduled to start in the past</value>
+    </data>
+    <data name="ChargebeeHttpServiceClient_SubscriptionNotFound" xml:space="preserve">
+        <value>A subscription with ID: {0}, does not exist in Chargebee</value>
+    </data>
+    <data name="ChargebeeHttpServiceClient_Cancel_ScheduleInvalid" xml:space="preserve">
+        <value>Cannot cancel a subscription for a customer that is not immediate or scheduled to cancel in the past</value>
+    </data>
+    <data name="ChargebeeHttpServiceClient_Transfer_BuyerInvalid" xml:space="preserve">
+        <value>Cannot transfer a subscription to another buyer without the buyer information</value>
     </data>
 
 </root>
