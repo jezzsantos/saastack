@@ -18,7 +18,7 @@ public class DataAnnotationsParameterFilter : IParameterFilter
         {
             var parameterInfo = context.ParameterInfo;
             var declaringType = parameterInfo.Member.DeclaringType;
-            if (declaringType.IsAnnotatable())
+            if (declaringType.IsRequestOrResponseType())
             {
                 parameter.SetRequired(parameterInfo);
                 parameter.SetDescription(parameterInfo);

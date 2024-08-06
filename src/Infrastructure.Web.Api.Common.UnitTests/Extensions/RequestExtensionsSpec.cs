@@ -25,7 +25,7 @@ public class RequestExtensionsSpec
     }
 
     [Fact]
-    public void WhenGetRequestInfoAndRequestHasNoProperties_ThenReturnsInfo()
+    public void WhenGetRequestInfoAndRequestHasNoFields_ThenReturnsInfo()
     {
         var request = new HasNoPropertiesRequest();
 
@@ -284,6 +284,51 @@ public class RequestExtensionsSpec
         var result = request.ToUrl();
 
         result.Should().Be("/aroute/anid/apath1/xxxyyy/apath2/avalue1/apath3");
+    }
+
+    [Fact]
+    public void WhenGetRouteTemplatePlaceholdersAndNoAttribute_ThenReturnsEmpty()
+    {
+        var result = typeof(NoRouteRequest).GetRouteTemplatePlaceholders();
+
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenGetRouteTemplatePlaceholdersAndRequestHasNoFields_ThenReturnsEmpty()
+    {
+        var result = typeof(HasNoPropertiesRequest).GetRouteTemplatePlaceholders();
+
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenGetRouteTemplatePlaceholdersAndRouteTemplateContainsNoPlaceholders_ThenReturnsEmpty()
+    {
+        var result = typeof(HasNoPlaceholdersPostRequest).GetRouteTemplatePlaceholders();
+
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenGetRouteTemplatePlaceholdersAndRouteTemplateHasUnknownPlaceholder_ThenReturnsEmpty()
+    {
+        var result = typeof(HasUnknownPlaceholderGetRequest).GetRouteTemplatePlaceholders();
+
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void WhenGetRouteTemplatePlaceholdersAndRouteTemplateHasPlaceholdersForPost_ThenReturns()
+    {
+        var result = typeof(HasPlaceholdersPostRequest).GetRouteTemplatePlaceholders();
+
+        result.Should().NotBeEmpty();
+        result.Count.Should().Be(4);
+        result[nameof(HasPlaceholdersPostRequest.Id)].Should().Be(typeof(string));
+        result[nameof(HasPlaceholdersPostRequest.ANumberProperty)].Should().Be(typeof(int?));
+        result[nameof(HasPlaceholdersPostRequest.AStringProperty1)].Should().Be(typeof(string));
+        result[nameof(HasPlaceholdersPostRequest.AStringProperty2)].Should().Be(typeof(string));
     }
 
     private class NoRouteRequest : IWebRequest<TestResponse>;

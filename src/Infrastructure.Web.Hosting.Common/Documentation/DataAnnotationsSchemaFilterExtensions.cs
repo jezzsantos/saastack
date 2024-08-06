@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Common.Extensions;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -12,11 +13,26 @@ namespace Infrastructure.Web.Hosting.Common.Documentation;
 
 internal static class DataAnnotationsSchemaFilterExtensions
 {
-    public static bool IsAnnotatable(this Type? parent)
+    /// <summary>
+    ///     Collates the required properties of the request type, into the schema
+    /// </summary>
+    public static void CollateRequiredProperties(this OpenApiSchema schema, Type requestType)
     {
-        return parent.Exists()
-               && (parent.IsAssignableTo(typeof(IWebRequest))
-                   || parent.IsAssignableTo(typeof(IWebResponse)));
+        var properties = requestType.GetProperties();
+        foreach (var property in properties)
+        {
+            // we have to add all required properties to the request collection
+            if (property.IsPropertyRequired())
+            {
+                var name = property.Name.ToCamelCase();
+                var required = schema.Required ?? new HashSet<string>();
+                // ReSharper disable once PossibleUnintendedLinearSearchInSet
+                if (!required.Contains(name, StringComparer.OrdinalIgnoreCase))
+                {
+                    required.Add(name);
+                }
+            }
+        }
     }
 
     public static bool IsPropertyRequired(this PropertyInfo property)
@@ -37,14 +53,47 @@ internal static class DataAnnotationsSchemaFilterExtensions
         return IsInRoute(routeAttribute, name);
     }
 
-    public static void SetDescription(this OpenApiSchema schema, MemberInfo member)
+    /// <summary>
+    ///     Determines if the type is a request or response type, which are the only ones that are annotatable
+    ///     with <see cref="System.ComponentModel.DataAnnotations" /> attributes
+    /// </summary>
+    public static bool IsRequestOrResponseType(this Type? parent)
     {
-        var descriptionAttribute = member.GetCustomAttribute<DescriptionAttribute>();
-        if (descriptionAttribute.Exists())
+        return parent.Exists()
+               && (parent.IsAssignableTo(typeof(IWebRequest))
+                   || parent.IsAssignableTo(typeof(IWebResponse)));
+    }
+
+    /// <summary>
+    ///     Removes any properties from the schema that are used in the path of the route template,
+    ///     which will be passed as route parameters
+    /// </summary>
+    public static void RemoveRouteTemplateFields(this OpenApiSchema schema, Type requestType)
+    {
+        var routeAttribute = requestType.GetCustomAttribute<RouteAttribute>();
+        if (routeAttribute.NotExists())
         {
-            if (descriptionAttribute.Description.HasValue())
+            return;
+        }
+
+        var route = routeAttribute.RouteTemplate;
+        if (route.HasNoValue())
+        {
+            return;
+        }
+
+        if (!routeAttribute.Method.CanHaveBody())
+        {
+            return;
+        }
+
+        var placeholders = requestType.GetRouteTemplatePlaceholders();
+        foreach (var placeholder in placeholders)
+        {
+            var property = schema.Properties.FirstOrDefault(prop => prop.Key.EqualsIgnoreCase(placeholder.Key));
+            if (property.Exists())
             {
-                schema.Description = descriptionAttribute.Description;
+                schema.Properties.Remove(property.Key);
             }
         }
     }
@@ -81,6 +130,21 @@ internal static class DataAnnotationsSchemaFilterExtensions
             }
 
             schema.Enum.Add(new OpenApiString(bestName));
+        }
+    }
+
+    /// <summary>
+    ///     Sets the description of a property of a requestType
+    /// </summary>
+    public static void SetPropertyDescription(this OpenApiSchema schema, MemberInfo property)
+    {
+        var descriptionAttribute = property.GetCustomAttribute<DescriptionAttribute>();
+        if (descriptionAttribute.Exists())
+        {
+            if (descriptionAttribute.Description.HasValue())
+            {
+                schema.Description = descriptionAttribute.Description;
+            }
         }
     }
 

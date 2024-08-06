@@ -1,3 +1,4 @@
+using Common.Extensions;
 using JetBrains.Annotations;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -26,7 +27,13 @@ public class BugFixParameterOperationFilter : IOperationFilter
             var filter = (IParameterFilter)Activator.CreateInstance(parameterFilter.Type, parameterFilter.Arguments)!;
             foreach (var parameter in operation.Parameters)
             {
-                var description = context.ApiDescription.ParameterDescriptions.First(x => x.Name == parameter.Name);
+                var description =
+                    context.ApiDescription.ParameterDescriptions.FirstOrDefault(x => x.Name == parameter.Name);
+                if (description.NotExists())
+                {
+                    continue;
+                }
+                
                 var parameterContext = new ParameterFilterContext(description, context.SchemaGenerator,
                     context.SchemaRepository, null, description.ParameterInfo());
 

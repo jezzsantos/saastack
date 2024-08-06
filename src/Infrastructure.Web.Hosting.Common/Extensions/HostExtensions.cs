@@ -324,14 +324,15 @@ public static class HostExtensions
             services.AddSwaggerGen(options =>
             {
                 options.ParameterFilter<DataAnnotationsParameterFilter>();
-                options.SchemaFilter<DataAnnotationsSchemaFilter>();
+                options.SchemaFilter<AllSchemaFilter>();
                 options.OperationFilter<BugFixParameterOperationFilter>(options);
+                options.OperationFilter<RouteTemplateParameterFilter>();
                 options.OperationFilter<FromFormMultiPartFilter>();
                 options
                     .OperationFilter<
                         XmlDocumentationOperationFilter>(); // must declare before the DefaultResponsesFilter
                 options.OperationFilter<DefaultResponsesFilter>();
-                options.OperationFilter<SecurityFilter>();
+                options.OperationFilter<RouteAuthenticationSecurityFilter>();
                 options.SwaggerDoc(version, new OpenApiInfo
                 {
                     Version = version,

@@ -11,10 +11,11 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace Infrastructure.Web.Hosting.Common.Documentation;
 
 /// <summary>
-///     Provides a <see cref="IOperationFilter" /> that adds the security scheme for each operation.
+///     Provides a <see cref="IOperationFilter" /> that adds the security scheme for each operation,
+///     based on the <see cref="AccessType" /> defined in the <see cref="RouteAttribute" />.
 /// </summary>
 [UsedImplicitly]
-public sealed class SecurityFilter : IOperationFilter
+public sealed class RouteAuthenticationSecurityFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {

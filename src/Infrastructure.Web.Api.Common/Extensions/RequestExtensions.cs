@@ -29,7 +29,14 @@ public static class RequestExtensions
     /// </summary>
     public static RequestInfo GetRequestInfo(this IWebRequest request)
     {
-        var attribute = GetRouteFromAttribute(request);
+        var requestType = request.GetType();
+        var attribute = TryGetRouteFromAttribute(requestType);
+        if (attribute.NotExists())
+        {
+            var requestTypeName = requestType.Name;
+            throw new InvalidOperationException(
+                Resources.RequestExtensions_MissingRouteAttribute.Format(requestTypeName, nameof(RouteAttribute)));
+        }
 
         var route = ExpandRouteTemplate(request, attribute);
 
@@ -39,6 +46,35 @@ public static class RequestExtensions
             Method = attribute.Method,
             IsTestingOnly = attribute.IsTestingOnly
         };
+    }
+
+    /// <summary>
+    ///     Returns the placeholders in the route template with their types
+    /// </summary>
+    public static Dictionary<string, Type> GetRouteTemplatePlaceholders(this Type requestType)
+    {
+        var attribute = TryGetRouteFromAttribute(requestType);
+        if (attribute.NotExists())
+        {
+            return new Dictionary<string, Type>();
+        }
+
+        var fields = GetRequestFieldsWithTypes(requestType);
+        if (fields.HasNone())
+        {
+            return new Dictionary<string, Type>();
+        }
+
+        var routeTemplate = attribute.RouteTemplate;
+        var placeholders = GetPlaceholders(routeTemplate);
+        if (placeholders.HasNone())
+        {
+            return new Dictionary<string, Type>();
+        }
+
+        return fields
+            .Where(field => placeholders.Any(ph => ph.Key.EqualsIgnoreCase(field.Key)))
+            .ToDictionary(field => field.Key, field => field.Value);
     }
 
     /// <summary>
@@ -62,23 +98,18 @@ public static class RequestExtensions
         return request.GetRequestInfo().Route;
     }
 
-    private static RouteAttribute GetRouteFromAttribute(IWebRequest request)
+    private static RouteAttribute? TryGetRouteFromAttribute(Type requestType)
     {
-        var attribute = request.GetType().GetCustomAttribute<RouteAttribute>();
-        if (attribute.NotExists())
-        {
-            var requestTypeName = request.GetType().Name;
-            throw new InvalidOperationException(
-                Resources.RequestExtensions_MissingRouteAttribute.Format(requestTypeName, nameof(RouteAttribute)));
-        }
-
-        return attribute;
+        var attribute = requestType.GetCustomAttribute<RouteAttribute>();
+        return attribute.NotExists()
+            ? null
+            : attribute;
     }
 
     private static string ExpandRouteTemplate(IWebRequest request, RouteAttribute attribute)
     {
         var routeTemplate = attribute.RouteTemplate;
-        var requestFields = GetRequestFields(request);
+        var requestFields = GetRequestFieldsWithValues(request);
         if (requestFields.HasNone())
         {
             return routeTemplate;
@@ -208,7 +239,7 @@ public static class RequestExtensions
     ///     We need to build a dictionary of all public properties, and their values (even if they are null or default),
     ///     where the key is always lowercase (for matching)
     /// </summary>
-    private static Dictionary<string, object?> GetRequestFields(IWebRequest request)
+    private static Dictionary<string, object?> GetRequestFieldsWithValues(IWebRequest request)
     {
         return request.GetType()
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -225,5 +256,19 @@ public static class RequestExtensions
                 ? jsonPropertyName.Name
                 : propInfo.Name.ToLowerInvariant();
         }
+    }
+
+    /// <summary>
+    ///     We need to build a dictionary of all public properties, and their types.
+    /// </summary>
+    private static Dictionary<string, Type> GetRequestFieldsWithTypes(Type requestType)
+    {
+        return requestType
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .ToDictionary
+            (
+                propInfo => propInfo.Name,
+                propInfo => propInfo.PropertyType
+            );
     }
 }
