@@ -4,7 +4,7 @@
 
 You want to represent a relationship from an aggregate to either a single entity or to a collection of entities.
 
-> Remember, an entity (and aggregate root) differ "by ID" and "not by value"
+> Remember, an entity (and aggregate root) differ from each other "by ID" and "not by value"
 >
 > If the concept you are modeling does NOT warrant a unique identifier (as opposed to differing "by value"), it probably is not a good candidate for an entity, and you should model your concept with a value object instead.
 >
@@ -102,6 +102,158 @@ public sealed class Unavailability : EntityBase
 > In the example above, you will notice that we are handling the domain event `UnavailabilitySlotAdded,` which is the "initial" event that is used to initialize the child entity passed from the aggregate in the call to `RaiseEventToChildEntity()`. This is the analog in the entity to setting the initial state of the aggregate with the `Created` event.
 
 Lastly, notice that a child entity also has an `EnsureInvariants()` method, which works exactly the same way as it does for the aggregate root.
+
+### Changing State
+
+For some entities, is it necessary to change their state in a use case.
+
+The use case is always implemented in the aggregate root, but the aggregate would be delegating the change in the entity to a method in the entity class, to comply with encapsulation and the design principles of [TellDontAsk](https://martinfowler.com/bliki/TellDontAsk.html) and the [Law of Demeter](https://en.wikipedia.org/wiki/Law_of_Demeter).
+
+#### Raising the event
+
+Changing an entity's state is done similarly to how you change the state of an aggregate. You raise a domain event to do that.
+
+> All domain events are defined on the aggregate.
+
+In the case of raising a domain event to change the state of an entity:
+
+1. From an aggregate root method, locate the instance of the specific entity to update. (usually from a collection of entities already stored on the on the aggregate).
+2. Provide a method on the entity class, and have the aggregate call that method.
+3. In the entity method, perform the usual validation and rules, and raise the domain event to the entity itself (using the `RaiseChangeEvent()` method).
+4. The underlying `EntityBase` class will replay the domain event onto the entity, and then it will call `EnsureInvariants()` on the entity.
+5. The entity will handle the domain event in the `OnStateChanged()` method and update its internal state from the state in the domain event.
+6. This domain event is then passed up to the parent aggregate to handle (via the `RootEventHandler` defined on the constructor of the entity).
+7. The aggregate root handles the domain event in its `OnStateChanged()` method, and finally the aggregate's `EnsureInvariants()` method is called, which often calls the `EnsureVariants() ` method on all the entities in the collection (again).
+
+> This process may seem on first-look to be the opposite of raising an event from the aggregate, where the aggregate receives the event first and then delegates it to the entity. But in actuality, the process is not any different at all. As in both cases, the entity's internal state is updated before the aggregate's state is updated.
+
+For example, for the `BookingRoot` entity in the `carsDomain`, a trip begins in the aggregate:
+
+```c# 
+    public Result<Error> StartTrip(Location from)
+    {
+        if (!CarId.HasValue)
+        {
+            return Error.RuleViolation(Resources.BookingRoot_ReservationRequiresCar);
+        }
+
+        var added = RaiseChangeEvent(BookingsDomain.Events.TripAdded(Id, OrganizationId));
+        if (added.IsFailure)
+        {
+            return added.Error;
+        }
+
+        var trip = Trips.Latest()!;
+        return trip.Begin(from);
+    }
+```
+
+Notice that the aggregate delegates the call to the specific `trip` entity, and the trip does this:
+
+```c#  
+    public Result<Error> Begin(Location from)
+    {
+        if (BeganAt.HasValue)
+        {
+            return Error.RuleViolation(Resources.TripEntity_AlreadyBegan);
+        }
+
+        var starts = DateTime.UtcNow;
+        return RaiseChangeEvent(Events.TripBegan(RootId.Value, OrganizationId.Value, Id, starts, from));
+    }
+```
+
+Which raises the event to the entity first and then the aggregate last.
+
+#### Handling the raised event
+
+When any event is raised (using the `RaiseChangeEvent()`), the entity will always play the event back onto itself through the `OnStateChanged()` method.
+
+The first thing to do is to handle the event in the `OnStateChanged()` method.
+
+For example,
+
+```c#
+protected override Result<Error> OnStateChanged(IDomainEvent @event)
+    {
+        switch (@event)
+        {
+            ... other event handlers
+               
+            case TripBegan changed:
+            {
+                var from = Location.Create(changed.BeganFrom);
+                if (from.IsFailure)
+                {
+                    return from.Error;
+                }
+
+                BeganAt = changed.BeganAt;
+                From = from.Value;
+                return Result.Ok;
+            }
+                
+            ... other event handlers
+
+            default:
+                return HandleUnKnownStateChangedEvent(@event);
+        }
+    }
+```
+
+The main job here is to convert the data in the domain event back into value objects and then set properties on the entity.
+
+> It is important to note that you only need to set properties on the entity if you need to use them in either the rules of other use cases or for mapping in the application class.
+> The other thing worth saying (to avoid over-engineering at this stage) is that even if you decide not to represent the data in a property on the entity now (which is optional), you can always add it later; there is no negative impact. YAGNI, don't add it now if you don't need it now. Then, when you need it, you add it.
+
+#### Invariant rules
+
+The second part of raising an event in the entity is the call to the `EnsureInvariants()` method, performed automatically by the `EntityBase` class immediately after it is handled by the `OnStateChanged()` method.
+
+The purpose of the method is to ensure that, at all times, the entity is in a valid state.
+
+> If you remember, one of the rules of aggregates is that (as a whole) they can NOT be invalid at any point in time. This moment is one of those points in time where that is enforced and verified.
+
+Thus, we say that the rules in this method are the "invariant" rules of the entity since they vary very little (if at all) over time.
+
+These rules, can cascade down to another collection of entities and value objects if needed.
+
+For example, in the `Trip`
+
+```c#
+    public override Result<Error> EnsureInvariants()
+    {
+        var ensureInvariants = base.EnsureInvariants();
+        if (ensureInvariants.IsFailure)
+        {
+            return ensureInvariants.Error;
+        }
+
+        if (BeganAt.HasValue && !From.HasValue)
+        {
+            return Error.RuleViolation(Resources.TripEntity_NoStartingLocation);
+        }
+
+        if (EndedAt.HasValue && !BeganAt.HasValue)
+        {
+            return Error.RuleViolation(Resources.TripEntity_NotBegun);
+        }
+
+        if (EndedAt.HasValue && !To.HasValue)
+        {
+            return Error.RuleViolation(Resources.TripEntity_NoEndingLocation);
+        }
+
+        return Result.Ok;
+    }
+```
+
+Some key notes here:
+
+1. Not every state (after an event is raised) requires an invariant rule to be put in place. Focus on those that must be true at all times, or in specific known states.
+2. You may want to cascade the rules in child entities or value object collections.
+3. In general, use the `RuleViolation` error with a specific description.
+4. These rules (and their contexts) should be unit-tested.
 
 ### Dealing with collections
 

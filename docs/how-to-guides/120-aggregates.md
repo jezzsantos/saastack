@@ -110,9 +110,9 @@ The above example is the simplest example of a use case, where:
 
 * A simple value object is passed in,
 * There are no rules applied to either who is performing this operation or what state the aggregate is in,
-* We raise a single event, and forward the same data to it.
+* We raise a single event and forward the same data to it.
 
-In many cases, things are a little more complex than this, in many dimensions.
+In many cases, things are a little more complex than this in many dimensions.
 
 For example, `AssignRoles()` in the `OrganizationsRoot`:
 
@@ -248,13 +248,11 @@ The main job here is to convert the data in the domain event back into value obj
 
 #### Invariant rules
 
-The second part of raising an event in the aggregate is the call to the `EnsureInvariants()` method.
-
-This method is called immediately after the event has been raised, and after it is handled by the `OnStateChanged()` method.
+The second part of raising an event in the aggregate is the call to the `EnsureInvariants()` method, performed automatically by the `AggregateRootBase` class immediately after it is handled by the `OnStateChanged()` method.
 
 The purpose of the method is to ensure that, at all times, the aggregate is in a valid state.
 
-> If you remember, one of the rules of aggregates is that they can NOT be invalid at any point in time. This moment is one of those points in time where that is enforced and verified.
+> If you remember, one of the rules of aggregates is that (as a whole) they can NOT be invalid at any point in time. This moment is one of those points in time where that is enforced and verified.
 
 Thus, we say that the rules in this method are the "invariant" rules of the aggregate since they vary very little (if at all) over time.
 

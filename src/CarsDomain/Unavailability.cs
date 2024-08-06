@@ -110,7 +110,10 @@ public sealed class Unavailability : EntityBase
     public void TestingOnly_Assign(Identifier carId, Identifier organizationId, TimeSlot timeSlot,
         CausedBy causedBy)
     {
-        RaiseChangeEvent(Events.UnavailabilitySlotAdded(carId, organizationId, timeSlot, causedBy));
+        CarId = carId;
+        OrganizationId = organizationId;
+        Slot = timeSlot;
+        CausedBy = causedBy;
     }
 #endif
 }
