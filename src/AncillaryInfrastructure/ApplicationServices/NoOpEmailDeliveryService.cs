@@ -19,10 +19,9 @@ public class NoOpEmailDeliveryService : IEmailDeliveryService
         _recorder = recorder;
     }
 
-    public Task<Result<EmailDeliveryReceipt, Error>> SendAsync(ICallerContext caller, string subject,
-        string htmlBody,
-        string toEmailAddress, string? toDisplayName,
-        string fromEmailAddress, string? fromDisplayName, CancellationToken cancellationToken = default)
+    public Task<Result<EmailDeliveryReceipt, Error>> SendAsync(ICallerContext caller, string subject, string htmlBody,
+        string toEmailAddress, string? toDisplayName, string fromEmailAddress, string? fromDisplayName,
+        CancellationToken cancellationToken = default)
     {
         _recorder.TraceDebug(caller.ToCall(),
             $"{nameof(NoOpUsageDeliveryService)} would have delivered email event {{Event}} for {{For}} with properties: {{Properties}}",
@@ -35,6 +34,9 @@ public class NoOpEmailDeliveryService : IEmailDeliveryService
                 Body = htmlBody
             }.ToJson()!);
 
-        return Task.FromResult<Result<EmailDeliveryReceipt, Error>>(new EmailDeliveryReceipt());
+        return Task.FromResult<Result<EmailDeliveryReceipt, Error>>(new EmailDeliveryReceipt
+        {
+            ReceiptId = $"receipt_{Guid.NewGuid():N}"
+        });
     }
 }

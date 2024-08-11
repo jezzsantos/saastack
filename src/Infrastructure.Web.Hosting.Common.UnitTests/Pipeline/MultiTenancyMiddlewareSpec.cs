@@ -226,7 +226,7 @@ public class MultiTenancyMiddlewareSpec
         }
 
         [Fact]
-        public async Task WhenInvokeAndNoUnRequiredTenantId_ThenContinuesPipeline()
+        public async Task WhenInvokeAndMissingUnRequiredTenantId_ThenContinuesPipeline()
         {
             var context = SetupContext(_callerContextFactory.Object, _tenancyContext.Object);
 
@@ -244,7 +244,7 @@ public class MultiTenancyMiddlewareSpec
         }
 
         [Fact]
-        public async Task WhenInvokeAndNoRequiredTenantId_ThenRespondsWithAProblem()
+        public async Task WhenInvokeAndMissingRequiredTenantId_ThenRespondsWithAProblem()
         {
             _tenantDetective.Setup(td =>
                     td.DetectTenantAsync(It.IsAny<HttpContext>(), It.IsAny<Optional<Type>>(),
@@ -456,7 +456,7 @@ public class MultiTenancyMiddlewareSpec
         }
 
         [Fact]
-        public async Task WhenInvokeAndNoRequiredTenantIdButNoMemberships_ThenRespondsWithAProblem()
+        public async Task WhenInvokeAndMissingRequiredTenantIdButNoMemberships_ThenRespondsWithAProblem()
         {
             _tenantDetective.Setup(td =>
                     td.DetectTenantAsync(It.IsAny<HttpContext>(), It.IsAny<Optional<Type>>(),
@@ -478,7 +478,7 @@ public class MultiTenancyMiddlewareSpec
         }
 
         [Fact]
-        public async Task WhenInvokeAndNoRequiredTenantIdButNoDefaultOrganization_ThenRespondsWithAProblem()
+        public async Task WhenInvokeAndMissingRequiredTenantIdButNoDefaultOrganization_ThenRespondsWithAProblem()
         {
             _tenantDetective.Setup(td =>
                     td.DetectTenantAsync(It.IsAny<HttpContext>(), It.IsAny<Optional<Type>>(),
@@ -516,7 +516,8 @@ public class MultiTenancyMiddlewareSpec
         }
 
         [Fact]
-        public async Task WhenInvokeAndNoRequiredTenantIdButHasDefaultOrganization_ThenSetsTenantAndContinuesPipeline()
+        public async Task
+            WhenInvokeAndMissingRequiredTenantIdButHasDefaultOrganization_ThenSetsTenantAndContinuesPipeline()
         {
             _tenantDetective.Setup(td =>
                     td.DetectTenantAsync(It.IsAny<HttpContext>(), It.IsAny<Optional<Type>>(),
