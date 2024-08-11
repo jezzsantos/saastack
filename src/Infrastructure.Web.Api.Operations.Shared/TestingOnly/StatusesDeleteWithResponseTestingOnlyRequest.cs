@@ -7,5 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 ///     Tests default status code for DELETE requests, with a response
 /// </summary>
 [Route("/testingonly/statuses/delete2", OperationMethod.Delete, isTestingOnly: true)]
-public class StatusesDeleteWithResponseTestingOnlyRequest : IWebRequest<StatusesTestingOnlyResponse>;
+public class
+    StatusesDeleteWithResponseTestingOnlyRequest : WebRequest<StatusesDeleteWithResponseTestingOnlyRequest,
+    StatusesTestingOnlyResponse>;
 #endif

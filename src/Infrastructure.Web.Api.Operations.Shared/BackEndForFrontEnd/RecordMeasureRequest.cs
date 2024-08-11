@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 ///     Measures an event in the product
 /// </summary>
 [Route("/record/measure", OperationMethod.Post)]
-public class RecordMeasureRequest : UnTenantedEmptyRequest
+public class RecordMeasureRequest : UnTenantedEmptyRequest<RecordMeasureRequest>
 {
     public Dictionary<string, object?>? Additional { get; set; }
 

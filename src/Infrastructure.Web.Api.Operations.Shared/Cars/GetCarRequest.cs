@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 /// </summary>
 [Route("/cars/{Id}", OperationMethod.Get, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class GetCarRequest : TenantedRequest<GetCarResponse>
+public class GetCarRequest : TenantedRequest<GetCarRequest, GetCarResponse>
 {
     [Required] public string? Id { get; set; }
 }

@@ -8,7 +8,9 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 ///     Tests response for validated GET requests
 /// </summary>
 [Route("/testingonly/validations/validated/{Id}", OperationMethod.Get, isTestingOnly: true)]
-public class ValidationsValidatedGetTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>
+public class
+    ValidationsValidatedGetTestingOnlyRequest : WebRequest<ValidationsValidatedGetTestingOnlyRequest,
+    StringMessageTestingOnlyResponse>
 {
     public string? Id { get; set; }
 

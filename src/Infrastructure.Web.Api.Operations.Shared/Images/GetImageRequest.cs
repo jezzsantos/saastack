@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Images;
 ///     Fetches the details about the image
 /// </summary>
 [Route("/images/{Id}", OperationMethod.Get)]
-public class GetImageRequest : UnTenantedRequest<GetImageResponse>
+public class GetImageRequest : UnTenantedRequest<GetImageRequest, GetImageResponse>
 {
     [Required] public string? Id { get; set; }
 }

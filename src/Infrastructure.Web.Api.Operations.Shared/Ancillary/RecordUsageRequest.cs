@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 /// </summary>
 [Route("/record/use", OperationMethod.Post, AccessType.HMAC)]
 [Authorize(Roles.Platform_ServiceAccount)]
-public class RecordUseRequest : UnTenantedEmptyRequest
+public class RecordUseRequest : UnTenantedEmptyRequest<RecordUseRequest>
 {
     public Dictionary<string, object?>? Additional { get; set; }
 

@@ -7,7 +7,9 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 ///     Tests response for non-validated requests
 /// </summary>
 [Route("/testingonly/validations/unvalidated", OperationMethod.Get, isTestingOnly: true)]
-public class ValidationsUnvalidatedTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>
+public class
+    ValidationsUnvalidatedTestingOnlyRequest : WebRequest<ValidationsUnvalidatedTestingOnlyRequest,
+    StringMessageTestingOnlyResponse>
 {
     public string? Id { get; set; }
 }

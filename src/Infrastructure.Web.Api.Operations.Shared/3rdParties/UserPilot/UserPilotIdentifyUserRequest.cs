@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.UserPilot;
 ///     Identifies the user
 /// </summary>
 [Route("/identify", OperationMethod.Post)]
-public class UserPilotIdentifyUserRequest : IWebRequest<EmptyResponse>
+public class UserPilotIdentifyUserRequest : WebRequestEmpty<UserPilotIdentifyUserRequest>
 {
     [JsonPropertyName("company")] public Dictionary<string, string> Company { get; set; } = new();
 

@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 /// </summary>
 [Route("/provisioning/notify", OperationMethod.Post, AccessType.HMAC)]
 [Authorize(Roles.Platform_ServiceAccount)]
-public class NotifyProvisioningRequest : UnTenantedRequest<DeliverMessageResponse>
+public class NotifyProvisioningRequest : UnTenantedRequest<NotifyProvisioningRequest, DeliverMessageResponse>
 {
     [Required] public string? Message { get; set; }
 }

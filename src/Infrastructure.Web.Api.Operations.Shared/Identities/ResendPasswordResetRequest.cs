@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 ///     Resends a password reset attempt (via email)
 /// </summary>
 [Route("/passwords/{Token}/reset/resend", OperationMethod.Post)]
-public class ResendPasswordResetRequest : UnTenantedEmptyRequest
+public class ResendPasswordResetRequest : UnTenantedEmptyRequest<ResendPasswordResetRequest>
 {
     [Required] public string? Token { get; set; }
 }

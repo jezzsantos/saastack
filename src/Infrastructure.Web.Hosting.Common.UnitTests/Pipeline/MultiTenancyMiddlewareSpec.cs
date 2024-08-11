@@ -366,6 +366,8 @@ public class MultiTenancyMiddlewareSpec
                 .Returns(true);
             _caller.Setup(cc => cc.CallerId)
                 .Returns("acallerid");
+            _caller.Setup(cc => cc.Roles)
+                .Returns(new ICallerContext.CallerRoles());
             _callerContextFactory.Setup(ccf => ccf.Create())
                 .Returns(_caller.Object);
             _organizationsService = new Mock<IOrganizationsService>();

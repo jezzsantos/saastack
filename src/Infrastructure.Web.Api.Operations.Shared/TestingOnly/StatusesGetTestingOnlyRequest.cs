@@ -7,5 +7,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 ///     Tests default status code for GET requests
 /// </summary>
 [Route("/testingonly/statuses/get", OperationMethod.Get, isTestingOnly: true)]
-public class StatusesGetTestingOnlyRequest : IWebRequest<StatusesTestingOnlyResponse>;
+public class StatusesGetTestingOnlyRequest : WebRequest<StatusesGetTestingOnlyRequest, StatusesTestingOnlyResponse>;
 #endif

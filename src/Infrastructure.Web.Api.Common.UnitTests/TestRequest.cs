@@ -3,7 +3,7 @@ using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Common.UnitTests;
 
 [Route("/aroute", OperationMethod.Get)]
-public class TestRequest : IWebRequest<TestResponse>
+public class TestRequest : WebRequest<TestRequest, TestResponse>
 {
     public int ANumberProperty { get; set; }
 

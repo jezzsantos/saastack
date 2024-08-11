@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 /// </summary>
 [Route("/usages/deliver", OperationMethod.Post, AccessType.HMAC)]
 [Authorize(Roles.Platform_ServiceAccount)]
-public class DeliverUsageRequest : UnTenantedRequest<DeliverMessageResponse>
+public class DeliverUsageRequest : UnTenantedRequest<DeliverUsageRequest, DeliverMessageResponse>
 {
     [Required] public string? Message { get; set; }
 }

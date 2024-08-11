@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 /// </summary>
 [Route("/emails/send", OperationMethod.Post, AccessType.HMAC)]
 [Authorize(Roles.Platform_ServiceAccount)]
-public class SendEmailRequest : UnTenantedRequest<DeliverMessageResponse>
+public class SendEmailRequest : UnTenantedRequest<SendEmailRequest, DeliverMessageResponse>
 {
     [Required] public string? Message { get; set; }
 }

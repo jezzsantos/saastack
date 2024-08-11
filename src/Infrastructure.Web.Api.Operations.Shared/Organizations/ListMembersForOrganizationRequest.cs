@@ -7,7 +7,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
 /// </summary>
 [Route("/organizations/{Id}/members", OperationMethod.Search, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_Basic)]
-public class ListMembersForOrganizationRequest : UnTenantedSearchRequest<ListMembersForOrganizationResponse>,
+public class ListMembersForOrganizationRequest :
+    UnTenantedSearchRequest<ListMembersForOrganizationRequest, ListMembersForOrganizationResponse>,
     IUnTenantedOrganizationRequest
 {
     public string? Id { get; set; }

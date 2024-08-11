@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.UserPilot;
 ///     Tracks the event
 /// </summary>
 [Route("/track", OperationMethod.Post)]
-public class UserPilotTrackEventRequest : IWebRequest<EmptyResponse>
+public class UserPilotTrackEventRequest : WebRequestEmpty<UserPilotTrackEventRequest>
 {
     [JsonPropertyName("event_name")] public string? EventName { get; set; }
 

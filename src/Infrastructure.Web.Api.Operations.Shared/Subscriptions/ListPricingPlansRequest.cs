@@ -6,6 +6,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.Subscriptions;
 ///     List all the pricing plans available for this product
 /// </summary>
 [Route("/pricing/plans", OperationMethod.Get)]
-public class ListPricingPlansRequest : UnTenantedRequest<ListPricingPlansResponse>
+public class ListPricingPlansRequest : UnTenantedRequest<ListPricingPlansRequest, ListPricingPlansResponse>
 {
 }

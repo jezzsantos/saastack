@@ -10,7 +10,10 @@ public static class PlatformRoles
 {
     public static readonly RoleLevel ExternalWebhookService = new("platform_external_webhook_service");
     public static readonly RoleLevel Standard = new("platform_standard");
-    public static readonly RoleLevel Operations = new("platform_operations", Standard);
+    public static readonly RoleLevel
+        Operations =
+            new("platform_operations",
+                Standard); // a privileged user that performs various operations across the platform 
     public static readonly RoleLevel ServiceAccount = new("platform_internal_service");
     public static readonly RoleLevel TestingOnly = new("platform_testingonly");
     public static readonly RoleLevel TestingOnlySuperUser = new("platform_super_testingonly", TestingOnly);

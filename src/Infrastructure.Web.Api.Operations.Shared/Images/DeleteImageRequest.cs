@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Images;
 /// </summary>
 [Route("/images/{Id}", OperationMethod.Delete, AccessType.Token)]
 [Authorize(Roles.Platform_Standard, Features.Platform_PaidTrial)]
-public class DeleteImageRequest : UnTenantedDeleteRequest
+public class DeleteImageRequest : UnTenantedDeleteRequest<DeleteImageRequest>
 {
     [Required] public string? Id { get; set; }
 }

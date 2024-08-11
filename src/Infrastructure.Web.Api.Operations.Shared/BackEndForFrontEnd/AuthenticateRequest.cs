@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 ///     Authenticates the user with the specified provider, using either an auth code or a username and password.
 /// </summary>
 [Route("/auth", OperationMethod.Post)]
-public class AuthenticateRequest : UnTenantedRequest<AuthenticateResponse>
+public class AuthenticateRequest : UnTenantedRequest<AuthenticateRequest, AuthenticateResponse>
 {
     public string? AuthCode { get; set; }
 

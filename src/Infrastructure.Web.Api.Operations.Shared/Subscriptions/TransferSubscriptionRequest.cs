@@ -7,7 +7,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.Subscriptions;
 /// </summary>
 [Route("/subscriptions/{Id}/transfer", OperationMethod.PutPatch, AccessType.Token)]
 [Authorize(Roles.Tenant_BillingAdmin, Features.Tenant_Basic)]
-public class TransferSubscriptionRequest : UnTenantedRequest<GetSubscriptionResponse>, IUnTenantedOrganizationRequest
+public class TransferSubscriptionRequest : UnTenantedRequest<TransferSubscriptionRequest, GetSubscriptionResponse>,
+    IUnTenantedOrganizationRequest
 {
     public string? UserId { get; set; }
 

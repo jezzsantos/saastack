@@ -714,7 +714,7 @@ public sealed class SubscriptionRoot : AggregateRootBase
         return Provider.Value.Name == provider.Name;
     }
 
-    private bool IsOperations(Roles roles)
+    private static bool IsOperations(Roles roles)
     {
         return roles.HasRole(PlatformRoles.Operations);
     }

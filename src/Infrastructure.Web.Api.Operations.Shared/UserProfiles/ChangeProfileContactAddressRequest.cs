@@ -8,7 +8,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.UserProfiles;
 /// </summary>
 [Route("/profiles/{UserId}/contact", OperationMethod.PutPatch, AccessType.Token)]
 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
-public class ChangeProfileContactAddressRequest : UnTenantedRequest<GetProfileResponse>
+public class
+    ChangeProfileContactAddressRequest : UnTenantedRequest<ChangeProfileContactAddressRequest, GetProfileResponse>
 {
     public string? City { get; set; }
 

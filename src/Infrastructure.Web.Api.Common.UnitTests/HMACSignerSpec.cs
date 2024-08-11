@@ -115,7 +115,7 @@ public class HMACSignerSpec
     }
 
     [Route("/aroute", OperationMethod.Get)]
-    public class TestHmacRequest : IWebRequest<TestHmacResponse>
+    public class TestHmacRequest : WebRequest<TestHmacRequest, TestHmacResponse>
     {
         public int? ANumberProperty { get; set; }
 

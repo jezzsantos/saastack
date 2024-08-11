@@ -7,7 +7,9 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 ///     Tests content negotiation with a specified format
 /// </summary>
 [Route("/testingonly/negotiations/get", OperationMethod.Get, isTestingOnly: true)]
-public class ContentNegotiationsTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>
+public class
+    ContentNegotiationsTestingOnlyRequest : WebRequest<ContentNegotiationsTestingOnlyRequest,
+    StringMessageTestingOnlyResponse>
 {
     public string? Format { get; set; }
 }

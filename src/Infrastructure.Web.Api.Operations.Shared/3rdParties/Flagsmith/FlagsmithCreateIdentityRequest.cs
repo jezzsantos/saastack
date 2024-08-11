@@ -9,7 +9,8 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 /// </summary>
 [Route("/identities/", OperationMethod.Post)]
 [UsedImplicitly]
-public class FlagsmithCreateIdentityRequest : IWebRequest<FlagsmithCreateIdentityResponse>
+public class
+    FlagsmithCreateIdentityRequest : WebRequest<FlagsmithCreateIdentityRequest, FlagsmithCreateIdentityResponse>
 {
     [JsonPropertyName("identifier")] public string? Identifier { get; set; }
 

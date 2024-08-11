@@ -10,7 +10,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 /// </summary>
 [Route("/testingonly/openapi/{Id}/binary", OperationMethod.Post, isTestingOnly: true)]
 [UsedImplicitly]
-public class OpenApiPostMultiPartFormTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>,
+public class OpenApiPostMultiPartFormTestingOnlyRequest :
+    WebRequest<OpenApiPostMultiPartFormTestingOnlyRequest, StringMessageTestingOnlyResponse>,
     IHasMultipartForm
 {
     public string? Id { get; set; }

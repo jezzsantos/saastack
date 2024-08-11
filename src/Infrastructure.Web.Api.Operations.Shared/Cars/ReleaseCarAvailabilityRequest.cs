@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 /// </summary>
 [Route("/cars/{Id}/release", OperationMethod.PutPatch, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class ReleaseCarAvailabilityRequest : TenantedRequest<GetCarResponse>
+public class ReleaseCarAvailabilityRequest : TenantedRequest<ReleaseCarAvailabilityRequest, GetCarResponse>
 {
     [Required] public DateTime? FromUtc { get; set; }
 

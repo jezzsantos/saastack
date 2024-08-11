@@ -65,7 +65,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class AResponse : IWebResponse
                                                 {
                                                 }
-                                                public class ARequest : IWebRequest<AResponse>
+                                                public class ARequest : WebRequest<ARequest, AResponse>
                                                 {
                                                 }
                                                 public class AServiceClass : IWebApiService
@@ -112,7 +112,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 {
                                                 }
                                                 [Route("aroute", OperationMethod.Get)]
-                                                public class ARequest : IWebRequest<AResponse>
+                                                public class ARequest : WebRequest<ARequest, AResponse>
                                                 {
                                                 }
                                                 public class AServiceClass : IWebApiService
@@ -150,7 +150,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                     await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -195,7 +195,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 {
                                                 }
                                                 [Route("aroute", OperationMethod.Get)]
-                                                public class ARequest : IWebRequest<AResponse>
+                                                public class ARequest : WebRequest<ARequest, AResponse>
                                                 {
                                                 }
                                                 public class AServiceClass : IWebApiService
@@ -233,7 +233,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                     await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -278,7 +278,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 {
                                                 }
                                                 [Route("aroute", OperationMethod.Get)]
-                                                public class ARequest : IWebRequest<AResponse>
+                                                public class ARequest : WebRequest<ARequest, AResponse>
                                                 {
                                                 }
                                                 public class AServiceClass : IWebApiService
@@ -317,7 +317,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                     await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -362,7 +362,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 {
                                                 }
                                                 [Route("aroute", OperationMethod.Get, isTestingOnly:true)]
-                                                public class ARequest : IWebRequest<AResponse>
+                                                public class ARequest : WebRequest<ARequest, AResponse>
                                                 {
                                                 }
                                                 public class AServiceClass : IWebApiService
@@ -402,7 +402,7 @@ public class MinimalApiMediatRGeneratorSpec
                 #if TESTINGONLY
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                     await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -450,7 +450,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 {
                                                 }
                                                 [Route("aroute", OperationMethod.Get, access:AccessType.HMAC, isTestingOnly:true)]
-                                                public class ARequest : IWebRequest<AResponse>
+                                                public class ARequest : WebRequest<ARequest, AResponse>
                                                 {
                                                 }
                                                 public class AServiceClass : IWebApiService
@@ -490,7 +490,7 @@ public class MinimalApiMediatRGeneratorSpec
                 #if TESTINGONLY
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                     await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("HMAC")
                                 .WithOpenApi(op =>
                                     {
@@ -539,7 +539,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 {
                                                 }
                                                 [Route("aroute", OperationMethod.Get, access:AccessType.Token, isTestingOnly:true)]
-                                                public class ARequest : IWebRequest<AResponse>
+                                                public class ARequest : WebRequest<ARequest, AResponse>
                                                 {
                                                 }
                                                 public class AServiceClass : IWebApiService
@@ -579,7 +579,7 @@ public class MinimalApiMediatRGeneratorSpec
                 #if TESTINGONLY
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                     await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
                                 .WithOpenApi(op =>
                                     {
@@ -629,7 +629,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 {
                                                 }
                                                 [Route("aroute", OperationMethod.Get)]
-                                                public class ARequest : IWebRequest<AResponse>
+                                                public class ARequest : WebRequest<ARequest, AResponse>
                                                 {
                                                 }
                                                 public class AServiceClass : IWebApiService
@@ -677,7 +677,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                     await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -733,7 +733,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 [Route("aroute", OperationMethod.Get, access:AccessType.Token, isTestingOnly:true)]
                                                 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
                                                 [Authorize(Roles.Platform_Operations, Features.Platform_PaidTrial)]
-                                                public class ARequest : IWebRequest<AResponse>
+                                                public class ARequest : WebRequest<ARequest, AResponse>
                                                 {
                                                 }
                                                 public class AServiceClass : IWebApiService
@@ -773,7 +773,7 @@ public class MinimalApiMediatRGeneratorSpec
                    #if TESTINGONLY
                                aserviceclassGroup.MapGet("aroute",
                                    async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.PaidTrial.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Operations.Name}}}|]}}")
                                    .WithOpenApi(op =>
@@ -824,7 +824,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 }
                                                 [Route("aroute", OperationMethod.Get, access:AccessType.Token, isTestingOnly:true)]
                                                 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
-                                                public class ARequest : IWebRequest<AResponse>
+                                                public class ARequest : WebRequest<ARequest, AResponse>
                                                 {
                                                 }
                                                 public class AServiceClass : IWebApiService
@@ -864,7 +864,7 @@ public class MinimalApiMediatRGeneratorSpec
                    #if TESTINGONLY
                                aserviceclassGroup.MapGet("aroute",
                                    async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .WithOpenApi(op =>
@@ -915,7 +915,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 }
                                                 [Route("aroute", OperationMethod.Get, access:AccessType.Token)]
                                                 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
-                                                public class ARequest : IWebRequest<AResponse>, ITenantedRequest
+                                                public class ARequest : WebRequest<ARequest, AResponse>, ITenantedRequest
                                                 {
                                                     public string? OrganizationId { get; set; }
                                                 }
@@ -956,7 +956,7 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                                aserviceclassGroup.MapGet("aroute",
                                    async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .WithOpenApi(op =>
@@ -1004,7 +1004,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 }
                                                 [Route("aroute", OperationMethod.Post, access:AccessType.Token)]
                                                 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
-                                                public class ARequest : IWebRequest<AResponse>, IHasMultipartForm
+                                                public class ARequest : WebRequest<ARequest, AResponse>, IHasMultipartForm
                                                 {
                                                 }
                                                 public class AServiceClass : IWebApiService
@@ -1042,8 +1042,8 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                                aserviceclassGroup.MapPost("aroute",
-                                   async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                   async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
+                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .DisableAntiforgery()
@@ -1092,7 +1092,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 }
                                                 [Route("aroute", OperationMethod.PutPatch, access:AccessType.Token)]
                                                 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
-                                                public class ARequest : IWebRequest<AResponse>, IHasMultipartForm
+                                                public class ARequest : WebRequest<ARequest, AResponse>, IHasMultipartForm
                                                 {
                                                 }
                                                 public class AServiceClass : IWebApiService
@@ -1130,8 +1130,8 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter>()
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                                aserviceclassGroup.MapPut("aroute",
-                                   async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                   async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
+                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .DisableAntiforgery()
@@ -1143,8 +1143,8 @@ public class MinimalApiMediatRGeneratorSpec
                                            return op;
                                        });
                                aserviceclassGroup.MapPatch("aroute",
-                                   async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                   async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
+                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .DisableAntiforgery()
@@ -1193,7 +1193,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 }
                                                 [Route("aroute", OperationMethod.Get, access:AccessType.Token, isTestingOnly:true)]
                                                 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
-                                                public class ARequest : IWebRequest<AResponse>
+                                                public class ARequest : WebRequest<ARequest, AResponse>
                                                 {
                                                 }
                                                 [WebService("aprefix")]
@@ -1234,7 +1234,7 @@ public class MinimalApiMediatRGeneratorSpec
                    #if TESTINGONLY
                                aserviceclassGroup.MapGet("aroute",
                                    async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
+                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .WithOpenApi(op =>

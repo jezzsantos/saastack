@@ -2482,47 +2482,47 @@ public class TestSearchResponse : IWebSearchResponse
 }
 
 [UsedImplicitly]
-public class TestNoRouteAttributeRequest : IWebRequest<TestResponse>;
+public class TestNoRouteAttributeRequest : WebRequest<TestNoRouteAttributeRequest, TestResponse>;
 
 [Route("/aresource", OperationMethod.Search)]
 [UsedImplicitly]
-public class TestSearchRouteAttributeRequest : IWebRequest<TestResponse>;
+public class TestSearchRouteAttributeRequest : WebRequest<TestSearchRouteAttributeRequest, TestResponse>;
 
 [Route("/aresource", OperationMethod.Post)]
 [UsedImplicitly]
-public class TestPostRouteAttributeRequest : IWebRequest<TestResponse>;
+public class TestPostRouteAttributeRequest : WebRequest<TestPostRouteAttributeRequest, TestResponse>;
 
 [Route("/aresource", OperationMethod.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest : IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest : WebRequest<TestGetRouteAttributeRequest, TestResponse>;
 
 [Route("/aresource/1", OperationMethod.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest1 : IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest1 : WebRequest<TestGetRouteAttributeRequest1, TestResponse>;
 
 [Route("/aresource/2", OperationMethod.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest2 : IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest2 : WebRequest<TestGetRouteAttributeRequest2, TestResponse>;
 
 [Route("/aresource/3", OperationMethod.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest3 : IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest3 : WebRequest<TestGetRouteAttributeRequest3, TestResponse>;
 
 [Route("/anotherresource/1", OperationMethod.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest4 : IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest4 : WebRequest<TestGetRouteAttributeRequest4, TestResponse>;
 
 [Route("/aresource/1", OperationMethod.Get)]
 [UsedImplicitly]
-public class TestGetRouteAttributeRequest5 : IWebRequest<TestResponse>;
+public class TestGetRouteAttributeRequest5 : WebRequest<TestGetRouteAttributeRequest5, TestResponse>;
 
 [Route("/aresource", OperationMethod.PutPatch)]
 [UsedImplicitly]
-public class TestPutPatchRouteAttributeRequest : IWebRequest<TestResponse>;
+public class TestPutPatchRouteAttributeRequest : WebRequest<TestPutPatchRouteAttributeRequest, TestResponse>;
 
 [Route("/aresource", OperationMethod.Delete)]
 [UsedImplicitly]
-public class TestDeleteRouteAttributeRequest : IWebRequest<TestResponse>;
+public class TestDeleteRouteAttributeRequest : WebRequest<TestDeleteRouteAttributeRequest, TestResponse>;
 
 [AttributeUsage(AttributeTargets.Method)]
 [UsedImplicitly]
@@ -2530,18 +2530,18 @@ public class TestAttribute : Attribute;
 
 [Route("/aresource", OperationMethod.Post)]
 [UsedImplicitly]
-public class TestAnonymousRouteNoAuthorizeAttributeRequest : IWebRequest<TestResponse>;
+public class TestAnonymousRouteNoAuthorizeAttributeRequest : WebRequest<TestAnonymousRouteNoAuthorizeAttributeRequest, TestResponse>;
 
 [Route("/aresource", OperationMethod.Post)]
 [Authorize(Roles.Platform_Standard)]
 [UsedImplicitly]
-public class TestAnonymousRouteAuthorizeAttributeRequest : IWebRequest<TestResponse>;
+public class TestAnonymousRouteAuthorizeAttributeRequest : WebRequest<TestAnonymousRouteAuthorizeAttributeRequest, TestResponse>;
 
 [Route("/aresource", OperationMethod.Post, AccessType.Token)]
 [Authorize(Roles.Platform_Standard)]
 [UsedImplicitly]
-public class TestSecureRouteAuthorizeAttributeRequest : IWebRequest<TestResponse>;
+public class TestSecureRouteAuthorizeAttributeRequest : WebRequest<TestSecureRouteAuthorizeAttributeRequest, TestResponse>;
 
 [Route("/aresource", OperationMethod.Post, AccessType.Token)]
 [UsedImplicitly]
-public class TestSecureRouteNoAuthorizeAttributeRequest : IWebRequest<TestResponse>;
+public class TestSecureRouteNoAuthorizeAttributeRequest : WebRequest<TestSecureRouteNoAuthorizeAttributeRequest, TestResponse>;

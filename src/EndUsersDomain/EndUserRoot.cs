@@ -642,7 +642,7 @@ public sealed partial class EndUserRoot : AggregateRootBase
         return CallerConstants.IsServiceAccount(userId);
     }
 
-    private static bool IsPlatformOperator(Roles roles)
+    private static bool IsOperations(Roles roles)
     {
         return roles.HasRole(PlatformRoles.Operations);
     }

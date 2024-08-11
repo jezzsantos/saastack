@@ -205,7 +205,7 @@ public class TestPostRequestStreamResponse : IWebRequestStream
 }
 
 [UsedImplicitly]
-public class TestPostRequestTypedResponse : IWebRequest<TestResponse>
+public class TestPostRequestTypedResponse : WebRequest<TestPostRequestTypedResponse, TestResponse>
 {
 }
 

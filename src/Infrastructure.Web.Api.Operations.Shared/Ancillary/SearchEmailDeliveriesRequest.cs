@@ -7,7 +7,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 /// </summary>
 [Route("/emails", OperationMethod.Search, AccessType.Token)]
 [Authorize(Roles.Platform_Operations)]
-public class SearchEmailDeliveriesRequest : UnTenantedSearchRequest<SearchEmailDeliveriesResponse>
+public class
+    SearchEmailDeliveriesRequest : UnTenantedSearchRequest<SearchEmailDeliveriesRequest, SearchEmailDeliveriesResponse>
 {
     public DateTime? SinceUtc { get; set; }
 }

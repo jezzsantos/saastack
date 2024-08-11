@@ -7,7 +7,9 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.OAuth2;
 ///     Exchanges an OAuth2 code for tokens
 /// </summary>
 [Route("/auth/token", OperationMethod.Post)]
-public class ExchangeOAuth2CodeForTokensRequest : UnTenantedRequest<ExchangeOAuth2CodeForTokensResponse>
+public class
+    ExchangeOAuth2CodeForTokensRequest : WebRequest<ExchangeOAuth2CodeForTokensRequest,
+    ExchangeOAuth2CodeForTokensResponse>
 {
     [JsonPropertyName("client_id")] public string? ClientId { get; set; }
 

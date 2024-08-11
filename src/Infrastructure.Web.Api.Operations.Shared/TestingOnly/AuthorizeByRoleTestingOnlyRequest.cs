@@ -8,5 +8,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 /// </summary>
 [Route("/testingonly/authz/role/get", OperationMethod.Get, AccessType.Token, true)]
 [Authorize(Roles.Platform_Standard)]
-public class AuthorizeByRoleTestingOnlyRequest : IWebRequest<GetCallerTestingOnlyResponse>;
+public class
+    AuthorizeByRoleTestingOnlyRequest : WebRequest<AuthorizeByRoleTestingOnlyRequest, GetCallerTestingOnlyResponse>;
 #endif

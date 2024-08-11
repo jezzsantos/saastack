@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.EndUsers;
 ///     Fetches the specified user
 /// </summary>
 [Route("/users/{Id}", OperationMethod.Get, isTestingOnly: true)]
-public class GetUserRequest : UnTenantedRequest<GetUserResponse>
+public class GetUserRequest : UnTenantedRequest<GetUserRequest, GetUserResponse>
 {
     [Required] public string? Id { get; set; }
 }

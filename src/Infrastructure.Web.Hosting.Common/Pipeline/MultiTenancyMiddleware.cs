@@ -1,5 +1,6 @@
 using System.Reflection;
 using Application.Interfaces;
+using Application.Interfaces.Extensions;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
@@ -240,7 +241,8 @@ public class MultiTenancyMiddleware
             return false;
         }
 
-        return !caller.IsServiceAccount;
+        return !caller.IsServiceAccount
+               && !caller.IsOperations();
     }
 
     private static string? GetDefaultOrganizationId(List<Membership> memberships)

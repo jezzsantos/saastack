@@ -7,7 +7,8 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 ///     Fetches the feature states
 /// </summary>
 [Route("/environments/{EnvironmentApiKey}/featurestates/", OperationMethod.Get)]
-public class FlagsmithGetFeatureStatesRequest : IWebRequest<FlagsmithGetFeatureStatesResponse>
+public class
+    FlagsmithGetFeatureStatesRequest : WebRequest<FlagsmithGetFeatureStatesRequest, FlagsmithGetFeatureStatesResponse>
 {
     public string? EnvironmentApiKey { get; set; }
 

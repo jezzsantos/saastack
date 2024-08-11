@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 ///     Confirms the failed delivery of a sent email message
 /// </summary>
 [Route("/emails/failed", OperationMethod.Post, isTestingOnly: true)]
-public class ConfirmEmailDeliveryFailedRequest : UnTenantedEmptyRequest
+public class ConfirmEmailDeliveryFailedRequest : UnTenantedEmptyRequest<ConfirmEmailDeliveryFailedRequest>
 {
     public DateTime? FailedAtUtc { get; set; }
 

@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Bookings;
 /// </summary>
 [Route("/bookings", OperationMethod.Post, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class MakeBookingRequest : TenantedRequest<MakeBookingResponse>
+public class MakeBookingRequest : TenantedRequest<MakeBookingRequest, MakeBookingResponse>
 {
     [Required] public string? CarId { get; set; }
 

@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 /// </summary>
 [Route("/apikeys/me", OperationMethod.Post, AccessType.Token, true)]
 [Authorize(Roles.Platform_Standard, Features.Platform_PaidTrial)]
-public class CreateAPIKeyForCallerRequest : UnTenantedRequest<CreateAPIKeyResponse>
+public class CreateAPIKeyForCallerRequest : UnTenantedRequest<CreateAPIKeyForCallerRequest, CreateAPIKeyResponse>
 {
     public DateTime? ExpiresOnUtc { get; set; }
 }

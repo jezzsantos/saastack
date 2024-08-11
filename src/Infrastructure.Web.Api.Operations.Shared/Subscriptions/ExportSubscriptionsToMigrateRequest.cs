@@ -8,6 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Subscriptions;
 /// </summary>
 [Route("/subscriptions/export", OperationMethod.Search, AccessType.HMAC)]
 [Authorize(Roles.Platform_ServiceAccount)]
-public class ExportSubscriptionsToMigrateRequest : UnTenantedSearchRequest<ExportSubscriptionsToMigrateResponse>
+public class ExportSubscriptionsToMigrateRequest : UnTenantedSearchRequest<ExportSubscriptionsToMigrateRequest,
+    ExportSubscriptionsToMigrateResponse>
 {
 }

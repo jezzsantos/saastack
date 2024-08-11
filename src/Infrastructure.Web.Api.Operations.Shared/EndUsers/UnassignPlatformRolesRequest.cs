@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.EndUsers;
 /// </summary>
 [Route("/users/{Id}/roles", OperationMethod.PutPatch, AccessType.Token)]
 [Authorize(Interfaces.Roles.Platform_Operations)]
-public class UnassignPlatformRolesRequest : UnTenantedRequest<UpdateUserResponse>
+public class UnassignPlatformRolesRequest : UnTenantedRequest<UnassignPlatformRolesRequest, UpdateUserResponse>
 {
     [Required] public string? Id { get; set; }
 

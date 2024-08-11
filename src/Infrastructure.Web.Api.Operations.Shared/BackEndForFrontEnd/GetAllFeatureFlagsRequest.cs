@@ -6,4 +6,4 @@ namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 ///     Lists all the available feature flags
 /// </summary>
 [Route("/flags", OperationMethod.Get)]
-public class GetAllFeatureFlagsRequest : UnTenantedRequest<GetAllFeatureFlagsResponse>;
+public class GetAllFeatureFlagsRequest : UnTenantedRequest<GetAllFeatureFlagsRequest, GetAllFeatureFlagsResponse>;

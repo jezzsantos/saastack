@@ -7,7 +7,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.EndUsers;
 ///     Verifies that the guest invitation is still valid
 /// </summary>
 [Route("/invitations/{Token}/verify", OperationMethod.Get)]
-public class VerifyGuestInvitationRequest : UnTenantedRequest<VerifyGuestInvitationResponse>
+public class
+    VerifyGuestInvitationRequest : UnTenantedRequest<VerifyGuestInvitationRequest, VerifyGuestInvitationResponse>
 {
     [Required] public string? Token { get; set; }
 }

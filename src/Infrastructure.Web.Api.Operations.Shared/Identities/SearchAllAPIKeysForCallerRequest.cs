@@ -7,6 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 /// </summary>
 [Route("/apikeys/me", OperationMethod.Search, AccessType.Token)]
 [Authorize(Roles.Platform_Standard, Features.Platform_PaidTrial)]
-public class SearchAllAPIKeysForCallerRequest : TenantedSearchRequest<SearchAllAPIKeysResponse>
+public class
+    SearchAllAPIKeysForCallerRequest : TenantedSearchRequest<SearchAllAPIKeysForCallerRequest, SearchAllAPIKeysResponse>
 {
 }

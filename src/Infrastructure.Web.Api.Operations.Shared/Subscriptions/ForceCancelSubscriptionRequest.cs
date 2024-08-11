@@ -7,7 +7,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.Subscriptions;
 /// </summary>
 [Route("/subscriptions/{Id}/force", OperationMethod.Delete, AccessType.Token)]
 [Authorize(Roles.Platform_Operations)]
-public class ForceCancelSubscriptionRequest : UnTenantedRequest<GetSubscriptionResponse>, IUnTenantedOrganizationRequest
+public class ForceCancelSubscriptionRequest :
+    UnTenantedRequest<ForceCancelSubscriptionRequest, GetSubscriptionResponse>, IUnTenantedOrganizationRequest
 {
     public string? Id { get; set; }
 }

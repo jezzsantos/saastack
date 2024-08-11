@@ -8,9 +8,9 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Mailgun;
 ///     Notifies a Mailgun event, via a webhook
 /// </summary>
 [Route("/webhooks/mailgun", OperationMethod.Post)]
-public class MailgunNotifyWebhookEventRequest : IWebRequest<EmptyResponse>
+public class MailgunNotifyWebhookEventRequest : WebRequestEmpty<MailgunNotifyWebhookEventRequest>
 {
     [JsonPropertyName("event-data")] public MailgunEventData? EventData { get; set; }
 
-    public MailgunSignature? Signature { get; set; }
+    [JsonPropertyName("signature")] public MailgunSignature? Signature { get; set; }
 }

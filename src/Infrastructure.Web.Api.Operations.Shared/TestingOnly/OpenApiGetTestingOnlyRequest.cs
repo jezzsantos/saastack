@@ -11,7 +11,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 /// </summary>
 [Route("/testingonly/openapi/{Id}", OperationMethod.Get, isTestingOnly: true)]
 [UsedImplicitly]
-public class OpenApiGetTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>
+public class OpenApiGetTestingOnlyRequest : WebRequest<OpenApiGetTestingOnlyRequest, StringMessageTestingOnlyResponse>
 {
     [Description("anid")] public string? Id { get; set; }
 

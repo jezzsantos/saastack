@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 ///     Records a usage of the product
 /// </summary>
 [Route("/record/use", OperationMethod.Post)]
-public class RecordUseRequest : UnTenantedEmptyRequest
+public class RecordUseRequest : UnTenantedEmptyRequest<RecordUseRequest>
 {
     public Dictionary<string, object?>? Additional { get; set; }
 

@@ -124,21 +124,12 @@ namespace {assemblyNamespace}
                 var endPointMethodName = $"Map{routeEndpointMethod}";
                 endpointRegistrations.AppendLine(
                     $"            {groupName}.{endPointMethodName}(\"{registration.RoutePath}\",");
-                if (registration.OperationMethod.CanHaveBody())
-                {
-                    endpointRegistrations.AppendLine(
-                        registration.IsMultipartFormData
-                            ? $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromForm] global::{registration.RequestDto.FullName} request) =>"
-                            : $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Mvc.FromBody] global::{registration.RequestDto.FullName} request) =>");
-                }
-                else
-                {
-                    endpointRegistrations.AppendLine(
-                        $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDto.FullName} request) =>");
-                }
+                endpointRegistrations.AppendLine(registration.OperationMethod.CanHaveBody()
+                    ? $"                async (global::MediatR.IMediator mediator, global::{registration.RequestDto.FullName} request) =>"
+                    : $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDto.FullName} request) =>");
 
                 endpointRegistrations.Append(
-                    "                     await mediator.Send(request, global::System.Threading.CancellationToken.None))");
+                    $"                     await mediator.Send(request ?? new global::{registration.RequestDto.FullName}(), global::System.Threading.CancellationToken.None))");
                 if (registration.OperationAccess != AccessType.Anonymous)
                 {
                     endpointRegistrations.AppendLine();

@@ -1,5 +1,6 @@
 #if TESTINGONLY
 using System.Net;
+using System.Net.Http.Json;
 using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using IntegrationTesting.WebApi.Common;
@@ -37,6 +38,17 @@ public class GeneralApiSpec : WebApiSpec<ApiHost1.Program>
 
         result.StatusCode.Should().Be(HttpStatusCode.Created);
         result.Content.Value.Message.Should().Be("amessage");
+    }
+
+    [Fact]
+    public async Task WhenPostWithRouteParamsAndEmptyBody_ThenReturns()
+    {
+        var result = await HttpApi.PostAsync("/testingonly/general/body/avalue/99/route",
+            JsonContent.Create(new PostWithRouteParamsAndEmptyBodyTestingOnlyRequest()));
+
+        result.StatusCode.Should().Be(HttpStatusCode.Created);
+        var content = await result.Content.ReadAsStringAsync();
+        content.Should().Be("{\"message\":\"amessageavalue99\"}");
     }
 }
 #endif

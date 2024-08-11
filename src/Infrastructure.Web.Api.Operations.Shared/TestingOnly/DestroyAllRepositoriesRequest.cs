@@ -7,5 +7,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 ///     Destroys all repositories
 /// </summary>
 [Route("/testingonly/repositories/destroy", OperationMethod.Post, isTestingOnly: true)]
-public class DestroyAllRepositoriesRequest : UnTenantedEmptyRequest;
+public class DestroyAllRepositoriesRequest : UnTenantedEmptyRequest<DestroyAllRepositoriesRequest>;
 #endif

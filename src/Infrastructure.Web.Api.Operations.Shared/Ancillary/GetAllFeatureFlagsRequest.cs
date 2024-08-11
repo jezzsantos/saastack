@@ -7,4 +7,4 @@ namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 /// </summary>
 [Route("/flags", OperationMethod.Get, AccessType.HMAC)]
 [Authorize(Roles.Platform_ServiceAccount)]
-public class GetAllFeatureFlagsRequest : UnTenantedRequest<GetAllFeatureFlagsResponse>;
+public class GetAllFeatureFlagsRequest : UnTenantedRequest<GetAllFeatureFlagsRequest, GetAllFeatureFlagsResponse>;

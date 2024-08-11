@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 ///     Creates a new feature
 /// </summary>
 [Route("/projects/{ProjectId}/features/", OperationMethod.Post)]
-public class FlagsmithCreateFeatureRequest : IWebRequest<FlagsmithCreateFeatureResponse>
+public class FlagsmithCreateFeatureRequest : WebRequest<FlagsmithCreateFeatureRequest, FlagsmithCreateFeatureResponse>
 {
     [JsonPropertyName("name")] public string? Name { get; set; }
 

@@ -8,5 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 /// </summary>
 [Route("/testingonly/authn/token/get", OperationMethod.Get, AccessType.Token, true)]
 [Authorize(Roles.Platform_Standard)]
-public class GetCallerWithTokenOrAPIKeyTestingOnlyRequest : IWebRequest<GetCallerTestingOnlyResponse>;
+public class
+    GetCallerWithTokenOrAPIKeyTestingOnlyRequest : WebRequest<GetCallerWithTokenOrAPIKeyTestingOnlyRequest,
+    GetCallerTestingOnlyResponse>;
 #endif

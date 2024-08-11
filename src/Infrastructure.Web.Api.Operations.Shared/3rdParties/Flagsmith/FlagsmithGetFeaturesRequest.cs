@@ -6,7 +6,7 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 ///     Fetches all features for a project
 /// </summary>
 [Route("/projects/{ProjectId}/features/", OperationMethod.Get)]
-public class FlagsmithGetFeaturesRequest : IWebRequest<FlagsmithGetFeaturesResponse>
+public class FlagsmithGetFeaturesRequest : WebRequest<FlagsmithGetFeaturesRequest, FlagsmithGetFeaturesResponse>
 {
     public int? ProjectId { get; set; }
 }

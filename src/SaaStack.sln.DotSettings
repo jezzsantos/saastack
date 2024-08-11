@@ -975,7 +975,7 @@ namespace $ns$;
 /// &lt;/summary&gt;
 [Route("/$route$/{Id}", OperationMethod.Get, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class $Action$$Resource$Request : TenantedRequest&lt;$Action$$Resource$Response&gt;
+public class $Action$$Resource$Request : TenantedRequest&lt;$Action$$Resource$Request, $Action$$Resource$Response&gt;
 {
     public string? Id { get; set; }
 }
@@ -1019,7 +1019,7 @@ namespace $ns$;
 /// &lt;/summary&gt;
 [Route("/$route$/{Id}", OperationMethod.Delete, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class $Action$$Resource$Request : TenantedDeleteRequest
+public class $Action$$Resource$Request : TenantedDeleteRequest&lt;$Action$$Resource$Request&gt;
 {
     public string? Id { get; set; }
 }</s:String>
@@ -1153,7 +1153,7 @@ namespace $ns$;
 
 [Route("/$route$", OperationMethod.Search, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class $Action$$Resource$ : TenantedSearchRequest&lt;$Action$$Resource$Response&gt;
+public class $Action$$Resource$Request : TenantedSearchRequest&lt;$Action$$Resource$Request, $Action$$Resource$Response&gt;
 {
 }
 
@@ -1204,7 +1204,7 @@ namespace $ns$;
 /// &lt;/summary&gt;
 [Route("/$route$", OperationMethod.Post, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class $Action$$Resource$Request : TenantedRequest&lt;$Action$$Resource$Response&gt;
+public class $Action$$Resource$Request : TenantedRequest&lt;$Action$$Resource$Request, $Action$$Resource$Response&gt;
 {
     public string? $Property$ { get; set; }
 }
@@ -1250,7 +1250,7 @@ namespace $ns$;
 /// &lt;/summary&gt;
 [Route("/$route$/{Id}", OperationMethod.PutPatch, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class $Action$$Resource$Request : TenantedRequest&lt;$Action$$Resource$Response&gt;
+public class $Action$$Resource$Request : TenantedRequest&lt;$Action$$Resource$Request, $Action$$Resource$Response&gt;
 {
     public string? Id { get; set; }
     

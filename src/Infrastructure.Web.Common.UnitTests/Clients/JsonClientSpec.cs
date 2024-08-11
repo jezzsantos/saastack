@@ -609,13 +609,13 @@ public class JsonClientSpec
 }
 
 [Api.Interfaces.Route("/test", OperationMethod.Get)]
-public class TestRequest : IWebRequest
+public class TestRequest : WebRequest<TestRequest>
 {
     public string AProperty { get; set; } = "avalue";
 }
 
 [Api.Interfaces.Route("/test", OperationMethod.Post)]
-public class TestMultiPartFormRequest : IWebRequest, IHasMultipartForm
+public class TestMultiPartFormRequest : WebRequest<TestRequest>, IHasMultipartForm
 {
     public string AProperty { get; set; } = "avalue";
 }

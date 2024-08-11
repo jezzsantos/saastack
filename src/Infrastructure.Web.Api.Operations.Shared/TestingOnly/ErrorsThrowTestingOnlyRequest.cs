@@ -7,5 +7,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 ///     Tests errors, by throwing an exception
 /// </summary>
 [Route("/testingonly/errors/throws", OperationMethod.Get, isTestingOnly: true)]
-public class ErrorsThrowTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>;
+public class
+    ErrorsThrowTestingOnlyRequest : WebRequest<ErrorsThrowTestingOnlyRequest, StringMessageTestingOnlyResponse>;
 #endif

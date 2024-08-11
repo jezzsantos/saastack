@@ -8,7 +8,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.Subscriptions;
 /// </summary>
 [Route("/subscriptions/{Id}/migrate", OperationMethod.PutPatch, AccessType.HMAC)]
 [Authorize(Roles.Platform_ServiceAccount)]
-public class MigrateSubscriptionRequest : UnTenantedRequest<MigrateSubscriptionResponse>, IUnTenantedOrganizationRequest
+public class MigrateSubscriptionRequest : UnTenantedRequest<MigrateSubscriptionRequest, MigrateSubscriptionResponse>,
+    IUnTenantedOrganizationRequest
 {
     public string? ProviderName { get; set; }
 

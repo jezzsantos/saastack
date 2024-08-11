@@ -7,6 +7,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.EndUsers;
 /// </summary>
 [Route("/memberships/me", OperationMethod.Search, AccessType.Token)]
 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
-public class ListMembershipsForCallerRequest : UnTenantedSearchRequest<ListMembershipsForCallerResponse>
+public class
+    ListMembershipsForCallerRequest : UnTenantedSearchRequest<ListMembershipsForCallerRequest,
+    ListMembershipsForCallerResponse>
 {
 }

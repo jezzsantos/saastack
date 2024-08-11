@@ -9,7 +9,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 /// <response code="401">The provider is not known, or the code is invalid</response>
 /// <response code="409">The user's account is suspended or locked, and cannot be authenticated or used</response>
 [Route("/sso/auth", OperationMethod.Post)]
-public class AuthenticateSingleSignOnRequest : UnTenantedRequest<AuthenticateResponse>
+public class AuthenticateSingleSignOnRequest : UnTenantedRequest<AuthenticateSingleSignOnRequest, AuthenticateResponse>
 {
     [Required] public string? AuthCode { get; set; }
 

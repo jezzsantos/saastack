@@ -227,7 +227,7 @@ For example,
 /// </summary>
 [Route("/cars", OperationMethod.Post, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class RegisterCarRequest : TenantedRequest<GetCarResponse>
+public class RegisterCarRequest : TenantedRequest<RegisterCarRequest, GetCarResponse>
 {
     [Required] public string? Jurisdiction { get; set; }
 
@@ -260,7 +260,7 @@ You would use `TenantedSearchRequest<TResponse>` for SEARCH operations (since th
 For example, to search for all cars, you would define this request:
 
 ```c#
-public class SearchAllCarsRequest : TenantedSearchRequest<SearchAllCarsResponse>;
+public class SearchAllCarsRequest : TenantedSearchRequest<SearchAllCarsRequest, SearchAllCarsResponse>;
 ```
 
 You would use a `TenantedDeleteRequest<TResponse>` for DELETE operations.
@@ -268,7 +268,7 @@ You would use a `TenantedDeleteRequest<TResponse>` for DELETE operations.
 For example, to delete a car, you would define this request:
 
 ```c#
-public class DeleteCarRequest : TenantedDeleteRequest
+public class DeleteCarRequest : TenantedDeleteRequest<DeleteCarRequest>
 {
     [Required] public string? Id { get; set; }
 }
@@ -281,7 +281,7 @@ Otherwise, you would use the standard `TenantedRequest<TResponse>` for all other
 For example,
 
 ```c#
-public class GetCarRequest : TenantedRequest<GetCarResponse>
+public class GetCarRequest : TenantedRequest<GetCarRequest, GetCarResponse>
 {
     [Required] public string? Id { get; set; }
 }
@@ -335,7 +335,7 @@ For example,
 /// <response code="405">The user has not yet verified their registration</response>
 /// <response code="409">The user's account is suspended or locked, and cannot be authenticated or used</response>
 [Route("/passwords/auth", OperationMethod.Post)]
-public class AuthenticatePasswordRequest : UnTenantedRequest<AuthenticateResponse>
+public class AuthenticatePasswordRequest : UnTenantedRequest<AuthenticatePasswordRequest, AuthenticateResponse>
 {
     [Required] public string? Password { get; set; }
 
@@ -357,7 +357,7 @@ For example,
 
 ```c#
 [Route("/cars", OperationMethod.Post, AccessType.Token)]
-public class RegisterCarRequest : TenantedRequest<GetCarResponse>
+public class RegisterCarRequest : TenantedRequest<RegisterCarRequest, GetCarResponse>
 {
     ... fields of the request
 }
@@ -373,7 +373,7 @@ For example, to populate the `Id` field of the request, you would define the rou
 
 ```c#
 [Route("/cars/{Id}", OperationMethod.Get, AccessType.Token)]
-public class GetCarRequest : TenantedRequest<GetCarResponse>
+public class GetCarRequest : TenantedRequest<GetCarRequest, GetCarResponse>
 {
     [Required] public string? Id { get; set; }
 }
@@ -406,7 +406,7 @@ For example,
 ```c#
 [Route("/cars", OperationMethod.Post, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class RegisterCarRequest : TenantedRequest<GetCarResponse>
+public class RegisterCarRequest : TenantedRequest<RegisterCarRequest, GetCarResponse>
 {
     ... fields of the request
 }
@@ -523,7 +523,7 @@ In the sub-folder where you defined your API class, you define a validation clas
 For example, for this request type:
 
 ```c#
-public class RegisterCarRequest : TenantedRequest<GetCarResponse>
+public class RegisterCarRequest : TenantedRequest<RegisterCarRequest, GetCarResponse>
 {
     [Required] public string? Jurisdiction { get; set; }
 
@@ -638,7 +638,7 @@ Sometimes, it is necessary to build your own validators for common types that yo
 For example, your request contains a collection of complex data objects, where as normally you are dealing with a single property value.
 
 ```c#
-public class CreateThingRequest : TenantedRequest<CreateThingResponse>
+public class CreateThingRequest : TenantedRequest<CreateThingRequest, CreateThingResponse>
 {
     public List<AComplexThing> Things { get; set; }
 }

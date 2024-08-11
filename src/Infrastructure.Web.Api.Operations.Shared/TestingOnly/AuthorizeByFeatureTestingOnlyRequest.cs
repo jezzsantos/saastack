@@ -8,5 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 /// </summary>
 [Route("/testingonly/authz/feature/get", OperationMethod.Get, AccessType.Token, true)]
 [Authorize(Features.Platform_PaidTrial)]
-public class AuthorizeByFeatureTestingOnlyRequest : IWebRequest<GetCallerTestingOnlyResponse>;
+public class
+    AuthorizeByFeatureTestingOnlyRequest : WebRequest<AuthorizeByFeatureTestingOnlyRequest,
+    GetCallerTestingOnlyResponse>;
 #endif

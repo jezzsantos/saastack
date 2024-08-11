@@ -378,7 +378,7 @@ public class WebApiAssemblyVisitorSpec
                                                     {
                                                     }
                                                     [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", OperationMethod.Get)]
-                                                    public class ARequest : IWebRequest<AResponse>
+                                                    public class ARequest : WebRequest<ARequest, AResponse>
                                                     {
                                                     }
                                                     public class AServiceClass : Infrastructure.Web.Api.Interfaces.IWebApiService
@@ -433,7 +433,7 @@ public class WebApiAssemblyVisitorSpec
                                                     }
                                                     [Infrastructure.Web.Api.Interfaces.AuthorizeAttribute(Infrastructure.Web.Api.Interfaces.Roles.Platform_Standard, Infrastructure.Web.Api.Interfaces.Features.Platform_Basic)]
                                                     [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", OperationMethod.Get)]
-                                                    public class ARequest : IWebRequest<AResponse>
+                                                    public class ARequest : WebRequest<ARequest, AResponse>
                                                     {
                                                     }
                                                     public class AServiceClass : Infrastructure.Web.Api.Interfaces.IWebApiService
@@ -490,7 +490,7 @@ public class WebApiAssemblyVisitorSpec
                                                     [Infrastructure.Web.Api.Interfaces.AuthorizeAttribute(Infrastructure.Web.Api.Interfaces.Roles.Platform_Operations, Infrastructure.Web.Api.Interfaces.Features.Platform_Paid2)]
                                                     [Infrastructure.Web.Api.Interfaces.AuthorizeAttribute(Infrastructure.Web.Api.Interfaces.Roles.Platform_Standard, Infrastructure.Web.Api.Interfaces.Features.Platform_Basic)]
                                                     [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", OperationMethod.Get)]
-                                                    public class ARequest : IWebRequest<AResponse>
+                                                    public class ARequest : WebRequest<ARequest, AResponse>
                                                     {
                                                     }
                                                     public class AServiceClass : Infrastructure.Web.Api.Interfaces.IWebApiService
@@ -546,7 +546,7 @@ public class WebApiAssemblyVisitorSpec
                                                     {
                                                     }
                                                     [Infrastructure.Web.Api.Interfaces.RouteAttribute("aroute", OperationMethod.Get)]
-                                                    public class ARequest : IWebRequest<AResponse>
+                                                    public class ARequest : WebRequest<ARequest, AResponse>
                                                     {
                                                     }
                                                     [Infrastructure.Web.Api.Interfaces.WebServiceAttribute("aprefix")]

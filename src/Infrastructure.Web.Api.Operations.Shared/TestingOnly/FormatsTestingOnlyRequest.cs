@@ -9,7 +9,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 /// </summary>
 [Route("/testingonly/formats/roundtrip", OperationMethod.Post, isTestingOnly: true)]
 [UsedImplicitly]
-public class FormatsTestingOnlyRequest : IWebRequest<FormatsTestingOnlyResponse>
+public class FormatsTestingOnlyRequest : WebRequest<FormatsTestingOnlyRequest, FormatsTestingOnlyResponse>
 {
     public CustomDto? Custom { get; set; }
 

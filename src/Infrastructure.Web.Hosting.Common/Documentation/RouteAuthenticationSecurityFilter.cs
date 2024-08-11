@@ -1,5 +1,4 @@
 using System.Reflection;
-using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.Auth;
@@ -19,7 +18,7 @@ public sealed class RouteAuthenticationSecurityFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        var type = GetRequestType(context);
+        var type = context.GetRequestType();
         if (!type.HasValue)
         {
             return;
@@ -92,29 +91,5 @@ public sealed class RouteAuthenticationSecurityFilter : IOperationFilter
             AccessType.HMAC => hmac,
             _ => []
         };
-    }
-
-    private static Optional<Type> GetRequestType(OperationFilterContext context)
-    {
-        var requestParameters = context.MethodInfo.GetParameters()
-            .Where(IsWebRequest)
-            .ToList();
-        if (requestParameters.HasNone())
-        {
-            return Optional<Type>.None;
-        }
-
-        return requestParameters.First().ParameterType;
-
-        static bool IsWebRequest(ParameterInfo requestParameter)
-        {
-            var type = requestParameter.ParameterType;
-            if (type.NotExists())
-            {
-                return false;
-            }
-
-            return typeof(IWebRequest).IsAssignableFrom(type);
-        }
     }
 }

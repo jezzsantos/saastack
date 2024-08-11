@@ -5,6 +5,7 @@ using FluentAssertions;
 using Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 using UnitTesting.Common;
 using Xunit;
@@ -44,7 +45,7 @@ public class RequestTenantDetectiveSpec
         }
 
         [Fact]
-        public async Task WhenDetectTenantAsyncButNoHeaderQueryOrBody_ThenReturnsNoTenantId()
+        public async Task WhenDetectTenantAsyncButNoHeaderRouteQueryOrBody_ThenReturnsNoTenantId()
         {
             var httpContext = new DefaultHttpContext
             {
@@ -125,6 +126,55 @@ public class RequestTenantDetectiveSpec
                         { nameof(IUnTenantedOrganizationRequest.Id), "anid" },
                         { nameof(RequestTenantDetective.RequestWithTenantIds.TenantId), "atenantid" }
                     })
+                }
+            };
+
+            var result =
+                await _detective.DetectTenantAsync(httpContext, typeof(TestUnTenantedRequest), CancellationToken.None);
+
+            result.Should().BeSuccess();
+            result.Value.TenantId.Should().Be("atenantid");
+            result.Value.ShouldHaveTenantId.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task WhenDetectTenantAsyncAndTenantIdInRouteValuesAsOrganizationId_ThenReturnsTenantId()
+        {
+            var httpContext = new DefaultHttpContext
+            {
+                Request =
+                {
+                    Method = HttpMethods.Get,
+                    RouteValues = new RouteValueDictionary
+                    {
+                        { nameof(IUnTenantedOrganizationRequest.Id), "anid" },
+                        { nameof(ITenantedRequest.OrganizationId), "anorganizationid" },
+                        { nameof(RequestTenantDetective.RequestWithTenantIds.TenantId), "atenantid" }
+                    }
+                }
+            };
+
+            var result =
+                await _detective.DetectTenantAsync(httpContext, typeof(TestUnTenantedRequest), CancellationToken.None);
+
+            result.Should().BeSuccess();
+            result.Value.TenantId.Should().Be("anorganizationid");
+            result.Value.ShouldHaveTenantId.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task WhenDetectTenantAsyncAndTenantIdInRouteValuesAsTenantId_ThenReturnsTenantId()
+        {
+            var httpContext = new DefaultHttpContext
+            {
+                Request =
+                {
+                    Method = HttpMethods.Get,
+                    RouteValues = new RouteValueDictionary
+                    {
+                        { nameof(IUnTenantedOrganizationRequest.Id), "anid" },
+                        { nameof(RequestTenantDetective.RequestWithTenantIds.TenantId), "atenantid" }
+                    }
                 }
             };
 
@@ -336,6 +386,29 @@ public class RequestTenantDetectiveSpec
         }
 
         [Fact]
+        public async Task WhenDetectTenantAsyncAndTenantIdInRouteValues_ThenReturnsTenantId()
+        {
+            var httpContext = new DefaultHttpContext
+            {
+                Request =
+                {
+                    Method = HttpMethods.Get,
+                    RouteValues = new RouteValueDictionary
+                    {
+                        { nameof(ITenantedRequest.OrganizationId), "atenantid" }
+                    }
+                }
+            };
+
+            var result =
+                await _detective.DetectTenantAsync(httpContext, typeof(TestTenantedRequest), CancellationToken.None);
+
+            result.Should().BeSuccess();
+            result.Value.TenantId.Should().Be("atenantid");
+            result.Value.ShouldHaveTenantId.Should().BeTrue();
+        }
+
+        [Fact]
         public async Task WhenDetectTenantAsyncAndTenantIdInJsonBody_ThenReturnsTenantId()
         {
             var httpContext = new DefaultHttpContext
@@ -459,6 +532,30 @@ public class RequestTenantDetectiveSpec
         }
 
         [Fact]
+        public async Task WhenDetectTenantAsyncAndTenantIdInRouteValues_ThenReturnsTenantId()
+        {
+            var httpContext = new DefaultHttpContext
+            {
+                Request =
+                {
+                    Method = HttpMethods.Get,
+                    RouteValues = new RouteValueDictionary
+                    {
+                        { nameof(IUnTenantedOrganizationRequest.Id), "atenantid" }
+                    }
+                }
+            };
+
+            var result =
+                await _detective.DetectTenantAsync(httpContext, typeof(TestUnTenantedOrganizationRequest),
+                    CancellationToken.None);
+
+            result.Should().BeSuccess();
+            result.Value.TenantId.Should().Be("atenantid");
+            result.Value.ShouldHaveTenantId.Should().BeTrue();
+        }
+
+        [Fact]
         public async Task WhenDetectTenantAsyncAndTenantIdInJsonBody_ThenReturnsTenantId()
         {
             var httpContext = new DefaultHttpContext
@@ -534,13 +631,14 @@ public class RequestTenantDetectiveSpec
     }
 
     [UsedImplicitly]
-    public class TestUnTenantedRequest : UnTenantedRequest<TestResponse>;
+    public class TestUnTenantedRequest : UnTenantedRequest<TestUnTenantedRequest, TestResponse>;
 
     [UsedImplicitly]
-    public class TestTenantedRequest : TenantedRequest<TestResponse>;
+    public class TestTenantedRequest : TenantedRequest<TestTenantedRequest, TestResponse>;
 
     [UsedImplicitly]
-    public class TestUnTenantedOrganizationRequest : UnTenantedRequest<TestResponse>, IUnTenantedOrganizationRequest
+    public class TestUnTenantedOrganizationRequest : UnTenantedRequest<TestUnTenantedOrganizationRequest, TestResponse>,
+        IUnTenantedOrganizationRequest
     {
         public string? Id { get; set; }
     }

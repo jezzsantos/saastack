@@ -89,6 +89,9 @@
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebSearchResponse.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebSearchResponse.cs</Link>
         </Compile>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\WebRequests.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\WebRequests.cs</Link>
+        </Compile>
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\EmptyResponse.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\EmptyResponse.cs</Link>
         </Compile>

@@ -7,5 +7,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 ///     Tests default status code for PUT/PATCH requests
 /// </summary>
 [Route("/testingonly/statuses/putpatch", OperationMethod.PutPatch, isTestingOnly: true)]
-public class StatusesPutPatchTestingOnlyRequest : IWebRequest<StatusesTestingOnlyResponse>;
+public class
+    StatusesPutPatchTestingOnlyRequest : WebRequest<StatusesPutPatchTestingOnlyRequest, StatusesTestingOnlyResponse>;
 #endif

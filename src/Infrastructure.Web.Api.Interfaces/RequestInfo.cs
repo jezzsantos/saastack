@@ -10,4 +10,6 @@ public class RequestInfo
     public required OperationMethod Method { get; init; }
 
     public required string Route { get; init; }
+
+    public required Dictionary<string, object?> RouteParams { get; init; }
 }

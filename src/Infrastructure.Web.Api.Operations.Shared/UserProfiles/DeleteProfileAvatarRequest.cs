@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.UserProfiles;
 /// </summary>
 [Route("/profiles/{UserId}/avatar", OperationMethod.Delete, AccessType.Token)]
 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
-public class DeleteProfileAvatarRequest : UnTenantedRequest<DeleteProfileAvatarResponse>
+public class DeleteProfileAvatarRequest : UnTenantedRequest<DeleteProfileAvatarRequest, DeleteProfileAvatarResponse>
 {
     [Required] public string? UserId { get; set; }
 }

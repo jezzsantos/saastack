@@ -8,7 +8,8 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 /// </summary>
 [Route("/environments/{EnvironmentApiKey}/edge-identities/{IdentityUuid}/edge-featurestates/", OperationMethod.Post)]
 public class
-    FlagsmithCreateEdgeIdentityFeatureStateRequest : IWebRequest<FlagsmithCreateEdgeIdentityFeatureStateResponse>
+    FlagsmithCreateEdgeIdentityFeatureStateRequest : WebRequest<FlagsmithCreateEdgeIdentityFeatureStateRequest,
+    FlagsmithCreateEdgeIdentityFeatureStateResponse>
 {
     [JsonPropertyName("enabled")] public bool Enabled { get; set; }
 

@@ -9,7 +9,9 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 /// </summary>
 [Route("/environments/{EnvironmentApiKey}/edge-identities/", OperationMethod.Post)]
 [UsedImplicitly]
-public class FlagsmithCreateEdgeIdentityRequest : IWebRequest<FlagsmithCreateEdgeIdentityResponse>
+public class
+    FlagsmithCreateEdgeIdentityRequest : WebRequest<FlagsmithCreateEdgeIdentityRequest,
+    FlagsmithCreateEdgeIdentityResponse>
 {
     public string? EnvironmentApiKey { get; set; }
 

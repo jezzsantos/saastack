@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 /// </summary>
 [Route("/cars/{Id}/maintain", OperationMethod.PutPatch, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class ScheduleMaintenanceCarRequest : TenantedRequest<GetCarResponse>
+public class ScheduleMaintenanceCarRequest : TenantedRequest<ScheduleMaintenanceCarRequest, GetCarResponse>
 {
     public DateTime FromUtc { get; set; }
 

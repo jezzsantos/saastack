@@ -117,7 +117,7 @@ For example,
 ```c#
 [Route("/cars/{Id}", OperationMethod.Get, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_Basic)]
-public class GetCarRequest : TenantedRequest<GetCarResponse>
+public class GetCarRequest : TenantedRequest<GetCarRequest, GetCarResponse>
 {
     public string? Id { get; set; }
 }
@@ -196,7 +196,7 @@ For example,
 ```c#
 [Route("/cars/{Id}", OperationMethod.Get, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_Basic)]
-public class GetCarRequest : TenantedRequest<GetCarResponse>
+public class GetCarRequest : TenantedRequest<GetCarRequest, GetCarResponse>
 {
     public string? Id { get; set; }
 }

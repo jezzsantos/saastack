@@ -7,5 +7,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 ///     Tests access with anonymous access
 /// </summary>
 [Route("/testingonly/security/none", OperationMethod.Post, AccessType.Anonymous, true)]
-public class PostInsecureTestingOnlyRequest : UnTenantedEmptyRequest;
+public class PostInsecureTestingOnlyRequest : UnTenantedEmptyRequest<PostInsecureTestingOnlyRequest>;
 #endif

@@ -327,7 +327,7 @@ public static class HostExtensions
                 options.SchemaFilter<AllSchemaFilter>();
                 options.OperationFilter<BugFixParameterOperationFilter>(options);
                 options.OperationFilter<RouteTemplateParameterFilter>();
-                options.OperationFilter<FromFormMultiPartFilter>();
+                options.OperationFilter<DefaultBodyFilter>();
                 options
                     .OperationFilter<
                         XmlDocumentationOperationFilter>(); // must declare before the DefaultResponsesFilter

@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.EndUsers;
 /// </summary>
 [Route("/invitations", OperationMethod.Post, AccessType.Token)]
 [Authorize(Roles.Platform_Standard, Features.Platform_Basic)]
-public class InviteGuestRequest : UnTenantedRequest<InviteGuestResponse>
+public class InviteGuestRequest : UnTenantedRequest<InviteGuestRequest, InviteGuestResponse>
 {
     [Required] public string? Email { get; set; }
 }

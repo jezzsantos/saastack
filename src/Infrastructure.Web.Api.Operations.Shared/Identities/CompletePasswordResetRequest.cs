@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 ///     Completes a password reset attempt
 /// </summary>
 [Route("/passwords/{Token}/reset/complete", OperationMethod.Post)]
-public class CompletePasswordResetRequest : UnTenantedEmptyRequest
+public class CompletePasswordResetRequest : UnTenantedEmptyRequest<CompletePasswordResetRequest>
 {
     [Required] public string? Password { get; set; }
 

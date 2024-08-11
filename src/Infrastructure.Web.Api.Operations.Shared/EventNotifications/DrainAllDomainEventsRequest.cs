@@ -8,5 +8,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.EventNotifications;
 /// </summary>
 [Route("/domain_events/drain", OperationMethod.Post, AccessType.HMAC, true)]
 [Authorize(Roles.Platform_ServiceAccount)]
-public class DrainAllDomainEventsRequest : UnTenantedEmptyRequest;
+public class DrainAllDomainEventsRequest : UnTenantedEmptyRequest<DrainAllDomainEventsRequest>;
 #endif

@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 ///     Revoke a valid refresh_token
 /// </summary>
 [Route("/tokens/{RefreshToken}", OperationMethod.Delete)]
-public class RevokeRefreshTokenRequest : UnTenantedDeleteRequest
+public class RevokeRefreshTokenRequest : UnTenantedDeleteRequest<RevokeRefreshTokenRequest>
 {
     [Required] public string? RefreshToken { get; set; }
 }

@@ -7,7 +7,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
 /// </summary>
 [Route("/organizations/{Id}/members", OperationMethod.Post, AccessType.Token)]
 [Authorize(Roles.Tenant_Owner, Features.Platform_PaidTrial)]
-public class InviteMemberToOrganizationRequest : UnTenantedRequest<InviteMemberToOrganizationResponse>,
+public class InviteMemberToOrganizationRequest :
+    UnTenantedRequest<InviteMemberToOrganizationRequest, InviteMemberToOrganizationResponse>,
     IUnTenantedOrganizationRequest
 {
     public string? Email { get; set; }

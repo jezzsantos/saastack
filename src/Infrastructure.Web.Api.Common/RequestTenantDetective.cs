@@ -12,10 +12,12 @@ namespace Infrastructure.Web.Api.Common;
 /// <summary>
 ///     Provides a detective that determines the tenant of the request from data within the request,
 ///     from one of these sources:
-///     1. The <see cref="ITenantedRequest.OrganizationId" /> field in the body,
-///     2. The <see cref="IUnTenantedOrganizationRequest.Id" /> field in the body,
-///     3. The <see cref="HttpQueryParams.Tenant" /> query string,
-///     4. The <see cref="HttpConstants.Headers.Tenant" /> header.
+///     1. The <see cref="HttpConstants.Headers.Tenant" /> header.
+///     2. For tenanted requests, <see cref="ITenantedRequest.OrganizationId" /> field in the route, querystring or body,
+///     3. For untenanted org requests, <see cref="IUnTenantedOrganizationRequest.Id" /> field in the route, querystring or
+///     body,
+///     4. For untenanted requests <see cref="ITenantedRequest.OrganizationId" /> field in the route, querystring or body,
+///     5. For untenanted requests <see cref="RequestWithTenantIds.TenantId" /> field in the route, querystring or body,
 /// </summary>
 public class RequestTenantDetective : ITenantDetective
 {
@@ -74,6 +76,16 @@ public class RequestTenantDetective : ITenantDetective
 
         if (type.IsTenanted)
         {
+            if (request.RouteValues.TryGetValue(nameof(ITenantedRequest.OrganizationId),
+                    out var tenantIdFromRouteValues))
+            {
+                var value = (tenantIdFromRouteValues ?? string.Empty).ToString();
+                if (value.HasValue())
+                {
+                    return (true, value);
+                }
+            }
+
             if (request.Query.TryGetValue(nameof(ITenantedRequest.OrganizationId), out var tenantIdFromQueryString))
             {
                 var value = GetFirstStringValue(tenantIdFromQueryString);
@@ -86,6 +98,16 @@ public class RequestTenantDetective : ITenantDetective
 
         if (type.IsUnTenantedOrganization)
         {
+            if (request.RouteValues.TryGetValue(nameof(IUnTenantedOrganizationRequest.Id),
+                    out var tenantIdFromRouteValues))
+            {
+                var value = (tenantIdFromRouteValues ?? string.Empty).ToString();
+                if (value.HasValue())
+                {
+                    return (true, value);
+                }
+            }
+
             if (request.Query.TryGetValue(nameof(IUnTenantedOrganizationRequest.Id), out var tenantIdFromQueryString))
             {
                 var value = GetFirstStringValue(tenantIdFromQueryString);
@@ -98,9 +120,29 @@ public class RequestTenantDetective : ITenantDetective
 
         if (type.IsUntenanted)
         {
+            if (request.RouteValues.TryGetValue(nameof(ITenantedRequest.OrganizationId),
+                    out var tenantIdFromRouteValues))
+            {
+                var value = (tenantIdFromRouteValues ?? string.Empty).ToString();
+                if (value.HasValue())
+                {
+                    return (true, value);
+                }
+            }
+
             if (request.Query.TryGetValue(nameof(ITenantedRequest.OrganizationId), out var tenantIdFromQueryString))
             {
                 var value = GetFirstStringValue(tenantIdFromQueryString);
+                if (value.HasValue())
+                {
+                    return (true, value);
+                }
+            }
+
+            if (request.RouteValues.TryGetValue(nameof(RequestWithTenantIds.TenantId),
+                    out var tenantIdFromRouteValues2))
+            {
+                var value = (tenantIdFromRouteValues2 ?? string.Empty).ToString();
                 if (value.HasValue())
                 {
                     return (true, value);

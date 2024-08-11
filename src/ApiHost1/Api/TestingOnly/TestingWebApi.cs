@@ -119,16 +119,6 @@ public sealed class TestingWebApi : IWebApiService
         });
     }
 
-    public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> GeneralEnumPost(
-        PostWithEnumTestingOnlyRequest request, CancellationToken cancellationToken)
-    {
-        await Task.CompletedTask;
-        return () =>
-            new PostResult<StringMessageTestingOnlyResponse>(
-                new StringMessageTestingOnlyResponse { Message = $"amessage{request.AnEnum}" },
-                "alocation");
-    }
-
     public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> GeneralEmptyBodyPost(
         PostWithEmptyBodyTestingOnlyRequest request, CancellationToken cancellationToken)
     {
@@ -136,6 +126,27 @@ public sealed class TestingWebApi : IWebApiService
         return () =>
             new PostResult<StringMessageTestingOnlyResponse>(
                 new StringMessageTestingOnlyResponse { Message = "amessage" },
+                "alocation");
+    }
+
+    public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> GeneralEmptyBodyWithRouteParamsPost(
+        PostWithRouteParamsAndEmptyBodyTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () =>
+            new PostResult<StringMessageTestingOnlyResponse>(
+                new StringMessageTestingOnlyResponse
+                    { Message = $"amessage{request.AStringProperty}{request.ANumberProperty}" },
+                "alocation");
+    }
+
+    public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> GeneralEnumPost(
+        PostWithEnumTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () =>
+            new PostResult<StringMessageTestingOnlyResponse>(
+                new StringMessageTestingOnlyResponse { Message = $"amessage{request.AnEnum}" },
                 "alocation");
     }
 
@@ -173,6 +184,14 @@ public sealed class TestingWebApi : IWebApiService
             new PostResult<StringMessageTestingOnlyResponse>(
                 new StringMessageTestingOnlyResponse { Message = $"amessage{request.RequiredField}" },
                 "alocation");
+    }
+
+    public async Task<ApiPutPatchResult<string, StringMessageTestingOnlyResponse>> OpenApiPut(
+        OpenApiPutTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () =>
+            new StringMessageTestingOnlyResponse { Message = $"amessage{request.RequiredField}" };
     }
 
     public async Task<ApiEmptyResult> PostInsecure(

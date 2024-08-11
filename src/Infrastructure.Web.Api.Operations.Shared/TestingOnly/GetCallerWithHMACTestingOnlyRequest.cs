@@ -8,5 +8,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 /// </summary>
 [Route("/testingonly/authn/hmac/get", OperationMethod.Get, AccessType.HMAC, true)]
 [Authorize(Roles.Platform_ServiceAccount)]
-public class GetCallerWithHMACTestingOnlyRequest : IWebRequest<GetCallerTestingOnlyResponse>;
+public class
+    GetCallerWithHMACTestingOnlyRequest : WebRequest<GetCallerWithHMACTestingOnlyRequest, GetCallerTestingOnlyResponse>;
 #endif

@@ -8,7 +8,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 ///     Tests the use of enums in the request
 /// </summary>
 [Route("/testingonly/general/enum", OperationMethod.Post, isTestingOnly: true)]
-public class PostWithEnumTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>
+public class
+    PostWithEnumTestingOnlyRequest : WebRequest<PostWithEnumTestingOnlyRequest, StringMessageTestingOnlyResponse>
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public TestEnum? AnEnum { get; set; }

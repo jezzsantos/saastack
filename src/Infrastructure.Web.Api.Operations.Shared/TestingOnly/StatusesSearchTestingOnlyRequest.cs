@@ -7,5 +7,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 ///     Tests default status code for SEARCH requests
 /// </summary>
 [Route("/testingonly/statuses/search", OperationMethod.Search, isTestingOnly: true)]
-public class StatusesSearchTestingOnlyRequest : IWebRequest<StatusesTestingOnlySearchResponse>;
+public class
+    StatusesSearchTestingOnlyRequest : WebRequest<StatusesSearchTestingOnlyRequest, StatusesTestingOnlySearchResponse>;
 #endif

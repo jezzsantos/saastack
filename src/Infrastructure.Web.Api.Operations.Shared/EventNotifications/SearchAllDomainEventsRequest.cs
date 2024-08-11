@@ -7,5 +7,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.EventNotifications;
 ///     Lists all delivered domain_events
 /// </summary>
 [Route("/domain_events", OperationMethod.Search, isTestingOnly: true)]
-public class SearchAllDomainEventsRequest : UnTenantedSearchRequest<SearchAllDomainEventsResponse>;
+public class
+    SearchAllDomainEventsRequest : UnTenantedSearchRequest<SearchAllDomainEventsRequest, SearchAllDomainEventsResponse>;
 #endif

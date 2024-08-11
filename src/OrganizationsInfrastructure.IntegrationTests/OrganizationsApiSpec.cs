@@ -643,7 +643,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Id = organizationId
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        subscription.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        subscription.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]

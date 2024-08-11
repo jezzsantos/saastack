@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 /// </summary>
 [Route("/cars/{Id}", OperationMethod.Delete, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class DeleteCarRequest : TenantedDeleteRequest
+public class DeleteCarRequest : TenantedDeleteRequest<DeleteCarRequest>
 {
     [Required] public string? Id { get; set; }
 }

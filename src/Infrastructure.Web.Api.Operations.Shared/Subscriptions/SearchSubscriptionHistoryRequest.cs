@@ -7,7 +7,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.Subscriptions;
 /// </summary>
 [Route("/subscriptions/{Id}/invoices", OperationMethod.Search, AccessType.Token)]
 [Authorize(Roles.Tenant_BillingAdmin, Features.Tenant_Basic)]
-public class SearchSubscriptionHistoryRequest : UnTenantedSearchRequest<SearchSubscriptionHistoryResponse>,
+public class SearchSubscriptionHistoryRequest :
+    UnTenantedSearchRequest<SearchSubscriptionHistoryRequest, SearchSubscriptionHistoryResponse>,
     IUnTenantedOrganizationRequest
 {
     public DateTime? FromUtc { get; set; }

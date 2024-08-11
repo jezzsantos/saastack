@@ -8,7 +8,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
 /// </summary>
 [Route("/organizations/{Id}/roles/unassign", OperationMethod.PutPatch, AccessType.Token)]
 [Authorize(Interfaces.Roles.Tenant_Owner, Features.Tenant_PaidTrial)]
-public class UnassignRolesFromOrganizationRequest : UnTenantedRequest<GetOrganizationResponse>,
+public class UnassignRolesFromOrganizationRequest :
+    UnTenantedRequest<UnassignRolesFromOrganizationRequest, GetOrganizationResponse>,
     IUnTenantedOrganizationRequest
 {
     public List<string> Roles { get; set; } = [];

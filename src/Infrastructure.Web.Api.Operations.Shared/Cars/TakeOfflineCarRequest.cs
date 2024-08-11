@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 /// </summary>
 [Route("/cars/{Id}/offline", OperationMethod.PutPatch, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class TakeOfflineCarRequest : TenantedRequest<GetCarResponse>
+public class TakeOfflineCarRequest : TenantedRequest<TakeOfflineCarRequest, GetCarResponse>
 {
     public DateTime? FromUtc { get; set; }
 

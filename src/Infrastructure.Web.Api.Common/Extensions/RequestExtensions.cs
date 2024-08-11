@@ -38,13 +38,14 @@ public static class RequestExtensions
                 Resources.RequestExtensions_MissingRouteAttribute.Format(requestTypeName, nameof(RouteAttribute)));
         }
 
-        var route = ExpandRouteTemplate(request, attribute);
+        var (route, routeParams) = ExpandRouteTemplate(request, attribute);
 
         return new RequestInfo
         {
             Route = route,
             Method = attribute.Method,
-            IsTestingOnly = attribute.IsTestingOnly
+            IsTestingOnly = attribute.IsTestingOnly,
+            RouteParams = routeParams
         };
     }
 
@@ -78,6 +79,18 @@ public static class RequestExtensions
     }
 
     /// <summary>
+    ///     Extracts the <see cref="RequestInfo" /> from the <see cref="RouteAttribute" /> declared on the
+    ///     <see cref="request" />, and removes any fields from the body of the request.
+    /// </summary>
+    public static (RequestInfo Info, IWebRequest Request) ParseRequestInfo(this IWebRequest request)
+    {
+        var info = GetRequestInfo(request);
+        var adjustedRequest = NullifyRequestFields(info.RouteParams, request);
+
+        return (info, adjustedRequest);
+    }
+
+    /// <summary>
     ///     Returns the JSON representation of the specified <see cref="request" />
     /// </summary>
     public static string SerializeToJson(this IWebRequest? request)
@@ -98,6 +111,33 @@ public static class RequestExtensions
         return request.GetRequestInfo().Route;
     }
 
+    private static IWebRequest NullifyRequestFields(Dictionary<string, object?> routeParams,
+        IWebRequest request)
+    {
+        var properties = request.GetType()
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        if (properties.HasNone())
+        {
+            return request;
+        }
+
+        if (routeParams.HasNone())
+        {
+            return request;
+        }
+
+        foreach (var routeParam in routeParams)
+        {
+            var property = properties.FirstOrDefault(prop => prop.Name.EqualsIgnoreCase(routeParam.Key));
+            if (property.Exists())
+            {
+                property.SetValue(request, null);
+            }
+        }
+
+        return request;
+    }
+
     private static RouteAttribute? TryGetRouteFromAttribute(Type requestType)
     {
         var attribute = requestType.GetCustomAttribute<RouteAttribute>();
@@ -106,24 +146,28 @@ public static class RequestExtensions
             : attribute;
     }
 
-    private static string ExpandRouteTemplate(IWebRequest request, RouteAttribute attribute)
+    private static (string Route, Dictionary<string, object?> RouteParams) ExpandRouteTemplate(IWebRequest request,
+        RouteAttribute attribute)
     {
         var routeTemplate = attribute.RouteTemplate;
         var requestFields = GetRequestFieldsWithValues(request);
         if (requestFields.HasNone())
         {
-            return routeTemplate;
+            return (routeTemplate,
+                new Dictionary<string, object?>());
         }
 
         var placeholders = GetPlaceholders(routeTemplate);
         if (placeholders.HasNone())
         {
-            return PopulateQueryString(attribute, requestFields, new StringBuilder(routeTemplate)).ToString();
+            return (PopulateQueryString(attribute, requestFields, new StringBuilder(routeTemplate)).ToString(),
+                new Dictionary<string, object?>());
         }
 
         var route = new StringBuilder();
         var positionInOriginalRoute = 0;
         var unSubstitutedRequestFields = new Dictionary<string, object?>(requestFields);
+        var substitutedRequestFields = new Dictionary<string, object?>();
         foreach (var placeholder in placeholders)
         {
             var placeholderStartsAt = placeholder.Value.Index;
@@ -139,6 +183,7 @@ public static class RequestExtensions
                 unSubstitutedRequestFields.Remove(requestFieldName);
                 if (substitute.Exists() && substitute.ToString().HasValue())
                 {
+                    substitutedRequestFields.Add(requestFieldName, substitute);
                     route.Append(substitute);
                 }
             }
@@ -152,7 +197,8 @@ public static class RequestExtensions
 
         AppendRemainingRoute(routeTemplate, positionInOriginalRoute, route);
 
-        return PopulateQueryString(attribute, unSubstitutedRequestFields, route).ToString();
+        return (PopulateQueryString(attribute, unSubstitutedRequestFields, route).ToString(),
+            substitutedRequestFields);
 
         static void AppendRouteBeforePlaceholder(string routeTemplate, int positionInOriginalRoute,
             int placeholderStartsAt, StringBuilder route)

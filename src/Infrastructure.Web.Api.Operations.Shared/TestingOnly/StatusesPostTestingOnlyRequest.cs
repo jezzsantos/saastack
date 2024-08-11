@@ -7,5 +7,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 ///     Tests default status code for POST requests, without a location
 /// </summary>
 [Route("/testingonly/statuses/post1", OperationMethod.Post, isTestingOnly: true)]
-public class StatusesPostTestingOnlyRequest : IWebRequest<StatusesTestingOnlyResponse>;
+public class StatusesPostTestingOnlyRequest : WebRequest<StatusesPostTestingOnlyRequest, StatusesTestingOnlyResponse>;
 #endif

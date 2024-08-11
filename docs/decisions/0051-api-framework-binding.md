@@ -1,0 +1,61 @@
+# API Framework Bindings
+
+* status: proposed
+
+* date: 2024-08-11
+* deciders: jezzsantos
+
+# Context and Problem Statement
+
+We are using minimal APIs, and we are defining all request handlers in this form:
+
+```c#
+apiGroup.MapPut("/cars/{Id}/maintain",
+                async (IMediator mediator, ARequest request) =>
+                     await mediator.Send(request, CancellationToken.None))
+```
+
+Where `ARequest` could look like this:
+
+```c#
+[Route("/resources/{Id}/action", OperationMethod.PutPatch, AccessType.Token)]
+[Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
+public class ARequest : TenantedRequest<ARequest, AResponse>
+{
+    [Required] public string? Id { get; set; }
+
+    public DateTime FromUtc { get; set; }
+
+    public DateTime ToUtc { get; set; }
+}
+```
+
+Where all request data is expected by the API as in either: `application/json` or in `multipart/form-data`.
+
+In this form, [traditional model binding for minimal APIs](https://learn.microsoft.com/en-gb/aspnet/core/fundamentals/minimal-apis/parameter-binding?view=aspnetcore-8.0#binding-precedence) of individual properties in the `ARequest` type is tedious for developers.
+
+The use of attributes like `[FromRoute]`, `[FromQuery]`, `[FromBody]` and  `[FromForm]` get confusing fast, and create dependencies on ASPNET in the assemblies where the types are shared.
+
+For all `GET` and `DELETE` APIs, we are generating those using the `[AsParameters]` but not for `POST`, `PUT`, `PATCH` requests.
+
+We assume that only `GET` and `DELETE` requests, will utilize query strings.
+
+It is possible to provide our own customer binding, by providing a `BindAsync` method on all request types.
+
+## Decision Outcome
+
+`Custom Binding`
+
+- We would prefer is developers did not have to use binding attributes like  `[FromRoute]`, `[FromQuery]`, `[FromBody]` and  `[FromForm]`.
+- We want to support both `application/json`, or in `multipart/form-data`.
+- We can make this easier for the developer
+
+### Pros and Cons of the Options
+
+There are some drawbacks to this approach, that could be with us for some time, as the minimal API framework matures.
+
+1. We have to define a base class for all request types, to avoid having to specify custom binding for each request type, as the ASPNET framework does not yet support a central binding override. Instead [it only supports](https://learn.microsoft.com/en-gb/aspnet/core/fundamentals/minimal-apis/parameter-binding?view=aspnetcore-8.0#binding-precedence) defining static methods on each type, and this cannot be inherited. Thus, we have had to define a base type called `WebRequest<TRequest>` that we can provide a central binding mechanism.
+2. We have to specially process form data.
+3. This custom binding mechanism occurs far down the request pipeline, long after middleware has run, so we need to account for it in several places.
+4. In our handling of requests to support automatic handling of multi-tenancy, we have to derive the current `TenantId` of the request from many places (i.e., from query string, route values, body, etc). We need to account for this binding there.
+5. We have to override defaults in the `Swashbuckle` library that accounts for these attributes, which wont be there anymore.

@@ -8,4 +8,6 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 /// </summary>
 [Route("/flags/", OperationMethod.Get)]
 [UsedImplicitly]
-public class FlagsmithGetEnvironmentFlagsRequest : IWebRequest<FlagsmithGetEnvironmentFlagsResponse>;
+public class
+    FlagsmithGetEnvironmentFlagsRequest : WebRequest<FlagsmithGetEnvironmentFlagsRequest,
+    FlagsmithGetEnvironmentFlagsResponse>;

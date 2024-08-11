@@ -5,8 +5,9 @@ namespace Infrastructure.Web.Api.Interfaces;
 /// <summary>
 ///     Defines the request of a SEARCH API
 /// </summary>
-public class SearchRequest<TResponse> : IWebSearchRequest<TResponse>
+public abstract class SearchRequest<TRequest, TResponse> : WebRequest<TRequest, TResponse>, IWebSearchRequest<TResponse>
     where TResponse : IWebSearchResponse
+    where TRequest : IWebRequest
 {
     [Description("List of child resources to embed in the resource")]
     public string? Embed { get; set; }

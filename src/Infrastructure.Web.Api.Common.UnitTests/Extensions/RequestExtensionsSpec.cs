@@ -34,6 +34,7 @@ public class RequestExtensionsSpec
         result.Route.Should().Be("/aroute/{unknown}");
         result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Should().BeEmpty();
     }
 
     [Fact]
@@ -46,6 +47,7 @@ public class RequestExtensionsSpec
         result.Route.Should().Be("/aroute");
         result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Should().BeEmpty();
     }
 
     [Fact]
@@ -67,6 +69,7 @@ public class RequestExtensionsSpec
                 "/aroute?adatetimeproperty=2023-10-29T12%3a30%3a15Z&anumberproperty=999&astringproperty=avalue&id=anid");
         result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Should().BeEmpty();
     }
 
     [Fact]
@@ -86,6 +89,7 @@ public class RequestExtensionsSpec
         result.Route.Should().Be("/aroute");
         result.Method.Should().Be(OperationMethod.Post);
         result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Should().BeEmpty();
     }
 
     [Fact]
@@ -98,6 +102,7 @@ public class RequestExtensionsSpec
         result.Route.Should().Be("/aroute/{unknown}");
         result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Should().BeEmpty();
     }
 
     [Fact]
@@ -119,6 +124,7 @@ public class RequestExtensionsSpec
                 "/aroute/{unknown}?adatetimeproperty=2023-10-29T12%3a30%3a15Z&anumberproperty=999&astringproperty=avalue&id=anid");
         result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Should().BeEmpty();
     }
 
     [Fact]
@@ -138,6 +144,7 @@ public class RequestExtensionsSpec
         result.Route.Should().Be("/aroute/{unknown}");
         result.Method.Should().Be(OperationMethod.Post);
         result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Should().BeEmpty();
     }
 
     [Fact]
@@ -158,6 +165,7 @@ public class RequestExtensionsSpec
         result.Route.Should().Be("/aroute/apath1/xxxyyy/apath2/apath3");
         result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Should().BeEmpty();
     }
 
     [Fact]
@@ -181,6 +189,11 @@ public class RequestExtensionsSpec
                 "/aroute/anid/apath1/xxx999yyy/apath2/avalue1/avalue2/apath3?adatetimeproperty=2023-10-29T12%3a30%3a15Z&astringproperty3=avalue3");
         result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Count.Should().Be(4);
+        result.RouteParams["id"].Should().Be("anid");
+        result.RouteParams["anumberproperty"].Should().Be(999);
+        result.RouteParams["astringproperty1"].Should().Be("avalue1");
+        result.RouteParams["astringproperty2"].Should().Be("avalue2");
     }
 
     [Fact]
@@ -203,6 +216,9 @@ public class RequestExtensionsSpec
             .Be("/aroute/anid/apath1/xxxyyy/apath2/avalue1/apath3?adatetimeproperty=2023-10-29T12%3a30%3a15Z");
         result.Method.Should().Be(OperationMethod.Get);
         result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Count.Should().Be(2);
+        result.RouteParams["id"].Should().Be("anid");
+        result.RouteParams["astringproperty1"].Should().Be("avalue1");
     }
 
     [Fact]
@@ -223,6 +239,7 @@ public class RequestExtensionsSpec
         result.Route.Should().Be("/aroute/apath1/xxxyyy/apath2/apath3");
         result.Method.Should().Be(OperationMethod.Post);
         result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Should().BeEmpty();
     }
 
     [Fact]
@@ -244,6 +261,12 @@ public class RequestExtensionsSpec
         result.Route.Should().Be("/aroute/anid/apath1/xxx999yyy/apath2/avalue1/avalue2/apath3");
         result.Method.Should().Be(OperationMethod.Post);
         result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Count.Should().Be(4);
+        result.RouteParams["id"].Should().Be("anid");
+        result.RouteParams["anumberproperty"].Should().Be(999);
+        result.RouteParams["astringproperty1"].Should().Be("avalue1");
+        result.RouteParams["astringproperty2"].Should().Be("avalue2");
+
     }
 
     [Fact]
@@ -265,6 +288,9 @@ public class RequestExtensionsSpec
         result.Route.Should().Be("/aroute/anid/apath1/xxxyyy/apath2/avalue1/apath3");
         result.Method.Should().Be(OperationMethod.Post);
         result.IsTestingOnly.Should().BeFalse();
+        result.RouteParams.Count.Should().Be(2);
+        result.RouteParams["id"].Should().Be("anid");
+        result.RouteParams["astringproperty1"].Should().Be("avalue1");
     }
 
     [Fact]

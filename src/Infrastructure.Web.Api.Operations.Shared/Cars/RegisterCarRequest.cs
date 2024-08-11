@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 /// </summary>
 [Route("/cars", OperationMethod.Post, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class RegisterCarRequest : TenantedRequest<GetCarResponse>
+public class RegisterCarRequest : TenantedRequest<RegisterCarRequest, GetCarResponse>
 {
     [Required] public string? Jurisdiction { get; set; }
 

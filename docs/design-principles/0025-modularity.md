@@ -137,7 +137,7 @@ For example,
 ```c# 
 [Route("/organizations/{Id}/settings", OperationMethod.Get, AccessType.Token, isPrivate = true)]
 [Authorize(Roles.Platform_Operations)]
-public class GetOrganizationSettingsRequest : TenantedRequest<GetOrganizationSettingsResponse>
+public class GetOrganizationSettingsRequest : TenantedRequest<GetOrganizationSettingsRequest, GetOrganizationSettingsResponse>
 {
     public string? Id { get; set; }
 }

@@ -240,8 +240,8 @@ public class ApiDocSpec
             var schema = openApi.Components.Schemas["OpenApiPostTestingOnlyRequest"];
             schema.Description.Should().BeNull();
             schema.Required.Should().BeEquivalentTo(["id", "requiredField"]);
-            schema.Properties.Should().HaveCount(3);
-            schema.Properties["id"].Description.Should().Be("anid");
+            schema.Properties.Should().HaveCount(2);
+            schema.Properties.Should().NotContainKey("id");
             schema.Properties["optionalField"].Description.Should().Be("anoptionalfield");
             schema.Properties["requiredField"].Description.Should().Be("arequiredfield");
         }
@@ -279,6 +279,65 @@ public class ApiDocSpec
 
     [Trait("Category", "Integration.API")]
     [Collection("API")]
+    public class GivenAPutRequest : WebApiSpec<ApiHost1.Program>
+    {
+        public GivenAPutRequest(WebApiSetup<ApiHost1.Program> setup) : base(setup)
+        {
+        }
+
+        [Fact]
+        public async Task WhenFetchOpenApi_ThenFieldsHaveDescriptions()
+        {
+            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
+
+            var openApi = new OpenApiStreamReader()
+                .Read(await result.Content.ReadAsStreamAsync(), out _);
+
+            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Put];
+            operation.Description.Should().Be("(request type: OpenApiPutTestingOnlyRequest)");
+            operation.OperationId.Should().Be("OpenApiPutTestingOnly (Put)");
+            var schema = openApi.Components.Schemas["OpenApiPutTestingOnlyRequest"];
+            schema.Description.Should().BeNull();
+            schema.Required.Should().BeEquivalentTo(["id", "requiredField"]);
+            schema.Properties.Should().HaveCount(2);
+            schema.Properties.Should().NotContainKey("id");
+            schema.Properties["optionalField"].Description.Should().Be("anoptionalfield");
+            schema.Properties["requiredField"].Description.Should().Be("arequiredfield");
+        }
+
+        [Fact]
+        public async Task WhenFetchOpenApi_ThenResponseHas201Response()
+        {
+            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
+
+            var openApi = new OpenApiStreamReader()
+                .Read(await result.Content.ReadAsStreamAsync(), out _);
+
+            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Put];
+            operation.Responses["202"].Description.Should().Be("Accepted");
+            operation.Responses["202"].Content.Count.Should().Be(2);
+            operation.Responses["202"].Content[HttpConstants.ContentTypes.Json].Schema.Reference.ReferenceV3.Should()
+                .Be("#/components/schemas/StringMessageTestingOnlyResponse");
+            operation.Responses["202"].Content[HttpConstants.ContentTypes.Xml].Schema.Reference.ReferenceV3.Should()
+                .Be("#/components/schemas/StringMessageTestingOnlyResponse");
+        }
+
+        [Fact]
+        public async Task WhenFetchOpenApi_ThenResponseHasGeneralErrorResponses()
+        {
+            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
+
+            var openApi = new OpenApiStreamReader()
+                .Read(await result.Content.ReadAsStreamAsync(), out _);
+
+            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Put];
+            operation.Responses.Count.Should().Be(10);
+            VerifyGeneralErrorResponses(operation.Responses, "a custom conflict response");
+        }
+    }
+
+    [Trait("Category", "Integration.API")]
+    [Collection("API")]
     public class GivenAPostMultiPartFormRequest : WebApiSpec<ApiHost1.Program>
     {
         public GivenAPostMultiPartFormRequest(WebApiSetup<ApiHost1.Program> setup) : base(setup)
@@ -296,14 +355,16 @@ public class ApiDocSpec
             var operation = openApi!.Paths["/testingonly/openapi/{Id}/binary"].Operations[OperationType.Post];
             operation.Description.Should().Be("(request type: OpenApiPostMultiPartFormTestingOnlyRequest)");
             operation.OperationId.Should().Be("OpenApiPostMultiPartFormTestingOnly");
+            operation.Parameters.Count.Should().Be(1);
+            operation.Parameters[0].Name.Should().Be("Id");
+            operation.Parameters[0].In.Should().Be(ParameterLocation.Path);
             var requestBody = operation.RequestBody;
             requestBody.Content.Count.Should().Be(1);
             requestBody.Content[HttpConstants.ContentTypes.MultiPartFormData].Schema.Required.Should()
-                .BeEquivalentTo([FromFormMultiPartFilter.FormFilesFieldName, "id", "requiredField"]);
+                .BeEquivalentTo([DefaultBodyFilter.FormFilesFieldName, "requiredField"]);
             var properties = requestBody.Content[HttpConstants.ContentTypes.MultiPartFormData].Schema.Properties;
-            properties.Should().HaveCount(4);
-            properties[FromFormMultiPartFilter.FormFilesFieldName].Items.Format.Should().Be("binary");
-            properties["id"].Type.Should().Be("string");
+            properties.Should().HaveCount(3);
+            properties[DefaultBodyFilter.FormFilesFieldName].Items.Format.Should().Be("binary");
             properties["optionalField"].Type.Should().Be("string");
             properties["requiredField"].Type.Should().Be("string");
         }

@@ -165,7 +165,7 @@ partial class EndUserRoot
 
     public Result<Error> AssignPlatformRoles(EndUserRoot assigner, Roles rolesToAssign, AssignRolesAction onAssign)
     {
-        if (!IsPlatformOperator(assigner.Roles))
+        if (!IsOperations(assigner.Roles))
         {
             return Error.RuleViolation(Resources.EndUserRoot_NotOperator);
         }
@@ -424,7 +424,7 @@ partial class EndUserRoot
     public Result<Error> UnassignPlatformRoles(EndUserRoot assigner, Roles rolesToUnassign,
         UnassignRolesAction onUnassign)
     {
-        if (!IsPlatformOperator(assigner.Roles))
+        if (!IsOperations(assigner.Roles))
         {
             return Error.RuleViolation(Resources.EndUserRoot_NotOperator);
         }

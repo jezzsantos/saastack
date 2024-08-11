@@ -7,7 +7,9 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 ///     Creates a new feature state for an edge identity.
 /// </summary>
 [Route("/environments/{EnvironmentApiKey}/featurestates/{FeatureStateId}/", OperationMethod.PutPatch)]
-public class FlagsmithCreateFeatureStateRequest : IWebRequest<FlagsmithCreateFeatureStateResponse>
+public class
+    FlagsmithCreateFeatureStateRequest : WebRequest<FlagsmithCreateFeatureStateRequest,
+    FlagsmithCreateFeatureStateResponse>
 {
     [JsonPropertyName("enabled")] public bool Enabled { get; set; }
 

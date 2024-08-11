@@ -9,7 +9,7 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Gravatar;
 /// </summary>
 [Route("/avatar/{Hash}", OperationMethod.Get)]
 [UsedImplicitly]
-public class GravatarGetImageRequest : IWebRequestStream
+public class GravatarGetImageRequest : WebRequestStream<GravatarGetImageRequest>
 {
     [JsonPropertyName("d")] public string? Default { get; set; }
 

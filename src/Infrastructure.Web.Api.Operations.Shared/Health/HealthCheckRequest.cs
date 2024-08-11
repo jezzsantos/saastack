@@ -6,4 +6,4 @@ namespace Infrastructure.Web.Api.Operations.Shared.Health;
 ///     Displays the health of the API
 /// </summary>
 [Route("/health", OperationMethod.Get)]
-public class HealthCheckRequest : UnTenantedRequest<HealthCheckResponse>;
+public class HealthCheckRequest : UnTenantedRequest<HealthCheckRequest, HealthCheckResponse>;

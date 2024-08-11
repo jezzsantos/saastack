@@ -315,14 +315,15 @@ public class JsonClient : IHttpJsonClient, IDisposable
         IWebRequest request, PostFile? file, Action<HttpRequestMessage>? requestFilter,
         CancellationToken? cancellationToken = default)
     {
-        var requestUri = request.GetRequestInfo().Route;
+        var (info, body) = request.ParseRequestInfo();
+        var requestUri = info.Route;
 
         HttpContent? content = null;
         try
         {
             if (method.CanHaveBody() && file.Exists())
             {
-                var multipart = ToFormData(request);
+                var multipart = ToFormData(body);
                 var streamContent = new StreamContent(file.Stream);
                 if (file.ContentType.HasValue())
                 {
@@ -334,13 +335,14 @@ public class JsonClient : IHttpJsonClient, IDisposable
             }
             else if (method.CanHaveBody() && request is IHasMultipartForm)
             {
-                var multipart = ToFormData(request);
+                var multipart = ToFormData(body);
                 content = multipart;
             }
             else
             {
+                var json = body.SerializeToJson();
                 content = method.CanHaveBody()
-                    ? new StringContent(request.SerializeToJson(),
+                    ? new StringContent(json,
                         new MediaTypeHeaderValue(HttpConstants.ContentTypes.Json))
                     : null;
             }
@@ -352,13 +354,12 @@ public class JsonClient : IHttpJsonClient, IDisposable
             (content as IDisposable)?.Dispose();
         }
 
-        static MultipartFormDataContent ToFormData(IWebRequest request)
+        static MultipartFormDataContent ToFormData(IWebRequest body)
         {
             var content = new MultipartFormDataContent();
-            var requestFields =
-                request.SerializeToJson()
-                    .FromJson<Dictionary<string, string>>()
-                !; //HACK: really need these values to be serialized as QueryString parameters
+            var requestFields = //HACK: really need these values to be serialized as QueryString parameters
+                body.SerializeToJson()
+                    .FromJson<Dictionary<string, string>>()!;
             if (requestFields.HasAny())
             {
                 foreach (var field in requestFields)
@@ -377,8 +378,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
     }
 
     private static async Task<HttpResponseMessage> SendRequestAsync(HttpClient httpClient, HttpMethod method,
-        string requestUri,
-        HttpContent? requestContent, Action<HttpRequestMessage>? requestFilter,
+        string requestUri, HttpContent? requestContent, Action<HttpRequestMessage>? requestFilter,
         CancellationToken? cancellationToken = default)
     {
         var request = new HttpRequestMessage

@@ -6,7 +6,7 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 ///     Deletes an edge identity
 /// </summary>
 [Route("/environments/{EnvironmentApiKey}/edge-identities/{IdentityUuid}/", OperationMethod.Delete)]
-public class FlagsmithDeleteEdgeIdentitiesRequest : IWebRequest<EmptyResponse>
+public class FlagsmithDeleteEdgeIdentitiesRequest : WebRequestEmpty<FlagsmithDeleteEdgeIdentitiesRequest>
 {
     public string? EnvironmentApiKey { get; set; }
 

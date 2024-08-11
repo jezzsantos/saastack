@@ -7,4 +7,4 @@ namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 /// </summary>
 [Route("/cars", OperationMethod.Search, AccessType.Token)]
 [Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
-public class SearchAllCarsRequest : TenantedSearchRequest<SearchAllCarsResponse>;
+public class SearchAllCarsRequest : TenantedSearchRequest<SearchAllCarsRequest, SearchAllCarsResponse>;

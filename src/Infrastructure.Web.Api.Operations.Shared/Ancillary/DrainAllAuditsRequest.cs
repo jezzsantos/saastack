@@ -8,5 +8,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 /// </summary>
 [Route("/audits/drain", OperationMethod.Post, AccessType.HMAC, true)]
 [Authorize(Roles.Platform_ServiceAccount)]
-public class DrainAllAuditsRequest : UnTenantedEmptyRequest;
+public class DrainAllAuditsRequest : UnTenantedEmptyRequest<DrainAllAuditsRequest>;
 #endif

@@ -35,13 +35,8 @@ internal static class DataAnnotationsSchemaFilterExtensions
         }
     }
 
-    public static bool IsPropertyRequired(this PropertyInfo property)
+    public static bool IsPropertyInRoute(this PropertyInfo property)
     {
-        if (property.HasAttribute<RequiredAttribute>())
-        {
-            return true;
-        }
-
         var requestDto = property.DeclaringType;
         var routeAttribute = requestDto!.GetCustomAttribute<RouteAttribute>();
         if (routeAttribute.NotExists())
@@ -51,6 +46,16 @@ internal static class DataAnnotationsSchemaFilterExtensions
 
         var name = property.Name.ToCamelCase();
         return IsInRoute(routeAttribute, name);
+    }
+
+    public static bool IsPropertyRequired(this PropertyInfo property)
+    {
+        if (property.HasAttribute<RequiredAttribute>())
+        {
+            return true;
+        }
+
+        return IsPropertyInRoute(property);
     }
 
     /// <summary>

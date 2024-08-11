@@ -7,7 +7,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 ///     Registers a new person on the platform
 /// </summary>
 [Route("/passwords/register", OperationMethod.Post)]
-public class RegisterPersonPasswordRequest : UnTenantedRequest<RegisterPersonPasswordResponse>
+public class
+    RegisterPersonPasswordRequest : UnTenantedRequest<RegisterPersonPasswordRequest, RegisterPersonPasswordResponse>
 {
     public string? CountryCode { get; set; }
 

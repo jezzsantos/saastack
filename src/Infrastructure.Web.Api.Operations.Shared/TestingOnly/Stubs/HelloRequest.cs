@@ -8,4 +8,4 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly.Stubs;
 /// </summary>
 [Route("/hello", OperationMethod.Get, isTestingOnly: true)]
 [UsedImplicitly]
-public class HelloRequest : IWebRequest<HelloResponse>;
+public class HelloRequest : WebRequest<HelloRequest, HelloResponse>;

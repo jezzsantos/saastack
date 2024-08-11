@@ -9,7 +9,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.EventNotifications;
 /// </summary>
 [Route("/domain_events/notify", OperationMethod.Post, AccessType.HMAC)]
 [Authorize(Roles.Platform_ServiceAccount)]
-public class NotifyDomainEventRequest : UnTenantedRequest<DeliverMessageResponse>
+public class NotifyDomainEventRequest : UnTenantedRequest<NotifyDomainEventRequest, DeliverMessageResponse>
 {
     [Required] public string? Message { get; set; }
 }

@@ -7,7 +7,9 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 ///     Tests the use of an empty post body
 /// </summary>
 [Route("/testingonly/general/body/empty", OperationMethod.Post, isTestingOnly: true)]
-public class PostWithEmptyBodyTestingOnlyRequest : IWebRequest<StringMessageTestingOnlyResponse>
+public class
+    PostWithEmptyBodyTestingOnlyRequest : WebRequest<PostWithEmptyBodyTestingOnlyRequest,
+    StringMessageTestingOnlyResponse>
 {
 }
 

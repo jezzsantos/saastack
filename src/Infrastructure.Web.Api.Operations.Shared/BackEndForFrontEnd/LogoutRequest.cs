@@ -6,4 +6,4 @@ namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 ///     Removes the current user's authenticated session (if any)
 /// </summary>
 [Route("/auth/logout", OperationMethod.Post)]
-public class LogoutRequest : UnTenantedEmptyRequest;
+public class LogoutRequest : UnTenantedEmptyRequest<LogoutRequest>;

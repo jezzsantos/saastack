@@ -7,5 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 ///     Tests access with no authorization
 /// </summary>
 [Route("/testingonly/authz/none/get", OperationMethod.Get, AccessType.Anonymous, true)]
-public class AuthorizeByNothingTestingOnlyRequest : IWebRequest<GetCallerTestingOnlyResponse>;
+public class
+    AuthorizeByNothingTestingOnlyRequest : WebRequest<AuthorizeByNothingTestingOnlyRequest,
+    GetCallerTestingOnlyResponse>;
 #endif

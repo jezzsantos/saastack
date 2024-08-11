@@ -8,7 +8,8 @@ namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
 /// </summary>
 [Route("/organizations/{Id}/members/{UserId}", OperationMethod.Delete, AccessType.Token)]
 [Authorize(Roles.Tenant_Owner, Features.Platform_PaidTrial)]
-public class UnInviteMemberFromOrganizationRequest : UnTenantedRequest<UnInviteMemberFromOrganizationResponse>,
+public class UnInviteMemberFromOrganizationRequest : UnTenantedRequest<UnInviteMemberFromOrganizationRequest,
+        UnInviteMemberFromOrganizationResponse>,
     IUnTenantedOrganizationRequest
 {
     [Required] public string? UserId { get; set; }

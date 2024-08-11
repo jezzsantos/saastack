@@ -6,6 +6,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.UserProfiles;
 ///     Fetches the profile of the authenticated user
 /// </summary>
 [Route("/profiles/me", OperationMethod.Get)]
-public class GetProfileForCallerRequest : UnTenantedRequest<GetProfileForCallerResponse>
+public class GetProfileForCallerRequest : UnTenantedRequest<GetProfileForCallerRequest, GetProfileForCallerResponse>
 {
 }

@@ -8,7 +8,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 ///     Confirms the delivery of a sent email message
 /// </summary>
 [Route("/emails/delivered", OperationMethod.Post, isTestingOnly: true)]
-public class ConfirmEmailDeliveredRequest : UnTenantedEmptyRequest
+public class ConfirmEmailDeliveredRequest : UnTenantedEmptyRequest<ConfirmEmailDeliveredRequest>
 {
     public DateTime? DeliveredAtUtc { get; set; }
 

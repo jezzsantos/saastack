@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 ///     Records a crash event of the product
 /// </summary>
 [Route("/record/crash", OperationMethod.Post)]
-public class RecordCrashRequest : UnTenantedEmptyRequest
+public class RecordCrashRequest : UnTenantedEmptyRequest<RecordCrashRequest>
 {
     [Required] public string? Message { get; set; }
 }
