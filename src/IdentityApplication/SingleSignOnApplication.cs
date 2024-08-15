@@ -11,6 +11,7 @@ namespace IdentityApplication;
 
 public class SingleSignOnApplication : ISingleSignOnApplication
 {
+    public const string AuthErrorProviderName = "provider";
     private readonly IAuthTokensService _authTokensService;
     private readonly IEndUsersService _endUsersService;
     private readonly IRecorder _recorder;
@@ -26,10 +27,10 @@ public class SingleSignOnApplication : ISingleSignOnApplication
     }
 
     public async Task<Result<AuthenticateTokens, Error>> AuthenticateAsync(ICallerContext caller,
-        string? invitationToken, string providerName,
-        string authCode, string? username, CancellationToken cancellationToken)
+        string? invitationToken, string providerName, string authCode, string? username,
+        CancellationToken cancellationToken)
     {
-        var retrievedProvider = await _ssoProvidersService.FindByNameAsync(providerName, cancellationToken);
+        var retrievedProvider = await _ssoProvidersService.FindByProviderNameAsync(providerName, cancellationToken);
         if (retrievedProvider.IsFailure)
         {
             return retrievedProvider.Error;
@@ -37,14 +38,14 @@ public class SingleSignOnApplication : ISingleSignOnApplication
 
         if (!retrievedProvider.Value.HasValue)
         {
-            return Error.NotAuthenticated();
+            return Error.NotAuthenticated(additionalData: GetAuthenticationErrorData(providerName));
         }
 
         var provider = retrievedProvider.Value.Value;
         var authenticated = await provider.AuthenticateAsync(caller, authCode, username, cancellationToken);
         if (authenticated.IsFailure)
         {
-            return authenticated.Error;
+            return Error.NotAuthenticated(additionalData: GetAuthenticationErrorData(providerName));
         }
 
         var userInfo = authenticated.Value;
@@ -82,13 +83,18 @@ public class SingleSignOnApplication : ISingleSignOnApplication
             await _endUsersService.GetMembershipsPrivateAsync(caller, registeredUserId, cancellationToken);
         if (retrievedUser.IsFailure)
         {
-            return Error.NotAuthenticated();
+            return Error.NotAuthenticated(additionalData: GetAuthenticationErrorData(providerName));
         }
 
         var user = retrievedUser.Value;
+        if (user.Classification != EndUserClassification.Person)
+        {
+            return Error.NotAuthenticated(additionalData: GetAuthenticationErrorData(providerName));
+        }
+        
         if (user.Status != EndUserStatus.Registered)
         {
-            return Error.NotAuthenticated();
+            return Error.NotAuthenticated(additionalData: GetAuthenticationErrorData(providerName));
         }
 
         if (user.Access == EndUserAccess.Suspended)
@@ -99,7 +105,8 @@ public class SingleSignOnApplication : ISingleSignOnApplication
             return Error.EntityExists(Resources.SingleSignOnApplication_AccountSuspended);
         }
 
-        var saved = await _ssoProvidersService.SaveUserInfoAsync(providerName, registeredUserId.ToId(), userInfo,
+        var saved = await _ssoProvidersService.SaveUserInfoAsync(caller, providerName, registeredUserId.ToId(),
+            userInfo,
             cancellationToken);
         if (saved.IsFailure)
         {
@@ -121,18 +128,98 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         var tokens = issued.Value;
         return new Result<AuthenticateTokens, Error>(new AuthenticateTokens
         {
-            AccessToken = new AuthenticateToken
+            AccessToken = new AuthenticationToken
             {
                 Value = tokens.AccessToken,
-                ExpiresOn = tokens.AccessTokenExpiresOn
+                ExpiresOn = tokens.AccessTokenExpiresOn,
+                Type = TokenType.AccessToken
             },
-            RefreshToken = new AuthenticateToken
+            RefreshToken = new AuthenticationToken
             {
                 Value = tokens.RefreshToken,
-                ExpiresOn = tokens.RefreshTokenExpiresOn
+                ExpiresOn = tokens.RefreshTokenExpiresOn,
+                Type = TokenType.RefreshToken
             },
             UserId = user.Id
         });
+    }
+
+    public async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensAsync(ICallerContext caller,
+        string userId,
+        CancellationToken cancellationToken)
+    {
+        return await _ssoProvidersService.GetTokensAsync(caller, userId.ToId(), cancellationToken);
+    }
+
+    public async Task<Result<ProviderAuthenticationTokens, Error>> RefreshTokenAsync(ICallerContext caller,
+        string userId, string providerName, string refreshToken, CancellationToken cancellationToken)
+    {
+        var retrievedProvider =
+            await _ssoProvidersService.FindByUserIdAsync(caller, userId.ToId(), providerName, cancellationToken);
+        if (retrievedProvider.IsFailure)
+        {
+            return retrievedProvider.Error;
+        }
+
+        if (!retrievedProvider.Value.HasValue)
+        {
+            return Error.NotAuthenticated(additionalData: GetAuthenticationErrorData(providerName));
+        }
+
+        var provider = retrievedProvider.Value.Value;
+        var retrievedUser =
+            await _endUsersService.GetUserPrivateAsync(caller, userId, cancellationToken);
+        if (retrievedUser.IsFailure)
+        {
+            return Error.NotAuthenticated(additionalData: GetAuthenticationErrorData(providerName));
+        }
+
+        var user = retrievedUser.Value;
+        if (user.Classification != EndUserClassification.Person)
+        {
+            return Error.NotAuthenticated(additionalData: GetAuthenticationErrorData(providerName));
+        }
+
+        if (user.Access == EndUserAccess.Suspended)
+        {
+            _recorder.AuditAgainst(caller.ToCall(), user.Id,
+                Audits.SingleSignOnApplication_Refresh_AccountSuspended,
+                "User {Id} tried to refresh tokens with SSO {Provider} with a suspended account", user.Id,
+                providerName);
+            return Error.EntityExists(Resources.SingleSignOnApplication_AccountSuspended);
+        }
+
+        var refreshed = await provider.RefreshTokenAsync(caller, refreshToken, cancellationToken);
+        if (refreshed.IsFailure)
+        {
+            return Error.NotAuthenticated(additionalData: GetAuthenticationErrorData(providerName));
+        }
+
+        var tokens = refreshed.Value;
+        var saved = await _ssoProvidersService.SaveUserTokensAsync(caller, providerName, userId.ToId(), tokens,
+            cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        _recorder.AuditAgainst(caller.ToCall(), user.Id,
+            Audits.SingleSignOnApplication_Refresh_Succeeded,
+            "User {Id} succeeded to refresh with SSO {Provider}", user.Id, providerName);
+        _recorder.TrackUsageFor(caller.ToCall(), user.Id,
+            UsageConstants.Events.UsageScenarios.Generic.UserExtendedLogin,
+            new Dictionary<string, object>
+            {
+                { UsageConstants.Properties.AuthProvider, providerName },
+                { UsageConstants.Properties.UserIdOverride, user.Id }
+            });
+
+        return tokens;
+    }
+
+    private static Dictionary<string, object> GetAuthenticationErrorData(string providerName)
+    {
+        return new Dictionary<string, object> { { AuthErrorProviderName, providerName } };
     }
 }
 

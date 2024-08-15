@@ -60,7 +60,7 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Authentication.Failed.AccountSuspended.
+        ///   Looks up a localized string similar to Authentication.APIKey.Failed.AccountSuspended.
         /// </summary>
         public static string APIKeysApplication_Authenticate_AccountSuspended {
             get {
@@ -69,11 +69,20 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Authentication.Passed.
+        ///   Looks up a localized string similar to Authentication.APIKey.Passed.
         /// </summary>
         public static string APIKeysApplication_Authenticate_Succeeded {
             get {
                 return ResourceManager.GetString("APIKeysApplication_Authenticate_Succeeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authentication.Any.Refreshed.Passed.
+        /// </summary>
+        public static string AuthTokensApplication_Refresh_Succeeded {
+            get {
+                return ResourceManager.GetString("AuthTokensApplication_Refresh_Succeeded", resourceCulture);
             }
         }
         
@@ -168,7 +177,7 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Mailgun.Authentication.Failed.
+        ///   Looks up a localized string similar to Authentication.Mailgun.Failed.
         /// </summary>
         public static string MailgunApi_WebhookAuthentication_Failed {
             get {
@@ -186,7 +195,7 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Authentication.Failed.AccountLocked.
+        ///   Looks up a localized string similar to Authentication.Password.Failed.AccountLocked.
         /// </summary>
         public static string PasswordCredentialsApplication_Authenticate_AccountLocked {
             get {
@@ -195,7 +204,7 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Authentication.Failed.AccountSuspended.
+        ///   Looks up a localized string similar to Authentication.Password.Failed.AccountSuspended.
         /// </summary>
         public static string PasswordCredentialsApplication_Authenticate_AccountSuspended {
             get {
@@ -204,7 +213,7 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Authentication.Failed.BeforeVerified.
+        ///   Looks up a localized string similar to Authentication.Password.Failed.BeforeVerified.
         /// </summary>
         public static string PasswordCredentialsApplication_Authenticate_BeforeVerified {
             get {
@@ -213,7 +222,7 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Authentication.Failed.InvalidCredentials.
+        ///   Looks up a localized string similar to Authentication.Password.Failed.InvalidCredentials.
         /// </summary>
         public static string PasswordCredentialsApplication_Authenticate_InvalidCredentials {
             get {
@@ -222,7 +231,7 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Authentication.Passed.
+        ///   Looks up a localized string similar to Authentication.Password.Passed.
         /// </summary>
         public static string PasswordCredentialsApplication_Authenticate_Succeeded {
             get {
@@ -240,7 +249,7 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Authentication.Failed.AccountSuspended.
+        ///   Looks up a localized string similar to Authentication.SSO.Failed.AccountSuspended.
         /// </summary>
         public static string SingleSignOnApplication_Authenticate_AccountSuspended {
             get {
@@ -249,11 +258,29 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Authentication.Passed.
+        ///   Looks up a localized string similar to Authentication.SSO.Passed.
         /// </summary>
         public static string SingleSignOnApplication_Authenticate_Succeeded {
             get {
                 return ResourceManager.GetString("SingleSignOnApplication_Authenticate_Succeeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authentication.SSO.Refreshed.Failed.AccountSuspended.
+        /// </summary>
+        public static string SingleSignOnApplication_Refresh_AccountSuspended {
+            get {
+                return ResourceManager.GetString("SingleSignOnApplication_Refresh_AccountSuspended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authentication.SSO.Refreshed.Passed.
+        /// </summary>
+        public static string SingleSignOnApplication_Refresh_Succeeded {
+            get {
+                return ResourceManager.GetString("SingleSignOnApplication_Refresh_Succeeded", resourceCulture);
             }
         }
         

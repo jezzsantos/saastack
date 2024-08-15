@@ -17,11 +17,11 @@ public static class ErrorExtensions
             .FirstOrDefault(c => c.Value.Contains(error.Code));
         if (httpStatusCode.NotExists())
         {
-            return new HttpError(HttpErrorCode.InternalServerError, error.Message);
+            return new HttpError(HttpErrorCode.InternalServerError, error.Message, error.AdditionalData);
         }
 
         return new HttpError(httpStatusCode.Key.ToStatusCode().HttpErrorCode ?? HttpErrorCode.InternalServerError,
-            error.Message);
+            error.Message, error.AdditionalData);
     }
 
     /// <summary>
@@ -30,6 +30,7 @@ public static class ErrorExtensions
     public static ProblemHttpResult ToProblem(this Error error)
     {
         var httpError = error.ToHttpError();
-        return (ProblemHttpResult)Results.Problem(statusCode: (int)httpError.Code, detail: httpError.Message);
+        return (ProblemHttpResult)Results.Problem(statusCode: (int)httpError.Code, detail: httpError.Message,
+            extensions: httpError.AdditionalData!);
     }
 }

@@ -8,15 +8,18 @@ namespace Infrastructure.Web.Api.Interfaces;
 /// </summary>
 public struct HttpError
 {
-    public HttpError(HttpErrorCode code, string? message)
+    public HttpError(HttpErrorCode code, string? message = null, Dictionary<string, object>? additionalData = null)
     {
         Message = message;
         Code = code;
+        AdditionalData = additionalData;
     }
 
     public HttpErrorCode Code { get; }
 
     public string? Message { get; }
+
+    public Dictionary<string, object>? AdditionalData { get; }
 }
 
 /// <summary>

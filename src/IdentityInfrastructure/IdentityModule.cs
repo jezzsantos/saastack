@@ -120,6 +120,7 @@ public class IdentityModule : ISubdomainModule
 
                 services.AddPerHttpRequest<IAPIKeysService, APIKeysService>();
                 services.AddPerHttpRequest<IIdentityService, IdentityInProcessServiceClient>();
+                services.AddPerHttpRequest<ISSOService, SSOInProcessServiceClient>();
                 services.AddPerHttpRequest<ISSOProvidersService, SSOProvidersService>();
 #if TESTINGONLY
                 // EXTEND: replace these registrations with your own OAuth2 implementations

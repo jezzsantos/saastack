@@ -117,5 +117,7 @@
     <data name="VerificationKeep_InvalidToken" xml:space="preserve">
         <value>The verification token is either missing or invalid</value>
     </data>
-
+    <data name="SSOUserRoot_NotOwner" xml:space="preserve">
+        <value>Only the user can update their own tokens</value>
+    </data>
 </root>

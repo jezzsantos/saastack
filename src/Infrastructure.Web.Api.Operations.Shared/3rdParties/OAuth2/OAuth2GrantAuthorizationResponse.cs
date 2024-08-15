@@ -3,7 +3,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.OAuth2;
 
-public class ExchangeOAuth2CodeForTokensResponse : IWebResponse
+public class OAuth2GrantAuthorizationResponse : IWebResponse
 {
     [JsonPropertyName("access_token")] public string? AccessToken { get; set; }
 
@@ -11,5 +11,5 @@ public class ExchangeOAuth2CodeForTokensResponse : IWebResponse
 
     [JsonPropertyName("refresh_token")] public string? RefreshToken { get; set; }
 
-    [JsonPropertyName("token_type")] public string? TokenType { get; set; }
+    [JsonPropertyName("token_type")] public string? TokenType { get; set; } //i.e. bearer
 }

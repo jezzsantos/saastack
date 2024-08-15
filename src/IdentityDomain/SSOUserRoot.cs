@@ -1,5 +1,4 @@
 using Common;
-using Common.Extensions;
 using Domain.Common.Entities;
 using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
@@ -7,35 +6,28 @@ using Domain.Events.Shared.Identities.SSOUsers;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
-using Domain.Services.Shared;
 using Domain.Shared;
 
 namespace IdentityDomain;
 
 public sealed class SSOUserRoot : AggregateRootBase
 {
-    private readonly IEncryptionService _encryptionService;
-
     public static Result<SSOUserRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
-        IEncryptionService encryptionService,
         string providerName, Identifier userId)
     {
-        var root = new SSOUserRoot(recorder, idFactory, encryptionService);
+        var root = new SSOUserRoot(recorder, idFactory);
         root.RaiseCreateEvent(IdentityDomain.Events.SSOUsers.Created(root.Id, providerName, userId));
         return root;
     }
 
-    private SSOUserRoot(IRecorder recorder, IIdentifierFactory idFactory, IEncryptionService encryptionService) : base(
+    private SSOUserRoot(IRecorder recorder, IIdentifierFactory idFactory) : base(
         recorder, idFactory)
     {
-        _encryptionService = encryptionService;
     }
 
-    private SSOUserRoot(IRecorder recorder, IIdentifierFactory idFactory, IEncryptionService encryptionService,
-        ISingleValueObject<string> identifier) : base(
+    private SSOUserRoot(IRecorder recorder, IIdentifierFactory idFactory, ISingleValueObject<string> identifier) : base(
         recorder, idFactory, identifier)
     {
-        _encryptionService = encryptionService;
     }
 
     public Optional<Address> Address { get; private set; }
@@ -48,14 +40,14 @@ public sealed class SSOUserRoot : AggregateRootBase
 
     public Optional<Timezone> Timezone { get; private set; }
 
-    public Optional<string> Tokens { get; private set; }
+    public Optional<SSOAuthTokens> Tokens { get; private set; }
 
     public Identifier UserId { get; private set; } = Identifier.Empty();
 
     public static AggregateRootFactory<SSOUserRoot> Rehydrate()
     {
         return (identifier, container, _) => new SSOUserRoot(container.GetRequiredService<IRecorder>(),
-            container.GetRequiredService<IIdentifierFactory>(), container.GetRequiredService<IEncryptionService>(),
+            container.GetRequiredService<IIdentifierFactory>(),
             identifier);
     }
 
@@ -81,39 +73,50 @@ public sealed class SSOUserRoot : AggregateRootBase
                 return Result.Ok;
             }
 
-            case TokensUpdated changed:
+            case TokensChanged changed:
             {
-                var emailAddress = Domain.Shared.EmailAddress.Create(changed.EmailAddress);
+                var tokens = SSOAuthTokens.Create(changed.Tokens);
+                if (tokens.IsFailure)
+                {
+                    return tokens.Error;
+                }
+
+                Tokens = tokens.Value;
+                Recorder.TraceDebug(null, "User {Id} has changed their tokens", Id);
+                return Result.Ok;
+            }
+
+            case DetailsAdded added:
+            {
+                var emailAddress = Domain.Shared.EmailAddress.Create(added.EmailAddress);
                 if (emailAddress.IsFailure)
                 {
                     return emailAddress.Error;
                 }
 
-                var name = PersonName.Create(changed.FirstName, changed.LastName);
+                EmailAddress = emailAddress.Value;
+                var name = PersonName.Create(added.FirstName, added.LastName);
                 if (name.IsFailure)
                 {
                     return name.Error;
                 }
 
-                var timezone = Domain.Shared.Timezone.Create(changed.Timezone);
+                Name = name.Value;
+                var timezone = Domain.Shared.Timezone.Create(added.Timezone);
                 if (timezone.IsFailure)
                 {
                     return timezone.Error;
                 }
 
-                var address = Domain.Shared.Address.Create(CountryCodes.FindOrDefault(changed.CountryCode));
+                Timezone = timezone.Value;
+                var address = Domain.Shared.Address.Create(CountryCodes.FindOrDefault(added.CountryCode));
                 if (address.IsFailure)
                 {
                     return address.Error;
                 }
 
-                var tokens = _encryptionService.Decrypt(changed.Tokens);
-                Name = name.Value;
-                EmailAddress = emailAddress.Value;
-                Timezone = timezone.Value;
                 Address = address.Value;
-                Tokens = tokens;
-                Recorder.TraceDebug(null, "User {Id} has updated their tokens", Id);
+                Recorder.TraceDebug(null, "User {Id} has added their details", Id);
                 return Result.Ok;
             }
 
@@ -122,12 +125,42 @@ public sealed class SSOUserRoot : AggregateRootBase
         }
     }
 
-    public Result<Error> UpdateDetails(SSOAuthTokens tokens, EmailAddress emailAddress,
+    public Result<Error> AddDetails(SSOAuthTokens tokens, EmailAddress emailAddress,
         PersonName name, Timezone timezone, Address address)
     {
-        var secureTokens = _encryptionService.Encrypt(tokens.ToJson(false)!);
-        return RaiseChangeEvent(
-            IdentityDomain.Events.SSOUsers.TokensUpdated(Id, secureTokens, emailAddress, name, timezone,
+        var detailsUpdated = RaiseChangeEvent(
+            IdentityDomain.Events.SSOUsers.DetailsAdded(Id, emailAddress, name, timezone,
                 address));
+        if (detailsUpdated.IsFailure)
+        {
+            return detailsUpdated.Error;
+        }
+
+        return RaiseChangeEvent(IdentityDomain.Events.SSOUsers.TokensChanged(Id, tokens));
+    }
+
+    public Result<Error> ChangeTokens(Identifier modifierId, SSOAuthTokens tokens)
+    {
+        if (!IsOwner(modifierId))
+        {
+            return Error.RoleViolation(Resources.SSOUserRoot_NotOwner);
+        }
+
+        return RaiseChangeEvent(IdentityDomain.Events.SSOUsers.TokensChanged(Id, tokens));
+    }
+
+    public Result<Error> ViewUser(Identifier viewerId)
+    {
+        if (!IsOwner(viewerId))
+        {
+            return Error.RoleViolation(Resources.SSOUserRoot_NotOwner);
+        }
+
+        return Result.Ok;
+    }
+
+    private bool IsOwner(Identifier userId)
+    {
+        return userId == UserId;
     }
 }

@@ -20,7 +20,7 @@ namespace IdentityApplication;
 
 public class PasswordCredentialsApplication : IPasswordCredentialsApplication
 {
-    private const string ProviderName = "credentials";
+    public const string ProviderName = "credentials";
 #if TESTINGONLY
     private const double MinAuthenticateDelayInSecs = 0;
     private const double MaxAuthenticateDelayInSecs = 0;
@@ -180,15 +180,17 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         var tokens = issued.Value;
         return new Result<AuthenticateTokens, Error>(new AuthenticateTokens
         {
-            AccessToken = new AuthenticateToken
+            AccessToken = new AuthenticationToken
             {
                 Value = tokens.AccessToken,
-                ExpiresOn = tokens.AccessTokenExpiresOn
+                ExpiresOn = tokens.AccessTokenExpiresOn,
+                Type = TokenType.AccessToken
             },
-            RefreshToken = new AuthenticateToken
+            RefreshToken = new AuthenticationToken
             {
                 Value = tokens.RefreshToken,
-                ExpiresOn = tokens.RefreshTokenExpiresOn
+                ExpiresOn = tokens.RefreshTokenExpiresOn,
+                Type = TokenType.RefreshToken
             },
             UserId = user.Id
         });

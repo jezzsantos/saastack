@@ -125,19 +125,31 @@ public class AuthTokensApplication : IAuthTokensApplication
 
         authTokens = saved.Value;
         _recorder.TraceInformation(caller.ToCall(), "AuthTokens were refreshed for {Id}", authTokens.Id);
+        _recorder.AuditAgainst(caller.ToCall(), user.Id,
+            Audits.AuthTokensApplication_Refresh_Succeeded,
+            "User {Id} succeeded to refresh token", user.Id);
+        _recorder.TrackUsageFor(caller.ToCall(), user.Id,
+            UsageConstants.Events.UsageScenarios.Generic.UserExtendedLogin,
+            new Dictionary<string, object>
+            {
+                { UsageConstants.Properties.AuthProvider, PasswordCredentialsApplication.ProviderName },
+                { UsageConstants.Properties.UserIdOverride, user.Id }
+            });
 
         return new AuthenticateTokens
         {
             UserId = user.Id,
-            AccessToken = new AuthenticateToken
+            AccessToken = new AuthenticationToken
             {
                 Value = tokens.AccessToken,
-                ExpiresOn = tokens.AccessTokenExpiresOn
+                ExpiresOn = tokens.AccessTokenExpiresOn,
+                Type = TokenType.AccessToken
             },
-            RefreshToken = new AuthenticateToken
+            RefreshToken = new AuthenticationToken
             {
                 Value = tokens.RefreshToken,
-                ExpiresOn = tokens.RefreshTokenExpiresOn
+                ExpiresOn = tokens.RefreshTokenExpiresOn,
+                Type = TokenType.RefreshToken
             }
         };
     }

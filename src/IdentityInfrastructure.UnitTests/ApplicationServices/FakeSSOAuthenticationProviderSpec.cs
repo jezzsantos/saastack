@@ -29,7 +29,7 @@ public class FakeSSOAuthenticationProviderSpec
         var result =
             await _provider.AuthenticateAsync(_caller.Object, "1234567890", null, CancellationToken.None);
 
-        result.Should().BeError(ErrorCode.RuleViolation, Resources.TestSSOAuthenticationProvider_MissingUsername);
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.FakeSSOAuthenticationProvider_MissingUsername);
     }
 
     [Fact]
@@ -38,7 +38,7 @@ public class FakeSSOAuthenticationProviderSpec
         var result =
             await _provider.AuthenticateAsync(_caller.Object, "awrongcode", null, CancellationToken.None);
 
-        result.Should().BeError(ErrorCode.RuleViolation, Resources.TestSSOAuthenticationProvider_MissingUsername);
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.FakeSSOAuthenticationProvider_MissingUsername);
     }
 
     [Fact]
@@ -59,6 +59,24 @@ public class FakeSSOAuthenticationProviderSpec
         result.Value.LastName.Should().Be("asurname");
         result.Value.Timezone.Should().Be(Timezones.Default);
         result.Value.CountryCode.Should().Be(CountryCodes.Default);
+    }
+
+    [Fact]
+    public async Task WhenRefreshTokenAsyncAndNoRefreshToken_ThenReturnsError()
+    {
+        var result =
+            await _provider.RefreshTokenAsync(_caller.Object, string.Empty, CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.RuleViolation, Resources.TestSSOAuthenticationProvider_MissingRefreshToken);
+    }
+
+    [Fact]
+    public async Task WhenRefreshTokenAsync_ThenReturnsError()
+    {
+        var result =
+            await _provider.RefreshTokenAsync(_caller.Object, "arefreshtoken", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.NotAuthenticated);
     }
 }
 #endif

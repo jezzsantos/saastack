@@ -25,19 +25,19 @@
         </value>
     </resheader>
     <data name="PasswordCredentialsApplication_Authenticate_AccountSuspended" xml:space="preserve">
-        <value>Authentication.Failed.AccountSuspended</value>
+        <value>Authentication.Password.Failed.AccountSuspended</value>
     </data>
     <data name="PasswordCredentialsApplication_Authenticate_AccountLocked" xml:space="preserve">
-        <value>Authentication.Failed.AccountLocked</value>
+        <value>Authentication.Password.Failed.AccountLocked</value>
     </data>
     <data name="PasswordCredentialsApplication_Authenticate_InvalidCredentials" xml:space="preserve">
-        <value>Authentication.Failed.InvalidCredentials</value>
+        <value>Authentication.Password.Failed.InvalidCredentials</value>
     </data>
     <data name="PasswordCredentialsApplication_Authenticate_BeforeVerified" xml:space="preserve">
-        <value>Authentication.Failed.BeforeVerified</value>
+        <value>Authentication.Password.Failed.BeforeVerified</value>
     </data>
     <data name="PasswordCredentialsApplication_Authenticate_Succeeded" xml:space="preserve">
-        <value>Authentication.Passed</value>
+        <value>Authentication.Password.Passed</value>
     </data>
     <data name="EndUsersApplication_User_Registered_TermsAccepted" xml:space="preserve">
         <value>EndUser.Registered.TermsAccepted</value>
@@ -58,10 +58,10 @@
         <value>SingleSignOn.AutoRegistered</value>
     </data>
     <data name="SingleSignOnApplication_Authenticate_AccountSuspended" xml:space="preserve">
-        <value>Authentication.Failed.AccountSuspended</value>
+        <value>Authentication.SSO.Failed.AccountSuspended</value>
     </data>
     <data name="SingleSignOnApplication_Authenticate_Succeeded" xml:space="preserve">
-        <value>Authentication.Passed</value>
+        <value>Authentication.SSO.Passed</value>
     </data>
     <data name="CSRFMiddleware_CSRFProtection_Failed" xml:space="preserve">
         <value>CSRFProtection.Failed</value>
@@ -85,12 +85,21 @@
         <value>Organization.Deleted</value>
     </data>
     <data name="APIKeysApplication_Authenticate_AccountSuspended" xml:space="preserve">
-        <value>Authentication.Failed.AccountSuspended</value>
+        <value>Authentication.APIKey.Failed.AccountSuspended</value>
     </data>
     <data name="APIKeysApplication_Authenticate_Succeeded" xml:space="preserve">
-        <value>Authentication.Passed</value>
+        <value>Authentication.APIKey.Passed</value>
     </data>
     <data name="MailgunApi_WebhookAuthentication_Failed" xml:space="preserve">
-        <value>Mailgun.Authentication.Failed</value>
+        <value>Authentication.Mailgun.Failed</value>
+    </data>
+    <data name="SingleSignOnApplication_Refresh_Succeeded" xml:space="preserve">
+        <value>Authentication.SSO.Refreshed.Passed</value>
+    </data>
+    <data name="AuthTokensApplication_Refresh_Succeeded" xml:space="preserve">
+        <value>Authentication.Any.Refreshed.Passed</value>
+    </data>
+    <data name="SingleSignOnApplication_Refresh_AccountSuspended" xml:space="preserve">
+        <value>Authentication.SSO.Refreshed.Failed.AccountSuspended</value>
     </data>
 </root>

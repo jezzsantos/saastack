@@ -33,16 +33,19 @@ public class SSOUserProjection : IReadModelProjection
                     },
                     cancellationToken);
 
-            case TokensUpdated e:
+            case DetailsAdded e:
                 return await _users.HandleUpdateAsync(e.RootId, dto =>
                 {
-                    dto.Tokens = e.Tokens;
                     dto.EmailAddress = e.EmailAddress;
                     dto.FirstName = e.FirstName;
                     dto.LastName = e.LastName;
                     dto.Timezone = e.Timezone;
                     dto.CountryCode = e.CountryCode;
                 }, cancellationToken);
+
+            case TokensChanged e:
+                return await _users.HandleUpdateAsync(e.RootId,
+                    dto => { dto.Tokens = SSOAuthTokens.Create(e.Tokens).Value; }, cancellationToken);
 
             default:
                 return false;

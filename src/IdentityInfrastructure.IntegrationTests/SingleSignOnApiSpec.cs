@@ -45,8 +45,7 @@ public class SingleSignOnApiSpec : WebApiSpec<Program>
             AuthCode = "1234567890"
         });
 
-        result.Content.Error.Status.Should().Be((int)HttpStatusCode.BadRequest);
-        result.Content.Error.Detail.Should().Be(Resources.TestSSOAuthenticationProvider_MissingUsername);
+        result.Content.Error.Status.Should().Be((int)HttpStatusCode.Unauthorized);
 #endif
     }
 

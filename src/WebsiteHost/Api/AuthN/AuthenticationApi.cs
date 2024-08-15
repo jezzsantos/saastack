@@ -91,7 +91,7 @@ public class AuthenticationApi : IWebApiService
         return Optional<string>.None;
     }
 
-    private static CookieOptions GetCookieOptions(DateTime expires)
+    private static CookieOptions GetCookieOptions(DateTime? expires)
     {
         var options = new CookieOptions
         {
@@ -99,7 +99,9 @@ public class AuthenticationApi : IWebApiService
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Lax,
-            Expires = new DateTimeOffset(expires)
+            Expires = expires.HasValue
+                ? new DateTimeOffset(expires.Value)
+                : null
         };
 
         return options;

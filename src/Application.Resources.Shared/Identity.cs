@@ -4,16 +4,29 @@ namespace Application.Resources.Shared;
 
 public class AuthenticateTokens
 {
-    public required AuthenticateToken AccessToken { get; set; }
+    public required AuthenticationToken AccessToken { get; set; }
 
-    public required AuthenticateToken RefreshToken { get; set; }
+    public required AuthenticationToken RefreshToken { get; set; }
 
     public required string UserId { get; set; }
 }
 
-public class AuthenticateToken
+public class ProviderAuthenticationTokens
 {
-    public required DateTime ExpiresOn { get; set; }
+    public required AuthenticationToken AccessToken { get; set; }
+
+    public required List<AuthenticationToken> OtherTokens { get; set; }
+
+    public required string Provider { get; set; }
+
+    public required AuthenticationToken? RefreshToken { get; set; }
+}
+
+public class AuthenticationToken
+{
+    public required DateTime? ExpiresOn { get; set; }
+
+    public required TokenType Type { get; set; }
 
     public required string Value { get; set; }
 }
@@ -49,7 +62,7 @@ public class AuthToken
 
 public enum TokenType
 {
+    OtherToken = 0,
     AccessToken = 1,
     RefreshToken = 2,
-    IdToken = 3
 }

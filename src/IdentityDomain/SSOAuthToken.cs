@@ -2,33 +2,47 @@ using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
+using Domain.Interfaces.ValueObjects;
+using Domain.Services.Shared;
 
 namespace IdentityDomain;
 
 public sealed class SSOAuthToken : ValueObjectBase<SSOAuthToken>
 {
-    public static Result<SSOAuthToken, Error> Create(SSOAuthTokenType type, string value, DateTime? expiresOn)
+    public static Result<SSOAuthToken, Error> Create(SSOAuthTokenType type, string value, DateTime? expiresOn,
+        IEncryptionService encryptionService)
     {
         if (value.IsNotValuedParameter(nameof(value), out var error1))
         {
             return error1;
         }
 
-        return new SSOAuthToken(type, value, expiresOn);
+        var encrypted = encryptionService.Encrypt(value);
+        return Create(type, encrypted, expiresOn);
     }
 
-    private SSOAuthToken(SSOAuthTokenType type, string value, DateTime? expiresOn)
+    public static Result<SSOAuthToken, Error> Create(SSOAuthTokenType type, string encryptedValue, DateTime? expiresOn)
+    {
+        if (encryptedValue.IsNotValuedParameter(nameof(encryptedValue), out var error1))
+        {
+            return error1;
+        }
+
+        return new SSOAuthToken(type, encryptedValue, expiresOn);
+    }
+
+    private SSOAuthToken(SSOAuthTokenType type, string encryptedValue, DateTime? expiresOn)
     {
         Type = type;
-        Value = value;
+        EncryptedValue = encryptedValue;
         ExpiresOn = expiresOn;
     }
+
+    public string EncryptedValue { get; }
 
     public DateTime? ExpiresOn { get; }
 
     public SSOAuthTokenType Type { get; }
-
-    public string Value { get; }
 
     public static ValueObjectFactory<SSOAuthToken> Rehydrate()
     {
@@ -42,6 +56,12 @@ public sealed class SSOAuthToken : ValueObjectBase<SSOAuthToken>
 
     protected override IEnumerable<object?> GetAtomicValues()
     {
-        return new object?[] { Type, Value, ExpiresOn };
+        return new object?[] { Type, EncryptedValue, ExpiresOn };
+    }
+
+    [SkipImmutabilityCheck]
+    public string GetValue(IEncryptionService encryptionService)
+    {
+        return encryptionService.Decrypt(EncryptedValue);
     }
 }

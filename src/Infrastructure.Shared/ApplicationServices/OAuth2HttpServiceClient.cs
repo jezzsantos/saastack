@@ -35,7 +35,7 @@ public class OAuth2HttpServiceClient : IOAuth2Service
     {
         try
         {
-            var response = await _serviceClient.PostAsync(caller, new ExchangeOAuth2CodeForTokensRequest
+            var response = await _serviceClient.PostAsync(caller, new OAuth2GrantAuthorizationRequest
             {
                 GrantType = "authorization_code",
                 Code = options.Code,
@@ -55,7 +55,7 @@ public class OAuth2HttpServiceClient : IOAuth2Service
             tokens.Add(new AuthToken(TokenType.AccessToken, response.Value.AccessToken!, expiresOn));
             if (response.Value.RefreshToken.HasValue())
             {
-                tokens.Add(new AuthToken(TokenType.RefreshToken, response.Value.AccessToken!, null));
+                tokens.Add(new AuthToken(TokenType.RefreshToken, response.Value.RefreshToken!, null));
             }
 
             return tokens;
@@ -63,6 +63,44 @@ public class OAuth2HttpServiceClient : IOAuth2Service
         catch (Exception ex)
         {
             _recorder.TraceError(caller.ToCall(), ex, "Failed to exchange OAuth2 code with OAuth2 server {Server}",
+                options.ServiceName);
+            return Error.Unexpected(ex.Message);
+        }
+    }
+
+    public async Task<Result<List<AuthToken>, Error>> RefreshTokenAsync(ICallerContext caller,
+        OAuth2RefreshTokenOptions options,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var response = await _serviceClient.PostAsync(caller, new OAuth2GrantAuthorizationRequest
+            {
+                GrantType = "refresh_token",
+                ClientId = _clientId,
+                ClientSecret = _clientSecret,
+                RefreshToken = options.RefreshToken
+            }, null, cancellationToken);
+
+            var tokens = new List<AuthToken>();
+            if (response.IsFailure)
+            {
+                return Error.NotAuthenticated(response.Error.Detail ?? response.Error.Title);
+            }
+
+            var expiresOn = DateTime.UtcNow.Add(TimeSpan.FromSeconds(response.Value.ExpiresIn));
+            tokens.Add(new AuthToken(TokenType.AccessToken, response.Value.AccessToken!, expiresOn));
+            if (response.Value.RefreshToken.HasValue())
+            {
+                tokens.Add(new AuthToken(TokenType.RefreshToken, response.Value.RefreshToken!, null));
+            }
+
+            return tokens;
+        }
+        catch (Exception ex)
+        {
+            _recorder.TraceError(caller.ToCall(), ex,
+                "Failed to refresh OAuth2 refresh token with OAuth2 server {Server}",
                 options.ServiceName);
             return Error.Unexpected(ex.Message);
         }

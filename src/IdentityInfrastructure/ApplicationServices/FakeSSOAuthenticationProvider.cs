@@ -1,5 +1,6 @@
 #if TESTINGONLY
 using Application.Interfaces;
+using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
 using IdentityApplication.ApplicationServices;
@@ -31,7 +32,7 @@ public class FakeSSOAuthenticationProvider : ISSOAuthenticationProvider
     {
         if (emailAddress.HasNoValue())
         {
-            return Error.RuleViolation(Resources.TestSSOAuthenticationProvider_MissingUsername);
+            return Error.RuleViolation(Resources.FakeSSOAuthenticationProvider_MissingUsername);
         }
 
         var retrievedTokens =
@@ -45,9 +46,30 @@ public class FakeSSOAuthenticationProvider : ISSOAuthenticationProvider
 
         var tokens = retrievedTokens.Value;
 
-        return FakeOAuth2Service.GetInfoFromToken(tokens);
+        return FakeOAuth2Service.GetUserInfoFromTokens(tokens);
     }
 
     public string ProviderName => SSOName;
+
+    public async Task<Result<ProviderAuthenticationTokens, Error>> RefreshTokenAsync(ICallerContext caller,
+        string refreshToken, CancellationToken cancellationToken)
+    {
+        if (refreshToken.HasNoValue())
+        {
+            return Error.RuleViolation(Resources.TestSSOAuthenticationProvider_MissingRefreshToken);
+        }
+
+        var retrievedTokens =
+            await _auth2Service.RefreshTokenAsync(caller,
+                new OAuth2RefreshTokenOptions(ServiceName, refreshToken),
+                cancellationToken);
+        if (retrievedTokens.IsFailure)
+        {
+            return Error.NotAuthenticated();
+        }
+
+        var tokens = retrievedTokens.Value;
+        return FakeOAuth2Service.GetProviderTokensFromTokens(SSOName, tokens);
+    }
 }
 #endif

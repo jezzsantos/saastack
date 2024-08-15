@@ -67,15 +67,17 @@ public class AuthenticationApiSpec
             .ReturnsAsync(new AuthenticateTokens
             {
                 UserId = "auserid",
-                AccessToken = new AuthenticateToken
+                AccessToken = new AuthenticationToken
                 {
                     Value = "anaccesstoken",
-                    ExpiresOn = accessTokenExpiresOn
+                    ExpiresOn = accessTokenExpiresOn,
+                    Type = TokenType.AccessToken
                 },
-                RefreshToken = new AuthenticateToken
+                RefreshToken = new AuthenticationToken
                 {
                     Value = "arefreshtoken",
-                    ExpiresOn = refreshTokenExpiresOn
+                    ExpiresOn = refreshTokenExpiresOn,
+                    Type = TokenType.RefreshToken
                 }
             });
 
@@ -133,15 +135,17 @@ public class AuthenticationApiSpec
             .ReturnsAsync(new AuthenticateTokens
             {
                 UserId = "auserid",
-                AccessToken = new AuthenticateToken
+                AccessToken = new AuthenticationToken
                 {
                     Value = "anaccesstoken",
-                    ExpiresOn = accessTokenExpiresOn
+                    ExpiresOn = accessTokenExpiresOn,
+                    Type = TokenType.AccessToken
                 },
-                RefreshToken = new AuthenticateToken
+                RefreshToken = new AuthenticationToken
                 {
                     Value = "arefreshtoken",
-                    ExpiresOn = refreshTokenExpiresOn
+                    ExpiresOn = refreshTokenExpiresOn,
+                    Type = TokenType.RefreshToken
                 }
             });
 

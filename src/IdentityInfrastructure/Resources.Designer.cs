@@ -150,6 +150,15 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;Username&apos; must be provided for this authentication attempt.
+        /// </summary>
+        internal static string FakeSSOAuthenticationProvider_MissingUsername {
+            get {
+                return ResourceManager.GetString("FakeSSOAuthenticationProvider_MissingUsername", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;EmailAddress&apos; is either missing or invalid.
         /// </summary>
         internal static string InitiatePasswordResetRequestValidator_InvalidEmailAddress {
@@ -267,11 +276,11 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &apos;Username&apos; must be provided for this authentication attempt.
+        ///   Looks up a localized string similar to The &apos;RefreshToken&apos; must be provided for this refresh attempt.
         /// </summary>
-        internal static string TestSSOAuthenticationProvider_MissingUsername {
+        internal static string TestSSOAuthenticationProvider_MissingRefreshToken {
             get {
-                return ResourceManager.GetString("TestSSOAuthenticationProvider_MissingUsername", resourceCulture);
+                return ResourceManager.GetString("TestSSOAuthenticationProvider_MissingRefreshToken", resourceCulture);
             }
         }
     }

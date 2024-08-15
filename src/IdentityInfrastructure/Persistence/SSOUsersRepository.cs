@@ -33,7 +33,7 @@ public class SSOUsersRepository : ISSOUsersRepository
     }
 #endif
 
-    public async Task<Result<Optional<SSOUserRoot>, Error>> FindUserInfoByUserIdAsync(string providerName,
+    public async Task<Result<Optional<SSOUserRoot>, Error>> FindByUserIdAsync(string providerName,
         Identifier userId, CancellationToken cancellationToken)
     {
         var query = Query.From<SSOUser>()

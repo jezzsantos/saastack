@@ -52,15 +52,17 @@ public class AuthenticationApplicationSpec
                 Tokens = new AuthenticateTokens
                 {
                     UserId = "auserid",
-                    AccessToken = new AuthenticateToken
+                    AccessToken = new AuthenticationToken
                     {
                         Value = "anaccesstoken",
-                        ExpiresOn = accessTokenExpiresOn
+                        ExpiresOn = accessTokenExpiresOn,
+                        Type = TokenType.AccessToken
                     },
-                    RefreshToken = new AuthenticateToken
+                    RefreshToken = new AuthenticationToken
                     {
                         Value = "arefreshtoken",
-                        ExpiresOn = refreshTokenExpiresOn
+                        ExpiresOn = refreshTokenExpiresOn,
+                        Type = TokenType.RefreshToken
                     }
                 }
             });
@@ -91,15 +93,17 @@ public class AuthenticationApplicationSpec
                 Tokens = new AuthenticateTokens
                 {
                     UserId = "auserid",
-                    AccessToken = new AuthenticateToken
+                    AccessToken = new AuthenticationToken
                     {
                         Value = "anaccesstoken",
-                        ExpiresOn = accessTokenExpiresOn
+                        ExpiresOn = accessTokenExpiresOn,
+                        Type = TokenType.AccessToken
                     },
-                    RefreshToken = new AuthenticateToken
+                    RefreshToken = new AuthenticationToken
                     {
                         Value = "arefreshtoken",
-                        ExpiresOn = refreshTokenExpiresOn
+                        ExpiresOn = refreshTokenExpiresOn,
+                        Type = TokenType.RefreshToken
                     }
                 }
             });
@@ -142,15 +146,17 @@ public class AuthenticationApplicationSpec
                 Tokens = new AuthenticateTokens
                 {
                     UserId = "auserid",
-                    AccessToken = new AuthenticateToken
+                    AccessToken = new AuthenticationToken
                     {
                         Value = "anaccesstoken",
-                        ExpiresOn = accessTokenExpiresOn
+                        ExpiresOn = accessTokenExpiresOn,
+                        Type = TokenType.AccessToken
                     },
-                    RefreshToken = new AuthenticateToken
+                    RefreshToken = new AuthenticationToken
                     {
                         Value = "arefreshtoken",
-                        ExpiresOn = refreshTokenExpiresOn
+                        ExpiresOn = refreshTokenExpiresOn,
+                        Type = TokenType.RefreshToken
                     }
                 }
             });
@@ -167,8 +173,5 @@ public class AuthenticationApplicationSpec
             sc => sc.PostAsync(_caller.Object, It.Is<RefreshTokenRequest>(req =>
                 req.RefreshToken == "arefreshtoken"
             ), null, It.IsAny<CancellationToken>()));
-        _recorder.Verify(rec =>
-            rec.TrackUsage(It.IsAny<ICallContext>(), UsageConstants.Events.UsageScenarios.Generic.UserExtendedLogin,
-                null));
     }
 }

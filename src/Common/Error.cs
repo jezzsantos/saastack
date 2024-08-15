@@ -15,15 +15,19 @@ public readonly struct Error
     {
         Code = ErrorCode.NoError;
         Message = NoErrorMessage;
+        AdditionalData = null;
     }
 
-    internal Error(ErrorCode code, string? message = null)
+    internal Error(ErrorCode code, string? message = null, Dictionary<string, object>? additionalData = null)
     {
         Code = code;
         Message = message ?? NoErrorMessage;
+        AdditionalData = additionalData;
     }
 
     public string Message { get; }
+
+    public Dictionary<string, object>? AdditionalData { get; }
 
     public ErrorCode Code { get; }
 
@@ -31,31 +35,59 @@ public readonly struct Error
     /// <summary>
     ///     Wraps the existing message within the specified message
     /// </summary>
-    public Error Wrap(string message)
+    public Error Wrap(string message, Dictionary<string, object>? additionalData = null)
     {
+        var additional = AdditionalData;
+        if (additionalData.Exists())
+        {
+            if (AdditionalData.Exists())
+            {
+                AdditionalData.Merge(additionalData);
+                additional = AdditionalData;
+            }
+            else
+            {
+                additional = additionalData;
+            }
+        }
+
         if (message.HasNoValue())
         {
-            return new Error(Code, Message);
+            return new Error(Code, Message, additional);
         }
 
         return new Error(Code, Message.HasValue() && Message != NoErrorMessage
             ? $"{message}{Environment.NewLine}\t{Message}"
-            : message);
+            : message, additional);
     }
 
     /// <summary>
     ///     Wraps the existing message within the specified message, for the specified code
     /// </summary>
-    public Error Wrap(ErrorCode code, string message)
+    public Error Wrap(ErrorCode code, string message, Dictionary<string, object>? additionalData = null)
     {
+        var additional = AdditionalData;
+        if (additionalData.Exists())
+        {
+            if (AdditionalData.Exists())
+            {
+                AdditionalData.Merge(additionalData);
+                additional = AdditionalData;
+            }
+            else
+            {
+                additional = additionalData;
+            }
+        }
+
         if (message.HasNoValue())
         {
-            return new Error(code, Message);
+            return new Error(code, Message, additional);
         }
 
         return new Error(code, Message.HasValue() && Message != NoErrorMessage
             ? $"{Code}: {message}{Environment.NewLine}\t{Message}"
-            : $"{Code}: {message}");
+            : $"{Code}: {message}", additional);
     }
 #endif
 
@@ -76,89 +108,89 @@ public readonly struct Error
     /// <summary>
     ///     Creates a <see cref="ErrorCode.Validation" /> error
     /// </summary>
-    public static Error Validation(string? message = null)
+    public static Error Validation(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.Validation, message);
+        return new Error(ErrorCode.Validation, message, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.RuleViolation" /> error
     /// </summary>
-    public static Error RuleViolation(string? message = null)
+    public static Error RuleViolation(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.RuleViolation, message);
+        return new Error(ErrorCode.RuleViolation, message, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.RoleViolation" /> error
     /// </summary>
-    public static Error RoleViolation(string? message = null)
+    public static Error RoleViolation(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.RoleViolation, message);
+        return new Error(ErrorCode.RoleViolation, message, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.PreconditionViolation" /> error
     /// </summary>
-    public static Error PreconditionViolation(string? message = null)
+    public static Error PreconditionViolation(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.PreconditionViolation, message);
+        return new Error(ErrorCode.PreconditionViolation, message, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.EntityNotFound" /> error
     /// </summary>
-    public static Error EntityNotFound(string? message = null)
+    public static Error EntityNotFound(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.EntityNotFound, message);
+        return new Error(ErrorCode.EntityNotFound, message, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.EntityExists" /> error
     /// </summary>
-    public static Error EntityExists(string? message = null)
+    public static Error EntityExists(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.EntityExists, message);
+        return new Error(ErrorCode.EntityExists, message, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.NotAuthenticated" /> error
     /// </summary>
-    public static Error NotAuthenticated(string? message = null)
+    public static Error NotAuthenticated(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.NotAuthenticated, message);
+        return new Error(ErrorCode.NotAuthenticated, message, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.ForbiddenAccess" /> error
     /// </summary>
-    public static Error ForbiddenAccess(string? message = null)
+    public static Error ForbiddenAccess(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.ForbiddenAccess, message);
+        return new Error(ErrorCode.ForbiddenAccess, message, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.FeatureViolation" /> error
     /// </summary>
-    public static Error FeatureViolation(string? message = null)
+    public static Error FeatureViolation(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.FeatureViolation, message);
+        return new Error(ErrorCode.FeatureViolation, message, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.Unexpected" /> error
     /// </summary>
-    public static Error Unexpected(string? message = null)
+    public static Error Unexpected(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.Unexpected, message);
+        return new Error(ErrorCode.Unexpected, message, additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.EntityDeleted" /> error
     /// </summary>
-    public static Error EntityDeleted(string? message = null)
+    public static Error EntityDeleted(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.EntityDeleted, message);
+        return new Error(ErrorCode.EntityDeleted, message, additionalData);
     }
 
     public override string ToString()

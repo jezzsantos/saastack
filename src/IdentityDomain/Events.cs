@@ -5,6 +5,7 @@ using Domain.Events.Shared.Identities.PasswordCredentials;
 using Domain.Events.Shared.Identities.SSOUsers;
 using Domain.Shared;
 using Created = Domain.Events.Shared.Identities.AuthTokens.Created;
+using TokensChanged = Domain.Events.Shared.Identities.SSOUsers.TokensChanged;
 
 namespace IdentityDomain;
 
@@ -20,11 +21,12 @@ public static class Events
             };
         }
 
-        public static TokensChanged TokensChanged(Identifier id, Identifier userId, string accessToken,
+        public static Domain.Events.Shared.Identities.AuthTokens.TokensChanged TokensChanged(Identifier id,
+            Identifier userId, string accessToken,
             DateTime accessTokenExpiresOn,
             string refreshToken, DateTime refreshTokenExpiresOn)
         {
-            return new TokensChanged(id)
+            return new Domain.Events.Shared.Identities.AuthTokens.TokensChanged(id)
             {
                 UserId = userId,
                 AccessToken = accessToken,
@@ -186,17 +188,31 @@ public static class Events
             };
         }
 
-        public static TokensUpdated TokensUpdated(Identifier id, string tokens, EmailAddress emailAddress,
+        public static DetailsAdded DetailsAdded(Identifier id, EmailAddress emailAddress,
             PersonName name, Timezone timezone, Address address)
         {
-            return new TokensUpdated(id)
+            return new DetailsAdded(id)
             {
-                Tokens = tokens,
                 EmailAddress = emailAddress,
                 FirstName = name.FirstName,
                 LastName = name.LastName.ValueOrDefault?.Text,
                 Timezone = timezone.Code.ToString(),
                 CountryCode = address.CountryCode.ToString()
+            };
+        }
+
+        public static TokensChanged TokensChanged(Identifier id, SSOAuthTokens tokens)
+        {
+            return new TokensChanged(id)
+            {
+                Tokens = tokens
+                    .ToList()
+                    .Select(tok => new SSOToken
+                    {
+                        Type = tok.Type.ToString(),
+                        EncryptedValue = tok.EncryptedValue,
+                        ExpiresOn = tok.ExpiresOn
+                    }).ToList()
             };
         }
     }

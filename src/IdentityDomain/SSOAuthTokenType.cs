@@ -2,7 +2,7 @@ namespace IdentityDomain;
 
 public enum SSOAuthTokenType
 {
-    AccessToken = 0,
-    RefreshToken = 1,
-    IdToken = 2
+    OtherToken = 0,
+    AccessToken = 1,
+    RefreshToken = 2
 }

@@ -4,14 +4,14 @@ using JetBrains.Annotations;
 
 namespace Domain.Events.Shared.Identities.SSOUsers;
 
-public sealed class TokensUpdated : DomainEvent
+public sealed class DetailsAdded : DomainEvent
 {
-    public TokensUpdated(Identifier id) : base(id)
+    public DetailsAdded(Identifier id) : base(id)
     {
     }
 
     [UsedImplicitly]
-    public TokensUpdated()
+    public DetailsAdded()
     {
     }
 
@@ -24,6 +24,4 @@ public sealed class TokensUpdated : DomainEvent
     public string? LastName { get; set; }
 
     public required string Timezone { get; set; }
-
-    public required string Tokens { get; set; }
 }

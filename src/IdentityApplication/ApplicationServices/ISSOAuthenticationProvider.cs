@@ -12,7 +12,17 @@ public interface ISSOAuthenticationProvider
 {
     string ProviderName { get; }
 
+    /// <summary>
+    ///     Returns the authenticated user with the specified <see cref="authCode" /> for the specified
+    ///     <see cref="emailAddress" />
+    /// </summary>
     Task<Result<SSOUserInfo, Error>> AuthenticateAsync(ICallerContext caller, string authCode, string? emailAddress,
+        CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Returns the refreshed token, with new access tokens
+    /// </summary>
+    Task<Result<ProviderAuthenticationTokens, Error>> RefreshTokenAsync(ICallerContext caller, string refreshToken,
         CancellationToken cancellationToken);
 }
 
@@ -38,13 +48,13 @@ public class SSOUserInfo
 
     public string FirstName { get; }
 
+    public string FullName => LastName.HasValue()
+        ? $"{FirstName} {LastName}"
+        : FirstName;
+
     public string? LastName { get; }
 
     public TimezoneIANA Timezone { get; }
 
     public IReadOnlyList<AuthToken> Tokens { get; }
-
-    public string FullName => LastName.HasValue()
-        ? $"{FirstName} {LastName}"
-        : FirstName;
 }

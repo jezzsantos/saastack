@@ -30,7 +30,47 @@ public class FakeOAuth2Service : IOAuth2Service
         });
     }
 
-    public static AuthToken CreateAccessToken(OAuth2CodeTokenExchangeOptions options)
+    public Task<Result<List<AuthToken>, Error>> RefreshTokenAsync(ICallerContext caller,
+        OAuth2RefreshTokenOptions options, CancellationToken cancellationToken)
+    {
+        return Task.FromResult<Result<List<AuthToken>, Error>>(Error.PreconditionViolation("Not Supported"));
+    }
+
+    public static Result<ProviderAuthenticationTokens, Error> GetProviderTokensFromTokens(string providerName,
+        List<AuthToken> tokens)
+    {
+        var accessToken = tokens.Single(tok => tok.Type == TokenType.AccessToken);
+        return new ProviderAuthenticationTokens
+        {
+            Provider = providerName,
+            AccessToken = new AuthenticationToken
+            {
+                ExpiresOn = accessToken.ExpiresOn
+                            ?? DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry),
+                Type = TokenType.AccessToken,
+                Value = accessToken.Value
+            },
+            RefreshToken = null,
+            OtherTokens = []
+        };
+    }
+
+    public static SSOUserInfo GetUserInfoFromTokens(List<AuthToken> tokens)
+    {
+        var accessToken = tokens.Single(tok => tok.Type == TokenType.AccessToken).Value;
+
+        var claims = new JwtSecurityTokenHandler().ReadJwtToken(accessToken).Claims.ToArray();
+        var emailAddress = claims.Single(c => c.Type == ClaimTypes.Email).Value;
+        var firstName = claims.Single(c => c.Type == ClaimTypes.GivenName).Value;
+        var lastName = claims.Single(c => c.Type == ClaimTypes.Surname).Value;
+        var timezone =
+            Timezones.FindOrDefault(claims.Single(c => c.Type == AuthenticationConstants.Claims.ForTimezone).Value);
+        var country = CountryCodes.FindOrDefault(claims.Single(c => c.Type == ClaimTypes.Country).Value);
+
+        return new SSOUserInfo(tokens, emailAddress, firstName, lastName, timezone, country);
+    }
+
+    private static AuthToken CreateAccessToken(OAuth2CodeTokenExchangeOptions options)
     {
         var expiresOn = DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry);
         var accessToken = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
@@ -46,21 +86,6 @@ public class FakeOAuth2Service : IOAuth2Service
         ));
 
         return new AuthToken(TokenType.AccessToken, accessToken, expiresOn);
-    }
-
-    public static SSOUserInfo GetInfoFromToken(List<AuthToken> tokens)
-    {
-        var accessToken = tokens.Single(tok => tok.Type == TokenType.AccessToken).Value;
-
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(accessToken).Claims.ToArray();
-        var emailAddress = claims.Single(c => c.Type == ClaimTypes.Email).Value;
-        var firstName = claims.Single(c => c.Type == ClaimTypes.GivenName).Value;
-        var lastName = claims.Single(c => c.Type == ClaimTypes.Surname).Value;
-        var timezone =
-            Timezones.FindOrDefault(claims.Single(c => c.Type == AuthenticationConstants.Claims.ForTimezone).Value);
-        var country = CountryCodes.FindOrDefault(claims.Single(c => c.Type == ClaimTypes.Country).Value);
-
-        return new SSOUserInfo(tokens, emailAddress, firstName, lastName, timezone, country);
     }
 }
 #endif

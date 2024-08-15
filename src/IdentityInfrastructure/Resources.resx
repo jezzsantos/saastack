@@ -78,8 +78,11 @@
     <data name="AuthenticateSingleSignOnRequestValidator_InvalidUsername" xml:space="preserve">
       <value>The 'Username' is invalid</value>
     </data>
-    <data name="TestSSOAuthenticationProvider_MissingUsername" xml:space="preserve">
+    <data name="FakeSSOAuthenticationProvider_MissingUsername" xml:space="preserve">
       <value>The 'Username' must be provided for this authentication attempt</value>
+    </data>
+    <data name="TestSSOAuthenticationProvider_MissingRefreshToken" xml:space="preserve">
+      <value>The 'RefreshToken' must be provided for this refresh attempt</value>
     </data>
     <data name="RegisterPersonPasswordRequestValidator_InvalidInvitationToken" xml:space="preserve">
       <value>The 'InvitationToken' is either missing or invalid</value>

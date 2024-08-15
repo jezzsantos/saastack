@@ -77,8 +77,6 @@ public class AuthenticationApplication : IAuthenticationApplication
             return refreshed.Error.ToError();
         }
 
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserExtendedLogin);
-
         return refreshed.Value.ToTokens();
     }
 }
