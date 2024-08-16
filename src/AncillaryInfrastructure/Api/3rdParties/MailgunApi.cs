@@ -86,7 +86,7 @@ public class MailgunApi : IWebApiService
             return Error.NotAuthenticated();
         }
 
-        var signature = $"sha1={parameters.Signature}";
+        var signature = $"sha256={parameters.Signature}";
         var text = $"{parameters.Timestamp}{parameters.Token}";
 
         var signer = new HMACSigner(text, webhookSigningKey);

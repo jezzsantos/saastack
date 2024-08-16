@@ -101,7 +101,7 @@ public class HttpRequestExtensionsSpec
         message.SetHMACAuth(request, "asecret");
 
         message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
-            hdr == "sha1=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
+            hdr == "sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
     }
 
     [Fact]
@@ -113,7 +113,7 @@ public class HttpRequestExtensionsSpec
         message.SetHMACAuth(request, "asecret");
 
         message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
-            hdr == "sha1=efab63816eb3c3ab799dfd64e717865116f7aa1547177293ec6598fe3cc8e3de");
+            hdr == "sha256=efab63816eb3c3ab799dfd64e717865116f7aa1547177293ec6598fe3cc8e3de");
     }
 
     [Fact]

@@ -25,7 +25,7 @@ public class HMACSignerSpec
 
             var result = signer.Sign();
 
-            result.Should().Be("sha1=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
+            result.Should().Be("sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
         }
 
         [Fact]
@@ -38,7 +38,7 @@ public class HMACSignerSpec
 
             var result = signer.Sign();
 
-            result.Should().Be("sha1=5ac3c7a7378d5f293359720f1bf64cfcbfbf672b61640121a11526638a57a2c5");
+            result.Should().Be("sha256=5ac3c7a7378d5f293359720f1bf64cfcbfbf672b61640121a11526638a57a2c5");
         }
 
         [Fact]
