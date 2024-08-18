@@ -15,8 +15,8 @@ partial class AzureSqlServerStore : IEventStore
     public async Task<Result<string, Error>> AddEventsAsync(string entityName, string entityId,
         List<EventSourcedChangeEvent> events, CancellationToken cancellationToken)
     {
-        entityName.ThrowIfNotValuedParameter(nameof(entityName), Resources.AzureSqlServerStore_MissingEntityName);
-        entityId.ThrowIfNotValuedParameter(nameof(entityId), Resources.AzureSqlServerStore_MissingEntityId);
+        entityName.ThrowIfNotValuedParameter(nameof(entityName), Resources.AnyStore_MissingEntityName);
+        entityId.ThrowIfNotValuedParameter(nameof(entityId), Resources.AnyStore_MissingEntityId);
         ArgumentNullException.ThrowIfNull(events);
 
         var streamName = DetermineEventStreamName(entityName, entityId);
@@ -53,7 +53,7 @@ partial class AzureSqlServerStore : IEventStore
     async Task<Result<Error>> IEventStore.DestroyAllAsync(string entityName, CancellationToken cancellationToken)
     {
         entityName.ThrowIfNotValuedParameter(nameof(entityName),
-            Resources.AzureSqlServerStore_MissingEntityName);
+            Resources.AnyStore_MissingEntityName);
 
         return await ExecuteSqlDeleteCommandAsync(DetermineEventStoreContainerName(),
             new KeyValuePair<string, object>(nameof(EventStoreEntity.EntityName), entityName), cancellationToken);
@@ -63,8 +63,8 @@ partial class AzureSqlServerStore : IEventStore
     public async Task<Result<IReadOnlyList<EventSourcedChangeEvent>, Error>> GetEventStreamAsync(string entityName,
         string entityId, CancellationToken cancellationToken)
     {
-        entityName.ThrowIfNotValuedParameter(nameof(entityName), Resources.AzureSqlServerStore_MissingEntityName);
-        entityId.ThrowIfNotValuedParameter(nameof(entityId), Resources.AzureSqlServerStore_MissingEntityId);
+        entityName.ThrowIfNotValuedParameter(nameof(entityName), Resources.AnyStore_MissingEntityName);
+        entityId.ThrowIfNotValuedParameter(nameof(entityId), Resources.AnyStore_MissingEntityId);
 
         var streamName = DetermineEventStreamName(entityName, entityId);
         var query = Query.From<EventStoreEntity>()

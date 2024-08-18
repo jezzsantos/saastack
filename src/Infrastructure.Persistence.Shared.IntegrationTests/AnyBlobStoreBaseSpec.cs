@@ -65,13 +65,12 @@ public abstract class AnyBlobStoreBaseSpec
 
         const string contentType = "image/bmp";
         await _setup.Store.UploadAsync(_setup.ContainerName, "ablobname", contentType, stream, CancellationToken.None);
-        using (var downloaded = new MemoryStream())
-        {
-            var result = await _setup.Store.DownloadAsync(_setup.ContainerName,
-                "adifferentblobname", downloaded, CancellationToken.None);
+        using var downloaded = new MemoryStream();
 
-            result.Value.Should().BeNone();
-        }
+        var result = await _setup.Store.DownloadAsync(_setup.ContainerName,
+            "adifferentblobname", downloaded, CancellationToken.None);
+
+        result.Value.Should().BeNone();
     }
 
     [Fact]
@@ -82,21 +81,21 @@ public abstract class AnyBlobStoreBaseSpec
         const string contentType = "image/bmp";
         await _setup.Store.UploadAsync(_setup.ContainerName, "ablobname", contentType, stream,
             CancellationToken.None);
-        using (var downloaded = new MemoryStream())
-        {
-            var result = await _setup.Store.DownloadAsync(_setup.ContainerName, "ablobname", downloaded,
-                CancellationToken.None);
+        using var downloaded = new MemoryStream();
 
-            result.Value.Value.ContentType.Should().Be(contentType);
-            downloaded.Rewind();
-            downloaded.ReadFully().Should().BeEquivalentTo(data);
-        }
+        var result = await _setup.Store.DownloadAsync(_setup.ContainerName, "ablobname", downloaded,
+            CancellationToken.None);
+
+        result.Value.Value.ContentType.Should().Be(contentType);
+        downloaded.Rewind();
+        downloaded.ReadFully().Should().BeEquivalentTo(data);
     }
 
     [Fact]
     public async Task WhenUploadAndContainerNameIsNull_ThenThrows()
     {
         const string contentType = "image/bmp";
+        
         await _setup.Store
             .Invoking(x =>
             {
@@ -110,6 +109,7 @@ public abstract class AnyBlobStoreBaseSpec
     public async Task WhenUploadAndBlobNameIsNull_ThenThrows()
     {
         const string contentType = "image/bmp";
+        
         await _setup.Store
             .Invoking(x =>
             {
@@ -135,6 +135,7 @@ public abstract class AnyBlobStoreBaseSpec
     public async Task WhenUploadAndStreamIsNull_ThenThrows()
     {
         const string contentType = "image/bmp";
+        
         await _setup.Store
             .Invoking(x =>
                 x.UploadAsync(_setup.ContainerName, "ablobname", contentType, null!, CancellationToken.None))
@@ -155,15 +156,13 @@ public abstract class AnyBlobStoreBaseSpec
         await _setup.Store.UploadAsync(_setup.ContainerName, "ablobname", newContentType, newStream,
             CancellationToken.None);
 
-        using (var downloaded = new MemoryStream())
-        {
-            var result = await _setup.Store.DownloadAsync(_setup.ContainerName, "ablobname", downloaded,
-                CancellationToken.None);
+        using var downloaded = new MemoryStream();
+        var result = await _setup.Store.DownloadAsync(_setup.ContainerName, "ablobname", downloaded,
+            CancellationToken.None);
 
-            result.Value.Value.ContentType.Should().Be(newContentType);
-            downloaded.Rewind();
-            downloaded.ReadFully().Should().BeEquivalentTo(newData);
-        }
+        result.Value.Value.ContentType.Should().Be(newContentType);
+        downloaded.Rewind();
+        downloaded.ReadFully().Should().BeEquivalentTo(newData);
     }
 
     [Fact]
@@ -177,17 +176,40 @@ public abstract class AnyBlobStoreBaseSpec
         await _setup.Store.UploadAsync(_setup.ContainerName, "ablobname", contentType, stream,
             CancellationToken.None);
 
-        using (var downloaded = new MemoryStream())
-        {
-            var result = await _setup.Store.DownloadAsync(_setup.ContainerName, "ablobname", downloaded,
-                CancellationToken.None);
+        using var downloaded = new MemoryStream();
+        var result = await _setup.Store.DownloadAsync(_setup.ContainerName, "ablobname", downloaded,
+            CancellationToken.None);
 
-            result.Value.Value.ContentType.Should().Be(contentType);
-            downloaded.Rewind();
-            downloaded.ReadFully().Should().BeEquivalentTo(data);
-        }
+        result.Value.Value.ContentType.Should().Be(contentType);
+        downloaded.Rewind();
+        downloaded.ReadFully().Should().BeEquivalentTo(data);
     }
 
+    [Fact]
+    public async Task WhenDeleteAndContainerNameIsNull_ThenThrows()
+    {
+        await _setup.Store
+            .Invoking(x =>
+            {
+                using var stream = new MemoryStream();
+                return x.DeleteAsync(null!, "ablobname", CancellationToken.None);
+            })
+            .Should().ThrowAsync<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public async Task WhenDeleteAndBlobNameIsNull_ThenThrows()
+    {
+        await _setup.Store
+            .Invoking(x =>
+            {
+                using var stream = new MemoryStream();
+                return x.DeleteAsync(_setup.ContainerName, null!, CancellationToken.None);
+            })
+            .Should().ThrowAsync<ArgumentOutOfRangeException>();
+    }
+
+    
     [Fact]
     public async Task WhenDeleteAndBlobNotExists_ThenDeletes()
     {
@@ -214,13 +236,11 @@ public abstract class AnyBlobStoreBaseSpec
         await _setup.Store.DeleteAsync(_setup.ContainerName, "adifferentblobname",
             CancellationToken.None);
 
-        using (var downloaded = new MemoryStream())
-        {
-            var result = await _setup.Store.DownloadAsync(_setup.ContainerName,
-                "adifferentblobname", downloaded, CancellationToken.None);
+        using var downloaded = new MemoryStream();
+        var result = await _setup.Store.DownloadAsync(_setup.ContainerName,
+            "adifferentblobname", downloaded, CancellationToken.None);
 
-            result.Value.Should().BeNone();
-        }
+        result.Value.Should().BeNone();
     }
 
     public class BlobStoreInfo

@@ -52,9 +52,9 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
     public async Task<Result<long, Error>> CountAsync(string topicName, string subscriptionName,
         CancellationToken cancellationToken)
     {
-        topicName.ThrowIfNotValuedParameter((string)nameof(topicName), Resources.AzureServiceBusStore_MissingTopicName);
+        topicName.ThrowIfNotValuedParameter((string)nameof(topicName), Resources.AnyStore_MissingTopicName);
         subscriptionName.ThrowIfNotValuedParameter((string)nameof(subscriptionName),
-            Resources.AzureServiceBusStore_MissingSubscriptionName);
+            Resources.AnyStore_MissingSubscriptionName);
 
         var admin = new ServiceBusAdministrationClient(_connectionString);
         var sanitizedTopicName = topicName.SanitizeAndValidateTopicName();
@@ -77,7 +77,7 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
 #if TESTINGONLY
     public async Task<Result<Error>> DestroyAllAsync(string topicName, CancellationToken cancellationToken)
     {
-        topicName.ThrowIfNotValuedParameter(nameof(topicName), Resources.AzureServiceBusStore_MissingTopicName);
+        topicName.ThrowIfNotValuedParameter(nameof(topicName), Resources.AnyStore_MissingTopicName);
 
         // NOTE: deleting the entire topic may take far too long (this method is only tenable in testing)
         await DeleteTopicAsync(topicName, cancellationToken);
@@ -93,9 +93,9 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         Func<string, CancellationToken, Task<Result<Error>>> messageHandlerAsync,
         CancellationToken cancellationToken)
     {
-        topicName.ThrowIfNotValuedParameter((string)nameof(topicName), Resources.AzureServiceBusStore_MissingTopicName);
+        topicName.ThrowIfNotValuedParameter((string)nameof(topicName), Resources.AnyStore_MissingTopicName);
         subscriptionName.ThrowIfNotValuedParameter((string)nameof(subscriptionName),
-            Resources.AzureServiceBusStore_MissingSubscriptionName);
+            Resources.AnyStore_MissingSubscriptionName);
         ArgumentNullException.ThrowIfNull(messageHandlerAsync);
 
         await using var receiver = await ConnectReceiverAsync(topicName, subscriptionName, cancellationToken);
@@ -153,8 +153,8 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
 
     public async Task<Result<Error>> SendAsync(string topicName, string message, CancellationToken cancellationToken)
     {
-        topicName.ThrowIfNotValuedParameter((string)nameof(topicName), Resources.AzureServiceBusStore_MissingTopicName);
-        message.ThrowIfNotValuedParameter((string)nameof(message), Resources.AzureServiceBusStore_MissingSentMessage);
+        topicName.ThrowIfNotValuedParameter((string)nameof(topicName), Resources.AnyStore_MissingTopicName);
+        message.ThrowIfNotValuedParameter((string)nameof(message), Resources.AnyStore_MissingSentMessage);
 
         try
         {

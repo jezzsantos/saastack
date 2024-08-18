@@ -17,22 +17,17 @@ namespace Infrastructure.Persistence.Azure.ApplicationServices;
 [UsedImplicitly]
 public class AzureStorageAccountQueueStore : IQueueStore
 {
-    private const string AccountKeySettingName = "ApplicationServices:Persistence:AzureStorageAccount:AccountKey";
-    private const string AccountNameSettingName = "ApplicationServices:Persistence:AzureStorageAccount:AccountName";
-    private const string ConnectionString =
-        "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net";
-    private const string DefaultConnectionString = "UseDevelopmentStorage=true";
     private readonly string _connectionString;
     private readonly Dictionary<string, bool> _queueExistenceChecks = new();
     private readonly IRecorder _recorder;
 
     public static AzureStorageAccountQueueStore Create(IRecorder recorder, IConfigurationSettings settings)
     {
-        var accountKey = settings.GetString(AccountKeySettingName);
-        var accountName = settings.GetString(AccountNameSettingName);
+        var accountKey = settings.GetString(AzureStorageAccountConstants.AccountKeySettingName);
+        var accountName = settings.GetString(AzureStorageAccountConstants.AccountNameSettingName);
         var connection = accountKey.HasValue()
-            ? ConnectionString.Format(accountName, accountKey)
-            : DefaultConnectionString;
+            ? AzureStorageAccountConstants.ConnectionString.Format(accountName, accountKey)
+            : AzureStorageAccountConstants.DefaultConnectionString;
 
         return new AzureStorageAccountQueueStore(recorder, connection);
     }
@@ -42,12 +37,12 @@ public class AzureStorageAccountQueueStore : IQueueStore
         _recorder = recorder;
         _connectionString = connectionString;
     }
-#if TESTINGONLY
 
+#if TESTINGONLY
     public async Task<Result<long, Error>> CountAsync(string queueName, CancellationToken cancellationToken)
     {
         queueName.ThrowIfNotValuedParameter(nameof(queueName),
-            Resources.AzureStorageAccountQueueStore_MissingQueueName);
+            Resources.AnyStore_MissingQueueName);
 
         var queue = await ConnectToQueueAsync(queueName, cancellationToken);
 
@@ -59,12 +54,11 @@ public class AzureStorageAccountQueueStore : IQueueStore
 #endif
 
 #if TESTINGONLY
-
     public async Task<Result<Error>> DestroyAllAsync(string queueName, CancellationToken cancellationToken)
     {
 #if TESTINGONLY
         queueName.ThrowIfNotValuedParameter(nameof(queueName),
-            Resources.AzureStorageAccountQueueStore_MissingQueueName);
+            Resources.AnyStore_MissingQueueName);
 
         var queue = await ConnectToQueueAsync(queueName, cancellationToken);
 
@@ -84,7 +78,7 @@ public class AzureStorageAccountQueueStore : IQueueStore
         Func<string, CancellationToken, Task<Result<Error>>> messageHandlerAsync, CancellationToken cancellationToken)
     {
         queueName.ThrowIfNotValuedParameter(nameof(queueName),
-            Resources.AzureStorageAccountQueueStore_MissingQueueName);
+            Resources.AnyStore_MissingQueueName);
         ArgumentNullException.ThrowIfNull(messageHandlerAsync);
 
         var queue = await ConnectToQueueAsync(queueName, cancellationToken);
@@ -123,9 +117,9 @@ public class AzureStorageAccountQueueStore : IQueueStore
     public async Task<Result<Error>> PushAsync(string queueName, string message, CancellationToken cancellationToken)
     {
         queueName.ThrowIfNotValuedParameter(nameof(queueName),
-            Resources.AzureStorageAccountQueueStore_MissingQueueName);
+            Resources.AnyStore_MissingQueueName);
         message.ThrowIfNotValuedParameter(nameof(message),
-            Resources.AzureStorageAccountQueueStore_MissingMessage);
+            Resources.AnyStore_MissingMessage);
 
         var queue = await ConnectToQueueAsync(queueName, cancellationToken);
 

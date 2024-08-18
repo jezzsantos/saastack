@@ -16,6 +16,7 @@ public class AzureStorageAccountSpecSetup : StoreSpecSetupBase, IDisposable
     public AzureStorageAccountSpecSetup()
     {
         QueueStore = AzureStorageAccountQueueStore.Create(NoOpRecorder.Instance, Settings);
+        BlobStore = AzureStorageAccountBlobStore.Create(NoOpRecorder.Instance, Settings);
         AzuriteStorageEmulator.Start();
     }
 
@@ -32,6 +33,8 @@ public class AzureStorageAccountSpecSetup : StoreSpecSetupBase, IDisposable
             AzuriteStorageEmulator.Shutdown();
         }
     }
+
+    public IBlobStore BlobStore { get; }
 
     public IQueueStore QueueStore { get; }
 }
