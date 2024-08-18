@@ -7,6 +7,7 @@ using FluentAssertions;
 using Infrastructure.Shared.ApplicationServices.External;
 using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.OAuth2;
+using Infrastructure.Web.Interfaces.Auth;
 using Moq;
 using UnitTesting.Common;
 using UnitTesting.Common.Validation;
@@ -43,7 +44,7 @@ public class GenericOAuth2HttpServiceClientSpec
 
         result.Should().BeError(ErrorCode.Unexpected, "amessage");
         _client.Verify(c => c.PostAsync(_caller.Object, It.Is<GenericOAuth2GrantAuthorizationRequest>(req =>
-                req.GrantType == "authorization_code"
+                req.GrantType == OAuth2Constants.GrantTypes.AuthorizationCodeFlow
                 && req.Code == "acode"
                 && req.ClientId == "aclientid"
                 && req.ClientSecret == "aclientsecret"
@@ -83,7 +84,7 @@ public class GenericOAuth2HttpServiceClientSpec
         result.Value[2].Value.Should().Be("anidtoken");
         result.Value[2].ExpiresOn.Should().BeNear(now.AddHours(1));
         _client.Verify(c => c.PostAsync(_caller.Object, It.Is<GenericOAuth2GrantAuthorizationRequest>(req =>
-                req.GrantType == "authorization_code"
+                req.GrantType == OAuth2Constants.GrantTypes.AuthorizationCodeFlow
                 && req.Code == "acode"
                 && req.ClientId == "aclientid"
                 && req.ClientSecret == "aclientsecret"
@@ -117,7 +118,7 @@ public class GenericOAuth2HttpServiceClientSpec
         result.Value[0].Value.Should().Be("anaccesstoken");
         result.Value[0].ExpiresOn.Should().BeNear(expiresOn);
         _client.Verify(c => c.PostAsync(_caller.Object, It.Is<GenericOAuth2GrantAuthorizationRequest>(req =>
-                req.GrantType == "authorization_code"
+                req.GrantType == OAuth2Constants.GrantTypes.AuthorizationCodeFlow
                 && req.Code == "acode"
                 && req.ClientId == "aclientid"
                 && req.ClientSecret == "aclientsecret"
@@ -139,7 +140,7 @@ public class GenericOAuth2HttpServiceClientSpec
 
         result.Should().BeError(ErrorCode.Unexpected, "amessage");
         _client.Verify(c => c.PostAsync(_caller.Object, It.Is<GenericOAuth2GrantAuthorizationRequest>(req =>
-                req.GrantType == "refresh_token"
+                req.GrantType == OAuth2Constants.GrantTypes.RefreshFlow
                 && req.ClientId == "aclientid"
                 && req.ClientSecret == "aclientsecret"
                 && req.RefreshToken == "arefreshtoken"
@@ -177,7 +178,7 @@ public class GenericOAuth2HttpServiceClientSpec
         result.Value[2].Value.Should().Be("anidtoken");
         result.Value[2].ExpiresOn.Should().BeNear(now.AddHours(1));
         _client.Verify(c => c.PostAsync(_caller.Object, It.Is<GenericOAuth2GrantAuthorizationRequest>(req =>
-                req.GrantType == "refresh_token"
+                req.GrantType == OAuth2Constants.GrantTypes.RefreshFlow
                 && req.ClientId == "aclientid"
                 && req.ClientSecret == "aclientsecret"
                 && req.RefreshToken == "arefreshtoken"
@@ -209,7 +210,7 @@ public class GenericOAuth2HttpServiceClientSpec
         result.Value[0].Value.Should().Be("anaccesstoken");
         result.Value[0].ExpiresOn.Should().BeNear(expiresOn);
         _client.Verify(c => c.PostAsync(_caller.Object, It.Is<GenericOAuth2GrantAuthorizationRequest>(req =>
-                req.GrantType == "refresh_token"
+                req.GrantType == OAuth2Constants.GrantTypes.RefreshFlow
                 && req.ClientId == "aclientid"
                 && req.ClientSecret == "aclientsecret"
                 && req.RefreshToken == "arefreshtoken"

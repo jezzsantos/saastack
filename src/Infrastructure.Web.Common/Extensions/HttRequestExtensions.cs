@@ -5,14 +5,13 @@ using Application.Interfaces;
 using Common;
 using Common.Extensions;
 using Infrastructure.Web.Interfaces;
+using Infrastructure.Web.Interfaces.Auth;
 using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Web.Common.Extensions;
 
 public static class HttRequestExtensions
 {
-    private const string BearerTokenPrefix = "Bearer";
-
     /// <summary>
     ///     Whether the specified <see cref="method" /> could have a content body.
     /// </summary>
@@ -129,13 +128,14 @@ public static class HttRequestExtensions
             return Optional<string>.None;
         }
 
-        var value = authorization.FirstOrDefault(val => val.HasValue() && val.StartsWith(BearerTokenPrefix));
+        var value = authorization.FirstOrDefault(val =>
+            val.HasValue() && val.StartsWith(OAuth2Constants.BearerTokenPrefix));
         if (value.HasNoValue())
         {
             return Optional<string>.None;
         }
 
-        var indexOfToken = BearerTokenPrefix.Length + 1;
+        var indexOfToken = OAuth2Constants.BearerTokenPrefix.Length + 1;
         var token = value.Substring(indexOfToken);
 
         return token.HasValue()
@@ -231,7 +231,7 @@ public static class HttRequestExtensions
             return;
         }
 
-        message.Headers.Add(HttpConstants.Headers.Authorization, $"{BearerTokenPrefix} {token}");
+        message.Headers.Add(HttpConstants.Headers.Authorization, $"{OAuth2Constants.BearerTokenPrefix} {token}");
     }
 
     /// <summary>

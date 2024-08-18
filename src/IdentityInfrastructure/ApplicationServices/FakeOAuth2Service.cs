@@ -72,14 +72,14 @@ public class FakeOAuth2Service : IOAuth2Service
     {
         var expiresOn = DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry);
         var accessToken = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
-            claims: new Claim[]
-            {
-                new(ClaimTypes.Email, options.CodeVerifier!),
-                new(ClaimTypes.GivenName, options.CodeVerifier!),
-                new(ClaimTypes.Surname, "asurname"),
-                new(AuthenticationConstants.Claims.ForTimezone, Timezones.Default.ToString()),
-                new(ClaimTypes.Country, CountryCodes.Default.ToString())
-            }, expires: expiresOn,
+            claims:
+            [
+                new Claim(ClaimTypes.Email, options.CodeVerifier!),
+                new Claim(ClaimTypes.GivenName, options.CodeVerifier!),
+                new Claim(ClaimTypes.Surname, "asurname"),
+                new Claim(AuthenticationConstants.Claims.ForTimezone, Timezones.Default.ToString()),
+                new Claim(ClaimTypes.Country, CountryCodes.Default.ToString())
+            ], expires: expiresOn,
             issuer: options.ServiceName
         ));
 
