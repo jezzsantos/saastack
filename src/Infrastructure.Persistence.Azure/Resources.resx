@@ -51,5 +51,16 @@
     <data name="AzureServiceBusStore_MessageTooLarge" xml:space="preserve">
         <value>The message is too large to send in a batch for an Azure Service Bus</value>
     </data>
-
+    <data name="AzureSqlServerStore_MissingEntityName" xml:space="preserve">
+        <value>EntityName cannot be empty</value>
+    </data>
+    <data name="AzureSqlServerStore_MissingEntityId" xml:space="preserve">
+        <value>EntityId cannot be empty</value>
+    </data>
+    <data name="AnyStore_MissingContainerName" xml:space="preserve">
+        <value>ContainerName cannot be empty</value>
+    </data>
+    <data name="AnyStore_MissingId" xml:space="preserve">
+        <value>Id cannot be empty</value>
+    </data>
 </root>

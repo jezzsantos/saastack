@@ -60,6 +60,24 @@ namespace Infrastructure.Persistence.Azure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ContainerName cannot be empty.
+        /// </summary>
+        internal static string AnyStore_MissingContainerName {
+            get {
+                return ResourceManager.GetString("AnyStore_MissingContainerName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Id cannot be empty.
+        /// </summary>
+        internal static string AnyStore_MissingId {
+            get {
+                return ResourceManager.GetString("AnyStore_MissingId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The message is too large to send in a batch for an Azure Service Bus.
         /// </summary>
         internal static string AzureServiceBusStore_MessageTooLarge {
@@ -92,6 +110,24 @@ namespace Infrastructure.Persistence.Azure {
         internal static string AzureServiceBusStore_MissingTopicName {
             get {
                 return ResourceManager.GetString("AzureServiceBusStore_MissingTopicName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EntityId cannot be empty.
+        /// </summary>
+        internal static string AzureSqlServerStore_MissingEntityId {
+            get {
+                return ResourceManager.GetString("AzureSqlServerStore_MissingEntityId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EntityName cannot be empty.
+        /// </summary>
+        internal static string AzureSqlServerStore_MissingEntityName {
+            get {
+                return ResourceManager.GetString("AzureSqlServerStore_MissingEntityName", resourceCulture);
             }
         }
         

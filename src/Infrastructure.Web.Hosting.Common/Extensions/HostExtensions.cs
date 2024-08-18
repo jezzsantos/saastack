@@ -471,7 +471,7 @@ public static class HostExtensions
 #if TESTINGONLY
             TestingOnlyHostExtensions.RegisterStoreForTestingOnly(services, usesQueues, isMultiTenanted);
 #else
-            //HACK: we need a reasonable value for production here like SQLServerDataStore or DynamoDbDataStore
+            //HACK: we need a reasonable value for production here like AzureSqlServerStore or DynamoDbDataStore
             services.AddForPlatform<IDataStore, IEventStore, IBlobStore, IQueueStore, IMessageBusStore, NoOpStore>(_ =>
                 NoOpStore.Instance);
             if (isMultiTenanted)

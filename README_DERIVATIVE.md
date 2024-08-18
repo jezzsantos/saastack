@@ -52,7 +52,7 @@ Repeat for these directories:
 
 You only need the tools below installed if you are going to run specific `Integration.Persistence` tests, for the persistence technology adapters you need to use in your codebase.
 
-* If using the `SqlServerDataStore`, install `SQL Server 2019 Developer`. Available for [download here](https://go.microsoft.com/fwlink/?linkid=866662)
+* If using the `AzureSqlServerStore`, install `SQL Server 2019 Developer`. Available for [download here](https://go.microsoft.com/fwlink/?linkid=866662)
 * If using the `RedisDataStore`, install `Redis Server` locally to run the tests. Available for [download here](https://redis.io/download)
 * If using the `EventStoreEventStore`, install `EventStore` locally to run the tests. Install using the Chocolatey command: `choco install eventstore-oss`
 
@@ -187,7 +187,7 @@ In production builds, we build and deploy the code in the `ReleaseForDeploy` bui
 >
 > We absolutely need to do this because these specific testing code pieces should never exist in the production codebase and may expose security vulnerabilities and exposures we simply don't want in production environments.
 
-The various 3rd party *adapters* we need in production (e.g., `SendGridHttpServiceClient` and the `SqlServerDataStore`)
+The various 3rd party *adapters* we need in production (e.g., `SendGridHttpServiceClient` and the `AzureSqlServerStore`)
 will be configured in the DI containers (of `Program.cs` of the `ApiHost1` project, and in the modules of each subdomain) to use code to talk to real 3rd party APIs and will be configured with specific production settings in the `appsettings.json` file (overwritten by your CD server).
 
 These are the real 3rd party public API adapters, which, if used with production settings, in local CI environments, or in automated testing environments, may incur financial service charges, trigger rate-limiting quotas, and/or pollute or corrupt real customer data!
@@ -196,7 +196,7 @@ These are the real 3rd party public API adapters, which, if used with production
 
 You will notice that in the production build (`ReleaseForDeploy`), we have configured the code:
 
-* By injecting the `SqlServerDataStore` as the primary `IDataStore`.
+* By injecting the `AzureSqlServerStore` as the primary `IDataStore`.
 * By injecting various other dependencies according to the current value of the `$(HostingPlatform)` MS build property (e.g., `HOSTEDONAZURE`).
 
 > Note: that many of the other technology adapters (e.g., `SendGridHttpServiceClient`) will not need to be explicitly configured in the DI container (for specific build flavors), that is because these adapters can be configured to point to local stubs instead of pointing to production environments.
