@@ -17,7 +17,7 @@ using Application.Interfaces.Services;
 using Common.Configuration;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Interfaces;
-using Infrastructure.Persistence.Common.ApplicationServices;
+using Infrastructure.Persistence.Shared.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
 using Car = CarsApplication.Persistence.ReadModels.Car;

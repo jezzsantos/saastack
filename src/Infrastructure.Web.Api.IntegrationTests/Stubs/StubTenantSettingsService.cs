@@ -2,7 +2,7 @@ using Application.Interfaces;
 using Application.Interfaces.Services;
 using Common;
 using Common.Extensions;
-using Infrastructure.Persistence.Common.ApplicationServices;
+using Infrastructure.Persistence.Shared.ApplicationServices;
 
 namespace Infrastructure.Web.Api.IntegrationTests.Stubs;
 

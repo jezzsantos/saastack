@@ -7,7 +7,7 @@ using Infrastructure.Persistence.Interfaces;
 using QueryAny;
 using Task = System.Threading.Tasks.Task;
 
-namespace Infrastructure.Persistence.Common.ApplicationServices;
+namespace Infrastructure.Persistence.Shared.ApplicationServices;
 
 partial class InProcessInMemStore : IDataStore
 {

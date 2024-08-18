@@ -10,7 +10,7 @@ using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
 using Polly;
 
-namespace Infrastructure.Persistence.Common.ApplicationServices;
+namespace Infrastructure.Persistence.Shared.ApplicationServices;
 
 /// <summary>
 ///     Provides a combined store that persists all data to individual files of JSON on the local hard drive.

@@ -5,7 +5,7 @@ using Common.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using Task = System.Threading.Tasks.Task;
 
-namespace Infrastructure.Persistence.Common.ApplicationServices;
+namespace Infrastructure.Persistence.Shared.ApplicationServices;
 
 partial class LocalMachineJsonFileStore : IBlobStore
 {

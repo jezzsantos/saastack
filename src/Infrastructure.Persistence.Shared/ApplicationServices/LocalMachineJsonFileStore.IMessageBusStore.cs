@@ -5,7 +5,7 @@ using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
 using Task = System.Threading.Tasks.Task;
 
-namespace Infrastructure.Persistence.Common.ApplicationServices;
+namespace Infrastructure.Persistence.Shared.ApplicationServices;
 
 partial class LocalMachineJsonFileStore : IMessageBusStore, IMessageBusStoreTrigger
 {

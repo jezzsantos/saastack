@@ -5,7 +5,7 @@ using Domain.Interfaces;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
 
-namespace Infrastructure.Persistence.Common.ApplicationServices;
+namespace Infrastructure.Persistence.Shared.ApplicationServices;
 
 /// <summary>
 ///     Provides a combined store that persists all data to memory, in the current process

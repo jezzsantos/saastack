@@ -76,5 +76,86 @@ namespace Infrastructure.Persistence.Shared {
                 return ResourceManager.GetString("AnyStore_MissingId", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BlobName cannot be empty.
+        /// </summary>
+        internal static string InProcessInMemDataStore_MissingBlobName {
+            get {
+                return ResourceManager.GetString("InProcessInMemDataStore_MissingBlobName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ContentType cannot be empty.
+        /// </summary>
+        internal static string InProcessInMemDataStore_MissingContentType {
+            get {
+                return ResourceManager.GetString("InProcessInMemDataStore_MissingContentType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EntityId cannot be empty.
+        /// </summary>
+        internal static string InProcessInMemDataStore_MissingEntityId {
+            get {
+                return ResourceManager.GetString("InProcessInMemDataStore_MissingEntityId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EntityName cannot be empty.
+        /// </summary>
+        internal static string InProcessInMemDataStore_MissingEntityName {
+            get {
+                return ResourceManager.GetString("InProcessInMemDataStore_MissingEntityName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Message cannot be empty.
+        /// </summary>
+        internal static string InProcessInMemDataStore_MissingQueueMessage {
+            get {
+                return ResourceManager.GetString("InProcessInMemDataStore_MissingQueueMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to QueueName cannot be empty.
+        /// </summary>
+        internal static string InProcessInMemDataStore_MissingQueueName {
+            get {
+                return ResourceManager.GetString("InProcessInMemDataStore_MissingQueueName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SubscriptionName cannot be empty.
+        /// </summary>
+        internal static string InProcessInMemDataStore_MissingSubscriptionName {
+            get {
+                return ResourceManager.GetString("InProcessInMemDataStore_MissingSubscriptionName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TopicName cannot be empty.
+        /// </summary>
+        internal static string InProcessInMemDataStore_MissingTopicName {
+            get {
+                return ResourceManager.GetString("InProcessInMemDataStore_MissingTopicName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified root path: {0}, is not a valid path or for some reason cannot be created on this local machine..
+        /// </summary>
+        internal static string LocalMachineJsonFileStore_VerifyRootPath_CreateFailed {
+            get {
+                return ResourceManager.GetString("LocalMachineJsonFileStore_VerifyRootPath_CreateFailed", resourceCulture);
+            }
+        }
     }
 }

@@ -1,9 +1,9 @@
 #if TESTINGONLY
 using Common.Configuration;
 using Infrastructure.Hosting.Common.Extensions;
-using Infrastructure.Persistence.Common.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
+using Infrastructure.Persistence.Shared.ApplicationServices;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Web.Hosting.Common.Extensions;

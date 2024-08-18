@@ -2,9 +2,9 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
 using Application.Interfaces.Services;
-using Infrastructure.Persistence.Common.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
+using Infrastructure.Persistence.Shared.ApplicationServices;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common.Clients;

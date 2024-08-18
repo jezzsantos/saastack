@@ -75,39 +75,6 @@
     <data name="EventSourcingDddCommandStore_PublishFailed" xml:space="preserve">
         <value>Publishing of changed events for {0} failed.</value>
     </data>
-    <data name="AnyStore_MissingId" xml:space="preserve">
-        <value>Id cannot be empty</value>
-    </data>
-    <data name="AnyStore_MissingContainerName" xml:space="preserve">
-        <value>ContainerName cannot be empty</value>
-    </data>
-    <data name="InProcessInMemDataStore_MissingBlobName" xml:space="preserve">
-        <value>BlobName cannot be empty</value>
-    </data>
-    <data name="InProcessInMemDataStore_MissingContentType" xml:space="preserve">
-        <value>ContentType cannot be empty</value>
-    </data>
-    <data name="InProcessInMemDataStore_MissingQueueName" xml:space="preserve">
-        <value>QueueName cannot be empty</value>
-    </data>
-    <data name="InProcessInMemDataStore_MissingQueueMessage" xml:space="preserve">
-        <value>Message cannot be empty</value>
-    </data>
-    <data name="InProcessInMemDataStore_MissingEntityName" xml:space="preserve">
-        <value>EntityName cannot be empty</value>
-    </data>
-    <data name="InProcessInMemDataStore_MissingEntityId" xml:space="preserve">
-        <value>EntityId cannot be empty</value>
-    </data>
-    <data name="InProcessInMemDataStore_MissingTopicName" xml:space="preserve">
-        <value>TopicName cannot be empty</value>
-    </data>
-    <data name="InProcessInMemDataStore_MissingSubscriptionName" xml:space="preserve">
-        <value>SubscriptionName cannot be empty</value>
-    </data>
-    <data name="LocalMachineJsonFileStore_VerifyRootPath_CreateFailed" xml:space="preserve">
-        <value>The specified root path: {0}, is not a valid path or for some reason cannot be created on this local machine.</value>
-    </data>
     <data name="EventNotifyingStoreExtensions_OnComplete_FailedToNotify" xml:space="preserve">
         <value>Failed to notify new events for: {0}</value>
     </data>

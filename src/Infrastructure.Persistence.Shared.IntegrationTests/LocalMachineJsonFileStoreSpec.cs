@@ -1,6 +1,6 @@
 #if TESTINGONLY
-using Infrastructure.Persistence.Common.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
+using Infrastructure.Persistence.Shared.ApplicationServices;
 using JetBrains.Annotations;
 using Xunit;
 
