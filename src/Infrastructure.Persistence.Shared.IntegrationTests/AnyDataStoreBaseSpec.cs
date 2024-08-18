@@ -1,4 +1,5 @@
 using Common;
+using Common.Extensions;
 using Common.Recording;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
@@ -149,7 +150,7 @@ public abstract class AnyDataStoreBaseSpec
     {
         var query = Query.From<TestDataStoreEntity>()
             .WhereAll();
-        var entity = Setup.Store.AddAsync(Setup.ContainerName, CommandEntity.FromType(
+        var entity = await Setup.Store.AddAsync(Setup.ContainerName, CommandEntity.FromType(
             new TestDataStoreEntity
             {
                 AStringValue = "avalue"
@@ -159,7 +160,7 @@ public abstract class AnyDataStoreBaseSpec
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
         results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity.Result.Value.Id);
+        results.Value[0].Id.Should().Be(entity.Value.Id);
     }
 
     [Fact]
@@ -213,12 +214,12 @@ public abstract class AnyDataStoreBaseSpec
     {
         var query = Query.From<TestDataStoreEntity>()
             .Where(e => e.AStringValue, ConditionOperator.EqualTo, "avalue");
-        var entity1 = Setup.Store.AddAsync(Setup.ContainerName, CommandEntity.FromType(
+        var entity1 = await Setup.Store.AddAsync(Setup.ContainerName, CommandEntity.FromType(
             new TestDataStoreEntity
             {
                 AStringValue = "avalue"
             }), CancellationToken.None);
-        var entity2 = Setup.Store.AddAsync(Setup.ContainerName, CommandEntity.FromType(
+        var entity2 = await Setup.Store.AddAsync(Setup.ContainerName, CommandEntity.FromType(
             new TestDataStoreEntity
             {
                 AStringValue = "avalue"
@@ -228,8 +229,8 @@ public abstract class AnyDataStoreBaseSpec
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
         results.Value.Count.Should().Be(2);
-        results.Value[0].Id.Should().Be(entity1.Result.Value.Id);
-        results.Value[1].Id.Should().Be(entity2.Result.Value.Id);
+        results.Value[0].Id.Should().Be(entity1.Value.Id);
+        results.Value[1].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -271,7 +272,7 @@ public abstract class AnyDataStoreBaseSpec
     {
         await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalu'e" }), CancellationToken.None);
-        var entity2 = Setup.Store.AddAsync(Setup.ContainerName,
+        var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "a'value" }), CancellationToken.None);
         var query = Query.From<TestDataStoreEntity>()
             .Where(e => e.AStringValue, ConditionOperator.EqualTo, "a'value");
@@ -280,7 +281,7 @@ public abstract class AnyDataStoreBaseSpec
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
         results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity2.Result.Value.Id);
+        results.Value[0].Id.Should().Be(entity2.Value.Id);
     }
 
     [Fact]
@@ -369,7 +370,7 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public virtual async Task WhenQueryForStringValueWithLikeIncludingPercentSign_ThenReturnsResult()
     {
-        var entity1 = Setup.Store.AddAsync(Setup.ContainerName,
+        var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "av%alue" }), CancellationToken.None);
         await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue2" }), CancellationToken.None);
@@ -380,7 +381,7 @@ public abstract class AnyDataStoreBaseSpec
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
         results.Value.Count.Should().Be(1);
-        results.Value[0].Id.Should().Be(entity1.Result.Value.Id);
+        results.Value[0].Id.Should().Be(entity1.Value.Id);
     }
 
     [Fact]
@@ -404,12 +405,12 @@ public abstract class AnyDataStoreBaseSpec
     public async Task WhenQueryForANullableAnEnumValue_ThenReturnsResult()
     {
         await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AnNullableEnumValue = TestEnum.AValue1 }),
+            CommandEntity.FromType(new TestDataStoreEntity { ANullableEnumValue = TestEnum.AValue1 }),
             CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AnNullableEnumValue = null }), CancellationToken.None);
+            CommandEntity.FromType(new TestDataStoreEntity { ANullableEnumValue = null }), CancellationToken.None);
         var query = Query.From<TestDataStoreEntity>()
-            .Where(e => e.AnNullableEnumValue, ConditionOperator.EqualTo, null);
+            .Where(e => e.ANullableEnumValue, ConditionOperator.EqualTo, null);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
@@ -424,9 +425,10 @@ public abstract class AnyDataStoreBaseSpec
         await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ANullableDateTimeUtcValue = null }),
             CancellationToken.None);
+        var now = DateTime.UtcNow.ToNearestSecond();
 
         var query = Query.From<TestDataStoreEntity>()
-            .Where(e => e.ANullableDateTimeUtcValue, ConditionOperator.EqualTo, DateTime.UtcNow);
+            .Where(e => e.ANullableDateTimeUtcValue, ConditionOperator.EqualTo, now);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
@@ -437,8 +439,9 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForDateTimeUtcValue_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.UtcNow;
-        var dateTime2 = DateTime.UtcNow.AddDays(1);
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now.ToNearestSecond();
+        var dateTime2 = dateTime1.AddDays(1);
         await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ADateTimeUtcValue = dateTime1 }), CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
@@ -456,8 +459,9 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForNullableDateTimeUtcValue_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.UtcNow;
-        var dateTime2 = DateTime.UtcNow.AddDays(1);
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now;
+        var dateTime2 = dateTime1.AddDays(1);
         await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ANullableDateTimeUtcValue = dateTime1 }),
             CancellationToken.None);
@@ -519,7 +523,8 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForMinDateTimeValue_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.UtcNow;
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now;
         var dateTime2 = DateTime.MinValue;
         await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ADateTimeUtcValue = dateTime1 }), CancellationToken.None);
@@ -538,7 +543,8 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForNullableMinDateTimeValue_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.UtcNow;
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now;
         var dateTime2 = DateTime.MinValue;
         await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ANullableDateTimeUtcValue = dateTime1 }),
@@ -580,8 +586,9 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForDateTimeUtcValueGreaterThan_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.UtcNow;
-        var dateTime2 = DateTime.UtcNow.AddDays(1);
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now;
+        var dateTime2 = dateTime1.AddDays(1);
         await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ADateTimeUtcValue = dateTime1 }), CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
@@ -599,8 +606,9 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForDateTimeUtcValueGreaterThanOrEqualTo_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.UtcNow;
-        var dateTime2 = DateTime.UtcNow.AddDays(1);
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now;
+        var dateTime2 = dateTime1.AddDays(1);
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ADateTimeUtcValue = dateTime1 }), CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
@@ -619,8 +627,9 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForDateTimeUtcValueGreaterThanOrEqualToMinValue_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.MinValue;
-        var dateTime2 = DateTime.UtcNow.AddDays(1);
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now;
+        var dateTime2 = dateTime1.AddDays(1);
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ADateTimeUtcValue = dateTime1 }), CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
@@ -639,8 +648,9 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForDateTimeUtcValueLessThan_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.UtcNow;
-        var dateTime2 = DateTime.UtcNow.AddDays(1);
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now;
+        var dateTime2 = dateTime1.AddDays(1);
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ADateTimeUtcValue = dateTime1 }), CancellationToken.None);
         await Setup.Store.AddAsync(Setup.ContainerName,
@@ -658,7 +668,8 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForDateTimeUtcValueLessThanOrEqual_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.UtcNow;
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now;
         var dateTime2 = dateTime1.AddDays(1);
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ADateTimeUtcValue = dateTime1 }),
@@ -679,8 +690,9 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForDateTimeUtcValueNotEqual_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.UtcNow;
-        var dateTime2 = DateTime.UtcNow.AddDays(1);
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now;
+        var dateTime2 = dateTime1.AddDays(1);
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ADateTimeUtcValue = dateTime1 }), CancellationToken.None);
         await Setup.Store.AddAsync(Setup.ContainerName,
@@ -698,8 +710,9 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForNullableDateTimeUtcValueGreaterThan_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.UtcNow;
-        var dateTime2 = DateTime.UtcNow.AddDays(1);
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now;
+        var dateTime2 = dateTime1.AddDays(1);
         await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ANullableDateTimeUtcValue = dateTime1 }),
             CancellationToken.None);
@@ -719,8 +732,9 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForNullableDateTimeUtcValueGreaterThanOrEqualTo_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.UtcNow;
-        var dateTime2 = DateTime.UtcNow.AddDays(1);
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now;
+        var dateTime2 = dateTime1.AddDays(1);
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ANullableDateTimeUtcValue = dateTime1 }),
             CancellationToken.None);
@@ -741,8 +755,9 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForNullableDateTimeUtcValueLessThan_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.UtcNow;
-        var dateTime2 = DateTime.UtcNow.AddDays(1);
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now;
+        var dateTime2 = dateTime1.AddDays(1);
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ANullableDateTimeUtcValue = dateTime1 }),
             CancellationToken.None);
@@ -762,8 +777,9 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForNullableDateTimeUtcValueLessThanOrEqual_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.UtcNow;
-        var dateTime2 = DateTime.UtcNow.AddDays(1);
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now;
+        var dateTime2 = dateTime1.AddDays(1);
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ANullableDateTimeUtcValue = dateTime1 }),
             CancellationToken.None);
@@ -784,8 +800,9 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryForNullableDateTimeUtcValueNotEqual_ThenReturnsResult()
     {
-        var dateTime1 = DateTime.UtcNow;
-        var dateTime2 = DateTime.UtcNow.AddDays(1);
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var dateTime1 = now;
+        var dateTime2 = dateTime1.AddDays(1);
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ANullableDateTimeUtcValue = dateTime1 }),
             CancellationToken.None);
@@ -1148,10 +1165,10 @@ public abstract class AnyDataStoreBaseSpec
     public async Task WhenQueryForIntValue_ThenReturnsResult()
     {
         await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AIntValue = 1 }), CancellationToken.None);
+            CommandEntity.FromType(new TestDataStoreEntity { AnIntValue = 1 }), CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AIntValue = 2 }), CancellationToken.None);
-        var query = Query.From<TestDataStoreEntity>().Where(e => e.AIntValue, ConditionOperator.EqualTo, 2);
+            CommandEntity.FromType(new TestDataStoreEntity { AnIntValue = 2 }), CancellationToken.None);
+        var query = Query.From<TestDataStoreEntity>().Where(e => e.AnIntValue, ConditionOperator.EqualTo, 2);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
@@ -1165,7 +1182,7 @@ public abstract class AnyDataStoreBaseSpec
     {
         await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { ANullableIntValue = null }), CancellationToken.None);
-        var query = Query.From<TestDataStoreEntity>().Where(e => e.AIntValue, ConditionOperator.EqualTo, 5);
+        var query = Query.From<TestDataStoreEntity>().Where(e => e.AnIntValue, ConditionOperator.EqualTo, 5);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
@@ -1177,10 +1194,10 @@ public abstract class AnyDataStoreBaseSpec
     public async Task WhenQueryForIntValueGreaterThan_ThenReturnsResult()
     {
         await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AIntValue = 1 }), CancellationToken.None);
+            CommandEntity.FromType(new TestDataStoreEntity { AnIntValue = 1 }), CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AIntValue = 2 }), CancellationToken.None);
-        var query = Query.From<TestDataStoreEntity>().Where(e => e.AIntValue, ConditionOperator.GreaterThan, 1);
+            CommandEntity.FromType(new TestDataStoreEntity { AnIntValue = 2 }), CancellationToken.None);
+        var query = Query.From<TestDataStoreEntity>().Where(e => e.AnIntValue, ConditionOperator.GreaterThan, 1);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
@@ -1193,11 +1210,11 @@ public abstract class AnyDataStoreBaseSpec
     public async Task WhenQueryForIntValueGreaterThanOrEqualTo_ThenReturnsResult()
     {
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AIntValue = 1 }), CancellationToken.None);
+            CommandEntity.FromType(new TestDataStoreEntity { AnIntValue = 1 }), CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AIntValue = 2 }), CancellationToken.None);
+            CommandEntity.FromType(new TestDataStoreEntity { AnIntValue = 2 }), CancellationToken.None);
         var query = Query.From<TestDataStoreEntity>()
-            .Where(e => e.AIntValue, ConditionOperator.GreaterThanEqualTo, 1);
+            .Where(e => e.AnIntValue, ConditionOperator.GreaterThanEqualTo, 1);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
@@ -1211,10 +1228,10 @@ public abstract class AnyDataStoreBaseSpec
     public async Task WhenQueryForIntValueLessThan_ThenReturnsResult()
     {
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AIntValue = 1 }), CancellationToken.None);
+            CommandEntity.FromType(new TestDataStoreEntity { AnIntValue = 1 }), CancellationToken.None);
         await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AIntValue = 2 }), CancellationToken.None);
-        var query = Query.From<TestDataStoreEntity>().Where(e => e.AIntValue, ConditionOperator.LessThan, 2);
+            CommandEntity.FromType(new TestDataStoreEntity { AnIntValue = 2 }), CancellationToken.None);
+        var query = Query.From<TestDataStoreEntity>().Where(e => e.AnIntValue, ConditionOperator.LessThan, 2);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
@@ -1227,11 +1244,11 @@ public abstract class AnyDataStoreBaseSpec
     public async Task WhenQueryForIntValueLessThanOrEqual_ThenReturnsResult()
     {
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AIntValue = 1 }), CancellationToken.None);
+            CommandEntity.FromType(new TestDataStoreEntity { AnIntValue = 1 }), CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AIntValue = 2 }), CancellationToken.None);
+            CommandEntity.FromType(new TestDataStoreEntity { AnIntValue = 2 }), CancellationToken.None);
         var query =
-            Query.From<TestDataStoreEntity>().Where(e => e.AIntValue, ConditionOperator.LessThanEqualTo, 2);
+            Query.From<TestDataStoreEntity>().Where(e => e.AnIntValue, ConditionOperator.LessThanEqualTo, 2);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
@@ -1245,10 +1262,10 @@ public abstract class AnyDataStoreBaseSpec
     public async Task WhenQueryForIntValueNotEqual_ThenReturnsResult()
     {
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AIntValue = 1 }), CancellationToken.None);
+            CommandEntity.FromType(new TestDataStoreEntity { AnIntValue = 1 }), CancellationToken.None);
         await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AIntValue = 2 }), CancellationToken.None);
-        var query = Query.From<TestDataStoreEntity>().Where(e => e.AIntValue, ConditionOperator.NotEqualTo, 2);
+            CommandEntity.FromType(new TestDataStoreEntity { AnIntValue = 2 }), CancellationToken.None);
+        var query = Query.From<TestDataStoreEntity>().Where(e => e.AnIntValue, ConditionOperator.NotEqualTo, 2);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
@@ -1409,6 +1426,53 @@ public abstract class AnyDataStoreBaseSpec
     }
 
     [Fact]
+    public async Task WhenQueryForDecimalValue_ThenReturnsResult()
+    {
+        await Setup.Store.AddAsync(Setup.ContainerName,
+            CommandEntity.FromType(new TestDataStoreEntity { ADecimalValue = 1.0M }), CancellationToken.None);
+        var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
+            CommandEntity.FromType(new TestDataStoreEntity { ADecimalValue = 2.0M }), CancellationToken.None);
+        var query = Query.From<TestDataStoreEntity>().Where(e => e.ADecimalValue, ConditionOperator.EqualTo, 2.0M);
+
+        var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
+            PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
+
+        results.Value.Count.Should().Be(1);
+        results.Value[0].Id.Should().Be(entity2.Value.Id);
+    }
+
+    [Fact]
+    public async Task WhenQueryForNullableDecimalValue_ThenReturnsResult()
+    {
+        await Setup.Store.AddAsync(Setup.ContainerName,
+            CommandEntity.FromType(new TestDataStoreEntity { ANullableDecimalValue = 1.0M }), CancellationToken.None);
+        var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
+            CommandEntity.FromType(new TestDataStoreEntity { ANullableDecimalValue = 2.0M }), CancellationToken.None);
+        var query = Query.From<TestDataStoreEntity>()
+            .Where(e => e.ANullableDecimalValue, ConditionOperator.EqualTo, 2.0M);
+
+        var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
+            PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
+
+        results.Value.Count.Should().Be(1);
+        results.Value[0].Id.Should().Be(entity2.Value.Id);
+    }
+
+    [Fact]
+    public async Task WhenQueryForNullableDecimalValueThatIsNotSet_ThenReturnsEmpty()
+    {
+        await Setup.Store.AddAsync(Setup.ContainerName,
+            CommandEntity.FromType(new TestDataStoreEntity { ANullableDecimalValue = null }), CancellationToken.None);
+        var query = Query.From<TestDataStoreEntity>()
+            .Where(e => e.ANullableDecimalValue, ConditionOperator.EqualTo, 5.0M);
+
+        var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
+            PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
+
+        results.Value.Count.Should().Be(0);
+    }
+
+    [Fact]
     public async Task WhenQueryForDoubleValue_ThenReturnsResult()
     {
         await Setup.Store.AddAsync(Setup.ContainerName,
@@ -1532,7 +1596,7 @@ public abstract class AnyDataStoreBaseSpec
             CommandEntity.FromType(new TestDataStoreEntity { ABinaryValue = null! }), CancellationToken.None);
         var query =
             Query.From<TestDataStoreEntity>()
-                .Where(e => e.ABinaryValue, ConditionOperator.EqualTo, new byte[] { 0x01 });
+                .Where(e => e.ABinaryValue, ConditionOperator.EqualTo, [0x01]);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
@@ -1680,17 +1744,20 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryAndNoSelects_ThenReturnsResultWithAllPropertiesPopulated()
     {
+        var datum = DateTime.UtcNow.ToNearestSecond();
+        var datumOffset = DateTimeOffset.UnixEpoch.AddYears(25).ToUniversalTime();
         var entity = CommandEntity.FromType(new TestDataStoreEntity
         {
-            ABinaryValue = new byte[] { 0x01 },
+            ABinaryValue = [0x01],
             ABooleanValue = true,
+            ADecimalValue = 0.1M,
             ADoubleValue = 0.1,
             AGuidValue = Guid.Empty,
-            AIntValue = 1,
+            AnIntValue = 1,
             ALongValue = 2,
             AStringValue = "astringvalue",
-            ADateTimeUtcValue = DateTime.Today.ToUniversalTime(),
-            ADateTimeOffsetValue = DateTimeOffset.UnixEpoch.ToUniversalTime(),
+            ADateTimeUtcValue = datum,
+            ADateTimeOffsetValue = datumOffset,
             AComplexObjectValue =
                 new TestComplexObject
                 {
@@ -1712,14 +1779,15 @@ public abstract class AnyDataStoreBaseSpec
             .Should().BeTrue();
         result.GetValueOrDefault<bool>(nameof(TestDataStoreEntity.ABooleanValue)).Should().Be(true);
         result.GetValueOrDefault<Guid>(nameof(TestDataStoreEntity.AGuidValue)).Should().Be(Guid.Empty);
-        result.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AIntValue)).Should().Be(1);
+        result.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AnIntValue)).Should().Be(1);
         result.GetValueOrDefault<long>(nameof(TestDataStoreEntity.ALongValue)).Should().Be(2);
+        result.GetValueOrDefault<decimal>(nameof(TestDataStoreEntity.ADecimalValue)).Should().Be(0.1M);
         result.GetValueOrDefault<double>(nameof(TestDataStoreEntity.ADoubleValue)).Should().Be(0.1);
         result.GetValueOrDefault<string>(nameof(TestDataStoreEntity.AStringValue)).Should().Be("astringvalue");
         result.GetValueOrDefault<DateTime>(nameof(TestDataStoreEntity.ADateTimeUtcValue)).Should()
-            .Be(DateTime.Today.ToUniversalTime());
+            .Be(datum);
         result.GetValueOrDefault<DateTimeOffset>(nameof(TestDataStoreEntity.ADateTimeOffsetValue)).Should()
-            .Be(DateTimeOffset.UnixEpoch.ToUniversalTime());
+            .Be(datumOffset);
         result.GetValueOrDefault<TestComplexObject>(nameof(TestDataStoreEntity.AComplexObjectValue))
             .Should().Be(new TestComplexObject { APropertyValue = "avalue" });
         result.GetValueOrDefault<TestValueObject>(nameof(TestDataStoreEntity.AValueObjectValue),
@@ -1729,17 +1797,20 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenQueryAndSelect_ThenReturnsResultWithOnlySelectedPropertiesPopulated()
     {
+        var datum = DateTime.UtcNow.ToNearestSecond();
+        var datumOffset = DateTimeOffset.UnixEpoch.AddYears(25).ToUniversalTime();
         var entity = CommandEntity.FromType(new TestDataStoreEntity
         {
-            ABinaryValue = new byte[] { 0x01 },
+            ABinaryValue = [0x01],
             ABooleanValue = true,
+            ADecimalValue = 0.1M,
             ADoubleValue = 0.1,
             AGuidValue = Guid.Empty,
-            AIntValue = 1,
+            AnIntValue = 1,
             ALongValue = 2,
             AStringValue = "astringvalue",
-            ADateTimeUtcValue = DateTime.Today.ToUniversalTime(),
-            ADateTimeOffsetValue = DateTimeOffset.UnixEpoch.ToUniversalTime(),
+            ADateTimeUtcValue = datum,
+            ADateTimeOffsetValue = datumOffset,
             AComplexObjectValue =
                 new TestComplexObject
                 {
@@ -1762,8 +1833,9 @@ public abstract class AnyDataStoreBaseSpec
             .Should().BeTrue();
         result.GetValueOrDefault<bool>(nameof(TestDataStoreEntity.ABooleanValue)).Should().Be(false);
         result.GetValueOrDefault<Guid>(nameof(TestDataStoreEntity.AGuidValue)).Should().Be(Guid.Empty);
-        result.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AIntValue)).Should().Be(0);
+        result.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AnIntValue)).Should().Be(0);
         result.GetValueOrDefault<long>(nameof(TestDataStoreEntity.ALongValue)).Should().Be(0);
+        result.GetValueOrDefault<decimal>(nameof(TestDataStoreEntity.ADecimalValue)).Should().Be(0);
         result.GetValueOrDefault<double>(nameof(TestDataStoreEntity.ADoubleValue)).Should().Be(0);
         result.GetValueOrDefault<string>(nameof(TestDataStoreEntity.AStringValue)).Should().BeNull();
         result.GetValueOrDefault<DateTime>(nameof(TestDataStoreEntity.ADateTimeUtcValue)).Should()
@@ -1867,7 +1939,7 @@ public abstract class AnyDataStoreBaseSpec
         var query = Query.From<TestJoinedDataStoreEntity>()
             .Join<FirstJoiningTestQueryStoreEntity, string>(e => e.AStringValue, j => j.AStringValue)
             .WhereAll()
-            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AIntValue, je => je.AIntValue);
+            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AnIntValue, je => je.AnIntValue);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
@@ -1879,27 +1951,27 @@ public abstract class AnyDataStoreBaseSpec
     public async Task WhenQueryWithSelectFromInnerJoinOnOtherCollection_ThenReturnsAggregatedResults()
     {
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue1", AIntValue = 7 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue1", AnIntValue = 7 }),
             CancellationToken.None);
         await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue2" }), CancellationToken.None);
         await _firstJoiningSetup.Store.AddAsync(_firstJoiningSetup.ContainerName, CommandEntity.FromType(
             new FirstJoiningTestQueryStoreEntity
-                { AStringValue = "avalue1", AIntValue = 9 }), CancellationToken.None);
+                { AStringValue = "avalue1", AnIntValue = 9 }), CancellationToken.None);
         await _firstJoiningSetup.Store.AddAsync(_firstJoiningSetup.ContainerName,
             CommandEntity.FromType(new FirstJoiningTestQueryStoreEntity { AStringValue = "avalue3" }),
             CancellationToken.None);
         var query = Query.From<TestJoinedDataStoreEntity>()
             .Join<FirstJoiningTestQueryStoreEntity, string>(e => e.AStringValue, j => j.AStringValue)
             .WhereAll()
-            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AIntValue, je => je.AIntValue);
+            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AnIntValue, je => je.AnIntValue);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
 
         results.Value.Count.Should().Be(1);
         results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AIntValue)).Should().Be(9);
+        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
         results.Value[0].GetValueOrDefault<bool>(nameof(TestJoinedDataStoreEntity.ABooleanValue)).Should().Be(false);
     }
 
@@ -1908,20 +1980,20 @@ public abstract class AnyDataStoreBaseSpec
         WhenQueryWithSelectFromInnerJoinOnOtherCollectionAndWhereOnAProjectField_ThenReturnsAggregatedResults()
     {
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue1", AIntValue = 7 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue1", AnIntValue = 7 }),
             CancellationToken.None);
         await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue2" }), CancellationToken.None);
         await _firstJoiningSetup.Store.AddAsync(_firstJoiningSetup.ContainerName, CommandEntity.FromType(
             new FirstJoiningTestQueryStoreEntity
-                { AStringValue = "avalue1", AIntValue = 9 }), CancellationToken.None);
+                { AStringValue = "avalue1", AnIntValue = 9 }), CancellationToken.None);
         await _firstJoiningSetup.Store.AddAsync(_firstJoiningSetup.ContainerName,
             CommandEntity.FromType(new FirstJoiningTestQueryStoreEntity { AStringValue = "avalue3" }),
             CancellationToken.None);
         var query = Query.From<TestJoinedDataStoreEntity>()
             .Join<FirstJoiningTestQueryStoreEntity, string>(e => e.AStringValue, j => j.AStringValue)
             .Where(e => e.AFirstIntValue, ConditionOperator.EqualTo, 9)
-            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AFirstIntValue, je => je.AIntValue);
+            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AFirstIntValue, je => je.AnIntValue);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
@@ -1938,72 +2010,72 @@ public abstract class AnyDataStoreBaseSpec
     {
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName, CommandEntity.FromType(
             new TestDataStoreEntity
-                { AStringValue = "avalue1", AIntValue = 7 }), CancellationToken.None);
+                { AStringValue = "avalue1", AnIntValue = 7 }), CancellationToken.None);
         await Setup.Store.AddAsync(Setup.ContainerName, CommandEntity.FromType(new TestDataStoreEntity
-            { AStringValue = "avalue2", AIntValue = 8 }), CancellationToken.None);
+            { AStringValue = "avalue2", AnIntValue = 8 }), CancellationToken.None);
 
         await _firstJoiningSetup.Store.AddAsync(_firstJoiningSetup.ContainerName, CommandEntity.FromType(
             new FirstJoiningTestQueryStoreEntity
-                { AStringValue = "avalue1", AIntValue = 9 }), CancellationToken.None);
+                { AStringValue = "avalue1", AnIntValue = 9 }), CancellationToken.None);
         await _firstJoiningSetup.Store.AddAsync(_firstJoiningSetup.ContainerName, CommandEntity.FromType(
             new FirstJoiningTestQueryStoreEntity
-                { AStringValue = "avalue3", AIntValue = 10 }), CancellationToken.None);
+                { AStringValue = "avalue3", AnIntValue = 10 }), CancellationToken.None);
 
         var query = Query.From<TestJoinedDataStoreEntity>()
             .Join<FirstJoiningTestQueryStoreEntity, string>(e => e.AStringValue, j => j.AStringValue)
             .WhereAll()
-            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AIntValue, je => je.AIntValue)
-            .Select(e => e.AIntValue);
+            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AnIntValue, je => je.AnIntValue)
+            .Select(e => e.AnIntValue);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
 
         results.Value.Count.Should().Be(1);
         results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AIntValue)).Should().Be(9);
+        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
     }
 
     [Fact]
     public async Task WhenQueryWithSelectFromLeftJoinAndOtherCollectionNotExists_ThenReturnsUnAggregatedResults()
     {
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue1", AIntValue = 7 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue1", AnIntValue = 7 }),
             CancellationToken.None);
         var query = Query.From<TestDataStoreEntity>()
             .Join<FirstJoiningTestQueryStoreEntity, string>(e => e.AStringValue, j => j.AStringValue, JoinType.Left)
             .WhereAll()
-            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AIntValue, je => je.AIntValue);
+            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AnIntValue, je => je.AnIntValue);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
 
         results.Value.Count.Should().Be(1);
         results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AIntValue)).Should().Be(7);
+        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(7);
     }
 
     [Fact]
     public async Task WhenQueryWithSelectFromLeftJoinOnOtherCollection_ThenReturnsPartiallyAggregatedResults()
     {
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue1", AIntValue = 7 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue1", AnIntValue = 7 }),
             CancellationToken.None);
         var entity2 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue2", AIntValue = 7 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue2", AnIntValue = 7 }),
             CancellationToken.None);
         var entity3 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue3", AIntValue = 7 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue3", AnIntValue = 7 }),
             CancellationToken.None);
         await _firstJoiningSetup.Store.AddAsync(_firstJoiningSetup.ContainerName, CommandEntity.FromType(
             new FirstJoiningTestQueryStoreEntity
-                { AStringValue = "avalue1", AIntValue = 9 }), CancellationToken.None);
+                { AStringValue = "avalue1", AnIntValue = 9 }), CancellationToken.None);
         await _firstJoiningSetup.Store.AddAsync(_firstJoiningSetup.ContainerName,
             CommandEntity.FromType(new FirstJoiningTestQueryStoreEntity { AStringValue = "avalue5" }),
             CancellationToken.None);
         var query = Query.From<TestJoinedDataStoreEntity>()
             .Join<FirstJoiningTestQueryStoreEntity, string>(e => e.AStringValue, j => j.AStringValue, JoinType.Left)
             .WhereAll()
-            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AIntValue, je => je.AIntValue);
+            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AnIntValue, je => je.AnIntValue);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
             PersistedEntityMetadata.FromType<TestJoinedDataStoreEntity>(), CancellationToken.None);
@@ -2011,11 +2083,11 @@ public abstract class AnyDataStoreBaseSpec
 
         results.Value.Count.Should().Be(3);
         results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AIntValue)).Should().Be(9);
+        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
         results.Value[1].Id.Should().Be(entity2.Value.Id);
-        results.Value[1].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AIntValue)).Should().Be(7);
+        results.Value[1].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(7);
         results.Value[2].Id.Should().Be(entity3.Value.Id);
-        results.Value[2].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AIntValue)).Should().Be(7);
+        results.Value[2].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(7);
     }
 
     [Fact]
@@ -2023,18 +2095,18 @@ public abstract class AnyDataStoreBaseSpec
     {
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName, CommandEntity.FromType(
             new TestDataStoreEntity
-                { AStringValue = "avalue1", AIntValue = 7, ALongValue = 7 }), CancellationToken.None);
+                { AStringValue = "avalue1", AnIntValue = 7, ALongValue = 7 }), CancellationToken.None);
         await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue2" }), CancellationToken.None);
         await _firstJoiningSetup.Store.AddAsync(_firstJoiningSetup.ContainerName, CommandEntity.FromType(
             new FirstJoiningTestQueryStoreEntity
-                { AStringValue = "avalue1", AIntValue = 9 }), CancellationToken.None);
+                { AStringValue = "avalue1", AnIntValue = 9 }), CancellationToken.None);
         await _firstJoiningSetup.Store.AddAsync(_firstJoiningSetup.ContainerName,
             CommandEntity.FromType(new FirstJoiningTestQueryStoreEntity { AStringValue = "avalue3" }),
             CancellationToken.None);
         await _secondJoiningSetup.Store.AddAsync(_secondJoiningSetup.ContainerName,
             CommandEntity.FromType(new SecondJoiningTestQueryStoreEntity
-                { AStringValue = "avalue1", AIntValue = 9, ALongValue = 8 }), CancellationToken.None);
+                { AStringValue = "avalue1", AnIntValue = 9, ALongValue = 8 }), CancellationToken.None);
         await _secondJoiningSetup.Store.AddAsync(_secondJoiningSetup.ContainerName,
             CommandEntity.FromType(new SecondJoiningTestQueryStoreEntity { AStringValue = "avalue3" }),
             CancellationToken.None);
@@ -2042,7 +2114,7 @@ public abstract class AnyDataStoreBaseSpec
             .Join<FirstJoiningTestQueryStoreEntity, string>(e => e.AStringValue, j => j.AStringValue)
             .AndJoin<SecondJoiningTestQueryStoreEntity, string>(e => e.AStringValue, j => j.AStringValue)
             .WhereAll()
-            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AIntValue, je => je.AIntValue)
+            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AnIntValue, je => je.AnIntValue)
             .SelectFromJoin<SecondJoiningTestQueryStoreEntity, long>(e => e.ALongValue, je => je.ALongValue);
 
         var results = await Setup.Store.QueryAsync(Setup.ContainerName, query,
@@ -2050,7 +2122,7 @@ public abstract class AnyDataStoreBaseSpec
 
         results.Value.Count.Should().Be(1);
         results.Value[0].Id.Should().Be(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AIntValue)).Should().Be(9);
+        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
         results.Value[0].GetValueOrDefault<long>(nameof(TestJoinedDataStoreEntity.ALongValue)).Should().Be(8);
     }
 
@@ -2058,20 +2130,20 @@ public abstract class AnyDataStoreBaseSpec
     public async Task WhenQueryWithSelectFromInnerJoinAndOrderByOnAProjectField_ThenReturnsAggregatedResults()
     {
         var entity1 = await Setup.Store.AddAsync(Setup.ContainerName,
-            CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue1", AIntValue = 7 }),
+            CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue1", AnIntValue = 7 }),
             CancellationToken.None);
         await Setup.Store.AddAsync(Setup.ContainerName,
             CommandEntity.FromType(new TestDataStoreEntity { AStringValue = "avalue2" }), CancellationToken.None);
         await _firstJoiningSetup.Store.AddAsync(_firstJoiningSetup.ContainerName, CommandEntity.FromType(
             new FirstJoiningTestQueryStoreEntity
-                { AStringValue = "avalue1", AIntValue = 9 }), CancellationToken.None);
+                { AStringValue = "avalue1", AnIntValue = 9 }), CancellationToken.None);
         await _firstJoiningSetup.Store.AddAsync(_firstJoiningSetup.ContainerName,
             CommandEntity.FromType(new FirstJoiningTestQueryStoreEntity { AStringValue = "avalue3" }),
             CancellationToken.None);
         var query = Query.From<TestJoinedDataStoreEntity>()
             .Join<FirstJoiningTestQueryStoreEntity, string>(e => e.AStringValue, j => j.AStringValue)
             .WhereAll()
-            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AIntValue, je => je.AIntValue)
+            .SelectFromJoin<FirstJoiningTestQueryStoreEntity, int>(e => e.AnIntValue, je => je.AnIntValue)
             .SelectFromJoin<FirstJoiningTestQueryStoreEntity, string>(e => e.AFirstStringValue, je => je.AStringValue)
             .OrderBy(je => je.AFirstStringValue);
 
@@ -2080,7 +2152,7 @@ public abstract class AnyDataStoreBaseSpec
 
         results.Value.Count.Should().Be(1);
         results.Value[0].Id.Should().BeSome(entity1.Value.Id);
-        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AIntValue)).Should().Be(9);
+        results.Value[0].GetValueOrDefault<int>(nameof(TestJoinedDataStoreEntity.AnIntValue)).Should().Be(9);
         results.Value[0].GetValueOrDefault<bool>(nameof(TestJoinedDataStoreEntity.ABooleanValue)).Should().Be(false);
     }
 
@@ -2358,6 +2430,7 @@ public abstract class AnyDataStoreBaseSpec
     [Fact]
     public async Task WhenReplaceExisting_ThenReturnsUpdated()
     {
+        var now = DateTime.UtcNow.ToNearestSecond();
         var entity = new CommandEntity("anid");
         await Setup.Store.AddAsync(Setup.ContainerName, entity, CancellationToken.None);
 
@@ -2368,7 +2441,7 @@ public abstract class AnyDataStoreBaseSpec
         updated.Value.Value.Id.Should().Be(entity.Id);
         updated.Value.Value.Properties.GetValueOrDefault(nameof(TestDataStoreEntity.AStringValue)).Should()
             .Be("updated");
-        updated.Value.Value.LastPersistedAtUtc.Should().BeNear(DateTime.UtcNow);
+        updated.Value.Value.LastPersistedAtUtc.Should().BeNear(now);
     }
 
     [Fact]
@@ -2419,8 +2492,11 @@ public abstract class AnyDataStoreBaseSpec
     }
 
     [Fact]
-    public async Task WhenRetrieveAndExists_ThenReturnsEntity()
+    public async Task WhenRetrieveAndPopulated_ThenReturnsEntity()
     {
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var datum = now;
+        var datumOffset = DateTimeOffset.UnixEpoch.AddYears(25).ToUniversalTime();
         var entity = CommandEntity.FromType(new TestDataStoreEntity
         {
             AStringValue = "astringvalue",
@@ -2428,24 +2504,26 @@ public abstract class AnyDataStoreBaseSpec
             AnOptionalNullableStringValue = "astringvalue",
             EnumValue = TestEnum.AValue1,
             AnOptionalEnumValue = TestEnum.AValue1.ToOptional(),
-            AnNullableEnumValue = TestEnum.AValue1,
-            ABinaryValue = new byte[] { 0x01 },
+            ANullableEnumValue = TestEnum.AValue1,
+            ABinaryValue = [0x01],
             ABooleanValue = true,
             ANullableBooleanValue = true,
-            ADoubleValue = 0.1,
-            ANullableDoubleValue = 0.1,
+            ADecimalValue = 123.123M,
+            ANullableDecimalValue = 123.123M,
+            ADoubleValue = 1.1D,
+            ANullableDoubleValue = 1.1D,
             AGuidValue = new Guid("12345678-1111-2222-3333-123456789012"),
             ANullableGuidValue = new Guid("12345678-1111-2222-3333-123456789012"),
-            AIntValue = 1,
+            AnIntValue = 1,
             ANullableIntValue = 1,
             ALongValue = 2,
             ANullableLongValue = 2,
-            ADateTimeUtcValue = DateTime.Today.ToUniversalTime(),
-            ANullableDateTimeUtcValue = DateTime.Today.ToUniversalTime(),
-            AnOptionalDateTimeUtcValue = DateTime.Today.ToUniversalTime(),
-            AnOptionalNullableDateTimeUtcValue = DateTime.Today.ToUniversalTime(),
-            ADateTimeOffsetValue = DateTimeOffset.UnixEpoch.ToUniversalTime(),
-            ANullableDateTimeOffsetValue = DateTimeOffset.UnixEpoch.ToUniversalTime(),
+            ADateTimeUtcValue = datum,
+            ANullableDateTimeUtcValue = datum,
+            AnOptionalDateTimeUtcValue = datum,
+            AnOptionalNullableDateTimeUtcValue = datum,
+            ADateTimeOffsetValue = datumOffset,
+            ANullableDateTimeOffsetValue = datumOffset,
             AComplexObjectValue =
                 new TestComplexObject
                 {
@@ -2467,7 +2545,7 @@ public abstract class AnyDataStoreBaseSpec
                 PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
         result.Value.Value.Id.Should().BeSome(entity.Id);
-        result.Value.Value.LastPersistedAtUtc.Should().BeNear(DateTime.UtcNow);
+        result.Value.Value.LastPersistedAtUtc.Should().BeNear(now);
         result.Value.Value.LastPersistedAtUtc.Value.Kind.Should().Be(DateTimeKind.Utc);
         result.Value.Value.GetValueOrDefault<string>(nameof(TestDataStoreEntity.AStringValue)).Should()
             .Be("astringvalue");
@@ -2479,7 +2557,7 @@ public abstract class AnyDataStoreBaseSpec
             .BeSome("astringvalue");
         result.Value.Value.GetValueOrDefault<TestEnum>(nameof(TestDataStoreEntity.EnumValue)).Should()
             .Be(TestEnum.AValue1);
-        result.Value.Value.GetValueOrDefault<TestEnum?>(nameof(TestDataStoreEntity.AnNullableEnumValue)).Should()
+        result.Value.Value.GetValueOrDefault<TestEnum?>(nameof(TestDataStoreEntity.ANullableEnumValue)).Should()
             .Be(TestEnum.AValue1);
         result.Value.Value.GetValueOrDefault<Optional<TestEnum>>(nameof(TestDataStoreEntity.AnOptionalEnumValue))
             .Should()
@@ -2493,19 +2571,22 @@ public abstract class AnyDataStoreBaseSpec
             .Be(new Guid("12345678-1111-2222-3333-123456789012"));
         result.Value.Value.GetValueOrDefault<Guid?>(nameof(TestDataStoreEntity.ANullableGuidValue)).Should()
             .Be(new Guid("12345678-1111-2222-3333-123456789012"));
-        result.Value.Value.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AIntValue)).Should().Be(1);
+        result.Value.Value.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AnIntValue)).Should().Be(1);
         result.Value.Value.GetValueOrDefault<int?>(nameof(TestDataStoreEntity.ANullableIntValue)).Should().Be(1);
         result.Value.Value.GetValueOrDefault<long>(nameof(TestDataStoreEntity.ALongValue)).Should().Be(2);
         result.Value.Value.GetValueOrDefault<long?>(nameof(TestDataStoreEntity.ANullableLongValue)).Should().Be(2);
-        result.Value.Value.GetValueOrDefault<double>(nameof(TestDataStoreEntity.ADoubleValue)).Should().Be(0.1);
+        result.Value.Value.GetValueOrDefault<decimal>(nameof(TestDataStoreEntity.ADecimalValue)).Should().Be(123.123M);
+        result.Value.Value.GetValueOrDefault<decimal?>(nameof(TestDataStoreEntity.ANullableDecimalValue)).Should()
+            .Be(123.123M);
+        result.Value.Value.GetValueOrDefault<double>(nameof(TestDataStoreEntity.ADoubleValue)).Should().Be(1.1);
         result.Value.Value.GetValueOrDefault<double?>(nameof(TestDataStoreEntity.ANullableDoubleValue)).Should()
-            .Be(0.1);
+            .Be(1.1);
         result.Value.Value.GetValueOrDefault<DateTime>(nameof(TestDataStoreEntity.ADateTimeUtcValue)).Should()
-            .Be(DateTime.Today.ToUniversalTime());
+            .Be(datum);
         result.Value.Value.GetValueOrDefault<DateTime>(nameof(TestDataStoreEntity.ADateTimeUtcValue)).Kind
             .Should().Be(DateTimeKind.Utc);
         result.Value.Value.GetValueOrDefault<DateTime?>(nameof(TestDataStoreEntity.ANullableDateTimeUtcValue)).Should()
-            .Be(DateTime.Today.ToUniversalTime());
+            .Be(datum);
         result.Value.Value.GetValueOrDefault<DateTime?>(nameof(TestDataStoreEntity.ANullableDateTimeUtcValue))!.Value
             .Kind.Should().Be(DateTimeKind.Utc);
         result.Value.Value.GetValueOrDefault<Optional<DateTime>>(nameof(TestDataStoreEntity.AnOptionalDateTimeUtcValue))
@@ -2516,9 +2597,9 @@ public abstract class AnyDataStoreBaseSpec
             .Value!
             .Value.Kind.Should().Be(DateTimeKind.Utc);
         result.Value.Value.GetValueOrDefault<DateTimeOffset>(nameof(TestDataStoreEntity.ADateTimeOffsetValue)).Should()
-            .Be(DateTimeOffset.UnixEpoch.ToUniversalTime());
+            .Be(datumOffset);
         result.Value.Value.GetValueOrDefault<DateTimeOffset?>(nameof(TestDataStoreEntity.ANullableDateTimeOffsetValue))
-            .Should().Be(DateTimeOffset.UnixEpoch.ToUniversalTime());
+            .Should().Be(datumOffset);
         result.Value.Value
             .GetValueOrDefault<TestComplexObject>(nameof(TestDataStoreEntity.AComplexObjectValue)).Should()
             .Be(new TestComplexObject { APropertyValue = "avalue" });
@@ -2536,21 +2617,23 @@ public abstract class AnyDataStoreBaseSpec
     }
 
     [Fact]
-    public async Task WhenRetrieveAndExistsWithDefaultValues_ThenReturnsEntity()
+    public async Task WhenRetrieveAndPopulatedWithDefaultValues_ThenReturnsEntity()
     {
         var entity = CommandEntity.FromType(new TestDataStoreEntity
         {
             EnumValue = default,
             AnOptionalEnumValue = default,
-            AnNullableEnumValue = default,
+            ANullableEnumValue = default,
             ABinaryValue = default!,
             ABooleanValue = default,
             ANullableBooleanValue = default,
+            ADecimalValue = default,
+            ANullableDecimalValue = default,
             ADoubleValue = default,
             ANullableDoubleValue = default,
             AGuidValue = Guid.Empty,
             ANullableGuidValue = default,
-            AIntValue = default,
+            AnIntValue = default,
             ANullableIntValue = default,
             ALongValue = default,
             ANullableLongValue = default,
@@ -2575,8 +2658,9 @@ public abstract class AnyDataStoreBaseSpec
             await Setup.Store.RetrieveAsync(Setup.ContainerName, entity.Id,
                 PersistedEntityMetadata.FromType<TestDataStoreEntity>(), CancellationToken.None);
 
+        var now = DateTime.UtcNow.ToNearestSecond();
         result.Value.Value.Id.Should().Be(entity.Id);
-        result.Value.Value.LastPersistedAtUtc.Should().BeNear(DateTime.UtcNow);
+        result.Value.Value.LastPersistedAtUtc.Should().BeNear(now);
         result.Value.Value.LastPersistedAtUtc.Value.Kind.Should().Be(DateTimeKind.Utc);
         result.Value.Value.GetValueOrDefault<string>(nameof(TestDataStoreEntity.AStringValue)).Should().BeNull();
         result.Value.Value.GetValueOrDefault<Optional<string>>(nameof(TestDataStoreEntity.AnOptionalStringValue))
@@ -2586,7 +2670,7 @@ public abstract class AnyDataStoreBaseSpec
             .BeNone();
         result.Value.Value.GetValueOrDefault<TestEnum>(nameof(TestDataStoreEntity.EnumValue)).Should()
             .Be(TestEnum.NoValue);
-        result.Value.Value.GetValueOrDefault<TestEnum?>(nameof(TestDataStoreEntity.AnNullableEnumValue)).Should()
+        result.Value.Value.GetValueOrDefault<TestEnum?>(nameof(TestDataStoreEntity.ANullableEnumValue)).Should()
             .BeNull();
         result.Value.Value.GetValueOrDefault<Optional<TestEnum>>(nameof(TestDataStoreEntity.AnOptionalEnumValue))
             .ValueOrDefault.Should()
@@ -2597,10 +2681,13 @@ public abstract class AnyDataStoreBaseSpec
             .BeNull();
         result.Value.Value.GetValueOrDefault<Guid>(nameof(TestDataStoreEntity.AGuidValue)).Should().Be(Guid.Empty);
         result.Value.Value.GetValueOrDefault<Guid?>(nameof(TestDataStoreEntity.ANullableGuidValue)).Should().BeNull();
-        result.Value.Value.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AIntValue)).Should().Be(0);
+        result.Value.Value.GetValueOrDefault<int>(nameof(TestDataStoreEntity.AnIntValue)).Should().Be(0);
         result.Value.Value.GetValueOrDefault<int?>(nameof(TestDataStoreEntity.ANullableIntValue)).Should().BeNull();
         result.Value.Value.GetValueOrDefault<long>(nameof(TestDataStoreEntity.ALongValue)).Should().Be(0L);
         result.Value.Value.GetValueOrDefault<long?>(nameof(TestDataStoreEntity.ANullableLongValue)).Should().BeNull();
+        result.Value.Value.GetValueOrDefault<decimal>(nameof(TestDataStoreEntity.ADecimalValue)).Should().Be(0.0M);
+        result.Value.Value.GetValueOrDefault<decimal?>(nameof(TestDataStoreEntity.ANullableDecimalValue)).Should()
+            .BeNull();
         result.Value.Value.GetValueOrDefault<double>(nameof(TestDataStoreEntity.ADoubleValue)).Should().Be(0.0D);
         result.Value.Value.GetValueOrDefault<double?>(nameof(TestDataStoreEntity.ANullableDoubleValue)).Should()
             .BeNull();
@@ -2640,9 +2727,9 @@ public abstract class AnyDataStoreBaseSpec
 
     public struct DataStoreInfo
     {
-        public required IDataStore Store { get; set; }
+        public required IDataStore Store { get; init; }
 
-        public required string ContainerName { get; set; }
+        public required string ContainerName { get; init; }
     }
 
     protected IDataStore DataStore => Setup.Store;

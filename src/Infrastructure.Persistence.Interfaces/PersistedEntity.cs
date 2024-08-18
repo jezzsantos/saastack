@@ -147,7 +147,7 @@ public abstract class PersistedEntity
         return new HydrationProperties(properties);
     }
 
-    private Optional<Type> GetPropertyType(string propertyName)
+    public Optional<Type> GetPropertyType(string propertyName)
     {
         return Metadata.GetPropertyType(propertyName);
     }

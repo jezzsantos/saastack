@@ -4,7 +4,6 @@ using Azure.Storage.Queues.Models;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
-using Common.Recording;
 using Infrastructure.Persistence.Azure.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using JetBrains.Annotations;
@@ -111,8 +110,7 @@ public class AzureStorageAccountQueueStore : IQueueStore
         {
             await ReturnMessageToQueueForNextPopAsync(queue, queueMessage, cancellationToken);
 
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to handle last message: {MessageId} from queue: {Queue}", queueMessage.MessageId,
                 queue.Name);
             return ex.ToError(ErrorCode.Unexpected);
@@ -140,14 +138,14 @@ public class AzureStorageAccountQueueStore : IQueueStore
         }
         catch (RequestFailedException ex)
         {
-            _recorder.Crash(null, CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to push message: {Message} to queue: {Queue}. Error was: {ErrorCode}", message,
                 queue.Name, ex.ErrorCode ?? "none");
             return ex.ToError(ErrorCode.Unexpected);
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null, CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to push message: {Message} to queue: {Queue}", message, queue.Name);
             return ex.ToError(ErrorCode.Unexpected);
         }
@@ -171,15 +169,14 @@ public class AzureStorageAccountQueueStore : IQueueStore
         }
         catch (RequestFailedException ex)
         {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to POP last message from queue: {Queue}. Error was: {ErrorCode}", queue.Name,
                 ex.ErrorCode ?? "none");
             return Error.EntityNotFound();
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null, CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to POP last message from queue: {Queue}", queue.Name);
             return Error.EntityNotFound();
         }
@@ -194,16 +191,14 @@ public class AzureStorageAccountQueueStore : IQueueStore
         }
         catch (RequestFailedException ex)
         {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to remove last message: {MessageId} from queue: {Queue}. Error was: {ErrorCode}",
                 message.MessageId,
                 queue.Name, ex.ErrorCode ?? "none");
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to remove last message: {MessageId} from queue: {Queue}", message.MessageId,
                 queue.Name);
         }
@@ -219,15 +214,13 @@ public class AzureStorageAccountQueueStore : IQueueStore
         }
         catch (RequestFailedException ex)
         {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to return the current message: {MessageId} to the queue: {Queue}. Error was: {ErrorCode}",
                 message.MessageId, queue.Name, ex.ErrorCode ?? "none");
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to return the current message: {MessageId} to the queue: {Queue}", message.MessageId,
                 queue.Name);
         }

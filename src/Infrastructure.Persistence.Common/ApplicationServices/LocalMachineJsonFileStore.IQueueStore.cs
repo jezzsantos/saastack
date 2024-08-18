@@ -7,7 +7,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-public partial class LocalMachineJsonFileStore : IQueueStore, IQueueStoreTrigger
+partial class LocalMachineJsonFileStore : IQueueStore, IQueueStoreTrigger
 {
     private const string QueueStoreQueueContainerName = "Queues";
 

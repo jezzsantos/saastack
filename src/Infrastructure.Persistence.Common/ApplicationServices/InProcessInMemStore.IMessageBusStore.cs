@@ -8,7 +8,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-public partial class InProcessInMemStore : IMessageBusStore, IMessageBusStoreTrigger
+partial class InProcessInMemStore : IMessageBusStore, IMessageBusStoreTrigger
 {
     private readonly Dictionary<string, SubscriptionPosition> _subscriptions = new();
     private readonly Dictionary<string, Dictionary<long, HydrationProperties>> _topics = new();

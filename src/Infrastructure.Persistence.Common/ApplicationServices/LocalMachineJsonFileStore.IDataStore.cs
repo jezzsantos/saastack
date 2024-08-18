@@ -9,7 +9,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-public partial class LocalMachineJsonFileStore : IDataStore
+partial class LocalMachineJsonFileStore : IDataStore
 {
     public const string NullToken = @"null";
     private const string DocumentStoreContainerName = "Documents";
@@ -33,8 +33,6 @@ public partial class LocalMachineJsonFileStore : IDataStore
     {
         containerName.ThrowIfNotValuedParameter(nameof(containerName),
             Resources.AnyStore_MissingContainerName);
-
-        containerName.ThrowIfNotValuedParameter(nameof(containerName));
 
         var container = EnsureContainer(GetDocumentStoreContainerPath(containerName));
 

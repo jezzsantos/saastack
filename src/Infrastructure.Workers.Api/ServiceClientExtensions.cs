@@ -2,7 +2,6 @@ using Application.Common;
 using Application.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
-using Common.Recording;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common.Extensions;
@@ -39,8 +38,8 @@ public static class ServiceClientExtensions
         }
         catch (Exception ex)
         {
-            recorder.Crash(caller.ToCall(), CrashLevel.NonCritical, ex,
-                "Queued message {Id} of type {Type} failed delivery to API", messageId, messageType);
+            recorder.TraceError(caller.ToCall(),
+                ex, "Queued message {Id} of type {Type} failed delivery to API", messageId, messageType);
             throw;
         }
 

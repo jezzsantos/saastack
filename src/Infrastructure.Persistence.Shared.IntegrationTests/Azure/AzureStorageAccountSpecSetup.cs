@@ -1,6 +1,7 @@
 using Common.Recording;
 using Infrastructure.Persistence.Azure.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
+using IntegrationTesting.Persistence.Common;
 using JetBrains.Annotations;
 using Xunit;
 
@@ -15,7 +16,7 @@ public class AzureStorageAccountSpecSetup : StoreSpecSetupBase, IDisposable
     public AzureStorageAccountSpecSetup()
     {
         QueueStore = AzureStorageAccountQueueStore.Create(NoOpRecorder.Instance, Settings);
-        AzureStorageAccountBase.InitializeAllTests();
+        AzuriteStorageEmulator.Start();
     }
 
     public void Dispose()
@@ -28,7 +29,7 @@ public class AzureStorageAccountSpecSetup : StoreSpecSetupBase, IDisposable
     {
         if (disposing)
         {
-            AzureStorageAccountBase.CleanupAllTests();
+            AzuriteStorageEmulator.Shutdown();
         }
     }
 

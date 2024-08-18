@@ -32,6 +32,16 @@ public abstract class AnyEventStoreBaseSpec
     }
 
     [Fact]
+    public async Task WhenDestroyAllWithNullEntityName_ThenThrows()
+    {
+#if TESTINGONLY
+        await _setup.Store
+            .Invoking(x => x.DestroyAllAsync(null!, CancellationToken.None))
+            .Should().ThrowAsync<ArgumentOutOfRangeException>();
+#endif
+    }
+    
+    [Fact]
     public async Task WhenGetEventStreamWithNullEntityName_ThenThrows()
     {
         var entityId = GetNextEntityId();
@@ -65,7 +75,7 @@ public abstract class AnyEventStoreBaseSpec
     {
         var entityId = GetNextEntityId();
         await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
-            new List<EventSourcedChangeEvent> { CreateEvent(1) }, CancellationToken.None);
+            [CreateEvent(1)], CancellationToken.None);
 
         var result = await _setup.Store.GetEventStreamAsync(_setup.ContainerName,
             "anotherentityid", CancellationToken.None);
@@ -78,7 +88,7 @@ public abstract class AnyEventStoreBaseSpec
     {
         var entityId = GetNextEntityId();
         await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
-            new List<EventSourcedChangeEvent> { CreateEvent(1) }, CancellationToken.None);
+            [CreateEvent(1)], CancellationToken.None);
 
         var result =
             await _setup.Store.GetEventStreamAsync(_setup.ContainerName, entityId,
@@ -98,12 +108,11 @@ public abstract class AnyEventStoreBaseSpec
     {
         var entityId = GetNextEntityId();
         await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
-            new List<EventSourcedChangeEvent>
-            {
-                CreateEvent(1),
-                CreateEvent(2),
-                CreateEvent(3)
-            }, CancellationToken.None);
+        [
+            CreateEvent(1),
+            CreateEvent(2),
+            CreateEvent(3)
+        ], CancellationToken.None);
 
         var result =
             await _setup.Store.GetEventStreamAsync(_setup.ContainerName, entityId,
@@ -120,7 +129,7 @@ public abstract class AnyEventStoreBaseSpec
     {
         var entityId = GetNextEntityId();
         await _setup.Store
-            .Invoking(x => x.AddEventsAsync(null!, entityId, new List<EventSourcedChangeEvent> { CreateEvent(3) },
+            .Invoking(x => x.AddEventsAsync(null!, entityId, [CreateEvent(3)],
                 CancellationToken.None))
             .Should().ThrowAsync<ArgumentOutOfRangeException>();
     }
@@ -131,7 +140,7 @@ public abstract class AnyEventStoreBaseSpec
         await _setup.Store
             .Invoking(x =>
                 x.AddEventsAsync(_setup.ContainerName, null!,
-                    new List<EventSourcedChangeEvent> { CreateEvent(3) }, CancellationToken.None))
+                    [CreateEvent(3)], CancellationToken.None))
             .Should().ThrowAsync<ArgumentOutOfRangeException>();
     }
 
@@ -149,10 +158,7 @@ public abstract class AnyEventStoreBaseSpec
     {
         var entityId = GetNextEntityId();
         await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
-            new List<EventSourcedChangeEvent>
-            {
-                CreateEvent(1)
-            }, CancellationToken.None);
+            [CreateEvent(1)], CancellationToken.None);
 
         var result =
             await _setup.Store.GetEventStreamAsync(_setup.ContainerName, entityId,
@@ -168,10 +174,7 @@ public abstract class AnyEventStoreBaseSpec
         var entityId = GetNextEntityId();
 
         var result = await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
-            new List<EventSourcedChangeEvent>
-            {
-                CreateEvent(3)
-            }, CancellationToken.None);
+            [CreateEvent(3)], CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityExists,
             Resources.EventStoreExtensions_ConcurrencyVerificationFailed_StreamReset
@@ -183,18 +186,14 @@ public abstract class AnyEventStoreBaseSpec
     {
         var entityId = GetNextEntityId();
         await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
-            new List<EventSourcedChangeEvent>
-            {
-                CreateEvent(1),
-                CreateEvent(2),
-                CreateEvent(3)
-            }, CancellationToken.None);
+        [
+            CreateEvent(1),
+            CreateEvent(2),
+            CreateEvent(3)
+        ], CancellationToken.None);
 
         var result = await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
-            new List<EventSourcedChangeEvent>
-            {
-                CreateEvent(1)
-            }, CancellationToken.None);
+            [CreateEvent(1)], CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityExists,
             Resources.EventStoreExtensions_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format(
@@ -206,18 +205,14 @@ public abstract class AnyEventStoreBaseSpec
     {
         var entityId = GetNextEntityId();
         await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
-            new List<EventSourcedChangeEvent>
-            {
-                CreateEvent(1),
-                CreateEvent(2),
-                CreateEvent(3)
-            }, CancellationToken.None);
+        [
+            CreateEvent(1),
+            CreateEvent(2),
+            CreateEvent(3)
+        ], CancellationToken.None);
 
         var result = await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
-            new List<EventSourcedChangeEvent>
-            {
-                CreateEvent(10)
-            }, CancellationToken.None);
+            [CreateEvent(10)], CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityExists,
             Resources.EventStoreExtensions_ConcurrencyVerificationFailed_MissingUpdates.Format(
@@ -229,20 +224,18 @@ public abstract class AnyEventStoreBaseSpec
     {
         var entityId = GetNextEntityId();
         await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
-            new List<EventSourcedChangeEvent>
-            {
-                CreateEvent(1),
-                CreateEvent(2),
-                CreateEvent(3)
-            }, CancellationToken.None);
+        [
+            CreateEvent(1),
+            CreateEvent(2),
+            CreateEvent(3)
+        ], CancellationToken.None);
 
         await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
-            new List<EventSourcedChangeEvent>
-            {
-                CreateEvent(4),
-                CreateEvent(5),
-                CreateEvent(6)
-            }, CancellationToken.None);
+        [
+            CreateEvent(4),
+            CreateEvent(5),
+            CreateEvent(6)
+        ], CancellationToken.None);
 
         var result =
             await _setup.Store.GetEventStreamAsync(_setup.ContainerName, entityId,

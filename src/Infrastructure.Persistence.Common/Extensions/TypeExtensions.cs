@@ -6,16 +6,17 @@ namespace Infrastructure.Persistence.Common.Extensions;
 
 public static class TypeExtensions
 {
-    private static readonly List<Type> NonComplexTypes = new()
-    {
+    private static readonly List<Type> NonComplexTypes =
+    [
         typeof(string), typeof(Optional<string>), typeof(Optional<string?>), typeof(DateTime), typeof(DateTime?),
         typeof(Optional<DateTime>), typeof(Optional<DateTime?>), typeof(DateTimeOffset), typeof(DateTimeOffset?),
         typeof(Optional<DateTimeOffset>), typeof(Optional<DateTimeOffset?>), typeof(bool), typeof(bool?),
         typeof(Optional<bool>), typeof(Optional<bool?>), typeof(int), typeof(int?), typeof(Optional<int>),
         typeof(Optional<int?>), typeof(long), typeof(long?), typeof(Optional<long>), typeof(Optional<long?>),
-        typeof(double), typeof(double?), typeof(Optional<double>), typeof(Optional<double?>), typeof(byte[]),
+        typeof(double), typeof(double?), typeof(Optional<double>), typeof(Optional<double?>), typeof(decimal),
+        typeof(decimal?), typeof(Optional<decimal>), typeof(Optional<decimal?>), typeof(byte[]),
         typeof(Guid), typeof(Guid?), typeof(Optional<Guid>), typeof(Optional<Guid?>)
-    };
+    ];
 
     /// <summary>
     ///     Whether the <see cref="type" /> is considered a complex type

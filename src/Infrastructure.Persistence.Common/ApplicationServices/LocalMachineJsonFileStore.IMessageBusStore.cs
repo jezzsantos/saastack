@@ -7,7 +7,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-public partial class LocalMachineJsonFileStore : IMessageBusStore, IMessageBusStoreTrigger
+partial class LocalMachineJsonFileStore : IMessageBusStore, IMessageBusStoreTrigger
 {
     private const string MessageBusStoreSubscriptionContainerName = "MessageBus/Subscriptions";
     private const string MessageBusStoreTopicContainerName = "MessageBus/Topics";

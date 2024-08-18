@@ -3,7 +3,6 @@ using Azure.Messaging.ServiceBus.Administration;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
-using Common.Recording;
 using Infrastructure.Persistence.Azure.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using JetBrains.Annotations;
@@ -118,8 +117,7 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to receive message from topic: {Topic} for subscription: {Subscription}",
                 topicName, subscriptionName);
             return ex.ToError(ErrorCode.Unexpected);
@@ -141,8 +139,7 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         {
             await receiver.AbandonMessageAsync(topicMessage, null, cancellationToken);
 
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to handle last message: {MessageId} from topic: {Topic} for subscription: {Subscription}",
                 topicMessage.MessageId, topicName, subscriptionName);
             return ex.ToError(ErrorCode.Unexpected);
@@ -173,8 +170,7 @@ public sealed class AzureServiceBusStore : IMessageBusStore, IAsyncDisposable
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to send message: {Message} to the topic: {Topic}", message, topicName);
             return ex.ToError(ErrorCode.Unexpected);
         }

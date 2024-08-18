@@ -28,15 +28,15 @@ public class TestDataStoreEntity : IHasIdentity, IQueryableEntity
 
     public DateTime ADateTimeUtcValue { get; set; }
 
+    public decimal ADecimalValue { get; set; }
+
     public double ADoubleValue { get; set; }
 
     public Guid AGuidValue { get; set; }
 
-    public int AIntValue { get; set; }
-
     public long ALongValue { get; set; }
 
-    public TestEnum? AnNullableEnumValue { get; set; }
+    public int AnIntValue { get; set; }
 
     public Optional<TestComplexObject> AnOptionalComplexObjectValue { get; set; } = null!;
 
@@ -58,7 +58,11 @@ public class TestDataStoreEntity : IHasIdentity, IQueryableEntity
 
     public DateTime? ANullableDateTimeUtcValue { get; set; }
 
+    public decimal? ANullableDecimalValue { get; set; }
+
     public double? ANullableDoubleValue { get; set; }
+
+    public TestEnum? ANullableEnumValue { get; set; }
 
     public Guid? ANullableGuidValue { get; set; }
 
@@ -96,7 +100,7 @@ public class FirstJoiningTestQueryStoreEntity : IHasIdentity, IQueryableEntity
         Id = $"anid{++_instanceCounter}";
     }
 
-    public int AIntValue { get; set; }
+    public int AnIntValue { get; set; }
 
     public string AStringValue { get; set; } = null!;
 
@@ -113,9 +117,9 @@ public class SecondJoiningTestQueryStoreEntity : IHasIdentity, IQueryableEntity
         Id = $"anid{++_instanceCounter}";
     }
 
-    public int AIntValue { get; set; }
-
     public long ALongValue { get; set; }
+
+    public int AnIntValue { get; set; }
 
     public string AStringValue { get; set; } = null!;
 
@@ -202,14 +206,14 @@ public class TestValueObject : ValueObjectBase<TestValueObject>
 
     protected override IEnumerable<object> GetAtomicValues()
     {
-        return new object[] { AStringProperty, AnIntName, ABooleanPropertyName };
+        return [AStringProperty, AnIntName, ABooleanPropertyName];
     }
 
     private static List<string> RehydrateToList(string hydratedValue)
     {
         if (!hydratedValue.HasValue())
         {
-            return new List<string>();
+            return [];
         }
 
         return hydratedValue

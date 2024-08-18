@@ -10,9 +10,9 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-public partial class LocalMachineJsonFileStore : IEventStore
+partial class LocalMachineJsonFileStore : IEventStore
 {
-    private const string EventStoreContainerName = "Events";
+    private static string? _cachedContainerName;
 
     public async Task<Result<string, Error>> AddEventsAsync(string entityName, string entityId,
         List<EventSourcedChangeEvent> events, CancellationToken cancellationToken)
@@ -80,10 +80,10 @@ public partial class LocalMachineJsonFileStore : IEventStore
     {
         if (entityId.HasValue())
         {
-            return $"{EventStoreContainerName}/{containerName}/{entityId}";
+            return $"{DetermineEventStoreContainerName()}/{containerName}/{entityId}";
         }
 
-        return $"{EventStoreContainerName}/{containerName}";
+        return $"{DetermineEventStoreContainerName()}/{containerName}";
     }
 
     private async Task<Optional<EventStoreEntity>> GetLatestEventAsync(string entityName, string entityId,
@@ -132,6 +132,16 @@ public partial class LocalMachineJsonFileStore : IEventStore
     private static string GetEventStreamName(string entityName, string entityId)
     {
         return $"{entityName}_{entityId}";
+    }
+
+    private static string DetermineEventStoreContainerName()
+    {
+        if (_cachedContainerName.HasNoValue())
+        {
+            _cachedContainerName = typeof(EventStoreEntity).GetEntityNameSafe();
+        }
+
+        return _cachedContainerName;
     }
 }
 #endif

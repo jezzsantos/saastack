@@ -9,6 +9,7 @@ namespace Infrastructure.Persistence.Common.ApplicationServices;
 
 /// <summary>
 ///     Provides a combined store that persists all data to memory, in the current process
+///     Note: Should NEVER be used in production systems, and useful only in the current process.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public sealed partial class InProcessInMemStore

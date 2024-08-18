@@ -35,7 +35,8 @@ public class EmailAddressSpec
     [Fact]
     public void WhenEqualAndCaseVariantEmail_ThenReturnsTrue()
     {
-        var result = EmailAddress.Create("auser@company.com").Equals(EmailAddress.Create("AUSER@company.com"));
+        var result = EmailAddress.Create("auser@company.com").Value
+            .Equals(EmailAddress.Create("AUSER@company.com").Value);
 
         result.Should().BeTrue();
     }

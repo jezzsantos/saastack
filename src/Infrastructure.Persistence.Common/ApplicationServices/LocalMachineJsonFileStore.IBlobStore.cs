@@ -7,7 +7,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-public partial class LocalMachineJsonFileStore : IBlobStore
+partial class LocalMachineJsonFileStore : IBlobStore
 {
     private const string BlobStoreContainerName = "Blobs";
 

@@ -4,7 +4,6 @@ using Amazon.SQS.Model;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
-using Common.Recording;
 using Infrastructure.Persistence.AWS.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using Task = System.Threading.Tasks.Task;
@@ -77,8 +76,7 @@ public class AWSSQSQueueStore : IQueueStore
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to retrieve attributes from queue: {Queue}", queueUrl);
             return ex.ToError(ErrorCode.Unexpected);
         }
@@ -103,8 +101,7 @@ public class AWSSQSQueueStore : IQueueStore
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to delete queue: {Queue}", queueUrl);
             return ex.ToError(ErrorCode.Unexpected);
         }
@@ -152,8 +149,7 @@ public class AWSSQSQueueStore : IQueueStore
         {
             await ReturnMessageToQueueForNextPopAsync(queueUrl, queueMessage, cancellationToken);
 
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to handle last message: {MessageId} from queue: {Queue}", queueMessage.MessageId,
                 queueUrl);
             return ex.ToError(ErrorCode.Unexpected);
@@ -190,7 +186,7 @@ public class AWSSQSQueueStore : IQueueStore
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null, CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to push message: {Message} to queue: {Queue}", message, queueUrl);
             return ex.ToError(ErrorCode.Unexpected);
         }
@@ -246,8 +242,7 @@ public class AWSSQSQueueStore : IQueueStore
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to create queue: {Queue}", sanitizedQueueName);
             return ex.ToError(ErrorCode.Unexpected);
         }
@@ -324,8 +319,7 @@ public class AWSSQSQueueStore : IQueueStore
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to create dead-letter queue: {Queue}", sanitizedQueueName);
             return ex.ToError(ErrorCode.Unexpected);
         }
@@ -351,7 +345,7 @@ public class AWSSQSQueueStore : IQueueStore
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null, CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to POP last message from queue: {Queue}", queueUrl);
             return Error.EntityNotFound();
         }
@@ -372,8 +366,8 @@ public class AWSSQSQueueStore : IQueueStore
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null, CrashLevel.NonCritical, ex,
-                "Failed to remove last message: {MessageId} from queue: {Queue}", message, queueUrl);
+            _recorder.TraceError(null,
+                ex, "Failed to remove last message: {MessageId} from queue: {Queue}", message, queueUrl);
         }
     }
 
@@ -386,8 +380,7 @@ public class AWSSQSQueueStore : IQueueStore
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to return the current message: {MessageId} to the queue: {Queue}", message.MessageId,
                 queueUrl);
         }

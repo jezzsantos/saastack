@@ -9,7 +9,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-public partial class InProcessInMemStore : IDataStore
+partial class InProcessInMemStore : IDataStore
 {
     private readonly Dictionary<string, Dictionary<string, HydrationProperties>> _documents = new();
 

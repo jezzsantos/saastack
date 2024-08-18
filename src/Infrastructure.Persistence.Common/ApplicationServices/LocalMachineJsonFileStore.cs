@@ -17,6 +17,8 @@ namespace Infrastructure.Persistence.Common.ApplicationServices;
 ///     The files are located in named folders under <see cref="_rootPath" />,
 ///     on Windows that is: %LOCALAPPDATA%\saastack\{containerName},
 ///     on macOS that is: /Users/username/.local/share/saastack/{containerName}
+///     Note: Should NEVER be used in production systems, but useful in testing distributed systems, across multiple
+///     processes.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public sealed partial class LocalMachineJsonFileStore : IDisposable
@@ -488,6 +490,13 @@ internal static class LocalMachineFileStoreExtensions
                                                || targetPropertyType == typeof(Optional<Guid?>))
         {
             return Guid.Parse(propertyValue.Value);
+        }
+
+        if (targetPropertyType == typeof(decimal) || targetPropertyType == typeof(decimal?)
+                                                  || targetPropertyType == typeof(Optional<decimal>)
+                                                  || targetPropertyType == typeof(Optional<decimal?>))
+        {
+            return decimal.Parse(propertyValue.Value);
         }
 
         if (targetPropertyType == typeof(double) || targetPropertyType == typeof(double?)

@@ -10,7 +10,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-public partial class InProcessInMemStore : IEventStore
+partial class InProcessInMemStore : IEventStore
 {
     private readonly Dictionary<string, Dictionary<string, HydrationProperties>> _events = new();
 

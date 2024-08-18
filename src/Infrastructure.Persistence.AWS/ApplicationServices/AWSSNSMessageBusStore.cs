@@ -7,7 +7,6 @@ using Amazon.SQS;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
-using Common.Recording;
 using Infrastructure.Persistence.AWS.Extensions;
 using Infrastructure.Persistence.Interfaces;
 using JetBrains.Annotations;
@@ -161,7 +160,8 @@ public class AWSSNSMessageBusStore : IMessageBusStore
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null, CrashLevel.NonCritical, ex, "Failed to delete topic: {Topic}", topicArn);
+            _recorder.TraceError(null,
+                ex, "Failed to delete topic: {Topic}", topicArn);
             return ex.ToError(ErrorCode.Unexpected);
         }
 
@@ -214,8 +214,7 @@ public class AWSSNSMessageBusStore : IMessageBusStore
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to handle last message from topic: {Topic} for subscription: {Subscription}",
                 topicName, subscriptionName);
             return ex.ToError(ErrorCode.Unexpected);
@@ -243,8 +242,7 @@ public class AWSSNSMessageBusStore : IMessageBusStore
         }
         catch (Exception ex)
         {
-            _recorder.Crash(null,
-                CrashLevel.NonCritical,
+            _recorder.TraceError(null,
                 ex, "Failed to send message: {Message} to the topic: {Topic}", message, topicName);
             return ex.ToError(ErrorCode.Unexpected);
         }

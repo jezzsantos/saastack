@@ -8,7 +8,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Persistence.Common.ApplicationServices;
 
-public partial class InProcessInMemStore : IQueueStore, IQueueStoreTrigger
+partial class InProcessInMemStore : IQueueStore, IQueueStoreTrigger
 {
     private readonly Dictionary<string, Dictionary<string, HydrationProperties>> _queues = new();
 
