@@ -34,6 +34,29 @@ public static class ServiceCollectionExtensions
 
     /// <summary>
     ///     Registers the <see cref="implementationFactory" /> for the specified interfaces:
+    ///     <see cref="TService1" /> and <see cref="TService2" />
+    ///     to be resolved only by <see cref="ServiceProviderExtensions.GetRequiredServiceForPlatform{TService}" />
+    /// </summary>
+    public static IServiceCollection AddForPlatform<TService1, TService2, TImplementation>(
+        this IServiceCollection services, Func<IServiceProvider, TImplementation> implementationFactory)
+        where TImplementation : class, TService1, TService2
+        where TService1 : class
+        where TService2 : class
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(implementationFactory);
+
+        AddForPlatform(services, implementationFactory);
+        services.AddKeyedSingleton<TService1>(PlatformKey,
+            (svc, key) => svc.GetRequiredKeyedService<TImplementation>(key));
+        services.AddKeyedSingleton<TService2>(PlatformKey,
+            (svc, key) => svc.GetRequiredKeyedService<TImplementation>(key));
+
+        return services;
+    }
+
+    /// <summary>
+    ///     Registers the <see cref="implementationFactory" /> for the specified interfaces:
     ///     <see cref="TService1" />, <see cref="TService2" />, <see cref="TService3" /> and <see cref="TService4" />
     ///     to be resolved only by <see cref="ServiceProviderExtensions.GetRequiredServiceForPlatform{TService}" />
     /// </summary>
@@ -128,6 +151,25 @@ public static class ServiceCollectionExtensions
         Type serviceType, Func<IServiceProvider, object> implementationFactory)
     {
         return services.AddScoped(serviceType, implementationFactory);
+    }
+
+    /// <summary>
+    ///     Registers the <see cref="implementationFactory" /> for the specified interfaces:
+    ///     <see cref="TService1" /> and <see cref="TService2" /> as per request (scoped),
+    ///     only for services that must be initialized for each HTTP request
+    /// </summary>
+    public static IServiceCollection AddPerHttpRequest<TService1, TService2, TImplementation>(
+        this IServiceCollection services, Func<IServiceProvider, TImplementation> implementationFactory)
+        where TImplementation : class, TService1, TService2
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(implementationFactory);
+
+        AddPerHttpRequest(services, implementationFactory);
+        AddPerHttpRequest(services, typeof(TService1), svc => svc.GetRequiredService<TImplementation>());
+        AddPerHttpRequest(services, typeof(TService2), svc => svc.GetRequiredService<TImplementation>());
+
+        return services;
     }
 
     /// <summary>
