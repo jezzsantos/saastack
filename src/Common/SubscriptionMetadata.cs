@@ -23,6 +23,7 @@ public class SubscriptionMetadata : Dictionary<string, string>, IEquatable<Subsc
         }
 
         return Count == other.Count
+               // ReSharper disable once UsageOfDefaultStructEquality
                && !this.Except(other).Any();
     }
 
@@ -51,6 +52,7 @@ public class SubscriptionMetadata : Dictionary<string, string>, IEquatable<Subsc
         var hash = 0;
         foreach (var pair in this)
         {
+            // ReSharper disable once UsageOfDefaultStructEquality
             hash ^= pair.GetHashCode();
         }
 
