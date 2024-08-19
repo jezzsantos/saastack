@@ -3,7 +3,7 @@ using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
 
-namespace Infrastructure.Shared;
+namespace Application.Services.Shared;
 
 /// <summary>
 ///     Defines a generic service for exchanging OAuth2 codes for tokens.

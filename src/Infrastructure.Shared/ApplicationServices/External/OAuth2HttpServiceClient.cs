@@ -1,12 +1,13 @@
 using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Resources.Shared;
+using Application.Services.Shared;
 using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.OAuth2;
 using Infrastructure.Web.Interfaces.Clients;
 
-namespace Infrastructure.Shared.ApplicationServices;
+namespace Infrastructure.Shared.ApplicationServices.External;
 
 /// <summary>
 ///     Provides a general purpose OAuth2 service client for exchanging authorization codes for tokens.
@@ -45,20 +46,12 @@ public class OAuth2HttpServiceClient : IOAuth2Service
                 RedirectUri = _redirectUri
             }, null, cancellationToken);
 
-            var tokens = new List<AuthToken>();
             if (response.IsFailure)
             {
                 return Error.NotAuthenticated(response.Error.Detail ?? response.Error.Title);
             }
 
-            var expiresOn = DateTime.UtcNow.Add(TimeSpan.FromSeconds(response.Value.ExpiresIn));
-            tokens.Add(new AuthToken(TokenType.AccessToken, response.Value.AccessToken!, expiresOn));
-            if (response.Value.RefreshToken.HasValue())
-            {
-                tokens.Add(new AuthToken(TokenType.RefreshToken, response.Value.RefreshToken!, null));
-            }
-
-            return tokens;
+            return response.Value.ToTokens();
         }
         catch (Exception ex)
         {
@@ -82,20 +75,12 @@ public class OAuth2HttpServiceClient : IOAuth2Service
                 RefreshToken = options.RefreshToken
             }, null, cancellationToken);
 
-            var tokens = new List<AuthToken>();
             if (response.IsFailure)
             {
                 return Error.NotAuthenticated(response.Error.Detail ?? response.Error.Title);
             }
 
-            var expiresOn = DateTime.UtcNow.Add(TimeSpan.FromSeconds(response.Value.ExpiresIn));
-            tokens.Add(new AuthToken(TokenType.AccessToken, response.Value.AccessToken!, expiresOn));
-            if (response.Value.RefreshToken.HasValue())
-            {
-                tokens.Add(new AuthToken(TokenType.RefreshToken, response.Value.RefreshToken!, null));
-            }
-
-            return tokens;
+            return response.Value.ToTokens();
         }
         catch (Exception ex)
         {
@@ -104,5 +89,33 @@ public class OAuth2HttpServiceClient : IOAuth2Service
                 options.ServiceName);
             return Error.Unexpected(ex.Message);
         }
+    }
+}
+
+internal static class OAuth2ConversionExtensions
+{
+    public static List<AuthToken> ToTokens(this OAuth2GrantAuthorizationResponse response)
+    {
+        var tokens = new List<AuthToken>();
+        var now = DateTime.UtcNow.ToNearestSecond();
+        var expiresOn = now.Add(TimeSpan.FromSeconds(response.ExpiresIn));
+        tokens.Add(new AuthToken(TokenType.AccessToken, response.AccessToken!, expiresOn));
+        if (response.RefreshToken.HasValue())
+        {
+            // Note: Refresh tokens are typically long-lived, like: for days or weeks
+            var defaultRefreshTokenExpiry = TimeSpan.FromDays(1); //default from Microsoft Identity (for SPA)
+            var refreshExpiresOn = now.Add(defaultRefreshTokenExpiry);
+            tokens.Add(new AuthToken(TokenType.RefreshToken, response.RefreshToken!, refreshExpiresOn));
+        }
+
+        if (response.IdToken.HasValue())
+        {
+            // Note: ID tokens are typically very short-lived, like: less than an hour or so
+            var defaultIdTokenExpiry = TimeSpan.FromHours(1); //default from Microsoft Identity
+            var idTokenExpiresOn = now.Add(defaultIdTokenExpiry);
+            tokens.Add(new AuthToken(TokenType.OtherToken, response.IdToken!, idTokenExpiresOn));
+        }
+
+        return tokens;
     }
 }

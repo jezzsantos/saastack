@@ -60,6 +60,24 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;AuthCode&apos; must be provided for this authentication attempt.
+        /// </summary>
+        internal static string AnySSOAuthenticationProvider_MissingAuthCode {
+            get {
+                return ResourceManager.GetString("AnySSOAuthenticationProvider_MissingAuthCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;RefreshToken&apos; must be provided for this refresh attempt.
+        /// </summary>
+        internal static string AnySSOAuthenticationProvider_MissingRefreshToken {
+            get {
+                return ResourceManager.GetString("AnySSOAuthenticationProvider_MissingRefreshToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;Password&apos; is either missing or invalid.
         /// </summary>
         internal static string AuthenticatePasswordRequestValidator_InvalidPassword {
@@ -272,15 +290,6 @@ namespace IdentityInfrastructure {
         internal static string RevokeRefreshTokenRequestValidator_InvalidToken {
             get {
                 return ResourceManager.GetString("RevokeRefreshTokenRequestValidator_InvalidToken", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The &apos;RefreshToken&apos; must be provided for this refresh attempt.
-        /// </summary>
-        internal static string TestSSOAuthenticationProvider_MissingRefreshToken {
-            get {
-                return ResourceManager.GetString("TestSSOAuthenticationProvider_MissingRefreshToken", resourceCulture);
             }
         }
     }

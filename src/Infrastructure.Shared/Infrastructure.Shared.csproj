@@ -19,6 +19,7 @@
 
     <ItemGroup>
         <PackageReference Include="Flagsmith" Version="5.2.2" />
+        <PackageReference Include="Microsoft.Identity.Client" Version="4.63.0" />
     </ItemGroup>
 
     <ItemGroup>

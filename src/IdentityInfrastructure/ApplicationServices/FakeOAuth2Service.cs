@@ -3,10 +3,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Application.Interfaces;
 using Application.Resources.Shared;
+using Application.Services.Shared;
 using Common;
 using IdentityApplication.ApplicationServices;
 using Infrastructure.Interfaces;
-using Infrastructure.Shared;
 
 namespace IdentityInfrastructure.ApplicationServices;
 
@@ -16,8 +16,7 @@ namespace IdentityInfrastructure.ApplicationServices;
 public class FakeOAuth2Service : IOAuth2Service
 {
     public Task<Result<List<AuthToken>, Error>> ExchangeCodeForTokensAsync(ICallerContext caller,
-        OAuth2CodeTokenExchangeOptions options,
-        CancellationToken cancellationToken)
+        OAuth2CodeTokenExchangeOptions options, CancellationToken cancellationToken)
     {
         if (options.Code != "1234567890")
         {
@@ -45,8 +44,7 @@ public class FakeOAuth2Service : IOAuth2Service
             Provider = providerName,
             AccessToken = new AuthenticationToken
             {
-                ExpiresOn = accessToken.ExpiresOn
-                            ?? DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry),
+                ExpiresOn = accessToken.ExpiresOn,
                 Type = TokenType.AccessToken,
                 Value = accessToken.Value
             },

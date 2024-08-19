@@ -7,6 +7,7 @@ using IdentityInfrastructure.ApplicationServices;
 using Infrastructure.Interfaces;
 using Moq;
 using UnitTesting.Common;
+using UnitTesting.Common.Validation;
 using Xunit;
 
 namespace IdentityInfrastructure.UnitTests.ApplicationServices;
@@ -21,6 +22,15 @@ public class FakeSSOAuthenticationProviderSpec
     {
         _caller = new Mock<ICallerContext>();
         _provider = new FakeSSOAuthenticationProvider();
+    }
+
+    [Fact]
+    public async Task WhenAuthenticateAsyncAndNoAuthCode_ThenReturnsError()
+    {
+        await _provider.Invoking(x =>
+                x.AuthenticateAsync(_caller.Object, string.Empty, "anemailaddress", CancellationToken.None))
+            .Should().ThrowAsync<ArgumentOutOfRangeException>()
+            .WithMessageLike(Resources.AnySSOAuthenticationProvider_MissingAuthCode);
     }
 
     [Fact]
@@ -64,10 +74,9 @@ public class FakeSSOAuthenticationProviderSpec
     [Fact]
     public async Task WhenRefreshTokenAsyncAndNoRefreshToken_ThenReturnsError()
     {
-        var result =
-            await _provider.RefreshTokenAsync(_caller.Object, string.Empty, CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation, Resources.TestSSOAuthenticationProvider_MissingRefreshToken);
+        await _provider.Invoking(x => x.RefreshTokenAsync(_caller.Object, string.Empty, CancellationToken.None))
+            .Should().ThrowAsync<ArgumentOutOfRangeException>()
+            .WithMessageLike(Resources.AnySSOAuthenticationProvider_MissingRefreshToken);
     }
 
     [Fact]

@@ -1,10 +1,10 @@
 #if TESTINGONLY
 using Application.Interfaces;
 using Application.Resources.Shared;
+using Application.Services.Shared;
 using Common;
 using Common.Extensions;
 using IdentityApplication.ApplicationServices;
-using Infrastructure.Shared;
 
 namespace IdentityInfrastructure.ApplicationServices;
 
@@ -30,6 +30,9 @@ public class FakeSSOAuthenticationProvider : ISSOAuthenticationProvider
     public async Task<Result<SSOUserInfo, Error>> AuthenticateAsync(ICallerContext caller, string authCode,
         string? emailAddress, CancellationToken cancellationToken)
     {
+        authCode.ThrowIfNotValuedParameter(nameof(authCode),
+            Resources.AnySSOAuthenticationProvider_MissingAuthCode);
+
         if (emailAddress.HasNoValue())
         {
             return Error.RuleViolation(Resources.FakeSSOAuthenticationProvider_MissingUsername);
@@ -54,10 +57,8 @@ public class FakeSSOAuthenticationProvider : ISSOAuthenticationProvider
     public async Task<Result<ProviderAuthenticationTokens, Error>> RefreshTokenAsync(ICallerContext caller,
         string refreshToken, CancellationToken cancellationToken)
     {
-        if (refreshToken.HasNoValue())
-        {
-            return Error.RuleViolation(Resources.TestSSOAuthenticationProvider_MissingRefreshToken);
-        }
+        refreshToken.ThrowIfNotValuedParameter(nameof(refreshToken),
+            Resources.AnySSOAuthenticationProvider_MissingRefreshToken);
 
         var retrievedTokens =
             await _auth2Service.RefreshTokenAsync(caller,
