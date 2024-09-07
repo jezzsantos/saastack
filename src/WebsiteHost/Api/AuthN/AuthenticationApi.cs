@@ -101,6 +101,9 @@ public class AuthenticationApi : IWebApiService
             SameSite = SameSiteMode.Lax,
             Expires = expires.HasValue
                 ? new DateTimeOffset(expires.Value)
+                : null,
+            MaxAge = expires.HasValue
+                ? expires.Value.Subtract(DateTime.UtcNow)
                 : null
         };
 

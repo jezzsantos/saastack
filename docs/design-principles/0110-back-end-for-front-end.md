@@ -242,9 +242,75 @@ At present, the BEFFE is not keeping track of past generated values against requ
 
 ### API calls from JavaScript
 
-All API calls will be proxied through the Reverse Proxy in the BEFFE (to the Backend API).
+All API calls from the JS app should append the path `/api/` to the base URL for the BEFFE server, for example: `GET https://localhost:5101/api/profiles/me`.
 
-After the user is authenticated, those proxied calls will include the JWT `access_token` in an `Authorization` header, extracted from the `auth-tok` cookie.
+> All API calls to that prefix (except for any APIs defined on the BEFFE) will be automatically proxied through the Reverse Proxy to the Backend API. Any API calls to any other paths (other than `/api/` will terminate at the BEFFE itself.
+
+
+
+To determine the currently authenticated user, issue the API call: `GET /api/profiles/me`.
+
+This will return (at least) the following data for an authenticated user:
+
+```json
+{
+    "profile": {
+        "features": [
+            "platform_paidtrial_features",
+            "platform_basic_features"
+        ],
+        "isAuthenticated": true,
+        "roles": [
+            "platform_standard"
+        ],
+        "defaultOrganizationId": "org_NNE1A89PUW4HjDBSzmGg",
+        "address": {
+            "city": "",
+            "countryCode": "USA",
+            "line1": "",
+            "line2": "",
+            "line3": "",
+            "state": "",
+            "zip": ""
+        },
+        "displayName": "afirstname",
+        "emailAddress": "auser@company.com",
+        "name": {
+            "firstName": "afirstname",
+            "lastName": "alastname"
+        },
+        "timezone": "Pacific/Auckland",
+        "userId": "user_t6VmQhfvQkk6qGWVeQNgA",
+        "id": "profile_jmaEqNS6RUTaEwhCe1SMQ"
+    }
+}	
+```
+
+This will return the following data for an un-authenticated user:
+
+```json
+{
+  "profile": {
+    "features": [],
+    "roles": [],
+    "address": {
+      "countryCode": "USA"
+    },
+    "displayName": "xxx_anonymous0000000000000",
+    "name": {
+      "firstName": "xxx_anonymous0000000000000"
+    },
+    "userId": "xxx_anonymous0000000000000",
+    "id": "xxx_anonymous0000000000000"
+  }
+}
+```
+
+> Note: the property `isAuthenticated` is missing from the response, which implies that its value is `false`
+
+
+
+Once a user is authenticated, all forwarded calls to the backend will include the JWT `access_token` in an `Authorization` header, extracted from the `auth-tok` cookie (by the reverse proxy).
 
 It is possible that subsequent calls to the Backend API will eventually respond with `HTTP 401 - Unauthorized` response, once the token has expired (or been revoked). This response will get proxied back to the JS app.
 

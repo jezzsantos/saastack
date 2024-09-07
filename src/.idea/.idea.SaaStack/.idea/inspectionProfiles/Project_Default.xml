@@ -5,6 +5,7 @@
       <option name="customHeaders">
         <set>
           <option value="X-Hub-Signature" />
+          <option value="anti-csrf-tok" />
         </set>
       </option>
     </inspection_tool>
