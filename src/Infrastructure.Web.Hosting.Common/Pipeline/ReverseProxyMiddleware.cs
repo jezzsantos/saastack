@@ -5,13 +5,16 @@ using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Http.Metadata;
 
 namespace Infrastructure.Web.Hosting.Common.Pipeline;
 
 /// <summary>
-///     Provides middleware to reverse proxy all (non-hosted) API requests to the Backend API.
-///     Ignores any request to a minimal API endpoint
-///     Ignores any request that is not to prefix <see cref="WebConstants.BackEndForFrontEndBasePath" />
+///     Provides middleware to reverse proxy all (non-hosted) API requests to the Backend API, used on a BEFFE.
+///     Ignores any request that is not to prefixed with <see cref="WebConstants.BackEndForFrontEndBasePath" />
+///     Ignores any API request defined on this BEFFE server.
+///     Assumes that this BEFFE server is configured with fallbacks to some Home controller, for all routes not defined,
+///     and for all routes to Backend API.
 /// </summary>
 public sealed class ReverseProxyMiddleware
 {
@@ -30,26 +33,43 @@ public sealed class ReverseProxyMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        if (IsBEFFEApiEndpoint(context))
-        {
-            await _next(context); //Continue down the pipeline
-            return;
-        }
-
         var request = context.Request;
-        if (IsNotApiRequest(request))
+        if (!IsApiRequest(request))
         {
             await _next(context); //Continue down the pipeline
             return;
         }
 
-        if (context.Request.Path.StartsWithSegments(WebConstants.BackEndForFrontEndDocsPath))
+        var endpoint = context.GetEndpoint();
+        if (endpoint.NotExists())
+        {
+            await ForwardMessageToBackendAsync(context);
+            return;
+        }
+
+        if (IsBeffeApiRequest(context))
         {
             await _next(context); //Continue down the pipeline
             return;
         }
 
         await ForwardMessageToBackendAsync(context);
+    }
+
+    private static bool IsBeffeApiRequest(HttpContext context)
+    {
+        var endpoint = context.GetEndpoint();
+        if (endpoint!.Metadata.OfType<IRouteDiagnosticsMetadata>().Any())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsApiRequest(HttpRequest request)
+    {
+        return request.PathBase.ToString().StartsWith(WebConstants.BackEndForFrontEndBasePath);
     }
 
     private async Task ForwardMessageToBackendAsync(HttpContext context)
@@ -91,12 +111,12 @@ public sealed class ReverseProxyMiddleware
 
         message.Headers.Host = apiUrl.Authority;
 
-        AddAuthentication(request, message);
+        AddAuthorization(request, message);
 
         return message;
     }
 
-    private static void AddAuthentication(HttpRequest request, HttpRequestMessage message)
+    private static void AddAuthorization(HttpRequest request, HttpRequestMessage message)
     {
         if (request.Cookies.TryGetValue(AuthenticationConstants.Cookies.Token, out var token))
         {
@@ -138,15 +158,5 @@ public sealed class ReverseProxyMiddleware
             .Replace(WebConstants.BackEndForFrontEndBasePath, string.Empty);
 
         return new Uri(new Uri(_backEndApiBaseUrl), path);
-    }
-
-    private static bool IsNotApiRequest(HttpRequest request)
-    {
-        return !request.PathBase.ToString().StartsWith(WebConstants.BackEndForFrontEndBasePath);
-    }
-
-    private static bool IsBEFFEApiEndpoint(HttpContext context)
-    {
-        return context.GetEndpoint().Exists();
     }
 }

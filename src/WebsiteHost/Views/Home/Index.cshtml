@@ -1,0 +1,23 @@
+﻿@model WebsiteHost.Models.IndexSpaPage;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="SaaStack" name="description"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="@Model.CSRFHeaderToken" name="@Model.CSRFFieldName"/>
+    <link rel="icon" href="/favicon.ico">
+    <title>SaaStack</title>
+    <script type="text/javascript">
+        const isTestingOnly = @(Model.IsTestingOnly
+                                  ? "true"
+                                  : "false");
+    </script>
+</head>
+<body>
+<noscript>You need to enable Javascript to run this app.</noscript>
+<div id="root">
+    <h1>SaaStack Home</h1>
+</div>
+</body>
+</html>
