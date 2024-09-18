@@ -8,7 +8,7 @@ namespace EndUsersApplication.Persistence.ReadModels;
 [EntityName("Invitation")]
 public class Invitation : ReadModelEntity
 {
-    public Optional<DateTime> AcceptedAtUtc { get; set; }
+    public Optional<DateTime> AcceptedAt { get; set; }
 
     public Optional<string> AcceptedEmailAddress { get; set; }
 

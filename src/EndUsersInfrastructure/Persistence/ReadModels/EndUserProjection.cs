@@ -246,7 +246,7 @@ public class EndUserProjection : IReadModelProjection
                 {
                     dto.Token = Optional<string>.None;
                     dto.Status = UserStatus.Registered;
-                    dto.AcceptedAtUtc = e.AcceptedAtUtc;
+                    dto.AcceptedAt = e.AcceptedAtUtc;
                     dto.AcceptedEmailAddress = e.AcceptedEmailAddress;
                 }, cancellationToken);
 
