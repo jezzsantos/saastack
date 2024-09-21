@@ -301,7 +301,7 @@ public class JsonClientSpec
         }
 
         [Fact]
-        public async Task WhenSendRequestAsyncAndPostMethodWithIMultiPartRequest_ThenContentIsMultiPartForm()
+        public async Task WhenSendRequestAsyncAndPostMethodWithIMultiPartFormRequest_ThenContentIsMultiPartForm()
         {
             var response = new HttpResponseMessage();
             var handler = new Mock<HttpMessageHandler>();
@@ -356,6 +356,35 @@ public class JsonClientSpec
                     ItExpr.Is<HttpRequestMessage>(req =>
                         req.Method == HttpMethod.Post
                         && req.Content is MultipartContent
+                    ),
+                    ItExpr.IsAny<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task WhenSendRequestAsyncAndPostMethodWithIHasUrlEncodedFormRequest_ThenContentIsUrlEncodedForm()
+        {
+            var response = new HttpResponseMessage();
+            var handler = new Mock<HttpMessageHandler>();
+            handler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(response);
+            var client = new HttpClient(handler.Object)
+            {
+                BaseAddress = new Uri("http://localhost")
+            };
+            var request = new TestUrlEncodedFormRequest();
+
+            var result =
+                await JsonClient.SendRequestAsync(client, HttpMethod.Post, request, null, null,
+                    CancellationToken.None);
+
+            result.Should().Be(response);
+            handler.Protected()
+                .Verify("SendAsync", Times.Once(),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Post
+                        && req.Content is FormUrlEncodedContent
                     ),
                     ItExpr.IsAny<CancellationToken>());
         }
@@ -616,6 +645,12 @@ public class TestRequest : WebRequest<TestRequest>
 
 [Api.Interfaces.Route("/test", OperationMethod.Post)]
 public class TestMultiPartFormRequest : WebRequest<TestRequest>, IHasMultipartForm
+{
+    public string AProperty { get; set; } = "avalue";
+}
+
+[Api.Interfaces.Route("/test", OperationMethod.Post)]
+public class TestUrlEncodedFormRequest : WebRequest<TestRequest>, IHasUrlEncodedForm
 {
     public string AProperty { get; set; } = "avalue";
 }

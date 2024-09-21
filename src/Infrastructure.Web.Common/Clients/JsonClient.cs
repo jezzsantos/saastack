@@ -323,7 +323,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         {
             if (method.CanHaveBody() && file.Exists())
             {
-                var multipart = ToFormData(body);
+                var multipart = ToMultiPartContent(body);
                 var streamContent = new StreamContent(file.Stream);
                 if (file.ContentType.HasValue())
                 {
@@ -335,8 +335,13 @@ public class JsonClient : IHttpJsonClient, IDisposable
             }
             else if (method.CanHaveBody() && request is IHasMultipartForm)
             {
-                var multipart = ToFormData(body);
+                var multipart = ToMultiPartContent(body);
                 content = multipart;
+            }
+            else if (method.CanHaveBody() && request is IHasUrlEncodedForm)
+            {
+                var urlEncoded = ToUrlEncodedContent(body);
+                content = urlEncoded;
             }
             else
             {
@@ -354,7 +359,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
             (content as IDisposable)?.Dispose();
         }
 
-        static MultipartFormDataContent ToFormData(IWebRequest body)
+        static MultipartFormDataContent ToMultiPartContent(IWebRequest body)
         {
             var content = new MultipartFormDataContent();
             var requestFields = //HACK: really need these values to be serialized as QueryString parameters
@@ -369,6 +374,14 @@ public class JsonClient : IHttpJsonClient, IDisposable
             }
 
             return content;
+        }
+
+        static FormUrlEncodedContent ToUrlEncodedContent(IWebRequest body)
+        {
+            var requestFields = body.SerializeToJson()
+                .FromJson<Dictionary<string, string>>()!;
+
+            return new FormUrlEncodedContent(requestFields);
         }
     }
 

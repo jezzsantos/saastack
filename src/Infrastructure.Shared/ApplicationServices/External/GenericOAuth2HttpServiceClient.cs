@@ -10,10 +10,10 @@ using Infrastructure.Web.Interfaces.Clients;
 namespace Infrastructure.Shared.ApplicationServices.External;
 
 /// <summary>
-///     Provides a general purpose OAuth2 service client for exchanging authorization codes for tokens.
+///     Provides a general purpose generic OAuth2 service client for exchanging authorization codes for tokens.
 ///     Assumes <see href="https://datatracker.ietf.org/doc/html/rfc6749">The OAuth 2.0 Authorization Framework</see>
 /// </summary>
-public class OAuth2HttpServiceClient : IOAuth2Service
+public class GenericOAuth2HttpServiceClient : IOAuth2Service
 {
     private readonly string _clientId;
     private readonly string? _clientSecret;
@@ -21,7 +21,7 @@ public class OAuth2HttpServiceClient : IOAuth2Service
     private readonly string _redirectUri;
     private readonly IServiceClient _serviceClient;
 
-    public OAuth2HttpServiceClient(IRecorder recorder, IServiceClient serviceClient, string clientId,
+    public GenericOAuth2HttpServiceClient(IRecorder recorder, IServiceClient serviceClient, string clientId,
         string? clientSecret, string redirectUri)
     {
         _recorder = recorder;
@@ -36,7 +36,8 @@ public class OAuth2HttpServiceClient : IOAuth2Service
     {
         try
         {
-            var response = await _serviceClient.PostAsync(caller, new OAuth2GrantAuthorizationRequest
+            //We want you to be able to override this and use any IOAuth2GrantAuthorizationRequest
+            var response = await _serviceClient.PostAsync(caller, new GenericOAuth2GrantAuthorizationRequest
             {
                 GrantType = "authorization_code",
                 Code = options.Code,
@@ -67,7 +68,7 @@ public class OAuth2HttpServiceClient : IOAuth2Service
     {
         try
         {
-            var response = await _serviceClient.PostAsync(caller, new OAuth2GrantAuthorizationRequest
+            var response = await _serviceClient.PostAsync(caller, new GenericOAuth2GrantAuthorizationRequest
             {
                 GrantType = "refresh_token",
                 ClientId = _clientId,
@@ -94,7 +95,7 @@ public class OAuth2HttpServiceClient : IOAuth2Service
 
 internal static class OAuth2ConversionExtensions
 {
-    public static List<AuthToken> ToTokens(this OAuth2GrantAuthorizationResponse response)
+    public static List<AuthToken> ToTokens(this GenericOAuth2GrantAuthorizationResponse response)
     {
         var tokens = new List<AuthToken>();
         var now = DateTime.UtcNow.ToNearestSecond();

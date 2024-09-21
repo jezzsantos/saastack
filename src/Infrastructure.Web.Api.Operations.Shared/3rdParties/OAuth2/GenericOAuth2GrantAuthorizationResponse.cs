@@ -3,7 +3,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.OAuth2;
 
-public class OAuth2GrantAuthorizationResponse : IWebResponse
+public class GenericOAuth2GrantAuthorizationResponse : IWebResponse
 {
     [JsonPropertyName("access_token")] public string? AccessToken { get; set; }
 
