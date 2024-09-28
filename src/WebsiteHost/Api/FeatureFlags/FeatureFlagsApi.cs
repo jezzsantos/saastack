@@ -8,7 +8,7 @@ using WebsiteHost.Application;
 namespace WebsiteHost.Api.FeatureFlags;
 
 [BaseApiFrom("/api")]
-public class FeatureFlagsApi : IWebApiService
+public sealed class FeatureFlagsApi : IWebApiService
 {
     private readonly ICallerContextFactory _callerFactory;
     private readonly IFeatureFlagsApplication _featureFlagsApplication;
