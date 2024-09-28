@@ -73,7 +73,7 @@ public class ReverseProxyMiddlewareSpec
             Request =
             {
                 Method = HttpMethods.Post,
-                PathBase = new PathString("/api/apath")
+                Path = new PathString("/api/apath")
             }
         };
 

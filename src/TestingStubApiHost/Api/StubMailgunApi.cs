@@ -9,7 +9,7 @@ using Infrastructure.Web.Interfaces.Clients;
 
 namespace TestingStubApiHost.Api;
 
-[WebService("/mailgun")]
+[BaseApiFrom("/mailgun")]
 public class StubMailgunApi : StubApiBase
 {
     private readonly IServiceClient _serviceClient;

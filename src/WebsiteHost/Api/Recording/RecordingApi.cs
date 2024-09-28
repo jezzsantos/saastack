@@ -8,6 +8,7 @@ using WebsiteHost.Application;
 
 namespace WebsiteHost.Api.Recording;
 
+[BaseApiFrom("/api")]
 public sealed class RecordingApi : IWebApiService
 {
     private readonly ICallerContextFactory _callerFactory;

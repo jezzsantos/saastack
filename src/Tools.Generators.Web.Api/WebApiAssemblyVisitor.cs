@@ -37,7 +37,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
     private readonly INamedTypeSymbol _voidSymbol;
     private readonly INamedTypeSymbol _webRequestInterfaceSymbol;
     private readonly INamedTypeSymbol _webRequestResponseInterfaceSymbol;
-    private readonly INamedTypeSymbol _webserviceAttributeSymbol;
+    private readonly INamedTypeSymbol _baseApiAttributeSymbol;
 
     public WebApiAssemblyVisitor(CancellationToken cancellationToken, Compilation compilation)
     {
@@ -46,7 +46,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         _webRequestInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebRequest).FullName!)!;
         _tenantedWebRequestInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(ITenantedRequest).FullName!)!;
         _webRequestResponseInterfaceSymbol = compilation.GetTypeByMetadataName(typeof(IWebRequest<>).FullName!)!;
-        _webserviceAttributeSymbol = compilation.GetTypeByMetadataName(typeof(WebServiceAttribute).FullName!)!;
+        _baseApiAttributeSymbol = compilation.GetTypeByMetadataName(typeof(BaseApiFromAttribute).FullName!)!;
         _routeAttributeSymbol = compilation.GetTypeByMetadataName(typeof(RouteAttribute).FullName!)!;
         _authorizeAttributeSymbol = compilation.GetTypeByMetadataName(typeof(AuthorizeAttribute).FullName!)!;
         _authorizeAttributeRolesSymbol = compilation.GetTypeByMetadataName(typeof(Roles).FullName!)!;
@@ -226,7 +226,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
 
         string? GetBasePath()
         {
-            if (!HasWebServiceAttribute(symbol, out var attributeData))
+            if (!HasBaseApiAttribute(symbol, out var attributeData))
             {
                 return null;
             }
@@ -422,11 +422,11 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             return false;
         }
 
-        // We assume that the class can be decorated with an optional WebServiceAttribute
-        bool HasWebServiceAttribute(ITypeSymbol classSymbol, out AttributeData? webServiceAttribute)
+        // We assume that the class can be decorated with an optional BaseApiFromAttribute
+        bool HasBaseApiAttribute(ITypeSymbol classSymbol, out AttributeData? baseApiAttribute)
         {
-            webServiceAttribute = classSymbol.GetAttribute(_webserviceAttributeSymbol);
-            return webServiceAttribute is not null;
+            baseApiAttribute = classSymbol.GetAttribute(_baseApiAttributeSymbol);
+            return baseApiAttribute is not null;
         }
 
         // We assume that the request DTO it is decorated with one RouteAttribute

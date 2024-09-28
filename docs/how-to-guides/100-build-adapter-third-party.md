@@ -321,9 +321,9 @@ You will also need to be able to control whether your adapter talks to your stub
 
 You will build your stub API in the `TestingStubApiHost` project in the `Api` folder.
 
-You will need to add a `sealed class` that derives from `StubApiBase`, and that applies the `[WebService("/nameofintegration")]` attribute to it.
+You will need to add a `sealed class` that derives from `StubApiBase`, and that applies the `[BaseApiFrom("/vendor")]` attribute to it.
 
-> Note: the `[WebService]` attribute is required so that you can partition all inbound HTTP requests to the stub API they belong to, in cases where there are clashes with multiple vendors base URLs.
+> Note: the `[BaseApiFrom]` attribute is required so that you can partition all inbound HTTP requests to the stub API they belong to, in cases where there are clashes with multiple vendors base URLs.
 
 Next, and before you forget. Edit the value of the base URL setting that you might have put in the `appsettings.json` file of the `ApiHost` project, where you have registered your adapter using DI. Then, change the base URL value to point to your local stub API, so that your adapter will talk to your stub API in local development and debugging.
 

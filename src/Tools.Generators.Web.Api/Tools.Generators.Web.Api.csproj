@@ -59,8 +59,8 @@
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\EmptyResponse.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\EmptyResponse.cs</Link>
         </Compile>
-        <Compile Include="..\Infrastructure.Web.Api.Interfaces\WebServiceAttribute.cs">
-            <Link>Reference\Infrastructure.Web.Api.Interfaces\WebServiceAttribute.cs</Link>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\BaseApiFromAttribute.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\BaseApiFromAttribute.cs</Link>
         </Compile>
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\RouteAttribute.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\RouteAttribute.cs</Link>

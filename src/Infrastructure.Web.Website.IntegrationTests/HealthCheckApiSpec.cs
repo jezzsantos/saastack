@@ -17,9 +17,9 @@ public class HealthCheckApiSpec : WebsiteSpec<Program>
     [Fact]
     public async Task WhenCheck_ThenStatusOK()
     {
-        var result = await Api.GetAsync(new HealthCheckRequest());
+        var result = await HttpApi.GetAsync(new HealthCheckRequest().MakeApiRoute());
 
-        result.Content.Value.Name.Should().Be("WebsiteHost");
-        result.Content.Value.Status.Should().Be("OK");
+        var content = await result.Content.ReadAsStringAsync();
+        content.Should().Be("{\"name\":\"WebsiteHost\",\"status\":\"OK\"}");
     }
 }

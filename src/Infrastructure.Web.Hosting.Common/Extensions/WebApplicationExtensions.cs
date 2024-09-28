@@ -43,10 +43,6 @@ public static class WebApplicationExtensions
             return;
         }
 
-        // Note: must be registered before CORS since it calls app.UsesRouting()
-        middlewares.Add(new MiddlewareRegistration(30,
-            app => { app.UsePathBase(new PathString(WebConstants.BackEndForFrontEndBasePath)); },
-            "Pipeline: Website API is enabled: Route -> {Route}", WebConstants.BackEndForFrontEndBasePath));
         middlewares.Add(new MiddlewareRegistration(35, app =>
         {
             if (!app.Environment.IsDevelopment())

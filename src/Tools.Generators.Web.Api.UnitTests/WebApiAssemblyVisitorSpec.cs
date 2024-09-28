@@ -534,7 +534,7 @@ public class WebApiAssemblyVisitorSpec
             }
 
             [Fact]
-            public void WhenVisitNamedTypeAndClassHasWebServiceAttribute_ThenCreatesRegistration()
+            public void WhenVisitNamedTypeAndClassHasBaseApiFromAttribute_ThenCreatesRegistration()
             {
                 var compilation = CreateCompilation("""
                                                     using System;
@@ -549,7 +549,7 @@ public class WebApiAssemblyVisitorSpec
                                                     public class ARequest : WebRequest<ARequest, AResponse>
                                                     {
                                                     }
-                                                    [Infrastructure.Web.Api.Interfaces.WebServiceAttribute("aprefix")]
+                                                    [Infrastructure.Web.Api.Interfaces.BaseApiFromAttribute("aprefix")]
                                                     public class AServiceClass : Infrastructure.Web.Api.Interfaces.IWebApiService
                                                     {
                                                         public string AMethod(ARequest request)

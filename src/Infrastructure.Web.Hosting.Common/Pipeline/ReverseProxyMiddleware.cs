@@ -69,7 +69,7 @@ public sealed class ReverseProxyMiddleware
 
     private static bool IsApiRequest(HttpRequest request)
     {
-        return request.PathBase.ToString().StartsWith(WebConstants.BackEndForFrontEndBasePath);
+        return request.Path.ToString().StartsWith(WebConstants.BackEndForFrontEndBasePath);
     }
 
     private async Task ForwardMessageToBackendAsync(HttpContext context)

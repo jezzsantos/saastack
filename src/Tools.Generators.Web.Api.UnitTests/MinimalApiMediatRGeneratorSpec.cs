@@ -1179,7 +1179,7 @@ public class MinimalApiMediatRGeneratorSpec
         }
 
         [Fact]
-        public void WhenDefinesAWebServiceAttribute_ThenGenerates()
+        public void WhenDefinesABaseApiFromAttribute_ThenGenerates()
         {
             var compilation = CreateCompilation("""
                                                 using System;
@@ -1196,7 +1196,7 @@ public class MinimalApiMediatRGeneratorSpec
                                                 public class ARequest : WebRequest<ARequest, AResponse>
                                                 {
                                                 }
-                                                [WebService("aprefix")]
+                                                [BaseApiFrom("aprefix")]
                                                 public class AServiceClass : IWebApiService
                                                 {
                                                     public async Task<string> AMethod(ARequest request, CancellationToken cancellationToken)

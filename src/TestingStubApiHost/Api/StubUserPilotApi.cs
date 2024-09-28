@@ -6,7 +6,7 @@ using Infrastructure.Web.Api.Operations.Shared._3rdParties.UserPilot;
 
 namespace TestingStubApiHost.Api;
 
-[WebService("/userpilot")]
+[BaseApiFrom("/userpilot")]
 public class StubUserPilotApi : StubApiBase
 {
     public StubUserPilotApi(IRecorder recorder, IConfigurationSettings settings) : base(recorder, settings)

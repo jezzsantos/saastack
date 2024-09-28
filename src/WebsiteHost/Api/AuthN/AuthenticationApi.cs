@@ -8,6 +8,7 @@ using WebsiteHost.Application;
 
 namespace WebsiteHost.Api.AuthN;
 
+[BaseApiFrom("/api")]
 public class AuthenticationApi : IWebApiService
 {
     private readonly IAuthenticationApplication _authenticationApplication;

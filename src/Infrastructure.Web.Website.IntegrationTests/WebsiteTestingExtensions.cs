@@ -84,10 +84,9 @@ public static class WebsiteTestingExtensions
         return $"{WebConstants.BackEndForFrontEndBasePath}{request.GetRequestInfo().Route}";
     }
 
-    public static async Task<string> RegisterPersonUserFromBrowserAsync(this IHttpClient websiteClient,
+    public static async Task RegisterPersonUserFromBrowserAsync(this IHttpClient websiteClient,
         JsonSerializerOptions jsonOptions, CSRFMiddleware.ICSRFService csrfService,
-        string emailAddress,
-        string password)
+        string emailAddress, string password)
     {
         var registrationRequest = new RegisterPersonPasswordRequest
         {
@@ -124,7 +123,6 @@ public static class WebsiteTestingExtensions
         await websiteClient.PostAsync(confirmationUrl, JsonContent.Create(confirmationRequest),
             (msg, cookies) => msg.WithCSRF(cookies, csrfService));
 #endif
-        return userId;
     }
 
     public static void WithCSRF(this HttpRequestMessage message, CookieContainer cookies,

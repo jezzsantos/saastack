@@ -28,12 +28,12 @@ In many contexts of evolving SaaS products, a BEFFE can act as an [Anti-Corrupti
 The `WebsiteHost` project is a BEFFE. It performs these tasks:
 
 1. It serves up the JS app (as static files).
-2. It serves up other HTML, CSS, JS assets (as dynamic assets).
-3. It implements a Reverse Proxy in order to forward JSON requests to Backend APIs
-4. It implements its own Authentication API endpoints so that [HTTPOnly, secure] cookies can be used between the BEFFE and JS app to avoid storing any secrets in the browser.
-5. It necessarily protects against CSRF attacks (since it uses cookies).
-6. It provides API endpoints for common services, like: Recording (diagnostics, usages, crash reports, etc), Feature Flags, etc.
-7. It provides a platform to add dedicated API endpoints tailored for the JS app that can be easily added as required.
+2. It serves up other HTML, CSS, JS assets (as dynamic assets), using MVC (via Controllers)
+3. It implements a Reverse Proxy in order to forward JSON API requests to Backend APIs
+4. It implements its own Authentication API endpoints so that [HTTPOnly, secure] cookies can be used between the BEFFE and JS app, for security purposes, to avoid storing any tokens/secrets in the browser (anywhere).
+5. It necessarily protects against CSRF attacks (since it uses cookies to store authorization tokens).
+6. It provides other API endpoints for common services, like: Health monitoring, Recording (diagnostics, usages, crash reports, etc), Feature Flags, etc. These API's are available at `/api`.
+7. It provides a platform to add further custom dedicated API endpoints, that you might provide yourself to the JS app. These might be necessary to avoid performing N+1 operations in the browser, versus doing them in the BEFFE (in teh cloud), which is far more efficient in latency.
 8. It provides the opportunity to deploy (and scale) the web application separately from backend APIs.
 
 ### Reverse Proxy
@@ -349,3 +349,12 @@ The BEFFE has been designed to be extended to include additional (domain-specifi
 
 These endpoints can simply be added in the same way API endpoints are added to any host. The Reverse Proxy will detect requests to these endpoints and route them directly to the BEFFE API to process first.
 
+To create a new API, define a class in custom subfolder of the `Api` folder of the `WebsiteHost` project.
+
+> This custom folder should be named after the subdomain that the API pertains to.
+
+Next, like all other APIs in this codebase, create a class that derives from: `IWebApiService`.
+
+One last necessary detail. All BEFFE API classes should apply the `[BaseApiFrom("/api")]` attribute to the class.
+
+> Note: the `BaseApiFromAttribute` is necessary, so that your custom API is available to the JS app correctly somwhere under the `/api` prefix. Otherwise, it will be available under the root of the BEFFE `/`. This API then may clash with the routes of the page views that the JS App handles client-side, which should be avoided.

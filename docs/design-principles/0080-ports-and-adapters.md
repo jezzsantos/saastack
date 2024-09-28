@@ -264,7 +264,7 @@ For example, the `BaseUrl` configuration setting in the `appsettings.json` file 
 In the `TestingStubApiHost` project, in the `Api` folder:
 
 1. Create a class that derives from `StubApiBase` (e.g., `StubVendorApi`).
-2. Consider applying a `WebServiceAttribute` to define a prefix for this API (e.g. `[WebService("/vendor")]`) to separate this API from the other vendors that will also be hosted at `https://localhost:5656`.
+2. Consider applying a `BaseApiFromAttribute` to define a prefix for this API (e.g. `[BaseApiFrom("/vendor")]`) to separate this API from the other vendors that will also be hosted at `https://localhost:5656`.
 3. Implement the HTTP endpoints that your adapter uses, and provide empty or default responses that your adapter expects to receive. (same as the way we implement any endpoints)
 4. The Request types, Response types (and all complex data types that are used in the request and response) should all be defined in the `Infrastructure.Web.Api.Operations.Shared` project in a subfolder of the `3rdParties` folder named after the vendor (i.e., `3rdParties/Vendor`). These types follow the same patterns as requests and responses for all other API operations in the codebase. Except that these ones may use additional JSON attributes to match the real 3rd party APIs. (e.g., `JsonPropertyName` and `JsonConverter` attributes).
 5. Make sure that you trace out (using the `IRecorder`) each and every request to your Stub API (follow other examples) so that you can visually track when the API is called (by your adapter) in local testing. You can see this output in the console output for the `TestingStubApiHost` project.
@@ -272,7 +272,7 @@ In the `TestingStubApiHost` project, in the `Api` folder:
 For example,
 
 ```csharp
-[WebService("/vendor")]
+[BaseApiFrom("/vendor")]
 public class StubVendorApi : StubApiBase
 {
     public StubVendorApi(IRecorder recorder, IConfigurationSettings settings) : base(recorder, settings)
