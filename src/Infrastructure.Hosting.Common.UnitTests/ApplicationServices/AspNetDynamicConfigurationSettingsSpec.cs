@@ -311,7 +311,7 @@ public class AspNetDynamicConfigurationSettingsSpec
         }
 
         [Fact]
-        public void WhenGetStringAndNotExists_ThenReturnsPlatformValue()
+        public void WhenGetStringWithNoTenantedValueButPlatformValue_ThenReturnsPlatformValue()
         {
             var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>
             {
@@ -324,7 +324,21 @@ public class AspNetDynamicConfigurationSettingsSpec
         }
 
         [Fact]
-        public void WhenGetStringAndExistsInTenant_ThenReturnsTenantSetting()
+        public void WhenGetStringWithTenantedValueButNoPlatformValue_ThenReturnsTenantedValue()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>(),
+                new TenantSettings(new Dictionary<string, object>
+                {
+                    { "akey", "atenantvalue" }
+                }));
+
+            var result = settings.GetString("akey");
+
+            result.Should().Be("atenantvalue");
+        }
+
+        [Fact]
+        public void WhenGetStringWithTenantedValueAndPlatformValue_ThenReturnsTenantedValue()
         {
             var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>
             {
@@ -340,7 +354,7 @@ public class AspNetDynamicConfigurationSettingsSpec
         }
 
         [Fact]
-        public void WhenGetStringAndEmpty_ThenReturnsEmpty()
+        public void WhenGetStringWithEmptyTenantedValue_ThenReturnsEmpty()
         {
             var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>
             {
@@ -353,6 +367,58 @@ public class AspNetDynamicConfigurationSettingsSpec
             var result = settings.GetString("akey");
 
             result.Should().Be(string.Empty);
+        }
+
+        [Fact]
+        public void WhenGetStringWithNoTenantedValueButEmptyPlatformValue_ThenReturnsEmpty()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>
+            {
+                { "akey", string.Empty }
+            }, new TenantSettings(new Dictionary<string, object>()));
+
+            var result = settings.GetString("akey");
+
+            result.Should().Be(string.Empty);
+        }
+
+        [Fact]
+        public void WhenGetStringWithNeitherValueButHasDefault_ThenReturnsDefault()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>(),
+                new TenantSettings(new Dictionary<string, object>()));
+
+            var result = settings.GetString("akey", "adefaultvalue");
+
+            result.Should().Be("adefaultvalue");
+        }
+
+        [Fact]
+        public void WhenGetStringWithNoTenantedValueButPlatformValueAndHasDefault_ThenReturnsPlatformValue()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>
+                {
+                    { "akey", "aplatformvalue" }
+                },
+                new TenantSettings(new Dictionary<string, object>()));
+
+            var result = settings.GetString("akey", "adefaultvalue");
+
+            result.Should().Be("aplatformvalue");
+        }
+
+        [Fact]
+        public void WhenGetStringWithTenantedValueButNoPlatformValueAndHasDefault_ThenReturnsTenantedValue()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>(),
+                new TenantSettings(new Dictionary<string, object>
+                {
+                    { "akey", "atenantvalue" }
+                }));
+
+            var result = settings.GetString("akey", "adefaultvalue");
+
+            result.Should().Be("atenantvalue");
         }
 
         [Fact]
@@ -418,32 +484,85 @@ public class AspNetDynamicConfigurationSettingsSpec
         }
 
         [Fact]
-        public void WhenGetNumberAndNotExists_ThenReturnsPlatformValue()
+        public void WhenGetBoolWithNoTenantedValueButPlatformValue_ThenReturnsPlatformValue()
         {
             var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>
             {
-                { "akey", 99 }
+                { "akey", true }
             }, new TenantSettings());
 
-            var result = settings.GetNumber("akey");
+            var result = settings.GetBool("akey");
 
-            result.Should().Be(99);
+            result.Should().Be(true);
         }
 
         [Fact]
-        public void WhenGetNumberAndExistsInTenant_ThenReturnsTenantSetting()
+        public void WhenGetBoolWithTenantedValueButNoPlatformValue_ThenReturnsTenantedValue()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>(),
+                new TenantSettings(new Dictionary<string, object>
+                {
+                    { "akey", true }
+                }));
+
+            var result = settings.GetBool("akey");
+
+            result.Should().Be(true);
+        }
+
+        [Fact]
+        public void WhenGetBoolWithTenantedValueAndPlatformValue_ThenReturnsTenantedValue()
         {
             var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>
             {
-                { "akey", 99 }
+                { "akey", false }
             }, new TenantSettings(new Dictionary<string, object>
             {
-                { "akey", 66 }
+                { "akey", true }
             }));
 
-            var result = settings.GetNumber("akey");
+            var result = settings.GetBool("akey");
 
-            result.Should().Be(66);
+            result.Should().Be(true);
+        }
+
+        [Fact]
+        public void WhenGetBoolWithNeitherValueButHasDefault_ThenReturnsDefault()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>(),
+                new TenantSettings(new Dictionary<string, object>()));
+
+            var result = settings.GetBool("akey", true);
+
+            result.Should().Be(true);
+        }
+
+        [Fact]
+        public void WhenGetBoolWithNoTenantedValueButPlatformValueAndHasDefault_ThenReturnsPlatformValue()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>
+                {
+                    { "akey", true }
+                },
+                new TenantSettings(new Dictionary<string, object>()));
+
+            var result = settings.GetBool("akey", true);
+
+            result.Should().Be(true);
+        }
+
+        [Fact]
+        public void WhenGetBoolWithTenantedValueButNoPlatformValueAndHasDefault_ThenReturnsTenantedValue()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>(),
+                new TenantSettings(new Dictionary<string, object>
+                {
+                    { "akey", true }
+                }));
+
+            var result = settings.GetBool("akey", true);
+
+            result.Should().Be(true);
         }
 
         [Fact]
@@ -463,11 +582,93 @@ public class AspNetDynamicConfigurationSettingsSpec
                 .WithMessage(Resources.AspNetDynamicConfigurationSettings_ValueNotNumber.Format("akey"));
         }
 
+        [Fact]
+        public void WhenGetNumberWithNoTenantedValueButPlatformValue_ThenReturnsPlatformValue()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>
+            {
+                { "akey", 6 }
+            }, new TenantSettings());
+
+            var result = settings.GetNumber("akey");
+
+            result.Should().Be(6);
+        }
+
+        [Fact]
+        public void WhenGetNumberWithTenantedValueButNoPlatformValue_ThenReturnsTenantedValue()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>(),
+                new TenantSettings(new Dictionary<string, object>
+                {
+                    { "akey", 9 }
+                }));
+
+            var result = settings.GetNumber("akey");
+
+            result.Should().Be(9);
+        }
+
+        [Fact]
+        public void WhenGetNumberWithTenantedValueAndPlatformValue_ThenReturnsTenantedValue()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>
+            {
+                { "akey", 6 }
+            }, new TenantSettings(new Dictionary<string, object>
+            {
+                { "akey", 9 }
+            }));
+
+            var result = settings.GetNumber("akey");
+
+            result.Should().Be(9);
+        }
+
+        [Fact]
+        public void WhenGetNumberWithNeitherValueButHasDefault_ThenReturnsDefault()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>(),
+                new TenantSettings(new Dictionary<string, object>()));
+
+            var result = settings.GetNumber("akey", 4);
+
+            result.Should().Be(4);
+        }
+
+        [Fact]
+        public void WhenGetNumberWithNoTenantedValueButPlatformValueAndHasDefault_ThenReturnsPlatformValue()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>
+                {
+                    { "akey", 6 }
+                },
+                new TenantSettings(new Dictionary<string, object>()));
+
+            var result = settings.GetNumber("akey", 4);
+
+            result.Should().Be(6);
+        }
+
+        [Fact]
+        public void WhenGetNumberWithTenantedValueButNoPlatformValueAndHasDefault_ThenReturnsTenantedValue()
+        {
+            var settings = SetupPlatformAndTenancyConfiguration(_tenantContext, new Dictionary<string, object>(),
+                new TenantSettings(new Dictionary<string, object>
+                {
+                    { "akey", 9 }
+                }));
+
+            var result = settings.GetNumber("akey", 4);
+
+            result.Should().Be(9);
+        }
+
         private static IConfigurationSettings SetupPlatformAndTenancyConfiguration(Mock<ITenancyContext> context,
-            Dictionary<string, object> values, TenantSettings tenantSettings)
+            Dictionary<string, object> platformValues, TenantSettings tenantSettings)
         {
             var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(values.ToDictionary(pair => pair.Key, pair => pair.Value.ToString()))
+                .AddInMemoryCollection(platformValues.ToDictionary(pair => pair.Key, pair => pair.Value.ToString()))
                 .Build();
 
             context.Setup(ctx => ctx.Settings).Returns(tenantSettings);

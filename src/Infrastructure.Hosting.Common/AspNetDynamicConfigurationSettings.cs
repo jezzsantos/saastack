@@ -8,7 +8,7 @@ namespace Infrastructure.Hosting.Common;
 
 /// <summary>
 ///     Provides settings dynamically from the current Tenancy first (if available),
-///     then from Platform settings read from .NET configuration.
+///     then from Platform settings read from .NET configuration, and then a default value (if any given).
 ///     A <see cref="Tenancy" /> setting will only be used if all these conditions are satisfied:
 ///     1. The ctor that includes <see cref="ITenancyContext" /> is used,
 ///     and the instance is registered in the DI container as "scoped".
@@ -39,7 +39,8 @@ public class AspNetDynamicConfigurationSettings : IConfigurationSettings
     {
         if (IsTenanted)
         {
-            var value = _tenantSettings.Value.GetBoolSafely(key, defaultValue);
+            var value = _tenantSettings.Value
+                .GetBoolSafely(key); // Note: don't use the default here so we defer to the platform
             if (value.HasValue)
             {
                 return value.Value;
@@ -62,7 +63,8 @@ public class AspNetDynamicConfigurationSettings : IConfigurationSettings
     {
         if (IsTenanted)
         {
-            var value = _tenantSettings.Value.GetNumberSafely(key, defaultValue);
+            var value = _tenantSettings.Value
+                .GetNumberSafely(key); // Note: don't use the default here so we defer to the platform
             if (value.HasValue)
             {
                 return value.Value;
@@ -85,7 +87,8 @@ public class AspNetDynamicConfigurationSettings : IConfigurationSettings
     {
         if (IsTenanted)
         {
-            var value = _tenantSettings.Value.GetStringSafely(key, defaultValue);
+            var value = _tenantSettings.Value
+                .GetStringSafely(key); // Note: don't use the default here so we defer to the platform 
             if (value.HasValue)
             {
                 return value;
