@@ -297,6 +297,7 @@ CREATE TABLE [dbo].[DomainEvent]
     [EventType]          [nvarchar](max) NULL,
     [Metadata]           [nvarchar](max) NULL,
     [RootAggregateType]  [nvarchar](max) NULL,
+    [StreamName] [nvarchar](450) NULL,
     [Version]            [int]           NULL,
 ) ON [PRIMARY]
 GO
