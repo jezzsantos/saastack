@@ -28,6 +28,7 @@ public static class HostExtensions
         services.AddSingleton<IConfigurationSettings>(new AspNetDynamicConfigurationSettings(context.Configuration));
         services.AddSingleton<IHostSettings, HostSettings>();
         services.AddSingleton<IFeatureFlags, EmptyFeatureFlags>();
+        services.AddSingleton(JsonSerializerOptions.Default);
 
 #if TESTINGONLY
         services.AddSingleton<ICrashReporter>(new NoOpCrashReporter());
