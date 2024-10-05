@@ -15,6 +15,7 @@ You will need the following development tools to build, run, and test this proje
    * Note: if using Visual Studio, the built-in Roslyn analyzers will not work (due to .netstandard2.0 [restrictions between Visual Studio and Roslyn](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview))
 
 * Install the .NET8.0 SDK (specifically version 8.0.6). Available for [Windows Download](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.302-windows-x64-installer)
+* Install NodeJs (18.20.4 LTS or later), available for [Download](https://nodejs.org/en/download/)
 
 > We have ensured that you won't need any other infrastructure running on your local machine (i.e., a Microsoft SQLServer database) unless you want to run infrastructure-specific integration tests.
 
@@ -129,6 +130,24 @@ Now, test that LocalStack works by running: `localstack start`
 In the `Infrastructure.Shared.IntegrationTests` project, create a new file called `appsettings.Testing.local.json` and fill out the empty placeholders you see in `appsettings.TestingOnly.json` with values from service accounts that you have created for testing those 3rd party services.
 
 > DO NOT add this file to source control!
+
+## Build the Website
+
+* `cd src\WebsiteHost\ClientApp`
+* `npm install`
+* `npm run build`
+
+> Note: As a result of this build step you should see new bundle file (e.g. `0123456789abcdef.bundle.js`) appear in the
+`wwwroot` folder. This file should never be added to source control.
+
+### Environment Variables
+
+You need to create your own version of the `.env` file on your computer (not source controlled).
+
+1. Copy the `src/WebsiteHost/ClientApp/.env.example` to `src/WebsiteHost/ClientApp/.env`.
+
+> DO NOT add this file `.env` to source control!  This files exists locally for security purposes, and in order to have
+> the right environment variables in place when running and testing the JS App.
 
 # Build & Deploy
 

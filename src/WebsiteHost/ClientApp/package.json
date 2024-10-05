@@ -1,0 +1,27 @@
+{
+  "name": "saastack-websitehost",
+  "version": "1.0.0",
+  "description": "A BEFFE website host",
+  "scripts": {
+    "build": "webpack --mode=development",
+    "update:apis": "ts-node tools/update-apis.mjs"
+  },
+  "author": "jezzsantos",
+  "license": "https://github.com/jezzsantos/saastack/blob/main/LICENSE",
+  "devDependencies": {
+    "@hey-api/openapi-ts": "^0.53.7",
+    "@types/node": "^18.19.54",
+    "assets-webpack-plugin": "^7.1.1",
+    "prettier": "^3.3.3",
+    "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@hey-api/client-axios": "^0.2.7",
+    "@microsoft/applicationinsights-web": "^2.8.18",
+    "axios": "^1.7.7",
+    "dotenv-webpack": "^8.1.0"
+  }
+}

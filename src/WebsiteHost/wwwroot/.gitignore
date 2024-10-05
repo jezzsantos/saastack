@@ -1,0 +1,11 @@
+# Ignore all TypeScript built files
+*
+
+# except these static files
+!.gitignore
+!.png
+!.svg
+!favicon.ico
+!browserconfig.xml
+!manifest.json
+!robots.txt

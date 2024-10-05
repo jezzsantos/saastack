@@ -19,10 +19,10 @@ public class Audit : IIdentifiableResource
 
 public enum RecorderTraceLevel
 {
-    Debug,
-    Information,
-    Warning,
-    Error
+    Debug = 0,
+    Information = 1,
+    Warning = 2,
+    Error = 3
 }
 
 public class DeliveredEmail : IIdentifiableResource

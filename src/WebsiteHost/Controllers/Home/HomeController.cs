@@ -6,8 +6,8 @@ namespace WebsiteHost.Controllers.Home;
 
 public class HomeController : CSRFController
 {
-    public HomeController(CSRFMiddleware.ICSRFService csrfService) :
-        base(csrfService)
+    public HomeController(IHostEnvironment hostEnvironment, CSRFMiddleware.ICSRFService csrfService) :
+        base(hostEnvironment, csrfService)
     {
     }
 
