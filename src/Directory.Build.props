@@ -93,7 +93,7 @@
         <DebugType>pdbonly</DebugType>
         <Optimize>true</Optimize>
         <OutputPath>bin\$(Configuration)\</OutputPath>
-        <DefineConstants>TRACE;TESTINGONLY;$(HostingPlatform)</DefineConstants>
+        <DefineConstants>$(DefineConstants);TRACE;TESTINGONLY;$(HostingPlatform)</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
@@ -103,7 +103,7 @@
         <DebugType>pdbonly</DebugType>
         <Optimize>true</Optimize>
         <OutputPath>bin\$(Configuration)\</OutputPath>
-        <DefineConstants>TRACE;$(HostingPlatform)</DefineConstants>
+        <DefineConstants>$(DefineConstants);TRACE;$(HostingPlatform)</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
