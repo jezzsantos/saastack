@@ -32,7 +32,7 @@ partial class LocalMachineJsonFileStore : IMessageBusStore, IMessageBusStoreTrig
             return 0;
         }
 
-        if (!subscriptionsStore.Exists(subscriptionName))
+        if (subscriptionsStore.NotExists(subscriptionName))
         {
             return 0;
         }
@@ -90,7 +90,7 @@ partial class LocalMachineJsonFileStore : IMessageBusStore, IMessageBusStoreTrig
         }
 
         var subscriptionsStore = EnsureContainer(GetSubscriptionStoreContainerPath(topicName));
-        if (!subscriptionsStore.Exists(subscriptionName))
+        if (subscriptionsStore.NotExists(subscriptionName))
         {
             await SaveSubscriptionAsync(subscriptionsStore, new SubscriptionPosition(subscriptionName, topicName),
                 cancellationToken);
@@ -174,7 +174,7 @@ partial class LocalMachineJsonFileStore : IMessageBusStore, IMessageBusStoreTrig
 
         EnsureContainer(GetTopicStoreContainerPath(topicName));
         var subscriptionsStore = EnsureContainer(GetSubscriptionStoreContainerPath(topicName));
-        if (!subscriptionsStore.Exists(subscriptionName))
+        if (subscriptionsStore.NotExists(subscriptionName))
         {
             await SaveSubscriptionAsync(subscriptionsStore, new SubscriptionPosition(subscriptionName, topicName),
                 cancellationToken);

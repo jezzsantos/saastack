@@ -89,7 +89,7 @@ public sealed class UserPilotHttpServiceClient : IUsageDeliveryService
                 return Result.Ok;
             }
 
-            if (!additional.Exists()
+            if (additional.NotExists()
                 || !additional.TryGetValue(UsageConstants.Properties.DefaultOrganizationId,
                     out var defaultOrganizationId))
             {
@@ -439,7 +439,7 @@ public sealed class UserPilotHttpServiceClient : IUsageDeliveryService
 
         public string TenantId { get; }
 
-        public string? TenantIdOverride { get; set; }
+        public string? TenantIdOverride { get; private set; }
 
         public void ResetTenantIdOverride(string tenantId)
         {

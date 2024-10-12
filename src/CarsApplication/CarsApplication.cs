@@ -137,7 +137,7 @@ public class CarsApplication : ICarsApplication
         string id, DateTime fromUtc, DateTime toUtc, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!retrieved.Exists)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -168,7 +168,7 @@ public class CarsApplication : ICarsApplication
         string id, DateTime fromUtc, DateTime toUtc, string referenceId, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!retrieved.Exists)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -206,7 +206,7 @@ public class CarsApplication : ICarsApplication
         DateTime fromUtc, DateTime toUtc, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!retrieved.Exists)
+        if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
@@ -293,7 +293,7 @@ public class CarsApplication : ICarsApplication
         DateTime? fromUtc, DateTime? toUtc, CancellationToken cancellationToken)
     {
         var retrieved = await _repository.LoadAsync(organizationId.ToId(), id.ToId(), cancellationToken);
-        if (!retrieved.Exists)
+        if (retrieved.IsFailure)
         {
             return Error.EntityNotFound();
         }

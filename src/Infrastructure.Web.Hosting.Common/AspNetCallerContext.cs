@@ -66,7 +66,7 @@ internal sealed class AspNetCallerContext : ICallerContext
     private static ICallerContext.CallerAuthorization GetAuthorization(HttpContext context)
     {
         var authenticationFeature = context.Features.Get<IAuthenticateResultFeature>();
-        if (!authenticationFeature.Exists())
+        if (authenticationFeature.NotExists())
         {
             return Optional<ICallerContext.CallerAuthorization>.None;
         }

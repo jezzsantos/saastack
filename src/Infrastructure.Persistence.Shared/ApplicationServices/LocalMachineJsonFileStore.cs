@@ -278,6 +278,11 @@ public sealed partial class LocalMachineJsonFileStore : IDisposable
                 .EqualsIgnoreCase(Path.GetFullPath(fullPath).WithoutTrailingSlash());
         }
 
+        public bool NotExists(string entityId)
+        {
+            return !Exists(entityId);
+        }
+
         public async Task OverwriteAsync(string entityId, IReadOnlyDictionary<string, Optional<string>> properties,
             CancellationToken cancellationToken)
         {

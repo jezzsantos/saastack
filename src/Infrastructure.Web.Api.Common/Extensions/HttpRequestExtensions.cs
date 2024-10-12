@@ -55,7 +55,7 @@ public static class HttpRequestExtensions
         var fromBasicAuth = AuthenticationHeaderValue.TryParse(request.Headers.Authorization, out var result)
             ? result
             : null;
-        if (!fromBasicAuth.Exists())
+        if (fromBasicAuth.NotExists())
         {
             return (Optional<string>.None, Optional<string>.None);
         }

@@ -44,7 +44,7 @@ public class ReverseProxyApiSpec : WebsiteSpec<Program>
 
         result.Content.Headers.ContentType!.MediaType.Should().Be("image/x-icon");
         var stream = await result.Content.ReadAsStreamAsync();
-        stream.Length.Should().Be(318L);
+        stream.Length.Should().Be(245015L);
     }
 
     [Fact]
