@@ -703,7 +703,7 @@ public class EndUsersApplicationSpec
                     FirstName = "afirstname"
                 }
             });
-        
+
         var result = await _application.ChangeDefaultMembershipAsync(_caller.Object, "anorganizationid",
             CancellationToken.None);
 

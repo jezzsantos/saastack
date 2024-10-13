@@ -1,5 +1,9 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
+    <XML>
+      <option name="XML_KEEP_BLANK_LINES" value="1" />
+      <option name="XML_SPACE_INSIDE_EMPTY_TAG" value="true" />
+    </XML>
     <codeStyleSettings language="JSON">
       <option name="SPACE_WITHIN_BRACKETS" value="true" />
       <option name="SPACE_WITHIN_BRACES" value="true" />

@@ -23,10 +23,7 @@ public static class DictionaryExtensions
         where TKey : notnull
     {
         other.ToList()
-            .ForEach(entry =>
-            {
-                source[entry.Key] = entry.Value;
-            });
+            .ForEach(entry => { source[entry.Key] = entry.Value; });
     }
 
     /// <summary>

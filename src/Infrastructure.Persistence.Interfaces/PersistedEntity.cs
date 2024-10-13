@@ -70,6 +70,11 @@ public abstract class PersistedEntity
         }
     }
 
+    public Optional<Type> GetPropertyType(string propertyName)
+    {
+        return Metadata.GetPropertyType(propertyName);
+    }
+
     public TValue? GetValueOrDefault<TValue>(string propertyName, TValue? defaultValue = default)
     {
         if (!PropertyValues.ContainsKey(propertyName))
@@ -145,11 +150,6 @@ public abstract class PersistedEntity
         });
 
         return new HydrationProperties(properties);
-    }
-
-    public Optional<Type> GetPropertyType(string propertyName)
-    {
-        return Metadata.GetPropertyType(propertyName);
     }
 
     private static Optional<object> ConvertFromDomainProperty<TValue>(Optional<TValue> value)

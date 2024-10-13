@@ -9,7 +9,7 @@ public class TestCaller : ICallerContext
     {
         TenantId = tenantId;
     }
-    
+
     public Optional<ICallerContext.CallerAuthorization> Authorization =>
         Optional<ICallerContext.CallerAuthorization>.None;
 

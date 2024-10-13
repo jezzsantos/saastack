@@ -207,5 +207,4 @@ internal static class APIKeyConversionExtensions
             Id = apiKey.Id
         };
     }
-    
 }

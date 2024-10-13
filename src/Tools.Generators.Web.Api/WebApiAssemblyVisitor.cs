@@ -28,6 +28,7 @@ public class WebApiAssemblyVisitor : SymbolVisitor
     private readonly INamedTypeSymbol _authorizeAttributeFeaturesSymbol;
     private readonly INamedTypeSymbol _authorizeAttributeRolesSymbol;
     private readonly INamedTypeSymbol _authorizeAttributeSymbol;
+    private readonly INamedTypeSymbol _baseApiAttributeSymbol;
     private readonly CancellationToken _cancellationToken;
     private readonly INamedTypeSymbol _cancellationTokenSymbol;
     private readonly INamedTypeSymbol _multipartFormSymbol;
@@ -37,7 +38,6 @@ public class WebApiAssemblyVisitor : SymbolVisitor
     private readonly INamedTypeSymbol _voidSymbol;
     private readonly INamedTypeSymbol _webRequestInterfaceSymbol;
     private readonly INamedTypeSymbol _webRequestResponseInterfaceSymbol;
-    private readonly INamedTypeSymbol _baseApiAttributeSymbol;
 
     public WebApiAssemblyVisitor(CancellationToken cancellationToken, Compilation compilation)
     {

@@ -15,7 +15,7 @@ public sealed class SendingSucceeded : DomainEvent
     {
     }
 
-    public required DateTime When { get; set; }
-
     public required string? ReceiptId { get; set; }
+
+    public required DateTime When { get; set; }
 }

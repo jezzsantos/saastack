@@ -33,7 +33,7 @@ public class BugFixParameterOperationFilter : IOperationFilter
                 {
                     continue;
                 }
-                
+
                 var parameterContext = new ParameterFilterContext(description, context.SchemaGenerator,
                     context.SchemaRepository, null, description.ParameterInfo());
 

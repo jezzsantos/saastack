@@ -661,6 +661,25 @@ internal static class OrganizationConversionExtensions
         };
     }
 
+    public static Dictionary<string, object> ToOrganizationChangedUsageEvent(this OrganizationRoot organization,
+        ICallerContext caller)
+    {
+        var context = new Dictionary<string, object>
+        {
+            [UsageConstants.Properties.Id] = organization.Id,
+            [UsageConstants.Properties.Name] = organization.Name.Name,
+            [UsageConstants.Properties.Ownership] = organization.Ownership,
+            [UsageConstants.Properties.CreatedById] = organization.CreatedById,
+            [UsageConstants.Properties.UserIdOverride] = organization.CreatedById
+        };
+        if (organization.Avatar.HasValue)
+        {
+            context[UsageConstants.Properties.AvatarUrl] = organization.Avatar.Value.Url;
+        }
+
+        return context;
+    }
+
     public static OrganizationWithSettings ToOrganizationWithSettings(this OrganizationRoot organization)
     {
         var dto = organization.ToOrganization().Convert<Organization, OrganizationWithSettings>();
@@ -708,24 +727,5 @@ internal static class OrganizationConversionExtensions
         });
 
         return new TenantSettings(dictionary);
-    }
-
-    public static Dictionary<string, object> ToOrganizationChangedUsageEvent(this OrganizationRoot organization,
-        ICallerContext caller)
-    {
-        var context = new Dictionary<string, object>
-        {
-            [UsageConstants.Properties.Id] = organization.Id,
-            [UsageConstants.Properties.Name] = organization.Name.Name,
-            [UsageConstants.Properties.Ownership] = organization.Ownership,
-            [UsageConstants.Properties.CreatedById] = organization.CreatedById,
-            [UsageConstants.Properties.UserIdOverride] = organization.CreatedById
-        };
-        if (organization.Avatar.HasValue)
-        {
-            context[UsageConstants.Properties.AvatarUrl] = organization.Avatar.Value.Url;
-        }
-
-        return context;
     }
 }

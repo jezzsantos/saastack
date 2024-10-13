@@ -239,7 +239,7 @@ public class ApiDocSpec
             operation.OperationId.Should().Be("OpenApiPostTestingOnly");
             var schema = openApi.Components.Schemas["OpenApiPostTestingOnlyRequest"];
             schema.Description.Should().BeNull();
-            schema.Required.Should().BeEquivalentTo(["id", "requiredField"]);
+            schema.Required.Should().BeEquivalentTo("id", "requiredField");
             schema.Properties.Should().HaveCount(2);
             schema.Properties.Should().NotContainKey("id");
             schema.Properties["optionalField"].Description.Should().Be("anoptionalfield");
@@ -298,7 +298,7 @@ public class ApiDocSpec
             operation.OperationId.Should().Be("OpenApiPutTestingOnly (Put)");
             var schema = openApi.Components.Schemas["OpenApiPutTestingOnlyRequest"];
             schema.Description.Should().BeNull();
-            schema.Required.Should().BeEquivalentTo(["id", "requiredField"]);
+            schema.Required.Should().BeEquivalentTo("id", "requiredField");
             schema.Properties.Should().HaveCount(2);
             schema.Properties.Should().NotContainKey("id");
             schema.Properties["optionalField"].Description.Should().Be("anoptionalfield");
@@ -361,7 +361,7 @@ public class ApiDocSpec
             var requestBody = operation.RequestBody;
             requestBody.Content.Count.Should().Be(1);
             requestBody.Content[HttpConstants.ContentTypes.MultiPartFormData].Schema.Required.Should()
-                .BeEquivalentTo([DefaultBodyFilter.FormFilesFieldName, "requiredField"]);
+                .BeEquivalentTo(DefaultBodyFilter.FormFilesFieldName, "requiredField");
             var properties = requestBody.Content[HttpConstants.ContentTypes.MultiPartFormData].Schema.Properties;
             properties.Should().HaveCount(3);
             properties[DefaultBodyFilter.FormFilesFieldName].Items.Format.Should().Be("binary");

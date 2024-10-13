@@ -277,7 +277,8 @@ public static class HttpRequestExtensions
 
     /// <summary>
     ///     Whether the specified HMAC signature represents the signature of the contents of the inbound request,
-    ///     serialized by the method <see cref="RequestExtensions.SerializeToJson(Infrastructure.Web.Api.Interfaces.IWebRequest?)" />
+    ///     serialized by the method
+    ///     <see cref="RequestExtensions.SerializeToJson(Infrastructure.Web.Api.Interfaces.IWebRequest?)" />
     /// </summary>
     public static async Task<bool> VerifyHMACSignatureAsync(this HttpRequest request, string signature, string secret,
         CancellationToken cancellationToken)

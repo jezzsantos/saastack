@@ -44,7 +44,7 @@ public class AzureStorageAccountBlobStoreSpec : AnyBlobStoreBaseSpec
     public async Task WhenDestroyAllWithInvalidContainerName_ThenThrows()
     {
 #if TESTINGONLY
-             await _setup.BlobStore
+        await _setup.BlobStore
             .Invoking(x => x.DestroyAllAsync("^aninvalidcontainername^", CancellationToken.None))
             .Should().ThrowAsync<ArgumentOutOfRangeException>()
             .WithMessageLike(Resources.ValidationExtensions_InvalidStorageAccountResourceName);

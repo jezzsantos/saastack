@@ -64,5 +64,5 @@ public enum TokenType
 {
     OtherToken = 0,
     AccessToken = 1,
-    RefreshToken = 2,
+    RefreshToken = 2
 }

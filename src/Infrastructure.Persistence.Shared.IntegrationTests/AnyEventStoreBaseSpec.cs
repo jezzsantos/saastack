@@ -40,7 +40,7 @@ public abstract class AnyEventStoreBaseSpec
             .Should().ThrowAsync<ArgumentOutOfRangeException>();
 #endif
     }
-    
+
     [Fact]
     public async Task WhenGetEventStreamWithNullEntityName_ThenThrows()
     {

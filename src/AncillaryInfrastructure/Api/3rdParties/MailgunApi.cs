@@ -33,31 +33,6 @@ public class MailgunApi : IWebApiService
         _webhookSigningKey = settings.Platform.GetString(MailgunClient.Constants.WebhookSigningKeySettingName);
     }
 
-    public async Task<ApiEmptyResult> NotifyWebhookEvent(MailgunNotifyWebhookEventRequest request,
-        CancellationToken cancellationToken)
-    {
-        var caller = _callerFactory.Create();
-        var authenticated =
-            AuthenticateRequest(_recorder, caller, _httpContextAccessor, request.Signature, _webhookSigningKey);
-        if (authenticated.IsFailure)
-        {
-            return () => authenticated.Error;
-        }
-
-        if (request.EventData.NotExists()
-            || request.EventData.Event.HasNoValue())
-        {
-            return () => new EmptyResponse();
-        }
-
-        var maintenance = Caller.CreateAsMaintenance(caller.CallId);
-        var notified =
-            await _mailgunApplication.NotifyWebhookEvent(maintenance, request.EventData, cancellationToken);
-
-        return () => notified.Match(() => new EmptyResponse(),
-            error => new Result<EmptyResponse, Error>(error));
-    }
-
     /// <summary>
     ///     Authenticates the request with Mailgun HMAC auth
     ///     See <see href="https://documentation.mailgun.com/docs/mailgun/user-manual/tracking-messages/#securing-webhooks" />
@@ -100,5 +75,30 @@ public class MailgunApi : IWebApiService
         }
 
         return Result.Ok;
+    }
+
+    public async Task<ApiEmptyResult> NotifyWebhookEvent(MailgunNotifyWebhookEventRequest request,
+        CancellationToken cancellationToken)
+    {
+        var caller = _callerFactory.Create();
+        var authenticated =
+            AuthenticateRequest(_recorder, caller, _httpContextAccessor, request.Signature, _webhookSigningKey);
+        if (authenticated.IsFailure)
+        {
+            return () => authenticated.Error;
+        }
+
+        if (request.EventData.NotExists()
+            || request.EventData.Event.HasNoValue())
+        {
+            return () => new EmptyResponse();
+        }
+
+        var maintenance = Caller.CreateAsMaintenance(caller.CallId);
+        var notified =
+            await _mailgunApplication.NotifyWebhookEvent(maintenance, request.EventData, cancellationToken);
+
+        return () => notified.Match(() => new EmptyResponse(),
+            error => new Result<EmptyResponse, Error>(error));
     }
 }

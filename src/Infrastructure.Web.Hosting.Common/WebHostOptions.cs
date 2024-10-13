@@ -85,11 +85,11 @@ public class WebHostOptions : HostOptions
 
     public bool IsBackendForFrontEnd { get; set; }
 
+    public bool ReceivesWebhooks { get; set; }
+
     public bool UsesApiDocumentation { get; set; }
 
     public bool UsesNotifications { get; set; }
-
-    public bool ReceivesWebhooks { get; set; }
 }
 
 /// <summary>

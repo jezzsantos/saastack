@@ -17,6 +17,8 @@ public class Subscription : IIdentifiableResource
 
 public class SubscriptionWithPlan : Subscription
 {
+    public required string BuyerReference { get; set; }
+
     public bool CanBeCanceled { get; set; }
 
     public bool CanBeUnsubscribed { get; set; }
@@ -34,8 +36,6 @@ public class SubscriptionWithPlan : Subscription
     public SubscriptionStatus Status { get; set; }
 
     public string? SubscriptionReference { get; set; }
-
-    public required string BuyerReference { get; set; }
 }
 
 public class SubscriptionPlan

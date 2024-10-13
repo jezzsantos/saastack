@@ -91,7 +91,7 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         {
             return Error.NotAuthenticated(additionalData: GetAuthenticationErrorData(providerName));
         }
-        
+
         if (user.Status != EndUserStatus.Registered)
         {
             return Error.NotAuthenticated(additionalData: GetAuthenticationErrorData(providerName));

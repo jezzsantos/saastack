@@ -15,13 +15,13 @@ public sealed class BuyerRestored : DomainEvent
     {
     }
 
+    public required string BuyerReference { get; set; }
+
     public required string OwningEntityId { get; set; }
 
     public required string ProviderName { get; set; }
 
     public required Dictionary<string, string> ProviderState { get; set; }
-
-    public required string BuyerReference { get; set; }
 
     public string? SubscriptionReference { get; set; }
 }

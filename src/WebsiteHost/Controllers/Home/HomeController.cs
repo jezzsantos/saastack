@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebsiteHost.Controllers.Home;
 
-
 public class HomeController : CSRFController
 {
     public HomeController(IHostEnvironment hostEnvironment, CSRFMiddleware.ICSRFService csrfService) :

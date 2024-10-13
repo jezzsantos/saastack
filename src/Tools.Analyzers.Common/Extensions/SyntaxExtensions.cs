@@ -78,7 +78,7 @@ public static class SyntaxExtensions
                 .Where(tok => !string.IsNullOrWhiteSpace(tok.ToFullString()))
                 .Select(tok => tok.ToString()));
 
-            return content.TrimStart(['\t', ' ']).TrimEnd(['\t', ' ']);
+            return content.TrimStart('\t', ' ').TrimEnd('\t', ' ');
         }
 
         if (nodeSyntax is XmlElementSyntax xmlElementSyntax)

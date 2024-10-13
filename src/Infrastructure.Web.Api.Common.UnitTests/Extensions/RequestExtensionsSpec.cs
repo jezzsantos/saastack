@@ -266,7 +266,6 @@ public class RequestExtensionsSpec
         result.RouteParams["anumberproperty"].Should().Be(999);
         result.RouteParams["astringproperty1"].Should().Be("avalue1");
         result.RouteParams["astringproperty2"].Should().Be("avalue2");
-
     }
 
     [Fact]

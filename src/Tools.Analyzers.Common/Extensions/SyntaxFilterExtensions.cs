@@ -294,7 +294,6 @@ public static class SyntaxFilterExtensions
         var memberNamespace = symbol.ContainingNamespace.ToDisplayString();
         return includedNamespaces.Any(ns => memberNamespace.StartsWith(ns));
     }
-    
 
     public static bool IsInitialized(this PropertyDeclarationSyntax propertyDeclarationSyntax)
     {

@@ -132,9 +132,9 @@ public class MailgunClient : IMailgunClient
 
     public static class Constants
     {
-        public const string WebhookSigningKeySettingName = "ApplicationServices:Mailgun:WebhookSigningKey";
         public const string APIKeySettingName = "ApplicationServices:Mailgun:ApiKey";
         public const string BaseUrlSettingName = "ApplicationServices:Mailgun:BaseUrl";
         public const string DomainNameSettingName = "ApplicationServices:Mailgun:DomainName";
+        public const string WebhookSigningKeySettingName = "ApplicationServices:Mailgun:WebhookSigningKey";
     }
 }

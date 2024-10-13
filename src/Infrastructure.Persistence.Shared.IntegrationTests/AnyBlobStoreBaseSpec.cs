@@ -95,7 +95,7 @@ public abstract class AnyBlobStoreBaseSpec
     public async Task WhenUploadAndContainerNameIsNull_ThenThrows()
     {
         const string contentType = "image/bmp";
-        
+
         await _setup.Store
             .Invoking(x =>
             {
@@ -109,7 +109,7 @@ public abstract class AnyBlobStoreBaseSpec
     public async Task WhenUploadAndBlobNameIsNull_ThenThrows()
     {
         const string contentType = "image/bmp";
-        
+
         await _setup.Store
             .Invoking(x =>
             {
@@ -135,7 +135,7 @@ public abstract class AnyBlobStoreBaseSpec
     public async Task WhenUploadAndStreamIsNull_ThenThrows()
     {
         const string contentType = "image/bmp";
-        
+
         await _setup.Store
             .Invoking(x =>
                 x.UploadAsync(_setup.ContainerName, "ablobname", contentType, null!, CancellationToken.None))
@@ -209,7 +209,6 @@ public abstract class AnyBlobStoreBaseSpec
             .Should().ThrowAsync<ArgumentOutOfRangeException>();
     }
 
-    
     [Fact]
     public async Task WhenDeleteAndBlobNotExists_ThenDeletes()
     {
