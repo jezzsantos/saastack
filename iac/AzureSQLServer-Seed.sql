@@ -1,3 +1,18 @@
+-- To be used to keep your SQL database up to date as you change your platform, and subdomain read models.
+-- Note: We deliberately do NOT define any referential integrity, or associated structure, in this database, because that violates the architectural rules.
+--    The tables pertaining to each subdomain should always remain independent of each other
+--    individual subdomains could be split and deployed into separate databases at anytime
+--      you are not to be joining across subdomains 
+--      you are not to be creating joins across read-models, you can just write the full de-normalized table from your projection 
+--      you can write multiple read-models from multiple projections (if you need different representations) 
+-- Note: We are deliberately defining most columns (in most of the read-model tables) as "string nvarchar(max)", and only specifically using other datatypes, where we know they are very un-likely to change over time.
+-- We are deliberately defining most columns as NULL for the same reason. To avoid, as much as possible, having to make changes to the schema in the future, when the code changes.
+-- Most read-model columns will change from string to JSON(ValueObject) as things change in your domain models, so limiting them too early to specific datatypes can backfire later on in production workloads.
+-- If you want to be more specific and want to optimize column design early, you need to be very careful not to change the code in the future.
+-- We recommend optimizing for change, rather than for performance, until your product has matured and fully developed, or has scaled dramatically. 
+-- Clearly there are limits to this, so this strategy is simply minimizing them, since we don't care at this stage about optimizing SQL storage in the cloud (i.e. no longer depend on spinning hard disks, tracks and sectors).  
+-- "nvarchar(max)" is used as a default for all string fields to allow for future expansion of the data model without having to change the schema. You are free to modify that limit (across the board) at your will.
+-- Some columns with indexes cannot be nvarchar(max) because of the index size limit of 900 bytes.
 -- noinspection SqlDialectInspectionForFile
 
 USE
@@ -204,14 +219,14 @@ CREATE INDEX UserId
 
 CREATE TABLE [dbo].[AuthToken]
 (
-    [Id]                    [nvarchar](100) NOT NULL,
-    [LastPersistedAtUtc]    [datetime]      NULL,
-    [IsDeleted]             [bit]           NULL,
-    [AccessToken]           [nvarchar](450) NULL,
-    [AccessTokenExpiresOn]  [datetime]      NULL,
-    [RefreshToken]          [nvarchar](450) NULL,
-    [RefreshTokenExpiresOn] [datetime]      NULL,
-    [UserId]                [nvarchar](100) NULL,
+    [Id]                    [nvarchar](100)  NOT NULL,
+    [LastPersistedAtUtc]    [datetime]       NULL,
+    [IsDeleted]             [bit]            NULL,
+    [AccessToken]           [nvarchar](4000) NULL,
+    [AccessTokenExpiresOn]  [datetime]       NULL,
+    [RefreshToken]          [nvarchar](4000) NULL,
+    [RefreshTokenExpiresOn] [datetime]       NULL,
+    [UserId]                [nvarchar](100)  NULL,
 ) ON [PRIMARY]
 GO
 
@@ -219,11 +234,6 @@ CREATE INDEX Id
     ON [dbo].[AuthToken]
         (
          [Id]
-            );
-CREATE INDEX RefreshToken
-    ON [dbo].[AuthToken]
-        (
-         [RefreshToken]
             );
 CREATE INDEX UserId
     ON [dbo].[AuthToken]

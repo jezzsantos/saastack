@@ -1,5 +1,8 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
+    <SqlCodeStyleSettings version="7">
+      <option name="DISABLE_FORMATTING" value="true" />
+    </SqlCodeStyleSettings>
     <XML>
       <option name="XML_KEEP_BLANK_LINES" value="1" />
       <option name="XML_SPACE_INSIDE_EMPTY_TAG" value="true" />
