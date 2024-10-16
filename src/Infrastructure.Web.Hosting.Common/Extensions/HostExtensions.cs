@@ -71,6 +71,11 @@ public static class HostExtensions
         WebHostOptions hostOptions)
     {
         var services = appBuilder.Services;
+#if HOSTEDONAZURE
+        // HACK: We need to add this dependency before registering any keyed dependencies, for ApplicationInsights v2.22.0.
+        // See https://github.com/microsoft/ApplicationInsights-dotnet/issues/2879
+        services.AddApplicationInsightsTelemetry();
+#endif
         RegisterSharedServices();
         RegisterConfiguration(hostOptions.IsMultiTenanted);
         RegisterRecording();
@@ -171,8 +176,6 @@ public static class HostExtensions
 #else
 #if HOSTEDONAZURE
                 loggingBuilder.AddApplicationInsights();
-
-                services.AddApplicationInsightsTelemetry();
 #elif HOSTEDONAWS
                 loggingBuilder.AddLambdaLogger();
 #endif
