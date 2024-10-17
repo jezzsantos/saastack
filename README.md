@@ -1,5 +1,6 @@
-[![Backend API ReadyEnough](https://img.shields.io/badge/Status-BackendAPI_Ready_Enough-green.svg)](README.md)
-[![Frontend WebApp Under Construction](https://img.shields.io/badge/Status-FrontendUI_UnderConstruction-yellow.svg)](README.md)
+[![Backend API Ready](https://img.shields.io/badge/Backend_API-Ready-green.svg)](README.md)
+[![Technology Adapters Missing](https://img.shields.io/badge/Technology_Adapters-Some_Missing-yellow.svg)](README.md)
+[![Frontend WebApp Under Construction](https://img.shields.io/badge/FrontendUI-UnderConstruction-yellow.svg)](README.md)
 [![Build and Test](https://github.com/jezzsantos/saastack/actions/workflows/build.yml/badge.svg)](https://github.com/jezzsantos/saastack/actions/workflows/build.yml)
 [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/jezzsantos)
 
@@ -7,9 +8,9 @@
 
 Are you about to build a new SaaS product from scratch? On .NET?
 
-Then, try starting with SaaStack codebase template.
+Then, try starting with the SaaStack codebase template.
 
-It is a complete template for building real-world, fully featured SaaS web products.
+It is a complete template for building real-world, fully-featured SaaS web products.
 
 Ready to build, test, and deploy into a cloud provider of your choice (e.g., Azure, AWS, Google Cloud, etc.)
 
@@ -85,14 +86,14 @@ Are these trade-offs suitable for any kind of software project?
 
 ## What does it give you?
 
-It is a starter "template," not a 3rd party library or a fancy 3rd party framework. Once you clone it it is all yours:
+It is a starter "template," not a 3rd party library or a fancy 3rd party framework. Once you clone it, it is all yours:
 
 * You copy this codebase, as is, as your new codebase for your product.
 * You rename a few things to the name of your product.
 * You compile it, you run its tests, and you deploy its pieces into your cloud environment (e.g., Azure, AWS, or Google Cloud).
 * You then continue to evolve and add your own features to it (by following the established code patterns).
 * You then evolve and adapt the code to wherever you need it to go.
-   * Don't like those patterns? then change them to suit your preferences. There are no rigid frameworks or other dev teams to plead with.
+   * Don't like those patterns? Then change them to suit your preferences. There are no rigid frameworks or other dev teams to plead with.
 * At some point, you will delete the example subdomain modules (Cars and Bookings) that are provided as examples to follow and, of course, replace them with your own subdomain modules.
 * Read the [documentation](docs/README.md) to figure out what it already has and how things work.
    * So that you either don't need to worry about those specific things yet (and can focus on more valuable things), or you can modify them to suit your specific needs. It is your code, so you do as you please to it.
@@ -103,9 +104,9 @@ Since this starter "template" is NOT a framework (of the type you usually depend
 
 ## Want it to scale?
 
-What happens when the performance of this modular monolith requires that you MUST scale it out, and break it into independently deployable pieces?
+What happens when the performance of this modular monolith requires that you MUST scale it out and break it into independently deployable pieces?
 
-> Remember: No business can afford the expense for you to re-write your product, - so forget that idea!
+> Remember: No business can afford the expense of waiting for you to re-write your product, so forget that idea!
 
 This codebase has been explicitly designed so that you can split it up and deploy its various modules into separate deployable units as you see fit (when your product is ready for that).
 
@@ -152,7 +153,7 @@ The starter template also takes care of these specific kinds of things:
    * Applications are aligned to audiences and subdomains
 * Others
    * It provides documented code examples for the most common use cases. Simply follow and learn from the existing patterns in the codebase
-   * It provides [how-to guides](docs/how-to-guides/README.md) for performing the most common things on a codebase like this, until you've learned the patterns.
+   * It provides [how-to guides](docs/how-to-guides/README.md) for performing the most common things on a codebase like this until you've learned the patterns.
    * It provides a [decision log](docs/decisions/README.md) so you can see why certain design decisions were made.
    * It provides documentation about the [design principles](docs/design-principles/README.md) behind the codebase so you can learn about them and why they exist.
    * It \[will\] provide an eco-system/marketplace of common adapters that other people can build and share with the community.
