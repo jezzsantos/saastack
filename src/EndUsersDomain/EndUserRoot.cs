@@ -19,6 +19,10 @@ public delegate Task<Result<Error>> InviteAction(Identifier inviterId, string to
 
 public sealed partial class EndUserRoot : AggregateRootBase
 {
+#if TESTINGONLY
+    private const string TestingToken = "Ll4qhv77XhiXSqsTUc6icu56ZLrqu5p1gH9kT5IlHio";
+#endif
+
     public static Result<EndUserRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
         UserClassification classification)
     {
@@ -613,7 +617,7 @@ public sealed partial class EndUserRoot : AggregateRootBase
 #if TESTINGONLY
     public void TestingOnly_InviteGuest(EmailAddress emailAddress)
     {
-        GuestInvitation = GuestInvitation.Invite("atoken", emailAddress, "aninviter".ToId()).Value;
+        GuestInvitation = GuestInvitation.Invite(TestingToken, emailAddress, "aninviter".ToId()).Value;
     }
 #endif
 

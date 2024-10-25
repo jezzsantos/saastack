@@ -99,6 +99,9 @@
     <data name="GuestInvitation_AlreadyAccepted" xml:space="preserve">
         <value>This invitation has already been accepted</value>
     </data>
+    <data name="GuestInvitation_InvalidToken" xml:space="preserve">
+        <value>The Token for this invitation is invalid</value>
+    </data>
     <data name="EndUserRoot_GuestInvitationNeverSent" xml:space="preserve">
         <value>A guest invitation has not been sent yet</value>
     </data>

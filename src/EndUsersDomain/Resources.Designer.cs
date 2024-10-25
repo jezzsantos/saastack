@@ -294,6 +294,15 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Token for this invitation is invalid.
+        /// </summary>
+        internal static string GuestInvitation_InvalidToken {
+            get {
+                return ResourceManager.GetString("GuestInvitation_InvalidToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This invitation has not been sent yet.
         /// </summary>
         internal static string GuestInvitation_NotInvited {

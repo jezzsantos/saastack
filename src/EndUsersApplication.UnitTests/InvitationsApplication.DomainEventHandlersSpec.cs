@@ -50,13 +50,14 @@ public class InvitationsApplicationDomainEventHandlersSpec
         _notificationsService = new Mock<IUserNotificationsService>();
         _tokensService = new Mock<ITokensService>();
         _tokensService.Setup(ts => ts.CreateGuestInvitationToken())
-            .Returns("aninvitationtoken");
+            .Returns(TestingToken);
 
         _application =
             new InvitationsApplication(_recorder.Object, idFactory.Object, _tokensService.Object,
                 _notificationsService.Object, _userProfilesService.Object, _repository.Object);
     }
 
+    private const string TestingToken = "Ll4qhv77XhiXSqsTUc6icu56ZLrqu5p1gH9kT5IlHio";
     [Fact]
     public async Task WhenHandleOrganizationMemberInvitedAsyncAndNoUserIdNorEmailAddress_ThenReturnsError()
     {
@@ -179,7 +180,7 @@ public class InvitationsApplicationDomainEventHandlersSpec
         _userProfilesService.Verify(ups =>
             ups.FindPersonByEmailAddressPrivateAsync(_caller.Object, "aninvitee@company.com",
                 It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(_caller.Object, "aninvitationtoken",
+        _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(_caller.Object, TestingToken,
             "aninvitee@company.com", "Aninvitee", "aninviterdisplayname", It.IsAny<CancellationToken>()));
         _repository.Verify(rep => rep.LoadAsync("anid".ToId(), It.IsAny<CancellationToken>()), Times.Never);
         _repository.Verify(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()));
@@ -229,7 +230,7 @@ public class InvitationsApplicationDomainEventHandlersSpec
             && eu.GuestInvitation.IsInvited
             && eu.GuestInvitation.InvitedById! == "aninviterid".ToId()
         ), It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(_caller.Object, "aninvitationtoken",
+        _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(_caller.Object, TestingToken,
             "aninvitee@company.com", "Aninvitee", "aninviterdisplayname", It.IsAny<CancellationToken>()));
         _userProfilesService.Verify(ups =>
             ups.GetProfilePrivateAsync(_caller.Object, "aninviterid", It.IsAny<CancellationToken>()));

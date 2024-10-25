@@ -12,7 +12,8 @@ namespace EndUsersDomain.UnitTests;
 public class GuestInvitationSpec
 {
     private readonly EmailAddress _inviteeEmailAddress;
-
+    private const string TestingToken = "Ll4qhv77XhiXSqsTUc6icu56ZLrqu5p1gH9kT5IlHio";
+    
     public GuestInvitationSpec()
     {
         _inviteeEmailAddress = EmailAddress.Create("auser@company.com").Value;
@@ -36,13 +37,23 @@ public class GuestInvitationSpec
     }
 
     [Fact]
+    public void WhenInviteAndInvalidToken_ThenReturnsError()
+    {
+        var invitation = GuestInvitation.Empty;
+
+        var result = invitation.Invite("aninvalidtoken", _inviteeEmailAddress, "aninviterid".ToId());
+
+        result.Should().BeError(ErrorCode.Validation, Resources.GuestInvitation_InvalidToken);
+    }
+
+    [Fact]
     public void WhenInviteAndAlreadyInvited_ThenReturnsError()
     {
         var invitation = GuestInvitation.Empty;
-        invitation = invitation.Invite("atoken", _inviteeEmailAddress,
+        invitation = invitation.Invite(TestingToken, _inviteeEmailAddress,
             "aninviterid".ToId()).Value;
 
-        var result = invitation.Invite("atoken", _inviteeEmailAddress, "aninviterid".ToId());
+        var result = invitation.Invite(TestingToken, _inviteeEmailAddress, "aninviterid".ToId());
 
         result.Should().BeError(ErrorCode.RuleViolation, Resources.GuestInvitation_AlreadyInvited);
     }
@@ -51,11 +62,11 @@ public class GuestInvitationSpec
     public void WhenInviteAndAlreadyAccepted_ThenReturnsError()
     {
         var invitation = GuestInvitation.Empty;
-        invitation = invitation.Invite("atoken", _inviteeEmailAddress,
+        invitation = invitation.Invite(TestingToken, _inviteeEmailAddress,
             "aninviterid".ToId()).Value;
         invitation = invitation.Accept(_inviteeEmailAddress).Value;
 
-        var result = invitation.Invite("atoken", _inviteeEmailAddress, "aninviterid".ToId());
+        var result = invitation.Invite(TestingToken, _inviteeEmailAddress, "aninviterid".ToId());
 
         result.Should().BeError(ErrorCode.RuleViolation, Resources.GuestInvitation_AlreadyInvited);
     }
@@ -65,13 +76,13 @@ public class GuestInvitationSpec
     {
         var invitation = GuestInvitation.Empty;
 
-        invitation = invitation.Invite("atoken", _inviteeEmailAddress,
+        invitation = invitation.Invite(TestingToken, _inviteeEmailAddress,
             "aninviterid".ToId()).Value;
 
         invitation.IsInvited.Should().BeTrue();
         invitation.IsStillOpen.Should().BeTrue();
         invitation.IsAccepted.Should().BeFalse();
-        invitation.Token.Should().Be("atoken");
+        invitation.Token.Should().Be(TestingToken);
         invitation.ExpiresOnUtc.Should().BeNear(DateTime.UtcNow.Add(GuestInvitation.DefaultTokenExpiry));
         invitation.InvitedById.Should().Be("aninviterid".ToId());
         invitation.InviteeEmailAddress!.Address.Should().Be("auser@company.com");
@@ -81,11 +92,21 @@ public class GuestInvitationSpec
     }
 
     [Fact]
+    public void WhenRenewAndInvalidToken_ThenReturnsError()
+    {
+        var invitation = GuestInvitation.Empty;
+
+        var result = invitation.Renew("aninvalidtoken", _inviteeEmailAddress);
+
+        result.Should().BeError(ErrorCode.Validation, Resources.GuestInvitation_InvalidToken);
+    }
+
+    [Fact]
     public void WhenRenewAndNotInvited_ThenReturnsError()
     {
         var invitation = GuestInvitation.Empty;
 
-        var result = invitation.Renew("atoken", _inviteeEmailAddress);
+        var result = invitation.Renew(TestingToken, _inviteeEmailAddress);
 
         result.Should().BeError(ErrorCode.RuleViolation, Resources.GuestInvitation_NotInvited);
     }
@@ -94,11 +115,11 @@ public class GuestInvitationSpec
     public void WhenRenewAndAlreadyAccepted_ThenReturnsError()
     {
         var invitation = GuestInvitation.Empty;
-        invitation = invitation.Invite("atoken", _inviteeEmailAddress,
+        invitation = invitation.Invite(TestingToken, _inviteeEmailAddress,
             "aninviterid".ToId()).Value;
         invitation = invitation.Accept(_inviteeEmailAddress).Value;
 
-        var result = invitation.Renew("atoken", _inviteeEmailAddress);
+        var result = invitation.Renew(TestingToken, _inviteeEmailAddress);
 
         result.Should().BeError(ErrorCode.RuleViolation, Resources.GuestInvitation_AlreadyAccepted);
     }
@@ -107,15 +128,15 @@ public class GuestInvitationSpec
     public void WhenRenewAndInvited_ThenIsRenewed()
     {
         var invitation = GuestInvitation.Empty;
-        invitation = invitation.Invite("atoken", _inviteeEmailAddress,
+        invitation = invitation.Invite(TestingToken, _inviteeEmailAddress,
             "aninviterid".ToId()).Value;
 
-        invitation = invitation.Renew("atoken", _inviteeEmailAddress).Value;
+        invitation = invitation.Renew(TestingToken, _inviteeEmailAddress).Value;
 
         invitation.IsInvited.Should().BeTrue();
         invitation.IsStillOpen.Should().BeTrue();
         invitation.IsAccepted.Should().BeFalse();
-        invitation.Token.Should().Be("atoken");
+        invitation.Token.Should().Be(TestingToken);
         invitation.ExpiresOnUtc.Should().BeNear(DateTime.UtcNow.Add(GuestInvitation.DefaultTokenExpiry));
         invitation.InvitedById.Should().Be("aninviterid".ToId());
         invitation.InviteeEmailAddress!.Address.Should().Be("auser@company.com");
@@ -138,7 +159,7 @@ public class GuestInvitationSpec
     public void WhenAcceptAndAlreadyAccepted_ThenReturnsError()
     {
         var invitation = GuestInvitation.Empty;
-        invitation = invitation.Invite("atoken", _inviteeEmailAddress,
+        invitation = invitation.Invite(TestingToken, _inviteeEmailAddress,
             "aninviterid".ToId()).Value;
         invitation = invitation.Accept(_inviteeEmailAddress).Value;
 
@@ -152,7 +173,7 @@ public class GuestInvitationSpec
     {
         var invitation = GuestInvitation.Empty;
 
-        invitation = invitation.Invite("atoken", _inviteeEmailAddress,
+        invitation = invitation.Invite(TestingToken, _inviteeEmailAddress,
             "aninviterid".ToId()).Value;
 
         invitation = invitation.Accept(_inviteeEmailAddress).Value;
@@ -160,7 +181,7 @@ public class GuestInvitationSpec
         invitation.IsInvited.Should().BeTrue();
         invitation.IsStillOpen.Should().BeFalse();
         invitation.IsAccepted.Should().BeTrue();
-        invitation.Token.Should().Be("atoken");
+        invitation.Token.Should().Be(TestingToken);
         invitation.ExpiresOnUtc.Should().BeNull();
         invitation.InvitedById.Should().Be("aninviterid".ToId());
         invitation.InviteeEmailAddress!.Address.Should().Be("auser@company.com");

@@ -22,6 +22,7 @@ namespace EndUsersDomain.UnitTests;
 [UsedImplicitly]
 public class EndUserRootSpec
 {
+    private const string TestingToken = "Ll4qhv77XhiXSqsTUc6icu56ZLrqu5p1gH9kT5IlHio";
     private static EndUserRoot CreateOrgOwner(Mock<IRecorder> recorder, string organizationId,
         UserClassification classification = UserClassification.Person)
     {
@@ -86,7 +87,7 @@ public class EndUserRootSpec
                 });
             _tokensService = new Mock<ITokensService>();
             _tokensService.Setup(ts => ts.CreateGuestInvitationToken())
-                .Returns("aninvitationtoken");
+                .Returns(TestingToken);
 
             _user = EndUserRoot.Create(_recorder.Object, _identifierFactory.Object, UserClassification.Person).Value;
         }

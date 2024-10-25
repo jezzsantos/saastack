@@ -1,5 +1,6 @@
 using Common;
 using Common.Extensions;
+using Domain.Common.Extensions;
 using Domain.Common.ValueObjects;
 using Domain.Interfaces;
 using Domain.Shared;
@@ -102,6 +103,12 @@ public sealed class GuestInvitation : ValueObjectBase<GuestInvitation>
 
     public Result<GuestInvitation, Error> Invite(string token, EmailAddress inviteeEmailAddress, Identifier invitedById)
     {
+        if (token.IsInvalidParameter(Validations.Invitation.Token, nameof(token),
+                Resources.GuestInvitation_InvalidToken, out var error))
+        {
+            return error;
+        }
+        
         if (IsInvited)
         {
             return Error.RuleViolation(Resources.GuestInvitation_AlreadyInvited);
@@ -118,6 +125,12 @@ public sealed class GuestInvitation : ValueObjectBase<GuestInvitation>
 
     public Result<GuestInvitation, Error> Renew(string token, EmailAddress inviteeEmailAddress)
     {
+        if (token.IsInvalidParameter(Validations.Invitation.Token, nameof(token),
+                Resources.GuestInvitation_InvalidToken, out var error))
+        {
+            return error;
+        }
+
         if (!IsInvited)
         {
             return Error.RuleViolation(Resources.GuestInvitation_NotInvited);

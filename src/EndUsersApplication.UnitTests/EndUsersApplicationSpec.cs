@@ -155,6 +155,8 @@ public class EndUsersApplicationSpec
             It.IsAny<CancellationToken>()), Times.Never);
     }
 
+    private const string TestingToken = "Ll4qhv77XhiXSqsTUc6icu56ZLrqu5p1gH9kT5IlHio";
+    
     [Fact]
     public async Task WhenRegisterPersonAsyncAndAcceptingGuestInvitation_ThenCompletesRegistration()
     {
@@ -164,7 +166,7 @@ public class EndUsersApplicationSpec
             .Returns("acallid");
         var tokensService = new Mock<ITokensService>();
         tokensService.Setup(ts => ts.CreateGuestInvitationToken())
-            .Returns("aninvitationtoken");
+            .Returns(TestingToken);
         var invitee = EndUserRoot.Create(_recorder.Object, _idFactory.Object, UserClassification.Person).Value;
         await invitee.InviteGuestAsync(tokensService.Object, "aninviterid".ToId(),
             EmailAddress.Create("auser@company.com").Value, (_, _) => Task.FromResult(Result.Ok));
@@ -204,7 +206,7 @@ public class EndUsersApplicationSpec
                 }
             });
 
-        var result = await _application.RegisterPersonAsync(_caller.Object, "aninvitationtoken", "auser@company.com",
+        var result = await _application.RegisterPersonAsync(_caller.Object, TestingToken, "auser@company.com",
             "afirstname", "alastname", null, null, true, CancellationToken.None);
 
         result.Should().BeSuccess();
@@ -215,7 +217,7 @@ public class EndUsersApplicationSpec
         result.Value.Roles.Should().OnlyContain(role => role == PlatformRoles.Standard.Name);
         result.Value.Features.Should().ContainInOrder(PlatformFeatures.PaidTrial.Name, PlatformFeatures.Basic.Name);
         _invitationRepository.Verify(rep =>
-            rep.FindInvitedGuestByTokenAsync("aninvitationtoken", It.IsAny<CancellationToken>()));
+            rep.FindInvitedGuestByTokenAsync(TestingToken, It.IsAny<CancellationToken>()));
         _notificationsService.Verify(ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(),
             It.IsAny<string>(),
             It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),

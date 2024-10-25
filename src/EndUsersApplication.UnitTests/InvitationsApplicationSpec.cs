@@ -22,6 +22,7 @@ namespace EndUsersApplication.UnitTests;
 [Trait("Category", "Unit")]
 public class InvitationsApplicationSpec
 {
+    private const string TestingToken = "Ll4qhv77XhiXSqsTUc6icu56ZLrqu5p1gH9kT5IlHio";
     private readonly InvitationsApplication _application;
     private readonly Mock<ICallerContext> _caller;
     private readonly Mock<IUserNotificationsService> _notificationsService;
@@ -48,7 +49,7 @@ public class InvitationsApplicationSpec
         _notificationsService = new Mock<IUserNotificationsService>();
         _tokensService = new Mock<ITokensService>();
         _tokensService.Setup(ts => ts.CreateGuestInvitationToken())
-            .Returns("aninvitationtoken");
+            .Returns(TestingToken);
 
         _application =
             new InvitationsApplication(_recorder.Object, idFactory.Object, _tokensService.Object,
@@ -192,7 +193,7 @@ public class InvitationsApplicationSpec
         result.Value.EmailAddress.Should().Be("aninvitee@company.com");
         result.Value.FirstName.Should().Be("Aninvitee");
         result.Value.LastName.Should().BeNull();
-        _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(_caller.Object, "aninvitationtoken",
+        _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(_caller.Object, TestingToken,
             "aninvitee@company.com", "Aninvitee", "aninviterdisplayname", It.IsAny<CancellationToken>()));
     }
 
@@ -240,7 +241,7 @@ public class InvitationsApplicationSpec
         _userProfilesService.Verify(ups =>
             ups.FindPersonByEmailAddressPrivateAsync(_caller.Object, "aninvitee@company.com",
                 It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(_caller.Object, "aninvitationtoken",
+        _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(_caller.Object, TestingToken,
             "aninvitee@company.com", "Aninvitee", "aninviterdisplayname", It.IsAny<CancellationToken>()));
         _repository.Verify(rep => rep.LoadAsync("anid".ToId(), It.IsAny<CancellationToken>()), Times.Never);
         _repository.Verify(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()));
@@ -260,7 +261,7 @@ public class InvitationsApplicationSpec
             .ReturnsAsync(Optional<EndUserRoot>.None);
 
         var result =
-            await _application.ResendGuestInvitationAsync(_caller.Object, "aninvitationtoken", CancellationToken.None);
+            await _application.ResendGuestInvitationAsync(_caller.Object, TestingToken, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityNotFound);
     }
@@ -295,10 +296,10 @@ public class InvitationsApplicationSpec
             });
 
         var result =
-            await _application.ResendGuestInvitationAsync(_caller.Object, "aninvitationtoken", CancellationToken.None);
+            await _application.ResendGuestInvitationAsync(_caller.Object, TestingToken, CancellationToken.None);
 
         result.Should().BeSuccess();
-        _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(_caller.Object, "aninvitationtoken",
+        _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(_caller.Object, TestingToken,
             "aninvitee@company.com", "Aninvitee", "aninviterdisplayname", It.IsAny<CancellationToken>()));
         _repository.Verify(rep => rep.LoadAsync("anid".ToId(), It.IsAny<CancellationToken>()), Times.Never);
         _repository.Verify(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()));
@@ -318,7 +319,7 @@ public class InvitationsApplicationSpec
             .ReturnsAsync(Optional<EndUserRoot>.None);
 
         var result =
-            await _application.VerifyGuestInvitationAsync(_caller.Object, "aninvitationtoken", CancellationToken.None);
+            await _application.VerifyGuestInvitationAsync(_caller.Object, TestingToken, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityNotFound);
     }
@@ -341,7 +342,7 @@ public class InvitationsApplicationSpec
             .ReturnsAsync(invitee.ToOptional());
 
         var result =
-            await _application.VerifyGuestInvitationAsync(_caller.Object, "aninvitationtoken", CancellationToken.None);
+            await _application.VerifyGuestInvitationAsync(_caller.Object, TestingToken, CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.EmailAddress.Should().Be("aninvitee@company.com");
