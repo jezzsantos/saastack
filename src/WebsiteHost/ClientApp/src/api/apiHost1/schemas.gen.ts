@@ -2650,6 +2650,10 @@ export const SubscriptionWithPlanSchema = {
       type: "string",
       nullable: true
     },
+    buyerReference: {
+      type: "string",
+      nullable: true
+    },
     canBeCanceled: {
       type: "boolean"
     },
@@ -2677,10 +2681,6 @@ export const SubscriptionWithPlanSchema = {
       $ref: "#/components/schemas/SubscriptionStatus"
     },
     subscriptionReference: {
-      type: "string",
-      nullable: true
-    },
-    buyerReference: {
       type: "string",
       nullable: true
     }
@@ -2980,10 +2980,5 @@ export const VerifyGuestInvitationResponseSchema = {
       $ref: "#/components/schemas/Invitation"
     }
   },
-  additionalProperties: false
-} as const;
-
-export const VoidSchema = {
-  type: "object",
   additionalProperties: false
 } as const;

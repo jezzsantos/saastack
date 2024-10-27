@@ -78,6 +78,15 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Authentication.Any.Refreshed.Failed.AccountSuspended.
+        /// </summary>
+        public static string AuthTokensApplication_Refresh_AccountSuspended {
+            get {
+                return ResourceManager.GetString("AuthTokensApplication_Refresh_AccountSuspended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Authentication.Any.Refreshed.Passed.
         /// </summary>
         public static string AuthTokensApplication_Refresh_Succeeded {

@@ -123,7 +123,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
             _recorder.AuditAgainst(caller.ToCall(), user.Id,
                 Audits.PasswordCredentialsApplication_Authenticate_AccountSuspended,
                 "User {Id} tried to authenticate a password with a suspended account", user.Id);
-            return Error.EntityExists(Resources.PasswordCredentialsApplication_AccountSuspended);
+            return Error.EntityLocked(Resources.PasswordCredentialsApplication_AccountSuspended);
         }
 
         if (credentials.IsLocked)
@@ -131,7 +131,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
             _recorder.AuditAgainst(caller.ToCall(), user.Id,
                 Audits.PasswordCredentialsApplication_Authenticate_AccountLocked,
                 "User {Id} tried to authenticate a password with a locked account", user.Id);
-            return Error.EntityExists(Resources.PasswordCredentialsApplication_AccountLocked);
+            return Error.EntityLocked(Resources.PasswordCredentialsApplication_AccountLocked);
         }
 
         var verifyPassword = await VerifyPasswordAsync();

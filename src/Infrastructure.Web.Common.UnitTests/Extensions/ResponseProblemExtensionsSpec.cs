@@ -242,6 +242,18 @@ public class ResponseProblemExtensionsSpec
     }
 
     [Fact]
+    public void WhenToErrorAndHas423Status_ThenReturnsEntityLockedError()
+    {
+        var result = new ResponseProblem
+        {
+            Title = "atitle",
+            Status = (int)HttpStatusCode.Locked
+        }.ToError();
+
+        result.Should().BeError(ErrorCode.EntityLocked, "atitle");
+    }
+
+    [Fact]
     public void WhenToResponseProblemAndReasonIsNull_ThenReturnsProblem()
     {
         var result = HttpStatusCode.InternalServerError.ToResponseProblem(null);

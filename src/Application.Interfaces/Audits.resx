@@ -63,6 +63,12 @@
     <data name="SingleSignOnApplication_Authenticate_Succeeded" xml:space="preserve">
         <value>Authentication.SSO.Passed</value>
     </data>
+    <data name="SingleSignOnApplication_Refresh_Succeeded" xml:space="preserve">
+        <value>Authentication.SSO.Refreshed.Passed</value>
+    </data>
+    <data name="SingleSignOnApplication_Refresh_AccountSuspended" xml:space="preserve">
+        <value>Authentication.SSO.Refreshed.Failed.AccountSuspended</value>
+    </data>
     <data name="CSRFMiddleware_CSRFProtection_Failed" xml:space="preserve">
         <value>CSRFProtection.Failed</value>
     </data>
@@ -93,13 +99,10 @@
     <data name="MailgunApi_WebhookAuthentication_Failed" xml:space="preserve">
         <value>Authentication.Mailgun.Failed</value>
     </data>
-    <data name="SingleSignOnApplication_Refresh_Succeeded" xml:space="preserve">
-        <value>Authentication.SSO.Refreshed.Passed</value>
-    </data>
     <data name="AuthTokensApplication_Refresh_Succeeded" xml:space="preserve">
         <value>Authentication.Any.Refreshed.Passed</value>
     </data>
-    <data name="SingleSignOnApplication_Refresh_AccountSuspended" xml:space="preserve">
-        <value>Authentication.SSO.Refreshed.Failed.AccountSuspended</value>
+    <data name="AuthTokensApplication_Refresh_AccountSuspended" xml:space="preserve">
+        <value>Authentication.Any.Refreshed.Failed.AccountSuspended</value>
     </data>
 </root>

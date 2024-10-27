@@ -114,6 +114,15 @@ namespace Infrastructure.Web.Api.Interfaces {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The current resource is locked and cannot be accessed.
+        /// </summary>
+        internal static string HttpConstants_StatusCodes_Reason_Locked {
+            get {
+                return ResourceManager.GetString("HttpConstants_StatusCodes_Reason_Locked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The request is not allowed by the current state of the resource.
         /// </summary>
         internal static string HttpConstants_StatusCodes_Reason_MethodNotAllowed {
@@ -236,6 +245,15 @@ namespace Infrastructure.Web.Api.Interfaces {
         internal static string HttpConstants_StatusCodes_Title_InternalServerError {
             get {
                 return ResourceManager.GetString("HttpConstants_StatusCodes_Title_InternalServerError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Locked.
+        /// </summary>
+        internal static string HttpConstants_StatusCodes_Title_Locked {
+            get {
+                return ResourceManager.GetString("HttpConstants_StatusCodes_Title_Locked", resourceCulture);
             }
         }
         

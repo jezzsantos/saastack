@@ -101,6 +101,7 @@ public static class HttpConstants
                 new List<ErrorCode> { ErrorCode.PreconditionViolation, ErrorCode.EntityDeleted }
             },
             { HttpStatusCode.Conflict, new List<ErrorCode> { ErrorCode.EntityExists } },
+            { HttpStatusCode.Locked, new List<ErrorCode> { ErrorCode.EntityLocked } },
             { HttpStatusCode.InternalServerError, new List<ErrorCode> { ErrorCode.Unexpected } }
         };
 
@@ -116,7 +117,8 @@ public static class HttpConstants
             StatusCode.Forbidden,
             StatusCode.NotFound,
             StatusCode.MethodNotAllowed,
-            StatusCode.Conflict
+            StatusCode.Conflict,
+            StatusCode.Locked
         }.ToDictionary(pair => pair.Code, pair => pair);
     }
 }

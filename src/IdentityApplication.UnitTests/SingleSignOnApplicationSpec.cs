@@ -166,7 +166,7 @@ public class SingleSignOnApplicationSpec
             "anauthcode", null,
             CancellationToken.None);
 
-        result.Should().BeError(ErrorCode.EntityExists, Resources.SingleSignOnApplication_AccountSuspended);
+        result.Should().BeError(ErrorCode.EntityLocked, Resources.SingleSignOnApplication_AccountSuspended);
         _endUsersService.Verify(eus =>
             eus.FindPersonByEmailPrivateAsync(_caller.Object, "auser@company.com", It.IsAny<CancellationToken>()));
         _endUsersService.Verify(

@@ -51,4 +51,7 @@
     <data name="APIKeysApplication_AccountSuspended" xml:space="preserve">
       <value>The user account is suspended</value>
     </data>
+    <data name="AuthTokensApplication_AccountSuspended" xml:space="preserve">
+      <value>The user account is suspended</value>
+    </data>
 </root>

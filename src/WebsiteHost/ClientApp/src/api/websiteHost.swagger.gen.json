@@ -62,7 +62,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized: The client must authenticate itself to get the requested response"
+            "description": "The user's username or password is invalid"
           },
           "402": {
             "description": "Payment Required: The client must have payment information to get ther requested response"
@@ -74,10 +74,13 @@
             "description": "Not Found: The server cannot find the requested resource"
           },
           "405": {
-            "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
+            "description": "The user has not yet verified their registration"
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "The user's account is suspended or disabled, and cannot be authenticated or used"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -172,6 +175,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -248,7 +254,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized: The client must authenticate itself to get the requested response"
+            "description": "The refresh token has expired"
           },
           "402": {
             "description": "Payment Required: The client must have payment information to get ther requested response"
@@ -264,6 +270,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "The user's account is suspended or disabled, and cannot be authenticated or used"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -348,6 +357,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -444,6 +456,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -527,6 +542,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -633,6 +651,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -725,6 +746,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -819,6 +843,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -912,6 +939,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -1004,6 +1034,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -1239,10 +1272,6 @@
         "additionalProperties": false
       },
       "RefreshTokenRequest": {
-        "type": "object",
-        "additionalProperties": false
-      },
-      "Void": {
         "type": "object",
         "additionalProperties": false
       }

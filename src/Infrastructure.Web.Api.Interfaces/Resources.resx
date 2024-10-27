@@ -90,6 +90,12 @@
     <data name="HttpConstants_StatusCodes_Reason_Conflict" xml:space="preserve">
         <value>The request conflicts with the current state of the resource</value>
     </data>
+    <data name="HttpConstants_StatusCodes_Title_Locked" xml:space="preserve">
+        <value>Locked</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_Locked" xml:space="preserve">
+        <value>The current resource is locked and cannot be accessed</value>
+    </data>
     <data name="HttpConstants_StatusCodes_Title_UnsupportedMediaType" xml:space="preserve">
         <value>Unsupported MediaType</value>
     </data>

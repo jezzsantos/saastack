@@ -102,7 +102,7 @@ public class SingleSignOnApplication : ISingleSignOnApplication
             _recorder.AuditAgainst(caller.ToCall(), user.Id,
                 Audits.SingleSignOnApplication_Authenticate_AccountSuspended,
                 "User {Id} tried to authenticate with SSO {Provider} with a suspended account", user.Id, providerName);
-            return Error.EntityExists(Resources.SingleSignOnApplication_AccountSuspended);
+            return Error.EntityLocked(Resources.SingleSignOnApplication_AccountSuspended);
         }
 
         var saved = await _ssoProvidersService.SaveUserInfoAsync(caller, providerName, registeredUserId.ToId(),

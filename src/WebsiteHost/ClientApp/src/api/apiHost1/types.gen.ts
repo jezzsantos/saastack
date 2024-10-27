@@ -880,6 +880,7 @@ export type SubscriptionWithPlan = {
     [key: string]: string;
   } | null;
   id?: string | null;
+  buyerReference?: string | null;
   canBeCanceled?: boolean;
   canBeUnsubscribed?: boolean;
   canceledDateUtc?: string | null;
@@ -889,7 +890,6 @@ export type SubscriptionWithPlan = {
   plan?: SubscriptionPlan;
   status?: SubscriptionStatus;
   subscriptionReference?: string | null;
-  buyerReference?: string | null;
 };
 
 export type TakeOfflineCarRequest = {
@@ -984,10 +984,6 @@ export type ValidationsValidatedPostTestingOnlyRequest = {
 
 export type VerifyGuestInvitationResponse = {
   invitation?: Invitation;
-};
-
-export type Void = {
-  [key: string]: unknown;
 };
 
 export type CreateApiKeyForCallerData = {

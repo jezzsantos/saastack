@@ -424,6 +424,7 @@ export const deleteApiKey = <ThrowOnError extends boolean = false>(options: Opti
     ...options,
     url: "/apikeys/{Id}"
   });
+
 /**
  * Delivers an audit message
  * (request type: DeliverAuditRequest)
@@ -433,6 +434,7 @@ export const deliverAudit = <ThrowOnError extends boolean = false>(options?: Opt
     ...options,
     url: "/audits/deliver"
   });
+
 /**
  * Drains all the pending audit messages
  * (request type: DrainAllAuditsRequest)
@@ -444,6 +446,7 @@ export const drainAllAudits = <ThrowOnError extends boolean = false>(
     ...options,
     url: "/audits/drain"
   });
+
 /**
  * Lists all available audits
  * (request type: SearchAllAuditsRequest)
@@ -455,6 +458,7 @@ export const searchAllAudits = <ThrowOnError extends boolean = false>(
     ...options,
     url: "/audits"
   });
+
 /**
  * Refreshes the access_token for the specified refresh_token
  * (request type: RefreshTokenRequest)
@@ -812,6 +816,7 @@ export const getUser = <ThrowOnError extends boolean = false>(options: Options<G
     ...options,
     url: "/users/{Id}"
   });
+
 /**
  * Fetches the named feature flag, for all users, or for a specific user, and optionally for a specific tenancy
  * (request type: GetFeatureFlagRequest)
@@ -823,6 +828,7 @@ export const getFeatureFlag = <ThrowOnError extends boolean = false>(
     ...options,
     url: "/flags/{UserId}/{Name}"
   });
+
 /**
  * Lists all the available feature flags
  * (request type: GetAllFeatureFlagsRequest)
@@ -910,6 +916,7 @@ export const downloadImage = <ThrowOnError extends boolean = false>(
     ...options,
     url: "/images/{Id}/download"
   });
+
 /**
  * Uploads a new image. Can be one of the following types: jpg, jpeg, png, gif
  * (request type: UploadImageRequest)
@@ -982,6 +989,7 @@ export const mailgunNotifyWebhookEvent = <ThrowOnError extends boolean = false>(
     ...options,
     url: "/webhooks/mailgun"
   });
+
 /**
  * Changes the default organization for the authenticated user
  * (request type: ChangeDefaultOrganizationRequest)
@@ -997,6 +1005,7 @@ export const changeDefaultOrganizationPut = <ThrowOnError extends boolean = fals
     ...options,
     url: "/memberships/me/default"
   });
+
 /**
  * Changes the default organization for the authenticated user
  * (request type: ChangeDefaultOrganizationRequest)
@@ -1614,6 +1623,7 @@ export const contentNegotiationsTestingOnly = <ThrowOnError extends boolean = fa
     ...options,
     url: "/testingonly/negotiations/get"
   });
+
 /**
  * Destroys all repositories
  * (request type: DestroyAllRepositoriesRequest)

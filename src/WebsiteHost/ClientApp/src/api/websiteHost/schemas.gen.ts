@@ -215,8 +215,3 @@ export const RefreshTokenRequestSchema = {
   type: "object",
   additionalProperties: false
 } as const;
-
-export const VoidSchema = {
-  type: "object",
-  additionalProperties: false
-} as const;

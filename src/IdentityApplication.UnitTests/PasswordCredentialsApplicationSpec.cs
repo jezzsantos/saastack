@@ -190,7 +190,7 @@ public class PasswordCredentialsApplicationSpec
         var result =
             await _application.AuthenticateAsync(_caller.Object, "ausername", "apassword", CancellationToken.None);
 
-        result.Should().BeError(ErrorCode.EntityExists, Resources.PasswordCredentialsApplication_AccountSuspended);
+        result.Should().BeError(ErrorCode.EntityLocked, Resources.PasswordCredentialsApplication_AccountSuspended);
         _repository.Verify(rep => rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()),
             Times.Never);
         _recorder.Verify(rec => rec.AuditAgainst(It.IsAny<ICallContext>(), "auserid",
@@ -223,7 +223,7 @@ public class PasswordCredentialsApplicationSpec
         var result =
             await _application.AuthenticateAsync(_caller.Object, "ausername", "apassword", CancellationToken.None);
 
-        result.Should().BeError(ErrorCode.EntityExists, Resources.PasswordCredentialsApplication_AccountLocked);
+        result.Should().BeError(ErrorCode.EntityLocked, Resources.PasswordCredentialsApplication_AccountLocked);
         _repository.Verify(rep => rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()),
             Times.Never);
         _recorder.Verify(rec => rec.AuditAgainst(It.IsAny<ICallContext>(), "auserid",

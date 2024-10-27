@@ -32,12 +32,12 @@ public class ApiDocSpec
             .Be($"{StatusCode.NotFound.Title}: {Resources.HttpConstants_StatusCodes_Reason_NotFound}");
         responses["405"].Description.Should()
             .Be($"{StatusCode.MethodNotAllowed.Title}: {Resources.HttpConstants_StatusCodes_Reason_MethodNotAllowed}");
-
-        var conflictMessageText = conflictMessage.HasValue()
-            ? conflictMessage
-            : $"{StatusCode.Conflict.Title}: {Resources.HttpConstants_StatusCodes_Reason_Conflict}";
         responses["409"].Description.Should()
-            .Be(conflictMessageText);
+            .Be(conflictMessage.HasValue()
+                ? conflictMessage
+                : $"{StatusCode.Conflict.Title}: {Resources.HttpConstants_StatusCodes_Reason_Conflict}");
+        responses["423"].Description.Should()
+            .Be($"{StatusCode.Locked.Title}: {Resources.HttpConstants_StatusCodes_Reason_Locked}");
         responses["500"].Description.Should()
             .Be(
                 $"{StatusCode.InternalServerError.Title}: {Resources.HttpConstants_StatusCodes_Reason_InternalServerError}");
@@ -213,7 +213,7 @@ public class ApiDocSpec
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
             var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Get];
-            operation.Responses.Count.Should().Be(9);
+            operation.Responses.Count.Should().Be(10);
             VerifyGeneralErrorResponses(operation.Responses);
         }
     }
@@ -272,7 +272,7 @@ public class ApiDocSpec
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
             var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Post];
-            operation.Responses.Count.Should().Be(10);
+            operation.Responses.Count.Should().Be(11);
             VerifyGeneralErrorResponses(operation.Responses, "a custom conflict response");
         }
     }
@@ -331,7 +331,7 @@ public class ApiDocSpec
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
             var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Put];
-            operation.Responses.Count.Should().Be(10);
+            operation.Responses.Count.Should().Be(11);
             VerifyGeneralErrorResponses(operation.Responses, "a custom conflict response");
         }
     }
@@ -395,7 +395,7 @@ public class ApiDocSpec
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
             var operation = openApi!.Paths["/testingonly/openapi/{Id}/binary"].Operations[OperationType.Post];
-            operation.Responses.Count.Should().Be(9);
+            operation.Responses.Count.Should().Be(10);
             VerifyGeneralErrorResponses(operation.Responses);
         }
     }

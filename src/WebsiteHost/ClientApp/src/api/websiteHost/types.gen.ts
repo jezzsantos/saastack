@@ -78,10 +78,6 @@ export type RefreshTokenRequest = {
   [key: string]: unknown;
 };
 
-export type Void = {
-  [key: string]: unknown;
-};
-
 export type AuthenticateData = {
   body?: AuthenticateRequest;
 };

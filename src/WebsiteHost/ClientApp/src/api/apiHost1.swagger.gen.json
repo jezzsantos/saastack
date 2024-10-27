@@ -79,6 +79,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -227,6 +230,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -317,6 +323,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -419,6 +428,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -516,6 +528,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -664,6 +679,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -740,7 +758,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized: The client must authenticate itself to get the requested response"
+            "description": "The refresh token has expired"
           },
           "402": {
             "description": "Payment Required: The client must have payment information to get ther requested response"
@@ -756,6 +774,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "The user's account is suspended or disabled, and cannot be authenticated or used"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -839,6 +860,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -973,6 +997,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -1082,6 +1109,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -1189,6 +1219,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -1285,6 +1318,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -1386,6 +1422,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -1553,6 +1592,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -1652,6 +1694,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -1763,6 +1808,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -1863,6 +1911,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -2012,6 +2063,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -2124,6 +2178,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -2233,6 +2290,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -2402,6 +2462,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -2561,6 +2624,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -2664,6 +2730,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -2775,6 +2844,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -2876,6 +2948,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -2973,6 +3048,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -3112,6 +3190,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -3204,6 +3285,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -3298,6 +3382,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -3390,6 +3477,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -3538,6 +3628,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -3638,6 +3731,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -3747,6 +3843,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -3858,6 +3957,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -3968,6 +4070,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -4070,6 +4175,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -4183,6 +4291,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -4271,6 +4382,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -4372,6 +4486,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -4456,6 +4573,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -4538,6 +4658,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -4640,6 +4763,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -4741,6 +4867,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -4851,6 +4980,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -4969,6 +5101,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -5077,6 +5212,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -5177,6 +5315,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -5290,6 +5431,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -5393,6 +5537,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -5485,6 +5632,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -5579,6 +5729,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -5671,6 +5824,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -5770,6 +5926,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -5912,6 +6071,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -6024,6 +6186,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -6133,6 +6298,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -6258,6 +6426,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -6380,6 +6551,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -6480,6 +6654,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -6593,6 +6770,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -6703,6 +6883,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -6791,6 +6974,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -6893,6 +7079,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -6993,6 +7182,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -7096,6 +7288,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -7208,6 +7403,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -7357,6 +7555,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -7469,6 +7670,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -7578,6 +7782,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -7691,6 +7898,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -7790,7 +8000,10 @@
             "description": "The user has not yet verified their registration"
           },
           "409": {
-            "description": "The user's account is suspended or locked, and cannot be authenticated or used"
+            "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "The user's account is suspended or disabled, and cannot be authenticated or used"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -7896,6 +8109,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -7988,6 +8204,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -8082,6 +8301,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -8175,6 +8397,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -8267,6 +8492,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -8372,6 +8600,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -8467,6 +8698,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -8550,6 +8784,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -8643,6 +8880,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -8742,6 +8982,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -8839,6 +9082,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -8938,6 +9184,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -9034,7 +9283,10 @@
             "description": "Method Not Allowed: The request is not allowed by the current state of the resource"
           },
           "409": {
-            "description": "The user's account is suspended or locked, and cannot be authenticated or used"
+            "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "The user's account is suspended or disabled, and cannot be authenticated or used"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -9130,6 +9382,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -9231,6 +9486,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -9344,6 +9602,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -9454,6 +9715,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -9556,6 +9820,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -9725,6 +9992,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -9837,6 +10107,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -9947,6 +10220,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -10039,6 +10315,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -10127,6 +10406,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -10220,6 +10502,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -10303,6 +10588,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -10395,6 +10683,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -10498,6 +10789,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -10591,6 +10885,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -10675,6 +10972,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -10758,6 +11058,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -10852,6 +11155,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -10944,6 +11250,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -11058,6 +11367,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -11151,6 +11463,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -11234,6 +11549,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -11325,6 +11643,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -11441,6 +11762,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -11545,6 +11869,9 @@
           },
           "419": {
             "description": "a special response"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -11651,6 +11978,9 @@
           "419": {
             "description": "a special response"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -11755,6 +12085,9 @@
           },
           "419": {
             "description": "a special response"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -11879,6 +12212,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -11963,6 +12299,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -12034,6 +12373,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -12119,6 +12461,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -12202,6 +12547,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -12296,6 +12644,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -12388,6 +12739,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -12482,6 +12836,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -12573,6 +12930,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -12656,6 +13016,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -12750,6 +13113,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -12863,6 +13229,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -12965,6 +13334,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -13057,6 +13429,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -13155,6 +13530,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -13265,6 +13643,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -13374,6 +13755,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -13487,6 +13871,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -13596,6 +13983,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -13721,6 +14111,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -13843,6 +14236,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -13944,6 +14340,9 @@
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
           },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
+          },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
             "content": {
@@ -14035,6 +14434,9 @@
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
+          },
+          "423": {
+            "description": "Locked: The current resource is locked and cannot be accessed"
           },
           "500": {
             "description": "Internal Server Error: An unexpected error occured on the server, which should not have happened in normal operation",
@@ -16683,6 +17085,10 @@
             "type": "string",
             "nullable": true
           },
+          "buyerReference": {
+            "type": "string",
+            "nullable": true
+          },
           "canBeCanceled": {
             "type": "boolean"
           },
@@ -16710,10 +17116,6 @@
             "$ref": "#/components/schemas/SubscriptionStatus"
           },
           "subscriptionReference": {
-            "type": "string",
-            "nullable": true
-          },
-          "buyerReference": {
             "type": "string",
             "nullable": true
           }
@@ -17020,10 +17422,6 @@
             "$ref": "#/components/schemas/Invitation"
           }
         },
-        "additionalProperties": false
-      },
-      "Void": {
-        "type": "object",
         "additionalProperties": false
       }
     },

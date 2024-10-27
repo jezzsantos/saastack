@@ -11,6 +11,7 @@ function updateApis(serverName, swaggerUrl, targetDefinitionFile, targetFolder) 
       fs.copyFileSync(downloadFilename, targetDefinitionFile);
       formatLog("Replacing API definitions in ", targetDefinitionFile);
       generateApiServices(targetDefinitionFile, targetFolder);
+      fs.unlinkSync(downloadFilename);
     }
   });
 

@@ -120,6 +120,59 @@ public class AuthTokensApplicationSpec
     }
 
     [Fact]
+    public async Task WhenRefreshTokenAsyncAndNotAPerson_ThenReturnsError()
+    {
+        var user = new EndUserWithMemberships
+        {
+            Id = "anid",
+            Classification = EndUserClassification.Machine
+        };
+        var expiresOn1 = DateTime.UtcNow.AddMinutes(1);
+        var authTokens = AuthTokensRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId()).Value;
+        authTokens.SetTokens("anaccesstoken1", "arefreshtoken1", expiresOn1, expiresOn1);
+        _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(authTokens.ToOptional());
+        _endUsersService.Setup(eus =>
+                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        var result = await _application.RefreshTokenAsync(_caller.Object, "arefreshtoken1", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.NotAuthenticated);
+        _jwtTokensService.Verify(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()), Times.Never);
+        _repository.Verify(rep => rep.SaveAsync(It.IsAny<AuthTokensRoot>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenRefreshTokenAsyncAndSuspended_ThenReturnsError()
+    {
+        var user = new EndUserWithMemberships
+        {
+            Id = "anid",
+            Classification = EndUserClassification.Person,
+            Access = EndUserAccess.Suspended
+        };
+        var expiresOn1 = DateTime.UtcNow.AddMinutes(1);
+        var authTokens = AuthTokensRoot.Create(_recorder.Object, _idFactory.Object, "auserid".ToId()).Value;
+        authTokens.SetTokens("anaccesstoken1", "arefreshtoken1", expiresOn1, expiresOn1);
+        _repository.Setup(rep => rep.FindByRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(authTokens.ToOptional());
+        _endUsersService.Setup(eus =>
+                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        var result = await _application.RefreshTokenAsync(_caller.Object, "arefreshtoken1", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.EntityLocked, Resources.AuthTokensApplication_AccountSuspended);
+        _jwtTokensService.Verify(jts => jts.IssueTokensAsync(It.IsAny<EndUserWithMemberships>()), Times.Never);
+        _repository.Verify(rep => rep.SaveAsync(It.IsAny<AuthTokensRoot>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
     public async Task WhenRefreshTokenAsyncAndTokensExist_ThenReturnsRefreshedTokens()
     {
         var user = new EndUserWithMemberships

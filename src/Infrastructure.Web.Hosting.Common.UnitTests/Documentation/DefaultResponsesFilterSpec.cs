@@ -86,6 +86,7 @@ public class DefaultResponsesFilterSpec
         _operation.Responses["403"].Description.Should().EndWith(StatusCode.Forbidden.Reason);
         _operation.Responses["404"].Description.Should().EndWith(StatusCode.NotFound.Reason);
         _operation.Responses["409"].Description.Should().EndWith(StatusCode.Conflict.Reason);
+        _operation.Responses["423"].Description.Should().EndWith(StatusCode.Locked.Reason);
         _operation.Responses["500"].Description.Should().EndWith(StatusCode.InternalServerError.Reason);
     }
 

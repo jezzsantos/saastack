@@ -103,6 +103,19 @@ public class AuthTokensApplication : IAuthTokensApplication
         }
 
         var user = retrievedUser.Value;
+        if (user.Classification != EndUserClassification.Person)
+        {
+            return Error.NotAuthenticated();
+        }
+
+        if (user.Access == EndUserAccess.Suspended)
+        {
+            _recorder.AuditAgainst(caller.ToCall(), user.Id,
+                Audits.AuthTokensApplication_Refresh_AccountSuspended,
+                "User {Id} tried to refresh AuthTokens with a suspended account", user.Id);
+            return Error.EntityLocked(Resources.AuthTokensApplication_AccountSuspended);
+        }
+
         var issued = await _jwtTokensService.IssueTokensAsync(user);
         if (issued.IsFailure)
         {

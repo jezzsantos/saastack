@@ -41,6 +41,8 @@ public record StatusCode
 
     public static StatusCode InternalServerError => new(HttpStatusCode.InternalServerError);
 
+    public static StatusCode Locked => new(HttpStatusCode.Locked);
+
     public static StatusCode MethodNotAllowed => new(HttpStatusCode.MethodNotAllowed);
 
     public static StatusCode NoContent => new(HttpStatusCode.NoContent);

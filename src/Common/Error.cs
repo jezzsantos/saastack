@@ -154,6 +154,14 @@ public readonly struct Error
     }
 
     /// <summary>
+    ///     Creates a <see cref="ErrorCode.EntityLocked" /> error
+    /// </summary>
+    public static Error EntityLocked(string? message = null, Dictionary<string, object>? additionalData = null)
+    {
+        return new Error(ErrorCode.EntityLocked, message, additionalData);
+    }
+
+    /// <summary>
     ///     Creates a <see cref="ErrorCode.NotAuthenticated" /> error
     /// </summary>
     public static Error NotAuthenticated(string? message = null, Dictionary<string, object>? additionalData = null)
@@ -213,6 +221,7 @@ public enum ErrorCode
     PreconditionViolation, // the resource is not in a valid state to begin with
     EntityNotFound,
     EntityExists,
+    EntityLocked,
     EntityDeleted,
     NotAuthenticated,
     ForbiddenAccess,
