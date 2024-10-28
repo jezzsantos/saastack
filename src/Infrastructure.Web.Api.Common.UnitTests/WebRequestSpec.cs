@@ -1,9 +1,11 @@
+using System.Text.Json;
 using FluentAssertions;
 using Infrastructure.Web.Api.Interfaces;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
+using Moq;
 using Xunit;
 
 namespace Infrastructure.Web.Api.Common.UnitTests;
@@ -14,6 +16,14 @@ public class WebRequestSpec
     [Trait("Category", "Unit")]
     public class GivenAJsonRequest
     {
+        private readonly Mock<IServiceProvider> _serviceProvider;
+
+        public GivenAJsonRequest()
+        {
+            _serviceProvider = new Mock<IServiceProvider>();
+            _serviceProvider.Setup(sp => sp.GetService(typeof(JsonSerializerOptions)))
+                .Returns(JsonSerializerOptions.Default);
+        }
         [Fact]
         public async Task WhenBindAsyncAndEmptyHttpRequest_ThenReturnsInstance()
         {
@@ -23,7 +33,8 @@ public class WebRequestSpec
                 {
                     ContentType = HttpConstants.ContentTypes.Json,
                     Body = new MemoryStream("{}"u8.ToArray())
-                }
+                },
+                RequestServices = _serviceProvider.Object
             };
 
             var result = await TestRequest.BindAsync(context, null!);
@@ -49,7 +60,8 @@ public class WebRequestSpec
                         { nameof(TestRequest.ANumberProperty), "999" },
                         { nameof(TestRequest.AStringProperty), "avalue" }
                     })
-                }
+                },
+                RequestServices = _serviceProvider.Object
             };
 
             var result = await TestRequest.BindAsync(context, null!);
@@ -75,7 +87,8 @@ public class WebRequestSpec
                         { nameof(TestRequest.ANumberProperty), "999" },
                         { nameof(TestRequest.AStringProperty), "avalue" }
                     }
-                }
+                },
+                RequestServices = _serviceProvider.Object
             };
 
             var result = await TestRequest.BindAsync(context, null!);

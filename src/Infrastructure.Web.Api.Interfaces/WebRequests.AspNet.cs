@@ -1,7 +1,9 @@
 using System.ComponentModel;
 using System.Reflection;
+using System.Text.Json;
 using Common.Extensions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Web.Api.Interfaces;
 
@@ -26,11 +28,27 @@ public abstract partial class WebRequest<TRequest>
         }
         else
         {
-            var requestDto = await request.ReadFromJsonAsync<TRequest>();
+            var requestDto = await CreateFromJson(context);
             PopulateFromQueryStringValues(request, requestDto);
             PopulateFromRouteValues(request, requestDto);
             return requestDto;
         }
+    }
+
+    /// <summary>
+    ///     Returns the request DTO, populated from the JSON of the request, or an empty instance if the request has no JSON
+    ///     content
+    /// </summary>
+    private static async Task<TRequest?> CreateFromJson(HttpContext context)
+    {
+        var jsonOptions = context.RequestServices.GetRequiredService<JsonSerializerOptions>();
+        var request = context.Request;
+        if (request.HasJsonContentType())
+        {
+            return await request.ReadFromJsonAsync<TRequest>(jsonOptions);
+        }
+
+        return JsonSerializer.Deserialize<TRequest>("{}", jsonOptions);
     }
 
     /// <summary>
