@@ -3,12 +3,12 @@ import { AwsRecorder } from "./recorders/awsRecorder";
 import { NoOpRecorder } from "./recorders/noOpRecorder";
 
 export interface Recorder {
-  Crash: (error: Error, message?: string) => void;
-  Trace: (message: string, severityLevel: SeverityLevel) => void;
-  TraceDebug: (message: string) => void;
-  TraceInformation: (message: string) => void;
-  TrackPageView: (path: string) => void;
-  TrackUsage: (eventName: string, additional?: { [index: string]: any }) => void;
+  crash: (error: Error, message?: string) => void;
+  trace: (message: string, severityLevel: SeverityLevel) => void;
+  traceDebug: (message: string) => void;
+  traceInformation: (message: string) => void;
+  trackPageView: (path: string) => void;
+  trackUsage: (eventName: string, additional?: { [index: string]: any }) => void;
 }
 
 export const enum SeverityLevel {
@@ -21,34 +21,34 @@ export const enum SeverityLevel {
 class LazyLoadingRecorder implements Recorder {
   private recorder: Recorder | undefined = undefined;
 
-  Crash(error: Error, message?: string): void {
+  crash(error: Error, message?: string): void {
     this.ensureUnderlyingRecorder();
-    this.recorder?.Crash(error, message);
+    this.recorder?.crash(error, message);
   }
 
-  Trace(message: string, severityLevel: SeverityLevel): void {
+  trace(message: string, severityLevel: SeverityLevel): void {
     this.ensureUnderlyingRecorder();
-    this.recorder?.Trace(message, severityLevel);
+    this.recorder?.trace(message, severityLevel);
   }
 
-  TraceDebug(message: string): void {
+  traceDebug(message: string): void {
     this.ensureUnderlyingRecorder();
-    this.recorder?.TraceDebug(message);
+    this.recorder?.traceDebug(message);
   }
 
-  TraceInformation(message: string): void {
+  traceInformation(message: string): void {
     this.ensureUnderlyingRecorder();
-    this.recorder?.TraceInformation(message);
+    this.recorder?.traceInformation(message);
   }
 
-  TrackPageView(path: string): void {
+  trackPageView(path: string): void {
     this.ensureUnderlyingRecorder();
-    this.recorder?.TrackPageView(path);
+    this.recorder?.trackPageView(path);
   }
 
-  TrackUsage(eventName: string, additional: { [val: string]: any } | undefined): void {
+  trackUsage(eventName: string, additional?: { [val: string]: any } | undefined): void {
     this.ensureUnderlyingRecorder();
-    this.recorder?.TrackUsage(eventName, additional);
+    this.recorder?.trackUsage(eventName, additional);
   }
 
   private ensureUnderlyingRecorder() {

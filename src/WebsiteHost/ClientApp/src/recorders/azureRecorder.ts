@@ -20,8 +20,8 @@ if (applicationInsightsEnabled) {
 }
 
 export class AzureRecorder extends BrowserRecorder {
-  Crash(error: Error, message?: string): void {
-    super.Crash(error, message);
+  crash(error: Error, message?: string): void {
+    super.crash(error, message);
     if (!window.isTestingOnly) {
       appInsights.trackException({
         exception: error,
@@ -31,8 +31,8 @@ export class AzureRecorder extends BrowserRecorder {
     }
   }
 
-  Trace(message: string, severityLevel: SeverityLevel): void {
-    super.Trace(message, severityLevel);
+  trace(message: string, severityLevel: SeverityLevel): void {
+    super.trace(message, severityLevel);
     if (!window.isTestingOnly) {
       appInsights.trackTrace({
         message,
@@ -41,8 +41,8 @@ export class AzureRecorder extends BrowserRecorder {
     }
   }
 
-  TraceDebug(message: string): void {
-    super.TraceDebug(message);
+  traceDebug(message: string): void {
+    super.traceDebug(message);
     if (!window.isTestingOnly) {
       appInsights.trackTrace({
         message,
@@ -51,8 +51,8 @@ export class AzureRecorder extends BrowserRecorder {
     }
   }
 
-  TraceInformation(message: string): void {
-    super.TraceInformation(message);
+  traceInformation(message: string): void {
+    super.traceInformation(message);
     if (!window.isTestingOnly) {
       appInsights.trackTrace({
         message,
@@ -61,8 +61,8 @@ export class AzureRecorder extends BrowserRecorder {
     }
   }
 
-  TrackPageView(path: string): void {
-    super.TrackPageView(path);
+  trackPageView(path: string): void {
+    super.trackPageView(path);
     if (!window.isTestingOnly) {
       appInsights.trackPageView({
         name: path
@@ -70,8 +70,8 @@ export class AzureRecorder extends BrowserRecorder {
     }
   }
 
-  TrackUsage(eventName: string, additional: { [val: string]: any } | undefined): void {
-    super.TrackUsage(eventName, additional);
+  trackUsage(eventName: string, additional: { [val: string]: any } | undefined): void {
+    super.trackUsage(eventName, additional);
     if (!window.isTestingOnly) {
       appInsights.trackMetric({ name: eventName, average: 1 });
     }

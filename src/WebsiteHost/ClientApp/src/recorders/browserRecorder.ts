@@ -2,7 +2,7 @@ import { Recorder, SeverityLevel } from "../recorder";
 import { recordCrash, recordPageView, recordTrace, recordUse } from "../api/websiteHost";
 
 export abstract class BrowserRecorder implements Recorder {
-  Crash(error: Error, message?: string): void {
+  crash(error: Error, message?: string): void {
     if (window.isTestingOnly) {
       console.error(error, `SaaStack: Crash: ${message}: ${error.message}, ${error.stack}`);
     }
@@ -13,7 +13,7 @@ export abstract class BrowserRecorder implements Recorder {
     });
   }
 
-  Trace(message: string, severityLevel: SeverityLevel): void {
+  trace(message: string, severityLevel: SeverityLevel): void {
     if (window.isTestingOnly) {
       console.log(`SaaStack: Trace:${severityLevel}: ${message}`);
     }
@@ -26,15 +26,15 @@ export abstract class BrowserRecorder implements Recorder {
     });
   }
 
-  TraceDebug(message: string): void {
-    this.Trace(message, SeverityLevel.Debug);
+  traceDebug(message: string): void {
+    this.trace(message, SeverityLevel.Debug);
   }
 
-  TraceInformation(message: string): void {
-    this.Trace(message, SeverityLevel.Information);
+  traceInformation(message: string): void {
+    this.trace(message, SeverityLevel.Information);
   }
 
-  TrackPageView(path: string): void {
+  trackPageView(path: string): void {
     recordPageView({
       body: {
         path
@@ -46,7 +46,7 @@ export abstract class BrowserRecorder implements Recorder {
     }
   }
 
-  TrackUsage(eventName: string, additional: { [val: string]: any } | undefined): void {
+  trackUsage(eventName: string, additional: { [val: string]: any } | undefined): void {
     recordUse({
       body: {
         eventName,

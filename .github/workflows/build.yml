@@ -26,14 +26,20 @@ jobs:
           dotnet-version: ${{env.DOTNET_VERSION}}
       - name: Restore dependencies
         run: dotnet restore "${{env.SOLUTION_PATH}}"
-      - name: Build for Azure Testing
+      - name: Build (Backend) for Azure Testing
         run: dotnet build --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAZURE
-      - name: Build for AWS Testing
+      - name: Build (Backend) for AWS Testing
         run: dotnet build --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAWS
-      - name: Build for Azure Deploy
+      - name: Build (Backend) for Azure Deploy
         run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAZURE
-      - name: Build for AWS Deploy
+      - name: Build (Backend) for AWS Deploy
         run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAWS
+      - name: Build WebsiteHost (FrontEnd)
+        run: |
+          cd src/WebsiteHost/ClientApp
+          cp .env.example .env
+          npm ci --cache .npm --prefer-offline
+          npm run build:releasefordeploy
   test:
     runs-on: windows-latest
     timeout-minutes: 15
@@ -47,7 +53,7 @@ jobs:
         run: dotnet restore "${{env.SOLUTION_PATH}}"
       - name: Build for CI Testing (for Azure)
         run: dotnet build --configuration ${{env.TESTINGONLY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAZURE
-      - name: Unit Test
+      - name: Unit Test (Backend)
         continue-on-error: false
         run: >
           dotnet test --no-build --verbosity normal
@@ -56,7 +62,7 @@ jobs:
           --logger:"trx"
           --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
           --test-adapter-path:. "${{env.SOLUTION_PATH}}"
-      - name: Integration Test
+      - name: Integration Test (Backend)
         continue-on-error: true
         run: >
           dotnet test --no-build --verbosity normal
@@ -65,6 +71,14 @@ jobs:
           --logger:"trx"
           --logger:"junit;LogFileName={assembly}.junit.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
           --test-adapter-path:. "${{env.SOLUTION_PATH}}"
+      - name: Test WebsiteHost (FrontEnd)
+        continue-on-error: false
+        run: |
+          cd src/WebsiteHost/ClientApp
+          cp .env.example .env
+          npm ci --cache .npm --prefer-offline
+          npm run build:releasefordeploy
+          npm run test:ci
       - name: Testing Report
         uses: dorny/test-reporter@v1.7.0
         if: success() || failure()

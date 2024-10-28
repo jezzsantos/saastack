@@ -2,27 +2,27 @@ import { SeverityLevel } from "../recorder";
 import { BrowserRecorder } from "./browserRecorder";
 
 export class AwsRecorder extends BrowserRecorder {
-  Crash(error: Error, message?: string): void {
-    super.Crash(error, message);
+  crash(error: Error, message?: string): void {
+    super.crash(error, message);
   }
 
-  Trace(message: string, severityLevel: SeverityLevel): void {
-    super.Trace(message, severityLevel);
+  trace(message: string, severityLevel: SeverityLevel): void {
+    super.trace(message, severityLevel);
   }
 
-  TraceDebug(message: string): void {
-    super.TraceDebug(message);
+  traceDebug(message: string): void {
+    super.traceDebug(message);
   }
 
-  TraceInformation(message: string): void {
-    super.TraceInformation(message);
+  traceInformation(message: string): void {
+    super.traceInformation(message);
   }
 
-  TrackPageView(path: string): void {
-    super.TrackPageView(path);
+  trackPageView(path: string): void {
+    super.trackPageView(path);
   }
 
-  TrackUsage(eventName: string, additional: { [val: string]: any } | undefined): void {
-    super.TrackUsage(eventName, additional);
+  trackUsage(eventName: string, additional: { [val: string]: any } | undefined): void {
+    super.trackUsage(eventName, additional);
   }
 }

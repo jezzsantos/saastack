@@ -146,8 +146,8 @@ You need to create your own version of the `.env` file on your computer (not sou
 
 1. Copy the `src/WebsiteHost/ClientApp/.env.example` to `src/WebsiteHost/ClientApp/.env`.
 
-> DO NOT add this file `.env` to source control!  This files exists locally for security purposes, and in order to have
-> the right environment variables in place when running and testing the JS App.
+> DO NOT add this file
+`.env` to source control!  This files exists locally for security purposes, and in order to have the right environment variables in place when running and testing the JS App.
 
 # Build & Deploy
 
