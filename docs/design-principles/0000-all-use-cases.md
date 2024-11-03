@@ -16,11 +16,9 @@ Legend:
 
 * <sup>OPS</sup> denotes a support API that is only accessible to operations team of the platform
 
-### Cars (Sample)
+### Cars
 
-> This is sample subdomain, and is expected to be deleted when this product goes to production
-
-1. Register a new car <sup>$$$</sup>
+1. Register a new car <sup>$$</sup>
 2. Delete a car <sup>$$$</sup>
 3. Schedule the car for "maintenance" <sup>$$$</sup>
 4. Take a car "offline" <sup>$$$</sup>
@@ -29,9 +27,7 @@ Legend:
 7. Find all the cars on the platform <sup>$$$</sup>
 8. Find all the available cars for a specific time frame <sup>$$$</sup>
 
-### Bookings (Sample)
-
-> This is sample subdomain, and is expected to be deleted when this product goes to production
+### Bookings
 
 1. Make a booking for a specific car and time frame <sup>$$$</sup>
 2. Cancel an existing booking <sup>$$$</sup>
@@ -109,7 +105,7 @@ These are the end users on the platform.
 5. Guest verifies an invitation is still valid
 6. Change the default organization for the current (Authenticated) user <sup>$$$</sup>
 7. List all memberships of the current (Authenticated) user
-8. Inspect a specific user <sup>TSTO</sup>
+8. Inspect a specifc user <sup>TSTO</sup>
 
 ### Identities
 
@@ -138,7 +134,7 @@ Machines are the way that non-human entities can operate on the platform.
 
 Is the way a user can authenticate with the platform using a username and password.
 
-1. Authenticate the current user (with a password)
+1. Authenticate the current user (with a password), may include a second factor (i.e. MFA)
 2. Register a new person (with a password and with optional invitation)
 3. Confirm registration of a person (from email)
 4. Initiate a password reset
@@ -147,9 +143,21 @@ Is the way a user can authenticate with the platform using a username and passwo
 7. Reset password
 8. Fetch the registration confirmation token <sup>TSTO</sup>
 
+#### MFA
+
+Is the way you can use one or more second factors for authenticating with the platform for password protected accounts (above)
+
+1. Enable or disable MFA for the current user
+2. Associate a second factor authenticator for use in authentication (e.g., OOB-SMS, OOB-Email, or TOTP for authenticator apps)
+3. Complete the association to an authenticator, and authenticate
+4. Disassociate a second factor authenticator <sup>$$$</sup>
+5. List the associated MFA authenticators
+6. Challenge with an associated authenticator
+7. Verify with an associated authenticator, and authenticate
+
 #### Single-Sign On
 
-Is the way that a user can authenticate with the platform using an external OAuth2 provider (like Google, Facebook, etc.)
+Is the way that a user can authenticate with the platform using an external OAuth2 provider (like with: Microsoft, Google, Facebook, etc.)
 
 1. Authenticate and (auto-register) a person from another OAuth2 provider (with an optional invitation)
 
@@ -184,7 +192,7 @@ Organizations are the primary way that users are grouped together on the platfor
 Event Notifications are the way that subdomains can listen to each other in a loosely-coupled way. A "producing" subdomain produces "domain_events" which are stored on a message bus. This API provides an endpoint to consume those "domain_events".
 
 1. Handle a domain_event published to a message bus <sup>SVC</sup>
-2. Find all delivered domain_events <sup>TSTO</sup>
+2. Find all delvered domain_events <sup>TSTO</sup>
 3. Deliver all pending domain_events <sup>TSTO</sup>
 
 ### Subscriptions
@@ -225,7 +233,7 @@ These are the main use cases of this product that are exposed via "public" APIs 
 `WebsiteHost`.
 
 > In many cases, these API calls are made from a JavaScript client and are forwarded to the Backend APIs.
-> Most of these APIs are protected by CSRF protection, and only accessible to the JavaScript application
+> Most of these API's are protected by CSRF protection, and only accessible to the JavaScript application
 
 ### Health
 

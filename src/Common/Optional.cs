@@ -7,6 +7,7 @@ namespace Common;
 /// <summary>
 ///     Provides shortcuts for <see cref="Optional{T}" />
 /// </summary>
+[DebuggerStepThrough]
 public static class Optional
 {
     /// <summary>
@@ -189,6 +190,7 @@ public static class Optional
 ///     Provides an optional type that combines a <see cref="Value" /> and a <see cref="HasValue" /> which indicates
 ///     whether or not the <see cref="Value" /> is meaningful.
 /// </summary>
+[DebuggerStepThrough]
 public readonly struct Optional<TValue> : IEquatable<Optional<TValue>>
 {
     public const string NoValueStringValue = nameof(None);

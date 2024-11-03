@@ -1,9 +1,11 @@
+using Common;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.APIKeys;
 using Domain.Events.Shared.Identities.AuthTokens;
 using Domain.Events.Shared.Identities.PasswordCredentials;
 using Domain.Events.Shared.Identities.SSOUsers;
 using Domain.Shared;
+using Domain.Shared.Identities;
 using Created = Domain.Events.Shared.Identities.AuthTokens.Created;
 using TokensChanged = Domain.Events.Shared.Identities.SSOUsers.TokensChanged;
 
@@ -72,11 +74,13 @@ public static class Events
         }
 
         public static Domain.Events.Shared.Identities.PasswordCredentials.Created Created(Identifier id,
-            Identifier userId)
+            Identifier userId, MfaOptions mfaOptions)
         {
             return new Domain.Events.Shared.Identities.PasswordCredentials.Created(id)
             {
-                UserId = userId
+                UserId = userId,
+                IsMfaEnabled = mfaOptions.IsEnabled,
+                MfaCanBeDisabled = mfaOptions.CanBeDisabled
             };
         }
 
@@ -85,6 +89,125 @@ public static class Events
             return new CredentialsChanged(id)
             {
                 PasswordHash = passwordHash
+            };
+        }
+
+        public static MfaAuthenticationInitiated MfaAuthenticationInitiated(Identifier id,
+            Identifier userId, MfaOptions mfaOptions)
+        {
+            return new MfaAuthenticationInitiated(id)
+            {
+                UserId = userId,
+                AuthenticationToken = mfaOptions.AuthenticationToken.ValueOrDefault!,
+                AuthenticationExpiresAt = mfaOptions.AuthenticationTokenExpiresAt.ValueOrDefault
+            };
+        }
+
+        public static MfaAuthenticatorAdded MfaAuthenticatorAdded(Identifier id,
+            Identifier userId, MfaAuthenticatorType type, bool isActive)
+        {
+            return new MfaAuthenticatorAdded(id)
+            {
+                UserId = userId,
+                Type = type,
+                AuthenticatorId = null,
+                IsActive = isActive
+            };
+        }
+
+        public static MfaAuthenticatorAssociated MfaAuthenticatorAssociated(Identifier id,
+            MfaAuthenticator authenticator, Optional<string> oobCode, Optional<string> barCodeUri,
+            Optional<string> secret, Optional<string> oobChannel)
+        {
+            return new MfaAuthenticatorAssociated(id)
+            {
+                UserId = authenticator.UserId.Value,
+                AuthenticatorId = authenticator.Id,
+                Type = authenticator.Type,
+                OobChannelValue = oobChannel,
+                OobCode = oobCode,
+                BarCodeUri = barCodeUri,
+                Secret = secret
+            };
+        }
+
+        public static MfaAuthenticatorChallenged MfaAuthenticatorChallenged(Identifier id,
+            MfaAuthenticator authenticator, Optional<string> oobCode, Optional<string> barCodeUri,
+            Optional<string> secret, Optional<string> oobChannel)
+        {
+            return new MfaAuthenticatorChallenged(id)
+            {
+                UserId = authenticator.UserId.Value,
+                AuthenticatorId = authenticator.Id,
+                Type = authenticator.Type,
+                OobChannelValue = oobChannel,
+                OobCode = oobCode,
+                BarCodeUri = barCodeUri,
+                Secret = secret
+            };
+        }
+
+        public static MfaAuthenticatorConfirmed MfaAuthenticatorConfirmed(Identifier id,
+            MfaAuthenticator authenticator, Optional<string> oobCode, Optional<string> confirmationCode,
+            Optional<string> verifiedState)
+        {
+            return new MfaAuthenticatorConfirmed(id)
+            {
+                UserId = authenticator.UserId.Value,
+                AuthenticatorId = authenticator.Id,
+                Type = authenticator.Type,
+                IsActive = true,
+                OobCode = oobCode,
+                ConfirmationCode = confirmationCode,
+                VerifiedState = verifiedState
+            };
+        }
+
+        public static MfaAuthenticatorVerified MfaAuthenticatorVerified(Identifier id,
+            MfaAuthenticator authenticator, Optional<string> oobCode, Optional<string> confirmationCode,
+            Optional<string> verifiedState)
+        {
+            return new MfaAuthenticatorVerified(id)
+            {
+                UserId = authenticator.UserId.Value,
+                AuthenticatorId = authenticator.Id,
+                Type = authenticator.Type,
+                OobCode = oobCode,
+                ConfirmationCode = confirmationCode,
+                VerifiedState = verifiedState
+            };
+        }
+
+        public static MfaAuthenticatorRemoved MfaAuthenticatorRemoved(Identifier id,
+            Identifier userId, MfaAuthenticator authenticator)
+        {
+            return new MfaAuthenticatorRemoved(id)
+            {
+                UserId = authenticator.UserId.Value,
+                AuthenticatorId = authenticator.Id,
+                Type = authenticator.Type
+            };
+        }
+
+        public static MfaOptionsChanged MfaOptionsChanged(Identifier id,
+            Identifier userId, MfaOptions mfaOptions)
+        {
+            return new MfaOptionsChanged(id)
+            {
+                UserId = userId,
+                IsEnabled = mfaOptions.IsEnabled,
+                CanBeDisabled = mfaOptions.CanBeDisabled
+            };
+        }
+
+        public static MfaStateReset MfaStateReset(Identifier id,
+            Identifier userId, MfaOptions mfaOptions)
+        {
+            return new MfaStateReset(id)
+            {
+                UserId = userId,
+                IsEnabled = mfaOptions.IsEnabled,
+                CanBeDisabled = mfaOptions.CanBeDisabled
             };
         }
 

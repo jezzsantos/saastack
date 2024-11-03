@@ -49,16 +49,6 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
-<<<<<<<< HEAD:iac/AzureSQLServer-Seed-Eventing-Generic.sql
-========
-          WHERE object_id = OBJECT_ID(N'[dbo].[Car]')
-            AND type in (N'U'))
-    DROP TABLE [dbo].[Car]
-GO
-
-IF EXISTS(SELECT *
-          FROM sys.objects
->>>>>>>> ca4fe6b (Split SQL seed files):iac/AzureSQLServer-ReadModels-Seed.sql
           WHERE object_id = OBJECT_ID(N'[dbo].[DomainEvent]')
             AND type in (N'U'))
     DROP TABLE [dbo].[DomainEvent]
@@ -97,6 +87,13 @@ IF EXISTS(SELECT *
           WHERE object_id = OBJECT_ID(N'[dbo].[Membership]')
             AND type in (N'U'))
     DROP TABLE [dbo].[Membership]
+GO
+
+IF EXISTS(SELECT *
+          FROM sys.objects
+          WHERE object_id = OBJECT_ID(N'[dbo].[MfaAuthenticator]')
+            AND type in (N'U'))
+    DROP TABLE [dbo].[MfaAuthenticator]
 GO
 
 IF EXISTS(SELECT *
@@ -246,42 +243,6 @@ CREATE INDEX UserId
          [UserId]
             );
 
-<<<<<<<< HEAD:iac/AzureSQLServer-Seed-Eventing-Generic.sql
-========
-CREATE TABLE [dbo].[Car]
-(
-    [Id]                  [nvarchar](100) NOT NULL,
-    [LastPersistedAtUtc]  [datetime]      NULL,
-    [IsDeleted]           [bit]           NULL,
-    [LicenseJurisdiction] [nvarchar](max) NULL,
-    [LicenseNumber]       [nvarchar](max) NULL,
-    [ManagerIds]          [nvarchar](max) NULL,
-    [ManufactureMake]     [nvarchar](max) NULL,
-    [ManufactureModel]    [nvarchar](max) NULL,
-    [ManufactureYear]     [int]           NULL,
-    [OrganizationId]      [nvarchar](100) NULL,
-    [Status]              [nvarchar](100) NULL,
-    [VehicleOwnerId]      [nvarchar](100) NULL,
-) ON [PRIMARY]
-GO
-
-CREATE INDEX Id
-    ON [dbo].[Car]
-        (
-         [Id]
-            );
-CREATE INDEX OrganizationId
-    ON [dbo].[Car]
-        (
-         [OrganizationId]
-            );
-CREATE INDEX Status
-    ON [dbo].[Car]
-        (
-         [Status]
-            );
-
->>>>>>>> ca4fe6b (Split SQL seed files):iac/AzureSQLServer-ReadModels-Seed.sql
 CREATE TABLE [dbo].[DomainEvent]
 (
     [Id]                 [nvarchar](100) NOT NULL,
@@ -436,6 +397,30 @@ CREATE INDEX Id
          [Id]
             );
 
+CREATE TABLE [dbo].[MfaAuthenticator]
+(
+    [Id]                    [nvarchar](100) NOT NULL,
+    [LastPersistedAtUtc]    [datetime]      NULL,
+    [IsDeleted]             [bit]           NULL,
+    [BarCodeUri]            [nvarchar](max) NULL,
+    [VerifiedState]         [nvarchar](max) NULL,
+    [IsActive]              [bit]           NULL,
+    [State]                 [nvarchar](max) NULL,
+    [OobChannelValue]       [nvarchar](max) NULL,
+    [OobCode]               [nvarchar](max) NULL,
+    [PasswordCredentialId]  [nvarchar](100) NULL,
+    [Secret]                [nvarchar](max) NULL,
+    [Type]                  [nvarchar](max) NULL,
+    [UserId]                [nvarchar](100) NULL,
+) ON [PRIMARY]
+GO
+
+CREATE INDEX Id
+    ON [dbo].[MfaAuthenticator]
+        (
+         [Id]
+            );
+
 CREATE TABLE [dbo].[Organization]
 (
     [Id]                    [nvarchar](100) NOT NULL,
@@ -468,6 +453,10 @@ CREATE TABLE [dbo].[PasswordCredential]
     [LastPersistedAtUtc]            [datetime]      NULL,
     [IsDeleted]                     [bit]           NULL,
     [AccountLocked]                 [bit]           NULL,
+    [IsMfaEnabled]                  [bit]           NULL,
+    [MfaAuthenticationExpiresAt]    [datetime]      NULL,
+    [MfaAuthenticationToken]        [nvarchar](max) NULL,
+    [MfaCanBeDisabled]              [bit]           NULL,
     [PasswordResetToken]            [nvarchar](450) NULL,
     [RegistrationVerificationToken] [nvarchar](max) NULL,
     [RegistrationVerified]          [bit]           NULL,
@@ -496,6 +485,11 @@ CREATE INDEX UserName
     ON [dbo].[PasswordCredential]
         (
          [UserName]
+            );
+CREATE INDEX MfaAuthenticationToken
+    ON [dbo].[PasswordCredential]
+        (
+         [MfaAuthenticationToken]
             );
 
 CREATE TABLE [dbo].[ProjectionCheckpoints]

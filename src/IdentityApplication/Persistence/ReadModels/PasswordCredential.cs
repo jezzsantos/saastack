@@ -9,6 +9,14 @@ public class PasswordCredential : ReadModelEntity
 {
     public Optional<bool> AccountLocked { get; set; }
 
+    public Optional<bool> IsMfaEnabled { get; set; }
+
+    public Optional<DateTime> MfaAuthenticationExpiresAt { get; set; }
+
+    public Optional<string> MfaAuthenticationToken { get; set; }
+
+    public Optional<bool> MfaCanBeDisabled { get; set; }
+
     public Optional<string> PasswordResetToken { get; set; }
 
     public Optional<string> RegistrationVerificationToken { get; set; }

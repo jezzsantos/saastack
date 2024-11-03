@@ -26,6 +26,7 @@ public static class UsageConstants
         public const string DefaultOrganizationId = "DefaultOrganizationId";
         public const string Duration = "Duration";
         public const string EmailAddress = "EmailAddress";
+        public const string Enabled = "Enabled";
         public const string EndPoint = "EndPoint";
         public const string HttpMethod = "Method";
         public const string HttpPath = "Path";
@@ -34,6 +35,7 @@ public static class UsageConstants
         public const string Id = "ResourceId";
         public const string IpAddress = "IpAddress";
         public const string MetricEventName = "Metric";
+        public const string MfaAuthenticatorType = "MfaAuthenticatorType";
         public const string Name = "Name";
         public const string Ownership = "Ownership";
         public const string Path = "Path";
@@ -77,6 +79,11 @@ public static class UsageConstants
                 public const string UserLogin = "User Login";
                 public const string UserLogout = "User Logout";
                 public const string UserPasswordForgotten = "User Password Forgotten";
+                public const string UserPasswordMfaAuthenticated = "User 2FA Login";
+                public const string UserPasswordMfaAssociationStarted = "User MFA Association Started";
+                public const string UserPasswordMfaChallenge = "User MFA Challenge";
+                public const string UserPasswordMfaDisassociated = "User MFA Disassociated";
+                public const string UserPasswordMfaEnabled = "User MFA Enabled";
                 public const string UserPasswordReset = "User Password Reset";
                 public const string UserProfileChanged = "User Profile Updated";
             }

@@ -49,6 +49,544 @@ When passwords are verified in a login attempt, the authentication process intro
 
 Since password credentials include email addresses, these emails addresses, and passwords require resetting, it is important to confirm that the email address is accessible by a human end-user to manage future communications.
 
+### Multi-Factor Authentication
+
+MFA or 2FA (Two Factor Auth) is only applicable to credential based authentication systems (e.g., those that manage usernames and passwords).
+
+> It does not apply to SSO, HMAC or APIKey authentication mechanisms.
+
+The main idea behind 2FA is to introduce a second "factor" to identify a specific person, since a human having only "Something You Know" like a password (or pin number), is easily compromised (i.e., with social engineering attacks, or poor password management behaviors).
+
+Having a second "factor" introduces some certainty of one of the following: "Something You Have", "Something You Are", "Somewhere You Are", or "Something You Do".
+
+> See this [OWASP cheatsheet](https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html) for more information.
+
+There is now good support for 2FA, using the following built-in second factors:
+
+* TOTP Authenticator App - You typically scan a bar code form a website, and use an authenticator app on your mobile device that generates an one-time, time-based secret code (lasting only 30 seconds) and you copy and paste it into the website.
+* OOB SMS messages - Your mobile phone is sent a SMS text message containing a 6-digit code that you enter into the website.
+* OOB Email messages - You are sent an email message containing a 6-digit code that you enter into the website.
+
+> These second factors are backed up by 16 recovery codes, should the user lose access to their mobile device, access to their authenticator app or access to their email inbox.
+
+#### How it works
+
+MFA can be enforced, by default, for all new users of the product, or it can be allowed/disallowed to be turned on/off by individual users.
+
+> See the `MfaOptions` in the  `PasswordCredentialRoot` for these default settings.
+
+When MFA is enabled, users will fail to complete authenticate with just their username + password. instead, they will receive a
+`HTTP 403 - Forbidden` error containing the message
+`mfa_required`. This response means that the authentication has partially succeeded, but a second factor is required to complete the authentication. The error response will contain a value for a:
+`MfaToken` that will need to be used to authenticate the user with their chosen second factor, in subsequent API calls.
+
+Whether the user has already set up a second factor or not, they will receive this error, and it at this point that they can either set up a second factor, or be challenged by the second factor they already set up in a previous authentication attempt.
+
+The response will look like this:
+
+```    
+POST /passwords/auth
+
+HTTP 403
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+  "title": "mfa_required",
+  "status": 403,
+  "detail": "Authentication requires another factor\"",
+  "MfaToken": "oZJUUJxElejxHESgiGryfP7YlqUmdMSH3jyKr6804R0"
+}
+```
+
+At this point, the client (i.e., web app) will need to request for the available second factors to challenge.
+
+It will issue this request, and receive a list of "authenticators" to challenge:
+
+``` 
+GET /passwords/mfa/authenticators
+
+HTTP 200 
+{
+    "authenticators": [
+        {
+          "isActive": true,
+          "type": "recoveryCodes",
+          "id": "mfaauth_NWa2wP0iXUi3bcbOcfJog"
+        },
+        {
+          "isActive": true,
+          "type": "totpAuthenticator",
+          "id": "mfaauth_bkmOn7kPX0ifxWoMxZrSiA"
+        },
+        {
+          "isActive": false,
+          "type": "oobSms",
+          "id": "mfaauth_3J8f0guUGj9bmNXKzDg"
+        },
+        {
+          "isActive": true,
+          "type": "oobEmail",
+          "id": "mfaauth_wgg5K3E4H0i82MBKfI1kMQ"
+        }
+      ]
+}
+```
+
+If this list of authenticators above is empty, then a second factor needs to be "associated" now.
+
+If this list of authenticators contains any authenticators that are `IsActive == true` (other than
+`type == recoveryCodes`) then the client needs to give the user the choice to challenge one of those authenticators.
+
+It works likes this:
+
+1. The first time the user is authenticated, after enabling MFA, the user will have 10mins to complete the association of a second factor. If this time elapses, the user will be required to authenticate from the start again (where they need to give their username + password again). An
+   `HTTP 401 - Unauthorized` be be received during the association process.
+   1. The user can only complete the association of one "authenticator" (i.e., one OTP, OOB authenticator) at this time. By completing the association of the first authenticator, they will be authenticated at that moment. If the user wishes to add more "authenticators", they can do so, once they are authenticated. Typically in their "account settings" user interface.
+   2. To complete the association of an authenticator it is always a two-step process. The client must first request to "associate" the authenticator, and this will give the user instructions to complete to setup the second factor, and then after that the client must "confirm" the association, with the input from the user (sent over whatever channel, e.g., mobile phone, email or authenticator app).
+   3. When associating the first "authenticator" the client will receive a set of 16 recovery codes in the first step. The client MUST display those recovery codes to the user, and the user SHOULD be strongly advised to make a permanent note of them for later, should they need them to authenticate if they lose access to their second factor.
+   4. During the first "associate" step, the client can allow the user to modify their association (e.g., correct an incorrect phone number).
+   5. Once the "confirm" step is complete, the second factor cannot be modified. The user will be authenticated at this point in time, and can go into their "account settings" user interface to either delete the second factor association or add others.
+2. If this is not the users first time through this authentication process, they will already have at least on authenticator associated at this time (authenticators that have
+   `IsActive == true`).
+   1. The client can offer the user to choose from the active authenticators, but then MUST challenge that authenticator, and the user must answer the challenge (or select one other active authenticator).
+   2. The user cannot associate a new authenticator at this point in time (this would be a serious vulnerability).
+   3. Depending on the user's choices, they will be given the relevant instructions to either associate or challenge one of the follow authenticators.
+
+##### Associating a Second Factor
+
+Associating a second factor, during authentication, is only necessary when the user has not already associated any second factors.
+
+![MFA Associate](../images/Authentication-MFA-Associate.png)
+
+At this point the client will need to offer to the user a choice to "associate" one of the available second factors below:
+
+###### TOTP Authenticator
+
+If the user chooses to use an Authenticator App, then they are choosing the
+`TOTP Authenticator` option, which is a time-based one-time password.
+
+This method uses an Authenticator App (e.g. Microsoft, Google, etc), typically installed on a mobile device.
+
+The client will need to make this request:
+
+```
+POST /passwords/mfa/authenticators
+{
+  "MfaToken": "{{mfa_token}}",
+  "Type": "TotpAuthenticator"
+}
+```
+
+and get a response like this:
+
+```
+HTTP 200
+{
+  "authenticator": {
+    "barCodeUri": "otpauth://totp/SaaStack:auser@company.com?secret=ET77VTFQS4NHGZ1G&issuer=SaaStack&algorithm=SHA1&digits=6&period=30",
+    "recoveryCodes": [
+      "3b54fd93",
+      "f041820d",
+      "92a42776", up to 16 recovery codes
+    ],
+    "secret": "ET77VTFQS4NHGZ1G",
+    "type": "totpAuthenticator"
+  }
+}
+```
+
+At this point, the client will need to render the
+`barCodeUri` in the user interface, and instruct the user to open their Authenticator app on their mobile device, and scan it with their Authenticator App.
+
+The client can also offer to display the
+`secret`, if the user needs to input it manually into their Authenticator app, in the case where the bar code scanner is not working.
+
+Once configured in their Authenticator App, the user will see a revolving 6-digit code (every 30secs), they will need to copy and paste that code back into the user interface and the client will issue this request:
+
+``` 
+PUT /passwords/mfa/authenticators/TotpAuthenticator/confirm
+{
+  "MfaToken": "{{mfa_token}}",
+  "ConfirmationCode": "123456"
+}
+```
+
+If successful, the response will be:
+
+```
+HTTP 200
+{
+  "tokens": {
+    "accessToken": {
+      "expiresOn": "2024-11-24T00:24:14.7736408Z",
+      "type": "accessToken",
+      "value": "eyJhbGciOiJodHRwOi8vd3d3L..."
+    },
+    "refreshToken": {
+      "expiresOn": "2024-12-08T00:09:14.7736415Z",
+      "type": "refreshToken",
+      "value": "XZ31YG9lY85_Of1_hb3rJhCh0jIVG7WudpqsqIqeuvI"
+    },
+    "userId": "user_jTGSLJFnyUGUJ4aD9AU5iQ"
+  }
+}
+```
+
+###### Out of Band SMS
+
+If the user chooses to use their mobile phone device, then they are choosing the
+`SMS OOB` option, the client will need to make this request:
+
+```
+POST /passwords/mfa/authenticators
+{
+  "MfaToken": "{{mfa_token}}",
+  "Type": "OobSms",
+  "PhoneNumber": "+6498876986"
+}
+```
+
+> Note: the `PhoneNumber` in this request is necessary if the user has not provided a phone number in their
+`UserProfile` already, otherwise if blank, their
+`UserProfile.PhoneNumber` will be used. Unfortunately, there is no way at this point in time for the client to know that in advance.
+
+and get a response like this:
+
+```
+HTTP 200
+{
+  "authenticator": {
+    "oobCode": "vPRoGCB6FEmQ-sXbsIFL5Xzi2B8wl2v7vcuTsR5XqyU",
+    "type": "oobSms"
+  }
+}
+```
+
+Shortly, the user will receive an SMS message that will contain a secret code in the body of the text message, which they will need to copy and paste back into the user interface, and the client will issue this request:
+
+``` 
+PUT /passwords/mfa/authenticators/OobSms/confirm
+{
+  "MfaToken": "{{mfa_token}}",
+  "OobCode": "{{oob_code}}",
+  "ConfirmationCode": "123456"
+}
+```
+
+If successful, the response will be:
+
+```
+HTTP 200
+{
+  "tokens": {
+    "accessToken": {
+      "expiresOn": "2024-11-24T00:24:14.7736408Z",
+      "type": "accessToken",
+      "value": "eyJhbGciOiJodHRwOi8vd3d3L..."
+    },
+    "refreshToken": {
+      "expiresOn": "2024-12-08T00:09:14.7736415Z",
+      "type": "refreshToken",
+      "value": "XZ31YG9lY85_Of1_hb3rJhCh0jIVG7WudpqsqIqeuvI"
+    },
+    "userId": "user_jTGSLJFnyUGUJ4aD9AU5iQ"
+  }
+}
+```
+
+###### Out of Band Email
+
+If the user chooses to use their email, then they are choosing the
+`Email OOB` option, the client will need to make this request:
+
+```
+POST /passwords/mfa/authenticators
+{
+  "MfaToken": "{{mfa_token}}",
+  "Type": "OobEmail",
+}
+```
+
+> Note: there is no input required for the `EmailAddress` in this request. By default, the users email address in their
+`UserProfile` is used.
+
+and get a response like this:
+
+```
+HTTP 200
+{
+  "authenticator": {
+    "oobCode": "vPRoGCB6FEmQ-sXbsIFL5Xzi2B8wl2v7vcuTsR5XqyU",
+    "type": "oobEmail"
+  }
+}
+```
+
+Shortly, the user will receive an email message that will contain a secret code in the body of the message, which they will need to copy and paste back into the user interface, and the client will issue this request:
+
+```
+PUT /passwords/mfa/authenticators/OobEmail/confirm
+{
+  "MfaToken": "{{mfa_token}}",
+  "OobCode": "{{oob_code}}",
+  "ConfirmationCode": "123456"
+}
+```
+
+If successful, the response will be:
+
+```
+HTTP 200
+{
+
+}
+```
+
+##### Challenging a Second Factor
+
+Challenging a second factor, during authentication, is necessary when the user has already associated one or more second factors.
+
+![MFA Challenge](../images/Authentication-MFA-Challenge.png)
+
+That, is when the call to `GET /passwords/mfa/authenticators` yields one or more authenticators where
+`IsActive == true` (other than `type == recoveryCodes`).
+
+In all cases, a request is issued to challenge the authenticator, like this, given the data in the response to:
+
+```
+GET /passwords/mfa/authenticators
+
+HTTP 200 
+{
+    "authenticators": [
+        {
+          "isActive": true,
+          "type": "recoveryCodes",
+          "id": "mfaauth_NWa2wP0iXUi3bcbOcfJog"
+        },
+        {
+          "isActive": true,
+          "type": "totpAuthenticator",
+          "id": "mfaauth_bkmOn7kPX0ifxWoMxZrSiA"
+        },
+        {
+          "isActive": false,
+          "type": "oobSms",
+          "id": "mfaauth_3J8f0guUGj9bmNXKzDg"
+        },
+        {
+          "isActive": true,
+          "type": "oobEmail",
+          "id": "mfaauth_wgg5K3E4H0i82MBKfI1kMQ"
+        }
+      ]
+}
+```
+
+The client makes the challenge for each authenticator like this:
+
+```
+PUT /passwords/mfa/authenticators/{{AuthenticatorId}/challenge
+{
+	"MfaToken": "{{mfa_token}}",
+}
+```
+
+and if successful gets a response based on the authenticator type, like this:
+
+```
+HTTP 202
+{
+	"oobCode": "vPRoGCB6FEmQ-sXbsIFL5Xzi2B8wl2v7vcuTsR5XqyU"
+	"type": "oobEmail"
+}
+```
+
+In the case of the OOB channels, an SMS/Email message is sent to the user containing the secret code.
+
+In the case of OTP Authenticator, the user simplyopens their Authenticator App and copies the secret code from the app.
+
+Now the client needs to "verify" the "challenge" with input from the user, that the user typically harvests from the second factor channel (i.e., SMS text message, Email or Authenticator App).
+
+###### TOTP Authenticator
+
+To verify a TOTP Authenticator authenticator, the client needs to collect from the user the 6-digit code from their Authenticator App (e.g. from Microsoft, Google, etc).
+
+Then send this request:
+
+```
+PUT /passwords/mfa/authenticators/totpAuthenticator/verify
+{
+	"MfaToken": "{{mfa_token}}",
+	"ConfirmationCode": "123456"
+}
+```
+
+If successfully authenticated, the client will receive a response like this:
+
+```
+HTTP 200
+{
+  "tokens": {
+    "accessToken": {
+      "expiresOn": "2024-11-24T00:24:14.7736408Z",
+      "type": "accessToken",
+      "value": "eyJhbGciOiJodHRwOi8vd3d3L..."
+    },
+    "refreshToken": {
+      "expiresOn": "2024-12-08T00:09:14.7736415Z",
+      "type": "refreshToken",
+      "value": "XZ31YG9lY85_Of1_hb3rJhCh0jIVG7WudpqsqIqeuvI"
+    },
+    "userId": "user_jTGSLJFnyUGUJ4aD9AU5iQ"
+  }
+}
+```
+
+###### Out of Band SMS
+
+To verify a OOB SMS authenticator, the client needs to collect from the user the 6-digit code that had just been sent to their mobile phone device.
+
+Then send this request:
+
+```
+PUT /passwords/mfa/authenticators/OobSms/verify
+{
+	"MfaToken": "{{mfa_token}}",
+	"OobCode": "{{oob_code}}",
+	"ConfirmationCode": "123456"
+}
+```
+
+If successfully authenticated, the client will receive a response like this:
+
+```
+HTTP 200
+{
+  "tokens": {
+    "accessToken": {
+      "expiresOn": "2024-11-24T00:24:14.7736408Z",
+      "type": "accessToken",
+      "value": "eyJhbGciOiJodHRwOi8vd3d3L..."
+    },
+    "refreshToken": {
+      "expiresOn": "2024-12-08T00:09:14.7736415Z",
+      "type": "refreshToken",
+      "value": "XZ31YG9lY85_Of1_hb3rJhCh0jIVG7WudpqsqIqeuvI"
+    },
+    "userId": "user_jTGSLJFnyUGUJ4aD9AU5iQ"
+  }
+}
+```
+
+###### Out of Band Email
+
+To verify a OOB Email authenticator, the client needs to collect from the user the 6-digit code that had just been sent to their email inbox.
+
+Then send this request:
+
+```
+PUT /passwords/mfa/authenticators/OobEmail/verify
+{
+	"MfaToken": "{{mfa_token}}",
+	"OobCode": "{{oob_code}}",
+	"ConfirmationCode": "123456"
+}
+```
+
+If successfully authenticated, the client will receive a response like this:
+
+```
+HTTP 200
+{
+  "tokens": {
+    "accessToken": {
+      "expiresOn": "2024-11-24T00:24:14.7736408Z",
+      "type": "accessToken",
+      "value": "eyJhbGciOiJodHRwOi8vd3d3L..."
+    },
+    "refreshToken": {
+      "expiresOn": "2024-12-08T00:09:14.7736415Z",
+      "type": "refreshToken",
+      "value": "XZ31YG9lY85_Of1_hb3rJhCh0jIVG7WudpqsqIqeuvI"
+    },
+    "userId": "user_jTGSLJFnyUGUJ4aD9AU5iQ"
+  }
+}
+```
+
+###### Recovery Codes
+
+To verify the Recovery Code authenticator, the client needs to collect from the user one of the 8-digit recovery codes that had been displayed when associating their first authenticator.
+
+Then send this request:
+
+```
+PUT /passwords/mfa/authenticators/RecoveryCodes/verify
+{
+	"MfaToken": "{{mfa_token}}",
+	"ConfirmationCode": "12345678"
+}
+```
+
+If successfully authenticated, the client will receive a response like this:
+
+```
+HTTP 200
+{
+  "tokens": {
+    "accessToken": {
+      "expiresOn": "2024-11-24T00:24:14.7736408Z",
+      "type": "accessToken",
+      "value": "eyJhbGciOiJodHRwOi8vd3d3L..."
+    },
+    "refreshToken": {
+      "expiresOn": "2024-12-08T00:09:14.7736415Z",
+      "type": "refreshToken",
+      "value": "XZ31YG9lY85_Of1_hb3rJhCh0jIVG7WudpqsqIqeuvI"
+    },
+    "userId": "user_jTGSLJFnyUGUJ4aD9AU5iQ"
+  }
+}
+```
+
+##### 2FA Management
+
+Once successfully signed in, any user may add/remove and change their chosen second factors.
+
+They may choose to set up several second factors. This will mean that the next time they authenticate, they can choose another factor that they can use next (e.g., send me an SMS to my mobile phone, or email me a code to my email).
+
+###### Recovery Codes
+
+Recovery codes are used as a backup for the cases when the second factor is not available to the user.
+
+For example, they lose their mobile phone device, or access to their email inbox.
+
+The client should always allow a user to select the recovery code option to complete an authentication.
+
+Recovery codes are also a OTP (One Time Password) and can only be used once.
+
+There are only ever 16 recovery codes allowed or each user, and they are re-generated when enabling MFA for the user.
+
+There is no way to refresh or renew recovery codes, once issued.
+
+However, there is one workaround that only works if users are permitted to disable MFA for their account.
+
+> This is controlled in `MfaOptions` set in the `PasswordCrdentialRoot` at user creation time.
+
+A user can disable and then re-enable MFA, and when they do this, they will re-generated 16 new recovery codes.
+
+###### Reset MFA
+
+As a last resort, for users, they can of course call the businesses support help desk if they get locked out of their accounts.
+
+There is an API that only operations staff can use in a support context, that can be used to reset a users MFA settings.
+
+``` json 
+POST \passwords\mfa\reset
+```
+
+This API call will reset the users account back to the default MFA options that it was created with, removing all MFA configuration, and allowing the user to reset all MFA settings when they next authenticate.
+
 ### SSO Authentication
 
 We will offer SSO authentication via the `ISingleSignOnApplication`
