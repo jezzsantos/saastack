@@ -119,6 +119,15 @@ public sealed class TestingWebApi : IWebApiService
         });
     }
 
+    public async Task<ApiGetResult<string, StringMessageTestingOnlyResponse>> GeneralArrayGet(
+        GetWithSimpleArrayTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () =>
+            new Result<StringMessageTestingOnlyResponse, Error>(new StringMessageTestingOnlyResponse
+                { Message = request.AnArray!.JoinAsOredChoices() });
+    }
+
     public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> GeneralEmptyBodyPost(
         PostWithEmptyBodyTestingOnlyRequest request, CancellationToken cancellationToken)
     {

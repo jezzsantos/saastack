@@ -50,5 +50,17 @@ public class GeneralApiSpec : WebApiSpec<ApiHost1.Program>
         var content = await result.Content.ReadAsStringAsync();
         content.Should().Be("{\"message\":\"amessageavalue99\"}");
     }
+
+    [Fact]
+    public async Task WhenGetWithSimpleArray_ThenReturns()
+    {
+        var result = await Api.GetAsync(new GetWithSimpleArrayTestingOnlyRequest
+        {
+            AnArray = new[] { "a", "b", "c" }
+        });
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Content.Value.Message.Should().Be("a, b, c");
+    }
 }
 #endif

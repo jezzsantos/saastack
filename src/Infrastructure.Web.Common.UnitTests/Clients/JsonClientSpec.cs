@@ -243,7 +243,7 @@ public class JsonClientSpec
         }
 
         [Fact]
-        public async Task WhenSendRequestAsyncAndGetMethod_ThenContentIsEmpty()
+        public async Task WhenSendRequestAsyncAndGetMethodWithEmptyRequest_ThenContentIsEmpty()
         {
             var response = new HttpResponseMessage();
             var handler = new Mock<HttpMessageHandler>();
@@ -255,7 +255,10 @@ public class JsonClientSpec
             {
                 BaseAddress = new Uri("http://localhost")
             };
-            var request = new TestRequest();
+            var request = new TestRequest
+            {
+                AProperty = null!
+            };
 
             var result =
                 await JsonClient.SendRequestAsync(client, HttpMethod.Get, request, null, null,
@@ -266,6 +269,111 @@ public class JsonClientSpec
                 .Verify("SendAsync", Times.Once(),
                     ItExpr.Is<HttpRequestMessage>(req =>
                         req.Method == HttpMethod.Get
+                        && req.RequestUri == new Uri("http://localhost/test")
+                        && req.Content == null
+                    ),
+                    ItExpr.IsAny<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task WhenSendRequestAsyncAndGetMethodWithValue_ThenContentIsEmpty()
+        {
+            var response = new HttpResponseMessage();
+            var handler = new Mock<HttpMessageHandler>();
+            handler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(response);
+            var client = new HttpClient(handler.Object)
+            {
+                BaseAddress = new Uri("http://localhost")
+            };
+            var request = new TestRequest
+            {
+                AProperty = "avalue"
+            };
+
+            var result =
+                await JsonClient.SendRequestAsync(client, HttpMethod.Get, request, null, null,
+                    CancellationToken.None);
+
+            result.Should().Be(response);
+            handler.Protected()
+                .Verify("SendAsync", Times.Once(),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Get
+                        && req.RequestUri == new Uri("http://localhost/test?aproperty=avalue")
+                        && req.Content == null
+                    ),
+                    ItExpr.IsAny<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task WhenSendRequestAsyncAndGetMethodWithArray_ThenContentIsEmpty()
+        {
+            var response = new HttpResponseMessage();
+            var handler = new Mock<HttpMessageHandler>();
+            handler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(response);
+            var client = new HttpClient(handler.Object)
+            {
+                BaseAddress = new Uri("http://localhost")
+            };
+            var request = new TestRequest
+            {
+                AProperty = null!,
+                AnArrayProperty = new[] { "anothervalue1", "anothervalue2" }
+            };
+
+            var result =
+                await JsonClient.SendRequestAsync(client, HttpMethod.Get, request, null, null,
+                    CancellationToken.None);
+
+            result.Should().Be(response);
+            handler.Protected()
+                .Verify("SendAsync", Times.Once(),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Get
+                        && req.RequestUri
+                        == new Uri("http://localhost/test?anarrayproperty=anothervalue1&anarrayproperty=anothervalue2")
+                        && req.Content == null
+                    ),
+                    ItExpr.IsAny<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task WhenSendRequestAsyncAndGetMethodWithMultipleProperties_ThenContentIsEmpty()
+        {
+            var response = new HttpResponseMessage();
+            var handler = new Mock<HttpMessageHandler>();
+            handler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(response);
+            var client = new HttpClient(handler.Object)
+            {
+                BaseAddress = new Uri("http://localhost")
+            };
+            var request = new TestRequest
+            {
+                AProperty = "avalue",
+                AnArrayProperty = new[] { "anothervalue1", "anothervalue2" }
+            };
+
+            var result =
+                await JsonClient.SendRequestAsync(client, HttpMethod.Get, request, null, null,
+                    CancellationToken.None);
+
+            result.Should().Be(response);
+            handler.Protected()
+                .Verify("SendAsync", Times.Once(),
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Get
+                        && req.RequestUri
+                        == new Uri(
+                            "http://localhost/test?anarrayproperty=anothervalue1&anarrayproperty=anothervalue2&aproperty=avalue")
                         && req.Content == null
                     ),
                     ItExpr.IsAny<CancellationToken>());
@@ -640,6 +748,8 @@ public class JsonClientSpec
 [Api.Interfaces.Route("/test", OperationMethod.Get)]
 public class TestRequest : WebRequest<TestRequest>
 {
+    [FromQuery] public string[]? AnArrayProperty { get; set; }
+
     public string AProperty { get; set; } = "avalue";
 }
 

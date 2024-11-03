@@ -166,7 +166,7 @@ public static class RequestExtensions
 
         var route = new StringBuilder();
         var positionInOriginalRoute = 0;
-        var unSubstitutedRequestFields = new Dictionary<string, object?>(requestFields);
+        var unSubstitutedRequestFields = new Dictionary<string, (Type Type, object? Value)>(requestFields);
         var substitutedRequestFields = new Dictionary<string, object?>();
         foreach (var placeholder in placeholders)
         {
@@ -181,10 +181,10 @@ public static class RequestExtensions
             if (requestFields.TryGetValue(requestFieldName, out var substitute))
             {
                 unSubstitutedRequestFields.Remove(requestFieldName);
-                if (substitute.Exists() && substitute.ToString().HasValue())
+                if (substitute.Value.Exists() && substitute.Value.ToString().HasValue())
                 {
-                    substitutedRequestFields.Add(requestFieldName, substitute);
-                    route.Append(substitute);
+                    substitutedRequestFields.Add(requestFieldName, substitute.Value);
+                    route.Append(substitute.Value);
                 }
             }
             else
@@ -231,7 +231,7 @@ public static class RequestExtensions
     }
 
     private static StringBuilder PopulateQueryString(RouteAttribute attribute,
-        Dictionary<string, object?> requestFields,
+        Dictionary<string, (Type Type, object? Value)> requestFields,
         StringBuilder route)
     {
         if (attribute.Method is not OperationMethod.Get and not OperationMethod.Search)
@@ -239,28 +239,60 @@ public static class RequestExtensions
             return route;
         }
 
-        var count = 0;
+        var fieldCount = 0;
         foreach (var requestField in requestFields)
         {
-            var value = requestField.Value;
-            if (value.NotExists())
+            var fieldValue = requestField.Value.Value;
+            if (fieldValue.NotExists())
             {
                 continue;
             }
 
-            var stringValue = GetStringValue(value);
-            if (stringValue.HasValue())
-            {
-                route.Append(count == 0
-                    ? '?'
-                    : '&');
+            route.Append(fieldCount == 0
+                ? '?'
+                : '&');
 
-                route.Append($"{requestField.Key}={HttpUtility.UrlEncode(stringValue)}");
-                count++;
+            var pair = GetValuePairs(requestField);
+            var valueCount = 0;
+            foreach (var pairValue in pair)
+            {
+                if (valueCount > 0)
+                {
+                    route.Append('&');
+                }
+
+                route.Append(pairValue);
+                valueCount++;
             }
+
+            fieldCount++;
         }
 
         return route;
+    }
+
+    private static List<string> GetValuePairs(KeyValuePair<string, (Type Type, object? Value)> requestField)
+    {
+        var fieldValue = requestField.Value.Value;
+        if (fieldValue.NotExists())
+        {
+            return [];
+        }
+
+        if (requestField.Value.Type.IsAssignableTo(typeof(Array)))
+        {
+            var enumerable = fieldValue as Array;
+            return enumerable!.Cast<object>()
+                .Select(CreatePair)
+                .ToList();
+        }
+
+        return [CreatePair(fieldValue)];
+
+        string CreatePair(object value)
+        {
+            return $"{requestField.Key}={HttpUtility.UrlEncode(GetStringValue(value))}";
+        }
     }
 
     private static string? GetStringValue(object value)
@@ -285,14 +317,14 @@ public static class RequestExtensions
     ///     We need to build a dictionary of all public properties, and their values (even if they are null or default),
     ///     where the key is always lowercase (for matching)
     /// </summary>
-    private static Dictionary<string, object?> GetRequestFieldsWithValues(IWebRequest request)
+    private static Dictionary<string, (Type Type, object? Value)> GetRequestFieldsWithValues(IWebRequest request)
     {
         return request.GetType()
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .ToDictionary
             (
                 GetPropertyName,
-                propInfo => propInfo.GetValue(request, null)
+                propInfo => (propInfo.PropertyType, propInfo.GetValue(request, null))
             );
 
         static string GetPropertyName(PropertyInfo propInfo)
