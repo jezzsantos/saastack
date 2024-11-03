@@ -1,10 +1,12 @@
 using System.Net;
+using System.Text.Json;
 using ApiHost1;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
 using Domain.Interfaces.Authorization;
 using FluentAssertions;
+using IdentityApplication;
 using IdentityDomain;
 using Infrastructure.Interfaces;
 using Infrastructure.Shared.DomainServices;
@@ -125,6 +127,28 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
         result.Content.Value.Tokens.RefreshToken.Value.Should().NotBeNull();
         result.Content.Value.Tokens.RefreshToken.ExpiresOn.Should()
             .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultRefreshTokenExpiry));
+    }
+
+    [Fact]
+    public async Task WhenAuthenticateAndMfaEnabled_ThenReturnsMfaContinuance()
+    {
+        var login = await LoginUserAsync();
+        await Api.PutAsync(new ChangePasswordMfaForCallerRequest
+        {
+            IsEnabled = true,
+        }, req => req.SetJWTBearerToken(login.AccessToken));
+
+        var result = await Api.PostAsync(new AuthenticatePasswordRequest
+        {
+            Username = login.Profile!.EmailAddress,
+            Password = PasswordForPerson
+        });
+
+        result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        result.Content.Error.Title.Should().Be(PasswordCredentialsApplication.MfaRequiredCode);
+        result.Content.Error.Extensions!.Count.Should().Be(1);
+        result.Content.Error.Extensions[PasswordCredentialsApplication.MfaTokenName].As<JsonElement>().GetString()
+            .Should().NotBeEmpty();
     }
 
     [Fact]

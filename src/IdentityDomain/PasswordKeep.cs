@@ -29,24 +29,24 @@ public sealed class PasswordKeep : ValueObjectBase<PasswordKeep>
     }
 
     private PasswordKeep(Optional<string> passwordHash, Optional<string> resetToken,
-        Optional<DateTime> tokenExpiresUtc)
+        Optional<DateTime> tokenExpires)
     {
         PasswordHash = passwordHash;
         ResetToken = resetToken;
-        TokenExpiresUtc = tokenExpiresUtc;
+        TokenExpires = tokenExpires;
     }
 
     public bool HasPassword => PasswordHash.HasValue;
 
-    public bool IsResetInitiated => ResetToken.HasValue && TokenExpiresUtc.HasValue;
+    public bool IsResetInitiated => ResetToken.HasValue && TokenExpires.HasValue;
 
-    public bool IsResetStillValid => IsResetInitiated && TokenExpiresUtc > DateTime.UtcNow;
+    public bool IsResetStillValid => IsResetInitiated && TokenExpires > DateTime.UtcNow;
 
     public Optional<string> PasswordHash { get; }
 
     public Optional<string> ResetToken { get; }
 
-    public Optional<DateTime> TokenExpiresUtc { get; }
+    public Optional<DateTime> TokenExpires { get; }
 
     public static ValueObjectFactory<PasswordKeep> Rehydrate()
     {
@@ -63,7 +63,7 @@ public sealed class PasswordKeep : ValueObjectBase<PasswordKeep>
     protected override IEnumerable<object?> GetAtomicValues()
     {
         return new[]
-            { PasswordHash.ValueOrNull, ResetToken.ValueOrNull, TokenExpiresUtc.ToValueOrNull(val => val.ToIso8601()) };
+            { PasswordHash.ValueOrNull, ResetToken.ValueOrNull, TokenExpires.ToValueOrNull(val => val.ToIso8601()) };
     }
 
     public Result<PasswordKeep, Error> CompletePasswordReset(IPasswordHasherService passwordHasherService, string token,

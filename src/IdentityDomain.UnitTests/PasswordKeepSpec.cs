@@ -31,7 +31,7 @@ public class PasswordKeepSpec
 
         password.PasswordHash.Should().BeNone();
         password.ResetToken.Should().BeNone();
-        password.TokenExpiresUtc.Should().BeNone();
+        password.TokenExpires.Should().BeNone();
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class PasswordKeepSpec
 
         password.PasswordHash.Should().Be("apasswordhash");
         password.ResetToken.Should().BeNone();
-        password.TokenExpiresUtc.Should().BeNone();
+        password.TokenExpires.Should().BeNone();
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class PasswordKeepSpec
 
         password.PasswordHash.Should().Be("apasswordhash");
         password.ResetToken.Should().Be(Token);
-        password.TokenExpiresUtc.Should().BeNear(DateTime.UtcNow.Add(PasswordKeep.DefaultResetExpiry));
+        password.TokenExpires.Should().BeNear(DateTime.UtcNow.Add(PasswordKeep.DefaultResetExpiry));
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class PasswordKeepSpec
 
         password.PasswordHash.Should().Be("apasswordhash");
         password.ResetToken.Should().Be(token2);
-        password.TokenExpiresUtc.Should().BeNear(DateTime.UtcNow.Add(PasswordKeep.DefaultResetExpiry));
+        password.TokenExpires.Should().BeNear(DateTime.UtcNow.Add(PasswordKeep.DefaultResetExpiry));
     }
 
     [Fact]
@@ -287,6 +287,6 @@ public class PasswordKeepSpec
 
         password.PasswordHash.Should().Be("apasswordhash");
         password.ResetToken.Should().BeNone();
-        password.TokenExpiresUtc.Should().BeNone();
+        password.TokenExpires.Should().BeNone();
     }
 }

@@ -2,6 +2,15 @@ using Application.Interfaces.Resources;
 
 namespace Application.Resources.Shared;
 
+public class Identity : IIdentifiableResource
+{
+    public required bool IsMfaEnabled { get; set; }
+
+    public required bool HasCredentials { get; set; }
+
+    public required string Id { get; set; }
+}
+
 public class AuthenticateTokens
 {
     public required AuthenticationToken AccessToken { get; set; }
@@ -62,7 +71,7 @@ public class AuthToken
 
 public enum TokenType
 {
-    OtherToken = 0,
-    AccessToken = 1,
-    RefreshToken = 2
+    OtherToken = 0, // e.g. idToken
+    AccessToken = 1, // access_token
+    RefreshToken = 2 // refresh_token
 }

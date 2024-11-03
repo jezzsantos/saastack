@@ -145,17 +145,36 @@ public class SingleSignOnApplication : ISingleSignOnApplication
     }
 
     public async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensAsync(ICallerContext caller,
-        string userId,
         CancellationToken cancellationToken)
     {
-        return await _ssoProvidersService.GetTokensAsync(caller, userId.ToId(), cancellationToken);
+        return await _ssoProvidersService.GetTokensAsync(caller, cancellationToken);
+    }
+
+    public async Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensOnBehalfOfUserAsync(
+        ICallerContext caller, string userId, CancellationToken cancellationToken)
+    {
+        return await _ssoProvidersService.GetTokensOnBehalfOfUserAsync(caller, userId, cancellationToken);
     }
 
     public async Task<Result<ProviderAuthenticationTokens, Error>> RefreshTokenAsync(ICallerContext caller,
+        string providerName, string refreshToken, CancellationToken cancellationToken)
+    {
+        return await RefreshTokensInternalAsync(caller, caller.ToCallerId(), providerName, refreshToken,
+            cancellationToken);
+    }
+
+    public async Task<Result<ProviderAuthenticationTokens, Error>> RefreshTokenOnBehalfOfUserAsync(
+        ICallerContext caller,
         string userId, string providerName, string refreshToken, CancellationToken cancellationToken)
     {
+        return await RefreshTokensInternalAsync(caller, userId.ToId(), providerName, refreshToken, cancellationToken);
+    }
+
+    private async Task<Result<ProviderAuthenticationTokens, Error>> RefreshTokensInternalAsync(ICallerContext caller,
+        Identifier userId, string providerName, string refreshToken, CancellationToken cancellationToken)
+    {
         var retrievedProvider =
-            await _ssoProvidersService.FindByUserIdAsync(caller, userId.ToId(), providerName, cancellationToken);
+            await _ssoProvidersService.FindByUserIdAsync(caller, userId, providerName, cancellationToken);
         if (retrievedProvider.IsFailure)
         {
             return retrievedProvider.Error;
@@ -196,7 +215,7 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         }
 
         var tokens = refreshed.Value;
-        var saved = await _ssoProvidersService.SaveUserTokensAsync(caller, providerName, userId.ToId(), tokens,
+        var saved = await _ssoProvidersService.SaveUserTokensAsync(caller, providerName, userId, tokens,
             cancellationToken);
         if (saved.IsFailure)
         {

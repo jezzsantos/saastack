@@ -25,13 +25,14 @@ namespace IdentityApplication.UnitTests;
 [Trait("Category", "Unit")]
 public class PasswordCredentialsApplicationSpec
 {
-    private const string TestingToken = "Ll4qhv77XhiXSqsTUc6icu56ZLrqu5p1gH9kT5IlHio";
     private readonly PasswordCredentialsApplication _application;
     private readonly Mock<IAuthTokensService> _authTokensService;
     private readonly Mock<ICallerContext> _caller;
     private readonly Mock<IEmailAddressService> _emailAddressService;
+    private readonly Mock<IEncryptionService> _encryptionService;
     private readonly Mock<IEndUsersService> _endUsersService;
     private readonly Mock<IIdentifierFactory> _idFactory;
+    private readonly Mock<IMfaService> _mfaService;
     private readonly Mock<IUserNotificationsService> _notificationsService;
     private readonly Mock<IPasswordHasherService> _passwordHasherService;
     private readonly Mock<IRecorder> _recorder;
@@ -63,6 +64,9 @@ public class PasswordCredentialsApplicationSpec
         _tokensService = new Mock<ITokensService>();
         _tokensService.Setup(ts => ts.CreateRegistrationVerificationToken())
             .Returns("averificationtoken");
+        _tokensService.Setup(ts => ts.CreateMfaAuthenticationToken())
+            .Returns("anmfatoken");
+        _encryptionService = new Mock<IEncryptionService>();
         _passwordHasherService = new Mock<IPasswordHasherService>();
         _passwordHasherService.Setup(phs => phs.ValidatePassword(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns(true);
@@ -72,16 +76,23 @@ public class PasswordCredentialsApplicationSpec
             .Returns(true);
         _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(true);
+        _mfaService = new Mock<IMfaService>();
         _authTokensService = new Mock<IAuthTokensService>();
         var websiteUiService = new Mock<IWebsiteUiService>();
         _repository = new Mock<IPasswordCredentialsRepository>();
         _repository.Setup(rep => rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()))
             .Returns((PasswordCredentialRoot root, CancellationToken _) =>
                 Task.FromResult<Result<PasswordCredentialRoot, Error>>(root));
+        _repository.Setup(rep =>
+                rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .Returns((PasswordCredentialRoot root, bool _, CancellationToken _) =>
+                Task.FromResult<Result<PasswordCredentialRoot, Error>>(root));
 
         _application = new PasswordCredentialsApplication(_recorder.Object, _idFactory.Object, _endUsersService.Object,
             _userProfilesService.Object, _notificationsService.Object, _settings.Object, _emailAddressService.Object,
-            _tokensService.Object, _passwordHasherService.Object, _authTokensService.Object, websiteUiService.Object,
+            _tokensService.Object, _encryptionService.Object, _passwordHasherService.Object, _mfaService.Object,
+            _authTokensService.Object,
+            websiteUiService.Object,
             _repository.Object);
     }
 
@@ -254,7 +265,8 @@ public class PasswordCredentialsApplicationSpec
             await _application.AuthenticateAsync(_caller.Object, "ausername", "awrongpassword", CancellationToken.None);
 
         result.Should().BeError(ErrorCode.NotAuthenticated);
-        _repository.Verify(rep => rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()));
+        _repository.Verify(rep =>
+            rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
         _recorder.Verify(rec => rec.AuditAgainst(It.IsAny<ICallContext>(), "auserid",
             Audits.PasswordCredentialsApplication_Authenticate_InvalidCredentials, It.IsAny<string>(),
             It.IsAny<object[]>()));
@@ -282,14 +294,87 @@ public class PasswordCredentialsApplicationSpec
 
         result.Should().BeError(ErrorCode.PreconditionViolation,
             Resources.PasswordCredentialsApplication_RegistrationNotVerified);
-        _repository.Verify(rep => rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()));
+        _repository.Verify(rep =>
+            rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
         _recorder.Verify(rec => rec.AuditAgainst(It.IsAny<ICallContext>(), "auserid",
             Audits.PasswordCredentialsApplication_Authenticate_BeforeVerified, It.IsAny<string>(),
             It.IsAny<object[]>()));
     }
 
     [Fact]
-    public async Task WhenAuthenticateAsyncWithCorrectPassword_ThenAuthenticates()
+    public async Task WhenAuthenticateAsyncWithCorrectPasswordAndMfa_ThenReturnsError()
+    {
+        _caller.Setup(cc => cc.CallId)
+            .Returns("acallid");
+        var credential = CreateVerifiedCredential();
+        credential.ChangeMfaEnabled("auserid".ToId(), true);
+        _repository.Setup(rep => rep.FindCredentialsByUsernameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(credential.ToOptional());
+        var user = new EndUserWithMemberships
+        {
+            Id = "auserid",
+            Status = EndUserStatus.Registered,
+            Classification = EndUserClassification.Person,
+            Access = EndUserAccess.Enabled,
+            Memberships =
+            [
+                new Membership
+                {
+                    Id = "amembershipid",
+                    IsDefault = true,
+                    OrganizationId = "anorganizationid",
+                    UserId = "auserid"
+                }
+            ]
+        };
+        _endUsersService.Setup(eus =>
+                eus.GetMembershipsPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _userProfilesService.Setup(ups =>
+                ups.GetProfilePrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserProfile
+            {
+                Id = "aprofileid",
+                UserId = "auserid",
+                Name = new PersonName
+                {
+                    FirstName = "afirstname",
+                    LastName = "alastname"
+                },
+                DisplayName = "adisplayname"
+            });
+        var expiresOn = DateTime.UtcNow;
+        _authTokensService.Setup(jts =>
+                jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AccessTokens("anaccesstoken", expiresOn,
+                "arefreshtoken", expiresOn));
+
+        var result =
+            await _application.AuthenticateAsync(_caller.Object, "ausername", "apassword", CancellationToken.None);
+
+        result.Should().BeError(ErrorCode.ForbiddenAccess, Resources.PasswordCredentialsApplication_MfaRequired,
+            error => error.AdditionalCode == PasswordCredentialsApplication.MfaRequiredCode
+                     && error.AdditionalData!.Count == 1
+                     && (string)error.AdditionalData[PasswordCredentialsApplication.MfaTokenName] == "anmfatoken");
+        _userProfilesService.Verify(ups =>
+            ups.GetProfilePrivateAsync(It.Is<ICallerContext>(cc =>
+                cc.CallId == "acallid"
+            ), "auserid", It.IsAny<CancellationToken>()));
+        _repository.Verify(rep => rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()));
+        _recorder.Verify(rec => rec.AuditAgainst(It.IsAny<ICallContext>(), "auserid",
+            Audits.PasswordCredentialsApplication_Authenticate_Succeeded, It.IsAny<string>(),
+            It.IsAny<object[]>()));
+        _tokensService.Verify(ts => ts.CreateMfaAuthenticationToken());
+        _authTokensService.Verify(jts =>
+            jts.IssueTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<EndUserWithMemberships>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task WhenAuthenticateAsyncWithCorrectPasswordAndNotMfa_ThenAuthenticates()
     {
         _caller.Setup(cc => cc.CallId)
             .Returns("acallid");
@@ -350,39 +435,13 @@ public class PasswordCredentialsApplicationSpec
             ups.GetProfilePrivateAsync(It.Is<ICallerContext>(cc =>
                 cc.CallId == "acallid"
             ), "auserid", It.IsAny<CancellationToken>()));
-        _repository.Verify(rep => rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()));
+        _repository.Verify(rep =>
+            rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
         _recorder.Verify(rec => rec.AuditAgainst(It.IsAny<ICallContext>(), "auserid",
             Audits.PasswordCredentialsApplication_Authenticate_Succeeded, It.IsAny<string>(),
             It.IsAny<object[]>()));
         _authTokensService.Verify(jts =>
             jts.IssueTokensAsync(It.IsAny<ICallerContext>(), user, It.IsAny<CancellationToken>()));
-    }
-
-    [Fact]
-    public async Task WhenRegisterPersonAsyncAndAlreadyExists_ThenDoesNothing()
-    {
-        var endUser = new EndUser
-        {
-            Id = "auserid"
-        };
-        _endUsersService.Setup(uas => uas.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(endUser);
-        var credential = CreateUnVerifiedCredential();
-        _repository.Setup(s => s.FindCredentialsByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(credential.ToOptional());
-
-        var result = await _application.RegisterPersonAsync(_caller.Object, "aninvitationtoken", "afirstname",
-            "alastname", "auser@company.com", "apassword", "atimezone", "acountrycode", true, CancellationToken.None);
-
-        result.Value.User.Should().Be(endUser);
-        _repository.Verify(s => s.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()),
-            Times.Never);
-        _endUsersService.Verify(uas => uas.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
-            "auser@company.com", "afirstname", "alastname", "atimezone", "acountrycode", true,
-            It.IsAny<CancellationToken>()));
     }
 
     [Fact]
@@ -416,6 +475,33 @@ public class PasswordCredentialsApplicationSpec
             ns.NotifyPasswordRegistrationConfirmationAsync(_caller.Object, "auser@company.com", "afirstname",
                 "averificationtoken", It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()));
         _endUsersService.Verify(eus => eus.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
+            "auser@company.com", "afirstname", "alastname", "atimezone", "acountrycode", true,
+            It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task WhenRegisterPersonAsyncAndAlreadyExists_ThenDoesNothing()
+    {
+        var endUser = new EndUser
+        {
+            Id = "auserid"
+        };
+        _endUsersService.Setup(uas => uas.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(endUser);
+        var credential = CreateUnVerifiedCredential();
+        _repository.Setup(s => s.FindCredentialsByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(credential.ToOptional());
+
+        var result = await _application.RegisterPersonAsync(_caller.Object, "aninvitationtoken", "afirstname",
+            "alastname", "auser@company.com", "apassword", "atimezone", "acountrycode", true, CancellationToken.None);
+
+        result.Value.User.Should().Be(endUser);
+        _repository.Verify(s => s.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _endUsersService.Verify(uas => uas.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
             "auser@company.com", "afirstname", "alastname", "atimezone", "acountrycode", true,
             It.IsAny<CancellationToken>()));
     }
@@ -495,168 +581,43 @@ public class PasswordCredentialsApplicationSpec
     }
 
     [Fact]
-    public async Task WhenInitiatePasswordRequestAndUnknownEmailAddress_ThenSendsCourtesyNotification()
+    public async Task WhenGetPasswordCredentialAsyncAndNotFound_ThenReturnsError()
     {
-        _repository.Setup(s => s.FindCredentialsByUsernameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Optional<PasswordCredentialRoot>.None);
+        _repository.Setup(s => s.FindCredentialsByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Optional<PasswordCredentialRoot>
+                .None);
 
-        var result =
-            await _application.InitiatePasswordResetAsync(_caller.Object, "user@company.com", CancellationToken.None);
-
-        result.Should().BeSuccess();
-        _repository.Verify(s => s.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()),
-            Times.Never);
-        _notificationsService.Verify(ns =>
-            ns.NotifyPasswordResetInitiatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
-        _notificationsService.Verify(ns =>
-            ns.NotifyPasswordResetUnknownUserCourtesyAsync(_caller.Object, "user@company.com",
-                UserNotificationConstants.EmailTags.PasswordResetUnknownUser, CancellationToken.None));
-    }
-
-    [Fact]
-    public async Task WhenInitiatePasswordRequest_ThenSendsNotification()
-    {
-        _tokensService.Setup(ts => ts.CreatePasswordResetToken())
-            .Returns(TestingToken);
-        _repository.Setup(s => s.FindCredentialsByUsernameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(CreateVerifiedCredential().ToOptional());
-
-        var result =
-            await _application.InitiatePasswordResetAsync(_caller.Object, "user@company.com", CancellationToken.None);
-
-        result.Should().BeSuccess();
-        _repository.Verify(s => s.SaveAsync(It.Is<PasswordCredentialRoot>(cred =>
-            cred.IsPasswordSet
-        ), It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(ns =>
-            ns.NotifyPasswordResetInitiatedAsync(_caller.Object, "aname", "user@company.com", TestingToken,
-                UserNotificationConstants.EmailTags.PasswordResetInitiated, It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(ns =>
-            ns.NotifyPasswordResetUnknownUserCourtesyAsync(It.IsAny<ICallerContext>(), "user@company.com",
-                It.IsAny<IReadOnlyList<string>>(), CancellationToken.None), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenResendPasswordRequestAndUnknownToken_ThenReturnsError()
-    {
-        _repository.Setup(s =>
-                s.FindCredentialsByPasswordResetTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Optional<PasswordCredentialRoot>.None);
-
-        var result =
-            await _application.ResendPasswordResetAsync(_caller.Object, "atoken", CancellationToken.None);
+        var result = await _application.GetPasswordCredentialAsync(_caller.Object, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityNotFound);
-        _repository.Verify(s => s.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()),
-            Times.Never);
-        _notificationsService.Verify(ns =>
-            ns.NotifyPasswordResetInitiatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
-    public async Task WhenResendPasswordRequest_ThenResendsNotification()
+    public async Task WhenGetPasswordCredentialAsync_ThenReturnsCredentials()
     {
-        _tokensService.Setup(ts => ts.CreatePasswordResetToken())
-            .Returns(TestingToken);
-        _repository.Setup(s =>
-                s.FindCredentialsByPasswordResetTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(CreateVerifiedCredential().ToOptional());
-
-        var result =
-            await _application.ResendPasswordResetAsync(_caller.Object, "atoken", CancellationToken.None);
-
-        result.Should().BeSuccess();
-        _repository.Verify(s => s.SaveAsync(It.Is<PasswordCredentialRoot>(cred =>
-            cred.IsPasswordResetInitiated
-        ), It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(ns =>
-            ns.NotifyPasswordResetInitiatedAsync(_caller.Object, "aname", "auser@company.com", TestingToken,
-                UserNotificationConstants.EmailTags.PasswordResetResend, It.IsAny<CancellationToken>()));
-    }
-
-    [Fact]
-    public async Task WhenVerifyPasswordResetAsyncAndUnknownToken_ThenReturnsError()
-    {
-        _repository.Setup(s =>
-                s.FindCredentialsByPasswordResetTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Optional<PasswordCredentialRoot>.None);
-
-        var result =
-            await _application.VerifyPasswordResetAsync(_caller.Object, "atoken", CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.EntityNotFound);
-        _repository.Verify(s => s.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()),
-            Times.Never);
-        _notificationsService.Verify(ns =>
-            ns.NotifyPasswordResetInitiatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenVerifyPasswordResetAsync_ThenVerifies()
-    {
-        _tokensService.Setup(ts => ts.CreatePasswordResetToken())
-            .Returns(TestingToken);
+        _caller.Setup(cc => cc.CallerId)
+            .Returns("auserid");
         var credential = CreateVerifiedCredential();
-        credential.InitiatePasswordReset();
         _repository.Setup(s =>
-                s.FindCredentialsByPasswordResetTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                s.FindCredentialsByUserIdAsync(It.IsAny<Identifier>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(credential.ToOptional());
+        _endUsersService.Setup(eus =>
+                eus.GetUserPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new EndUser
+            {
+                Id = "auserid",
+                Classification = EndUserClassification.Person
+            });
 
-        var result =
-            await _application.VerifyPasswordResetAsync(_caller.Object, TestingToken, CancellationToken.None);
+        var result = await _application.GetPasswordCredentialAsync(_caller.Object, CancellationToken.None);
 
-        result.Should().BeSuccess();
-        _repository.Verify(s => s.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()),
-            Times.Never);
-    }
+        result.Value.Id.Should().Be("anid");
 
-    [Fact]
-    public async Task WhenCompletePasswordResetAsyncAndUnknownToken_ThenReturnsError()
-    {
-        _repository.Setup(s =>
-                s.FindCredentialsByPasswordResetTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Optional<PasswordCredentialRoot>.None);
-
-        var result =
-            await _application.CompletePasswordResetAsync(_caller.Object, "atoken", "apassword",
-                CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.EntityNotFound);
-        _repository.Verify(s => s.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()),
-            Times.Never);
-        _notificationsService.Verify(ns =>
-            ns.NotifyPasswordResetInitiatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenCompletePasswordResetAsync_ThenCompletes()
-    {
-        _tokensService.Setup(ts => ts.CreatePasswordResetToken())
-            .Returns(TestingToken);
-        _passwordHasherService.Setup(phs => phs.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(false);
-
-        var credential = CreateVerifiedCredential();
-        credential.InitiatePasswordReset();
-        _repository.Setup(s =>
-                s.FindCredentialsByPasswordResetTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(credential.ToOptional());
-
-        var result =
-            await _application.CompletePasswordResetAsync(_caller.Object, TestingToken, "2Password!",
-                CancellationToken.None);
-
-        result.Should().BeSuccess();
-        _repository.Verify(s => s.SaveAsync(It.Is<PasswordCredentialRoot>(creds =>
-            !creds.IsPasswordResetInitiated
-        ), It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(ns =>
-            ns.NotifyPasswordResetInitiatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
+        result.Value.IsMfaEnabled.Should().BeFalse();
+        _endUsersService.Verify(eus =>
+            eus.GetUserPrivateAsync(_caller.Object, "auserid",
+                It.IsAny<CancellationToken>()));
     }
 
     private PasswordCredentialRoot CreateUnVerifiedCredential()
@@ -680,7 +641,8 @@ public class PasswordCredentialsApplicationSpec
     private PasswordCredentialRoot CreateCredential()
     {
         return PasswordCredentialRoot.Create(_recorder.Object, _idFactory.Object, _settings.Object,
-            _emailAddressService.Object, _tokensService.Object, _passwordHasherService.Object,
-            "auserid".ToId()).Value;
+            _emailAddressService.Object, _tokensService.Object, _encryptionService.Object,
+            _passwordHasherService.Object,
+            _mfaService.Object, "auserid".ToId()).Value;
     }
 }

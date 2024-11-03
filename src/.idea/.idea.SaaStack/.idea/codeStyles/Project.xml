@@ -1,6 +1,7 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
     <Markdown>
+      <option name="MIN_LINES_AROUND_BLOCK_ELEMENTS" value="2" />
       <option name="WRAP_TEXT_IF_LONG" value="false" />
       <option name="WRAP_TEXT_INSIDE_BLOCKQUOTES" value="false" />
     </Markdown>

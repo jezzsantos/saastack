@@ -249,6 +249,33 @@ namespace Application.Interfaces {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Authentication.Password.Mfa.Failed.InvalidMfa.
+        /// </summary>
+        public static string PasswordCredentialsApplication_MfaAuthenticate_Failed {
+            get {
+                return ResourceManager.GetString("PasswordCredentialsApplication_MfaAuthenticate_Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authentication.Password.Mfa.Passed.
+        /// </summary>
+        public static string PasswordCredentialsApplication_MfaAuthenticate_Succeeded {
+            get {
+                return ResourceManager.GetString("PasswordCredentialsApplication_MfaAuthenticate_Succeeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authentication.Password.Mfa.Reset.
+        /// </summary>
+        public static string PasswordCredentialsApplication_MfaReset {
+            get {
+                return ResourceManager.GetString("PasswordCredentialsApplication_MfaReset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SingleSignOn.AutoRegistered.
         /// </summary>
         public static string SingleSignOnApplication_Authenticate_AccountOnboarded {

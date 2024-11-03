@@ -114,6 +114,24 @@ namespace IdentityApplication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Authentication requires another factor.
+        /// </summary>
+        internal static string PasswordCredentialsApplication_MfaRequired {
+            get {
+                return ResourceManager.GetString("PasswordCredentialsApplication_MfaRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user account ID is not a person.
+        /// </summary>
+        internal static string PasswordCredentialsApplication_NotPerson {
+            get {
+                return ResourceManager.GetString("PasswordCredentialsApplication_NotPerson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user account has already been verified.
         /// </summary>
         internal static string PasswordCredentialsApplication_RegistrationAlreadyVerified {

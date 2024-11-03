@@ -88,7 +88,7 @@
         <value>A membership must always have at least the feature '{0}'</value>
     </data>
     <data name="EndUserRoot_NotOperator" xml:space="preserve">
-        <value>The assigner is not a member of the operations team</value>
+        <value>This user is not a member of the operations team</value>
     </data>
     <data name="GuestInvitation_NotInvited" xml:space="preserve">
         <value>This invitation has not been sent yet</value>

@@ -6,55 +6,82 @@ using Domain.Common.Identity;
 using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Identities.PasswordCredentials;
 using Domain.Interfaces;
+using Domain.Interfaces.Authorization;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 using Domain.Services.Shared;
 using Domain.Shared;
+using Domain.Shared.Identities;
 using IdentityDomain.DomainServices;
 
 namespace IdentityDomain;
 
+public delegate Task<Result<Error>> NotifyChallenged(MfaAuthenticator associatedAuthenticator);
+
 public sealed class PasswordCredentialRoot : AggregateRootBase
 {
-    public const string CooldownPeriodInMinutesSettingName = "IdentityApi:PasswordCredential:CooldownPeriodInMinutes";
-    public const string MaxFailedLoginsSettingName = "IdentityApi:PasswordCredential:MaxFailedLogins";
+    private const string CooldownPeriodInMinutesSettingName = "IdentityApi:PasswordCredential:CooldownPeriodInMinutes";
+    private const string MaxFailedLoginsSettingName = "IdentityApi:PasswordCredential:MaxFailedLogins";
+    // EXTEND: Change default MFA options for all users
+    private static readonly MfaOptions DefaultMfaOptions = MfaOptions.Create(false, true).Value;
     private readonly IEmailAddressService _emailAddressService;
+    private readonly IEncryptionService _encryptionService;
+    private readonly IMfaService _mfaService;
     private readonly IPasswordHasherService _passwordHasherService;
     private readonly ITokensService _tokensService;
 
+#pragma warning disable SAASDDD012
     public static Result<PasswordCredentialRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
+#pragma warning restore SAASDDD012
         IConfigurationSettings settings, IEmailAddressService emailAddressService, ITokensService tokensService,
-        IPasswordHasherService passwordHasherService, Identifier userId)
+        IEncryptionService encryptionService, IPasswordHasherService passwordHasherService, IMfaService mfaService,
+        Identifier userId)
+    {
+        return Create(recorder, idFactory, settings, emailAddressService, tokensService, encryptionService,
+            passwordHasherService, mfaService, userId, DefaultMfaOptions);
+    }
+
+    internal static Result<PasswordCredentialRoot, Error> Create(IRecorder recorder, IIdentifierFactory idFactory,
+        IConfigurationSettings settings, IEmailAddressService emailAddressService, ITokensService tokensService,
+        IEncryptionService encryptionService, IPasswordHasherService passwordHasherService, IMfaService mfaService,
+        Identifier userId, MfaOptions mfaOptions)
     {
         var root = new PasswordCredentialRoot(recorder, idFactory, settings, emailAddressService, tokensService,
-            passwordHasherService);
-        root.RaiseCreateEvent(IdentityDomain.Events.PasswordCredentials.Created(root.Id, userId));
+            encryptionService, passwordHasherService, mfaService);
+        root.RaiseCreateEvent(IdentityDomain.Events.PasswordCredentials.Created(root.Id, userId, mfaOptions));
         return root;
     }
 
     private PasswordCredentialRoot(IRecorder recorder, IIdentifierFactory idFactory, IConfigurationSettings settings,
         IEmailAddressService emailAddressService, ITokensService tokensService,
-        IPasswordHasherService passwordHasherService) :
+        IEncryptionService encryptionService, IPasswordHasherService passwordHasherService, IMfaService mfaService) :
         base(recorder, idFactory)
     {
         _emailAddressService = emailAddressService;
         _tokensService = tokensService;
+        _encryptionService = encryptionService;
         _passwordHasherService = passwordHasherService;
+        _mfaService = mfaService;
         Login = CreateLoginMonitor(settings);
     }
 
     private PasswordCredentialRoot(IRecorder recorder, IIdentifierFactory idFactory, IConfigurationSettings settings,
         IEmailAddressService emailAddressService, ITokensService tokensService,
-        IPasswordHasherService passwordHasherService, ISingleValueObject<string> identifier) : base(
+        IEncryptionService encryptionService, IPasswordHasherService passwordHasherService, IMfaService mfaService,
+        ISingleValueObject<string> identifier) : base(
         recorder, idFactory, identifier)
     {
         _emailAddressService = emailAddressService;
         _tokensService = tokensService;
+        _encryptionService = encryptionService;
         _passwordHasherService = passwordHasherService;
+        _mfaService = mfaService;
         Login = CreateLoginMonitor(settings);
     }
 
     public bool IsLocked => Login.IsLocked;
+
+    public bool IsMfaEnabled => MfaOptions.IsEnabled;
 
     public bool IsPasswordResetInitiated => Password.IsResetInitiated;
 
@@ -72,6 +99,10 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
 
     public LoginMonitor Login { get; private set; }
 
+    public MfaAuthenticators MfaAuthenticators { get; } = new();
+
+    public MfaOptions MfaOptions { get; private set; } = MfaOptions.Default;
+
     public PasswordKeep Password { get; private set; } = PasswordKeep.Create().Value;
 
     public Optional<Registration> Registration { get; private set; }
@@ -86,7 +117,9 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
             container.GetRequiredService<IIdentifierFactory>(),
             container.GetRequiredServiceForPlatform<IConfigurationSettings>(),
             container.GetRequiredService<IEmailAddressService>(), container.GetRequiredService<ITokensService>(),
-            container.GetRequiredService<IPasswordHasherService>(), identifier);
+            container.GetRequiredService<IEncryptionService>(),
+            container.GetRequiredService<IPasswordHasherService>(),
+            container.GetRequiredService<IMfaService>(), identifier);
     }
 
     public override Result<Error> EnsureInvariants()
@@ -97,20 +130,26 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
             return ensureInvariants.Error;
         }
 
+        var mfaAuthenticators = MfaAuthenticators.EnsureInvariants();
+        if (mfaAuthenticators.IsFailure)
+        {
+            return mfaAuthenticators.Error;
+        }
+
         if (Registration.HasValue)
         {
             var isEmailUnique = _emailAddressService.EnsureUniqueAsync(Registration.Value.EmailAddress, UserId)
                 .GetAwaiter().GetResult();
             if (!isEmailUnique)
             {
-                return Error.RuleViolation(Resources.PasswordCredentialsRoot_EmailNotUnique);
+                return Error.RuleViolation(Resources.PasswordCredentialRoot_EmailNotUnique);
             }
         }
 
         if (!Registration.HasValue
             && Password.IsResetInitiated)
         {
-            return Error.RuleViolation(Resources.PasswordCredentialsRoot_PasswordInitiatedWithoutRegistration);
+            return Error.RuleViolation(Resources.PasswordCredentialRoot_PasswordInitiatedWithoutRegistration);
         }
 
         return Result.Ok;
@@ -123,7 +162,17 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
             case Created created:
             {
                 UserId = created.UserId.ToId();
-                Recorder.TraceDebug(null, "Password credential {Id} was created for {UserId}", Id, created.UserId);
+                var mfaOptions =
+                    MfaOptions.Create(created.IsMfaEnabled, created.MfaCanBeDisabled);
+                if (mfaOptions.IsFailure)
+                {
+                    return mfaOptions.Error;
+                }
+
+                MfaOptions = mfaOptions.Value;
+                Recorder.TraceDebug(null, "Password credential {Id} was created for {UserId}, with MFA {IsMfaEnabled}",
+                    Id,
+                    created.UserId, created.IsMfaEnabled);
                 return Result.Ok;
             }
 
@@ -219,9 +268,369 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
                 return Result.Ok;
             }
 
+            case MfaOptionsChanged changed:
+            {
+                var options =
+                    MfaOptions.Create(changed.IsEnabled, changed.CanBeDisabled);
+                if (options.IsFailure)
+                {
+                    return options.Error;
+                }
+
+                MfaOptions = options.Value;
+                Recorder.TraceDebug(null,
+                    "Password credential {Id} changed MFA options, enabled {IsEnabled}, canBeDisabled {CanBeDisabled}",
+                    Id, changed.IsEnabled, changed.CanBeDisabled);
+                return Result.Ok;
+            }
+
+            case MfaStateReset reset:
+            {
+                var options =
+                    MfaOptions.Create(reset.IsEnabled, reset.CanBeDisabled);
+                if (options.IsFailure)
+                {
+                    return options.Error;
+                }
+
+                MfaOptions = options.Value;
+                Recorder.TraceDebug(null,
+                    "Password credential {Id} reset MFA state, enabled {IsEnabled}, canBeDisabled {CanBeDisabled}",
+                    Id, reset.IsEnabled, reset.CanBeDisabled);
+                return Result.Ok;
+            }
+
+            case MfaAuthenticationInitiated initiated:
+            {
+                var options = MfaOptions.Create(true, MfaOptions.CanBeDisabled, initiated.AuthenticationToken,
+                    initiated.AuthenticationExpiresAt);
+                if (options.IsFailure)
+                {
+                    return options.Error;
+                }
+
+                MfaOptions = options.Value;
+                Recorder.TraceDebug(null,
+                    "Password credential {Id} initiated MFA authentication",
+                    Id);
+                return Result.Ok;
+            }
+
+            case MfaAuthenticatorAdded added:
+            {
+                var authenticator = RaiseEventToChildEntity(isReconstituting, added, idFactory =>
+                        MfaAuthenticator.Create(Recorder, idFactory, _encryptionService,
+                            _mfaService,
+                            RaiseChangeEvent),
+                    e => e.AuthenticatorId!);
+                if (authenticator.IsFailure)
+                {
+                    return authenticator.Error;
+                }
+
+                MfaAuthenticators.Add(authenticator.Value);
+                Recorder.TraceDebug(null, "Password credential {Id} added authenticator of type {Type}",
+                    Id, added.Type);
+                return Result.Ok;
+            }
+
+            case MfaAuthenticatorRemoved removed:
+            {
+                MfaAuthenticators.Remove(removed.AuthenticatorId.ToId());
+                Recorder.TraceDebug(null, "CPassword credential {Id} has had authenticator {AuthenticatorId} removed",
+                    Id, removed.AuthenticatorId);
+                return Result.Ok;
+            }
+
+            case MfaAuthenticatorAssociated associated:
+            {
+                var authenticator = MfaAuthenticators.FindById(associated.AuthenticatorId.ToId());
+                if (!authenticator.HasValue)
+                {
+                    return Error.RuleViolation(Resources.PasswordCredentialRoot_NoAuthenticator);
+                }
+
+                var forwarded = RaiseEventToChildEntity(associated, authenticator.Value);
+                if (forwarded.IsFailure)
+                {
+                    return forwarded.Error;
+                }
+
+                Recorder.TraceDebug(null, "Password credential {Id} is associating authenticator of type {Type}",
+                    Id, associated.Type);
+                return Result.Ok;
+            }
+
+            case MfaAuthenticatorChallenged challenged:
+            {
+                var authenticator = MfaAuthenticators.FindById(challenged.AuthenticatorId.ToId());
+                if (!authenticator.HasValue)
+                {
+                    return Error.RuleViolation(Resources.PasswordCredentialRoot_NoAuthenticator);
+                }
+
+                var forwarded = RaiseEventToChildEntity(challenged, authenticator.Value);
+                if (forwarded.IsFailure)
+                {
+                    return forwarded.Error;
+                }
+
+                Recorder.TraceDebug(null, "Password credential {Id} has challenged authenticator of type {Type}",
+                    Id, challenged.Type);
+                return Result.Ok;
+            }
+
+            case MfaAuthenticatorConfirmed confirmed:
+            {
+                var authenticator = MfaAuthenticators.FindById(confirmed.AuthenticatorId.ToId());
+                if (!authenticator.HasValue)
+                {
+                    return Error.RuleViolation(Resources.PasswordCredentialRoot_NoAuthenticator);
+                }
+
+                var forwarded = RaiseEventToChildEntity(confirmed, authenticator.Value);
+                if (forwarded.IsFailure)
+                {
+                    return forwarded.Error;
+                }
+
+                Recorder.TraceDebug(null,
+                    "Password credential {Id} has associated authenticator {AuthenticatorId} of type {Type}",
+                    Id, confirmed.AuthenticatorId, confirmed.Type);
+                return Result.Ok;
+            }
+
+            case MfaAuthenticatorVerified verified:
+            {
+                var authenticator = MfaAuthenticators.FindById(verified.AuthenticatorId.ToId());
+                if (!authenticator.HasValue)
+                {
+                    return Error.RuleViolation(Resources.PasswordCredentialRoot_NoAuthenticator);
+                }
+
+                var forwarded = RaiseEventToChildEntity(verified, authenticator.Value);
+                if (forwarded.IsFailure)
+                {
+                    return forwarded.Error;
+                }
+
+                Recorder.TraceDebug(null,
+                    "Password credential {Id} has verified authenticator {AuthenticatorId} of type {Type}",
+                    Id, verified.AuthenticatorId, verified.Type);
+                return Result.Ok;
+            }
+
             default:
                 return HandleUnKnownStateChangedEvent(@event);
         }
+    }
+
+    public async Task<Result<MfaAuthenticator, Error>> AssociateMfaAuthenticatorAsync(MfaCaller caller,
+        MfaAuthenticatorType type, Optional<PhoneNumber> oobPhoneNumber,
+        Optional<EmailAddress> oobEmailAddress, Optional<EmailAddress> otpUsername, NotifyChallenged onChallenged)
+    {
+        if (!IsOwner(caller.CallerId))
+        {
+            return Error.RoleViolation(Resources.PasswordCredentialRoot_NotOwner);
+        }
+
+        if (!IsRegistrationVerified)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_RegistrationUnverified);
+        }
+
+        if (!IsPasswordSet)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_NoPassword);
+        }
+
+        if (!IsMfaEnabled)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_MfaNotEnabled);
+        }
+
+        var authenticated = MfaOptions.Authenticate(caller);
+        if (authenticated.IsFailure)
+        {
+            return authenticated.Error;
+        }
+
+        if (type is MfaAuthenticatorType.None or MfaAuthenticatorType.RecoveryCodes)
+        {
+            return Error.RuleViolation(Resources
+                .PasswordCredentialRoot_AssociateMfaAuthenticator_InvalidType);
+        }
+
+        if (!caller.IsAuthenticated)
+        {
+            if (MfaAuthenticators.HasAnyConfirmedPlusRecoveryCodes)
+            {
+                return Error.PreconditionViolation(Resources
+                    .PasswordCredentialRoot_AssociateMfaAuthenticator_MustChallenge);
+            }
+        }
+
+        var authenticator = MfaAuthenticators.FindByType(type);
+        if (authenticator is { HasValue: true, Value.HasBeenConfirmed: true })
+        {
+            return Error.PreconditionViolation(Resources
+                .PasswordCredentialRoot_AssociateMfaAuthenticator_AlreadyAssociated);
+        }
+
+        var recoveryCodesAuthenticator = MfaAuthenticators.FindRecoveryCodes();
+        if (!recoveryCodesAuthenticator.HasValue)
+        {
+            var recoveryCodesCompleted = AddRecoveryCodes();
+            if (recoveryCodesCompleted.IsFailure)
+            {
+                return recoveryCodesCompleted.Error;
+            }
+        }
+
+        if (!authenticator.HasValue)
+        {
+            var added =
+                RaiseChangeEvent(
+                    IdentityDomain.Events.PasswordCredentials.MfaAuthenticatorAdded(Id, UserId, type, true));
+            if (added.IsFailure)
+            {
+                return added.Error;
+            }
+
+            authenticator = MfaAuthenticators.FindByType(type).Value;
+        }
+
+        var associated =
+            authenticator.Value.Associate(oobPhoneNumber, oobEmailAddress, otpUsername, Optional<string>.None);
+        if (associated.IsFailure)
+        {
+            return associated.Error;
+        }
+
+        // Send challenge to user
+        authenticator = MfaAuthenticators.FindByType(type).Value;
+        var handled = await onChallenged(authenticator.Value);
+        if (handled.IsFailure)
+        {
+            return handled.Error;
+        }
+
+        return authenticator.Value;
+
+        Result<Error> AddRecoveryCodes()
+        {
+            var recoveryAdded =
+                RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.MfaAuthenticatorAdded(Id, UserId,
+                    MfaAuthenticatorType.RecoveryCodes, true));
+            if (recoveryAdded.IsFailure)
+            {
+                return recoveryAdded.Error;
+            }
+
+            recoveryCodesAuthenticator = MfaAuthenticators.FindRecoveryCodes();
+            var recoveryCodes = MfaAuthenticators.GenerateRecoveryCodes();
+            var recoveryAssociated = recoveryCodesAuthenticator.Value.Associate(Optional<PhoneNumber>.None,
+                Optional<EmailAddress>.None, Optional<EmailAddress>.None, recoveryCodes);
+            if (recoveryAssociated.IsFailure)
+            {
+                return recoveryAssociated.Error;
+            }
+
+            return recoveryCodesAuthenticator.Value.ConfirmAssociation(Optional<string>.None,
+                Optional<string>.None);
+        }
+    }
+
+    public async Task<Result<MfaAuthenticator, Error>> ChallengeMfaAuthenticatorAsync(MfaCaller caller,
+        Identifier authenticatorId, NotifyChallenged onChallenged)
+    {
+        if (!IsOwner(caller.CallerId))
+        {
+            return Error.RoleViolation(Resources.PasswordCredentialRoot_NotOwner);
+        }
+
+        if (!IsRegistrationVerified)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_RegistrationUnverified);
+        }
+
+        if (!IsPasswordSet)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_NoPassword);
+        }
+
+        if (!IsMfaEnabled)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_MfaNotEnabled);
+        }
+
+        var authenticated = MfaOptions.Authenticate(caller);
+        if (authenticated.IsFailure)
+        {
+            return authenticated.Error;
+        }
+
+        var authenticator = MfaAuthenticators.FindById(authenticatorId);
+        if (!authenticator.HasValue)
+        {
+            return Error.EntityNotFound();
+        }
+
+        var challenged = authenticator.Value.Challenge();
+        if (challenged.IsFailure)
+        {
+            return challenged.Error;
+        }
+
+        // Send challenge to user
+        var handled = await onChallenged(authenticator.Value);
+        if (handled.IsFailure)
+        {
+            return handled.Error;
+        }
+
+        return authenticator.Value;
+    }
+
+    public Result<Error> ChangeMfaEnabled(Identifier modifierId, bool isEnabled)
+    {
+        if (!IsOwner(modifierId))
+        {
+            return Error.RoleViolation(Resources.PasswordCredentialRoot_NotOwner);
+        }
+
+        if (!IsRegistrationVerified)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_RegistrationUnverified);
+        }
+
+        if (!IsPasswordSet)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_NoPassword);
+        }
+
+        if (MfaOptions.IsEnabled == isEnabled)
+        {
+            return Result.Ok;
+        }
+
+        var changed = MfaOptions.Enable(isEnabled);
+        if (changed.IsFailure)
+        {
+            return changed.Error;
+        }
+
+        if (!isEnabled)
+        {
+            var deleted = DeleteAllMfaAuthenticators();
+            if (deleted.IsFailure)
+            {
+                return deleted.Error;
+            }
+        }
+
+        return RaiseChangeEvent(
+            IdentityDomain.Events.PasswordCredentials.MfaOptionsChanged(Id, UserId, changed.Value));
     }
 
     public Result<Error> CompletePasswordReset(string token, string password)
@@ -232,30 +641,30 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
         }
 
         if (password.IsInvalidParameter(pwd => _passwordHasherService.ValidatePassword(pwd, false),
-                nameof(password), Resources.PasswordCredentialsRoot_InvalidPassword, out var error2))
+                nameof(password), Resources.PasswordCredentialRoot_InvalidPassword, out var error2))
         {
             return error2;
         }
 
         if (!IsPasswordSet)
         {
-            return Error.PreconditionViolation(Resources.PasswordCredentialsRoot_NoPassword);
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_NoPassword);
         }
 
         if (password.IsInvalidParameter(pwd => !_passwordHasherService.VerifyPassword(pwd, Password.PasswordHash),
-                nameof(password), Resources.PasswordCredentialsRoot_DuplicatePassword, out var error3))
+                nameof(password), Resources.PasswordCredentialRoot_DuplicatePassword, out var error3))
         {
             return error3;
         }
 
         if (!IsRegistrationVerified)
         {
-            return Error.PreconditionViolation(Resources.PasswordCredentialsRoot_RegistrationUnverified);
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_RegistrationUnverified);
         }
 
         if (!IsPasswordResetStillValid)
         {
-            return Error.PreconditionViolation(Resources.PasswordCredentialsRoot_PasswordResetTokenExpired);
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_PasswordResetTokenExpired);
         }
 
         var passwordHash = _passwordHasherService.HashPassword(password);
@@ -274,11 +683,143 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
         return Result.Ok;
     }
 
+    public Result<Error> ConfirmMfaAuthenticatorAssociation(MfaCaller caller,
+        MfaAuthenticatorType type, string? oobCode, string confirmationCode)
+    {
+        if (!IsOwner(caller.CallerId))
+        {
+            return Error.RoleViolation(Resources.PasswordCredentialRoot_NotOwner);
+        }
+
+        if (!IsRegistrationVerified)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_RegistrationUnverified);
+        }
+
+        if (!IsPasswordSet)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_NoPassword);
+        }
+
+        if (!IsMfaEnabled)
+        {
+            return Error.RuleViolation(Resources.PasswordCredentialRoot_MfaNotEnabled);
+        }
+
+        var authenticated = MfaOptions.Authenticate(caller);
+        if (authenticated.IsFailure)
+        {
+            return authenticated.Error;
+        }
+
+        if (type is MfaAuthenticatorType.None or MfaAuthenticatorType.RecoveryCodes)
+        {
+            return Error.RuleViolation(Resources
+                .PasswordCredentialRoot_AssociateMfaAuthenticator_InvalidType);
+        }
+
+        var authenticator = MfaAuthenticators.FindByType(type);
+        if (!authenticator.HasValue)
+        {
+            return Error.PreconditionViolation(Resources
+                .PasswordCredentialRoot_CompleteMfaAuthenticatorAssociation_NotFound);
+        }
+
+        return authenticator.Value.ConfirmAssociation(oobCode, confirmationCode);
+    }
+
+    public Result<MfaAuthenticator, Error> DisassociateMfaAuthenticator(MfaCaller caller,
+        Identifier authenticatorId)
+    {
+        if (!IsOwner(caller.CallerId))
+        {
+            return Error.RoleViolation(Resources.PasswordCredentialRoot_NotOwner);
+        }
+
+        if (!IsRegistrationVerified)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_RegistrationUnverified);
+        }
+
+        if (!IsPasswordSet)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_NoPassword);
+        }
+
+        if (!IsMfaEnabled)
+        {
+            return Error.RuleViolation(Resources.PasswordCredentialRoot_MfaNotEnabled);
+        }
+
+        var authenticator = MfaAuthenticators.FindById(authenticatorId);
+        if (!authenticator.HasValue)
+        {
+            return Error.EntityNotFound();
+        }
+
+        var recoveryCodesAuthenticator = MfaAuthenticators.FindRecoveryCodes();
+        if (recoveryCodesAuthenticator.HasValue
+            && recoveryCodesAuthenticator.Value.Id == authenticatorId)
+        {
+            return Error.RuleViolation(Resources
+                .PasswordCredentialRoot_DisassociateMfaAuthenticator_RecoveryCodesCannotBeDeleted);
+        }
+
+        var authenticatorDeleted = RaiseChangeEvent(
+            IdentityDomain.Events.PasswordCredentials.MfaAuthenticatorRemoved(Id, UserId, authenticator));
+        if (authenticatorDeleted.IsFailure)
+        {
+            return authenticatorDeleted.Error;
+        }
+
+        if (MfaAuthenticators.HasOnlyRecoveryCodes)
+        {
+            var recoveryDeleted = RaiseChangeEvent(
+                IdentityDomain.Events.PasswordCredentials.MfaAuthenticatorRemoved(Id, UserId,
+                    recoveryCodesAuthenticator.Value));
+            if (recoveryDeleted.IsFailure)
+            {
+                return recoveryDeleted.Error;
+            }
+        }
+
+        return authenticator.Value;
+    }
+
+    public Result<string, Error> InitiateMfaAuthentication()
+    {
+        if (!IsRegistrationVerified)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_RegistrationUnverified);
+        }
+
+        if (!IsPasswordSet)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_NoPassword);
+        }
+
+        var initiated = MfaOptions.InitiateAuthentication(_tokensService);
+        if (initiated.IsFailure)
+        {
+            return initiated.Error;
+        }
+
+        var raised =
+            RaiseChangeEvent(
+                IdentityDomain.Events.PasswordCredentials.MfaAuthenticationInitiated(Id, UserId, initiated.Value));
+        if (raised.IsFailure)
+        {
+            return raised.Error;
+        }
+
+        return MfaOptions.AuthenticationToken.Value;
+    }
+
     public Result<Error> InitiatePasswordReset()
     {
         if (!IsRegistrationVerified)
         {
-            return Error.PreconditionViolation(Resources.PasswordCredentialsRoot_RegistrationUnverified);
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_RegistrationUnverified);
         }
 
         var token = _tokensService.CreatePasswordResetToken();
@@ -289,7 +830,7 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
     {
         if (IsVerified)
         {
-            return Error.PreconditionViolation(Resources.PasswordCredentialsRoot_RegistrationVerified);
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_RegistrationVerified);
         }
 
         var token = _tokensService.CreateRegistrationVerificationToken();
@@ -297,10 +838,36 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
             IdentityDomain.Events.PasswordCredentials.RegistrationVerificationCreated(Id, token));
     }
 
+    public Result<Error> ResetMfa(Roles resetterRoles)
+    {
+        if (!IsOperations(resetterRoles))
+        {
+            return Error.RoleViolation(Resources.PasswordCredentialRoot_NotOperator);
+        }
+
+        if (!IsRegistrationVerified)
+        {
+            return Result.Ok;
+        }
+
+        if (!IsPasswordSet)
+        {
+            return Result.Ok;
+        }
+
+        var deleted = DeleteAllMfaAuthenticators();
+        if (deleted.IsFailure)
+        {
+            return deleted.Error;
+        }
+
+        return RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.MfaStateReset(Id, UserId, DefaultMfaOptions));
+    }
+
     public Result<Error> SetPasswordCredential(string password)
     {
         if (password.IsInvalidParameter(pwd => _passwordHasherService.ValidatePassword(pwd, true),
-                nameof(password), Resources.PasswordCredentialsRoot_InvalidPassword, out var error1))
+                nameof(password), Resources.PasswordCredentialRoot_InvalidPassword, out var error1))
         {
             return error1;
         }
@@ -359,10 +926,60 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
     }
 #endif
 
+    public Result<Error> VerifyMfaAuthenticator(MfaCaller caller,
+        MfaAuthenticatorType type, string? oobCode, string confirmationCode)
+    {
+        if (caller.IsAuthenticated)
+        {
+            return Error.ForbiddenAccess();
+        }
+
+        if (!IsOwner(caller.CallerId))
+        {
+            return Error.RoleViolation(Resources.PasswordCredentialRoot_NotOwner);
+        }
+
+        if (!IsRegistrationVerified)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_RegistrationUnverified);
+        }
+
+        if (!IsPasswordSet)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_NoPassword);
+        }
+
+        if (!IsMfaEnabled)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_MfaNotEnabled);
+        }
+
+        var authenticated = MfaOptions.Authenticate(caller);
+        if (authenticated.IsFailure)
+        {
+            return authenticated.Error;
+        }
+
+        if (type is MfaAuthenticatorType.None)
+        {
+            return Error.RuleViolation(Resources
+                .PasswordCredentialRoot_AssociateMfaAuthenticator_InvalidType);
+        }
+
+        var authenticator = MfaAuthenticators.FindByType(type);
+        if (!authenticator.HasValue)
+        {
+            return Error.PreconditionViolation(Resources
+                .PasswordCredentialRoot_CompleteMfaAuthenticatorAssociation_NotFound);
+        }
+
+        return authenticator.Value.Verify(oobCode, confirmationCode);
+    }
+
     public Result<bool, Error> VerifyPassword(string password, bool auditAttempt = true)
     {
         if (password.IsInvalidParameter(pwd => _passwordHasherService.ValidatePassword(pwd, false),
-                nameof(password), Resources.PasswordCredentialsRoot_InvalidPassword, out var error1))
+                nameof(password), Resources.PasswordCredentialRoot_InvalidPassword, out var error1))
         {
             return error1;
         }
@@ -421,11 +1038,73 @@ public sealed class PasswordCredentialRoot : AggregateRootBase
         if (!IsVerificationStillVerifying)
         {
             return Error.PreconditionViolation(!IsVerificationVerifying
-                ? Resources.PasswordCredentialsRoot_RegistrationNotVerifying
-                : Resources.PasswordCredentialsRoot_RegistrationVerifyingExpired);
+                ? Resources.PasswordCredentialRoot_RegistrationNotVerifying
+                : Resources.PasswordCredentialRoot_RegistrationVerifyingExpired);
         }
 
         return RaiseChangeEvent(IdentityDomain.Events.PasswordCredentials.RegistrationVerificationVerified(Id));
+    }
+
+    public Result<Error> ViewMfaAuthenticators(MfaCaller caller)
+    {
+        if (!IsOwner(caller.CallerId))
+        {
+            return Error.RoleViolation(Resources.PasswordCredentialRoot_NotOwner);
+        }
+
+        if (!IsRegistrationVerified)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_RegistrationUnverified);
+        }
+
+        if (!IsPasswordSet)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_NoPassword);
+        }
+
+        if (!IsMfaEnabled)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialRoot_MfaNotEnabled);
+        }
+
+        var authenticated = MfaOptions.Authenticate(caller);
+        if (authenticated.IsFailure)
+        {
+            return authenticated.Error;
+        }
+
+        return Result.Ok;
+    }
+
+    private Result<Error> DeleteAllMfaAuthenticators()
+    {
+        var authenticators = MfaAuthenticators.WithoutRecoveryCodes();
+        foreach (var authenticator in authenticators)
+        {
+            var caller = MfaCaller.Create(UserId, null);
+            if (caller.IsFailure)
+            {
+                return caller.Error;
+            }
+
+            var disassociated = DisassociateMfaAuthenticator(caller.Value, authenticator.Id);
+            if (disassociated.IsFailure)
+            {
+                return disassociated.Error;
+            }
+        }
+
+        return Result.Ok;
+    }
+
+    private bool IsOwner(Identifier userId)
+    {
+        return UserId == userId;
+    }
+
+    private static bool IsOperations(Roles roles)
+    {
+        return roles.HasRole(PlatformRoles.Operations);
     }
 
     private static LoginMonitor CreateLoginMonitor(IConfigurationSettings settings)

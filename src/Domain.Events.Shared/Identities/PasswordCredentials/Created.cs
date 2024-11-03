@@ -15,5 +15,9 @@ public sealed class Created : DomainEvent
     {
     }
 
+    public required bool IsMfaEnabled { get; set; }
+
+    public required bool MfaCanBeDisabled { get; set; }
+
     public required string UserId { get; set; }
 }

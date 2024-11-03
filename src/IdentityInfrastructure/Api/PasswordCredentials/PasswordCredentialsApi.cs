@@ -70,6 +70,7 @@ public class PasswordCredentialsApi : IWebApiService
     }
 #endif
 
+
     public async Task<ApiPostResult<PasswordCredential, RegisterPersonPasswordResponse>> RegisterPerson(
         RegisterPersonPasswordRequest request, CancellationToken cancellationToken)
     {

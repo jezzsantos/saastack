@@ -9,18 +9,21 @@ using IdentityDomain;
 using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
+using MfaAuthenticator = IdentityApplication.Persistence.ReadModels.MfaAuthenticator;
 
 namespace IdentityInfrastructure.Persistence;
 
 public class PasswordCredentialsRepository : IPasswordCredentialsRepository
 {
     private readonly ISnapshottingQueryStore<PasswordCredential> _credentialQueries;
+    private readonly ISnapshottingQueryStore<MfaAuthenticator> _mfaAuthenticatorsQueries;
     private readonly IEventSourcingDddCommandStore<PasswordCredentialRoot> _credentials;
 
     public PasswordCredentialsRepository(IRecorder recorder, IDomainFactory domainFactory,
         IEventSourcingDddCommandStore<PasswordCredentialRoot> credentialsStore, IDataStore store)
     {
         _credentialQueries = new SnapshottingQueryStore<PasswordCredential>(recorder, domainFactory, store);
+        _mfaAuthenticatorsQueries = new SnapshottingQueryStore<MfaAuthenticator>(recorder, domainFactory, store);
         _credentials = credentialsStore;
     }
 
@@ -29,9 +32,18 @@ public class PasswordCredentialsRepository : IPasswordCredentialsRepository
     {
         return await Tasks.WhenAllAsync(
             _credentialQueries.DestroyAllAsync(cancellationToken),
+            _mfaAuthenticatorsQueries.DestroyAllAsync(cancellationToken),
             _credentials.DestroyAllAsync(cancellationToken));
     }
 #endif
+
+    public async Task<Result<Optional<PasswordCredentialRoot>, Error>> FindCredentialsByMfaAuthenticationTokenAsync(
+        string token, CancellationToken cancellationToken)
+    {
+        var query = Query.From<PasswordCredential>()
+            .Where<string>(pc => pc.MfaAuthenticationToken, ConditionOperator.EqualTo, token);
+        return await FindFirstByQueryAsync(query, cancellationToken);
+    }
 
     public async Task<Result<Optional<PasswordCredentialRoot>, Error>> FindCredentialsByPasswordResetTokenAsync(
         string token, CancellationToken cancellationToken)
@@ -69,10 +81,30 @@ public class PasswordCredentialsRepository : IPasswordCredentialsRepository
     public async Task<Result<PasswordCredentialRoot, Error>> SaveAsync(PasswordCredentialRoot credential,
         CancellationToken cancellationToken)
     {
+        return await SaveAsync(credential, false, cancellationToken);
+    }
+
+    public async Task<Result<PasswordCredentialRoot, Error>> SaveAsync(PasswordCredentialRoot credential, bool reload,
+        CancellationToken cancellationToken)
+    {
         var saved = await _credentials.SaveAsync(credential, cancellationToken);
         if (saved.IsFailure)
         {
             return saved.Error;
+        }
+
+        return reload
+            ? await LoadAsync(credential.Id, cancellationToken)
+            : credential;
+    }
+
+    private async Task<Result<PasswordCredentialRoot, Error>> LoadAsync(Identifier id,
+        CancellationToken cancellationToken)
+    {
+        var credential = await _credentials.LoadAsync(id, cancellationToken);
+        if (credential.IsFailure)
+        {
+            return credential.Error;
         }
 
         return credential;
@@ -94,12 +126,12 @@ public class PasswordCredentialsRepository : IPasswordCredentialsRepository
             return Optional<PasswordCredentialRoot>.None;
         }
 
-        var tokens = await _credentials.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
-        if (tokens.IsFailure)
+        var credential = await _credentials.LoadAsync(matching.Id.Value.ToId(), cancellationToken);
+        if (credential.IsFailure)
         {
-            return tokens.Error;
+            return credential.Error;
         }
 
-        return tokens.Value.ToOptional();
+        return credential.Value.ToOptional();
     }
 }

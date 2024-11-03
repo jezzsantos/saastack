@@ -18,7 +18,7 @@ using IdentityDomain.DomainServices;
 
 namespace IdentityApplication;
 
-public class PasswordCredentialsApplication : IPasswordCredentialsApplication
+public partial class PasswordCredentialsApplication : IPasswordCredentialsApplication
 {
     public const string ProviderName = "credentials";
 #if TESTINGONLY
@@ -34,6 +34,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
     private readonly IEmailAddressService _emailAddressService;
     private readonly ITokensService _tokensService;
     private readonly IPasswordHasherService _passwordHasherService;
+    private readonly IMfaService _mfaService;
     private readonly IAuthTokensService _authTokensService;
     private readonly IWebsiteUiService _websiteUiService;
     private readonly IRecorder _recorder;
@@ -41,17 +42,18 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
     private readonly IPasswordCredentialsRepository _repository;
     private readonly IDelayGenerator _delayGenerator;
     private readonly IUserProfilesService _userProfilesService;
+    private readonly IEncryptionService _encryptionService;
 
     public PasswordCredentialsApplication(IRecorder recorder, IIdentifierFactory identifierFactory,
         IEndUsersService endUsersService, IUserProfilesService userProfilesService,
         IUserNotificationsService userNotificationsService,
         IConfigurationSettings settings,
-        IEmailAddressService emailAddressService, ITokensService tokensService,
-        IPasswordHasherService passwordHasherService, IAuthTokensService authTokensService,
+        IEmailAddressService emailAddressService, ITokensService tokensService, IEncryptionService encryptionService,
+        IPasswordHasherService passwordHasherService, IMfaService mfaService, IAuthTokensService authTokensService,
         IWebsiteUiService websiteUiService,
         IPasswordCredentialsRepository repository) : this(recorder, identifierFactory, endUsersService,
-        userProfilesService, userNotificationsService, settings, emailAddressService, tokensService,
-        passwordHasherService, authTokensService, websiteUiService, repository, new DelayGenerator())
+        userProfilesService, userNotificationsService, settings, emailAddressService, tokensService, encryptionService,
+        passwordHasherService, mfaService, authTokensService, websiteUiService, repository, new DelayGenerator())
     {
         _recorder = recorder;
         _endUsersService = endUsersService;
@@ -62,8 +64,8 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         IEndUsersService endUsersService, IUserProfilesService userProfilesService,
         IUserNotificationsService userNotificationsService,
         IConfigurationSettings settings,
-        IEmailAddressService emailAddressService, ITokensService tokensService,
-        IPasswordHasherService passwordHasherService, IAuthTokensService authTokensService,
+        IEmailAddressService emailAddressService, ITokensService tokensService, IEncryptionService encryptionService,
+        IPasswordHasherService passwordHasherService, IMfaService mfaService, IAuthTokensService authTokensService,
         IWebsiteUiService websiteUiService,
         IPasswordCredentialsRepository repository,
         IDelayGenerator delayGenerator)
@@ -76,7 +78,9 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         _settings = settings;
         _emailAddressService = emailAddressService;
         _tokensService = tokensService;
+        _encryptionService = encryptionService;
         _passwordHasherService = passwordHasherService;
+        _mfaService = mfaService;
         _authTokensService = authTokensService;
         _websiteUiService = websiteUiService;
         _repository = repository;
@@ -99,9 +103,9 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
             return Error.NotAuthenticated();
         }
 
-        var credentials = retrievedCredentials.Value.Value;
+        var credential = retrievedCredentials.Value.Value;
         var retrievedUser =
-            await _endUsersService.GetMembershipsPrivateAsync(caller, credentials.UserId, cancellationToken);
+            await _endUsersService.GetMembershipsPrivateAsync(caller, credential.UserId, cancellationToken);
         if (retrievedUser.IsFailure)
         {
             return Error.NotAuthenticated();
@@ -126,7 +130,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
             return Error.EntityLocked(Resources.PasswordCredentialsApplication_AccountSuspended);
         }
 
-        if (credentials.IsLocked)
+        if (credential.IsLocked)
         {
             _recorder.AuditAgainst(caller.ToCall(), user.Id,
                 Audits.PasswordCredentialsApplication_Authenticate_AccountLocked,
@@ -134,13 +138,21 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
             return Error.EntityLocked(Resources.PasswordCredentialsApplication_AccountLocked);
         }
 
-        var verifyPassword = await VerifyPasswordAsync();
-        if (verifyPassword.IsFailure)
+        var verified = credential.VerifyPassword(password);
+        if (verified.IsFailure)
         {
-            return verifyPassword.Error;
+            return verified.Error;
         }
 
-        var isVerified = verifyPassword.Value;
+        var saved = await _repository.SaveAsync(credential, true, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        _recorder.TraceInformation(caller.ToCall(), "Credentials were verified for {Id}", saved.Value.Id);
+        credential = saved.Value;
+        var isVerified = verified.Value;
         if (!isVerified)
         {
             _recorder.AuditAgainst(caller.ToCall(), user.Id,
@@ -149,7 +161,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
             return Error.NotAuthenticated();
         }
 
-        if (!credentials.IsVerified)
+        if (!credential.IsVerified)
         {
             _recorder.AuditAgainst(caller.ToCall(), user.Id,
                 Audits.PasswordCredentialsApplication_Authenticate_BeforeVerified,
@@ -171,110 +183,34 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         _recorder.TrackUsageFor(caller.ToCall(), user.Id, UsageConstants.Events.UsageScenarios.Generic.UserLogin,
             user.ToLoginUserUsage(ProviderName, profile));
 
-        var issued = await _authTokensService.IssueTokensAsync(caller, user, cancellationToken);
-        if (issued.IsFailure)
+        if (credential.IsMfaEnabled)
         {
-            return issued.Error;
-        }
-
-        var tokens = issued.Value;
-        return new Result<AuthenticateTokens, Error>(new AuthenticateTokens
-        {
-            AccessToken = new AuthenticationToken
+            var initiated = credential.InitiateMfaAuthentication();
+            if (initiated.IsFailure)
             {
-                Value = tokens.AccessToken,
-                ExpiresOn = tokens.AccessTokenExpiresOn,
-                Type = TokenType.AccessToken
-            },
-            RefreshToken = new AuthenticationToken
-            {
-                Value = tokens.RefreshToken,
-                ExpiresOn = tokens.RefreshTokenExpiresOn,
-                Type = TokenType.RefreshToken
-            },
-            UserId = user.Id
-        });
-
-        async Task<Result<bool, Error>> VerifyPasswordAsync()
-        {
-            var verify = credentials.VerifyPassword(password);
-            if (verify.IsFailure)
-            {
-                return verify.Error;
+                return initiated.Error;
             }
 
-            var saved1 = await _repository.SaveAsync(credentials, cancellationToken);
-            if (saved1.IsFailure)
+            var mfaToken = initiated.Value;
+            saved = await _repository.SaveAsync(credential, cancellationToken);
+            if (saved.IsFailure)
             {
-                return saved1.Error;
+                return saved.Error;
             }
 
-            _recorder.TraceInformation(caller.ToCall(), "Credentials were verified for {Id}", saved1.Value.Id);
-
-            return verify.Value;
-        }
-    }
-
-    public async Task<Result<Error>> InitiatePasswordResetAsync(ICallerContext caller, string emailAddress,
-        CancellationToken cancellationToken)
-    {
-        var retrieved = await _repository.FindCredentialsByUsernameAsync(emailAddress, cancellationToken);
-        if (retrieved.IsFailure)
-        {
-            return retrieved.Error;
+            return Error.ForbiddenAccess(Resources.PasswordCredentialsApplication_MfaRequired, MfaRequiredCode,
+                new Dictionary<string, object>
+                {
+                    { MfaTokenName, mfaToken }
+                });
         }
 
-        if (!retrieved.Value.HasValue)
-        {
-            var warned =
-                await _userNotificationsService.NotifyPasswordResetUnknownUserCourtesyAsync(caller, emailAddress,
-                    UserNotificationConstants.EmailTags.PasswordResetUnknownUser, cancellationToken);
-            if (warned.IsFailure)
-            {
-                return warned.Error;
-            }
-
-            return Result.Ok;
-        }
-
-        var credentials = retrieved.Value.Value;
-        var initiated = credentials.InitiatePasswordReset();
-        if (initiated.IsFailure)
-        {
-            return initiated.Error;
-        }
-
-        var registration = credentials.Registration.Value;
-        var notified = await _userNotificationsService.NotifyPasswordResetInitiatedAsync(caller, registration.Name,
-            emailAddress, credentials.Password.ResetToken, UserNotificationConstants.EmailTags.PasswordResetInitiated,
-            cancellationToken);
-        if (notified.IsFailure)
-        {
-            return notified.Error;
-        }
-
-        var saved = await _repository.SaveAsync(credentials, cancellationToken);
-        if (saved.IsFailure)
-        {
-            return saved.Error;
-        }
-
-        credentials = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Password reset initiated for {Id}", credentials.UserId);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserPasswordForgotten,
-            new Dictionary<string, object>
-            {
-                { nameof(PasswordCredential.Id), credentials.UserId }
-            });
-
-        return Result.Ok;
+        return await IssueAuthenticationTokensAsync(caller, user, cancellationToken);
     }
 
     public async Task<Result<PasswordCredential, Error>> RegisterPersonAsync(ICallerContext caller,
-        string? invitationToken, string firstName,
-        string lastName, string emailAddress, string password, string? timezone, string? countryCode,
-        bool termsAndConditionsAccepted,
-        CancellationToken cancellationToken)
+        string? invitationToken, string firstName, string lastName, string emailAddress, string password,
+        string? timezone, string? countryCode, bool termsAndConditionsAccepted, CancellationToken cancellationToken)
     {
         var registered = await _endUsersService.RegisterPersonPrivateAsync(caller, invitationToken, emailAddress,
             firstName, lastName, timezone, countryCode, termsAndConditionsAccepted, cancellationToken);
@@ -287,10 +223,10 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
             cancellationToken);
     }
 
-    public async Task<Result<Error>> ResendPasswordResetAsync(ICallerContext caller, string token,
+    public async Task<Result<PasswordCredential, Error>> GetPasswordCredentialAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
-        var retrieved = await _repository.FindCredentialsByPasswordResetTokenAsync(token, cancellationToken);
+        var retrieved = await _repository.FindCredentialsByUserIdAsync(caller.CallerId.ToId(), cancellationToken);
         if (retrieved.IsFailure)
         {
             return retrieved.Error;
@@ -301,96 +237,23 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
             return Error.EntityNotFound();
         }
 
-        var credentials = retrieved.Value.Value;
-        var initiated = credentials.InitiatePasswordReset();
-        if (initiated.IsFailure)
+        var credential = retrieved.Value.Value;
+        var retrievedUser = await _endUsersService.GetUserPrivateAsync(caller, caller.CallerId, cancellationToken);
+        if (retrievedUser.IsFailure)
         {
-            return initiated.Error;
+            return retrievedUser.Error;
         }
 
-        var registration = credentials.Registration.Value;
-        var notified = await _userNotificationsService.NotifyPasswordResetInitiatedAsync(caller, registration.Name,
-            registration.EmailAddress, credentials.Password.ResetToken,
-            UserNotificationConstants.EmailTags.PasswordResetResend, cancellationToken);
-        if (notified.IsFailure)
+        var user = retrievedUser.Value;
+        if (user.Classification != EndUserClassification.Person)
         {
-            return notified.Error;
+            return Error.PreconditionViolation(Resources.PasswordCredentialsApplication_NotPerson);
         }
 
-        var saved = await _repository.SaveAsync(credentials, cancellationToken);
-        if (saved.IsFailure)
-        {
-            return saved.Error;
-        }
+        _recorder.TraceInformation(caller.ToCall(), "Password credentials for {UserId} has been retrieved",
+            credential.UserId);
 
-        credentials = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Password reset re-initiated for {Id}", credentials.UserId);
-
-        return Result.Ok;
-    }
-
-    public async Task<Result<Error>> VerifyPasswordResetAsync(ICallerContext caller, string token,
-        CancellationToken cancellationToken)
-    {
-        var retrieved = await _repository.FindCredentialsByPasswordResetTokenAsync(token, cancellationToken);
-        if (retrieved.IsFailure)
-        {
-            return retrieved.Error;
-        }
-
-        if (!retrieved.Value.HasValue)
-        {
-            return Error.EntityNotFound();
-        }
-
-        var credentials = retrieved.Value.Value;
-        var verified = credentials.VerifyPasswordReset(token);
-        if (verified.IsFailure)
-        {
-            return verified.Error;
-        }
-
-        _recorder.TraceInformation(caller.ToCall(), "Password reset verified for {Id}", credentials.UserId);
-
-        return Result.Ok;
-    }
-
-    public async Task<Result<Error>> CompletePasswordResetAsync(ICallerContext caller, string token, string password,
-        CancellationToken cancellationToken)
-    {
-        var retrieved = await _repository.FindCredentialsByPasswordResetTokenAsync(token, cancellationToken);
-        if (retrieved.IsFailure)
-        {
-            return retrieved.Error;
-        }
-
-        if (!retrieved.Value.HasValue)
-        {
-            return Error.EntityNotFound();
-        }
-
-        var credentials = retrieved.Value.Value;
-        var reset = credentials.CompletePasswordReset(token, password);
-        if (reset.IsFailure)
-        {
-            return reset.Error;
-        }
-
-        var saved = await _repository.SaveAsync(credentials, cancellationToken);
-        if (saved.IsFailure)
-        {
-            return saved.Error;
-        }
-
-        credentials = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Password was reset for {Id}", credentials.UserId);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserPasswordReset,
-            new Dictionary<string, object>
-            {
-                { nameof(credentials.Id), credentials.UserId }
-            });
-
-        return Result.Ok;
+        return credential.ToCredential(user);
     }
 
 #if TESTINGONLY
@@ -422,6 +285,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
             Url = _websiteUiService.ConstructPasswordRegistrationConfirmationPageUrl(credential.VerificationKeep.Token)
         };
     }
+
 #endif
 
     public async Task<Result<Error>> ConfirmPersonRegistrationAsync(ICallerContext caller, string token,
@@ -463,6 +327,34 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         return Result.Ok;
     }
 
+    private async Task<Result<AuthenticateTokens, Error>> IssueAuthenticationTokensAsync(ICallerContext caller,
+        EndUserWithMemberships user, CancellationToken cancellationToken)
+    {
+        var issued = await _authTokensService.IssueTokensAsync(caller, user, cancellationToken);
+        if (issued.IsFailure)
+        {
+            return issued.Error;
+        }
+
+        var tokens = issued.Value;
+        return new Result<AuthenticateTokens, Error>(new AuthenticateTokens
+        {
+            AccessToken = new AuthenticationToken
+            {
+                Value = tokens.AccessToken,
+                ExpiresOn = tokens.AccessTokenExpiresOn,
+                Type = TokenType.AccessToken
+            },
+            RefreshToken = new AuthenticationToken
+            {
+                Value = tokens.RefreshToken,
+                ExpiresOn = tokens.RefreshTokenExpiresOn,
+                Type = TokenType.RefreshToken
+            },
+            UserId = user.Id
+        });
+    }
+
     private async Task<Result<PasswordCredential, Error>> RegisterPersonInternalAsync(ICallerContext caller,
         string emailAddress, string password, string displayName, EndUser user, CancellationToken cancellationToken)
     {
@@ -478,7 +370,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         }
 
         var created = PasswordCredentialRoot.Create(_recorder, _identifierFactory, _settings, _emailAddressService,
-            _tokensService, _passwordHasherService, user.Id.ToId());
+            _tokensService, _encryptionService, _passwordHasherService, _mfaService, user.Id.ToId());
         if (created.IsFailure)
         {
             return created.Error;
@@ -558,6 +450,7 @@ internal static class PasswordCredentialConversionExtensions
         return new PasswordCredential
         {
             Id = credential.Id,
+            IsMfaEnabled = credential.IsMfaEnabled,
             User = user
         };
     }

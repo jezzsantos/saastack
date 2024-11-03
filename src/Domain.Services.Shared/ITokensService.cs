@@ -11,9 +11,13 @@ public interface ITokensService
 
     string CreateJWTRefreshToken();
 
+    string CreateMfaAuthenticationToken();
+
     string CreatePasswordResetToken();
 
     string CreateRegistrationVerificationToken();
+
+    string GenerateRandomToken();
 
     Optional<APIKeyToken> ParseApiKey(string apiKey);
 }

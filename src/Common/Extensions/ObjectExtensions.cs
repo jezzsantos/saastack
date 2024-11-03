@@ -1,6 +1,7 @@
 #if COMMON_PROJECT
 using AutoMapper;
 #endif
+using System.Diagnostics;
 #if COMMON_PROJECT || GENERATORS_WEB_API_PROJECT || ANALYZERS_NONPLATFORM || ANALYZERS_PLATFORM
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
@@ -8,6 +9,7 @@ using JetBrains.Annotations;
 
 namespace Common.Extensions;
 
+[DebuggerStepThrough]
 public static class ObjectExtensions
 {
 #if COMMON_PROJECT

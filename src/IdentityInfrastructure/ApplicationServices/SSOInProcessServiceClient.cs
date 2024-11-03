@@ -16,16 +16,28 @@ public class SSOInProcessServiceClient : ISSOService
     }
 
     public Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensAsync(ICallerContext caller,
-        string userId,
         CancellationToken cancellationToken)
     {
-        return _singleSignOnApplication.GetTokensAsync(caller, userId, cancellationToken);
+        return _singleSignOnApplication.GetTokensAsync(caller, cancellationToken);
     }
 
-    public Task<Result<ProviderAuthenticationTokens, Error>> RefreshTokenAsync(ICallerContext caller, string userId,
+    public Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensOnBehalfOfUserAsync(
+        ICallerContext caller, string userId, CancellationToken cancellationToken)
+    {
+        return _singleSignOnApplication.GetTokensOnBehalfOfUserAsync(caller, userId, cancellationToken);
+    }
+
+    public Task<Result<ProviderAuthenticationTokens, Error>> RefreshTokenAsync(ICallerContext caller,
         string providerName, string refreshToken, CancellationToken cancellationToken)
     {
-        return _singleSignOnApplication.RefreshTokenAsync(caller, userId, providerName, refreshToken,
+        return _singleSignOnApplication.RefreshTokenAsync(caller, providerName, refreshToken,
+            cancellationToken);
+    }
+
+    public Task<Result<ProviderAuthenticationTokens, Error>> RefreshTokenOnBehalfOfUserAsync(ICallerContext caller,
+        string userId, string providerName, string refreshToken, CancellationToken cancellationToken)
+    {
+        return _singleSignOnApplication.RefreshTokenOnBehalfOfUserAsync(caller, userId, providerName, refreshToken,
             cancellationToken);
     }
 }

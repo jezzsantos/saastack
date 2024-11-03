@@ -341,7 +341,8 @@ public class SSOProvidersServiceSpec
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(ssoUser.ToOptional());
 
-            var result = await _service.GetTokensAsync(_caller.Object, "auserid".ToId(), CancellationToken.None);
+            var result =
+                await _service.GetTokensOnBehalfOfUserAsync(_caller.Object, "auserid".ToId(), CancellationToken.None);
 
             result.Should().BeSuccess();
             result.Value.Count.Should().Be(0);
@@ -367,7 +368,8 @@ public class SSOProvidersServiceSpec
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(ssoUser.ToOptional());
 
-            var result = await _service.GetTokensAsync(_caller.Object, "auserid".ToId(), CancellationToken.None);
+            var result =
+                await _service.GetTokensOnBehalfOfUserAsync(_caller.Object, "auserid".ToId(), CancellationToken.None);
 
             result.Should().BeSuccess();
             result.Value.Count.Should().Be(1);

@@ -48,34 +48,34 @@
     <data name="PasswordKeep_InvalidToken" xml:space="preserve">
         <value>The password reset token is either missing or invalid</value>
     </data>
-    <data name="PasswordCredentialsRoot_EmailNotUnique" xml:space="preserve">
+    <data name="PasswordCredentialRoot_EmailNotUnique" xml:space="preserve">
         <value>The email is already in use by another user</value>
     </data>
-    <data name="PasswordCredentialsRoot_PasswordInitiatedWithoutRegistration" xml:space="preserve">
+    <data name="PasswordCredentialRoot_PasswordInitiatedWithoutRegistration" xml:space="preserve">
         <value>Cannot initiate password reset before the user is registered</value>
     </data>
-    <data name="PasswordCredentialsRoot_InvalidPassword" xml:space="preserve">
+    <data name="PasswordCredentialRoot_InvalidPassword" xml:space="preserve">
         <value>The password is not valid</value>
     </data>
-    <data name="PasswordCredentialsRoot_RegistrationVerified" xml:space="preserve">
+    <data name="PasswordCredentialRoot_RegistrationVerified" xml:space="preserve">
         <value>The user's registration is already verified</value>
     </data>
-    <data name="PasswordCredentialsRoot_RegistrationNotVerifying" xml:space="preserve">
+    <data name="PasswordCredentialRoot_RegistrationNotVerifying" xml:space="preserve">
         <value>The user's registration confirmation cannot be confirmed</value>
     </data>
-    <data name="PasswordCredentialsRoot_RegistrationVerifyingExpired" xml:space="preserve">
+    <data name="PasswordCredentialRoot_RegistrationVerifyingExpired" xml:space="preserve">
         <value>The user's registration confirmation window has expired</value>
     </data>
-    <data name="PasswordCredentialsRoot_RegistrationUnverified" xml:space="preserve">
+    <data name="PasswordCredentialRoot_RegistrationUnverified" xml:space="preserve">
         <value>The user's registration has not been verified yet</value>
     </data>
-    <data name="PasswordCredentialsRoot_DuplicatePassword" xml:space="preserve">
+    <data name="PasswordCredentialRoot_DuplicatePassword" xml:space="preserve">
         <value>New password cannot be the same as old password</value>
     </data>
-    <data name="PasswordCredentialsRoot_PasswordResetTokenExpired" xml:space="preserve">
+    <data name="PasswordCredentialRoot_PasswordResetTokenExpired" xml:space="preserve">
         <value>The password reset confirmation has expired</value>
     </data>
-    <data name="PasswordCredentialsRoot_NoPassword" xml:space="preserve">
+    <data name="PasswordCredentialRoot_NoPassword" xml:space="preserve">
         <value>No password has yet been set for this user</value>
     </data>
     <data name="AuthTokensRoot_TokensExpired" xml:space="preserve">
@@ -119,5 +119,86 @@
     </data>
     <data name="SSOUserRoot_NotOwner" xml:space="preserve">
         <value>Only the user can update their own tokens</value>
+    </data>
+    <data name="MfaOptions_Change_CannotBeDisabled" xml:space="preserve">
+        <value>MFA cannot be disabled</value>
+    </data>
+    <data name="MfaOptions_Change_CannotBeEnabled" xml:space="preserve">
+        <value>MFA cannot be enabled</value>
+    </data>
+    <data name="MfaOptions_CannotChangeCanBeDisabled" xml:space="preserve">
+        <value>Cannot change whether you can disable MFA or not</value>
+    </data>
+    <data name="MfaOptions_NotEnabled" xml:space="preserve">
+        <value>MFA is not enabled for this user</value>
+    </data>
+    <data name="MfaOptions_AuthenticationNotInitiated" xml:space="preserve">
+        <value>MFA authentication has not been initiated yet</value>
+    </data>
+    <data name="MfaOptions_AuthenticationTokenExpired" xml:space="preserve">
+        <value>MFA authentication session has expired</value>
+    </data>
+    <data name="MfaOptions_AuthenticationFailed" xml:space="preserve">
+        <value>MFA authentication failed</value>
+    </data>
+    <data name="MfaOptions_TokenWithoutExpiry" xml:space="preserve">
+        <value>MFA authentication session must have expiry</value>
+    </data>
+    <data name="PasswordCredentialRoot_NotOwner" xml:space="preserve">
+        <value>You must be an owner of this user account to change MFA settings</value>
+    </data>
+    <data name="PasswordCredentialRoot_DisassociateMfaAuthenticator_RecoveryCodesCannotBeDeleted" xml:space="preserve">
+        <value>You cannot delete the recovery codes for MFA</value>
+    </data>
+    <data name="PasswordCredentialRoot_MfaNotEnabled" xml:space="preserve">
+        <value>MFA is not enabled for this user</value>
+    </data>
+    <data name="PasswordCredentialRoot_AssociateMfaAuthenticator_AlreadyAssociated" xml:space="preserve">
+        <value>This authenticator has already been associated</value>
+    </data>
+    <data name="PasswordCredentialRoot_AssociateMfaAuthenticator_MustChallenge" xml:space="preserve">
+        <value>An authenticator has already been associated, you must challenge it</value>
+    </data>
+    <data name="PasswordCredentialRoot_AssociateMfaAuthenticator_InvalidType" xml:space="preserve">
+        <value>This authenticator cannot be associated</value>
+    </data>
+    <data name="PasswordCredentialRoot_CompleteMfaAuthenticatorAssociation_NotFound" xml:space="preserve">
+        <value>The authenticator has not yet been associated</value>
+    </data>
+    <data name="MfaAuthenticator_ConfirmAssociation_NotAssociated" xml:space="preserve">
+        <value>The authenticator cannot be confirmed</value>
+    </data>
+    <data name="PasswordCredentialRoot_NoAuthenticator" xml:space="preserve">
+        <value>This authenticator does not exist</value>
+    </data>
+    <data name="MfaAuthenticator_Associate_OobSms_NoPhoneNumber" xml:space="preserve">
+        <value>A phone number is required to associate OOB with SMS</value>
+    </data>
+    <data name="MfaAuthenticator_Associate_OobEmail_NoEmailAddress" xml:space="preserve">
+        <value>An email address is required to associate OOB with Email</value>
+    </data>
+    <data name="MfaAuthenticator_Associate_OtpAuthenticator_NoUsername" xml:space="preserve">
+        <value>An email address is required to associate OTP Authenticator</value>
+    </data>
+    <data name="MfaAuthenticator_Associate_NoRecoveryCodes" xml:space="preserve">
+        <value>Recovery codes required to associate Recovery Codes</value>
+    </data>
+    <data name="MfaAuthenticator_ConfirmAssociation_InvalidType" xml:space="preserve">
+        <value>You cannot confirm this type of authenticator</value>
+    </data>
+    <data name="MfaAuthenticator_Challenge_NotConfirmed" xml:space="preserve">
+        <value>The authenticator must be confirmed before being challenged</value>
+    </data>
+    <data name="MfaAuthenticator_Challenge_InvalidAuthenticator" xml:space="preserve">
+        <value>This authenticator cannot be challenged</value>
+    </data>
+    <data name="MfaAuthenticator_Verify_NotVerifiable" xml:space="preserve">
+        <value>The authenticator must be confirmed before being verified</value>
+    </data>
+    <data name="MfaAuthenticator_Verify_InvalidType" xml:space="preserve">
+        <value>You cannot verify this type of authenticator</value>
+    </data>
+    <data name="PasswordCredentialRoot_NotOperator" xml:space="preserve">
+        <value>This user is not a member of the operations team</value>
     </data>
 </root>

@@ -6,6 +6,7 @@ using Application.Services.Shared;
 using Common;
 using Common.Extensions;
 using Domain.Common.ValueObjects;
+using Domain.Services.Shared;
 using Domain.Shared;
 using Domain.Shared.Identities;
 using IdentityDomain;
@@ -17,19 +18,22 @@ partial class PasswordCredentialsApplication
     public const string MfaRequiredCode = "mfa_required";
     public const string MfaTokenName = "MfaToken";
 
-    public async Task<Result<AssociatedPasswordCredentialMfaAuthenticator, Error>> AssociateMfaAuthenticatorAsync(
+    public async Task<Result<PasswordCredentialMfaAuthenticatorAssociation, Error>> AssociateMfaAuthenticatorAsync(
         ICallerContext caller, string? mfaToken, PasswordCredentialMfaAuthenticatorType authenticatorType,
         string? phoneNumber, CancellationToken cancellationToken)
     {
-        var authenticated = await AuthenticateUserForMfaInternalAsync(caller, mfaToken, cancellationToken);
-        if (authenticated.IsFailure)
+        var retrieved =
+            await FindAuthenticatedMfaUserAsync(caller, mfaToken, MfaPermittedAccessibility.Both,
+                cancellationToken);
+        if (retrieved.IsFailure)
         {
-            return authenticated.Error;
+            return retrieved.Error;
         }
 
-        var credential = authenticated.Value;
-        var callerId = authenticated.Value.UserId;
-        var retrievedUser = await _endUsersService.GetUserPrivateAsync(caller, callerId, cancellationToken);
+        var credential = retrieved.Value.Credential;
+        var mfaCaller = retrieved.Value.Caller;
+        var userId = mfaCaller.CallerId;
+        var retrievedUser = await _endUsersService.GetUserPrivateAsync(caller, userId, cancellationToken);
         if (retrievedUser.IsFailure)
         {
             return retrievedUser.Error;
@@ -43,7 +47,7 @@ partial class PasswordCredentialsApplication
 
         var maintenance = Caller.CreateAsMaintenance(caller.CallId);
         var retrievedProfile =
-            await _userProfilesService.GetProfilePrivateAsync(maintenance, callerId, cancellationToken);
+            await _userProfilesService.GetProfilePrivateAsync(maintenance, userId, cancellationToken);
         if (retrievedProfile.IsFailure)
         {
             return retrievedProfile.Error;
@@ -52,21 +56,25 @@ partial class PasswordCredentialsApplication
         var userProfile = retrievedProfile.Value;
         var oobPhoneNumber = DerivePhoneNumber(phoneNumber, userProfile);
         var oobEmailAddress = DeriveEmailAddress(userProfile);
-        var associated = await credential.AssociateMfaAuthenticatorAsync(callerId,
+        var otpUsername = oobEmailAddress;
+        var associated = await credential.AssociateMfaAuthenticatorAsync(mfaCaller,
             authenticatorType.ToEnumOrDefault(MfaAuthenticatorType.None), oobPhoneNumber, oobEmailAddress.Value,
-            OnAssociate);
+            otpUsername.Value,
+            challengedAuthenticator => NotifyUser(caller, challengedAuthenticator, cancellationToken));
         if (associated.IsFailure)
         {
             return associated.Error;
         }
 
-        var authenticator = associated.Value;
         var saved = await _repository.SaveAsync(credential, cancellationToken);
         if (saved.IsFailure)
         {
             return saved.Error;
         }
 
+        credential = saved.Value;
+        var authenticator = associated.Value;
+        var isFirstAuthenticator = credential.MfaAuthenticators.HasOnlyOneUnconfirmedPlusRecoveryCodes;
         _recorder.TraceInformation(caller.ToCall(),
             "Password credentials for {UserId} is associating MFA authenticator {AuthenticatorType}",
             credential.UserId, authenticatorType);
@@ -78,28 +86,7 @@ partial class PasswordCredentialsApplication
                 { UsageConstants.Properties.MfaAuthenticatorType, authenticatorType }
             });
 
-        return credential.ToAssociatedAuthenticator(authenticator);
-
-        async Task<Result<Error>> OnAssociate(MfaAuthenticator associatedAuthenticator)
-        {
-            await Task.CompletedTask;
-
-            switch (associatedAuthenticator.Type.Value)
-            {
-                case MfaAuthenticatorType.OobSms:
-                    return await _userNotificationsService.NotifyPasswordMfaOobSmsAsync(caller,
-                        associatedAuthenticator.OobChannelValue, associatedAuthenticator.OobCode,
-                        UserNotificationConstants.EmailTags.PasswordMfaOob, cancellationToken);
-
-                case MfaAuthenticatorType.OobEmail:
-                    return await _userNotificationsService.NotifyPasswordMfaOobEmailAsync(caller,
-                        associatedAuthenticator.OobChannelValue, associatedAuthenticator.OobCode,
-                        UserNotificationConstants.EmailTags.PasswordMfaOob, cancellationToken);
-
-                default:
-                    return Result.Ok;
-            }
-        }
+        return credential.ToAssociatedAuthenticator(authenticator, isFirstAuthenticator, _encryptionService);
 
         static Optional<PhoneNumber> DerivePhoneNumber(string? phoneNumber, UserProfile userProfile)
         {
@@ -145,6 +132,47 @@ partial class PasswordCredentialsApplication
         }
     }
 
+    public async Task<Result<PasswordCredentialMfaAuthenticatorChallenge, Error>> ChallengeMfaAuthenticatorAsync(
+        ICallerContext caller, string mfaToken, string authenticatorId, CancellationToken cancellationToken)
+    {
+        var retrieved = await FindAuthenticatedMfaUserAsync(caller, mfaToken,
+            MfaPermittedAccessibility.UnauthenticatedOnly, cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        var credential = retrieved.Value.Credential;
+        var mfaCaller = retrieved.Value.Caller;
+        var challenged = await credential.ChallengeMfaAuthenticatorAsync(mfaCaller, authenticatorId.ToId(),
+            challengedAuthenticator => NotifyUser(caller, challengedAuthenticator, cancellationToken));
+        if (challenged.IsFailure)
+        {
+            return challenged.Error;
+        }
+
+        var saved = await _repository.SaveAsync(credential, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        credential = saved.Value;
+        var authenticator = challenged.Value;
+        _recorder.TraceInformation(caller.ToCall(),
+            "Password credentials for {UserId} is challenging MFA authenticator {AuthenticatorType}",
+            credential.UserId, authenticator.Type);
+        _recorder.TrackUsage(caller.ToCall(),
+            UsageConstants.Events.UsageScenarios.Generic.UserPasswordMfaChallenge,
+            new Dictionary<string, object>
+            {
+                { nameof(credential.Id), credential.UserId },
+                { UsageConstants.Properties.MfaAuthenticatorType, authenticator.Type }
+            });
+
+        return authenticator.ToChallengedAuthenticator();
+    }
+
     public async Task<Result<PasswordCredential, Error>> ChangeMfaAsync(ICallerContext caller,
         bool isEnabled, CancellationToken cancellationToken)
     {
@@ -160,7 +188,7 @@ partial class PasswordCredentialsApplication
             return Error.EntityNotFound();
         }
 
-        var retrievedUser = await _endUsersService.GetUserPrivateAsync(caller, caller.ToCallerId(), cancellationToken);
+        var retrievedUser = await _endUsersService.GetUserPrivateAsync(caller, caller.CallerId, cancellationToken);
         if (retrievedUser.IsFailure)
         {
             return retrievedUser.Error;
@@ -198,22 +226,33 @@ partial class PasswordCredentialsApplication
         return credential.ToCredential(user);
     }
 
-    public async Task<Result<AuthenticateTokens, Error>> CompleteMfaAuthenticatorAssociationAsync(ICallerContext caller,
-        string? mfaToken, PasswordCredentialMfaAuthenticatorType authenticatorType, string? oobCode,
-        string completionCode, CancellationToken cancellationToken)
+    public async Task<Result<PasswordCredentialMfaAuthenticatorConfirmation, Error>>
+        ConfirmMfaAuthenticatorAssociationAsync(ICallerContext caller, string? mfaToken,
+            PasswordCredentialMfaAuthenticatorType authenticatorType, string? oobCode, string confirmationCode,
+            CancellationToken cancellationToken)
     {
-        var authenticated = await AuthenticateUserForMfaInternalAsync(caller, mfaToken, cancellationToken);
-        if (authenticated.IsFailure)
+        var retrieved =
+            await FindAuthenticatedMfaUserAsync(caller, mfaToken, MfaPermittedAccessibility.Both,
+                cancellationToken);
+        if (retrieved.IsFailure)
         {
-            return authenticated.Error;
+            return retrieved.Error;
         }
 
-        var credential = authenticated.Value;
-        var completed = credential.CompleteMfaAuthenticatorAssociation(caller.ToCallerId(),
-            authenticatorType.ToEnumOrDefault(MfaAuthenticatorType.None), oobCode, completionCode);
-        if (completed.IsFailure)
+        var credential = retrieved.Value.Credential;
+        var mfaCaller = retrieved.Value.Caller;
+        var confirmed = credential.ConfirmMfaAuthenticatorAssociation(mfaCaller,
+            authenticatorType.ToEnumOrDefault(MfaAuthenticatorType.None), oobCode, confirmationCode);
+        if (confirmed.IsFailure)
         {
-            return completed.Error;
+            if (confirmed.Error.Code == ErrorCode.NotAuthenticated)
+            {
+                _recorder.AuditAgainst(caller.ToCall(), credential.UserId,
+                    Audits.PasswordCredentialsApplication_MfaAuthenticate_Failed,
+                    "User {Id} failed to authenticate with invalid 2FA", credential.UserId);
+            }
+
+            return confirmed.Error;
         }
 
         var saved = await _repository.SaveAsync(credential, cancellationToken);
@@ -224,15 +263,28 @@ partial class PasswordCredentialsApplication
 
         credential = saved.Value;
         _recorder.TraceInformation(caller.ToCall(),
-            "Password credentials for {UserId} has completed association for MFA authenticator {AuthenticatorType}",
+            "Password credentials for {UserId} has successfully authenticated for MFA authenticator {AuthenticatorType}",
             credential.UserId, authenticatorType);
+        _recorder.AuditAgainst(caller.ToCall(), credential.UserId,
+            Audits.PasswordCredentialsApplication_MfaAuthenticate_Succeeded,
+            "User {Id} succeeded to authenticate with MFA factor {AuthenticatorType}", credential.UserId,
+            authenticatorType);
         _recorder.TrackUsage(caller.ToCall(),
-            UsageConstants.Events.UsageScenarios.Generic.UserPasswordMfaAssociationCompleted,
+            UsageConstants.Events.UsageScenarios.Generic.UserPasswordMfaAuthenticated,
             new Dictionary<string, object>
             {
                 { nameof(credential.Id), credential.UserId },
                 { UsageConstants.Properties.MfaAuthenticatorType, authenticatorType }
             });
+
+        if (caller.IsAuthenticated)
+        {
+            return new PasswordCredentialMfaAuthenticatorConfirmation
+            {
+                Tokens = null,
+                Authenticators = credential.ToMfaAuthenticators()
+            };
+        }
 
         var retrievedUser =
             await _endUsersService.GetMembershipsPrivateAsync(caller, credential.UserId, cancellationToken);
@@ -242,26 +294,32 @@ partial class PasswordCredentialsApplication
         }
 
         var user = retrievedUser.Value;
-        return await IssueAuthenticationTokensAsync(caller, user, cancellationToken);
+        var tokens = await IssueAuthenticationTokensAsync(caller, user, cancellationToken);
+        if (tokens.IsFailure)
+        {
+            return tokens.Error;
+        }
+
+        return new PasswordCredentialMfaAuthenticatorConfirmation
+        {
+            Tokens = tokens.Value,
+            Authenticators = credential.ToMfaAuthenticators()
+        };
     }
 
     public async Task<Result<Error>> DisassociateMfaAuthenticatorAsync(ICallerContext caller, string authenticatorId,
         CancellationToken cancellationToken)
     {
-        var retrieved =
-            await _repository.FindCredentialsByUserIdAsync(caller.ToCallerId(), cancellationToken);
+        var retrieved = await FindAuthenticatedMfaUserAsync(caller, null,
+            MfaPermittedAccessibility.AuthenticatedOnly, cancellationToken);
         if (retrieved.IsFailure)
         {
             return retrieved.Error;
         }
 
-        if (!retrieved.Value.HasValue)
-        {
-            return Error.EntityNotFound();
-        }
-
-        var credential = retrieved.Value.Value;
-        var disassociated = credential.DisassociateMfaAuthenticator(caller.ToCallerId(), authenticatorId.ToId());
+        var credential = retrieved.Value.Credential;
+        var mfaCaller = retrieved.Value.Caller;
+        var disassociated = credential.DisassociateMfaAuthenticator(mfaCaller, authenticatorId.ToId());
         if (disassociated.IsFailure)
         {
             return disassociated.Error;
@@ -290,18 +348,169 @@ partial class PasswordCredentialsApplication
     public async Task<Result<List<PasswordCredentialMfaAuthenticator>, Error>> ListMfaAuthenticatorsAsync(
         ICallerContext caller, string? mfaToken, CancellationToken cancellationToken)
     {
-        var authenticated = await AuthenticateUserForMfaInternalAsync(caller, mfaToken, cancellationToken);
-        if (authenticated.IsFailure)
+        var retrieved =
+            await FindAuthenticatedMfaUserAsync(caller, mfaToken, MfaPermittedAccessibility.Both,
+                cancellationToken);
+        if (retrieved.IsFailure)
         {
-            return authenticated.Error;
+            return retrieved.Error;
         }
 
-        var credential = authenticated.Value;
+        var credential = retrieved.Value.Credential;
+        var mfaCaller = retrieved.Value.Caller;
+        var viewed = credential.ViewMfaAuthenticators(mfaCaller);
+        if (viewed.IsFailure)
+        {
+            return viewed.Error;
+        }
+
         _recorder.TraceInformation(caller.ToCall(),
             "Password credentials for {UserId} have had the MFA authenticators retrieved",
             credential.UserId);
 
         return credential.ToMfaAuthenticators();
+    }
+
+    public async Task<Result<PasswordCredential, Error>> ResetPasswordMfaAsync(ICallerContext caller, string userId,
+        CancellationToken cancellationToken)
+    {
+        var retrievedCredential =
+            await _repository.FindCredentialsByUserIdAsync(userId.ToId(), cancellationToken);
+        if (retrievedCredential.IsFailure)
+        {
+            return retrievedCredential.Error;
+        }
+
+        if (!retrievedCredential.Value.HasValue)
+        {
+            return Error.EntityNotFound();
+        }
+
+        var retrievedUser = await _endUsersService.GetUserPrivateAsync(caller, userId, cancellationToken);
+        if (retrievedUser.IsFailure)
+        {
+            return retrievedUser.Error;
+        }
+
+        var user = retrievedUser.Value;
+        if (user.Classification != EndUserClassification.Person)
+        {
+            return Error.PreconditionViolation(Resources.PasswordCredentialsApplication_NotPerson);
+        }
+
+        var credential = retrievedCredential.Value.Value;
+        var resetterRoles = Roles.Create(caller.Roles.All);
+        if (resetterRoles.IsFailure)
+        {
+            return resetterRoles.Error;
+        }
+
+        var reset = credential.ResetMfa(resetterRoles.Value);
+        if (reset.IsFailure)
+        {
+            return reset.Error;
+        }
+
+        var saved = await _repository.SaveAsync(credential, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        _recorder.TraceInformation(caller.ToCall(), "Password credentials for {UserId} has had MFA reset by {Operator}",
+            credential.UserId, caller.CallerId);
+        _recorder.AuditAgainst(caller.ToCall(), credential.UserId,
+            Audits.PasswordCredentialsApplication_MfaReset,
+            "User {Id} had their MFA state reset by {Operator}", credential.UserId, caller.CallerId);
+
+        return credential.ToCredential(user);
+    }
+
+    public async Task<Result<AuthenticateTokens, Error>> VerifyMfaAuthenticatorAsync(ICallerContext caller,
+        string mfaToken,
+        PasswordCredentialMfaAuthenticatorType authenticatorType, string? oobCode, string confirmationCode,
+        CancellationToken cancellationToken)
+    {
+        var retrieved = await FindAuthenticatedMfaUserAsync(caller, mfaToken,
+            MfaPermittedAccessibility.UnauthenticatedOnly, cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        var credential = retrieved.Value.Credential;
+        var mfaCaller = retrieved.Value.Caller;
+        var verified = credential.VerifyMfaAuthenticator(mfaCaller,
+            authenticatorType.ToEnumOrDefault(MfaAuthenticatorType.None), oobCode, confirmationCode);
+        if (verified.IsFailure)
+        {
+            if (verified.Error.Code == ErrorCode.NotAuthenticated)
+            {
+                _recorder.AuditAgainst(caller.ToCall(), credential.UserId,
+                    Audits.PasswordCredentialsApplication_MfaAuthenticate_Failed,
+                    "User {Id} failed to authenticate with invalid 2FA", credential.UserId);
+            }
+
+            return verified.Error;
+        }
+
+        var saved = await _repository.SaveAsync(credential, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        credential = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(),
+            "Password credentials for {UserId} has successfully authenticated for MFA authenticator {AuthenticatorType}",
+            credential.UserId, authenticatorType);
+        _recorder.AuditAgainst(caller.ToCall(), credential.UserId,
+            Audits.PasswordCredentialsApplication_MfaAuthenticate_Succeeded,
+            "User {Id} succeeded to authenticate with MFA factor {AuthenticatorType}", credential.UserId,
+            authenticatorType);
+        _recorder.TrackUsage(caller.ToCall(),
+            UsageConstants.Events.UsageScenarios.Generic.UserPasswordMfaAuthenticated,
+            new Dictionary<string, object>
+            {
+                { nameof(credential.Id), credential.UserId },
+                { UsageConstants.Properties.MfaAuthenticatorType, authenticatorType }
+            });
+
+        var retrievedUser =
+            await _endUsersService.GetMembershipsPrivateAsync(caller, credential.UserId, cancellationToken);
+        if (retrievedUser.IsFailure)
+        {
+            return Error.NotAuthenticated();
+        }
+
+        var user = retrievedUser.Value;
+        return await IssueAuthenticationTokensAsync(caller, user, cancellationToken);
+    }
+
+    private async Task<Result<Error>> NotifyUser(ICallerContext caller, MfaAuthenticator authenticator,
+        CancellationToken cancellationToken)
+    {
+        switch (authenticator.Type)
+        {
+            case MfaAuthenticatorType.OobSms:
+            {
+                var secret = _encryptionService.Decrypt(authenticator.Secret);
+                return await _userNotificationsService.NotifyPasswordMfaOobSmsAsync(caller,
+                    authenticator.OobChannelValue, secret,
+                    UserNotificationConstants.EmailTags.PasswordMfaOob, cancellationToken);
+            }
+
+            case MfaAuthenticatorType.OobEmail:
+            {
+                var secret = _encryptionService.Decrypt(authenticator.Secret);
+                return await _userNotificationsService.NotifyPasswordMfaOobEmailAsync(caller,
+                    authenticator.OobChannelValue, secret,
+                    UserNotificationConstants.EmailTags.PasswordMfaOob, cancellationToken);
+            }
+
+            default:
+                return Result.Ok;
+        }
     }
 
     /// <summary>
@@ -310,21 +519,55 @@ partial class PasswordCredentialsApplication
     /// <remarks>
     ///     If the caller is not authenticated, the uMFA token must be provided
     /// </remarks>
-    private async Task<Result<PasswordCredentialRoot, Error>> AuthenticateUserForMfaInternalAsync(ICallerContext caller,
-        string? mfaToken,
-        CancellationToken cancellationToken)
+    private async Task<Result<(PasswordCredentialRoot Credential, MfaCaller Caller), Error>>
+        FindAuthenticatedMfaUserAsync(ICallerContext caller, string? mfaToken, MfaPermittedAccessibility accessibility,
+            CancellationToken cancellationToken)
     {
-        if (!caller.IsAuthenticated
-            && mfaToken.HasNoValue())
+        switch (accessibility)
         {
-            return Error.NotAuthenticated();
+            case MfaPermittedAccessibility.UnauthenticatedOnly:
+            {
+                if (caller.IsAuthenticated)
+                {
+                    return Error.ForbiddenAccess();
+                }
+
+                return await FindUserByMfaTokenAsync();
+            }
+
+            case MfaPermittedAccessibility.AuthenticatedOnly:
+            {
+                if (!caller.IsAuthenticated)
+                {
+                    return Error.ForbiddenAccess();
+                }
+
+                return await FindUserByUserIdAsync();
+            }
+
+            case MfaPermittedAccessibility.Both:
+            {
+                if (caller.IsAuthenticated)
+                {
+                    return await FindUserByUserIdAsync();
+                }
+
+                return await FindUserByMfaTokenAsync();
+            }
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(accessibility), accessibility, null);
         }
 
-        PasswordCredentialRoot credential;
-        if (caller.IsAuthenticated)
+        async Task<Result<(PasswordCredentialRoot Credential, MfaCaller Caller), Error>> FindUserByMfaTokenAsync()
         {
+            if (mfaToken.HasNoValue())
+            {
+                return Error.NotAuthenticated();
+            }
+
             var retrieved =
-                await _repository.FindCredentialsByUserIdAsync(caller.ToCallerId(), cancellationToken);
+                await _repository.FindCredentialsByMfaAuthenticationTokenAsync(mfaToken, cancellationToken);
             if (retrieved.IsFailure)
             {
                 return retrieved.Error;
@@ -335,12 +578,21 @@ partial class PasswordCredentialsApplication
                 return Error.NotAuthenticated();
             }
 
-            credential = retrieved.Value.Value;
+            var credential = retrieved.Value.Value;
+            var mfaCaller = MfaCaller.Create(credential.UserId, mfaToken);
+            if (mfaCaller.IsFailure)
+            {
+                return mfaCaller.Error;
+            }
+
+            return (credential, mfaCaller.Value);
         }
-        else
+
+        async Task<Result<(PasswordCredentialRoot Credential, MfaCaller Caller), Error>> FindUserByUserIdAsync()
         {
+            var userId = caller.ToCallerId();
             var retrieved =
-                await _repository.FindCredentialsByMfaAuthenticationTokenAsync(mfaToken!, cancellationToken);
+                await _repository.FindCredentialsByUserIdAsync(userId, cancellationToken);
             if (retrieved.IsFailure)
             {
                 return retrieved.Error;
@@ -348,33 +600,56 @@ partial class PasswordCredentialsApplication
 
             if (!retrieved.Value.HasValue)
             {
-                return Error.NotAuthenticated();
+                return Error.EntityNotFound();
             }
 
-            credential = retrieved.Value.Value;
-        }
+            var credential = retrieved.Value.Value;
+            var mfaCaller = MfaCaller.Create(credential.UserId, null);
+            if (mfaCaller.IsFailure)
+            {
+                return mfaCaller.Error;
+            }
 
-        var authenticated = credential.MfaAuthenticate(caller.IsAuthenticated, mfaToken!);
-        if (authenticated.IsFailure)
-        {
-            return authenticated.Error;
+            return (credential, mfaCaller.Value);
         }
+    }
 
-        return credential;
+    private enum MfaPermittedAccessibility
+    {
+        UnauthenticatedOnly = 0,
+        AuthenticatedOnly = 1,
+        Both = 2
     }
 }
 
 internal static class PasswordCredentialMfaConversionExtensions
 {
-    public static AssociatedPasswordCredentialMfaAuthenticator ToAssociatedAuthenticator(
-        this PasswordCredentialRoot credential, MfaAuthenticator authenticator)
+    public static PasswordCredentialMfaAuthenticatorAssociation ToAssociatedAuthenticator(
+        this PasswordCredentialRoot credential, MfaAuthenticator authenticator, bool showRecoveryCodes,
+        IEncryptionService encryptionService)
     {
-        return new AssociatedPasswordCredentialMfaAuthenticator
+        var secret = authenticator.Type == MfaAuthenticatorType.TotpAuthenticator
+            ? encryptionService.Decrypt(authenticator.Secret)
+            : null;
+        return new PasswordCredentialMfaAuthenticatorAssociation
         {
-            Type = authenticator.Type.Value.ToEnum<MfaAuthenticatorType, PasswordCredentialMfaAuthenticatorType>(),
-            RecoveryCodes = credential.MfaAuthenticators.GetRecoveryCodes(),
+            Type = authenticator.Type.ToEnum<MfaAuthenticatorType, PasswordCredentialMfaAuthenticatorType>(),
+            RecoveryCodes = showRecoveryCodes
+                ? credential.MfaAuthenticators.ToRecoveryCodes(encryptionService)
+                : null,
             BarCodeUri = authenticator.BarCodeUri,
-            OobCode = authenticator.OobCode
+            OobCode = authenticator.OobCode,
+            Secret = secret
+        };
+    }
+
+    public static PasswordCredentialMfaAuthenticatorChallenge ToChallengedAuthenticator(
+        this MfaAuthenticator authenticator)
+    {
+        return new PasswordCredentialMfaAuthenticatorChallenge
+        {
+            OobCode = authenticator.OobCode,
+            Type = authenticator.Type.ToEnum<MfaAuthenticatorType, PasswordCredentialMfaAuthenticatorType>()
         };
     }
 
@@ -384,7 +659,7 @@ internal static class PasswordCredentialMfaConversionExtensions
             .Select(auth => new PasswordCredentialMfaAuthenticator
             {
                 Id = auth.Id,
-                Type = auth.Type.Value.ToEnumOrDefault(PasswordCredentialMfaAuthenticatorType.None),
+                Type = auth.Type.ToEnumOrDefault(PasswordCredentialMfaAuthenticatorType.None),
                 IsActive = auth.IsActive
             })
             .ToList();

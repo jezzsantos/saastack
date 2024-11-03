@@ -88,6 +88,13 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
+          WHERE object_id = OBJECT_ID(N'[dbo].[MfaAuthenticator]')
+            AND type in (N'U'))
+    DROP TABLE [dbo].[MfaAuthenticator]
+GO
+
+IF EXISTS(SELECT *
+          FROM sys.objects
           WHERE object_id = OBJECT_ID(N'[dbo].[Organization]')
             AND type in (N'U'))
     DROP TABLE [dbo].[Organization]
@@ -387,6 +394,30 @@ CREATE INDEX Id
          [Id]
             );
 
+CREATE TABLE [dbo].[MfaAuthenticator]
+(
+    [Id]                    [nvarchar](100) NOT NULL,
+    [LastPersistedAtUtc]    [datetime]      NULL,
+    [IsDeleted]             [bit]           NULL,
+    [BarCodeUri]            [nvarchar](max) NULL,
+    [VerifiedState]         [nvarchar](max) NULL,
+    [IsActive]              [bit]           NULL,
+    [State]                 [nvarchar](max) NULL,
+    [OobChannelValue]       [nvarchar](max) NULL,
+    [OobCode]               [nvarchar](max) NULL,
+    [PasswordCredentialId]  [nvarchar](100) NULL,
+    [Secret]                [nvarchar](max) NULL,
+    [Type]                  [nvarchar](max) NULL,
+    [UserId]                [nvarchar](100) NULL,
+) ON [PRIMARY]
+GO
+
+CREATE INDEX Id
+    ON [dbo].[MfaAuthenticator]
+        (
+         [Id]
+            );
+
 CREATE TABLE [dbo].[Organization]
 (
     [Id]                    [nvarchar](100) NOT NULL,
@@ -419,6 +450,10 @@ CREATE TABLE [dbo].[PasswordCredential]
     [LastPersistedAtUtc]            [datetime]      NULL,
     [IsDeleted]                     [bit]           NULL,
     [AccountLocked]                 [bit]           NULL,
+    [IsMfaEnabled]                  [bit]           NULL,
+    [MfaAuthenticationExpiresAt]    [datetime]      NULL,
+    [MfaAuthenticationToken]        [nvarchar](max) NULL,
+    [MfaCanBeDisabled]              [bit]           NULL,
     [PasswordResetToken]            [nvarchar](450) NULL,
     [RegistrationVerificationToken] [nvarchar](max) NULL,
     [RegistrationVerified]          [bit]           NULL,
@@ -447,6 +482,11 @@ CREATE INDEX UserName
     ON [dbo].[PasswordCredential]
         (
          [UserName]
+            );
+CREATE INDEX MfaAuthenticationToken
+    ON [dbo].[PasswordCredential]
+        (
+         [MfaAuthenticationToken]
             );
 
 CREATE TABLE [dbo].[ProjectionCheckpoints]

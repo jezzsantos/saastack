@@ -2,13 +2,13 @@
 
 ## Design Principles
 
-Many processes in the backend of a SaaS product aim to notify/alert the end user to activities or processes that occur in a SaaS product, that might warrant their attention. Most of these notifications/alerts are ultimately delivered by email (albeit some are delivered by other means, too, i.e., in-app, SMS texts, etc.).
+Many processes in the backend of a SaaS product aim to notify/alert the end user to activities or processes that occur in a SaaS product, that might warrant their attention. Most of these notifications/alerts are ultimately delivered by email/SMS/Push (albeit some are delivered by other means, too, i.e., in-app, etc.).
 
-Sending emails is often done via 3rd party systems like SendGrid, Mailgun, Postmark, etc., over HTTP.
+Sending emails/SMS is often done via 3rd party systems like SendGrid, Twilio, Mailgun, Postmark, etc., over HTTP.
 
-> Due to its nature, doing this directly isn't very reliable, especially with systems under load and with rate limits being applied.
+> Due to its nature, doing this directly in a use case, isn't very reliable, nor is it optimal with systems under load, and with 3rd parties applying rate limits. All of these aspects can lead to a poor user experience is the user is waiting for these workloads to complete before they can move on with their work.
 
-* We need to "broker" between the sending of emails and the delivering of them to make the entire process more reliable, and we need to provide observability when things go wrong.
+* We need to "broker" between the sending of emails/SMS, and the delivering of them, to make the entire process more reliable, and we need to provide observability when things go wrong.
 * Since an inbound API request to any API backend can yield of the order ~10 emails per API call, delivering them reliably across HTTP can require minutes of time, if you consider the possibility of retries and back-offs, etc. We simply could not afford to keep API clients blocked and waiting while email delivery takes place, let alone the risk of timing out their connection to the inbound API call in the first place.
 * Delivery of some emails is critical to the functioning of the product, and this data cannot be lost. Consider an email to confirm the email of a registered account, for example.
 
@@ -20,29 +20,37 @@ Thus, we need to take advantage of all these facts and engineer a reliable mecha
 
 ## Implementation
 
-![Email Delivery](../../docs/images/Email-Delivery.png)
+This is how emails and SMS messages are delivered from subdomain, using the Ancillary API:
+
+![Email/SMS Delivery](../../docs/images/Email-Delivery.png)
 
 ### Sending notifications
 
 Any API Host (any subdomain) may want to send notifications to users.
 
-They do this by calling very specific `IUserNotificationsService.NotifyXXXAsync()` methods.
+They do this by calling very specific and custom `IUserNotificationsService.NotifyXXXAsync()` methods.
 
 Injected into the runtime will be an instance of the `IUserNotificationService`, which can then deliver notifications to new and existing users based on communication preferences that those users have set up in the system.
 
-Without such information present in the system (as is the present case), a simple default implementation of the `IUserNotificationsService` is being used to deliver notifications via email, called the `EmailNotificationService`.
+> At present, this mechanism is pretty rudimentary. It does not abstract the users messaging details much at all. However, it is open to be extended in the future, if you needed to look up the users preferences from another service to decide how to deliver notifications, or if you needed to send notifications to multiple users at once, etc.
 
-> This simple adapter is going to send an email notification to a user based on the email address. (future implementations of "notifiers" may behave very differently).
+Without such information present in the system (as is the present case), a simple default implementation of the
+`IUserNotificationsService` is being used to deliver notifications via email, and via SMS. It is called the:
+`MessageUserNotificationsService`.
 
-### Sending emails
+> This simple adapter is going to send an email notification to a user based on the email address, and an SMS notification to a user based on their phone number. (future implementations of "notifiers" may behave very differently).
 
-Receiving emails from a SaaS product often participate in the flows of critical end-user processes, be those just "alert" notifications or instructional "call to action" (CTA) notifications.
+### Sending emails/SMS
 
-These email communications, thus, require reliable delivery in order to ensure the recipient gets the email at some point in time.
+Receiving emails and SMS text messages from a SaaS product often participate in the flows of critical end-user processes, be those just "alert" notifications or instructional "call to action" (CTA) type notifications.
 
-Typically, emails will be actually delivered by 3rd party online services (e.g., SendGrid, Mailgun, or Postmark), and those systems can employ their own management and rules for delivering emails.
+> For example, a user may need to confirm their email address at registration time, or they may need to reset their password, or they may need to confirm a booking, etc.
 
-> For example, they may support rate limits, daily/monthly quotas, and email templates, and may even support blocked-email lists, and things like that that prevent emails from being received by recipients.
+These email/SMS communications, thus, require asynchronous "reliable delivery" in order to improve the chances of the recipient getting the email at some point in time in the future.
+
+Typically, emails/SMS will be actually delivered by 3rd party online services (e.g., SendGrid, Twilio, Mailgun, or Postmark), and those systems can employ their own management and rules for delivering these messages.
+
+> For example, they may support rate limits, daily/monthly quotas, and email templates, and may even support blocked-email lists, and things like that to prevent emails from being received by recipients.
 
 For most businesses using these services, operationally, they will need to manage those systems directly with whatever tools are available.
 
@@ -50,15 +58,19 @@ On the automation side, these 3rd party services may support API integration, an
 
 #### Reliable delivery
 
-The injected implementation of the `EmailNotificationsService` hands off the scheduling of the delivery to an implementation of the `IEmailSchedulingService`. This service packages up the scheduled email and enqueues it to the `emails` queue, and the thread that sent the notification is returned immediately.
+The injected implementation of the
+`MessageUserNotificationsService` hands off the scheduling of the delivery to an implementation of the
+`IEmailSchedulingService`. This service packages up the scheduled email and enqueues it to the
+`emails` queue, and the thread that sent the notification is returned immediately.
 
-Delivery of the actual email to the 3rd party service is not performed at this point, and the request thread is not blocked waiting for that to occur.
+Delivery of the actual email to the 3rd party service is not performed at this point, and the original request thread is not blocked waiting for that process to occur. This is a key design principle, since the client probably cannot do much in the case when the email/SMS fails to be delivered the first time, and the client certainly does not want to be kept waiting for a response back from the 3rd party email/SMS delivery service. These are typically notifications, not critical synchronous responses.
 
-A scheduled email message goes onto the `emails` FIFO queue, where a cloud-based trigger (i.e., an Azure Function or AWS Lambda) picks up the message and calls back the Ancillary API to "send" the message using the configured Email Provider (i.e., SendGrid, Mailgun, Postmark, etc).
+A scheduled email message goes onto the `emails` FIFO queue (an SMS goes into the
+`smses` queue), where a cloud-based trigger (i.e., an Azure Function or AWS Lambda) picks up the message and calls back the Ancillary API to "send" the message using the configured Email Provider (i.e., SendGrid, Twilio, Mailgun, Postmark, etc.).
 
 This cloud-based mechanism is designed with queues to be reliable in several ways.
 
-1. The queues are always FIFO
+1. The queues are always FIFO.
 2. When a message is "dequeued" (processed) by a "client" (a piece of code like an Azure Function or a Lambda), the message is not removed/deleted from the queue immediately, but it becomes "invisible" to further processing by either the same client or another client. However, this message is only "invisible" for a [configurable] period of time (by default: 30 seconds).
 3. The message is only "deleted" from the queue when the client explicitly instructs the queue to delete the message after successfully processing it. Failing to explicitly delete the message from the queue (by the client) returns the message to the queue (making it "visible" again) after the visibility timeout has expired.
 4. Also, any exception raised by the client while processing the message will automatically return the message to the queue, making it "visible" to be consumed by another client again.

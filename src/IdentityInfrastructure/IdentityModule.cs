@@ -39,9 +39,10 @@ public class IdentityModule : ISubdomainModule
     public Dictionary<Type, string> EntityPrefixes => new()
     {
         { typeof(PasswordCredentialRoot), "pwdcred" },
+        { typeof(MfaAuthenticator), "mfaauth" },
         { typeof(AuthTokensRoot), "authtok" },
         { typeof(APIKeyRoot), "apikey" },
-        { typeof(SSOUserRoot), "ssocred_" }
+        { typeof(SSOUserRoot), "ssocred" }
     };
 
     public Assembly InfrastructureAssembly => typeof(PasswordCredentialsApi).Assembly;
@@ -55,6 +56,10 @@ public class IdentityModule : ISubdomainModule
                 services.AddSingleton<ITokensService, TokensService>();
                 services.AddPerHttpRequest<IEmailAddressService, EmailAddressService>();
                 services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
+                services.AddSingleton<IMfaService>(c =>
+                    new MfaService(
+                        c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                        c.GetRequiredService<ITokensService>()));
                 services.AddSingleton<IAPIKeyHasherService, APIKeyHasherService>();
                 services.AddSingleton<IJWTTokensService>(c =>
                     new JWTTokensService(c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
@@ -64,6 +69,7 @@ public class IdentityModule : ISubdomainModule
                     new AesEncryptionService(c.GetRequiredServiceForPlatform<IConfigurationSettings>()
                         .GetString("ApplicationServices:SSOProvidersService:SSOUserTokens:AesSecret")));
 
+                services.AddPerHttpRequest<IIdentityApplication, IdentityApplication.IdentityApplication>();
                 services.AddPerHttpRequest<IAPIKeysApplication, APIKeysApplication>();
                 services.AddPerHttpRequest<IAuthTokensApplication, AuthTokensApplication>();
                 services.AddPerHttpRequest<IPasswordCredentialsApplication>(c =>
@@ -75,7 +81,9 @@ public class IdentityModule : ISubdomainModule
                         c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
                         c.GetRequiredService<IEmailAddressService>(),
                         c.GetRequiredService<ITokensService>(),
+                        c.GetRequiredService<IEncryptionService>(),
                         c.GetRequiredService<IPasswordHasherService>(),
+                        c.GetRequiredService<IMfaService>(),
                         c.GetRequiredService<IAuthTokensService>(),
                         c.GetRequiredService<IWebsiteUiService>(),
                         c.GetRequiredService<IPasswordCredentialsRepository>()));
@@ -122,6 +130,8 @@ public class IdentityModule : ISubdomainModule
                 services.AddPerHttpRequest<IIdentityService, IdentityInProcessServiceClient>();
                 services.AddPerHttpRequest<ISSOService, SSOInProcessServiceClient>();
                 services.AddPerHttpRequest<ISSOProvidersService, SSOProvidersService>();
+                services.AddPerHttpRequest<IPasswordCredentialsService, PasswordCredentialsService>();
+
 #if TESTINGONLY
                 // EXTEND: replace these registrations with your own OAuth2 implementations
                 services.AddSingleton<ISSOAuthenticationProvider, FakeSSOAuthenticationProvider>();

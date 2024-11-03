@@ -74,7 +74,7 @@ public class MessageUserNotificationsService : IUserNotificationsService
         CancellationToken cancellationToken)
     {
         var webSiteUrl = _hostSettings.GetWebsiteHostBaseUrl();
-        var webSiteRoute = _websiteUiService.ConstructPasswordMfaOobCompletionPageUrl(code);
+        var webSiteRoute = _websiteUiService.ConstructPasswordMfaOobConfirmationPageUrl(code);
         var link = webSiteUrl.WithoutTrailingSlash() + webSiteRoute;
         var htmlBody =
             $"""

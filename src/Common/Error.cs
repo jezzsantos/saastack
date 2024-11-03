@@ -106,6 +106,15 @@ public readonly struct Error
     }
 
     /// <summary>
+    ///     Whether this error is notof the specified <see cref="code" />
+    ///     and optional <see cref="message" />
+    /// </summary>
+    public bool IsNot(ErrorCode code, string? message = null)
+    {
+        return !Is(code, message);
+    }
+
+    /// <summary>
     ///     Creates a <see cref="ErrorCode.NoError" /> error
     /// </summary>
     public static Error NoError => new(ErrorCode.NoError);
