@@ -7,6 +7,9 @@ namespace IdentityApplication.Persistence;
 
 public interface IPasswordCredentialsRepository : IApplicationRepository
 {
+    Task<Result<Optional<PasswordCredentialRoot>, Error>> FindCredentialsByMfaAuthenticationTokenAsync(string token,
+        CancellationToken cancellationToken);
+
     Task<Result<Optional<PasswordCredentialRoot>, Error>> FindCredentialsByPasswordResetTokenAsync(string token,
         CancellationToken cancellationToken);
 
@@ -21,5 +24,8 @@ public interface IPasswordCredentialsRepository : IApplicationRepository
         CancellationToken cancellationToken);
 
     Task<Result<PasswordCredentialRoot, Error>> SaveAsync(PasswordCredentialRoot credential,
+        CancellationToken cancellationToken);
+
+    Task<Result<PasswordCredentialRoot, Error>> SaveAsync(PasswordCredentialRoot credential, bool reload,
         CancellationToken cancellationToken);
 }

@@ -127,9 +127,9 @@ public class WebApiSetup<THost> : WebApplicationFactory<THost>
 public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDisposable
     where THost : class
 {
+    protected const string PasswordForPerson = "1Password!";
     private const string DotNetCommandLineWithLaunchProfileArgumentsFormat =
         "run --no-build --configuration {0} --launch-profile {1} --project {2}";
-    private const string PasswordForPerson = "1Password!";
     private const string TestingServerUrl = "https://localhost";
     private const int WaitStateRetries = 30;
     // ReSharper disable once StaticMemberInGenericType

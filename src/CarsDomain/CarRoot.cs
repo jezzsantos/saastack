@@ -168,7 +168,7 @@ public sealed class CarRoot : AggregateRootBase
             {
                 Unavailabilities.Remove(deleted.UnavailabilityId.ToId());
                 Recorder.TraceDebug(null, "Car {Id} has had unavailability {UnavailabilityId} removed", Id,
-                    deleted.RootId);
+                    deleted.UnavailabilityId);
                 return Result.Ok;
             }
 

@@ -16,11 +16,9 @@ Legend:
 
 * <sup>OPS</sup> denotes a support API that is only accessible to operations team of the platform
 
-### Cars (Sample)
+### Cars
 
-> This is sample subdomain, and is expected to be deleted when this product goes to production
-
-1. Register a new car <sup>$$$</sup>
+1. Register a new car <sup>$$</sup>
 2. Delete a car <sup>$$$</sup>
 3. Schedule the car for "maintenance" <sup>$$$</sup>
 4. Take a car "offline" <sup>$$$</sup>
@@ -29,9 +27,7 @@ Legend:
 7. Find all the cars on the platform <sup>$$$</sup>
 8. Find all the available cars for a specific time frame <sup>$$$</sup>
 
-### Bookings (Sample)
-
-> This is sample subdomain, and is expected to be deleted when this product goes to production
+### Bookings
 
 1. Make a booking for a specific car and time frame <sup>$$$</sup>
 2. Cancel an existing booking <sup>$$$</sup>
@@ -138,7 +134,7 @@ Machines are the way that non-human entities can operate on the platform.
 
 Is the way a user can authenticate with the platform using a username and password.
 
-1. Authenticate the current user (with a password)
+1. Authenticate the current user (with a password), may include a second factor (i.e. MFA)
 2. Register a new person (with a password and with optional invitation)
 3. Confirm registration of a person (from email)
 4. Initiate a password reset
@@ -147,9 +143,21 @@ Is the way a user can authenticate with the platform using a username and passwo
 7. Reset password
 8. Fetch the registration confirmation token <sup>TSTO</sup>
 
+#### MFA
+
+Is the way you can use one or more second factors for authenticating with the platform for password-protected accounts (above)
+
+1. Enable or disable MFA for the current user
+2. Associate a second factor authenticator for use in authentication (e.g., OOB-SMS, OOB-Email, or TOTP for authenticator apps)
+3. Complete the association to an authenticator, and authenticate
+4. Disassociate a second factor authenticator <sup>$$$</sup>
+5. List the associated authenticators
+6. Challenge for an associated authenticator
+7. Verify the associated authenticator, and authenticate
+
 #### Single-Sign On
 
-Is the way that a user can authenticate with the platform using an external OAuth2 provider (like Google, Facebook, etc.)
+Is the way that a user can authenticate with the platform using an external OAuth2 provider (like with: Microsoft, Google, Facebook, etc.)
 
 1. Authenticate and (auto-register) a person from another OAuth2 provider (with an optional invitation)
 

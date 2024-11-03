@@ -195,7 +195,7 @@ namespace EndUsersDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The assigner is not a member of the operations team.
+        ///   Looks up a localized string similar to This user is not a member of the operations team.
         /// </summary>
         internal static string EndUserRoot_NotOperator {
             get {

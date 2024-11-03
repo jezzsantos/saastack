@@ -102,4 +102,27 @@
     <data name="CompletePasswordResetRequestValidator_InvalidToken" xml:space="preserve">
       <value>The 'Token' is either missing or invalid</value>
     </data>
+    <data name="PasswordMfaAuthenticatorForCallerRequestValidator_InvalidAuthenticatorType"
+          xml:space="preserve">
+      <value>The 'AuthenticatorType' is either missing or invalid</value>
+    </data>
+    <data name="PasswordMfaAuthenticatorForCallerRequestValidator_InvalidMfaToken" xml:space="preserve">
+      <value>The 'MfaToken' is either missing or invalid</value>
+    </data>
+    <data name="AssociatePasswordMfaAuthenticatorForCallerRequestValidator_InvalidPhoneNumber" xml:space="preserve">
+      <value>The 'PhoneNumber' is either missing or invalid</value>
+    </data>
+    <data name="ConfirmPasswordMfaAuthenticatorForCallerRequestValidator_InvalidOobCode" xml:space="preserve">
+      <value>The 'OobCode' is either missing or invalid</value>
+    </data>
+    <data name="ConfirmPasswordMfaAuthenticatorForCallerRequestValidator_InvalidConfirmationCode" xml:space="preserve">
+      <value>The 'ConfirmationCode' is either missing or invalid</value>
+    </data>
+    <data name="ConfirmPasswordMfaAuthenticatorForCallerRequestValidator_InvalidRecoveryConfirmationCode"
+          xml:space="preserve">
+      <value>The 'ConfirmationCode' is either missing or invalid</value>
+    </data>
+    <data name="ChallengePasswordMfaAuthenticatorForCallerRequestValidator_InvalidAuthenticatorId" xml:space="preserve">
+      <value>The 'AuthenticatorId' is either missing or invalid</value>
+    </data>
 </root>

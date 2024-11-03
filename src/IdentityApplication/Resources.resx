@@ -42,6 +42,9 @@
     <data name="PasswordCredentialsApplication_InvalidUserAccountId" xml:space="preserve">
         <value>The user account ID is not a valid identifier</value>
     </data>
+    <data name="PasswordCredentialsApplication_NotPerson" xml:space="preserve">
+        <value>The user account ID is not a person</value>
+    </data>
     <data name="SingleSignOnApplication_AccountSuspended" xml:space="preserve">
       <value>The user account is suspended</value>
     </data>
@@ -53,5 +56,8 @@
     </data>
     <data name="AuthTokensApplication_AccountSuspended" xml:space="preserve">
       <value>The user account is suspended</value>
+    </data>
+    <data name="PasswordCredentialsApplication_MfaRequired" xml:space="preserve">
+      <value>Authentication requires another factor</value>
     </data>
 </root>

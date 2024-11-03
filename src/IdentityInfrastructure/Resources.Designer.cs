@@ -78,6 +78,15 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;PhoneNumber&apos; is either missing or invalid.
+        /// </summary>
+        internal static string AssociatePasswordMfaAuthenticatorForCallerRequestValidator_InvalidPhoneNumber {
+            get {
+                return ResourceManager.GetString("AssociatePasswordMfaAuthenticatorForCallerRequestValidator_InvalidPhoneNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;Password&apos; is either missing or invalid.
         /// </summary>
         internal static string AuthenticatePasswordRequestValidator_InvalidPassword {
@@ -132,6 +141,16 @@ namespace IdentityInfrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;AuthenticatorId&apos; is either missing or invalid.
+        /// </summary>
+        internal static string ChallengePasswordMfaAuthenticatorForCallerRequestValidator_InvalidAuthenticatorId {
+            get {
+                return ResourceManager.GetString("ChallengePasswordMfaAuthenticatorForCallerRequestValidator_InvalidAuthenticatorId" +
+                        "", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;Password&apos; is either missing or invalid.
         /// </summary>
         internal static string CompletePasswordResetRequestValidator_InvalidPassword {
@@ -146,6 +165,34 @@ namespace IdentityInfrastructure {
         internal static string CompletePasswordResetRequestValidator_InvalidToken {
             get {
                 return ResourceManager.GetString("CompletePasswordResetRequestValidator_InvalidToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;ConfirmationCode&apos; is either missing or invalid.
+        /// </summary>
+        internal static string ConfirmPasswordMfaAuthenticatorForCallerRequestValidator_InvalidConfirmationCode {
+            get {
+                return ResourceManager.GetString("ConfirmPasswordMfaAuthenticatorForCallerRequestValidator_InvalidConfirmationCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;OobCode&apos; is either missing or invalid.
+        /// </summary>
+        internal static string ConfirmPasswordMfaAuthenticatorForCallerRequestValidator_InvalidOobCode {
+            get {
+                return ResourceManager.GetString("ConfirmPasswordMfaAuthenticatorForCallerRequestValidator_InvalidOobCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;ConfirmationCode&apos; is either missing or invalid.
+        /// </summary>
+        internal static string ConfirmPasswordMfaAuthenticatorForCallerRequestValidator_InvalidRecoveryConfirmationCode {
+            get {
+                return ResourceManager.GetString("ConfirmPasswordMfaAuthenticatorForCallerRequestValidator_InvalidRecoveryConfirmat" +
+                        "ionCode", resourceCulture);
             }
         }
         
@@ -182,6 +229,24 @@ namespace IdentityInfrastructure {
         internal static string InitiatePasswordResetRequestValidator_InvalidEmailAddress {
             get {
                 return ResourceManager.GetString("InitiatePasswordResetRequestValidator_InvalidEmailAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;AuthenticatorType&apos; is either missing or invalid.
+        /// </summary>
+        internal static string PasswordMfaAuthenticatorForCallerRequestValidator_InvalidAuthenticatorType {
+            get {
+                return ResourceManager.GetString("PasswordMfaAuthenticatorForCallerRequestValidator_InvalidAuthenticatorType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;MfaToken&apos; is either missing or invalid.
+        /// </summary>
+        internal static string PasswordMfaAuthenticatorForCallerRequestValidator_InvalidMfaToken {
+            get {
+                return ResourceManager.GetString("PasswordMfaAuthenticatorForCallerRequestValidator_InvalidMfaToken", resourceCulture);
             }
         }
         

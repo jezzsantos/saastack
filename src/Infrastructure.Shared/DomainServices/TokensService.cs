@@ -12,9 +12,9 @@ public sealed class TokensService : ITokensService
 
     public APIKeyToken CreateAPIKey()
     {
-        var token = GenerateRandomTokenSafeForUrl(CommonValidations.APIKeys.ApiKeyTokenSize,
+        var token = GenerateRandomStringSafeForUrl(CommonValidations.APIKeys.ApiKeyTokenSize,
             CommonValidations.APIKeys.ApiKeyPaddingReplacement);
-        var key = GenerateRandomTokenSafeForUrl(CommonValidations.APIKeys.ApiKeySize,
+        var key = GenerateRandomStringSafeForUrl(CommonValidations.APIKeys.ApiKeySize,
             CommonValidations.APIKeys.ApiKeyPaddingReplacement);
 
         return new APIKeyToken
@@ -28,22 +28,32 @@ public sealed class TokensService : ITokensService
 
     public string CreateGuestInvitationToken()
     {
-        return GenerateRandomTokenSafeForUrl();
+        return GenerateRandomStringSafeForUrl();
     }
 
     public string CreateJWTRefreshToken()
     {
-        return GenerateRandomTokenSafeForUrl();
+        return GenerateRandomStringSafeForUrl();
+    }
+
+    public string CreateMfaAuthenticationToken()
+    {
+        return GenerateRandomStringSafeForUrl();
     }
 
     public string CreatePasswordResetToken()
     {
-        return GenerateRandomTokenSafeForUrl();
+        return GenerateRandomStringSafeForUrl();
     }
 
     public string CreateRegistrationVerificationToken()
     {
-        return GenerateRandomTokenSafeForUrl();
+        return GenerateRandomStringSafeForUrl();
+    }
+
+    public string GenerateRandomToken()
+    {
+        return GenerateRandomStringSafeForUrl();
     }
 
     /// <summary>
@@ -71,20 +81,18 @@ public sealed class TokensService : ITokensService
         };
     }
 
-    private static string GenerateRandomTokenSafeForUrl(int keySize = DefaultTokenSizeInBytes,
+    private static string GenerateRandomStringSafeForUrl(int keySize = DefaultTokenSizeInBytes,
         string paddingReplacement = "")
     {
-        return MakeSafeForUrls(GenerateRandomToken(keySize), paddingReplacement);
+        return MakeSafeForUrls(GenerateRandomString(keySize), paddingReplacement);
     }
 
-    private static string GenerateRandomToken(int keySize = DefaultTokenSizeInBytes)
+    private static string GenerateRandomString(int keySize = DefaultTokenSizeInBytes)
     {
-        using (var random = RandomNumberGenerator.Create())
-        {
-            var bytes = new byte[keySize];
-            random.GetNonZeroBytes(bytes);
-            return Convert.ToBase64String(bytes);
-        }
+        using var random = RandomNumberGenerator.Create();
+        var bytes = new byte[keySize];
+        random.GetNonZeroBytes(bytes);
+        return Convert.ToBase64String(bytes);
     }
 
     private static string MakeSafeForUrls(string value, string paddingReplacement = "")

@@ -39,6 +39,15 @@
     <data name="PasswordCredentialsApplication_Authenticate_Succeeded" xml:space="preserve">
         <value>Authentication.Password.Passed</value>
     </data>
+    <data name="PasswordCredentialsApplication_MfaAuthenticate_Succeeded" xml:space="preserve">
+        <value>Authentication.Password.Mfa.Passed</value>
+    </data>
+    <data name="PasswordCredentialsApplication_MfaAuthenticate_Failed" xml:space="preserve">
+        <value>Authentication.Password.Mfa.Failed.InvalidMfa</value>
+    </data>
+    <data name="PasswordCredentialsApplication_MfaReset" xml:space="preserve">
+        <value>Authentication.Password.Mfa.Reset</value>
+    </data>
     <data name="EndUsersApplication_User_Registered_TermsAccepted" xml:space="preserve">
         <value>EndUser.Registered.TermsAccepted</value>
     </data>

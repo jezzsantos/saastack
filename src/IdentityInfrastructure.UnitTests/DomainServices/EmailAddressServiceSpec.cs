@@ -17,6 +17,8 @@ namespace IdentityInfrastructure.UnitTests.DomainServices;
 public class EmailAddressServiceSpec
 {
     private readonly Mock<IEmailAddressService> _emailAddressService;
+    private readonly Mock<IEncryptionService> _encryptionService;
+    private readonly Mock<IMfaService> _mfaService;
     private readonly Mock<IPasswordHasherService> _passwordHasherService;
     private readonly Mock<IRecorder> _recorder;
     private readonly Mock<IPasswordCredentialsRepository> _repository;
@@ -32,7 +34,9 @@ public class EmailAddressServiceSpec
         _emailAddressService.Setup(es => es.EnsureUniqueAsync(It.IsAny<EmailAddress>(), It.IsAny<Identifier>()))
             .ReturnsAsync(true);
         _tokensService = new Mock<ITokensService>();
+        _encryptionService = new Mock<IEncryptionService>();
         _passwordHasherService = new Mock<IPasswordHasherService>();
+        _mfaService = new Mock<IMfaService>();
         _settings = new Mock<IConfigurationSettings>();
         _settings.Setup(s => s.Platform.GetString(It.IsAny<string>(), It.IsAny<string>()))
             .Returns((string?)null!);
@@ -81,8 +85,9 @@ public class EmailAddressServiceSpec
     private PasswordCredentialRoot CreateCredential(string userId)
     {
         var credential = PasswordCredentialRoot.Create(_recorder.Object, "acredentialid".ToIdentifierFactory(),
-            _settings.Object, _emailAddressService.Object, _tokensService.Object, _passwordHasherService.Object,
-            userId.ToId()).Value;
+            _settings.Object, _emailAddressService.Object, _tokensService.Object, _encryptionService.Object,
+            _passwordHasherService.Object,
+            _mfaService.Object, userId.ToId()).Value;
         credential.SetPasswordCredential("apassword");
         credential.SetRegistrationDetails(EmailAddress.Create("auser@company.com").Value,
             PersonDisplayName.Create("aname").Value);

@@ -26,20 +26,6 @@ public class OptionalAssertions<TValue> : ObjectAssertions<Optional<TValue>, Opt
         return new AndConstraint<OptionalAssertions<TValue>>(this);
     }
 
-    public AndConstraint<OptionalAssertions<TValue>> BeSome(string because = "",
-        params object[] becauseArgs)
-    {
-        Execute.Assertion
-            .BecauseOf(because, becauseArgs)
-            .Given(() => Subject)
-            .ForCondition(optional => optional.HasValue)
-            .FailWith(
-                "Expected {context:optional} to have a value {0}{reason}, but it was None instead.",
-                optional => optional.ValueOrDefault);
-
-        return new AndConstraint<OptionalAssertions<TValue>>(this);
-    }
-
     public AndConstraint<OptionalAssertions<TValue>> BeSome(TValue some, string because = "",
         params object[] becauseArgs)
     {
@@ -72,6 +58,14 @@ public class OptionalAssertions<TValue> : ObjectAssertions<Optional<TValue>, Opt
     public AndConstraint<OptionalAssertions<TValue>> NotBeNone(string because = "",
         params object[] becauseArgs)
     {
-        return BeSome(because, becauseArgs);
+        Execute.Assertion
+            .BecauseOf(because, becauseArgs)
+            .Given(() => Subject)
+            .ForCondition(optional => optional.HasValue)
+            .FailWith(
+                "Expected {context:optional} not to be None{reason}, but it was.",
+                optional => optional.ValueOrDefault);
+
+        return new AndConstraint<OptionalAssertions<TValue>>(this);
     }
 }
