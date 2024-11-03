@@ -45,7 +45,8 @@ public interface IAncillaryApplication
 #endif
 
     Task<Result<SearchResults<DeliveredEmail>, Error>> SearchAllEmailDeliveriesAsync(ICallerContext caller,
-        DateTime? sinceUtc, SearchOptions searchOptions, GetOptions getOptions, CancellationToken cancellationToken);
+        DateTime? sinceUtc, IReadOnlyList<string>? tags, SearchOptions searchOptions, GetOptions getOptions,
+        CancellationToken cancellationToken);
 
     Task<Result<bool, Error>> SendEmailAsync(ICallerContext caller, string messageAsJson,
         CancellationToken cancellationToken);

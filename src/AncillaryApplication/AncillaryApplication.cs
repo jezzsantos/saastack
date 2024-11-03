@@ -256,13 +256,13 @@ public class AncillaryApplication : IAncillaryApplication
     }
 #endif
 
-    public async Task<Result<SearchResults<DeliveredEmail>, Error>> SearchAllEmailDeliveriesAsync(
-        ICallerContext caller, DateTime? sinceUtc, SearchOptions searchOptions,
+    public async Task<Result<SearchResults<DeliveredEmail>, Error>> SearchAllEmailDeliveriesAsync(ICallerContext caller,
+        DateTime? sinceUtc, IReadOnlyList<string>? tags, SearchOptions searchOptions,
         GetOptions getOptions, CancellationToken cancellationToken)
     {
         var sinceWhen = sinceUtc ?? DateTime.UtcNow.SubtractDays(14);
         var searched =
-            await _emailDeliveryRepository.SearchAllDeliveriesAsync(sinceWhen, searchOptions, cancellationToken);
+            await _emailDeliveryRepository.SearchAllDeliveriesAsync(sinceWhen, tags, searchOptions, cancellationToken);
         if (searched.IsFailure)
         {
             return searched.Error;
@@ -363,6 +363,8 @@ public class AncillaryApplication : IAncillaryApplication
             return sender.Error;
         }
 
+        var tags = message.Html!.Tags;
+
         EmailDeliveryRoot email;
         var found = retrieved.Value.HasValue;
         if (found)
@@ -379,7 +381,7 @@ public class AncillaryApplication : IAncillaryApplication
 
             email = created.Value;
 
-            var detailed = email.SetEmailDetails(subject, body, recipient.Value);
+            var detailed = email.SetEmailDetails(subject, body, recipient.Value, tags);
             if (detailed.IsFailure)
             {
                 return detailed.Error;
@@ -637,7 +639,10 @@ public static class AncillaryConversionExtensions
                 : null,
             FailedDeliveryReason = email.DeliveryFailedReason.HasValue
                 ? email.DeliveryFailedReason.Value
-                : null
+                : null,
+            Tags = email.Tags.HasValue
+                ? email.Tags.Value.FromJson<List<string>>()!
+                : new List<string>()
         };
     }
 }

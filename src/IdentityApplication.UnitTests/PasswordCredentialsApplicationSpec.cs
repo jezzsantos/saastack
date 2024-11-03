@@ -402,8 +402,8 @@ public class PasswordCredentialsApplicationSpec
                 .None);
         _notificationsService.Setup(ns =>
                 ns.NotifyPasswordRegistrationConfirmationAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                    It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                    It.IsAny<CancellationToken>()))
             .ReturnsAsync(Error.Unexpected());
 
         var result = await _application.RegisterPersonAsync(_caller.Object, "aninvitationtoken", "afirstname",
@@ -414,7 +414,7 @@ public class PasswordCredentialsApplicationSpec
             Times.Never);
         _notificationsService.Verify(ns =>
             ns.NotifyPasswordRegistrationConfirmationAsync(_caller.Object, "auser@company.com", "afirstname",
-                "averificationtoken", It.IsAny<CancellationToken>()));
+                "averificationtoken", It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()));
         _endUsersService.Verify(eus => eus.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
             "auser@company.com", "afirstname", "alastname", "atimezone", "acountrycode", true,
             It.IsAny<CancellationToken>()));
@@ -451,7 +451,8 @@ public class PasswordCredentialsApplicationSpec
         ), It.IsAny<CancellationToken>()));
         _notificationsService.Verify(ns =>
             ns.NotifyPasswordRegistrationConfirmationAsync(_caller.Object, "auser@company.com", "afirstname",
-                "averificationtoken", It.IsAny<CancellationToken>()));
+                "averificationtoken", UserNotificationConstants.EmailTags.RegisterPerson,
+                It.IsAny<CancellationToken>()));
         _endUsersService.Verify(eus => eus.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
             "auser@company.com", "afirstname", "alastname", "atimezone", "acountrycode", true,
             It.IsAny<CancellationToken>()));
@@ -507,9 +508,10 @@ public class PasswordCredentialsApplicationSpec
             Times.Never);
         _notificationsService.Verify(ns =>
             ns.NotifyPasswordResetInitiatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
         _notificationsService.Verify(ns =>
-            ns.NotifyPasswordResetUnknownUserCourtesyAsync(_caller.Object, "user@company.com", CancellationToken.None));
+            ns.NotifyPasswordResetUnknownUserCourtesyAsync(_caller.Object, "user@company.com",
+                UserNotificationConstants.EmailTags.PasswordResetUnknownUser, CancellationToken.None));
     }
 
     [Fact]
@@ -529,10 +531,10 @@ public class PasswordCredentialsApplicationSpec
         ), It.IsAny<CancellationToken>()));
         _notificationsService.Verify(ns =>
             ns.NotifyPasswordResetInitiatedAsync(_caller.Object, "aname", "user@company.com", TestingToken,
-                It.IsAny<CancellationToken>()));
+                UserNotificationConstants.EmailTags.PasswordResetInitiated, It.IsAny<CancellationToken>()));
         _notificationsService.Verify(ns =>
             ns.NotifyPasswordResetUnknownUserCourtesyAsync(It.IsAny<ICallerContext>(), "user@company.com",
-                CancellationToken.None), Times.Never);
+                It.IsAny<IReadOnlyList<string>>(), CancellationToken.None), Times.Never);
     }
 
     [Fact]
@@ -550,7 +552,7 @@ public class PasswordCredentialsApplicationSpec
             Times.Never);
         _notificationsService.Verify(ns =>
             ns.NotifyPasswordResetInitiatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -570,8 +572,8 @@ public class PasswordCredentialsApplicationSpec
             cred.IsPasswordResetInitiated
         ), It.IsAny<CancellationToken>()));
         _notificationsService.Verify(ns =>
-            ns.NotifyPasswordResetInitiatedAsync(_caller.Object, "aname", "auser@company.com",
-                TestingToken, It.IsAny<CancellationToken>()));
+            ns.NotifyPasswordResetInitiatedAsync(_caller.Object, "aname", "auser@company.com", TestingToken,
+                UserNotificationConstants.EmailTags.PasswordResetResend, It.IsAny<CancellationToken>()));
     }
 
     [Fact]
@@ -589,7 +591,7 @@ public class PasswordCredentialsApplicationSpec
             Times.Never);
         _notificationsService.Verify(ns =>
             ns.NotifyPasswordResetInitiatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -627,7 +629,7 @@ public class PasswordCredentialsApplicationSpec
             Times.Never);
         _notificationsService.Verify(ns =>
             ns.NotifyPasswordResetInitiatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -654,7 +656,7 @@ public class PasswordCredentialsApplicationSpec
         ), It.IsAny<CancellationToken>()));
         _notificationsService.Verify(ns =>
             ns.NotifyPasswordResetInitiatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     private PasswordCredentialRoot CreateUnVerifiedCredential()

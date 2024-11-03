@@ -39,14 +39,15 @@ public static class Events
         }
 
         public static EmailDetailsChanged EmailDetailsChanged(Identifier id, string subject, string body,
-            EmailRecipient to)
+            EmailRecipient to, IReadOnlyList<string>? tags)
         {
             return new EmailDetailsChanged(id)
             {
                 Subject = subject,
                 Body = body,
                 ToEmailAddress = to.EmailAddress,
-                ToDisplayName = to.DisplayName
+                ToDisplayName = to.DisplayName,
+                Tags = new List<string>(tags ?? new List<string>())
             };
         }
 

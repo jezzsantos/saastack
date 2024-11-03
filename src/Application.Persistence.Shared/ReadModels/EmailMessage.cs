@@ -19,6 +19,8 @@ public class QueuedEmailHtmlMessage
 
     public string? Subject { get; set; }
 
+    public List<string>? Tags { get; set; }
+
     public string? ToDisplayName { get; set; }
 
     public string? ToEmailAddress { get; set; }

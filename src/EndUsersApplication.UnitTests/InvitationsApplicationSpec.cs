@@ -91,9 +91,10 @@ public class InvitationsApplicationSpec
             await _application.InviteGuestAsync(_caller.Object, "aninvitee@company.com", CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityExists, Resources.EndUsersApplication_GuestAlreadyRegistered);
-        _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(It.IsAny<ICallerContext>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        _notificationsService.Verify(
+            ns => ns.NotifyGuestInvitationToPlatformAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                It.IsAny<CancellationToken>()), Times.Never);
         _repository.Verify(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()));
     }
 
@@ -140,9 +141,10 @@ public class InvitationsApplicationSpec
             eu.Memberships.Count == 0
             && eu.GuestInvitation.IsInvited == false
         ), It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(It.IsAny<ICallerContext>(),
-            It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<CancellationToken>()), Times.Never);
+        _notificationsService.Verify(
+            ns => ns.NotifyGuestInvitationToPlatformAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                It.IsAny<CancellationToken>()), Times.Never);
         _userProfilesService.Verify(ups =>
             ups.FindPersonByEmailAddressPrivateAsync(_caller.Object, "aninvitee@company.com",
                 It.IsAny<CancellationToken>()));
@@ -194,7 +196,8 @@ public class InvitationsApplicationSpec
         result.Value.FirstName.Should().Be("Aninvitee");
         result.Value.LastName.Should().BeNull();
         _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(_caller.Object, TestingToken,
-            "aninvitee@company.com", "Aninvitee", "aninviterdisplayname", It.IsAny<CancellationToken>()));
+            "aninvitee@company.com", "Aninvitee", "aninviterdisplayname",
+            UserNotificationConstants.EmailTags.InviteGuest, It.IsAny<CancellationToken>()));
     }
 
     [Fact]
@@ -242,7 +245,8 @@ public class InvitationsApplicationSpec
             ups.FindPersonByEmailAddressPrivateAsync(_caller.Object, "aninvitee@company.com",
                 It.IsAny<CancellationToken>()));
         _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(_caller.Object, TestingToken,
-            "aninvitee@company.com", "Aninvitee", "aninviterdisplayname", It.IsAny<CancellationToken>()));
+            "aninvitee@company.com", "Aninvitee", "aninviterdisplayname",
+            UserNotificationConstants.EmailTags.InviteGuest, It.IsAny<CancellationToken>()));
         _repository.Verify(rep => rep.LoadAsync("anid".ToId(), It.IsAny<CancellationToken>()), Times.Never);
         _repository.Verify(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()));
     }
@@ -300,7 +304,8 @@ public class InvitationsApplicationSpec
 
         result.Should().BeSuccess();
         _notificationsService.Verify(ns => ns.NotifyGuestInvitationToPlatformAsync(_caller.Object, TestingToken,
-            "aninvitee@company.com", "Aninvitee", "aninviterdisplayname", It.IsAny<CancellationToken>()));
+            "aninvitee@company.com", "Aninvitee", "aninviterdisplayname",
+            UserNotificationConstants.EmailTags.InviteGuest, It.IsAny<CancellationToken>()));
         _repository.Verify(rep => rep.LoadAsync("anid".ToId(), It.IsAny<CancellationToken>()), Times.Never);
         _repository.Verify(rep => rep.LoadAsync("aninviterid".ToId(), It.IsAny<CancellationToken>()));
     }

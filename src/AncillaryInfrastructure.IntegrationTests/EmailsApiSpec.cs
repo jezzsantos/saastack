@@ -54,7 +54,8 @@ public class EmailsApiSpec : WebApiSpec<Program>
                     ToEmailAddress = "arecipient@company.com",
                     ToDisplayName = "atodisplayname",
                     FromEmailAddress = "asender@company.com",
-                    FromDisplayName = "afromdisplayname"
+                    FromDisplayName = "afromdisplayname",
+                    Tags = ["atag"]
                 }
             }.ToJson()!
         };
@@ -81,6 +82,8 @@ public class EmailsApiSpec : WebApiSpec<Program>
         deliveries.Content.Value.Emails[0].DeliveredAt.Should().BeNull();
         deliveries.Content.Value.Emails[0].IsDeliveryFailed.Should().BeFalse();
         deliveries.Content.Value.Emails[0].FailedDeliveryAt.Should().BeNull();
+        deliveries.Content.Value.Emails[0].Tags.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].Tags[0].Should().Be("atag");
     }
 
     [Fact]
@@ -101,7 +104,8 @@ public class EmailsApiSpec : WebApiSpec<Program>
                     ToEmailAddress = "arecipient@company.com",
                     ToDisplayName = "atodisplayname",
                     FromEmailAddress = "asender@company.com",
-                    FromDisplayName = "afromdisplayname"
+                    FromDisplayName = "afromdisplayname",
+                    Tags = ["atag"]
                 }
             }.ToJson()!
         };
@@ -128,6 +132,8 @@ public class EmailsApiSpec : WebApiSpec<Program>
         deliveries.Content.Value.Emails[0].DeliveredAt.Should().BeNull();
         deliveries.Content.Value.Emails[0].IsDeliveryFailed.Should().BeFalse();
         deliveries.Content.Value.Emails[0].FailedDeliveryAt.Should().BeNull();
+        deliveries.Content.Value.Emails[0].Tags.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].Tags[0].Should().Be("atag");
     }
 
     [Fact]
@@ -148,7 +154,8 @@ public class EmailsApiSpec : WebApiSpec<Program>
                     ToEmailAddress = "arecipient@company.com",
                     ToDisplayName = "atodisplayname",
                     FromEmailAddress = "asender@company.com",
-                    FromDisplayName = "afromdisplayname"
+                    FromDisplayName = "afromdisplayname",
+                    Tags = ["atag"]
                 }
             }.ToJson()!
         };
@@ -178,6 +185,8 @@ public class EmailsApiSpec : WebApiSpec<Program>
         deliveries.Content.Value.Emails[0].DeliveredAt.Should().BeNull();
         deliveries.Content.Value.Emails[0].IsDeliveryFailed.Should().BeFalse();
         deliveries.Content.Value.Emails[0].FailedDeliveryAt.Should().BeNull();
+        deliveries.Content.Value.Emails[0].Tags.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].Tags[0].Should().Be("atag");
     }
 
     [Fact]
@@ -198,7 +207,8 @@ public class EmailsApiSpec : WebApiSpec<Program>
                     ToEmailAddress = "arecipient@company.com",
                     ToDisplayName = "atodisplayname",
                     FromEmailAddress = "asender@company.com",
-                    FromDisplayName = "afromdisplayname"
+                    FromDisplayName = "afromdisplayname",
+                    Tags = ["atag"]
                 }
             }.ToJson()!
         };
@@ -233,6 +243,8 @@ public class EmailsApiSpec : WebApiSpec<Program>
         deliveries.Content.Value.Emails[0].DeliveredAt.Should().BeNear(now, TimeSpan.FromMinutes(1));
         deliveries.Content.Value.Emails[0].IsDeliveryFailed.Should().BeFalse();
         deliveries.Content.Value.Emails[0].FailedDeliveryAt.Should().BeNull();
+        deliveries.Content.Value.Emails[0].Tags.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].Tags[0].Should().Be("atag");
     }
 
     [Fact]
@@ -253,7 +265,8 @@ public class EmailsApiSpec : WebApiSpec<Program>
                     ToEmailAddress = "arecipient@company.com",
                     ToDisplayName = "atodisplayname",
                     FromEmailAddress = "asender@company.com",
-                    FromDisplayName = "afromdisplayname"
+                    FromDisplayName = "afromdisplayname",
+                    Tags = ["atag"]
                 }
             }.ToJson()!
         };
@@ -290,6 +303,51 @@ public class EmailsApiSpec : WebApiSpec<Program>
         deliveries.Content.Value.Emails[0].IsDeliveryFailed.Should().BeTrue();
         deliveries.Content.Value.Emails[0].FailedDeliveryAt.Should().BeNear(now, TimeSpan.FromMinutes(1));
         deliveries.Content.Value.Emails[0].FailedDeliveryReason.Should().Be("areason");
+        deliveries.Content.Value.Emails[0].Tags.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].Tags[0].Should().Be("atag");
+    }
+
+    [Fact]
+    public async Task WhenSearchEmailDeliveriesWithTags_TheReturnsEmails()
+    {
+        _emailDeliveryService.SendingSucceeds = true;
+        var request = new SendEmailRequest
+        {
+            Message = new EmailMessage
+            {
+                MessageId = CreateMessageId(),
+                CallId = "acallid",
+                CallerId = "acallerid",
+                Html = new QueuedEmailHtmlMessage
+                {
+                    Subject = "asubject",
+                    HtmlBody = "anhtmlbody",
+                    ToEmailAddress = "arecipient@company.com",
+                    ToDisplayName = "atodisplayname",
+                    FromEmailAddress = "asender@company.com",
+                    FromDisplayName = "afromdisplayname",
+                    Tags = ["atag1", "atag2", "atag3"]
+                }
+            }.ToJson()!
+        };
+        var result = await Api.PostAsync(request, req => req.SetHMACAuth(request, "asecret"));
+
+        result.Content.Value.IsSent.Should().BeTrue();
+        _emailDeliveryService.LastSubject.Should().Be("asubject");
+
+        var login = await LoginUserAsync(LoginUser.Operator);
+        var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest
+            {
+                Tags = ["atag2", "atag3"]
+            },
+            req => req.SetJWTBearerToken(login.AccessToken));
+
+        deliveries.Content.Value.Emails!.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
+        deliveries.Content.Value.Emails[0].Tags.Count.Should().Be(3);
+        deliveries.Content.Value.Emails[0].Tags[0].Should().Be("atag1");
+        deliveries.Content.Value.Emails[0].Tags[1].Should().Be("atag2");
+        deliveries.Content.Value.Emails[0].Tags[2].Should().Be("atag3");
     }
 
 #if TESTINGONLY
@@ -323,7 +381,8 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 ToEmailAddress = "arecipient@company.com",
                 ToDisplayName = "atodisplayname",
                 FromEmailAddress = "asender@company.com",
-                FromDisplayName = "afromdisplayname"
+                FromDisplayName = "afromdisplayname",
+                Tags = ["atag"]
             }
         }, CancellationToken.None);
         await _emailMessageQueue.PushAsync(call, new EmailMessage
@@ -338,7 +397,8 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 ToEmailAddress = "arecipient@company.com",
                 ToDisplayName = "atodisplayname",
                 FromEmailAddress = "asender@company.com",
-                FromDisplayName = "afromdisplayname"
+                FromDisplayName = "afromdisplayname",
+                Tags = ["atag"]
             }
         }, CancellationToken.None);
         await _emailMessageQueue.PushAsync(call, new EmailMessage
@@ -353,7 +413,8 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 ToEmailAddress = "arecipient@company.com",
                 ToDisplayName = "atodisplayname",
                 FromEmailAddress = "asender@company.com",
-                FromDisplayName = "afromdisplayname"
+                FromDisplayName = "afromdisplayname",
+                Tags = ["atag"]
             }
         }, CancellationToken.None);
 

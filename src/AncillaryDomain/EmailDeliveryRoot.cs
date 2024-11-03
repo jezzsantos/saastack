@@ -98,6 +98,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
                 }
 
                 Recipient = recipient.Value;
+                Tags = changed.Tags;
                 Recorder.TraceDebug(null, "EmailDelivery {Id} has updated the email details", Id);
                 return Result.Ok;
             }
@@ -149,6 +150,8 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
                 return HandleUnKnownStateChangedEvent(@event);
         }
     }
+
+    public List<string> Tags { get; private set; } = [];
 
     public Result<bool, Error> AttemptSending()
     {
@@ -219,7 +222,8 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
         return RaiseChangeEvent(AncillaryDomain.Events.EmailDelivery.SendingFailed(Id, when));
     }
 
-    public Result<Error> SetEmailDetails(string? subject, string? body, EmailRecipient recipient)
+    public Result<Error> SetEmailDetails(string? subject, string? body, EmailRecipient recipient,
+        IReadOnlyList<string>? tags)
     {
         if (subject.IsInvalidParameter(x => x.HasValue(), nameof(subject),
                 Resources.EmailDeliveryRoot_MissingEmailSubject, out var error1))
@@ -234,7 +238,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
         }
 
         return RaiseChangeEvent(
-            AncillaryDomain.Events.EmailDelivery.EmailDetailsChanged(Id, subject!, body!, recipient));
+            AncillaryDomain.Events.EmailDelivery.EmailDetailsChanged(Id, subject!, body!, recipient, tags));
     }
 
     public Result<Error> SucceededSending(Optional<string> receiptId)

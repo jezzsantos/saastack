@@ -33,7 +33,8 @@ public class QueuingEmailSchedulingService : IEmailSchedulingService
                 FromDisplayName = htmlEmail.FromDisplayName,
                 HtmlBody = htmlEmail.Body,
                 ToEmailAddress = htmlEmail.ToEmailAddress,
-                ToDisplayName = htmlEmail.ToDisplayName
+                ToDisplayName = htmlEmail.ToDisplayName,
+                Tags = htmlEmail.Tags
             }
         }, cancellationToken);
         if (queued.IsFailure)
@@ -43,8 +44,8 @@ public class QueuingEmailSchedulingService : IEmailSchedulingService
 
         var message = queued.Value;
         _recorder.TraceInformation(caller.ToCall(),
-            "Pended email message {Id} for {To} with subject {Subject}", message.MessageId!,
-            htmlEmail.ToEmailAddress, htmlEmail.Subject);
+            "Pended email message {Id} for {To} with subject {Subject}, and tags {Tags}", message.MessageId!,
+            htmlEmail.ToEmailAddress, htmlEmail.Subject, htmlEmail.Tags ?? new List<string> { "(none)" });
 
         return Result.Ok;
     }

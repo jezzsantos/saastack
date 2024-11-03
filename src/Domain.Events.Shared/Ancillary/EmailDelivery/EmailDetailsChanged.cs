@@ -19,6 +19,8 @@ public sealed class EmailDetailsChanged : DomainEvent
 
     public required string Subject { get; set; }
 
+    public required List<string> Tags { get; set; }
+
     public required string ToDisplayName { get; set; }
 
     public required string ToEmailAddress { get; set; }

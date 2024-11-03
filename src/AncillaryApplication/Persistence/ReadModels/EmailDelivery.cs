@@ -30,6 +30,8 @@ public class EmailDelivery : ReadModelEntity
 
     public Optional<string> Subject { get; set; }
 
+    public Optional<string> Tags { get; set; }
+
     public Optional<string> ToDisplayName { get; set; }
 
     public Optional<string> ToEmailAddress { get; set; }

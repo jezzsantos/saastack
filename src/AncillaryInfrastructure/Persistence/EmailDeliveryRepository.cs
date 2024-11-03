@@ -68,12 +68,26 @@ public class EmailDeliveryRepository : IEmailDeliveryRepository
             : delivery;
     }
 
-    public async Task<Result<List<EmailDelivery>, Error>> SearchAllDeliveriesAsync(DateTime sinceUtc,
-        SearchOptions searchOptions, CancellationToken cancellationToken)
+    public async Task<Result<List<EmailDelivery>, Error>> SearchAllDeliveriesAsync(DateTime? sinceUtc,
+        IReadOnlyList<string>? tags, SearchOptions searchOptions, CancellationToken cancellationToken)
     {
-        var queried = await _deliveryQueries.QueryAsync(Query.From<EmailDelivery>()
-            .Where<DateTime?>(u => u.LastAttempted, ConditionOperator.GreaterThan, sinceUtc)
-            .WithSearchOptions(searchOptions), cancellationToken: cancellationToken);
+        var query = Query.From<EmailDelivery>().WhereNoOp();
+        if (sinceUtc.HasValue)
+        {
+            query = query.AndWhere<DateTime?>(u => u.LastAttempted, ConditionOperator.GreaterThan, sinceUtc);
+        }
+
+        if (tags.Exists() && tags.HasAny())
+        {
+            foreach (var tag in tags)
+            {
+                query = query.AndWhere<string>(u => u.Tags, ConditionOperator.Like, tag);
+            }
+        }
+
+        query = query.WithSearchOptions(searchOptions);
+
+        var queried = await _deliveryQueries.QueryAsync(query, cancellationToken: cancellationToken);
         if (queried.IsFailure)
         {
             return queried.Error;

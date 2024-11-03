@@ -103,5 +103,23 @@ namespace AncillaryInfrastructure {
                 return ResourceManager.GetString("GetFeatureFlagRequestValidator_InvalidUserId", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One of the &apos;Tags&apos; is invalid.
+        /// </summary>
+        internal static string SearchEmailDeliveriesRequestValidator_InvalidTag {
+            get {
+                return ResourceManager.GetString("SearchEmailDeliveriesRequestValidator_InvalidTag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;SinceUtc&apos; is too far into the future.
+        /// </summary>
+        internal static string SearchEmailDeliveriesRequestValidator_SinceUtc_TooFuture {
+            get {
+                return ResourceManager.GetString("SearchEmailDeliveriesRequestValidator_SinceUtc_TooFuture", resourceCulture);
+            }
+        }
     }
 }

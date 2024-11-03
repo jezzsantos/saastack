@@ -399,7 +399,8 @@ public partial class EndUsersApplication : IEndUsersApplication
 
                 var notified = await _userNotificationsService.NotifyPasswordRegistrationRepeatCourtesyAsync(caller,
                     unregisteredUser.Id, unregisteredUserProfile.EmailAddress, unregisteredUserProfile.DisplayName,
-                    unregisteredUserProfile.Timezone, unregisteredUserProfile.Address.CountryCode, cancellationToken);
+                    unregisteredUserProfile.Timezone, unregisteredUserProfile.Address.CountryCode,
+                    UserNotificationConstants.EmailTags.RegistrationRepeatCourtesy, cancellationToken);
                 if (notified.IsFailure)
                 {
                     return notified.Error;

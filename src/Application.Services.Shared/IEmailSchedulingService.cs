@@ -28,4 +28,6 @@ public class HtmlEmail
     public required string ToDisplayName { get; set; }
 
     public required string ToEmailAddress { get; set; }
+
+    public List<string>? Tags { get; set; }
 }

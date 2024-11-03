@@ -39,4 +39,10 @@
     <data name="GetFeatureFlagRequestValidator_InvalidUserId" xml:space="preserve">
         <value>The 'UserId' is not a valid identifier</value>
     </data>
+    <data name="SearchEmailDeliveriesRequestValidator_SinceUtc_TooFuture" xml:space="preserve">
+        <value>The 'SinceUtc' is too far into the future</value>
+    </data>
+    <data name="SearchEmailDeliveriesRequestValidator_InvalidTag" xml:space="preserve">
+        <value>One of the 'Tags' is invalid</value>
+    </data>
 </root>

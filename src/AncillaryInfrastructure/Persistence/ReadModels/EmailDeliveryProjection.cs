@@ -3,6 +3,7 @@ using AncillaryDomain;
 using Application.Persistence.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
+using Common.Extensions;
 using Domain.Events.Shared.Ancillary.EmailDelivery;
 using Domain.Interfaces;
 using Domain.Interfaces.Entities;
@@ -43,6 +44,7 @@ public class EmailDeliveryProjection : IReadModelProjection
                     dto.Body = e.Body;
                     dto.ToEmailAddress = e.ToEmailAddress;
                     dto.ToDisplayName = e.ToDisplayName;
+                    dto.Tags = e.Tags.ToJson();
                 }, cancellationToken);
 
             case SendingAttempted e:

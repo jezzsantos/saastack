@@ -46,7 +46,7 @@ public class EmailDeliverRootSpec
         var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
         var recipient = EmailRecipient.Create(EmailAddress.Create("auser@company.com").Value, "adisplayname").Value;
 
-        var result = root.SetEmailDetails(string.Empty, "abody", recipient);
+        var result = root.SetEmailDetails(string.Empty, "abody", recipient, new List<string>());
 
         result.Should().BeError(ErrorCode.Validation, Resources.EmailDeliveryRoot_MissingEmailSubject);
     }
@@ -58,7 +58,7 @@ public class EmailDeliverRootSpec
         var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
         var recipient = EmailRecipient.Create(EmailAddress.Create("auser@company.com").Value, "adisplayname").Value;
 
-        var result = root.SetEmailDetails("asubject", string.Empty, recipient);
+        var result = root.SetEmailDetails("asubject", string.Empty, recipient, new List<string>());
 
         result.Should().BeError(ErrorCode.Validation, Resources.EmailDeliveryRoot_MissingEmailBody);
     }
@@ -70,10 +70,12 @@ public class EmailDeliverRootSpec
         var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
         var recipient = EmailRecipient.Create(EmailAddress.Create("auser@company.com").Value, "adisplayname").Value;
 
-        var result = root.SetEmailDetails("asubject", "abody", recipient);
+        var result = root.SetEmailDetails("asubject", "abody", recipient, new List<string> { "atag" });
 
         result.Should().BeSuccess();
         root.Recipient.Should().Be(recipient);
+        root.Tags.Count.Should().Be(1);
+        root.Tags[0].Should().Be("atag");
         root.Events.Last().Should().BeOfType<EmailDetailsChanged>();
     }
 

@@ -279,7 +279,7 @@ public partial class InvitationsApplication : IInvitationsApplication
         var inviterName = inviterProfile.Value.DisplayName;
         var notified =
             await _userNotificationsService.NotifyGuestInvitationToPlatformAsync(caller, token, inviteeEmailAddress,
-                inviteeName, inviterName, cancellationToken);
+                inviteeName, inviterName, UserNotificationConstants.EmailTags.InviteGuest, cancellationToken);
         if (notified.IsFailure)
         {
             return notified.Error;

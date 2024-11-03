@@ -246,13 +246,15 @@ public class AncillaryApplicationSpec
                 ToEmailAddress = "arecipient@company.com",
                 ToDisplayName = "arecipient",
                 FromEmailAddress = "asender@company.com",
-                FromDisplayName = "asender"
+                FromDisplayName = "asender",
+                Tags = new List<string> { "atag" }
             }
         }.ToJson()!;
         var email = EmailDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
         email.SetEmailDetails("asubject", "abody",
-            EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value);
+            EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
+            new List<string> { "atag" });
         email.AttemptSending();
         email.SucceededSending("areceiptid");
         _emailDeliveryRepository.Setup(edr =>
@@ -427,7 +429,7 @@ public class AncillaryApplicationSpec
             Body = "abody",
             Sent = datum,
             SendFailed = Optional<DateTime?>.None,
-            Attempts = SendingAttempts.Create(new List<DateTime> { datum }).Value,
+            Attempts = SendingAttempts.Create([datum]).Value,
             MessageId = "amessageid",
             Subject = "asubject",
             ToDisplayName = "arecipient",
@@ -435,11 +437,12 @@ public class AncillaryApplicationSpec
             LastAttempted = datum
         };
         _emailDeliveryRepository.Setup(edr =>
-                edr.SearchAllDeliveriesAsync(It.IsAny<DateTime>(), It.IsAny<SearchOptions>(),
+                edr.SearchAllDeliveriesAsync(It.IsAny<DateTime?>(), It.IsAny<IReadOnlyList<string>>(),
+                    It.IsAny<SearchOptions>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<EmailDelivery> { delivery });
 
-        var result = await _application.SearchAllEmailDeliveriesAsync(_caller.Object, null, new SearchOptions(),
+        var result = await _application.SearchAllEmailDeliveriesAsync(_caller.Object, null, null, new SearchOptions(),
             new GetOptions(), CancellationToken.None);
 
         result.Value.Results.Count.Should().Be(1);
@@ -475,7 +478,8 @@ public class AncillaryApplicationSpec
         var email = EmailDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
         email.SetEmailDetails("asubject", "abody",
-            EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value);
+            EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
+            new List<string> { "atag" });
         email.SucceededSending("areceiptid");
         email.ConfirmDelivery("areceiptid", DateTime.UtcNow);
         _emailDeliveryRepository.Setup(rep =>
@@ -498,7 +502,8 @@ public class AncillaryApplicationSpec
         var email = EmailDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
         email.SetEmailDetails("asubject", "abody",
-            EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value);
+            EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
+            new List<string> { "atag" });
         email.AttemptSending();
         email.SucceededSending("areceiptid");
         _emailDeliveryRepository.Setup(rep =>
@@ -541,7 +546,8 @@ public class AncillaryApplicationSpec
         var email = EmailDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
         email.SetEmailDetails("asubject", "abody",
-            EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value);
+            EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
+            new List<string> { "atag" });
         email.SucceededSending("areceiptid");
         email.ConfirmDelivery("areceiptid", DateTime.UtcNow);
         _emailDeliveryRepository.Setup(rep =>
@@ -564,7 +570,8 @@ public class AncillaryApplicationSpec
         var email = EmailDeliveryRoot
             .Create(_recorder.Object, _idFactory.Object, QueuedMessageId.Create(messageId).Value).Value;
         email.SetEmailDetails("asubject", "abody",
-            EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value);
+            EmailRecipient.Create(EmailAddress.Create("arecipient@company.com").Value, "adisplayname").Value,
+            new List<string> { "atag" });
         email.AttemptSending();
         email.SucceededSending("areceiptid");
         _emailDeliveryRepository.Setup(rep =>

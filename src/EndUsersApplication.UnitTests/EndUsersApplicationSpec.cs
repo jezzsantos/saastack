@@ -26,6 +26,7 @@ namespace EndUsersApplication.UnitTests;
 [Trait("Category", "Unit")]
 public class EndUsersApplicationSpec
 {
+    private const string TestingToken = "Ll4qhv77XhiXSqsTUc6icu56ZLrqu5p1gH9kT5IlHio";
     private readonly EndUsersApplication _application;
     private readonly Mock<ICallerContext> _caller;
     private readonly Mock<IEndUserRepository> _endUserRepository;
@@ -149,14 +150,12 @@ public class EndUsersApplicationSpec
         result.Value.Features.Should().ContainInOrder(PlatformFeatures.PaidTrial.Name, PlatformFeatures.Basic.Name);
         _invitationRepository.Verify(rep =>
             rep.FindInvitedGuestByTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
-        _notificationsService.Verify(ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<CancellationToken>()), Times.Never);
+        _notificationsService.Verify(
+            ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
-    private const string TestingToken = "Ll4qhv77XhiXSqsTUc6icu56ZLrqu5p1gH9kT5IlHio";
-    
     [Fact]
     public async Task WhenRegisterPersonAsyncAndAcceptingGuestInvitation_ThenCompletesRegistration()
     {
@@ -218,10 +217,10 @@ public class EndUsersApplicationSpec
         result.Value.Features.Should().ContainInOrder(PlatformFeatures.PaidTrial.Name, PlatformFeatures.Basic.Name);
         _invitationRepository.Verify(rep =>
             rep.FindInvitedGuestByTokenAsync(TestingToken, It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<CancellationToken>()), Times.Never);
+        _notificationsService.Verify(
+            ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -274,10 +273,10 @@ public class EndUsersApplicationSpec
         result.Value.Features.Should().ContainInOrder(PlatformFeatures.PaidTrial.Name, PlatformFeatures.Basic.Name);
         _invitationRepository.Verify(rep =>
             rep.FindInvitedGuestByTokenAsync("anunknowninvitationtoken", It.IsAny<CancellationToken>()));
-        _notificationsService.Verify(ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<CancellationToken>()), Times.Never);
+        _notificationsService.Verify(
+            ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -330,7 +329,7 @@ public class EndUsersApplicationSpec
         _notificationsService.Verify(
             ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<CancellationToken>()), Times.Never);
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -368,7 +367,7 @@ public class EndUsersApplicationSpec
         _notificationsService.Setup(ns =>
                 ns.NotifyPasswordRegistrationRepeatCourtesyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                     It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
+                    It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Ok);
 
         var result = await _application.RegisterPersonAsync(_caller.Object, null, "auser@company.com",
@@ -389,7 +388,8 @@ public class EndUsersApplicationSpec
                     It.IsAny<CancellationToken>()),
             Times.Never);
         _notificationsService.Verify(ns => ns.NotifyPasswordRegistrationRepeatCourtesyAsync(_caller.Object, "anid",
-            "anotheruser@company.com", "afirstname", "atimezone", "acountrycode", CancellationToken.None));
+            "anotheruser@company.com", "afirstname", "atimezone", "acountrycode",
+            UserNotificationConstants.EmailTags.RegistrationRepeatCourtesy, CancellationToken.None));
     }
 
     [Fact]

@@ -228,7 +228,7 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         {
             var warned =
                 await _userNotificationsService.NotifyPasswordResetUnknownUserCourtesyAsync(caller, emailAddress,
-                    cancellationToken);
+                    UserNotificationConstants.EmailTags.PasswordResetUnknownUser, cancellationToken);
             if (warned.IsFailure)
             {
                 return warned.Error;
@@ -246,7 +246,8 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
 
         var registration = credentials.Registration.Value;
         var notified = await _userNotificationsService.NotifyPasswordResetInitiatedAsync(caller, registration.Name,
-            emailAddress, credentials.Password.ResetToken, cancellationToken);
+            emailAddress, credentials.Password.ResetToken, UserNotificationConstants.EmailTags.PasswordResetInitiated,
+            cancellationToken);
         if (notified.IsFailure)
         {
             return notified.Error;
@@ -309,7 +310,8 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
 
         var registration = credentials.Registration.Value;
         var notified = await _userNotificationsService.NotifyPasswordResetInitiatedAsync(caller, registration.Name,
-            registration.EmailAddress, credentials.Password.ResetToken, cancellationToken);
+            registration.EmailAddress, credentials.Password.ResetToken,
+            UserNotificationConstants.EmailTags.PasswordResetResend, cancellationToken);
         if (notified.IsFailure)
         {
             return notified.Error;
@@ -514,8 +516,8 @@ public class PasswordCredentialsApplication : IPasswordCredentialsApplication
         }
 
         var notified = await _userNotificationsService.NotifyPasswordRegistrationConfirmationAsync(caller,
-            credentials.Registration.Value.EmailAddress,
-            credentials.Registration.Value.Name, credentials.VerificationKeep.Token, cancellationToken);
+            credentials.Registration.Value.EmailAddress, credentials.Registration.Value.Name,
+            credentials.VerificationKeep.Token, UserNotificationConstants.EmailTags.RegisterPerson, cancellationToken);
         if (notified.IsFailure)
         {
             return notified.Error;

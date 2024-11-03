@@ -37,8 +37,8 @@ public class EmailUserNotificationsService : IUserNotificationsService
     }
 
     public async Task<Result<Error>> NotifyGuestInvitationToPlatformAsync(ICallerContext caller, string token,
-        string inviteeEmailAddress,
-        string inviteeName, string inviterName, CancellationToken cancellationToken)
+        string inviteeEmailAddress, string inviteeName, string inviterName, IReadOnlyList<string>? tags,
+        CancellationToken cancellationToken)
     {
         var webSiteUrl = _hostSettings.GetWebsiteHostBaseUrl();
         var webSiteRoute = _websiteUiService.CreateRegistrationPageUrl(token);
@@ -58,12 +58,15 @@ public class EmailUserNotificationsService : IUserNotificationsService
             FromEmailAddress = _senderEmailAddress,
             FromDisplayName = _senderName,
             ToEmailAddress = inviteeEmailAddress,
-            ToDisplayName = inviteeName
+            ToDisplayName = inviteeName,
+            Tags = tags.Exists()
+                ? new List<string>(tags)
+                : null
         }, cancellationToken);
     }
 
     public async Task<Result<Error>> NotifyPasswordRegistrationConfirmationAsync(ICallerContext caller,
-        string emailAddress, string name, string token,
+        string emailAddress, string name, string token, IReadOnlyList<string>? tags,
         CancellationToken cancellationToken)
     {
         var webSiteUrl = _hostSettings.GetWebsiteHostBaseUrl();
@@ -84,12 +87,16 @@ public class EmailUserNotificationsService : IUserNotificationsService
             FromEmailAddress = _senderEmailAddress,
             FromDisplayName = _senderName,
             ToEmailAddress = emailAddress,
-            ToDisplayName = name
+            ToDisplayName = name,
+            Tags = tags.Exists()
+                ? new List<string>(tags)
+                : null
         }, cancellationToken);
     }
 
     public async Task<Result<Error>> NotifyPasswordRegistrationRepeatCourtesyAsync(ICallerContext caller, string userId,
-        string emailAddress, string name, string? timezone, string? countryCode, CancellationToken cancellationToken)
+        string emailAddress, string name, string? timezone, string? countryCode, IReadOnlyList<string>? tags,
+        CancellationToken cancellationToken)
     {
         var htmlBody =
             $"""
@@ -110,13 +117,15 @@ public class EmailUserNotificationsService : IUserNotificationsService
             FromEmailAddress = _senderEmailAddress,
             FromDisplayName = _senderName,
             ToEmailAddress = emailAddress,
-            ToDisplayName = name
+            ToDisplayName = name,
+            Tags = tags.Exists()
+                ? new List<string>(tags)
+                : null
         }, cancellationToken);
     }
 
     public async Task<Result<Error>> NotifyPasswordResetInitiatedAsync(ICallerContext caller, string name,
-        string emailAddress, string token,
-        CancellationToken cancellationToken)
+        string emailAddress, string token, IReadOnlyList<string>? tags, CancellationToken cancellationToken)
     {
         var webSiteUrl = _hostSettings.GetWebsiteHostBaseUrl();
         var webSiteRoute = _websiteUiService.ConstructPasswordResetConfirmationPageUrl(token);
@@ -138,13 +147,15 @@ public class EmailUserNotificationsService : IUserNotificationsService
             FromEmailAddress = _senderEmailAddress,
             FromDisplayName = _senderName,
             ToEmailAddress = emailAddress,
-            ToDisplayName = name
+            ToDisplayName = name,
+            Tags = tags.Exists()
+                ? new List<string>(tags)
+                : null
         }, cancellationToken);
     }
 
     public async Task<Result<Error>> NotifyPasswordResetUnknownUserCourtesyAsync(ICallerContext caller,
-        string emailAddress,
-        CancellationToken cancellationToken)
+        string emailAddress, IReadOnlyList<string>? tags, CancellationToken cancellationToken)
     {
         var htmlBody =
             $"""
@@ -166,7 +177,10 @@ public class EmailUserNotificationsService : IUserNotificationsService
             FromEmailAddress = _senderEmailAddress,
             FromDisplayName = _senderName,
             ToEmailAddress = emailAddress,
-            ToDisplayName = emailAddress
+            ToDisplayName = emailAddress,
+            Tags = tags.Exists()
+                ? new List<string>(tags)
+                : null
         }, cancellationToken);
     }
 }

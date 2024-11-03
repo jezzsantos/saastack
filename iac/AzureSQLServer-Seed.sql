@@ -334,6 +334,7 @@ CREATE TABLE [dbo].[EmailDelivery]
     [SendFailed]           [datetime]      NULL,
     [Sent]                 [datetime]      NULL,
     [Subject]              [nvarchar](max) NULL,
+    [Tags]                 [nvarchar](max) NULL,
     [ToDisplayName]        [nvarchar](max) NULL,
     [ToEmailAddress]       [nvarchar](max) NULL,
 ) ON [PRIMARY]
