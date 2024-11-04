@@ -43,8 +43,7 @@ public class MultiTenancyMiddleware
             organizationsService, cancellationToken);
         if (result.IsFailure)
         {
-            var httpError = result.Error.ToHttpError();
-            var details = Results.Problem(statusCode: (int)httpError.Code, detail: httpError.Message);
+            var details = result.Error.ToProblem();
             await details
                 .ExecuteAsync(context);
             return;

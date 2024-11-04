@@ -82,7 +82,8 @@ public static class ResponseProblemExtensions
             Title = details.Title,
             Status = details.Status,
             Detail = details.Detail,
-            Instance = details.Instance
+            Instance = details.Instance,
+            Extensions = details.Extensions
         };
 
         if (details.Extensions.TryGetValue(HttpConstants.Responses.ProblemDetails.Extensions.ExceptionPropertyName,
