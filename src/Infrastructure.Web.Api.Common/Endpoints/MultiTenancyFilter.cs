@@ -25,8 +25,7 @@ public class MultiTenancyFilter : IEndpointFilter
         var result = await ModifyRequestAsync(context, tenancyContext, cancellationToken);
         if (result.IsFailure)
         {
-            var httpError = result.Error.ToHttpError();
-            return Results.Problem(statusCode: (int)httpError.Code, detail: httpError.Message);
+            return result.Error.ToProblem();
         }
 
         return await next(context); //Continue down the pipeline

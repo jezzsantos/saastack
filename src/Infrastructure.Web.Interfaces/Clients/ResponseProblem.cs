@@ -20,4 +20,6 @@ public struct ResponseProblem
     public string? Exception { get; set; }
 
     public ValidatorProblem[]? Errors { get; set; }
+
+    public IDictionary<string, object?>? Extensions { get; set; }
 }

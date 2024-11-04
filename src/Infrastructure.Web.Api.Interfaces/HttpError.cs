@@ -35,5 +35,6 @@ public enum HttpErrorCode
     NotFound = HttpStatusCode.NotFound,
     MethodNotAllowed = HttpStatusCode.MethodNotAllowed,
     Conflict = HttpStatusCode.Conflict,
+    Locked = HttpStatusCode.Locked,
     InternalServerError = HttpStatusCode.InternalServerError
 }

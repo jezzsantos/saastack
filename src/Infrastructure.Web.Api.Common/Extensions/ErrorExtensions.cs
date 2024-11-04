@@ -9,9 +9,22 @@ namespace Infrastructure.Web.Api.Common.Extensions;
 public static class ErrorExtensions
 {
     /// <summary>
+    ///     Converts the specified error to a <see cref="IResult" /> with problem details according to
+    ///     <see href="https://datatracker.ietf.org/doc/html/rfc7807" />
+    /// </summary>
+    public static ProblemHttpResult ToProblem(this Error error)
+    {
+        var httpError = error.ToHttpError();
+        return (ProblemHttpResult)Results.Problem(title: error.AdditionalCode.HasValue()
+                ? error.AdditionalCode
+                : null, statusCode: (int)httpError.Code, detail: httpError.Message,
+            extensions: httpError.AdditionalData!);
+    }
+
+    /// <summary>
     ///     Converts the <see cref="Error" /> to a <see cref="Infrastructure.Web.Api.Interfaces.HttpError" />
     /// </summary>
-    public static HttpError ToHttpError(this Error error)
+    private static HttpError ToHttpError(this Error error)
     {
         var httpStatusCode = HttpConstants.StatusCodes.SupportedErrorCodesMap
             .FirstOrDefault(c => c.Value.Contains(error.Code));
@@ -22,15 +35,5 @@ public static class ErrorExtensions
 
         return new HttpError(httpStatusCode.Key.ToStatusCode().HttpErrorCode ?? HttpErrorCode.InternalServerError,
             error.Message, error.AdditionalData);
-    }
-
-    /// <summary>
-    ///     Converts the specified error to a <see cref="IResult" /> with a problem detail
-    /// </summary>
-    public static ProblemHttpResult ToProblem(this Error error)
-    {
-        var httpError = error.ToHttpError();
-        return (ProblemHttpResult)Results.Problem(statusCode: (int)httpError.Code, detail: httpError.Message,
-            extensions: httpError.AdditionalData!);
     }
 }

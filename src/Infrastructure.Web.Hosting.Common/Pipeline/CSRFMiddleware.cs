@@ -53,8 +53,7 @@ public sealed class CSRFMiddleware
         var result = VerifyRequest(request);
         if (result.IsFailure)
         {
-            var httpError = result.Error.ToHttpError();
-            var details = Results.Problem(statusCode: (int)httpError.Code, detail: httpError.Message);
+            var details = result.Error.ToProblem();
             _recorder.Audit(caller.ToCall(), Audits.CSRFMiddleware_CSRFProtection_Failed,
                 "User {Id} failed CSRF protection", caller.CallerId);
             await details

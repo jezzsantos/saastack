@@ -16,13 +16,16 @@ public readonly struct Error
         Code = ErrorCode.NoError;
         Message = NoErrorMessage;
         AdditionalData = null;
+        AdditionalCode = null;
     }
 
-    internal Error(ErrorCode code, string? message = null, Dictionary<string, object>? additionalData = null)
+    internal Error(ErrorCode code, string? message = null, string? additionalCode = null,
+        Dictionary<string, object>? additionalData = null)
     {
         Code = code;
         Message = message ?? NoErrorMessage;
         AdditionalData = additionalData;
+        AdditionalCode = additionalCode;
     }
 
     public string Message { get; }
@@ -30,6 +33,8 @@ public readonly struct Error
     public Dictionary<string, object>? AdditionalData { get; }
 
     public ErrorCode Code { get; }
+
+    public string? AdditionalCode { get; }
 
 #if !ANALYZERS_NONPLATFORM
     /// <summary>
@@ -53,12 +58,12 @@ public readonly struct Error
 
         if (message.HasNoValue())
         {
-            return new Error(Code, Message, additional);
+            return new Error(Code, Message, additionalData: additional);
         }
 
         return new Error(Code, Message.HasValue() && Message != NoErrorMessage
             ? $"{message}{Environment.NewLine}\t{Message}"
-            : message, additional);
+            : message, additionalData: additional);
     }
 
     /// <summary>
@@ -82,12 +87,12 @@ public readonly struct Error
 
         if (message.HasNoValue())
         {
-            return new Error(code, Message, additional);
+            return new Error(code, Message, additionalData: additional);
         }
 
         return new Error(code, Message.HasValue() && Message != NoErrorMessage
             ? $"{Code}: {message}{Environment.NewLine}\t{Message}"
-            : $"{Code}: {message}", additional);
+            : $"{Code}: {message}", additionalData: additional);
     }
 #endif
 
@@ -110,7 +115,7 @@ public readonly struct Error
     /// </summary>
     public static Error Validation(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.Validation, message, additionalData);
+        return new Error(ErrorCode.Validation, message, additionalData: additionalData);
     }
 
     /// <summary>
@@ -118,7 +123,7 @@ public readonly struct Error
     /// </summary>
     public static Error RuleViolation(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.RuleViolation, message, additionalData);
+        return new Error(ErrorCode.RuleViolation, message, additionalData: additionalData);
     }
 
     /// <summary>
@@ -126,7 +131,7 @@ public readonly struct Error
     /// </summary>
     public static Error RoleViolation(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.RoleViolation, message, additionalData);
+        return new Error(ErrorCode.RoleViolation, message, additionalData: additionalData);
     }
 
     /// <summary>
@@ -134,7 +139,7 @@ public readonly struct Error
     /// </summary>
     public static Error PreconditionViolation(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.PreconditionViolation, message, additionalData);
+        return new Error(ErrorCode.PreconditionViolation, message, additionalData: additionalData);
     }
 
     /// <summary>
@@ -142,7 +147,7 @@ public readonly struct Error
     /// </summary>
     public static Error EntityNotFound(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.EntityNotFound, message, additionalData);
+        return new Error(ErrorCode.EntityNotFound, message, additionalData: additionalData);
     }
 
     /// <summary>
@@ -150,7 +155,7 @@ public readonly struct Error
     /// </summary>
     public static Error EntityExists(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.EntityExists, message, additionalData);
+        return new Error(ErrorCode.EntityExists, message, additionalData: additionalData);
     }
 
     /// <summary>
@@ -158,7 +163,7 @@ public readonly struct Error
     /// </summary>
     public static Error EntityLocked(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.EntityLocked, message, additionalData);
+        return new Error(ErrorCode.EntityLocked, message, additionalData: additionalData);
     }
 
     /// <summary>
@@ -166,15 +171,16 @@ public readonly struct Error
     /// </summary>
     public static Error NotAuthenticated(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.NotAuthenticated, message, additionalData);
+        return new Error(ErrorCode.NotAuthenticated, message, additionalData: additionalData);
     }
 
     /// <summary>
     ///     Creates a <see cref="ErrorCode.ForbiddenAccess" /> error
     /// </summary>
-    public static Error ForbiddenAccess(string? message = null, Dictionary<string, object>? additionalData = null)
+    public static Error ForbiddenAccess(string? message = null, string? forbiddenCode = null,
+        Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.ForbiddenAccess, message, additionalData);
+        return new Error(ErrorCode.ForbiddenAccess, message, forbiddenCode, additionalData);
     }
 
     /// <summary>
@@ -182,7 +188,7 @@ public readonly struct Error
     /// </summary>
     public static Error FeatureViolation(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.FeatureViolation, message, additionalData);
+        return new Error(ErrorCode.FeatureViolation, message, additionalData: additionalData);
     }
 
     /// <summary>
@@ -190,7 +196,7 @@ public readonly struct Error
     /// </summary>
     public static Error Unexpected(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.Unexpected, message, additionalData);
+        return new Error(ErrorCode.Unexpected, message, additionalData: additionalData);
     }
 
     /// <summary>
@@ -198,7 +204,7 @@ public readonly struct Error
     /// </summary>
     public static Error EntityDeleted(string? message = null, Dictionary<string, object>? additionalData = null)
     {
-        return new Error(ErrorCode.EntityDeleted, message, additionalData);
+        return new Error(ErrorCode.EntityDeleted, message, additionalData: additionalData);
     }
 
     public override string ToString()

@@ -70,7 +70,7 @@ public class ResultAssertions<TValue> : ObjectAssertions<Result<TValue, Error>, 
     protected override string Identifier => "result";
 
     public AndConstraint<ResultAssertions<TValue>> BeError(ErrorCode code,
-        string? message = null, string because = "", params object[] becauseArgs)
+        string? message = null, Predicate<Error>? predicate = null, string because = "", params object[] becauseArgs)
     {
         Execute.Assertion
             .BecauseOf(because, becauseArgs)
@@ -84,6 +84,16 @@ public class ResultAssertions<TValue> : ObjectAssertions<Result<TValue, Error>, 
             .ForCondition(result => result.Code == code)
             .FailWith("Expected {context:result} to contain code {0}{reason}, but found {1}.",
                 _ => code, error => error.Code);
+
+        if (predicate.Exists())
+        {
+            Execute.Assertion
+                .BecauseOf(because, becauseArgs)
+                .Given(() => Subject)
+                .ForCondition(result => predicate(result.Error))
+                .FailWith("Expected {context:result} to match condition {reason}, but {0} didn't match.",
+                    result => result.Error.Message);
+        }
 
         if (message.HasValue())
         {
@@ -94,32 +104,6 @@ public class ResultAssertions<TValue> : ObjectAssertions<Result<TValue, Error>, 
                 .FailWith("Expected {context:result} to contain message {0}{reason}, but found {1}.",
                     _ => message, result => result.Error.Message);
         }
-
-        return new AndConstraint<ResultAssertions<TValue>>(this);
-    }
-
-    public AndConstraint<ResultAssertions<TValue>> BeError(ErrorCode code,
-        Predicate<string> predicate, string because = "", params object[] becauseArgs)
-    {
-        Execute.Assertion
-            .BecauseOf(because, becauseArgs)
-            .Given(() => Subject)
-            .ForCondition(result => result.IsFailure)
-            .FailWith(
-                "Expected {context:result} to return an Error with code {0}{reason}, but it returned a Successful value.",
-                _ => code)
-            .Then
-            .Given(_ => Subject.Error)
-            .ForCondition(result => result.Code == code)
-            .FailWith("Expected {context:result} to contain code {0}{reason}, but found {1}.",
-                _ => code, error => error.Code);
-
-        Execute.Assertion
-            .BecauseOf(because, becauseArgs)
-            .Given(() => Subject)
-            .ForCondition(result => predicate(result.Error.Message))
-            .FailWith("Expected {context:result} to match condition {reason}, but {0} didn't match.",
-                result => result.Error.Message);
 
         return new AndConstraint<ResultAssertions<TValue>>(this);
     }
