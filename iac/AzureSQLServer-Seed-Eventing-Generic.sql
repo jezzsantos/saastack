@@ -49,6 +49,16 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
+<<<<<<<< HEAD:iac/AzureSQLServer-Seed-Eventing-Generic.sql
+========
+          WHERE object_id = OBJECT_ID(N'[dbo].[Car]')
+            AND type in (N'U'))
+    DROP TABLE [dbo].[Car]
+GO
+
+IF EXISTS(SELECT *
+          FROM sys.objects
+>>>>>>>> ca4fe6b (Split SQL seed files):iac/AzureSQLServer-ReadModels-Seed.sql
           WHERE object_id = OBJECT_ID(N'[dbo].[DomainEvent]')
             AND type in (N'U'))
     DROP TABLE [dbo].[DomainEvent]
@@ -229,6 +239,42 @@ CREATE INDEX UserId
          [UserId]
             );
 
+<<<<<<<< HEAD:iac/AzureSQLServer-Seed-Eventing-Generic.sql
+========
+CREATE TABLE [dbo].[Car]
+(
+    [Id]                  [nvarchar](100) NOT NULL,
+    [LastPersistedAtUtc]  [datetime]      NULL,
+    [IsDeleted]           [bit]           NULL,
+    [LicenseJurisdiction] [nvarchar](max) NULL,
+    [LicenseNumber]       [nvarchar](max) NULL,
+    [ManagerIds]          [nvarchar](max) NULL,
+    [ManufactureMake]     [nvarchar](max) NULL,
+    [ManufactureModel]    [nvarchar](max) NULL,
+    [ManufactureYear]     [int]           NULL,
+    [OrganizationId]      [nvarchar](100) NULL,
+    [Status]              [nvarchar](100) NULL,
+    [VehicleOwnerId]      [nvarchar](100) NULL,
+) ON [PRIMARY]
+GO
+
+CREATE INDEX Id
+    ON [dbo].[Car]
+        (
+         [Id]
+            );
+CREATE INDEX OrganizationId
+    ON [dbo].[Car]
+        (
+         [OrganizationId]
+            );
+CREATE INDEX Status
+    ON [dbo].[Car]
+        (
+         [Status]
+            );
+
+>>>>>>>> ca4fe6b (Split SQL seed files):iac/AzureSQLServer-ReadModels-Seed.sql
 CREATE TABLE [dbo].[DomainEvent]
 (
     [Id]                 [nvarchar](100) NOT NULL,
