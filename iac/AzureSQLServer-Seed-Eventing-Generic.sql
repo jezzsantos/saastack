@@ -1,8 +1,5 @@
--- To be used to use your SQL database to define the read models produced by all event-sourcing aggregates.
--- To be used to keep your SQL database up to date as you change your platform, and subdomains evolve.
---
--- Note: Normalization:
---    We deliberately do NOT define any referential integrity, or associated structure, in this database, because that violates the architectural rules.
+-- To be used to keep your SQL database up to date as you change your platform, and subdomain read models.
+-- Note: We deliberately do NOT define any referential integrity, or associated structure, in this database, because that violates the architectural rules.
 --    The tables pertaining to each subdomain should always remain independent of each other
 --    Individual subdomains could be split and deployed into separate databases at any time
 --      you are not to be joining across subdomains 
