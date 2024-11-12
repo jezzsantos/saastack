@@ -395,7 +395,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{2B24670B-EFAC-
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IAC", "IAC", "{596C8F37-52D2-402A-AD31-62B3DCB3A3E0}"
 	ProjectSection(SolutionItems) = preProject
-		..\iac\AzureSQLServer-Seed.sql = ..\iac\AzureSQLServer-Seed.sql
+		..\iac\AzureSQLServer-Seed-Eventing-Core.sql = ..\iac\AzureSQLServer-Seed-Eventing-Core.sql
+		..\iac\AzureSQLServer-Seed-Eventing-Generic.sql = ..\iac\AzureSQLServer-Seed-Eventing-Generic.sql
+		..\iac\AzureSQLServer-Seed-EventStore.sql = ..\iac\AzureSQLServer-Seed-EventStore.sql
+		..\iac\AzureSQLServer-Seed-Snapshotting-Core.sql = ..\iac\AzureSQLServer-Seed-Snapshotting-Core.sql
 	EndProjectSection
 EndProject
 Global
