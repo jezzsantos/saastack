@@ -32,7 +32,8 @@ public class AncillaryModule : ISubdomainModule
     public Dictionary<Type, string> EntityPrefixes => new()
     {
         { typeof(AuditRoot), "audit" },
-        { typeof(EmailDeliveryRoot), "emaildelivery" }
+        { typeof(EmailDeliveryRoot), "emaildelivery" },
+        { typeof(SmsDeliveryRoot), "smsdelivery" }
     };
 
     public Assembly InfrastructureAssembly => typeof(UsagesApi).Assembly;
@@ -59,6 +60,10 @@ public class AncillaryModule : ISubdomainModule
                     new EmailMessageQueue(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IMessageQueueIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
+                services.AddSingleton<ISmsMessageQueue>(c =>
+                    new SmsMessageQueue(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IMessageQueueIdFactory>(),
+                        c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services.AddPerHttpRequest<IAuditRepository>(c =>
                     new AuditRepository(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
@@ -77,15 +82,26 @@ public class AncillaryModule : ISubdomainModule
                     c => new EmailDeliveryProjection(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IDomainFactory>(),
                         c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.AddPerHttpRequest<ISmsDeliveryRepository>(c =>
+                    new SmsDeliveryRepository(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredService<IEventSourcingDddCommandStore<SmsDeliveryRoot>>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
+                services.RegisterEventing<SmsDeliveryRoot, SmsDeliveryProjection>(
+                    c => new SmsDeliveryProjection(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IDomainFactory>(),
+                        c.GetRequiredServiceForPlatform<IDataStore>()));
                 services.AddSingleton<IProvisioningMessageQueue>(c =>
                     new ProvisioningMessageQueue(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IMessageQueueIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
-
-                services.AddSingleton<IUsageDeliveryService, NoOpUsageDeliveryService>();
-                services.AddSingleton<IEmailDeliveryService, NoOpEmailDeliveryService>();
                 services
                     .AddPerHttpRequest<IProvisioningNotificationService, OrganizationProvisioningNotificationService>();
+
+                // EXTEND: Change these services for your preferred providers
+                services.AddSingleton<IUsageDeliveryService, NoOpUsageDeliveryService>();
+                services.AddSingleton<IEmailDeliveryService, NoOpEmailDeliveryService>();
+                services.AddSingleton<ISmsDeliveryService, NoOpSmsDeliveryService>();
             };
         }
     }

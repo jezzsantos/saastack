@@ -56,6 +56,33 @@ public class DeliveredEmail : IIdentifiableResource
     public required string Id { get; set; }
 }
 
+public class DeliveredSms : IIdentifiableResource
+{
+    public List<DateTime> Attempts { get; set; } = new();
+
+    public required string Body { get; set; }
+
+    public DateTime? DeliveredAt { get; set; }
+
+    public DateTime? FailedDeliveryAt { get; set; }
+
+    public string? FailedDeliveryReason { get; set; }
+
+    public bool IsDelivered { get; set; }
+
+    public bool IsDeliveryFailed { get; set; }
+
+    public bool IsSent { get; set; }
+
+    public DateTime? SentAt { get; set; }
+
+    public required List<string> Tags { get; set; }
+
+    public required string ToPhoneNumber { get; set; }
+
+    public required string Id { get; set; }
+}
+
 public class DomainEvent : IIdentifiableResource
 {
     public required string Data { get; set; }

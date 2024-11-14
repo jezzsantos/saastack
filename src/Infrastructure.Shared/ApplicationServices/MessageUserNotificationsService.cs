@@ -9,10 +9,9 @@ namespace Infrastructure.Shared.ApplicationServices;
 
 /// <summary>
 ///     Provides a <see cref="IUserNotificationsService" /> that delivers notifications via asynchronous email delivery
-///     using
-///     <see cref="IEmailSchedulingService" />
+///     using <see cref="IEmailSchedulingService" /> and via asynchronous SMS text message delivery using <see cref="ISmsSchedulingService"/>
 /// </summary>
-public class EmailUserNotificationsService : IUserNotificationsService
+public class MessageUserNotificationsService : IUserNotificationsService
 {
     private const string ProductNameSettingName = "ApplicationServices:EmailNotifications:SenderProductName";
     private const string SenderDisplayNameSettingName = "ApplicationServices:EmailNotifications:SenderDisplayName";
@@ -22,18 +21,22 @@ public class EmailUserNotificationsService : IUserNotificationsService
     private readonly string _productName;
     private readonly string _senderEmailAddress;
     private readonly string _senderName;
+    private readonly ISmsSchedulingService _smsSchedulingService;
     private readonly IWebsiteUiService _websiteUiService;
 
-    public EmailUserNotificationsService(IConfigurationSettings settings, IHostSettings hostSettings,
-        IWebsiteUiService websiteUiService, IEmailSchedulingService emailSchedulingService)
+    public MessageUserNotificationsService(IConfigurationSettings settings, IHostSettings hostSettings,
+        IWebsiteUiService websiteUiService, IEmailSchedulingService emailSchedulingService,
+        ISmsSchedulingService smsSchedulingService)
     {
         _hostSettings = hostSettings;
         _websiteUiService = websiteUiService;
         _emailSchedulingService = emailSchedulingService;
-        _productName = settings.Platform.GetString(ProductNameSettingName, nameof(EmailUserNotificationsService));
+        _smsSchedulingService = smsSchedulingService;
+        _productName = settings.Platform.GetString(ProductNameSettingName, nameof(MessageUserNotificationsService));
         _senderEmailAddress =
-            settings.Platform.GetString(SenderEmailAddressSettingName, nameof(EmailUserNotificationsService));
-        _senderName = settings.Platform.GetString(SenderDisplayNameSettingName, nameof(EmailUserNotificationsService));
+            settings.Platform.GetString(SenderEmailAddressSettingName, nameof(MessageUserNotificationsService));
+        _senderName =
+            settings.Platform.GetString(SenderDisplayNameSettingName, nameof(MessageUserNotificationsService));
     }
 
     public async Task<Result<Error>> NotifyGuestInvitationToPlatformAsync(ICallerContext caller, string token,
@@ -59,6 +62,56 @@ public class EmailUserNotificationsService : IUserNotificationsService
             FromDisplayName = _senderName,
             ToEmailAddress = inviteeEmailAddress,
             ToDisplayName = inviteeName,
+            Tags = tags.Exists()
+                ? new List<string>(tags)
+                : null
+        }, cancellationToken);
+    }
+
+    public async Task<Result<Error>> NotifyPasswordMfaOobEmailAsync(ICallerContext caller, string emailAddress,
+        string code,
+        IReadOnlyList<string>? tags,
+        CancellationToken cancellationToken)
+    {
+        var webSiteUrl = _hostSettings.GetWebsiteHostBaseUrl();
+        var webSiteRoute = _websiteUiService.ConstructPasswordMfaOobCompletionPageUrl(code);
+        var link = webSiteUrl.WithoutTrailingSlash() + webSiteRoute;
+        var htmlBody =
+            $"""
+             <p>Thank you for signin in at {_productName}.</p>
+             <p>Your sign in code is: <span style="font-weight: bold;font-size: x-large">{code}</span></p>
+             <p></p>
+             <p>Please click this link to <a href="{link}">complete the signing in process</a></p>
+             <p>This is an automated email from the support team at {_productName}</p>
+             """;
+
+        return await _emailSchedulingService.ScheduleHtmlEmail(caller, new HtmlEmail
+        {
+            Subject = $"Welcome to {_productName}",
+            Body = htmlBody,
+            FromEmailAddress = _senderEmailAddress,
+            FromDisplayName = _senderName,
+            ToEmailAddress = emailAddress,
+            ToDisplayName = emailAddress,
+            Tags = tags.Exists()
+                ? new List<string>(tags)
+                : null
+        }, cancellationToken);
+    }
+
+    public async Task<Result<Error>> NotifyPasswordMfaOobSmsAsync(ICallerContext caller, string phoneNumber,
+        string code,
+        IReadOnlyList<string>? tags, CancellationToken cancellationToken)
+    {
+        var body =
+            $"""
+             Use verification code {code} to sign in to {_productName}.
+             """;
+
+        return await _smsSchedulingService.ScheduleSms(caller, new SmsText
+        {
+            Body = body,
+            To = phoneNumber,
             Tags = tags.Exists()
                 ? new List<string>(tags)
                 : null

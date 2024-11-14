@@ -24,7 +24,7 @@ public class NoOpEmailDeliveryService : IEmailDeliveryService
         CancellationToken cancellationToken = default)
     {
         _recorder.TraceDebug(caller.ToCall(),
-            $"{nameof(NoOpUsageDeliveryService)} would have delivered email event {{Event}} for {{For}} with properties: {{Properties}}",
+            $"{nameof(NoOpEmailDeliveryService)} would have delivered email message {{Subject}} for {{For}} with properties: {{Properties}}",
             subject, toEmailAddress, new
             {
                 To = toEmailAddress,

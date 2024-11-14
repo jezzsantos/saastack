@@ -8,7 +8,7 @@ using Common;
 namespace Infrastructure.Shared.ApplicationServices;
 
 /// <summary>
-///     Provides an queue scheduling service, that will schedule messages for asynchronous and deferred delivery
+///     Provides a queue scheduling service, that will schedule email messages for asynchronous and deferred delivery
 /// </summary>
 public class QueuingEmailSchedulingService : IEmailSchedulingService
 {
@@ -26,7 +26,7 @@ public class QueuingEmailSchedulingService : IEmailSchedulingService
     {
         var queued = await _queue.PushAsync(caller.ToCall(), new EmailMessage
         {
-            Html = new QueuedEmailHtmlMessage
+            Message = new QueuedEmailHtmlMessage
             {
                 Subject = htmlEmail.Subject,
                 FromEmailAddress = htmlEmail.FromEmailAddress,

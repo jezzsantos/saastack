@@ -4,7 +4,7 @@ using Common;
 namespace Application.Persistence.Shared;
 
 /// <summary>
-///     Defines a service to which we can send email events.
+///     Defines a service to which we can send email messages.
 ///     Delivery of the message can be confirmed by the service later
 /// </summary>
 public interface IEmailDeliveryService

@@ -16,6 +16,18 @@ public interface IUserNotificationsService
         CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Notifies a user, via email, with a two-factor code to complete MFA authentication
+    /// </summary>
+    Task<Result<Error>> NotifyPasswordMfaOobEmailAsync(ICallerContext caller, string emailAddress, string code,
+        IReadOnlyList<string>? tags, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Notifies a user, via SMS text message, with a two-factor code to complete MFA authentication
+    /// </summary>
+    Task<Result<Error>> NotifyPasswordMfaOobSmsAsync(ICallerContext caller, string phoneNumber, string code,
+        IReadOnlyList<string>? tags, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Notifies a user, via email, to confirm their account registration
     /// </summary>
     Task<Result<Error>> NotifyPasswordRegistrationConfirmationAsync(ICallerContext caller, string emailAddress,

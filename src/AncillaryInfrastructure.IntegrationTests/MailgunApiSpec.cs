@@ -195,7 +195,7 @@ public class MailgunApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
-                Html = new QueuedEmailHtmlMessage
+                Message = new QueuedEmailHtmlMessage
                 {
                     Subject = "asubject",
                     HtmlBody = "anhtmlbody",

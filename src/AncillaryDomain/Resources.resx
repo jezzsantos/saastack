@@ -33,12 +33,6 @@
     <data name="EmailDeliveryRoot_MissingEmailBody" xml:space="preserve">
         <value>The email message is missing a 'HtmlBody'</value>
     </data>
-    <data name="SendingAttempts_LatestAttemptNotAfterLastAttempt" xml:space="preserve">
-        <value>The latest attempt must be after the last attempt</value>
-    </data>
-    <data name="SendingAttempts_PreviousAttemptsNotInOrder" xml:space="preserve">
-        <value>All attempts must in chronological order</value>
-    </data>
     <data name="EmailDeliveryRoot_AlreadySent" xml:space="preserve">
         <value>The email has already been sent for delivery</value>
     </data>
@@ -50,5 +44,26 @@
     </data>
     <data name="EmailDeliveryRoot_AlreadyDelivered" xml:space="preserve">
         <value>The email has already been delivered</value>
+    </data>
+    <data name="SendingAttempts_LatestAttemptNotAfterLastAttempt" xml:space="preserve">
+        <value>The latest attempt must be after the last attempt</value>
+    </data>
+    <data name="SendingAttempts_PreviousAttemptsNotInOrder" xml:space="preserve">
+        <value>All attempts must in chronological order</value>
+    </data>
+    <data name="SmsDeliveryRoot_MissingSmsBody" xml:space="preserve">
+        <value>The sms message is missing a 'Body'</value>
+    </data>
+    <data name="SmsDeliveryRoot_AlreadySent" xml:space="preserve">
+        <value>The sms has already been sent for delivery</value>
+    </data>
+    <data name="SmsDeliveryRoot_NotAttempted" xml:space="preserve">
+        <value>The sms sending has not yet been attempted</value>
+    </data>
+    <data name="SmsDeliveryRoot_NotSent" xml:space="preserve">
+        <value>The sms has not yet been sent</value>
+    </data>
+    <data name="SmsDeliveryRoot_AlreadyDelivered" xml:space="preserve">
+        <value>The sms has already been delivered</value>
     </data>
 </root>

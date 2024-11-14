@@ -5,6 +5,8 @@ namespace Application.Services.Shared;
 /// </summary>
 public interface IWebsiteUiService
 {
+    string ConstructPasswordMfaOobCompletionPageUrl(string code);
+
     string ConstructPasswordRegistrationConfirmationPageUrl(string token);
 
     string ConstructPasswordResetConfirmationPageUrl(string token);

@@ -61,6 +61,14 @@ For delivering emails to 3rd party services
 2. Find all delivered emails <sup>TSTO</sup>
 3. Deliver all pending emails <sup>TSTO</sup>
 
+#### SMS
+
+For delivering SMS to 3rd party services
+
+1. [Asynchronously] deliver an SMS to an SMS gateway <sup>SVC</sup>
+2. Find all delivered SMS <sup>TSTO</sup>
+3. Deliver all pending SMS <sup>TSTO</sup>
+
 #### Feature Flags
 
 For controlling feature flags for software releases
