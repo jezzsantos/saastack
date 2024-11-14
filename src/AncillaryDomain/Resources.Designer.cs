@@ -139,5 +139,50 @@ namespace AncillaryDomain {
                 return ResourceManager.GetString("SendingAttempts_PreviousAttemptsNotInOrder", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The sms has already been delivered.
+        /// </summary>
+        internal static string SmsDeliveryRoot_AlreadyDelivered {
+            get {
+                return ResourceManager.GetString("SmsDeliveryRoot_AlreadyDelivered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The sms has already been sent for delivery.
+        /// </summary>
+        internal static string SmsDeliveryRoot_AlreadySent {
+            get {
+                return ResourceManager.GetString("SmsDeliveryRoot_AlreadySent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The sms message is missing a &apos;Body&apos;.
+        /// </summary>
+        internal static string SmsDeliveryRoot_MissingSmsBody {
+            get {
+                return ResourceManager.GetString("SmsDeliveryRoot_MissingSmsBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The sms sending has not yet been attempted.
+        /// </summary>
+        internal static string SmsDeliveryRoot_NotAttempted {
+            get {
+                return ResourceManager.GetString("SmsDeliveryRoot_NotAttempted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The sms has not yet been sent.
+        /// </summary>
+        internal static string SmsDeliveryRoot_NotSent {
+            get {
+                return ResourceManager.GetString("SmsDeliveryRoot_NotSent", resourceCulture);
+            }
+        }
     }
 }

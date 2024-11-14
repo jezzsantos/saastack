@@ -31,6 +31,7 @@ public class StubApiModule : ISubdomainModule
         { WorkerConstants.Queues.Audits, new DrainAllAuditsRequest() },
         { WorkerConstants.Queues.Usages, new DrainAllUsagesRequest() },
         { WorkerConstants.Queues.Emails, new DrainAllEmailsRequest() },
+        { WorkerConstants.Queues.Smses, new DrainAllSmsesRequest() },
         { WorkerConstants.Queues.Provisionings, new DrainAllProvisioningsRequest() }
     };
 

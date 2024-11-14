@@ -36,8 +36,11 @@
     <data name="AncillaryApplication_Audit_MissingCode" xml:space="preserve">
         <value>The audit message is missing a 'AuditCode'</value>
     </data>
-    <data name="AncillaryApplication_Email_MissingHtml" xml:space="preserve">
-        <value>The email message is missing the 'HTML' email</value>
+    <data name="AncillaryApplication_Email_MissingMessage" xml:space="preserve">
+        <value>The email message is missing the 'Message'</value>
+    </data>
+    <data name="AncillaryApplication_Sms_MissingMessage" xml:space="preserve">
+        <value>The sms message is missing the 'Message'</value>
     </data>
     <data name="AncillaryApplication_Provisioning_MissingTenantId" xml:space="preserve">
         <value>The provisioning message is missing the 'TenantId' identifier</value>

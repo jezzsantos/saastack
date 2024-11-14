@@ -6,7 +6,7 @@ namespace Application.Persistence.Shared.ReadModels;
 [EntityName(WorkerConstants.Queues.Emails)]
 public class EmailMessage : QueuedMessage
 {
-    public QueuedEmailHtmlMessage? Html { get; set; }
+    public QueuedEmailHtmlMessage? Message { get; set; }
 }
 
 public class QueuedEmailHtmlMessage

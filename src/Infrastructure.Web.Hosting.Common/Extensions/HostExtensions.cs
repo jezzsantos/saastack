@@ -383,12 +383,18 @@ public static class HostExtensions
                     new EmailMessageQueue(c.GetRequiredService<IRecorder>(),
                         c.GetRequiredService<IMessageQueueIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
+                services.AddSingleton<ISmsMessageQueue>(c =>
+                    new SmsMessageQueue(c.GetRequiredService<IRecorder>(),
+                        c.GetRequiredService<IMessageQueueIdFactory>(),
+                        c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services.AddSingleton<IEmailSchedulingService, QueuingEmailSchedulingService>();
+                services.AddSingleton<ISmsSchedulingService, QueuingSmsSchedulingService>();
                 services.AddSingleton<IWebsiteUiService, WebsiteUiService>();
                 services.AddSingleton<IUserNotificationsService>(c =>
-                    new EmailUserNotificationsService(c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
+                    new MessageUserNotificationsService(c.GetRequiredServiceForPlatform<IConfigurationSettings>(),
                         c.GetRequiredService<IHostSettings>(), c.GetRequiredService<IWebsiteUiService>(),
-                        c.GetRequiredService<IEmailSchedulingService>()));
+                        c.GetRequiredService<IEmailSchedulingService>(),
+                        c.GetRequiredService<ISmsSchedulingService>()));
             }
         }
 

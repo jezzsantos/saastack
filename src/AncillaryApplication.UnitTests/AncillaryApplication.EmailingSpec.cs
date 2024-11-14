@@ -2,7 +2,6 @@ using AncillaryApplication.Persistence;
 using AncillaryApplication.Persistence.ReadModels;
 using AncillaryDomain;
 using Application.Interfaces;
-using Application.Interfaces.Services;
 using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
 using Common;
@@ -21,35 +20,27 @@ using Task = System.Threading.Tasks.Task;
 namespace AncillaryApplication.UnitTests;
 
 [Trait("Category", "Unit")]
-public class AncillaryApplicationSpec
+public class AncillaryApplicationEmailingSpec
 {
     private readonly AncillaryApplication _application;
-    private readonly Mock<IAuditMessageQueueRepository> _auditMessageRepository;
-    private readonly Mock<IAuditRepository> _auditRepository;
     private readonly Mock<ICallerContext> _caller;
     private readonly Mock<IEmailDeliveryRepository> _emailDeliveryRepository;
     private readonly Mock<IEmailDeliveryService> _emailDeliveryService;
     private readonly Mock<IEmailMessageQueue> _emailMessageQueue;
     private readonly Mock<IIdentifierFactory> _idFactory;
-    private readonly Mock<IProvisioningNotificationService> _provisioningDeliveryService;
-    private readonly Mock<IProvisioningMessageQueue> _provisioningMessageQueue;
     private readonly Mock<IRecorder> _recorder;
-    private readonly Mock<IUsageDeliveryService> _usageDeliveryService;
-    private readonly Mock<IUsageMessageQueue> _usageMessageQueue;
 
-    public AncillaryApplicationSpec()
+    public AncillaryApplicationEmailingSpec()
     {
         _recorder = new Mock<IRecorder>();
         _idFactory = new Mock<IIdentifierFactory>();
         _idFactory.Setup(idf => idf.Create(It.IsAny<IIdentifiableEntity>()))
             .Returns(new Result<Identifier, Error>("anid".ToId()));
         _caller = new Mock<ICallerContext>();
-        _usageMessageQueue = new Mock<IUsageMessageQueue>();
-        _usageDeliveryService = new Mock<IUsageDeliveryService>();
-        _auditMessageRepository = new Mock<IAuditMessageQueueRepository>();
-        _auditRepository = new Mock<IAuditRepository>();
-        _auditRepository.Setup(ar => ar.SaveAsync(It.IsAny<AuditRoot>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((AuditRoot root, CancellationToken _) => root);
+        var usageMessageQueue = new Mock<IUsageMessageQueue>();
+        var usageDeliveryService = new Mock<IUsageDeliveryService>();
+        var auditMessageRepository = new Mock<IAuditMessageQueueRepository>();
+        var auditRepository = new Mock<IAuditRepository>();
         _emailMessageQueue = new Mock<IEmailMessageQueue>();
         _emailDeliveryService = new Mock<IEmailDeliveryService>();
         _emailDeliveryService.Setup(eds => eds.SendAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
@@ -63,142 +54,17 @@ public class AncillaryApplicationSpec
         _emailDeliveryRepository.Setup(edr =>
                 edr.FindByMessageIdAsync(It.IsAny<QueuedMessageId>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Optional<EmailDeliveryRoot>.None);
-        _provisioningMessageQueue = new Mock<IProvisioningMessageQueue>();
-        _provisioningDeliveryService = new Mock<IProvisioningNotificationService>();
-        _provisioningDeliveryService.Setup(pds => pds.NotifyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<TenantSettings>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result.Ok);
+        var smsMessageQueue = new Mock<ISmsMessageQueue>();
+        var smsDeliveryService = new Mock<ISmsDeliveryService>();
+        var smsDeliveryRepository = new Mock<ISmsDeliveryRepository>();
+        var provisioningMessageQueue = new Mock<IProvisioningMessageQueue>();
+        var provisioningDeliveryService = new Mock<IProvisioningNotificationService>();
 
-        _application = new AncillaryApplication(_recorder.Object, _idFactory.Object, _usageMessageQueue.Object,
-            _usageDeliveryService.Object, _auditMessageRepository.Object, _auditRepository.Object,
+        _application = new AncillaryApplication(_recorder.Object, _idFactory.Object, usageMessageQueue.Object,
+            usageDeliveryService.Object, auditMessageRepository.Object, auditRepository.Object,
             _emailMessageQueue.Object, _emailDeliveryService.Object, _emailDeliveryRepository.Object,
-            _provisioningMessageQueue.Object, _provisioningDeliveryService.Object);
-    }
-
-    [Fact]
-    public async Task WhenDeliverUsageAsyncAndMessageIsNotRehydratable_ThenReturnsError()
-    {
-        var result = await _application.DeliverUsageAsync(_caller.Object, "anunknownmessage", CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_InvalidQueuedMessage.Format(nameof(UsageMessage), "anunknownmessage"));
-        _usageDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenDeliverUsageAsyncAndMessageHasNoForId_ThenReturnsError()
-    {
-        var messageAsJson = new UsageMessage
-        {
-            ForId = null,
-            EventName = "aneventname"
-        }.ToJson()!;
-
-        var result = await _application.DeliverUsageAsync(_caller.Object, messageAsJson, CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_Usage_MissingForId);
-        _usageDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenDeliverUsageAsyncAndMessageHasNoEventName_ThenReturnsError()
-    {
-        var messageAsJson = new UsageMessage
-        {
-            ForId = "aforid",
-            EventName = null
-        }.ToJson()!;
-
-        var result = await _application.DeliverUsageAsync(_caller.Object, messageAsJson, CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_Usage_MissingEventName);
-        _usageDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenDeliverUsageAsync_ThenDelivers()
-    {
-        var messageAsJson = new UsageMessage
-        {
-            ForId = "aforid",
-            EventName = "aneventname",
-            Additional = new Dictionary<string, string>
-            {
-                { "aname", "avalue" }
-            }
-        }.ToJson()!;
-
-        var result = await _application.DeliverUsageAsync(_caller.Object, messageAsJson, CancellationToken.None);
-
-        result.Should().BeSuccess();
-        _usageDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "aforid", "aneventname",
-                It.Is<Dictionary<string, string>>(dic =>
-                    dic.Count == 1
-                    && dic["aname"] == "avalue"
-                ), It.IsAny<CancellationToken>()));
-    }
-
-    [Fact]
-    public async Task WhenDeliverAuditAsyncAndMessageIsNotRehydratable_ThenReturnsError()
-    {
-        var result = await _application.DeliverAuditAsync(_caller.Object, "anunknownmessage", CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_InvalidQueuedMessage.Format(nameof(AuditMessage), "anunknownmessage"));
-        _auditRepository.Verify(
-            ar => ar.SaveAsync(It.IsAny<AuditRoot>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenDeliverAuditAsyncAndMessageHasNoAuditCode_ThenReturnsError()
-    {
-        var messageAsJson = new AuditMessage
-        {
-            AuditCode = null
-        }.ToJson()!;
-
-        var result = await _application.DeliverAuditAsync(_caller.Object, messageAsJson, CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_Audit_MissingCode);
-        _auditRepository.Verify(
-            ar => ar.SaveAsync(It.IsAny<AuditRoot>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenDeliverAuditAsync_ThenDelivers()
-    {
-        var messageAsJson = new AuditMessage
-        {
-            AuditCode = "anauditcode",
-            AgainstId = "anagainstid",
-            Arguments = new List<string> { "anarg1", "anarg2" },
-            MessageTemplate = "amessagetemplate",
-            TenantId = "atenantid"
-        }.ToJson()!;
-
-        var result = await _application.DeliverAuditAsync(_caller.Object, messageAsJson, CancellationToken.None);
-
-        result.Should().BeSuccess();
-        _auditRepository.Verify(
-            ar => ar.SaveAsync(It.Is<AuditRoot>(aud =>
-                aud.AuditCode == "anauditcode"
-                && aud.AgainstId == "anagainstid".ToId()
-                && aud.MessageTemplate == "amessagetemplate"
-                && aud.TemplateArguments.Value.Items.Count == 2
-                && aud.TemplateArguments.Value.Items[0] == "anarg1"
-                && aud.TemplateArguments.Value.Items[1] == "anarg2"
-                && aud.OrganizationId.Value == "atenantid"
-            ), It.IsAny<CancellationToken>()));
+            smsMessageQueue.Object, smsDeliveryService.Object, smsDeliveryRepository.Object,
+            provisioningMessageQueue.Object, provisioningDeliveryService.Object);
     }
 
     [Fact]
@@ -219,13 +85,13 @@ public class AncillaryApplicationSpec
     {
         var messageAsJson = new EmailMessage
         {
-            Html = null
+            Message = null
         }.ToJson()!;
 
         var result = await _application.SendEmailAsync(_caller.Object, messageAsJson, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_Email_MissingHtml);
+            Resources.AncillaryApplication_Email_MissingMessage);
         _emailDeliveryService.Verify(
             urs => urs.SendAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
@@ -239,7 +105,7 @@ public class AncillaryApplicationSpec
         var messageAsJson = new EmailMessage
         {
             MessageId = messageId,
-            Html = new QueuedEmailHtmlMessage
+            Message = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject",
                 HtmlBody = "abody",
@@ -285,7 +151,7 @@ public class AncillaryApplicationSpec
         var messageAsJson = new EmailMessage
         {
             MessageId = messageId,
-            Html = new QueuedEmailHtmlMessage
+            Message = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject",
                 HtmlBody = "abody",
@@ -324,7 +190,7 @@ public class AncillaryApplicationSpec
         var messageAsJson = new EmailMessage
         {
             MessageId = messageId,
-            Html = new QueuedEmailHtmlMessage
+            Message = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject",
                 HtmlBody = "abody",
@@ -354,69 +220,6 @@ public class AncillaryApplicationSpec
             && root.Attempts.Attempts[0].IsNear(DateTime.UtcNow)
             && root.IsSent == true
         ), true, It.IsAny<CancellationToken>()));
-    }
-
-    [Fact]
-    public async Task WhenNotifyProvisioningAsyncAndMessageIsNotRehydratable_ThenReturnsError()
-    {
-        var result =
-            await _application.NotifyProvisioningAsync(_caller.Object, "anunknownmessage", CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_InvalidQueuedMessage.Format(nameof(ProvisioningMessage),
-                "anunknownmessage"));
-        _provisioningDeliveryService.Verify(
-            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<TenantSettings>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenNotifyProvisioningAsyncAndMessageHasNoTenantId_ThenReturnsError()
-    {
-        var messageAsJson = new ProvisioningMessage
-        {
-            TenantId = null,
-            Settings = new Dictionary<string, TenantSetting>
-            {
-                { "aname", new TenantSetting("avalue") }
-            }
-        }.ToJson()!;
-
-        var result = await _application.NotifyProvisioningAsync(_caller.Object, messageAsJson, CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_Provisioning_MissingTenantId);
-        _provisioningDeliveryService.Verify(
-            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<TenantSettings>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenNotifyProvisioningAsync_ThenNotifies()
-    {
-        var messageAsJson = new ProvisioningMessage
-        {
-            TenantId = "atenantid",
-            Settings = new Dictionary<string, TenantSetting>
-            {
-                { "aname1", new TenantSetting("avalue") },
-                { "aname2", new TenantSetting(99) },
-                { "aname3", new TenantSetting(true) }
-            }
-        }.ToJson()!;
-
-        var result = await _application.NotifyProvisioningAsync(_caller.Object, messageAsJson, CancellationToken.None);
-
-        result.Should().BeSuccess();
-        _provisioningDeliveryService.Verify(
-            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), "atenantid",
-                It.Is<TenantSettings>(dic =>
-                    dic.Count == 3
-                    && dic["aname1"].As<TenantSetting>().Value.As<string>() == "avalue"
-                    // ReSharper disable once CompareOfFloatsByEqualityOperator
-                    && dic["aname2"].As<TenantSetting>().Value.As<double>() == 99D
-                    && dic["aname3"].As<TenantSetting>().Value.As<bool>() == true
-                ), It.IsAny<CancellationToken>()));
     }
 
     [Fact]
@@ -591,151 +394,7 @@ public class AncillaryApplicationSpec
         ), false, It.IsAny<CancellationToken>()));
     }
 
-    private static string CreateMessageId()
-    {
-        return new MessageQueueIdFactory().Create("aqueuename");
-    }
-
 #if TESTINGONLY
-    [Fact]
-    public async Task WhenDrainAllUsagesAsyncAndNoneOnQueue_ThenDoesNotDeliver()
-    {
-        _usageMessageQueue.Setup(umr =>
-                umr.PopSingleAsync(It.IsAny<Func<UsageMessage, CancellationToken, Task<Result<Error>>>>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
-
-        var result = await _application.DrainAllUsagesAsync(_caller.Object, CancellationToken.None);
-
-        result.Should().BeSuccess();
-        _usageMessageQueue.Verify(
-            urs => urs.PopSingleAsync(It.IsAny<Func<UsageMessage, CancellationToken, Task<Result<Error>>>>(),
-                It.IsAny<CancellationToken>()));
-        _usageDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenDrainAllUsagesAsyncAndSomeOnQueue_ThenDeliversAll()
-    {
-        var message1 = new UsageMessage
-        {
-            ForId = "aforid1",
-            EventName = "aneventname1"
-        };
-        var message2 = new UsageMessage
-        {
-            ForId = "aforid2",
-            EventName = "aneventname2"
-        };
-        var callbackCount = 1;
-        _usageMessageQueue.Setup(umr =>
-                umr.PopSingleAsync(It.IsAny<Func<UsageMessage, CancellationToken, Task<Result<Error>>>>(),
-                    It.IsAny<CancellationToken>()))
-            .Callback((Func<UsageMessage, CancellationToken, Task<Result<Error>>> action, CancellationToken _) =>
-            {
-                if (callbackCount == 1)
-                {
-                    action(message1, CancellationToken.None);
-                }
-
-                if (callbackCount == 2)
-                {
-                    action(message2, CancellationToken.None);
-                }
-            })
-            .Returns((Func<UsageMessage, CancellationToken, Task<Result<Error>>> _, CancellationToken _) =>
-            {
-                callbackCount++;
-                return Task.FromResult<Result<bool, Error>>(callbackCount is 1 or 2);
-            });
-
-        var result = await _application.DrainAllUsagesAsync(_caller.Object, CancellationToken.None);
-
-        result.Should().BeSuccess();
-        _usageMessageQueue.Verify(
-            urs => urs.PopSingleAsync(It.IsAny<Func<UsageMessage, CancellationToken, Task<Result<Error>>>>(),
-                It.IsAny<CancellationToken>()), Times.Exactly(2));
-        _usageDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "aforid1", "aneventname1",
-                It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()));
-        _usageDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), "aforid2", "aneventname2",
-                It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()));
-        _usageDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
-    }
-
-    [Fact]
-    public async Task WhenDrainAllAuditsAsyncAndNoneOnQueue_ThenDoesNotDeliver()
-    {
-        _auditMessageRepository.Setup(umr =>
-                umr.PopSingleAsync(It.IsAny<Func<AuditMessage, CancellationToken, Task<Result<Error>>>>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
-
-        var result = await _application.DrainAllAuditsAsync(_caller.Object, CancellationToken.None);
-
-        result.Should().BeSuccess();
-        _auditMessageRepository.Verify(
-            urs => urs.PopSingleAsync(It.IsAny<Func<AuditMessage, CancellationToken, Task<Result<Error>>>>(),
-                It.IsAny<CancellationToken>()));
-        _auditRepository.Verify(ar => ar.SaveAsync(It.IsAny<AuditRoot>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenDrainAllAuditsAsyncAndSomeOnQueue_ThenDeliversAll()
-    {
-        var message1 = new AuditMessage
-        {
-            TenantId = "atenantid",
-            AuditCode = "anauditcode1"
-        };
-        var message2 = new AuditMessage
-        {
-            TenantId = "atenantid",
-            AuditCode = "anauditcode2"
-        };
-        var callbackCount = 1;
-        _auditMessageRepository.Setup(umr =>
-                umr.PopSingleAsync(It.IsAny<Func<AuditMessage, CancellationToken, Task<Result<Error>>>>(),
-                    It.IsAny<CancellationToken>()))
-            .Callback((Func<AuditMessage, CancellationToken, Task<Result<Error>>> action, CancellationToken _) =>
-            {
-                if (callbackCount == 1)
-                {
-                    action(message1, CancellationToken.None);
-                }
-
-                if (callbackCount == 2)
-                {
-                    action(message2, CancellationToken.None);
-                }
-            })
-            .Returns((Func<AuditMessage, CancellationToken, Task<Result<Error>>> _, CancellationToken _) =>
-            {
-                callbackCount++;
-                return Task.FromResult<Result<bool, Error>>(callbackCount is 1 or 2);
-            });
-
-        var result = await _application.DrainAllAuditsAsync(_caller.Object, CancellationToken.None);
-
-        result.Should().BeSuccess();
-        _auditMessageRepository.Verify(
-            urs => urs.PopSingleAsync(It.IsAny<Func<AuditMessage, CancellationToken, Task<Result<Error>>>>(),
-                It.IsAny<CancellationToken>()), Times.Exactly(2));
-        _auditRepository.Verify(ar => ar.SaveAsync(It.Is<AuditRoot>(aud =>
-            aud.AuditCode == "anauditcode1"
-        ), It.IsAny<CancellationToken>()));
-        _auditRepository.Verify(ar => ar.SaveAsync(It.Is<AuditRoot>(aud =>
-            aud.AuditCode == "anauditcode2"
-        ), It.IsAny<CancellationToken>()));
-        _auditRepository.Verify(ar => ar.SaveAsync(It.IsAny<AuditRoot>(), It.IsAny<CancellationToken>()),
-            Times.Exactly(2));
-    }
-
     [Fact]
     public async Task WhenDrainAllEmailsAsyncAndNoneOnQueue_ThenDoesNotDeliver()
     {
@@ -755,7 +414,9 @@ public class AncillaryApplicationSpec
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<CancellationToken>()), Times.Never);
     }
+#endif
 
+#if TESTINGONLY
     [Fact]
     public async Task WhenDrainAllEmailsAsyncAndSomeOnQueue_ThenDeliversAll()
     {
@@ -763,7 +424,7 @@ public class AncillaryApplicationSpec
         var message1 = new EmailMessage
         {
             MessageId = message1Id,
-            Html = new QueuedEmailHtmlMessage
+            Message = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject1",
                 HtmlBody = "abody1",
@@ -777,7 +438,7 @@ public class AncillaryApplicationSpec
         var message2 = new EmailMessage
         {
             MessageId = message2Id,
-            Html = new QueuedEmailHtmlMessage
+            Message = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject2",
                 HtmlBody = "abody2",
@@ -829,85 +490,10 @@ public class AncillaryApplicationSpec
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
             Times.Exactly(2));
     }
-
-    [Fact]
-    public async Task WhenDrainAllProvisioningsAsyncAndNoneOnQueue_ThenDoesNotDeliver()
-    {
-        _provisioningMessageQueue.Setup(umr =>
-                umr.PopSingleAsync(It.IsAny<Func<ProvisioningMessage, CancellationToken, Task<Result<Error>>>>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
-
-        var result = await _application.DrainAllProvisioningsAsync(_caller.Object, CancellationToken.None);
-
-        result.Should().BeSuccess();
-        _provisioningMessageQueue.Verify(
-            urs => urs.PopSingleAsync(It.IsAny<Func<ProvisioningMessage, CancellationToken, Task<Result<Error>>>>(),
-                It.IsAny<CancellationToken>()));
-        _provisioningDeliveryService.Verify(
-            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<TenantSettings>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task WhenDrainAllProvisioningsAsyncAndSomeOnQueue_ThenDeliversAll()
-    {
-        var message1 = new ProvisioningMessage
-        {
-            TenantId = "atenantid1",
-            Settings = new Dictionary<string, TenantSetting>
-            {
-                { "aname", new TenantSetting("avalue1") }
-            }
-        };
-        var message2 = new ProvisioningMessage
-        {
-            TenantId = "atenantid2",
-            Settings = new Dictionary<string, TenantSetting>
-            {
-                { "aname", new TenantSetting("avalue2") }
-            }
-        };
-        var callbackCount = 1;
-        _provisioningMessageQueue.Setup(umr =>
-                umr.PopSingleAsync(It.IsAny<Func<ProvisioningMessage, CancellationToken, Task<Result<Error>>>>(),
-                    It.IsAny<CancellationToken>()))
-            .Callback((Func<ProvisioningMessage, CancellationToken, Task<Result<Error>>> action, CancellationToken _) =>
-            {
-                if (callbackCount == 1)
-                {
-                    action(message1, CancellationToken.None);
-                }
-
-                if (callbackCount == 2)
-                {
-                    action(message2, CancellationToken.None);
-                }
-            })
-            .Returns((Func<ProvisioningMessage, CancellationToken, Task<Result<Error>>> _, CancellationToken _) =>
-            {
-                callbackCount++;
-                return Task.FromResult<Result<bool, Error>>(callbackCount is 1 or 2);
-            });
-
-        var result = await _application.DrainAllProvisioningsAsync(_caller.Object, CancellationToken.None);
-
-        result.Should().BeSuccess();
-        _provisioningMessageQueue.Verify(
-            urs => urs.PopSingleAsync(It.IsAny<Func<ProvisioningMessage, CancellationToken, Task<Result<Error>>>>(),
-                It.IsAny<CancellationToken>()), Times.Exactly(2));
-        _provisioningDeliveryService.Verify(
-            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), "atenantid1",
-                It.Is<TenantSettings>(dic => dic["aname"].Value.As<string>() == "avalue1"),
-                It.IsAny<CancellationToken>()));
-        _provisioningDeliveryService.Verify(
-            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), "atenantid2",
-                It.Is<TenantSettings>(dic => dic["aname"].Value.As<string>() == "avalue2"),
-                It.IsAny<CancellationToken>()));
-        _provisioningDeliveryService.Verify(
-            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<TenantSettings>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
-    }
-
 #endif
+
+    private static string CreateMessageId()
+    {
+        return new MessageQueueIdFactory().Create("aqueuename");
+    }
 }

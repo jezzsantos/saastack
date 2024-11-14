@@ -46,7 +46,7 @@ public abstract class SendEmailSpecBase<TSetup> : ApiWorkerSpec<TSetup>
     {
         var message = StringExtensions.ToJson(new EmailMessage
         {
-            Html = new QueuedEmailHtmlMessage
+            Message = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject",
                 HtmlBody = "abody",

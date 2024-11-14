@@ -47,7 +47,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
-                Html = new QueuedEmailHtmlMessage
+                Message = new QueuedEmailHtmlMessage
                 {
                     Subject = "asubject",
                     HtmlBody = "anhtmlbody",
@@ -97,7 +97,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
-                Html = new QueuedEmailHtmlMessage
+                Message = new QueuedEmailHtmlMessage
                 {
                     Subject = "asubject",
                     HtmlBody = "anhtmlbody",
@@ -147,7 +147,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
-                Html = new QueuedEmailHtmlMessage
+                Message = new QueuedEmailHtmlMessage
                 {
                     Subject = "asubject",
                     HtmlBody = "anhtmlbody",
@@ -200,7 +200,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
-                Html = new QueuedEmailHtmlMessage
+                Message = new QueuedEmailHtmlMessage
                 {
                     Subject = "asubject",
                     HtmlBody = "anhtmlbody",
@@ -258,7 +258,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
-                Html = new QueuedEmailHtmlMessage
+                Message = new QueuedEmailHtmlMessage
                 {
                     Subject = "asubject",
                     HtmlBody = "anhtmlbody",
@@ -318,7 +318,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
-                Html = new QueuedEmailHtmlMessage
+                Message = new QueuedEmailHtmlMessage
                 {
                     Subject = "asubject",
                     HtmlBody = "anhtmlbody",
@@ -374,7 +374,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
             MessageId = messageId1,
             CallId = "acallid",
             CallerId = "acallerid",
-            Html = new QueuedEmailHtmlMessage
+            Message = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject1",
                 HtmlBody = "anhtmlbody",
@@ -390,7 +390,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
             MessageId = messageId2,
             CallId = "acallid",
             CallerId = "acallerid",
-            Html = new QueuedEmailHtmlMessage
+            Message = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject2",
                 HtmlBody = "anhtmlbody",
@@ -406,7 +406,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
             MessageId = messageId3,
             CallId = "acallid",
             CallerId = "acallerid",
-            Html = new QueuedEmailHtmlMessage
+            Message = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject3",
                 HtmlBody = "anhtmlbody",

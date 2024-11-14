@@ -109,6 +109,13 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
+          WHERE object_id = OBJECT_ID(N'[dbo].[SmsDelivery]')
+            AND type in (N'U'))
+    DROP TABLE [dbo].[SmsDelivery]
+GO
+
+IF EXISTS(SELECT *
+          FROM sys.objects
           WHERE object_id = OBJECT_ID(N'[dbo].[SSOUser]')
             AND type in (N'U'))
     DROP TABLE [dbo].[SSOUser]
@@ -461,6 +468,44 @@ CREATE INDEX StreamName
     ON [dbo].[ProjectionCheckpoints]
         (
          [StreamName]
+            );
+
+CREATE TABLE [dbo].[SmsDelivery]
+(
+    [Id]                   [nvarchar](100) NOT NULL,
+    [LastPersistedAtUtc]   [datetime]      NULL,
+    [IsDeleted]            [bit]           NULL,
+    [Attempts]             [nvarchar](max) NULL,
+    [Body]                 [nvarchar](max) NULL,
+    [Delivered]            [datetime]      NULL,
+    [DeliveryFailed]       [datetime]      NULL,
+    [DeliveryFailedReason] [nvarchar](max) NULL,
+    [LastAttempted]        [datetime]      NULL,
+    [MessageId]            [nvarchar](450) NULL,
+    [ReceiptId]            [nvarchar](450) NULL,
+    [SendFailed]           [datetime]      NULL,
+    [Sent]                 [datetime]      NULL,
+    [Tags]                 [nvarchar](max) NULL,
+    [ToPhoneNumber]        [nvarchar](max) NULL,
+) ON [PRIMARY]
+GO
+
+CREATE INDEX Id
+    ON [dbo].[EmailDelivery]
+        (
+         [Id]
+            );
+
+CREATE INDEX MessageId
+    ON [dbo].[EmailDelivery]
+        (
+         [MessageId]
+            );
+
+CREATE INDEX ReceiptId
+    ON [dbo].[EmailDelivery]
+        (
+         [ReceiptId]
             );
 
 CREATE TABLE [dbo].[Subscription]

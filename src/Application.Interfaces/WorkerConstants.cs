@@ -7,6 +7,7 @@ public static class WorkerConstants
         public const string Audits = "audits";
         public const string Emails = "emails";
         public const string Provisionings = "tenant_provisionings";
+        public const string Smses = "smses";
         public const string Usages = "usages";
     }
 

@@ -17,6 +17,12 @@ public sealed class StubUserNotificationsService : IUserNotificationsService
 
     public string? LastGuestInvitationToken { get; private set; }
 
+    public string? LastMfaOobCode { get; private set; }
+
+    public string? LastMfaOobEmailRecipient { get; private set; }
+
+    public string? LastMfaOobSmsRecipient { get; private set; }
+
     public string? LastPasswordResetCourtesyEmailRecipient { get; private set; }
 
     public string? LastPasswordResetEmailRecipient { get; private set; }
@@ -35,6 +41,24 @@ public sealed class StubUserNotificationsService : IUserNotificationsService
     {
         LastGuestInvitationEmailRecipient = inviteeEmailAddress;
         LastGuestInvitationToken = token;
+        return Task.FromResult(Result.Ok);
+    }
+
+    public Task<Result<Error>> NotifyPasswordMfaOobEmailAsync(ICallerContext caller, string emailAddress, string code,
+        IReadOnlyList<string>? tags,
+        CancellationToken cancellationToken)
+    {
+        LastMfaOobEmailRecipient = emailAddress;
+        LastMfaOobCode = code;
+        return Task.FromResult(Result.Ok);
+    }
+
+    public Task<Result<Error>> NotifyPasswordMfaOobSmsAsync(ICallerContext caller, string phoneNumber, string code,
+        IReadOnlyList<string>? tags,
+        CancellationToken cancellationToken)
+    {
+        LastMfaOobSmsRecipient = phoneNumber;
+        LastMfaOobCode = code;
         return Task.FromResult(Result.Ok);
     }
 
@@ -81,5 +105,8 @@ public sealed class StubUserNotificationsService : IUserNotificationsService
         LastGuestInvitationEmailRecipient = null;
         LastGuestInvitationToken = null;
         LastPasswordResetToken = null;
+        LastMfaOobCode = null;
+        LastMfaOobEmailRecipient = null;
+        LastMfaOobSmsRecipient = null;
     }
 }
