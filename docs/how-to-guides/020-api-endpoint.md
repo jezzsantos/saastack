@@ -28,7 +28,7 @@ The general approach to building a new API is to start "outside-in", that is sta
 
 We strongly recommend that before you start, you have some idea of the contract of an API to build and that it is not based upon a CRUD data-model, and it considers the entire lifecycle of a REST "resource".
 
-A simple psuedo-description like:
+A simple pseudo-description like:
 
 ```http
 POST /myresources
@@ -120,7 +120,7 @@ A "Service Operation" is essentially the same thing as an "endpoint", it is gene
 
 * An HTTP request (likely in JSON)
 * A route (that defines the collection of the REST resource)
-* Some authorization declaration (most authenticated requests will limit access to some degree, either by role or by subscription level a.k.a features)
+* Some authorization declaration (most authenticated requests will limit access to some degree, either by role or by subscription level a.k.a. features)
 * A response, which may or may not have a body (in JSON/XML/etc, if it does)
 
 In SaaStack, we like to define the request and response objects independently and then couple them together since it provides advantages later for processing requests. Particularly with typed API clients.
@@ -199,13 +199,13 @@ The return type of all these service operations is an `ApiResult`. There are sev
 > There are several other flavors of `ApiResult`, that are used in specific cases:
 >
 >
-`ApiEmptyResult` - can be used instead of any of the other kinds to denote an API that does not return any data in the result. (i.e., an
+`ApiEmptyResult` - can be used instead of the other kinds to denote an API that does not return any data in the result. (i.e., an
 `HTTP 204 - No Content`)
 >
-> `ApiResult` - can be used in place of any of the others for PUT, PATCH, DELETE or GET methods, but not POST.
+> `ApiResult` - can be used in place of the others for PUT, PATCH, DELETE or GET methods, but not POST.
 
 In most cases, these `ApiResult` return values include the type of the resource (i.e.,
-`ApiResult<TResources, TResponse>` that is being returned in a successful call (or an `Error`).
+`ApiResult<TResources, TResponse>` that is being returned in a successful call - or an `Error`).
 
 #### Request and response types
 
@@ -224,7 +224,7 @@ For example,
     └── RegisterCarResponse.cs
 ```
 
-To create a new request type, in Rider, right click on the subfolder, and use the
+To create a new request type, in Rider, right-click on the subfolder, and use the
 `Add -> SaaStack -> API POST Request DTO` command, and fill out the template. Or you can hand-craft your own request types by copying from one of the other existing definitions in the codebase.
 
 > If you decide to hand-craft your own definition, there will be code analysis rules to help you complete the correct structure.
@@ -428,10 +428,11 @@ If your endpoint is intended to only allow authenticated users to have access to
 To make this take effect, you need to specify the 3rd parameter of the `[Route]` attribute to be something other than
 `Anonymous`, to indicate the endpoint can only be called by an authenticated caller.
 
-* `Token` - means the calling user is identified by a token in the request. i.e., a JWT bearer token in teh
+* `Token` - means the calling user is identified by a token in the request. i.e., a JWT bearer token in the
   `Autheorixation` header of the request.
 *
-`HMAC` - means that the request will use HMAC authentication to identifiy the calling user. This is only used for private API calls, not intended for the public to use.
+
+`HMAC` - means that the request will use HMAC authentication to identify the calling user. This is only used for private API calls, not intended for the public to use.
 * `Anonymous` - means no authentication mechanism is required. (even is a token is included in the request)
 
 For example,
@@ -448,7 +449,7 @@ public class RegisterCarRequest : TenantedRequest<RegisterCarRequest, GetCarResp
 When you do this, you now have the option of adding a `[Authorize]` attribute to the class.
 
 > By default, if you do not specify an `[Authorize]` attribute (when you specify a
-`[Route]` attribute, the API call is always going to be asserting that the authenticated user has the following roles:
+`[Route]` attribute), the API call is always going to be asserting that the authenticated user has the following  roles:
 `Platform_Standard` and features: `Platform_Basic`.
 
 This is where you need to make sure that you have correctly defined whether your request is "Tenanted" or "Un-Tenanted".
@@ -633,7 +634,7 @@ public class AnExampleRequestValidator : AbstractValidator<AnExampleRequest>
 ```
 
 In this case, we need to validate the inbound
-`Id` property, and make sure it is formatted like all the other identifiers used for resource in the codebase. So we dependency inject the
+`Id` property, and make sure it is formatted like all the other identifiers used for resource in the codebase. So, we dependency-inject the
 `IIdentiferFactory` into the constructor, and we use the `IsEntityId(idFactory)` validator.
 
 #### Custom Validation Expressions
@@ -678,7 +679,7 @@ public static class Validations
 
 Sometimes, it is necessary to build your own validators for common types that you find you are using in many requests.
 
-For example, your request contains a collection of complex data objects, where as normally you are dealing with a single property value.
+For example, your request contains a collection of complex data objects, whereas normally you are dealing with a single property value.
 
 ```c#
 public class CreateThingRequest : TenantedRequest<CreateThingRequest, CreateThingResponse>
@@ -773,7 +774,7 @@ Instead, just follow the same patterns as every other service operation in the c
 
 The forthcoming integration tests will cover it and ensure it is all wired up correctly and mapped properly.
 
-> One exception to this rule, is when you are processing something that you want to extract from the HTTP request that is not normally supported. Such as specific headers or multi-part bodies. In these cases, you will be introducing some new code to handle those cases, and we recommend that you do unit test this code, if there is significant processing involved in it.
+> One exception to this rule, is when you are processing something that you want to extract from the HTTP request that is not normally supported. Such as specific headers or multipart bodies. In these cases, you will be introducing some new code to handle those cases, and we recommend that you do unit test this code, if there is significant processing involved in it.
 >
 > For example, an example of handling a binary `multipart-form` body can be seen in the
 `ImagesApi.UploadImage` service operation.
@@ -795,11 +796,11 @@ The forthcoming integration tests will cover the use of these types, and ensure 
 
 Each of the validators for each of these request types (i.e., `RegisterCarRequestValidator`)
 
-All request validators SHOULD DEFINATELY be unit-tested.
+All request validators SHOULD DEFINITELY be unit-tested.
 
 These validators require unit testing since it is highly unlikely that any other kind of test will be ensuring they work as you designed them for all permutations of data.
 
-Your integration tests are likely to only test a small number of permutations of test data (and certainly you would not integration tests for all permutations).
+Your integration tests are likely to only test a small number of permutations of test data (and certainly you would not integration-tests for all permutations).
 
 You should write a separate class for each validator and make sure you thoroughly cover both happy path cases and invalid cases.
 
@@ -934,7 +935,7 @@ public class CarsApiSpec : WebApiSpec<Program>
 Notice a few key things here:
 
 1. The class derives from
-   `WebApiSpec<Program>` this is necessary to launch your API code into the a test harness for testing APIs.
+   `WebApiSpec<Program>` this is necessary to launch your API code into a test harness for testing APIs.
 2. The class is decorated with the category
    `[Trait("Category", "Integration.API")]` that is important to distinguish these kinds of tests from others (like unit tests).
 3. The class is decorated with the attribute
@@ -966,7 +967,7 @@ Let's say that you are using the following application interface in your Applica
 `ICustomService`, and let's say that you have already built a technology adapter for that interface called
 `MyCustomService`. This adapter is likely to have been injected at runtime, into your subdomain module at runtime. So, when your integration tests run, that adapter is being used for real in automated testing.
 
-We want to avoid using the real adapter, so we need to build a integration testing stub adapter instead.
+We want to avoid using the real adapter, so we need to build an integration testing stub adapter instead.
 
 In the integrations testing project of your infrastructure project (where your integration tests are), you will create a sub-folder called
 `Stubs`.
@@ -1063,7 +1064,7 @@ Finally, in your test, (as you can see above) you can ask the stub adapter if it
 
 #### TESTINGONLY
 
-Last thing to mention about integration testing your APIs.
+Last thing to mention with integration-testing your APIs.
 
 Sometimes, to set up the data and context that you need to test one of your APIs, you may find that you cannot do that, either:
 

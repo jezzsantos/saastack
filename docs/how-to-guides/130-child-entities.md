@@ -81,7 +81,7 @@ public sealed class Unavailability : EntityBase
     public override Result<Error> EnsureInvariants()
     {
         var ensureInvariants = base.EnsureInvariants();
-        if (!ensureInvariants.IsSuccessful)
+        if (ensureInvariants.IsFailure)
         {
             return ensureInvariants.Error;
         }
@@ -117,7 +117,7 @@ Changing an entity's state is done similarly to how you change the state of an a
 
 In the case of raising a domain event to change the state of an entity:
 
-1. From an aggregate root method, locate the instance of the specific entity to update. (usually from a collection of entities already stored on the on the aggregate).
+1. From an aggregate root method, locate the instance of the specific entity to update. (usually from a collection of entities already stored on the aggregate).
 2. Provide a method on the entity class, and have the aggregate call that method.
 3. In the entity method, perform the usual validation and rules, and raise the domain event to the entity itself (using the `RaiseChangeEvent()` method).
 4. The underlying `EntityBase` class will replay the domain event onto the entity, and then it will call `EnsureInvariants()` on the entity.
@@ -248,7 +248,7 @@ For example, in the `Trip`
     }
 ```
 
-Some key notes here:
+Some keynotes here:
 
 1. Not every state (after an event is raised) requires an invariant rule to be put in place. Focus on those that must be true at all times, or in specific known states.
 2. You may want to cascade the rules in child entities or value object collections.
