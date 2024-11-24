@@ -79,7 +79,11 @@ public class EventSourcingDddCommandStore<TAggregateRoot> : IEventSourcingDddCom
 
                 var lastPersistedAtUtc = events.Last().LastPersistedAtUtc;
                 var aggregate = RehydrateAggregateRoot(id, lastPersistedAtUtc);
-                aggregate.LoadChanges(events, _migrator);
+                var loaded = aggregate.LoadChanges(events, _migrator);
+                if (loaded.IsFailure)
+                {
+                    return loaded.Error;
+                }
 
                 return aggregate;
             });
