@@ -63,7 +63,7 @@ public static class EnumExtensions
 
     /// <summary>
     ///     Converts the value to its string representation, or
-    ///     to teh value of the <see cref="EnumMemberAttribute" /> if it exists
+    ///     to the value of the <see cref="EnumMemberAttribute" /> if it exists
     /// </summary>
     public static string ToString<TEnum>(this TEnum value, bool useEnumMember = false)
         where TEnum : Enum

@@ -1,6 +1,6 @@
 # Back-End for Front-End
 
-(a.k.a BEFFE or BFF) coined by [Sam Newman](https://samnewman.io/patterns/architectural/bff/) circa 2015
+(a.k.a. BEFFE or BFF) coined by [Sam Newman](https://samnewman.io/patterns/architectural/bff/) circa 2015
 
 A web BEFFE is a web server designed specifically to serve a web application (i.e. a JavaScript application like those created with a framework like ReactJs/AngularJs/VueJs application).
 
@@ -19,8 +19,8 @@ In many contexts of evolving SaaS products, a BEFFE can act as an [Anti-Corrupti
 * A BEFFE is a dedicated boundary to a specific type of client application. Typically, a web application. Its purpose is to serve assets and data to a web application just the way the web application likes it, and to abstract the visual interface from the machine interface of the Backend APIs.
 * A BEFFE should remain stateless
 * A BEFFE can offer caching of responses to make the UI more responsive and typically aggregates data from various backend sources (e.g., different APIs).
-* A BEFFE is a necessary strategy when the same development team designs both the Frontend and the Backend of a system simultaneously. Without this, it is easy for the team to forget that both HTTP interfaces (HTML for Frontend and JSON for Backend) are designed for two quite different [human] audiences. A Frontend is a visual [human] interface designed for the end-users of the product, focused on performing familiar tasks easily. The Backend is a machine interface designed around business processes for [human] developers who then integrate other systems with the API of the product (regardless of what subsequent interface they are building and for whom). Thus these two interfaces are necessarily designed quite differently. Without a BEFFE, a team is likely to fall back to creating RPC/CRUD-like APIs, which does not achieve much more than making an API directly to their database. Then that simplification leads them to distribute core logic between various layers of the overall system (if they have any bounded layers at all), and that lack of structure and lack of encapsulation creates a big-ball-of-mud which slows them down in later stages, as the product onboards more [incidental complexity](https://en.wikipedia.org/wiki/No_Silver_Bullet).
-* A BEFFE typically provides a secure way to maintain stateful (but not sticky) user sessions. Typically using [HTTPOnly, Secure] cookies to avoid the need for clients to store any secrets or tokens in the browser (which is always to be avoided since XSS vulnerabilities are ever-present). The BEFFE can then store and forward tokens created by Backends when calls are forwarded from BEFFE to Backend APIs. This avoids the tendency that many developers have to project cookies or sessions (or other legacy web application authentication mechanisms) onto their Backend API, which makes them far harder for machine integration.
+* A BEFFE is a necessary strategy when the same development team designs both the Frontend and the Backend of a system simultaneously. Without this, it is easy for the team to forget that both HTTP interfaces (HTML for Frontend and JSON for Backend) are designed for two quite different [human] audiences. A Frontend is a visual [human] interface designed for the end-users of the product, focused on performing familiar tasks easily. The Backend is a machine interface designed around business processes for [human] developers who then integrate other systems with the API of the product (regardless of what subsequent interface they are building and for whom). Thus, these two interfaces are necessarily designed quite differently. Without a BEFFE, a team is likely to fall back to creating RPC/CRUD-like APIs, which does not achieve much more than making an API directly to their database. Then that simplification leads them to distribute core logic between various layers of the overall system (if they have any bounded layers at all), and that lack of structure and lack of encapsulation creates a big-ball-of-mud which slows them down in later stages, as the product onboards more [incidental complexity](https://en.wikipedia.org/wiki/No_Silver_Bullet).
+* A BEFFE typically provides a secure way to maintain stateful (but not sticky) user sessions. Typically, using [HTTPOnly, Secure] cookies to avoid the need for clients to store any secrets or tokens in the browser (which is always to be avoided since XSS vulnerabilities are ever-present). The BEFFE can then store and forward tokens created by Backends when calls are forwarded from BEFFE to Backend APIs. This avoids the tendency that many developers have to project cookies or sessions (or other legacy web application authentication mechanisms) onto their Backend API, which makes them far harder for machine integration.
 * A BEFFE may provide its own API tailored to the JS app, or it may provide a reverse proxy to forward requests on to other Backend APIs.
 
 ## Implementation
@@ -32,9 +32,9 @@ The `WebsiteHost` project is a BEFFE. It performs these tasks:
 3. It implements a Reverse Proxy in order to forward JSON API requests to Backend APIs
 4. It implements its own Authentication API endpoints so that [HTTPOnly, secure] cookies can be used between the BEFFE and JS app, for security purposes, to avoid storing any tokens/secrets in the browser (anywhere).
 5. It necessarily protects against CSRF attacks (since it uses cookies to store authorization tokens).
-6. It provides other API endpoints for common services, like: Health monitoring, Recording (diagnostics, usages, crash reports, etc), Feature Flags, etc. These API's are available at
+6. It provides other API endpoints for common services, like: Health monitoring, Recording (diagnostics, usages, crash reports, etc.), Feature Flags, etc. These APIs are available at
    `/api`.
-7. It provides a platform to add further custom dedicated API endpoints, that you might provide yourself to the JS app. These might be necessary to avoid performing N+1 operations in the browser, versus doing them in the BEFFE (in teh cloud), which is far more efficient in latency.
+7. It provides a platform to add further custom dedicated API endpoints, that you might provide yourself to the JS app. These might be necessary to avoid performing N+1 operations in the browser, versus doing them in the BEFFE (in the cloud), which is far more efficient in latency.
 8. It provides the opportunity to deploy (and scale) the web application separately from backend APIs.
 
 ### Reverse Proxy
@@ -251,7 +251,7 @@ To defeat the CSRF protection, an attack would have to send an "un-safe" state-c
 1. Included in the request is a signed `anti-csrf-tok` cookie, signed with the same HMAC key stored on the BEFFE.
 2. Included in the request is an
    `anti-csrf-tok` header containing a CSRF token (paired to the cookie above), encrypted with the same AES encryption key stored on the BEFFE.
-3. That CSRF token (above) would have had to include the ID of the currently authenticated user (a.k.a session ID). Or include no user ID for an anonymous call.
+3. That CSRF token (above) would have had to include the ID of the currently authenticated user (a.k.a. session ID). Or include no user ID for an anonymous call.
 4. Included an `origin` header (or included a `referer` header) that matched the origin of the JS app.
 5. By-passed the browsers CORS pre-flight check.
 
@@ -264,7 +264,7 @@ For an attacker to do this from JavaScript running in the same browser, they nee
   `anti-csrf-tok` header on the request with the value it reads from the
   `index.html` page. Writing custom headers on requests (like:
   `anti-csrf-tok`) is forbidden by SOP in compliant browsers.
-* Point 3: The JS on www.hacker.com would have to know the AES encryption key on the BEFFE to create their own token value. (They could, however, use their own encrypted token and related cookie- from monitoring their own account on the site - to force a re-login of their account and initiate a "Login CSRF").
+* Point 3: The JS on www.hacker.com would have to know the AES encryption key on the BEFFE to create their own token value. (They could, however, use their own encrypted token and related cookie, from monitoring their own account on the site, to force a re-login of their account and initiate a "Login CSRF").
 * Point 4: The JS on www.hacker.com would have to spoof the `origin` or
   `referer` headers on the request. The browser should not allow JavaScript to do this.
 * Point 5: The JS on www.hacker.com would have to bypass the CORS preflight check set on www.yourproduct.com in order for any state-changing API call to succeed.
@@ -289,7 +289,7 @@ All API calls from the JS app should append the path `/api/` to the base URL for
 `GET https://localhost:5101/api/profiles/me`, regardless of whether those API calls are to the BEFFE itself or to a Backend API.
 
 > All API calls to that prefix (except for any APIs defined on the BEFFE) will be automatically proxied through the Reverse Proxy to the Backend API. Any API calls to any other paths (other than
-`/api/` will terminate at the BEFFE itself.
+`/api/` will terminate at the BEFFE itself).
 
 
 
