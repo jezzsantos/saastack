@@ -2,7 +2,6 @@ using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Persistence.Shared;
 using Common;
-using Common.Extensions;
 using Task = System.Threading.Tasks.Task;
 
 namespace AncillaryInfrastructure.ApplicationServices;
@@ -21,18 +20,11 @@ public class NoOpEmailDeliveryService : IEmailDeliveryService
 
     public Task<Result<EmailDeliveryReceipt, Error>> SendAsync(ICallerContext caller, string subject, string htmlBody,
         string toEmailAddress, string? toDisplayName, string fromEmailAddress, string? fromDisplayName,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
-        _recorder.TraceDebug(caller.ToCall(),
-            $"{nameof(NoOpEmailDeliveryService)} would have delivered email message {{Subject}} for {{For}} with properties: {{Properties}}",
-            subject, toEmailAddress, new
-            {
-                To = toEmailAddress,
-                ToDisplayName = toDisplayName,
-                From = fromEmailAddress,
-                FromDisplayName = fromDisplayName,
-                Body = htmlBody
-            }.ToJson()!);
+        _recorder.TraceInformation(caller.ToCall(),
+            $"{nameof(NoOpEmailDeliveryService)} would have delivered email message {{To}}, from {{From}}, with subject {{Subject}}, body {{Body}}",
+            toEmailAddress, fromEmailAddress, subject, htmlBody);
 
         return Task.FromResult<Result<EmailDeliveryReceipt, Error>>(new EmailDeliveryReceipt
         {

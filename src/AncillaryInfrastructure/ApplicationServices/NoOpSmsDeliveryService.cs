@@ -2,7 +2,6 @@ using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Persistence.Shared;
 using Common;
-using Common.Extensions;
 using Task = System.Threading.Tasks.Task;
 
 namespace AncillaryInfrastructure.ApplicationServices;
@@ -20,15 +19,11 @@ public class NoOpSmsDeliveryService : ISmsDeliveryService
     }
 
     public Task<Result<SmsDeliveryReceipt, Error>> SendAsync(ICallerContext caller, string body,
-        string toPhoneNumber, CancellationToken cancellationToken = default)
+        string toPhoneNumber, CancellationToken cancellationToken)
     {
-        _recorder.TraceDebug(caller.ToCall(),
-            $"{nameof(NoOpSmsDeliveryService)} would have delivered SMS message for {{For}} with properties: {{Properties}}",
-            toPhoneNumber, new
-            {
-                To = toPhoneNumber,
-                Body = body
-            }.ToJson()!);
+        _recorder.TraceInformation(caller.ToCall(),
+            $"{nameof(NoOpSmsDeliveryService)} would have delivered SMS message {{To}}, with {{Body}}",
+            toPhoneNumber, body);
 
         return Task.FromResult<Result<SmsDeliveryReceipt, Error>>(new SmsDeliveryReceipt
         {

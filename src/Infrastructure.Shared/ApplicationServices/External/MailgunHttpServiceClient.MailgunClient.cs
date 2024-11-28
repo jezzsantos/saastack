@@ -91,7 +91,7 @@ public class MailgunClient : IMailgunClient
         var caller = Caller.CreateAsCallerFromCall(call);
         try
         {
-            var response = await _retryPolicy.ExecuteAsync(() => _serviceClient.PostAsync(caller,
+            var response = await _retryPolicy.ExecuteAsync(async () => await _serviceClient.PostAsync(caller,
                 new MailgunSendRequest
                 {
                     DomainName = _domainName,
@@ -119,7 +119,7 @@ public class MailgunClient : IMailgunClient
         }
         catch (HttpRequestException ex)
         {
-            _recorder.TraceError(call, "Error sending Mailgun email to {To}", to);
+            _recorder.TraceError(call, ex, "Error sending Mailgun email to {To}", to);
             return ex.ToError(ErrorCode.Unexpected);
         }
     }

@@ -14,7 +14,7 @@ public interface IEmailDeliveryService
     /// </summary>
     Task<Result<EmailDeliveryReceipt, Error>> SendAsync(ICallerContext caller, string subject, string htmlBody,
         string toEmailAddress, string? toDisplayName, string fromEmailAddress, string? fromDisplayName,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken);
 }
 
 public class EmailDeliveryReceipt

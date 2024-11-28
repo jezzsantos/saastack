@@ -29,7 +29,7 @@ public class MailgunHttpServiceClient : IEmailDeliveryService
 
     public async Task<Result<EmailDeliveryReceipt, Error>> SendAsync(ICallerContext caller, string subject,
         string htmlBody, string toEmailAddress, string? toDisplayName,
-        string fromEmailAddress, string? fromDisplayName, CancellationToken cancellationToken = default)
+        string fromEmailAddress, string? fromDisplayName, CancellationToken cancellationToken)
     {
         _recorder.TraceInformation(caller.ToCall(), "Sending email to {To} in Mailgun from {From}", toEmailAddress,
             fromEmailAddress);

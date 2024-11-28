@@ -47,6 +47,7 @@ public class AncillaryModule : ISubdomainModule
                 services.AddPerHttpRequest<IRecordingApplication, RecordingApplication>();
                 services.AddPerHttpRequest<IFeatureFlagsApplication, FeatureFlagsApplication>();
                 services.AddPerHttpRequest<IMailgunApplication, MailgunApplication>();
+                services.AddPerHttpRequest<ITwilioApplication, TwilioApplication>();
                 services.AddPerHttpRequest<IAncillaryApplication, AncillaryApplication.AncillaryApplication>();
                 services.AddSingleton<IUsageMessageQueue>(c =>
                     new UsageMessageQueue(c.GetRequiredService<IRecorder>(),

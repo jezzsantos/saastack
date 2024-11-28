@@ -23,7 +23,7 @@ public interface IUserPilotClient
 
 public sealed class UserPilotClient : IUserPilotClient
 {
-    internal const string APIVersionHeaderName = "X-API-Version";
+    private const string APIVersionHeaderName = "X-API-Version";
     private const string APIKeySettingName = "ApplicationServices:UserPilot:ApiKey";
     private const string BaseUrlSettingName = "ApplicationServices:UserPilot:BaseUrl";
     private readonly string _apiKey;
@@ -58,7 +58,7 @@ public sealed class UserPilotClient : IUserPilotClient
         var caller = Caller.CreateAsCallerFromCall(call);
         try
         {
-            var response = await _retryPolicy.ExecuteAsync(() => _serviceClient.PostAsync(caller,
+            var response = await _retryPolicy.ExecuteAsync(async () => await _serviceClient.PostAsync(caller,
                 new UserPilotIdentifyUserRequest
                 {
                     UserId = userId,
@@ -74,19 +74,18 @@ public sealed class UserPilotClient : IUserPilotClient
         }
         catch (HttpRequestException ex)
         {
-            _recorder.TraceError(call, "Error identifying UserPilot user {User}", userId);
+            _recorder.TraceError(call, ex, "Error identifying UserPilot user {User}", userId);
             return ex.ToError(ErrorCode.Unexpected);
         }
     }
 
     public async Task<Result<Error>> TrackEventAsync(ICallContext call, string userId, string eventName,
-        Dictionary<string, string> metadata,
-        CancellationToken cancellationToken)
+        Dictionary<string, string> metadata, CancellationToken cancellationToken)
     {
         var caller = Caller.CreateAsCallerFromCall(call);
         try
         {
-            var response = await _retryPolicy.ExecuteAsync(() => _serviceClient.PostAsync(caller,
+            var response = await _retryPolicy.ExecuteAsync(async () => await _serviceClient.PostAsync(caller,
                 new UserPilotTrackEventRequest
                 {
                     UserId = userId,
@@ -102,7 +101,7 @@ public sealed class UserPilotClient : IUserPilotClient
         }
         catch (HttpRequestException ex)
         {
-            _recorder.TraceError(call, "Error tracking UserPilot event {Event} for user {User}", eventName,
+            _recorder.TraceError(call, ex, "Error tracking UserPilot event {Event} for user {User}", eventName,
                 userId);
             return ex.ToError(ErrorCode.Unexpected);
         }

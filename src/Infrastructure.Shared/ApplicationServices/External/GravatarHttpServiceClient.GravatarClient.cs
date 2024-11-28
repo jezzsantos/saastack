@@ -53,7 +53,7 @@ internal class GravatarClient : IGravatarClient
         Result<BinaryResponse, ResponseProblem> response;
         try
         {
-            response = await _retryPolicy.ExecuteAsync(() => _serviceClient.GetBinaryAsync(caller,
+            response = await _retryPolicy.ExecuteAsync(async () => await _serviceClient.GetBinaryAsync(caller,
                 new GravatarGetImageRequest
                 {
                     Hash = HashEmailAddress(emailAddress),
@@ -65,9 +65,9 @@ internal class GravatarClient : IGravatarClient
                 return Optional<FileUpload>.None;
             }
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
-            _recorder.TraceError(caller.ToCall(),
+            _recorder.TraceError(caller.ToCall(), ex,
                 "Error retrieving gravatar for {EmailAddress}", emailAddress);
             return Optional<FileUpload>.None;
         }

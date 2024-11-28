@@ -16,7 +16,7 @@ public sealed class StubEmailDeliveryService : IEmailDeliveryService
 
     public Task<Result<EmailDeliveryReceipt, Error>> SendAsync(ICallerContext caller, string subject, string htmlBody,
         string toEmailAddress, string? toDisplayName, string fromEmailAddress, string? fromDisplayName,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var receiptId = $"receipt_{Guid.NewGuid():N}";
         AllSubjects.Add(subject);

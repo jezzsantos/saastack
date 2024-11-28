@@ -36,7 +36,7 @@ public class MailgunHttpServiceClientSpec
             });
 
         var result = await _serviceClient.SendAsync(_caller.Object, "asubject", "anhtmlbody", "atoemailaddress",
-            "atodisplayname", "afromemailaddress", "afromdisplayname");
+            "atodisplayname", "afromemailaddress", "afromdisplayname", CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.ReceiptId.Should().Be("areceiptid");

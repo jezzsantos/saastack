@@ -37,7 +37,8 @@ public class MailgunApplication : IMailgunApplication
         if (created.IsFailure)
         {
             _recorder.TraceError(caller.ToCall(),
-                "Failed to audit Mailgun webhook event {Event} with {Code}: {Message}", eventType, created.Error.Code,
+                "Failed to audit Mailgun webhook event {Event} with {ErrorCode}: {Message}", eventType,
+                created.Error.Code,
                 created.Error.Message);
             return created.Error;
         }
@@ -91,7 +92,7 @@ public class MailgunApplication : IMailgunApplication
         if (delivered.IsFailure)
         {
             _recorder.TraceError(caller.ToCall(),
-                "Failed to confirm delivery for Mailgun receipt {Receipt}, with {Code}: {Message}",
+                "Failed to confirm delivery for Mailgun receipt {Receipt}, with {ErrorCode}: {Message}",
                 receiptId, delivered.Error.Code, delivered.Error.Message);
 
             var updated =
@@ -122,7 +123,7 @@ public class MailgunApplication : IMailgunApplication
         if (delivered.IsFailure)
         {
             _recorder.TraceError(caller.ToCall(),
-                "Failed to confirm failed delivery for Mailgun receipt {Receipt}, with {Code}: {Message}",
+                "Failed to confirm failed delivery for Mailgun receipt {Receipt}, with {ErrorCode}: {Message}",
                 receiptId, delivered.Error.Code, delivered.Error.Message);
 
             var updated =

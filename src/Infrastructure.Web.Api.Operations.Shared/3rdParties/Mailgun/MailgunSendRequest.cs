@@ -7,7 +7,7 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Mailgun;
 ///     Sends an email
 /// </summary>
 [Route("/{DomainName}/messages", OperationMethod.Post)]
-public class MailgunSendRequest : WebRequest<MailgunSendRequest, MailgunSendResponse>, IHasMultipartForm
+public class MailgunSendRequest : WebRequest<MailgunSendRequest, MailgunSendResponse>, IHasMultipartFormData
 {
     [JsonIgnore] public string? DomainName { get; set; }
 

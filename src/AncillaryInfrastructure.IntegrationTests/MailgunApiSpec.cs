@@ -83,12 +83,13 @@ public class MailgunApiSpec : WebApiSpec<Program>
         var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        deliveries.Content.Value.Emails![0].IsSent.Should().BeTrue();
-        deliveries.Content.Value.Emails![0].IsDelivered.Should().BeTrue();
-        deliveries.Content.Value.Emails![0].DeliveredAt.Should().Be(deliveredAt.FromUnixTimestamp());
-        deliveries.Content.Value.Emails![0].IsDeliveryFailed.Should().BeFalse();
-        deliveries.Content.Value.Emails![0].FailedDeliveryAt.Should().BeNull();
-        deliveries.Content.Value.Emails![0].FailedDeliveryReason.Should().BeNull();
+        deliveries.Content.Value.Emails!.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].IsSent.Should().BeTrue();
+        deliveries.Content.Value.Emails[0].IsDelivered.Should().BeTrue();
+        deliveries.Content.Value.Emails[0].DeliveredAt.Should().Be(deliveredAt.FromUnixTimestamp());
+        deliveries.Content.Value.Emails[0].IsDeliveryFailed.Should().BeFalse();
+        deliveries.Content.Value.Emails[0].FailedDeliveryAt.Should().BeNull();
+        deliveries.Content.Value.Emails[0].FailedDeliveryReason.Should().BeNull();
     }
 
     [Fact]
@@ -130,12 +131,13 @@ public class MailgunApiSpec : WebApiSpec<Program>
         var deliveries = await Api.GetAsync(new SearchEmailDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        deliveries.Content.Value.Emails![0].IsSent.Should().BeTrue();
-        deliveries.Content.Value.Emails![0].IsDelivered.Should().BeFalse();
-        deliveries.Content.Value.Emails![0].DeliveredAt.Should().BeNull();
-        deliveries.Content.Value.Emails![0].IsDeliveryFailed.Should().BeFalse();
-        deliveries.Content.Value.Emails![0].FailedDeliveryAt.Should().BeNull();
-        deliveries.Content.Value.Emails![0].FailedDeliveryReason.Should().BeNull();
+        deliveries.Content.Value.Emails!.Count.Should().Be(1);
+        deliveries.Content.Value.Emails[0].IsSent.Should().BeTrue();
+        deliveries.Content.Value.Emails[0].IsDelivered.Should().BeFalse();
+        deliveries.Content.Value.Emails[0].DeliveredAt.Should().BeNull();
+        deliveries.Content.Value.Emails[0].IsDeliveryFailed.Should().BeFalse();
+        deliveries.Content.Value.Emails[0].FailedDeliveryAt.Should().BeNull();
+        deliveries.Content.Value.Emails[0].FailedDeliveryReason.Should().BeNull();
     }
 
     [Fact]

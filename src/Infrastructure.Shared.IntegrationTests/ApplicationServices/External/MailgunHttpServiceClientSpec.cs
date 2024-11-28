@@ -26,7 +26,7 @@ public class MailgunHttpServiceClientSpec : ExternalApiSpec
     }
 
     [Fact]
-    public async Task WhenDeliverAsync_ThenSends()
+    public async Task WhenSendAsync_ThenSends()
     {
         var result = await _serviceClient.SendAsync(new TestCaller(), "asubject", "<body>abody</body>",
             _recipientEmail, "arecipient", _senderEmail, "asender", CancellationToken.None);
