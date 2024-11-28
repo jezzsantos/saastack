@@ -3,9 +3,10 @@ using System.Reflection;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using WebApiAuthorizationGenerator::JetBrains.Annotations;
 using Xunit;
-using AuthorizationAttributeGenerator = WebApiAuthorizationGenerator::Tools.Generators.Web.Api.Authorization.AuthorizationAttributeGenerator;
-using UsedImplicitly = WebApiAuthorizationGenerator::JetBrains.Annotations.UsedImplicitlyAttribute;
+using AuthorizationAttributeGenerator =
+    WebApiAuthorizationGenerator::Tools.Generators.Web.Api.Authorization.AuthorizationAttributeGenerator;
 
 namespace Tools.Generators.Web.Api.Authorization.UnitTests;
 
@@ -111,7 +112,7 @@ public class AuthorizationAttributeGeneratorSpec
 
         private string Generate(CSharpCompilation compilation)
         {
-            _driver = _driver.RunGeneratorsAndUpdateCompilation(compilation, out var _, out var _);
+            _driver = _driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
             return _driver.GetRunResult().Results[0].GeneratedSources[0].SourceText.ToString();
         }
     }

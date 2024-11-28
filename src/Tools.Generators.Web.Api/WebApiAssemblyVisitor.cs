@@ -31,7 +31,8 @@ public class WebApiAssemblyVisitor : SymbolVisitor
     private readonly INamedTypeSymbol _baseApiAttributeSymbol;
     private readonly CancellationToken _cancellationToken;
     private readonly INamedTypeSymbol _cancellationTokenSymbol;
-    private readonly INamedTypeSymbol _multipartFormSymbol;
+    private readonly INamedTypeSymbol _multipartFormDataSymbol;
+    private readonly INamedTypeSymbol _formUrlEncodedSymbol;
     private readonly INamedTypeSymbol _routeAttributeSymbol;
     private readonly INamedTypeSymbol _serviceInterfaceSymbol;
     private readonly INamedTypeSymbol _tenantedWebRequestInterfaceSymbol;
@@ -53,7 +54,8 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         _authorizeAttributeFeaturesSymbol = compilation.GetTypeByMetadataName(typeof(Features).FullName!)!;
         _cancellationTokenSymbol = compilation.GetTypeByMetadataName(typeof(CancellationToken).FullName!)!;
         _voidSymbol = compilation.GetTypeByMetadataName(typeof(void).FullName!)!;
-        _multipartFormSymbol = compilation.GetTypeByMetadataName(typeof(IHasMultipartForm).FullName!)!;
+        _multipartFormDataSymbol = compilation.GetTypeByMetadataName(typeof(IHasMultipartFormData).FullName!)!;
+        _formUrlEncodedSymbol = compilation.GetTypeByMetadataName(typeof(IHasFormUrlEncoded).FullName!)!;
     }
 
     public List<ServiceOperationRegistration> OperationRegistrations { get; } = [];
@@ -201,7 +203,8 @@ public class WebApiAssemblyVisitor : SymbolVisitor
             var methodName = method.Name;
             var isAsync = method.IsAsync;
             var hasCancellationToken = method.Parameters.Length == 2;
-            var isMultipart = requestType.IsDerivedFrom(_multipartFormSymbol);
+            var isMultipartFormData = requestType.IsDerivedFrom(_multipartFormDataSymbol);
+            var isFormUrlEncoded = requestType.IsDerivedFrom(_formUrlEncodedSymbol);
 
             OperationRegistrations.Add(new ServiceOperationRegistration
             {
@@ -214,7 +217,8 @@ public class WebApiAssemblyVisitor : SymbolVisitor
                 OperationAuthorization = operationAuthorization,
                 IsTestingOnly = isTestingOnly,
                 IsAsync = isAsync,
-                IsMultipartFormData = isMultipart,
+                IsMultipartFormData = isMultipartFormData,
+                IsFormUrlEncoded = isFormUrlEncoded,
                 HasCancellationToken = hasCancellationToken,
                 MethodName = methodName,
                 MethodBody = methodBody,
@@ -470,6 +474,8 @@ public class WebApiAssemblyVisitor : SymbolVisitor
         public bool IsAsync { get; set; }
 
         public bool IsMultipartFormData { get; set; }
+
+        public bool IsFormUrlEncoded { get; set; }
 
         public bool IsRequestDtoTenanted { get; set; }
 

@@ -9,7 +9,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
 [Authorize(Roles.Tenant_Owner, Features.Tenant_Basic)]
 public class ChangeOrganizationAvatarRequest :
     UnTenantedRequest<ChangeOrganizationAvatarRequest, GetOrganizationResponse>,
-    IUnTenantedOrganizationRequest, IHasMultipartForm
+    IUnTenantedOrganizationRequest, IHasMultipartFormData
 {
     // Will also include bytes for the multipart-form image
     public string? Id { get; set; }

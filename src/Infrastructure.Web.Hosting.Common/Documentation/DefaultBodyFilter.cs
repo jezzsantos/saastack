@@ -10,7 +10,7 @@ namespace Infrastructure.Web.Hosting.Common.Documentation;
 
 /// <summary>
 ///     Provides a <see cref="IOperationFilter" /> that adds the request body schemas for all POST, PUT and PATCH requests,
-///     and adds additional Swagger UI to display extra tooling for <see cref="IHasMultipartForm" /> requests.
+///     and adds additional Swagger UI to display extra tooling for <see cref="IHasMultipartFormData" /> requests.
 /// </summary>
 [UsedImplicitly]
 public sealed class DefaultBodyFilter : IOperationFilter
@@ -34,7 +34,7 @@ public sealed class DefaultBodyFilter : IOperationFilter
         var requestProperties = requestDto.GetProperties();
         var content = new Dictionary<string, OpenApiMediaType>();
 
-        var isMultiPartForm = typeof(IHasMultipartForm).IsAssignableFrom(type);
+        var isMultiPartForm = typeof(IHasMultipartFormData).IsAssignableFrom(type);
         if (isMultiPartForm)
         {
             var parts = new Dictionary<string, OpenApiSchema>
@@ -85,7 +85,43 @@ public sealed class DefaultBodyFilter : IOperationFilter
                 }
             });
         }
-        else
+
+        var isFormUrlEncoded = typeof(IHasFormUrlEncoded).IsAssignableFrom(type);
+        if (isFormUrlEncoded)
+        {
+            var parts = new Dictionary<string, OpenApiSchema>();
+            var requiredParts = new HashSet<string>();
+            foreach (var property in requestProperties)
+            {
+                if (property.IsPropertyInRoute())
+                {
+                    continue;
+                }
+
+                var name = property.Name.ToCamelCase();
+                parts.Add(name, new OpenApiSchema
+                {
+                    Type = ConvertToSchemaType(context, property)
+                });
+
+                if (property.IsPropertyRequired())
+                {
+                    requiredParts.Add(name);
+                }
+            }
+
+            content.Add(HttpConstants.ContentTypes.FormUrlEncoded, new OpenApiMediaType
+            {
+                Schema = new OpenApiSchema
+                {
+                    Type = "object",
+                    Properties = parts,
+                    Required = requiredParts
+                }
+            });
+        }
+
+        if (!isMultiPartForm && !isFormUrlEncoded)
         {
             content.Add(HttpConstants.ContentTypes.Json, new OpenApiMediaType
             {

@@ -4,6 +4,7 @@ using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.Documentation;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
 using Moq;
@@ -101,7 +102,7 @@ public class DefaultBodyFilterSpec
     [Fact]
     public void WhenApplyAndMultiPartFormBody_ThenSetsRequestBodyAndIgnoresRouteProperties()
     {
-        var request = (object _, TestMultipartFormRequest req) => { };
+        var request = (object _, TestMultipartFormDataRequest req) => { };
         _methodInfo.Setup(mi => mi.GetParameters())
             .Returns(request.GetMethodInfo().GetParameters);
 
@@ -112,15 +113,38 @@ public class DefaultBodyFilterSpec
         var properties = _operation.RequestBody.Content[HttpConstants.ContentTypes.MultiPartFormData].Schema.Properties;
         properties.Count.Should().Be(4);
         properties[DefaultBodyFilter.FormFilesFieldName].Type.Should().Be("array");
-        properties[nameof(TestMultipartFormRequest.AStringProperty).ToCamelCase()].Type.Should().Be("string");
-        properties[nameof(TestMultipartFormRequest.ADateProperty).ToCamelCase()].Type.Should().Be("date");
-        properties[nameof(TestMultipartFormRequest.ANumberProperty).ToCamelCase()].Type.Should().Be("int");
+        properties[nameof(TestMultipartFormDataRequest.AStringProperty).ToCamelCase()].Type.Should().Be("string");
+        properties[nameof(TestMultipartFormDataRequest.ADateProperty).ToCamelCase()].Type.Should().Be("date");
+        properties[nameof(TestMultipartFormDataRequest.ANumberProperty).ToCamelCase()].Type.Should().Be("int");
         var required = _operation.RequestBody.Content[HttpConstants.ContentTypes.MultiPartFormData].Schema.Required
             .ToArray();
         required.Length.Should().Be(3);
         required[0].Should().Be(DefaultBodyFilter.FormFilesFieldName);
-        required[1].Should().Be(nameof(TestMultipartFormRequest.ADateProperty).ToCamelCase());
-        required[2].Should().Be(nameof(TestMultipartFormRequest.ANumberProperty).ToCamelCase());
+        required[1].Should().Be(nameof(TestMultipartFormDataRequest.ADateProperty).ToCamelCase());
+        required[2].Should().Be(nameof(TestMultipartFormDataRequest.ANumberProperty).ToCamelCase());
+    }
+
+    [Fact]
+    public void WhenApplyAndFormUrlEncoded_ThenSetsRequestBodyAndIgnoresRouteProperties()
+    {
+        var request = (object _, TestFormUrlEncodedRequest req) => { };
+        _methodInfo.Setup(mi => mi.GetParameters())
+            .Returns(request.GetMethodInfo().GetParameters);
+
+        _filter.Apply(_operation, _context);
+
+        _operation.RequestBody.Content.Count.Should().Be(1);
+        _operation.RequestBody.Content[HttpConstants.ContentTypes.FormUrlEncoded].Schema.Type.Should().Be("object");
+        var properties = _operation.RequestBody.Content[HttpConstants.ContentTypes.FormUrlEncoded].Schema.Properties;
+        properties.Count.Should().Be(3);
+        properties[nameof(TestFormUrlEncodedRequest.AStringProperty).ToCamelCase()].Type.Should().Be("string");
+        properties[nameof(TestFormUrlEncodedRequest.ADateProperty).ToCamelCase()].Type.Should().Be("date");
+        properties[nameof(TestFormUrlEncodedRequest.ANumberProperty).ToCamelCase()].Type.Should().Be("int");
+        var required = _operation.RequestBody.Content[HttpConstants.ContentTypes.FormUrlEncoded].Schema.Required
+            .ToArray();
+        required.Length.Should().Be(2);
+        required[0].Should().Be(nameof(TestFormUrlEncodedRequest.ADateProperty).ToCamelCase());
+        required[1].Should().Be(nameof(TestFormUrlEncodedRequest.ANumberProperty).ToCamelCase());
     }
 }
 
@@ -129,7 +153,21 @@ public class TestGetRequestTypedResponse : WebRequest<TestGetRequestTypedRespons
 }
 
 [Route("/aroute/{AnId}", OperationMethod.Post)]
-public class TestMultipartFormRequest : IWebRequest, IHasMultipartForm
+[UsedImplicitly]
+public class TestMultipartFormDataRequest : IWebRequest, IHasMultipartFormData
+{
+    [Required] public DateTime ADateProperty { get; set; }
+
+    public string? AnId { get; set; }
+
+    [Required] public int ANumberProperty { get; set; }
+
+    public string? AStringProperty { get; set; }
+}
+
+[Route("/aroute/{AnId}", OperationMethod.Post)]
+[UsedImplicitly]
+public class TestFormUrlEncodedRequest : IWebRequest, IHasFormUrlEncoded
 {
     [Required] public DateTime ADateProperty { get; set; }
 

@@ -154,7 +154,8 @@ namespace {assemblyNamespace}
                         $@"                .RequireCallerAuthorization(""{policyName}"")");
                 }
 
-                if (registration.IsMultipartFormData)
+                if (registration.IsMultipartFormData
+                    || registration.IsFormUrlEncoded)
                 {
                     endpointRegistrations.AppendLine();
                     endpointRegistrations.Append(

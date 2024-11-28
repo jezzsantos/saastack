@@ -4,14 +4,12 @@ using System.Reflection;
 using FluentAssertions;
 using Generators::Domain.Interfaces.Authorization;
 using Generators::Infrastructure.Web.Api.Interfaces;
+using Generators::JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Moq;
 using Xunit;
-using IWebApiService = Generators::Infrastructure.Web.Api.Interfaces.IWebApiService;
-using IWebRequest = Generators::Infrastructure.Web.Api.Interfaces.IWebRequest;
 using WebApiAssemblyVisitor = Generators::Tools.Generators.Web.Api.WebApiAssemblyVisitor;
-using UsedImplicitly = Generators::JetBrains.Annotations.UsedImplicitlyAttribute;
 
 namespace Tools.Generators.Web.Api.UnitTests;
 
@@ -19,9 +17,11 @@ namespace Tools.Generators.Web.Api.UnitTests;
 public class WebApiAssemblyVisitorSpec
 {
     private const string CompilationSourceCode = "";
-    private static readonly string[] AdditionalCompilationAssemblies = [
-        "System.Runtime.dll", 
-        "netstandard.dll"]; //HACK: required to analyze use custom attributes
+    private static readonly string[] AdditionalCompilationAssemblies =
+    [
+        "System.Runtime.dll",
+        "netstandard.dll"
+    ]; //HACK: required to analyze use custom attributes
 
     private static CSharpCompilation CreateCompilation(string sourceCode)
     {

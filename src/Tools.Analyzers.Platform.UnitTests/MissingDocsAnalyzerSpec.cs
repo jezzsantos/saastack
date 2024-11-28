@@ -1,7 +1,7 @@
 extern alias PlatformAnalyzers;
+using PlatformAnalyzers::JetBrains.Annotations;
 using Xunit;
 using MissingDocsAnalyzer = PlatformAnalyzers::Tools.Analyzers.Platform.MissingDocsAnalyzer;
-using UsedImplicitly = PlatformAnalyzers::JetBrains.Annotations.UsedImplicitlyAttribute;
 
 namespace Tools.Analyzers.Platform.UnitTests;
 

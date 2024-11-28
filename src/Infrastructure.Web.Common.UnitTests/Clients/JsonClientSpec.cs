@@ -421,7 +421,7 @@ public class JsonClientSpec
             {
                 BaseAddress = new Uri("http://localhost")
             };
-            var request = new TestMultiPartFormRequest();
+            var request = new TestMultiPartFormDataRequest();
             var file = new PostFile(new MemoryStream(), HttpConstants.ContentTypes.Json, "afilename");
 
             var result =
@@ -481,7 +481,7 @@ public class JsonClientSpec
             {
                 BaseAddress = new Uri("http://localhost")
             };
-            var request = new TestUrlEncodedFormRequest();
+            var request = new TestFormUrlEncodedRequest();
 
             var result =
                 await JsonClient.SendRequestAsync(client, HttpMethod.Post, request, null, null,
@@ -754,13 +754,13 @@ public class TestRequest : WebRequest<TestRequest>
 }
 
 [Api.Interfaces.Route("/test", OperationMethod.Post)]
-public class TestMultiPartFormRequest : WebRequest<TestRequest>, IHasMultipartForm
+public class TestMultiPartFormDataRequest : WebRequest<TestRequest>, IHasMultipartFormData
 {
     public string AProperty { get; set; } = "avalue";
 }
 
 [Api.Interfaces.Route("/test", OperationMethod.Post)]
-public class TestUrlEncodedFormRequest : WebRequest<TestRequest>, IHasUrlEncodedForm
+public class TestFormUrlEncodedRequest : WebRequest<TestRequest>, IHasFormUrlEncoded
 {
     public string AProperty { get; set; } = "avalue";
 }

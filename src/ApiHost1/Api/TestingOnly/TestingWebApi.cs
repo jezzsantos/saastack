@@ -176,7 +176,17 @@ public sealed class TestingWebApi : IWebApiService
     }
 
     public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> OpenApiMultiPartForm(
-        OpenApiPostMultiPartFormTestingOnlyRequest request, CancellationToken cancellationToken)
+        OpenApiPostMultiPartFormDataTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () =>
+            new PostResult<StringMessageTestingOnlyResponse>(
+                new StringMessageTestingOnlyResponse { Message = $"amessage{request.RequiredField}" },
+                "alocation");
+    }
+
+    public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> OpenApiFormUrlEncoded(
+        OpenApiPostFormUrlEncodedTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         return () =>

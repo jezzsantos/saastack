@@ -1,9 +1,9 @@
 extern alias NonPlatformAnalyzers;
 using NonPlatformAnalyzers::Domain.Interfaces.ValueObjects;
+using NonPlatformAnalyzers::JetBrains.Annotations;
 using Xunit;
 using DomainDrivenDesignAnalyzer = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignAnalyzer;
 using DomainDrivenDesignCodeFix = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignCodeFix;
-using UsedImplicitly = NonPlatformAnalyzers::JetBrains.Annotations.UsedImplicitlyAttribute;
 using Resources = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.Resources;
 
 namespace Tools.Analyzers.NonPlatform.UnitTests;
@@ -1599,7 +1599,8 @@ public sealed class AClass : ValueObjectBase<AClass>
 
                 await Verify.CodeFixed<DomainDrivenDesignAnalyzer, DomainDrivenDesignCodeFix>(
                     DomainDrivenDesignAnalyzer.Rule035,
-                    Resources.CodeFix_DomainDrivenDesign_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod, problem, fix, 40,
+                    Resources.CodeFix_DomainDrivenDesign_Title_AddSkipImmutabilityCheckAttributeToValueObjectMethod,
+                    problem, fix, 40,
                     17,
                     "AMethod", "ANamespace.AClass or Common.Result<ANamespace.AClass, Common.Error>",
                     nameof(SkipImmutabilityCheckAttribute));

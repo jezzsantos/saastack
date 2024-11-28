@@ -47,7 +47,7 @@ It is possible to provide our own customer binding, by providing a `BindAsync` m
 `Custom Binding`
 
 - We would prefer is developers did not have to use binding attributes like  `[FromRoute]`, `[FromQuery]`, `[FromBody]` and  `[FromForm]`.
-- We want to support both `application/json`, or in `multipart/form-data`.
+- We want to support both `application/json`, and `multipart/form-data` and `application/form-urlencoded`.
 - We can make this easier for the developer
 
 ### Pros and Cons of the Options

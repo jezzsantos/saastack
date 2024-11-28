@@ -9,7 +9,7 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.OAuth2;
 [Route("/auth/token", OperationMethod.Post)]
 public class
     GenericOAuth2GrantAuthorizationRequest : WebRequest<GenericOAuth2GrantAuthorizationRequest,
-    GenericOAuth2GrantAuthorizationResponse>, IHasUrlEncodedForm
+    GenericOAuth2GrantAuthorizationResponse>, IHasFormUrlEncoded
 {
     [JsonPropertyName("client_id")] public string? ClientId { get; set; }
 

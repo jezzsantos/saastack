@@ -41,6 +41,32 @@ public class GeneralApiSpec : WebApiSpec<ApiHost1.Program>
     }
 
     [Fact]
+    public async Task WhenPostWithFormData_ThenReturns()
+    {
+        var result = await Api.PostAsync(new OpenApiPostMultiPartFormDataTestingOnlyRequest
+        {
+            Id = "anid",
+            RequiredField = "avalue"
+        });
+
+        result.StatusCode.Should().Be(HttpStatusCode.Created);
+        result.Content.Value.Message.Should().Be("amessageavalue");
+    }
+
+    [Fact]
+    public async Task WhenPostWithUrlEncoded_ThenReturns()
+    {
+        var result = await Api.PostAsync(new OpenApiPostFormUrlEncodedTestingOnlyRequest
+        {
+            Id = "anid",
+            RequiredField = "avalue"
+        });
+
+        result.StatusCode.Should().Be(HttpStatusCode.Created);
+        result.Content.Value.Message.Should().Be("amessageavalue");
+    }
+
+    [Fact]
     public async Task WhenPostWithRouteParamsAndEmptyBody_ThenReturns()
     {
         var result = await HttpApi.PostAsync("/testingonly/general/body/avalue/99/route",

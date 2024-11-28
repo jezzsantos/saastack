@@ -3,6 +3,7 @@ using FluentAssertions;
 using HtmlAgilityPack;
 using Infrastructure.Hosting.Common;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using Infrastructure.Web.Common;
 using Infrastructure.Web.Hosting.Common.Auth;
 using Infrastructure.Web.Hosting.Common.Documentation;
@@ -345,16 +346,19 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenFieldsHaveDescriptions()
+        public async Task WhenFetchOpenApiForMultiPartForm_ThenFieldsHaveDescriptions()
         {
             var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
 
             var openApi = new OpenApiStreamReader()
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}/binary"].Operations[OperationType.Post];
-            operation.Description.Should().Be("(request type: OpenApiPostMultiPartFormTestingOnlyRequest)");
-            operation.OperationId.Should().Be("OpenApiPostMultiPartFormTestingOnly");
+            var operation = openApi!.Paths["/testingonly/openapi/{Id}/form-data"].Operations[OperationType.Post];
+#if TESTINGONLY
+            operation.Description.Should()
+                .Be($"(request type: {nameof(OpenApiPostMultiPartFormDataTestingOnlyRequest)})");
+#endif
+            operation.OperationId.Should().Be("OpenApiPostMultiPartFormDataTestingOnly");
             operation.Parameters.Count.Should().Be(1);
             operation.Parameters[0].Name.Should().Be("Id");
             operation.Parameters[0].In.Should().Be(ParameterLocation.Path);
@@ -370,14 +374,14 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenResponseHas201Response()
+        public async Task WhenFetchOpenApiForMultiPartForm_ThenResponseHas201Response()
         {
             var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
 
             var openApi = new OpenApiStreamReader()
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}/binary"].Operations[OperationType.Post];
+            var operation = openApi!.Paths["/testingonly/openapi/{Id}/form-data"].Operations[OperationType.Post];
             operation.Responses["201"].Description.Should().Be("Created");
             operation.Responses["201"].Content.Count.Should().Be(2);
             operation.Responses["201"].Content[HttpConstants.ContentTypes.Json].Schema.Reference.ReferenceV3.Should()
@@ -387,14 +391,70 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenResponseHasGeneralErrorResponses()
+        public async Task WhenFetchOpenApiForMultiPartForm_ThenResponseHasGeneralErrorResponses()
         {
             var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
 
             var openApi = new OpenApiStreamReader()
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
-            var operation = openApi!.Paths["/testingonly/openapi/{Id}/binary"].Operations[OperationType.Post];
+            var operation = openApi!.Paths["/testingonly/openapi/{Id}/form-data"].Operations[OperationType.Post];
+            operation.Responses.Count.Should().Be(10);
+            VerifyGeneralErrorResponses(operation.Responses);
+        }
+
+        [Fact]
+        public async Task WhenFetchOpenApiForFormUrlEncoded_ThenFieldsHaveDescriptions()
+        {
+            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
+
+            var openApi = new OpenApiStreamReader()
+                .Read(await result.Content.ReadAsStreamAsync(), out _);
+
+            var operation = openApi!.Paths["/testingonly/openapi/{Id}/urlencoded"].Operations[OperationType.Post];
+#if TESTINGONLY
+            operation.Description.Should().Be($"(request type: {nameof(OpenApiPostFormUrlEncodedTestingOnlyRequest)})");
+#endif
+            operation.OperationId.Should().Be("OpenApiPostFormUrlEncodedTestingOnly");
+            operation.Parameters.Count.Should().Be(1);
+            operation.Parameters[0].Name.Should().Be("Id");
+            operation.Parameters[0].In.Should().Be(ParameterLocation.Path);
+            var requestBody = operation.RequestBody;
+            requestBody.Content.Count.Should().Be(1);
+            requestBody.Content[HttpConstants.ContentTypes.FormUrlEncoded].Schema.Required.Should()
+                .BeEquivalentTo("requiredField");
+            var properties = requestBody.Content[HttpConstants.ContentTypes.FormUrlEncoded].Schema.Properties;
+            properties.Should().HaveCount(2);
+            properties["optionalField"].Type.Should().Be("string");
+            properties["requiredField"].Type.Should().Be("string");
+        }
+
+        [Fact]
+        public async Task WhenFetchOpenApiForFormUrlEncoded_ThenResponseHas201Response()
+        {
+            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
+
+            var openApi = new OpenApiStreamReader()
+                .Read(await result.Content.ReadAsStreamAsync(), out _);
+
+            var operation = openApi!.Paths["/testingonly/openapi/{Id}/urlencoded"].Operations[OperationType.Post];
+            operation.Responses["201"].Description.Should().Be("Created");
+            operation.Responses["201"].Content.Count.Should().Be(2);
+            operation.Responses["201"].Content[HttpConstants.ContentTypes.Json].Schema.Reference.ReferenceV3.Should()
+                .Be("#/components/schemas/StringMessageTestingOnlyResponse");
+            operation.Responses["201"].Content[HttpConstants.ContentTypes.Xml].Schema.Reference.ReferenceV3.Should()
+                .Be("#/components/schemas/StringMessageTestingOnlyResponse");
+        }
+
+        [Fact]
+        public async Task WhenFetchOpenApiForFormUrlEncoded_ThenResponseHasGeneralErrorResponses()
+        {
+            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
+
+            var openApi = new OpenApiStreamReader()
+                .Read(await result.Content.ReadAsStreamAsync(), out _);
+
+            var operation = openApi!.Paths["/testingonly/openapi/{Id}/urlencoded"].Operations[OperationType.Post];
             operation.Responses.Count.Should().Be(10);
             VerifyGeneralErrorResponses(operation.Responses);
         }

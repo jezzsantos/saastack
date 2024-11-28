@@ -6,13 +6,13 @@ using JetBrains.Annotations;
 namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 
 /// <summary>
-///     Tests OpenAPI swagger for multipart-form POST requests
+///     Tests OpenAPI swagger for multipart/form-data POST requests
 /// </summary>
-[Route("/testingonly/openapi/{Id}/binary", OperationMethod.Post, isTestingOnly: true)]
+[Route("/testingonly/openapi/{Id}/form-data", OperationMethod.Post, isTestingOnly: true)]
 [UsedImplicitly]
-public class OpenApiPostMultiPartFormTestingOnlyRequest :
-    WebRequest<OpenApiPostMultiPartFormTestingOnlyRequest, StringMessageTestingOnlyResponse>,
-    IHasMultipartForm
+public class OpenApiPostMultiPartFormDataTestingOnlyRequest :
+    WebRequest<OpenApiPostMultiPartFormDataTestingOnlyRequest, StringMessageTestingOnlyResponse>,
+    IHasMultipartFormData
 {
     public string? Id { get; set; }
 

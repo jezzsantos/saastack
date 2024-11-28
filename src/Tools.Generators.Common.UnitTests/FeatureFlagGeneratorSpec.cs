@@ -1,13 +1,13 @@
 extern alias CommonGenerator;
 using System.Reflection;
 using System.Text;
+using CommonGenerator::JetBrains.Annotations;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using Xunit;
 using FeatureFlagGenerator = CommonGenerator::Tools.Generators.Common.FeatureFlagGenerator;
-using UsedImplicitly = CommonGenerator::JetBrains.Annotations.UsedImplicitlyAttribute;
 
 namespace Tools.Generators.Common.UnitTests;
 
@@ -75,7 +75,7 @@ public class FeatureFlagGeneratorSpec
 
         private string Generate(CSharpCompilation compilation)
         {
-            _driver = _driver.RunGeneratorsAndUpdateCompilation(compilation, out var _, out var _);
+            _driver = _driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
             return _driver.GetRunResult().Results[0].GeneratedSources[0].SourceText.ToString();
         }
     }

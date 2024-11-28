@@ -1,8 +1,9 @@
 extern alias NonPlatformAnalyzers;
+using NonPlatformAnalyzers::JetBrains.Annotations;
 using Xunit;
 using ApiLayerAnalyzer = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.ApiLayerAnalyzer;
 using ApiLayerCodeFix = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.ApiLayerCodeFix;
-using UsedImplicitly = NonPlatformAnalyzers::JetBrains.Annotations.UsedImplicitlyAttribute;
+
 namespace Tools.Analyzers.NonPlatform.UnitTests;
 
 [UsedImplicitly]

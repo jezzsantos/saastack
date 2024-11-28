@@ -47,8 +47,11 @@
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\IWebResponse.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\IWebResponse.cs</Link>
         </Compile>
-        <Compile Include="..\Infrastructure.Web.Api.Interfaces\IHasMultipartForm.cs">
-            <Link>Reference\Infrastructure.Web.Api.Interfaces\IHasMultipartForm.cs</Link>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\IHasMultipartFormData.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\IHasMultipartFormData.cs</Link>
+        </Compile>
+        <Compile Include="..\Infrastructure.Web.Api.Interfaces\IHasFormUrlEncoded.cs">
+            <Link>Reference\Infrastructure.Web.Api.Interfaces\IHasFormUrlEncoded.cs</Link>
         </Compile>
         <Compile Include="..\Infrastructure.Web.Api.Interfaces\ITenantedRequest.cs">
             <Link>Reference\Infrastructure.Web.Api.Interfaces\ITenantedRequest.cs</Link>

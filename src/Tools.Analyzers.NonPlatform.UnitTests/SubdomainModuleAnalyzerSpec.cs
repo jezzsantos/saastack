@@ -1,5 +1,5 @@
 extern alias NonPlatformAnalyzers;
-using UsedImplicitly = NonPlatformAnalyzers::JetBrains.Annotations.UsedImplicitlyAttribute;
+using NonPlatformAnalyzers::JetBrains.Annotations;
 using Xunit;
 using SubdomainModuleAnalyzer = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.SubdomainModuleAnalyzer;
 
@@ -206,7 +206,7 @@ public class AnEntity : IEntity
 
                 await Verify.NoDiagnosticExists<SubdomainModuleAnalyzer>(input);
             }
-            
+
             [Fact]
             public async Task WhenAggregateAndEntityIsRegistered_ThenNoAlert()
             {

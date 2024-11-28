@@ -1,16 +1,12 @@
 extern alias NonPlatformAnalyzers;
 extern alias CommonAnalyzers;
 using CommonAnalyzers::Tools.Analyzers.Common;
+using NonPlatformAnalyzers::Application.Interfaces;
 using NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces;
+using NonPlatformAnalyzers::JetBrains.Annotations;
 using Xunit;
-using TypeExtensions = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.TypeExtensions;
-using IWebResponse = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebResponse;
-using IWebSearchResponse = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.IWebSearchResponse;
-using SearchResultMetadata = NonPlatformAnalyzers::Application.Interfaces.SearchResultMetadata;
-using AccessType = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.AccessType;
 using ApiLayerAnalyzer = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.ApiLayerAnalyzer;
-using Roles = NonPlatformAnalyzers::Infrastructure.Web.Api.Interfaces.Roles;
-using UsedImplicitly = NonPlatformAnalyzers::JetBrains.Annotations.UsedImplicitlyAttribute;
+using TypeExtensions = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.TypeExtensions;
 
 namespace Tools.Analyzers.NonPlatform.UnitTests;
 
@@ -106,8 +102,7 @@ public class AClass : IWebApiService
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule010,
                     input, 6, 17, "AMethod",
-                    TypeExtensions.Stringify(
-                        ApiLayerAnalyzer.AllowableServiceOperationReturnTypes));
+                    TypeExtensions.Stringify(ApiLayerAnalyzer.AllowableServiceOperationReturnTypes));
             }
 
             [Fact]
@@ -124,8 +119,7 @@ public class AClass : IWebApiService
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule010,
                     input, 7, 17, "AMethod",
-                    TypeExtensions.Stringify(
-                        ApiLayerAnalyzer.AllowableServiceOperationReturnTypes));
+                    TypeExtensions.Stringify(ApiLayerAnalyzer.AllowableServiceOperationReturnTypes));
             }
 
             [Fact]
@@ -142,8 +136,7 @@ public class AClass : IWebApiService
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule010,
                     input, 7, 25, "AMethod",
-                    TypeExtensions.Stringify(
-                        ApiLayerAnalyzer.AllowableServiceOperationReturnTypes));
+                    TypeExtensions.Stringify(ApiLayerAnalyzer.AllowableServiceOperationReturnTypes));
             }
 
             [Fact]
@@ -300,9 +293,8 @@ public class AClass : IWebApiService
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(ApiLayerAnalyzer.Rule010,
                     input, 6,
                     19, "AMethod",
-                    TypeExtensions.Stringify(
-                        ApiLayerAnalyzer
-                            .AllowableServiceOperationReturnTypes));
+                    TypeExtensions.Stringify(ApiLayerAnalyzer
+                        .AllowableServiceOperationReturnTypes));
             }
 
             [Fact]
@@ -1541,9 +1533,8 @@ public class AClass : IWebApiService
 
             private static string ExpectedAllowedResultTypes(OperationMethod method)
             {
-                return TypeExtensions.Stringify(
-                    ApiLayerAnalyzer
-                        .AllowableOperationReturnTypes[method].ToArray());
+                return TypeExtensions.Stringify(ApiLayerAnalyzer
+                    .AllowableOperationReturnTypes[method].ToArray());
             }
         }
 
@@ -2530,18 +2521,23 @@ public class TestAttribute : Attribute;
 
 [Route("/aresource", OperationMethod.Post)]
 [UsedImplicitly]
-public class TestAnonymousRouteNoAuthorizeAttributeRequest : WebRequest<TestAnonymousRouteNoAuthorizeAttributeRequest, TestResponse>;
+public class
+    TestAnonymousRouteNoAuthorizeAttributeRequest : WebRequest<TestAnonymousRouteNoAuthorizeAttributeRequest,
+    TestResponse>;
 
 [Route("/aresource", OperationMethod.Post)]
 [Authorize(Roles.Platform_Standard)]
 [UsedImplicitly]
-public class TestAnonymousRouteAuthorizeAttributeRequest : WebRequest<TestAnonymousRouteAuthorizeAttributeRequest, TestResponse>;
+public class
+    TestAnonymousRouteAuthorizeAttributeRequest : WebRequest<TestAnonymousRouteAuthorizeAttributeRequest, TestResponse>;
 
 [Route("/aresource", OperationMethod.Post, AccessType.Token)]
 [Authorize(Roles.Platform_Standard)]
 [UsedImplicitly]
-public class TestSecureRouteAuthorizeAttributeRequest : WebRequest<TestSecureRouteAuthorizeAttributeRequest, TestResponse>;
+public class
+    TestSecureRouteAuthorizeAttributeRequest : WebRequest<TestSecureRouteAuthorizeAttributeRequest, TestResponse>;
 
 [Route("/aresource", OperationMethod.Post, AccessType.Token)]
 [UsedImplicitly]
-public class TestSecureRouteNoAuthorizeAttributeRequest : WebRequest<TestSecureRouteNoAuthorizeAttributeRequest, TestResponse>;
+public class
+    TestSecureRouteNoAuthorizeAttributeRequest : WebRequest<TestSecureRouteNoAuthorizeAttributeRequest, TestResponse>;

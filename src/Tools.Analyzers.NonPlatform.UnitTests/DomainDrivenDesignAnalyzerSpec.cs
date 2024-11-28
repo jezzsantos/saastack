@@ -1,8 +1,8 @@
 extern alias NonPlatformAnalyzers;
 using NonPlatformAnalyzers::Domain.Interfaces.ValueObjects;
+using NonPlatformAnalyzers::JetBrains.Annotations;
 using Xunit;
 using DomainDrivenDesignAnalyzer = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.DomainDrivenDesignAnalyzer;
-using UsedImplicitly = NonPlatformAnalyzers::JetBrains.Annotations.UsedImplicitlyAttribute;
 
 namespace Tools.Analyzers.NonPlatform.UnitTests;
 

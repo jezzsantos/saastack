@@ -333,12 +333,12 @@ public class JsonClient : IHttpJsonClient, IDisposable
                 multipart.Add(streamContent, "file", file.Filename);
                 content = multipart;
             }
-            else if (method.CanHaveBody() && request is IHasMultipartForm)
+            else if (method.CanHaveBody() && request is IHasMultipartFormData)
             {
                 var multipart = ToMultiPartContent(body);
                 content = multipart;
             }
-            else if (method.CanHaveBody() && request is IHasUrlEncodedForm)
+            else if (method.CanHaveBody() && request is IHasFormUrlEncoded)
             {
                 var urlEncoded = ToUrlEncodedContent(body);
                 content = urlEncoded;
@@ -364,7 +364,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
             var content = new MultipartFormDataContent();
             var requestFields = //HACK: really need these values to be serialized as QueryString parameters
                 body.SerializeToJson()
-                    .FromJson<Dictionary<string, string>>()!;
+                    .FromJson<Dictionary<string, object>>()!
+                    .ToDictionary(pair => pair.Key, pair => pair.Value.ToString() ?? string.Empty);
             if (requestFields.HasAny())
             {
                 foreach (var field in requestFields)
@@ -379,7 +380,8 @@ public class JsonClient : IHttpJsonClient, IDisposable
         static FormUrlEncodedContent ToUrlEncodedContent(IWebRequest body)
         {
             var requestFields = body.SerializeToJson()
-                .FromJson<Dictionary<string, string>>()!;
+                .FromJson<Dictionary<string, object>>()!
+                .ToDictionary(pair => pair.Key, pair => pair.Value.ToString() ?? string.Empty); 
 
             return new FormUrlEncodedContent(requestFields);
         }

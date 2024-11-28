@@ -3,7 +3,7 @@ extern alias CommonAnalyzers;
 using CommonAnalyzers::Tools.Analyzers.Common;
 using Xunit;
 using ApplicationLayerAnalyzer = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.ApplicationLayerAnalyzer;
-using UsedImplicitly = NonPlatformAnalyzers::JetBrains.Annotations.UsedImplicitlyAttribute;
+using NonPlatformAnalyzers::JetBrains.Annotations;
 
 namespace Tools.Analyzers.NonPlatform.UnitTests;
 

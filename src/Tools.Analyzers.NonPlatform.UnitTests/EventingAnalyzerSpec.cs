@@ -1,7 +1,7 @@
 extern alias NonPlatformAnalyzers;
+using NonPlatformAnalyzers::JetBrains.Annotations;
 using Xunit;
 using EventingAnalyzer = NonPlatformAnalyzers::Tools.Analyzers.NonPlatform.EventingAnalyzer;
-using UsedImplicitly = NonPlatformAnalyzers::JetBrains.Annotations.UsedImplicitlyAttribute;
 
 namespace Tools.Analyzers.NonPlatform.UnitTests;
 

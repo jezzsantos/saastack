@@ -24,6 +24,7 @@ public class WebRequestSpec
             _serviceProvider.Setup(sp => sp.GetService(typeof(JsonSerializerOptions)))
                 .Returns(JsonSerializerOptions.Default);
         }
+
         [Fact]
         public async Task WhenBindAsyncAndEmptyHttpRequest_ThenReturnsInstance()
         {
@@ -101,7 +102,7 @@ public class WebRequestSpec
     }
 
     [Trait("Category", "Unit")]
-    public class GivenAMultiPartFormRequest
+    public class GivenAMultiPartFormDataRequest
     {
         [Fact]
         public async Task WhenBindAsyncAndEmptyHttpRequest_ThenReturnsInstance()
@@ -114,7 +115,7 @@ public class WebRequestSpec
                 }
             };
 
-            var result = await TestMultiPartRequest.BindAsync(context, null!);
+            var result = await TestMultiPartFormDataDataRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().BeNull();
@@ -140,7 +141,7 @@ public class WebRequestSpec
                 }
             };
 
-            var result = await TestMultiPartRequest.BindAsync(context, null!);
+            var result = await TestMultiPartFormDataDataRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().Be("anid");
@@ -166,7 +167,7 @@ public class WebRequestSpec
                 }
             };
 
-            var result = await TestMultiPartRequest.BindAsync(context, null!);
+            var result = await TestMultiPartFormDataDataRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().Be("anid");
@@ -191,7 +192,107 @@ public class WebRequestSpec
                 }
             };
 
-            var result = await TestMultiPartRequest.BindAsync(context, null!);
+            var result = await TestMultiPartFormDataDataRequest.BindAsync(context, null!);
+
+            result.Should().NotBeNull();
+            result!.Id.Should().Be("anid");
+            result.ANumberProperty.Should().Be(999);
+            result.AStringProperty.Should().Be("avalue");
+        }
+    }
+
+    [Trait("Category", "Unit")]
+    public class GivenAMultiPartFormUrlEncodedRequest
+    {
+        [Fact]
+        public async Task WhenBindAsyncAndEmptyHttpRequest_ThenReturnsInstance()
+        {
+            var context = new DefaultHttpContext
+            {
+                Request =
+                {
+                    Form = new FormCollection(new Dictionary<string, StringValues>())
+                }
+            };
+
+            var result = await TestMultiPartUlEncodedRequest.BindAsync(context, null!);
+
+            result.Should().NotBeNull();
+            result!.Id.Should().BeNull();
+            result.ANumberProperty.Should().Be(0);
+            result.AStringProperty.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task WhenBindAsyncAndPropertiesInQueryString_ThenReturnsInstance()
+        {
+            var context = new DefaultHttpContext
+            {
+                Request =
+                {
+                    ContentType = HttpConstants.ContentTypes.FormUrlEncoded,
+                    Form = new FormCollection(new Dictionary<string, StringValues>()),
+                    Query = new QueryCollection(new Dictionary<string, StringValues>
+                    {
+                        { nameof(TestRequest.Id), "anid" },
+                        { nameof(TestRequest.ANumberProperty), "999" },
+                        { nameof(TestRequest.AStringProperty), "avalue" }
+                    })
+                }
+            };
+
+            var result = await TestMultiPartUlEncodedRequest.BindAsync(context, null!);
+
+            result.Should().NotBeNull();
+            result!.Id.Should().Be("anid");
+            result.ANumberProperty.Should().Be(999);
+            result.AStringProperty.Should().Be("avalue");
+        }
+
+        [Fact]
+        public async Task WhenBindAsyncAndPropertiesInRouteValues_ThenReturnsInstance()
+        {
+            var context = new DefaultHttpContext
+            {
+                Request =
+                {
+                    ContentType = HttpConstants.ContentTypes.FormUrlEncoded,
+                    Form = new FormCollection(new Dictionary<string, StringValues>()),
+                    RouteValues = new RouteValueDictionary
+                    {
+                        { nameof(TestRequest.Id), "anid" },
+                        { nameof(TestRequest.ANumberProperty), "999" },
+                        { nameof(TestRequest.AStringProperty), "avalue" }
+                    }
+                }
+            };
+
+            var result = await TestMultiPartUlEncodedRequest.BindAsync(context, null!);
+
+            result.Should().NotBeNull();
+            result!.Id.Should().Be("anid");
+            result.ANumberProperty.Should().Be(999);
+            result.AStringProperty.Should().Be("avalue");
+        }
+
+        [Fact]
+        public async Task WhenBindAsyncAndPropertiesInForm_ThenReturnsInstance()
+        {
+            var context = new DefaultHttpContext
+            {
+                Request =
+                {
+                    ContentType = HttpConstants.ContentTypes.MultiPartFormData,
+                    Form = new FormCollection(new Dictionary<string, StringValues>
+                    {
+                        { nameof(TestRequest.Id), "anid" },
+                        { nameof(TestRequest.ANumberProperty), "999" },
+                        { nameof(TestRequest.AStringProperty), "avalue" }
+                    })
+                }
+            };
+
+            var result = await TestMultiPartUlEncodedRequest.BindAsync(context, null!);
 
             result.Should().NotBeNull();
             result!.Id.Should().Be("anid");
@@ -201,9 +302,22 @@ public class WebRequestSpec
     }
 }
 
-[Route("/aroute", OperationMethod.Get)]
+[Route("/aroute", OperationMethod.Post)]
 [UsedImplicitly]
-public class TestMultiPartRequest : WebRequest<TestMultiPartRequest, TestResponse>, IHasMultipartForm
+public class TestMultiPartFormDataDataRequest : WebRequest<TestMultiPartFormDataDataRequest, TestResponse>,
+    IHasMultipartFormData
+{
+    public int ANumberProperty { get; set; }
+
+    public string? AStringProperty { get; set; }
+
+    public string? Id { get; set; }
+}
+
+[Route("/aroute", OperationMethod.Post)]
+[UsedImplicitly]
+public class TestMultiPartUlEncodedRequest : WebRequest<TestMultiPartUlEncodedRequest, TestResponse>,
+    IHasFormUrlEncoded
 {
     public int ANumberProperty { get; set; }
 

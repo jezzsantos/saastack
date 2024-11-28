@@ -12,12 +12,12 @@ public abstract partial class WebRequest<TRequest>
 {
     /// <summary>
     ///     Provides custom binding that populates the request DTO from the request query, route values,
-    ///     and body for <see cref="IsMultiPartForm" /> requests
+    ///     and body for <see cref="IsMultiPartFormData" /> requests
     /// </summary>
     public static async ValueTask<TRequest?> BindAsync(HttpContext context, ParameterInfo parameter)
     {
         var request = context.Request;
-        if (IsMultiPartForm())
+        if (IsMultiPartFormData())
         {
             var requestDto = Activator.CreateInstance<TRequest>();
             PopulateFromQueryStringValues(request, requestDto);
@@ -26,13 +26,21 @@ public abstract partial class WebRequest<TRequest>
 
             return requestDto;
         }
-        else
+
+        if (IsFormUrlEncoded())
         {
-            var requestDto = await CreateFromJson(context);
+            var requestDto = Activator.CreateInstance<TRequest>();
             PopulateFromQueryStringValues(request, requestDto);
             PopulateFromRouteValues(request, requestDto);
+            PopulateFromFormValues(request, requestDto);
+
             return requestDto;
         }
+
+        var jsonRequest = await CreateFromJson(context);
+        PopulateFromQueryStringValues(request, jsonRequest);
+        PopulateFromRouteValues(request, jsonRequest);
+        return jsonRequest;
     }
 
     /// <summary>
@@ -117,8 +125,13 @@ public abstract partial class WebRequest<TRequest>
         }
     }
 
-    private static bool IsMultiPartForm()
+    private static bool IsMultiPartFormData()
     {
-        return typeof(TRequest).IsAssignableTo(typeof(IHasMultipartForm));
+        return typeof(TRequest).IsAssignableTo(typeof(IHasMultipartFormData));
+    }
+
+    private static bool IsFormUrlEncoded()
+    {
+        return typeof(TRequest).IsAssignableTo(typeof(IHasFormUrlEncoded));
     }
 }
