@@ -27,11 +27,14 @@
     <data name="QueuedMessageId_InvalidId" xml:space="preserve">
         <value>The ID of the message is invalid</value>
     </data>
-    <data name="EmailDeliveryRoot_MissingEmailSubject" xml:space="preserve">
+    <data name="EmailDeliveryRoot_HtmlEmail_MissingSubject" xml:space="preserve">
         <value>The email message is missing a 'Subject'</value>
     </data>
-    <data name="EmailDeliveryRoot_MissingEmailBody" xml:space="preserve">
-        <value>The email message is missing a 'HtmlBody'</value>
+    <data name="EmailDeliveryRoot_HtmlEmail_MissingBody" xml:space="preserve">
+        <value>The email message is missing a 'Body'</value>
+    </data>
+    <data name="EmailDeliveryRoot_TemplatedEmail_MissingTemplateId" xml:space="preserve">
+        <value>The email message is missing a 'TemplateId'</value>
     </data>
     <data name="EmailDeliveryRoot_AlreadySent" xml:space="preserve">
         <value>The email has already been sent for delivery</value>

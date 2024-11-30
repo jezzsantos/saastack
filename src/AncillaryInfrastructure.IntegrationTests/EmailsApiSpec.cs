@@ -47,10 +47,10 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
-                Message = new QueuedEmailHtmlMessage
+                Html = new QueuedEmailHtmlMessage
                 {
                     Subject = "asubject",
-                    HtmlBody = "anhtmlbody",
+                    Body = "anhtmlbody",
                     ToEmailAddress = "arecipient@company.com",
                     ToDisplayName = "atodisplayname",
                     FromEmailAddress = "asender@company.com",
@@ -97,10 +97,10 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
-                Message = new QueuedEmailHtmlMessage
+                Html = new QueuedEmailHtmlMessage
                 {
                     Subject = "asubject",
-                    HtmlBody = "anhtmlbody",
+                    Body = "anhtmlbody",
                     ToEmailAddress = "arecipient@company.com",
                     ToDisplayName = "atodisplayname",
                     FromEmailAddress = "asender@company.com",
@@ -147,10 +147,10 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
-                Message = new QueuedEmailHtmlMessage
+                Html = new QueuedEmailHtmlMessage
                 {
                     Subject = "asubject",
-                    HtmlBody = "anhtmlbody",
+                    Body = "anhtmlbody",
                     ToEmailAddress = "arecipient@company.com",
                     ToDisplayName = "atodisplayname",
                     FromEmailAddress = "asender@company.com",
@@ -200,10 +200,10 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
-                Message = new QueuedEmailHtmlMessage
+                Html = new QueuedEmailHtmlMessage
                 {
                     Subject = "asubject",
-                    HtmlBody = "anhtmlbody",
+                    Body = "anhtmlbody",
                     ToEmailAddress = "arecipient@company.com",
                     ToDisplayName = "atodisplayname",
                     FromEmailAddress = "asender@company.com",
@@ -258,10 +258,10 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
-                Message = new QueuedEmailHtmlMessage
+                Html = new QueuedEmailHtmlMessage
                 {
                     Subject = "asubject",
-                    HtmlBody = "anhtmlbody",
+                    Body = "anhtmlbody",
                     ToEmailAddress = "arecipient@company.com",
                     ToDisplayName = "atodisplayname",
                     FromEmailAddress = "asender@company.com",
@@ -318,10 +318,10 @@ public class EmailsApiSpec : WebApiSpec<Program>
                 MessageId = CreateMessageId(),
                 CallId = "acallid",
                 CallerId = "acallerid",
-                Message = new QueuedEmailHtmlMessage
+                Html = new QueuedEmailHtmlMessage
                 {
                     Subject = "asubject",
-                    HtmlBody = "anhtmlbody",
+                    Body = "anhtmlbody",
                     ToEmailAddress = "arecipient@company.com",
                     ToDisplayName = "atodisplayname",
                     FromEmailAddress = "asender@company.com",
@@ -374,10 +374,10 @@ public class EmailsApiSpec : WebApiSpec<Program>
             MessageId = messageId1,
             CallId = "acallid",
             CallerId = "acallerid",
-            Message = new QueuedEmailHtmlMessage
+            Html = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject1",
-                HtmlBody = "anhtmlbody",
+                Body = "anhtmlbody",
                 ToEmailAddress = "arecipient@company.com",
                 ToDisplayName = "atodisplayname",
                 FromEmailAddress = "asender@company.com",
@@ -390,10 +390,10 @@ public class EmailsApiSpec : WebApiSpec<Program>
             MessageId = messageId2,
             CallId = "acallid",
             CallerId = "acallerid",
-            Message = new QueuedEmailHtmlMessage
+            Html = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject2",
-                HtmlBody = "anhtmlbody",
+                Body = "anhtmlbody",
                 ToEmailAddress = "arecipient@company.com",
                 ToDisplayName = "atodisplayname",
                 FromEmailAddress = "asender@company.com",
@@ -406,10 +406,10 @@ public class EmailsApiSpec : WebApiSpec<Program>
             MessageId = messageId3,
             CallId = "acallid",
             CallerId = "acallerid",
-            Message = new QueuedEmailHtmlMessage
+            Html = new QueuedEmailHtmlMessage
             {
                 Subject = "asubject3",
-                HtmlBody = "anhtmlbody",
+                Body = "anhtmlbody",
                 ToEmailAddress = "arecipient@company.com",
                 ToDisplayName = "atodisplayname",
                 FromEmailAddress = "asender@company.com",

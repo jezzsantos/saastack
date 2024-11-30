@@ -1,6 +1,7 @@
 using AncillaryDomain;
 using Application.Persistence.Common;
 using Common;
+using Domain.Shared.Ancillary;
 using QueryAny;
 
 namespace AncillaryApplication.Persistence.ReadModels;
@@ -11,6 +12,8 @@ public class EmailDelivery : ReadModelEntity
     public Optional<SendingAttempts> Attempts { get; set; }
 
     public Optional<string> Body { get; set; }
+
+    public DeliveredEmailContentType ContentType { get; set; }
 
     public Optional<DateTime?> Delivered { get; set; }
 
@@ -30,7 +33,11 @@ public class EmailDelivery : ReadModelEntity
 
     public Optional<string> Subject { get; set; }
 
+    public Optional<string> Substitutions { get; set; }
+
     public Optional<string> Tags { get; set; }
+
+    public Optional<string> TemplateId { get; set; }
 
     public Optional<string> ToDisplayName { get; set; }
 

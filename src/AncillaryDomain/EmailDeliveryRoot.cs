@@ -7,6 +7,7 @@ using Domain.Interfaces;
 using Domain.Interfaces.Entities;
 using Domain.Interfaces.ValueObjects;
 using Domain.Shared;
+using Domain.Shared.Ancillary;
 
 namespace AncillaryDomain;
 
@@ -49,6 +50,11 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
     public Optional<EmailRecipient> Recipient { get; private set; } = Optional<EmailRecipient>.None;
 
     public Optional<DateTime> Sent { get; private set; } = Optional<DateTime>.None;
+
+    public List<string> Tags { get; private set; } = [];
+
+    public Optional<DeliveredEmailContentType> ContentType { get; private set; } =
+        Optional<DeliveredEmailContentType>.None;
 
     public static AggregateRootFactory<EmailDeliveryRoot> Rehydrate()
     {
@@ -97,6 +103,7 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
                     return recipient.Error;
                 }
 
+                ContentType = changed.ContentType;
                 Recipient = recipient.Value;
                 Tags = changed.Tags;
                 Recorder.TraceDebug(null, "EmailDelivery {Id} has updated the email details", Id);
@@ -150,8 +157,6 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
                 return HandleUnKnownStateChangedEvent(@event);
         }
     }
-
-    public List<string> Tags { get; private set; } = [];
 
     public Result<bool, Error> AttemptSending()
     {
@@ -222,23 +227,38 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
         return RaiseChangeEvent(AncillaryDomain.Events.EmailDelivery.SendingFailed(Id, when));
     }
 
-    public Result<Error> SetEmailDetails(string? subject, string? body, EmailRecipient recipient,
+    public Result<Error> SetContent(string? subject, string? body, EmailRecipient recipient,
         IReadOnlyList<string>? tags)
     {
         if (subject.IsInvalidParameter(x => x.HasValue(), nameof(subject),
-                Resources.EmailDeliveryRoot_MissingEmailSubject, out var error1))
+                Resources.EmailDeliveryRoot_HtmlEmail_MissingSubject, out var error1))
         {
             return error1;
         }
 
-        if (body.IsInvalidParameter(x => x.HasValue(), nameof(body), Resources.EmailDeliveryRoot_MissingEmailBody,
+        if (body.IsInvalidParameter(x => x.HasValue(), nameof(body), Resources.EmailDeliveryRoot_HtmlEmail_MissingBody,
                 out var error2))
         {
             return error2;
         }
 
         return RaiseChangeEvent(
-            AncillaryDomain.Events.EmailDelivery.EmailDetailsChanged(Id, subject!, body!, recipient, tags));
+            AncillaryDomain.Events.EmailDelivery.EmailDetailsChanged(Id, subject!, body!, Optional<string>.None,
+                Optional<Dictionary<string, string>>.None, recipient, tags));
+    }
+
+    public Result<Error> SetContent(string? templateId, string? subject, Dictionary<string, string>? substitutions,
+        EmailRecipient recipient, IReadOnlyList<string>? tags)
+    {
+        if (templateId.IsInvalidParameter(x => x.HasValue(), nameof(templateId),
+                Resources.EmailDeliveryRoot_TemplatedEmail_MissingTemplateId, out var error1))
+        {
+            return error1;
+        }
+
+        return RaiseChangeEvent(
+            AncillaryDomain.Events.EmailDelivery.EmailDetailsChanged(Id, subject, Optional<string>.None,
+                templateId!, substitutions, recipient, tags));
     }
 
     public Result<Error> SucceededSending(Optional<string> receiptId)

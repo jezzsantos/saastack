@@ -37,7 +37,13 @@
         <value>The audit message is missing a 'AuditCode'</value>
     </data>
     <data name="AncillaryApplication_Email_MissingMessage" xml:space="preserve">
-        <value>The email message is missing the 'Message'</value>
+        <value>The email message is missing either a 'Html' or 'Template' message</value>
+    </data>
+    <data name="AncillaryApplication_Email_HtmlMissingBody" xml:space="preserve">
+        <value>The email message is missing a 'Body'</value>
+    </data>
+    <data name="AncillaryApplication_Email_TemplateMissingId" xml:space="preserve">
+        <value>The email message is missing a 'TemplateId'</value>
     </data>
     <data name="AncillaryApplication_Sms_MissingMessage" xml:space="preserve">
         <value>The sms message is missing the 'Message'</value>

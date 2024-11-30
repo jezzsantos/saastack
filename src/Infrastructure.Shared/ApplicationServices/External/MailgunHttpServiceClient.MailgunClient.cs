@@ -16,8 +16,13 @@ namespace Infrastructure.Shared.ApplicationServices.External;
 
 public interface IMailgunClient
 {
-    Task<Result<EmailDeliveryReceipt, Error>> SendAsync(ICallContext call, string subject, string from,
+    Task<Result<EmailDeliveryReceipt, Error>> SendHtmlAsync(ICallContext call, string subject, string from,
         string? fromDisplayName, MailGunRecipient to, string htmlMessage, CancellationToken cancellationToken);
+
+    Task<Result<EmailDeliveryReceipt, Error>> SendTemplatedAsync(ICallContext call, string templateId, string? subject,
+        string from,
+        string? fromDisplayName, MailGunRecipient to,
+        Dictionary<string, string> substitutions, CancellationToken cancellationToken);
 }
 
 public class MailGunRecipient
@@ -41,6 +46,10 @@ public class MailGunRecipient
     }
 }
 
+/// <summary>
+///     Provides a client for sending emails via the Mailgun API.
+///     <see href="https://documentation.mailgun.com/docs/mailgun/api-reference/openapi-final/tag/Messages/" />
+/// </summary>
 public class MailgunClient : IMailgunClient
 {
     private readonly string _apiKey;
@@ -75,14 +84,16 @@ public class MailgunClient : IMailgunClient
     {
     }
 
-    public async Task<Result<EmailDeliveryReceipt, Error>> SendAsync(ICallContext call, string subject, string from,
+    public async Task<Result<EmailDeliveryReceipt, Error>> SendHtmlAsync(ICallContext call, string subject, string from,
         string? fromDisplayName, MailGunRecipient to, string htmlMessage, CancellationToken cancellationToken)
     {
         var recipient = to.ToVariable();
-        var recipients = recipient.Exists()
-            ? new Dictionary<string, Dictionary<string, object>> { { recipient.Value.Key, recipient.Value.Value } }
-                .ToJson(
-                    casing: StringExtensions.JsonCasing.Camel)
+        var recipientVariables = recipient.Exists()
+            ? new Dictionary<string, Dictionary<string, object>>
+                {
+                    { recipient.Value.Key, recipient.Value.Value }
+                }
+                .ToJson(casing: StringExtensions.JsonCasing.Camel)
             : null;
         var sender = fromDisplayName.HasValue()
             ? $"{fromDisplayName} <{from}>"
@@ -92,13 +103,68 @@ public class MailgunClient : IMailgunClient
         try
         {
             var response = await _retryPolicy.ExecuteAsync(async () => await _serviceClient.PostAsync(caller,
-                new MailgunSendRequest
+                new MailgunSendMessageRequest
                 {
                     DomainName = _domainName,
                     From = sender,
                     To = to.EmailAddress,
                     Subject = subject,
                     Html = htmlMessage,
+                    RecipientVariables = recipientVariables,
+#if TESTINGONLY
+                    TestingOnly = "yes",
+#else
+                    TestingOnly = "no",
+#endif
+                    Tracking = "no"
+                }, req => PrepareRequest(req, _apiKey), cancellationToken));
+            if (response.IsFailure)
+            {
+                return response.Error.ToError();
+            }
+
+            return new EmailDeliveryReceipt
+            {
+                ReceiptId = response.Value.Id ?? string.Empty.TrimStart('<').TrimEnd('>')
+            };
+        }
+        catch (HttpRequestException ex)
+        {
+            _recorder.TraceError(call, ex, "Error sending Mailgun HTML email to {To}", to);
+            return ex.ToError(ErrorCode.Unexpected);
+        }
+    }
+
+    public async Task<Result<EmailDeliveryReceipt, Error>> SendTemplatedAsync(ICallContext call, string templateId,
+        string? subject,
+        string from, string? fromDisplayName, MailGunRecipient to, Dictionary<string, string> substitutions,
+        CancellationToken cancellationToken)
+    {
+        var recipient = to.ToVariable();
+        var recipients = recipient.Exists()
+            ? new Dictionary<string, Dictionary<string, object>> { { recipient.Value.Key, recipient.Value.Value } }
+                .ToJson(casing: StringExtensions.JsonCasing.Camel)
+            : null;
+        var sender = fromDisplayName.HasValue()
+            ? $"{fromDisplayName} <{from}>"
+            : from;
+        var variables = substitutions.HasAny()
+            ? substitutions.ToDictionary(pair => pair.Key, pair => pair.Value)
+                .ToJson(casing: StringExtensions.JsonCasing.Camel)
+            : null;
+
+        var caller = Caller.CreateAsCallerFromCall(call);
+        try
+        {
+            var response = await _retryPolicy.ExecuteAsync(async () => await _serviceClient.PostAsync(caller,
+                new MailgunSendMessageRequest
+                {
+                    DomainName = _domainName,
+                    From = sender,
+                    To = to.EmailAddress,
+                    Subject = subject,
+                    Template = templateId,
+                    TemplateVariables = variables,
                     RecipientVariables = recipients,
 #if TESTINGONLY
                     TestingOnly = "yes",
@@ -119,7 +185,8 @@ public class MailgunClient : IMailgunClient
         }
         catch (HttpRequestException ex)
         {
-            _recorder.TraceError(call, ex, "Error sending Mailgun email to {To}", to);
+            _recorder.TraceError(call, ex, "Error sending Mailgun templated email to {To} with template {Template}", to,
+                templateId);
             return ex.ToError(ErrorCode.Unexpected);
         }
     }

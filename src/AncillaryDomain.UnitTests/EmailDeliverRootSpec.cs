@@ -6,6 +6,7 @@ using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Ancillary.EmailDelivery;
 using Domain.Interfaces.Entities;
 using Domain.Shared;
+using Domain.Shared.Ancillary;
 using FluentAssertions;
 using Moq;
 using UnitTesting.Common;
@@ -40,39 +41,72 @@ public class EmailDeliverRootSpec
     }
 
     [Fact]
-    public void WhenSetEmailDetailsAndMissingSubject_ThenReturnsError()
+    public void WhenSetContentForHtmlEmailAndMissingSubject_ThenReturnsError()
     {
         var messageId = CreateMessageId();
         var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
         var recipient = EmailRecipient.Create(EmailAddress.Create("auser@company.com").Value, "adisplayname").Value;
 
-        var result = root.SetEmailDetails(string.Empty, "abody", recipient, new List<string>());
+        var result = root.SetContent(string.Empty, "abody", recipient, new List<string>());
 
-        result.Should().BeError(ErrorCode.Validation, Resources.EmailDeliveryRoot_MissingEmailSubject);
+        result.Should().BeError(ErrorCode.Validation, Resources.EmailDeliveryRoot_HtmlEmail_MissingSubject);
     }
 
     [Fact]
-    public void WhenSetEmailDetailsAndMissingBody_ThenReturnsError()
+    public void WhenSetContentForHtmlEmailAndMissingBody_ThenReturnsError()
     {
         var messageId = CreateMessageId();
         var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
         var recipient = EmailRecipient.Create(EmailAddress.Create("auser@company.com").Value, "adisplayname").Value;
 
-        var result = root.SetEmailDetails("asubject", string.Empty, recipient, new List<string>());
+        var result = root.SetContent("asubject", string.Empty, recipient, new List<string>());
 
-        result.Should().BeError(ErrorCode.Validation, Resources.EmailDeliveryRoot_MissingEmailBody);
+        result.Should().BeError(ErrorCode.Validation, Resources.EmailDeliveryRoot_HtmlEmail_MissingBody);
     }
 
     [Fact]
-    public void WhenSetEmailDetails_ThenDetailsAssigned()
+    public void WhenSetContentForHtmlEmail_ThenDetailsAssigned()
     {
         var messageId = CreateMessageId();
         var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
         var recipient = EmailRecipient.Create(EmailAddress.Create("auser@company.com").Value, "adisplayname").Value;
 
-        var result = root.SetEmailDetails("asubject", "abody", recipient, new List<string> { "atag" });
+        var result = root.SetContent("asubject", "abody", recipient, new List<string> { "atag" });
 
         result.Should().BeSuccess();
+        root.ContentType.Should().Be(DeliveredEmailContentType.Html);
+        root.Recipient.Should().Be(recipient);
+        root.Tags.Count.Should().Be(1);
+        root.Tags[0].Should().Be("atag");
+        root.Events.Last().Should().BeOfType<EmailDetailsChanged>();
+    }
+
+    [Fact]
+    public void WhenSetContentForTemplatedEmailAndMissingTemplateId_ThenReturnsError()
+    {
+        var messageId = CreateMessageId();
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var recipient = EmailRecipient.Create(EmailAddress.Create("auser@company.com").Value, "adisplayname").Value;
+
+        var result = root.SetContent(string.Empty, "asubject", new Dictionary<string, string>(), recipient,
+            new List<string>());
+
+        result.Should().BeError(ErrorCode.Validation, Resources.EmailDeliveryRoot_TemplatedEmail_MissingTemplateId);
+    }
+
+    [Fact]
+    public void WhenSetContentForTemplatedEmail_ThenDetailsAssigned()
+    {
+        var messageId = CreateMessageId();
+        var root = EmailDeliveryRoot.Create(_recorder.Object, _idFactory.Object, messageId).Value;
+        var recipient = EmailRecipient.Create(EmailAddress.Create("auser@company.com").Value, "adisplayname").Value;
+
+        var result = root.SetContent("atemplateid", "asubject",
+            new Dictionary<string, string> { { "aname", "avalue" } }, recipient,
+            new List<string> { "atag" });
+
+        result.Should().BeSuccess();
+        root.ContentType.Should().Be(DeliveredEmailContentType.Templated);
         root.Recipient.Should().Be(recipient);
         root.Tags.Count.Should().Be(1);
         root.Tags[0].Should().Be("atag");

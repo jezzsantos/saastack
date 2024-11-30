@@ -26,9 +26,23 @@ public class MailgunHttpServiceClientSpec : ExternalApiSpec
     }
 
     [Fact]
-    public async Task WhenSendAsync_ThenSends()
+    public async Task WhenSendHtmlAsync_ThenSends()
     {
-        var result = await _serviceClient.SendAsync(new TestCaller(), "asubject", "<body>abody</body>",
+        var result = await _serviceClient.SendHtmlAsync(new TestCaller(), "asubject", "<body>abody</body>",
+            _recipientEmail, "arecipient", _senderEmail, "asender", CancellationToken.None);
+
+        result.Should().BeSuccess();
+        result.Value.ReceiptId.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task WhenSendTemplatedAsync_ThenSends()
+    {
+        var result = await _serviceClient.SendTemplatedAsync(new TestCaller(), "testingonly", "asubject",
+            new Dictionary<string, string>
+            {
+                { "aname", "avalue" }
+            },
             _recipientEmail, "arecipient", _senderEmail, "asender", CancellationToken.None);
 
         result.Should().BeSuccess();

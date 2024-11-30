@@ -21,20 +21,20 @@ public class QueuingEmailSchedulingService : IEmailSchedulingService
         _queue = queue;
     }
 
-    public async Task<Result<Error>> ScheduleHtmlEmail(ICallerContext caller, HtmlEmail htmlEmail,
+    public async Task<Result<Error>> ScheduleHtmlEmail(ICallerContext caller, HtmlEmail email,
         CancellationToken cancellationToken)
     {
         var queued = await _queue.PushAsync(caller.ToCall(), new EmailMessage
         {
-            Message = new QueuedEmailHtmlMessage
+            Html = new QueuedEmailHtmlMessage
             {
-                Subject = htmlEmail.Subject,
-                FromEmailAddress = htmlEmail.FromEmailAddress,
-                FromDisplayName = htmlEmail.FromDisplayName,
-                HtmlBody = htmlEmail.Body,
-                ToEmailAddress = htmlEmail.ToEmailAddress,
-                ToDisplayName = htmlEmail.ToDisplayName,
-                Tags = htmlEmail.Tags
+                Subject = email.Subject,
+                Body = email.Body,
+                FromEmailAddress = email.FromEmailAddress,
+                FromDisplayName = email.FromDisplayName,
+                ToEmailAddress = email.ToEmailAddress,
+                ToDisplayName = email.ToDisplayName,
+                Tags = email.Tags
             }
         }, cancellationToken);
         if (queued.IsFailure)
@@ -44,8 +44,39 @@ public class QueuingEmailSchedulingService : IEmailSchedulingService
 
         var message = queued.Value;
         _recorder.TraceInformation(caller.ToCall(),
-            "Pended email message {Id} for {To} with subject {Subject}, and tags {Tags}", message.MessageId!,
-            htmlEmail.ToEmailAddress, htmlEmail.Subject, htmlEmail.Tags ?? new List<string> { "(none)" });
+            "Pended HTML email message {Id} for {To} with subject {Subject}, and tags {Tags}", message.MessageId!,
+            email.ToEmailAddress, email.Subject, email.Tags ?? ["(none)"]);
+
+        return Result.Ok;
+    }
+
+    public async Task<Result<Error>> ScheduleTemplatedEmail(ICallerContext caller, TemplatedEmail email,
+        CancellationToken cancellationToken)
+    {
+        var queued = await _queue.PushAsync(caller.ToCall(), new EmailMessage
+        {
+            Template = new QueuedEmailTemplatedMessage
+            {
+                TemplateId = email.TemplateId,
+                Subject = email.Subject,
+                Substitutions = email.Substitutions,
+                FromEmailAddress = email.FromEmailAddress,
+                FromDisplayName = email.FromDisplayName,
+                ToEmailAddress = email.ToEmailAddress,
+                ToDisplayName = email.ToDisplayName,
+                Tags = email.Tags
+            }
+        }, cancellationToken);
+        if (queued.IsFailure)
+        {
+            return queued.Error;
+        }
+
+        var message = queued.Value;
+        _recorder.TraceInformation(caller.ToCall(),
+            "Pended templated email message {Id} for {To} with template {Template}, and tags {Tags}",
+            message.MessageId!,
+            email.ToEmailAddress, email.TemplateId, email.Tags ?? ["(none)"]);
 
         return Result.Ok;
     }

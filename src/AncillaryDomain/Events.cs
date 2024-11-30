@@ -3,6 +3,7 @@ using Domain.Common.ValueObjects;
 using Domain.Events.Shared.Ancillary.EmailDelivery;
 using Domain.Events.Shared.Ancillary.SmsDelivery;
 using Domain.Shared;
+using Domain.Shared.Ancillary;
 using Created = Domain.Events.Shared.Ancillary.Audits.Created;
 using DeliveryConfirmed = Domain.Events.Shared.Ancillary.EmailDelivery.DeliveryConfirmed;
 using DeliveryFailureConfirmed = Domain.Events.Shared.Ancillary.EmailDelivery.DeliveryFailureConfirmed;
@@ -45,16 +46,24 @@ public static class Events
             };
         }
 
-        public static EmailDetailsChanged EmailDetailsChanged(Identifier id, string subject, string body,
+        public static EmailDetailsChanged EmailDetailsChanged(Identifier id, Optional<string> subject,
+            Optional<string> body, Optional<string> templateId, Optional<Dictionary<string, string>> substitutions,
             EmailRecipient to, IReadOnlyList<string>? tags)
         {
             return new EmailDetailsChanged(id)
             {
+                ContentType = templateId.HasValue
+                    ? DeliveredEmailContentType.Templated
+                    : DeliveredEmailContentType.Html,
                 Subject = subject,
                 Body = body,
+                TemplateId = templateId,
+                Substitutions = substitutions.HasValue
+                    ? substitutions.Value
+                    : new Dictionary<string, string>(),
                 ToEmailAddress = to.EmailAddress,
                 ToDisplayName = to.DisplayName,
-                Tags = new List<string>(tags ?? new List<string>())
+                Tags = [..tags ?? new List<string>()]
             };
         }
 
@@ -156,7 +165,7 @@ public static class Events
             {
                 Body = body,
                 ToPhoneNumber = to.Number,
-                Tags = new List<string>(tags ?? new List<string>())
+                Tags = [..tags ?? new List<string>()]
             };
         }
     }

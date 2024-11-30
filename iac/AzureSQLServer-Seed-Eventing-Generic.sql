@@ -267,6 +267,7 @@ CREATE TABLE [dbo].[EmailDelivery]
     [IsDeleted]            [bit]           NULL,
     [Attempts]             [nvarchar](max) NULL,
     [Body]                 [nvarchar](max) NULL,
+    [ContentType]          [nvarchar](max) NULL,
     [Delivered]            [datetime]      NULL,
     [DeliveryFailed]       [datetime]      NULL,
     [DeliveryFailedReason] [nvarchar](max) NULL,
@@ -276,7 +277,9 @@ CREATE TABLE [dbo].[EmailDelivery]
     [SendFailed]           [datetime]      NULL,
     [Sent]                 [datetime]      NULL,
     [Subject]              [nvarchar](max) NULL,
+    [Substitutions]        [nvarchar](max) NULL,
     [Tags]                 [nvarchar](max) NULL,
+    [TemplateId]           [nvarchar](max) NULL,
     [ToDisplayName]        [nvarchar](max) NULL,
     [ToEmailAddress]       [nvarchar](max) NULL,
 ) ON [PRIMARY]

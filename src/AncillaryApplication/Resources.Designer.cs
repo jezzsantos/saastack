@@ -69,11 +69,29 @@ namespace AncillaryApplication {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email message is missing the &apos;Message&apos;.
+        ///   Looks up a localized string similar to The email message is missing a &apos;Body&apos;.
+        /// </summary>
+        internal static string AncillaryApplication_Email_HtmlMissingBody {
+            get {
+                return ResourceManager.GetString("AncillaryApplication_Email_HtmlMissingBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email message is missing either a &apos;Html&apos; or &apos;Template&apos; message.
         /// </summary>
         internal static string AncillaryApplication_Email_MissingMessage {
             get {
                 return ResourceManager.GetString("AncillaryApplication_Email_MissingMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email message is missing a &apos;TemplateId&apos;.
+        /// </summary>
+        internal static string AncillaryApplication_Email_TemplateMissingId {
+            get {
+                return ResourceManager.GetString("AncillaryApplication_Email_TemplateMissingId", resourceCulture);
             }
         }
         

@@ -40,8 +40,11 @@ public class EmailDeliveryProjection : IReadModelProjection
             case EmailDetailsChanged e:
                 return await _deliveries.HandleUpdateAsync(e.RootId, dto =>
                 {
+                    dto.ContentType = e.ContentType;
                     dto.Subject = e.Subject;
                     dto.Body = e.Body;
+                    dto.TemplateId = e.TemplateId;
+                    dto.Substitutions = e.Substitutions.ToJson();
                     dto.ToEmailAddress = e.ToEmailAddress;
                     dto.ToDisplayName = e.ToDisplayName;
                     dto.Tags = e.Tags.ToJson();

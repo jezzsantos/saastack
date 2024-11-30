@@ -7,7 +7,8 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Mailgun;
 ///     Sends an email
 /// </summary>
 [Route("/{DomainName}/messages", OperationMethod.Post)]
-public class MailgunSendRequest : WebRequest<MailgunSendRequest, MailgunSendResponse>, IHasMultipartFormData
+public class MailgunSendMessageRequest : WebRequest<MailgunSendMessageRequest, MailgunSendMessageResponse>,
+    IHasMultipartFormData
 {
     [JsonIgnore] public string? DomainName { get; set; }
 
@@ -19,6 +20,11 @@ public class MailgunSendRequest : WebRequest<MailgunSendRequest, MailgunSendResp
     public string? RecipientVariables { get; set; }
 
     [JsonPropertyName("subject")] public string? Subject { get; set; }
+
+    [JsonPropertyName("template")] public string? Template { get; set; }
+
+    [JsonPropertyName("h:X-Mailgun-Variables")]
+    public string? TemplateVariables { get; set; }
 
     [JsonPropertyName("o:testmode")] public string TestingOnly { get; set; } = "no";
 

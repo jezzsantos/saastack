@@ -31,20 +31,20 @@ public class MailgunClientSpec
     [Fact]
     public async Task WhenSendAsync_ThenSends()
     {
-        _serviceClient.Setup(sc => sc.PostAsync(It.IsAny<ICallerContext>(), It.IsAny<MailgunSendRequest>(),
+        _serviceClient.Setup(sc => sc.PostAsync(It.IsAny<ICallerContext>(), It.IsAny<MailgunSendMessageRequest>(),
                 It.IsAny<Action<HttpRequestMessage>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new MailgunSendResponse
+            .ReturnsAsync(new MailgunSendMessageResponse
             {
                 Id = "areceiptid"
             });
 
-        var result = await _client.SendAsync(_call.Object, "asubject", "afromemailaddress", "afromdisplayname",
+        var result = await _client.SendHtmlAsync(_call.Object, "asubject", "afromemailaddress", "afromdisplayname",
             new MailGunRecipient { DisplayName = "atodisplayname", EmailAddress = "atoemailaddress" }, "anhtmlmessage",
             CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.ReceiptId.Should().Be("areceiptid");
-        _serviceClient.Verify(sc => sc.PostAsync(It.IsAny<ICallerContext>(), It.Is<MailgunSendRequest>(req =>
+        _serviceClient.Verify(sc => sc.PostAsync(It.IsAny<ICallerContext>(), It.Is<MailgunSendMessageRequest>(req =>
                 req.DomainName == "adomainname"
                 && req.To == "atoemailaddress"
                 && req.From == "afromdisplayname <afromemailaddress>"

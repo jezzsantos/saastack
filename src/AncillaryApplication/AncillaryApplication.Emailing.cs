@@ -2,6 +2,7 @@ using AncillaryApplication.Persistence.ReadModels;
 using AncillaryDomain;
 using Application.Common.Extensions;
 using Application.Interfaces;
+using Application.Persistence.Shared;
 using Application.Persistence.Shared.ReadModels;
 using Application.Resources.Shared;
 using Common;
@@ -144,7 +145,7 @@ partial class AncillaryApplication
     private async Task<Result<bool, Error>> SendEmailInternalAsync(ICallerContext caller, EmailMessage message,
         CancellationToken cancellationToken)
     {
-        if (message.Message.IsInvalidParameter(x => x.Exists(), nameof(EmailMessage.Message), out _))
+        if (message.Html.NotExists() && message.Template.NotExists())
         {
             return Error.RuleViolation(Resources.AncillaryApplication_Email_MissingMessage);
         }
@@ -161,36 +162,45 @@ partial class AncillaryApplication
             return retrieved.Error;
         }
 
-        var subject = message.Message!.Subject;
-        var body = message.Message!.HtmlBody;
-        var recipientEmailAddress = EmailAddress.Create(message.Message!.ToEmailAddress!);
+        var toEmailAddress = message.Html.Exists()
+            ? message.Html!.ToEmailAddress!
+            : message.Template!.ToEmailAddress!;
+        var recipientEmailAddress = EmailAddress.Create(toEmailAddress);
         if (recipientEmailAddress.IsFailure)
         {
             return recipientEmailAddress.Error;
         }
 
-        var recipientName = message.Message!.ToDisplayName ?? string.Empty;
-        var recipient = EmailRecipient.Create(recipientEmailAddress.Value, recipientName);
+        var toDisplayName = (message.Html.Exists()
+            ? message.Html!.ToDisplayName
+            : message.Template!.ToDisplayName) ?? string.Empty;
+        var recipient = EmailRecipient.Create(recipientEmailAddress.Value, toDisplayName);
         if (recipient.IsFailure)
         {
             return recipient.Error;
         }
 
-        var senderEmailAddress = EmailAddress.Create(message.Message!.FromEmailAddress!);
+        var fromEmailAddress = message.Html.Exists()
+            ? message.Html!.FromEmailAddress!
+            : message.Template!.FromEmailAddress!;
+        var senderEmailAddress = EmailAddress.Create(fromEmailAddress);
         if (senderEmailAddress.IsFailure)
         {
             return senderEmailAddress.Error;
         }
 
-        var senderName = message.Message!.FromDisplayName ?? string.Empty;
-        var sender = EmailRecipient.Create(senderEmailAddress.Value, senderName);
+        var fromDisplayName = (message.Html.Exists()
+            ? message.Html!.FromDisplayName
+            : message.Template!.FromDisplayName) ?? string.Empty;
+        var sender = EmailRecipient.Create(senderEmailAddress.Value, fromDisplayName);
         if (sender.IsFailure)
         {
             return sender.Error;
         }
 
-        var tags = message.Message!.Tags;
-
+        var tags = message.Html.Exists()
+            ? message.Html!.Tags
+            : message.Template!.Tags;
         EmailDeliveryRoot email;
         var found = retrieved.Value.HasValue;
         if (found)
@@ -207,10 +217,27 @@ partial class AncillaryApplication
 
             email = created.Value;
 
-            var detailed = email.SetEmailDetails(subject, body, recipient.Value, tags);
-            if (detailed.IsFailure)
+            if (message.Html.Exists())
             {
-                return detailed.Error;
+                var subject = message.Html!.Subject;
+                var body = message.Html!.Body;
+                var detailed = email.SetContent(subject, body, recipient.Value, tags);
+                if (detailed.IsFailure)
+                {
+                    return detailed.Error;
+                }
+            }
+
+            if (message.Template.Exists())
+            {
+                var templateId = message.Template!.TemplateId;
+                var subject = message.Template!.Subject;
+                var substitutions = message.Template!.Substitutions;
+                var detailed = email.SetContent(templateId, subject, substitutions, recipient.Value, tags);
+                if (detailed.IsFailure)
+                {
+                    return detailed.Error;
+                }
             }
         }
 
@@ -235,9 +262,26 @@ partial class AncillaryApplication
         }
 
         email = saved.Value;
-        var sent = await _emailDeliveryService.SendAsync(caller, subject!, body!, recipient.Value.EmailAddress,
-            recipient.Value.DisplayName, sender.Value.EmailAddress,
-            sender.Value.DisplayName, cancellationToken);
+        var sent = new Result<EmailDeliveryReceipt, Error>(Error.Unexpected());
+        if (message.Html.Exists())
+        {
+            var subject = message.Html.Subject;
+            var body = message.Html.Body;
+            sent = await _emailDeliveryService.SendHtmlAsync(caller, subject!, body!, recipient.Value.EmailAddress,
+                recipient.Value.DisplayName, sender.Value.EmailAddress,
+                sender.Value.DisplayName, cancellationToken);
+        }
+
+        if (message.Template.Exists())
+        {
+            var templateId = message.Template.TemplateId!;
+            var subject = message.Template.Subject;
+            var substitutions = message.Template.Substitutions!;
+            sent = await _emailDeliveryService.SendTemplatedAsync(caller, templateId, subject, substitutions,
+                recipient.Value.EmailAddress, recipient.Value.DisplayName, sender.Value.EmailAddress,
+                sender.Value.DisplayName, cancellationToken);
+        }
+
         if (sent.IsFailure)
         {
             var failed = email.FailedSending();

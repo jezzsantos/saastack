@@ -20,13 +20,15 @@ public class StubMailgunApi : StubApiBase
         _serviceClient = serviceClient;
     }
 
-    public async Task<ApiPostResult<string, MailgunSendResponse>> SendMessage(MailgunSendRequest request,
+    public async Task<ApiPostResult<string, MailgunSendMessageResponse>> SendMessage(MailgunSendMessageRequest request,
         CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         Recorder.TraceInformation(null,
-            "StubMailgun: SendMessage to {To}{Recipient}, from {From}, with subject {Subject}, and body {Body}",
-            request.To!, request.RecipientVariables!, request.From!, request.Subject!, request.Html!);
+            "StubMailgun: SendMessage to {To}{Recipient}, from {From}, with subject {Subject}. Either body {Body}, or template {Template} with variables {Variables}",
+            request.To!, request.RecipientVariables ?? "none", request.From!, request.Subject ?? "none",
+            request.Html ?? "none",
+            request.Template ?? "none", request.TemplateVariables ?? "none");
 
         // Fire the webhook event after returning
         var receiptId = $"receipt_{Guid.NewGuid():N}";
@@ -56,7 +58,7 @@ public class StubMailgunApi : StubApiBase
             }), cancellationToken);
 
         return () =>
-            new PostResult<MailgunSendResponse>(new MailgunSendResponse
+            new PostResult<MailgunSendMessageResponse>(new MailgunSendMessageResponse
             {
                 Id = receiptId,
                 Message = "Queued. Thank you."

@@ -6,17 +6,19 @@ Many processes in the backend of a SaaS product aim to notify/alert the end user
 
 Sending emails/SMS is often done via 3rd party systems like SendGrid, Twilio, Mailgun, Postmark, etc., over HTTP.
 
-> Due to its nature, doing this directly in a use case, isn't very reliable, nor is it optimal with systems under load, and with 3rd parties applying rate limits. All of these aspects can lead to a poor user experience is the user is waiting for these workloads to complete before they can move on with their work.
+> Sending emails/SMS directly in a use case, can be very unreliable, and is it optimal with systems under load, where 3rd party API availability may not be 100%, and they can also apply rate limits. These aspects can lead to a poor user experience is the user is waiting for these workloads to complete before they can move on with their work.
+
+Messaging, especially email/SMS is inherently "asynchronous" (from the users' point of view) because it is always out of band (OOB) from the application sending the messages. Thus:
 
 * We need to "broker" between the sending of emails/SMS, and the delivering of them, to make the entire process more reliable, and we need to provide observability when things go wrong.
-* Since an inbound API request to any API backend can yield of the order ~10 emails per API call, delivering them reliably across HTTP can require minutes of time, if you consider the possibility of retries and back-offs, etc. We simply could not afford to keep API clients blocked and waiting while email delivery takes place, let alone the risk of timing out their connection to the inbound API call in the first place.
-* Delivery of some emails is critical to the functioning of the product, and this data cannot be lost. Consider an email to confirm the email of a registered account, for example.
+* Since an inbound API request to any API backend can yield of the order ~10 emails per API call, delivering them all reliably across HTTP can require many seconds/minutes of time, if you consider the possibility of retries and back-offs, etc. We simply could not afford to keep API clients blocked and waiting while email delivery takes place, let alone the risk of timing out their connection to the inbound API call in the first place.
+* Delivery of some emails is critical to the functioning of the product, and this data cannot be lost, in a failure. e.g. Consider the email sent to a user to confirm the registration of their new account, or the SMS used to provide two-factor authentication to gain access to your account. These messages must be delivered, albeit in a reasonably short period of time.
 
-Fortunately, an individual email arriving in a person's inbox is not a time-critical and synchronous usability function to begin with.
+Fortunately, an individual email arriving in a person's inbox, or SMS text message arriving on your phone, is not a time-critical and synchronous usability function to begin with.
 
-> Some delay, in the order of seconds to minutes, is anticipated.
+> Some delay, in the order of seconds to minutes, is anticipated by the user, and is common even today.
 
-Thus, we need to take advantage of all these facts and engineer a reliable mechanism.
+Thus, we need to take advantage of all these facts and engineer a reliable and usable mechanism.
 
 ## Implementation
 
@@ -24,9 +26,11 @@ This is how emails and SMS messages are delivered from subdomain, using the Anci
 
 ![Email/SMS Delivery](../../docs/images/Email-Delivery.png)
 
+> Although, not shown in this diagram (explicitly), SMS text messages have the same mechanisms.
+
 ### Sending notifications
 
-Any API Host (any subdomain) may want to send notifications to users.
+Any API Host (any deployed subdomain) may want to send notifications to users.
 
 They do this by calling very specific and custom `IUserNotificationsService.NotifyXXXAsync()` methods.
 
@@ -91,6 +95,16 @@ In the Ancillary API, the message is processed by the injected instance of the `
 The specific adapter will likely use an exponential back-off retry policy, which will allow about three attempts to succeed before failing.
 
 Any exception that is raised from this processing will fail the API call, and that will start another delivery cycle from the queue.
+
+#### Templating
+
+In some products, you might want to control the HTML body of emails being sent.
+
+> In some products you may also want to allow your customers to control their emails.
+
+Most 3rd party provides support email templating in some capacity or another.
+
+Emails can be sent either as hardcoded HMTL, or by specifying a collection of "substitutions" that are rendered by the templating engine of the 3rd party provider (e.g., MailGun, Twilio, etc).
 
 ### Delivery status
 

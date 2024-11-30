@@ -78,20 +78,20 @@ namespace AncillaryDomain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email message is missing a &apos;HtmlBody&apos;.
+        ///   Looks up a localized string similar to The email message is missing a &apos;Body&apos;.
         /// </summary>
-        internal static string EmailDeliveryRoot_MissingEmailBody {
+        internal static string EmailDeliveryRoot_HtmlEmail_MissingBody {
             get {
-                return ResourceManager.GetString("EmailDeliveryRoot_MissingEmailBody", resourceCulture);
+                return ResourceManager.GetString("EmailDeliveryRoot_HtmlEmail_MissingBody", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The email message is missing a &apos;Subject&apos;.
         /// </summary>
-        internal static string EmailDeliveryRoot_MissingEmailSubject {
+        internal static string EmailDeliveryRoot_HtmlEmail_MissingSubject {
             get {
-                return ResourceManager.GetString("EmailDeliveryRoot_MissingEmailSubject", resourceCulture);
+                return ResourceManager.GetString("EmailDeliveryRoot_HtmlEmail_MissingSubject", resourceCulture);
             }
         }
         
@@ -110,6 +110,15 @@ namespace AncillaryDomain {
         internal static string EmailDeliveryRoot_NotSent {
             get {
                 return ResourceManager.GetString("EmailDeliveryRoot_NotSent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email message is missing a &apos;TemplateId&apos;.
+        /// </summary>
+        internal static string EmailDeliveryRoot_TemplatedEmail_MissingTemplateId {
+            get {
+                return ResourceManager.GetString("EmailDeliveryRoot_TemplatedEmail_MissingTemplateId", resourceCulture);
             }
         }
         

@@ -3,7 +3,7 @@ using Infrastructure.Web.Api.Interfaces;
 
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Mailgun;
 
-public class MailgunSendResponse : IWebResponse
+public class MailgunSendMessageResponse : IWebResponse
 {
     [JsonPropertyName("id")] public string? Id { get; set; }
 
