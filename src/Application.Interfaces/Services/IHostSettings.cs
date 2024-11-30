@@ -11,7 +11,7 @@ public interface IHostSettings
     string GetAncillaryApiHostBaseUrl();
 
     /// <summary>
-    ///     Returns the HMAC auth secret
+    ///     Returns the HMAC auth secret for the Ancillary API Host
     /// </summary>
     string GetAncillaryApiHostHmacAuthSecret();
 

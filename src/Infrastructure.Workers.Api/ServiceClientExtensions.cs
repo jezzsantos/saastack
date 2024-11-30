@@ -2,6 +2,7 @@ using Application.Common;
 using Application.Common.Extensions;
 using Application.Persistence.Interfaces;
 using Common;
+using Common.Extensions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common.Extensions;
@@ -20,9 +21,12 @@ public static class ServiceClientExtensions
         where TQueuedMessage : IQueuedMessage
         where TWebResponse : IWebResponse, new()
     {
+        var callId = message.CallId.HasValue()
+            ? message.CallId
+            : "unknown";
         var messageType = typeof(TQueuedMessage).FullName!;
         var messageId = message.MessageId!; // we expect all messages pulled from queue to be assigned an ID
-        var caller = Caller.CreateAsMaintenanceTenant(message.CallId, message.TenantId);
+        var caller = Caller.CreateAsMaintenanceTenant(callId, message.TenantId);
 
         try
         {

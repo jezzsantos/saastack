@@ -25,6 +25,7 @@ public static class HostExtensions
         services.AddSingleton<IConfigurationSettings>(new AspNetDynamicConfigurationSettings(configuration));
         services.AddSingleton<IHostSettings, HostSettings>();
         services.AddSingleton<IFeatureFlags, EmptyFeatureFlags>();
+        services.AddSingleton(JsonSerializerOptions.Default);
 
 #if TESTINGONLY
         services.AddSingleton<ICrashReporter>(new NoOpCrashReporter());
@@ -38,10 +39,6 @@ public static class HostExtensions
         services.AddSingleton<IRecorder>(c =>
             new CrashTraceOnlyRecorder("AWS API Lambdas", c.GetRequiredService<ILoggerFactory>(),
                 c.GetRequiredService<ICrashReporter>()));
-        services.AddSingleton<IServiceClient>(c =>
-            new InterHostServiceClient(c.GetRequiredService<IHttpClientFactory>(),
-                c.GetRequiredService<JsonSerializerOptions>(),
-                c.GetRequiredService<IHostSettings>().GetAncillaryApiHostBaseUrl()));
         services.AddSingleton<IServiceClientFactory>(c =>
             new InterHostServiceClientFactory(c.GetRequiredService<IHttpClientFactory>(),
                 c.GetRequiredService<JsonSerializerOptions>()));

@@ -1,3 +1,4 @@
+using Application.Interfaces;
 using Application.Interfaces.Services;
 using Application.Persistence.Shared.ReadModels;
 using Common;
@@ -10,15 +11,27 @@ namespace Infrastructure.Workers.Api.Workers;
 
 public sealed class SendSmsRelayWorker : IQueueMonitoringApiRelayWorker<SmsMessage>
 {
+    private readonly string _hmacSecret;
     private readonly IRecorder _recorder;
     private readonly IServiceClient _serviceClient;
-    private readonly IHostSettings _settings;
 
-    public SendSmsRelayWorker(IRecorder recorder, IHostSettings settings, IServiceClient serviceClient)
+    public SendSmsRelayWorker(IRecorder recorder, IHostSettings settings,
+        IServiceClientFactory serviceClientFactory) : this(recorder, serviceClientFactory,
+        WorkerConstants.Queues.QueueDeliveryApiEndpoints[WorkerConstants.Queues.Smses](settings))
+    {
+    }
+
+    private SendSmsRelayWorker(IRecorder recorder, IServiceClientFactory serviceClientFactory,
+        (string BaseUrl, string HmacSecret) apiEndpointSettings) : this(recorder,
+        serviceClientFactory.CreateServiceClient(apiEndpointSettings.BaseUrl), apiEndpointSettings.HmacSecret)
+    {
+    }
+
+    private SendSmsRelayWorker(IRecorder recorder, IServiceClient serviceClient, string hmacSecret)
     {
         _recorder = recorder;
-        _settings = settings;
         _serviceClient = serviceClient;
+        _hmacSecret = hmacSecret;
     }
 
     public async Task RelayMessageOrThrowAsync(SmsMessage message, CancellationToken cancellationToken)
@@ -27,6 +40,6 @@ public sealed class SendSmsRelayWorker : IQueueMonitoringApiRelayWorker<SmsMessa
             message, new SendSmsRequest
             {
                 Message = message.ToJson()!
-            }, _settings.GetAncillaryApiHostHmacAuthSecret(), cancellationToken);
+            }, _hmacSecret, cancellationToken);
     }
 }

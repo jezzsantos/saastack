@@ -1,6 +1,7 @@
 #if TESTINGONLY
 using System.Collections.Concurrent;
 using System.Text.Json;
+using Application.Interfaces;
 using Application.Interfaces.Services;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
@@ -86,10 +87,10 @@ public class StubCloudWorkerService : BackgroundService
             $"Ending the '{nameof(StubCloudWorkerService)}'");
     }
 
-    private static JsonClient CreateApiClient(string key, IHttpClientFactory httpClientFactory,
+    private static JsonClient CreateApiEndpointClient(string clientType, IHttpClientFactory httpClientFactory,
         JsonSerializerOptions jsonOptions, string baseUrl)
     {
-        var cacheKey = key + baseUrl;
+        var cacheKey = $"{clientType}|{baseUrl}";
         if (CachedClients.TryGetValue(cacheKey, out var cachedClient))
         {
             return cachedClient;
@@ -105,10 +106,6 @@ public class StubCloudWorkerService : BackgroundService
 
     private async Task DrainQueuesAsync(CancellationToken cancellationToken)
     {
-        var ancillaryApiBaseUrl = _settings.GetAncillaryApiHostBaseUrl();
-        var ancillaryApiHmacSecret = _settings.GetAncillaryApiHostHmacAuthSecret();
-        var apiClient = CreateApiClient("queues", _httpClientFactory, _jsonOptions, ancillaryApiBaseUrl);
-
         while (!cancellationToken.IsCancellationRequested)
         {
             var queueName = _monitor.NextQueueName();
@@ -118,8 +115,11 @@ public class StubCloudWorkerService : BackgroundService
                 {
                     if (_monitorQueueMappings.TryGetValue(queueName, out var webRequest))
                     {
+                        var (baseUrl, hmacSecret) =
+                            WorkerConstants.Queues.QueueDeliveryApiEndpoints[queueName](_settings);
+                        var apiClient = CreateApiEndpointClient("queues", _httpClientFactory, _jsonOptions, baseUrl);
                         await apiClient.PostAsync(webRequest,
-                            req => req.SetHMACAuth(webRequest, ancillaryApiHmacSecret),
+                            req => req.SetHMACAuth(webRequest, hmacSecret),
                             cancellationToken);
                         _logger.LogDebug("Drained messages for queue: {Queue}", queueName);
                     }
@@ -155,7 +155,7 @@ public class StubCloudWorkerService : BackgroundService
                     {
                         foreach (var subscriber in subscribers)
                         {
-                            var apiClient = CreateApiClient("topics", _httpClientFactory, _jsonOptions,
+                            var apiClient = CreateApiEndpointClient("topics", _httpClientFactory, _jsonOptions,
                                 subscriber.BaseUrl);
                             await apiClient.PostAsync(webRequest,
                                 req => req.SetHMACAuth(webRequest, subscriber.HmacSecret),

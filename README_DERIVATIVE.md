@@ -101,6 +101,11 @@ In a Terminal window:
 
 2. Run: `npm install`
 
+Now, test that Azurite works by running: `azurite`
+
+> You only need to run the emulator in local development if you choose to run the AzureFunctions.Api.WorkerHost project locally. It will be run for you automatically in automated testing, when running the
+`Integration.Persistence` tests for Azure Storage
+
 ## AWS Local Development
 
 Only if you are deploying your product to AWS
