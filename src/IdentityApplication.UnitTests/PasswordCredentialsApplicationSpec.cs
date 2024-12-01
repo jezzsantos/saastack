@@ -107,6 +107,10 @@ public class PasswordCredentialsApplicationSpec
             await _application.AuthenticateAsync(_caller.Object, "ausername", "apassword", CancellationToken.None);
 
         result.Should().BeError(ErrorCode.NotAuthenticated);
+        _repository.Verify(rep => rep.SaveAsync(It.IsAny<PasswordCredentialRoot>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _recorder.Verify(rec => rec.AuditAgainst(It.IsAny<ICallContext>(), It.IsAny<string>(),
+            It.IsAny<string>(), It.IsAny<string>(), It.IsAny<object[]>()), Times.Never);
     }
 
     [Fact]

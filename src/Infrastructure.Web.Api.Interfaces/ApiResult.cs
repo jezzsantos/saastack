@@ -97,6 +97,14 @@ public class StreamResult
         ContentType = contentType;
     }
 
+    public StreamResult(Stream stream, string contentType, string fileName)
+    {
+        FileName = fileName;
+        Stream = stream;
+        ContentType = contentType;
+    }
+
+    public string? FileName { get; }
     public string ContentType { get; }
 
     public Stream Stream { get; }

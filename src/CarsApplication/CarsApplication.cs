@@ -125,6 +125,7 @@ public class CarsApplication : ICarsApplication
                 new Dictionary<string, object>
                 {
                     { UsageConstants.Properties.Id, car.Id },
+                    { UsageConstants.Properties.TenantId, car.OrganizationId },
                     { UsageConstants.Properties.CarMake, car.Manufacturer.Value.Make.Text },
                     { UsageConstants.Properties.CarModel, car.Manufacturer.Value.Model.Text },
                     { UsageConstants.Properties.CarYear, car.Manufacturer.Value.Year.Number }

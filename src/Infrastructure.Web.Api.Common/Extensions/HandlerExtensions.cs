@@ -152,7 +152,7 @@ public static class HandlerExtensions
 
     private static IResult ToResult(this StreamResult result, OperationMethod _)
     {
-        return Results.Stream(result.Stream, result.ContentType);
+        return Results.Stream(result.Stream, result.ContentType, result.FileName);
     }
 
     private static IResult ToResult<TResponse>(this PostResult<TResponse> postResult, OperationMethod method)

@@ -62,6 +62,7 @@ public class BookingsApplication : IBookingsApplication
             new Dictionary<string, object>
             {
                 { UsageConstants.Properties.Id, booking.Id },
+                { UsageConstants.Properties.TenantId, booking.OrganizationId },
                 { UsageConstants.Properties.Started, booking.Start.Value.Hour },
                 {
                     UsageConstants.Properties.Duration,
@@ -117,6 +118,7 @@ public class BookingsApplication : IBookingsApplication
             new Dictionary<string, object>
             {
                 { UsageConstants.Properties.Id, booking.Id },
+                { UsageConstants.Properties.TenantId, booking.OrganizationId },
                 { UsageConstants.Properties.Started, booking.Start.Value.Hour },
                 {
                     UsageConstants.Properties.Duration,
