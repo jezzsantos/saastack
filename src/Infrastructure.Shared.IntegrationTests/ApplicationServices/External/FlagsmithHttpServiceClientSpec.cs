@@ -14,7 +14,7 @@ using Xunit;
 namespace Infrastructure.Shared.IntegrationTests.ApplicationServices.External;
 
 [Trait("Category", "Integration.External")]
-[Collection("External")]
+[Collection("EXTERNAL")]
 public class FlagsmithHttpServiceClientSpec : ExternalApiSpec
 {
     private const string TestTenant1 = "atenant1";

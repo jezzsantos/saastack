@@ -240,9 +240,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Hosting.Comm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebsiteHost", "WebsiteHost\WebsiteHost.csproj", "{9B420F01-63A5-4EEE-B6AC-09717BE179E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Web.Website.IntegrationTests", "Infrastructure.Web.Website.IntegrationTests\Infrastructure.Web.Website.IntegrationTests.csproj", "{BC14CDD1-E127-4DF7-A1B3-55164CA8D1A4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebsiteHost.IntegrationTests", "WebsiteHost.IntegrationTests\WebsiteHost.IntegrationTests.csproj", "{BC14CDD1-E127-4DF7-A1B3-55164CA8D1A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Web.Website.UnitTests", "Infrastructure.Web.Website.UnitTests\Infrastructure.Web.Website.UnitTests.csproj", "{11F60901-1E1C-4B1B-83E8-261269D2681B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebsiteHost.UnitTests", "WebsiteHost.UnitTests\WebsiteHost.UnitTests.csproj", "{11F60901-1E1C-4B1B-83E8-261269D2681B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Persistence.AWS", "Infrastructure.Persistence.AWS\Infrastructure.Persistence.AWS.csproj", "{5DD98C48-F081-4CD1-9F01-1FF19323FC1E}"
 EndProject
@@ -400,6 +400,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IAC", "IAC", "{596C8F37-52D
 		..\iac\AzureSQLServer-Seed-EventStore.sql = ..\iac\AzureSQLServer-Seed-EventStore.sql
 		..\iac\AzureSQLServer-Seed-Snapshotting-Core.sql = ..\iac\AzureSQLServer-Seed-Snapshotting-Core.sql
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiHost1.IntegrationTests", "ApiHost1.IntegrationTests\ApiHost1.IntegrationTests.csproj", "{E7B97607-58EA-4357-B649-E48A6F719A3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTesting.Website.Common", "IntegrationTesting.Website.Common\IntegrationTesting.Website.Common.csproj", "{88B5D089-4D17-4CFF-AFA7-9F7037CD6C7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1278,6 +1282,18 @@ Global
 		{90055376-3EB3-4AFD-B413-1CE6EC1CC909}.Release|Any CPU.Build.0 = Release|Any CPU
 		{90055376-3EB3-4AFD-B413-1CE6EC1CC909}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
 		{90055376-3EB3-4AFD-B413-1CE6EC1CC909}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
+		{E7B97607-58EA-4357-B649-E48A6F719A3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7B97607-58EA-4357-B649-E48A6F719A3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7B97607-58EA-4357-B649-E48A6F719A3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7B97607-58EA-4357-B649-E48A6F719A3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7B97607-58EA-4357-B649-E48A6F719A3B}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
+		{E7B97607-58EA-4357-B649-E48A6F719A3B}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
+		{88B5D089-4D17-4CFF-AFA7-9F7037CD6C7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88B5D089-4D17-4CFF-AFA7-9F7037CD6C7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88B5D089-4D17-4CFF-AFA7-9F7037CD6C7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88B5D089-4D17-4CFF-AFA7-9F7037CD6C7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88B5D089-4D17-4CFF-AFA7-9F7037CD6C7C}.ReleaseForDeploy|Any CPU.ActiveCfg = ReleaseForDeploy|Any CPU
+		{88B5D089-4D17-4CFF-AFA7-9F7037CD6C7C}.ReleaseForDeploy|Any CPU.Build.0 = ReleaseForDeploy|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F5C77A86-38AF-40E4-82FC-617E624B2754} = {508E7DA4-4DF2-4201-955D-CCF70C41AD05}
@@ -1447,7 +1463,6 @@ Global
 		{B082ABE4-2A00-4BC9-9C0B-64EC46384B87} = {F1C02AC7-F281-4FF3-BFE6-7549F32E6CD2}
 		{75CBA0BF-A7A6-433B-BDE0-6A4C64D33C1C} = {F1C02AC7-F281-4FF3-BFE6-7549F32E6CD2}
 		{3B7202F6-9FE0-450D-A77F-937935988CD8} = {F1C02AC7-F281-4FF3-BFE6-7549F32E6CD2}
-		{AE57212B-9A30-4577-A795-7B411621BCDA} = {D3B68FF7-293B-4458-B8D8-49D3DF59B495}
 		{57853763-7287-43FB-8CF0-67AED9C303CB} = {3D4737A4-7C63-428F-946A-9D0C091CEEF9}
 		{269EEDCB-6CCF-4798-B8B4-81F337795F59} = {57853763-7287-43FB-8CF0-67AED9C303CB}
 		{59FC6CA2-BC94-4D75-96A5-4E158075BF23} = {57853763-7287-43FB-8CF0-67AED9C303CB}
@@ -1468,5 +1483,8 @@ Global
 		{EA58877D-3023-429C-A1A8-E8479441139E} = {9B6B0235-BD3F-4604-8E93-B0112A241C63}
 		{2B24670B-EFAC-4779-B6BA-B34C17D3D39D} = {56E869FB-D718-421C-85DF-07291F1F47C6}
 		{596C8F37-52D2-402A-AD31-62B3DCB3A3E0} = {56E869FB-D718-421C-85DF-07291F1F47C6}
+		{AE57212B-9A30-4577-A795-7B411621BCDA} = {19ADDB2F-B589-49EF-9BDA-BD9908057D60}
+		{E7B97607-58EA-4357-B649-E48A6F719A3B} = {D3B68FF7-293B-4458-B8D8-49D3DF59B495}
+		{88B5D089-4D17-4CFF-AFA7-9F7037CD6C7C} = {5838EE94-374F-4A6F-A231-1BC1C87985F4}
 	EndGlobalSection
 EndGlobal

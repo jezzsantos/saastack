@@ -2,23 +2,16 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <IsTestProject>true</IsTestProject>
+        <IsPlatformProject>true</IsPlatformProject>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ApiHost1\ApiHost1.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Hosting.Common\Infrastructure.Web.Hosting.Common.csproj" />
         <ProjectReference Include="..\IntegrationTesting.WebApi.Common\IntegrationTesting.WebApi.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-        <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.14" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="appsettings.Testing.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
     </ItemGroup>
 
 </Project>

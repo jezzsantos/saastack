@@ -10,7 +10,13 @@
 
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>Infrastructure.Web.Website.UnitTests</_Parameter1>
+            <_Parameter1>WebsiteHost.UnitTests</_Parameter1>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>WebsiteHost.IntegrationTests</_Parameter1>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>Infrastructure.Web.IntegrationTests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
 

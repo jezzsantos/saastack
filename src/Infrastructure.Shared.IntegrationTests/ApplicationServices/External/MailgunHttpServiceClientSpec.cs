@@ -10,7 +10,7 @@ using Xunit;
 namespace Infrastructure.Shared.IntegrationTests.ApplicationServices.External;
 
 [Trait("Category", "Integration.External")]
-[Collection("External")]
+[Collection("EXTERNAL")]
 public class MailgunHttpServiceClientSpec : ExternalApiSpec
 {
     private readonly string _recipientEmail;

@@ -30,6 +30,20 @@ using Xunit;
 namespace IntegrationTesting.WebApi.Common;
 
 /// <summary>
+///     Provides an xUnit collection for running "Integration.API" tests together
+/// </summary>
+[CollectionDefinition("API", DisableParallelization = false)]
+public class AllApiSpecs<THost> : ICollectionFixture<WebApiSetup<THost>>
+    where THost : class;
+
+/// <summary>
+///     Provides an xUnit collection for running "Integration.Website" tests together
+/// </summary>
+[CollectionDefinition("WEBSITE", DisableParallelization = true)]
+public class AllWebsiteSpecs<THost> : ICollectionFixture<WebApiSetup<THost>>
+    where THost : class;
+
+/// <summary>
 ///     Provides an xUnit class fixture for integration testing APIs
 /// </summary>
 [UsedImplicitly]

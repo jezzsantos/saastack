@@ -222,9 +222,10 @@ These are just some of the reasons why these integration tests should be tagged 
 
 Create a new test class in the `Infrastructure.Shared.IntegrationTests` project.
 
-Mark up your class with the attributes: `[Trait("Category", "Integration.External")]` and `[Collection("External")]`.
+Mark up your class with the attributes: `[Trait("Category", "Integration.External")]` and `[Collection("EXTERNAL")]`.
 
-> The `[Collection("External")]` attribute is used to ensure that your tests do NOT run in parallel and share the same common setup and tear down methods.
+> The
+`[Collection("EXTERNAL")]` attribute is used to ensure that your tests do NOT run in parallel and share the same common setup and tear down methods.
 
 Inherit from the `ExternalApiSpec` class, which will require you to inject the `ExternalApiSpec` instance into your constructor. This is also where you can get access to other DI dependencies for use in your tests.
 
@@ -239,7 +240,7 @@ For example,
 
 ```c#
 [Trait("Category", "Integration.External")]
-[Collection("External")]
+[Collection("EXTERNAL")]
 public class MyCustomHttpServiceClientSpec : ExternalApiSpec
 {
     private readonly MyCustomHttpServiceClient _serviceClient;
