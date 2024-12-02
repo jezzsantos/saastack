@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
 public class RegisterMachineResponse : IWebResponse
 {
-    public MachineCredential? Machine { get; set; }
+    public required MachineCredential Machine { get; set; }
 }

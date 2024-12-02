@@ -85,11 +85,11 @@ internal static class AuthenticationConversionExtensions
 {
     public static AuthenticateTokens ToTokens(this AuthenticateResponse response)
     {
-        return response.Tokens!;
+        return response.Tokens;
     }
 
     public static AuthenticateTokens ToTokens(this RefreshTokenResponse response)
     {
-        return response.Tokens!;
+        return response.Tokens;
     }
 }

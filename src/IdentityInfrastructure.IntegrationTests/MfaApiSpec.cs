@@ -54,7 +54,7 @@ public class MfaApiSpec
                 MfaToken = mfaToken
             });
 
-            result.Content.Value.Authenticators!.Count.Should().Be(0);
+            result.Content.Value.Authenticators.Count.Should().Be(0);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ public class MfaApiSpec
                 PhoneNumber = null
             });
 
-            result.Content.Value.Authenticator!.Type.Should()
+            result.Content.Value.Authenticator.Type.Should()
                 .Be(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().BeNull();
@@ -99,7 +99,7 @@ public class MfaApiSpec
                 PhoneNumber = "+6498876986"
             });
 
-            result.Content.Value.Authenticator!.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            result.Content.Value.Authenticator.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().NotBeNullOrEmpty();
             result.Content.Value.Authenticator.BarCodeUri.Should().BeNull();
@@ -129,7 +129,7 @@ public class MfaApiSpec
                 PhoneNumber = null
             });
 
-            result.Content.Value.Authenticator!.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobEmail);
+            result.Content.Value.Authenticator.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobEmail);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().NotBeNullOrEmpty();
             result.Content.Value.Authenticator.BarCodeUri.Should().BeNull();
@@ -164,7 +164,7 @@ public class MfaApiSpec
                 PhoneNumber = "+6498876982"
             });
 
-            result.Content.Value.Authenticator!.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            result.Content.Value.Authenticator.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().NotBeNullOrEmpty();
             result.Content.Value.Authenticator.BarCodeUri.Should().BeNull();
@@ -295,8 +295,8 @@ public class MfaApiSpec
                 AuthenticatorId = authenticator!.Id
             });
 
-            result.Content.Value.Challenge!.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator);
-            result.Content.Value.Challenge!.OobCode.Should().BeNull();
+            result.Content.Value.Challenge.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator);
+            result.Content.Value.Challenge.OobCode.Should().BeNull();
             _userNotificationsService.LastMfaOobSmsRecipient.Should().BeNull();
             _userNotificationsService.LastMfaOobEmailRecipient.Should().BeNull();
         }
@@ -319,8 +319,8 @@ public class MfaApiSpec
                 AuthenticatorId = authenticator!.Id
             });
 
-            result.Content.Value.Challenge!.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
-            result.Content.Value.Challenge!.OobCode.Should().NotBeNullOrEmpty();
+            result.Content.Value.Challenge.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            result.Content.Value.Challenge.OobCode.Should().NotBeNullOrEmpty();
             _userNotificationsService.LastMfaOobSmsRecipient.Should().Be("+6498876986");
             _userNotificationsService.LastMfaOobCode.Should().NotBeEmpty();
         }
@@ -343,8 +343,8 @@ public class MfaApiSpec
                 AuthenticatorId = authenticator!.Id
             });
 
-            result.Content.Value.Challenge!.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobEmail);
-            result.Content.Value.Challenge!.OobCode.Should().NotBeNullOrEmpty();
+            result.Content.Value.Challenge.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobEmail);
+            result.Content.Value.Challenge.OobCode.Should().NotBeNullOrEmpty();
             _userNotificationsService.LastMfaOobEmailRecipient.Should().Be(login.Profile!.EmailAddress);
             _userNotificationsService.LastMfaOobCode.Should().NotBeEmpty();
         }
@@ -372,7 +372,7 @@ public class MfaApiSpec
                 ConfirmationCode = confirmationCode
             });
 
-            result.Content.Value.Tokens!.AccessToken.Value.Should().NotBeNull();
+            result.Content.Value.Tokens.AccessToken.Value.Should().NotBeNull();
             result.Content.Value.Tokens.AccessToken.ExpiresOn.Should()
                 .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry));
             result.Content.Value.Tokens.RefreshToken.Value.Should().NotBeNull();
@@ -401,7 +401,7 @@ public class MfaApiSpec
                 ConfirmationCode = confirmationCode
             });
 
-            result.Content.Value.Tokens!.AccessToken.Value.Should().NotBeNull();
+            result.Content.Value.Tokens.AccessToken.Value.Should().NotBeNull();
             result.Content.Value.Tokens.AccessToken.ExpiresOn.Should()
                 .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry));
             result.Content.Value.Tokens.RefreshToken.Value.Should().NotBeNull();
@@ -430,7 +430,7 @@ public class MfaApiSpec
                 ConfirmationCode = confirmationCode
             });
 
-            result.Content.Value.Tokens!.AccessToken.Value.Should().NotBeNull();
+            result.Content.Value.Tokens.AccessToken.Value.Should().NotBeNull();
             result.Content.Value.Tokens.AccessToken.ExpiresOn.Should()
                 .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry));
             result.Content.Value.Tokens.RefreshToken.Value.Should().NotBeNull();
@@ -460,7 +460,7 @@ public class MfaApiSpec
                 ConfirmationCode = recoveryCodes![0]
             });
 
-            result.Content.Value.Tokens!.AccessToken.Value.Should().NotBeNull();
+            result.Content.Value.Tokens.AccessToken.Value.Should().NotBeNull();
             result.Content.Value.Tokens.AccessToken.ExpiresOn.Should()
                 .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry));
             result.Content.Value.Tokens.RefreshToken.Value.Should().NotBeNull();
@@ -477,7 +477,7 @@ public class MfaApiSpec
                 AuthenticatorId = authenticator!.Id
             });
 
-            var oobCode = challenged.Content.Value.Challenge!.OobCode!;
+            var oobCode = challenged.Content.Value.Challenge.OobCode!;
             var confirmationCode = _mfaService.LastOobConfirmationCode!;
 
             return (oobCode, confirmationCode);
@@ -491,7 +491,7 @@ public class MfaApiSpec
                 MfaToken = mfaToken
             });
 
-            return authenticators.Content.Value.Authenticators!
+            return authenticators.Content.Value.Authenticators
                 .FirstOrDefault(auth => auth.Type == type);
         }
 
@@ -502,7 +502,7 @@ public class MfaApiSpec
                 MfaToken = mfaToken
             });
 
-            return authenticators.Content.Value.Authenticators!;
+            return authenticators.Content.Value.Authenticators;
         }
 
         private async Task Confirm(PasswordCredentialMfaAuthenticatorType type, string mfaToken, string? oobCode = null,
@@ -529,9 +529,9 @@ public class MfaApiSpec
                     : null
             });
 
-            var oobCode = associated.Content.Value.Authenticator!.OobCode!;
+            var oobCode = associated.Content.Value.Authenticator.OobCode!;
             var confirmationCode = _mfaService.LastOobConfirmationCode!;
-            var recoveryCodes = associated.Content.Value.Authenticator!.RecoveryCodes;
+            var recoveryCodes = associated.Content.Value.Authenticator.RecoveryCodes;
 
             return (oobCode, confirmationCode, recoveryCodes);
         }
@@ -591,7 +591,7 @@ public class MfaApiSpec
                 IsEnabled = true
             }, req => req.SetJWTBearerToken(login.AccessToken));
 
-            result.Content.Value.Credential!.Id.Should().NotBeEmpty();
+            result.Content.Value.Credential.Id.Should().NotBeEmpty();
             result.Content.Value.Credential.IsMfaEnabled.Should().BeTrue();
         }
 
@@ -606,7 +606,7 @@ public class MfaApiSpec
                 IsEnabled = false
             }, req => req.SetJWTBearerToken(login.AccessToken));
 
-            result.Content.Value.Credential!.Id.Should().NotBeEmpty();
+            result.Content.Value.Credential.Id.Should().NotBeEmpty();
             result.Content.Value.Credential.IsMfaEnabled.Should().BeFalse();
         }
 
@@ -626,7 +626,7 @@ public class MfaApiSpec
 
             await EnableMfa(login);
 
-            result.Content.Value.Credential!.IsMfaEnabled.Should().BeFalse();
+            result.Content.Value.Credential.IsMfaEnabled.Should().BeFalse();
             var authenticators = await GetAuthenticators(login);
             authenticators.Count.Should().Be(0);
         }
@@ -639,7 +639,7 @@ public class MfaApiSpec
             var result = await Api.GetAsync(new ListPasswordMfaAuthenticatorsForCallerRequest(),
                 req => req.SetJWTBearerToken(login.AccessToken));
 
-            result.Content.Value.Authenticators!.Count.Should().Be(0);
+            result.Content.Value.Authenticators.Count.Should().Be(0);
         }
 
         [Fact]
@@ -654,7 +654,7 @@ public class MfaApiSpec
                 },
                 req => req.SetJWTBearerToken(login.AccessToken));
 
-            result.Content.Value.Authenticator!.Type.Should()
+            result.Content.Value.Authenticator.Type.Should()
                 .Be(PasswordCredentialMfaAuthenticatorType.TotpAuthenticator);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().BeNull();
@@ -682,7 +682,7 @@ public class MfaApiSpec
                 },
                 req => req.SetJWTBearerToken(login.AccessToken));
 
-            result.Content.Value.Authenticator!.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            result.Content.Value.Authenticator.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().NotBeNullOrEmpty();
             result.Content.Value.Authenticator.BarCodeUri.Should().BeNull();
@@ -711,7 +711,7 @@ public class MfaApiSpec
                 },
                 req => req.SetJWTBearerToken(login.AccessToken));
 
-            result.Content.Value.Authenticator!.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobEmail);
+            result.Content.Value.Authenticator.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobEmail);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().NotBeNullOrEmpty();
             result.Content.Value.Authenticator.BarCodeUri.Should().BeNull();
@@ -745,7 +745,7 @@ public class MfaApiSpec
                 },
                 req => req.SetJWTBearerToken(login.AccessToken));
 
-            result.Content.Value.Authenticator!.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            result.Content.Value.Authenticator.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
             result.Content.Value.Authenticator.RecoveryCodes.Should().NotBeEmpty();
             result.Content.Value.Authenticator.OobCode.Should().NotBeNullOrEmpty();
             result.Content.Value.Authenticator.BarCodeUri.Should().BeNull();
@@ -778,7 +778,7 @@ public class MfaApiSpec
                 },
                 req => req.SetJWTBearerToken(login.AccessToken));
 
-            result.Content.Value.Authenticator!.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
+            result.Content.Value.Authenticator.Type.Should().Be(PasswordCredentialMfaAuthenticatorType.OobSms);
             result.Content.Value.Authenticator.RecoveryCodes.Should().BeNull();
             result.Content.Value.Authenticator.OobCode.Should().NotBeNullOrEmpty();
             result.Content.Value.Authenticator.BarCodeUri.Should().BeNull();
@@ -964,9 +964,9 @@ public class MfaApiSpec
                 },
                 req => req.SetJWTBearerToken(login.AccessToken));
 
-            var oobCode = associated.Content.Value.Authenticator!.OobCode!;
+            var oobCode = associated.Content.Value.Authenticator.OobCode!;
             var confirmationCode = _mfaService.LastOobConfirmationCode!;
-            var recoveryCodes = associated.Content.Value.Authenticator!.RecoveryCodes;
+            var recoveryCodes = associated.Content.Value.Authenticator.RecoveryCodes;
 
             return (oobCode, confirmationCode, recoveryCodes);
         }
@@ -988,7 +988,7 @@ public class MfaApiSpec
             var authenticators = await Api.GetAsync(new ListPasswordMfaAuthenticatorsForCallerRequest(),
                 req => req.SetJWTBearerToken(login.AccessToken));
 
-            return authenticators.Content.Value.Authenticators!;
+            return authenticators.Content.Value.Authenticators;
         }
 
         private async Task EnableMfa(LoginDetails login)

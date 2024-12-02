@@ -66,7 +66,7 @@ partial class FlagsmithHttpServiceClient
                 new FlagsmithCreateEdgeIdentityFeatureStateRequest
                 {
                     EnvironmentApiKey = _testingConfiguration.EnvironmentApiKey,
-                    IdentityUuid = identityCreated.Value.IdentityUuid!,
+                    IdentityUuid = identityCreated.Value.IdentityUuid,
                     Feature = featureId,
                     Enabled = enabled
                 }, req => AddApiToken(req, _testingConfiguration));
@@ -97,7 +97,7 @@ partial class FlagsmithHttpServiceClient
         var allIdentities = identitiesRetrieved.Value.Results;
         foreach (var identity in allIdentities)
         {
-            await DestroyIdentityAsync(identity.IdentityUuid!);
+            await DestroyIdentityAsync(identity.IdentityUuid);
         }
     }
 

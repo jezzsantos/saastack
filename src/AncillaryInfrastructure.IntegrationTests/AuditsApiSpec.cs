@@ -58,7 +58,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
             OrganizationId = tenantId
         });
 
-        audits.Content.Value.Audits!.Count.Should().Be(1);
+        audits.Content.Value.Audits.Count.Should().Be(1);
         audits.Content.Value.Audits[0].OrganizationId.Should().Be(tenantId);
         audits.Content.Value.Audits[0].MessageTemplate.Should().Be("amessagetemplate");
         audits.Content.Value.Audits[0].TemplateArguments.Count.Should().Be(2);
@@ -82,7 +82,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
             OrganizationId = tenantId
         });
 
-        audits.Content.Value.Audits!.Count.Should().Be(0);
+        audits.Content.Value.Audits.Count.Should().Be(0);
     }
 #endif
 
@@ -126,7 +126,7 @@ public class AuditsApiSpec : WebApiSpec<Program>
             OrganizationId = tenantId
         });
 
-        audits.Content.Value.Audits!.Count.Should().Be(2);
+        audits.Content.Value.Audits.Count.Should().Be(2);
         audits.Content.Value.Audits[0].OrganizationId.Should().Be(tenantId);
         audits.Content.Value.Audits[0].AuditCode.Should().Be("anauditcode1");
         audits.Content.Value.Audits[0].MessageTemplate.Should().Be("amessagetemplate1");

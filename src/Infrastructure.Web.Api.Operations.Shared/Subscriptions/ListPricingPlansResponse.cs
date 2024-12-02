@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Subscriptions;
 
 public class ListPricingPlansResponse : IWebResponse
 {
-    public PricingPlans? Plans { get; set; }
+    public required PricingPlans Plans { get; set; }
 }

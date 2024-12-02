@@ -41,7 +41,7 @@ public class CarsApiSpec : WebApiSpec<Program>
 
         var result = (await Api.GetAsync(new GetCarRequest { Id = car.Id },
                 req => req.SetJWTBearerToken(login.AccessToken)))
-            .Content.Value.Car!;
+            .Content.Value.Car;
 
         result.Id.Should().Be(car.Id);
         result.Manufacturer!.Make.Should().Be(Manufacturer.AllowedMakes[0]);
@@ -68,7 +68,7 @@ public class CarsApiSpec : WebApiSpec<Program>
             NumberPlate = "aplate"
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        var car = result.Content.Value.Car!;
+        var car = result.Content.Value.Car;
         var location = result.Headers.Location?.ToString();
         location.Should().Be(new GetCarRequest { Id = car.Id }.ToUrl());
         car.Id.Should().NotBeEmpty();
@@ -90,7 +90,7 @@ public class CarsApiSpec : WebApiSpec<Program>
 
         var result = (await Api.GetAsync(new SearchAllCarsRequest(),
                 req => req.SetJWTBearerToken(login.AccessToken)))
-            .Content.Value.Cars!;
+            .Content.Value.Cars;
 
         result.Count.Should().Be(1);
         result[0].Id.Should().Be(car.Id);
@@ -114,7 +114,7 @@ public class CarsApiSpec : WebApiSpec<Program>
         {
             FromUtc = datum,
             ToUtc = datum.AddDays(1)
-        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Cars!;
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Cars;
 
         cars.Count.Should().Be(1);
         cars[0].Id.Should().Be(car2.Id);
@@ -132,7 +132,7 @@ public class CarsApiSpec : WebApiSpec<Program>
             Id = car.Id,
             FromUtc = datum,
             ToUtc = datum.AddHours(1)
-        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Car!;
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Car;
 
         result.Id.Should().Be(car.Id);
 
@@ -140,7 +140,7 @@ public class CarsApiSpec : WebApiSpec<Program>
         var unavailabilities = (await Api.GetAsync(new SearchAllCarUnavailabilitiesRequest
         {
             Id = car.Id
-        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Unavailabilities!;
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Unavailabilities;
 
         unavailabilities.Count.Should().Be(1);
         unavailabilities[0].CarId.Should().Be(car.Id);
@@ -161,7 +161,7 @@ public class CarsApiSpec : WebApiSpec<Program>
             Id = car.Id,
             FromUtc = datum,
             ToUtc = datum.AddHours(1)
-        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Car!;
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Car;
 
         result.Id.Should().Be(car.Id);
 
@@ -169,7 +169,7 @@ public class CarsApiSpec : WebApiSpec<Program>
         var unavailabilities = (await Api.GetAsync(new SearchAllCarUnavailabilitiesRequest
         {
             Id = car.Id
-        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Unavailabilities!;
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Unavailabilities;
 
         unavailabilities.Count.Should().Be(1);
         unavailabilities[0].CarId.Should().Be(car.Id);
@@ -194,6 +194,6 @@ public class CarsApiSpec : WebApiSpec<Program>
             NumberPlate = "aplate"
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        return car.Content.Value.Car!;
+        return car.Content.Value.Car;
     }
 }

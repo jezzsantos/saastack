@@ -25,8 +25,8 @@ public class IdentityApiSpec : WebApiSpec<Program>
         var result = await Api.GetAsync(new GetIdentityForCallerRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Identity!.Id.Should().NotBeEmpty();
-        result.Content.Value.Identity!.IsMfaEnabled.Should().BeFalse();
+        result.Content.Value.Identity.Id.Should().NotBeEmpty();
+        result.Content.Value.Identity.IsMfaEnabled.Should().BeFalse();
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class IdentityApiSpec : WebApiSpec<Program>
         var result = await Api.GetAsync(new GetIdentityForCallerRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Identity!.IsMfaEnabled.Should().BeTrue();
+        result.Content.Value.Identity.IsMfaEnabled.Should().BeTrue();
     }
 
     private static void OverrideDependencies(IServiceCollection services)

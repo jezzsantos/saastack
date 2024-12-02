@@ -49,9 +49,9 @@ public sealed class StubFlagsmithApi : StubApiBase
         var counter = 1000;
         return allFlags.Select(f => new FlagsmithFlag
         {
-            Id = null,
+            Id = ++counter,
             Enabled = false,
-            Value = null,
+            Value = "avalue",
             Feature = new FlagsmithFeature
             {
                 Id = ++counter,

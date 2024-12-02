@@ -14,5 +14,5 @@ public class
 {
     [JsonPropertyName("identifier")] public string? Identifier { get; set; }
 
-    [JsonPropertyName("traits")] public List<FlagsmithTrait> Traits { get; set; } = new();
+    [JsonPropertyName("traits")] public List<FlagsmithTrait> Traits { get; set; } = [];
 }

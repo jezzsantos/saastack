@@ -62,19 +62,19 @@
             }
           },
           "401": {
-            "description": "The user's username or password is invalid"
+            "description": "The user's credentials are invalid"
           },
           "402": {
-            "description": "Payment Required: The client must have payment information to get ther requested response"
+            "description": "Payment Required: The client must have payment information to get the requested response"
           },
           "403": {
-            "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
+            "description": "When the user has authenticated with credentials, but has MFA enabled. The details of the error contains a value of \"mfa_required\"."
           },
           "404": {
             "description": "Not Found: The server cannot find the requested resource"
           },
           "405": {
-            "description": "The user has not yet verified their registration"
+            "description": "When the user has authenticated with credentials, but has not yet verified their registration"
           },
           "409": {
             "description": "Conflict: The request conflicts with the current state of the resource"
@@ -161,7 +161,7 @@
             "description": "Unauthorized: The client must authenticate itself to get the requested response"
           },
           "402": {
-            "description": "Payment Required: The client must have payment information to get ther requested response"
+            "description": "Payment Required: The client must have payment information to get the requested response"
           },
           "403": {
             "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
@@ -257,7 +257,7 @@
             "description": "The refresh token has expired"
           },
           "402": {
-            "description": "Payment Required: The client must have payment information to get ther requested response"
+            "description": "Payment Required: The client must have payment information to get the requested response"
           },
           "403": {
             "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
@@ -344,7 +344,7 @@
             "description": "Unauthorized: The client must authenticate itself to get the requested response"
           },
           "402": {
-            "description": "Payment Required: The client must have payment information to get ther requested response"
+            "description": "Payment Required: The client must have payment information to get the requested response"
           },
           "403": {
             "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
@@ -442,7 +442,7 @@
             "description": "Unauthorized: The client must authenticate itself to get the requested response"
           },
           "402": {
-            "description": "Payment Required: The client must have payment information to get ther requested response"
+            "description": "Payment Required: The client must have payment information to get the requested response"
           },
           "403": {
             "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
@@ -529,7 +529,7 @@
             "description": "Unauthorized: The client must authenticate itself to get the requested response"
           },
           "402": {
-            "description": "Payment Required: The client must have payment information to get ther requested response"
+            "description": "Payment Required: The client must have payment information to get the requested response"
           },
           "403": {
             "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
@@ -637,7 +637,7 @@
             "description": "Unauthorized: The client must authenticate itself to get the requested response"
           },
           "402": {
-            "description": "Payment Required: The client must have payment information to get ther requested response"
+            "description": "Payment Required: The client must have payment information to get the requested response"
           },
           "403": {
             "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
@@ -733,7 +733,7 @@
             "description": "Unauthorized: The client must authenticate itself to get the requested response"
           },
           "402": {
-            "description": "Payment Required: The client must have payment information to get ther requested response"
+            "description": "Payment Required: The client must have payment information to get the requested response"
           },
           "403": {
             "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
@@ -829,7 +829,7 @@
             "description": "Unauthorized: The client must authenticate itself to get the requested response"
           },
           "402": {
-            "description": "Payment Required: The client must have payment information to get ther requested response"
+            "description": "Payment Required: The client must have payment information to get the requested response"
           },
           "403": {
             "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
@@ -925,7 +925,7 @@
             "description": "Unauthorized: The client must authenticate itself to get the requested response"
           },
           "402": {
-            "description": "Payment Required: The client must have payment information to get ther requested response"
+            "description": "Payment Required: The client must have payment information to get the requested response"
           },
           "403": {
             "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
@@ -1021,7 +1021,7 @@
             "description": "Unauthorized: The client must authenticate itself to get the requested response"
           },
           "402": {
-            "description": "Payment Required: The client must have payment information to get ther requested response"
+            "description": "Payment Required: The client must have payment information to get the requested response"
           },
           "403": {
             "description": "Forbidden: The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource"
@@ -1087,11 +1087,13 @@
         "additionalProperties": false
       },
       "AuthenticateResponse": {
+        "required": [
+          "userId"
+        ],
         "type": "object",
         "properties": {
           "userId": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -1101,32 +1103,40 @@
         "additionalProperties": false
       },
       "FeatureFlag": {
+        "required": [
+          "isEnabled",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "isEnabled": {
             "type": "boolean"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
       },
       "GetAllFeatureFlagsResponse": {
+        "required": [
+          "flags"
+        ],
         "type": "object",
         "properties": {
           "flags": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/FeatureFlag"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "GetFeatureFlagResponse": {
+        "required": [
+          "flag"
+        ],
         "type": "object",
         "properties": {
           "flag": {
@@ -1136,15 +1146,17 @@
         "additionalProperties": false
       },
       "HealthCheckResponse": {
+        "required": [
+          "name",
+          "status"
+        ],
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "status": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -1154,28 +1166,29 @@
         "additionalProperties": false
       },
       "ProblemDetails": {
+        "required": [
+          "detail",
+          "instance",
+          "title",
+          "type"
+        ],
         "type": "object",
         "properties": {
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "title": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "status": {
             "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "format": "int32"
           },
           "detail": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "instance": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": { }
@@ -1236,6 +1249,10 @@
           "arguments": {
             "type": "array",
             "items": {
+              "required": [
+                "chars",
+                "length"
+              ],
               "type": "string"
             },
             "nullable": true

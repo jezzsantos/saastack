@@ -44,7 +44,7 @@ public class EndUsersApiSpec : WebApiSpec<Program>
             Roles = [PlatformRoles.TestingOnly.Name]
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.User!.Roles.Should()
+        result.Content.Value.User.Roles.Should()
             .ContainInOrder(PlatformRoles.Standard.Name, PlatformRoles.TestingOnly.Name);
 #endif
     }
@@ -66,7 +66,7 @@ public class EndUsersApiSpec : WebApiSpec<Program>
             Roles = [PlatformRoles.TestingOnly.Name]
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.User!.Roles.Should()
+        result.Content.Value.User.Roles.Should()
             .ContainInOrder(PlatformRoles.Operations.Name, PlatformRoles.Standard.Name);
 #endif
     }
@@ -83,7 +83,7 @@ public class EndUsersApiSpec : WebApiSpec<Program>
             Roles = [PlatformRoles.Operations.Name]
         }, req => req.SetJWTBearerToken(@operator.AccessToken));
 
-        result1.Content.Value.User!.Roles.Should()
+        result1.Content.Value.User.Roles.Should()
             .ContainInOrder(PlatformRoles.Operations.Name, PlatformRoles.Standard.Name);
 
         var result2 = await Api.PatchAsync(new UnassignPlatformRolesRequest
@@ -92,7 +92,7 @@ public class EndUsersApiSpec : WebApiSpec<Program>
             Roles = [PlatformRoles.Operations.Name]
         }, req => req.SetJWTBearerToken(@operator.AccessToken));
 
-        result2.Content.Value.User!.Roles.Should()
+        result2.Content.Value.User.Roles.Should()
             .OnlyContain(rol => rol == PlatformRoles.Standard.Name);
 #endif
     }

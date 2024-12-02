@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.EndUsers;
 
 public class ListMembershipsForCallerResponse : SearchResponse
 {
-    public List<Membership>? Memberships { get; set; }
+    public List<Membership> Memberships { get; set; } = [];
 }

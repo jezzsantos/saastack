@@ -99,11 +99,11 @@ public class MultiTenancySpec
             var organization1 = (await Api.GetAsync(new GetOrganizationRequest
             {
                 Id = organization1Id
-            }, req => req.SetJWTBearerToken(loginA.AccessToken))).Content.Value.Organization!;
+            }, req => req.SetJWTBearerToken(loginA.AccessToken))).Content.Value.Organization;
             var organization2 = (await Api.PostAsync(new CreateOrganizationRequest
             {
                 Name = "anorganizationname2"
-            }, req => req.SetJWTBearerToken(loginA.AccessToken))).Content.Value.Organization!;
+            }, req => req.SetJWTBearerToken(loginA.AccessToken))).Content.Value.Organization;
 
             loginA = await ReAuthenticateUserAsync(loginA);
             var car1Id = await CreateUnregisteredCarAsync(loginA, organization1, 2010);
@@ -125,11 +125,11 @@ public class MultiTenancySpec
             }, req => req.SetJWTBearerToken(loginA.AccessToken))).Content.Value.Cars;
 
             // Proves the Data was logically partitioned 
-            cars1!.Count.Should().Be(3);
+            cars1.Count.Should().Be(3);
             cars1[0].Id.Should().Be(car1Id);
             cars1[1].Id.Should().Be(car3Id);
             cars1[2].Id.Should().Be(car5Id);
-            cars2!.Count.Should().Be(3);
+            cars2.Count.Should().Be(3);
             cars2[0].Id.Should().Be(car2Id);
             cars2[1].Id.Should().Be(car4Id);
             cars2[2].Id.Should().Be(car6Id);
@@ -196,7 +196,7 @@ public class MultiTenancySpec
                 NumberPlate = "aplate"
             }, req => req.SetJWTBearerToken(login.AccessToken));
 
-            return car.Content.Value.Car!.Id;
+            return car.Content.Value.Car.Id;
         }
 
 #if TESTINGONLY

@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
 public class RefreshTokenResponse : IWebResponse
 {
-    public AuthenticateTokens? Tokens { get; set; }
+    public required AuthenticateTokens Tokens { get; set; }
 }

@@ -39,6 +39,7 @@ public class CustomDto
 
 public enum CustomEnum
 {
+    None,
     One,
     TwentyOne,
     OneHundredAndOne

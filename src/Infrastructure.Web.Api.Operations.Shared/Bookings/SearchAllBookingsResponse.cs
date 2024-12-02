@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Bookings;
 
 public class SearchAllBookingsResponse : SearchResponse
 {
-    public List<Booking>? Bookings { get; set; }
+    public List<Booking> Bookings { get; set; } = [];
 }

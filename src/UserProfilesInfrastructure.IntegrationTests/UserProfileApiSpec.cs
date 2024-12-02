@@ -37,7 +37,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
             Timezone = Timezones.Sydney.ToString()
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Profile!.Name.FirstName.Should().Be("anewfirstname");
+        result.Content.Value.Profile.Name.FirstName.Should().Be("anewfirstname");
         result.Content.Value.Profile.Name.LastName.Should().Be("anewlastname");
         result.Content.Value.Profile.DisplayName.Should().Be("anewdisplayname");
         result.Content.Value.Profile.Timezone.Should().Be(Timezones.Sydney.ToString());
@@ -79,7 +79,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
             Zip = "anewzipcode"
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Profile!.Address.Line1.Should().Be("anewline1");
+        result.Content.Value.Profile.Address.Line1.Should().Be("anewline1");
         result.Content.Value.Profile.Address.Line2.Should().Be("anewline2");
         result.Content.Value.Profile.Address.Line3.Should().Be("anewline3");
         result.Content.Value.Profile.Address.City.Should().Be("anewcity");
@@ -135,7 +135,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
             }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Profile!.AvatarUrl.Should().StartWith("https://localhost:5001/images/image_");
+        result.Content.Value.Profile.AvatarUrl.Should().StartWith("https://localhost:5001/images/image_");
     }
 
     [Fact]
@@ -154,7 +154,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
             UserId = login.User.Id
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Profile!.AvatarUrl.Should().BeNull();
+        result.Content.Value.Profile.AvatarUrl.Should().BeNull();
     }
 
     [Fact]
@@ -162,7 +162,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
     {
         var result = await Api.GetAsync(new GetProfileForCallerRequest());
 
-        result.Content.Value.Profile!.IsAuthenticated.Should().BeFalse();
+        result.Content.Value.Profile.IsAuthenticated.Should().BeFalse();
         result.Content.Value.Profile.Id.Should().Be(CallerConstants.AnonymousUserId);
         result.Content.Value.Profile.UserId.Should().Be(CallerConstants.AnonymousUserId);
         result.Content.Value.Profile.DefaultOrganizationId.Should().BeNull();
@@ -176,7 +176,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
         var result = await Api.GetAsync(new GetProfileForCallerRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Profile!.IsAuthenticated.Should().BeTrue();
+        result.Content.Value.Profile.IsAuthenticated.Should().BeTrue();
         result.Content.Value.Profile.Id.Should().NotBeNullOrEmpty();
         result.Content.Value.Profile.UserId.Should().Be(login.User.Id);
         result.Content.Value.Profile.DefaultOrganizationId.Should().NotBeNullOrEmpty();
@@ -198,7 +198,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
             }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        var avatarUrl = profile.Content.Value.Profile!.AvatarUrl!;
+        var avatarUrl = profile.Content.Value.Profile.AvatarUrl!;
         var imageId = avatarUrl
             .Replace("https://localhost:5001/images/", string.Empty)
             .Replace("/download", string.Empty);
@@ -213,7 +213,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
         var result = await Api.GetAsync(new GetProfileForCallerRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Profile!.AvatarUrl.Should().BeNull();
+        result.Content.Value.Profile.AvatarUrl.Should().BeNull();
     }
 
     private static void OverrideDependencies(IServiceCollection services)

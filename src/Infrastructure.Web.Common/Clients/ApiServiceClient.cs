@@ -66,7 +66,7 @@ public class ApiServiceClient : IServiceClient
     public async Task<Result<TResponse, ResponseProblem>> GetAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = null)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         using var client = CreateJsonClient(context, requestFilter, out var modifiedRequestFilter);
         return await _retryPolicy.ExecuteAsync(
@@ -107,7 +107,7 @@ public class ApiServiceClient : IServiceClient
     public async Task<Result<TResponse, ResponseProblem>> PatchAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         using var client = CreateJsonClient(context, requestFilter, out var modifiedRequestFilter);
         return await _retryPolicy.ExecuteAsync(
@@ -118,7 +118,7 @@ public class ApiServiceClient : IServiceClient
     public async Task<Result<TResponse, ResponseProblem>> PostAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         using var client = CreateJsonClient(context, requestFilter, out var modifiedRequestFilter);
         return await _retryPolicy.ExecuteAsync(
@@ -129,7 +129,7 @@ public class ApiServiceClient : IServiceClient
     public async Task<Result<TResponse, ResponseProblem>> PutAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         using var client = CreateJsonClient(context, requestFilter, out var modifiedRequestFilter);
         return await _retryPolicy.ExecuteAsync(
@@ -143,14 +143,9 @@ public class ApiServiceClient : IServiceClient
     {
         var client = new JsonClient(ClientFactory, JsonOptions);
         client.SetBaseUrl(BaseUrl);
-        if (inboundRequestFilter.Exists())
-        {
-            modifiedRequestFilter = inboundRequestFilter;
-        }
-        else
-        {
-            modifiedRequestFilter = _ => { };
-        }
+        modifiedRequestFilter = inboundRequestFilter.Exists()
+            ? inboundRequestFilter
+            : _ => { };
 
         return client;
     }

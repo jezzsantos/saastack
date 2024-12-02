@@ -69,7 +69,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
-        deliveries.Content.Value.Emails!.Count.Should().Be(1);
+        deliveries.Content.Value.Emails.Count.Should().Be(1);
         deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
         deliveries.Content.Value.Emails[0].Body.Should().Be("anhtmlbody");
         deliveries.Content.Value.Emails[0].ToEmailAddress.Should().Be("arecipient@company.com");
@@ -119,7 +119,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
-        deliveries.Content.Value.Emails!.Count.Should().Be(1);
+        deliveries.Content.Value.Emails.Count.Should().Be(1);
         deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
         deliveries.Content.Value.Emails[0].Body.Should().Be("anhtmlbody");
         deliveries.Content.Value.Emails[0].ToEmailAddress.Should().Be("arecipient@company.com");
@@ -173,7 +173,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
-        deliveries.Content.Value.Emails!.Count.Should().Be(1);
+        deliveries.Content.Value.Emails.Count.Should().Be(1);
         deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
         deliveries.Content.Value.Emails[0].Body.Should().Be("anhtmlbody");
         deliveries.Content.Value.Emails[0].ToEmailAddress.Should().Be("arecipient@company.com");
@@ -230,7 +230,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
-        deliveries.Content.Value.Emails!.Count.Should().Be(1);
+        deliveries.Content.Value.Emails.Count.Should().Be(1);
         deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
         deliveries.Content.Value.Emails[0].Body.Should().Be("anhtmlbody");
         deliveries.Content.Value.Emails[0].ToEmailAddress.Should().Be("arecipient@company.com");
@@ -289,7 +289,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
-        deliveries.Content.Value.Emails!.Count.Should().Be(1);
+        deliveries.Content.Value.Emails.Count.Should().Be(1);
         deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
         deliveries.Content.Value.Emails[0].Body.Should().Be("anhtmlbody");
         deliveries.Content.Value.Emails[0].ToEmailAddress.Should().Be("arecipient@company.com");
@@ -342,7 +342,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
             },
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        deliveries.Content.Value.Emails!.Count.Should().Be(1);
+        deliveries.Content.Value.Emails.Count.Should().Be(1);
         deliveries.Content.Value.Emails[0].Subject.Should().Be("asubject");
         deliveries.Content.Value.Emails[0].Tags.Count.Should().Be(3);
         deliveries.Content.Value.Emails[0].Tags[0].Should().Be("atag1");

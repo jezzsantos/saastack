@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
 public class ListPasswordMfaAuthenticatorsForCallerResponse : IWebResponse
 {
-    public List<PasswordCredentialMfaAuthenticator>? Authenticators { get; set; }
+    public List<PasswordCredentialMfaAuthenticator> Authenticators { get; set; } = [];
 }

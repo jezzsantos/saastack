@@ -5,7 +5,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
 
 public class GetOrganizationSettingsResponse : IWebResponse
 {
-    public Organization? Organization { get; set; }
+    public required Organization Organization { get; set; }
 
-    public Dictionary<string, string>? Settings { get; set; }
+    public Dictionary<string, string> Settings { get; set; } = new();
 }

@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.EndUsers;
 
 public class InviteGuestResponse : IWebResponse
 {
-    public Invitation? Invitation { get; set; }
+    public required Invitation Invitation { get; set; }
 }

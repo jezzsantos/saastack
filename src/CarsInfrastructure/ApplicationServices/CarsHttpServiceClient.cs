@@ -30,7 +30,7 @@ public class CarsHttpServiceClient : ICarsService
             Id = id
         }, null, cancellationToken);
 
-        return response.Match<Result<Car, Error>>(res => res.Value.Car!, error => error.ToError());
+        return response.Match<Result<Car, Error>>(res => res.Value.Car, error => error.ToError());
     }
 
     public async Task<Result<Car, Error>> ReleaseCarAvailabilityAsync(ICallerContext caller, string organizationId,
@@ -44,7 +44,7 @@ public class CarsHttpServiceClient : ICarsService
             ToUtc = toUtc
         }, null, cancellationToken);
 
-        return response.Match<Result<Car, Error>>(res => res.Value.Car!, error => error.ToError());
+        return response.Match<Result<Car, Error>>(res => res.Value.Car, error => error.ToError());
     }
 
     public async Task<Result<bool, Error>> ReserveCarIfAvailableAsync(ICallerContext caller, string organizationId,

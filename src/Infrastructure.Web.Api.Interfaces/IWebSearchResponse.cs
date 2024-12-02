@@ -7,5 +7,5 @@ namespace Infrastructure.Web.Api.Interfaces;
 /// </summary>
 public interface IWebSearchResponse : IWebResponse
 {
-    SearchResultMetadata? Metadata { get; set; }
+    SearchResultMetadata Metadata { get; set; }
 }

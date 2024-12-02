@@ -4,7 +4,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Health;
 
 public class HealthCheckResponse : IWebResponse
 {
-    public string? Name { get; set; }
+    public required string Name { get; set; }
 
-    public string? Status { get; set; }
+    public required string Status { get; set; }
 }

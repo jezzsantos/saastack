@@ -64,7 +64,7 @@ public class TwilioApiSpec : WebApiSpec<Program>
         var deliveries = await Api.GetAsync(new SearchSmsDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        deliveries.Content.Value.Smses!.Count.Should().Be(1);
+        deliveries.Content.Value.Smses.Count.Should().Be(1);
         deliveries.Content.Value.Smses[0].IsSent.Should().BeTrue();
         deliveries.Content.Value.Smses[0].IsDelivered.Should().BeTrue();
         deliveries.Content.Value.Smses[0].DeliveredAt.Should().Be(deliveredAt);
@@ -92,7 +92,7 @@ public class TwilioApiSpec : WebApiSpec<Program>
         var deliveries = await Api.GetAsync(new SearchSmsDeliveriesRequest(),
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        deliveries.Content.Value.Smses!.Count.Should().Be(1);
+        deliveries.Content.Value.Smses.Count.Should().Be(1);
         deliveries.Content.Value.Smses[0].IsSent.Should().BeTrue();
         deliveries.Content.Value.Smses[0].IsDelivered.Should().BeFalse();
         deliveries.Content.Value.Smses[0].DeliveredAt.Should().BeNull();

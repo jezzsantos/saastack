@@ -37,7 +37,7 @@ public class BookingsApiSpec : WebApiSpec<Program>
             EndUtc = end
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        var booking = result.Content.Value.Booking!;
+        var booking = result.Content.Value.Booking;
         var location = result.Headers.Location?.ToString();
         location.Should().BeNull();
         booking.Id.Should().NotBeEmpty();
@@ -60,12 +60,12 @@ public class BookingsApiSpec : WebApiSpec<Program>
             CarId = car.Id,
             StartUtc = start,
             EndUtc = end
-        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Booking!;
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Booking;
 
         var result =
             await Api.GetAsync(new SearchAllBookingsRequest(), req => req.SetJWTBearerToken(login.AccessToken));
 
-        var bookings = result.Content.Value.Bookings!;
+        var bookings = result.Content.Value.Bookings;
         bookings.Count.Should().Be(1);
         bookings[0].Id.Should().Be(booking.Id);
         bookings[0].BorrowerId.Should().Be(login.User.Id);
@@ -87,7 +87,7 @@ public class BookingsApiSpec : WebApiSpec<Program>
             CarId = car.Id,
             StartUtc = start,
             EndUtc = end
-        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Booking!;
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Booking;
 
         await Api.DeleteAsync(new CancelBookingRequest
         {
@@ -98,7 +98,7 @@ public class BookingsApiSpec : WebApiSpec<Program>
         var unavailabilities = (await Api.GetAsync(new SearchAllCarUnavailabilitiesRequest
         {
             Id = car.Id
-        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Unavailabilities!;
+        }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Unavailabilities;
 
         unavailabilities.Count.Should().Be(0);
 #endif
@@ -120,6 +120,6 @@ public class BookingsApiSpec : WebApiSpec<Program>
             NumberPlate = "aplate"
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        return car.Content.Value.Car!;
+        return car.Content.Value.Car;
     }
 }

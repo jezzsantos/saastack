@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.UserProfiles;
 
 public class GetProfileForCallerResponse : IWebResponse
 {
-    public UserProfileForCaller? Profile { get; set; }
+    public required UserProfileForCaller Profile { get; set; }
 }

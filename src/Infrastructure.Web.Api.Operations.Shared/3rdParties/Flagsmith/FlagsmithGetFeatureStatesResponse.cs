@@ -8,7 +8,7 @@ public class FlagsmithGetFeatureStatesResponse : IWebResponse
 {
     [JsonPropertyName("results")]
     // ReSharper disable once CollectionNeverUpdated.Global
-    public List<FlagsmithFeatureState> Results { get; set; } = new();
+    public List<FlagsmithFeatureState> Results { get; set; } = [];
 }
 
 [UsedImplicitly]

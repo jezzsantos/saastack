@@ -2414,11 +2414,13 @@ using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared.Test;
 public class AResponse : IWebResponse
 {
-    public string? AProperty { get; }
+    public string? AProperty1 { get; }
+
+    public required string AProperty2 { get; set; }
 }";
 
                 await Verify.DiagnosticExists<ApiLayerAnalyzer>(
-                    ApiLayerAnalyzer.Rule044, input, 7, 20, "AProperty");
+                    ApiLayerAnalyzer.Rule044, input, 7, 20, "AProperty1");
             }
         }
 
@@ -2456,6 +2458,21 @@ public class AResponse : IWebResponse
 
                 await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
             }
+
+            [Fact]
+            public async Task WhenAnyPropertyReferenceTypeIsRequired_ThenNoAlert()
+            {
+                const string input = @"
+using System;
+using Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Api.Operations.Shared.Test;
+public class AResponse : IWebResponse
+{
+    public required string AProperty { get; set; }
+}";
+
+                await Verify.NoDiagnosticExists<ApiLayerAnalyzer>(input);
+            }
         }
     }
 }
@@ -2469,7 +2486,7 @@ public class TestResponse : IWebResponse;
 [UsedImplicitly]
 public class TestSearchResponse : IWebSearchResponse
 {
-    public SearchResultMetadata? Metadata { get; set; }
+    public SearchResultMetadata Metadata { get; set; } = new();
 }
 
 [UsedImplicitly]

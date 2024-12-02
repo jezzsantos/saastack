@@ -125,7 +125,7 @@ public class MailgunClient : IMailgunClient
 
             return new EmailDeliveryReceipt
             {
-                ReceiptId = response.Value.Id ?? string.Empty.TrimStart('<').TrimEnd('>')
+                ReceiptId = ToReceiptId(response.Value.Id)
             };
         }
         catch (HttpRequestException ex)
@@ -180,7 +180,7 @@ public class MailgunClient : IMailgunClient
 
             return new EmailDeliveryReceipt
             {
-                ReceiptId = response.Value.Id ?? string.Empty.TrimStart('<').TrimEnd('>')
+                ReceiptId = ToReceiptId(response.Value.Id)
             };
         }
         catch (HttpRequestException ex)
@@ -189,6 +189,11 @@ public class MailgunClient : IMailgunClient
                 templateId);
             return ex.ToError(ErrorCode.Unexpected);
         }
+    }
+
+    private string ToReceiptId(string id)
+    {
+        return id.TrimStart('<').TrimEnd('>');
     }
 
     private static void PrepareRequest(HttpRequestMessage message, string apiKey)

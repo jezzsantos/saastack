@@ -477,7 +477,7 @@ An example response type would be:
 ```c#
 public class GetCarResponse : IWebResponse
 {
-    public Car? Car { get; set; }
+    public required Car Car { get; set; }
 }
 ```
 
@@ -486,7 +486,7 @@ However, there is one specific response type that you want to use for your SEARC
 ```c#
 public class SearchAllCarsResponse : SearchResponse
 {
-    public List<Car>? Cars { get; set; }
+    public List<Car> Cars { get; set; } = [];
 }
 ```
 

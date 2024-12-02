@@ -5,6 +5,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 
 public class StringMessageTestingOnlyResponse : IWebResponse
 {
-    public string? Message { get; set; }
+    public required string Message { get; set; }
 }
 #endif

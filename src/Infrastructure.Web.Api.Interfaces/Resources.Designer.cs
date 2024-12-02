@@ -159,7 +159,7 @@ namespace Infrastructure.Web.Api.Interfaces {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The client must have payment information to get ther requested response.
+        ///   Looks up a localized string similar to The client must have payment information to get the requested response.
         /// </summary>
         internal static string HttpConstants_StatusCodes_Reason_PaymentRequired {
             get {

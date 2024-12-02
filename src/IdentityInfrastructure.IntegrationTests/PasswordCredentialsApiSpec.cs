@@ -48,7 +48,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
-        result.Content.Value.Credential!.Id.Should().NotBeEmpty();
+        result.Content.Value.Credential.Id.Should().NotBeEmpty();
         result.Content.Value.Credential.User.Id.Should().NotBeEmpty();
         result.Content.Value.Credential.User.Access.Should().Be(EndUserAccess.Enabled);
         result.Content.Value.Credential.User.Status.Should().Be(EndUserStatus.Registered);
@@ -121,7 +121,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
             Password = "1Password!"
         });
 
-        result.Content.Value.Tokens!.AccessToken.Value.Should().NotBeNull();
+        result.Content.Value.Tokens.AccessToken.Value.Should().NotBeNull();
         result.Content.Value.Tokens.AccessToken.ExpiresOn.Should()
             .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry));
         result.Content.Value.Tokens.RefreshToken.Value.Should().NotBeNull();
@@ -177,14 +177,14 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
             Password = "1Password!"
         });
 
-        var accessToken = authenticate.Content.Value.Tokens!.AccessToken.Value;
+        var accessToken = authenticate.Content.Value.Tokens.AccessToken.Value;
 
 #if TESTINGONLY
         var result = await Api.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest(),
             req => req.SetJWTBearerToken(accessToken));
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Content.Value.CallerId.Should().Be(person.Content.Value.Credential!.User.Id);
+        result.Content.Value.CallerId.Should().Be(person.Content.Value.Credential.User.Id);
 #endif
     }
 

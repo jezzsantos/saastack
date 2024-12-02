@@ -6,6 +6,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 
 public class SearchAllCarUnavailabilitiesResponse : SearchResponse
 {
-    public List<Unavailability>? Unavailabilities { get; set; }
+    public List<Unavailability> Unavailabilities { get; set; } = [];
 }
 #endif

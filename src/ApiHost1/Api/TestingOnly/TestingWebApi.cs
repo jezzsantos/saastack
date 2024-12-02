@@ -1,4 +1,5 @@
 #if TESTINGONLY
+using Application.Interfaces;
 using Application.Persistence.Interfaces;
 using Common;
 using Common.Extensions;
@@ -167,50 +168,50 @@ public sealed class TestingWebApi : IWebApiService
         return () => new Result<EmptyResponse, Error>();
     }
 
-    public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> OpenApiGet(
-        OpenApiGetTestingOnlyRequest request, CancellationToken cancellationToken)
-    {
-        await Task.CompletedTask;
-        return () => new Result<StringMessageTestingOnlyResponse, Error>(new StringMessageTestingOnlyResponse
-            { Message = $"amessage{request.RequiredField}" });
-    }
-
-    public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> OpenApiMultiPartForm(
-        OpenApiPostMultiPartFormDataTestingOnlyRequest request, CancellationToken cancellationToken)
-    {
-        await Task.CompletedTask;
-        return () =>
-            new PostResult<StringMessageTestingOnlyResponse>(
-                new StringMessageTestingOnlyResponse { Message = $"amessage{request.RequiredField}" },
-                "alocation");
-    }
-
-    public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> OpenApiFormUrlEncoded(
+    public async Task<ApiPostResult<string, OpenApiTestingOnlyResponse>> OpenApiFormUrlEncoded(
         OpenApiPostFormUrlEncodedTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         return () =>
-            new PostResult<StringMessageTestingOnlyResponse>(
-                new StringMessageTestingOnlyResponse { Message = $"amessage{request.RequiredField}" },
+            new PostResult<OpenApiTestingOnlyResponse>(
+                new OpenApiTestingOnlyResponse { ARequiredField = "", Message = $"amessage{request.RequiredField}" },
                 "alocation");
     }
 
-    public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> OpenApiPost(
+    public async Task<ApiResult<string, OpenApiTestingOnlyResponse>> OpenApiGet(
+        OpenApiGetTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () => new Result<OpenApiTestingOnlyResponse, Error>(new OpenApiTestingOnlyResponse
+            { ARequiredField = "", Message = $"amessage{request.RequiredField}" });
+    }
+
+    public async Task<ApiPostResult<string, OpenApiTestingOnlyResponse>> OpenApiMultiPartForm(
+        OpenApiPostMultiPartFormDataTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () =>
+            new PostResult<OpenApiTestingOnlyResponse>(
+                new OpenApiTestingOnlyResponse { ARequiredField = "", Message = $"amessage{request.RequiredField}" },
+                "alocation");
+    }
+
+    public async Task<ApiPostResult<string, OpenApiTestingOnlyResponse>> OpenApiPost(
         OpenApiPostTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         return () =>
-            new PostResult<StringMessageTestingOnlyResponse>(
-                new StringMessageTestingOnlyResponse { Message = $"amessage{request.RequiredField}" },
+            new PostResult<OpenApiTestingOnlyResponse>(
+                new OpenApiTestingOnlyResponse { ARequiredField = "", Message = $"amessage{request.RequiredField}" },
                 "alocation");
     }
 
-    public async Task<ApiPutPatchResult<string, StringMessageTestingOnlyResponse>> OpenApiPut(
+    public async Task<ApiPutPatchResult<string, OpenApiTestingOnlyResponse>> OpenApiPut(
         OpenApiPutTestingOnlyRequest request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         return () =>
-            new StringMessageTestingOnlyResponse { Message = $"amessage{request.RequiredField}" };
+            new OpenApiTestingOnlyResponse { ARequiredField = "", Message = $"amessage{request.RequiredField}" };
     }
 
     public async Task<ApiEmptyResult> PostInsecure(
@@ -284,7 +285,7 @@ public sealed class TestingWebApi : IWebApiService
         await Task.CompletedTask;
         return () =>
             new Result<StatusesTestingOnlySearchResponse, Error>(new StatusesTestingOnlySearchResponse
-                { Messages = new List<string> { "amessage" } });
+                { Messages = ["amessage"], Metadata = new SearchResultMetadata() });
     }
 
     public async Task<ApiResult<string, StringMessageTestingOnlyResponse>> ValidationsUnvalidated(

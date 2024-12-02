@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
 public class ChangePasswordMfaResponse : IWebResponse
 {
-    public PasswordCredential? Credential { get; set; }
+    public required PasswordCredential Credential { get; set; }
 }

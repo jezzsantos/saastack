@@ -49,6 +49,6 @@ public class FeatureFlagsApplication : IFeatureFlagsApplication
             return retrieved.Error.ToError();
         }
 
-        return retrieved.Value.Flag!;
+        return retrieved.Value.Flag;
     }
 }

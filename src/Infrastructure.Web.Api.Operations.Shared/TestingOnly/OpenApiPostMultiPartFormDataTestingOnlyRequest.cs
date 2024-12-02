@@ -11,7 +11,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 [Route("/testingonly/openapi/{Id}/form-data", OperationMethod.Post, isTestingOnly: true)]
 [UsedImplicitly]
 public class OpenApiPostMultiPartFormDataTestingOnlyRequest :
-    WebRequest<OpenApiPostMultiPartFormDataTestingOnlyRequest, StringMessageTestingOnlyResponse>,
+    WebRequest<OpenApiPostMultiPartFormDataTestingOnlyRequest, OpenApiTestingOnlyResponse>,
     IHasMultipartFormData
 {
     public string? Id { get; set; }

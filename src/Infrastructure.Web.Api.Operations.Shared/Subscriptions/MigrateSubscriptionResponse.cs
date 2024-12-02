@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Subscriptions;
 
 public class MigrateSubscriptionResponse : IWebResponse
 {
-    public Subscription? Subscription { get; set; }
+    public required Subscription Subscription { get; set; }
 }

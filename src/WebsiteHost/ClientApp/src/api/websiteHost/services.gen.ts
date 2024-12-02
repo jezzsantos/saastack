@@ -133,9 +133,7 @@ export const recordMeasure = <ThrowOnError extends boolean = false>(
  * Records a page view event in the product
  * (request type: RecordPageViewRequest)
  */
-export const recordPageView = <ThrowOnError extends boolean = false>(
-  options?: Options<RecordPageViewData, ThrowOnError>
-) =>
+export const recordPageView = <ThrowOnError extends boolean = false>(options?: Options<RecordPageViewData, ThrowOnError>) =>
   (options?.client ?? client).post<RecordPageViewResponse, RecordPageViewError, ThrowOnError>({
     ...options,
     url: "/api/record/page_view"

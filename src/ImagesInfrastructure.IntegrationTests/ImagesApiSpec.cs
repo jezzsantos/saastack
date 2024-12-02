@@ -47,7 +47,7 @@ public class ImagesApiSpec : WebApiSpec<Program>
             Id = image.Id
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Image!.ContentType.Should().Be(HttpConstants.ContentTypes.ImagePng);
+        result.Content.Value.Image.ContentType.Should().Be(HttpConstants.ContentTypes.ImagePng);
         result.Content.Value.Image.Description.Should().Be("adescription");
         result.Content.Value.Image.Filename.Should().Be("afilename.png");
         result.Content.Value.Image.Url.Should().Be($@"https://localhost:5001/images/{image.Id}/download");
@@ -98,7 +98,7 @@ public class ImagesApiSpec : WebApiSpec<Program>
             Description = "anewdescription"
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Image!.ContentType.Should().Be(HttpConstants.ContentTypes.ImagePng);
+        result.Content.Value.Image.ContentType.Should().Be(HttpConstants.ContentTypes.ImagePng);
         result.Content.Value.Image.Description.Should().Be("anewdescription");
         result.Content.Value.Image.Filename.Should().Be("afilename.png");
         result.Content.Value.Image.Url.Should().Be($"https://localhost:5001/images/{image.Id}/download");
@@ -112,7 +112,7 @@ public class ImagesApiSpec : WebApiSpec<Program>
             }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        return result.Content.Value.Image!;
+        return result.Content.Value.Image;
     }
 
     private static void OverrideDependencies(IServiceCollection services)

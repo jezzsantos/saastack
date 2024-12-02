@@ -69,7 +69,7 @@ public sealed class DefaultBodyFilter : IOperationFilter
                     Type = ConvertToSchemaType(context, property)
                 });
 
-                if (property.IsPropertyRequired())
+                if (property.IsRequestPropertyRequired())
                 {
                     requiredParts.Add(name);
                 }
@@ -104,7 +104,7 @@ public sealed class DefaultBodyFilter : IOperationFilter
                     Type = ConvertToSchemaType(context, property)
                 });
 
-                if (property.IsPropertyRequired())
+                if (property.IsRequestPropertyRequired())
                 {
                     requiredParts.Add(name);
                 }

@@ -32,7 +32,7 @@ public class SubscriptionsApiSpec
         [Fact]
         public async Task WhenListPricingPlans_ThenReturnsPlans()
         {
-            var result = (await Api.GetAsync(new ListPricingPlansRequest())).Content.Value.Plans!;
+            var result = (await Api.GetAsync(new ListPricingPlansRequest())).Content.Value.Plans;
 
             result.Eternally.Count.Should().Be(1);
             result.Eternally[0].Id.Should().Be(SinglePlanBillingStateInterpreter.Constants.DefaultPlanId);
@@ -53,7 +53,7 @@ public class SubscriptionsApiSpec
             var result = (await Api.GetAsync(new GetSubscriptionRequest
             {
                 Id = login.DefaultOrganizationId!
-            }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Subscription!;
+            }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Subscription;
 
             result.BuyerId.Should().Be(login.Profile!.UserId);
             result.ProviderName.Should().Be(SinglePlanBillingStateInterpreter.Constants.ProviderName);
@@ -73,7 +73,7 @@ public class SubscriptionsApiSpec
             {
                 Id = organizationId,
                 PlanId = SinglePlanBillingStateInterpreter.Constants.DefaultPlanId
-            }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Subscription!;
+            }, req => req.SetJWTBearerToken(login.AccessToken))).Content.Value.Subscription;
 
             result.BuyerId.Should().Be(login.User.Id);
             result.OwningEntityId.Should().Be(organizationId);
@@ -134,7 +134,7 @@ public class SubscriptionsApiSpec
             {
                 Id = organizationId,
                 PlanId = SinglePlanBillingStateInterpreter.Constants.DefaultPlanId
-            }, req => req.SetJWTBearerToken(loginB.AccessToken))).Content.Value.Subscription!;
+            }, req => req.SetJWTBearerToken(loginB.AccessToken))).Content.Value.Subscription;
 
             result.BuyerId.Should().Be(loginB.User.Id);
             result.OwningEntityId.Should().Be(organizationId);
@@ -164,7 +164,7 @@ public class SubscriptionsApiSpec
             var result = (await Api.DeleteAsync(new CancelSubscriptionRequest
             {
                 Id = organizationId
-            }, req => req.SetJWTBearerToken(loginA.AccessToken))).Content.Value.Subscription!;
+            }, req => req.SetJWTBearerToken(loginA.AccessToken))).Content.Value.Subscription;
 
             result.OwningEntityId.Should().Be(organizationId);
             result.BuyerReference.Should().Be(login.User.Id);
@@ -193,7 +193,7 @@ public class SubscriptionsApiSpec
             var result = (await Api.DeleteAsync(new ForceCancelSubscriptionRequest
             {
                 Id = organizationId
-            }, req => req.SetJWTBearerToken(@operator.AccessToken))).Content.Value.Subscription!;
+            }, req => req.SetJWTBearerToken(@operator.AccessToken))).Content.Value.Subscription;
 
             result.OwningEntityId.Should().Be(organizationId);
             result.BuyerReference.Should().Be(login.User.Id);
@@ -225,7 +225,7 @@ public class SubscriptionsApiSpec
                 Id = organizationId,
                 FromUtc = fromUtc,
                 ToUtc = null
-            }, req => req.SetJWTBearerToken(loginA.AccessToken))).Content.Value.Invoices!;
+            }, req => req.SetJWTBearerToken(loginA.AccessToken))).Content.Value.Invoices;
 
             result.Count.Should().Be(4);
             result[0].InvoicedOnUtc.Should().Be(new DateTime(2024, 06, 01, 0, 0, 0, DateTimeKind.Utc));
@@ -252,7 +252,7 @@ public class SubscriptionsApiSpec
             {
                 Id = organizationId,
                 UserId = loginB.User.Id
-            }, req => req.SetJWTBearerToken(loginA.AccessToken))).Content.Value.Subscription!;
+            }, req => req.SetJWTBearerToken(loginA.AccessToken))).Content.Value.Subscription;
 
             result.BuyerId.Should().Be(loginB.User.Id);
             result.OwningEntityId.Should().Be(organizationId);
@@ -297,7 +297,7 @@ public class SubscriptionsApiSpec
                 Name = "aname"
             }, req => req.SetJWTBearerToken(login.AccessToken));
 
-            var organizationId = organization.Content.Value.Organization!.Id;
+            var organizationId = organization.Content.Value.Organization.Id;
             login = await ReAuthenticateUserAsync(login);
 
             return (login, organizationId);

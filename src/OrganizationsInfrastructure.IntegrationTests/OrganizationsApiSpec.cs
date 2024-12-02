@@ -37,9 +37,9 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Id = login.DefaultOrganizationId!
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Organization!.CreatedById.Should().Be(login.User.Id);
-        result.Content.Value.Organization!.Name.Should().Be("persona alastname");
-        result.Content.Value.Organization!.Ownership.Should().Be(OrganizationOwnership.Personal);
+        result.Content.Value.Organization.CreatedById.Should().Be(login.User.Id);
+        result.Content.Value.Organization.Name.Should().Be("persona alastname");
+        result.Content.Value.Organization.Ownership.Should().Be(OrganizationOwnership.Personal);
     }
 
     [Fact]
@@ -52,10 +52,10 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        var organizationId = result.Content.Value.Organization!.Id;
-        result.Content.Value.Organization!.CreatedById.Should().Be(login.User.Id);
-        result.Content.Value.Organization!.Name.Should().Be("aname");
-        result.Content.Value.Organization!.Ownership.Should().Be(OrganizationOwnership.Shared);
+        var organizationId = result.Content.Value.Organization.Id;
+        result.Content.Value.Organization.CreatedById.Should().Be(login.User.Id);
+        result.Content.Value.Organization.Name.Should().Be("aname");
+        result.Content.Value.Organization.Ownership.Should().Be(OrganizationOwnership.Shared);
 
         login = await ReAuthenticateUserAsync(login);
         login.DefaultOrganizationId.Should().Be(organizationId);
@@ -65,7 +65,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Id = organizationId
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        members.Content.Value.Members!.Count.Should().Be(1);
+        members.Content.Value.Members.Count.Should().Be(1);
         members.Content.Value.Members[0].IsDefault.Should().BeTrue();
         members.Content.Value.Members[0].IsOwner.Should().BeTrue();
         members.Content.Value.Members[0].IsRegistered.Should().BeTrue();
@@ -90,7 +90,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        var organizationId = organization.Content.Value.Organization!.Id;
+        var organizationId = organization.Content.Value.Organization.Id;
         loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
@@ -118,7 +118,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Id = organizationId
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        members.Content.Value.Members!.Count.Should().Be(4);
+        members.Content.Value.Members.Count.Should().Be(4);
         members.Content.Value.Members[0].IsDefault.Should().BeTrue();
         members.Content.Value.Members[0].IsOwner.Should().BeTrue();
         members.Content.Value.Members[0].IsRegistered.Should().BeTrue();
@@ -150,7 +150,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         members.Content.Value.Members[3].IsDefault.Should().BeTrue();
         members.Content.Value.Members[3].IsOwner.Should().BeFalse();
         members.Content.Value.Members[3].IsRegistered.Should().BeTrue();
-        members.Content.Value.Members[3].UserId.Should().Be(machine.Content.Value.Machine!.Id);
+        members.Content.Value.Members[3].UserId.Should().Be(machine.Content.Value.Machine.Id);
         members.Content.Value.Members[3].EmailAddress.Should().BeNull();
         members.Content.Value.Members[3].Name.FirstName.Should().Be("amachinename");
         members.Content.Value.Members[3].Name.LastName.Should().BeNull();
@@ -186,7 +186,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
         loginA = await ReAuthenticateUserAsync(loginA);
-        var organizationId = organization.Content.Value.Organization!.Id;
+        var organizationId = organization.Content.Value.Organization.Id;
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
             Id = organizationId,
@@ -215,7 +215,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Organization!.AvatarUrl.Should().StartWith("https://localhost:5001/images/image_");
+        result.Content.Value.Organization.AvatarUrl.Should().StartWith("https://localhost:5001/images/image_");
     }
 
     [Fact]
@@ -235,7 +235,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Id = organizationId
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Organization!.AvatarUrl.Should().BeNull();
+        result.Content.Value.Organization.AvatarUrl.Should().BeNull();
     }
 
     [Fact]
@@ -250,7 +250,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "anewname"
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Organization!.Name.Should().Be("anewname");
+        result.Content.Value.Organization.Name.Should().Be("anewname");
     }
 
     [Fact]
@@ -264,7 +264,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        var organizationId = organization.Content.Value.Organization!.Id;
+        var organizationId = organization.Content.Value.Organization.Id;
         loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
@@ -277,7 +277,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         {
             Id = organizationId
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
-        var loginCId = members.Content.Value.Members![1].UserId;
+        var loginCId = members.Content.Value.Members[1].UserId;
 
         await Api.DeleteAsync(new UnInviteMemberFromOrganizationRequest
         {
@@ -291,7 +291,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Id = organizationId
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        members.Content.Value.Members!.Count.Should().Be(1);
+        members.Content.Value.Members.Count.Should().Be(1);
         members.Content.Value.Members[0].IsDefault.Should().BeTrue();
         members.Content.Value.Members[0].IsOwner.Should().BeTrue();
         members.Content.Value.Members[0].IsRegistered.Should().BeTrue();
@@ -315,7 +315,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        var organizationId = organization.Content.Value.Organization!.Id;
+        var organizationId = organization.Content.Value.Organization.Id;
         loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
@@ -328,7 +328,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         {
             Id = organizationId
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
-        var loginBId = members.Content.Value.Members![1].UserId;
+        var loginBId = members.Content.Value.Members[1].UserId;
 
         await Api.DeleteAsync(new UnInviteMemberFromOrganizationRequest
         {
@@ -342,7 +342,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Id = organizationId
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        members.Content.Value.Members!.Count.Should().Be(1);
+        members.Content.Value.Members.Count.Should().Be(1);
         members.Content.Value.Members[0].IsDefault.Should().BeTrue();
         members.Content.Value.Members[0].IsOwner.Should().BeTrue();
         members.Content.Value.Members[0].IsRegistered.Should().BeTrue();
@@ -358,9 +358,9 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         var memberships = await Api.GetAsync(new ListMembershipsForCallerRequest(),
             req => req.SetJWTBearerToken(loginB.AccessToken));
 
-        memberships.Content.Value.Memberships!.Count.Should().Be(1);
-        memberships.Content.Value.Memberships![0].OrganizationId.Should().NotBeNull();
-        memberships.Content.Value.Memberships![0].Ownership.Should().Be(OrganizationOwnership.Personal);
+        memberships.Content.Value.Memberships.Count.Should().Be(1);
+        memberships.Content.Value.Memberships[0].OrganizationId.Should().NotBeNull();
+        memberships.Content.Value.Memberships[0].Ownership.Should().Be(OrganizationOwnership.Personal);
     }
 
     [Fact]
@@ -375,7 +375,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        var organizationId = organization.Content.Value.Organization!.Id;
+        var organizationId = organization.Content.Value.Organization.Id;
         loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
@@ -402,9 +402,9 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         {
             Id = organizationId
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
-        var loginBId = members.Content.Value.Members![1].UserId;
-        var loginCId = members.Content.Value.Members![2].UserId;
-        var machineId = members.Content.Value.Members![3].UserId;
+        var loginBId = members.Content.Value.Members[1].UserId;
+        var loginCId = members.Content.Value.Members[2].UserId;
+        var machineId = members.Content.Value.Members[3].UserId;
 
         await Api.DeleteAsync(new UnInviteMemberFromOrganizationRequest
         {
@@ -428,7 +428,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Id = organizationId
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        members.Content.Value.Members!.Count.Should().Be(1);
+        members.Content.Value.Members.Count.Should().Be(1);
         members.Content.Value.Members[0].IsDefault.Should().BeTrue();
         members.Content.Value.Members[0].IsOwner.Should().BeTrue();
         members.Content.Value.Members[0].IsRegistered.Should().BeTrue();
@@ -452,7 +452,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        var organizationId = organization.Content.Value.Organization!.Id;
+        var organizationId = organization.Content.Value.Organization.Id;
         loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
@@ -472,13 +472,13 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         var memberships = await Api.GetAsync(new ListMembershipsForCallerRequest(),
             req => req.SetJWTBearerToken(loginB.AccessToken));
 
-        memberships.Content.Value.Memberships!.Count.Should().Be(2);
-        memberships.Content.Value.Memberships![0].OrganizationId.Should().NotBeNull();
-        memberships.Content.Value.Memberships![0].Ownership.Should().Be(OrganizationOwnership.Personal);
-        memberships.Content.Value.Memberships![0].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
-        memberships.Content.Value.Memberships![1].OrganizationId.Should().Be(organizationId);
-        memberships.Content.Value.Memberships![1].Ownership.Should().Be(OrganizationOwnership.Shared);
-        memberships.Content.Value.Memberships![1].Roles.Should()
+        memberships.Content.Value.Memberships.Count.Should().Be(2);
+        memberships.Content.Value.Memberships[0].OrganizationId.Should().NotBeNull();
+        memberships.Content.Value.Memberships[0].Ownership.Should().Be(OrganizationOwnership.Personal);
+        memberships.Content.Value.Memberships[0].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
+        memberships.Content.Value.Memberships[1].OrganizationId.Should().Be(organizationId);
+        memberships.Content.Value.Memberships[1].Ownership.Should().Be(OrganizationOwnership.Shared);
+        memberships.Content.Value.Memberships[1].Roles.Should()
             .ContainInOrder(TenantRoles.Owner.Name, TenantRoles.Member.Name);
     }
 
@@ -493,7 +493,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        var organizationId = organization.Content.Value.Organization!.Id;
+        var organizationId = organization.Content.Value.Organization.Id;
         loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
@@ -521,13 +521,13 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         var memberships = await Api.GetAsync(new ListMembershipsForCallerRequest(),
             req => req.SetJWTBearerToken(loginB.AccessToken));
 
-        memberships.Content.Value.Memberships!.Count.Should().Be(2);
-        memberships.Content.Value.Memberships![0].OrganizationId.Should().NotBeNull();
-        memberships.Content.Value.Memberships![0].Ownership.Should().Be(OrganizationOwnership.Personal);
-        memberships.Content.Value.Memberships![0].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
-        memberships.Content.Value.Memberships![1].OrganizationId.Should().Be(organizationId);
-        memberships.Content.Value.Memberships![1].Ownership.Should().Be(OrganizationOwnership.Shared);
-        memberships.Content.Value.Memberships![1].Roles.Should().ContainInOrder(TenantRoles.Member.Name);
+        memberships.Content.Value.Memberships.Count.Should().Be(2);
+        memberships.Content.Value.Memberships[0].OrganizationId.Should().NotBeNull();
+        memberships.Content.Value.Memberships[0].Ownership.Should().Be(OrganizationOwnership.Personal);
+        memberships.Content.Value.Memberships[0].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
+        memberships.Content.Value.Memberships[1].OrganizationId.Should().Be(organizationId);
+        memberships.Content.Value.Memberships[1].Ownership.Should().Be(OrganizationOwnership.Shared);
+        memberships.Content.Value.Memberships[1].Roles.Should().ContainInOrder(TenantRoles.Member.Name);
     }
 
     [Fact]
@@ -541,7 +541,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        var organizationId = organization.Content.Value.Organization!.Id;
+        var organizationId = organization.Content.Value.Organization.Id;
         loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
@@ -561,13 +561,13 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         var memberships1 = await Api.GetAsync(new ListMembershipsForCallerRequest(),
             req => req.SetJWTBearerToken(loginB.AccessToken));
 
-        memberships1.Content.Value.Memberships!.Count.Should().Be(2);
-        memberships1.Content.Value.Memberships![0].OrganizationId.Should().NotBeNull();
-        memberships1.Content.Value.Memberships![0].Ownership.Should().Be(OrganizationOwnership.Personal);
-        memberships1.Content.Value.Memberships![0].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
-        memberships1.Content.Value.Memberships![1].OrganizationId.Should().Be(organizationId);
-        memberships1.Content.Value.Memberships![1].Ownership.Should().Be(OrganizationOwnership.Shared);
-        memberships1.Content.Value.Memberships![1].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
+        memberships1.Content.Value.Memberships.Count.Should().Be(2);
+        memberships1.Content.Value.Memberships[0].OrganizationId.Should().NotBeNull();
+        memberships1.Content.Value.Memberships[0].Ownership.Should().Be(OrganizationOwnership.Personal);
+        memberships1.Content.Value.Memberships[0].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
+        memberships1.Content.Value.Memberships[1].OrganizationId.Should().Be(organizationId);
+        memberships1.Content.Value.Memberships[1].Ownership.Should().Be(OrganizationOwnership.Shared);
+        memberships1.Content.Value.Memberships[1].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
 
         await Api.PutAsync(new UnassignRolesFromOrganizationRequest
         {
@@ -580,13 +580,13 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         var memberships2 = await Api.GetAsync(new ListMembershipsForCallerRequest(),
             req => req.SetJWTBearerToken(loginB.AccessToken));
 
-        memberships2.Content.Value.Memberships!.Count.Should().Be(2);
-        memberships2.Content.Value.Memberships![0].OrganizationId.Should().NotBeNull();
-        memberships2.Content.Value.Memberships![0].Ownership.Should().Be(OrganizationOwnership.Personal);
-        memberships2.Content.Value.Memberships![0].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
-        memberships2.Content.Value.Memberships![1].OrganizationId.Should().Be(organizationId);
-        memberships2.Content.Value.Memberships![1].Ownership.Should().Be(OrganizationOwnership.Shared);
-        memberships2.Content.Value.Memberships![1].Roles.Should().ContainInOrder(TenantRoles.Member.Name);
+        memberships2.Content.Value.Memberships.Count.Should().Be(2);
+        memberships2.Content.Value.Memberships[0].OrganizationId.Should().NotBeNull();
+        memberships2.Content.Value.Memberships[0].Ownership.Should().Be(OrganizationOwnership.Personal);
+        memberships2.Content.Value.Memberships[0].Roles.Should().ContainInOrder(TenantRoles.Owner.Name);
+        memberships2.Content.Value.Memberships[1].OrganizationId.Should().Be(organizationId);
+        memberships2.Content.Value.Memberships[1].Ownership.Should().Be(OrganizationOwnership.Shared);
+        memberships2.Content.Value.Memberships[1].Roles.Should().ContainInOrder(TenantRoles.Member.Name);
     }
 
     [Fact]
@@ -600,7 +600,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Name = "aname"
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
-        var organizationId = organization.Content.Value.Organization!.Id;
+        var organizationId = organization.Content.Value.Organization.Id;
         loginA = await ReAuthenticateUserAsync(loginA);
         await Api.PostAsync(new InviteMemberToOrganizationRequest
         {
@@ -628,7 +628,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         }, req => req.SetJWTBearerToken(loginA.AccessToken));
 
         loginA = await ReAuthenticateUserAsync(loginA);
-        var organizationId = organization.Content.Value.Organization!.Id;
+        var organizationId = organization.Content.Value.Organization.Id;
 
         var result = await Api.DeleteAsync(new DeleteOrganizationRequest
         {
@@ -658,7 +658,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        var avatarUrl = organization.Content.Value.Organization!.AvatarUrl!;
+        var avatarUrl = organization.Content.Value.Organization.AvatarUrl!;
         var imageId = avatarUrl
             .Replace("https://localhost:5001/images/", string.Empty)
             .Replace("/download", string.Empty);
@@ -675,7 +675,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
             Id = organizationId
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Organization!.AvatarUrl.Should().BeNull();
+        result.Content.Value.Organization.AvatarUrl.Should().BeNull();
     }
 
     private static string CreateRandomEmailAddress()

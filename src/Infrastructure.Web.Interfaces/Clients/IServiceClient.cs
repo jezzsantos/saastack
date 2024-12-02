@@ -17,7 +17,7 @@ public interface IServiceClient : IFireAndForgetServiceClient
     Task<Result<TResponse, ResponseProblem>> GetAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = null)
-        where TResponse : IWebResponse, new();
+        where TResponse : IWebResponse;
 
     Task<Result<BinaryResponse, ResponseProblem>> GetBinaryAsync(ICallerContext? context, IWebRequest request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = null);
@@ -28,17 +28,17 @@ public interface IServiceClient : IFireAndForgetServiceClient
     Task<Result<TResponse, ResponseProblem>> PatchAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = null)
-        where TResponse : IWebResponse, new();
+        where TResponse : IWebResponse;
 
     Task<Result<TResponse, ResponseProblem>> PostAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = null)
-        where TResponse : IWebResponse, new();
+        where TResponse : IWebResponse;
 
     Task<Result<TResponse, ResponseProblem>> PutAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = null)
-        where TResponse : IWebResponse, new();
+        where TResponse : IWebResponse;
 }
 
 public class BinaryResponse

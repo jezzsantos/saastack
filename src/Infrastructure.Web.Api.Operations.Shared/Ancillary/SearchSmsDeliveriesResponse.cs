@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Ancillary;
 
 public class SearchSmsDeliveriesResponse : SearchResponse
 {
-    public List<DeliveredSms>? Smses { get; set; }
+    public List<DeliveredSms> Smses { get; set; } = [];
 }

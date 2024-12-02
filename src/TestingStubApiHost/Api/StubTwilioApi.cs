@@ -42,7 +42,8 @@ public class StubTwilioApi : StubApiBase
             new PostResult<TwilioSendResponse>(new TwilioSendResponse
             {
                 Sid = receiptId,
-                Status = TwilioMessageStatus.Queued
+                Status = TwilioMessageStatus.Queued,
+                Body = request.Body!
             });
     }
 }

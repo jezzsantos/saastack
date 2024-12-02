@@ -100,7 +100,7 @@ internal static class OAuth2ConversionExtensions
         var tokens = new List<AuthToken>();
         var now = DateTime.UtcNow.ToNearestSecond();
         var expiresOn = now.Add(TimeSpan.FromSeconds(response.ExpiresIn));
-        tokens.Add(new AuthToken(TokenType.AccessToken, response.AccessToken!, expiresOn));
+        tokens.Add(new AuthToken(TokenType.AccessToken, response.AccessToken, expiresOn));
         if (response.RefreshToken.HasValue())
         {
             // Note: Refresh tokens are typically long-lived, like: for days or weeks
@@ -114,7 +114,7 @@ internal static class OAuth2ConversionExtensions
             // Note: ID tokens are typically very short-lived, like: less than an hour or so
             var defaultIdTokenExpiry = TimeSpan.FromHours(1); //default from Microsoft Identity
             var idTokenExpiresOn = now.Add(defaultIdTokenExpiry);
-            tokens.Add(new AuthToken(TokenType.OtherToken, response.IdToken!, idTokenExpiresOn));
+            tokens.Add(new AuthToken(TokenType.OtherToken, response.IdToken, idTokenExpiresOn));
         }
 
         return tokens;

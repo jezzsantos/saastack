@@ -50,7 +50,7 @@ public class FeatureFlagsApiSpec : WebsiteSpec<Program>
         var result = await HttpApi.GetAsync(request.MakeApiRoute());
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        var flag = (await result.Content.ReadFromJsonAsync<GetFeatureFlagResponse>(JsonOptions))!.Flag!;
+        var flag = (await result.Content.ReadFromJsonAsync<GetFeatureFlagResponse>(JsonOptions))!.Flag;
         flag.Name.Should().Be(Flag.TestingOnly.Name);
 #endif
     }

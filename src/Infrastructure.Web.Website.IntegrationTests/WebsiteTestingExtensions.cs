@@ -34,9 +34,14 @@ public static class WebsiteTestingExtensions
         var authenticateUrl = authenticateRequest.MakeApiRoute();
         var authenticated = await websiteClient.PostAsync(authenticateUrl, JsonContent.Create(authenticateRequest),
             (msg, cookies) => msg.WithCSRF(cookies, csrfService));
+        if (authenticated.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            return (null!, authenticated);
+        }
+        
         var authTokens = (await authenticated.Content.ReadFromJsonAsync<AuthenticateResponse>(jsonOptions))!;
 
-        return (authTokens.UserId, authenticated)!;
+        return (authTokens.UserId, authenticated);
     }
 
     public static Optional<string> GetCookie(this HttpResponseMessage responseMessage, string name)
@@ -101,7 +106,7 @@ public static class WebsiteTestingExtensions
             (msg, cookies) => msg.WithCSRF(cookies, csrfService));
 
         var userId = (await person.Content.ReadFromJsonAsync<RegisterPersonPasswordResponse>(jsonOptions))!
-            .Credential!.User.Id;
+            .Credential.User.Id;
 
 #if TESTINGONLY
         await websiteClient.PropagateDomainEventsAsync(csrfService);
@@ -117,7 +122,7 @@ public static class WebsiteTestingExtensions
             .Token;
         var confirmationRequest = new ConfirmRegistrationPersonPasswordRequest
         {
-            Token = token!
+            Token = token
         };
         var confirmationUrl = confirmationRequest.MakeApiRoute();
         await websiteClient.PostAsync(confirmationUrl, JsonContent.Create(confirmationRequest),

@@ -6,7 +6,7 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Twilio;
 
 public class TwilioSendResponse : IWebResponse
 {
-    [JsonPropertyName("body")] public string? Body { get; set; }
+    [JsonPropertyName("body")] public required string Body { get; set; }
 
     [JsonPropertyName("sid")] public string? Sid { get; set; }
 

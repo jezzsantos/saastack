@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -40,7 +41,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (disposing)
         {
@@ -50,7 +51,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
 
     public async Task<JsonResponse<TResponse>> DeleteAsync<TResponse>(IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         var response = await SendRequestAsync(_httpClient, HttpMethod.Delete, request, null, requestFilter,
             cancellationToken);
@@ -72,7 +73,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
     public async Task<JsonResponse<TResponse>> GetAsync<TResponse>(IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = default)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         var response =
             await SendRequestAsync(_httpClient, HttpMethod.Get, request, null, requestFilter, cancellationToken);
@@ -95,7 +96,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
     public async Task<JsonResponse<TResponse>> PatchAsync<TResponse>(IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = default)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         var response = await SendRequestAsync(_httpClient, HttpMethod.Patch, request, null, requestFilter,
             cancellationToken);
@@ -118,7 +119,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
     public async Task<JsonResponse<TResponse>> PostAsync<TResponse>(IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = default)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         var response =
             await SendRequestAsync(_httpClient, HttpMethod.Post, request, null, requestFilter, cancellationToken);
@@ -141,7 +142,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
     public async Task<JsonResponse<TResponse>> PostAsync<TResponse>(IWebRequest<TResponse> request, PostFile file,
         Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = default)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         var response =
             await SendRequestAsync(_httpClient, HttpMethod.Post, request, file, requestFilter, cancellationToken);
@@ -164,7 +165,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
     public async Task<JsonResponse<TResponse>> PutAsync<TResponse>(IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = default)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         var response =
             await SendRequestAsync(_httpClient, HttpMethod.Put, request, null, requestFilter, cancellationToken);
@@ -176,7 +177,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
     public async Task<JsonResponse<TResponse>> PutAsync<TResponse>(IWebRequest<TResponse> request, PostFile file,
         Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = default)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         var response =
             await SendRequestAsync(_httpClient, HttpMethod.Put, request, file, requestFilter, cancellationToken);
@@ -252,16 +253,33 @@ public class JsonClient : IHttpJsonClient, IDisposable
 
     internal static async Task<Result<TResponse, ResponseProblem>> GetTypedResponseAsync<TResponse>(
         HttpResponseMessage response, JsonSerializerOptions? jsonOptions, CancellationToken? cancellationToken)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         var contentType = response.Content.Headers.ContentType;
         if (contentType.NotExists())
         {
             if (response.IsSuccessStatusCode)
             {
-                return new TResponse();
-            }
+                if (typeof(EmptyResponse).IsAssignableTo(typeof(TResponse)))
+                {
+                    return TryCreateEmptyResponse<TResponse>();
+                }
 
+                // Assume JSON
+                try
+                {
+                    var instance = await response.Content.ReadFromJsonAsync<TResponse>(jsonOptions,
+                        cancellationToken ?? CancellationToken.None);
+                    return instance.Exists()
+                        ? instance
+                        : TryCreateEmptyResponse<TResponse>();
+                }
+                catch (JsonException)
+                {
+                    return TryCreateEmptyResponse<TResponse>();
+                }
+            }
+            
             return response.StatusCode.ToResponseProblem(response.ReasonPhrase);
         }
 
@@ -277,8 +295,11 @@ public class JsonClient : IHttpJsonClient, IDisposable
         {
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadFromJsonAsync<TResponse>(jsonOptions,
-                    cancellationToken ?? CancellationToken.None) ?? new TResponse();
+                var instance = await response.Content.ReadFromJsonAsync<TResponse>(jsonOptions,
+                    cancellationToken ?? CancellationToken.None);
+                return instance.Exists()
+                    ? instance
+                    : TryCreateEmptyResponse<TResponse>();
             }
 
             if (response.Content.Headers.ContentType.Exists())
@@ -296,13 +317,14 @@ public class JsonClient : IHttpJsonClient, IDisposable
         {
             if (response.IsSuccessStatusCode)
             {
-                return new TResponse();
+                return TryCreateEmptyResponse<TResponse>();
             }
 
             return response.StatusCode.ToResponseProblem(response.ReasonPhrase);
         }
 
-        return new TResponse();
+        return HttpStatusCode.UnsupportedMediaType.ToResponseProblem(
+            string.Format(Resources.JsonClient_GetTypedResponse_UnsupportedMediaType, contentType.MediaType));
     }
 
     public async Task SendOneWayAsync(IWebRequest request, Action<HttpRequestMessage>? requestFilter = null,
@@ -381,7 +403,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
         {
             var requestFields = body.SerializeToJson()
                 .FromJson<Dictionary<string, object>>()!
-                .ToDictionary(pair => pair.Key, pair => pair.Value.ToString() ?? string.Empty); 
+                .ToDictionary(pair => pair.Key, pair => pair.Value.ToString() ?? string.Empty);
 
             return new FormUrlEncodedContent(requestFields);
         }
@@ -390,6 +412,21 @@ public class JsonClient : IHttpJsonClient, IDisposable
     public void SetBaseUrl(string baseUrl)
     {
         _httpClient.BaseAddress = new Uri(baseUrl.WithTrailingSlash(), UriKind.Absolute);
+    }
+
+    private static Result<TResponse, ResponseProblem> TryCreateEmptyResponse<TResponse>()
+        where TResponse : IWebResponse
+    {
+        try
+        {
+            return Activator.CreateInstance<TResponse>();
+        }
+        catch (Exception ex)
+        {
+            return HttpStatusCode.InternalServerError.ToResponseProblem(
+                string.Format(Resources.JsonClient_TryCreateEmptyResponse_NotConstructable, typeof(TResponse),
+                    ex.Message));
+        }
     }
 
     private static async Task<HttpResponseMessage> SendRequestAsync(HttpClient httpClient, HttpMethod method,
@@ -484,7 +521,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
 
     private static JsonResponse<TResponse> CreateResponse<TResponse>(HttpResponseMessage response,
         Result<TResponse, ResponseProblem> content)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         return new JsonResponse<TResponse>
         {
@@ -493,7 +530,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
             ContentHeaders = response.Content.Headers,
             Headers = response.Headers,
             RequestId = response.GetOrCreateRequestId(),
-            RawContent = content.IsSuccessful && !content.HasValue
+            RawContent = content is { IsSuccessful: true, HasValue: false }
                 ? response.Content.ReadAsStream()
                 : null
         };

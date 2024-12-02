@@ -9,5 +9,5 @@ namespace Infrastructure.Web.Api.Interfaces;
 public abstract class SearchResponse : IWebSearchResponse
 {
     [Description("Metadata about the search results")]
-    public SearchResultMetadata? Metadata { get; set; }
+    public required SearchResultMetadata Metadata { get; set; }
 }

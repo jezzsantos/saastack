@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Images;
 
 public class GetImageResponse : IWebResponse
 {
-    public Image? Image { get; set; }
+    public required Image Image { get; set; }
 }

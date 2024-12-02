@@ -6,13 +6,13 @@ namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
 
 public class FlagsmithGetEdgeIdentitiesResponse : IWebResponse
 {
-    [JsonPropertyName("results")] public List<FlagsmithEdgeIdentity> Results { get; set; } = new();
+    [JsonPropertyName("results")] public List<FlagsmithEdgeIdentity> Results { get; set; } = [];
 }
 
 [UsedImplicitly]
 public class FlagsmithEdgeIdentity
 {
-    [JsonPropertyName("identifier")] public string? Identifier { get; set; }
+    [JsonPropertyName("identifier")] public required string Identifier { get; set; }
 
-    [JsonPropertyName("identity_uuid")] public string? IdentityUuid { get; set; }
+    [JsonPropertyName("identity_uuid")] public required string IdentityUuid { get; set; }
 }

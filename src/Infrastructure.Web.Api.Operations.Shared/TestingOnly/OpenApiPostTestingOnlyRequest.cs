@@ -9,11 +9,14 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 /// <summary>
 ///     Tests OpenAPI swagger for POST requests
 /// </summary>
-/// <response code="409">a custom conflict response</response>
+/// <response code="409">
+///     a custom conflict response
+///     which spills over to the next line
+/// </response>
 /// <response code="419">a special response</response>
 [Route("/testingonly/openapi/{Id}", OperationMethod.Post, isTestingOnly: true)]
 [UsedImplicitly]
-public class OpenApiPostTestingOnlyRequest : WebRequest<OpenApiPostTestingOnlyRequest, StringMessageTestingOnlyResponse>
+public class OpenApiPostTestingOnlyRequest : WebRequest<OpenApiPostTestingOnlyRequest, OpenApiTestingOnlyResponse>
 {
     [Description("anid")] public string? Id { get; set; }
 

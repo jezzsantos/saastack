@@ -212,7 +212,7 @@ public class TestPostRequestTypedResponse : WebRequest<TestPostRequestTypedRespo
 
 public class TestResponse : IWebResponse
 {
-    public TestDto? TestDto { get; set; }
+    public required TestDto TestDto { get; set; }
 }
 
 public class TestDto

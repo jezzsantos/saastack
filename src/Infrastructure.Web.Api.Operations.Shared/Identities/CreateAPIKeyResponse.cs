@@ -5,6 +5,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
 public class CreateAPIKeyResponse : IWebResponse
 {
-    public string? ApiKey { get; set; }
+    public required string ApiKey { get; set; }
 }
 #endif

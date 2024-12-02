@@ -64,7 +64,7 @@
         <value>Payment Required</value>
     </data>
     <data name="HttpConstants_StatusCodes_Reason_PaymentRequired" xml:space="preserve">
-        <value>The client must have payment information to get ther requested response</value>
+        <value>The client must have payment information to get the requested response</value>
     </data>
     <data name="HttpConstants_StatusCodes_Title_Forbidden" xml:space="preserve">
         <value>Forbidden</value>

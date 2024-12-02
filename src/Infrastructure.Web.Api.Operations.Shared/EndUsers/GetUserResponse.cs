@@ -6,6 +6,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.EndUsers;
 
 public class GetUserResponse : IWebResponse
 {
-    public EndUserWithMemberships? User { get; set; }
+    public required EndUserWithMemberships User { get; set; }
 }
 #endif

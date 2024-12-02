@@ -34,7 +34,7 @@ public class StubServiceClient : IServiceClient
     public Task<Result<TResponse, ResponseProblem>> GetAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         throw new NotImplementedException();
     }
@@ -56,7 +56,7 @@ public class StubServiceClient : IServiceClient
     public Task<Result<TResponse, ResponseProblem>> PatchAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         throw new NotImplementedException();
     }
@@ -64,17 +64,18 @@ public class StubServiceClient : IServiceClient
     public Task<Result<TResponse, ResponseProblem>> PostAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         LastPostedMessage = Optional<IWebRequest>.Some(request);
 
-        return Task.FromResult<Result<TResponse, ResponseProblem>>(new TResponse());
+        var response = Activator.CreateInstance<TResponse>();
+        return Task.FromResult<Result<TResponse, ResponseProblem>>(response);
     }
 
     public Task<Result<TResponse, ResponseProblem>> PutAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)
-        where TResponse : IWebResponse, new()
+        where TResponse : IWebResponse
     {
         throw new NotImplementedException();
     }

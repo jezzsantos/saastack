@@ -13,7 +13,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 /// <response code="419">a special response</response>
 [Route("/testingonly/openapi/{Id}", OperationMethod.PutPatch, isTestingOnly: true)]
 [UsedImplicitly]
-public class OpenApiPutTestingOnlyRequest : WebRequest<OpenApiPutTestingOnlyRequest, StringMessageTestingOnlyResponse>
+public class OpenApiPutTestingOnlyRequest : WebRequest<OpenApiPutTestingOnlyRequest, OpenApiTestingOnlyResponse>
 {
     [Description("anid")] public string? Id { get; set; }
 

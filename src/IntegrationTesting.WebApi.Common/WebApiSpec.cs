@@ -278,7 +278,7 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
 
         var person = await RegisterUserAsync(emailAddress, firstName);
 
-        var user = person.Credential!.User;
+        var user = person.Credential.User;
         return await ReAuthenticateUserAsync(user, emailAddress);
     }
 
@@ -313,11 +313,11 @@ public abstract class WebApiSpec<THost> : IClassFixture<WebApiSetup<THost>>, IDi
             Password = password
         });
 
-        var accessToken = login.Content.Value.Tokens!.AccessToken.Value;
+        var accessToken = login.Content.Value.Tokens.AccessToken.Value;
         var refreshToken = login.Content.Value.Tokens.RefreshToken.Value;
 
         var profile = (await Api.GetAsync(new GetProfileForCallerRequest(),
-            req => req.SetJWTBearerToken(accessToken))).Content.Value.Profile!;
+            req => req.SetJWTBearerToken(accessToken))).Content.Value.Profile;
 
         var defaultOrganizationId = profile.DefaultOrganizationId!;
         return new LoginDetails(accessToken, refreshToken, user, profile, defaultOrganizationId);

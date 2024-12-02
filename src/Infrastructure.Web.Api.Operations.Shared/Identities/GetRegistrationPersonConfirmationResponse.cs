@@ -5,6 +5,6 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
 public class GetRegistrationPersonConfirmationResponse : IWebResponse
 {
-    public string? Token { get; set; }
+    public required string Token { get; set; }
 }
 #endif

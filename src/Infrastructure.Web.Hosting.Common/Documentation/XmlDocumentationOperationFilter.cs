@@ -70,7 +70,7 @@ public sealed class XmlDocumentationOperationFilter : IOperationFilter
         foreach (var docResponse in docResponses)
         {
             var code = docResponse.Xml.FirstAttribute!.Value;
-            var description = docResponse.Xml.Value;
+            var description = docResponse.ToText();
 
             responses.Add(code, new OpenApiResponse
             {

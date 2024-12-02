@@ -58,5 +58,23 @@ namespace Infrastructure.Web.Common {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported media type in response: {0}.
+        /// </summary>
+        internal static string JsonClient_GetTypedResponse_UnsupportedMediaType {
+            get {
+                return ResourceManager.GetString("JsonClient_GetTypedResponse_UnsupportedMediaType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An empty instance of &apos;{0}&apos; could not be created, likely due to the fact that it does not have a default parameterless constructor or it has properties that require initialization at construction time. More details: {1}.
+        /// </summary>
+        internal static string JsonClient_TryCreateEmptyResponse_NotConstructable {
+            get {
+                return ResourceManager.GetString("JsonClient_TryCreateEmptyResponse_NotConstructable", resourceCulture);
+            }
+        }
     }
 }

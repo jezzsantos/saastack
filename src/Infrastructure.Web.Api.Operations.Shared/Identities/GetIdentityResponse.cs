@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
 public class GetIdentityResponse : IWebResponse
 {
-    public Identity? Identity { get; set; }
+    public required Identity Identity { get; set; }
 }

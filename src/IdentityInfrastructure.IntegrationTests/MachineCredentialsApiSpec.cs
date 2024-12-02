@@ -31,7 +31,7 @@ public class MachineCredentialsApiSpec : WebApiSpec<Program>
             Name = "amachinename"
         });
 
-        result.Content.Value.Machine!.Id.Should().NotBeEmpty();
+        result.Content.Value.Machine.Id.Should().NotBeEmpty();
         result.Content.Value.Machine.Description.Should().Be("amachinename");
         result.Content.Value.Machine.ApiKey.Should().StartWith("apk_");
         result.Content.Value.Machine.CreatedById.Should().Be(CallerConstants.AnonymousUserId);
@@ -49,7 +49,7 @@ public class MachineCredentialsApiSpec : WebApiSpec<Program>
             Name = "amachinename"
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Machine!.Id.Should().NotBeEmpty();
+        result.Content.Value.Machine.Id.Should().NotBeEmpty();
         result.Content.Value.Machine.Description.Should().Be("amachinename");
         result.Content.Value.Machine.ApiKey.Should().StartWith("apk_");
         result.Content.Value.Machine.CreatedById.Should().Be(login.User.Id);
@@ -66,7 +66,7 @@ public class MachineCredentialsApiSpec : WebApiSpec<Program>
         });
 
         await PropagateDomainEventsAsync(PropagationRounds.Twice);
-        var apiKey = machine.Content.Value.Machine!.ApiKey;
+        var apiKey = machine.Content.Value.Machine.ApiKey;
 #if TESTINGONLY
         var result = await Api.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest(),
             req => req.SetAPIKey(apiKey));

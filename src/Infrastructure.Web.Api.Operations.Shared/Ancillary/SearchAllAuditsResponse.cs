@@ -6,7 +6,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Ancillary
 {
     public class SearchAllAuditsResponse : SearchResponse
     {
-        public List<Audit>? Audits { get; set; }
+        public List<Audit> Audits { get; set; } = [];
     }
 }
 #endif

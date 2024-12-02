@@ -41,9 +41,9 @@ public class InvitationsApiSpec : WebApiSpec<Program>
             Email = emailAddress
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Invitation!.EmailAddress.Should().Be(emailAddress);
-        result.Content.Value.Invitation!.FirstName.Should().Be("Aninvitee");
-        result.Content.Value.Invitation!.LastName.Should().BeNull();
+        result.Content.Value.Invitation.EmailAddress.Should().Be(emailAddress);
+        result.Content.Value.Invitation.FirstName.Should().Be("Aninvitee");
+        result.Content.Value.Invitation.LastName.Should().BeNull();
         _userNotificationService.LastGuestInvitationEmailRecipient.Should().Be(emailAddress);
     }
 
@@ -67,9 +67,9 @@ public class InvitationsApiSpec : WebApiSpec<Program>
             Email = emailAddress
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Invitation!.EmailAddress.Should().Be(emailAddress);
-        result.Content.Value.Invitation!.FirstName.Should().Be("Aninvitee");
-        result.Content.Value.Invitation!.LastName.Should().BeNull();
+        result.Content.Value.Invitation.EmailAddress.Should().Be(emailAddress);
+        result.Content.Value.Invitation.FirstName.Should().Be("Aninvitee");
+        result.Content.Value.Invitation.LastName.Should().BeNull();
         _userNotificationService.LastGuestInvitationEmailRecipient.Should().Be(emailAddress);
     }
 
@@ -95,9 +95,9 @@ public class InvitationsApiSpec : WebApiSpec<Program>
             Email = emailAddress
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        result.Content.Value.Invitation!.EmailAddress.Should().Be(emailAddress);
-        result.Content.Value.Invitation!.FirstName.Should().Be("afirstname");
-        result.Content.Value.Invitation!.LastName.Should().Be("alastname");
+        result.Content.Value.Invitation.EmailAddress.Should().Be(emailAddress);
+        result.Content.Value.Invitation.FirstName.Should().Be("afirstname");
+        result.Content.Value.Invitation.LastName.Should().Be("alastname");
         _userNotificationService.LastGuestInvitationEmailRecipient.Should().BeNull();
     }
 
@@ -140,7 +140,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
             Token = token
         });
 
-        result.Content.Value.Invitation!.EmailAddress.Should().Be(emailAddress);
+        result.Content.Value.Invitation.EmailAddress.Should().Be(emailAddress);
         result.Content.Value.Invitation.FirstName.Should().Be("Aninvitee");
         result.Content.Value.Invitation.LastName.Should().BeNull();
     }
@@ -203,7 +203,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
-        result.Content.Value.Credential!.Id.Should().NotBeEmpty();
+        result.Content.Value.Credential.Id.Should().NotBeEmpty();
         result.Content.Value.Credential.User.Id.Should().NotBeEmpty();
         result.Content.Value.Credential.User.Access.Should().Be(EndUserAccess.Enabled);
         result.Content.Value.Credential.User.Status.Should().Be(EndUserStatus.Registered);
@@ -235,7 +235,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
-        result.Content.Value.Credential!.Id.Should().NotBeEmpty();
+        result.Content.Value.Credential.Id.Should().NotBeEmpty();
         result.Content.Value.Credential.User.Id.Should().NotBeEmpty();
         result.Content.Value.Credential.User.Access.Should().Be(EndUserAccess.Enabled);
         result.Content.Value.Credential.User.Status.Should().Be(EndUserStatus.Registered);
@@ -268,7 +268,7 @@ public class InvitationsApiSpec : WebApiSpec<Program>
             TermsAndConditionsAccepted = true
         });
 
-        result.Content.Value.Credential!.Id.Should().NotBeEmpty();
+        result.Content.Value.Credential.Id.Should().NotBeEmpty();
         result.Content.Value.Credential.User.Id.Should().NotBeEmpty();
         result.Content.Value.Credential.User.Access.Should().Be(EndUserAccess.Enabled);
         result.Content.Value.Credential.User.Status.Should().Be(EndUserStatus.Registered);

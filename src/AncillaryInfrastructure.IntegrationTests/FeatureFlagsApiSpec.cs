@@ -50,7 +50,7 @@ public class FeatureFlagsApiSpec : WebApiSpec<Program>
         var result = await Api.GetAsync(request, req => req.SetHMACAuth(request, "asecret"));
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        result.Content.Value.Flag!.Name.Should().Be(Flag.TestingOnly.Name);
+        result.Content.Value.Flag.Name.Should().Be(Flag.TestingOnly.Name);
         _featureFlags.LastGetFlag.Should().Be(Flag.TestingOnly.Name);
 #endif
     }

@@ -72,8 +72,8 @@ public class ReverseProxyApiSpec : WebsiteSpec<Program>
         result.StatusCode.Should().Be(HttpStatusCode.OK);
         var response = await result.Content.ReadFromJsonAsync<GetProfileForCallerResponse>(JsonOptions);
 
-        response!.Profile!.IsAuthenticated.Should().BeFalse();
-        response.Profile!.Id.Should().Be(CallerConstants.AnonymousUserId);
+        response!.Profile.IsAuthenticated.Should().BeFalse();
+        response.Profile.Id.Should().Be(CallerConstants.AnonymousUserId);
     }
 
     [Fact]

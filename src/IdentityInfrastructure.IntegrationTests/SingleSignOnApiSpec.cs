@@ -75,7 +75,7 @@ public class SingleSignOnApiSpec : WebApiSpec<Program>
             AuthCode = "1234567890"
         });
 
-        result.Content.Value.Tokens!.UserId.Should().NotBeNull();
+        result.Content.Value.Tokens.UserId.Should().NotBeNull();
         result.Content.Value.Tokens.AccessToken.Value.Should().NotBeNull();
         result.Content.Value.Tokens.AccessToken.ExpiresOn.Should()
             .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry));
@@ -113,7 +113,7 @@ public class SingleSignOnApiSpec : WebApiSpec<Program>
             AuthCode = "1234567890"
         });
 
-        result.Content.Value.Tokens!.UserId.Should().Be(person.Content.Value.Credential!.User.Id);
+        result.Content.Value.Tokens.UserId.Should().Be(person.Content.Value.Credential.User.Id);
         result.Content.Value.Tokens.AccessToken.Value.Should().NotBeNull();
         result.Content.Value.Tokens.AccessToken.ExpiresOn.Should()
             .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry));
@@ -134,7 +134,7 @@ public class SingleSignOnApiSpec : WebApiSpec<Program>
             AuthCode = "1234567890"
         });
 
-        var accessToken = authenticate.Content.Value.Tokens!.AccessToken.Value;
+        var accessToken = authenticate.Content.Value.Tokens.AccessToken.Value;
 
         var result = await Api.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest(),
             req => req.SetJWTBearerToken(accessToken));

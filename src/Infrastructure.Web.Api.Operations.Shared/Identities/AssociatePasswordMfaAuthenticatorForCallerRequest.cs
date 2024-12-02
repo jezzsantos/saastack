@@ -10,7 +10,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 ///     Depending on the specific authenticator, this can send an SMS or email to the user containing a secret code.
 /// </summary>
 /// <response code="405">
-///     The user has already associated at least one other authenticator, or this authenticator is already associated
+///     The user has already associated at least one other authenticator, or this authenticator is already associated.
 ///     You must make a challenge using an existing association
 /// </response>
 /// <remarks>

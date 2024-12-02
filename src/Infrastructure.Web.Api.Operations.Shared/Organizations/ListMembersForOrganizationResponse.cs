@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
 
 public class ListMembersForOrganizationResponse : SearchResponse
 {
-    public List<OrganizationMember>? Members { get; set; }
+    public List<OrganizationMember> Members { get; set; } = [];
 }

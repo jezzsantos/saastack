@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Common.Extensions;
 using Infrastructure.Web.Api.Common.Extensions;
@@ -14,23 +15,72 @@ namespace Infrastructure.Web.Hosting.Common.Documentation;
 internal static class DataAnnotationsSchemaFilterExtensions
 {
     /// <summary>
-    ///     Collates the required properties of the request type, into the schema
+    ///     Collates the required properties of the request or response type, into the schema
     /// </summary>
-    public static void CollateRequiredProperties(this OpenApiSchema schema, Type requestType)
+    public static void CollateRequiredProperties(this OpenApiSchema schema, Type type)
     {
-        var properties = requestType.GetProperties();
+        var required = schema.Required ?? new HashSet<string>();
+        var properties = type.GetProperties();
         foreach (var property in properties)
         {
-            // we have to add all required properties to the request collection
-            if (property.IsPropertyRequired())
+            if (IsRequestType(type))
             {
-                var name = property.Name.ToCamelCase();
-                var required = schema.Required ?? new HashSet<string>();
-                // ReSharper disable once PossibleUnintendedLinearSearchInSet
-                if (!required.Contains(name, StringComparer.OrdinalIgnoreCase))
+                if (property.IsRequestPropertyRequired())
                 {
-                    required.Add(name);
+                    AddToRequired(property);
                 }
+                else
+                {
+                    RemoveFromRequired(property);
+                }
+
+                continue;
+            }
+
+            if (IsResponseType(type))
+            {
+                if (property.IsAnyPropertyRequired())
+                {
+                    AddToRequired(property);
+                }
+                else
+                {
+                    RemoveFromRequired(property);
+                }
+
+                continue;
+            }
+
+            // Either a request or repose DTO
+            if (property.IsAnyPropertyRequired())
+            {
+                AddToRequired(property);
+            }
+            else
+            {
+                RemoveFromRequired(property);
+            }
+        }
+
+        return;
+
+        void AddToRequired(PropertyInfo property)
+        {
+            var name = property.Name.ToCamelCase();
+            // ReSharper disable once PossibleUnintendedLinearSearchInSet
+            if (!required.Contains(name, StringComparer.OrdinalIgnoreCase))
+            {
+                required.Add(name);
+            }
+        }
+
+        void RemoveFromRequired(PropertyInfo property)
+        {
+            var name = property.Name.ToCamelCase();
+            // ReSharper disable once PossibleUnintendedLinearSearchInSet
+            if (required.Contains(name, StringComparer.OrdinalIgnoreCase))
+            {
+                required.Remove(name);
             }
         }
     }
@@ -48,7 +98,16 @@ internal static class DataAnnotationsSchemaFilterExtensions
         return IsInRoute(routeAttribute, name);
     }
 
-    public static bool IsPropertyRequired(this PropertyInfo property)
+    /// <summary>
+    ///     Determines if the type is a request or response type, which are the only ones that are annotatable
+    ///     with <see cref="System.ComponentModel.DataAnnotations" /> attributes
+    /// </summary>
+    public static bool IsRequestOrResponseType(this Type? parent)
+    {
+        return IsRequestType(parent) || IsResponseType(parent);
+    }
+
+    public static bool IsRequestPropertyRequired(this PropertyInfo property)
     {
         if (property.HasAttribute<RequiredAttribute>())
         {
@@ -59,23 +118,30 @@ internal static class DataAnnotationsSchemaFilterExtensions
     }
 
     /// <summary>
-    ///     Determines if the type is a request or response type, which are the only ones that are annotatable
+    ///     Determines if the type is a request type, which are the only ones that are annotatable
     ///     with <see cref="System.ComponentModel.DataAnnotations" /> attributes
     /// </summary>
-    public static bool IsRequestOrResponseType(this Type? parent)
+    public static bool IsRequestType(this Type? parent)
     {
-        return parent.Exists()
-               && (parent.IsAssignableTo(typeof(IWebRequest))
-                   || parent.IsAssignableTo(typeof(IWebResponse)));
+        return parent.Exists() && parent.IsAssignableTo(typeof(IWebRequest));
+    }
+
+    /// <summary>
+    ///     Determines if the type is a response type, which are the only ones that are annotatable
+    ///     with <see cref="System.ComponentModel.DataAnnotations" /> attributes
+    /// </summary>
+    public static bool IsResponseType(this Type? parent)
+    {
+        return parent.Exists() && parent.IsAssignableTo(typeof(IWebResponse));
     }
 
     /// <summary>
     ///     Removes any properties from the schema that are used in the path of the route template,
     ///     which will be passed as route parameters
     /// </summary>
-    public static void RemoveRouteTemplateFields(this OpenApiSchema schema, Type requestType)
+    public static void RemoveRouteTemplateFields(this OpenApiSchema schema, Type type)
     {
-        var routeAttribute = requestType.GetCustomAttribute<RouteAttribute>();
+        var routeAttribute = type.GetCustomAttribute<RouteAttribute>();
         if (routeAttribute.NotExists())
         {
             return;
@@ -92,7 +158,7 @@ internal static class DataAnnotationsSchemaFilterExtensions
             return;
         }
 
-        var placeholders = requestType.GetRouteTemplatePlaceholders();
+        var placeholders = type.GetRouteTemplatePlaceholders();
         foreach (var placeholder in placeholders)
         {
             var property = schema.Properties.FirstOrDefault(prop => prop.Key.EqualsIgnoreCase(placeholder.Key));
@@ -143,6 +209,11 @@ internal static class DataAnnotationsSchemaFilterExtensions
     /// </summary>
     public static void SetPropertyDescription(this OpenApiSchema schema, MemberInfo property)
     {
+        if (property.MemberType != MemberTypes.Property)
+        {
+            return;
+        }
+
         var descriptionAttribute = property.GetCustomAttribute<DescriptionAttribute>();
         if (descriptionAttribute.Exists())
         {
@@ -153,6 +224,21 @@ internal static class DataAnnotationsSchemaFilterExtensions
         }
     }
 
+    /// <summary>
+    ///     Sets the nullability of a property to false, so that it is never nullable
+    ///     Note: nullable here (in OpenApi) means that the property would exist in the JSON with a value of "null"
+    ///     We don't want "nullable", we will use "required" instead.
+    /// </summary>
+    public static void SetPropertyNullable(this OpenApiSchema schema, MemberInfo property)
+    {
+        if (property.MemberType != MemberTypes.Property)
+        {
+            return;
+        }
+
+        schema.Nullable = false;
+    }
+
     public static void SetRequired(this OpenApiParameter parameter, ParameterInfo parameterInfo)
     {
         if (parameter.In == ParameterLocation.Path
@@ -160,6 +246,41 @@ internal static class DataAnnotationsSchemaFilterExtensions
         {
             parameter.Required = true;
         }
+    }
+
+    private static bool IsAnyPropertyRequired(this PropertyInfo propertyInfo)
+    {
+        return !propertyInfo.IsAnyPropertyNullable();
+    }
+
+    private static bool IsAnyPropertyNullable(this PropertyInfo propertyInfo)
+    {
+        var isNullable = false;
+
+        // Check for the [Required] DataAnnotation attribute
+        if (propertyInfo.GetCustomAttribute<RequiredAttribute>().Exists())
+        {
+            isNullable = false;
+        }
+
+        // Check for the 'required' C# keyword
+        if (propertyInfo.GetCustomAttribute<RequiredMemberAttribute>().Exists())
+        {
+            isNullable = false;
+        }
+
+        if (propertyInfo.PropertyType.IsValueType)
+        {
+            isNullable = Nullable.GetUnderlyingType(propertyInfo.PropertyType).Exists();
+        }
+
+        // Check for the ? nullable annotation
+        if (propertyInfo.GetCustomAttribute<NullableAttribute>().Exists())
+        {
+            isNullable = true;
+        }
+
+        return isNullable;
     }
 
     private static bool IsInRoute(RouteAttribute routeAttribute, string name)

@@ -65,7 +65,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
-        deliveries.Content.Value.Smses!.Count.Should().Be(1);
+        deliveries.Content.Value.Smses.Count.Should().Be(1);
         deliveries.Content.Value.Smses[0].Body.Should().Be("anhtmlbody");
         deliveries.Content.Value.Smses[0].ToPhoneNumber.Should().Be("+6498876986");
         deliveries.Content.Value.Smses[0].Attempts.Should()
@@ -109,7 +109,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
-        deliveries.Content.Value.Smses!.Count.Should().Be(1);
+        deliveries.Content.Value.Smses.Count.Should().Be(1);
         deliveries.Content.Value.Smses[0].Body.Should().Be("anhtmlbody");
         deliveries.Content.Value.Smses[0].ToPhoneNumber.Should().Be("+6498876986");
         deliveries.Content.Value.Smses[0].Attempts.Should()
@@ -157,7 +157,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
-        deliveries.Content.Value.Smses!.Count.Should().Be(1);
+        deliveries.Content.Value.Smses.Count.Should().Be(1);
         deliveries.Content.Value.Smses[0].Body.Should().Be("anhtmlbody");
         deliveries.Content.Value.Smses[0].ToPhoneNumber.Should().Be("+6498876986");
         deliveries.Content.Value.Smses[0].Attempts.Should().HaveCount(2);
@@ -208,7 +208,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
-        deliveries.Content.Value.Smses!.Count.Should().Be(1);
+        deliveries.Content.Value.Smses.Count.Should().Be(1);
         deliveries.Content.Value.Smses[0].Body.Should().Be("anhtmlbody");
         deliveries.Content.Value.Smses[0].ToPhoneNumber.Should().Be("+6498876986");
         deliveries.Content.Value.Smses[0].Attempts.Should()
@@ -261,7 +261,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var now = DateTime.UtcNow;
-        deliveries.Content.Value.Smses!.Count.Should().Be(1);
+        deliveries.Content.Value.Smses.Count.Should().Be(1);
         deliveries.Content.Value.Smses[0].Body.Should().Be("anhtmlbody");
         deliveries.Content.Value.Smses[0].ToPhoneNumber.Should().Be("+6498876986");
         deliveries.Content.Value.Smses[0].Attempts.Should()
@@ -308,7 +308,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
             },
             req => req.SetJWTBearerToken(login.AccessToken));
 
-        deliveries.Content.Value.Smses!.Count.Should().Be(1);
+        deliveries.Content.Value.Smses.Count.Should().Be(1);
         deliveries.Content.Value.Smses[0].Tags.Count.Should().Be(3);
         deliveries.Content.Value.Smses[0].Tags[0].Should().Be("atag1");
         deliveries.Content.Value.Smses[0].Tags[1].Should().Be("atag2");

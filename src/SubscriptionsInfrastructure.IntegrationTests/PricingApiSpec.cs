@@ -26,7 +26,7 @@ public class PricingApiSpec
         [Fact]
         public async Task WhenListPricingPlans_ThenReturnsPlans()
         {
-            var result = (await Api.GetAsync(new ListPricingPlansRequest())).Content.Value.Plans!;
+            var result = (await Api.GetAsync(new ListPricingPlansRequest())).Content.Value.Plans;
 
             result.Eternally.Count.Should().Be(1);
             result.Eternally[0].Id.Should().Be(SinglePlanBillingStateInterpreter.Constants.DefaultPlanId);

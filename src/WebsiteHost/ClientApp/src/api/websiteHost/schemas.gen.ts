@@ -25,11 +25,11 @@ export const AuthenticateRequestSchema = {
 } as const;
 
 export const AuthenticateResponseSchema = {
+  required: ["userId"],
   type: "object",
   properties: {
     userId: {
-      type: "string",
-      nullable: true
+      type: "string"
     }
   },
   additionalProperties: false
@@ -41,34 +41,35 @@ export const EmptyResponseSchema = {
 } as const;
 
 export const FeatureFlagSchema = {
+  required: ["isEnabled", "name"],
   type: "object",
   properties: {
     isEnabled: {
       type: "boolean"
     },
     name: {
-      type: "string",
-      nullable: true
+      type: "string"
     }
   },
   additionalProperties: false
 } as const;
 
 export const GetAllFeatureFlagsResponseSchema = {
+  required: ["flags"],
   type: "object",
   properties: {
     flags: {
       type: "array",
       items: {
         $ref: "#/components/schemas/FeatureFlag"
-      },
-      nullable: true
+      }
     }
   },
   additionalProperties: false
 } as const;
 
 export const GetFeatureFlagResponseSchema = {
+  required: ["flag"],
   type: "object",
   properties: {
     flag: {
@@ -79,15 +80,14 @@ export const GetFeatureFlagResponseSchema = {
 } as const;
 
 export const HealthCheckResponseSchema = {
+  required: ["name", "status"],
   type: "object",
   properties: {
     name: {
-      type: "string",
-      nullable: true
+      type: "string"
     },
     status: {
-      type: "string",
-      nullable: true
+      type: "string"
     }
   },
   additionalProperties: false
@@ -99,28 +99,24 @@ export const LogoutRequestSchema = {
 } as const;
 
 export const ProblemDetailsSchema = {
+  required: ["detail", "instance", "title", "type"],
   type: "object",
   properties: {
     type: {
-      type: "string",
-      nullable: true
+      type: "string"
     },
     title: {
-      type: "string",
-      nullable: true
+      type: "string"
     },
     status: {
       type: "integer",
-      format: "int32",
-      nullable: true
+      format: "int32"
     },
     detail: {
-      type: "string",
-      nullable: true
+      type: "string"
     },
     instance: {
-      type: "string",
-      nullable: true
+      type: "string"
     }
   },
   additionalProperties: {}
@@ -176,6 +172,7 @@ export const RecordTraceRequestSchema = {
     arguments: {
       type: "array",
       items: {
+        required: ["chars", "length"],
         type: "string"
       },
       nullable: true

@@ -107,7 +107,7 @@ public class AuthNApiSpec : WebApiSpec<ApiHost1.Program>
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var result = await Api.GetAsync(new GetCallerWithTokenOrAPIKeyTestingOnlyRequest(),
-            req => req.SetAPIKey(apiKey.Content.Value.ApiKey!));
+            req => req.SetAPIKey(apiKey.Content.Value.ApiKey));
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
         result.Content.Value.CallerId.Should().Be(login.User.Id);

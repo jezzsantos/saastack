@@ -8,7 +8,7 @@ export type AuthenticateRequest = {
 };
 
 export type AuthenticateResponse = {
-  userId?: string | null;
+  userId: string;
 };
 
 export type EmptyResponse = {
@@ -16,21 +16,21 @@ export type EmptyResponse = {
 };
 
 export type FeatureFlag = {
-  isEnabled?: boolean;
-  name?: string | null;
+  isEnabled: boolean;
+  name: string;
 };
 
 export type GetAllFeatureFlagsResponse = {
-  flags?: Array<FeatureFlag> | null;
+  flags: Array<FeatureFlag>;
 };
 
 export type GetFeatureFlagResponse = {
-  flag?: FeatureFlag;
+  flag: FeatureFlag;
 };
 
 export type HealthCheckResponse = {
-  name?: string | null;
-  status?: string | null;
+  name: string;
+  status: string;
 };
 
 export type LogoutRequest = {
@@ -38,11 +38,11 @@ export type LogoutRequest = {
 };
 
 export type ProblemDetails = {
-  type?: string | null;
-  title?: string | null;
-  status?: number | null;
-  detail?: string | null;
-  instance?: string | null;
+  type: string;
+  title: string;
+  status?: number;
+  detail: string;
+  instance: string;
   [key: string]: (unknown | string | number) | undefined;
 };
 

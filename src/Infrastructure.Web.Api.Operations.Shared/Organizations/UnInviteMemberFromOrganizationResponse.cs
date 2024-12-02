@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Organizations;
 
 public class UnInviteMemberFromOrganizationResponse : IWebResponse
 {
-    public Organization? Organization { get; set; }
+    public required Organization Organization { get; set; }
 }

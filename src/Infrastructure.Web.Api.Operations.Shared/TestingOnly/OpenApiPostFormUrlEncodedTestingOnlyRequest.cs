@@ -11,7 +11,7 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 [Route("/testingonly/openapi/{Id}/urlencoded", OperationMethod.Post, isTestingOnly: true)]
 [UsedImplicitly]
 public class OpenApiPostFormUrlEncodedTestingOnlyRequest :
-    WebRequest<OpenApiPostFormUrlEncodedTestingOnlyRequest, StringMessageTestingOnlyResponse>,
+    WebRequest<OpenApiPostFormUrlEncodedTestingOnlyRequest, OpenApiTestingOnlyResponse>,
     IHasFormUrlEncoded
 {
     public string? Id { get; set; }

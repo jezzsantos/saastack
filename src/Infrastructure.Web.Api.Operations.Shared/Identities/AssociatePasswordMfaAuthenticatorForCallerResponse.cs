@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Identities;
 
 public class AssociatePasswordMfaAuthenticatorForCallerResponse : IWebResponse
 {
-    public PasswordCredentialMfaAuthenticatorAssociation? Authenticator { get; set; }
+    public required PasswordCredentialMfaAuthenticatorAssociation Authenticator { get; set; }
 }

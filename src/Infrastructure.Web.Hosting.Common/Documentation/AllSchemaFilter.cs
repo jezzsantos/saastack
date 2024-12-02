@@ -19,10 +19,26 @@ public class AllSchemaFilter : ISchemaFilter
         {
             var member = context.MemberInfo;
             var declaringType = member.DeclaringType;
-            if (declaringType.IsRequestOrResponseType())
+            if (declaringType.IsRequestType())
             {
-                // dealing with each property of a request and responses type
+                // dealing with each property of a request type
                 schema.SetPropertyDescription(member);
+
+                return;
+            }
+
+            if (declaringType.IsResponseType())
+            {
+                // dealing with each property of a responses type
+                schema.SetPropertyDescription(member);
+                schema.SetPropertyNullable(member);
+
+                return;
+            }
+
+            if (declaringType.Exists())
+            {
+                schema.SetPropertyNullable(member);
             }
 
             return;
@@ -35,11 +51,15 @@ public class AllSchemaFilter : ISchemaFilter
         }
 
         // dealing with any other schemas in general
+        var dtoType = context.Type;
         if (context.Type.IsRequestOrResponseType())
         {
-            var requestType = context.Type;
-            schema.CollateRequiredProperties(requestType);
-            schema.RemoveRouteTemplateFields(requestType);
+            schema.CollateRequiredProperties(dtoType);
+            schema.RemoveRouteTemplateFields(dtoType);
+        }
+        else
+        {
+            schema.CollateRequiredProperties(dtoType);
         }
 
         if (context.Type.IsEnum)

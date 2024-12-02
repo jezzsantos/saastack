@@ -35,7 +35,8 @@ public class MailgunClientSpec
                 It.IsAny<Action<HttpRequestMessage>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new MailgunSendMessageResponse
             {
-                Id = "areceiptid"
+                Id = "areceiptid",
+                Message = "amessage"
             });
 
         var result = await _client.SendHtmlAsync(_call.Object, "asubject", "afromemailaddress", "afromdisplayname",

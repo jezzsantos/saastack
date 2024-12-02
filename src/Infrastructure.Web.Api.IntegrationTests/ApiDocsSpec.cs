@@ -1,3 +1,5 @@
+#if TESTINGONLY
+     using ApiHost1;
 using Common.Extensions;
 using FluentAssertions;
 using HtmlAgilityPack;
@@ -46,9 +48,9 @@ public class ApiDocSpec
 
     [Trait("Category", "Integration.API")]
     [Collection("API")]
-    public class GivenAnyRequest : WebApiSpec<ApiHost1.Program>
+    public class GivenAnyRequest : WebApiSpec<Program>
     {
-        public GivenAnyRequest(WebApiSetup<ApiHost1.Program> setup) : base(setup)
+        public GivenAnyRequest(WebApiSetup<Program> setup) : base(setup)
         {
         }
 
@@ -83,9 +85,10 @@ public class ApiDocSpec
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
             var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Get];
-            operation.Description.Should().Be("(request type: OpenApiGetTestingOnlyRequest)");
+            operation.Description.Should().Be($"(request type: {nameof(OpenApiGetTestingOnlyRequest)})");
             operation.OperationId.Should().Be("OpenApiGetTestingOnly");
-            operation.Summary.Should().Be("Tests OpenAPI swagger for GET requests");
+            operation.Summary.Should()
+                .Be("Tests OpenAPI swagger for GET requests This includes multiple lines explaining things");
         }
 
         [Fact]
@@ -97,15 +100,53 @@ public class ApiDocSpec
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
             var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Post];
-            operation.Description.Should().Be("(request type: OpenApiPostTestingOnlyRequest)");
+            operation.Description.Should().Be($"(request type: {nameof(OpenApiPostTestingOnlyRequest)})");
             operation.OperationId.Should().Be("OpenApiPostTestingOnly");
             operation.Summary.Should().Be("Tests OpenAPI swagger for POST requests");
-            operation.Responses["409"].Description.Should().Be("a custom conflict response");
+            operation.Responses["409"].Description.Should()
+                .Be("a custom conflict response which spills over to the next line");
             operation.Responses["419"].Description.Should().Be("a special response");
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenAnonymousAuthorizationHasNoSecurityScheme()
+        public async Task WhenFetchOpenApi_ThenHasNullableResponseFields()
+        {
+            var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
+
+            var openApi = new OpenApiStreamReader()
+                .Read(await result.Content.ReadAsStreamAsync(), out _);
+
+            var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Get];
+            operation.Description.Should().Be($"(request type: {nameof(OpenApiGetTestingOnlyRequest)})");
+            operation.OperationId.Should().Be("OpenApiGetTestingOnly");
+
+            var responseType = openApi.Components.Schemas[nameof(OpenApiTestingOnlyResponse)];
+            responseType.Required.Count.Should().Be(5);
+            responseType.Required.Should().ContainInOrder("anAnnotatedRequiredField", "anInitializedField",
+                "aRequiredField", "aValueTypeField", "message");
+            responseType.Properties["anAnnotatedRequiredField"].Nullable.Should().BeFalse();
+            responseType.Properties["anInitializedField"].Nullable.Should().BeFalse();
+            responseType.Properties["aNullableField"].Nullable.Should().BeFalse();
+            responseType.Properties["aRequiredField"].Nullable.Should().BeFalse();
+            responseType.Properties["aValueTypeField"].Nullable.Should().BeFalse();
+            responseType.Properties["aNullableValueTypeField"].Nullable.Should().BeFalse();
+            responseType.Properties["message"].Nullable.Should().BeFalse();
+            responseType.Properties["anNullableObject"].Nullable.Should().BeFalse();
+
+            var nestedType = openApi.Components.Schemas[nameof(OpenApiResponseObject)];
+            nestedType.Required.Count.Should().Be(4);
+            nestedType.Required.Should().ContainInOrder("anAnnotatedRequiredField", "anInitializedField",
+                "aRequiredField", "aValueTypeField");
+            nestedType.Properties["anAnnotatedRequiredField"].Nullable.Should().BeFalse();
+            nestedType.Properties["anInitializedField"].Nullable.Should().BeFalse();
+            nestedType.Properties["aNullableField"].Nullable.Should().BeFalse();
+            nestedType.Properties["aRequiredField"].Nullable.Should().BeFalse();
+            nestedType.Properties["aValueTypeField"].Nullable.Should().BeFalse();
+            nestedType.Properties["aNullableValueTypeField"].Nullable.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task WhenFetchOpenApiForNonSecuredEndpoint_ThenAnonymousAuthorizationHasNoSecurityScheme()
         {
             var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
 
@@ -113,13 +154,13 @@ public class ApiDocSpec
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
             var operation = openApi!.Paths["/testingonly/security/none"].Operations[OperationType.Get];
-            operation.Description.Should().Be("(request type: GetInsecureTestingOnlyRequest)");
+            operation.Description.Should().Be($"(request type: {nameof(GetInsecureTestingOnlyRequest)})");
             operation.OperationId.Should().Be("GetInsecureTestingOnly");
             operation.Security.Should().HaveCount(0);
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenTokenAuthorizationHasSecurityScheme()
+        public async Task WhenFetchOpenApiForTokenSecuredEndpoint_ThenTokenAuthorizationHasSecurityScheme()
         {
             var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
 
@@ -127,7 +168,8 @@ public class ApiDocSpec
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
             var operation = openApi!.Paths["/testingonly/authn/token/get"].Operations[OperationType.Get];
-            operation.Description.Should().Be("(request type: GetCallerWithTokenOrAPIKeyTestingOnlyRequest)");
+            operation.Description.Should()
+                .Be($"(request type: {nameof(GetCallerWithTokenOrAPIKeyTestingOnlyRequest)})");
             operation.OperationId.Should().Be("GetCallerWithTokenOrAPIKeyTestingOnly");
             operation.Security.Should().HaveCount(2);
             operation.Security[0].Values.Count.Should().Be(1);
@@ -140,7 +182,7 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApi_ThenHMACAuthorizationHasSecurityScheme()
+        public async Task WhenFetchOpenApiForSecureHMACEndpoint_ThenHMACAuthorizationHasSecurityScheme()
         {
             var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
 
@@ -148,7 +190,7 @@ public class ApiDocSpec
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
             var operation = openApi!.Paths["/testingonly/authn/hmac/get"].Operations[OperationType.Get];
-            operation.Description.Should().Be("(request type: GetCallerWithHMACTestingOnlyRequest)");
+            operation.Description.Should().Be($"(request type: {nameof(GetCallerWithHMACTestingOnlyRequest)})");
             operation.OperationId.Should().Be("GetCallerWithHMACTestingOnly");
             operation.Security.Should().HaveCount(1);
             operation.Security[0].Values.Count.Should().Be(1);
@@ -159,9 +201,9 @@ public class ApiDocSpec
 
     [Trait("Category", "Integration.API")]
     [Collection("API")]
-    public class GivenAGetRequest : WebApiSpec<ApiHost1.Program>
+    public class GivenAGetRequest : WebApiSpec<Program>
     {
-        public GivenAGetRequest(WebApiSetup<ApiHost1.Program> setup) : base(setup)
+        public GivenAGetRequest(WebApiSetup<Program> setup) : base(setup)
         {
         }
 
@@ -174,7 +216,7 @@ public class ApiDocSpec
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
             var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Get];
-            operation.Description.Should().Be("(request type: OpenApiGetTestingOnlyRequest)");
+            operation.Description.Should().Be($"(request type: {nameof(OpenApiGetTestingOnlyRequest)})");
             operation.OperationId.Should().Be("OpenApiGetTestingOnly");
             operation.Parameters.Should().HaveCount(3);
             operation.Parameters[0].Name.Should().Be("Id");
@@ -200,9 +242,9 @@ public class ApiDocSpec
             operation.Responses["200"].Description.Should().Be("OK");
             operation.Responses["200"].Content.Count.Should().Be(2);
             operation.Responses["200"].Content[HttpConstants.ContentTypes.Json].Schema.Reference.ReferenceV3.Should()
-                .Be("#/components/schemas/StringMessageTestingOnlyResponse");
+                .Be($"#/components/schemas/{nameof(OpenApiTestingOnlyResponse)}");
             operation.Responses["200"].Content[HttpConstants.ContentTypes.Xml].Schema.Reference.ReferenceV3.Should()
-                .Be("#/components/schemas/StringMessageTestingOnlyResponse");
+                .Be($"#/components/schemas/{nameof(OpenApiTestingOnlyResponse)}");
         }
 
         [Fact]
@@ -221,9 +263,9 @@ public class ApiDocSpec
 
     [Trait("Category", "Integration.API")]
     [Collection("API")]
-    public class GivenAPostRequest : WebApiSpec<ApiHost1.Program>
+    public class GivenAPostRequest : WebApiSpec<Program>
     {
-        public GivenAPostRequest(WebApiSetup<ApiHost1.Program> setup) : base(setup)
+        public GivenAPostRequest(WebApiSetup<Program> setup) : base(setup)
         {
         }
 
@@ -236,9 +278,9 @@ public class ApiDocSpec
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
             var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Post];
-            operation.Description.Should().Be("(request type: OpenApiPostTestingOnlyRequest)");
+            operation.Description.Should().Be($"(request type: {nameof(OpenApiPostTestingOnlyRequest)})");
             operation.OperationId.Should().Be("OpenApiPostTestingOnly");
-            var schema = openApi.Components.Schemas["OpenApiPostTestingOnlyRequest"];
+            var schema = openApi.Components.Schemas[nameof(OpenApiPostTestingOnlyRequest)];
             schema.Description.Should().BeNull();
             schema.Required.Should().BeEquivalentTo("id", "requiredField");
             schema.Properties.Should().HaveCount(2);
@@ -259,9 +301,9 @@ public class ApiDocSpec
             operation.Responses["201"].Description.Should().Be("Created");
             operation.Responses["201"].Content.Count.Should().Be(2);
             operation.Responses["201"].Content[HttpConstants.ContentTypes.Json].Schema.Reference.ReferenceV3.Should()
-                .Be("#/components/schemas/StringMessageTestingOnlyResponse");
+                .Be($"#/components/schemas/{nameof(OpenApiTestingOnlyResponse)}");
             operation.Responses["201"].Content[HttpConstants.ContentTypes.Xml].Schema.Reference.ReferenceV3.Should()
-                .Be("#/components/schemas/StringMessageTestingOnlyResponse");
+                .Be($"#/components/schemas/{nameof(OpenApiTestingOnlyResponse)}");
         }
 
         [Fact]
@@ -274,15 +316,16 @@ public class ApiDocSpec
 
             var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Post];
             operation.Responses.Count.Should().Be(11);
-            VerifyGeneralErrorResponses(operation.Responses, "a custom conflict response");
+            VerifyGeneralErrorResponses(operation.Responses,
+                "a custom conflict response which spills over to the next line");
         }
     }
 
     [Trait("Category", "Integration.API")]
     [Collection("API")]
-    public class GivenAPutRequest : WebApiSpec<ApiHost1.Program>
+    public class GivenAPutRequest : WebApiSpec<Program>
     {
-        public GivenAPutRequest(WebApiSetup<ApiHost1.Program> setup) : base(setup)
+        public GivenAPutRequest(WebApiSetup<Program> setup) : base(setup)
         {
         }
 
@@ -295,9 +338,9 @@ public class ApiDocSpec
                 .Read(await result.Content.ReadAsStreamAsync(), out _);
 
             var operation = openApi!.Paths["/testingonly/openapi/{Id}"].Operations[OperationType.Put];
-            operation.Description.Should().Be("(request type: OpenApiPutTestingOnlyRequest)");
+            operation.Description.Should().Be($"(request type: {nameof(OpenApiPutTestingOnlyRequest)})");
             operation.OperationId.Should().Be("OpenApiPutTestingOnly (Put)");
-            var schema = openApi.Components.Schemas["OpenApiPutTestingOnlyRequest"];
+            var schema = openApi.Components.Schemas[nameof(OpenApiPutTestingOnlyRequest)];
             schema.Description.Should().BeNull();
             schema.Required.Should().BeEquivalentTo("id", "requiredField");
             schema.Properties.Should().HaveCount(2);
@@ -318,9 +361,9 @@ public class ApiDocSpec
             operation.Responses["202"].Description.Should().Be("Accepted");
             operation.Responses["202"].Content.Count.Should().Be(2);
             operation.Responses["202"].Content[HttpConstants.ContentTypes.Json].Schema.Reference.ReferenceV3.Should()
-                .Be("#/components/schemas/StringMessageTestingOnlyResponse");
+                .Be($"#/components/schemas/{nameof(OpenApiTestingOnlyResponse)}");
             operation.Responses["202"].Content[HttpConstants.ContentTypes.Xml].Schema.Reference.ReferenceV3.Should()
-                .Be("#/components/schemas/StringMessageTestingOnlyResponse");
+                .Be($"#/components/schemas/{nameof(OpenApiTestingOnlyResponse)}");
         }
 
         [Fact]
@@ -339,14 +382,14 @@ public class ApiDocSpec
 
     [Trait("Category", "Integration.API")]
     [Collection("API")]
-    public class GivenAPostMultiPartFormRequest : WebApiSpec<ApiHost1.Program>
+    public class GivenAPostMultiPartFormDataRequest : WebApiSpec<Program>
     {
-        public GivenAPostMultiPartFormRequest(WebApiSetup<ApiHost1.Program> setup) : base(setup)
+        public GivenAPostMultiPartFormDataRequest(WebApiSetup<Program> setup) : base(setup)
         {
         }
 
         [Fact]
-        public async Task WhenFetchOpenApiForMultiPartForm_ThenFieldsHaveDescriptions()
+        public async Task WhenFetchOpenApiForMultiPartFormData_ThenFieldsHaveDescriptions()
         {
             var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
 
@@ -374,7 +417,7 @@ public class ApiDocSpec
         }
 
         [Fact]
-        public async Task WhenFetchOpenApiForMultiPartForm_ThenResponseHas201Response()
+        public async Task WhenFetchOpenApiForMultiPartFormData_ThenResponseHas201Response()
         {
             var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
 
@@ -385,13 +428,13 @@ public class ApiDocSpec
             operation.Responses["201"].Description.Should().Be("Created");
             operation.Responses["201"].Content.Count.Should().Be(2);
             operation.Responses["201"].Content[HttpConstants.ContentTypes.Json].Schema.Reference.ReferenceV3.Should()
-                .Be("#/components/schemas/StringMessageTestingOnlyResponse");
+                .Be($"#/components/schemas/{nameof(OpenApiTestingOnlyResponse)}");
             operation.Responses["201"].Content[HttpConstants.ContentTypes.Xml].Schema.Reference.ReferenceV3.Should()
-                .Be("#/components/schemas/StringMessageTestingOnlyResponse");
+                .Be($"#/components/schemas/{nameof(OpenApiTestingOnlyResponse)}");
         }
 
         [Fact]
-        public async Task WhenFetchOpenApiForMultiPartForm_ThenResponseHasGeneralErrorResponses()
+        public async Task WhenFetchOpenApiForMultiPartFormData_ThenResponseHasGeneralErrorResponses()
         {
             var result = await HttpApi.GetAsync(WebConstants.SwaggerEndpointFormat.Format("v1"));
 
@@ -401,6 +444,15 @@ public class ApiDocSpec
             var operation = openApi!.Paths["/testingonly/openapi/{Id}/form-data"].Operations[OperationType.Post];
             operation.Responses.Count.Should().Be(10);
             VerifyGeneralErrorResponses(operation.Responses);
+        }
+    }
+
+    [Trait("Category", "Integration.API")]
+    [Collection("API")]
+    public class GivenAPostFormUrlEncodingRequest : WebApiSpec<Program>
+    {
+        public GivenAPostFormUrlEncodingRequest(WebApiSetup<Program> setup) : base(setup)
+        {
         }
 
         [Fact]
@@ -441,9 +493,9 @@ public class ApiDocSpec
             operation.Responses["201"].Description.Should().Be("Created");
             operation.Responses["201"].Content.Count.Should().Be(2);
             operation.Responses["201"].Content[HttpConstants.ContentTypes.Json].Schema.Reference.ReferenceV3.Should()
-                .Be("#/components/schemas/StringMessageTestingOnlyResponse");
+                .Be($"#/components/schemas/{nameof(OpenApiTestingOnlyResponse)}");
             operation.Responses["201"].Content[HttpConstants.ContentTypes.Xml].Schema.Reference.ReferenceV3.Should()
-                .Be("#/components/schemas/StringMessageTestingOnlyResponse");
+                .Be($"#/components/schemas/{nameof(OpenApiTestingOnlyResponse)}");
         }
 
         [Fact]
@@ -460,3 +512,4 @@ public class ApiDocSpec
         }
     }
 }
+#endif

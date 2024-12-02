@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.EndUsers;
 
 public class UpdateUserResponse : IWebResponse
 {
-    public EndUser? User { get; set; }
+    public required EndUser User { get; set; }
 }

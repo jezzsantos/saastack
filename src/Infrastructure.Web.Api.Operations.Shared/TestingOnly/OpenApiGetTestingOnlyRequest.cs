@@ -8,10 +8,14 @@ namespace Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 
 /// <summary>
 ///     Tests OpenAPI swagger for GET requests
+///     This includes multiple lines explaining things
 /// </summary>
+/// <remarks>
+///     This is some explanation
+/// </remarks>
 [Route("/testingonly/openapi/{Id}", OperationMethod.Get, isTestingOnly: true)]
 [UsedImplicitly]
-public class OpenApiGetTestingOnlyRequest : WebRequest<OpenApiGetTestingOnlyRequest, StringMessageTestingOnlyResponse>
+public class OpenApiGetTestingOnlyRequest : WebRequest<OpenApiGetTestingOnlyRequest, OpenApiTestingOnlyResponse>
 {
     [Description("anid")] public string? Id { get; set; }
 

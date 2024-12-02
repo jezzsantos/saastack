@@ -62,7 +62,7 @@ public class ProvisioningsApiSpec : WebApiSpec<Program>
             Id = tenantId
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        organization.Content.Value.Settings!.Count.Should().Be(3);
+        organization.Content.Value.Settings.Count.Should().Be(3);
         organization.Content.Value.Settings["aname1"].Should().Be("avalue");
         organization.Content.Value.Settings["aname2"].Should().Be("99");
         organization.Content.Value.Settings["aname3"].Should().Be("True");
@@ -107,7 +107,7 @@ public class ProvisioningsApiSpec : WebApiSpec<Program>
             Id = tenantId!
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
-        organization.Content.Value.Settings!.Count.Should().Be(3);
+        organization.Content.Value.Settings.Count.Should().Be(3);
         organization.Content.Value.Settings["aname1"].Should().Be("avalue1");
         organization.Content.Value.Settings["aname2"].Should().Be("99");
         organization.Content.Value.Settings["aname3"].Should().Be("True");

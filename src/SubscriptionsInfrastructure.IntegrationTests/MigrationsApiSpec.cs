@@ -33,7 +33,7 @@ public class MigrationsApiSpec
             var request = new ExportSubscriptionsToMigrateRequest();
             var result = (await Api.GetAsync(request,
                     req => req.SetHMACAuth(request, "asecret")))
-                .Content.Value.Subscriptions!;
+                .Content.Value.Subscriptions;
 
             result.Count.Should().Be(1);
             result[0].BuyerId.Should().Be(login.Profile!.UserId);

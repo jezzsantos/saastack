@@ -45,7 +45,7 @@ public class AuthTokensApiSpec : WebApiSpec<Program>
             Password = "1Password!"
         });
 
-        oldTokens.Content.Value.Tokens!.AccessToken.Value.Should().NotBeNull();
+        oldTokens.Content.Value.Tokens.AccessToken.Value.Should().NotBeNull();
         oldTokens.Content.Value.Tokens.AccessToken.ExpiresOn.Should()
             .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry));
         oldTokens.Content.Value.Tokens.RefreshToken.Value.Should().NotBeNull();
@@ -62,7 +62,7 @@ public class AuthTokensApiSpec : WebApiSpec<Program>
             RefreshToken = oldRefreshToken
         });
 
-        newTokens.Content.Value.Tokens!.AccessToken.Value.Should().NotBeNull().And.NotBe(oldAccessToken);
+        newTokens.Content.Value.Tokens.AccessToken.Value.Should().NotBeNull().And.NotBe(oldAccessToken);
         newTokens.Content.Value.Tokens.AccessToken.ExpiresOn.Should()
             .BeNear(DateTime.UtcNow.Add(AuthenticationConstants.Tokens.DefaultAccessTokenExpiry));
         newTokens.Content.Value.Tokens.RefreshToken.Value.Should().NotBeNull().And.NotBe(oldRefreshToken);

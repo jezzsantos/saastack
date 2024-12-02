@@ -5,5 +5,5 @@ namespace Infrastructure.Web.Api.Operations.Shared.Cars;
 
 public class SearchAllCarsResponse : SearchResponse
 {
-    public List<Car>? Cars { get; set; }
+    public List<Car> Cars { get; set; } = [];
 }
