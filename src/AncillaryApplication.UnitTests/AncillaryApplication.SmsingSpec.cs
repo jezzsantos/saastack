@@ -67,18 +67,6 @@ public class AncillaryApplicationSmsingSpec
     }
 
     [Fact]
-    public async Task WhenSendSmsAsyncAndMessageIsNotRehydratable_ThenReturnsError()
-    {
-        var result = await _application.SendSmsAsync(_caller.Object, "anunknownmessage", CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_InvalidQueuedMessage.Format(nameof(SmsMessage), "anunknownmessage"));
-        _smsDeliveryService.Verify(
-            urs => urs.SendAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
     public async Task WhenSendSmsAsyncAndMessageHasNoHtml_ThenReturnsError()
     {
         var messageAsJson = new SmsMessage

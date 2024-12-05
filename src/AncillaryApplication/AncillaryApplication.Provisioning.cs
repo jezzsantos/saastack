@@ -2,6 +2,7 @@ using System.Text.Json;
 using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Interfaces.Services;
+using Application.Persistence.Shared.Extensions;
 using Application.Persistence.Shared.ReadModels;
 using Common;
 using Common.Extensions;
@@ -14,7 +15,7 @@ partial class AncillaryApplication
     public async Task<Result<Error>> DrainAllProvisioningsAsync(ICallerContext caller,
         CancellationToken cancellationToken)
     {
-        await DrainAllOnQueueAsync(_provisioningMessageQueue,
+        await _provisioningMessageQueue.DrainAllQueuedMessagesAsync(
             message => NotifyProvisioningInternalAsync(caller, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(caller.ToCall(), "Drained all provisioning messages");
@@ -26,7 +27,7 @@ partial class AncillaryApplication
     public async Task<Result<bool, Error>> NotifyProvisioningAsync(ICallerContext caller, string messageAsJson,
         CancellationToken cancellationToken)
     {
-        var rehydrated = RehydrateMessage<ProvisioningMessage>(messageAsJson);
+        var rehydrated = messageAsJson.RehydrateQueuedMessage<ProvisioningMessage>();
         if (rehydrated.IsFailure)
         {
             return rehydrated.Error;

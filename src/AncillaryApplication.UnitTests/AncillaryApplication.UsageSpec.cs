@@ -50,18 +50,6 @@ public class AncillaryApplicationUsageSpec
     }
 
     [Fact]
-    public async Task WhenDeliverUsageAsyncAndMessageIsNotRehydratable_ThenReturnsError()
-    {
-        var result = await _application.DeliverUsageAsync(_caller.Object, "anunknownmessage", CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_InvalidQueuedMessage.Format(nameof(UsageMessage), "anunknownmessage"));
-        _usageDeliveryService.Verify(
-            urs => urs.DeliverAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<Dictionary<string, string>>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
     public async Task WhenDeliverUsageAsyncAndMessageHasNoForId_ThenReturnsError()
     {
         var messageAsJson = new UsageMessage

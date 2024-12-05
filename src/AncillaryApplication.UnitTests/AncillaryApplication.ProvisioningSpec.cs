@@ -54,19 +54,6 @@ public class AncillaryApplicationProvisioningSpec
             _provisioningMessageQueue.Object, _provisioningDeliveryService.Object);
     }
 
-    [Fact]
-    public async Task WhenNotifyProvisioningAsyncAndMessageIsNotRehydratable_ThenReturnsError()
-    {
-        var result =
-            await _application.NotifyProvisioningAsync(_caller.Object, "anunknownmessage", CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_InvalidQueuedMessage.Format(nameof(ProvisioningMessage),
-                "anunknownmessage"));
-        _provisioningDeliveryService.Verify(
-            urs => urs.NotifyAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<TenantSettings>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
 
     [Fact]
     public async Task WhenNotifyProvisioningAsyncAndMessageHasNoTenantId_ThenReturnsError()
