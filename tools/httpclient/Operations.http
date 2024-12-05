@@ -1,0 +1,39 @@
+### Register and authenticate Operator
+
+run ./CreateUser.http (@username = {{operator_username}})
+
+### View Email deliveries
+
+GET {{apihost1}}/emails
+Authorization: Bearer {{access_token}}
+Accept: application/json
+
+
+### View SMS deliveries
+
+GET {{apihost1}}/smses
+Authorization: Bearer {{access_token}}
+Accept: application/json
+
+### View feature flags
+
+GET {{apihost1}}/flags
+Accept: application/json
+X-Hub-Signature: sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653
+Content-Type: application/json
+
+{ }
+
+
+### Change a users roles
+
+@user_id = "anotheruserid"
+
+POST {{apihost1}}/users/{{user_id}}/roles
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "Roles": "platform_operations"
+}
+
