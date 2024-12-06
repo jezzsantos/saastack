@@ -19,7 +19,7 @@ Accept: application/json
 
 GET {{apihost1}}/flags
 Accept: application/json
-X-Hub-Signature: sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653
+X-Hub-Signature: {{hmac_signature}}
 Content-Type: application/json
 
 { }
