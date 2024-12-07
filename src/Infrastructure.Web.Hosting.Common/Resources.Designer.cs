@@ -69,15 +69,6 @@ namespace Infrastructure.Web.Hosting.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Requires a value in the &apos;{0}&apos; parameter of the request.
-        /// </summary>
-        internal static string APIKeyAuthenticationHandler_MissingParameter {
-            get {
-                return ResourceManager.GetString("APIKeyAuthenticationHandler_MissingParameter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Authentication failed.
         /// </summary>
         internal static string AuthenticationHandler_Failed {
@@ -263,15 +254,6 @@ namespace Infrastructure.Web.Hosting.Common {
         internal static string HMACAuthenticationHandler_FailedAuthentication {
             get {
                 return ResourceManager.GetString("HMACAuthenticationHandler_FailedAuthentication", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Requires a value in the &apos;{0}&apos; header of the request.
-        /// </summary>
-        internal static string HMACAuthenticationHandler_MissingHeader {
-            get {
-                return ResourceManager.GetString("HMACAuthenticationHandler_MissingHeader", resourceCulture);
             }
         }
         

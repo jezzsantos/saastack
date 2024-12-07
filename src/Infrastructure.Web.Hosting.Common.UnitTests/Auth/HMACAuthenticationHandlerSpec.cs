@@ -2,7 +2,6 @@ using System.Text.Encodings.Web;
 using Application.Interfaces;
 using Application.Interfaces.Services;
 using Common;
-using Common.Extensions;
 using Domain.Interfaces;
 using Domain.Interfaces.Authorization;
 using FluentAssertions;
@@ -72,7 +71,7 @@ public class HMACAuthenticationHandlerSpec
     }
 
     [Fact]
-    public async Task WhenHandleAuthenticateAsyncAndNoSignatureHeader_ThenReturnsFailure()
+    public async Task WhenHandleAuthenticateAsyncAndNoSignatureHeader_ThenReturnsNoResult()
     {
         _handler.InitializeAsync(new AuthenticationScheme(HMACAuthenticationHandler.AuthenticationScheme, null,
             typeof(HMACAuthenticationHandler)), _httpContext).GetAwaiter().GetResult();
@@ -80,9 +79,8 @@ public class HMACAuthenticationHandlerSpec
         var result = await _handler.AuthenticateAsync();
 
         result.Succeeded.Should().BeFalse();
-        result.Failure.Should().BeOfType<AuthenticationFailureException>()
-            .Which.Message.Should()
-            .Be(Resources.HMACAuthenticationHandler_MissingHeader.Format(HttpConstants.Headers.HMACSignature));
+        result.Failure.Should().BeNull();
+        result.None.Should().BeTrue();
     }
 
     [Fact]

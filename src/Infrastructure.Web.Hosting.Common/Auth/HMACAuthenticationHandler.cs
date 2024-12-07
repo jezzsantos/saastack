@@ -7,7 +7,6 @@ using Common.Extensions;
 using Infrastructure.Common.Extensions;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common.Extensions;
-using Infrastructure.Web.Api.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -37,8 +36,7 @@ public class HMACAuthenticationHandler : AuthenticationHandler<HMACOptions>
         var signature = Request.GetHMACAuth();
         if (!signature.HasValue)
         {
-            return AuthenticateResult.Fail(
-                Resources.HMACAuthenticationHandler_MissingHeader.Format(HttpConstants.Headers.HMACSignature));
+            return AuthenticateResult.NoResult();
         }
 
         var hmacSecret = Context.RequestServices.GetRequiredService<IHostSettings>()

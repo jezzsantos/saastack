@@ -3,7 +3,6 @@ using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
-using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Interfaces;
@@ -68,7 +67,7 @@ public class APIKeyAuthenticationHandlerSpec
     }
 
     [Fact]
-    public async Task WhenHandleAuthenticateAsyncAndNoApiKeyInRequest_ThenReturnsFailure()
+    public async Task WhenHandleAuthenticateAsyncAndNoApiKeyInRequest_ThenReturnsNoResult()
     {
         _handler.InitializeAsync(new AuthenticationScheme(APIKeyAuthenticationHandler.AuthenticationScheme, null,
             typeof(APIKeyAuthenticationHandler)), _httpContext).GetAwaiter().GetResult();
@@ -76,9 +75,8 @@ public class APIKeyAuthenticationHandlerSpec
         var result = await _handler.AuthenticateAsync();
 
         result.Succeeded.Should().BeFalse();
-        result.Failure.Should().BeOfType<AuthenticationFailureException>()
-            .Which.Message.Should()
-            .Be(Resources.APIKeyAuthenticationHandler_MissingParameter.Format(HttpConstants.QueryParams.APIKey));
+        result.Failure.Should().BeNull();
+        result.None.Should().BeTrue();
     }
 
     [Fact]
