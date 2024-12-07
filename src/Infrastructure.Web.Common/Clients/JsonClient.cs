@@ -279,7 +279,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
                     return TryCreateEmptyResponse<TResponse>();
                 }
             }
-            
+
             return response.StatusCode.ToResponseProblem(response.ReasonPhrase);
         }
 
@@ -380,38 +380,119 @@ public class JsonClient : IHttpJsonClient, IDisposable
         {
             (content as IDisposable)?.Dispose();
         }
-
-        static MultipartFormDataContent ToMultiPartContent(IWebRequest body)
-        {
-            var content = new MultipartFormDataContent();
-            var requestFields = //HACK: really need these values to be serialized as QueryString parameters
-                body.SerializeToJson()
-                    .FromJson<Dictionary<string, object>>()!
-                    .ToDictionary(pair => pair.Key, pair => pair.Value.ToString() ?? string.Empty);
-            if (requestFields.HasAny())
-            {
-                foreach (var field in requestFields)
-                {
-                    content.Add(new StringContent(field.Value), field.Key);
-                }
-            }
-
-            return content;
-        }
-
-        static FormUrlEncodedContent ToUrlEncodedContent(IWebRequest body)
-        {
-            var requestFields = body.SerializeToJson()
-                .FromJson<Dictionary<string, object>>()!
-                .ToDictionary(pair => pair.Key, pair => pair.Value.ToString() ?? string.Empty);
-
-            return new FormUrlEncodedContent(requestFields);
-        }
     }
 
     public void SetBaseUrl(string baseUrl)
     {
         _httpClient.BaseAddress = new Uri(baseUrl.WithTrailingSlash(), UriKind.Absolute);
+    }
+
+    /// <summary>
+    ///     Converts the request body into a <see cref="FormUrlEncodedContent" />.
+    ///     Properties of the <see cref="body" /> that are arrays are expanded into multiple individual params with the same
+    ///     name. e.g. Tags=Value1&amp;Tags=Value2
+    ///     Properties of the <see cref="body" /> that are objects/dictionaries are expanded into multiple individual params
+    ///     with the different indexed names. e.g. Tags[Key1]=Value1&amp;Tags[Key2]=Value2
+    /// </summary>
+    private static FormUrlEncodedContent ToUrlEncodedContent(IWebRequest body)
+    {
+        var requestFields = body.SerializeToJson()
+            .FromJson<Dictionary<string, object>>()!;
+        if (requestFields.HasNone())
+        {
+            return new FormUrlEncodedContent(new Dictionary<string, string>());
+        }
+
+        var values = new Dictionary<string, string>();
+        foreach (var field in requestFields)
+        {
+            if (field.Value is JsonElement jsonElement)
+            {
+                if (jsonElement.ValueKind == JsonValueKind.Object)
+                {
+                    foreach (var property in jsonElement.EnumerateObject())
+                    {
+                        var propertyName = property.Name;
+                        var propertyValue = property.Value.ToString();
+                        values.Add($"{field.Key}[{propertyName}]", propertyValue);
+                    }
+                }
+                else if (jsonElement.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var item in jsonElement.EnumerateArray())
+                    {
+                        var itemValue = item.ToString();
+                        values.Add(field.Key, itemValue);
+                    }
+                }
+                else
+                {
+                    var value = jsonElement.ToString();
+                    values.Add(field.Key, value);
+                }
+            }
+            else
+            {
+                var value = field.Value.ToString() ?? string.Empty;
+                values.Add(field.Key, value);
+            }
+        }
+
+        return new FormUrlEncodedContent(values);
+    }
+
+    /// <summary>
+    ///     Converts request body into a <see cref="MultipartFormDataContent" />.
+    ///     Properties of the <see cref="body" /> that are arrays are expanded into multiple individual parts with the same
+    ///     name. e.g. Tags=Value1 and Tags=Value2
+    ///     Properties of the <see cref="body" /> that are objects/dictionaries are expanded into multiple individual parts
+    ///     with different indexed names. e.g. Tags[Key1]=Value1 and Tags[Key2]=Value2
+    /// </summary>
+    private static MultipartFormDataContent ToMultiPartContent(IWebRequest body)
+    {
+        var content = new MultipartFormDataContent();
+        var requestFields = body.SerializeToJson()
+            .FromJson<Dictionary<string, object>>()!;
+        if (requestFields.HasAny())
+        {
+            foreach (var field in requestFields)
+            {
+                if (field.Value is JsonElement jsonElement)
+                {
+                    if (jsonElement.ValueKind == JsonValueKind.Object)
+                    {
+                        foreach (var property in jsonElement.EnumerateObject())
+                        {
+                            var propertyName = property.Name;
+                            content.Add(CreateStringContent(property), $"{field.Key}[{propertyName}]");
+                        }
+                    }
+                    else if (jsonElement.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var item in jsonElement.EnumerateArray())
+                        {
+                            content.Add(CreateStringContent(item), field.Key);
+                        }
+                    }
+                    else
+                    {
+                        content.Add(CreateStringContent(field.Value), field.Key);
+                    }
+                }
+                else
+                {
+                    content.Add(CreateStringContent(field.Value), field.Key);
+                }
+            }
+        }
+
+        return content;
+
+        static StringContent CreateStringContent(object value)
+        {
+            var stringValue = value.ToString() ?? string.Empty;
+            return new StringContent(stringValue);
+        }
     }
 
     private static Result<TResponse, ResponseProblem> TryCreateEmptyResponse<TResponse>()

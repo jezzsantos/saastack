@@ -29,20 +29,22 @@ public class MailgunHttpServiceClientSpec
     public async Task WhenDeliverAsync_ThenSends()
     {
         _client.Setup(c => c.SendHtmlAsync(It.IsAny<ICallContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<MailGunRecipient>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                It.IsAny<string>(), It.IsAny<MailGunRecipient>(), It.IsAny<string>(), It.IsAny<List<string>>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(new EmailDeliveryReceipt
             {
                 ReceiptId = "areceiptid"
             });
 
         var result = await _serviceClient.SendHtmlAsync(_caller.Object, "asubject", "anhtmlbody", "atoemailaddress",
-            "atodisplayname", "afromemailaddress", "afromdisplayname", CancellationToken.None);
+            "atodisplayname", "afromemailaddress", "afromdisplayname", new List<string> { "atag", "anothertag" },
+            CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.ReceiptId.Should().Be("areceiptid");
         _client.Verify(c => c.SendHtmlAsync(It.IsAny<ICallContext>(), "asubject", "afromemailaddress",
             "afromdisplayname",
             It.Is<MailGunRecipient>(r => r.EmailAddress == "atoemailaddress" && r.DisplayName == "atodisplayname"),
-            "anhtmlbody", It.IsAny<CancellationToken>()));
+            "anhtmlbody", new List<string> { "atag", "anothertag" }, It.IsAny<CancellationToken>()));
     }
 }

@@ -47,7 +47,7 @@ public class AncillaryApplicationSmsingSpec
         _smsMessageQueue = new Mock<ISmsMessageQueue>();
         _smsDeliveryService = new Mock<ISmsDeliveryService>();
         _smsDeliveryService.Setup(eds => eds.SendAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new SmsDeliveryReceipt());
         _smsDeliveryRepository = new Mock<ISmsDeliveryRepository>();
         _smsDeliveryRepository.Setup(ar =>
@@ -80,6 +80,7 @@ public class AncillaryApplicationSmsingSpec
             Resources.AncillaryApplication_Sms_MissingMessage);
         _smsDeliveryService.Verify(
             urs => urs.SendAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -106,7 +107,7 @@ public class AncillaryApplicationSmsingSpec
                 edr.FindByMessageIdAsync(It.IsAny<QueuedMessageId>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(sms.ToOptional());
         _smsDeliveryService.Setup(eds => eds.SendAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new SmsDeliveryReceipt());
 
         var result = await _application.SendSmsAsync(_caller.Object, messageAsJson, CancellationToken.None);
@@ -114,6 +115,7 @@ public class AncillaryApplicationSmsingSpec
         result.Should().BeSuccess();
         _smsDeliveryService.Verify(
             urs => urs.SendAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _smsDeliveryRepository.Verify(
             edr => edr.SaveAsync(It.IsAny<SmsDeliveryRoot>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
@@ -134,14 +136,14 @@ public class AncillaryApplicationSmsingSpec
             }
         }.ToJson()!;
         _smsDeliveryService.Setup(eds => eds.SendAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Error.Unexpected());
 
         var result = await _application.SendSmsAsync(_caller.Object, messageAsJson, CancellationToken.None);
 
         result.Should().BeError(ErrorCode.Unexpected);
         _smsDeliveryService.Verify(
-            urs => urs.SendAsync(It.IsAny<ICallerContext>(), "abody", "+6498876986",
+            urs => urs.SendAsync(It.IsAny<ICallerContext>(), "abody", "+6498876986", It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()));
         _smsDeliveryRepository.Verify(edr => edr.SaveAsync(It.Is<SmsDeliveryRoot>(root =>
             root.MessageId == messageId
@@ -166,14 +168,14 @@ public class AncillaryApplicationSmsingSpec
             }
         }.ToJson()!;
         _smsDeliveryService.Setup(eds => eds.SendAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new SmsDeliveryReceipt());
 
         var result = await _application.SendSmsAsync(_caller.Object, messageAsJson, CancellationToken.None);
 
         result.Should().BeSuccess();
         _smsDeliveryService.Verify(
-            urs => urs.SendAsync(It.IsAny<ICallerContext>(), "abody", "+6498876986",
+            urs => urs.SendAsync(It.IsAny<ICallerContext>(), "abody", "+6498876986", It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()));
         _smsDeliveryRepository.Verify(edr => edr.SaveAsync(It.Is<SmsDeliveryRoot>(root =>
             root.MessageId == messageId
@@ -361,6 +363,7 @@ public class AncillaryApplicationSmsingSpec
                 It.IsAny<CancellationToken>()));
         _smsDeliveryService.Verify(
             urs => urs.SendAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()), Times.Never);
     }
 #endif
@@ -376,7 +379,8 @@ public class AncillaryApplicationSmsingSpec
             Message = new QueuedSmsMessage
             {
                 Body = "abody1",
-                ToPhoneNumber = "+6498876986"
+                ToPhoneNumber = "+6498876986",
+                Tags = ["atag", "anothertag"]
             }
         };
         var message2Id = CreateMessageId();
@@ -386,7 +390,8 @@ public class AncillaryApplicationSmsingSpec
             Message = new QueuedSmsMessage
             {
                 Body = "abody2",
-                ToPhoneNumber = "+6498876986"
+                ToPhoneNumber = "+6498876986",
+                Tags = ["atag", "anothertag"]
             }
         };
         var callbackCount = 1;
@@ -418,11 +423,20 @@ public class AncillaryApplicationSmsingSpec
             urs => urs.PopSingleAsync(It.IsAny<Func<SmsMessage, CancellationToken, Task<Result<Error>>>>(),
                 It.IsAny<CancellationToken>()), Times.Exactly(2));
         _smsDeliveryService.Verify(
-            urs => urs.SendAsync(It.IsAny<ICallerContext>(), "abody1", "+6498876986", It.IsAny<CancellationToken>()));
+            urs => urs.SendAsync(It.IsAny<ICallerContext>(), "abody1", "+6498876986", It.Is<IReadOnlyList<string>>(
+                tags =>
+                    tags.Count == 2
+                    && tags[0] == "atag"
+                    && tags[1] == "anothertag"), It.IsAny<CancellationToken>()));
         _smsDeliveryService.Verify(
-            urs => urs.SendAsync(It.IsAny<ICallerContext>(), "abody2", "+6498876986", It.IsAny<CancellationToken>()));
+            urs => urs.SendAsync(It.IsAny<ICallerContext>(), "abody2", "+6498876986", It.Is<IReadOnlyList<string>>(
+                tags =>
+                    tags.Count == 2
+                    && tags[0] == "atag"
+                    && tags[1] == "anothertag"), It.IsAny<CancellationToken>()));
         _smsDeliveryService.Verify(
             urs => urs.SendAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()),
             Times.Exactly(2));
     }

@@ -13,7 +13,7 @@ public interface ISmsDeliveryService
     ///     Sends the SMS for delivery
     /// </summary>
     Task<Result<SmsDeliveryReceipt, Error>> SendAsync(ICallerContext caller, string body,
-        string toPhoneNumber, CancellationToken cancellationToken);
+        string toPhoneNumber, IReadOnlyList<string>? tags, CancellationToken cancellationToken);
 }
 
 public class SmsDeliveryReceipt

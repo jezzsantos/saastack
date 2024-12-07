@@ -28,11 +28,11 @@ public class TwilioHttpServiceClient : ISmsDeliveryService
     }
 
     public async Task<Result<SmsDeliveryReceipt, Error>> SendAsync(ICallerContext caller, string body,
-        string toPhoneNumber, CancellationToken cancellationToken)
+        string toPhoneNumber, IReadOnlyList<string>? tags, CancellationToken cancellationToken)
     {
         _recorder.TraceInformation(caller.ToCall(), "Sending SMS to {To} in Twilio", toPhoneNumber);
 
-        var sent = await _serviceClient.SendAsync(caller.ToCall(), toPhoneNumber, body, cancellationToken);
+        var sent = await _serviceClient.SendAsync(caller.ToCall(), toPhoneNumber, body, tags, cancellationToken);
         if (sent.IsFailure)
         {
             return sent.Error;

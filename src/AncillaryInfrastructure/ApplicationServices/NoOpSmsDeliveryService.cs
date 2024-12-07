@@ -19,7 +19,7 @@ public class NoOpSmsDeliveryService : ISmsDeliveryService
     }
 
     public Task<Result<SmsDeliveryReceipt, Error>> SendAsync(ICallerContext caller, string body,
-        string toPhoneNumber, CancellationToken cancellationToken)
+        string toPhoneNumber, IReadOnlyList<string>? tags, CancellationToken cancellationToken)
     {
         _recorder.TraceInformation(caller.ToCall(),
             $"{nameof(NoOpSmsDeliveryService)} would have delivered SMS message {{To}}, with {{Body}}",

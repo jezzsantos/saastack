@@ -21,6 +21,8 @@ public class MailgunSendMessageRequest : WebRequest<MailgunSendMessageRequest, M
 
     [JsonPropertyName("subject")] public string? Subject { get; set; }
 
+    [JsonPropertyName("o:tag")] public List<string>? Tags { get; set; }
+
     [JsonPropertyName("template")] public string? Template { get; set; }
 
     [JsonPropertyName("h:X-Mailgun-Variables")]

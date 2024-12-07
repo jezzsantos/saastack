@@ -15,7 +15,7 @@ public sealed class StubSmsDeliveryService : ISmsDeliveryService
     public bool SendingSucceeds { get; set; } = true;
 
     public Task<Result<SmsDeliveryReceipt, Error>> SendAsync(ICallerContext caller, string body,
-        string toPhoneNumber, CancellationToken cancellationToken)
+        string toPhoneNumber, IReadOnlyList<string>? tags, CancellationToken cancellationToken)
     {
         var receiptId = $"receipt_{Guid.NewGuid():N}";
         AllPhoneNumbers.Add(toPhoneNumber);

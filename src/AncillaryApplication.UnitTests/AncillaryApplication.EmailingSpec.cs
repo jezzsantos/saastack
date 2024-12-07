@@ -45,6 +45,7 @@ public class AncillaryApplicationEmailingSpec
         _emailDeliveryService = new Mock<IEmailDeliveryService>();
         _emailDeliveryService.Setup(eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new EmailDeliveryReceipt());
         _emailDeliveryRepository = new Mock<IEmailDeliveryRepository>();
@@ -83,6 +84,7 @@ public class AncillaryApplicationEmailingSpec
         _emailDeliveryService.Verify(
             eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -116,6 +118,7 @@ public class AncillaryApplicationEmailingSpec
             .ReturnsAsync(email.ToOptional());
         _emailDeliveryService.Setup(eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new EmailDeliveryReceipt());
 
@@ -125,13 +128,13 @@ public class AncillaryApplicationEmailingSpec
         _emailDeliveryService.Verify(
             eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _emailDeliveryService.Verify(
             eds => eds.SendTemplatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<Dictionary<string, string>>(),
                 It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _emailDeliveryRepository.Verify(
             edr => edr.SaveAsync(It.IsAny<EmailDeliveryRoot>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
@@ -170,6 +173,7 @@ public class AncillaryApplicationEmailingSpec
             .ReturnsAsync(email.ToOptional());
         _emailDeliveryService.Setup(eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new EmailDeliveryReceipt());
 
@@ -179,13 +183,13 @@ public class AncillaryApplicationEmailingSpec
         _emailDeliveryService.Verify(
             eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _emailDeliveryService.Verify(
             eds => eds.SendTemplatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<Dictionary<string, string>>(),
                 It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _emailDeliveryRepository.Verify(
             edr => edr.SaveAsync(It.IsAny<EmailDeliveryRoot>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
@@ -206,11 +210,13 @@ public class AncillaryApplicationEmailingSpec
                 ToEmailAddress = "arecipient@company.com",
                 ToDisplayName = "arecipient",
                 FromEmailAddress = "asender@company.com",
-                FromDisplayName = "asender"
+                FromDisplayName = "asender",
+                Tags = ["atag", "anothertag"]
             }
         }.ToJson()!;
         _emailDeliveryService.Setup(eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(Error.Unexpected());
 
@@ -219,13 +225,13 @@ public class AncillaryApplicationEmailingSpec
         result.Should().BeError(ErrorCode.Unexpected);
         _emailDeliveryService.Verify(
             eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), "asubject", "abody", "arecipient@company.com",
-                "arecipient", "asender@company.com", "asender",
+                "arecipient", "asender@company.com", "asender", new List<string> { "atag", "anothertag" },
                 It.IsAny<CancellationToken>()));
         _emailDeliveryService.Verify(
             eds => eds.SendTemplatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<Dictionary<string, string>>(),
                 It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _emailDeliveryRepository.Verify(edr => edr.SaveAsync(It.Is<EmailDeliveryRoot>(root =>
             root.MessageId == messageId
@@ -251,11 +257,13 @@ public class AncillaryApplicationEmailingSpec
                 ToEmailAddress = "arecipient@company.com",
                 ToDisplayName = "arecipient",
                 FromEmailAddress = "asender@company.com",
-                FromDisplayName = "asender"
+                FromDisplayName = "asender",
+                Tags = ["atag", "anothertag"]
             }
         }.ToJson()!;
         _emailDeliveryService.Setup(eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new EmailDeliveryReceipt());
 
@@ -264,13 +272,13 @@ public class AncillaryApplicationEmailingSpec
         result.Should().BeSuccess();
         _emailDeliveryService.Verify(
             eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), "asubject", "abody", "arecipient@company.com",
-                "arecipient", "asender@company.com", "asender",
+                "arecipient", "asender@company.com", "asender", new List<string> { "atag", "anothertag" },
                 It.IsAny<CancellationToken>()));
         _emailDeliveryService.Verify(
             eds => eds.SendTemplatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<Dictionary<string, string>>(),
                 It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _emailDeliveryRepository.Verify(edr => edr.SaveAsync(It.Is<EmailDeliveryRoot>(root =>
             root.MessageId == messageId
@@ -297,13 +305,14 @@ public class AncillaryApplicationEmailingSpec
                 ToEmailAddress = "arecipient@company.com",
                 ToDisplayName = "arecipient",
                 FromEmailAddress = "asender@company.com",
-                FromDisplayName = "asender"
+                FromDisplayName = "asender",
+                Tags = ["atag", "anothertag"]
             }
         }.ToJson()!;
         _emailDeliveryService.Setup(eds => eds.SendTemplatedAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<Dictionary<string, string>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new EmailDeliveryReceipt());
 
@@ -313,11 +322,13 @@ public class AncillaryApplicationEmailingSpec
         _emailDeliveryService.Verify(
             eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _emailDeliveryService.Verify(
             eds => eds.SendTemplatedAsync(_caller.Object, "atemplateid", "asubject",
                 It.IsAny<Dictionary<string, string>>(),
                 "arecipient@company.com", "arecipient", "asender@company.com", "asender",
+                new List<string> { "atag", "anothertag" },
                 It.IsAny<CancellationToken>()));
         _emailDeliveryRepository.Verify(edr => edr.SaveAsync(It.Is<EmailDeliveryRoot>(root =>
             root.MessageId == messageId
@@ -519,6 +530,7 @@ public class AncillaryApplicationEmailingSpec
         _emailDeliveryService.Verify(
             eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<CancellationToken>()), Times.Never);
     }
 #endif
@@ -538,7 +550,8 @@ public class AncillaryApplicationEmailingSpec
                 ToEmailAddress = "arecipient1@company.com",
                 ToDisplayName = "arecipient1",
                 FromEmailAddress = "asender1@company.com",
-                FromDisplayName = "asender1"
+                FromDisplayName = "asender1",
+                Tags = ["atag", "anothertag"]
             }
         };
         var message2Id = CreateMessageId();
@@ -552,7 +565,8 @@ public class AncillaryApplicationEmailingSpec
                 ToEmailAddress = "arecipient2@company.com",
                 ToDisplayName = "arecipient2",
                 FromEmailAddress = "asender2@company.com",
-                FromDisplayName = "asender2"
+                FromDisplayName = "asender2",
+                Tags = ["atag", "anothertag"]
             }
         };
         var callbackCount = 1;
@@ -585,16 +599,17 @@ public class AncillaryApplicationEmailingSpec
                 It.IsAny<CancellationToken>()), Times.Exactly(2));
         _emailDeliveryService.Verify(
             eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), "asubject1", "abody1", "arecipient1@company.com",
-                "arecipient1", "asender1@company.com", "asender1",
+                "arecipient1", "asender1@company.com", "asender1", new List<string> { "atag", "anothertag" },
                 It.IsAny<CancellationToken>()));
         _emailDeliveryService.Verify(
             eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), "asubject2", "abody2", "arecipient2@company.com",
-                "arecipient2", "asender2@company.com", "asender2",
+                "arecipient2", "asender2@company.com", "asender2", new List<string> { "atag", "anothertag" },
                 It.IsAny<CancellationToken>()));
         _emailDeliveryService.Verify(
             eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IReadOnlyList<string>>(),
+                It.IsAny<CancellationToken>()),
             Times.Exactly(2));
     }
 #endif

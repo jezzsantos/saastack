@@ -4,7 +4,7 @@ using Infrastructure.Web.Api.Interfaces;
 namespace Infrastructure.Web.Api.Operations.Shared._3rdParties.Twilio;
 
 /// <summary>
-///     Sends an SMS
+///     Sends an SMS text message
 /// </summary>
 [Route("/2010-04-01/Accounts/{AccountSid}/Messages.json", OperationMethod.Post)]
 public class TwilioSendRequest : WebRequest<TwilioSendRequest, TwilioSendResponse>, IHasFormUrlEncoded
@@ -16,6 +16,8 @@ public class TwilioSendRequest : WebRequest<TwilioSendRequest, TwilioSendRespons
     public string? From { get; set; }
 
     public string? StatusCallback { get; set; }
+
+    public Dictionary<string, string>? Tags { get; set; }
 
     public string? To { get; set; }
 }

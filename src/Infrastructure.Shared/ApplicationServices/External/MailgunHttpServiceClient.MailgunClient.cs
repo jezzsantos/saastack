@@ -17,12 +17,12 @@ namespace Infrastructure.Shared.ApplicationServices.External;
 public interface IMailgunClient
 {
     Task<Result<EmailDeliveryReceipt, Error>> SendHtmlAsync(ICallContext call, string subject, string from,
-        string? fromDisplayName, MailGunRecipient to, string htmlMessage, CancellationToken cancellationToken);
+        string? fromDisplayName, MailGunRecipient to, string htmlMessage, IReadOnlyList<string>? tags,
+        CancellationToken cancellationToken);
 
     Task<Result<EmailDeliveryReceipt, Error>> SendTemplatedAsync(ICallContext call, string templateId, string? subject,
-        string from,
-        string? fromDisplayName, MailGunRecipient to,
-        Dictionary<string, string> substitutions, CancellationToken cancellationToken);
+        string from, string? fromDisplayName, MailGunRecipient to, Dictionary<string, string> substitutions,
+        IReadOnlyList<string>? tags, CancellationToken cancellationToken);
 }
 
 public class MailGunRecipient
@@ -85,7 +85,8 @@ public class MailgunClient : IMailgunClient
     }
 
     public async Task<Result<EmailDeliveryReceipt, Error>> SendHtmlAsync(ICallContext call, string subject, string from,
-        string? fromDisplayName, MailGunRecipient to, string htmlMessage, CancellationToken cancellationToken)
+        string? fromDisplayName, MailGunRecipient to, string htmlMessage, IReadOnlyList<string>? tags,
+        CancellationToken cancellationToken)
     {
         var recipient = to.ToVariable();
         var recipientVariables = recipient.Exists()
@@ -111,6 +112,9 @@ public class MailgunClient : IMailgunClient
                     Subject = subject,
                     Html = htmlMessage,
                     RecipientVariables = recipientVariables,
+                    Tags = tags.Exists() && tags.HasAny()
+                        ? tags.ToList()
+                        : null,
 #if TESTINGONLY
                     TestingOnly = "yes",
 #else
@@ -136,9 +140,8 @@ public class MailgunClient : IMailgunClient
     }
 
     public async Task<Result<EmailDeliveryReceipt, Error>> SendTemplatedAsync(ICallContext call, string templateId,
-        string? subject,
-        string from, string? fromDisplayName, MailGunRecipient to, Dictionary<string, string> substitutions,
-        CancellationToken cancellationToken)
+        string? subject, string from, string? fromDisplayName, MailGunRecipient to,
+        Dictionary<string, string> substitutions, IReadOnlyList<string>? tags, CancellationToken cancellationToken)
     {
         var recipient = to.ToVariable();
         var recipients = recipient.Exists()
@@ -166,8 +169,11 @@ public class MailgunClient : IMailgunClient
                     Template = templateId,
                     TemplateVariables = variables,
                     RecipientVariables = recipients,
+                    Tags = tags.Exists() && tags.HasAny()
+                        ? tags.ToList()
+                        : null,
 #if TESTINGONLY
-                    TestingOnly = "yes",
+                    TestingOnly = "no",
 #else
                     TestingOnly = "no",
 #endif

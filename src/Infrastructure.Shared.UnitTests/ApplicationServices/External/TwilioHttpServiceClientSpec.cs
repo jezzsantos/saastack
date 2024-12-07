@@ -29,17 +29,21 @@ public class TwilioHttpServiceClientSpec
     public async Task WhenDeliverAsync_ThenSends()
     {
         _client.Setup(c => c.SendAsync(It.IsAny<ICallContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<CancellationToken>()))
+                It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new SmsDeliveryReceipt
             {
                 ReceiptId = "areceiptid"
             });
 
-        var result = await _serviceClient.SendAsync(_caller.Object, "abody", "aphonenumber", CancellationToken.None);
+        var result = await _serviceClient.SendAsync(_caller.Object, "abody", "aphonenumber", ["atag", "anothertag"],
+            CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.ReceiptId.Should().Be("areceiptid");
         _client.Verify(c =>
-            c.SendAsync(It.IsAny<ICallContext>(), "aphonenumber", "abody", It.IsAny<CancellationToken>()));
+            c.SendAsync(It.IsAny<ICallContext>(), "aphonenumber", "abody", It.Is<IReadOnlyList<string>>(tags =>
+                tags.Count == 2
+                && tags[0] == "atag"
+                && tags[1] == "anothertag"), It.IsAny<CancellationToken>()));
     }
 }

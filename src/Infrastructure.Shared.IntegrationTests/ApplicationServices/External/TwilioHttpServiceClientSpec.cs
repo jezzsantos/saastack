@@ -27,7 +27,7 @@ public class TwilioHttpServiceClientSpec : ExternalApiSpec
     public async Task WhenSendAsync_ThenSends()
     {
         var result = await _serviceClient.SendAsync(new TestCaller(), "atestmessage", _recipientPhoneNumber,
-            CancellationToken.None);
+            ["atag", "anothertag"], CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.ReceiptId.Should().NotBeEmpty();

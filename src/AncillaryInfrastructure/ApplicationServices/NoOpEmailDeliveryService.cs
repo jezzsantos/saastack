@@ -20,9 +20,8 @@ public class NoOpEmailDeliveryService : IEmailDeliveryService
     }
 
     public Task<Result<EmailDeliveryReceipt, Error>> SendHtmlAsync(ICallerContext caller, string subject,
-        string htmlBody,
-        string toEmailAddress, string? toDisplayName, string fromEmailAddress, string? fromDisplayName,
-        CancellationToken cancellationToken)
+        string htmlBody, string toEmailAddress, string? toDisplayName, string fromEmailAddress, string? fromDisplayName,
+        IReadOnlyList<string>? tags, CancellationToken cancellationToken)
     {
         _recorder.TraceInformation(caller.ToCall(),
             $"{nameof(NoOpEmailDeliveryService)} would have delivered HTML email message {{To}}, from {{From}}, with subject {{Subject}}, body {{Body}}",
@@ -35,9 +34,9 @@ public class NoOpEmailDeliveryService : IEmailDeliveryService
     }
 
     public Task<Result<EmailDeliveryReceipt, Error>> SendTemplatedAsync(ICallerContext caller, string templateId,
-        string? subject,
-        Dictionary<string, string> substitutions, string toEmailAddress,
-        string? toDisplayName, string fromEmailAddress, string? fromDisplayName, CancellationToken cancellationToken)
+        string? subject, Dictionary<string, string> substitutions, string toEmailAddress, string? toDisplayName,
+        string fromEmailAddress, string? fromDisplayName, IReadOnlyList<string>? tags,
+        CancellationToken cancellationToken)
     {
         _recorder.TraceInformation(caller.ToCall(),
             $"{nameof(NoOpEmailDeliveryService)} would have delivered Templated email message {{To}}, from {{From}}, with template {{Template}}, and substitutions {{Substitutions}}",
