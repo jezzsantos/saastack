@@ -1,0 +1,104 @@
+### Send an email message (to Stub API)
+
+POST https://localhost:5656/mailgun/adomainname/messages
+Accept: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="from"
+
+from@company.com
+
+--WebAppBoundary
+Content-Disposition: form-data; name="to"
+
+to@company.com
+
+--WebAppBoundary
+Content-Disposition: form-data; name="subject"
+
+asubject
+
+--WebAppBoundary
+Content-Disposition: form-data; name="html"
+
+<body>abody</body>
+
+--WebAppBoundary
+Content-Disposition: form-data; name="receipient-variables"
+
+{
+"to@company.com": {
+  "name": "to"
+  }
+}
+
+--WebAppBoundary
+
+### Send webhook update
+
+POST {{apihost1}}/webhooks/mailgun
+Accept: application/json
+Content-Type: application/json
+
+{
+  "signature": {
+    "token": "97bbceb14b4be1c7f0665e346688c765c41fb3e09cce867909",
+    "timestamp": "1721508785",
+    "signature": "739eb6609f61cc14d0a4191a735578e278268dccc2fb6daa5914f93cd38d1d08"
+  },
+  "event-data": {
+    "id": "CPgfbmQMTCKtHW6uIWtuVe",
+    "timestamp": 1521472262.908181,
+    "log-level": "info",
+    "event": "delivered",
+    "delivery-status": {
+      "tls": true,
+      "mx-host": "smtp-in.example.com",
+      "code": 250,
+      "description": "",
+      "session-seconds": 0.4331989288330078,
+      "utf8": true,
+      "attempt-no": 1,
+      "message": "OK",
+      "certificate-verified": true
+    },
+    "flags": {
+      "is-routed": false,
+      "is-authenticated": true,
+      "is-system-test": false,
+      "is-test-mode": false
+    },
+    "envelope": {
+      "transport": "smtp",
+      "sender": "bob@sandbox2e90976de82a4cb8a514aaddd1e75ee4.mailgun.org",
+      "sending-ip": "209.61.154.250",
+      "targets": "alice@example.com"
+    },
+    "message": {
+      "headers": {
+        "to": "Alice <alice@example.com>",
+        "message-id": "20130503182626.18666.16540@sandbox2e90976de82a4cb8a514aaddd1e75ee4.mailgun.org",
+        "from": "Bob <bob@sandbox2e90976de82a4cb8a514aaddd1e75ee4.mailgun.org>",
+        "subject": "Test delivered webhook"
+      },
+      "attachments": [ ],
+      "size": 111
+    },
+    "recipient": "alice@example.com",
+    "recipient-domain": "example.com",
+    "storage": {
+      "url": "https://se.api.mailgun.net/v3/domains/sandbox2e90976de82a4cb8a514aaddd1e75ee4.mailgun.org/messages/message_key",
+      "key": "message_key"
+    },
+    "campaigns": [ ],
+    "tags": [
+      "my_tag_1",
+      "my_tag_2"
+    ],
+    "user-variables": {
+      "my_var_1": "Mailgun Variable #1",
+      "my-var-2": "awesome"
+    }
+  }
+}

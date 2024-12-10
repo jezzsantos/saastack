@@ -1,0 +1,20 @@
+### Register and authenticate user
+
+run ./CreateUser.http
+
+### Create a draft signing request
+
+POST {{apihost1}}/signing-requests
+Accept: application/json
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "Signees": [
+    {
+      "EmailAddress": "auser@ecompany.com",
+      "FullName": "afullname",
+      "PhoneNumber": "+6498876986"
+    }
+  ]
+}

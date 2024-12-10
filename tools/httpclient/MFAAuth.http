@@ -1,0 +1,204 @@
+### Register and authenticate user
+
+run ./CreateUser.http
+
+### Enable MFA
+
+PUT {{apihost1}}/passwords/mfa
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "IsEnabled": true
+}
+
+
+### Start MFA process (by authenticating)
+
+POST {{apihost1}}/passwords/auth
+Accept: application/json
+Content-Type: application/json
+
+{
+  "Username": "{{username}}",
+  "Password": "{{password}}",
+  "Provider" : "credentials"
+}
+
+> {%
+    client.global.set("mfa_token", response.body.MfaToken);
+%}
+
+
+### List the associated authenticators
+
+GET {{apihost1}}/passwords/mfa/authenticators?mfatoken={{mfa_token}}
+Accept: application/json
+
+> {%
+    client.global.set("authenticator_id", response.body.authenticators[1].id);
+%}
+
+
+### Associate TOTP authenticator
+
+POST {{apihost1}}/passwords/mfa/authenticators
+Accept: application/json
+Content-Type: application/json
+
+{
+  "MfaToken": "{{mfa_token}}",
+  "AuthenticatorType": "TotpAuthenticator"
+}
+
+
+### Associate OOB SMS authenticator
+
+POST {{apihost1}}/passwords/mfa/authenticators
+Accept: application/json
+Content-Type: application/json
+
+{
+  "MfaToken": "{{mfa_token}}",
+  "AuthenticatorType": "OobSms",
+  "PhoneNumber": "+6498876986"
+}
+
+> {%
+    client.global.set("oob_code", response.body.authenticator.oobCode);
+%}
+
+
+### Associate OOB Email authenticator
+
+POST {{apihost1}}/passwords/mfa/authenticators
+Accept: application/json
+Content-Type: application/json
+
+{
+  "MfaToken": "{{mfa_token}}",
+  "AuthenticatorType": "OobEmail"
+}
+
+> {%
+    client.global.set("oob_code", response.body.authenticator.oobCode);
+%}
+
+### Confirm TOTP authenticator
+
+PUT {{apihost1}}/passwords/mfa/authenticators/TotpAuthenticator/confirm
+Accept: application/json
+Content-Type: application/json
+
+{
+  "MfaToken": "{{mfa_token}}",
+  "ConfirmationCode": "498947"
+}
+
+### Confirm OOB SMS authenticator
+
+PUT {{apihost1}}/passwords/mfa/authenticators/OobSms/confirm
+Accept: application/json
+Content-Type: application/json
+
+{
+  "MfaToken": "{{mfa_token}}",
+  "OobCode": "{{oob_code}}",
+  "ConfirmationCode": "095898"
+}
+
+
+### Confirm OOB Email authenticator
+
+PUT {{apihost1}}/passwords/mfa/authenticators/OobEmail/confirm
+Accept: application/json
+Content-Type: application/json
+
+{
+  "MfaToken": "{{mfa_token}}",
+  "OobCode": "{{oob_code}}",
+  "ConfirmationCode": "123456"
+}
+
+### Challenge TOTP authenticator
+
+PUT {{apihost1}}/passwords/mfa/authenticators/{{authenticator_id}}/challenge
+Accept: application/json
+Content-Type: application/json
+
+{
+  "MfaToken": "{{mfa_token}}"
+}
+
+
+### Challenge OOB SMS authenticator
+
+PUT {{apihost1}}/passwords/mfa/authenticators/{{authenticator_id}}/challenge
+Accept: application/json
+Content-Type: application/json
+
+{
+  "MfaToken": "{{mfa_token}}"
+}
+
+
+### Challenge OOB Email authenticator
+
+PUT {{apihost1}}/passwords/mfa/authenticators/OobEmail/challenge
+Accept: application/json
+Content-Type: application/json
+
+{
+  "MfaToken": "{{mfa_token}}"
+}
+
+### Verify TOTP authenticator
+
+PUT {{apihost1}}/passwords/mfa/authenticators/TotpAuthenticator/verify
+Accept: application/json
+Content-Type: application/json
+
+{
+  "MfaToken": "{{mfa_token}}",
+  "ConfirmationCode": "209914"
+}
+
+
+### Verify OOB SMS authenticator
+
+PUT {{apihost1}}/passwords/mfa/authenticators/OobSms/verify
+Accept: application/json
+Content-Type: application/json
+
+{
+  "MfaToken": "{{mfa_token}}",
+  "OobCode": "{{oob_code}}",
+  "ConfirmationCode": "260364"
+}
+
+
+### Verify Email SMS authenticator
+
+PUT {{apihost1}}/passwords/mfa/authenticators/OobEmail/verify
+Accept: application/json
+Content-Type: application/json
+
+{
+  "MfaToken": "{{mfa_token}}",
+  "OobCode": "{{oob_code}}",
+  "ConfirmationCode": "123456"
+}
+
+### Verify RecoveryCodes authenticator
+
+PUT {{apihost1}}/passwords/mfa/authenticators/RecoveryCodes/verify
+Accept: application/json
+Content-Type: application/json
+
+{
+  "MfaToken": "{{mfa_token}}",
+  "ConfirmationCode": "08e27697"
+}
+
+

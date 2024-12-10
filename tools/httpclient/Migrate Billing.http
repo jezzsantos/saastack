@@ -1,0 +1,9 @@
+### Register and authenticate user
+
+run ./CreateUser.http
+
+###
+
+GET {{apihost1}}/subscriptions/export
+Accept: application/json
+X-Hub-Signature: {{hmac_signature}}

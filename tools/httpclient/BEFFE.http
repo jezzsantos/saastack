@@ -1,0 +1,54 @@
+### Get Index.html page and extract the CSRF token from the meta tag
+
+GET {{websitehost}}
+Accept: text/html
+
+
+> {%
+    const doc = new DOMParser().parseFromString(response.body, "application/xml");
+    client.global.set("csrf_token", doc.getElementsByTagName("meta").item(2).getAttribute("content"));
+%}
+
+### Authenticate
+
+POST {{websitehost}}/api/auth
+Accept: application/json
+Content-Type: application/json
+anti-csrf-tok: {{csrf_token}}
+Origin: {{websitehost}}
+
+{
+  "Username": "auser@company.com",
+  "Password": "{{password}}",
+  "Provider" : "credentials"
+}
+
+### Who am I?
+
+## for some reason, the cookie values (that are set in the previous step) are expiring for this client, 
+## because this client does not treat the returned expiry dates as UTC. Try using a different client, like PostMan instead!
+
+GET {{websitehost}}/api/profiles/me
+Accept: application/json
+anti-csrf-tok: {{csrf_token}}
+
+{}
+
+### Get all feature flags
+
+GET {{websitehost}}/api/flags
+Accept: application/json
+X-Hub-Signature: {{hmac_signature}}
+Content-Type: application/json
+
+{ }
+
+
+### Record a browser crash
+
+POST {{websitehost}}/api/record/crash
+Content-Type: application/json
+
+{
+  "Message": "Browser crashed"
+}

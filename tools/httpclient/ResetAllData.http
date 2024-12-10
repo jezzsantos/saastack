@@ -1,0 +1,7 @@
+### Reset all data in all repositories
+
+POST {{apihost1}}/testingonly/repositories/destroy
+Accept: application/json
+Content-Type: application/json
+
+{ }

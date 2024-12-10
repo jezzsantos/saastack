@@ -1,0 +1,21 @@
+### Register and authenticate user
+
+run ./CreateUser.http
+
+### What is my profile?
+
+GET {{apihost1}}/profiles/me
+Accept: application/json
+Authorization: Bearer {{access_token}}
+
+### What Orgs do I have?
+
+GET {{apihost1}}/memberships/me
+Accept: application/json
+Authorization: Bearer {{access_token}}
+
+### What is my user?
+
+GET {{apihost1}}/users/me
+Accept: application/json
+Authorization: Bearer {{access_token}}

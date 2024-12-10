@@ -29,6 +29,26 @@ public class HMACSignerSpec
         }
 
         [Fact]
+        public void WhenSignAndJsonIsEmpty_ThenReturnsSignature()
+        {
+            var signer = new HMACSigner("{}", "asecret");
+
+            var result = signer.Sign();
+
+            result.Should().Be("sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
+        }
+
+        [Fact]
+        public void WhenSignAndJsonIsHollow_ThenReturnsSignature()
+        {
+            var signer = new HMACSigner("{ }", "asecret");
+
+            var result = signer.Sign();
+
+            result.Should().Be("sha256=8783b4ec700a5bd9714c5abe838923b6319eb32f59a7d02e01ecc4eca1cac02c");
+        }
+
+        [Fact]
         public void WhenSignAndRequestIsPopulated_ThenReturnsSignature()
         {
             var signer = new HMACSigner(new TestHmacRequest

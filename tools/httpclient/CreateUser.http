@@ -1,0 +1,66 @@
+### Reset all data
+
+run ./ResetAllData.http
+
+### Register a user
+
+POST {{apihost1}}/passwords/register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "EmailAddress": "{{username}}",
+  "Password": "{{password}}",
+  "FirstName" : "afirstname",
+  "LastName" : "alastname",
+  "TermsAndConditionsAccepted": true
+}
+
+> {%
+    client.global.set("user_id", response.body.credential.user.id);
+%}
+
+### Get Registration Token (the one sent in an email)
+
+GET {{apihost1}}/passwords/confirm-registration?UserId={{user_id}}
+Accept: application/json
+
+> {%
+    client.global.set("registration_token", response.body.token);
+%}
+
+### COnfirm registration
+
+POST {{apihost1}}/passwords/confirm-registration
+Accept: application/json
+Content-Type: application/json
+
+{
+  "Token": "{{registration_token}}"
+}
+
+### Drain all events, must be done before any other operation
+
+POST {{apihost1}}/domain_events/drain
+Accept: application/json
+X-Hub-Signature: {{hmac_signature}}
+Content-Type: application/json
+
+{ }
+
+### Authenticate
+
+POST {{apihost1}}/passwords/auth
+Accept: application/json
+Content-Type: application/json
+
+{
+  "Username": "{{username}}",
+  "Password": "{{password}}",
+  "Provider" : "credentials"
+}
+
+> {%
+    client.global.set("access_token", response.body.tokens.accessToken.value);
+    client.global.set("user_id", response.body.tokens.userId.value);
+%}

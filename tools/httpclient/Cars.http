@@ -1,0 +1,40 @@
+### Register and authenticate
+run ./CreateUser.http
+
+### Create a car
+
+POST {{apihost1}}/cars
+Accept: application/json
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "Make": "Honda",
+  "Model": "Civic",
+  "Year": 2017,
+  "Jurisdiction": "New Zealand",
+  "NumberPlate": "ABC123"
+}
+
+> {%
+    client.global.set("car_id", response.body.car.id);
+%}
+
+### Put the car into maintenance
+
+PUT {{apihost1}}/cars/{{car_id}}/maintain
+Accept: application/json
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "FromUtc": "2025-01-01T00:00:00Z",
+  "ToUtc": "2025-01-02T00:00:00Z"
+}
+
+### List all cars
+
+GET {{apihost1}}/cars
+Accept: application/json
+Authorization: Bearer {{access_token}}
+
