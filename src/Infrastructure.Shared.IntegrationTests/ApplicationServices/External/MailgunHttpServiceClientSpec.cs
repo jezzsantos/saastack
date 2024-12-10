@@ -29,7 +29,7 @@ public class MailgunHttpServiceClientSpec : ExternalApiSpec
     public async Task WhenSendHtmlAsync_ThenSends()
     {
         var result = await _serviceClient.SendHtmlAsync(new TestCaller(), "asubject", "<body>abody</body>",
-            _recipientEmail, "arecipient", _senderEmail, "asender", CancellationToken.None);
+            _recipientEmail, "arecipient", _senderEmail, "asender", ["atag", "anothertag"], CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.ReceiptId.Should().NotBeEmpty();
@@ -43,7 +43,7 @@ public class MailgunHttpServiceClientSpec : ExternalApiSpec
             {
                 { "aname", "avalue" }
             },
-            _recipientEmail, "arecipient", _senderEmail, "asender", CancellationToken.None);
+            _recipientEmail, "arecipient", _senderEmail, "asender", ["atag", "anothertag"], CancellationToken.None);
 
         result.Should().BeSuccess();
         result.Value.ReceiptId.Should().NotBeEmpty();

@@ -16,7 +16,7 @@ namespace Infrastructure.Shared.ApplicationServices.External;
 public interface ITwilioClient
 {
     Task<Result<SmsDeliveryReceipt, Error>> SendAsync(ICallContext call, string toPhoneNumber, string body,
-        CancellationToken cancellationToken);
+        IReadOnlyList<string>? tags, CancellationToken cancellationToken);
 }
 
 /// <summary>
@@ -60,7 +60,7 @@ public class TwilioClient : ITwilioClient
     }
 
     public async Task<Result<SmsDeliveryReceipt, Error>> SendAsync(ICallContext call, string toPhoneNumber, string body,
-        CancellationToken cancellationToken)
+        IReadOnlyList<string>? tags, CancellationToken cancellationToken)
     {
         try
         {
@@ -72,7 +72,8 @@ public class TwilioClient : ITwilioClient
                     StatusCallback = _webhookCallbackUrl,
                     To = toPhoneNumber,
                     From = _senderPhoneNumber,
-                    Body = body
+                    Body = body,
+                    Tags = ToTags()
                 }, req => req.SetBasicAuth(_accountSid, _authToken), cancellationToken));
             if (response.IsFailure)
             {
@@ -88,6 +89,17 @@ public class TwilioClient : ITwilioClient
         {
             _recorder.TraceError(call, ex, "Error sending Twilio SMS to {To}", toPhoneNumber);
             return ex.ToError(ErrorCode.Unexpected);
+        }
+
+        Dictionary<string, string>? ToTags()
+        {
+            if (tags.NotExists() || tags.HasNone())
+            {
+                return null;
+            }
+
+            var counter = 0;
+            return tags.ToDictionary(_ => $"Tag{++counter}", tag => tag);
         }
     }
 

@@ -19,9 +19,8 @@ public sealed class StubEmailDeliveryService : IEmailDeliveryService
     public bool SendingSucceeds { get; set; } = true;
 
     public Task<Result<EmailDeliveryReceipt, Error>> SendHtmlAsync(ICallerContext caller, string subject,
-        string htmlBody,
-        string toEmailAddress, string? toDisplayName, string fromEmailAddress, string? fromDisplayName,
-        CancellationToken cancellationToken)
+        string htmlBody, string toEmailAddress, string? toDisplayName, string fromEmailAddress, string? fromDisplayName,
+        IReadOnlyList<string>? tags, CancellationToken cancellationToken)
     {
         var receiptId = $"receipt_{Guid.NewGuid():N}";
         AllSubjects.Add(subject);
@@ -37,9 +36,9 @@ public sealed class StubEmailDeliveryService : IEmailDeliveryService
     }
 
     public Task<Result<EmailDeliveryReceipt, Error>> SendTemplatedAsync(ICallerContext caller, string templateId,
-        string? subject,
-        Dictionary<string, string> substitutions, string toEmailAddress,
-        string? toDisplayName, string fromEmailAddress, string? fromDisplayName, CancellationToken cancellationToken)
+        string? subject, Dictionary<string, string> substitutions, string toEmailAddress, string? toDisplayName,
+        string fromEmailAddress, string? fromDisplayName, IReadOnlyList<string>? tags,
+        CancellationToken cancellationToken)
     {
         var receiptId = $"receipt_{Guid.NewGuid():N}";
         AllTemplates.Add(templateId);

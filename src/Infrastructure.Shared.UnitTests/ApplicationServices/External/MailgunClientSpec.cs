@@ -41,6 +41,7 @@ public class MailgunClientSpec
 
         var result = await _client.SendHtmlAsync(_call.Object, "asubject", "afromemailaddress", "afromdisplayname",
             new MailGunRecipient { DisplayName = "atodisplayname", EmailAddress = "atoemailaddress" }, "anhtmlmessage",
+            ["atag", "anothertag"],
             CancellationToken.None);
 
         result.Should().BeSuccess();
@@ -52,6 +53,8 @@ public class MailgunClientSpec
                 && req.Subject == "asubject"
                 && req.RecipientVariables
                 == "{\r\n  \"atoemailaddress\": {\r\n    \"Name\": \"atodisplayname\",\r\n    \"Id\": 1\r\n  }\r\n}"
+                && req.Tags![0] == "atag"
+                && req.Tags![1] == "anothertag"
                 && req.TestingOnly == "yes"
                 && req.Tracking == "no"
             ),

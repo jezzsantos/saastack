@@ -28,7 +28,8 @@ public class MailgunHttpServiceClient : IEmailDeliveryService
 
     public async Task<Result<EmailDeliveryReceipt, Error>> SendHtmlAsync(ICallerContext caller, string subject,
         string htmlBody, string toEmailAddress, string? toDisplayName,
-        string fromEmailAddress, string? fromDisplayName, CancellationToken cancellationToken)
+        string fromEmailAddress, string? fromDisplayName, IReadOnlyList<string>? tags,
+        CancellationToken cancellationToken)
     {
         _recorder.TraceInformation(caller.ToCall(), "Sending HTML email to {To} in Mailgun from {From}", toEmailAddress,
             fromEmailAddress);
@@ -39,7 +40,7 @@ public class MailgunHttpServiceClient : IEmailDeliveryService
                 DisplayName = toDisplayName ?? string.Empty,
                 EmailAddress = toEmailAddress
             },
-            htmlBody, cancellationToken);
+            htmlBody, tags, cancellationToken);
         if (sent.IsFailure)
         {
             return sent.Error;
@@ -53,7 +54,8 @@ public class MailgunHttpServiceClient : IEmailDeliveryService
 
     public async Task<Result<EmailDeliveryReceipt, Error>> SendTemplatedAsync(ICallerContext caller, string templateId,
         string? subject, Dictionary<string, string> substitutions, string toEmailAddress,
-        string? toDisplayName, string fromEmailAddress, string? fromDisplayName, CancellationToken cancellationToken)
+        string? toDisplayName, string fromEmailAddress, string? fromDisplayName, IReadOnlyList<string>? tags,
+        CancellationToken cancellationToken)
     {
         _recorder.TraceInformation(caller.ToCall(), "Sending templated email to {To} in Mailgun from {From}",
             toEmailAddress,
@@ -65,7 +67,7 @@ public class MailgunHttpServiceClient : IEmailDeliveryService
                 DisplayName = toDisplayName ?? string.Empty,
                 EmailAddress = toEmailAddress
             },
-            substitutions, cancellationToken);
+            substitutions, tags, cancellationToken);
         if (sent.IsFailure)
         {
             return sent.Error;

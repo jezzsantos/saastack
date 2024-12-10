@@ -199,9 +199,6 @@ partial class AncillaryApplication
             return sender.Error;
         }
 
-        var tags = message.Html.Exists()
-            ? message.Html!.Tags
-            : message.Template!.Tags;
         EmailDeliveryRoot email;
         var found = retrieved.Value.HasValue;
         if (found)
@@ -222,6 +219,9 @@ partial class AncillaryApplication
             {
                 var subject = message.Html!.Subject;
                 var body = message.Html!.Body;
+                var tags = message.Html.Tags.Exists()
+                    ? message.Html!.Tags
+                    : null;
                 var detailed = email.SetContent(subject, body, recipient.Value, tags);
                 if (detailed.IsFailure)
                 {
@@ -233,6 +233,9 @@ partial class AncillaryApplication
             {
                 var templateId = message.Template!.TemplateId;
                 var subject = message.Template!.Subject;
+                var tags = message.Template.Tags.Exists()
+                    ? message.Template!.Tags
+                    : null;
                 var substitutions = message.Template!.Substitutions;
                 var detailed = email.SetContent(templateId, subject, substitutions, recipient.Value, tags);
                 if (detailed.IsFailure)
@@ -268,19 +271,21 @@ partial class AncillaryApplication
         {
             var subject = message.Html.Subject;
             var body = message.Html.Body;
+            var tags = message.Html.Tags;
             sent = await _emailDeliveryService.SendHtmlAsync(caller, subject!, body!, recipient.Value.EmailAddress,
                 recipient.Value.DisplayName, sender.Value.EmailAddress,
-                sender.Value.DisplayName, cancellationToken);
+                sender.Value.DisplayName, tags, cancellationToken);
         }
 
         if (message.Template.Exists())
         {
             var templateId = message.Template.TemplateId!;
             var subject = message.Template.Subject;
+            var tags = message.Template.Tags;
             var substitutions = message.Template.Substitutions!;
             sent = await _emailDeliveryService.SendTemplatedAsync(caller, templateId, subject, substitutions,
                 recipient.Value.EmailAddress, recipient.Value.DisplayName, sender.Value.EmailAddress,
-                sender.Value.DisplayName, cancellationToken);
+                sender.Value.DisplayName, tags, cancellationToken);
         }
 
         if (sent.IsFailure)

@@ -216,7 +216,7 @@ partial class AncillaryApplication
         }
 
         sms = saved.Value;
-        var sent = await _smsDeliveryService.SendAsync(caller, body!, recipient.Number, cancellationToken);
+        var sent = await _smsDeliveryService.SendAsync(caller, body!, recipient.Number, tags, cancellationToken);
         if (sent.IsFailure)
         {
             var failed = sms.FailedSending();
