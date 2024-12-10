@@ -24,9 +24,6 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="AncillaryApplication_InvalidQueuedMessage" xml:space="preserve">
-        <value>The queued message was not valid JSON for its type: '{0}', message was: {1}</value>
-    </data>
     <data name="AncillaryApplication_Usage_MissingForId" xml:space="preserve">
         <value>The usage message is missing a 'ForId'</value>
     </data>

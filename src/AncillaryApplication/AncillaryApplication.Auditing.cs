@@ -1,6 +1,7 @@
 using AncillaryDomain;
 using Application.Common.Extensions;
 using Application.Interfaces;
+using Application.Persistence.Shared.Extensions;
 using Application.Persistence.Shared.ReadModels;
 using Common;
 using Common.Extensions;
@@ -14,7 +15,7 @@ partial class AncillaryApplication
     public async Task<Result<bool, Error>> DeliverAuditAsync(ICallerContext caller, string messageAsJson,
         CancellationToken cancellationToken)
     {
-        var rehydrated = RehydrateMessage<AuditMessage>(messageAsJson);
+        var rehydrated = messageAsJson.RehydrateQueuedMessage<AuditMessage>();
         if (rehydrated.IsFailure)
         {
             return rehydrated.Error;
@@ -33,7 +34,7 @@ partial class AncillaryApplication
 #if TESTINGONLY
     public async Task<Result<Error>> DrainAllAuditsAsync(ICallerContext caller, CancellationToken cancellationToken)
     {
-        await DrainAllOnQueueAsync(_auditMessageQueueRepository,
+        await _auditMessageQueueRepository.DrainAllQueuedMessagesAsync(
             message => DeliverAuditInternalAsync(caller, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(caller.ToCall(), "Drained all audit messages");

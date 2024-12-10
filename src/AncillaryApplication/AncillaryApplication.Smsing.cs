@@ -2,6 +2,7 @@ using AncillaryApplication.Persistence.ReadModels;
 using AncillaryDomain;
 using Application.Common.Extensions;
 using Application.Interfaces;
+using Application.Persistence.Shared.Extensions;
 using Application.Persistence.Shared.ReadModels;
 using Application.Resources.Shared;
 using Common;
@@ -93,7 +94,7 @@ partial class AncillaryApplication
 #if TESTINGONLY
     public async Task<Result<Error>> DrainAllSmsesAsync(ICallerContext caller, CancellationToken cancellationToken)
     {
-        await DrainAllOnQueueAsync(_smsMessageQueue,
+        await _smsMessageQueue.DrainAllQueuedMessagesAsync(
             message => SendSmsInternalAsync(caller, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(caller.ToCall(), "Drained all sms messages");
@@ -125,7 +126,7 @@ partial class AncillaryApplication
     public async Task<Result<bool, Error>> SendSmsAsync(ICallerContext caller, string messageAsJson,
         CancellationToken cancellationToken)
     {
-        var rehydrated = RehydrateMessage<SmsMessage>(messageAsJson);
+        var rehydrated = messageAsJson.RehydrateQueuedMessage<SmsMessage>();
         if (rehydrated.IsFailure)
         {
             return rehydrated.Error;

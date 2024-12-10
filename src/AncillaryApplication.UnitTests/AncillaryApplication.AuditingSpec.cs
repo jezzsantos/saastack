@@ -52,16 +52,6 @@ public class AncillaryApplicationAuditingSpec
             provisioningMessageQueue.Object, provisioningDeliveryService.Object);
     }
 
-    [Fact]
-    public async Task WhenDeliverAuditAsyncAndMessageIsNotRehydratable_ThenReturnsError()
-    {
-        var result = await _application.DeliverAuditAsync(_caller.Object, "anunknownmessage", CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_InvalidQueuedMessage.Format(nameof(AuditMessage), "anunknownmessage"));
-        _auditRepository.Verify(
-            ar => ar.SaveAsync(It.IsAny<AuditRoot>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
 
     [Fact]
     public async Task WhenDeliverAuditAsyncAndMessageHasNoAuditCode_ThenReturnsError()

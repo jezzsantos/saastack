@@ -3,6 +3,7 @@ using AncillaryDomain;
 using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Persistence.Shared;
+using Application.Persistence.Shared.Extensions;
 using Application.Persistence.Shared.ReadModels;
 using Application.Resources.Shared;
 using Common;
@@ -94,7 +95,7 @@ partial class AncillaryApplication
 #if TESTINGONLY
     public async Task<Result<Error>> DrainAllEmailsAsync(ICallerContext caller, CancellationToken cancellationToken)
     {
-        await DrainAllOnQueueAsync(_emailMessageQueue,
+        await _emailMessageQueue.DrainAllQueuedMessagesAsync(
             message => SendEmailInternalAsync(caller, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(caller.ToCall(), "Drained all email messages");
@@ -126,7 +127,7 @@ partial class AncillaryApplication
     public async Task<Result<bool, Error>> SendEmailAsync(ICallerContext caller, string messageAsJson,
         CancellationToken cancellationToken)
     {
-        var rehydrated = RehydrateMessage<EmailMessage>(messageAsJson);
+        var rehydrated = messageAsJson.RehydrateQueuedMessage<EmailMessage>();
         if (rehydrated.IsFailure)
         {
             return rehydrated.Error;

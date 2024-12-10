@@ -96,15 +96,6 @@ namespace AncillaryApplication {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The queued message was not valid JSON for its type: &apos;{0}&apos;, message was: {1}.
-        /// </summary>
-        internal static string AncillaryApplication_InvalidQueuedMessage {
-            get {
-                return ResourceManager.GetString("AncillaryApplication_InvalidQueuedMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The provisioning message is missing the &apos;TenantId&apos; identifier.
         /// </summary>
         internal static string AncillaryApplication_Provisioning_MissingTenantId {

@@ -1,5 +1,6 @@
 using Application.Common.Extensions;
 using Application.Interfaces;
+using Application.Persistence.Shared.Extensions;
 using Application.Persistence.Shared.ReadModels;
 using Common;
 using Common.Extensions;
@@ -11,7 +12,7 @@ partial class AncillaryApplication
     public async Task<Result<bool, Error>> DeliverUsageAsync(ICallerContext caller, string messageAsJson,
         CancellationToken cancellationToken)
     {
-        var rehydrated = RehydrateMessage<UsageMessage>(messageAsJson);
+        var rehydrated = messageAsJson.RehydrateQueuedMessage<UsageMessage>();
         if (rehydrated.IsFailure)
         {
             return rehydrated.Error;
@@ -30,7 +31,7 @@ partial class AncillaryApplication
 #if TESTINGONLY
     public async Task<Result<Error>> DrainAllUsagesAsync(ICallerContext caller, CancellationToken cancellationToken)
     {
-        await DrainAllOnQueueAsync(_usageMessageQueue,
+        await _usageMessageQueue.DrainAllQueuedMessagesAsync(
             message => DeliverUsageInternalAsync(caller, message, cancellationToken), cancellationToken);
 
         _recorder.TraceInformation(caller.ToCall(), "Drained all usage messages");

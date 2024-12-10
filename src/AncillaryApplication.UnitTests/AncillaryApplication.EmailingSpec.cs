@@ -67,18 +67,6 @@ public class AncillaryApplicationEmailingSpec
             provisioningMessageQueue.Object, provisioningDeliveryService.Object);
     }
 
-    [Fact]
-    public async Task WhenSendEmailAsyncAndHtmlMessageIsNotRehydratable_ThenReturnsError()
-    {
-        var result = await _application.SendEmailAsync(_caller.Object, "anunknownmessage", CancellationToken.None);
-
-        result.Should().BeError(ErrorCode.RuleViolation,
-            Resources.AncillaryApplication_InvalidQueuedMessage.Format(nameof(EmailMessage), "anunknownmessage"));
-        _emailDeliveryService.Verify(
-            eds => eds.SendHtmlAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<CancellationToken>()), Times.Never);
-    }
 
     [Fact]
     public async Task WhenSendEmailAsyncAndMessageHasNoHtmlNorTemplate_ThenReturnsError()
