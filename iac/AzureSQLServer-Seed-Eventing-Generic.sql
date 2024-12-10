@@ -534,19 +534,19 @@ CREATE TABLE [dbo].[SmsDelivery]
 GO
 
 CREATE INDEX Id
-    ON [dbo].[EmailDelivery]
+    ON [dbo].[SmsDelivery]
         (
          [Id]
             );
 
 CREATE INDEX MessageId
-    ON [dbo].[EmailDelivery]
+    ON [dbo].[SmsDelivery]
         (
          [MessageId]
             );
 
 CREATE INDEX ReceiptId
-    ON [dbo].[EmailDelivery]
+    ON [dbo].[SmsDelivery]
         (
          [ReceiptId]
             );
