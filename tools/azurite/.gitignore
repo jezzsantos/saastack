@@ -1,2 +1,4 @@
 azurite
 node_modules
+__blogstorage__
+__azurite_*
