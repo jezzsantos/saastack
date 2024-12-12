@@ -41,22 +41,22 @@ public class SSOProvidersServiceSpec
         }
 
         [Fact]
-        public async Task WhenFindByNameAsyncAndNotRegistered_ThenReturnsNone()
+        public async Task WhenFindProviderByNameAsyncAndNotRegistered_ThenReturnsNone()
         {
-            var result = await _service.FindByProviderNameAsync("aname", CancellationToken.None);
+            var result = await _service.FindProviderByNameAsync("aname", CancellationToken.None);
 
             result.Should().BeSuccess();
             result.Value.Should().BeNone();
         }
 
         [Fact]
-        public async Task WhenSaveUserInfoAsyncAndProviderNotRegistered_ThenReturnsError()
+        public async Task WhenSaveInfoOnBehalfOfUserAsyncAndProviderNotRegistered_ThenReturnsError()
         {
             var userInfo = new SSOUserInfo(new List<AuthToken>(), "auser@company.com", "afirstname", null,
                 Timezones.Default, CountryCodes.Default);
 
             var result =
-                await _service.SaveUserInfoAsync(_caller.Object, "aprovidername", "auserid".ToId(), userInfo,
+                await _service.SaveInfoOnBehalfOfUserAsync(_caller.Object, "aprovidername", "auserid".ToId(), userInfo,
                     CancellationToken.None);
 
             result.Should().BeError(ErrorCode.EntityNotFound,
@@ -87,19 +87,19 @@ public class SSOProvidersServiceSpec
         }
 
         [Fact]
-        public async Task WhenFindByNameAsyncAndNotRegistered_ThenReturnsNone()
+        public async Task WhenFindProviderByNameAsyncAndNotRegistered_ThenReturnsNone()
         {
-            var result = await _service.FindByProviderNameAsync("aname", CancellationToken.None);
+            var result = await _service.FindProviderByNameAsync("aname", CancellationToken.None);
 
             result.Should().BeSuccess();
             result.Value.Should().BeNone();
         }
 
         [Fact]
-        public async Task WhenFindByNameAsyncRegistered_ThenReturnsProvider()
+        public async Task WhenFindProviderByNameAsyncRegistered_ThenReturnsProvider()
         {
             var result =
-                await _service.FindByProviderNameAsync(TestSSOAuthenticationProvider.Name, CancellationToken.None);
+                await _service.FindProviderByNameAsync(TestSSOAuthenticationProvider.Name, CancellationToken.None);
 
             result.Should().BeSuccess();
             result.Value.Value.Should().BeOfType<TestSSOAuthenticationProvider>();
@@ -141,13 +141,13 @@ public class SSOProvidersServiceSpec
         }
 
         [Fact]
-        public async Task WhenSaveUserInfoAsyncAndProviderNotRegistered_ThenReturnsError()
+        public async Task WhenSaveInfoOnBehalfOfUserAsyncAndProviderNotRegistered_ThenReturnsError()
         {
             var userInfo = new SSOUserInfo(new List<AuthToken>(), "auser@company.com", "afirstname", null,
                 Timezones.Default, CountryCodes.Default);
 
             var result =
-                await _service.SaveUserInfoAsync(_caller.Object, "aprovidername", "auserid".ToId(), userInfo,
+                await _service.SaveInfoOnBehalfOfUserAsync(_caller.Object, "aprovidername", "auserid".ToId(), userInfo,
                     CancellationToken.None);
 
             result.Should().BeError(ErrorCode.EntityNotFound,
@@ -155,7 +155,7 @@ public class SSOProvidersServiceSpec
         }
 
         [Fact]
-        public async Task WhenSaveUserInfoAsyncAndUserNotExists_ThenCreatesAndSavesDetails()
+        public async Task WhenSaveInfoOnBehalfOfUserAsyncAndUserNotExists_ThenCreatesAndSavesDetails()
         {
             var userInfo = new SSOUserInfo(new List<AuthToken>(), "auser@company.com", "afirstname", null,
                 Timezones.Default, CountryCodes.Default);
@@ -165,7 +165,8 @@ public class SSOProvidersServiceSpec
                 .ReturnsAsync(Optional<SSOUserRoot>.None);
 
             var result =
-                await _service.SaveUserInfoAsync(_caller.Object, TestSSOAuthenticationProvider.Name, "auserid".ToId(),
+                await _service.SaveInfoOnBehalfOfUserAsync(_caller.Object, TestSSOAuthenticationProvider.Name,
+                    "auserid".ToId(),
                     userInfo,
                     CancellationToken.None);
 
@@ -183,7 +184,7 @@ public class SSOProvidersServiceSpec
         }
 
         [Fact]
-        public async Task WhenSaveUserTokensAsyncAndProviderNotRegistered_ThenReturnsError()
+        public async Task WhenSaveTokensOnBehalfOfUserAsyncAndProviderNotRegistered_ThenReturnsError()
         {
             var tokens = new ProviderAuthenticationTokens
             {
@@ -212,7 +213,7 @@ public class SSOProvidersServiceSpec
             };
 
             var result =
-                await _service.SaveUserTokensAsync(_caller.Object, "aprovidername", "auserid".ToId(), tokens,
+                await _service.SaveTokensOnBehalfOfUserAsync(_caller.Object, "aprovidername", "auserid".ToId(), tokens,
                     CancellationToken.None);
 
             result.Should().BeError(ErrorCode.EntityNotFound,
@@ -223,7 +224,7 @@ public class SSOProvidersServiceSpec
         }
 
         [Fact]
-        public async Task WhenSaveUserTokensAsyncAndUserNotExists_ThenReturnsError()
+        public async Task WhenSaveTokensOnBehalfOfUserAsyncAndUserNotExists_ThenReturnsError()
         {
             var tokens = new ProviderAuthenticationTokens
             {
@@ -256,7 +257,8 @@ public class SSOProvidersServiceSpec
                 .ReturnsAsync(Optional<SSOUserRoot>.None);
 
             var result =
-                await _service.SaveUserTokensAsync(_caller.Object, TestSSOAuthenticationProvider.Name, "auserid".ToId(),
+                await _service.SaveTokensOnBehalfOfUserAsync(_caller.Object, TestSSOAuthenticationProvider.Name,
+                    "auserid".ToId(),
                     tokens, CancellationToken.None);
 
             result.Should().BeError(ErrorCode.EntityNotFound);
@@ -265,7 +267,7 @@ public class SSOProvidersServiceSpec
         }
 
         [Fact]
-        public async Task WhenSaveUserTokensAsync_ThenSavesTokens()
+        public async Task WhenSaveTokensOnBehalfOfUserAsync_ThenSavesTokens()
         {
             _caller.Setup(cc => cc.CallerId)
                 .Returns("auserid");
@@ -303,7 +305,8 @@ public class SSOProvidersServiceSpec
                 .ReturnsAsync(ssoUser.ToOptional());
 
             var result =
-                await _service.SaveUserTokensAsync(_caller.Object, TestSSOAuthenticationProvider.Name, "auserid".ToId(),
+                await _service.SaveTokensOnBehalfOfUserAsync(_caller.Object, TestSSOAuthenticationProvider.Name,
+                    "auserid".ToId(),
                     tokens, CancellationToken.None);
 
             var expectedTokens = SSOAuthTokens.Create([
@@ -320,17 +323,107 @@ public class SSOProvidersServiceSpec
                 && user.Tokens == expectedTokens
             ), It.IsAny<CancellationToken>()));
         }
-        //
-        // [Fact]
-        // public async Task WhenGetTokensAsyncAndNotOwner_ThenReturnsError()
-        // {
-        //     var result = await _service.GetTokensAsync(_caller.Object, "auserid".ToId(), CancellationToken.None);
-        //
-        //     result.Should().BeError(ErrorCode.RoleViolation, IdentityDomain.Resources.SSOUserRoot_NotOwner);
-        // }
 
         [Fact]
-        public async Task WhenGetTokensAsyncAndNoTokens_ThenReturnsNone()
+        public async Task WhenSaveTokensOnBehalfOfUserAsyncWhenCallerIsNotOwner_ThenSucceeds()
+        {
+            _caller.Setup(cc => cc.CallerId)
+                .Returns("auserid");
+            var datum = DateTime.UtcNow;
+            var tokens = new ProviderAuthenticationTokens
+            {
+                Provider = "aprovidername",
+                AccessToken = new AuthenticationToken
+                {
+                    ExpiresOn = datum,
+                    Type = TokenType.AccessToken,
+                    Value = "anaccesstoken"
+                },
+                RefreshToken = new AuthenticationToken
+                {
+                    ExpiresOn = datum,
+                    Type = TokenType.RefreshToken,
+                    Value = "arefreshtoken"
+                },
+                OtherTokens =
+                [
+                    new AuthenticationToken
+                    {
+                        ExpiresOn = datum,
+                        Type = TokenType.OtherToken,
+                        Value = "anothertoken"
+                    }
+                ]
+            };
+            var ssoUser = SSOUserRoot.Create(_recorder.Object, _idFactory.Object,
+                "aprovidername", "anotheruserid".ToId()).Value;
+            _repository.Setup(rep =>
+                    rep.FindByUserIdAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(ssoUser.ToOptional());
+
+            var result =
+                await _service.SaveTokensOnBehalfOfUserAsync(_caller.Object, TestSSOAuthenticationProvider.Name,
+                    "anotheruserid".ToId(), tokens, CancellationToken.None);
+
+            var expectedTokens = SSOAuthTokens.Create([
+                SSOAuthToken.Create(SSOAuthTokenType.AccessToken, "anencryptedvalue", datum).Value,
+                SSOAuthToken.Create(SSOAuthTokenType.RefreshToken, "anencryptedvalue", datum).Value,
+                SSOAuthToken.Create(SSOAuthTokenType.OtherToken, "anencryptedvalue", datum).Value
+            ]).Value;
+            result.Should().BeSuccess();
+            _repository.Verify(rep => rep.FindByUserIdAsync(TestSSOAuthenticationProvider.Name, "anotheruserid".ToId(),
+                It.IsAny<CancellationToken>()));
+            _repository.Verify(rep => rep.SaveAsync(It.Is<SSOUserRoot>(user =>
+                user.UserId == "anotheruserid"
+                && user.ProviderName == "aprovidername"
+                && user.Tokens == expectedTokens
+            ), It.IsAny<CancellationToken>()));
+        }
+
+        [Fact]
+        public async Task WhenFindProviderByUserId_ThenSucceeds()
+        {
+            _caller.Setup(cc => cc.CallerId)
+                .Returns("auserid");
+
+            var ssoUser = SSOUserRoot.Create(_recorder.Object, _idFactory.Object,
+                "aprovidername", "auserid".ToId()).Value;
+            _repository.Setup(rep =>
+                    rep.FindByUserIdAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(ssoUser.ToOptional());
+
+            var result = await _service.FindProviderByUserIdAsync(_caller.Object, "auserid".ToId(), "atestprovider",
+                CancellationToken.None);
+
+            result.Should().BeSuccess();
+            result.Value.Value.ProviderName.Should().Be("atestprovider");
+        }
+
+        [Fact]
+        public async Task WhenFindProviderByUserIdAndCallerNotOwner_ThenSucceeds()
+        {
+            _caller.Setup(cc => cc.CallerId)
+                .Returns("auserid");
+
+            var ssoUser = SSOUserRoot.Create(_recorder.Object, _idFactory.Object,
+                "aprovidername", "anotheruserid".ToId()).Value;
+            _repository.Setup(rep =>
+                    rep.FindByUserIdAsync(It.IsAny<string>(), It.IsAny<Identifier>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(ssoUser.ToOptional());
+
+            var result = await _service.FindProviderByUserIdAsync(_caller.Object, "anotheruserid".ToId(),
+                "atestprovider",
+                CancellationToken.None);
+
+            result.Should().BeSuccess();
+            result.Value.Value.ProviderName.Should().Be("atestprovider");
+        }
+
+        [Fact]
+        public async Task WhenGetTokensOnBehalfOfUserAsyncAndNoTokens_ThenReturnsNone()
         {
             _caller.Setup(cc => cc.CallerId)
                 .Returns("auserid");
@@ -351,7 +444,7 @@ public class SSOProvidersServiceSpec
         }
 
         [Fact]
-        public async Task WhenGetTokensAsync_ThenReturnsError()
+        public async Task WhenGetTokensOnBehalfOfUserAsync_ThenReturnsError()
         {
             _caller.Setup(cc => cc.CallerId)
                 .Returns("auserid");

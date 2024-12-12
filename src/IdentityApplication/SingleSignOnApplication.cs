@@ -30,7 +30,7 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         string? invitationToken, string providerName, string authCode, string? username,
         CancellationToken cancellationToken)
     {
-        var retrievedProvider = await _ssoProvidersService.FindByProviderNameAsync(providerName, cancellationToken);
+        var retrievedProvider = await _ssoProvidersService.FindProviderByNameAsync(providerName, cancellationToken);
         if (retrievedProvider.IsFailure)
         {
             return retrievedProvider.Error;
@@ -105,7 +105,8 @@ public class SingleSignOnApplication : ISingleSignOnApplication
             return Error.EntityLocked(Resources.SingleSignOnApplication_AccountSuspended);
         }
 
-        var saved = await _ssoProvidersService.SaveUserInfoAsync(caller, providerName, registeredUserId.ToId(),
+        var saved = await _ssoProvidersService.SaveInfoOnBehalfOfUserAsync(caller, providerName,
+            registeredUserId.ToId(),
             userInfo,
             cancellationToken);
         if (saved.IsFailure)
@@ -174,7 +175,7 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         Identifier userId, string providerName, string refreshToken, CancellationToken cancellationToken)
     {
         var retrievedProvider =
-            await _ssoProvidersService.FindByUserIdAsync(caller, userId, providerName, cancellationToken);
+            await _ssoProvidersService.FindProviderByUserIdAsync(caller, userId, providerName, cancellationToken);
         if (retrievedProvider.IsFailure)
         {
             return retrievedProvider.Error;
@@ -215,7 +216,7 @@ public class SingleSignOnApplication : ISingleSignOnApplication
         }
 
         var tokens = refreshed.Value;
-        var saved = await _ssoProvidersService.SaveUserTokensAsync(caller, providerName, userId, tokens,
+        var saved = await _ssoProvidersService.SaveTokensOnBehalfOfUserAsync(caller, providerName, userId, tokens,
             cancellationToken);
         if (saved.IsFailure)
         {

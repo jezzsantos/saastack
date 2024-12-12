@@ -29,10 +29,10 @@ public class SingleSignOnApplicationSpec
         _ssoProvider = new Mock<ISSOAuthenticationProvider>();
         _ssoProvidersService = new Mock<ISSOProvidersService>();
         _ssoProvidersService
-            .Setup(sps => sps.FindByProviderNameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Setup(sps => sps.FindProviderByNameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(_ssoProvider.Object.ToOptional());
         _ssoProvidersService.Setup(sps =>
-                sps.FindByUserIdAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                sps.FindProviderByUserIdAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(_ssoProvider.Object.ToOptional());
         _authTokensService = new Mock<IAuthTokensService>();
@@ -45,7 +45,7 @@ public class SingleSignOnApplicationSpec
     [Fact]
     public async Task WhenAuthenticateAndNoProvider_ThenReturnsError()
     {
-        _ssoProvidersService.Setup(sp => sp.FindByProviderNameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        _ssoProvidersService.Setup(sp => sp.FindProviderByNameAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Optional<ISSOAuthenticationProvider>.None);
 
         var result = await _application.AuthenticateAsync(_caller.Object, "aninvitationtoken", "aprovidername",
@@ -119,7 +119,7 @@ public class SingleSignOnApplicationSpec
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _ssoProvidersService.Verify(
-            sps => sps.SaveUserInfoAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+            sps => sps.SaveInfoOnBehalfOfUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<SSOUserInfo>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _endUsersService.Verify(eus =>
@@ -173,7 +173,7 @@ public class SingleSignOnApplicationSpec
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _ssoProvidersService.Verify(
-            sps => sps.SaveUserInfoAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+            sps => sps.SaveInfoOnBehalfOfUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<SSOUserInfo>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _endUsersService.Verify(eus =>
@@ -240,7 +240,7 @@ public class SingleSignOnApplicationSpec
         _endUsersService.Verify(eus => eus.RegisterPersonPrivateAsync(_caller.Object, "aninvitationtoken",
             "auser@company.com", "afirstname", null, Timezones.Sydney.ToString(), CountryCodes.Australia.ToString(),
             true, It.IsAny<CancellationToken>()));
-        _ssoProvidersService.Verify(sps => sps.SaveUserInfoAsync(_caller.Object, "aprovidername",
+        _ssoProvidersService.Verify(sps => sps.SaveInfoOnBehalfOfUserAsync(_caller.Object, "aprovidername",
             "aregistereduserid".ToId(),
             It.Is<SSOUserInfo>(ui => ui == userInfo), It.IsAny<CancellationToken>()));
         _endUsersService.Verify(eus =>
@@ -307,7 +307,7 @@ public class SingleSignOnApplicationSpec
             eus => eus.RegisterPersonPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(),
                 It.IsAny<CancellationToken>()), Times.Never);
-        _ssoProvidersService.Verify(sps => sps.SaveUserInfoAsync(_caller.Object, "aprovidername",
+        _ssoProvidersService.Verify(sps => sps.SaveInfoOnBehalfOfUserAsync(_caller.Object, "aprovidername",
             "anexistinguserid".ToId(),
             It.Is<SSOUserInfo>(ui => ui == userInfo), It.IsAny<CancellationToken>()));
         _endUsersService.Verify(eus =>
@@ -321,7 +321,7 @@ public class SingleSignOnApplicationSpec
     public async Task WhenRefreshTokenOnBehalfOfUserAsyncAndProviderUserNotExists_ThenReturnsError()
     {
         _ssoProvidersService.Setup(sp =>
-                sp.FindByUserIdAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+                sp.FindProviderByUserIdAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(Optional<ISSOAuthenticationProvider>.None);
 
@@ -335,7 +335,7 @@ public class SingleSignOnApplicationSpec
             eus => eus.GetUserPrivateAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _ssoProvidersService.Verify(
-            sps => sps.SaveUserTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+            sps => sps.SaveTokensOnBehalfOfUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<ProviderAuthenticationTokens>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -360,7 +360,7 @@ public class SingleSignOnApplicationSpec
             sop => sop.RefreshTokenAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _ssoProvidersService.Verify(
-            sps => sps.SaveUserTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+            sps => sps.SaveTokensOnBehalfOfUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<ProviderAuthenticationTokens>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -392,7 +392,7 @@ public class SingleSignOnApplicationSpec
             sop => sop.RefreshTokenAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(),
                 It.IsAny<CancellationToken>()), Times.Never);
         _ssoProvidersService.Verify(
-            sps => sps.SaveUserTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+            sps => sps.SaveTokensOnBehalfOfUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<ProviderAuthenticationTokens>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -426,7 +426,7 @@ public class SingleSignOnApplicationSpec
             sop => sop.RefreshTokenAsync(_caller.Object, It.IsAny<string>(),
                 It.IsAny<CancellationToken>()));
         _ssoProvidersService.Verify(
-            sps => sps.SaveUserTokensAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
+            sps => sps.SaveTokensOnBehalfOfUserAsync(It.IsAny<ICallerContext>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<ProviderAuthenticationTokens>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -490,7 +490,7 @@ public class SingleSignOnApplicationSpec
             sop => sop.RefreshTokenAsync(_caller.Object, It.IsAny<string>(),
                 It.IsAny<CancellationToken>()));
         _ssoProvidersService.Verify(
-            sps => sps.SaveUserTokensAsync(_caller.Object, "aprovidername", "auserid".ToId(),
+            sps => sps.SaveTokensOnBehalfOfUserAsync(_caller.Object, "aprovidername", "auserid".ToId(),
                 It.Is<ProviderAuthenticationTokens>(token =>
                     token.Provider == "aprovidername"
                     && token.AccessToken.Value == "anaccesstoken"

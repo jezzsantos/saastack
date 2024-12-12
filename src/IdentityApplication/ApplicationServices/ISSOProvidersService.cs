@@ -9,10 +9,10 @@ namespace IdentityApplication.ApplicationServices;
 /// </summary>
 public interface ISSOProvidersService
 {
-    Task<Result<Optional<ISSOAuthenticationProvider>, Error>> FindByProviderNameAsync(string providerName,
+    Task<Result<Optional<ISSOAuthenticationProvider>, Error>> FindProviderByNameAsync(string providerName,
         CancellationToken cancellationToken);
 
-    Task<Result<Optional<ISSOAuthenticationProvider>, Error>> FindByUserIdAsync(ICallerContext caller,
+    Task<Result<Optional<ISSOAuthenticationProvider>, Error>> FindProviderByUserIdAsync(ICallerContext caller,
         string userId, string providerName, CancellationToken cancellationToken);
 
     Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensAsync(ICallerContext caller,
@@ -21,9 +21,9 @@ public interface ISSOProvidersService
     Task<Result<IReadOnlyList<ProviderAuthenticationTokens>, Error>> GetTokensOnBehalfOfUserAsync(ICallerContext caller,
         string userId, CancellationToken cancellationToken);
 
-    Task<Result<Error>> SaveUserInfoAsync(ICallerContext caller, string providerName, string userId,
+    Task<Result<Error>> SaveInfoOnBehalfOfUserAsync(ICallerContext caller, string providerName, string userId,
         SSOUserInfo userInfo, CancellationToken cancellationToken);
 
-    Task<Result<Error>> SaveUserTokensAsync(ICallerContext caller, string providerName, string userId,
+    Task<Result<Error>> SaveTokensOnBehalfOfUserAsync(ICallerContext caller, string providerName, string userId,
         ProviderAuthenticationTokens tokens, CancellationToken cancellationToken);
 }

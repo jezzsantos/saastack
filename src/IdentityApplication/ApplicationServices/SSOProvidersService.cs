@@ -36,7 +36,7 @@ public class SSOProvidersService : ISSOProvidersService
         _authenticationProviders = authenticationProviders;
     }
 
-    public Task<Result<Optional<ISSOAuthenticationProvider>, Error>> FindByProviderNameAsync(string providerName,
+    public Task<Result<Optional<ISSOAuthenticationProvider>, Error>> FindProviderByNameAsync(string providerName,
         CancellationToken cancellationToken)
     {
         var provider =
@@ -44,7 +44,8 @@ public class SSOProvidersService : ISSOProvidersService
         return Task.FromResult<Result<Optional<ISSOAuthenticationProvider>, Error>>(provider.ToOptional());
     }
 
-    public async Task<Result<Optional<ISSOAuthenticationProvider>, Error>> FindByUserIdAsync(ICallerContext caller,
+    public async Task<Result<Optional<ISSOAuthenticationProvider>, Error>> FindProviderByUserIdAsync(
+        ICallerContext caller,
         string userId, string providerName, CancellationToken cancellationToken)
     {
         var provider =
@@ -67,7 +68,7 @@ public class SSOProvidersService : ISSOProvidersService
 
         var user = retrieved.Value.Value;
 
-        var viewed = user.ViewUser(caller.ToCallerId());
+        var viewed = user.ViewUser(userId.ToId());
         if (viewed.IsFailure)
         {
             return viewed.Error;
@@ -88,10 +89,11 @@ public class SSOProvidersService : ISSOProvidersService
         return await GetTokensInternalAsync(userId.ToId(), cancellationToken);
     }
 
-    public async Task<Result<Error>> SaveUserInfoAsync(ICallerContext caller, string providerName, string userId,
+    public async Task<Result<Error>> SaveInfoOnBehalfOfUserAsync(ICallerContext caller, string providerName,
+        string userId,
         SSOUserInfo userInfo, CancellationToken cancellationToken)
     {
-        var retrievedProvider = await FindByProviderNameAsync(providerName, cancellationToken);
+        var retrievedProvider = await FindProviderByNameAsync(providerName, cancellationToken);
         if (retrievedProvider.IsFailure)
         {
             return retrievedProvider.Error;
@@ -181,10 +183,11 @@ public class SSOProvidersService : ISSOProvidersService
         return Result.Ok;
     }
 
-    public async Task<Result<Error>> SaveUserTokensAsync(ICallerContext caller, string providerName, string userId,
+    public async Task<Result<Error>> SaveTokensOnBehalfOfUserAsync(ICallerContext caller, string providerName,
+        string userId,
         ProviderAuthenticationTokens tokens, CancellationToken cancellationToken)
     {
-        var retrievedProvider = await FindByProviderNameAsync(providerName, cancellationToken);
+        var retrievedProvider = await FindProviderByNameAsync(providerName, cancellationToken);
         if (retrievedProvider.IsFailure)
         {
             return retrievedProvider.Error;
@@ -221,7 +224,7 @@ public class SSOProvidersService : ISSOProvidersService
             return ssoTokens.Error;
         }
 
-        var changed = user.ChangeTokens(caller.ToCallerId(), ssoTokens.Value);
+        var changed = user.ChangeTokens(userId.ToId(), ssoTokens.Value);
         if (changed.IsFailure)
         {
             return changed.Error;
