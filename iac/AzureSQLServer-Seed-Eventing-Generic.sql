@@ -46,13 +46,6 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
-          WHERE object_id = OBJECT_ID(N'[dbo].[DomainEvent]')
-            AND type in (N'U'))
-    DROP TABLE [dbo].[DomainEvent]
-GO
-
-IF EXISTS(SELECT *
-          FROM sys.objects
           WHERE object_id = OBJECT_ID(N'[dbo].[EmailDelivery]')
             AND type in (N'U'))
     DROP TABLE [dbo].[EmailDelivery]
@@ -109,13 +102,6 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
-          WHERE object_id = OBJECT_ID(N'[dbo].[ProjectionCheckpoints]')
-            AND type in (N'U'))
-    DROP TABLE [dbo].[ProjectionCheckpoints]
-GO
-
-IF EXISTS(SELECT *
-          FROM sys.objects
           WHERE object_id = OBJECT_ID(N'[dbo].[SmsDelivery]')
             AND type in (N'U'))
     DROP TABLE [dbo].[SmsDelivery]
@@ -137,24 +123,11 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
-          WHERE object_id = OBJECT_ID(N'[dbo].[Unavailability]')
-            AND type in (N'U'))
-    DROP TABLE [dbo].[Unavailability]
-GO
-
-IF EXISTS(SELECT *
-          FROM sys.objects
           WHERE object_id = OBJECT_ID(N'[dbo].[UserProfile]')
             AND type in (N'U'))
     DROP TABLE [dbo].[UserProfile]
 GO
 
-IF EXISTS(SELECT *
-          FROM sys.objects
-          WHERE object_id = OBJECT_ID(N'[dbo].[WebhookNotificationAudits]')
-            AND type in (N'U'))
-    DROP TABLE [dbo].[WebhookNotificationAudits]
-GO
 
 SET ANSI_NULLS ON
 GO
@@ -238,26 +211,6 @@ CREATE INDEX UserId
     ON [dbo].[AuthToken]
         (
          [UserId]
-            );
-
-CREATE TABLE [dbo].[DomainEvent]
-(
-    [Id]                 [nvarchar](100) NOT NULL,
-    [LastPersistedAtUtc] [datetime]      NULL,
-    [IsDeleted]          [bit]           NULL,
-    [Data]               [nvarchar](max) NULL,
-    [EventType]          [nvarchar](max) NULL,
-    [Metadata]           [nvarchar](max) NULL,
-    [RootAggregateType]  [nvarchar](max) NULL,
-    [StreamName] [nvarchar](450) NULL,
-    [Version]            [int]           NULL,
-) ON [PRIMARY]
-GO
-
-CREATE INDEX Id
-    ON [dbo].[DomainEvent]
-        (
-         [Id]
             );
 
 CREATE TABLE [dbo].[EmailDelivery]
@@ -492,27 +445,6 @@ CREATE INDEX MfaAuthenticationToken
          [MfaAuthenticationToken]
             );
 
-CREATE TABLE [dbo].[ProjectionCheckpoints]
-(
-    [Id]                 [nvarchar](100) NOT NULL,
-    [LastPersistedAtUtc] [datetime]      NULL,
-    [IsDeleted]          [bit]           NULL,
-    [Position]           [int]           NULL,
-    [StreamName]         [nvarchar](450) NULL,
-) ON [PRIMARY]
-GO
-
-CREATE INDEX Id
-    ON [dbo].[ProjectionCheckpoints]
-        (
-         [Id]
-            );
-CREATE INDEX StreamName
-    ON [dbo].[ProjectionCheckpoints]
-        (
-         [StreamName]
-            );
-
 CREATE TABLE [dbo].[SmsDelivery]
 (
     [Id]                   [nvarchar](100) NOT NULL,
@@ -613,31 +545,6 @@ CREATE INDEX UserId
          [UserId]
             );
 
-CREATE TABLE [dbo].[Unavailability]
-(
-    [Id]                 [nvarchar](100) NOT NULL,
-    [LastPersistedAtUtc] [datetime]      NULL,
-    [IsDeleted]          [bit]           NULL,
-    [CarId]              [nvarchar](100) NULL,
-    [CausedBy]           [nvarchar](max) NULL,
-    [CausedByReference]  [nvarchar](max) NULL,
-    [From]               [datetime]      NULL,
-    [OrganizationId]     [nvarchar](100) NULL,
-    [To]                 [datetime]      NULL,
-) ON [PRIMARY]
-GO
-
-CREATE INDEX Id
-    ON [dbo].[Unavailability]
-        (
-         [Id]
-            );
-CREATE INDEX OrganizationId
-    ON [dbo].[Unavailability]
-        (
-         [OrganizationId]
-            );
-
 CREATE TABLE [dbo].[UserProfile]
 (
     [Id]                    [nvarchar](100) NOT NULL,
@@ -677,23 +584,4 @@ CREATE INDEX UserId
     ON [dbo].[UserProfile]
         (
          [UserId]
-            );
-
-CREATE TABLE [dbo].[WebhookNotificationAudits]
-(
-    [Id]                 [nvarchar](100) NOT NULL,
-    [LastPersistedAtUtc] [datetime]      NULL,
-    [IsDeleted]          [bit]           NULL,
-    [EventId]            [nvarchar](max) NULL,
-    [EventType]          [nvarchar](max) NULL,
-    [JsonContent]        [nvarchar](max) NULL,
-    [Source]             [nvarchar](max) NULL,
-    [Status]             [nvarchar](max) NULL,
-) ON [PRIMARY]
-GO
-
-CREATE INDEX Id
-    ON [dbo].[WebhookNotificationAudits]
-        (
-         [Id]
             );

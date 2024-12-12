@@ -50,7 +50,7 @@ public class DomainEventsApplicationSpec
             Resources.DomainEventsApplication_InvalidBusMessage.Format(nameof(DomainEventingMessage),
                 "anunknownmessage"));
         _domainEventRepository.Verify(
-            der => der.AddAsync(It.IsAny<Persistence.ReadModels.DomainEvent>(), It.IsAny<CancellationToken>()),
+            der => der.SaveAsync(It.IsAny<Persistence.ReadModels.DomainEvent>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -81,7 +81,7 @@ public class DomainEventsApplicationSpec
 
         result.Should().BeSuccess();
         _domainEventRepository.Verify(
-            der => der.AddAsync(It.Is<Persistence.ReadModels.DomainEvent>(de =>
+            der => der.SaveAsync(It.Is<Persistence.ReadModels.DomainEvent>(de =>
                 de.Id == "anid"
                 && de.RootAggregateType == "anaggregatetype"
                 && de.EventType == "aneventtype"

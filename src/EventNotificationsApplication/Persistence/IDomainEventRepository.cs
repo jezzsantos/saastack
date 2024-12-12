@@ -7,7 +7,7 @@ namespace EventNotificationsApplication.Persistence;
 
 public interface IDomainEventRepository : IApplicationRepository
 {
-    Task<Result<Error>> AddAsync(DomainEvent domainEvent, CancellationToken cancellationToken);
+    Task<Result<Error>> SaveAsync(DomainEvent domainEvent, CancellationToken cancellationToken);
 
     Task<Result<IReadOnlyList<DomainEvent>, Error>> SearchAllAsync(SearchOptions searchOptions,
         CancellationToken cancellationToken);

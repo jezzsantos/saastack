@@ -147,7 +147,7 @@ public class DomainEventsApplication : IDomainEventsApplication
         DomainEventingMessage message, CancellationToken cancellationToken)
     {
         var domainEvent = message.ToDomainEvent();
-        var added = await _domainEventRepository.AddAsync(domainEvent, cancellationToken);
+        var added = await _domainEventRepository.SaveAsync(domainEvent, cancellationToken);
         if (added.IsFailure)
         {
             return added.Error;

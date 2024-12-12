@@ -107,7 +107,7 @@ public static class EventingExtensions
         {
             services.AddPerHttpRequest<IProjectionCheckpointRepository>(c => new ProjectionCheckpointRepository(
                 c.GetRequiredService<IRecorder>(), c.GetRequiredService<IIdentifierFactory>(),
-                c.GetRequiredService<IDomainFactory>(), c.GetRequiredServiceForPlatform<IDataStore>()));
+                c.GetRequiredServiceForPlatform<IDataStore>()));
         }
 
         Eventing.AddEventingStorageTypes<TAggregateRoot>();

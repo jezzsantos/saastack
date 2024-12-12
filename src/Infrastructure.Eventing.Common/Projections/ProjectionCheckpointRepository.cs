@@ -1,9 +1,10 @@
-﻿using Common;
+﻿using Application.Persistence.Interfaces;
+using Common;
 using Common.Extensions;
 using Domain.Common.Identity;
-using Domain.Interfaces;
 using Infrastructure.Eventing.Common.Projections.ReadModels;
 using Infrastructure.Eventing.Interfaces.Projections;
+using Infrastructure.Persistence.Common;
 using Infrastructure.Persistence.Interfaces;
 using QueryAny;
 
@@ -15,26 +16,27 @@ namespace Infrastructure.Eventing.Common.Projections;
 public sealed class ProjectionCheckpointRepository : IProjectionCheckpointRepository
 {
     public const int StartingCheckpointVersion = 1;
-    private readonly IDomainFactory _domainFactory;
+    private readonly ISnapshottingStore<Checkpoint> _checkpoints;
     private readonly IIdentifierFactory _idFactory;
     private readonly IRecorder _recorder;
-    private readonly IDataStore _store;
 
-    public ProjectionCheckpointRepository(IRecorder recorder, IIdentifierFactory idFactory,
-        IDomainFactory domainFactory, IDataStore store)
+    public ProjectionCheckpointRepository(IRecorder recorder, IIdentifierFactory idFactory, IDataStore store) : this(
+        recorder, idFactory, new SnapshottingStore<Checkpoint>(recorder, store))
+    {
+    }
+
+    internal ProjectionCheckpointRepository(IRecorder recorder, IIdentifierFactory idFactory,
+        ISnapshottingStore<Checkpoint> checkpoints)
     {
         _recorder = recorder;
         _idFactory = idFactory;
-        _store = store;
-        _domainFactory = domainFactory;
+        _checkpoints = checkpoints;
     }
-
-    private static string ContainerName => typeof(Checkpoint).GetEntityNameSafe();
 
     public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
     {
 #if TESTINGONLY
-        return await _store.DestroyAllAsync(ContainerName, cancellationToken);
+        return await _checkpoints.DestroyAllAsync(cancellationToken);
 #else
         await Task.CompletedTask;
         return Result.Ok;
@@ -43,7 +45,7 @@ public sealed class ProjectionCheckpointRepository : IProjectionCheckpointReposi
 
     public async Task<Result<int, Error>> LoadCheckpointAsync(string streamName, CancellationToken cancellationToken)
     {
-        var retrieved = await GetCheckpointAsync(streamName, cancellationToken);
+        var retrieved = await FindCheckpointByStreamNameAsync(streamName, cancellationToken);
         if (retrieved.IsFailure)
         {
             return retrieved.Error;
@@ -58,7 +60,7 @@ public sealed class ProjectionCheckpointRepository : IProjectionCheckpointReposi
     public async Task<Result<Error>> SaveCheckpointAsync(string streamName, int position,
         CancellationToken cancellationToken)
     {
-        var retrieved = await GetCheckpointAsync(streamName, cancellationToken);
+        var retrieved = await FindCheckpointByStreamNameAsync(streamName, cancellationToken);
         if (retrieved.IsFailure)
         {
             return retrieved.Error;
@@ -73,8 +75,7 @@ public sealed class ProjectionCheckpointRepository : IProjectionCheckpointReposi
                 StreamName = streamName
             };
             checkpoint.Value.Id = _idFactory.Create(checkpoint.Value).Value.Text;
-            var added = await _store.AddAsync(ContainerName, CommandEntity.FromType(checkpoint.Value),
-                cancellationToken);
+            var added = await _checkpoints.UpsertAsync(checkpoint, false, cancellationToken);
             if (added.IsFailure)
             {
                 return added.Error;
@@ -83,9 +84,7 @@ public sealed class ProjectionCheckpointRepository : IProjectionCheckpointReposi
         else
         {
             checkpoint.Value.Position = position;
-            var replaced = await _store.ReplaceAsync(ContainerName, checkpoint.Value.Id,
-                CommandEntity.FromType(checkpoint.Value),
-                cancellationToken);
+            var replaced = await _checkpoints.UpsertAsync(checkpoint.Value, false, cancellationToken);
             if (replaced.IsFailure)
             {
                 return replaced.Error;
@@ -98,23 +97,23 @@ public sealed class ProjectionCheckpointRepository : IProjectionCheckpointReposi
         return Result.Ok;
     }
 
-    private async Task<Result<Optional<Checkpoint>, Error>> GetCheckpointAsync(string streamName,
+    private async Task<Result<Optional<Checkpoint>, Error>> FindCheckpointByStreamNameAsync(string streamName,
         CancellationToken cancellationToken)
     {
-        var query = await _store.QueryAsync(ContainerName, Query.From<Checkpoint>()
-                .Where<string>(cp => cp.StreamName, ConditionOperator.EqualTo, streamName),
-            PersistedEntityMetadata.FromType<Checkpoint>(), cancellationToken);
-        if (query.IsFailure)
+        var query = Query.From<Checkpoint>()
+            .Where<string>(cp => cp.StreamName, ConditionOperator.EqualTo, streamName);
+        var queried = await _checkpoints.QueryAsync(query, false, cancellationToken);
+        if (queried.IsFailure)
         {
-            return query.Error;
+            return queried.Error;
         }
 
-        var checkpoint = query.Value.FirstOrDefault();
-        if (checkpoint.NotExists())
+        var matching = queried.Value.Results.FirstOrDefault();
+        if (matching.NotExists())
         {
             return Optional<Checkpoint>.None;
         }
 
-        return new Result<Optional<Checkpoint>, Error>(checkpoint.ToDomainEntity<Checkpoint>(_domainFactory));
+        return matching.ToOptional();
     }
 }

@@ -33,6 +33,13 @@ IF EXISTS(SELECT *
     DROP TABLE [dbo].[Car]
 GO
 
+IF EXISTS(SELECT *
+          FROM sys.objects
+          WHERE object_id = OBJECT_ID(N'[dbo].[Unavailability]')
+            AND type in (N'U'))
+    DROP TABLE [dbo].[Unavailability]
+GO
+
 SET ANSI_NULLS ON
 GO
 
@@ -72,4 +79,29 @@ CREATE INDEX Status
     ON [dbo].[Car]
         (
          [Status]
+            );
+
+CREATE TABLE [dbo].[Unavailability]
+(
+    [Id]                 [nvarchar](100) NOT NULL,
+    [LastPersistedAtUtc] [datetime]      NULL,
+    [IsDeleted]          [bit]           NULL,
+    [CarId]              [nvarchar](100) NULL,
+    [CausedBy]           [nvarchar](max) NULL,
+    [CausedByReference]  [nvarchar](max) NULL,
+    [From]               [datetime]      NULL,
+    [OrganizationId]     [nvarchar](100) NULL,
+    [To]                 [datetime]      NULL,
+) ON [PRIMARY]
+GO
+
+CREATE INDEX Id
+    ON [dbo].[Unavailability]
+        (
+         [Id]
+            );
+CREATE INDEX OrganizationId
+    ON [dbo].[Unavailability]
+        (
+         [OrganizationId]
             );

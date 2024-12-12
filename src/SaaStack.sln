@@ -399,6 +399,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IAC", "IAC", "{596C8F37-52D
 		..\iac\AzureSQLServer-Seed-Eventing-Generic.sql = ..\iac\AzureSQLServer-Seed-Eventing-Generic.sql
 		..\iac\AzureSQLServer-Seed-EventStore.sql = ..\iac\AzureSQLServer-Seed-EventStore.sql
 		..\iac\AzureSQLServer-Seed-Snapshotting-Core.sql = ..\iac\AzureSQLServer-Seed-Snapshotting-Core.sql
+		..\iac\AzureSQLServer-Seed-Snapshotting-Generic.sql = ..\iac\AzureSQLServer-Seed-Snapshotting-Generic.sql
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiHost1.IntegrationTests", "ApiHost1.IntegrationTests\ApiHost1.IntegrationTests.csproj", "{E7B97607-58EA-4357-B649-E48A6F719A3B}"

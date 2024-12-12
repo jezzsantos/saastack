@@ -20,7 +20,7 @@ public class DomainEventRepository : IDomainEventRepository
         _events = new ReadModelStore<DomainEvent>(recorder, domainFactory, store);
     }
 
-    public async Task<Result<Error>> AddAsync(DomainEvent domainEvent, CancellationToken cancellationToken)
+    public async Task<Result<Error>> SaveAsync(DomainEvent domainEvent, CancellationToken cancellationToken)
     {
         var added = await _events.UpsertAsync(domainEvent, false, cancellationToken);
         return added.IsFailure
