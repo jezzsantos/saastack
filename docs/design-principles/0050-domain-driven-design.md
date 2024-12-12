@@ -146,27 +146,48 @@ Nonetheless, in this architecture, we wish to generate "domain events" in our Do
 
 > Event Sourcing will be new to many developers who are used to data modeling techniques that only store the "snapshot" of data. And with all things new, it comes with some reservations about its use.
 
-Despite the advantages and the different challenges of using event sourcing ([see here for more details](https://martinfowler.com/eaaDev/EventSourcing.html)), this "event-timeline" capability has some significant advantages that are hard to accomplish with the "snapshot" strategy, particularly for SaaS-based products. The primary one is that you can create time-based reports on key aggregates in your domain for deeper data analysis any time later.
+Despite the advantages and the different challenges of using event sourcing ([see here for more details](https://martinfowler.com/eaaDev/EventSourcing.html)), this "event-timeline" capability has some significant advantages that are hard to accomplish with the "snapshot" strategy, particularly for SaaS-based products.
 
-> For example, let's say that 2 years into your Car Sharing product, you now want to understand your end user's behaviors a little better because you are contemplating a new capability in the product.
->
-> So you want to ask the software/database to report its data on the probability of a car in an urban area being unavailable at 8 pm at night. But until that day, your software had not been capturing that kind of unavailability data because the software only cared about storing the future unavailability of a car for making its reservations. Why would it care about capturing and storing past unavailability after all? You've not needed it until now.
->
-> So you have to engineer a solution to provide this historical data from this day forward and start capturing it in the data. The problem is that now, you need a large enough dataset for any statistical significance or meaning, and you don't have it. So you can't provide an answer to the question for another few months or years down the track while you collect that data. With an event-sourced system, it is likely that you can have that answer right away, it is in the data already.
+The primary advantage is that you can create time-based reports on key aggregates in your domain for deeper data analysis any time later. Then secondarily, you can change your read models (database tables) at any time (or even support many of them at the same time), and rebuild them from scratch at any time based on the source events. In many cases, this creates new data in the tables from past events.
+
+This ability to re-write history is a big advantage.
+
+For example, let's say that 2 years into your Car Sharing product, you now want to understand your end user's behaviors a little better because you are contemplating a new capability in the product.
+
+So you want to ask the software/database to report its data on the probability of a car in an urban area being unavailable at 8 pm at night. But until that day, your software had not been capturing that kind of unavailability data because the software only cared about storing the future unavailability of a car for making its reservations. Why would it care about capturing and storing past unavailability after all? You've not needed it until now.
+
+So you have to engineer a solution to provide this historical data from this day forward and start capturing it in the data. The problem is that now, you need a large enough dataset for any statistical significance or meaning, and you don't have it. So you can't provide an answer to the question for another few months or years down the track while you collect that data. With an event-sourced system, it is likely that you can have that answer right away, it is in the data already.
 
 This is why we recommend using event sourcing as your default persistence strategy by storing your domain events in an event stream in an Event Store for all new core subdomains.
 
-See the [Persistence](0070-persistence.md) guidance for how persistence of domain events works in practice and when to use one or the other.
+#### When to Snapshot?
+
+There are some very legitimate reasons not to use event-sourcing aggregates.
+Particularly, when you have data that changes very frequently, which would result in 1000's, 100,000's or millions of change events in a short period of time. This might be a key indicator that you are probably not modelling much behavior at all.
+
+One example of this are aggregates that might process "telemetry" data.
+
+For example, a change in temperature over time.
+
+In these cases, you need to think very carefully about saving the raw historical values (as they arrive) in a snapshot storage (like a data lake), and then processing that raw data at intervals, and only save the interesting changes over time in an event-sourced aggregate.
+
+Every use case different, but try to keep the number of events to hundreds or thousands, not much beyond that unless you have special use cases, that might require special strategies for managing large event streams of data.
+
+#### More Information
+
+See the [Persistence](0070-persistence.md) guidance for how the persistence of domain events works in practice.
 
 ### Aggregate Design
 
-Every subdomain should have at least one root aggregate.
+Every subdomain should have (at least) one root aggregate.
 
 > Think of an aggregate root as the trunk of a tree. Think of entities as the branches of the tree, and think of value objects as the leaves of the tree.
 
-Aggregate classes are typically named (in the code) with the suffix: `Root` to distinguish them from other types that are used throughout the other Layers of the codebase, such as those with the same name in the ReadModels and Resources for the same subdomain.
+Aggregate classes are by convention named (in the code) with the suffix:
+`Root` to distinguish them from other types that are used throughout the other Layers of the codebase, such as those with the same name in the ReadModels and Resources for the same subdomain.
 
-The class should derive from `AggregateRootBase,` and the designer should decide whether the state of the aggregate is going to be persisted in an event stream (using an EventStore) or in a traditional snapshot persistence store (e.g., a database).
+The class should derive from
+`AggregateRootBase,` and the designer should immediately decide whether the state of the aggregate is going to be persisted in an event stream (using an Event Store) or in a traditional snapshot persistence store (e.g., a database).
 
 For example,
 
@@ -498,15 +519,39 @@ For example:
     }
 ```
 
+#### Aggregate Rehydration
+
+Last thing to mention about aggregate design, is to understand (at a high level) how event-sourced aggregates are created in memory by your code.
+
+When your repository returns you an instance of a new aggregate that was pulled from storage, the instance of your root aggregate class has under gone the following process:
+
+> Note: you can follow the implementation of the
+`EventSourcingDddCommandStore<TAggregateRoot>.LoadAsync()` method for more details
+
+1. The instance aggregate was created by calling the `Rehydrate()` method of your class, with the
+   `identifier` of the aggregate. This creates a new instance of your aggregate, but it is not initialized yet into its current state.
+2. The
+   `LoadChanges()` method is called on the aggregate, and this replays all the events (from storage) in-order through the
+   `OnStateChanged()` method, but with the flag
+   `isReconstituting = true`. Which means that we are loading the aggregates complete state in one shot. No invariant checks. It is important to understand that events are only replayed through the aggregate, and not through any child entities, which means that if the aggregate does not delegate these events to child entities, then they will not be initialized correctly.
+
+Once the aggregate root is initialized, then use cases can be run, more events can be raised that change the state of the aggregate root.
+
 ### Entity Design
 
 Every root aggregate can have a hierarchy of child/descendent entities and value objects. They can be single entities or collections of entities.
 
 > Think of entities as the branches of a tree. Think of value objects as the leaves of a tree.
 
-Entities are typically named (in the code) with the suffix: `Entity` to distinguish them from other types that are used throughout the other Layers of the codebase, such as those with the same name in the read models and resources for the same subdomain.
+Entities can be named (in the code) with the suffix:
+`Entity` to distinguish them from other domain types (like value objects) that are used throughout the other Layers of the codebase, such as those with the same name in the read models and resources for the same subdomain.
 
-An entity class should derive from `EntityBase,` and the designer should decide whether the state of the ancestor aggregate is going to be persisted in an event stream (using an EventStore) or in a traditional snapshot persistence store (e.g., a database).
+The current naming convention, is that they have no suffix.
+
+An entity class should derive from
+`EntityBase,` and the designer should decide whether the state of the ancestor aggregate is going to be persisted in an event stream (using an Event Store) or in a traditional snapshot persistence store (e.g., a database table).
+
+> If your aggregate root is event sourced, all your entities will also be event-sourced as well. If your aggregate root is snapshotted, all your entities will also be snapshotted.
 
 For example,
 
@@ -520,9 +565,10 @@ public sealed class Unavailability : EntityBase
 
 #### Creation
 
-Entities are not created directly. They are always created by their parent/ancestor root aggregate in response to a domain event. The aggregate will handle the entity creation domain event, it will instantiate an instance of the entity, and it will relay the domain event to the entity that will then set its own internal state.
+Entities are not created directly. They are always created by their parent/ancestor root aggregate in response to some domain event. The aggregate will handle the entity creation domain event, it will instantiate an instance of the entity, and it will relay the domain event to the entity that will then set its own internal state.
 
-For example, this is how the `CarRoot` creates an `UnavailabilityEntity` in response to raising a `UnavailabilitySlotAdded` domain event
+For example, this is how the `CarRoot` creates an `UnavailabilityEntity` in response to raising a
+`UnavailabilitySlotAdded` domain event that was raised by the aggregate root, in some use case method.
 
 ```c#
     // Note: this is called automatically after the domain event is raised 
@@ -598,17 +644,21 @@ then, in the `UnavailabilityEntity` class, the entity will also handle the same 
     }
 ```
 
+> This specific event
+`UnavailabilitySlotAdded` is known as the creation event that calls the constructor of the entity and instantiates the instance of the entity. Any other events simply set the internal state of the entity.
+
 When a new entity is created, it must be constructed with a class factory method that includes the `RootEventHandler rootEventHandler`. This handler is later used by the entity to raise events to its parent/ancestor root aggregate when they originate from the entity.
 
-> Instantiating an entity using a constructor directly is not permitted from outside of the domain.
+> Instantiating an entity using a constructor directly is not permitted from outside of the aggregate root.
 
 This class factory is unlikely to be given any additional parameters that are mandatory to construct the entity since the data it will need will likely come from the domain events that are relayed to it from the aggregate.
 
 Any additional parameters that are needed at creation time must be validated to maintain the integrity of the state of the aggregate.
 
-> Remember: An aggregate (as a whole, which includes all its child/descendant entities and value objects) must be in a valid state at all times.
+> Remember: An aggregate (as a whole, which includes all of its child/descendant entities and value objects) and they must all be in a valid state at all times.
 
-> Note: The entity will create its own `Id` value (using the `IIdentifierFactory`), and it will initialize its initial in-memory state.
+> Note: The entity will create its own `Id` value (using the
+`IIdentifierFactory`), and it will initialize its initial in-memory state with its "creation" event.
 
 For example, a typical entity class factory creation method might look like this:
 
@@ -634,7 +684,8 @@ All entities will need to implement the `public static EntityFactory<TEntity> Re
 
 There are two supported persistence mechanisms:
 
-**Snap Shotting**: Entities that are going to be persisted by "dehydrating" their current/latest in-memory state (e.g., to be stored in a database) will need to implement these characteristics:
+**SnapShotting
+**: Entities that are going to be persisted by "dehydrating" their current/latest in-memory state (e.g., to be stored in a database) will need to implement these characteristics:
 
 1. They will declare a `[EntityName("TableName")]` on their class declaration. This will be used to identify the storage container (i.e., the table name in a relational SQL database or the document/collection name in a NoSQL database) by the persistence layer.
 2. They will implement a private constructor that populates the in-memory state of the aggregate, which is called by the `public static EntityFactory<TEntity> Rehydrate()` method.
@@ -681,7 +732,8 @@ public sealed class Trip : EntityBase
 }
 ```
 
-**Event Sourcing**: Entities that are going to be persisted by saving and loading their parent/ancestors aggregate event stream (e.g., to and from an event store) will need to implement these characteristics:
+**Event-Sourcing
+**: Entities that are going to be persisted by saving and loading their parent/ancestors aggregate event stream (e.g., to and from an event store) will need to implement these characteristics:
 
 1. They will implement a private constructor that is called by their own `Create()` factory method, which is called by the  `AggregateRootBase.RaiseEventToChildEntity()` method.
 
@@ -702,17 +754,32 @@ public sealed class Unavailability : EntityBase
 
 To change the state of any entity, the root aggregate is going to define a use case method [as described above](#Modeling-use-cases) that then calls a method on the existing entity instance (in-memory).
 
-The method on the entity then creates a new domain event and relays the domain event back to the aggregate.
+The method on the entity then (typically) raises a new domain event and relays the domain event back to the aggregate.
 
-The aggregate will handle this domain event in its `OnStateChanged()` method and relay the call back to the appropriate entity.
+> Note: It is possible that the root aggregate raises this change event, but to encapsulate logic, it is more often the entity itself that raises the domain event to change its own state.
+
+When an entity raises an event (using the `RaiseChangeEvent()` method) it first calls
+`OnStateChanged()` on the entity, followed by
+`EnsureInvariants()` on the entity, followed by passing the event to the root aggregate to handle in the root's
+`OnStateChanged()` method, and then the `EnsureVariants()` method on the root.
+
+> Note: In the
+`OnStateChanged()` method of the root aggregate, it is likely that the handler for this specific event will delegate the call back to the entity instance, to the entity's
+`OnStateChanged()` method again - setting the entities internal state again (as it already did before passing the event to the root aggregate). This might seem inefficient, and it is. In most cases, this won't have a negative impact. But in some case, it may. The point to understand is this. If the root aggregate
+`OnStateChange()` method did not delegate the event to the entity, then the entity would never be initialized when the aggregate root is initialized. So this delegation must happen, from root to child entity. The problem comes when the entity is the party that raises the event. Then we enter this duplicated cycle. You can avoid the duplicated initialization cycle by considering the value of the
+`isReconstituting` parameter of the aggregate root's
+`OnStateChanged()` method. In other words, if the entity is the raising the event, the the aggregate root would not pass the event back to the entity is the
+`isReconstituting == false`.
+
+The aggregate will handle this event in its `OnStateChanged()` method and relay the call back to the appropriate entity.
 
 The entity then updates its state (much like the aggregate does).
 
-In a nutshell, this is the process:
+In a nutshell, this is the process, when the entity raises the domain event:
 
 ![Entity Code Flow](../images/Entity-CodeFlow.png)
 
-For example,
+For example, in the entity class:
 
 ```c#
     public Result<Error> Begin(Location from)
