@@ -8,7 +8,6 @@ using Infrastructure.Web.Api.Operations.Shared._3rdParties.UserPilot;
 using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Common.Extensions;
 using Infrastructure.Web.Interfaces.Clients;
-using Polly;
 
 namespace Infrastructure.Shared.ApplicationServices.External;
 
@@ -23,31 +22,29 @@ public interface IUserPilotClient
 
 public sealed class UserPilotClient : IUserPilotClient
 {
-    private const string APIVersionHeaderName = "X-API-Version";
     private const string APIKeySettingName = "ApplicationServices:UserPilot:ApiKey";
+    private const string APIVersionHeaderName = "X-API-Version";
     private const string BaseUrlSettingName = "ApplicationServices:UserPilot:BaseUrl";
     private readonly string _apiKey;
     private readonly IRecorder _recorder;
-    private readonly IAsyncPolicy _retryPolicy;
     private readonly IServiceClient _serviceClient;
 
     public UserPilotClient(IRecorder recorder, IConfigurationSettings settings, IHttpClientFactory httpClientFactory)
         : this(recorder, settings.GetString(BaseUrlSettingName), settings.GetString(APIKeySettingName),
-            ApiClientRetryPolicies.CreateRetryWithExponentialBackoffAndJitter(), httpClientFactory)
+            httpClientFactory)
     {
     }
 
-    internal UserPilotClient(IRecorder recorder, IServiceClient serviceClient, IAsyncPolicy retryPolicy, string apiKey)
+    internal UserPilotClient(IRecorder recorder, IServiceClient serviceClient, string apiKey)
     {
         _recorder = recorder;
         _serviceClient = serviceClient;
-        _retryPolicy = retryPolicy;
         _apiKey = apiKey;
     }
 
-    private UserPilotClient(IRecorder recorder, string baseUrl, string apiKey, IAsyncPolicy retryPolicy,
+    private UserPilotClient(IRecorder recorder, string baseUrl, string apiKey,
         IHttpClientFactory httpClientFactory) : this(recorder,
-        new ApiServiceClient(httpClientFactory, JsonSerializerOptions.Default, baseUrl), retryPolicy, apiKey)
+        new ApiServiceClient(httpClientFactory, JsonSerializerOptions.Default, baseUrl), apiKey)
     {
     }
 
@@ -58,13 +55,13 @@ public sealed class UserPilotClient : IUserPilotClient
         var caller = Caller.CreateAsCallerFromCall(call);
         try
         {
-            var response = await _retryPolicy.ExecuteAsync(async () => await _serviceClient.PostAsync(caller,
+            var response = await _serviceClient.PostAsync(caller,
                 new UserPilotIdentifyUserRequest
                 {
                     UserId = userId,
                     Metadata = metadata,
                     Company = company
-                }, req => PrepareRequest(req, _apiKey), cancellationToken));
+                }, req => PrepareRequest(req, _apiKey), cancellationToken);
             if (response.IsFailure)
             {
                 return response.Error.ToError();
@@ -85,13 +82,13 @@ public sealed class UserPilotClient : IUserPilotClient
         var caller = Caller.CreateAsCallerFromCall(call);
         try
         {
-            var response = await _retryPolicy.ExecuteAsync(async () => await _serviceClient.PostAsync(caller,
+            var response = await _serviceClient.PostAsync(caller,
                 new UserPilotTrackEventRequest
                 {
                     UserId = userId,
                     EventName = eventName,
                     Metadata = metadata
-                }, req => PrepareRequest(req, _apiKey), cancellationToken));
+                }, req => PrepareRequest(req, _apiKey), cancellationToken);
             if (response.IsFailure)
             {
                 return response.Error.ToError();

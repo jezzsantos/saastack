@@ -10,7 +10,6 @@ using Common.Configuration;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.Gravatar;
 using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Interfaces.Clients;
-using Polly;
 
 namespace Infrastructure.Shared.ApplicationServices.External;
 
@@ -25,25 +24,22 @@ internal class GravatarClient : IGravatarClient
     internal const string DefaultImageBehaviour = "404";
     private const string BaseUrlSettingName = "ApplicationServices:Gravatar:BaseUrl";
     private readonly IRecorder _recorder;
-    private readonly IAsyncPolicy _retryPolicy;
     private readonly IServiceClient _serviceClient;
 
     public GravatarClient(IRecorder recorder, IConfigurationSettings settings, IHttpClientFactory httpClientFactory)
-        : this(recorder, settings.GetString(BaseUrlSettingName),
-            ApiClientRetryPolicies.CreateRetryWithExponentialBackoffAndJitter(), httpClientFactory)
+        : this(recorder, settings.GetString(BaseUrlSettingName), httpClientFactory)
     {
     }
 
-    internal GravatarClient(IRecorder recorder, IServiceClient serviceClient, IAsyncPolicy retryPolicy)
+    internal GravatarClient(IRecorder recorder, IServiceClient serviceClient)
     {
         _recorder = recorder;
         _serviceClient = serviceClient;
-        _retryPolicy = retryPolicy;
     }
 
-    private GravatarClient(IRecorder recorder, string baseUrl, IAsyncPolicy retryPolicy,
+    private GravatarClient(IRecorder recorder, string baseUrl,
         IHttpClientFactory httpClientFactory) : this(recorder,
-        new ApiServiceClient(httpClientFactory, JsonSerializerOptions.Default, baseUrl), retryPolicy)
+        new ApiServiceClient(httpClientFactory, JsonSerializerOptions.Default, baseUrl))
     {
     }
 
@@ -53,13 +49,13 @@ internal class GravatarClient : IGravatarClient
         Result<BinaryResponse, ResponseProblem> response;
         try
         {
-            response = await _retryPolicy.ExecuteAsync(async () => await _serviceClient.GetBinaryAsync(caller,
+            response = await _serviceClient.GetBinaryAsync(caller,
                 new GravatarGetImageRequest
                 {
                     Hash = HashEmailAddress(emailAddress),
                     Default = DefaultImageBehaviour,
                     Width = 400
-                }, null, cancellationToken));
+                }, null, cancellationToken);
             if (response.IsFailure)
             {
                 return Optional<FileUpload>.None;

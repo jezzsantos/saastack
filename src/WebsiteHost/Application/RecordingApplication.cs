@@ -60,8 +60,8 @@ public class RecordingApplication : IRecordingApplication
         CancellationToken cancellationToken)
     {
         var args = arguments.Exists()
-            ? arguments.Select(arg => (object)arg).ToArray()
-            : Array.Empty<object>();
+            ? arguments.Select(object (arg) => arg).ToArray()
+            : [];
 
         switch (level)
         {

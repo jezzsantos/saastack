@@ -35,6 +35,11 @@ public interface IServiceClient : IFireAndForgetServiceClient
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = null)
         where TResponse : IWebResponse;
 
+    Task<Result<TResponse, ResponseProblem>> PostAsync<TResponse>(ICallerContext? context,
+        IWebRequest<TResponse> request, PostFile file,
+        Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = null)
+        where TResponse : IWebResponse;
+
     Task<Result<TResponse, ResponseProblem>> PutAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request,
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = null)

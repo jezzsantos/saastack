@@ -72,6 +72,14 @@ public class StubServiceClient : IServiceClient
         return Task.FromResult<Result<TResponse, ResponseProblem>>(response);
     }
 
+    public Task<Result<TResponse, ResponseProblem>> PostAsync<TResponse>(ICallerContext? context,
+        IWebRequest<TResponse> request, PostFile file, Action<HttpRequestMessage>? requestFilter = null,
+        CancellationToken? cancellationToken = null)
+        where TResponse : IWebResponse
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<Result<TResponse, ResponseProblem>> PutAsync<TResponse>(ICallerContext? context,
         IWebRequest<TResponse> request, Action<HttpRequestMessage>? requestFilter = null,
         CancellationToken? cancellationToken = null)

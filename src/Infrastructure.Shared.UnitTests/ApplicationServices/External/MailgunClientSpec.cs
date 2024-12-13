@@ -5,7 +5,6 @@ using Infrastructure.Shared.ApplicationServices.External;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.Mailgun;
 using Infrastructure.Web.Interfaces.Clients;
 using Moq;
-using Polly;
 using UnitTesting.Common;
 using Xunit;
 
@@ -23,9 +22,8 @@ public class MailgunClientSpec
         _call = new Mock<ICallContext>();
         var recorder = new Mock<IRecorder>();
         _serviceClient = new Mock<IServiceClient>();
-        var retryPolicy = Policy.NoOpAsync().As<IAsyncPolicy>();
 
-        _client = new MailgunClient(recorder.Object, _serviceClient.Object, retryPolicy, "anapikey", "adomainname");
+        _client = new MailgunClient(recorder.Object, _serviceClient.Object, "anapikey", "adomainname");
     }
 
     [Fact]

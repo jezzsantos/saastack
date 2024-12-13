@@ -8,7 +8,6 @@ using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.Gravatar;
 using Infrastructure.Web.Interfaces.Clients;
 using Moq;
-using Polly;
 using UnitTesting.Common;
 using Xunit;
 
@@ -26,9 +25,8 @@ public class GravatarClientSpec
         _caller = new Mock<ICallerContext>();
         var recorder = new Mock<IRecorder>();
         _serviceClient = new Mock<IServiceClient>();
-        var retryPolicy = Policy.NoOpAsync().As<IAsyncPolicy>();
 
-        _client = new GravatarClient(recorder.Object, _serviceClient.Object, retryPolicy);
+        _client = new GravatarClient(recorder.Object, _serviceClient.Object);
     }
 
     [Fact]
