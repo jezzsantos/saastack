@@ -254,7 +254,7 @@ public class ResponseProblemExtensionsSpec
     }
 
     [Fact]
-    public void WhenToResponseProblemAndReasonIsNull_ThenReturnsProblem()
+    public void WhenToResponseProblemAndTitleIsNull_ThenReturnsProblem()
     {
         var result = HttpStatusCode.InternalServerError.ToResponseProblem(null);
 
@@ -263,11 +263,31 @@ public class ResponseProblemExtensionsSpec
     }
 
     [Fact]
-    public void WhenToResponseProblemAndHasReason_ThenReturnsProblem()
+    public void WhenToResponseProblemAndHasTitle_ThenReturnsProblem()
     {
-        var result = HttpStatusCode.InternalServerError.ToResponseProblem("areason");
+        var result = HttpStatusCode.InternalServerError.ToResponseProblem("atitle");
 
-        result.Title.Should().Be("areason");
+        result.Title.Should().Be("atitle");
+        result.Status.Should().Be((int)HttpStatusCode.InternalServerError);
+    }
+
+    [Fact]
+    public void WhenToResponseProblemAndHasDetail_ThenReturnsProblem()
+    {
+        var result = HttpStatusCode.InternalServerError.ToResponseProblem("atitle", "adetail");
+
+        result.Title.Should().Be("atitle");
+        result.Detail.Should().Be("adetail");
+        result.Status.Should().Be((int)HttpStatusCode.InternalServerError);
+    }    
+    [Fact]
+    public void WhenToResponseProblemAndHasType_ThenReturnsProblem()
+    {
+        var result = HttpStatusCode.InternalServerError.ToResponseProblem("atitle", null, "atype");
+
+        result.Title.Should().Be("atitle");
+        result.Detail.Should().BeNull();
+        result.Type.Should().Be("atype");
         result.Status.Should().Be((int)HttpStatusCode.InternalServerError);
     }
 }

@@ -53,12 +53,15 @@ public static class ResponseProblemExtensions
     /// <summary>
     ///     Converts the given <see cref="status" /> to a <see cref="Infrastructure.Web.Interfaces.Clients.ResponseProblem" />
     /// </summary>
-    public static ResponseProblem ToResponseProblem(this HttpStatusCode status, string? reason)
+    public static ResponseProblem ToResponseProblem(this HttpStatusCode status, string? title, string? detail = null,
+        string? type = null)
     {
         return new ResponseProblem
         {
-            Title = reason ?? status.ToString(),
-            Status = (int)status
+            Status = (int)status,
+            Title = title ?? status.ToString(),
+            Detail = detail,
+            Type = type
         };
     }
 

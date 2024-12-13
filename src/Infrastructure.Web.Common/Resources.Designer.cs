@@ -76,5 +76,14 @@ namespace Infrastructure.Web.Common {
                 return ResourceManager.GetString("JsonClient_TryCreateEmptyResponse_NotConstructable", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Non-standard error.
+        /// </summary>
+        internal static string JsonClient_TryParseNonStandardErrors_NonStandard {
+            get {
+                return ResourceManager.GetString("JsonClient_TryParseNonStandardErrors_NonStandard", resourceCulture);
+            }
+        }
     }
 }

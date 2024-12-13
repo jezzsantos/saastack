@@ -30,4 +30,7 @@
     <data name="JsonClient_TryCreateEmptyResponse_NotConstructable" xml:space="preserve">
         <value>An empty instance of '{0}' could not be created, likely due to the fact that it does not have a default parameterless constructor or it has properties that require initialization at construction time. More details: {1}</value>
     </data>
+    <data name="JsonClient_TryParseNonStandardErrors_NonStandard" xml:space="preserve">
+        <value>Non-standard error</value>
+    </data>
 </root>

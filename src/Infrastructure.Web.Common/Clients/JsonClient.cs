@@ -3,12 +3,14 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common.Extensions;
 using Infrastructure.Web.Interfaces.Clients;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using JsonException = System.Text.Json.JsonException;
 using Task = System.Threading.Tasks.Task;
@@ -65,7 +67,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
     {
         var response = await SendRequestAsync(_httpClient, HttpMethod.Delete, request, null, requestFilter,
             cancellationToken);
-        var content = await GetStringResponseAsync(response, _jsonOptions, cancellationToken);
+        var content = await GetStringResponseAsync(response, cancellationToken);
 
         return CreateResponse(response, content);
     }
@@ -88,7 +90,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
     {
         var response =
             await SendRequestAsync(_httpClient, HttpMethod.Get, request, null, requestFilter, cancellationToken);
-        var content = await GetStringResponseAsync(response, _jsonOptions, cancellationToken);
+        var content = await GetStringResponseAsync(response, cancellationToken);
 
         return CreateResponse(response, content);
     }
@@ -111,7 +113,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
     {
         var response = await SendRequestAsync(_httpClient, HttpMethod.Patch, request, null, requestFilter,
             cancellationToken);
-        var content = await GetStringResponseAsync(response, _jsonOptions, cancellationToken);
+        var content = await GetStringResponseAsync(response, cancellationToken);
 
         return CreateResponse(response, content);
     }
@@ -134,7 +136,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
     {
         var response =
             await SendRequestAsync(_httpClient, HttpMethod.Post, request, null, requestFilter, cancellationToken);
-        var content = await GetStringResponseAsync(response, _jsonOptions, cancellationToken);
+        var content = await GetStringResponseAsync(response, cancellationToken);
 
         return CreateResponse(response, content);
     }
@@ -157,7 +159,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
     {
         var response =
             await SendRequestAsync(_httpClient, HttpMethod.Post, request, file, requestFilter, cancellationToken);
-        var content = await GetStringResponseAsync(response, _jsonOptions, cancellationToken);
+        var content = await GetStringResponseAsync(response, cancellationToken);
 
         return CreateResponse(response, content);
     }
@@ -192,80 +194,59 @@ public class JsonClient : IHttpJsonClient, IDisposable
     {
         var response =
             await SendRequestAsync(_httpClient, HttpMethod.Put, request, null, requestFilter, cancellationToken);
-        var content = await GetStringResponseAsync(response, _jsonOptions, cancellationToken);
+        var content = await GetStringResponseAsync(response, cancellationToken);
 
         return CreateResponse(response, content);
     }
 
     internal static async Task<Result<string?, ResponseProblem>> GetStringResponseAsync(HttpResponseMessage response,
-        JsonSerializerOptions? jsonOptions, CancellationToken? cancellationToken)
+        CancellationToken? cancellationToken)
     {
-        var contentType = response.Content.Headers.ContentType;
-        if (contentType.NotExists())
+        if (response.IsSuccessStatusCode)
         {
-            if (response.IsSuccessStatusCode)
+            var contentType = response.Content.Headers.ContentType;
+            if (contentType.NotExists())
             {
                 return default;
             }
 
-            return response.StatusCode.ToResponseProblem(response.ReasonPhrase);
-        }
-
-        if (contentType.MediaType == HttpConstants.ContentTypes.JsonProblem)
-        {
-            if (TryReadRfc7807Error(response, jsonOptions, cancellationToken, out var problem))
+            switch (contentType.MediaType)
             {
-                return problem;
-            }
-        }
+                case HttpConstants.ContentTypes.Text or HttpConstants.ContentTypes.Html:
+                    return await response.Content.ReadAsStringAsync(cancellationToken ?? CancellationToken.None);
 
-        if (contentType.MediaType == HttpConstants.ContentTypes.Json)
-        {
-            if (response.IsSuccessStatusCode)
-            {
-                return await response.Content.ReadAsStringAsync(cancellationToken ?? CancellationToken.None);
-            }
+                case HttpConstants.ContentTypes.OctetStream:
+                    return default;
 
-            if (response.Content.Headers.ContentType.Exists())
-            {
-                if (TryReadRfc6749Error(response, jsonOptions, cancellationToken, out var problem))
+                case HttpConstants.ContentTypes.Json:
+                    return await response.Content.ReadAsStringAsync(cancellationToken ?? CancellationToken.None);
+
+                default:
                 {
-                    return problem;
+                    //Unrecognized content type (could be a file or image?)
+                    return default;
                 }
             }
-
-            return response.StatusCode.ToResponseProblem(response.ReasonPhrase);
         }
 
-        if (contentType.MediaType is HttpConstants.ContentTypes.Text or HttpConstants.ContentTypes.Html)
-        {
-            return await response.Content.ReadAsStringAsync(cancellationToken ?? CancellationToken.None);
-        }
-
-        if (contentType.MediaType == HttpConstants.ContentTypes.OctetStream)
-        {
-            return default;
-        }
-
-        //Unrecognized content type (could be a file or image?)
-        return default;
+        return await ParseErrorAsync(response, cancellationToken ?? CancellationToken.None);
     }
 
     internal static async Task<Result<TResponse, ResponseProblem>> GetTypedResponseAsync<TResponse>(
         HttpResponseMessage response, JsonSerializerOptions? jsonOptions, CancellationToken? cancellationToken)
         where TResponse : IWebResponse
     {
-        var contentType = response.Content.Headers.ContentType;
-        if (contentType.NotExists())
+        if (response.IsSuccessStatusCode)
         {
-            if (response.IsSuccessStatusCode)
+            var contentType = response.Content.Headers.ContentType;
+            if (contentType.NotExists())
             {
                 if (typeof(EmptyResponse).IsAssignableTo(typeof(TResponse)))
                 {
                     return TryCreateEmptyResponse<TResponse>();
                 }
 
-                // Assume JSON
+                // Assumes JSON by default
                 try
                 {
                     var instance = await response.Content.ReadFromJsonAsync<TResponse>(jsonOptions,
@@ -280,51 +261,36 @@ public class JsonClient : IHttpJsonClient, IDisposable
                 }
             }
 
-            return response.StatusCode.ToResponseProblem(response.ReasonPhrase);
-        }
-
-        if (contentType.MediaType is HttpConstants.ContentTypes.JsonProblem)
-        {
-            if (TryReadRfc7807Error(response, jsonOptions, cancellationToken, out var problem))
+            switch (contentType.MediaType)
             {
-                return problem;
-            }
-        }
-
-        if (contentType.MediaType is HttpConstants.ContentTypes.Json)
-        {
-            if (response.IsSuccessStatusCode)
-            {
-                var instance = await response.Content.ReadFromJsonAsync<TResponse>(jsonOptions,
-                    cancellationToken ?? CancellationToken.None);
-                return instance.Exists()
-                    ? instance
-                    : TryCreateEmptyResponse<TResponse>();
-            }
-
-            if (response.Content.Headers.ContentType.Exists())
-            {
-                if (TryReadRfc6749Error(response, jsonOptions, cancellationToken, out var problem))
+                case HttpConstants.ContentTypes.Text or HttpConstants.ContentTypes.Html:
                 {
-                    return problem;
+                    return TryCreateEmptyResponse<TResponse>();
+                }
+
+                case HttpConstants.ContentTypes.OctetStream:
+                    return default;
+
+                case HttpConstants.ContentTypes.Json:
+                {
+                    var instance = await response.Content.ReadFromJsonAsync<TResponse>(jsonOptions,
+                        cancellationToken ?? CancellationToken.None);
+                    return instance.Exists()
+                        ? instance
+                        : TryCreateEmptyResponse<TResponse>();
+                }
+
+                default:
+                {
+                    //Unrecognized content type
+                    return HttpStatusCode.UnsupportedMediaType.ToResponseProblem(
+                        string.Format(Resources.JsonClient_GetTypedResponse_UnsupportedMediaType,
+                            contentType.MediaType));
                 }
             }
-
-            return response.StatusCode.ToResponseProblem(response.ReasonPhrase);
         }
 
-        if (contentType.MediaType is HttpConstants.ContentTypes.Text or HttpConstants.ContentTypes.Html)
-        {
-            if (response.IsSuccessStatusCode)
-            {
-                return TryCreateEmptyResponse<TResponse>();
-            }
-
-            return response.StatusCode.ToResponseProblem(response.ReasonPhrase);
-        }
-
-        return HttpStatusCode.UnsupportedMediaType.ToResponseProblem(
-            string.Format(Resources.JsonClient_GetTypedResponse_UnsupportedMediaType, contentType.MediaType));
+        return await ParseErrorAsync(response, cancellationToken ?? CancellationToken.None);
     }
 
     public async Task SendOneWayAsync(IWebRequest request, Action<HttpRequestMessage>? requestFilter = null,
@@ -529,26 +495,47 @@ public class JsonClient : IHttpJsonClient, IDisposable
         return await httpClient.SendAsync(request, cancellationToken ?? CancellationToken.None);
     }
 
-    private static bool TryReadRfc7807Error(HttpResponseMessage response, JsonSerializerOptions? jsonOptions,
-        CancellationToken? cancellationToken, out ResponseProblem problem)
+    private static async Task<ResponseProblem> ParseErrorAsync(HttpResponseMessage response,
+        CancellationToken cancellationToken)
     {
-        if (cancellationToken.HasValue)
+        await Task.CompletedTask;
+        cancellationToken.ThrowIfCancellationRequested();
+        var errorText = response.Content.ReadAsStringAsync(cancellationToken).GetAwaiter().GetResult();
+
+        if (TryParseRfc7807Error(errorText, response.StatusCode, out var problem1))
         {
-            cancellationToken.Value.ThrowIfCancellationRequested();
+            return problem1;
         }
 
+        if (TryParseRfc6749Error(errorText, response.StatusCode, out var problem2))
+        {
+            return problem2;
+        }
+
+        if (TryParseNonStandardErrors(errorText, response.StatusCode, out var problem3))
+        {
+            return problem3;
+        }
+
+        return response.StatusCode.ToResponseProblem(response.ReasonPhrase);
+    }
+
+    private static bool TryParseRfc7807Error(string responseText, HttpStatusCode statusCode,
+        out ResponseProblem problem)
+    {
         problem = new ResponseProblem();
 
         try
         {
-            var details = response.Content.ReadFromJsonAsync<ProblemDetails>(jsonOptions, CancellationToken.None)
-                .GetAwaiter().GetResult()!;
-            if (details.Type.HasNoValue())
+            var details = responseText.FromJson<ProblemDetails>();
+            if (details.NotExists()
+                || (details.Title.HasNoValue() && details.Detail.HasNoValue()))
             {
                 return false;
             }
 
             problem = details.ToResponseProblem();
+            problem.Status = (int)statusCode;
             return true;
         }
         catch (JsonException)
@@ -557,26 +544,58 @@ public class JsonClient : IHttpJsonClient, IDisposable
         }
     }
 
-    private static bool TryReadRfc6749Error(HttpResponseMessage response, JsonSerializerOptions? jsonOptions,
-        CancellationToken? cancellationToken, out ResponseProblem problem)
+    private static bool TryParseRfc6749Error(string responseText, HttpStatusCode statusCode,
+        out ResponseProblem problem)
     {
-        if (cancellationToken.HasValue)
-        {
-            cancellationToken.Value.ThrowIfCancellationRequested();
-        }
-
         problem = new ResponseProblem();
         try
         {
-            var details = response.Content
-                .ReadFromJsonAsync<OAuth2Rfc6749ProblemDetails>(jsonOptions, CancellationToken.None)
-                .GetAwaiter().GetResult()!;
-            if (details.Error.HasNoValue())
+            var details = responseText.FromJson<OAuth2Rfc6749ProblemDetails>();
+            if (details.NotExists() || details.Error.HasNoValue())
             {
                 return false;
             }
 
-            problem = details.ToResponseProblem((int)response.StatusCode);
+            problem = details.ToResponseProblem((int)statusCode);
+            return true;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+    }
+
+    private static bool TryParseNonStandardErrors(string responseText, HttpStatusCode statusCode,
+        out ResponseProblem problem)
+    {
+        problem = new ResponseProblem();
+        try
+        {
+            var details = responseText.FromJson<NonStandardProblemDetails>();
+            if (details.NotExists())
+            {
+                return false;
+            }
+
+            if (details.Error.Exists())
+            {
+                // Google errors: https://google.github.io/styleguide/jsoncstyleguide.xml
+                if (details.Error.Code.HasValue())
+                {
+                    problem = statusCode.ToResponseProblem(details.Error.Code, details.Error.Message);
+                    return true;
+                }
+
+                // Other random formats
+                if (details.Error.Reason.HasValue())
+                {
+                    problem = statusCode.ToResponseProblem(details.Error.Reason, details.Error.Description);
+                    return true;
+                }
+            }
+
+            problem = statusCode.ToResponseProblem(Resources.JsonClient_TryParseNonStandardErrors_NonStandard,
+                responseText);
             return true;
         }
         catch (JsonException)
@@ -616,4 +635,22 @@ public class JsonClient : IHttpJsonClient, IDisposable
                 : null
         };
     }
+}
+
+[UsedImplicitly]
+internal class NonStandardProblemDetails
+{
+    [JsonPropertyName("error")] public NonStandardProblemError? Error { get; set; }
+}
+
+[UsedImplicitly]
+internal class NonStandardProblemError
+{
+    [JsonPropertyName("code")] public string? Code { get; set; }
+
+    [JsonPropertyName("reason")] public string? Reason { get; set; }
+
+    [JsonPropertyName("description")] public string? Description { get; set; }
+
+    [JsonPropertyName("message")] public string? Message { get; set; }
 }

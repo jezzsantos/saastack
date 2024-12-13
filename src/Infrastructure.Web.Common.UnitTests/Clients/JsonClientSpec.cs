@@ -1,6 +1,8 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
+using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Common.Clients;
@@ -93,6 +95,70 @@ public class JsonClientSpec
             result.Error.Instance.Should().BeNull();
             result.Error.Exception.Should().BeNull();
             result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task WhenGetTypedResponseAsyncAndNoContentTypeForFailureAndRfc7808Error_ThenReturnsProblem()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content = new StringContent(new ProblemDetails
+                {
+                    Title = "atitle",
+                    Type = "atype",
+                    Detail = "adetail",
+                    Instance = "aninstance",
+                    Status = 999,
+                    Extensions = { { "aname", "avalue" } }
+                }.ToJson()!),
+                ReasonPhrase = "areason"
+            };
+
+            var result =
+                await JsonClient.GetTypedResponseAsync<TestResponse>(response, null, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeFalse();
+            result.Error.Status.Should().Be(500);
+            result.Error.Title.Should().Be("atitle");
+            result.Error.Detail.Should().Be("adetail");
+            result.Error.Type.Should().Be("atype");
+            result.Error.Instance.Should().Be("aninstance");
+            result.Error.Exception.Should().BeNull();
+            result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should()
+                .OnlyContain(pair => pair.Key == "aname" && pair.Value.As<JsonElement>().GetString() == "avalue");
+        }
+
+        [Fact]
+        public async Task WhenGetTypedResponseAsyncAndNoContentTypeForFailureAndRfc6749Error_ThenReturnsProblem()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content = new StringContent(new
+                {
+                    error = "anerror",
+                    error_description = "anerrordescription",
+                    error_uri = "anerroruri",
+                    state = "astate"
+                }.ToJson()!),
+                ReasonPhrase = "areason"
+            };
+
+            var result =
+                await JsonClient.GetTypedResponseAsync<TestResponse>(response, null, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeFalse();
+            result.Error.Status.Should().Be(500);
+            result.Error.Title.Should().Be("anerror");
+            result.Error.Detail.Should().Be("anerrordescription");
+            result.Error.Type.Should().Be(OAuth2Rfc6749ProblemDetails.Reference);
+            result.Error.Instance.Should().Be("anerroruri");
+            result.Error.Exception.Should().BeNull();
+            result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
         }
 
         [Fact]
@@ -117,13 +183,15 @@ public class JsonClientSpec
                 await JsonClient.GetTypedResponseAsync<TestResponse>(response, null, CancellationToken.None);
 
             result.IsSuccessful.Should().BeFalse();
-            result.Error.Status.Should().Be(999);
+            result.Error.Status.Should().Be(500);
             result.Error.Title.Should().Be("atitle");
             result.Error.Detail.Should().Be("adetail");
             result.Error.Type.Should().Be("atype");
             result.Error.Instance.Should().Be("aninstance");
             result.Error.Exception.Should().BeNull();
             result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should()
+                .OnlyContain(pair => pair.Key == "aname" && pair.Value.As<JsonElement>().GetString() == "avalue");
         }
 
         [Fact]
@@ -167,6 +235,40 @@ public class JsonClientSpec
             result.Error.Instance.Should().BeNull();
             result.Error.Exception.Should().BeNull();
             result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task WhenGetTypedResponseAsyncAndContentTypeIsJsonAndContentForRfc7808Error_ThenReturnsProblem()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content = JsonContent.Create(new
+                {
+                    title = "atitle",
+                    type = "atype",
+                    detail = "adetail",
+                    instance = "aninstance",
+                    status = 999,
+                    aname = "avalue" // Note all extensions are on the root!
+                }, new MediaTypeHeaderValue(HttpConstants.ContentTypes.Json)),
+                ReasonPhrase = "areason"
+            };
+
+            var result =
+                await JsonClient.GetTypedResponseAsync<TestResponse>(response, null, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeFalse();
+            result.Error.Status.Should().Be(500);
+            result.Error.Title.Should().Be("atitle");
+            result.Error.Detail.Should().Be("adetail");
+            result.Error.Type.Should().Be("atype");
+            result.Error.Instance.Should().Be("aninstance");
+            result.Error.Exception.Should().BeNull();
+            result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should()
+                .OnlyContain(pair => pair.Key == "aname" && pair.Value.As<JsonElement>().GetString() == "avalue");
         }
 
         [Fact]
@@ -196,6 +298,99 @@ public class JsonClientSpec
             result.Error.Instance.Should().Be("anerroruri");
             result.Error.Exception.Should().BeNull();
             result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task
+            WhenGetTypedResponseAsyncAndContentTypeIsJsonAndNonStandardError1ForFailure_ThenReturnsResponseProblem()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content = new StringContent(new
+                {
+                    unknown = "anunknown"
+                }.ToJson(false)!),
+                ReasonPhrase = "areason"
+            };
+
+            var result =
+                await JsonClient.GetTypedResponseAsync<TestResponse>(response, null, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeFalse();
+            result.Error.Status.Should().Be(500);
+            result.Error.Title.Should().Be(Resources.JsonClient_TryParseNonStandardErrors_NonStandard);
+            result.Error.Detail.Should().Be("{\"unknown\":\"anunknown\"}");
+            result.Error.Type.Should().BeNull();
+            result.Error.Instance.Should().BeNull();
+            result.Error.Exception.Should().BeNull();
+            result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task
+            WhenGetTypedResponseAsyncAndContentTypeIsJsonAndNonStandardError2ForFailure1ThenReturnsResponseProblem()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content = new StringContent(new NonStandardProblemDetails
+                {
+                    Error = new NonStandardProblemError
+                    {
+                        Code = "acode",
+                        Message = "amessage"
+                    }
+                }.ToJson()!),
+                ReasonPhrase = "areason"
+            };
+
+            var result =
+                await JsonClient.GetTypedResponseAsync<TestResponse>(response, null, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeFalse();
+            result.Error.Status.Should().Be(500);
+            result.Error.Title.Should().Be("acode");
+            result.Error.Detail.Should().Be("amessage");
+            result.Error.Type.Should().BeNull();
+            result.Error.Instance.Should().BeNull();
+            result.Error.Exception.Should().BeNull();
+            result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task
+            WhenGetTypedResponseAsyncAndContentTypeIsJsonAndNonStandardError3ForFailure1ThenReturnsResponseProblem()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content = new StringContent(new NonStandardProblemDetails
+                {
+                    Error = new NonStandardProblemError
+                    {
+                        Reason = "areason",
+                        Description = "adescription"
+                    }
+                }.ToJson()!),
+                ReasonPhrase = "areason"
+            };
+
+            var result =
+                await JsonClient.GetTypedResponseAsync<TestResponse>(response, null, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeFalse();
+            result.Error.Status.Should().Be(500);
+            result.Error.Title.Should().Be("areason");
+            result.Error.Detail.Should().Be("adescription");
+            result.Error.Type.Should().BeNull();
+            result.Error.Instance.Should().BeNull();
+            result.Error.Exception.Should().BeNull();
+            result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
         }
 
         [Fact]
@@ -240,6 +435,7 @@ public class JsonClientSpec
             result.Error.Instance.Should().BeNull();
             result.Error.Exception.Should().BeNull();
             result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
         }
 
         [Fact]
@@ -517,7 +713,7 @@ public class JsonClientSpec
             };
 
             var result =
-                await JsonClient.GetStringResponseAsync(response, null, CancellationToken.None);
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
 
             result.IsSuccessful.Should().BeTrue();
             result.HasValue.Should().BeFalse();
@@ -539,7 +735,7 @@ public class JsonClientSpec
             };
 
             var result =
-                await JsonClient.GetStringResponseAsync(response, null, CancellationToken.None);
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
 
             result.IsSuccessful.Should().BeTrue();
             result.HasValue.Should().BeTrue();
@@ -556,7 +752,7 @@ public class JsonClientSpec
             };
 
             var result =
-                await JsonClient.GetStringResponseAsync(response, null, CancellationToken.None);
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
 
             result.IsSuccessful.Should().BeTrue();
             result.HasValue.Should().BeTrue();
@@ -564,7 +760,7 @@ public class JsonClientSpec
         }
 
         [Fact]
-        public async Task WhenGetStringResponseAsyncAndNoContentTypeForFailure_ThenReturnsProblem()
+        public async Task WhenGetStringResponseAsyncAndNoContentTypeForFailureAndNoError_ThenReturnsProblem()
         {
             var response = new HttpResponseMessage
             {
@@ -580,7 +776,7 @@ public class JsonClientSpec
             };
 
             var result =
-                await JsonClient.GetStringResponseAsync(response, null, CancellationToken.None);
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
 
             result.IsSuccessful.Should().BeFalse();
             result.Error.Status.Should().Be(500);
@@ -590,6 +786,70 @@ public class JsonClientSpec
             result.Error.Instance.Should().BeNull();
             result.Error.Exception.Should().BeNull();
             result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task WhenGetStringResponseAsyncAndNoContentTypeForFailureAndRfc7808Error_ThenReturnsProblem()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content = new StringContent(new ProblemDetails
+                {
+                    Title = "atitle",
+                    Type = "atype",
+                    Detail = "adetail",
+                    Instance = "aninstance",
+                    Status = 999,
+                    Extensions = { { "aname", "avalue" } }
+                }.ToJson()!),
+                ReasonPhrase = "areason"
+            };
+
+            var result =
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeFalse();
+            result.Error.Status.Should().Be(500);
+            result.Error.Title.Should().Be("atitle");
+            result.Error.Detail.Should().Be("adetail");
+            result.Error.Type.Should().Be("atype");
+            result.Error.Instance.Should().Be("aninstance");
+            result.Error.Exception.Should().BeNull();
+            result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should()
+                .OnlyContain(pair => pair.Key == "aname" && pair.Value.As<JsonElement>().GetString() == "avalue");
+        }
+
+        [Fact]
+        public async Task WhenGetStringResponseAsyncAndNoContentTypeForFailureAndRfc6749Error_ThenReturnsProblem()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content = new StringContent(new
+                {
+                    error = "anerror",
+                    error_description = "anerrordescription",
+                    error_uri = "anerroruri",
+                    state = "astate"
+                }.ToJson()!),
+                ReasonPhrase = "areason"
+            };
+
+            var result =
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeFalse();
+            result.Error.Status.Should().Be(500);
+            result.Error.Title.Should().Be("anerror");
+            result.Error.Detail.Should().Be("anerrordescription");
+            result.Error.Type.Should().Be(OAuth2Rfc6749ProblemDetails.Reference);
+            result.Error.Instance.Should().Be("anerroruri");
+            result.Error.Exception.Should().BeNull();
+            result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
         }
 
         [Fact]
@@ -611,16 +871,18 @@ public class JsonClientSpec
             };
 
             var result =
-                await JsonClient.GetStringResponseAsync(response, null, CancellationToken.None);
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
 
             result.IsSuccessful.Should().BeFalse();
-            result.Error.Status.Should().Be(999);
+            result.Error.Status.Should().Be(500);
             result.Error.Title.Should().Be("atitle");
             result.Error.Detail.Should().Be("adetail");
             result.Error.Type.Should().Be("atype");
             result.Error.Instance.Should().Be("aninstance");
             result.Error.Exception.Should().BeNull();
             result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should()
+                .OnlyContain(pair => pair.Key == "aname" && pair.Value.As<JsonElement>().GetString() == "avalue");
         }
 
         [Fact]
@@ -637,7 +899,7 @@ public class JsonClientSpec
             };
 
             var result =
-                await JsonClient.GetStringResponseAsync(response, null, CancellationToken.None);
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
 
             result.IsSuccessful.Should().BeTrue();
             result.Value.Should()
@@ -655,7 +917,7 @@ public class JsonClientSpec
             };
 
             var result =
-                await JsonClient.GetStringResponseAsync(response, null, CancellationToken.None);
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
 
             result.IsSuccessful.Should().BeFalse();
             result.Error.Status.Should().Be(500);
@@ -665,6 +927,99 @@ public class JsonClientSpec
             result.Error.Instance.Should().BeNull();
             result.Error.Exception.Should().BeNull();
             result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task
+            WhenGetStringResponseAsyncAndContentTypeIsJsonAndNonStandardError1ForFailure1ThenReturnsResponseProblem()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content = new StringContent(new
+                {
+                    unknown = "anunknown"
+                }.ToJson(false)!),
+                ReasonPhrase = "areason"
+            };
+
+            var result =
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeFalse();
+            result.Error.Status.Should().Be(500);
+            result.Error.Title.Should().Be(Resources.JsonClient_TryParseNonStandardErrors_NonStandard);
+            result.Error.Detail.Should().Be("{\"unknown\":\"anunknown\"}");
+            result.Error.Type.Should().BeNull();
+            result.Error.Instance.Should().BeNull();
+            result.Error.Exception.Should().BeNull();
+            result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task
+            WhenGetStringResponseAsyncAndContentTypeIsJsonAndNonStandardError2ForFailure_ThenReturnsResponseProblem()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content = new StringContent(new NonStandardProblemDetails
+                {
+                    Error = new NonStandardProblemError
+                    {
+                        Code = "acode",
+                        Message = "amessage"
+                    }
+                }.ToJson()!),
+                ReasonPhrase = "areason"
+            };
+
+            var result =
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeFalse();
+            result.Error.Status.Should().Be(500);
+            result.Error.Title.Should().Be("acode");
+            result.Error.Detail.Should().Be("amessage");
+            result.Error.Type.Should().BeNull();
+            result.Error.Instance.Should().BeNull();
+            result.Error.Exception.Should().BeNull();
+            result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task
+            WhenGetStringResponseAsyncAndContentTypeIsJsonAndNonStandardError3ForFailure1ThenReturnsResponseProblem()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content = new StringContent(new NonStandardProblemDetails
+                {
+                    Error = new NonStandardProblemError
+                    {
+                        Reason = "areason",
+                        Description = "adescription"
+                    }
+                }.ToJson()!),
+                ReasonPhrase = "areason"
+            };
+
+            var result =
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeFalse();
+            result.Error.Status.Should().Be(500);
+            result.Error.Title.Should().Be("areason");
+            result.Error.Detail.Should().Be("adescription");
+            result.Error.Type.Should().BeNull();
+            result.Error.Instance.Should().BeNull();
+            result.Error.Exception.Should().BeNull();
+            result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
         }
 
         [Fact]
@@ -685,7 +1040,7 @@ public class JsonClientSpec
             };
 
             var result =
-                await JsonClient.GetStringResponseAsync(response, null, CancellationToken.None);
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
 
             result.IsSuccessful.Should().BeFalse();
             result.Error.Status.Should().Be(500);
@@ -695,6 +1050,7 @@ public class JsonClientSpec
             result.Error.Instance.Should().Be("anerroruri");
             result.Error.Exception.Should().BeNull();
             result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
         }
 
         [Fact]
@@ -714,7 +1070,7 @@ public class JsonClientSpec
             };
 
             var result =
-                await JsonClient.GetStringResponseAsync(response, null, CancellationToken.None);
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
 
             result.IsSuccessful.Should().BeTrue();
             result.HasValue.Should().BeFalse();
@@ -737,7 +1093,7 @@ public class JsonClientSpec
             };
 
             var result =
-                await JsonClient.GetStringResponseAsync(response, null, CancellationToken.None);
+                await JsonClient.GetStringResponseAsync(response, CancellationToken.None);
 
             result.IsSuccessful.Should().BeTrue();
             result.HasValue.Should().BeFalse();
