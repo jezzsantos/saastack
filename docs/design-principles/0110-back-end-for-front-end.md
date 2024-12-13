@@ -8,11 +8,16 @@ A web BEFFE is a web server designed specifically to serve a web application (i.
 * It is always the web server that the JS app sends requests to for HTML and JSON.
 * Sometimes, a BEFFE exposes its own customized JSON APIs; other times, it forwards those JSON requests to other Backend APIs.
 
-A BEFFE is a de-coupling design strategy to avoid designing a Backend API that is directly coupled to a specific Frontend, or a Backend API that has to be all things to several Frontend applications (e.g., a web application, an admin web application, a mobile application, and a desktop application), all of which have different needs for data processing.
+**Decoupling
+**: A BEFFE is a de-coupling design strategy to avoid designing a Backend API that is directly coupled to a specific Frontend, or a Backend API that has to be all things to several Frontend applications (e.g., a web application, an admin web application, a mobile application, and a desktop application), all of which have different needs for data processing.
 
-> This frees the developer/designer of the Backend to focus on designing REST APIs instead of RPC/CRUD APIs to only serve a single dedicated Frontend.
+**Performance
+**: The BEFFE can act as an "API aggregator" for a specific Frontend, and save the Frontend JSApp from issuing multiple requests from the user's browser to the cloud server, where each request from the browser adds latency cost. Whereas, the BEFFE is likely in the same data center, or closer to that datacenter, where the Backend API is that it needs data from. In this way, the Frontend becomes more response to the user.
 
-In many contexts of evolving SaaS products, a BEFFE can act as an [Anti-Corruption Layer (ACL)](https://learn.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer) whenever the Backend needs to be re-designed/re-engineered for legacy reasons, as a business grows and starts taking onboard direct integrations with the backend. Or when the product evolves to be more of an integration platform.
+> Both these strategies free the developer/designer of the Backend to focus on designing REST APIs instead of RPC/CRUD APIs to only serve a single dedicated Frontend.
+
+**Change
+**: Lastly, in many contexts of evolving SaaS products, a BEFFE can act as an [Anti-Corruption Layer (ACL)](https://learn.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer) whenever the Backend needs to be re-designed/re-engineered for legacy reasons, as a business grows and starts taking onboard direct integrations with the backend. Or when the product evolves to be more of an integration platform.
 
 ## Design Principles
 

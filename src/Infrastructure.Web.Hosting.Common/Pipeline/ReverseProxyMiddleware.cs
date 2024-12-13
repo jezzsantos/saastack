@@ -40,13 +40,6 @@ public sealed class ReverseProxyMiddleware
             return;
         }
 
-        var endpoint = context.GetEndpoint();
-        if (endpoint.NotExists())
-        {
-            await ForwardMessageToBackendAsync(context);
-            return;
-        }
-
         if (IsBeffeApiRequest(context))
         {
             await _next(context); //Continue down the pipeline
@@ -59,7 +52,12 @@ public sealed class ReverseProxyMiddleware
     private static bool IsBeffeApiRequest(HttpContext context)
     {
         var endpoint = context.GetEndpoint();
-        if (endpoint!.Metadata.OfType<IRouteDiagnosticsMetadata>().Any())
+        if (endpoint.NotExists())
+        {
+            return false;
+        }
+
+        if (endpoint.Metadata.OfType<IRouteDiagnosticsMetadata>().Any())
         {
             return true;
         }
