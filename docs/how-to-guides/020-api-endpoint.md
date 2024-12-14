@@ -302,6 +302,109 @@ public class GetCarRequest : TenantedRequest<GetCarRequest, GetCarResponse>
 }
 ```
 
+###### C# and request DTOs
+
+By default, we have turned on nullability checking across the whole codebase (e.g.
+`<Nullable>enable</Nullable>`) so that the compiler will help us not set reference types to null, and as much as possible avoid raising the dreaded
+`NullReferenceException` (an NRE), in production code. As well as removing lots of code that checks for null.
+
+> We have also invested quite a bit of design into `Optional<T>` and various extension methods like
+`NotExists()` for the same purpose of being more explicit about what it means to not have a value.
+
+All request DTO types are, by design, [POCO](https://en.wikipedia.org/wiki/Plain_old_CLR_object) objects. They must also be JSON serializable as they represent in-memory of the JSON sent on the wire to your HTTP API. Therefore they must have a public parameter-less constructor and all public properties must have public getters and setters. With nullability enabled, if those properties are reference types (e.g., objects or strings) then they must be initialized to not-null in the constructor of the class, or set to nullable. Using nullable properties is somewhat undesirable, for properties that you know must be in the request to make a valid request. Making them nullable can feel awkward (from a C# perspective).
+
+For example, in this request we would know that no one could possibly make this request without a valid
+`Id` in the request. It is in fact, part of the route.
+
+```c#
+/// <summary>
+///     Deletes the specified car
+/// </summary>
+[Route("/cars/{Id}", OperationMethod.Delete, AccessType.Token)]
+[Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
+public class DeleteCarRequest : TenantedDeleteRequest<DeleteCarRequest>
+{
+    [Required] public string? Id { get; set; }
+}
+```
+
+How about this example:
+
+```c#
+/// <summary>
+///     Reserves the availability of the car for the specified period of time
+/// </summary>
+[Route("/cars/{Id}/reserve", OperationMethod.PutPatch, AccessType.Token)]
+[Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
+public class ReserveCarIfAvailableRequest : TenantedRequest<ReserveCarIfAvailableRequest, ReserveCarIfAvailableResponse>
+{
+    [Required] public DateTime? FromUtc { get; set; }
+
+    [Required] public string? Id { get; set; }
+
+    [Required] public string? ReferenceId { get; set; }
+
+    [Required] public DateTime? ToUtc { get; set; }
+}
+```
+
+The `FromUtc`, `ToUtc`,
+`ReferenceId` must also be present in this request to make any logical sense to its use case as well.
+
+Despite the fact that these example C# properties should be marked with the `required` keyword (ignore the
+`[Required]` attribute for now, we cannot do this in most cases for type being used to represent an HTTP request on the wire, if we want things to work correctly in the ASPNET pipeline.
+
+> BTW: the same problem exists, whether or not the property is part of the route or not. We need a consistent way of defining requests, and having technical exceptions to the rule does not mean all developers will know how to apply those rules effectively without advanced ASPNET knowledge. So, consistency is favored over perfection here.
+
+C# defines the keyword
+`required` to mean, for a property, that it must be explicitly initialized in an objects initializer, should the initializer ever be used. This would make it very nice an exp
+
+This presents a challenge for the
+`JsonSerializer` that is used in the ASPNET pipeline, that takes raw JSON data and tries to deserialize it into a POCO request DTO.
+
+If we were to use the C#
+`required` keyword on any properties of a request DTO, and if those properties do not exist in the inbound JSON, then the
+`JsonSerializer` will throw a
+`JsonException` because the instance of the request DTO cannot be created with uninitialized `required` properties.
+
+This is a significant challenge, that is hard to overcome in general for the whole codebase.
+
+A good solution, would be to somehow configure the `JsonSerializer` to be less strict about populating
+`required` properties with null, or to manage this specific kind of exception.
+
+Another solution might be to somehow extend the `JsonSerializer` to workaround this issue.
+
+At present we have chosen to make [this design decision](../decisions/0190-request-declarations.md) to fall back to using a less-than-ideal declarative syntax, specifically for request DTO objects, and rely on request validators (further down the pipeline) to do the checking for us and return proper
+`HTTP 400 - BadRequest` responses when data is actually missing.
+
+###### Open API and request DTOs
+
+Consider a request DTO such as this:
+
+```c#
+/// <summary>
+///     Reserves the availability of the car for the specified period of time
+/// </summary>
+[Route("/cars/{Id}/reserve", OperationMethod.PutPatch, AccessType.Token)]
+[Authorize(Roles.Tenant_Member, Features.Tenant_PaidTrial)]
+public class ReserveCarIfAvailableRequest : TenantedRequest<ReserveCarIfAvailableRequest, ReserveCarIfAvailableResponse>
+{
+    [Required] public DateTime? FromUtc { get; set; }
+
+    [Required] public string? Id { get; set; }
+
+    [Required] public string? ReferenceId { get; set; }
+
+    [Required] public DateTime? ToUtc { get; set; }
+}
+```
+
+Given the constraints about not using the C# keyword
+`required` on these properties, it becomes difficult to indicate in the Open API documentation that these properties are, in fact, logically "required" to be provided in the request, to the human reader.
+
+We must apply the
+`[Required]` attribute to each logically "required" property to disambiguate this for the documentation.
+
 ##### Fields
 
 Your request type might include zero, one or more fields of data, that may be optional or mandatory for the client to provide your API endpoint.
@@ -430,7 +533,7 @@ To make this take effect, you need to specify the 3rd parameter of the `[Route]`
 
 * `Token` - means the calling user is identified by a token in the request. i.e., a JWT bearer token in the
   `Autheorixation` header of the request.
-*
+    *
 
 `HMAC` - means that the request will use HMAC authentication to identify the calling user. This is only used for private API calls, not intended for the public to use.
 * `Anonymous` - means no authentication mechanism is required. (even is a token is included in the request)
@@ -460,17 +563,19 @@ For Tenanted requests, you can specify specific tenant based roles and features.
 
 ##### Response type
 
-The response type is where you define the body of the response.
+The response type is where you define the body (i.e. the content) of the response.
 
-By convention, most requests result in returning a body, except for some DELETE requests.
+By convention, typically, most requests result in returning a body, except for some DELETE requests.
 
-> However, there are some common exceptions to this rule. For example, when you logically "cancel" a booking for a car you might decide to use the DELETE method for this operation, AND you might also decide to return a representation of the booking that is now canceled.
+> However, there are some common exceptions to this convention.
+>
+> For example, when you logically "cancel" a booking for a car you might decide to use the DELETE method for this operation, AND you might also decide to return a representation of the booking that is now canceled.
 >
 > Strictly speaking, this operation could/should be defined using the PUTPATCH  method instead, as it actually changes the state of the booking, instead of deleting it from existence.
 >
 > When deleting from existence, there is likely to be no content in the response
 
-Most responses will be defined as deriving from the `IWebResponse` interface, which is simply a marker interface.
+All responses must be defined as deriving from the `IWebResponse` interface, which is simply a marker interface.
 
 An example response type would be:
 
@@ -545,6 +650,39 @@ The JSON returned from this kind of response would look something like this:
   }
 }
 ```
+
+###### C# and response DTOs
+
+By default, we have turned on nullability checking across the whole codebase (e.g.
+`<Nullable>enable</Nullable>`) so that the compiler will help us not set reference types to null, and as much as possible avoid raising the dreaded
+`NullReferenceException` (an NRE), in production code. As well as removing lots of code that checks for null.
+
+> We have also invested quite a bit of design into `Optional<T>` and various extension methods like
+`NotExists()` for the same purpose of being more explicit about what it means to not have a value.
+
+All response DTO types are, by design, [POCO](https://en.wikipedia.org/wiki/Plain_old_CLR_object) objects. They must also be JSON serializable as they represent in-memory of the JSON sent on the wire back from HTTP requests. Therefore they must have a public parameter-less constructor and all public properties must have public getters and setters. With nullability enabled, if those properties are reference types (e.g., objects or strings) then they must be initialized to not-null in the constructor of the class. This is tedious.
+
+To work around lots of boiler plate code in constructors, C# also defines the keyword
+`required` to mean, for a property, that it must be explicitly initialized in an objects initializer, should the initializer ever be used. Which is typically how response DTO's are created and populated (with mapping code) in the Application layer.
+
+Since response DTOs, unlike request DTOs, are never deserialized, there are no serializer concerns about the use of the
+`required` keyword, and the use of this keyword is string encouraged. For example:
+
+```
+public class GetCarResponse : IWebResponse
+{
+    public required Car Car { get; set; }
+}
+```
+
+> For collections in response DTOs, we recommend initializing collections as empty collections, making it clearer to clients that you have an empty array, as opposed to nothing in the JSON response, for example:
+>
+> ```C#
+> public class SearchAllCarsResponse : SearchResponse
+> {
+>     public List<Car> Cars { get; set; } = [];
+> }
+> ```
 
 ### Request Validator
 
