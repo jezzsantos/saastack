@@ -150,7 +150,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -233,7 +233,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -317,7 +317,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -402,7 +402,7 @@ public class MinimalApiMediatRGeneratorSpec
                 #if TESTINGONLY
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -490,7 +490,7 @@ public class MinimalApiMediatRGeneratorSpec
                 #if TESTINGONLY
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("HMAC")
                                 .WithOpenApi(op =>
                                     {
@@ -579,7 +579,7 @@ public class MinimalApiMediatRGeneratorSpec
                 #if TESTINGONLY
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .RequireAuthorization("Token")
                                 .WithOpenApi(op =>
                                     {
@@ -677,7 +677,7 @@ public class MinimalApiMediatRGeneratorSpec
                                 .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                             aserviceclassGroup.MapGet("aroute",
                                 async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                     await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                     await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                 .WithOpenApi(op =>
                                     {
                                         op.OperationId = "A";
@@ -773,7 +773,7 @@ public class MinimalApiMediatRGeneratorSpec
                    #if TESTINGONLY
                                aserviceclassGroup.MapGet("aroute",
                                    async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.PaidTrial.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Operations.Name}}}|]}}")
                                    .WithOpenApi(op =>
@@ -864,7 +864,7 @@ public class MinimalApiMediatRGeneratorSpec
                    #if TESTINGONLY
                                aserviceclassGroup.MapGet("aroute",
                                    async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .WithOpenApi(op =>
@@ -956,7 +956,7 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                                aserviceclassGroup.MapGet("aroute",
                                    async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .WithOpenApi(op =>
@@ -1043,7 +1043,7 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                                aserviceclassGroup.MapPost("aroute",
                                    async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .DisableAntiforgery()
@@ -1131,7 +1131,7 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                                aserviceclassGroup.MapPut("aroute",
                                    async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .DisableAntiforgery()
@@ -1144,7 +1144,7 @@ public class MinimalApiMediatRGeneratorSpec
                                        });
                                aserviceclassGroup.MapPatch("aroute",
                                    async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .DisableAntiforgery()
@@ -1232,7 +1232,7 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                                aserviceclassGroup.MapPost("aroute",
                                    async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .DisableAntiforgery()
@@ -1320,7 +1320,7 @@ public class MinimalApiMediatRGeneratorSpec
                                    .AddEndpointFilter<global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter>();
                                aserviceclassGroup.MapPut("aroute",
                                    async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .DisableAntiforgery()
@@ -1333,7 +1333,7 @@ public class MinimalApiMediatRGeneratorSpec
                                        });
                                aserviceclassGroup.MapPatch("aroute",
                                    async (global::MediatR.IMediator mediator, global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .DisableAntiforgery()
@@ -1423,7 +1423,7 @@ public class MinimalApiMediatRGeneratorSpec
                    #if TESTINGONLY
                                aserviceclassGroup.MapGet("aroute",
                                    async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::ANamespace.ARequest request) =>
-                                        await mediator.Send(request ?? new global::ANamespace.ARequest(), global::System.Threading.CancellationToken.None))
+                                        await mediator.Send(request, global::System.Threading.CancellationToken.None))
                                    .RequireAuthorization("Token")
                                    .RequireCallerAuthorization("POLICY:{|Features|:{|Platform|:[|{{{PlatformFeatures.Basic.Name}}}|]},|Roles|:{|Platform|:[|{{{PlatformRoles.Standard.Name}}}|]}}")
                                    .WithOpenApi(op =>

@@ -139,6 +139,16 @@ public sealed class TestingWebApi : IWebApiService
                 "alocation");
     }
 
+    public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> GeneralEmptyBodyRequiredPost(
+        PostWithEmptyBodyAndRequiredPropertiesTestingOnlyRequest request, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return () =>
+            new PostResult<StringMessageTestingOnlyResponse>(
+                new StringMessageTestingOnlyResponse { Message = "amessage" },
+                "alocation");
+    }
+
     public async Task<ApiPostResult<string, StringMessageTestingOnlyResponse>> GeneralEmptyBodyWithRouteParamsPost(
         PostWithRouteParamsAndEmptyBodyTestingOnlyRequest request, CancellationToken cancellationToken)
     {

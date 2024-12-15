@@ -1,0 +1,5 @@
+### GET request to example server
+POST https://{{apihost1}}/testingonly/general/body/empty/required
+Content-Type: application/json
+
+###

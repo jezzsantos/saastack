@@ -111,7 +111,8 @@ public sealed class TestingClient : IHttpClient, IDisposable
             throw details.ToException();
         }
 
-        throw response.StatusCode.ToResponseProblem(response.ReasonPhrase)
+        var responseText = await response.Content.ReadAsStringAsync();
+        throw response.StatusCode.ToResponseProblem(response.ReasonPhrase, responseText)
             .ToException();
     }
 }

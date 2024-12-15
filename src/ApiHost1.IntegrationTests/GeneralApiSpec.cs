@@ -82,11 +82,26 @@ public class GeneralApiSpec : WebApiSpec<Program>
     {
         var result = await Api.GetAsync(new GetWithSimpleArrayTestingOnlyRequest
         {
-            AnArray = new[] { "a", "b", "c" }
+            AnArray = ["a", "b", "c"]
         });
 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
         result.Content.Value.Message.Should().Be("a, b, c");
+    }
+
+    [Fact]
+    public async Task WhenPostWithEmptyBodyAndMissingRequiredProperties_ThenThrows()
+    {
+        try
+        {
+            await HttpApi.PostEmptyJsonAsync("/testingonly/general/body/empty/required");
+        }
+        catch (Exception ex)
+        {
+            ex.Should().BeOfType<InvalidOperationException>()
+                .Which.Message.Should().Contain(
+                    "JSON deserialization for type 'Infrastructure.Web.Api.Operations.Shared.TestingOnly.PostWithEmptyBodyAndRequiredPropertiesTestingOnlyRequest' was missing required properties, including the following: requiredField");
+        }
     }
 }
 #endif

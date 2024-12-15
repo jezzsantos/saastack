@@ -129,7 +129,7 @@ namespace {assemblyNamespace}
                     : $"                async (global::MediatR.IMediator mediator, [global::Microsoft.AspNetCore.Http.AsParameters] global::{registration.RequestDto.FullName} request) =>");
 
                 endpointRegistrations.Append(
-                    $"                     await mediator.Send(request ?? new global::{registration.RequestDto.FullName}(), global::System.Threading.CancellationToken.None))");
+                    "                     await mediator.Send(request, global::System.Threading.CancellationToken.None))");
                 if (registration.OperationAccess != AccessType.Anonymous)
                 {
                     endpointRegistrations.AppendLine();
