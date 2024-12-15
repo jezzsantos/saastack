@@ -105,15 +105,6 @@ namespace IntegrationTesting.Persistence.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Docker is either not started, or there is no &apos;LocalStack&apos; container running yet - you must start Docker, and run &apos;localstack start&apos; first.
-        /// </summary>
-        internal static string LocalStackEmulator_StartEmulator_LocalStackNotRunning {
-            get {
-                return ResourceManager.GetString("LocalStackEmulator_StartEmulator_LocalStackNotRunning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The current Operating system does not support running this emulator.
         /// </summary>
         internal static string UnSupportedPlatform {
