@@ -28,13 +28,6 @@ GO
 
 IF EXISTS(SELECT *
           FROM sys.objects
-          WHERE object_id = OBJECT_ID(N'[dbo].[Booking]')
-            AND type in (N'U'))
-    DROP TABLE [dbo].[Booking]
-GO
-
-IF EXISTS(SELECT *
-          FROM sys.objects
           WHERE object_id = OBJECT_ID(N'[dbo].[DomainEvent]')
             AND type in (N'U'))
     DROP TABLE [dbo].[DomainEvent]
@@ -61,29 +54,6 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [dbo].[Booking]
-(
-    [Id]                 [nvarchar](100) NOT NULL,
-    [LastPersistedAtUtc] [datetime]      NULL,
-    [IsDeleted]          [bit]           NULL,
-    [BorrowerId]         [nvarchar](100) NULL,
-    [CarId]              [nvarchar](100) NULL,
-    [End]                [datetime]      NULL,
-    [OrganizationId]     [nvarchar](100) NULL,
-    [Start]              [datetime]      NULL,
-) ON [PRIMARY]
-GO
-
-CREATE INDEX Id
-    ON [dbo].[Booking]
-        (
-         [Id]
-            );
-CREATE INDEX OrganizationId
-    ON [dbo].[Booking]
-        (
-         [OrganizationId]
-            );
 
 CREATE TABLE [dbo].[DomainEvent]
 (
