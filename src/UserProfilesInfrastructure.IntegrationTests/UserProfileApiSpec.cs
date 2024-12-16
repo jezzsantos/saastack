@@ -118,7 +118,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
         var result = await Api.PutAsync(new ChangeProfileAvatarRequest
             {
                 UserId = loginA.User.Id
-            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng),
             req => req.SetJWTBearerToken(loginB.AccessToken));
 
         result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -132,7 +132,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
         var result = await Api.PutAsync(new ChangeProfileAvatarRequest
             {
                 UserId = login.User.Id
-            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         result.Content.Value.Profile.AvatarUrl.Should().StartWith("https://localhost:5001/images/image_");
@@ -146,7 +146,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
         await Api.PutAsync(new ChangeProfileAvatarRequest
             {
                 UserId = login.User.Id
-            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var result = await Api.DeleteAsync(new DeleteProfileAvatarRequest
@@ -195,7 +195,7 @@ public class UserProfileApiSpec : WebApiSpec<Program>
         var profile = await Api.PutAsync(new ChangeProfileAvatarRequest
             {
                 UserId = login.User.Id
-            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var avatarUrl = profile.Content.Value.Profile.AvatarUrl!;

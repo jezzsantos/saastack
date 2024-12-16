@@ -109,7 +109,7 @@ public class ImagesApiSpec : WebApiSpec<Program>
         var result = await Api.PostAsync(new UploadImageRequest
             {
                 Description = description
-            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, Filename: "afilename"),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         return result.Content.Value.Image;

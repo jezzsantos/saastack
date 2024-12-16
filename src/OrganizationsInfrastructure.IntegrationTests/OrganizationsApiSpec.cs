@@ -168,7 +168,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         var result = await Api.PutAsync(new ChangeOrganizationAvatarRequest
             {
                 Id = organizationId
-            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng),
             req => req.SetJWTBearerToken(loginB.AccessToken));
 
         result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -197,7 +197,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         var result = await Api.PutAsync(new ChangeOrganizationAvatarRequest
             {
                 Id = organizationId
-            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng),
             req => req.SetJWTBearerToken(loginB.AccessToken));
 
         result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -212,7 +212,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         var result = await Api.PutAsync(new ChangeOrganizationAvatarRequest
             {
                 Id = organizationId
-            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         result.Content.Value.Organization.AvatarUrl.Should().StartWith("https://localhost:5001/images/image_");
@@ -227,7 +227,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         await Api.PutAsync(new ChangeOrganizationAvatarRequest
             {
                 Id = organizationId
-            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var result = await Api.DeleteAsync(new DeleteOrganizationAvatarRequest
@@ -655,7 +655,7 @@ public class OrganizationsApiSpec : WebApiSpec<Program>
         var organization = await Api.PutAsync(new ChangeOrganizationAvatarRequest
             {
                 Id = organizationId
-            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng, "afilename"),
+            }, new PostFile(GetTestImage(), HttpConstants.ContentTypes.ImagePng),
             req => req.SetJWTBearerToken(login.AccessToken));
 
         var avatarUrl = organization.Content.Value.Organization.AvatarUrl!;

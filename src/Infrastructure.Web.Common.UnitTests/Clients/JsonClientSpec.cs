@@ -394,6 +394,35 @@ public class JsonClientSpec
         }
 
         [Fact]
+        public async Task
+            WhenGetTypedResponseAsyncAndContentTypeIsJsonAndNonStandardError4ForFailure1ThenReturnsResponseProblem()
+        {
+            var response = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content = new StringContent(new NonStandardProblemDetails
+                {
+                    Details = "adetails",
+                    Status = 500
+                }.ToJson()!),
+                ReasonPhrase = "areason"
+            };
+
+            var result =
+                await JsonClient.GetTypedResponseAsync<TestResponse>(response, null, CancellationToken.None);
+
+            result.IsSuccessful.Should().BeFalse();
+            result.Error.Status.Should().Be(500);
+            result.Error.Title.Should().Be("adetails");
+            result.Error.Detail.Should().BeNull();
+            result.Error.Type.Should().BeNull();
+            result.Error.Instance.Should().BeNull();
+            result.Error.Exception.Should().BeNull();
+            result.Error.Errors.Should().BeNull();
+            result.Error.Extensions.Should().BeNull();
+        }
+
+        [Fact]
         public async Task WhenGetTypedResponseAsyncAndContentTypeIsTextForSuccess_ThenReturnsEmptyResponse()
         {
             var response = new HttpResponseMessage
@@ -618,7 +647,7 @@ public class JsonClientSpec
                 BaseAddress = new Uri("http://localhost")
             };
             var request = new TestMultiPartFormDataRequest();
-            var file = new PostFile(new MemoryStream(), HttpConstants.ContentTypes.Json, "afilename");
+            var file = new PostFile(new MemoryStream(), HttpConstants.ContentTypes.Json);
 
             var result =
                 await JsonClient.SendRequestAsync(client, HttpMethod.Post, request, file, null,
@@ -648,7 +677,7 @@ public class JsonClientSpec
                 BaseAddress = new Uri("http://localhost")
             };
             var request = new TestRequest();
-            var file = new PostFile(new MemoryStream(), HttpConstants.ContentTypes.Json, "afilename");
+            var file = new PostFile(new MemoryStream(), HttpConstants.ContentTypes.Json);
 
             var result =
                 await JsonClient.SendRequestAsync(client, HttpMethod.Post, request, file, null,

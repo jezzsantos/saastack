@@ -58,4 +58,4 @@ public interface IHttpJsonClient
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default);
 }
 
-public record PostFile(Stream Stream, string ContentType, string Filename = "file");
+public record PostFile(Stream Stream, string ContentType, string PartName = "file", string? Filename = null);

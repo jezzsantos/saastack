@@ -318,7 +318,7 @@ public class JsonClient : IHttpJsonClient, IDisposable
                     streamContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
                 }
 
-                multipart.Add(streamContent, "file", file.Filename);
+                multipart.Add(streamContent, file.PartName, file.Filename ?? file.PartName);
                 content = multipart;
             }
             else if (method.CanHaveBody() && request is IHasMultipartFormData)
@@ -594,6 +594,13 @@ public class JsonClient : IHttpJsonClient, IDisposable
                 }
             }
 
+            // Other common formats
+            if (details.Status.HasValue && details.Details.HasValue())
+            {
+                problem = statusCode.ToResponseProblem(details.Details);
+                return true;
+            }
+
             problem = statusCode.ToResponseProblem(Resources.JsonClient_TryParseNonStandardErrors_NonStandard,
                 responseText);
             return true;
@@ -640,7 +647,11 @@ public class JsonClient : IHttpJsonClient, IDisposable
 [UsedImplicitly]
 internal class NonStandardProblemDetails
 {
+    [JsonPropertyName("details")] public string? Details { get; set; }
+
     [JsonPropertyName("error")] public NonStandardProblemError? Error { get; set; }
+
+    [JsonPropertyName("status")] public int? Status { get; set; }
 }
 
 [UsedImplicitly]
@@ -648,9 +659,9 @@ internal class NonStandardProblemError
 {
     [JsonPropertyName("code")] public string? Code { get; set; }
 
-    [JsonPropertyName("reason")] public string? Reason { get; set; }
-
     [JsonPropertyName("description")] public string? Description { get; set; }
 
     [JsonPropertyName("message")] public string? Message { get; set; }
+
+    [JsonPropertyName("reason")] public string? Reason { get; set; }
 }
