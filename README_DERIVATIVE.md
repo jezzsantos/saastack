@@ -55,9 +55,18 @@ You only need the tools below installed if you are going to run specific `Integr
 
 * If using the `AzureSqlServerStore`, install `SQL Server 2019 Developer`. Available for [download here](https://go.microsoft.com/fwlink/?linkid=866662)
 * If using the `RedisDataStore`, install `Redis Server` locally to run the tests. Available for [download here](https://redis.io/download)
-* If using the `EventStoreEventStore`, install `EventStore` locally to run the tests. Install using the Chocolatey command: `choco install eventstore-oss`
 
 > We would normally run these storage integration tests in CI periodically.
+
+### Kurrent (formerly EventStoreDb)
+
+If using `KurrentEventStore`...
+
+> You only need to perform this step once
+
+Install [Docker Desktop](https://docs.docker.com/desktop/)
+
+[TestContainers](https://dotnet.testcontainers.org/) are used to create a Kurrent event store docker container specifically for the tests.
 
 ## Azure Local Development
 

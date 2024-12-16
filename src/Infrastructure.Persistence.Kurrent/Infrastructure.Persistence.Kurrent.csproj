@@ -5,7 +5,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Infrastructure.Persistence.Common\Infrastructure.Persistence.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.Interfaces\Infrastructure.Persistence.Interfaces.csproj" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Interfaces\Infrastructure.Web.Api.Interfaces.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -16,8 +18,24 @@
 
     <ItemGroup>
         <PackageReference Include="EventStore.Client.Grpc.Streams" Version="23.3.7">
-            <PrivateAssets>all</PrivateAssets>
+            <!-- Needed to prevent JetBrains.Annotations from being exposed to our code -->
+            <PrivateAssets>compile;analyzers</PrivateAssets>
         </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Update="Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
 
 </Project>

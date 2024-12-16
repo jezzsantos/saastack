@@ -20,7 +20,7 @@ public class EventStoreExtensionsSpec
         var result = _eventStore.Object.VerifyConcurrencyCheck("astreamname", Optional<int>.None, 10);
 
         result.Should().BeError(ErrorCode.EntityExists,
-            Resources.EventStoreExtensions_ConcurrencyVerificationFailed_StreamReset.Format("astreamname"));
+            Resources.EventStore_ConcurrencyVerificationFailed_StreamReset.Format("astreamname"));
     }
 
     [Fact]
@@ -38,7 +38,7 @@ public class EventStoreExtensionsSpec
         var result = _eventStore.Object.VerifyConcurrencyCheck("astreamname", 2, 2);
 
         result.Should().BeError(ErrorCode.EntityExists,
-            Resources.EventStoreExtensions_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format("astreamname", 2));
+            Resources.EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format("astreamname", 2));
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class EventStoreExtensionsSpec
         var result = _eventStore.Object.VerifyConcurrencyCheck("astreamname", 2, 1);
 
         result.Should().BeError(ErrorCode.EntityExists,
-            Resources.EventStoreExtensions_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format("astreamname", 1));
+            Resources.EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format("astreamname", 1));
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public class EventStoreExtensionsSpec
         var result = _eventStore.Object.VerifyConcurrencyCheck("astreamname", 1, 3);
 
         result.Should().BeError(ErrorCode.EntityExists,
-            Resources.EventStoreExtensions_ConcurrencyVerificationFailed_MissingUpdates.Format("astreamname", 2, 3));
+            Resources.EventStore_ConcurrencyVerificationFailed_MissingUpdates.Format("astreamname", 2, 3));
     }
 
     [Fact]

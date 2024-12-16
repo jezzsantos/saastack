@@ -177,7 +177,7 @@ public abstract class AnyEventStoreBaseSpec
             [CreateEvent(3)], CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityExists,
-            Resources.EventStoreExtensions_ConcurrencyVerificationFailed_StreamReset
+            Resources.EventStore_ConcurrencyVerificationFailed_StreamReset
                 .Format($"testentities_{entityId}"));
     }
 
@@ -196,7 +196,7 @@ public abstract class AnyEventStoreBaseSpec
             [CreateEvent(1)], CancellationToken.None);
 
         result.Should().BeError(ErrorCode.EntityExists,
-            Resources.EventStoreExtensions_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format(
+            Resources.EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated.Format(
                 $"testentities_{entityId}", 1));
     }
 
@@ -213,9 +213,9 @@ public abstract class AnyEventStoreBaseSpec
 
         var result = await _setup.Store.AddEventsAsync(_setup.ContainerName, entityId,
             [CreateEvent(10)], CancellationToken.None);
-
+        
         result.Should().BeError(ErrorCode.EntityExists,
-            Resources.EventStoreExtensions_ConcurrencyVerificationFailed_MissingUpdates.Format(
+            Resources.EventStore_ConcurrencyVerificationFailed_MissingUpdates.Format(
                 $"testentities_{entityId}", 4, 10));
     }
 

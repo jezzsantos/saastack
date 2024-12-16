@@ -98,27 +98,27 @@ namespace Infrastructure.Persistence.Common {
         /// <summary>
         ///   Looks up a localized string similar to Could not write new events to event stream: {0}, events between version {1} and version {2} have not been entered into stream yet.
         /// </summary>
-        internal static string EventStoreExtensions_ConcurrencyVerificationFailed_MissingUpdates {
+        internal static string EventStore_ConcurrencyVerificationFailed_MissingUpdates {
             get {
-                return ResourceManager.GetString("EventStoreExtensions_ConcurrencyVerificationFailed_MissingUpdates", resourceCulture);
+                return ResourceManager.GetString("EventStore_ConcurrencyVerificationFailed_MissingUpdates", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Could not write new events to event stream: {0}, another process has updated the stream at the same time, since version {1}.
         /// </summary>
-        internal static string EventStoreExtensions_ConcurrencyVerificationFailed_StreamAlreadyUpdated {
+        internal static string EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated {
             get {
-                return ResourceManager.GetString("EventStoreExtensions_ConcurrencyVerificationFailed_StreamAlreadyUpdated", resourceCulture);
+                return ResourceManager.GetString("EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Could not write new events to event stream: {0}, another process may have cleared the stream?.
         /// </summary>
-        internal static string EventStoreExtensions_ConcurrencyVerificationFailed_StreamReset {
+        internal static string EventStore_ConcurrencyVerificationFailed_StreamReset {
             get {
-                return ResourceManager.GetString("EventStoreExtensions_ConcurrencyVerificationFailed_StreamReset", resourceCulture);
+                return ResourceManager.GetString("EventStore_ConcurrencyVerificationFailed_StreamReset", resourceCulture);
             }
         }
         

@@ -1,9 +1,11 @@
+using JetBrains.Annotations;
 using Xunit;
 
 namespace Infrastructure.Persistence.Shared.IntegrationTests.Kurrent;
 
 [Trait("Category", "Integration.Persistence")]
 [Collection("Kurrent")]
+[UsedImplicitly]
 public class KurrentEventStoreSpec : AnyEventStoreBaseSpec
 {
     private readonly KurrentSpecSetup _setup;
@@ -12,8 +14,4 @@ public class KurrentEventStoreSpec : AnyEventStoreBaseSpec
     {
         _setup = setup;
     }
-
-    //TODO: all other tests
-
-    //TODO: override the base class tests
 }
