@@ -12,20 +12,24 @@ namespace Infrastructure.Persistence.Kurrent.ApplicationServices;
 
 /// <summary>
 ///     Provides an event store to Kurrent
-///
-///     Important to note that our aggregate versioning is 1-based, while Kurrent's is 0-based. So an aggregate event with version 6 will be stored inside a Kurrent event with EventNumber = 5.
+///     Note: Domain events are 1-based, while Kurrent's events are 0-based.
+///     e.g. an aggregate domain event at version == 6 will be stored inside a Kurrent event with EventNumber == 5.
+///     <see href="https://developers.eventstore.com/clients/grpc/getting-started.html" />
 /// </summary>
 public class KurrentEventStore : IEventStore
 {
+    private const string ConnectionStringSettingName = "ApplicationServices:Persistence:Kurrent:ConnectionString";
     private readonly EventStoreClient _client;
     private readonly IRecorder _recorder;
-    private const string ConnectionStringSettingName =
-        "ApplicationServices:Persistence:EventStoreDb:ConnectionString";
-    
+
     public static KurrentEventStore Create(IRecorder recorder, IConfigurationSettings settings)
     {
-        // See https://developers.eventstore.com/clients/grpc/getting-started.html#connection-string
         var connectionString = settings.GetString(ConnectionStringSettingName);
+        return Create(recorder, connectionString);
+    }
+
+    public static KurrentEventStore Create(IRecorder recorder, string connectionString)
+    {
         return new KurrentEventStore(recorder, connectionString);
     }
 
@@ -55,10 +59,9 @@ public class KurrentEventStore : IEventStore
             contentType: HttpConstants.ContentTypes.Json
         )).ToArray();
 
-        var firstEventVersion = events.First().Version;
-
-        // Used to detect if someone modified the stream after we read it
         // See https://developers.eventstore.com/clients/grpc/appending-events.html#handling-concurrency 
+        var firstEventVersion = events.First().Version;
+        var lastEventVersion = events.Last().Version;
         var expectedKurrentRevision = firstEventVersion == EventStream.FirstVersion
             ? StreamRevision.None
             : StreamRevision.FromInt64(AggregateVersionToKurrentEventNumber(firstEventVersion) - 1);
@@ -67,6 +70,20 @@ public class KurrentEventStore : IEventStore
         {
             await _client.AppendToStreamAsync(streamName, expectedKurrentRevision, eventData,
                 cancellationToken: cancellationToken);
+
+            if (events.Count > 1)
+            {
+                _recorder.TraceInformation(null,
+                    "Kurrent added {Count} events to stream {StreamName}, from version {FromVersion} to version {ToVersion}",
+                    events.Count, streamName, firstEventVersion, lastEventVersion);
+            }
+            else
+            {
+                _recorder.TraceInformation(null,
+                    "Kurrent added 1 event to stream {StreamName}, at version {FromVersion}", streamName,
+                    firstEventVersion);
+            }
+
             return streamName;
         }
         catch (WrongExpectedVersionException ex)
@@ -100,7 +117,83 @@ public class KurrentEventStore : IEventStore
         }
         catch (Exception ex)
         {
-            _recorder.TraceError(null, "KurrentEventStore failed to add events to stream {StreamName}", streamName);
+            _recorder.TraceError(null,
+                "KurrentEventStore failed to add {Count} events to stream {StreamName}, from version {FromVersion} to version {ToVersion}",
+                events.Count, streamName, firstEventVersion, lastEventVersion);
+            return ex.ToError(ErrorCode.Unexpected);
+        }
+    }
+
+#if TESTINGONLY
+    async Task<Result<Error>> IEventStore.DestroyAllAsync(string entityName, CancellationToken cancellationToken)
+    {
+        entityName.ThrowIfNotValuedParameter(nameof(entityName), Resources.KurrentEventStore_MissingEntityName);
+
+        try
+        {
+            var allStreams =
+                _client.ReadAllAsync(Direction.Forwards, Position.Start, cancellationToken: cancellationToken);
+
+            var streamNames = new HashSet<string>();
+            await foreach (var resolvedEvent in allStreams)
+            {
+                if (resolvedEvent.Event.EventStreamId.StartsWith(entityName))
+                {
+                    streamNames.Add(resolvedEvent.Event.EventStreamId);
+                }
+            }
+
+            foreach (var streamName in streamNames)
+            {
+                await _client.TombstoneAsync(streamName, StreamState.Any, cancellationToken: cancellationToken);
+            }
+
+            return Result.Ok;
+        }
+        catch (Exception ex)
+        {
+            _recorder.TraceError(null, "KurrentEventStore failed to destroy all events for entity {EntityName}",
+                entityName);
+            return ex.ToError(ErrorCode.Unexpected);
+        }
+    }
+#endif
+
+    public async Task<Result<IReadOnlyList<EventSourcedChangeEvent>, Error>> GetEventStreamAsync(string entityName,
+        string entityId, CancellationToken cancellationToken)
+    {
+        entityName.ThrowIfNotValuedParameter(nameof(entityName), Resources.KurrentEventStore_MissingEntityName);
+        entityId.ThrowIfNotValuedParameter(nameof(entityId), Resources.KurrentEventStore_MissingEntityId);
+
+        var streamName = GetEventStreamName(entityName, entityId);
+        var events = new List<EventSourcedChangeEvent>();
+
+        try
+        {
+            var eventStream = _client.ReadStreamAsync(Direction.Forwards, streamName, StreamPosition.Start,
+                cancellationToken: cancellationToken);
+            await foreach (var resolvedEvent in eventStream)
+            {
+                var data = resolvedEvent.Event.Data.ToArray();
+                events.Add(data.FromEvent());
+            }
+
+            var firstEventVersion = events.First().Version;
+            var lastEventVersion = events.Last().Version;
+            _recorder.TraceInformation(null,
+                "Kurrent retrieved {Count} events from stream {StreamName}, from version {FromVersion} to version {ToVersion}",
+                events.Count, streamName, firstEventVersion, lastEventVersion);
+
+            return events;
+        }
+        catch (StreamNotFoundException)
+        {
+            return new List<EventSourcedChangeEvent>();
+        }
+        catch (Exception ex)
+        {
+            _recorder.TraceError(null, "KurrentEventStore failed to read all events from stream {StreamName}",
+                streamName);
             return ex.ToError(ErrorCode.Unexpected);
         }
     }
@@ -133,73 +226,6 @@ public class KurrentEventStore : IEventStore
         var streamUnexpectedlyEmpty = expectedKurrentRevision != StreamRevision.None
                                       && actualKurrentRevision == StreamRevision.None;
         return streamUnexpectedlyEmpty;
-    }
-
-#if TESTINGONLY
-    async Task<Result<Error>> IEventStore.DestroyAllAsync(string entityName, CancellationToken cancellationToken)
-    {
-        entityName.ThrowIfNotValuedParameter(nameof(entityName), Resources.KurrentEventStore_MissingEntityName);
-
-        try
-        {
-            var result = _client.ReadAllAsync(Direction.Forwards, Position.Start, cancellationToken: cancellationToken);
-
-            var entityEventStreams = new HashSet<string>();
-            await foreach (var resolvedEvent in result)
-            {
-                if (resolvedEvent.Event.EventStreamId.StartsWith(entityName))
-                {
-                    entityEventStreams.Add(resolvedEvent.Event.EventStreamId);
-                }
-            }
-
-            foreach (var streamName in entityEventStreams)
-            {
-                await _client.TombstoneAsync(streamName, StreamState.Any, cancellationToken: cancellationToken);
-            }
-
-            return Result.Ok;
-        }
-        catch (Exception ex)
-        {
-            _recorder.TraceError(null, "KurrentEventStore failed to destroy all events for entity {EntityName}",
-                entityName);
-            return ex.ToError(ErrorCode.Unexpected);
-        }
-    }
-#endif
-
-    public async Task<Result<IReadOnlyList<EventSourcedChangeEvent>, Error>> GetEventStreamAsync(string entityName,
-        string entityId, CancellationToken cancellationToken)
-    {
-        entityName.ThrowIfNotValuedParameter(nameof(entityName), Resources.KurrentEventStore_MissingEntityName);
-        entityId.ThrowIfNotValuedParameter(nameof(entityId), Resources.KurrentEventStore_MissingEntityId);
-
-        var streamName = GetEventStreamName(entityName, entityId);
-        var events = new List<EventSourcedChangeEvent>();
-
-        try
-        {
-            var result = _client.ReadStreamAsync(Direction.Forwards, streamName, StreamPosition.Start,
-                cancellationToken: cancellationToken);
-            await foreach (var resolvedEvent in result)
-            {
-                var data = resolvedEvent.Event.Data.ToArray();
-                var @event = data.FromEvent();
-                events.Add(@event);
-            }
-
-            return events;
-        }
-        catch (StreamNotFoundException)
-        {
-            return new List<EventSourcedChangeEvent>();
-        }
-        catch (Exception ex)
-        {
-            _recorder.TraceError(null, "KurrentEventStore failed to read events from stream {StreamName}", streamName);
-            return ex.ToError(ErrorCode.Unexpected);
-        }
     }
 
     private static string GetEventStreamName(string entityName, string entityId)

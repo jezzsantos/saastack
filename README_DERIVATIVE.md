@@ -58,15 +58,16 @@ You only need the tools below installed if you are going to run specific `Integr
 
 > We would normally run these storage integration tests in CI periodically.
 
-### Kurrent (formerly EventStoreDb)
-
-If using `KurrentEventStore`...
+### Docker
 
 > You only need to perform this step once
 
+You will need to install docker to run certain kinds of integration tests against certain local/cloud infrastructure components. For example, all
+`Integration.Persistence` tests.
+
 Install [Docker Desktop](https://docs.docker.com/desktop/)
 
-[TestContainers](https://dotnet.testcontainers.org/) are used to create a Kurrent event store docker container specifically for the tests.
+We use [TestContainers](https://dotnet.testcontainers.org/) to create containers specifically for the tests.
 
 ## Azure Local Development
 
