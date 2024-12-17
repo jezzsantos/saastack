@@ -10,6 +10,7 @@
         <ProjectReference Include="..\Infrastructure.Hosting.Common\Infrastructure.Hosting.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.AWS\Infrastructure.Persistence.AWS.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.Azure\Infrastructure.Persistence.Azure.csproj" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Kurrent\Infrastructure.Persistence.Kurrent.csproj" />
         <ProjectReference Include="..\IntegrationTesting.Persistence.Common\IntegrationTesting.Persistence.Common.csproj" />
     </ItemGroup>
 
@@ -17,6 +18,7 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
         <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
+        <PackageReference Include="Testcontainers.EventStoreDb" Version="4.1.0" />
     </ItemGroup>
 
     <ItemGroup>

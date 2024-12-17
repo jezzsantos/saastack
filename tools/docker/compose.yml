@@ -1,0 +1,22 @@
+services:
+  eventstoredb:
+    image: eventstore/eventstore:latest
+    environment:
+      - EVENTSTORE_CLUSTER_SIZE=1
+      - EVENTSTORE_NODE_PORT=2113
+      - EVENTSTORE_INSECURE=true
+      # Needed for the stream browser feature in Admin UI
+      - EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=true
+    ports:
+      - "2113:2113"
+    volumes:
+      - type: volume
+        source: eventstore-volume-data
+        target: /var/lib/eventstore
+      - type: volume
+        source: eventstore-volume-logs
+        target: /var/log/eventstore
+
+volumes:
+  eventstore-volume-data:
+  eventstore-volume-logs:

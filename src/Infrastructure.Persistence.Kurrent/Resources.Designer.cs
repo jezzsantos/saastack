@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace IntegrationTesting.Persistence.Common {
+namespace Infrastructure.Persistence.Kurrent {
     using System;
     
     
@@ -38,7 +38,7 @@ namespace IntegrationTesting.Persistence.Common {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IntegrationTesting.Persistence.Common.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Infrastructure.Persistence.Kurrent.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,56 +60,29 @@ namespace IntegrationTesting.Persistence.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to launch Azurite, the process failed to startup, error: {0}.
+        ///   Looks up a localized string similar to There must be at least one event.
         /// </summary>
-        internal static string AzuriteStorageEmulator_StartEmulator_Exited {
+        internal static string KurrentEventStore_AddEventsAsync_NoEvents {
             get {
-                return ResourceManager.GetString("AzuriteStorageEmulator_StartEmulator_Exited", resourceCulture);
+                return ResourceManager.GetString("KurrentEventStore_AddEventsAsync_NoEvents", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to launch Azurite process, with command: {0} {1}.
+        ///   Looks up a localized string similar to EntityId cannot be empty.
         /// </summary>
-        internal static string AzuriteStorageEmulator_StartEmulator_FailedStartup {
+        internal static string KurrentEventStore_MissingEntityId {
             get {
-                return ResourceManager.GetString("AzuriteStorageEmulator_StartEmulator_FailedStartup", resourceCulture);
+                return ResourceManager.GetString("KurrentEventStore_MissingEntityId", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Docker is either not started, or there is no &apos;{0}&apos; container running yet - you must start Docker, and may need to initiate a process on the docker image first.
+        ///   Looks up a localized string similar to EntityName cannot be empty.
         /// </summary>
-        internal static string DockerImageEmulator_StartEmulator_ContainerNotRunning {
+        internal static string KurrentEventStore_MissingEntityName {
             get {
-                return ResourceManager.GetString("DockerImageEmulator_StartEmulator_ContainerNotRunning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to launch LocalStack, the process failed to startup, error: {0}.
-        /// </summary>
-        internal static string DockerImageEmulator_StartEmulator_Exited {
-            get {
-                return ResourceManager.GetString("DockerImageEmulator_StartEmulator_Exited", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to launch LocalStack process, with command: {0} {1}.
-        /// </summary>
-        internal static string DockerImageEmulator_StartEmulator_FailedStartup {
-            get {
-                return ResourceManager.GetString("DockerImageEmulator_StartEmulator_FailedStartup", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The current Operating system does not support running this emulator.
-        /// </summary>
-        internal static string UnSupportedPlatform {
-            get {
-                return ResourceManager.GetString("UnSupportedPlatform", resourceCulture);
+                return ResourceManager.GetString("KurrentEventStore_MissingEntityName", resourceCulture);
             }
         }
     }

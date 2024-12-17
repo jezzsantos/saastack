@@ -2,29 +2,25 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <IsPlatformProject>true</IsPlatformProject>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Application.Persistence.Common\Application.Persistence.Common.csproj" />
+        <ProjectReference Include="..\Infrastructure.Persistence.Common\Infrastructure.Persistence.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Persistence.Interfaces\Infrastructure.Persistence.Interfaces.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Polly" Version="7.2.4" />
-        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.3.6" />
+        <ProjectReference Include="..\Infrastructure.Web.Api.Interfaces\Infrastructure.Web.Api.Interfaces.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>$(AssemblyName).UnitTests</_Parameter1>
         </AssemblyAttribute>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>Infrastructure.Persistence.Shared.IntegrationTests</_Parameter1>
-        </AssemblyAttribute>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>Infrastructure.Persistence.Kurrent</_Parameter1>
-        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="EventStore.Client.Grpc.Streams" Version="23.3.7">
+            <!-- Needed to prevent JetBrains.Annotations from being exposed to our code -->
+            <PrivateAssets>compile;analyzers</PrivateAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>

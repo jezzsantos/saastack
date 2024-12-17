@@ -63,13 +63,13 @@
     <data name="StoreExtensions_InvalidJoinType" xml:space="preserve">
         <value>The type {0} does not exist</value>
     </data>
-    <data name="EventStoreExtensions_ConcurrencyVerificationFailed_StreamReset" xml:space="preserve">
+    <data name="EventStore_ConcurrencyVerificationFailed_StreamReset" xml:space="preserve">
         <value>Could not write new events to event stream: {0}, another process may have cleared the stream?</value>
     </data>
-    <data name="EventStoreExtensions_ConcurrencyVerificationFailed_StreamAlreadyUpdated" xml:space="preserve">
+    <data name="EventStore_ConcurrencyVerificationFailed_StreamAlreadyUpdated" xml:space="preserve">
         <value>Could not write new events to event stream: {0}, another process has updated the stream at the same time, since version {1}</value>
     </data>
-    <data name="EventStoreExtensions_ConcurrencyVerificationFailed_MissingUpdates" xml:space="preserve">
+    <data name="EventStore_ConcurrencyVerificationFailed_MissingUpdates" xml:space="preserve">
         <value>Could not write new events to event stream: {0}, events between version {1} and version {2} have not been entered into stream yet</value>
     </data>
     <data name="EventSourcingDddCommandStore_PublishFailed" xml:space="preserve">

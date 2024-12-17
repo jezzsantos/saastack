@@ -42,7 +42,4 @@
     <data name="DockerImageEmulator_StartEmulator_ContainerNotRunning" xml:space="preserve">
         <value>Docker is either not started, or there is no '{0}' container running yet - you must start Docker, and may need to initiate a process on the docker image first</value>
     </data>
-    <data name="LocalStackEmulator_StartEmulator_LocalStackNotRunning" xml:space="preserve">
-        <value>Docker is either not started, or there is no 'LocalStack' container running yet - you must start Docker, and run 'localstack start' first</value>
-    </data>
 </root>
