@@ -5,13 +5,13 @@ using Xunit;
 namespace Domain.Common.UnitTests;
 
 [Trait("Category", "Unit")]
-public class MessageQueueIdFactorySpec
+public class MessageBusTopicMessageIdFactorySpec
 {
-    private readonly MessageQueueIdFactory _factory;
+    private readonly MessageBusTopicMessageIdFactory _factory;
 
-    public MessageQueueIdFactorySpec()
+    public MessageBusTopicMessageIdFactorySpec()
     {
-        _factory = new MessageQueueIdFactory();
+        _factory = new MessageBusTopicMessageIdFactory();
     }
 
     [Fact]
@@ -33,16 +33,24 @@ public class MessageQueueIdFactorySpec
         _factory
             .Invoking(x => x.Create("a"))
             .Should().Throw<ArgumentOutOfRangeException>()
-            .WithMessageLike(Resources.MessageQueueFactory_InvalidQueueName);
+            .WithMessageLike(Resources.MessageBusTopicMessageIdFactory_InvalidTopicName);
     }
 
     [Fact]
     public void WhenCreateAndQueueNameIsTooLong_ThenThrows()
     {
         _factory
-            .Invoking(x => x.Create(new string('a', MessageQueueIdFactory.MaxQueueName + 1)))
+            .Invoking(x => x.Create(new string('a', MessageBusTopicMessageIdFactory.MaxTopicName + 1)))
             .Should().Throw<ArgumentOutOfRangeException>()
-            .WithMessageLike(Resources.MessageQueueFactory_InvalidQueueName);
+            .WithMessageLike(Resources.MessageBusTopicMessageIdFactory_InvalidTopicName);
+    }
+
+    [Fact]
+    public void WhenCreateAndQueueNameIsUnderscored_ThenCreates()
+    {
+        var result = _factory.Create("a_name");
+
+        result.Should().StartWith("a_name_");
     }
 
     [Fact]

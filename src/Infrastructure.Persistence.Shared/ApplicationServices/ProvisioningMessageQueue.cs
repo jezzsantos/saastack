@@ -12,9 +12,10 @@ public class ProvisioningMessageQueue : IProvisioningMessageQueue
 {
     private readonly MessageQueueStore<ProvisioningMessage> _messageQueue;
 
-    public ProvisioningMessageQueue(IRecorder recorder, IMessageQueueIdFactory messageQueueIdFactory, IQueueStore store)
+    public ProvisioningMessageQueue(IRecorder recorder, IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
+        IQueueStore store)
     {
-        _messageQueue = new MessageQueueStore<ProvisioningMessage>(recorder, messageQueueIdFactory, store);
+        _messageQueue = new MessageQueueStore<ProvisioningMessage>(recorder, messageQueueMessageIdFactory, store);
     }
 
 #if TESTINGONLY

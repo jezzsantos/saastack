@@ -311,7 +311,7 @@ public class EmailDeliverRootSpec
 
     private static QueuedMessageId CreateMessageId()
     {
-        var messageId = new MessageQueueIdFactory().Create("aqueuename");
+        var messageId = new MessageQueueMessageIdFactory().Create("aqueuename");
         return QueuedMessageId.Create(messageId).Value;
     }
 }

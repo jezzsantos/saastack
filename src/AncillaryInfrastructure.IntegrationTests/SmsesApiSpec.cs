@@ -381,7 +381,7 @@ public class SmsesApiSpec : WebApiSpec<Program>
 
     private static string CreateMessageId()
     {
-        return new MessageQueueIdFactory().Create("sms");
+        return new MessageQueueMessageIdFactory().Create("sms");
     }
 
     private static void OverrideDependencies(IServiceCollection services)

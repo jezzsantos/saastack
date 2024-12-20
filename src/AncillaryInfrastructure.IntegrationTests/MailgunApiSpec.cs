@@ -222,6 +222,6 @@ public class MailgunApiSpec : WebApiSpec<Program>
 
     private static string CreateMessageId()
     {
-        return new MessageQueueIdFactory().Create("email");
+        return new MessageQueueMessageIdFactory().Create("email");
     }
 }

@@ -19,8 +19,10 @@ public class AsynchronousQueueConsumerRelay : IDomainEventConsumerRelay
 {
     private readonly IDomainEventingMessageBusTopic _messageBusTopic;
 
-    public AsynchronousQueueConsumerRelay(IRecorder recorder, IMessageQueueIdFactory messageQueueIdFactory,
-        IMessageBusStore store) : this(new DomainEventingMessageBusTopic(recorder, messageQueueIdFactory, store))
+    public AsynchronousQueueConsumerRelay(IRecorder recorder,
+        IMessageBusTopicMessageIdFactory messageBusTopicMessageIdFactory,
+        IMessageBusStore store) : this(
+        new DomainEventingMessageBusTopic(recorder, messageBusTopicMessageIdFactory, store))
     {
     }
 

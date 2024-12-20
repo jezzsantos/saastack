@@ -37,6 +37,6 @@ public class QueuedMessageIdSpec
 
     private static string CreateMessageId()
     {
-        return new MessageQueueIdFactory().Create("aqueuename");
+        return new MessageQueueMessageIdFactory().Create("aqueuename");
     }
 }

@@ -616,6 +616,6 @@ public class AncillaryApplicationEmailingSpec
 
     private static string CreateMessageId()
     {
-        return new MessageQueueIdFactory().Create("aqueuename");
+        return new MessageQueueMessageIdFactory().Create("aqueuename");
     }
 }

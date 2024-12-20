@@ -41,7 +41,7 @@ public class EventNotificationsModule : ISubdomainModule
             {
                 services.AddSingleton<IDomainEventingMessageBusTopic>(c =>
                     new DomainEventingMessageBusTopic(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IMessageQueueIdFactory>(),
+                        c.GetRequiredService<IMessageBusTopicMessageIdFactory>(),
                         c.GetRequiredServiceForPlatform<IMessageBusStore>()));
                 services.AddSingleton<IDomainEventingSubscriber>(c =>
                     new ApiHostDomainEventingSubscriber(

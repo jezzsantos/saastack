@@ -382,11 +382,11 @@ public static class HostExtensions
             {
                 services.AddSingleton<IEmailMessageQueue>(c =>
                     new EmailMessageQueue(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IMessageQueueIdFactory>(),
+                        c.GetRequiredService<IMessageQueueMessageIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services.AddSingleton<ISmsMessageQueue>(c =>
                     new SmsMessageQueue(c.GetRequiredService<IRecorder>(),
-                        c.GetRequiredService<IMessageQueueIdFactory>(),
+                        c.GetRequiredService<IMessageQueueMessageIdFactory>(),
                         c.GetRequiredServiceForPlatform<IQueueStore>()));
                 services.AddSingleton<IEmailSchedulingService, QueuingEmailSchedulingService>();
                 services.AddSingleton<ISmsSchedulingService, QueuingSmsSchedulingService>();
@@ -475,7 +475,8 @@ public static class HostExtensions
                     c.GetRequiredServiceForPlatform<IDependencyContainer>(), domainAssemblies));
             }
 
-            services.AddSingleton<IMessageQueueIdFactory, MessageQueueIdFactory>();
+            services.AddSingleton<IMessageQueueMessageIdFactory, MessageQueueMessageIdFactory>();
+            services.AddSingleton<IMessageBusTopicMessageIdFactory, MessageBusTopicMessageIdFactory>();
             services.AddSingleton<IEventSourcedChangeEventMigrator, ChangeEventTypeMigrator>();
 
 #if TESTINGONLY

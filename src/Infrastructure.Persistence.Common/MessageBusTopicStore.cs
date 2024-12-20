@@ -13,16 +13,17 @@ public sealed class MessageBusTopicStore<TMessage> : IMessageBusTopicStore<TMess
     where TMessage : IQueuedMessage, new()
 {
     private readonly IMessageBusStore _messageBusStore;
-    private readonly IMessageQueueIdFactory _messageQueueIdFactory;
+    private readonly IMessageBusTopicMessageIdFactory _messageBusTopicMessageIdFactory;
     private readonly IRecorder _recorder;
     private readonly string _topicName;
 
-    public MessageBusTopicStore(IRecorder recorder, string topicName, IMessageQueueIdFactory messageQueueIdFactory,
+    public MessageBusTopicStore(IRecorder recorder, string topicName,
+        IMessageBusTopicMessageIdFactory messageBusTopicMessageIdFactory,
         IMessageBusStore messageBusStore)
     {
         InstanceId = Guid.NewGuid();
         _recorder = recorder;
-        _messageQueueIdFactory = messageQueueIdFactory;
+        _messageBusTopicMessageIdFactory = messageBusTopicMessageIdFactory;
         _messageBusStore = messageBusStore;
         _topicName = topicName;
     }
@@ -68,9 +69,8 @@ public sealed class MessageBusTopicStore<TMessage> : IMessageBusTopicStore<TMess
                         return handled.Error;
                     }
 
-                    _recorder.TraceDebug(null, "Message {Text} was removed from the queue {Queue} in the {Store} store",
-                        messageAsText,
-                        _topicName, _messageBusStore.GetType().Name);
+                    _recorder.TraceDebug(null, "Message {Text} was removed from the topic {Topic} in the {Store} store",
+                        messageAsText, _topicName, _messageBusStore.GetType().Name);
                 }
 
                 return Result.Ok;
@@ -99,7 +99,7 @@ public sealed class MessageBusTopicStore<TMessage> : IMessageBusTopicStore<TMess
             return pushed.Error;
         }
 
-        _recorder.TraceDebug(null, "Message {Message} was added to the queue {Queue} in the {Store} store", messageJson,
+        _recorder.TraceDebug(null, "Message {Message} was added to the queue {Topic} in the {Store} store", messageJson,
             _topicName, _messageBusStore.GetType().Name);
 
         return message;
@@ -107,6 +107,6 @@ public sealed class MessageBusTopicStore<TMessage> : IMessageBusTopicStore<TMess
 
     private string CreateMessageId()
     {
-        return _messageQueueIdFactory.Create(_topicName);
+        return _messageBusTopicMessageIdFactory.Create(_topicName);
     }
 }

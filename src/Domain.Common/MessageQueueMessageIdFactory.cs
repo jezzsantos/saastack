@@ -8,14 +8,14 @@ namespace Domain.Common;
 /// <summary>
 ///     Provides a factory for creating identifiers for queued messages
 /// </summary>
-public class MessageQueueIdFactory : IMessageQueueIdFactory
+public class MessageQueueMessageIdFactory : IMessageQueueMessageIdFactory
 {
-    public static readonly int MaxQueueName = CommonValidations.MessageQueues.Ids.MaxPrefixLength;
+    public static readonly int MaxQueueName = CommonValidations.Messaging.Ids.MaxPrefixLength;
 
     public string Create(string queueName)
     {
-        queueName.ThrowIfInvalidParameter(CommonValidations.MessageQueues.Ids.Prefix, nameof(queueName),
-            Resources.MessageQueueFactory_InvalidQueueName);
+        queueName.ThrowIfInvalidParameter(CommonValidations.Messaging.Ids.QueueName, nameof(queueName),
+            Resources.MessageQueueMessageIdFactory_InvalidQueueName);
 
         return $"{queueName.ToLowerInvariant()}_{Guid.NewGuid():N}";
     }
@@ -24,6 +24,6 @@ public class MessageQueueIdFactory : IMessageQueueIdFactory
     {
         id.ThrowIfNotValuedParameter(nameof(id));
 
-        return CommonValidations.MessageQueues.Ids.Id.Matches(id);
+        return CommonValidations.Messaging.Ids.MessageId.Matches(id);
     }
 }

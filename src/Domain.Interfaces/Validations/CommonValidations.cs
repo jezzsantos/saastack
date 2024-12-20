@@ -138,18 +138,20 @@ public static class CommonValidations
         return false;
     }
 
-    public static class MessageQueues
+    public static class Messaging
     {
         public static class Ids
         {
-            public const int MaxPrefixLength = 20;
-            public const int MinPrefixLength = 2;
-            public const int RandomLength = 32;
-            public static readonly Validation Id =
-                new($@"^[\w]{{{MinPrefixLength},{MaxPrefixLength}}}_[0-9a-f]{{{RandomLength}}}$",
-                    MinPrefixLength + 1 + RandomLength, MaxPrefixLength + 1 + RandomLength);
-
-            public static readonly Validation Prefix = new($@"^[\w]{{{MinPrefixLength},{MaxPrefixLength}}}$",
+            public const int MaxPrefixLength = 100;
+            private const int IdLength = 32;
+            private const int MinPrefixLength = 2;
+            public static readonly Validation MessageId =
+                new($@"^[a-zA-Z0-9_\-]{{{MinPrefixLength},{MaxPrefixLength}}}_[0-9a-f]{{{IdLength}}}$",
+                    MinPrefixLength + 1 + IdLength, MaxPrefixLength + 1 + IdLength);
+            public static readonly Validation QueueName = new(
+                $@"^[a-zA-Z0-9\-]{{{MinPrefixLength},{MaxPrefixLength}}}$",
+                MinPrefixLength, MaxPrefixLength);
+            public static readonly Validation TopicName = new($@"^[a-zA-Z0-9_]{{{MinPrefixLength},{MaxPrefixLength}}}$",
                 MinPrefixLength, MaxPrefixLength);
         }
     }

@@ -13,11 +13,12 @@ public class DomainEventingMessageBusTopic : IDomainEventingMessageBusTopic
 {
     private readonly MessageBusTopicStore<DomainEventingMessage> _messageBusTopic;
 
-    public DomainEventingMessageBusTopic(IRecorder recorder, IMessageQueueIdFactory messageQueueIdFactory,
+    public DomainEventingMessageBusTopic(IRecorder recorder,
+        IMessageBusTopicMessageIdFactory messageBusTopicMessageIdFactory,
         IMessageBusStore store)
     {
         _messageBusTopic = new MessageBusTopicStore<DomainEventingMessage>(recorder,
-            EventingConstants.Topics.DomainEvents, messageQueueIdFactory, store);
+            EventingConstants.Topics.DomainEvents, messageBusTopicMessageIdFactory, store);
     }
 
 #if TESTINGONLY

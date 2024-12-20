@@ -444,6 +444,6 @@ public class AncillaryApplicationSmsingSpec
 
     private static string CreateMessageId()
     {
-        return new MessageQueueIdFactory().Create("aqueuename");
+        return new MessageQueueMessageIdFactory().Create("aqueuename");
     }
 }

@@ -20,7 +20,7 @@ public class MessageQueueStoreSpec
     {
         var recorder = new Mock<IRecorder>();
         _queueStore = new Mock<IQueueStore>();
-        var messageQueueIdFactory = new Mock<IMessageQueueIdFactory>();
+        var messageQueueIdFactory = new Mock<IMessageQueueMessageIdFactory>();
         messageQueueIdFactory.Setup(mqif => mqif.Create(It.IsAny<string>()))
             .Returns("anid");
 

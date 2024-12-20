@@ -132,11 +132,20 @@ namespace Domain.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The name of the topic is invalid.
+        /// </summary>
+        internal static string MessageBusTopicMessageIdFactory_InvalidTopicName {
+            get {
+                return ResourceManager.GetString("MessageBusTopicMessageIdFactory_InvalidTopicName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The name of the queue is invalid.
         /// </summary>
-        internal static string MessageQueueFactory_InvalidQueueName {
+        internal static string MessageQueueMessageIdFactory_InvalidQueueName {
             get {
-                return ResourceManager.GetString("MessageQueueFactory_InvalidQueueName", resourceCulture);
+                return ResourceManager.GetString("MessageQueueMessageIdFactory_InvalidQueueName", resourceCulture);
             }
         }
     }

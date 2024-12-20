@@ -428,7 +428,7 @@ public class EmailsApiSpec : WebApiSpec<Program>
 
     private static string CreateMessageId()
     {
-        return new MessageQueueIdFactory().Create("email");
+        return new MessageQueueMessageIdFactory().Create("email");
     }
 
     private static void OverrideDependencies(IServiceCollection services)

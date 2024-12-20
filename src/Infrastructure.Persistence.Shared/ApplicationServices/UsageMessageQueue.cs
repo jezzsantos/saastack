@@ -12,9 +12,10 @@ public class UsageMessageQueue : IUsageMessageQueue
 {
     private readonly MessageQueueStore<UsageMessage> _messageQueue;
 
-    public UsageMessageQueue(IRecorder recorder, IMessageQueueIdFactory messageQueueIdFactory, IQueueStore store)
+    public UsageMessageQueue(IRecorder recorder, IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
+        IQueueStore store)
     {
-        _messageQueue = new MessageQueueStore<UsageMessage>(recorder, messageQueueIdFactory, store);
+        _messageQueue = new MessageQueueStore<UsageMessage>(recorder, messageQueueMessageIdFactory, store);
     }
 
 #if TESTINGONLY

@@ -12,10 +12,10 @@ public class AuditMessageQueueRepository : IAuditMessageQueueRepository
 {
     private readonly MessageQueueStore<AuditMessage> _messageQueue;
 
-    public AuditMessageQueueRepository(IRecorder recorder, IMessageQueueIdFactory messageQueueIdFactory,
+    public AuditMessageQueueRepository(IRecorder recorder, IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
         IQueueStore store)
     {
-        _messageQueue = new MessageQueueStore<AuditMessage>(recorder, messageQueueIdFactory, store);
+        _messageQueue = new MessageQueueStore<AuditMessage>(recorder, messageQueueMessageIdFactory, store);
     }
 
 #if TESTINGONLY

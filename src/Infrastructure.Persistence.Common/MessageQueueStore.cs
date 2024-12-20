@@ -13,16 +13,17 @@ namespace Infrastructure.Persistence.Common;
 public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
     where TMessage : IQueuedMessage, new()
 {
-    private readonly IMessageQueueIdFactory _messageQueueIdFactory;
+    private readonly IMessageQueueMessageIdFactory _messageQueueMessageIdFactory;
     private readonly string _queueName;
     private readonly IQueueStore _queueStore;
     private readonly IRecorder _recorder;
 
-    public MessageQueueStore(IRecorder recorder, IMessageQueueIdFactory messageQueueIdFactory, IQueueStore queueStore)
+    public MessageQueueStore(IRecorder recorder, IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
+        IQueueStore queueStore)
     {
         InstanceId = Guid.NewGuid();
         _recorder = recorder;
-        _messageQueueIdFactory = messageQueueIdFactory;
+        _messageQueueMessageIdFactory = messageQueueMessageIdFactory;
         _queueStore = queueStore;
         _queueName = typeof(TMessage).GetEntityNameSafe();
     }
@@ -104,6 +105,6 @@ public sealed class MessageQueueStore<TMessage> : IMessageQueueStore<TMessage>
 
     private string CreateMessageId()
     {
-        return _messageQueueIdFactory.Create(_queueName);
+        return _messageQueueMessageIdFactory.Create(_queueName);
     }
 }

@@ -12,9 +12,10 @@ public class EmailMessageQueue : IEmailMessageQueue
 {
     private readonly MessageQueueStore<EmailMessage> _messageQueue;
 
-    public EmailMessageQueue(IRecorder recorder, IMessageQueueIdFactory messageQueueIdFactory, IQueueStore store)
+    public EmailMessageQueue(IRecorder recorder, IMessageQueueMessageIdFactory messageQueueMessageIdFactory,
+        IQueueStore store)
     {
-        _messageQueue = new MessageQueueStore<EmailMessage>(recorder, messageQueueIdFactory, store);
+        _messageQueue = new MessageQueueStore<EmailMessage>(recorder, messageQueueMessageIdFactory, store);
     }
 
 #if TESTINGONLY
