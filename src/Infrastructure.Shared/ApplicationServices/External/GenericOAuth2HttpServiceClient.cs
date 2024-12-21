@@ -4,8 +4,8 @@ using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
 using Common.Extensions;
+using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.OAuth2;
-using Infrastructure.Web.Interfaces.Clients;
 
 namespace Infrastructure.Shared.ApplicationServices.External;
 

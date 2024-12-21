@@ -8,14 +8,15 @@ using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Common.Extensions;
-using Infrastructure.Web.Interfaces.Clients;
+using Infrastructure.Web.Interfaces;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using JsonException = System.Text.Json.JsonException;
 using Task = System.Threading.Tasks.Task;
 
-namespace Infrastructure.Web.Common.Clients;
+namespace Infrastructure.Web.Api.Common.Clients;
 
 /// <summary>
 ///     Provides a convenient typed <see cref="HttpClient" /> that accepts and returns JSON
@@ -644,6 +645,10 @@ public class JsonClient : IHttpJsonClient, IDisposable
     }
 }
 
+/// <summary>
+///     Defines non-standard 3rd party errors
+///     Note: We are attempting to model all possible error formats we have encountered in the wild
+/// </summary>
 [UsedImplicitly]
 internal class NonStandardProblemDetails
 {
@@ -654,6 +659,10 @@ internal class NonStandardProblemDetails
     [JsonPropertyName("status")] public int? Status { get; set; }
 }
 
+/// <summary>
+///     Defines a non-standard 3rd party error
+///     Note: We are attempting to model all possible error formats we have encountered in the wild
+/// </summary>
 [UsedImplicitly]
 internal class NonStandardProblemError
 {

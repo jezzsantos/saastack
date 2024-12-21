@@ -1,12 +1,13 @@
 using System.Net;
+using ApiHost1;
 using Application.Resources.Shared;
 using CarsDomain;
 using Common.Extensions;
 using FluentAssertions;
-using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.IntegrationTests.Stubs;
 using Infrastructure.Web.Api.Operations.Shared.Cars;
 using Infrastructure.Web.Api.Operations.Shared.Organizations;
+using Infrastructure.Web.Common.Extensions;
 using Infrastructure.Web.Hosting.Common;
 using IntegrationTesting.WebApi.Common;
 using JetBrains.Annotations;
@@ -30,9 +31,9 @@ public class MultiTenancySpec
 {
     [Trait("Category", "Integration.API")]
     [Collection("API")]
-    public class GivenSamePhysicalStorage : WebApiSpec<ApiHost1.Program>
+    public class GivenSamePhysicalStorage : WebApiSpec<Program>
     {
-        public GivenSamePhysicalStorage(WebApiSetup<ApiHost1.Program> setup) : base(setup, OverrideDependencies)
+        public GivenSamePhysicalStorage(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
         {
             EmptyAllRepositories();
         }
@@ -79,9 +80,9 @@ public class MultiTenancySpec
 
     [Trait("Category", "Integration.API")]
     [Collection("API")]
-    public class GivenDifferentPhysicalStorage : WebApiSpec<ApiHost1.Program>
+    public class GivenDifferentPhysicalStorage : WebApiSpec<Program>
     {
-        public GivenDifferentPhysicalStorage(WebApiSetup<ApiHost1.Program> setup) : base(setup, OverrideDependencies)
+        public GivenDifferentPhysicalStorage(WebApiSetup<Program> setup) : base(setup, OverrideDependencies)
         {
             EmptyAllRepositories();
             DeleteAllPreviousTenants(StubTenantSettingsService.GetRepositoryPath(null));

@@ -1,20 +1,20 @@
 #if TESTINGONLY
-     using ApiHost1;
+using ApiHost1;
 using Common.Extensions;
 using FluentAssertions;
 using HtmlAgilityPack;
 using Infrastructure.Hosting.Common;
-using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
-using Infrastructure.Web.Common;
 using Infrastructure.Web.Hosting.Common.Auth;
 using Infrastructure.Web.Hosting.Common.Documentation;
+using Infrastructure.Web.Interfaces;
 using IntegrationTesting.WebApi.Common;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 using Xunit;
+using Resources = Infrastructure.Web.Interfaces.Resources;
 
 namespace Infrastructure.Web.Api.IntegrationTests;
 

@@ -1,8 +1,9 @@
 using System.Text.Json;
 using Common;
 using Common.Extensions;
-using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Common.Extensions;
+using Infrastructure.Web.Interfaces;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -12,7 +13,7 @@ namespace Infrastructure.Web.Api.Common;
 /// <summary>
 ///     Provides a detective that determines the tenant of the request from data within the request,
 ///     from one of these sources:
-///     1. The <see cref="HttpConstants.Headers.Tenant" /> header.
+///     1. The <see cref="Infrastructure.Web.Interfaces.HttpConstants.Headers.Tenant" /> header.
 ///     2. For tenanted requests, <see cref="ITenantedRequest.OrganizationId" /> field in the route, querystring or body,
 ///     3. For untenanted org requests, <see cref="IUnTenantedOrganizationRequest.Id" /> field in the route, querystring or
 ///     body,
@@ -159,7 +160,7 @@ public class RequestTenantDetective : ITenantDetective
             }
         }
 
-        var couldHaveBody = new HttpMethod(request.Method).CanHaveBody();
+        var couldHaveBody = request.CanHaveBody();
         if (couldHaveBody)
         {
             var (found, tenantIdFromRequestBody) =

@@ -1,4 +1,4 @@
-using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 
 namespace Infrastructure.Web.Hosting.Common.Pipeline;
 

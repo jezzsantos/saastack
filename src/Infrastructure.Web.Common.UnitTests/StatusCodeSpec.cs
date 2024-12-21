@@ -1,10 +1,10 @@
 using System.Net;
 using Common;
 using FluentAssertions;
-using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 using Xunit;
 
-namespace Infrastructure.Web.Api.Common.UnitTests;
+namespace Infrastructure.Web.Common.UnitTests;
 
 [Trait("Category", "Unit")]
 public class StatusCodeSpec

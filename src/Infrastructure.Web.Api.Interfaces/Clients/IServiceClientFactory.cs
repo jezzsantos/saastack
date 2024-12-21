@@ -1,4 +1,4 @@
-namespace Infrastructure.Web.Interfaces.Clients;
+namespace Infrastructure.Web.Api.Interfaces.Clients;
 
 /// <summary>
 ///     Defines a factory for creating service clients for calling remote APIs

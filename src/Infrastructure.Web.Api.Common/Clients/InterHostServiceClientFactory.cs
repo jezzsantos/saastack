@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Infrastructure.Web.Interfaces.Clients;
+using Infrastructure.Web.Api.Interfaces.Clients;
 
-namespace Infrastructure.Web.Common.Clients;
+namespace Infrastructure.Web.Api.Common.Clients;
 
 /// <summary>
 ///     A factory of <see cref="InterHostServiceClient" /> connected to a remote host.

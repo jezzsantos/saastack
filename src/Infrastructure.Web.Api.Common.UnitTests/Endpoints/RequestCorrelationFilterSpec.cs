@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Endpoints;
-using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Xunit;
 

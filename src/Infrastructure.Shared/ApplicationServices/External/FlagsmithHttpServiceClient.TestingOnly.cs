@@ -1,8 +1,8 @@
 #if TESTINGONLY
 
-using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.Flagsmith;
-using Infrastructure.Web.Interfaces.Clients;
+using Infrastructure.Web.Interfaces;
 using Flag = Common.FeatureFlags.Flag;
 
 namespace Infrastructure.Shared.ApplicationServices.External;

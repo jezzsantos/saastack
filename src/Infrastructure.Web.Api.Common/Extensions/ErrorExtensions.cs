@@ -1,6 +1,6 @@
 using Common;
 using Common.Extensions;
-using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -22,7 +22,7 @@ public static class ErrorExtensions
     }
 
     /// <summary>
-    ///     Converts the <see cref="Error" /> to a <see cref="Infrastructure.Web.Api.Interfaces.HttpError" />
+    ///     Converts the <see cref="Error" /> to a <see cref="HttpError" />
     /// </summary>
     private static HttpError ToHttpError(this Error error)
     {

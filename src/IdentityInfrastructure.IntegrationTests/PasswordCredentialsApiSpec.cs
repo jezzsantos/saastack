@@ -10,9 +10,9 @@ using IdentityApplication;
 using IdentityDomain;
 using Infrastructure.Interfaces;
 using Infrastructure.Shared.DomainServices;
-using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
+using Infrastructure.Web.Common.Extensions;
 using IntegrationTesting.WebApi.Common;
 using IntegrationTesting.WebApi.Common.Stubs;
 using Microsoft.Extensions.DependencyInjection;
@@ -135,7 +135,7 @@ public class PasswordCredentialsApiSpec : WebApiSpec<Program>
         var login = await LoginUserAsync();
         await Api.PutAsync(new ChangePasswordMfaForCallerRequest
         {
-            IsEnabled = true,
+            IsEnabled = true
         }, req => req.SetJWTBearerToken(login.AccessToken));
 
         var result = await Api.PostAsync(new AuthenticatePasswordRequest

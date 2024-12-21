@@ -5,7 +5,7 @@ using Application.Services.Shared;
 using Common;
 using Infrastructure.Common.Extensions;
 using Infrastructure.Interfaces;
-using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Common.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

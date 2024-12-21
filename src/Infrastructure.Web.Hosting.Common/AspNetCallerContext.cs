@@ -7,7 +7,7 @@ using Domain.Interfaces;
 using Infrastructure.Common.Extensions;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common.Endpoints;
-using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Common.Extensions;
 using Infrastructure.Web.Hosting.Common.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

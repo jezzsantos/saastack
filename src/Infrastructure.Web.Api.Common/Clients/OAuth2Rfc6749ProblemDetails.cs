@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 
-namespace Infrastructure.Web.Common.Clients;
+namespace Infrastructure.Web.Api.Common.Clients;
 
 /// <summary>
 ///     Defines an OAuth2 error, from <see href="https://datatracker.ietf.org/doc/html/rfc6749#section-5.2">RFC6749</see>

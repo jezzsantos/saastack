@@ -6,7 +6,7 @@ using Domain.Common.ValueObjects;
 using Domain.Interfaces.Entities;
 using EventStore.Client;
 using Infrastructure.Persistence.Interfaces;
-using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 
 namespace Infrastructure.Persistence.Kurrent.ApplicationServices;
 

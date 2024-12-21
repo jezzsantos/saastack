@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Infrastructure.Web.Api.Common.Extensions;
-using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Common.Extensions;
+using Infrastructure.Web.Interfaces;
 using Xunit;
 
 namespace Infrastructure.Web.Api.Common.UnitTests.Extensions;

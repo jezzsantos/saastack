@@ -8,6 +8,7 @@ using FluentAssertions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 using Infrastructure.Web.Api.Operations.Shared.Organizations;
+using Infrastructure.Web.Common.Extensions;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;

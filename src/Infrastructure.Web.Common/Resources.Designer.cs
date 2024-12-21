@@ -60,29 +60,11 @@ namespace Infrastructure.Web.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unsupported media type in response: {0}.
+        ///   Looks up a localized string similar to HMAC authorization cannot be relayed as an authorization method.
         /// </summary>
-        internal static string JsonClient_GetTypedResponse_UnsupportedMediaType {
+        internal static string HttpRequestExtensions_HMACAuthorizationNotSupported {
             get {
-                return ResourceManager.GetString("JsonClient_GetTypedResponse_UnsupportedMediaType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An empty instance of &apos;{0}&apos; could not be created, likely due to the fact that it does not have a default parameterless constructor or it has properties that require initialization at construction time. More details: {1}.
-        /// </summary>
-        internal static string JsonClient_TryCreateEmptyResponse_NotConstructable {
-            get {
-                return ResourceManager.GetString("JsonClient_TryCreateEmptyResponse_NotConstructable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Non-standard error.
-        /// </summary>
-        internal static string JsonClient_TryParseNonStandardErrors_NonStandard {
-            get {
-                return ResourceManager.GetString("JsonClient_TryParseNonStandardErrors_NonStandard", resourceCulture);
+                return ResourceManager.GetString("HttpRequestExtensions_HMACAuthorizationNotSupported", resourceCulture);
             }
         }
     }

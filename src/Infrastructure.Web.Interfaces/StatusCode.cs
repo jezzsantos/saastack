@@ -1,7 +1,7 @@
 using System.Net;
 using Common;
 
-namespace Infrastructure.Web.Api.Interfaces;
+namespace Infrastructure.Web.Interfaces;
 
 /// <summary>
 ///     An HTTP status code

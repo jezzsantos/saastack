@@ -10,6 +10,7 @@ using IdentityInfrastructure.ApplicationServices;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
+using Infrastructure.Web.Common.Extensions;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
 

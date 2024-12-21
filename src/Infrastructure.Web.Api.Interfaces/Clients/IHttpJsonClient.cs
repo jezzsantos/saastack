@@ -1,6 +1,4 @@
-using Infrastructure.Web.Api.Interfaces;
-
-namespace Infrastructure.Web.Interfaces.Clients;
+namespace Infrastructure.Web.Api.Interfaces.Clients;
 
 /// <summary>
 ///     Defines a JSON <see cref="HttpClient" />
@@ -58,4 +56,7 @@ public interface IHttpJsonClient
         Action<HttpRequestMessage>? requestFilter = null, CancellationToken? cancellationToken = default);
 }
 
+/// <summary>
+///     Defines a file that has been POSTed to an endpoint
+/// </summary>
 public record PostFile(Stream Stream, string ContentType, string PartName = "file", string? Filename = null);

@@ -2,6 +2,7 @@ using Application.Resources.Shared;
 using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 
 namespace Infrastructure.Web.Api.Common;
 

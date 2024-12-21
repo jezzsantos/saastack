@@ -4,9 +4,10 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Common.Extensions;
 using FluentAssertions;
+using Infrastructure.Web.Api.Common.Clients;
 using Infrastructure.Web.Api.Interfaces;
-using Infrastructure.Web.Common.Clients;
-using Infrastructure.Web.Interfaces.Clients;
+using Infrastructure.Web.Api.Interfaces.Clients;
+using Infrastructure.Web.Interfaces;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -14,7 +15,7 @@ using Moq.Protected;
 using Xunit;
 using HttpClient = System.Net.Http.HttpClient;
 
-namespace Infrastructure.Web.Common.UnitTests.Clients;
+namespace Infrastructure.Web.Api.Common.UnitTests.Clients;
 
 [UsedImplicitly]
 public class JsonClientSpec
@@ -1130,7 +1131,7 @@ public class JsonClientSpec
     }
 }
 
-[Api.Interfaces.Route("/test", OperationMethod.Get)]
+[Interfaces.Route("/test", OperationMethod.Get)]
 public class TestRequest : WebRequest<TestRequest>
 {
     [FromQuery] public string[]? AnArrayProperty { get; set; }
@@ -1138,13 +1139,13 @@ public class TestRequest : WebRequest<TestRequest>
     public string AProperty { get; set; } = "avalue";
 }
 
-[Api.Interfaces.Route("/test", OperationMethod.Post)]
+[Interfaces.Route("/test", OperationMethod.Post)]
 public class TestMultiPartFormDataRequest : WebRequest<TestRequest>, IHasMultipartFormData
 {
     public string AProperty { get; set; } = "avalue";
 }
 
-[Api.Interfaces.Route("/test", OperationMethod.Post)]
+[Interfaces.Route("/test", OperationMethod.Post)]
 public class TestFormUrlEncodedRequest : WebRequest<TestRequest>, IHasFormUrlEncoded
 {
     public string AProperty { get; set; } = "avalue";

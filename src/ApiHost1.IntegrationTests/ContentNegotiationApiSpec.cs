@@ -1,8 +1,8 @@
 #if TESTINGONLY
 using System.Net;
 using FluentAssertions;
-using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
+using Infrastructure.Web.Interfaces;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
 

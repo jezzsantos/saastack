@@ -5,8 +5,8 @@ using Common;
 using Common.Extensions;
 using Infrastructure.Interfaces;
 using Infrastructure.Web.Api.Common.Extensions;
-using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.Extensions;
+using Infrastructure.Web.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Web.Hosting.Common.Pipeline;

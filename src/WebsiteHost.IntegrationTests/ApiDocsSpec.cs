@@ -1,7 +1,7 @@
 using FluentAssertions;
 using HtmlAgilityPack;
 using Infrastructure.Hosting.Common;
-using Infrastructure.Web.Common;
+using Infrastructure.Web.Interfaces;
 using IntegrationTesting.WebApi.Common;
 using IntegrationTesting.Website.Common;
 using Xunit;

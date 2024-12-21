@@ -1,6 +1,7 @@
 using System.Net;
 using FluentValidation.Results;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Infrastructure.Web.Api.Common.Extensions;

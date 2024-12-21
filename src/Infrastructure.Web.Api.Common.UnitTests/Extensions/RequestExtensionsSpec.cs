@@ -2,6 +2,7 @@ using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 using Xunit;
 
 // ReSharper disable UnusedMember.Local
@@ -12,6 +13,30 @@ namespace Infrastructure.Web.Api.Common.UnitTests.Extensions;
 [Trait("Category", "Unit")]
 public class RequestExtensionsSpec
 {
+    [Fact]
+    public void WhenSetHmacAuthWithEmptyRequest_ThenSetsSignatureHeader()
+    {
+        var request = new TestEmptyRequest();
+        var message = new HttpRequestMessage();
+
+        message.SetHMACAuth(request, "asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
+            hdr == "sha256=f8dbae1fc1114a368a46f762db4a5ad5417e0e1ea4bc34d7924d166621c45653");
+    }
+
+    [Fact]
+    public void WhenSetHmacAuthWithPopulatedRequest_ThenSetsSignatureHeader()
+    {
+        var request = new TestPopulatedRequest();
+        var message = new HttpRequestMessage();
+
+        message.SetHMACAuth(request, "asecret");
+
+        message.Headers.GetValues(HttpConstants.Headers.HMACSignature).Should().OnlyContain(hdr =>
+            hdr == "sha256=efab63816eb3c3ab799dfd64e717865116f7aa1547177293ec6598fe3cc8e3de");
+    }
+
     [Fact]
     public void WhenGetRequestInfoAndNoAttribute_ThenThrows()
     {
@@ -442,4 +467,11 @@ public class RequestExtensionsSpec
 
         public string? Id { get; set; }
     }
+
+    private class TestPopulatedRequest : IWebRequest
+    {
+        public string AProperty => "avalue";
+    }
+
+    private class TestEmptyRequest : IWebRequest;
 }

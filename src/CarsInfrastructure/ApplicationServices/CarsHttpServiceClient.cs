@@ -2,9 +2,9 @@ using Application.Interfaces;
 using Application.Resources.Shared;
 using Application.Services.Shared;
 using Common;
+using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Api.Operations.Shared.Cars;
-using Infrastructure.Web.Common.Extensions;
-using Infrastructure.Web.Interfaces.Clients;
 
 namespace CarsInfrastructure.ApplicationServices;
 

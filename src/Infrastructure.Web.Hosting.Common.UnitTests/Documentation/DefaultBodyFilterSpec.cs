@@ -4,6 +4,7 @@ using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.Documentation;
+using Infrastructure.Web.Interfaces;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;

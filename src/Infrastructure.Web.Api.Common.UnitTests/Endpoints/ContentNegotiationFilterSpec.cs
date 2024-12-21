@@ -4,7 +4,7 @@ using Common.Extensions;
 using FluentAssertions;
 using Infrastructure.Web.Api.Common.Endpoints;
 using Infrastructure.Web.Api.Common.Pipeline;
-using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;

@@ -27,8 +27,14 @@
     <data name="RequestExtensions_MissingRouteAttribute" xml:space="preserve">
         <value>The request DTO type '{0}' is missing a '{1}' declared on the class</value>
     </data>
-    <data name="HttpRequestExtensions_HMACAuthorizationNotSupported" xml:space="preserve">
-        <value>HMAC authorization cannot be relayed as an authorization method</value>
+    <data name="JsonClient_GetTypedResponse_UnsupportedMediaType" xml:space="preserve">
+        <value>Unsupported media type in response: {0}</value>
+    </data>
+    <data name="JsonClient_TryCreateEmptyResponse_NotConstructable" xml:space="preserve">
+        <value>An empty instance of '{0}' could not be created, likely due to the fact that it does not have a default parameterless constructor or it has properties that require initialization at construction time. More details: {1}</value>
+    </data>
+    <data name="JsonClient_TryParseNonStandardErrors_NonStandard" xml:space="preserve">
+        <value>Non-standard error</value>
     </data>
     <data name="FileUploadService_NoFiles" xml:space="preserve">
         <value>There are no files to upload</value>

@@ -34,6 +34,7 @@ using Infrastructure.Web.Api.Common.Validation;
 using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Hosting.Common.Auth;
 using Infrastructure.Web.Hosting.Common.Documentation;
+using Infrastructure.Web.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;

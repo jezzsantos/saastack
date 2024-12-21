@@ -7,12 +7,12 @@ using Common.Extensions;
 using Infrastructure.Hosting.Common.Extensions;
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
 using Infrastructure.Persistence.Shared.ApplicationServices;
+using Infrastructure.Web.Api.Common.Clients;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
 using Infrastructure.Web.Api.Operations.Shared.EventNotifications;
-using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Hosting.Common;
-using Infrastructure.Web.Interfaces.Clients;
 using TestingStubApiHost.Api;
 using TestingStubApiHost.Workers;
 

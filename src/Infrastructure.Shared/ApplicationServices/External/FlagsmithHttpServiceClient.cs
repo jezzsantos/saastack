@@ -5,7 +5,7 @@ using Common.Extensions;
 using Common.FeatureFlags;
 using Domain.Interfaces;
 using Flagsmith;
-using Infrastructure.Web.Common.Clients;
+using Infrastructure.Web.Api.Common.Clients;
 using Flag = Common.FeatureFlags.Flag;
 
 namespace Infrastructure.Shared.ApplicationServices.External;

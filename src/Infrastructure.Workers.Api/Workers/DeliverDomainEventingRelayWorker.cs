@@ -2,8 +2,8 @@ using Application.Interfaces.Services;
 using Application.Persistence.Shared.ReadModels;
 using Common;
 using Common.Extensions;
+using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Api.Operations.Shared.EventNotifications;
-using Infrastructure.Web.Interfaces.Clients;
 using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Workers.Api.Workers;

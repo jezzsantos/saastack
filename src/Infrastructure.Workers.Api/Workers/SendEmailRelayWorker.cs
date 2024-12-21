@@ -3,17 +3,17 @@ using Application.Interfaces.Services;
 using Application.Persistence.Shared.ReadModels;
 using Common;
 using Common.Extensions;
+using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
-using Infrastructure.Web.Interfaces.Clients;
 using Task = System.Threading.Tasks.Task;
 
 namespace Infrastructure.Workers.Api.Workers;
 
 public sealed class SendEmailRelayWorker : IQueueMonitoringApiRelayWorker<EmailMessage>
 {
+    private readonly string _hmacSecret;
     private readonly IRecorder _recorder;
     private readonly IServiceClient _serviceClient;
-    private readonly string _hmacSecret;
 
     public SendEmailRelayWorker(IRecorder recorder, IHostSettings settings,
         IServiceClientFactory serviceClientFactory) : this(recorder, serviceClientFactory,

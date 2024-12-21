@@ -1,5 +1,5 @@
 using System.Net;
-using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 
 namespace Infrastructure.Web.Api.Common.Extensions;
 

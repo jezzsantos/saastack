@@ -35,6 +35,7 @@ public class ResultRecordingMiddleware
 
         // Log the outgoing response
         var httpResponse = context.Response;
+
         var statusCodeDescription = $"{httpResponse.StatusCode} - {(HttpStatusCode)httpResponse.StatusCode}";
         if (httpResponse.StatusCode >= 500)
         {

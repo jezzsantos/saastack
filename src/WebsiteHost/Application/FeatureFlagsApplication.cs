@@ -3,9 +3,8 @@ using Application.Interfaces.Services;
 using Common;
 using Common.FeatureFlags;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
-using Infrastructure.Web.Common.Extensions;
-using Infrastructure.Web.Interfaces.Clients;
 
 namespace WebsiteHost.Application;
 

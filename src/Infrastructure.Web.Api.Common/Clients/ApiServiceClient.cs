@@ -4,10 +4,10 @@ using Application.Interfaces;
 using Common;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
-using Infrastructure.Web.Interfaces.Clients;
+using Infrastructure.Web.Api.Interfaces.Clients;
 using Polly.Retry;
 
-namespace Infrastructure.Web.Common.Clients;
+namespace Infrastructure.Web.Api.Common.Clients;
 
 /// <summary>
 ///     A service client used to call external 3rd party services, with retries

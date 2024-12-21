@@ -2,11 +2,10 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Application.Common;
 using Common.Extensions;
-using Infrastructure.Web.Api.Common.Endpoints;
-using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Infrastructure.Web.Api.Common.Extensions;
+namespace Infrastructure.Web.Common.Extensions;
 
 public static class HttpResponseExtensions
 {

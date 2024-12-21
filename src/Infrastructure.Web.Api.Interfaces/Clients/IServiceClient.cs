@@ -1,9 +1,8 @@
 using System.Net;
 using Application.Interfaces;
 using Common;
-using Infrastructure.Web.Api.Interfaces;
 
-namespace Infrastructure.Web.Interfaces.Clients;
+namespace Infrastructure.Web.Api.Interfaces.Clients;
 
 /// <summary>
 ///     Defines a service client for calling remote APIs
@@ -46,6 +45,9 @@ public interface IServiceClient : IFireAndForgetServiceClient
         where TResponse : IWebResponse;
 }
 
+/// <summary>
+///     Defines a response whose content is binary data
+/// </summary>
 public class BinaryResponse
 {
     public required Stream Content { get; set; }

@@ -1,12 +1,13 @@
 using System.Net;
 using Common;
 using Common.Extensions;
+using Infrastructure.Web.Api.Common.Clients;
 using Infrastructure.Web.Api.Interfaces;
-using Infrastructure.Web.Common.Clients;
-using Infrastructure.Web.Interfaces.Clients;
+using Infrastructure.Web.Api.Interfaces.Clients;
+using Infrastructure.Web.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Infrastructure.Web.Common.Extensions;
+namespace Infrastructure.Web.Api.Common.Extensions;
 
 public static class ResponseProblemExtensions
 {
@@ -51,7 +52,7 @@ public static class ResponseProblemExtensions
     }
 
     /// <summary>
-    ///     Converts the given <see cref="status" /> to a <see cref="Infrastructure.Web.Interfaces.Clients.ResponseProblem" />
+    ///     Converts the given <see cref="status" /> to a <see cref="ResponseProblem" />
     /// </summary>
     public static ResponseProblem ToResponseProblem(this HttpStatusCode status, string? title, string? detail = null,
         string? type = null)
@@ -66,7 +67,7 @@ public static class ResponseProblemExtensions
     }
 
     /// <summary>
-    ///     Converts the given <see cref="details" /> to a <see cref="Infrastructure.Web.Interfaces.Clients.ResponseProblem" />
+    ///     Converts the given <see cref="details" /> to a <see cref="ResponseProblem" />
     /// </summary>
     public static ResponseProblem ToResponseProblem(this ProblemDetails? details)
     {
@@ -113,6 +114,9 @@ public static class ResponseProblemExtensions
         return response;
     }
 
+    /// <summary>
+    ///     Converts the given <see cref="details" /> to a <see cref="ResponseProblem" />
+    /// </summary>
     public static ResponseProblem ToResponseProblem(this OAuth2Rfc6749ProblemDetails? details, int statusCode)
     {
         if (details.NotExists())

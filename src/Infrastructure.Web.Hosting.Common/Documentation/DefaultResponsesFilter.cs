@@ -3,6 +3,7 @@ using Common.Extensions;
 using FluentValidation.Results;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Any;

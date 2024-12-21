@@ -6,9 +6,9 @@ using Application.Interfaces.Services;
 using Infrastructure.Persistence.Interfaces;
 using Infrastructure.Persistence.Interfaces.ApplicationServices;
 using Infrastructure.Persistence.Shared.ApplicationServices;
+using Infrastructure.Web.Api.Common.Clients;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
-using Infrastructure.Web.Common.Clients;
 using Task = System.Threading.Tasks.Task;
 
 namespace TestingStubApiHost.Workers;

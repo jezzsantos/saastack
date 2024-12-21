@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="HttpConstants_StatusCodes_Title_OK" xml:space="preserve">
+        <value>OK</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_OK" xml:space="preserve">
+        <value>The request succeeded</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Title_Created" xml:space="preserve">
+        <value>Created</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_Created" xml:space="preserve">
+        <value>The request succeeded, and a new resource was created as a result</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Title_Accepted" xml:space="preserve">
+        <value>Accepted</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_Accepted" xml:space="preserve">
+        <value>The request has been received but not yet acted upon</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Title_NoContent" xml:space="preserve">
+        <value>No Content</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_NoContent" xml:space="preserve">
+        <value>There is no content to send for this request, but the headers may be useful</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Title_BadRequest" xml:space="preserve">
+        <value>Bad Request</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_BadRequest" xml:space="preserve">
+        <value>The server cannot or will not process the request due to something that is perceived to be a client error</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Title_Unauthorized" xml:space="preserve">
+        <value>Unauthorized</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_Unauthorized" xml:space="preserve">
+        <value>The client must authenticate itself to get the requested response</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Title_PaymentRequired" xml:space="preserve">
+        <value>Payment Required</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_PaymentRequired" xml:space="preserve">
+        <value>The client must have payment information to get the requested response</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Title_Forbidden" xml:space="preserve">
+        <value>Forbidden</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_Forbidden" xml:space="preserve">
+        <value>The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Title_NotFound" xml:space="preserve">
+        <value>Not Found</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_NotFound" xml:space="preserve">
+        <value>The server cannot find the requested resource</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Title_MethodNotAllowed" xml:space="preserve">
+        <value>Method Not Allowed</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_MethodNotAllowed" xml:space="preserve">
+        <value>The request is not allowed by the current state of the resource</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Title_Conflict" xml:space="preserve">
+        <value>Conflict</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_Conflict" xml:space="preserve">
+        <value>The request conflicts with the current state of the resource</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Title_Locked" xml:space="preserve">
+        <value>Locked</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_Locked" xml:space="preserve">
+        <value>The current resource is locked and cannot be accessed</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Title_UnsupportedMediaType" xml:space="preserve">
+        <value>Unsupported MediaType</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_UnsupportedMediaType" xml:space="preserve">
+        <value>The client has made a request to Accept a media type that is not supported by the server</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Title_TooManyRequests" xml:space="preserve">
+        <value>Too Many Requests</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_TooManyRequests" xml:space="preserve">
+        <value>The client has made too many requests in a specific timeframe</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Title_InternalServerError" xml:space="preserve">
+        <value>Internal Server Error</value>
+    </data>
+    <data name="HttpConstants_StatusCodes_Reason_InternalServerError" xml:space="preserve">
+        <value>An unexpected error occured on the server, which should not have happened in normal operation</value>
+    </data>
+</root>

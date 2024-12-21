@@ -9,8 +9,8 @@ using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd;
 using Infrastructure.Web.Api.Operations.Shared.EventNotifications;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
-using Infrastructure.Web.Common;
 using Infrastructure.Web.Hosting.Common.Pipeline;
+using Infrastructure.Web.Interfaces;
 using IntegrationTesting.WebApi.Common;
 using AuthenticateResponse = Infrastructure.Web.Api.Operations.Shared.BackEndForFrontEnd.AuthenticateResponse;
 
@@ -38,7 +38,7 @@ public static class WebsiteTestingExtensions
         {
             return (null!, authenticated);
         }
-        
+
         var authTokens = (await authenticated.Content.ReadFromJsonAsync<AuthenticateResponse>(jsonOptions))!;
 
         return (authTokens.UserId, authenticated);

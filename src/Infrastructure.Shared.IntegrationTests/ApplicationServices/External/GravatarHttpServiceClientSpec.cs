@@ -2,7 +2,7 @@ using Common.Configuration;
 using Common.Recording;
 using FluentAssertions;
 using Infrastructure.Shared.ApplicationServices.External;
-using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.Extensions.DependencyInjection;
 using UnitTesting.Common;

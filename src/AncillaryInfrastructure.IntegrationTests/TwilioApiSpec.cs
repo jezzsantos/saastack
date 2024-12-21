@@ -11,6 +11,7 @@ using FluentAssertions;
 using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.Twilio;
 using Infrastructure.Web.Api.Operations.Shared.Ancillary;
+using Infrastructure.Web.Common.Extensions;
 using IntegrationTesting.WebApi.Common;
 using Microsoft.Extensions.DependencyInjection;
 using UnitTesting.Common.Validation;

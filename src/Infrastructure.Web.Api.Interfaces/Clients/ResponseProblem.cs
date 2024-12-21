@@ -1,6 +1,4 @@
-using Infrastructure.Web.Api.Interfaces;
-
-namespace Infrastructure.Web.Interfaces.Clients;
+namespace Infrastructure.Web.Api.Interfaces.Clients;
 
 /// <summary>
 ///     Defines a problem returned in a response

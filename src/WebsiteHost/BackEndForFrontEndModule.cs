@@ -3,10 +3,10 @@ using System.Text.Json;
 using Application.Interfaces.Services;
 using Domain.Services.Shared;
 using Infrastructure.Common.DomainServices;
-using Infrastructure.Web.Common.Clients;
+using Infrastructure.Web.Api.Common.Clients;
+using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Hosting.Common;
 using Infrastructure.Web.Hosting.Common.Pipeline;
-using Infrastructure.Web.Interfaces.Clients;
 using WebsiteHost.Api.Recording;
 using WebsiteHost.Application;
 

@@ -2,14 +2,15 @@ using System.Net;
 using Common;
 using Common.Extensions;
 using FluentAssertions;
+using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
-using Infrastructure.Web.Common.Extensions;
-using Infrastructure.Web.Interfaces.Clients;
+using Infrastructure.Web.Api.Interfaces.Clients;
+using Infrastructure.Web.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using UnitTesting.Common;
 using Xunit;
 
-namespace Infrastructure.Web.Common.UnitTests.Extensions;
+namespace Infrastructure.Web.Api.Common.UnitTests.Extensions;
 
 [Trait("Category", "Unit")]
 public class ResponseProblemExtensionsSpec
@@ -279,7 +280,8 @@ public class ResponseProblemExtensionsSpec
         result.Title.Should().Be("atitle");
         result.Detail.Should().Be("adetail");
         result.Status.Should().Be((int)HttpStatusCode.InternalServerError);
-    }    
+    }
+
     [Fact]
     public void WhenToResponseProblemAndHasType_ThenReturnsProblem()
     {

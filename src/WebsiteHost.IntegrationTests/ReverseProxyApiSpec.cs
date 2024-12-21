@@ -5,7 +5,7 @@ using FluentAssertions;
 using Infrastructure.Web.Api.Operations.Shared.Health;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using Infrastructure.Web.Api.Operations.Shared.UserProfiles;
-using Infrastructure.Web.Common;
+using Infrastructure.Web.Interfaces;
 using IntegrationTesting.WebApi.Common;
 using IntegrationTesting.Website.Common;
 using Microsoft.Extensions.DependencyInjection;

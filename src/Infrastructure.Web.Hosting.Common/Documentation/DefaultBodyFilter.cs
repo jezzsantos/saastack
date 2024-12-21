@@ -1,7 +1,8 @@
 using System.Reflection;
 using Common.Extensions;
-using Infrastructure.Web.Api.Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Common.Extensions;
+using Infrastructure.Web.Interfaces;
 using JetBrains.Annotations;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;

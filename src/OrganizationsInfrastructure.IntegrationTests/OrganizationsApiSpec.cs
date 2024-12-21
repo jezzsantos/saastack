@@ -3,14 +3,14 @@ using ApiHost1;
 using Application.Resources.Shared;
 using Domain.Interfaces.Authorization;
 using FluentAssertions;
-using Infrastructure.Web.Api.Common.Extensions;
-using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Api.Operations.Shared.EndUsers;
 using Infrastructure.Web.Api.Operations.Shared.Identities;
 using Infrastructure.Web.Api.Operations.Shared.Images;
 using Infrastructure.Web.Api.Operations.Shared.Organizations;
 using Infrastructure.Web.Api.Operations.Shared.Subscriptions;
-using Infrastructure.Web.Interfaces.Clients;
+using Infrastructure.Web.Common.Extensions;
+using Infrastructure.Web.Interfaces;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
 

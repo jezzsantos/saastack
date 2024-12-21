@@ -1,7 +1,7 @@
 using Application.Interfaces;
 using Common;
 using Infrastructure.Web.Api.Interfaces;
-using Infrastructure.Web.Interfaces.Clients;
+using Infrastructure.Web.Api.Interfaces.Clients;
 
 namespace Infrastructure.Worker.Api.IntegrationTests.Stubs;
 

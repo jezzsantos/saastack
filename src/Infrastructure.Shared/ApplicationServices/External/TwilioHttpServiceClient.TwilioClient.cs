@@ -4,11 +4,11 @@ using Application.Persistence.Shared;
 using Common;
 using Common.Configuration;
 using Common.Extensions;
+using Infrastructure.Web.Api.Common.Clients;
 using Infrastructure.Web.Api.Common.Extensions;
+using Infrastructure.Web.Api.Interfaces.Clients;
 using Infrastructure.Web.Api.Operations.Shared._3rdParties.Twilio;
-using Infrastructure.Web.Common.Clients;
 using Infrastructure.Web.Common.Extensions;
-using Infrastructure.Web.Interfaces.Clients;
 
 namespace Infrastructure.Shared.ApplicationServices.External;
 

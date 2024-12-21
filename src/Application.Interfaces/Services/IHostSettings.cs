@@ -1,4 +1,6 @@
-﻿namespace Application.Interfaces.Services;
+﻿using System.Net.Mime;
+
+namespace Application.Interfaces.Services;
 
 /// <summary>
 ///     Defines settings for the current API host
@@ -42,7 +44,7 @@ public interface IHostSettings
     string GetWebsiteHostCSRFSigningSecret();
 
     /// <summary>
-    ///     Returns the URL for the specified <see cref="Image" />
+    ///     Returns the URL for the specified <see cref="MediaTypeNames.Image" />
     /// </summary>
     string MakeImagesApiGetUrl(string imageId);
 }

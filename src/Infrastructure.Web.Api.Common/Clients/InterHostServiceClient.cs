@@ -3,10 +3,10 @@ using System.Text.Json;
 using Application.Common.Extensions;
 using Application.Interfaces;
 using Common.Extensions;
-using Infrastructure.Web.Api.Common.Extensions;
-using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Common.Extensions;
+using Infrastructure.Web.Interfaces;
 
-namespace Infrastructure.Web.Common.Clients;
+namespace Infrastructure.Web.Api.Common.Clients;
 
 /// <summary>
 ///     A service client used to call between API hosts, with retries.

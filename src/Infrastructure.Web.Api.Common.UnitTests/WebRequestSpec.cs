@@ -1,6 +1,7 @@
 using System.Text.Json;
 using FluentAssertions;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;

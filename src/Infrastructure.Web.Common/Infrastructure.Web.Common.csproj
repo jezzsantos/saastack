@@ -7,7 +7,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
-        <ProjectReference Include="..\Infrastructure.Web.Api.Common\Infrastructure.Web.Api.Common.csproj" />
         <ProjectReference Include="..\Infrastructure.Web.Interfaces\Infrastructure.Web.Interfaces.csproj" />
     </ItemGroup>
 

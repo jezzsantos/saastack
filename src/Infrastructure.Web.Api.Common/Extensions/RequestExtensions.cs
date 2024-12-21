@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Common.Extensions;
 using Infrastructure.Web.Api.Interfaces;
+using Infrastructure.Web.Interfaces;
 
 namespace Infrastructure.Web.Api.Common.Extensions;
 
@@ -101,6 +102,17 @@ public static class RequestExtensions
         }
 
         return request.ToJson()!;
+    }
+
+    /// <summary>
+    ///     Sets the HMAC signature header on the specified <see cref="message" /> by signing the body of the specified
+    ///     <see cref="request" />
+    /// </summary>
+    public static void SetHMACAuth(this HttpRequestMessage message, IWebRequest request, string secret)
+    {
+        var signature = request.CreateHMACSignature(secret);
+
+        message.Headers.Add(HttpConstants.Headers.HMACSignature, signature);
     }
 
     /// <summary>

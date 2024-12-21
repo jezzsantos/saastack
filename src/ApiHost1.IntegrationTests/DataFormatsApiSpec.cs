@@ -2,8 +2,8 @@
 using System.Text;
 using Common.Extensions;
 using FluentAssertions;
-using Infrastructure.Web.Api.Interfaces;
 using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
+using Infrastructure.Web.Interfaces;
 using IntegrationTesting.WebApi.Common;
 using Xunit;
 using Task = System.Threading.Tasks.Task;

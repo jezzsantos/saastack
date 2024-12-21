@@ -5,7 +5,7 @@ using Polly.Contrib.WaitAndRetry;
 using Polly.Retry;
 using Polly.Timeout;
 
-namespace Infrastructure.Web.Common.Clients;
+namespace Infrastructure.Web.Api.Common.Clients;
 
 public static class ApiClientRetryPolicies
 {

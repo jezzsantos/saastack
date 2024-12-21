@@ -1,4 +1,4 @@
-namespace Infrastructure.Web.Common;
+namespace Infrastructure.Web.Interfaces;
 
 public static class WebConstants
 {
