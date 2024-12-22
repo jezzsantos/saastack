@@ -29,7 +29,7 @@ Accept: application/json
     client.global.set("registration_token", response.body.token);
 %}
 
-### COnfirm registration
+### Confirm registration
 
 POST {{apihost1}}/passwords/confirm-registration
 Accept: application/json

@@ -12,7 +12,6 @@ public static class HttpConstants
     {
         public const string Everything = "*/*";
         public const string FormUrlEncoded = "application/x-www-form-urlencoded";
-        public const string FormUrlEncodedWithCharset = "application/x-www-form-urlencoded; charset=utf-8";
         public const string Html = "text/html";
         public const string ImageGif = "image/gif";
         public const string ImageJpeg = "image/jpeg";
@@ -42,7 +41,7 @@ public static class HttpConstants
         public const string HMACSignature = "X-Hub-Signature";
         public const string Origin = "Origin";
         public const string Referer = "Referer";
-        public const string RequestId = "Request-ID";
+        public const string RequestId = "Request-Id";
         public const string SetCookie = "Set-Cookie";
         public const string Tenant = "Tenant";
     }

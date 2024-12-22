@@ -54,7 +54,7 @@ public static class HasGetOptionsExtensions
     }
 
     /// <summary>
-    ///     COnverts a <see cref="GetOptions" /> to a <see cref="HasGetOptions" />
+    ///     Converts a <see cref="GetOptions" /> to a <see cref="HasGetOptions" />
     /// </summary>
     public static HasGetOptions ToHasGetOptions(this GetOptions options)
     {
