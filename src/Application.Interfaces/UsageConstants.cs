@@ -96,8 +96,7 @@ public static class UsageConstants
 
         public static class Api
         {
-            public const string HttpRequestRequested = "http.request";
-            public const string HttpRequestResponded = "http.response";
+            public const string HttpRequestResponded = "http.request";
         }
     }
 }

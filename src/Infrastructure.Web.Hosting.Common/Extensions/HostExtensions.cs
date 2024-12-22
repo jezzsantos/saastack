@@ -163,26 +163,26 @@ public static class HostExtensions
 #endif
             services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
 #endif
-            services.AddLogging(loggingBuilder =>
+            services.AddLogging(builder =>
             {
-                loggingBuilder.ClearProviders();
-                loggingBuilder.AddConfiguration(appBuilder.Configuration.GetSection(LoggingSettingName));
+                builder.ClearProviders();
+                builder.AddConfiguration(appBuilder.Configuration.GetSection(LoggingSettingName));
 #if TESTINGONLY
-                loggingBuilder.AddSimpleConsole(options =>
+                builder.AddSimpleConsole(options =>
                 {
                     options.TimestampFormat = "hh:mm:ss ";
                     options.SingleLine = true;
                     options.IncludeScopes = false;
                 });
-                loggingBuilder.AddDebug();
+                builder.AddDebug();
 #else
 #if HOSTEDONAZURE
-                loggingBuilder.AddApplicationInsights();
+                builder.AddApplicationInsights();
 #elif HOSTEDONAWS
-                loggingBuilder.AddLambdaLogger();
+                builder.AddLambdaLogger();
 #endif
 #endif
-                loggingBuilder.AddEventSourceLogger();
+                builder.AddEventSourceLogger();
             });
 
             // Note: IRecorder should always be not tenanted

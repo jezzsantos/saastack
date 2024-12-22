@@ -17,25 +17,28 @@ using RecordUseRequest = Infrastructure.Web.Api.Operations.Shared.Ancillary.Reco
 namespace Infrastructure.Web.Api.Common.Endpoints;
 
 /// <summary>
-///     Provides a request filter that captures usage of the current request
+///     Provides a request filter that captures usage of the current request/response
 /// </summary>
 public class ApiUsageFilter : IEndpointFilter
 {
-    public static readonly Type[] IgnoredTrackedRequestTypes =
+    private static readonly Type[] IgnoredTrackedRequestTypes =
     {
         // Exclude these as they are not API's called by users
 #if TESTINGONLY
         typeof(DrainAllAuditsRequest),
         typeof(DrainAllUsagesRequest),
         typeof(DrainAllEmailsRequest),
+        typeof(DrainAllSmsesRequest),
         typeof(DrainAllProvisioningsRequest),
         typeof(DrainAllDomainEventsRequest),
         typeof(SearchAllAuditsRequest),
+        typeof(SearchAllDomainEventsRequest),
 #endif
         typeof(HealthCheckRequest),
-        typeof(DeliverUsageRequest),
         typeof(DeliverAuditRequest),
+        typeof(DeliverUsageRequest),
         typeof(SendEmailRequest),
+        typeof(SendSmsRequest),
         typeof(NotifyProvisioningRequest),
         typeof(NotifyDomainEventRequest),
 
@@ -60,29 +63,15 @@ public class ApiUsageFilter : IEndpointFilter
 
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
-        var caller = _callerContextFactory.Create();
         var stopwatch = Stopwatch.StartNew();
-        TrackRequest(context, caller);
 
         var response = await next(context); //Continue down the pipeline
 
         stopwatch.Stop();
+        var caller = _callerContextFactory.Create();
         TrackResponse(context, caller, stopwatch.Elapsed);
 
         return response;
-    }
-
-    private void TrackRequest(EndpointFilterInvocationContext context, ICallerContext caller)
-    {
-        var request = GetRequest(context);
-        if (request.NotExists())
-        {
-            return;
-        }
-
-        var additional = PopulatePropertiesFromRequest(context.HttpContext, request, caller);
-
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.Api.HttpRequestRequested, additional);
     }
 
     private void TrackResponse(EndpointFilterInvocationContext context, ICallerContext caller, TimeSpan duration)

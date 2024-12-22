@@ -187,9 +187,6 @@ public static class WebApplicationExtensions
     public static void EnableOtherFeatures(this WebApplication builder,
         List<MiddlewareRegistration> middlewares, WebHostOptions hostOptions)
     {
-        middlewares.Add(new MiddlewareRegistration(-100, app => { app.UseMiddleware<ResultRecordingMiddleware>(); },
-            "Feature: Result logging"));
-
         var loggers = builder.Services.GetServices<ILoggerProvider>()
             .Select(logger => logger.GetType().Name).Join(", ");
         middlewares.Add(new MiddlewareRegistration(-80, _ =>

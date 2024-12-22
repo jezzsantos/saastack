@@ -87,17 +87,6 @@ public class ApiUsageFilterSpec
         await _filter.InvokeAsync(context, next);
 
         _recorder.Verify(
-            rec => rec.TrackUsage(It.IsAny<ICallContext?>(), UsageConstants.Events.Api.HttpRequestRequested,
-                It.Is<Dictionary<string, object>>(dic =>
-                    dic.Count == 5
-                    && dic[UsageConstants.Properties.EndPoint].As<string>()
-                    == nameof(GetCallerWithTokenOrAPIKeyTestingOnlyRequest).ToLower()
-                    && dic[UsageConstants.Properties.UsedById].As<string>() == "acallerid"
-                    && dic[UsageConstants.Properties.HttpRoute].As<string>() == "aroute"
-                    && dic[UsageConstants.Properties.HttpPath].As<string>() == "/apath"
-                    && dic[UsageConstants.Properties.HttpMethod].As<string>() == "amethod"
-                )));
-        _recorder.Verify(
             rec => rec.TrackUsage(It.IsAny<ICallContext?>(), UsageConstants.Events.Api.HttpRequestResponded,
                 It.Is<Dictionary<string, object>>(dic =>
                     dic.Count == 7
@@ -127,17 +116,6 @@ public class ApiUsageFilterSpec
 
         await _filter.InvokeAsync(context, next);
 
-        _recorder.Verify(
-            rec => rec.TrackUsage(It.IsAny<ICallContext?>(), UsageConstants.Events.Api.HttpRequestRequested,
-                It.Is<Dictionary<string, object>>(dic =>
-                    dic.Count == 6
-                    && dic[UsageConstants.Properties.EndPoint].As<string>() == nameof(TestRequest).ToLower()
-                    && dic[UsageConstants.Properties.UsedById].As<string>() == "acallerid"
-                    && dic[UsageConstants.Properties.HttpRoute].As<string>() == "aroute"
-                    && dic[UsageConstants.Properties.HttpPath].As<string>() == "/apath"
-                    && dic[UsageConstants.Properties.HttpMethod].As<string>() == "amethod"
-                    && dic[UsageConstants.Properties.ResourceId].As<string>() == "aresourceid"
-                )));
         _recorder.Verify(
             rec => rec.TrackUsage(It.IsAny<ICallContext?>(), UsageConstants.Events.Api.HttpRequestResponded,
                 It.Is<Dictionary<string, object>>(dic =>

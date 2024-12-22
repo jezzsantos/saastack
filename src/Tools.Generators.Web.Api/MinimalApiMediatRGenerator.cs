@@ -214,6 +214,8 @@ namespace {assemblyNamespace}
     {
         var filterSet = new List<string>
         {
+            // Order matters here!
+            "global::Infrastructure.Web.Api.Common.Endpoints.HttpRecordingFilter",
             "global::Infrastructure.Web.Api.Common.Endpoints.ApiUsageFilter",
             "global::Infrastructure.Web.Api.Common.Endpoints.RequestCorrelationFilter",
             "global::Infrastructure.Web.Api.Common.Endpoints.ContentNegotiationFilter"
@@ -221,7 +223,7 @@ namespace {assemblyNamespace}
         var isMultiTenanted = serviceRegistrations.Any(registration => registration.IsRequestDtoTenanted);
         if (isMultiTenanted)
         {
-            filterSet.Insert(0, "global::Infrastructure.Web.Api.Common.Endpoints.MultiTenancyFilter");
+            filterSet.Add("global::Infrastructure.Web.Api.Common.Endpoints.MultiTenancyFilter");
         }
 
         var builder = new StringBuilder();
