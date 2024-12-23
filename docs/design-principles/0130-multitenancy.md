@@ -71,7 +71,7 @@ A tenant can be scoped in a given digital product as any of these common concept
 
 In SaaStack, we have a choice of how to model multitenancy out of the box. The choices we have *essentially* comes down to whether we want to define identities **exclusively** within a tenant, or define identities **centrally** outside all tenancies (and shared with all tenancies across the platform).
 
-In B2B and B2C SaaS products, it is common to model identity either way. SaaStack has to make a choice in order to be a functional template however.
+In B2B and B2C SaaS products, it is common to model identity either way. However, SaaStack has to make a choice in order to be a functional template.
 
 > Note: This decision is not baked in concrete, and can be changed if necessary, but it cannot be both at the same time.
 
@@ -83,8 +83,8 @@ The implication of this decision is that:
 
 * An `EndUser` in the system is unique across all tenancies by their username (their email address). That implies that a human using the system is the same human (by email) address, no matter what tenancy they are working in at any one time. (e.g., an independent consultant collaborating with more than one company). That human can of course use several email addresses, should it be necessary (due to rules/constraints) to access any specific tenancy only with a certain email domain. Which is a common requirement in many enterprise B2B products.
 * Any `EndUser` can have any number of `Memberships` to any number of tenancies (`Organizations`), which is common for many B2B and B2C products. However, they must always have at least one (see later).
-* The authentication (login) process, would be branded with the branding of the the SaaS product itself, since at that point in time, it is not clear which tenancy the user wishes to access. Which is common for a lot of B2C and B2B products. Think www.slack.com, or www.miro.com or www.google.com, etc, where you login to the unbranded product, before accessing the branded tenant.
-* This also means that any `Enduser` will need to have a default "home" tenancy at all times, so that they can always login to the platform and either make a choice about what context they are working in at that time, or be sent to the default tenancy they normally work in, or last worked in, etc..
+* The authentication (login) process, would be branded with the branding of the SaaS product itself, since at that point in time, it is not clear which tenancy the user wishes to access. Which is common for a lot of B2C and B2B products. Think www.slack.com, or www.miro.com or www.google.com, etc., where you log in to the unbranded product, before accessing the branded tenant.
+* This also means that any `Enduser` will need to have a default "home" tenancy at all times, so that they can always log in to the platform and either make a choice about what context they are working in at that time, or be sent to the default tenancy they normally work in, or last worked in, etc.
 * This also means that when they register on the central platform they are automatically assigned to their own "personal" tenant (`Organization`), from which they can use the product (to some degree - depending on their subscription at that time). They must always have that personal `Organization`, for the times when they lose access to any other tenancy (i.e., a consultant ends their engagement with a company, or as an employee change jobs at any organization).
 
 > Of course, it should remain possible to change that default tenant/organization at any time, and certain actions, like getting invited to another tenancy can automatically change that default also.
@@ -97,7 +97,7 @@ As you can see, `EndUser` is the at the heart of the model, and almost everythin
 
 ### Managing Multi-tenancy
 
-Lets break down the implementation of multi-tenancy in SaaStack into these critical areas:
+Let's break down the implementation of multi-tenancy in SaaStack into these critical areas:
 
 * [Creation of tenants](#Tenant-Creation)
 * [Configuration for each tenant](#Infrastructure-Configuration)
@@ -132,7 +132,7 @@ If any infrastructure is required to be provisioned and configured, that process
 
 In multi-tenanted SaaS systems, we always share computing resources across multiple tenants, whether that is on a single server/process or across multiple scaled-out servers/processes.
 
-However, sometimes we need (due to the our business model) to separate/segregate customer data to different locations or different ownership, e.g., different databases in different global data centers, or a dedicated databases per tenant.
+However, sometimes we need (due to our business model) to separate/segregate customer data to different locations or different ownership, e.g., different databases in different global data centers, or a dedicated databases per tenant.
 
 To do that, each tenant requires its own unique configuration for connecting to those services (e.g., the technology-specific `IDataStore` adapter, like the `AzureSqlServerStore`, or the `DynamoDbDataStore`).
 
@@ -149,9 +149,7 @@ This needs to happen dynamically at runtime to work effectively, and it works at
 
 1. When an HTTP request comes into the Backend API, a new request "scope" is created for each request by the dependency injection container, so that we can resolve "scoped" dependencies (as well as "transient" dependencies). Note: "singleton" dependencies will have already been resolved at this point in time.
 2. The request is processed by the middleware pipeline, and in the middleware pipeline we have the `MultiTenancyMiddleware` that parses the HTTP request and uses the `ITenantDetective` (see detection below) to discover the specific tenant of the inbound request. Once discovered, it sets the `ITenancyContext.Current` with the tenant ID and sets the `ITenancyContext.Settings` for that specific tenant. These settings are fetched from the stored `Organization` that the tenant identifies, which were created when the `Organization` was created.
-3. Then, later down the request pipeline, a new instance of an "Application Layer" class (e.g., the `ICarsApplication`), and this application class is injected into the `CarsApi` class, where the request is processed by the remaining code. This application class instance will require a dependency on one or more technology adapters to 3rd party services (e.g., the
-   `ICarRepository`) that will ultimately be dependent on an adapter for the `IDataStore` that can be satisfied by instantiating some technology adapter (e.g., `AzureSqlServerStore` or `DynamoDbDataStore`). Into the constructor of this instance of technology adapter, an instance of the `IConfigurationSettings` will be injected, which will ultimately be dependent on the
-   `ITenancyContext.Settings` which, in turn, will fetch specific settings for this specific tenant. (see the `AspNetConfigurationSettings`)
+3. Then, later down the request pipeline, a new instance of an "Application Layer" class (e.g., the `ICarsApplication`), and this application class is injected into the `CarsApi` class, where the request is processed by the remaining code. This application class instance will require a dependency on one or more technology adapters to 3rd party services (e.g., the `ICarRepository`) that will ultimately be dependent on an adapter for the `IDataStore` that can be satisfied by instantiating some technology adapter (e.g., `AzureSqlServerStore` or `DynamoDbDataStore`). Into the constructor of this instance of technology adapter, an instance of the `IConfigurationSettings` will be injected, which will ultimately be dependent on the `ITenancyContext.Settings` which, in turn, will fetch specific settings for this specific tenant. (see the `AspNetConfigurationSettings`)
 4. Finally, the specific technology adapter (e.g.  `AzureSqlServerStore` or `DynamoDbDataStore`) will load its configuration settings, the `IConfigurationSettings` will attempt to retrieve them first, from the current `ITenancyContext.Settings` if they exist for the tenant, and if not, then retrieve them from the shared `Platform` settings (available to all tenants).
 
 Ultimately, the actual settings that are used in any adapter in any Application or Domain Layer, is down to two things:
@@ -163,7 +161,7 @@ Ultimately, the actual settings that are used in any adapter in any Application 
 
 ##### A note about dependency injection
 
-For many "generic" subdomains like `EndUsers`, `Organizations`, `Identity` and `Ancillary` etc all their data will be centralized (by default), and none of that data is specific to any tenant. They store the data that all tenants require to operate, including the definition of the tenants themselves (`Organizations`). These dependencies have the lifetime of "singletons" (i.e. one instance shared with all consumers, and only ever instantiated once). They also only use `Platform` configuration settings.
+For many "generic" subdomains like `EndUsers`, `Organizations`, `Identity` and `Ancillary` etc. all their data will be centralized (by default), and none of that data is specific to any tenant. They store the data that all tenants require to operate, including the definition of the tenants themselves (`Organizations`). These dependencies have the lifetime of "singletons" (i.e. one instance shared with all consumers, and only ever instantiated once). They also only use `Platform` configuration settings.
 
 However, most of the "core" subdomains like `Cars`, `Bookings` (and the others to be added) are likely to be tenant-specific. These dependencies have a lifetime of "scoped" (i.e. a different lifetime per HTTP request). They may require private tenant specific configuration settings to work, or may use shared `Platform` configuration settings.
 
@@ -191,7 +189,7 @@ Once a user identifies with and interacts with the product/system, their tenancy
 
 For that to be possible, in the broadest range of options, the tenants and the users need to be held centrally to be looked up at runtime.
 
-> Note: Some SaaS systems store users in each of the tenants, which is a viable solution only if the tenant can be pre-determined AND users are duplicated across the tenants that they are members of. In SaaStack the default is to keep all `EndUsers` centrally, so that a end user in the software equates to a single email address in the real world, and end users can be members in many tenancies, and can come and go frequently from those tenancies.
+> Note: Some SaaS systems store users in each of the tenants, which is a viable solution only if the tenant can be pre-determined AND users are duplicated across the tenants that they are members of. In SaaStack the default is to keep all `EndUsers` centrally, so that an end user in the software equates to a single email address in the real world, and end users can be members in many tenancies, and can come and go frequently from those tenancies.
 
 In some systems, the user's tenancy is pre-determined for them ahead of interacting with the system (each request contains that information); in some systems, the tenancy that they want to access needs to be manually selected in some way and then declared to the system when interacting with it.
 
@@ -251,7 +249,7 @@ With all these different services and all these different workloads in the produ
 
 ##### Logical Data Partitioning
 
-Logical data "partitioning" is a technique used to store data from multiple tenants within a single physical repository or service, where records are divided into logical "containers" based upon some "key" (i.e., some identifier). That's is all data from one tenant is isolated from all data of another tenant.
+Logical data "partitioning" is a technique used to store data from multiple tenants within a single physical repository or service, where records are divided into logical "containers" based upon some "key" (i.e., some identifier). That is all data from one tenant is isolated from all data of another tenant.
 
 > Most repository technologies have size limits (per physical container), and partitioning is also a good way to work around these kinds of limits. For example, storing records starting with letters A,B,C, and D in one container and records from E,F,G, and H in another container, etc. increases the capacity of the database.
 
@@ -259,9 +257,9 @@ This approach is supported by most data stores and third-party online services i
 
 The key concept behind logical data partitioning is to utilize a single physical service (and usually an account subscription) and specify a "partition" for each tenant in the data.
 
-For example, in a SQL database, you can add an additional foreign key column to each table that contains tenanted data called `TenantId` and ensure that this column participates in each and every SQL operation, such as SELECT, INSERT, UPDATE, and DELETE.
+For example, in a SQL database, you can add a foreign key column to each table that contains tenanted data called `TenantId` and ensure that this column participates in each and every SQL operation, such as SELECT, INSERT, UPDATE, and DELETE.
 
-> Where as, the data shared across all tenants will not require this partition key.
+> Whereas, the data shared across all tenants will not require this partition key.
 >
 > There is a real world danger with this kind of partitioning, that developers can easily make a mistake and forget to include the `TenantId` in the query or update statement, and they can inadvertently expose data from one tenant to others, causing a data breach event.
 
@@ -281,7 +279,7 @@ Not all single data repositories and third-party services can address those need
 
 ##### Infrastructure Partitioning
 
-Infrastructure partitioning (called "sharding") is similar to logical/physical partitioning except that it uses separate (but cloned) physical infrastructure to contain the partition of data. That could be a separate server, separate database, separate storage account, etc, which is addressed differently than other shards, sometimes in different physical locations or in different geographic data centers.
+Infrastructure partitioning (called "sharding") is similar to logical/physical partitioning except that it uses separate (but cloned) physical infrastructure to contain the partition of data. That could be a separate server, separate database, separate storage account, etc., which is addressed differently than other shards, sometimes in different physical locations or in different geographic data centers.
 
 Thanks to the large cloud providers, it is becoming increasingly financially viable for small companies to deploy this capability. They make it more economical and easier to employ.
 
@@ -315,7 +313,7 @@ Consider the following workflow:
 1. A new customer signs up for the platform. They register a new user, and that will create a new `Personal` organization for them to use the product. This organization will have a billing subscription that gives them some \[limited\] access level to the product at this time (i.e., a trial).
 2. At that time, or at some future time (like when they upgrade to a paid plan), a new event (e.g., `Domain.Events.Shared.EndUsers.Registered`) can be subscribed to by adding a new `IDomainEventNotificationConsumer` in one of the subdomains.
 3. This event is then raised at runtime, which triggers an application (in some subdomain) to make some API call to some cloud-based process to provision some specific infrastructure (e.g., via queue message or direct via an API call to an Azure function or AWS Lambda - there are many integration options). Let's assume that this triggers Azure to create a new SQL database in a regional data center physically closer to where this specific customer is signing up.
-4. Let's assume that this cloud provisioning process takes some time to complete (perhaps several minutes), and meanwhile, the customer is starting using the product and try it out for themselves (using their `Personal` organization, which we assume is using shared platform infrastructure at this time.
+4. Let's assume that this cloud provisioning process takes some time to complete (perhaps several minutes), and meanwhile, the customer is starting using the product and try it out for themselves (using their `Personal` organization), which we assume is using shared platform infrastructure at this time.
 5. When the provisioning process is completed (a few minutes later), a new message [containing some data about the provisioning process] is created and dropped on the `provisioning` queue (in Azure or AWS).
 6. The `DeliverProvisioning` task is triggered, and the message is picked up off the queue and delivered to the `Ancillary` API by the Azure function or AWS Lambda.
 7. The `Ancillary` API then handles the message and forwards it to the `Organization` subdomain to update the settings of the `Personal` organization that the customer is using.

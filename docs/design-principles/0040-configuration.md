@@ -7,13 +7,13 @@ In order to run these systems is different environments (e.g., `Local`, `Staging
 ## Design Principles
 
 1. We want all components in each runtime host (e.g., `ApiHost1`) to have access to static configuration (read-only), that would be set at deployment time. (i.e., in static files like `appsettings.json`)
-2. We want that configuration to be over-written into static packaged assets (like `appsettings.json`) just before deployment, in the CD pipeline. Rather then as design time by a developer, so we avoid storing these settings in source code, or expose them to unprivileged people designing the system.
+2. We want that configuration to be over-written into static packaged assets (like `appsettings.json`) just before deployment, in the CD pipeline. Rather than as design time by a developer, so we avoid storing these settings in source code, or expose them to unprivileged people designing the system.
 3. We want that configuration to be specific to a specific environment (e.g. `Local` development, `Staging`, or `Production`)
 4. We do not want developers writing anything but `local` development environment settings (secrets or otherwise) into configuration files. With one exception, see note below.
 5. We will need some "shared" configuration for the SaaS "platform" (used by all components), and some "private" configuration used by each "tenant" running on the platform. These two sets of configuration must be kept separate from each other, and may not be stored in the same repositories. (e.g. platform configuration is defined in `appsettings.json`, whilst tenancy configuration is stored in a data stores)
 6. Configuration needs to be hierarchical (e.g. it can be grouped by namespace), and hierarchical in terms of layering.
 7. Settings are expected to be of only 3 kinds: `string`, `number` and `boolean`
-8. Components are responsible for reading their own configuration, and shall not re-use other components configuration.
+8. Components are responsible for reading their own configuration, and shall not re-use other components' configuration.
 9. Secrets may be stored separately from non-confidential configuration in other repositories (e.g. files, databases, 3rd party services).
 10. We want to be able to change storage location of configuration at any time, without breaking code (e.g. files, databases, 3rd party services).
 11. We want to use dependency injection to give components their configuration.
@@ -53,7 +53,7 @@ For example:
 * Connection strings to a tenant's physically partitioned repository (e.g., in a nearby data center of their choice)
 * Account details for accessing a specific 3rd party system account via adapters (e.g., an accounting integration)
 
-At runtime, in a multi-tenanted host, when the inbound HTTP request is destined for an API that is tenanted, the `ITenantContext` will define the tenancy and it will define the `ITenancyContext.Settings` for the current HTTP request.
+At runtime, in a multi-tenanted host, when the inbound HTTP request is destined for an API that is tenanted, the `ITenantContext` will define the tenancy, and it will define the `ITenancyContext.Settings` for the current HTTP request.
 
 These settings are read from the `IOrganizationsRepository` (i.e., a data store), and can be updated by other APIs.
 

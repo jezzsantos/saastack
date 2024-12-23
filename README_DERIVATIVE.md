@@ -62,8 +62,7 @@ You only need the tools below installed if you are going to run specific `Integr
 
 > You only need to perform this step once
 
-You will need to install docker to run certain kinds of integration tests against certain local/cloud infrastructure components. For example, all
-`Integration.Persistence` tests.
+You will need to install docker to run certain kinds of integration tests against certain local/cloud infrastructure components. For example, all `Integration.Persistence` tests.
 
 Install [Docker Desktop](https://docs.docker.com/desktop/)
 
@@ -113,8 +112,7 @@ In a Terminal window:
 
 Now, test that Azurite works by running: `azurite`
 
-> You only need to run the emulator in local development if you choose to run the AzureFunctions.Api.WorkerHost project locally. It will be run for you automatically in automated testing, when running the
-`Integration.Persistence` tests for Azure Storage
+> You only need to run the emulator in local development if you choose to run the AzureFunctions.Api.WorkerHost project locally. It will be run for you automatically in automated testing, when running the `Integration.Persistence` tests for Azure Storage
 
 ## AWS Local Development
 
@@ -123,7 +121,7 @@ Only if you are deploying your product to AWS
 
 ### LocalStack (AWS Emulator)
 
-> You only need to perform this step once, prior to running any of the `Integration.Persistence` tests against AWS infrastructure (e.g., CloudWatch, SQS queues, S3 Buckets, RDS/Dynamo databases, etc)
+> You only need to perform this step once, prior to running any of the `Integration.Persistence` tests against AWS infrastructure (e.g., CloudWatch, SQS queues, S3 Buckets, RDS/Dynamo databases, etc.)
 
 In a Terminal window:
 
@@ -140,7 +138,7 @@ Now, test that LocalStack works by running: `localstack start`
 
 ### External Adapter Testing
 
-> You only need to perform this step once, prior to running any of the `Integration.External` tests against 3rd party adapters (e.g., Flagsmith, Twillio, etc)
+> You only need to perform this step once, prior to running any of the `Integration.External` tests against 3rd party adapters (e.g., Flagsmith, Twillio, etc.)
 
 In the `Infrastructure.Shared.IntegrationTests` project, create a new file called `appsettings.Testing.local.json` and fill out the empty placeholders you see in `appsettings.TestingOnly.json` with values from service accounts that you have created for testing those 3rd party services.
 
@@ -152,8 +150,7 @@ In the `Infrastructure.Shared.IntegrationTests` project, create a new file calle
 * `npm install`
 * `npm run build`
 
-> Note: As a result of this build step you should see new bundle file (e.g. `0123456789abcdef.bundle.js`) appear in the
-`wwwroot` folder. This file should never be added to source control.
+> Note: As a result of this build step you should see new bundle file (e.g. `0123456789abcdef.bundle.js`) appear in the `wwwroot` folder. This file should never be added to source control.
 
 ### Environment Variables
 
@@ -161,8 +158,7 @@ You need to create your own version of the `.env` file on your computer (not sou
 
 1. Copy the `src/WebsiteHost/ClientApp/.env.example` to `src/WebsiteHost/ClientApp/.env`.
 
-> DO NOT add this file
-`.env` to source control!  This files exists locally for security purposes, and in order to have the right environment variables in place when running and testing the JS App.
+> DO NOT add this file `.env` to source control!  This files exists locally for security purposes, and in order to have the right environment variables in place when running and testing the JS App.
 
 # Build & Deploy
 
@@ -210,7 +206,7 @@ There are 3 environments you need to be aware of and how they differ in their de
 
 1. Local (manual) testing (aka F5 debugging) - `Debug` or `Release`
 2. Automated integration testing - `Debug` or `Release`
-3. Production (and/or Staging etc) - `ReleaseForDeploy`
+3. Production (and/or Staging etc.) - `ReleaseForDeploy`
 
 > Note: In all cases, in all environments, there should NEVER be any production settings nor **secrets** in any configuration file (i.e.  `appsettings.json` ) anywhere in this codebase! These production settings and secrets should only be defined in the CD pipeline, and replaced when a production build is packaged and deployed.
 
@@ -252,7 +248,7 @@ This is what we modify and how:
 
   > Which should never ever contain ANY production settings or secrets!
 
-* We then manipulate the DI container (seen in the constructor of your integration testing project) and replace certain dependencies (e.g., the 3rd party adapters like: `IUserNotificationsService,` etc) with their respective hardcoded Stubbed equivalents (found in the `Stubs` directory of your integration testing project).
+* We then manipulate the DI container (seen in the constructor of your integration testing project) and replace certain dependencies (e.g., the 3rd party adapters like: `IUserNotificationsService,` etc.) with their respective hardcoded Stubbed equivalents (found in the `Stubs` directory of your integration testing project).
 
 > Note: These integration testing stubs will likely use no configuration settings from `appsettings.json` as their responses and behavior are hardcoded/canned in the hardcoded classes of the integration test project.
 

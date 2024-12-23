@@ -20,11 +20,11 @@ public sealed class MfaAuthenticatorVerified : DomainEvent
 
     public string? ConfirmationCode { get; set; }
 
-    public string? VerifiedState { get; set; }
-
     public string? OobCode { get; set; }
 
     public required MfaAuthenticatorType Type { get; set; }
 
     public required string UserId { get; set; }
+
+    public string? VerifiedState { get; set; }
 }

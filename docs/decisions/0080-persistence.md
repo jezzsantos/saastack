@@ -8,7 +8,7 @@
 
 Persistence is an essential aspect of any stateful or stateless cloud-based system.
 
-When considering our chosen [Modeling](0040-modeling.md) strategy as: domain-driven-design, persisting state is no longer just about data-modelling and creating rows in tables in a relational database. DDD particularly is driven by handling domain-events rather then by snapshotting the latest state of aggregates in a system.
+When considering our chosen [Modeling](0040-modeling.md) strategy as: domain-driven-design, persisting state is no longer just about data-modelling and creating rows in tables in a relational database. DDD particularly is driven by handling domain-events rather than by snapshotting the latest state of aggregates in a system.
 
 When considering multi-tenancy aspects, most SaaS systems require multi-tenancy, and in many cases, individual customers will not permit their data to be stored in the same physical databases/physical locations as other customers. Data sovereignty is a common issue.
 
@@ -30,7 +30,7 @@ The options are:
 
 - Moving away from data-modeling means (to domain-modeling) developers need to stop thinking about relational databases and data optimization
 - Best tool for the job - chose the appropriate store for the work load. i.e. events stored in an event store. read models in databases, temporary data in caches
-- Testability - developers can work with in-memory databases on local machines, eliminating the need fro emulators, or installing cloud infrastructure components in their machines
+- Testability - developers can work with in-memory databases on local machines, eliminating the need for emulators, or installing cloud infrastructure components in their machines
 - Multi-tenancy - using dependency injection, and dynamic configuration, we can connect to different data sources specific to the subdomain and specific to individual tenants.
 
 ### (Optional) Consequences
@@ -39,10 +39,10 @@ Selecting polyglot persistence means crafting one or more abstractions of persis
 For example, domain state would be stored in an event store, that would need to define common aspects of all event stores.
 For example, read model data would be stored in a traditional "record" stores like databases (Relational or NoSQL)
 
-As with all abstractions they would need to define a lowest common denominator, in terms of capabilities, that all persistence technologies could implement.
+As with all abstractions they would need to define the lowest common denominator, in terms of capabilities, that all persistence technologies could implement.
 This has the anticipated consequence that the generalized abstractions will not be specifically optimal for any specific technology implementation.
 
-For example, a relational database will support optimization of queries based on specific workloads (e.g. indexes, stored procs, views etc). These are all RMDBS optimizations that are not supported in say NoSQL databases.
+For example, a relational database will support optimization of queries based on specific workloads (e.g. indexes, stored procedures, views etc.). These are all RMDBS optimizations that are not supported in say NoSQL databases.
 
 The thinking behind any abstraction that attempts to model all persistence technologies is optimizing for flexibility and testing, not optimizing for performance.
 When performance of certain workloads is something that is critical to a system, then this abstraction can be replaced for more optimal implementations. And this should be feasible in the architecture.

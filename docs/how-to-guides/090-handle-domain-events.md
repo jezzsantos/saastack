@@ -8,13 +8,13 @@ e.g. When a user deletes a specific image, and that image is being used as the a
 
 ## What is the mechanism?
 
-Every subdomain that changes state, creates domain events as a handy side-effect.
+Every subdomain that changes state, creates domain events as a handy side effect.
 
 Assuming that the subdomain of interest persists its state in some `IApplicationRepository`, it will also emit domain events whenever the state is persisted.
 
 Those domain events can be subscribed to, either in-process (as "domain events"), or out-of-process (as "integration events").
 
-Any other subdomain can register a "notification consumer: to capture those events and process them, any way they see fit.
+Any other subdomain can register a "notification consumer": to capture those events and process them, any way they see fit.
 
 See [Eventing](/design-principles/0170-eventing.md) for more details on how that Notifications mechanism works
 
@@ -171,7 +171,7 @@ For example, [OrganizationNotificationConsumer.cs](https://github.com/jezzsantos
 
 #### Create the Handler
 
-Normally, handling a domain event in this way is conceptually equivalent to handling an inbound API call. Thus this handler of this call is logically the Application Layer, defined by the application interface.
+Normally, handling a domain event in this way is conceptually equivalent to handling an inbound API call. Thus, this handler of this call is logically the Application Layer, defined by the application interface.
 
 > Note: The convention, that you will see implemented in this template, we create a separate port/contract for event handlers that are distinct from those being used by an inbound API endpoint. However, we also want to be able to use the same patterns and services of the existing application layer.
 >
@@ -200,7 +200,7 @@ partial interface IEndUsersApplication
 }
 ```
 
-Finally, you implement this handlers in an adjacent `class` to your Application class.
+Finally, you implement these handlers in an adjacent `class` to your Application class.
 
 Then, create another file containing another part of the `partial class` for implementing your event handlers.
 

@@ -79,8 +79,8 @@ public static class UsageConstants
                 public const string UserLogin = "User Login";
                 public const string UserLogout = "User Logout";
                 public const string UserPasswordForgotten = "User Password Forgotten";
-                public const string UserPasswordMfaAuthenticated = "User 2FA Login";
                 public const string UserPasswordMfaAssociationStarted = "User MFA Association Started";
+                public const string UserPasswordMfaAuthenticated = "User 2FA Login";
                 public const string UserPasswordMfaChallenge = "User MFA Challenge";
                 public const string UserPasswordMfaDisassociated = "User MFA Disassociated";
                 public const string UserPasswordMfaEnabled = "User MFA Enabled";

@@ -16,8 +16,8 @@ namespace IdentityInfrastructure.Persistence;
 public class PasswordCredentialsRepository : IPasswordCredentialsRepository
 {
     private readonly ISnapshottingQueryStore<PasswordCredential> _credentialQueries;
-    private readonly ISnapshottingQueryStore<MfaAuthenticator> _mfaAuthenticatorsQueries;
     private readonly IEventSourcingDddCommandStore<PasswordCredentialRoot> _credentials;
+    private readonly ISnapshottingQueryStore<MfaAuthenticator> _mfaAuthenticatorsQueries;
 
     public PasswordCredentialsRepository(IRecorder recorder, IDomainFactory domainFactory,
         IEventSourcingDddCommandStore<PasswordCredentialRoot> credentialsStore, IDataStore store)

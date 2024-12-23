@@ -30,7 +30,7 @@ Even though most web APIs are defined by the HTTP methods: `POST`, `GET`, `PUT`,
 
 Designing a REST API for web interop is not to be confused with designing a database API with CRUD.
 
-> REST and CRUD are two different design styles for two different parts of the system that ultimately must mesh together at some layer in the code. But keeping them separate is important for increasing the usability of of your API.
+> REST and CRUD are two different design styles for two different parts of the system that ultimately must mesh together at some layer in the code. But keeping them separate is important for increasing the usability of your API.
 
 #### A little history about CRUD
 
@@ -52,7 +52,7 @@ With RMDBS and ORMs being so prevalent, developers building CRUD systems only re
 1. Naming and data type selection of columns in a SQL database (and applying indexes in the right places)
 2. The relationships with other tables, using foreign keys.
 
-Normalization dictated that duplicity of data should be eliminated, and thus, reuse of data to be maximized. Thus, we end up with simple relationships and muti-variant semantics crammed into the most efficient datatypes for minimizing storage space, and maximizing performance.
+Normalization dictated that duplicity of data should be eliminated, and thus, reuse of data to be maximized. Thus, we end up with simple relationships and multi-variant semantics crammed into the most efficient datatypes for minimizing storage space, and maximizing performance.
 
 This mantra of "data reuse" was then poorly extrapolated out and over-applied to reuse data across unrelated components in the system. In many medium-sized systems of this kind, developers would start mapping new use cases (for new components) onto existing tables that were designed for other components of the system. Semantics and abstractions were mixed. Worse, these existing tables were then modified for newer use-cases for newer components of the system, breaking existing functionality in a way very hard to detect before releasing the software.
 
@@ -64,8 +64,7 @@ Back in the 1990s, databases were generally very poorly performant for most comp
 
 > Magnetic hard drive: a hard drive with physical spinning disks. Long before SSDs were invented.
 
-Because reducing the amount of data stored was a sure way to increase storage access times, developers then focused on cramming as much meaning/semantics/variability into the smallest number of bytes of data (and using fancy encodings) to fit that data into the smallest length database column as possible.
-`nvarchar(max)` was considered a performance smell back then.
+Because reducing the amount of data stored was a sure way to increase storage access times, developers then focused on cramming as much meaning/semantics/variability into the smallest number of bytes of data (and using fancy encodings) to fit that data into the smallest length database column as possible. `nvarchar(max)` was considered a performance smell back then.
 
 Today, SSD disks are (at least) an order of magnitude faster than spinning disks ever were, and most of these physical "disks" are now hidden so far away from developers (in the cloud), that it no longer matters for the design of most SaaS systems in their first few years.
 
@@ -223,9 +222,7 @@ For example, if a `car` that **has an** `availability`, and that `availability` 
 
   `POST /cars/{carid}/availabilities/{availabilityid}/timeslots/{timeslotid}`
 
-Alternatively, depending on if
-`availabilities` are considered themselves a top-level resource, then you may also have an API for
-`availabilities` in their own right, which makes the relationship above redundant (in most cases):
+Alternatively, depending on if `availabilities` are considered themselves a top-level resource, then you may also have an API for `availabilities` in their own right, which makes the relationship above redundant (in most cases):
 
 * Fetch a list of all timeslots for that `availability`:
 
@@ -237,22 +234,17 @@ Alternatively, depending on if
 
 ### Embedding Resources
 
-Generally, it is a violation of REST to _expand_ associations in representations by default, as this can lead to
-`N+1` problems in distributed systems, and there have to be practical limits on how deep the resources should expand.
+Generally, it is a violation of REST to _expand_ associations in representations by default, as this can lead to `N+1` problems in distributed systems, and there have to be practical limits on how deep the resources should expand.
 
 > Consider what should happen with cyclic resources
 
-For example, a `car` resource has a `useraccount` resource for the owner of the `car`, and it also has a
-`membership` to an `organization` resource.
+For example, a `car` resource has a `useraccount` resource for the owner of the `car`, and it also has a `membership` to an `organization` resource.
 
-REST strictly says that the `useraccount` resources **should not** be included (embedded) in the representation of the
-`car` resource.
+REST strictly says that the `useraccount` resources **should not** be included (embedded) in the representation of the `car` resource.
 
-The resources are separate top-level resources. But if they are associated then the `useraccount` of the
-`car` should only be referenced by its ID.
+The resources are separate top-level resources. But if they are associated then the `useraccount` of the `car` should only be referenced by its ID.
 
-> The [HAL specification](https://en.m.wikipedia.org/wiki/Hypertext_Application_Language) is one example of how to define embedded resources, with its
-`_embedded` pattern.
+> The [HAL specification](https://en.m.wikipedia.org/wiki/Hypertext_Application_Language) is one example of how to define embedded resources, with its `_embedded` pattern.
 
 The constraint in REST forces a client to explicitly request any embedded resources explicitly, if the client requires them, and to aggregate them if necessary.
 
@@ -329,7 +321,7 @@ Should return all cars without embedded resources for the owner.
 ```
 
 > In general, this rule eliminates the
-`N+1` problem on the server, but requires that the client must fetch all child resources from other services if needed. In that case, the client may choose to opt-in to the server doing the embedding with the
+`N+1` problem on the server, but requires that the client must fetch all child resources from other services if needed. In that case, the client may choose to opt in to the server doing the embedding with the
 `embed=resource.childresource` parameter, or the child requests the other resources itself.
 
 #### Overriding Defaults
@@ -351,7 +343,7 @@ The network is dynamic in nature and its size and effectiveness are determined b
 The
 `N+1` problem mentioned in the Embedding section above, is alleviated somewhat by the presence of the network of data, and dependent largely on how many services are providing resources to the network.
 The network of data will not reside within the bounds of a single service, nor between resources that are served by the same service, since its unlikely that those in-process method calls are cached in the HTTP caches of the network of data.
-However, outside the services, and as services are separated (i.e. Move towards becoming micro-services), the network of data starts to have more of a performance benefit to the
+However, outside the services, and as services are separated (i.e. Move towards becoming microservices), the network of data starts to have more of a performance benefit to the
 `N+1` problem.
 
 ### Searches & Filtering
@@ -362,20 +354,17 @@ These properties generally don't form part of the route.
 
 In the API the naming convention for search type API's has been the following:
 
-* For search type API's, where the request contains something to search for, (even in cases where only a single result is expected) we have been using the convention:
-  `GET /resources/search`, and defining the search criteria in the QueryString.
-  * For example, to determine if a user exists for a specified email address, we have the SearchUsers API:
-    `GET /users/search?email=bob@company.com`.
+* For search type API's, where the request contains something to search for, (even in cases where only a single result is expected) we have been using the convention: `GET /resources/search`, and defining the search criteria in the QueryString.
+  * For example, to determine if a user exists for a specified email address, we have the SearchUsers API: `GET /users/search?email=bob@company.com`.
 
-* For Listing type API's, where the request may not contain any search criteria, and usually returns different variants of a resource based upon the caller, or context, we have been using the convention:
-  `GET /resources`, and defining any parameters in the QueryString also.
+* For Listing type API's, where the request may not contain any search criteria, and usually returns different variants of a resource based upon the caller, or context, we have been using the convention: `GET /resources`, and defining any parameters in the QueryString also.
   * For example, to list the car that you own, we have the ListForCallerCars API: `GET /cars`.
 
 The difference in the naming convention is purely for semantics. For search APIs, the route adds the `/search` part.
 
 #### Search Metadata
 
-In all cases (Search-type API's, and List-type API's), the request will support ([IHasSearchOptions](../src/Application.Interfaces/IHasSearchOptions.cs)) filter, sorting, and pagination parameters, the results will contain Metadata about the actual results being returned. ([SearchMetadata](../src/Application.Interfaces/SearchMetadata.cs))
+In all cases (Search-type API's, and List-type API's), the request will support ([IHasSearchOptions](../../src/Infrastructure.Web.Api.Interfaces/IHasSearchOptions.cs)) filter, sorting, and pagination parameters, the results will contain Metadata about the actual results being returned. ([SearchMetadata](../../src/Application.Interfaces/SearchResultMetadata.cs))
 
 For example, a call to
 `GET /cars?sort=-LastModifiedUtc&limit=50&offset=100` will include the following metadata in its request:
@@ -500,12 +489,12 @@ The service will return JSON responses by default.
 
 It will **try** to provide responses in formats that the client typically requests in the `Accept` header
 
-> Other formats (e.g. CSV, SOAP, XML, etc) may be supported as needed.
+> Other formats (e.g. CSV, SOAP, XML, etc.) may be supported as needed.
 
 We support the following means to request different content types:
 
 1. Using the HTTP Accept Header (i.e. `Accept: application/json`)
-2. By appending the filetype (i.e. `.json`) suffix to the URL (i.e. `/cars.json`
+2. By appending the filetype (i.e. `.json`) suffix to the URL (i.e. `/cars.json`)
 3. Appending the format to the query string: `?format=json` (i.e. `/cars?format=json`)
 
 ### Response Bodies

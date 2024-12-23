@@ -34,7 +34,7 @@ Managing complexity effectively (over time) is paramount to preventing the softw
 We believe that:
 
 * There are critical advantages to a single team working on a single codebase when starting a new software business
-* The most performant software components are deployed as a single unit (e.g. with shared memory, etc)
+* The most performant software components are deployed as a single unit (e.g. with shared memory, etc.)
 * Far too much complexity is introduced into a single codebase software component far too early in a product lifecycle, as a result of tight coupling, and under-engineering, while still discovering the domain they are modeling in the real world. This software is then not revised as a result of poor under-engineering practices, as there is no built-in regression testing capability. Largely due to the business driving more feature development in search of a product market kit.
 * In the context of many new businesses (startups), teams must keep moving and making decisions, even if that means making suboptimal decisions so that they can learn more in the future to change their designs
 * Eventually, the business will reach the point where it will need to reach a larger audience, and thus scale up (and out) its software economically
@@ -55,7 +55,7 @@ There are other (undesirable/unsuccessful) variants of these:
 
 `Modular Monolith`
 
-For a small team, working on a new software system, they should take all the economic advantages of working together on a single deployable codebase, containing one or more compute units (web servers, databases, serverless triggers, message brokers, etc).
+For a small team, working on a new software system, they should take all the economic advantages of working together on a single deployable codebase, containing one or more compute units (web servers, databases, serverless triggers, message brokers, etc.).
 
 There are many advantages, not limited to:
 

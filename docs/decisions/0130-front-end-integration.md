@@ -25,7 +25,7 @@ Every Frontend application requires it to be optimized for usability on a specif
 
 No Backend API (collectively) can be optimal for each and every Frontend that integrates with it, but it can provide a superset of use cases for most Frontend applications that integrate with it.
 
-Thus it becomes necessary for a more optimized translation between what data and performance can be provided by a Backend and what is required by any specific Frontend.
+Thus, it becomes necessary for a more optimized translation between what data and performance can be provided by a Backend and what is required by any specific Frontend.
 
 That translation can be done in one of 3 places:
 

@@ -41,10 +41,10 @@ public static class Validations
         public static class Password
         {
             public static readonly Validation ConfirmationCode = new(@"^\d{6}$");
-            public static readonly Validation RecoveryConfirmationCode = new(@"^[a-fA-F0-9]{8}$");
             public static readonly Validation MfaPhoneNumber = CommonValidations.PhoneNumber;
             public static readonly Validation MfaToken = CommonValidations.RandomToken();
             public static readonly Validation OobCode = CommonValidations.RandomToken();
+            public static readonly Validation RecoveryConfirmationCode = new(@"^[a-fA-F0-9]{8}$");
             public static readonly Validation ResetToken = CommonValidations.RandomToken();
             public static readonly Validation VerificationToken = CommonValidations.RandomToken();
         }

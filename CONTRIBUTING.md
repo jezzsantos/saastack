@@ -74,7 +74,7 @@ Developers on every project come and go, and SaaStack is no different. When you 
 
 ### Set expectations for behavior (yours, and theirs).
 
-This includes not just how to communicate with others (being respectful, considerate, etc) but also technical responsibilities (importance of testing, project dependencies, etc). Mention and link to your code of conduct, if you have one.
+This includes not just how to communicate with others (being respectful, considerate, etc.) but also technical responsibilities (importance of testing, project dependencies, etc.). Mention and link to your code of conduct, if you have one.
 
 # Ground Rules for Contributing Code
 
@@ -115,7 +115,7 @@ That documentation is intended to be part of the template itself that users of t
 
 > It is possible to apply for a personal free license for Rider from Jetbrains, for OSS projects
 
-> We have ensured that you wont need any other infrastructure running on your local machine (i.e. SQLServer database), unless you want to run infrastructure specific integration tests.
+> We have ensured that you won't need any other infrastructure running on your local machine (i.e. SQLServer database), unless you want to run infrastructure specific integration tests.
 
 * Clone the repo locally
 * Open the `src/SaaStack.sln` solution

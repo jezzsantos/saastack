@@ -25,6 +25,7 @@ public class PasswordCredentialsApplicationPasswordResetSpec
     private readonly PasswordCredentialsApplication _application;
     private readonly Mock<ICallerContext> _caller;
     private readonly Mock<IEmailAddressService> _emailAddressService;
+    private readonly Mock<IEncryptionService> _encryptionService;
     private readonly Mock<IIdentifierFactory> _idFactory;
     private readonly Mock<IMfaService> _mfaService;
     private readonly Mock<IUserNotificationsService> _notificationsService;
@@ -33,7 +34,6 @@ public class PasswordCredentialsApplicationPasswordResetSpec
     private readonly Mock<IPasswordCredentialsRepository> _repository;
     private readonly Mock<IConfigurationSettings> _settings;
     private readonly Mock<ITokensService> _tokensService;
-    private readonly Mock<IEncryptionService> _encryptionService;
 
     public PasswordCredentialsApplicationPasswordResetSpec()
     {

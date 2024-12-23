@@ -121,6 +121,19 @@ public static class CurrencyCodes
 /// </summary>
 public sealed class CurrencyCodeIso4217 : IEquatable<CurrencyCodeIso4217>
 {
+    internal static CurrencyCodeIso4217 Create(string shortName, string code, string numeric, CurrencyDecimalKind kind)
+    {
+        shortName.ThrowIfNotValuedParameter(nameof(shortName));
+        code.ThrowIfNotValuedParameter(nameof(code));
+
+        var instance = new CurrencyCodeIso4217(numeric, shortName, code)
+        {
+            Kind = kind
+        };
+
+        return instance;
+    }
+
     private CurrencyCodeIso4217(string numeric, string shortName, string code)
     {
         numeric.ThrowIfInvalidParameter(num =>
@@ -158,19 +171,6 @@ public sealed class CurrencyCodeIso4217 : IEquatable<CurrencyCodeIso4217>
         }
 
         return Numeric == other.Numeric;
-    }
-
-    internal static CurrencyCodeIso4217 Create(string shortName, string code, string numeric, CurrencyDecimalKind kind)
-    {
-        shortName.ThrowIfNotValuedParameter(nameof(shortName));
-        code.ThrowIfNotValuedParameter(nameof(code));
-
-        var instance = new CurrencyCodeIso4217(numeric, shortName, code)
-        {
-            Kind = kind
-        };
-
-        return instance;
     }
 
     public override bool Equals(object? obj)

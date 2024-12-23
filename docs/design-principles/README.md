@@ -3,7 +3,7 @@
 [All Use Cases](0000-all-use-cases.md) the main use cases that we have implemented across the product (so that you do not have to implement them yourselves)
 
 * [REST API Design Guidelines](0010-rest-api.md) how REST API's should be designed
-* [REST API Framework](0020-api-framework.md) how REST API's are implemented
+* [REST API Framework](0020-api-framework.md) how REST APIs are implemented
 * [Modularity](0025-modularity.md) is how we build modules that can be scaled-out later as the product grows
 * [Recording/Logging/etc](0030-recording.md) how we do crash reporting, logging, auditing, and capture usage metrics
 * [Configuration Management](0040-configuration.md) how we manage configuration in the source code at design-time and runtime
@@ -20,3 +20,5 @@
 * [Developer Tooling](0140-developer-tooling.md) all the tooling that is included in this codebase to help developers use this codebase effectively, and consistently
 * [User Lifecycle](0160-user-lifecycle.md) how are users managed on the platform, and the relationship to their organizations
 * [Billing Integration](0180-billing-integration.md) how the integration between the billing management and the product works to enable self-serve plan management 
+* [Testing Strategies](0190-testing-strategies.md) how we test our codebase
+* [Javascript Actions](0200-javascript-actions.md) a concept to enhance common user interface experiences 

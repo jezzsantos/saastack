@@ -9,7 +9,8 @@ namespace Infrastructure.Shared.ApplicationServices;
 
 /// <summary>
 ///     Provides a <see cref="IUserNotificationsService" /> that delivers notifications via asynchronous email delivery
-///     using <see cref="IEmailSchedulingService" /> and via asynchronous SMS text message delivery using <see cref="ISmsSchedulingService"/>
+///     using <see cref="IEmailSchedulingService" /> and via asynchronous SMS text message delivery using
+///     <see cref="ISmsSchedulingService" />
 /// </summary>
 public class MessageUserNotificationsService : IUserNotificationsService
 {

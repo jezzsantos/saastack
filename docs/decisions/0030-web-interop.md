@@ -52,4 +52,4 @@ REST does not just mean JSON over HTTP.
 
 REST defines "resources" that are involved in processes, that model the real world. They are not just defined by nouns modeled in SQL databases. In fact, it is possible that the REST resources are converted into other domain entities further down the stack in the domain model, and further that data entities in the database are different as well.
 
-Designing REST requires a deeper insight into remote client use cases. Read our [guidance on designing REST APIs](../principles/0010-rest-api.md)
+Designing REST requires a deeper insight into remote client use cases. Read our [guidance on designing REST APIs](../design-principles/0010-rest-api.md)

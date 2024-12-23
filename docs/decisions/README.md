@@ -26,7 +26,7 @@ Name your file in this format: `0000-name.md` (lowercase, hyphenated) where the 
 * status: {proposed | rejected | accepted | deprecated | … | superseded by }
 * date: {YYYY-MM-DD} when the decision was last updated
 * deciders: everyone involved in the decision
-* (optional) consulted: everyone whose opinions are sought and with whom there is a two-way communication (such as subject matter experts)
+* (optional) consulted: everyone whose opinions are sought and with whom there is a two-way communication (such as subject-matter experts)
 * (optional) informed: everyone who is kept up-to-date on progress in one-way communication
 
 # Context and Problem Statement
@@ -79,7 +79,7 @@ The options are:
 
 ### (Optional) Validation
 
-> This optional section describes how the implementation of/compliance with the ADR is evaluated (aka enforced), for instance, by way of a review or a test. See “A Definition of Done for Architectural Decision Making” in this blog for related hints.
+> This optional section describes how the implementation of/compliance with the ADR is evaluated (aka enforced), for instance, by way of a review or a test. See “A Definition of Done for Architectural Decision-Making” in this blog for related hints.
 
 ### (Optional) Pros and Cons of the Options
 

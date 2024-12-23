@@ -6,7 +6,7 @@
 
 # Context and Problem Statement
 
-A key quality of a [Modular Monolith](0010-deployment-model.md) codebase is that you have discrete "modules" that can be re-deployed in one or more hosts, with little cost in time and engineering.
+A key quality of a [Modular Monolith](0010-architectural-pattern.md) codebase is that you have discrete "modules" that can be re-deployed in one or more hosts, with little cost in time and engineering.
 
 > For example, splitting one service into two, as separate services or containers in the cloud.
 
@@ -52,4 +52,4 @@ Choosing DDD Subdomains at the early stage of a SaaS business is a good starting
 
 Thus, DDD aggregates (as containers of use cases) will be expected to change and evolve over time, with deeper understanding of the entire system.
 
-Therefore making this choice early does not preclude changing it later when the conditions of the business change to warrant choosing another vertical slice definition.
+Therefore, making this choice early does not preclude changing it later when the conditions of the business change to warrant choosing another vertical slice definition.

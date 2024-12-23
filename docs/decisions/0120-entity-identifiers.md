@@ -38,6 +38,6 @@ The options are:
 
 `Named Short Identifiers`
 
-- Short identifiers try to be as short as possible to guarantee uniqueness, and they use only letters (upper and lower case) to be human readable
-- Named identifiers tell the \[human\} reader what entity the identifier belongs to in cases where the human is dealing with many identifiers at the same time.
+- Short identifiers try to be as short as possible to guarantee uniqueness, and they use only letters (upper and lower case) to be human-readable
+- Named identifiers tell the \[human\] reader what entity the identifier belongs to in cases where the human is dealing with many identifiers at the same time.
 - Named identifiers also clear up ambiguity in ID found all over REST JSON responses

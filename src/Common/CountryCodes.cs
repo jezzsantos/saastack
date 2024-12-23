@@ -85,6 +85,18 @@ public static class CountryCodes
 /// </summary>
 public sealed class CountryCodeIso3166 : IEquatable<CountryCodeIso3166>
 {
+    internal static CountryCodeIso3166 Create(string shortName, string alpha2,
+        string alpha3, string numeric)
+    {
+        shortName.ThrowIfNotValuedParameter(nameof(shortName));
+        alpha2.ThrowIfNotValuedParameter(nameof(alpha2));
+        alpha3.ThrowIfNotValuedParameter(nameof(alpha3));
+
+        var instance = new CountryCodeIso3166(numeric, shortName, alpha2, alpha3);
+
+        return instance;
+    }
+
     private CountryCodeIso3166(string numeric, string shortName, string alpha2, string alpha3)
     {
         numeric.ThrowIfInvalidParameter(num =>
@@ -123,18 +135,6 @@ public sealed class CountryCodeIso3166 : IEquatable<CountryCodeIso3166>
         }
 
         return Numeric == other.Numeric;
-    }
-
-    internal static CountryCodeIso3166 Create(string shortName, string alpha2,
-        string alpha3, string numeric)
-    {
-        shortName.ThrowIfNotValuedParameter(nameof(shortName));
-        alpha2.ThrowIfNotValuedParameter(nameof(alpha2));
-        alpha3.ThrowIfNotValuedParameter(nameof(alpha3));
-
-        var instance = new CountryCodeIso3166(numeric, shortName, alpha2, alpha3);
-
-        return instance;
     }
 
     public override bool Equals(object? obj)

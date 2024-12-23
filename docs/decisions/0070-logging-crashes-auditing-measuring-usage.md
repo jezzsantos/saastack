@@ -18,7 +18,7 @@ Rather than separating these concerns and having 5 different disparate ways of c
 
 1. Developers of SaaS systems need to be aware of these 5 things at all times while designing their software. So having it in one abstraction reminds them of those 5 things.
 2. There needs to be an easy and consistent way to capture these 5 kinds of data (and reuse it between these 5 different mechanisms). Rather than engineering 5 different ways, and injecting 5 different things into the code.
-3. A single well-known abstraction will need to be provided to work across any cloud platform (e.g., Azure, AWS, GoogleCloud) in any deployment topology (e.g., Monolith, Microservices, etc).
+3. A single well-known abstraction will need to be provided to work across any cloud platform (e.g., Azure, AWS, GoogleCloud) in any deployment topology (e.g., Monolith, Microservices, etc.).
 
 ## Considered Options
 
@@ -33,6 +33,6 @@ The options are:
 `A Recorder`
 
 - `IRecorder` is a single interface to access these 5 services
-- We can plugin in the standard .Net `Ilogger` to take care of diagnostic logging.
-- We can use ports and adapters to plugin any 3rd party system to handle all 5 mechanisms
+- We can plug in the standard .Net `Ilogger` to take care of diagnostic logging.
+- We can use ports and adapters to plug in any 3rd party system to handle all 5 mechanisms
 - We will need to use a reliable messaging mechanism (i.e. queues) to offload this load on HTTP requests

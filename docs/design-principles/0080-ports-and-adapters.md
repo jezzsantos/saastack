@@ -14,7 +14,7 @@ In general, this de-coupling pattern can also be applied in any layer of the cod
 
 > In other words, you don't need to go from a single "port" to a single "adapter" representing physical infrastructure (like a database). Your "port" can be implemented by an "adapter" that exposes a lower level "port" that can be implemented by a lower level "adapter".
 
-A "port" defines the data and behavior required by the consumer of it. Thus the consumer is always protected from changes in any implementation of the "port".
+A "port" defines the data and behavior required by the consumer of it. Thus, the consumer is always protected from changes in any implementation of the "port".
 > This pattern is also known as the "[Plug-in Pattern](https://en.wikipedia.org/wiki/Plug-in_(computing))", which is common in reusable libraries or frameworks that offer extensibility points for those using them.
 
 A "port," in code is simply defined in an interface.
@@ -27,7 +27,7 @@ An "adapter" is realized as a concrete class, that simply implements the "port" 
 
 Whenever a port is required to be used by a component, it declares the port in its constructor, and dependency injection is used to inject a real adapter into the component at runtime (depending on what is currently registered in the container at that time).
 
-An "adapter" class typically implements a specific kind of behavior that is self-describing in the class, or it will wrap a third-party library to implement this behavior, or it will wrap a 3rd party SDK that relays the information to a remote 3rd party system. In general, these "adapters" facilitate access to infrastructure components, such as databases, message queues, or machine infrastructure like clocks, disks, encryption, configuration, etc, or access to remote 3rd party services. Any I/O of any kind. Sometimes, they provide access to other subdomains and deployed modules in the same codebase. Essentially they help the developer separate multiple concerns into services that can be independently tested and developed.
+An "adapter" class typically implements a specific kind of behavior that is self-describing in the class, or it will wrap a third-party library to implement this behavior, or it will wrap a 3rd party SDK that relays the information to a remote 3rd party system. In general, these "adapters" facilitate access to infrastructure components, such as databases, message queues, or machine infrastructure like clocks, disks, encryption, configuration, etc., or access to remote 3rd party services. Any I/O of any kind. Sometimes, they provide access to other subdomains and deployed modules in the same codebase. Essentially they help the developer separate multiple concerns into services that can be independently tested and developed.
 
 This concrete "adapter" is then registered in the dependency injection container at runtime, for injection to where ever the port is required.
 > In this way, the consumer of the port is completely de-coupled from the implementation of the port, and the implementation of the port is completely de-coupled from the consumer of the port.
@@ -36,7 +36,7 @@ What this also enables is that the code for the port and code for the adapter(s)
 
 ## Design Principles
 
-* We want to maintain high levels of de-coupling for performing any actions outside subdomain aggregates in the "Domain Layer". This means that access to any data outside of a subdomain requires the use of a "port" to obtain it, which provides data that can be presented to the aggregate in the subdomain. This is the primary job of the "Application Layer".
+* We want to maintain high levels of de-coupling for performing any actions outside subdomain aggregates in the "Domain Layer". This means that access to any data outside a subdomain requires the use of a "port" to obtain it, which provides data that can be presented to the aggregate in the subdomain. This is the primary job of the "Application Layer".
 * We want to be able to swap out the implementation of any "adapter" (something that provides/processes its own data) without changing the domain model or requiring a change in it.
 * We want to be able to unit test the domain model in isolation without requiring any external infrastructure. (A domain model should only require data and, in some rare cases, require  "domain services" which can be mocked in order to be tested).
 * We want to be able to test the real infrastructural "adapters" in isolation also, without needing to use the domain model.
@@ -81,12 +81,12 @@ There are some notable exceptions to that unit testing rule:
 
 ### 3rd Party Services
 
-Adapters to 3rd party remote systems (a.k.a "3rd party integrations") are a special kind of "adapter" requiring additional and special treatment in the codebase, so that they are properly tested and configured correctly for use in local environments, as well as in staging/production environments.
+Adapters to 3rd party remote systems (a.k.a. "3rd party integrations") are a special kind of "adapter" requiring additional and special treatment in the codebase, so that they are properly tested and configured correctly for use in local environments, as well as in staging/production environments.
 
 The main difference between them is that they:
 
-1. Typically require the creation of accounts in the 3rd party online system (e.g., register an account with a 3rd party service and obtain an API key, a client ID, a client secret, etc). In these cases, they require separate accounts for testing-only and separate accounts for staging/production use. Testing-only accounts can never lead observers to compromising staging/production accounts. Some 3rd party providers mitigate this with sandbox environments, but not all provide that service.
-2. They often offer the use of a 3rd party SDK, a 3rd party library, or a 3rd party service to communicate with the 3rd party system. These can be very useful sometimes, depending on their sophistication (particularly with caching, retry policies, etc), but they must be configurable to point to local "stubbed" versions of them in order to be used in local development environments.
+1. Typically, require the creation of accounts in the 3rd party online system (e.g., register an account with a 3rd party service and obtain an API key, a client ID, a client secret, etc.). In these cases, they require separate accounts for testing-only and separate accounts for staging/production use. Testing-only accounts can never lead observers to compromising staging/production accounts. Some 3rd party providers mitigate this with sandbox environments, but not all provide that service.
+2. They often offer the use of a 3rd party SDK, a 3rd party library, or a 3rd party service to communicate with the 3rd party system. These can be very useful sometimes, depending on their sophistication (particularly with caching, retry policies, etc.), but they must be configurable to point to local "stubbed" versions of them in order to be used in local development environments.
 3. They require connection configuration (and often secrets) to access the 3rd party system, which often differs between local, staging, and production environments. Details for staging/production environments can never be hard-coded into the codebase, and must be configurable at deployment time.
 4. They require us to build one or more "stub" implementations of the 3rd party system so that they can be used in local development and in automated testing without requiring access to the real 3rd party system.
 
@@ -104,7 +104,7 @@ In practice, to build one of these 3rd party adapters, you need to take extra ti
 Most external adapters for 3rd party integrations, that you build, should be built and maintained in the `Infrastructure.Shared` project in a folder called: `ApplicationServices/External`.
 > This single project would be the only project that would take a dependency on any 3rd party NuGet packages required by these adapters, which should be kept to a minimum.
 
-Your adapter will likely act as an HTTPS "Service Client" to a remote 3rd party service (in the cloud or deployed in your cloud, a.k.a on-premise). Thus, the name of your adapter is likely to follow the naming pattern: `VendorHttpServiceClient`.
+Your adapter will likely act as an HTTPS "Service Client" to a remote 3rd party service (in the cloud or deployed in your cloud, a.k.a. on-premise). Thus, the name of your adapter is likely to follow the naming pattern: `VendorHttpServiceClient`.
 
 Your adapter can use the vendor-provided SDK library (from NuGet), but consider these challenges:
 
@@ -166,7 +166,7 @@ You can, however, expose testing-only credentials and configuration inside your 
 
 Integration tests are REQUIRED to test the real adapter against the real 3rd party vendor systems, using real configuration, to ensure that the adapter works as designed.
 
-These integration tests are different than others, in many ways:
+These integration tests are different from others, in many ways:
 
 1. They are of a different category called "Integration.External"
 2. They should not be executed frequently by the team, like other integration tests are, since they are testing against real 3rd party systems, can be slow, can be rate limited, and can incur costs to your organization (depending on the 3rd party system, and pricing).
@@ -266,7 +266,7 @@ In the `TestingStubApiHost` project, in the `Api` folder:
 1. Create a class that derives from `StubApiBase` (e.g., `StubVendorApi`).
 2. Consider applying a `BaseApiFromAttribute` to define a prefix for this API (e.g. `[BaseApiFrom("/vendor")]`) to separate this API from the other vendors that will also be hosted at `https://localhost:5656`.
 3. Implement the HTTP endpoints that your adapter uses, and provide empty or default responses that your adapter expects to receive. (same as the way we implement any endpoints)
-4. The Request types, Response types (and all complex data types that are used in the request and response) should all be defined in the `Infrastructure.Web.Api.Operations.Shared` project in a subfolder of the `3rdParties` folder named after the vendor (i.e., `3rdParties/Vendor`). These types follow the same patterns as requests and responses for all other API operations in the codebase. Except that these ones may use additional JSON attributes to match the real 3rd party APIs. (e.g., `JsonPropertyName` and `JsonConverter` attributes).
+4. The Request types, Response types (and all complex data types that are used in the request and response) should all be defined in the `Infrastructure.Web.Api.Operations.Shared` project in a subfolder of the `3rdParties` folder named after the vendor (i.e., `3rdParties/Vendor`). These types follow the same patterns as requests and responses for all other API operations in the codebase. Except these may use additional JSON attributes to match the real 3rd party APIs. (e.g., `JsonPropertyName` and `JsonConverter` attributes).
 5. Make sure that you trace out (using the `IRecorder`) each and every request to your Stub API (follow other examples) so that you can visually track when the API is called (by your adapter) in local testing. You can see this output in the console output for the `TestingStubApiHost` project.
 
 For example,

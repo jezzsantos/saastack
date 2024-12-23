@@ -2,7 +2,7 @@
 
 ## Why?
 
-You have defined a port in the code to a 3rd party remote service that is outside of your codebase (likely in the cloud).
+You have defined a port in the code to a 3rd party remote service that is outside your codebase (likely in the cloud).
 
 You now want to build and test an adapter to that 3rd party service.
 
@@ -66,7 +66,7 @@ If you do not wish to use an SDK from a vendor, you can easily build your own HT
 
 > You can see an example of an adapter that does exactly that with the `GravatarHttpServiceClient`.
 
-We recommend that you do not inject instances from the vendor's SDK into your class, but instead only inject the dependencies that it requires to create those types in your adapter. Otherwise you are coupling the vendors SDK to your modules, which should be avoided if possible.
+We recommend that you do not inject instances from the vendor's SDK into your class, but instead only inject the dependencies that it requires to create those types in your adapter. Otherwise, you are coupling the vendors SDK to your modules, which should be avoided if possible.
 
 A note about testability.
 
@@ -86,7 +86,7 @@ This means that you need to do some extra work, but this will be worth it in the
 
 ### Build custom service client
 
-If you are going to build an abstraction around the service client of the vendor's library for testing purposes, then define an interface for the service client in another file along side your adapter class that is named like this: `MyAdapterHttpServiceClient.VendorClient.cs`.
+If you are going to build an abstraction around the service client of the vendor's library for testing purposes, then define an interface for the service client in another file alongside your adapter class that is named like this: `MyAdapterHttpServiceClient.VendorClient.cs`.
 
 In that file, add your interface called: `IVendorClient`, and create a derived `internal sealed class VendorClient : IVendorClient`
 
@@ -189,7 +189,7 @@ Write your unit tests in the `Infrastructure.Shared.UnitTests` project, and veri
 
 You should test all public methods of your adapter (according to the "port" you have implemented). You are aiming for 100% coverage here.
 
-If you have implemented a custom vendor client, you should also unit test parts of that adapter to ensure that requests are being prepared in the correct ways.
+If you have implemented a custom vendor client, you should also unit-test parts of that adapter to ensure that requests are being prepared in the correct ways.
 
 > Many vendors have very strict and specific ways to construct requests to their APIs, and handle specific error responses, and these constraints should be tested here.
 

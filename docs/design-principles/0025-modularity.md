@@ -6,10 +6,10 @@ How should we construct and define our modules (so that we can develop/test them
 
 1. While we are a small team (e.g., a single product team or several product teams working on the same release cadence), for as long as possible, we want to be working on the same codebase so that its whole design can evolve as a single unit. This is one case of using a ["Mono-Repo"](https://en.wikipedia.org/wiki/Monorepo).
 2. We want to (as much as possible) run, test, and debug the entire system or the most relevant sub-system of the system.
-3. As a business [survives and] grows, the complexity of the software naturally increases as the software supports more functionality and as the subdomain models are explored in deeper detail. More use cases crop up (i.e., more features), and the demand and load on the software starts to increase (i.e., more users/growth). Due to either of these causes (or all of them), typically, the performance of the software decreases as more and more components/modules come into existence and more and more need to interact with each other. Bottlenecks on shared infrastructure are common. To improve that performance, the components/modules of the system are required to be split and scaled independently (e.g., towards independent microservices, with dedicated infrastructure). Eventually, it will become necessary to split the system components in the backend to serve more clients in the frontend. (Note: Typically, frontends are only split by channel or audience, whereas backends tend to be split by subdomain or by load/demand). We do not want to have to re-engineer the system to split it up; the mechanism to split it up should already be in place and can require additional work to connect the split pieces together once split. This is precisely the case for using a ["Modular Monolith"](../decisions/0010-deployment-model.md).
+3. As a business [survives and] grows, the complexity of the software naturally increases as the software supports more functionality and as the subdomain models are explored in deeper detail. More use cases crop up (i.e., more features), and the demand and load on the software starts to increase (i.e., more users/growth). Due to either of these causes (or all of them), typically, the performance of the software decreases as more and more components/modules come into existence and more and more need to interact with each other. Bottlenecks on shared infrastructure are common. To improve that performance, the components/modules of the system are required to be split and scaled independently (e.g., towards independent microservices, with dedicated infrastructure). Eventually, it will become necessary to split the system components in the backend to serve more clients in the frontend. (Note: Typically, frontends are only split by channel or audience, whereas backends tend to be split by subdomain or by load/demand). We do not want to have to re-engineer the system to split it up; the mechanism to split it up should already be in place and can require additional work to connect the split pieces together once split. This is precisely the case for using a ["Modular Monolith"](../decisions/0010-architectural-pattern.md).
 4. We've [already decided](../decisions/0045-modularization.md) that we will structure the backend into subdomains (and use DDD structures/practices), and those will be the base unit of our modules.
 5. The modules/subdomains in the system at present are defined using the `ISubDomainModule` abstraction and collated into individual Host projects (e.g, web projects or executables) using `SubDomainModules`, which are then packaged and deployed onto respective hosts/infrastructure in the cloud (e.g., into an "App Service" in Azure, or into a "Lambda" or "EC2 instance" in AWS). When they are deployed in the same deployed Host (i.e., into the same running process), then they can communicate with each other (through ports and adapters) with "in-process" adapters. When they are deployed into separate Hosts/infrastructure, they must communicate across HTTP, using the same port, but using a different HTTP adapter. Thus, even though these submodules can be deployed and scaled independently (to improve performance and reduce bottlenecks), the additional communication between them now increases latency and decreases reliability between them. See the [CAP Theorem](https://en.wikipedia.org/wiki/CAP_theorem) for the introduced challenges this brings.
-6. While this codebase starts off with defining and deploying 1 single Backend API and 1 single Website, running alongside numerous other infrastructure components (i.e, queues, functions/lambdas, databases, etc), it is anticipated that at some time in the future, that more client applications will be built for this specific product (e.g, more websites or more mobile apps, or appliances, etc) and that the API will be split into several API Hosts (for salability), and then routed together using some kind of API/Application Gateway to appear as a single IP address.
+6. While this codebase starts off with defining and deploying 1 single Backend API and 1 single Website, running alongside numerous other infrastructure components (i.e, queues, functions/lambdas, databases, etc.), it is anticipated that at some time in the future, that more client applications will be built for this specific product (e.g, more websites or more mobile apps, or appliances, etc.) and that the API will be split into several API Hosts (for scalability), and then routed together using some kind of API/Application Gateway to appear as a single IP address.
 
 ![Modular Monolith](../images/Physical-Architecture-Azure.png)
 
@@ -30,11 +30,11 @@ A logical "module" in this codebase is intended to be independently deployable, 
 1. The code for a module is defined in an `ISubDomainModule`, which is then collated into a `SubDomainModules` in a physical host project like `ApiHost1.HostedModules`. All extensibility and dependency injection, related to this module, is declared in the `ISubDomainModule`
 2. The host project (i.e., `ApiHost`) configures itself by defining its `WebHostOptions`, which in turn drives the configuration of the ASPNET process, and pipelines (via the call to `WebApplicationBuilder.ConfigureApiHost` in `Program.cs`). All dependency injection and setup for the host is contained in call to `ConfigureApiHost`.
 3. Configuration settings are declared in the host project, in a collection of `appsettings.json` files, some that are environment-specific and others that are host-specific, respective to the components in the module.
-4. Data that the subdomain "owns" (or originates) is intentionally organized separately, from other subdomains, right down to how it is stored in their respective repositories (e.g., event stores, databases, caches, etc).
+4. Data that the subdomain "owns" (or originates) is intentionally organized separately, from other subdomains, right down to how it is stored in their respective repositories (e.g., event stores, databases, caches, etc.).
 
 > Note: When it comes to data repositories like relational databases (where joining data is a native capability), traditionally, developers working in a monolith are used to creating joins/dependencies between tables across the whole schema. This entangles the individual tables in larger database, making splitting modules later an extremely hard, if not impossible, task. Thus, with a Modular Monolith, extra special care has to be taken not to just reuse tables across individual subdomains but to keep them entirely separate (possibly duplicating some data). So that those tables pertaining to a single module can be either moved (or copied) to other database deployments without breaking the system or the integrity of the data.
 >
-> Note: To be a micro-service, you must be able to maintain and control your own data in a separate infrastructure, from other micro-services.
+> Note: To be a microservice, you must be able to maintain and control your own data in a separate infrastructure, from other microservices.
 
 ### Splitting API Hosts
 
@@ -60,7 +60,7 @@ To make this easier, here are the steps you will need to split `ApiHost1` into a
    2. Remove the `Api/TestingOnly` folder.
       1. Leave the `Api/Health` folder in place, but rename the type inside `HealthApi.cs`.
    3. Edit the `HostedModules.cs`,
-      1. Remove any sub-modules that will NOT be hosted in this host.
+      1. Remove any submodules that will NOT be hosted in this host.
       2. Remove the `TestingOnlyApiModule`
       3. Add any new modules for this host.
    4. Edit `Program.cs`,
@@ -75,9 +75,9 @@ To make this easier, here are the steps you will need to split `ApiHost1` into a
 3. Now that you know more about what modules you will actually host in this project, change these files (in order):
 
    1. Edit the `ApiHostModule.cs` file, and add any additional dependencies in `RegisterServices`.
-      1. Note that all sub-modules should have already declared their dependencies themselves, so you may have nothing to do here.
+      1. Note that all submodules should have already declared their dependencies themselves, so you may have nothing to do here.
 
-   1. Edit all the `appsettings.*.json` files, and remove any sections not needed by the modules you are hosting, or by the base configuration of the host.
+   2. Edit all the `appsettings.*.json` files, and remove any sections not needed by the modules you are hosting, or by the base configuration of the host.
 
 4. The last thing to do is take care of inter-host communication, as detailed below.
 
@@ -122,7 +122,7 @@ For example, we don't want anyone on the internet connecting to our API and maki
 
 These "private" API calls should not be publicly documented or advertised (i.e., in SwaggerUI) nor accessible to just any client on the internet, but they do need to be accessible to HTTP from trusted parties. They should be protected with some further mechanism that can only be used by other sanctioned/trusted hosts that we control.
 
-In a "public" API call, we can make the call and include the necessary headers, and the host will treat this call like any other "public" API call, whether that call originated from a client directly or via another host (e.g., involved in a multi-step saga of some kind).
+In a "public" API call, we can make the call and include the necessary headers, and the host will treat this call like any other "public" API call, whether that call originated from a client directly or via another host (e.g., involved in a multistep saga of some kind).
 
 In a "private" API call, we still want to impersonate the original user that made the originating API call (that we are now relaying to another host), but we also need a further level of authentication to identify the sanctioned host forwarding the call as a "private" API call. As opposed to a client making this call directly.
 

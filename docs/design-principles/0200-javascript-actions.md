@@ -29,9 +29,7 @@ The action is always bound to:
 1. An `IOfflineService`, that monitors the 'online' status of the browser/device
 2. An XHR API call with a defined set of expected errors with end-user specific messages, an optional set of unexpected errors with end-user specific messages, and an option set of success codes (per every API call).
 
-The action can optionally be bound to:
-
-3. A UI form, that uses action-enabled for controls, and components
+The action can also optionally be bound to: A UI form, that uses action-enabled for controls, and components
 
 ### How It Works
 
@@ -45,7 +43,7 @@ The `IOfflineService` actively monitors the browser's network connectivity.
 
 * This service actively/passively detects when connectivity is lost using various strategies (i.e., polling),
 * It maintains a state of 'online' or 'offline'.
-* This service must also updated whenever any XHR call fails due to loss of connectivity, and when it is, it must then actively detect when connectivity is restored.
+* This service must also be updated whenever any XHR call fails due to loss of connectivity, and when it is, it must then actively detect when connectivity is restored.
 
 The action is always wired into this `IOfflineService`:
 

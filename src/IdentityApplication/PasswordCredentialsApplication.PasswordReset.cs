@@ -8,6 +8,44 @@ namespace IdentityApplication;
 
 partial class PasswordCredentialsApplication
 {
+    public async Task<Result<Error>> CompletePasswordResetAsync(ICallerContext caller, string token, string password,
+        CancellationToken cancellationToken)
+    {
+        var retrieved = await _repository.FindCredentialsByPasswordResetTokenAsync(token, cancellationToken);
+        if (retrieved.IsFailure)
+        {
+            return retrieved.Error;
+        }
+
+        if (!retrieved.Value.HasValue)
+        {
+            return Error.EntityNotFound();
+        }
+
+        var credentials = retrieved.Value.Value;
+        var reset = credentials.CompletePasswordReset(token, password);
+        if (reset.IsFailure)
+        {
+            return reset.Error;
+        }
+
+        var saved = await _repository.SaveAsync(credentials, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
+
+        credentials = saved.Value;
+        _recorder.TraceInformation(caller.ToCall(), "Password was reset for {Id}", credentials.UserId);
+        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserPasswordReset,
+            new Dictionary<string, object>
+            {
+                { nameof(credentials.Id), credentials.UserId }
+            });
+
+        return Result.Ok;
+    }
+
     public async Task<Result<Error>> InitiatePasswordResetAsync(ICallerContext caller, string emailAddress,
         CancellationToken cancellationToken)
     {
@@ -127,44 +165,6 @@ partial class PasswordCredentialsApplication
         }
 
         _recorder.TraceInformation(caller.ToCall(), "Password reset verified for {Id}", credentials.UserId);
-
-        return Result.Ok;
-    }
-
-    public async Task<Result<Error>> CompletePasswordResetAsync(ICallerContext caller, string token, string password,
-        CancellationToken cancellationToken)
-    {
-        var retrieved = await _repository.FindCredentialsByPasswordResetTokenAsync(token, cancellationToken);
-        if (retrieved.IsFailure)
-        {
-            return retrieved.Error;
-        }
-
-        if (!retrieved.Value.HasValue)
-        {
-            return Error.EntityNotFound();
-        }
-
-        var credentials = retrieved.Value.Value;
-        var reset = credentials.CompletePasswordReset(token, password);
-        if (reset.IsFailure)
-        {
-            return reset.Error;
-        }
-
-        var saved = await _repository.SaveAsync(credentials, cancellationToken);
-        if (saved.IsFailure)
-        {
-            return saved.Error;
-        }
-
-        credentials = saved.Value;
-        _recorder.TraceInformation(caller.ToCall(), "Password was reset for {Id}", credentials.UserId);
-        _recorder.TrackUsage(caller.ToCall(), UsageConstants.Events.UsageScenarios.Generic.UserPasswordReset,
-            new Dictionary<string, object>
-            {
-                { nameof(credentials.Id), credentials.UserId }
-            });
 
         return Result.Ok;
     }

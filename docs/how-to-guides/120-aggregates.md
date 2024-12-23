@@ -12,7 +12,7 @@ Typically, (and we recommend) one aggregate per subdomain.
 
 > There are, however, exceptions to the guideline, as can be seen in a couple of the larger Generic subdomains of this template.
 
-An aggregate root is a single class (derived from `AggregateRootBase`) that is dehydratable/re-hydratable to/from persistence and is composed of zero or more entities and value objects, that together represent its state in memory. It changes its state (in memory) by raising domain events, then handling those same events, and updating its child entities and value objects with those events (in memory). Its' state will be persisted in a repository, and its state is loaded from a repository, either from raw domain events (i.e., event-sourced) or from traditional collections.
+An aggregate root is a single class (derived from `AggregateRootBase`) that is dehydratable/re-hydratable to/from persistence and is composed of zero or more entities and value objects, that together represent its state in memory. It changes its state (in memory) by raising domain events, then handling those same events, and updating its child entities and value objects with those events (in memory). Its state will be persisted in a repository, and its state is loaded from a repository, either from raw domain events (i.e., event-sourced) or from traditional collections.
 
 > There are very specific rules and constraints that govern the design of aggregates, entities, and value objects and their behavior. See [Domain Driven Design](../design-principles/0050-domain-driven-design.md) notes for more details.
 
@@ -35,7 +35,7 @@ The initial state of an aggregate requires a little thinking upfront as to what 
 
 If the subdomain is tenanted, you must include at least the `OrganizationId` as part of the initial state. Most often, that is all that is required to be passed in.
 
-All aggregates/entities and value objects are required to be constructed with class factories and not constructors. Thus if an aggregate needs a certain piece of data (or domain service) to derive its initial state, these need to be provided to the `Create()` class factory method.
+All aggregates/entities and value objects are required to be constructed with class factories and not constructors. Thus, if an aggregate needs a certain piece of data (or domain service) to derive its initial state, these need to be provided to the `Create()` class factory method.
 
 In the case of an aggregate, not only is it constructed in the class factory method (`Create()`), but it immediately raises a `Created` event to set up its initial state. Unlike regular OOP objects, the initial state of an aggregate class is set by handling the `Created` event in the `OnStateChanged()` method, not by setting properties directly in the constructor.
 
@@ -59,7 +59,7 @@ If the aggregate is snapshotted, the persisted data will need to be mapped into 
 
 The last step in initialization is to set the actual state change in memory.
 
-This is done in the `OnStateChanged()` method by handling the raised `Created` event (from the `Create()` method, and setting any initial properties of the aggregate.
+This is done in the `OnStateChanged()` method by handling the raised `Created` event (from the `Create()` method), and setting any initial properties of the aggregate.
 
 For example,
 
@@ -83,7 +83,7 @@ protected override Result<Error> OnStateChanged(IDomainEvent @event, bool isReco
 }
 ```
 
-> For more complex state machines, like the example above, it is quite common to define an enum, and set a `Status` property to the initial state of the aggregate, in this handler (as opposed to setting a default value for it, as you would in OOP). In memory state-changes should all be grouped in this `OnStateChanged()` method to make it easier for the reader to understand the individual sate changes, and their transitions in one place.
+> For more complex state machines, like the example above, it is quite common to define an enum, and set a `Status` property to the initial state of the aggregate, in this handler (as opposed to setting a default value for it, as you would in OOP). In memory state-changes should all be grouped in this `OnStateChanged()` method to make it easier for the reader to understand the individual state changes, and their transitions in one place.
 
 ### Changing state
 
@@ -161,7 +161,7 @@ Also, notice that the methods all return a `Result<Error>`.
 
 In more complex cases, these aggregate methods can accept delegates that are invoked within the method under certain conditions.
 
-For example,, `RemoveAvatarAsync()` in the `OrganizationsRoot`:
+For example, `RemoveAvatarAsync()` in the `OrganizationsRoot`:
 
 ```c#
     public async Task<Result<Error>> RemoveAvatarAsync(Identifier deleterId, Roles deleterRoles,
@@ -297,7 +297,7 @@ public override Result<Error> EnsureInvariants()
     }
 ```
 
-Some key notes here:
+Some key points here:
 
 1. Not every state (after an event is raised) requires an invariant rule to be put in place. Focus on those that must be true at all times, or in specific known states.
 2. You may want to cascade the rules in child entities or value object collections, as you can see in the example above, with the `Unavailabilities` entities.

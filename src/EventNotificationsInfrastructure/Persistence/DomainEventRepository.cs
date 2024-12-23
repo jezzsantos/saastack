@@ -20,6 +20,13 @@ public class DomainEventRepository : IDomainEventRepository
         _events = new ReadModelStore<DomainEvent>(recorder, domainFactory, store);
     }
 
+#if TESTINGONLY
+    public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
+    {
+        return await _events.DestroyAllAsync(cancellationToken);
+    }
+#endif
+
     public async Task<Result<Error>> SaveAsync(DomainEvent domainEvent, CancellationToken cancellationToken)
     {
         var added = await _events.UpsertAsync(domainEvent, false, cancellationToken);
@@ -27,13 +34,6 @@ public class DomainEventRepository : IDomainEventRepository
             ? added.Error
             : Result.Ok;
     }
-
-#if TESTINGONLY
-    public async Task<Result<Error>> DestroyAllAsync(CancellationToken cancellationToken)
-    {
-        return await _events.DestroyAllAsync(cancellationToken);
-    }
-#endif
 
     public async Task<Result<IReadOnlyList<DomainEvent>, Error>> SearchAllAsync(SearchOptions searchOptions,
         CancellationToken cancellationToken)

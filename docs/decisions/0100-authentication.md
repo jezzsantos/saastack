@@ -8,7 +8,7 @@
 
 AuthN (short for Authentication) is not to be confused with AuthZ (short for Authorization).
 
-AuthN is essentially the process of identifying an end-user given some kind of proof that they provide. Common forms of proof include: usernames+passwords, pin numbers, locations, keys etc). Once that proof is verified, the end-user can correctly and uniquely be identified, and information about the end-user can be used downstream to "Authorize" the user to access parts of the system, and to apply rules to their use of the software.
+AuthN is essentially the process of identifying an end-user given some kind of proof that they provide. Common forms of proof include: usernames+passwords, pins, locations, keys etc. Once that proof is verified, the end-user can correctly and uniquely be identified, and information about the end-user can be used downstream to "Authorize" the user to access parts of the system, and to apply rules to their use of the software.
 
 > Part of the reason that many developers confuse and conflate AuthN and AuthZ is to do with how they've experienced them in the various frameworks they've used in the past that have not been so explicit in the distinction. Another part of the reason is that some "implementations" of these mechanisms combine them as well.
 >
@@ -16,9 +16,9 @@ AuthN is essentially the process of identifying an end-user given some kind of p
 >
 > It gets even more conflated for things like '[HMAC authentication](https://datatracker.ietf.org/doc/html/rfc2104)' where typically the user's identity is pre-assumed to be known ahead of time, so when the request arrives, the identity of the user is already known (you could say, implied by the HMAC signing key, or included in other data the request). There may be no explicit authentication step at all.
 >
-> However, in most systems (post 2012) that adopted the '[OAuth2 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749)' and then later the ''[OpenID Connect Authentication Framework](https://openid.net/specs/openid-connect-core-1_0.html)' the AuthZ and AuthN steps are explicitly separated into different processes using tokens and claims.
+> However, in most systems (post 2012) that adopted the '[OAuth2 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749)' and then later the '[OpenID Connect Authentication Framework](https://openid.net/specs/openid-connect-core-1_0.html)' the AuthZ and AuthN steps are explicitly separated into different processes using tokens and claims.
 
-Today there are many options for integrating AuthN into a SaaS product, it is not a straightforward choice to make, and and each and everyone of those options represents a set of trade-offs in many things, including:
+Today there are many options for integrating AuthN into a SaaS product, it is not a straightforward choice to make, and each one of those options represents a set of trade-offs in many things, including:
 
 * Cost
 * Maintainability
@@ -44,7 +44,7 @@ Lastly, we need to introduce some minimal abstractions to make that integration 
 The options are:
 
 1. Custom Implementation
-2. ASP.NET Core Identity
+2. ASP.NET Core Identity (ANCI)
 3. Auth0
 4. Duende IdentityServer (https://duendesoftware.com/products/identityserver)
 5. OpenIddict (https://documentation.openiddict.com/)
@@ -58,9 +58,9 @@ The options are:
 - Can support many authorization assertions, like: Roles (RBAC), Features access, etc.
 - Can support SSO authentication from 3rd parties, like: Microsoft, Google, Facebook etc.
 - Would not be OIDC authentication compliant at first, but could be made to be OIDC compliant later, by either integrating with an external provider or implementing the endpoints and flows.
-- No additional operational costs, (unlike IdentityServer, Auth0 require etc)
+- No additional operational costs, (unlike IdentityServer, Auth0 require etc.)
 - Can be ripped out and replaced out for an implementation of IdentityServer, Auth0, Okta, or other solution later.
-- Has decent support for most of the most common capabilities for an early stage SaaS business e.g. transparent JWT tokens, custom claims, Single Sign On integrations, MFA, Authenticator apps, password management, etc)
+- Has decent support for most of the most common capabilities for an early stage SaaS business (e.g. transparent JWT tokens, custom claims, Single Sign On integrations, MFA, Authenticator apps, password management, etc.)
 - Is a superior option to `ASP.NET Core Identity` since we would not be limited, as ANCI is, to opaque non-JWT tokens, and we can control the behaviour of each of the APIs, which cannot be done in ANCI either.
 
 Downsides:

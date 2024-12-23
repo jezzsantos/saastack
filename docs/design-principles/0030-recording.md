@@ -21,7 +21,7 @@ The `IRecorder` abstraction is used to give access to all these monitoring servi
 * `IAuditReporter` is for capturing application-level business-defined, regulatory/compliance auditable events in the software. e.g., an end-user accepted a certain version of an EULA. Or an end-user deleted a critical resource being managed by the tenant, etc.
 * `IUsageReporter` is for capturing usage metrics about end-users using the system. In general, these are application-level, business-interest (product-outcomes) that drive important business metrics, like activation, acquisition, referral, retention, etc.
 * `IMetricReporter` is for capturing metrics about the system, like performance metrics of the system or metrics about the data in the system. e.g., how many events exist for a specific aggregate.
-* `ILogger`(a.k.a Logging) is for the typical diagnostic traces that engineers supporting the system are accustomed to seeing in production logs, that help them identify what happened, usually when experiencing an outage or defect in the software.
+* `ILogger`(a.k.a. Logging) is for the typical diagnostic traces that engineers supporting the system are accustomed to seeing in production logs, that help them identify what happened, usually when experiencing an outage or defect in the software.
 
 ### Structured Logging
 
@@ -53,7 +53,7 @@ logger.LogInformation($"User {{UserId}} saved the {car.Color} car booking on {{B
 
 ### Crash Reporting
 
-a.k.a Crashlytics
+a.k.a. Crashlytics
 
 One anti-pattern that is very common by developers who only understand "logging" is to capture all critical errors (in the system) in trace logs together with all trace diagnostics. This approach is fraught with operational issues since the two facets are wildly different in many of the ways we manage the data sets.
 
@@ -95,13 +95,13 @@ Most digital products today mature to a point where, for compliance needs, they 
 
 ### Product Usage Metrics
 
-a.k.a Analytics
+a.k.a. Analytics
 
 In all digital SaaS products, tracking what users are actually doing with the whole system is vital. Knowing this information is critical for planning and designing the remainder of the system and for running experiments for the effectiveness of delivered features.
 
 e.g., knowing how many times users complete a particular sequence of features of the product, as indicators of how valuable and frequently used the software is used (e.g., for calculating Activation and Retention occurrences).
 
-These can include technical usage events, such as how many times a specific API was used, in order to help understand how the system should be paid for. They are as varied as the products that produce them, and for the most part (apart from common features like Login/Logout/Register etc), are specific to those products.
+These can include technical usage events, such as how many times a specific API was used, in order to help understand how the system should be paid for. They are as varied as the products that produce them, and for the most part (apart from common features like Login/Logout/Register etc.), are specific to those products.
 
 **Lifetime**: Generally, these "events" are required to be kept for either the lifetime of the product (capturing enduring usage data) and never discarded so that historical records can be searched as well. In practice, they are never deleted from storage, and it is only the code that once created them that could be removed.
 
@@ -117,7 +117,7 @@ In most digital products (especially ones where lots of user experiments are car
 
 e.g., how many times a certain feature has been used in a certain timeframe. Or how many users achieved a specific behavioral goal.
 
-These are generally non-technical or system performance-related events but more about users who use the system that is used to measure and determine the effectiveness of the software. They are as varied as the products that produce them, and for the most part (apart from common features like calling an API endpoint etc), are specific to those products.
+These are generally non-technical or system performance-related events but more about users who use the system that is used to measure and determine the effectiveness of the software. They are as varied as the products that produce them, and for the most part (apart from common features like calling an API endpoint etc.), are specific to those products.
 
 **Lifetime**: Generally, these "metrics" are required to be kept for either the lifetime of the product (capturing enduring metrics) or only for the scope of a usability experiment before they are overwritten or discarded. In practice, they are never deleted from storage, and it is only the code that creates them that is removed.
 
@@ -157,13 +157,13 @@ When deployed to AWS, all Traces, Crashes and Measures are offloaded to CloudWat
 
 ### Audits and Usages
 
-Audits are ultimately destined to be stored permanently in a database. Usages are typically relayed to a remote 3rd party system (i.e. Google Analytics, MixPanel, Amplitude etc).
+Audits are ultimately destined to be stored permanently in a database. Usages are typically relayed to a remote 3rd party system (i.e. Google Analytics, MixPanel, Amplitude etc.).
 
 In both cases, to avoid tying up the client's HTTP request, the telemetry for these types is first "scheduled" on a reliable queue, and then later, an API call to the Ancillary API is issued that "delivers" the telemetry to its final destination.
 
 > On Azure, an Azure Function is triggered when the telemetry arrives on a queue, and the Azure Function simply calls an API in the Ancillary API to deliver the telemetry to its destination. The Azure Function Trigger is a reliable means to handle this process, since if the API call fails, the message will return to the queue, and subsequent failures will result in the message moving to the poison queue, to be dealt with manually.
 
-> In AWS, a Lambda does the same job as the Azure Function above, and the SQS adapter is configured with poison queues (a.k.a a dead-letter queue) to operate in exactly the same way.
+> In AWS, a Lambda does the same job as the Azure Function above, and the SQS adapter is configured with poison queues (a.k.a. a dead-letter queue) to operate in exactly the same way.
 
 ## Website Hosts
 

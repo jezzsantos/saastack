@@ -163,6 +163,17 @@ public static class Events
             };
         }
 
+        public static MfaAuthenticatorRemoved MfaAuthenticatorRemoved(Identifier id,
+            Identifier userId, MfaAuthenticator authenticator)
+        {
+            return new MfaAuthenticatorRemoved(id)
+            {
+                UserId = authenticator.UserId.Value,
+                AuthenticatorId = authenticator.Id,
+                Type = authenticator.Type
+            };
+        }
+
         public static MfaAuthenticatorVerified MfaAuthenticatorVerified(Identifier id,
             MfaAuthenticator authenticator, Optional<string> oobCode, Optional<string> confirmationCode,
             Optional<string> verifiedState)
@@ -175,17 +186,6 @@ public static class Events
                 OobCode = oobCode,
                 ConfirmationCode = confirmationCode,
                 VerifiedState = verifiedState
-            };
-        }
-
-        public static MfaAuthenticatorRemoved MfaAuthenticatorRemoved(Identifier id,
-            Identifier userId, MfaAuthenticator authenticator)
-        {
-            return new MfaAuthenticatorRemoved(id)
-            {
-                UserId = authenticator.UserId.Value,
-                AuthenticatorId = authenticator.Id,
-                Type = authenticator.Type
             };
         }
 

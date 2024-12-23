@@ -86,7 +86,7 @@ Infrastructure code is the code you need to write for the plug-in "infrastructur
 
 Essentially, infrastructure components are those that deal with any form of IO (input/output). (i.e. memory, disk, internet, database, etc.), and they are the only pieces of software that you would build that are coupled to external services or physical infrastructure like databases, and external 3rd party APIs.
 
-An API is an infrastructure component that is driven by the internet (HTTP requests). All technology "adapters" (a.k.a ports-and-adapters) are also infrastructure components, whether they are driven by the Application Layer, or whether they drive the Application Layer.
+An API is an infrastructure component that is driven by the internet (HTTP requests). All technology "adapters" (a.k.a. ports-and-adapters) are also infrastructure components, whether they are driven by the Application Layer, or whether they drive the Application Layer.
 
 For example, a subdomain that we want to build to model cars might be called a `Car` (singular form).
 
@@ -98,9 +98,9 @@ The "module" is the unit of deployment in a codebase like SaaStack.
 
 * It usually contains one or more vertical slices of the software (Infrastructure + Application + Domain). It can be deployed standalone in some kind of runtime host (i.e. a web server or serverless container), or it can be deployed with one or more other modules in a shared host (i.e. a modular-monolith).
 
-* The module is independent of other modules. It likely communicates with other modules via HTTP, (or other protocols like queues, messages buses etc). It can be independently tested in isolation or as part of a larger collection of modules.
+* The module is independent of other modules. It likely communicates with other modules via HTTP, (or other protocols like queues, messages buses etc.). It can be independently tested in isolation or as part of a larger collection of modules.
 
-* It defines it's own dependencies and configures itself within the host it is registered in. The host instructs the module on when to register its dependencies, and when to configure itself.
+* It defines its own dependencies and configures itself within the host it is registered in. The host instructs the module on when to register its dependencies, and when to configure itself.
 
 The module is a class in a file like `CarsModule.cs` (plural form). The class derives from `ISubdomainModule`, like this:
 
@@ -160,12 +160,12 @@ public class CarsModule : ISubdomainModule
 
 ##### Dependency Injection
 
-Lets look at Dependency Injection and the rules around how you should configure the dependencies of your module.
+Let's look at Dependency Injection and the rules around how you should configure the dependencies of your module.
 
 Dependencies are injected, typically into constructors (that is the convention used in SaaStack), and when injected at runtime, an instance of the dependency is used. Like most DI frameworks (we are based on .net > 8.0), there are three levels of instancing of dependencies:
 
 1. **Singleton** - means one and only one instance of the dependency is created (ever) and reused whenever that dependency is resolved or injected into another class.
-2. **Scoped** (a.k.a **PerHttpRequest**)- means one and only one instance of the dependency is created (per HTTP Request) and reused within the same HTTP thread. Other HTTP threads get their own instances. A unique instance per HTTP request.
+2. **Scoped** (a.k.a. **PerHttpRequest**)- means one and only one instance of the dependency is created (per HTTP Request) and reused within the same HTTP thread. Other HTTP threads get their own instances. A unique instance per HTTP request.
 3. **Transient** - means that a new instance of the dependency is created every time the dependency is resolved or injected into another class.
 
 With these instancing "policies" it should be clear that if we instantiate a Singleton instance, and that class depends on an instance of another class that is a Transient, then that transient dependency is only ever injected once (ever) into the Singleton (at the moment that the Singleton is created). This is a grave mistake, and it may have difficult-to-debug side effects at runtime since the intended behavior of the Transient dependency has been altered by being injected into the Singleton instance.

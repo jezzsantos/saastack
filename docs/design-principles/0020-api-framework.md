@@ -129,7 +129,7 @@ AND have to register the minimal API's like this:
 
 since all the code above, is:
 
-1. Is very boiler-plate, tedious to type out for every endpoint, and can easily lead to typos
+1. Is very boilerplate, tedious to type out for every endpoint, and can easily lead to typos
 2. It repeats the same things in every handler class (like the constructor and fields)
 3. There is no design-time binding between the minimal API route registration and the MediatR handler to make sure they are properly bound when things change
 4. You need to maintain 2 pieces of code together when you make changes, otherwise the API just stops responding!
@@ -144,7 +144,7 @@ One of the distinguishing design principles of a Modular Monolith (over a Monoli
 
 Taking this to the extreme of one endpoint/subdomain/vertical slice per deployed unit (per web host), you would end up with very granular microservices. However, in reality, for small teams, moving forward with larger deployments in smaller steps towards that full microservices implementation is very necessary to balance cost with complexity in distributed systems as they expand (according to the stage of the SaaS business).
 
-> Recommendation: With a small team and limited budget, we recommend starting with one deployment unit (a.k.a a Monolith). Then, next, as load increases on the system, identify the "hot" subdomains/vertical slices and group them into their own web host while grouping the remaining subdomains together into other web hosts. Continue like this until you have a suitable balance of subdomains and hosts, that can be afforded.
+> Recommendation: With a small team and limited budget, we recommend starting with one deployment unit (a.k.a. a Monolith). Then, next, as load increases on the system, identify the "hot" subdomains/vertical slices and group them into their own web host while grouping the remaining subdomains together into other web hosts. Continue like this until you have a suitable balance of subdomains and hosts, that can be afforded.
 
 The ability to deploy any (vertical slice/subdomain) of the code to a separate web host should be quick, easy, and safe to accomplish (between releases) without expensive re-engineering (some minimal engineering of HTTP adapters is required and expected). This is the primary value of starting with a modular monolith.
 
@@ -216,9 +216,9 @@ public static class HostedModules
 
 The design of Minimal APIs makes developing 10s or 100s of them in a single project quite unwieldy to manage well.
 
-> All the examples out there (teaching minimal APIs) do little to demonstrate how to separate concerns across them in more complex systems. Since they are registered as individual handlers, there are not good collective ways to declare groups of related APIs. Especially since most REST APIs are grouped around resources. This is certainly the case when exposing a whole vertical slice/subdomain in a module.
+> All the examples out there (teaching minimal APIs) do little to demonstrate how to separate concerns across them in more complex systems. Since they are registered as individual handlers, there are no good collective ways to declare groups of related APIs. Especially since most REST APIs are grouped around resources. This is certainly the case when exposing a whole vertical slice/subdomain in a module.
 
-A nicer way is to use a Source Generator to read the declarative code, and do the heavy lifting for us by generating the boiler plate code, reliably.
+A nicer way is to use a Source Generator to read the declarative code, and do the heavy lifting for us by generating the boilerplate code, reliably.
 
 Then we use Roslyn analyzers (and other tooling) to guide the author in creating the correct declarative syntax.
 
@@ -300,7 +300,7 @@ Then we use Roslyn analyzers (and other tooling) to guide the author in creating
 
    > Note: Your route should always begin with a leading slash `/`, and you can substitute into the route any public property you define in your request class. For example, `/cars/{Id}` where `{Id}` refers to the property `public string Id { get; set; }`
    >
-   > Note: All service operations must share the same primary route segment, corresponding to your resource (e.g. they all start with `/cars`. This also permits sub resources (e.g. `/cars/wheels`, but not different primary resources in the same class.
+   > Note: All service operations must share the same primary route segment, corresponding to your resource (e.g. they all start with `/cars`). This also permits sub resources (e.g. `/cars/wheels`), but not different primary resources in the same class.
 
 5. You inject any dependencies into a custom constructor of yours.
 
@@ -568,7 +568,7 @@ On all inbound HTTP requests (of all hosts) we are looking for a correlation ID 
 * `X-Correlation-ID`
 
 If any of these headers are found in a request, we are then extracting that value and using it as the `ICallerContext.CallId` that is then passed down the call stack to all layers.
-Otherwise we are fabricating a brand new value for the Correlation ID, and starting with that value.
+Otherwise, we are fabricating a brand-new value for the Correlation ID, and starting with that value.
 
 > Correlation ID that are fabricated are simply UUIDs (see `Caller.GenerateCallId()`)
 

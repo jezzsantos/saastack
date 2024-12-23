@@ -14,7 +14,7 @@ Messaging, especially email/SMS is inherently "asynchronous" (from the users' po
 * Since an inbound API request to any API backend can yield of the order ~10 emails per API call, delivering them all reliably across HTTP can require many seconds/minutes of time, if you consider the possibility of retries and back-offs, etc. We simply could not afford to keep API clients blocked and waiting while email delivery takes place, let alone the risk of timing out their connection to the inbound API call in the first place.
 * Delivery of some emails is critical to the functioning of the product, and this data cannot be lost, in a failure. e.g. Consider the email sent to a user to confirm the registration of their new account, or the SMS used to provide two-factor authentication to gain access to your account. These messages must be delivered, albeit in a reasonably short period of time.
 
-Fortunately, an individual email arriving in a person's inbox, or SMS text message arriving on your phone, is not a time-critical and synchronous usability function to begin with.
+Fortunately, an individual email arriving in a person's inbox, or SMS text message arriving to your phone, is not a time-critical and synchronous usability function to begin with.
 
 > Some delay, in the order of seconds to minutes, is anticipated by the user, and is common even today.
 
@@ -38,9 +38,7 @@ Injected into the runtime will be an instance of the `IUserNotificationService`,
 
 > At present, this mechanism is pretty rudimentary. It does not abstract the users messaging details much at all. However, it is open to be extended in the future, if you needed to look up the users preferences from another service to decide how to deliver notifications, or if you needed to send notifications to multiple users at once, etc.
 
-Without such information present in the system (as is the present case), a simple default implementation of the
-`IUserNotificationsService` is being used to deliver notifications via email, and via SMS. It is called the:
-`MessageUserNotificationsService`.
+Without such information present in the system (as is the present case), a simple default implementation of the `IUserNotificationsService` is being used to deliver notifications via email, and via SMS. It is called the: `MessageUserNotificationsService`.
 
 > This simple adapter is going to send an email notification to a user based on the email address, and an SMS notification to a user based on their phone number. (future implementations of "notifiers" may behave very differently).
 
@@ -62,10 +60,7 @@ On the automation side, these 3rd party services may support API integration, an
 
 #### Reliable delivery
 
-The injected implementation of the
-`MessageUserNotificationsService` hands off the scheduling of the delivery to an implementation of the
-`IEmailSchedulingService`. This service packages up the scheduled email and enqueues it to the
-`emails` queue, and the thread that sent the notification is returned immediately.
+The injected implementation of the `MessageUserNotificationsService` hands off the scheduling of the delivery to an implementation of the `IEmailSchedulingService`. This service packages up the scheduled email and enqueues it to the `emails` queue, and the thread that sent the notification is returned immediately.
 
 Delivery of the actual email to the 3rd party service is not performed at this point, and the original request thread is not blocked waiting for that process to occur. This is a key design principle, since the client probably cannot do much in the case when the email/SMS fails to be delivered the first time, and the client certainly does not want to be kept waiting for a response back from the 3rd party email/SMS delivery service. These are typically notifications, not critical synchronous responses.
 
@@ -104,7 +99,7 @@ In some products, you might want to control the HTML body of emails being sent.
 
 Most 3rd party provides support email templating in some capacity or another.
 
-Emails can be sent either as hardcoded HMTL, or by specifying a collection of "substitutions" that are rendered by the templating engine of the 3rd party provider (e.g., MailGun, Twilio, etc).
+Emails can be sent either as hardcoded HTML, or by specifying a collection of "substitutions" that are rendered by the templating engine of the 3rd party provider (e.g., MailGun, Twilio, etc.).
 
 ### Delivery status
 

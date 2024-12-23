@@ -14,7 +14,7 @@
 * We want the specific technologies that persist the data (in staging/production environments) to not be a concern of the developer at design time, and further, we don't want the developer leaking implementation details of the specific technology beyond the adapter that connects to the specific technology. In other words, the Application and Domain layers have no idea or care about where data comes from or in what specific form.
 * We need to design a general set of capabilities for reading/writing data from any persistence technology, that can be supported by any technology. Clearly, this abstraction will not be optimized for any specific technology.
 * Any relaying of domain events for updating of read models or of notifications (to other components), needs to be reliable, and in order. We must appropriately guard against any inconsistencies that could occur between the stages of (1) writing of updates to aggregates (either snapshotting or event sourcing) and (2) propagation of domain events. Such patterns as "outbox" must be appropriately deployed.
-* We want any propagation of domain events for updating of read models or of notifications (to other components) to be asynchronous by default, since being asynchronous/synchronous has a dramatic effect on both "downstream consumers" and "upstream producers". "Upstream producers" (e.g. API clients) that trigger domain event creation via aggregate commands will need to adopt strategies for retrieval of updated data immediately after issuing state changing commands. As there will be non-deterministic latency (and eventual consistency) between the time of receiving a response from a command, and the time a an updated read model is actually updated. "Downstream consumers" will always be eventually consistent by default.
+* We want any propagation of domain events for updating of read models or of notifications (to other components) to be asynchronous by default, since being asynchronous/synchronous has a dramatic effect on both "downstream consumers" and "upstream producers". "Upstream producers" (e.g. API clients) that trigger domain event creation via aggregate commands will need to adopt strategies for retrieval of updated data immediately after issuing state changing commands. As there will be non-deterministic latency (and eventual consistency) between the time of receiving a response from a command, and the time an updated read model is actually updated. "Downstream consumers" will always be eventually consistent by default.
 * We need to be able to rip & replace any implementations of repositories with optimized implementations at a time and place where that is required without having to disruptively change the contract to the rest of the system. In other words, when changing the specific adapter for a specific Application Layer, the Application and Domain layers are not affected (i.e., the ports do not change). Only the implementation of the repository adapter will change from using general storage abstractions to using specific technology abstractions.
 
 ## Implementation
@@ -33,7 +33,7 @@ Using well-known architectural patterns to manage testability and coupling (like
 
 The missing link for most designs is having a suitable unified abstraction of ALL data sources (within a class of data source and within reason).
 
-> The "within reason" part of this exposes an intentional trade-off that needs to be made. Do you design for maximum throughput and performance from day one?, or do you optimize for changing your mind and evolving your design over time to match your actual growth trajectory? This is a tradeoff that needs to be made before you lay down any patterns in your software because once you get ~6-12 months in your build on the first track, reverting back is daunting for most teams and most businesses, to the point it cannot be done.
+> The "within reason" part of this statement exposes an intentional trade-off that needs to be made. Do you design for maximum throughput and performance from day one?, or do you optimize for changing your mind and evolving your design over time to match your actual growth trajectory? This is a tradeoff that needs to be made before you lay down any patterns in your software because once you get ~6-12 months in your build on the first track, reverting back is daunting for most teams and most businesses, to the point it cannot be done.
 
 What are these (suitable) abstractions in SaaStack?
 
@@ -155,7 +155,7 @@ public class CarRepository : ICarRepository
 }
 ```
 
-These store implementations make it very easy to access data through the lower-level technology adapters (i.e., `IDataStore` and `EventStore`, etc) that they use.
+These store implementations make it very easy to access data through the lower-level technology adapters (i.e., `IDataStore` and `EventStore`, etc.) that they use.
 
 > Note: at no point in this code does the developer have to know what technology adapter is being used at runtime. There is no leaky abstraction from the actual technology adapter in this code, such as what query language is being used. The developer has no idea if the data is saved to an RMDBS like Microsoft SQL Server or as a KV pair to a Redis cache. That is all defined by dependency injection, making all of this code highly testable and decoupled.
 
@@ -167,7 +167,7 @@ As you may appreciate by now, specifically for aggregate state persistence (as o
 
 Both persistence schemes can persist the state of an aggregate (and all its descendant entities and value objects), but each scheme uses different mechanisms to do it. The choice of this scheme affects the code you need to write in the aggregate and the code you need to write in your domain-specific `IApplicationRepository`. However, the code you write in the application layer can remain the same.
 
-> This means that if/when you change your mind down the track and you switch from one scheme to the other, you only need to change the implementation of your domain-specific `IApplicationRepository,` and you need to add/remove the `Dehydration()` method and constructor to/from your aggregate classes.
+> This means that if/when you change your mind down the track, and you switch from one scheme to the other, you only need to change the implementation of your domain-specific `IApplicationRepository,` and you need to add/remove the `Dehydration()` method and constructor to/from your aggregate classes.
 
 The code flows from the Application's perspective are the same, but the implementation of the domain-specific `IApplicationRepository` and the aggregate are slightly different.
 

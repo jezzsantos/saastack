@@ -33,6 +33,9 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
 
     public SendingAttempts Attempts { get; private set; } = SendingAttempts.Empty;
 
+    public Optional<DeliveredEmailContentType> ContentType { get; private set; } =
+        Optional<DeliveredEmailContentType>.None;
+
     public Optional<DateTime> Delivered { get; private set; } = Optional<DateTime>.None;
 
     public Optional<DateTime> FailedDelivery { get; private set; } = Optional<DateTime>.None;
@@ -52,9 +55,6 @@ public sealed class EmailDeliveryRoot : AggregateRootBase
     public Optional<DateTime> Sent { get; private set; } = Optional<DateTime>.None;
 
     public List<string> Tags { get; private set; } = [];
-
-    public Optional<DeliveredEmailContentType> ContentType { get; private set; } =
-        Optional<DeliveredEmailContentType>.None;
 
     public static AggregateRootFactory<EmailDeliveryRoot> Rehydrate()
     {

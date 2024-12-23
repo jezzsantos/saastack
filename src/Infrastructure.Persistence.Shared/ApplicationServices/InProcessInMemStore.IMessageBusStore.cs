@@ -21,7 +21,7 @@ partial class InProcessInMemStore : IMessageBusStore, IMessageBusStoreTrigger
         subscriptionName.ThrowIfNotValuedParameter(nameof(subscriptionName),
             Resources.InProcessInMemDataStore_MissingSubscriptionName);
 
-        if (!_topics.TryGetValue(topicName, out var _))
+        if (!_topics.TryGetValue(topicName, out _))
         {
             return Task.FromResult<Result<long, Error>>(0);
         }

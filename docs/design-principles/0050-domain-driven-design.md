@@ -4,7 +4,7 @@
 
 ## Design Principles
 
-1. We want to design our software according to the use cases we understand from the real world. Thus, focusing on [modeling behaviors](../decisions/0040-modeling.md) in the software rather than modeling the data (a.k.a Data-Modeling) required to enable the software to operate. Data modeling is too database and technology focused.
+1. We want to design our software according to the use cases we understand from the real world. Thus, focusing on [modeling behaviors](../decisions/0040-modeling.md) in the software rather than modeling the data (a.k.a. Data-Modeling) required to enable the software to operate. Data modeling is too database and technology focused.
 2. We want to define discrete boundaries of "state" changes, and thus, we want to use the notion of "aggregates" to do that where an aggregate represents the smallest atomic unit of state change.
 3. We want to define at least one root aggregate per explicit subdomain. (Ideally, one per subdomain).
 4. We want aggregates to be the source/producer of "domain events" that represent atomic units of change, and have them communicated to other subdomains (either: remotely over HTTP, or in-process), using a pub-sub mechanism.
@@ -26,12 +26,12 @@
 20. All dependencies only point inward. i.e., The Domain Layer strictly has no dependency on the Application Layer, nor on the Infrastructure Layer. In contrast, the Infrastructure Layer and Application Layer can have dependencies on the Domain Layer (directly or indirectly).
 21. We want to avoid building [Transaction Scripts (and anemic domain models)](https://martinfowler.com/eaaCatalog/transactionScript.html) in the Application Layer, as that encourages tight coupling, and anemic domain models.
 22. Application interfaces/contracts will be composed of commands and queries (CQRS):
-   1. For "commands" it will delegate the command to one (or more) Root Aggregates (i.e., that results in a change of state).
-   2. For "queries" it will delegate the query directly to a read model in an `IDataStore`. In rare cases, the query may involve an Aggregate to check access rules.
+    1. For "commands" it will delegate the command to one (or more) Root Aggregates (i.e., that results in a change of state).
+    2. For "queries" it will delegate the query directly to a read model in an `IDataStore`. In rare cases, the query may involve an Aggregate to check access rules.
 23. The Application Layer delegates all decisions (in a command or query) to an Aggregate. The only decisions that should exist in the Application Layer, are:
-   1. The statelessness of the contract. Stateless or Stateful.
-   2. Where to pull data from (which ApplicationService/Repository) and where to push it (which ApplicationService/Repository) and when.
-   3. Which Aggregate use case to invoke, when.
+    1. The statelessness of the contract. Stateless or Stateful.
+    2. Where to pull data from (which ApplicationService/Repository) and where to push it (which ApplicationService/Repository) and when.
+    3. Which Aggregate use case to invoke, when.
 24. The Application Layer is responsible for providing the Domain Layer with all the data it needs to execute the specific use case. Also, may require domain services for data processing.
 25. The Application Layer is responsible for converting all data it obtains (either from Repository/ApplicationService, or from its contract parameters) into ValueObjects that the Domain Layer requires. Domain Layer does not accept variables in anything but primitives and ValueObjects.
 26. The Application Layer will use the [Tell Don't Ask](https://martinfowler.com/bliki/TellDontAsk.html) pattern to instruct the Aggregate to execute the use case, no matter how complex the use case is (or isn't). The [Law of Demeter](https://en.wikipedia.org/wiki/Law_of_Demeter) also applies to reading any data from an Aggregate.
@@ -57,7 +57,7 @@ Among the subdomains will exist one or more "bounded contexts". In DDD, a bounde
 
 For example, in this codebase, we have provided two "Core" subdomains: `Cars` and `Bookings`. Together, these two subdomains alone are understood together to represent the "core" of a bounded context of borrowing cars with the "Car Sharing" domain.
 
-The other subdomains are all "Generic" subdomains, and form another more technical bounded context where they work together to provide consistency and rules that govern things like multi-tenancy, ownership and payment authority, etc:
+The other subdomains are all "Generic" subdomains, and form another more technical bounded context where they work together to provide consistency and rules that govern things like multi-tenancy, ownership and payment authority, etc.:
 
 - `EndUsers`, `Organizations`, `UserProfiles`, `Identities`, and `Subscriptions` are all generic subdomains related to the multi-tenancy and identity management within a typical SaaS product.
 - `Ancillary`, `Images` (and `Workers`) are all generic subdomains related to the operation of a typical SaaS product.
@@ -70,7 +70,7 @@ A lot of work has been done on what is called "strategic" design in DDD. Whole b
 
 However, what is not so hard is answering this question:
 
-Q. What are the use cases for using the software you want to build? a.k.a What, specifically, should your software do?
+Q. What are the use cases for using the software you want to build? a.k.a. What, specifically, should your software do?
 
 If you can answer that question, then you are already designing the "Subdomains" of your domain.
 
@@ -111,7 +111,7 @@ So, "Unavailability" starts out as an entity of a Car, and "Location" can start 
 
 As time goes on, and as you explore your product opportunities further, it is very common that subdomains both diverge (and split up) or converge (and merge together). This is very normal, and unavoidable, and unpredictable, and unknowable ahead of time. So we recommend that you don't try to second guess the future since it is likely to change as you move forward.
 
-> For example, one day, in a few months or years' time, your specific product may decide to expand, branch out, and create some set of features around Trip management where you might provide `EndUsers` the capability to plan and schedule their `Trips` or even create and manage `Tours`. At that point in time, in the software, you will be deciding whether to factor out `Trip` from being a entity into its own subdomain, where you might now have 5 or 6 use cases for it. At that time, the `Bookings` subdomain that once used a Trip entity will need to be changed to use a "memento" of a `Trip` from the `Trips` subdomain. This is quite normal progress as the software is explored.
+> For example, one day, in a few months or years' time, your specific product may decide to expand, branch out, and create some set of features around Trip management where you might provide `EndUsers` the capability to plan and schedule their `Trips` or even create and manage `Tours`. At that point in time, in the software, you will be deciding whether to factor out `Trip` from being an entity into its own subdomain, where you might now have 5 or 6 use cases for it. At that time, the `Bookings` subdomain that once used a Trip entity will need to be changed to use a "memento" of a `Trip` from the `Trips` subdomain. This is quite normal progress as the software is explored.
 >
 
 ### Bounded Contexts
@@ -134,7 +134,7 @@ This change is also almost impossible to predict and design ahead of time, so we
 
 ### Event Sourced versus Snapshotting
 
-[Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) is a strategy to capture individual 'changes in the state' of your software over time, as opposed to (the more traditional way of) capturing only the 'latest version of your data' (a.k.a "Snapshotting").
+[Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) is a strategy to capture individual 'changes in the state' of your software over time, as opposed to (the more traditional way of) capturing only the 'latest version of your data' (a.k.a. "Snapshotting").
 
 > "State" and "data" mean slightly different things in this context.
 
@@ -154,7 +154,7 @@ This ability to re-write history is a big advantage.
 
 For example, let's say that 2 years into your Car Sharing product, you now want to understand your end user's behaviors a little better because you are contemplating a new capability in the product.
 
-So you want to ask the software/database to report its data on the probability of a car in an urban area being unavailable at 8 pm at night. But until that day, your software had not been capturing that kind of unavailability data because the software only cared about storing the future unavailability of a car for making its reservations. Why would it care about capturing and storing past unavailability after all? You've not needed it until now.
+So you want to ask the software/database to report its data on the probability of a car in an urban area being unavailable at 8pm at night. But until that day, your software had not been capturing that kind of unavailability data because the software only cared about storing the future unavailability of a car for making its reservations. Why would it care about capturing and storing past unavailability after all? You've not needed it until now.
 
 So you have to engineer a solution to provide this historical data from this day forward and start capturing it in the data. The problem is that now, you need a large enough dataset for any statistical significance or meaning, and you don't have it. So you can't provide an answer to the question for another few months or years down the track while you collect that data. With an event-sourced system, it is likely that you can have that answer right away, it is in the data already.
 
@@ -183,11 +183,9 @@ Every subdomain should have (at least) one root aggregate.
 
 > Think of an aggregate root as the trunk of a tree. Think of entities as the branches of the tree, and think of value objects as the leaves of the tree.
 
-Aggregate classes are by convention named (in the code) with the suffix:
-`Root` to distinguish them from other types that are used throughout the other Layers of the codebase, such as those with the same name in the ReadModels and Resources for the same subdomain.
+Aggregate classes are by convention named (in the code) with the suffix: `Root` to distinguish them from other types that are used throughout the other Layers of the codebase, such as those with the same name in the ReadModels and Resources for the same subdomain.
 
-The class should derive from
-`AggregateRootBase,` and the designer should immediately decide whether the state of the aggregate is going to be persisted in an event stream (using an Event Store) or in a traditional snapshot persistence store (e.g., a database).
+The class should derive from `AggregateRootBase,` and the designer should immediately decide whether the state of the aggregate is going to be persisted in an event stream (using an Event Store) or in a traditional snapshot persistence store (e.g., a database).
 
 For example,
 
@@ -203,7 +201,7 @@ public sealed class CarRoot : AggregateRootBase
 
 When a new aggregate is created, it must be constructed using a class factory method. This method will then be called from the Application Layer when a new aggregate needs to be created.
 
-> Instantiating an aggregate using a constructor directly is not permitted from outside of the domain.
+> Instantiating an aggregate using a constructor directly is not permitted from outside the domain.
 
 This class factory is to be given only parameters that are mandatory to construct the aggregate in a valid state when the aggregate is initially created. Otherwise, parameters can be included in subsequent use cases (i.e., other method calls).
 
@@ -324,8 +322,8 @@ These changes will manifest as domain change events.
 
 For any state change (or any query) to an aggregate's state, we are not permitted to navigate the hierarchy of an aggregate into its child/descendant entities and value objects, and change the state of them. There are at least two design principles at play here that enforce this rule:
 
-* [The Law of Demeter](https://en.wikipedia.org/wiki/Law_of_Demeter) a.k.a the Principle of Least Knowledge - don't take dependencies (of knowledge) on the internal details and implementation of any object in a graph. That knowledge should only be known to, and encapsulated by the aggregate.
-* [Tell Don't Ask](https://martinfowler.com/bliki/TellDontAsk.html) - instruct the aggregate to perform the operation; do not read the aggregate's state so that you can change the system outside of the aggregate.
+* [The Law of Demeter](https://en.wikipedia.org/wiki/Law_of_Demeter) a.k.a. the Principle of Least Knowledge - don't take dependencies (of knowledge) on the internal details and implementation of any object in a graph. That knowledge should only be known to, and encapsulated by the aggregate.
+* [Tell Don't Ask](https://martinfowler.com/bliki/TellDontAsk.html) - instruct the aggregate to perform the operation; do not read the aggregate's state so that you can change the system outside the aggregate.
 
 These design principles help us to encapsulate behaviors in use cases inside the aggregate.
 
@@ -521,19 +519,15 @@ For example:
 
 #### Aggregate Rehydration
 
-Last thing to mention about aggregate design, is to understand (at a high level) how event-sourced aggregates are created in memory by your code.
+Last thing to mention with aggregate design, is to understand (at a high level) how event-sourced aggregates are created in memory by your code.
 
-When your repository returns you an instance of a new aggregate that was pulled from storage, the instance of your root aggregate class has under gone the following process:
+When your repository returns you an instance of a new aggregate that was pulled from storage, the instance of your root aggregate class has undergone the following process:
 
 > Note: you can follow the implementation of the
 `EventSourcingDddCommandStore<TAggregateRoot>.LoadAsync()` method for more details
 
-1. The instance aggregate was created by calling the `Rehydrate()` method of your class, with the
-   `identifier` of the aggregate. This creates a new instance of your aggregate, but it is not initialized yet into its current state.
-2. The
-   `LoadChanges()` method is called on the aggregate, and this replays all the events (from storage) in-order through the
-   `OnStateChanged()` method, but with the flag
-   `isReconstituting = true`. Which means that we are loading the aggregates complete state in one shot. No invariant checks. It is important to understand that events are only replayed through the aggregate, and not through any child entities, which means that if the aggregate does not delegate these events to child entities, then they will not be initialized correctly.
+1. The instance aggregate was created by calling the `Rehydrate()` method of your class, with the `identifier` of the aggregate. This creates a new instance of your aggregate, but it is not initialized yet into its current state.
+2. The `LoadChanges()` method is called on the aggregate, and this replays all the events (from storage) in-order through the `OnStateChanged()` method, but with the flag `isReconstituting = true`. Which means that we are loading the aggregates complete state in one shot. No invariant checks. It is important to understand that events are only replayed through the aggregate, and not through any child entities, which means that if the aggregate does not delegate these events to child entities, then they will not be initialized correctly.
 
 Once the aggregate root is initialized, then use cases can be run, more events can be raised that change the state of the aggregate root.
 
@@ -649,7 +643,7 @@ then, in the `UnavailabilityEntity` class, the entity will also handle the same 
 
 When a new entity is created, it must be constructed with a class factory method that includes the `RootEventHandler rootEventHandler`. This handler is later used by the entity to raise events to its parent/ancestor root aggregate when they originate from the entity.
 
-> Instantiating an entity using a constructor directly is not permitted from outside of the aggregate root.
+> Instantiating an entity using a constructor directly is not permitted from outside the aggregate root.
 
 This class factory is unlikely to be given any additional parameters that are mandatory to construct the entity since the data it will need will likely come from the domain events that are relayed to it from the aggregate.
 
@@ -768,7 +762,7 @@ When an entity raises an event (using the `RaiseChangeEvent()` method) it first 
 `OnStateChanged()` method again - setting the entities internal state again (as it already did before passing the event to the root aggregate). This might seem inefficient, and it is. In most cases, this won't have a negative impact. But in some case, it may. The point to understand is this. If the root aggregate
 `OnStateChange()` method did not delegate the event to the entity, then the entity would never be initialized when the aggregate root is initialized. So this delegation must happen, from root to child entity. The problem comes when the entity is the party that raises the event. Then we enter this duplicated cycle. You can avoid the duplicated initialization cycle by considering the value of the
 `isReconstituting` parameter of the aggregate root's
-`OnStateChanged()` method. In other words, if the entity is the raising the event, the the aggregate root would not pass the event back to the entity is the
+`OnStateChanged()` method. In other words, if the entity is the raising the event, the aggregate root would not pass the event back to the entity is the
 `isReconstituting == false`.
 
 The aggregate will handle this event in its `OnStateChanged()` method and relay the call back to the appropriate entity.
@@ -798,7 +792,7 @@ For example, in the entity class:
 
 Entities, like aggregates, may have conditions within states that are "invariant". That is, things about its state that must be true at all times (i.e., they don't vary).
 
-Entities, like aggregates should be verifying their variants before and after raising events. Similarly they should implement the `EnsureInvariants()` method.
+Entities, like aggregates should be verifying their variants before and after raising events. Similarly, they should implement the `EnsureInvariants()` method.
 
 For example:
 
@@ -869,7 +863,7 @@ public sealed class Jurisdiction : SingleValueObjectBase<Jurisdiction, string>
 
 When a new value object is created, it must be constructed with a class factory method. This method will then be called from the Application Layer when a new value object needs to be created.
 
-> Instantiating an value object using a constructor directly is not permitted from outside of the domain.
+> Instantiating a value object using a constructor directly is not permitted from outside the domain.
 
 This class factory is to be given only parameters that are mandatory to construct the value object in a valid state when the value object is initially created.
 

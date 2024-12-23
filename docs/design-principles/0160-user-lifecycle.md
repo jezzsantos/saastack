@@ -22,7 +22,7 @@ Users of the product are managed in the `EndUser` subdomain.
 
 Users self-register in the `Identity` subdomain via either `PasswordCredentials`, `SSOUsers`, or other methods, each responsible for its own onboarding flow (e.g., passwords require email confirmations and a managed registration flow, whereas SSO can just automate it).
 
-* New users can be invited by another party and can respond to that invitation (e.g., a "warm" guest invitation) or register without an invite (e.g., a "cold" direct registration).
+* New users can be invited by another party and can respond to that invitation (e.g., a "warm" guest invitation) or register without an invitation (e.g., a "cold" direct registration).
 
 ![User Lifecycle](../images/EndUser-Lifecycle.png)
 
@@ -34,7 +34,7 @@ An `Organization` has a classification of either `Personal` or `Shared`.
 * `Personal` organizations are for each `EndUser` (person or machine) to use on the platform and cannot be shared with others.
 * A person/machine will have a membership to one `Personal` organization at all times, and can have a membership to one or more `Shared` organizations.
 
-> Note: By default, The primary use case of a `Personal` org is for the user to still be able to login to the platform and at least use basic functionality of the product without having to upgrade to paid features. The basic plan is assumed by default to be a "free" (unpaid) plan. This is intended so that they have to have a space in the product of their own, from which they can still use the product even if they are removed from other companies organizations, and from there add other (paid) organizations if they wish to, or be invited into other organizations later.
+> Note: By default, The primary use case of a `Personal` org is for the user to still be able to log in to the platform and at least use basic functionality of the product without having to upgrade to paid features. The basic plan is assumed by default to be a "free" (unpaid) plan. This is intended so that they have to have a space in the product of their own, from which they can still use the product even if they are removed from other companies organizations, and from there add other (paid) organizations if they wish to, or be invited into other organizations later.
 
 #### Roles and Responsibilities
 
@@ -100,5 +100,5 @@ Guest invitations are the mechanism to introduce (and refer) new users to the pr
 
 * Any organization owner (role) can invite a guest to their organization (by email) or invite an existing user to their organization (by email or by ID)
 * As above, a "guest invitation" requires only an email address and has an expiry (14 days, by default)
-* A "guest invitation" follows the same process as above, except that when they eventually register (either by accepting the guest invitation with a different email address or by registering with the same email address that they were invited with), they will added to the organization.
+* A "guest invitation" follows the same process as above, except that when they eventually register (either by accepting the guest invitation with a different email address or by registering with the same email address that they were invited with), they will be added to the organization.
 * This organization (or the last one they were invited to) will become their "default" organization (rather than their `Personal` organization).

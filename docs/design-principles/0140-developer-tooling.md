@@ -4,11 +4,11 @@ This page summarizes the developer tooling that is included in SaaStack to help 
 
 ## Overview
 
-Sample code templates, of the type that software vendors like Microsoft produces are great for learning new concepts. So are many of the training videos out there on youtube, trying to explain a cool single concept. Beyond that, these examples are very problematic to copy and commercialize as they establish no architectural styles or enduring structure upon which to build real systems.
+Sample code templates, of the type that software vendors like Microsoft produces are great for learning new concepts. So are many of the training videos out there on YouTube, trying to explain a cool single concept. Beyond that, these examples are very problematic to copy and commercialize as they establish no architectural styles or enduring structure upon which to build real systems.
 
-> There is very good reason for this for vendors. Vendors like Microsoft simply cannot afford to commit to supporting any one architectural style, over others, because it will not be fit for purpose for the whole market they sell to. They are after selling to the largest market, as opposed to serving any niche market. General purpose tools and advice for the largest possible market influence. Leave the niche specific tools for the relatively smaller players in the partner networks. Its all upside for everyone.
+> There is very good reason for this for vendors. Vendors like Microsoft simply cannot afford to commit to supporting any one architectural style, over others, because it will not be fit for purpose for the whole market they sell to. They are after selling to the largest market, as opposed to serving any niche market. General purpose tools and advice for the largest possible market influence. Leave the niche specific tools for the relatively smaller players in the partner networks. It's all upside for everyone.
 
-It requires decades of experience of building software from first principles (and many mistakes) to establish long lived patterns that teams can be effective with in new products. Unfortunately this skill is far rarer than the industry would like to believe (in the growing pool of software development talent out there), and as a result many software teams are starting up (in a myriad of different kinds of contexts) without this experience on board when they begin. And with that inexperience, they fall back unto naive templates and code samples, which ultimately lead to unstructured codebases with very naïve patterns in them, with lack of abstraction and basic design patterns for managing the long term future of the product. Particularly if "data-modeling" and relational databases are the predominant design pattern. These kinds of codebases very quickly evolve into big balls of mud, with a giant monolithic database at their center, and ultimately this leads to one of two outcomes: A successful business cannot scale, due to lack of funding, and rewrites or rage quits ensue.
+It requires decades of experience of building software from first principles (and many mistakes) to establish long-lived patterns that teams can be effective with in new products. Unfortunately this skill is far rarer than the industry would like to believe (in the growing pool of software development talent out there), and as a result many software teams are starting up (in a myriad of different kinds of contexts) without this experience on board when they begin. And with that inexperience, they fall back unto naive templates and code samples, which ultimately lead to unstructured codebases with very naive patterns in them, with lack of abstraction and basic design patterns for managing the long term future of the product. Particularly if "data-modeling" and relational databases are the predominant design pattern. These kinds of codebases very quickly evolve into big balls of mud, with a giant monolithic database at their center, and ultimately this leads to one of two outcomes: A successful business cannot scale, due to lack of funding, and rewrites or rage-quits ensue.
 
 The second problem that product teams have is that the tools they use. Their favorite tools tend to be general purpose tools, that they know so well from previous employ. For example, all IDEs like Visual Studio, VS Code and JetBrains Rider are, by design, general purpose and highly extensible tools aimed at every kind of software development.
 
@@ -34,8 +34,8 @@ For example,
 
 * In a Clean/Onion/Hexagonal Architecture (which SaaStack advocates), we have several well-known horizontal layers. These layers have a specific direction of dependencies.
 * In DDD (which SaaStack backends also advocate), subdomains mark the boundaries between aggregates and their data, and coupling between them is forbidden. Not just at the code level but also in the data repository.
-* And finally, in an Event Driven Architecture (which SaaStack backends advocate), domain events should be emitted from the Aggregates and brokered to other components and MUST cross boundaries (both vertical Subdomain boundaries and horizontal Layer boundaries), and so they must be behavior-less data containers (a.k.a DTOs) that are [JSON/XML] serializable.
-* With all these constraints, in the "heat of the moment" when time is tight, and the pressure is on, despite best intentions, developers can easily violate any one or all these rules/constraints by simply selecting the wrong type from an intelli-sense picker (or from predictive AI like GitHub Copilot) and never know they have violated any constraint at all. Often, not until months later when this discovery now costs too much to remediate - slowly cascading to disorder again.
+* And finally, in an Event Driven Architecture (which SaaStack backends advocate), domain events should be emitted from the Aggregates and brokered to other components and MUST cross boundaries (both vertical Subdomain boundaries and horizontal Layer boundaries), and so they must be behavior-less data containers (a.k.a. DTOs) that are [JSON/XML] serializable.
+* With all these constraints, in the "heat of the moment" when time is tight, and the pressure is on, despite their best intentions, developers can easily violate any one or all these rules/constraints by simply selecting the wrong type from an intelli-sense picker (or from predictive AI like GitHub Copilot) and never know they have violated any constraint at all. Often, not until months later when this discovery now costs too much to remediate - slowly cascading to disorder again.
 
 What is really needed is custom tooling that will call these things out when they happen and force the developer to change their mistake to conform to the established patterns there and then as they change the software.
 
@@ -81,13 +81,13 @@ TBD
 
 ## Code Generators
 
-> a.k.a Roslyn Source Generators
+> a.k.a. Roslyn Source Generators
 
 TBD
 
 ## Code Analysis
 
-> a.k.a Roslyn Analyzers
+> a.k.a. Roslyn Analyzers
 
 TBD
 
@@ -107,7 +107,7 @@ TBD
 
 ## Swagger UI
 
-> a.k.a OpenAPI documentation
+> a.k.a. OpenAPI documentation
 
 We provide Swagger UI tooling for both the frontend and backend APIs.
 

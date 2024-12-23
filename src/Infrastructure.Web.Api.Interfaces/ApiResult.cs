@@ -104,8 +104,9 @@ public class StreamResult
         ContentType = contentType;
     }
 
-    public string? FileName { get; }
     public string ContentType { get; }
+
+    public string? FileName { get; }
 
     public Stream Stream { get; }
 }

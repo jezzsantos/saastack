@@ -62,7 +62,7 @@ The options are:
 
 `Hybrid Structuring`
 
-- We believe that most of the focus in the early days of building a new product will be on the use cases of subdomains. Thus we should organize around subdomains.
+- We believe that most of the focus in the early days of building a new product will be on the use cases of subdomains. Thus, we should organize around subdomains.
 - In a code template like this, there will be stable 'Generic' subdomains that will only need infrequent attention, once configured (e.g. `UserAccounts`, `Organizations`, `Ancillary,` etc.) then there will be the product specific 'Core' subdomains to this specific product that are being explored most of the time. Segregating those subdomains will be useful.
 - Common components (that are scoped to be reused only by components in each horizontal layer) are best contained in projects related to that layer. In the absence of specificity of a subdomain, those common/shared components are better organized by a horizontal layer. We would expect to see a hierarchy of Common/Shared components, where there is more of a focus on technical aspects, as these components apply to all components in the layer of all subdomains.
 - For better abstraction, there is no need to directly reflect the names of components for specific frameworks in the namespaces and type names of things. This is an undesirable form of coupling to 3rd party frameworks and libraries.  

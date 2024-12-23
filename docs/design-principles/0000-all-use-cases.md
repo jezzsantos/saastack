@@ -205,13 +205,9 @@ Event Notifications are the way that subdomains can listen to each other in a lo
 
 ### Subscriptions
 
-A billing subscription is created for every
-`Organization` (personal and shared) on the platform for any (person or machine). It represents the billing subscription plan for that tenant/organization (i.e., pricing, cost, and features). The subscription plan determines the
-`Features` each user has access to on the platform, and it defines the fiscal responsibilities that each
-`EndUser` has an obligation for (i.e., scheduled payments).
+A billing subscription is created for every `Organization` (personal and shared) on the platform for any (person or machine). It represents the billing subscription plan for that tenant/organization (i.e., pricing, cost, and features). The subscription plan determines the `Features` each user has access to on the platform, and it defines the fiscal responsibilities that each `EndUser` has an obligation for (i.e., scheduled payments).
 
-Every `Organization` must have a single `EndUser` that owns the fiscal responsibility of the
-`Organization` (called the "buyer"), who can control the extent of that responsibility.
+Every `Organization` must have a single `EndUser` that owns the fiscal responsibility of the `Organization` (called the "buyer"), who can control the extent of that responsibility.
 
 1. Inspect the subscription for a specific organization
 2. Upgrade/Downgrade the subscription plan (or transfer the subscription to another authorized buyer when the buyer has left the platform)
@@ -226,8 +222,7 @@ Every `Organization` must have a single `EndUser` that owns the fiscal responsib
 ### User Profiles
 
 A user profile will be automatically created for every new registered `EndUser` on the platform (person or machine).
-When a person is registered we also query the
-`IAvatarService` to see if we can find a default avatar for the persons email. The default adapter is Gravatar.com.
+When a person is registered we also query the `IAvatarService` to see if we can find a default avatar for the persons email. The default adapter is Gravatar.com.
 
 1. Change the details (i.e. names, phone, time zone) of the profile
 2. Change the address of the profile
@@ -237,8 +232,7 @@ When a person is registered we also query the
 
 ## Backend for Frontend
 
-These are the main use cases of this product that are exposed via "public" APIs in the Frontend BEFFE, e.g.,
-`WebsiteHost`.
+These are the main use cases of this product that are exposed via "public" APIs in the Frontend BEFFE, e.g., `WebsiteHost`.
 
 > In many cases, these API calls are made from a JavaScript client and are forwarded to the Backend APIs.
 > Most of these APIs are protected by CSRF protection, and only accessible to the JavaScript application

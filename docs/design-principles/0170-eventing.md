@@ -4,11 +4,11 @@ Eventing is the gateway to Event Driven Architecture (EDA), but it starts in the
 
 ## Design Principles
 
-1. We want all DDD aggregates to utilize "domain events" to drive use cases, irrespective of whether we are sourcing/capturing their current state from events (a.k.a Event Sourcing) or sourcing/capturing their current state from data snapshots (i.e. traditional record persistence).
+1. We want all DDD aggregates to utilize "domain events" to drive use cases, irrespective of whether we are sourcing/capturing their current state from events (a.k.a. Event Sourcing) or sourcing/capturing their current state from data snapshots (i.e. traditional record persistence).
 2. For [event-sourcing persistence schemes](0070-persistence.md) (that are by definition "write models" only), we need to build associated "read models" so that we can query domain aggregates.
 3. We want the flexibility to add/change our "read models" at any time, as the software changes, and not have lost any data, and ideally re-create views of the data not previously seen (not persisted) in the past.
 4. We want to use denormalized views of data to query for maximum efficiency (i.e. without complex joins).
-5. We want to de-couple subdomains from each other as much as possible. Even for subdomains that are highly-coupled to begin with (e.g., `EndUsers` and `Organizations` and `Subscriptions`.
+5. We want to de-couple subdomains from each other as much as possible. Even for subdomains that are highly-coupled to begin with (e.g., `EndUsers` and `Organizations` and `Subscriptions`).
 6. We want to deploy certain groups of subdomains into separate hosts and split the modular monolith into many independent hosts (i.e., micros-services) later in the lifecycle of the product, but not have to re-engineer flows to accommodate those changes.
 7. Sending imperative "commands" (i.e. API calls) between different API's is by its nature unreliable, and it encourages coupling (and assumptions) in many subtle ways for the software designer. We want to try to minimize that.
 8. We want the flexibility to make changes to key use cases in the product, without changing multiple subdomains at the same time.
@@ -130,13 +130,13 @@ Instead, the target domain can simply "observe" and react to the appearance of a
 
 The coupling of the imperative method/API call is eliminated.
 
-> This is particularly useful when you have highly inter-dependent subdomains, that require that their data be in sync with each other (i.e., `EndUser` memberships with `Organizations` and `UserProfiles`. As seen below.
+> This is particularly useful when you have highly inter-dependent subdomains, that require that their data be in sync with each other (i.e., `EndUser` memberships with `Organizations` and `UserProfiles`). As seen below.
 
 ![Generic Subdomains](../images/Eventing-Flows-Generic.png)
 
 This eventing capability is particularly necessary in distributed deployments, where direct calls between separately deployed components are realized as HTTP calls (requiring both the source and target subdomains to be synchronously responsive and consistent to each other).
 
-Instead, decoupling this asynchronously via "integration events" would normally done in distributed systems with a message broker of some kind (i.e., a queue, a message bus, etc.).
+Instead, decoupling this asynchronously via "integration events" would normally be done in distributed systems with a message broker of some kind (i.e., a queue, a message bus, etc.).
 
 The synchronous publication of all "domain events" is handled automatically by the `IEventNotifyingStoreNotificationRelay` (after events have first been projected by the `IEventNotifyingStoreProjectionRelay`).
 

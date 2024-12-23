@@ -37,8 +37,7 @@ The `WebsiteHost` project is a BEFFE. It performs these tasks:
 3. It implements a Reverse Proxy in order to forward JSON API requests to Backend APIs
 4. It implements its own Authentication API endpoints so that [HTTPOnly, secure] cookies can be used between the BEFFE and JS app, for security purposes, to avoid storing any tokens/secrets in the browser (anywhere).
 5. It necessarily protects against CSRF attacks (since it uses cookies to store authorization tokens).
-6. It provides other API endpoints for common services, like: Health monitoring, Recording (diagnostics, usages, crash reports, etc.), Feature Flags, etc. These APIs are available at
-   `/api`.
+6. It provides other API endpoints for common services, like: Health monitoring, Recording (diagnostics, usages, crash reports, etc.), Feature Flags, etc. These APIs are available at `/api`.
 7. It provides a platform to add further custom dedicated API endpoints, that you might provide yourself to the JS app. These might be necessary to avoid performing N+1 operations in the browser, versus doing them in the BEFFE (in the cloud), which is far more efficient in latency.
 8. It provides the opportunity to deploy (and scale) the web application separately from backend APIs.
 
@@ -50,7 +49,7 @@ BEFFEs are intended to be built specifically for a specific Web Application.
 
 > BEFFEs can also be built for Mobile applications
 
-They are responsible for returning data to client applications (i.e., the JS app) in the most efficient form. Thus they are tightly coupled to the JS app. To do this well, they often filter and aggregate data fetched from other Backend sources (via HTTP service clients).
+They are responsible for returning data to client applications (i.e., the JS app) in the most efficient form. Thus, they are tightly coupled to the JS app. To do this well, they often filter and aggregate data fetched from other Backend sources (via HTTP service clients).
 
 > In general, a BEFFE does not directly access databases for application data. They use Backend APIs to obtain that data. However, they may implement their own caches to enhance performance.
 
@@ -85,22 +84,17 @@ Since there is a Reverse Proxy handling inbound calls, and since we do not want 
 *access_tokens* and
 *refresh_tokens* from disclosure in the JS app is NOT to have them present (or accessible) to the JS app at all.
 
-The BEFFE offers a dedicated API for authentication (
-`POST /api/auth`) that intermediates the authentication process. Regardless of what data is used to authenticate the user (i.e., password credentials or SSO tokens, etc.), the call is made directly with the BEFFE and then relayed to the various authentication endpoints in the backend.
+The BEFFE offers a dedicated API for authentication ( `POST /api/auth`) that intermediates the authentication process. Regardless of what data is used to authenticate the user (i.e., password credentials or SSO tokens, etc.), the call is made directly with the BEFFE and then relayed to the various authentication endpoints in the backend.
 
-If the attempt to authenticate is successful, the authentication response from the Backend API (e.g., from
-`POST /passwords/auth` or `POST /sso/auth`) will always include an `access_token` and a `refresh_token`.
+If the attempt to authenticate is successful, the authentication response from the Backend API (e.g., from `POST /passwords/auth` or `POST /sso/auth`) will always include an `access_token` and a `refresh_token`.
 
 These "auth tokens" are then added to [HTTPOnly, secure] cookies that are then returned to the browser to be used between the browser and BEFFE for subsequent requests/responses.
 
-At some point in time, either of those auth tokens will expire, at which point either the
-`access_token` can be refreshed (using the `refresh_token`), or the
-`refresh_tokesn` expires, and the end user will need to re-authenticate again.
+At some point in time, either of those auth tokens will expire, at which point either the `access_token` can be refreshed (using the `refresh_token`), or the `refresh_tokens` expires, and the end user will need to re-authenticate again.
 
 #### Login
 
-To authenticate (login) a user from the browser, make a XHR call to
-`POST /api/auth` with a body containing either, the user's credentials,
+To authenticate (login) a user from the browser, make a XHR call to `POST /api/auth` with a body containing either, the user's credentials,
 
 For example,
 
@@ -158,7 +152,7 @@ A successful logout request will remove both the `auth-tok` and `auth-reftok` co
 
 #### Refreshing Session
 
-When the `access_token` cookie (`auth-tok`) expires (by default, after 15 mins), it will be necessary to refresh the
+When the `access_token` cookie (`auth-tok`) expires (by default, after 15 minutes), it will be necessary to refresh the
 `access_token`.
 
 To refresh the session, call `POST /api/auth/refresh`
@@ -184,30 +178,18 @@ Since there are several cookies exchanged between the browser and BEFFE, there m
 Implementing CSRF protection correctly requires that the JS app adheres to the strict CSRF implementation policy:
 
 1. All XHR calls (using any method) must go directly to the BEFFE, which must also be the origin server of the JS app that is making the request. No requests (of any sort) from the JS app should <u>ever</u> bypass BEFFE and go directly to any Backend API.
-2. This policy applies to all "un-safe" API methods: `POST`, `PUT`, `PATCH`, and `DELETE`, but it excludes `GET`,
-   `HEAD`, and `OPTIONS`.
-
-3. Any "un-safe" XHR call (from JS app to the BEFFE) that changes any state must be implemented with the methods:
-   `POST`, `PUT`, `PATCH`, `DELETE`, and not `GET`, `HEAD`, or `OPTIONS`.
-4. Include in all "unsafe" XHR calls (e.g., `POST`, `PUT`, `PATCH`, `DELETE`), an HTTP header called
-   `anti-csrf-tok`. The value of this header can be read from the `meta` header called
-   `csrf-token` found in the header of the HTML of `index.html`. For example,
+2. This policy applies to all "unsafe" API methods: `POST`, `PUT`, `PATCH`, and `DELETE`, but it excludes `GET`, `HEAD`, and `OPTIONS`.
+3. Any "unsafe" XHR call (from JS app to the BEFFE) that changes any state must be implemented with the methods: `POST`, `PUT`, `PATCH`, `DELETE`, and not `GET`, `HEAD`, or `OPTIONS`.
+4. Include in all "unsafe" XHR calls (e.g., `POST`, `PUT`, `PATCH`, `DELETE`), an HTTP header called `anti-csrf-tok`. The value of this header can be read from the `meta` header called `csrf-token` found in the header of the HTML of `index.html`. For example,
 
     ```
     var csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
     ```
-5. The JS app must not store the value of the
-   `csrf-token` anywhere in the browser. Neither in-memory, nor in local storage, nor any other cache or store in the JS app. It must read the value from the HTML of
-   `index.html` each and every time it needs it since the value will change every time
-   `index.html` is requested from the BEFFE.
+5. The JS app must not store the value of the `csrf-token` anywhere in the browser. Neither in-memory, nor in local storage, nor any other cache or store in the JS app. It must read the value from the HTML of `index.html` each and every time it needs it since the value will change every time `index.html` is requested from the BEFFE.
 
-6. Ensure that this `csrf-token` value is never included in any "safe" XHR call (e.g., `GET`, `HEAD`, or
-   `OPTIONS`), and never exposed in any browser history.
+6. Ensure that this `csrf-token` value is never included in any "safe" XHR call (e.g., `GET`, `HEAD`, or `OPTIONS`), and never exposed in any browser history.
 
-7. After the user is authenticated, or after the authenticated user logs out, a new value of both the
-   `anti-csrf-tok` cookie and metadata header
-   `csrf-token` will be updated by the BEFFE. The JS app must implement a scheme that re-fetches the
-   `index.html` page containing these new values for subsequent XHR calls. Failing to do so, will block all subsequent XHR calls to the BEFFE.
+7. After the user is authenticated, or after the authenticated user logs out, a new value of both the `anti-csrf-tok` cookie and metadata header `csrf-token` will be updated by the BEFFE. The JS app must implement a scheme that re-fetches the `index.html` page containing these new values for subsequent XHR calls. Failing to do so, will block all subsequent XHR calls to the BEFFE.
 
 #### How it works
 
@@ -233,17 +215,13 @@ In the BEFFE, we are using a defense-in-depth strategy (informed by the OWASP gu
 
 ##### Workflow
 
-- Each request to `index.html` creates a CSRF token and writes it into the `csrf-token` metadata tag of the
-  `index.html` page.
+- Each request to `index.html` creates a CSRF token and writes it into the `csrf-token` metadata tag of the `index.html` page.
 - The value is unique for each fetch of `index.html` regardless of whether the user is authenticated or not.
 - A corresponding `anti-csrf-tok` cookie is also updated with the HMAC signature of the CSRF token.
-- The JS app is then required to send back (in any "unsafe"  XHR call to the BEFFE) the value of the
-  `csrf-token` metadata value in a request header called `anti-csrf-tok`.
+- The JS app is then required to send back (in any "unsafe"  XHR call to the BEFFE) the value of the `csrf-token` metadata value in a request header called `anti-csrf-tok`.
 - The two values sent to the BEFFE are paired, but not the same, and they are compared (via HMAC signatures) in the BEFFE to prove that they are paired.
 - The CSRF token corresponds to the currently authenticated user, but it is encrypted.
-- In addition, the `origin` header of the request (or the
-  `referer` header of the request) is compared to ensure the request originated from JavaScript served from this BEFFE. Otherwise,
-  `HTTP 403 - Forbidden` is returned.
+- In addition, the `origin` header of the request (or the `referer` header of the request) is compared to ensure the request originated from JavaScript served from this BEFFE. Otherwise, `HTTP 403 - Forbidden` is returned.
 - A [same-origin CORS policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) is also enabled.
 
 > Note: Likewise, when the authentication status of the current user changes (i.e. they go from logged out to logged in, or visa-versa), the CSRF token and cookie will need to be updated. This means that a new request to
@@ -251,27 +229,20 @@ In the BEFFE, we are using a defense-in-depth strategy (informed by the OWASP gu
 
 ##### Defeating CSRF
 
-To defeat the CSRF protection, an attack would have to send an "un-safe" state-changing request to the BEFFE, that:
+To defeat the CSRF protection, an attack would have to send an "unsafe" state-changing request to the BEFFE, that:
 
 1. Included in the request is a signed `anti-csrf-tok` cookie, signed with the same HMAC key stored on the BEFFE.
-2. Included in the request is an
-   `anti-csrf-tok` header containing a CSRF token (paired to the cookie above), encrypted with the same AES encryption key stored on the BEFFE.
+2. Included in the request is an `anti-csrf-tok` header containing a CSRF token (paired to the cookie above), encrypted with the same AES encryption key stored on the BEFFE.
 3. That CSRF token (above) would have had to include the ID of the currently authenticated user (a.k.a. session ID). Or include no user ID for an anonymous call.
 4. Included an `origin` header (or included a `referer` header) that matched the origin of the JS app.
 5. By-passed the browsers CORS pre-flight check.
 
 For an attacker to do this from JavaScript running in the same browser, they need to defeat these challenges:
 
-* Point 1 (above): The current cookies (including
-  `anti-csrf-tok`) are automatically sent to the BEFFE (by the browser) when making a cross-origin request from www.hacker.com to www.yourproduct.com. In a compliant browser, JavaScript should not be allowed to create (read or write) its own HTTP-Only cookies. Even if they could do this, they would have to know the same HMAC secret as the BEFFE to create a valid signature for that cookie value.
-* Point 2: The JS on www.hacker.com would have to download a request to www.yourproduct.com/index.html and read the HTML to retrieve a value for the
-  `csrf-token` from the HTML. This is forbidden by the [Same Origin Policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) (SOP) in compliant browsers. The JS on www.hacker.com would have to write the
-  `anti-csrf-tok` header on the request with the value it reads from the
-  `index.html` page. Writing custom headers on requests (like:
-  `anti-csrf-tok`) is forbidden by SOP in compliant browsers.
+* Point 1 (above): The current cookies (including `anti-csrf-tok`) are automatically sent to the BEFFE (by the browser) when making a cross-origin request from www.hacker.com to www.yourproduct.com. In a compliant browser, JavaScript should not be allowed to create (read or write) its own HTTP-Only cookies. Even if they could do this, they would have to know the same HMAC secret as the BEFFE to create a valid signature for that cookie value.
+* Point 2: The JS on www.hacker.com would have to download a request to www.yourproduct.com/index.html and read the HTML to retrieve a value for the `csrf-token` from the HTML. This is forbidden by the [Same Origin Policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) (SOP) in compliant browsers. The JS on www.hacker.com would have to write the `anti-csrf-tok` header on the request with the value it reads from the `index.html` page. Writing custom headers on requests (like: `anti-csrf-tok`) is forbidden by SOP in compliant browsers.
 * Point 3: The JS on www.hacker.com would have to know the AES encryption key on the BEFFE to create their own token value. (They could, however, use their own encrypted token and related cookie, from monitoring their own account on the site, to force a re-login of their account and initiate a "Login CSRF").
-* Point 4: The JS on www.hacker.com would have to spoof the `origin` or
-  `referer` headers on the request. The browser should not allow JavaScript to do this.
+* Point 4: The JS on www.hacker.com would have to spoof the `origin` or `referer` headers on the request. The browser should not allow JavaScript to do this.
 * Point 5: The JS on www.hacker.com would have to bypass the CORS preflight check set on www.yourproduct.com in order for any state-changing API call to succeed.
 
 All of these things above would have to happen in JS on www.hacker.com to bypass the CSRF protection on any state-changing XHR request.
@@ -371,7 +342,7 @@ The JS app now has a choice to make on how to handle the `HTTP 401 - Unauthorize
 1. It can handle that response and direct the user to the login page for them to authenticate again, and redirect them back to where they started.
 2. It can attempt to refresh the `access_token`, obtain refresh `access_token`, and then retry the call to the Backend.
 
-> Clearly, due to the short lifetimes of access_tokens (being in the order of 15 mins), users would experience poor usability if they were asked to log in on the same frequency that an
+> Clearly, due to the short lifetimes of access_tokens (being in the order of 15 minutes), users would experience poor usability if they were asked to log in on the same frequency that an
 `access_token` expired, especially in most SaaS-based products.
 
 ### Handling `HTTP 401 - Unauthorized` Responses
@@ -380,17 +351,10 @@ The following process should be implemented in the JS app, to maintain a reasona
 
 1. In a global handler, for each XHR call, handle the case when an `HTTP 401 - Unauthorized` is received.
     - Otherwise, process the request as a normal response.
-2. When  `HTTP 401 - Unauthorized` is received, first attempt to refresh the users' authentication "session" by calling
-   `POST /api/auth/refresh`.
-   1. If this refresh call fails with `HTTP 401 - Unauthorized` or
-      `HTTP 423 - Locked` (either the refresh token has expired or the cookie containing it did not exist to begin with, or the account has been locked out), Redirect the user to a login page to re-authenticate.
-   2. If this refresh call succeeds with
-      `HTTP 200 - OK` then retry the original XHR request (as this request should now be proxied with a valid and refreshed
-      `access_token` by the BEFFE)
-   3. If the retried request fails a second time with `HTTP 401 - Unauthorized` (or
-      `HTTP 423 - Locked`), redirect the user to a login page to re-authenticate. This could indicate that the
-      `refresh_token` has now expired, or the
-      `access_token` has been revoked, or is, at this point in time, invalid for some other reason.
+2. When  `HTTP 401 - Unauthorized` is received, first attempt to refresh the users' authentication "session" by calling `POST /api/auth/refresh`.
+   1. If this refresh call fails with `HTTP 401 - Unauthorized` or `HTTP 423 - Locked` (either the refresh token has expired or the cookie containing it did not exist to begin with, or the account has been locked out), Redirect the user to a login page to re-authenticate.
+   2. If this refresh call succeeds with `HTTP 200 - OK` then retry the original XHR request (as this request should now be proxied with a valid and refreshed `access_token` by the BEFFE)
+   3. If the retried request fails a second time with `HTTP 401 - Unauthorized` (or `HTTP 423 - Locked`), redirect the user to a login page to re-authenticate. This could indicate that the `refresh_token` has now expired, or the `access_token` has been revoked, or is, at this point in time, invalid for some other reason.
 
 > Note: responses that include
 `HTTP 403 - Forbidden` are likely to be from CSRF violations which are also applicable to all these XHR interactions.

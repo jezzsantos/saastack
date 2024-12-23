@@ -18,6 +18,8 @@ public sealed class EmailDetailsChanged : DomainEvent
 
     public string? Body { get; set; }
 
+    public required DeliveredEmailContentType ContentType { get; set; }
+
     public string? Subject { get; set; }
 
     public Dictionary<string, string>? Substitutions { get; set; }
@@ -29,6 +31,4 @@ public sealed class EmailDetailsChanged : DomainEvent
     public required string ToDisplayName { get; set; }
 
     public required string ToEmailAddress { get; set; }
-
-    public required DeliveredEmailContentType ContentType { get; set; }
 }

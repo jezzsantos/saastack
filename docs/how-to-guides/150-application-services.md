@@ -10,4 +10,4 @@ Explanation of where we do this and how
 
 ## Where to start?
 
-Steps to do it
+Steps to take

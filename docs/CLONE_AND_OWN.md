@@ -28,7 +28,7 @@ You are likely to have a specific name of your company/venture/project. You migh
 
 Your project might be hosted in GitHub, or it might be hosted in a private company repository, like: GitLab/AzureDevOps, etc
 
-Either way, you are going to need to make some changes to all places in the code where you see any of the following terms/words/referencs.
+Either way, you are going to need to make some changes to all places in the code where you see any of the following terms/words/references.
 
 ### Names
 

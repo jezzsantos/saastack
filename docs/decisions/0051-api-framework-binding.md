@@ -54,8 +54,8 @@ It is possible to provide our own customer binding, by providing a `BindAsync` m
 
 There are some drawbacks to this approach, that could be with us for some time, as the minimal API framework matures.
 
-1. We have to define a base class for all request types, to avoid having to specify custom binding for each request type, as the ASPNET framework does not yet support a central binding override. Instead [it only supports](https://learn.microsoft.com/en-gb/aspnet/core/fundamentals/minimal-apis/parameter-binding?view=aspnetcore-8.0#binding-precedence) defining static methods on each type, and this cannot be inherited. Thus, we have had to define a base type called `WebRequest<TRequest>` that we can provide a central binding mechanism.
+1. We have to define a base class for all request types, to avoid having to specify custom binding for each request type, as the ASPNET framework does not yet support a central binding override. Instead, [it only supports](https://learn.microsoft.com/en-gb/aspnet/core/fundamentals/minimal-apis/parameter-binding?view=aspnetcore-8.0#binding-precedence) defining static methods on each type, and this cannot be inherited. Thus, we have had to define a base type called `WebRequest<TRequest>` that we can provide a central binding mechanism.
 2. We have to specially process form data.
 3. This custom binding mechanism occurs far down the request pipeline, long after middleware has run, so we need to account for it in several places.
-4. In our handling of requests to support automatic handling of multi-tenancy, we have to derive the current `TenantId` of the request from many places (i.e., from query string, route values, body, etc). We need to account for this binding there.
-5. We have to override defaults in the `Swashbuckle` library that accounts for these attributes, which wont be there anymore.
+4. In our handling of requests to support automatic handling of multi-tenancy, we have to derive the current `TenantId` of the request from many places (i.e., from query string, route values, body, etc.). We need to account for this binding there.
+5. We have to override defaults in the `Swashbuckle` library that accounts for these attributes, which won't be there anymore.

@@ -6,14 +6,14 @@
 
 # Context and Problem Statement
 
-Most SaaS products charge their customers for use of the product and they receive revenue.
+Most SaaS products charge their customers for use of the product, and they receive revenue.
 
 > The rest does not apply to businesses that don't charge for their products
 
 There is a universe of options and possibilities when it comes to:
 
 1. How much to charge,
-2. What to charge for (e.g., seats, tenancies, services, etc),
+2. What to charge for (e.g., seats, tenancies, services, etc.),
 3. Whether there are recurring charges for some things and fixed charges for others,
 4. Whether to charge on some schedule (e.g., daily, monthly, annually) and/or usage charges (e.g., per API call, per transaction, storage capacity) etc.
 
@@ -31,7 +31,7 @@ To make this experience seamless and reliable for customers of SaaS products, th
 
 Furthermore, the SaaS business's customer support/success functions will be required to centrally manage their customers' data and billing policies, and they will need comprehensive tools to do that effectively and efficiently, when required. These tools are already provided by the BMS vendors themselves as table-stakes for all SaaS products to use. (whether they integrate their products or not).
 
-Thus we have a situation where both the SaaS product and the BMS system are sharing the same set of data and acting upon it. Given each party can change that data, there is a case here for bi-direction syncing of that data to some reasonable timeframe. This is a challenge the SaaS product needs to resolve.
+Thus, we have a situation where both the SaaS product and the BMS system are sharing the same set of data and acting upon it. Given each party can change that data, there is a case here for bi-direction syncing of that data to some reasonable timeframe. This is a challenge the SaaS product needs to resolve.
 
 ## Considered Options
 

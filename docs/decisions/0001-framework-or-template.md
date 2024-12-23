@@ -14,7 +14,7 @@ Common ways we experience developers sharing their code, patterns, and tools:
 
 - They build and distribute a library (in binary form, like a nuget/npm package)
 - Build and distribute a framework (in binary form, like a nuget/npm package)
-- Build and make accessible source code to their libraries, frameworks, code snippets, etc to be built and maintained by someone else (in source code form, like a GitHub project)
+- Build and make accessible source code to their libraries, frameworks, code snippets, etc. to be built and maintained by someone else (in source code form, like a GitHub project)
 
 Library or Framework? The size and perceived complexity of the SaaStack codebase will probably be seen to be of the type "framework" (as opposed to being a "library") since it describes certain structured solutions and abstractions at many layers of the code, taking care of many concerns. It also describes where to put your code and the interfaces available to it, which is a common characteristic of frameworks. It would appear just like any other framework that developers experience, despite the fact that it does not come in binary form.
 
@@ -26,7 +26,7 @@ There are well-known issues with adopting other people's frameworks:
 There are also particularly difficult issues to deal with if they are packaged, versioned, and controlled by those other people:
 
 - **Customization**: Frameworks may limit your ability to customize your application to your specific needs and preferences.
-- **Standards**: You often have to follow the conventions and rules that the framework defines and enforces, which may be different than what you are comfortable with, and will need to be acceptable to you.
+- **Standards**: You often have to follow the conventions and rules that the framework defines and enforces, which may be different from what you are comfortable with, and will need to be acceptable to you.
 - **Lock-in
   **: Using a framework can also lead to "lock-in" where you are tied to a specific set of technologies and unable to switch to alternatives easily. This can make it harder to adapt to the changing needs and environment of your specific context. You also become dependent on the framework developers for support and maintenance, which can pose risks if they stop updating or fixing the framework, or ignore your requests to alter it for your specific context.
 

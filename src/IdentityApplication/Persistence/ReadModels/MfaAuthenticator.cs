@@ -11,8 +11,6 @@ public class MfaAuthenticator : ReadModelEntity
 {
     public Optional<string> BarCodeUri { get; set; }
 
-    public Optional<string> VerifiedState { get; set; }
-
     public bool IsActive { get; set; }
 
     public Optional<string> OobChannelValue { get; set; }
@@ -28,4 +26,6 @@ public class MfaAuthenticator : ReadModelEntity
     public MfaAuthenticatorType Type { get; set; } = MfaAuthenticatorType.None;
 
     public Optional<string> UserId { get; set; }
+
+    public Optional<string> VerifiedState { get; set; }
 }

@@ -36,10 +36,10 @@ For example, we make it trivial to define robust REST APIs, and under the covers
 
 Furthermore, we have many Roslyn analyzers that continuously check your code to make sure that you and your team do not inadvertently violate certain architectural rules and constraints that are in place to manage the complexity of the source code over time, as your product develops. It is like having continuous code review, and your own plugins that understand your code.
 
-For example, clean architecture mandates that all dependencies point inwards from Infrastructure to Application to Domain layers for very good reasons. But developers, in the heat of the moment, can easily violate that rule by simply adding a `using` statement the other way. Your IDE will make this easy for you and it doesn't actually care, becuase it does not care about architectural rules. Your code review process may miss that subtle violation. However, our Roslyn rules certainly won't miss that violation, and they will guide you into fixing it.
+For example, clean architecture mandates that all dependencies point inwards from Infrastructure to Application to Domain layers for very good reasons. But developers, in the heat of the moment, can easily violate that rule by simply adding a `using` statement the other way. Your IDE will make this easy for you, and it doesn't actually care, because it does not care about architectural rules. Your code review process may miss that subtle violation. However, our Roslyn rules certainly won't miss that violation, and they will guide you into fixing it.
 
 Lastly, if you are using JetBrains Rider, we have baked in a set of common coding standards that are enforced across the codebase for you.
 We also provide you with a number of project templates for adding the various projects for new subdomains.
-We also give you several macros in the text editor (a.k.a Live Templates) for creating certain kinds of classes, like DDD ValueObjects and DDD AggregateRoots, and xUnit test classes.
+We also give you several macros in the text editor (a.k.a. Live Templates) for creating certain kinds of classes, like DDD ValueObjects and DDD AggregateRoots, and xUnit test classes.
 
 You can see all of these things in the Platform/Tools projects.

@@ -75,11 +75,9 @@ MFA can be enforced, by default, for all new users of the product, or it can be 
 
 > See the `MfaOptions` in the  `PasswordCredentialRoot` for these default settings.
 
-When MFA is enabled, users will fail to complete authenticate with just their username + password. instead, they will receive a
-`HTTP 403 - Forbidden` error containing the message `mfa_required`.
+When MFA is enabled, users will fail to complete authenticate with just their username + password. instead, they will receive a `HTTP 403 - Forbidden` error containing the message `mfa_required`.
 
-This response means that the authentication has partially succeeded, but a second factor is required to complete the authentication. The error response will contain a value for an:
-`MfaToken` that will need to be used to authenticate the user with their chosen second factor, in subsequent API calls.
+This response means that the authentication has partially succeeded, but a second factor is required to complete the authentication. The error response will contain a value for an: `MfaToken` that will need to be used to authenticate the user with their chosen second factor, in subsequent API calls.
 
 Whether the user has already set up a second factor or not, they will receive this error, and it at this point that they can either set up a second factor, or be challenged by the second factor they already set up in a previous authentication attempt.
 
@@ -134,20 +132,17 @@ HTTP 200
 
 If this list of authenticators above is empty, then a second factor needs to be "associated" now.
 
-If this list of authenticators contains any authenticators that are `IsActive == true` (other than
-`type == recoveryCodes`) then the client needs to give the user the choice to challenge one of those authenticators.
+If this list of authenticators contains any authenticators that are `IsActive == true` (other than `type == recoveryCodes`) then the client needs to give the user the choice to challenge one of those authenticators.
 
 It works likes this:
 
-1. The first time the user is authenticated, after enabling MFA, the user will have 10 minutes to complete the association of a second factor. If this time elapses, the user will be required to authenticate from the start again (where they need to give their username + password again). An
-   `HTTP 401 - Unauthorized` be be received during the association process.
+1. The first time the user is authenticated, after enabling MFA, the user will have 10 minutes to complete the association of a second factor. If this time elapses, the user will be required to authenticate from the start again (where they need to give their username + password again). An `HTTP 401 - Unauthorized`  be received during the association process.
    1. The user can only complete the association of one "authenticator" (i.e., one OTP, OOB authenticator) at this time. By completing the association of the first authenticator, they will be authenticated at that moment. If the user wishes to add more "authenticators", they can do so, once they are authenticated. Typically, in their "account settings" user interface.
    2. To complete the association of an authenticator it is always a two-step process. The client must first request to "associate" the authenticator, and this will give the user instructions to complete to set up the second factor, and then after that the client must "confirm" the association, with the input from the user (sent over whatever channel, e.g., mobile phone, email or authenticator app).
    3. When associating the first "authenticator" the client will receive a set of 16 recovery codes in the first step. The client MUST display those recovery codes to the user, and the user SHOULD be strongly advised to make a permanent note of them for later, should they need them to authenticate if they lose access to their second factor.
    4. During the first "associate" step, the client can allow the user to modify their association (e.g., correct an incorrect phone number).
    5. Once the "confirm" step is complete, the second factor cannot be modified. The user will be authenticated at this point in time, and can go into their "account settings" user interface to either delete the second factor association or add others.
-2. If this is not the users first time through this authentication process, they will already have at least on authenticator associated at this time (authenticators that have
-   `IsActive == true`).
+2. If this is not the users first time through this authentication process, they will already have at least on authenticator associated at this time (authenticators that have `IsActive == true`).
    1. The client can offer the user to choose from the active authenticators, but then MUST challenge that authenticator, and the user must answer the challenge (or select one other active authenticator).
    2. The user cannot associate a new authenticator at this point in time (this would be a serious vulnerability).
    3. Depending on the user's choices, they will be given the relevant instructions to either associate or challenge one of the follow authenticators.
@@ -616,15 +611,10 @@ Managing the first few steps of this flow is typically done by a 3rd party JavaS
 
 There are two reasons that this step is performed in the backend API (in the `Identities` subdomain).
 
-1. The
-   `client_secret` (if any) cannot be accessible to any JavaScript, nor stored anywhere in the browser where it is possible to be accessed by any XSS vulnerability.
+1. The `client_secret` (if any) cannot be accessible to any JavaScript, nor stored anywhere in the browser where it is possible to be accessed by any XSS vulnerability.
 2. The backend can trust and verify the OAuth2 "code", as being from a trusted 3rd party by performing the exchange itself. The returned tokens are proof of that.
-3. The returned tokens (i.e., `access_token`,  `refresh_token` and possibly
-   `id_token`) can be used to identify the user in the 3rd party system, and link them to a user in this system. (e.g., find the
-   `EndUser` with the same email address as found in the claims of the 3rd party tokens)
-4. Furthermore, the tokens that are made available by the 3rd party service (i.e. `access_token` ,
-   `refresh_token` and possibly
-   `id_token`), can be stored for future use, and can be used to perform activities with the 3rd party system when necessary.
+3. The returned tokens (i.e., `access_token`,  `refresh_token` and possibly `id_token`) can be used to identify the user in the 3rd party system, and link them to a user in this system. (e.g., find the `EndUser` with the same email address as found in the claims of the 3rd party tokens)
+4. Furthermore, the tokens that are made available by the 3rd party service (i.e. `access_token` , `refresh_token` and possibly `id_token`), can be stored for future use, and can be used to perform activities with the 3rd party system when necessary.
 5. The API has full encapsulated control of what the user can and cannot do with 3rd party systems, as opposed to having that code deployed or duplicated to the Frontend JavaScript application.
 
 ### HMAC Authentication/Authorization
@@ -708,10 +698,8 @@ In "Token" based authorization, those "claims" are contained within a [transpare
 JWT tokens can be passed easily between modules and components of a whole system as a "bearer token" in the
 `Authorization` header of an HTTP request.
 
-1. When an incoming request (that must be from an authenticated user) is processed, the token is extracted from the
-   `Ahthorization` header first. If not present, then a `401 - Unauthorized` response if returned.
-2. Next, the token itself is unpacked into its component parts, and the signature on the token is verified to be from the trusted issuer. In a system like this, the issuers is the system itself. If the signature check fails, then so does authorization and a
-   `401 - Unauthorized` response is returned.
+1. When an incoming request (that must be from an authenticated user) is processed, the token is extracted from the `Authorization` header first. If not present, then a `401 - Unauthorized` response if returned.
+2. Next, the token itself is unpacked into its component parts, and the signature on the token is verified to be from the trusted issuer. In a system like this, the issuers is the system itself. If the signature check fails, then so does authorization and a `401 - Unauthorized` response is returned.
 3. Lastly, if the signature is good, this means that the claims in the token, are to be trusted by the receiving party. The claims are unpacked and used to verify the token is valid (from the correct issuer, and not expired), and used to identify the user, and figure out what access the user might have.
 
 JWT tokens, always declare their issuers (backed up with a signature), and always have an expiry date, which is usually short-lived to limit exposure should the token fall into the wrong hands (e.g. 15 minutes).

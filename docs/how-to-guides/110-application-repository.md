@@ -2,7 +2,7 @@
 
 ## Why?
 
-You are building an application class and now want to load or save data for your aggregate root, to execute some kind of a command (CQS). Or you want to read data from a read model to execute a query (CQS).
+You are building an application class and now want to load or save data for your aggregate root, to execute some kind of command (CQS). Or you want to read data from a read model to execute a query (CQS).
 
 ## What is the mechanism?
 
@@ -122,7 +122,7 @@ Add a new constructor, and inject into that constructor the following types:
 * `IRecorder` - used for logging
 * `IDomainFactory` - used to dehydrate your aggregate root and its child entities and value objects.
 * Either an `IEventSourcingDddCommandStore<TAggregateRoot>` or an `ISnapshottingDddCommandStore<TAggregateRoot>` - depending on which persistence scheme you are using
-* `IDataStore` - this is a port to underlying persistence technology (i.e., Azure SQL, Amazon RDS, MongoDB, Redis, DynamoDB, etc)
+* `IDataStore` - this is a port to underlying persistence technology (i.e., Azure SQL, Amazon RDS, MongoDB, Redis, DynamoDB, etc.)
 
 In the constructor, use those injected parameters to construct local implementations of:
 
@@ -480,9 +480,9 @@ public class CarProjection : IReadModelProjection
 }
 ```
 
-> Note: in the case of the actual `CarsProjection.cs` you will notice that it creates two read models (a.k.a database tables) from handling all these events (e.g. a `Cars` read model, and a `Unavailabilities` read model).
+> Note: in the case of the actual `CarsProjection.cs` you will notice that it creates two read models (a.k.a. database tables) from handling all these events (e.g. a `Cars` read model, and a `Unavailabilities` read model).
 >
-> You will also notice the use of `HandleCreateAsync`, `HandleUpdateAsync`, and `HandleDeleteAsync` methods)
+> You will also notice the use of `HandleCreateAsync`, `HandleUpdateAsync`, and `HandleDeleteAsync` methods in the projection.
 
 ### Inject your adapters
 

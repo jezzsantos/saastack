@@ -8,9 +8,9 @@
 
 Nullability refers to the issue of managing nulls in code.
 Managing null in C# has been a long-standing issue, and the language has made several advances to reduce the amount of handling required.
-However, the issue still remains, and the language has not yet provided a definitive solution. Thus many developers are still guarding against nulls and handling them as results.
+However, the issue still remains, and the language has not yet provided a definitive solution. Thus, many developers are still guarding against nulls and handling them as results.
 
-Nullable value types were first introduced in C# 2.0 (circa, Nov 2005), which allowed "value types" (like `int?`, `DateTime?`, and `MyCustomEnum?` etc) to be explicitly assigned a null value.
+Nullable value types were first introduced in C# 2.0 (circa, Nov 2005), which allowed "value types" (like `int?`, `DateTime?`, and `MyCustomEnum?` etc.) to be explicitly assigned a null value.
 Since C# 8 (circa, Sept 2019), we've had the ability to define nullable "reference types" (like `string?` or `MyCustomObject?`), which allow developers to annotate their code to indicate where nulls are allowed. We also had the ability to mark up code, and projects with nullable annotations to help the compiler identify potential null reference exceptions. (like `#nullable enable` or `#nullable disable`) and make whole projects nullable or not using `<Nullable>enable</Nullable>`. Which also added tooling like Roslyn rules to help identify potential null reference exceptions.
 
 Outside of official dotnet releases, we've seen the introduction of more functional programming concepts like `Option<T>`, `OneOf<T>` and `Result<T>` types, which are used to wrap values that may or may not be null, and provide a more functional way of handling nulls.

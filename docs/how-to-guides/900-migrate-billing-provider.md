@@ -11,7 +11,7 @@ There are two pieces of this mechanism:
 1. An implementation of an `IBillingProvider` specific to the BMS.
 2. Webhooks, or custom syncing mechanisms to ensure that changes in the BMS reach this product.
 
-> We highly recommend using Webhooks notifications where possible; otherwise, you must poll the BMS frequently and you risk being rate-limited.
+> We highly recommend using Webhooks notifications where possible; otherwise, you must poll the BMS frequently, and you risk being rate-limited.
 
 ## Where to start?
 
@@ -152,7 +152,7 @@ Your newly chosen BMS will require a built and tested implementation of the `IBi
 
 You will also need to build any webhooks or synchronization processes to handle updates originating from the BMS to the `Subscriptions` subdomain so that changes in the BMS update the data kept in the `Subscription` of the product.
 
-> SaaStack comes with a small number of existing `IBillingProvider` implementations already. These can be used and they can be referenced to build your own implementations for other BMSs.
+> SaaStack comes with a small number of existing `IBillingProvider` implementations already. These can be used, and they can be referenced to build your own implementations for other BMSs.
 
 To swap out the existing `IBillingProvider` (e.g. `SimpleBillingProvider`) with your new implementation, you simply change the dependency injection code in the `Subscriptions` subdomain (see: `SubscriptionsModule`).
 
@@ -166,13 +166,13 @@ You might also consider updating your web/mobile apps to support the self-serve 
 
 Finally, when you are satisfied (and tested) that you have a working version of the software with your new `IBillingProvider`, it will be time to plan the switch out.
 
-> Remember that you should not deploy the new `IBillingProvider` before you export the existing subscriptions and migrate them to your new BMS. You might put this new implementation in a tested branch of the code, in preparation however.
+> Remember that you should not deploy the new `IBillingProvider` before you export the existing subscriptions and migrate them to your new BMS. You might put this new implementation in a tested branch of the code, in preparation, however.
 
 ## Perform the Migration
 
 Unfortunately, due to the nature of this migration, you are going to need to schedule some kind of outage of your product service while you migrate to your new BMS.
 
-These are the activities to schedule and perform to complete the migration and before you can resume service with the new BMS integration:
+These are the activities to schedule and perform to complete the migration, and before you can resume service with the new BMS integration:
 
 1. Export the data from the running product using the endpoint: `GET /subscriptions/export`
 2. Immediately shutdown your service, to prevent any new customers signing up (and thus creating new subscriptions). You may need other measures if you have heavy sign-up traffic to ensure no one is signing up while you are exporting the data.

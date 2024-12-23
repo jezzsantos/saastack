@@ -35,10 +35,10 @@ These are always two competing forces keeping SaaS product businesses alive and 
 
 There are real dangers in pursuing early revenue, pre-PMF stages of the business.
 
-> This is a common pitfall for founders who are prior service-oriented (i.e., expect invoice payment for services rendered) who are happy to settle for a small number of paying customers and serve them a customized service (i.e. former consultants, solution providers, etc), as opposed to founders who are more focused on creating a more desirable generalized product for a larger market, and deferred payment.
+> This is a common pitfall for founders who are prior service-oriented (i.e., expect invoice payment for services rendered) who are happy to settle for a small number of paying customers and serve them a customized service (i.e. former consultants, solution providers, etc.), as opposed to founders who are more focused on creating a more desirable generalized product for a larger market, and deferred payment.
 
-- Pursuing revenue too soon risks misallocation of resources that would be better applied to R&D for PMF. Defer, and avoid turning the product business into a boutique services business.
-- Premature billing integration can distract the product team from critical PMF discovery. This kind of work is intense, error-prone, and, in many cases, over-engineered to guard against uncertain and unknown futures. All those things are all hinderances long term. Focus on PMF.
+- Pursuing revenue too soon risks mis-allocation of resources that would be better applied to R&D for PMF. Defer, and avoid turning the product business into a boutique services business.
+- Premature billing integration can distract the product team from critical PMF discovery. This kind of work is intense, error-prone, and, in many cases, over-engineered to guard against uncertain and unknown futures. All those things are all hindrances long term. Focus on PMF.
 - Bespoke billing management solutions may emerge (from over-confident and naive engineers), hindering the scalability of the business in the long-run, and ultimately lost revenue from all but the simplest pricing models. This hubris should be avoided at all costs.
 
 ### Converting Free to Paid Users
@@ -76,7 +76,7 @@ There is much that will change over time with both active subscriptions and the 
 
 Instead of building our own system, SaaStack has been designed to be fully two-way integrated with established 3rd party billing providers (e.g.,  [Chargebee](https://www.chargebee.com), [Maxio](https://www.chargify.com/), or [Stripe Billing](https://www.stripe.com/billing)).
 
-All these providers offer APIs for integration as well as management portals and tools for handling subscriptions, plans, pricing, trials, discounts, and coupons. The API interface (and webhooks) provided by the BMS becomes the user interface of your product that your customers can self-serve with. The management portal the BMS provides becomes an administrative tool your business (product, support & success, etc) can use to manage customers, billing, and pricing changes long term.
+All these providers offer APIs for integration as well as management portals and tools for handling subscriptions, plans, pricing, trials, discounts, and coupons. The API interface (and webhooks) provided by the BMS becomes the user interface of your product that your customers can self-serve with. The management portal the BMS provides becomes an administrative tool your business (product, support & success, etc.) can use to manage customers, billing, and pricing changes long term.
 
 This bidirectional approach introduces a need for seamless synchronization between your SaaS product and third-party services, as changes can occur in both systems independently (due to different actors). Therefore, the product's backend API will be needed (via webhooks) to modify and synchronize subscriptions from the BMS and ensure consistency between the two systems. Eventual consistency is completely tolerable in this scenario.
 
@@ -88,13 +88,13 @@ In B2B products specifically, it is likely that the "buyer" of the SaaS product 
 
 > By default, SaaStack is configured for B2B out of the box, but can be easily altered to suit B2C models as well.
 
-By default, the "buyer" of a SaaStack product will be the individual taking the financial responsibility for the billing `Subscription` (the buyer) and that is is going to be bound to an `Organization` (the tenant).
+By default, the "buyer" of a SaaStack product will be the individual taking the financial responsibility for the billing `Subscription` (the buyer) and that is going to be bound to an `Organization` (the tenant).
 
 The selected "pricing plan" associated with this billing subscription would need to apply to all current and future members of that organization (tenant).
 
 By default, when a new organization for an `EndUser` (buyer) is created, it is associated a new billing `Subscription` for that `Organization`. This billing subscription and organization will collaborate to impose restrictions on the members of the organization, such as access to specific features of the product and possibly limits on the usage of certain features of the product.
 
-Initially, the "creator" of any organization will automatically become the "buyer" of the billing subscription. As a result, they will become the payment authority (via a payment method) for the subscription and will make purchasing decisions (i.e., upgrade/downgrade decisions). This person, the buyer, will be charged for the use of their organization/tenancy on the SaaS product at certain subscription levels (via the `PaymentMethod`), and they will also be the primary user responsible for managing the billing subscription (usually represented as a "customer" in the BMS.
+Initially, the "creator" of any organization will automatically become the "buyer" of the billing subscription. As a result, they will become the payment authority (via a payment method) for the subscription and will make purchasing decisions (i.e., upgrade/downgrade decisions). This person, the buyer, will be charged for the use of their organization/tenancy on the SaaS product at certain subscription levels (via the `PaymentMethod`), and they will also be the primary user responsible for managing the billing subscription (usually represented as a "customer" in the BMS).
 
 > Ordinary members of an organization will not have access to view or modify the organization's billing information that information may be too sensitive. viewing and management of this data is typically only available to the "buyer" of the subscription associated with the organization, and to others members of the same organization nominated by the "buyer" to act on their behalf (i.e. nominated billing administrators).
 
@@ -173,9 +173,9 @@ When tiers change, the conditions of use of the "buyer" of the subscription and 
 
 Billing Management Systems (like [Chargebee](https://www.chargebee.com), [Maxio](https://www.chargify.com/), or [Stripe Billing](https://www.stripe.com/billing), etc.) are 3rd parties that provide their own tools to manage concepts like customers, subscriptions, payments, plans, charges, etc. Anyone in the SaaS business can use those tools at any time to make critical changes to those customers, subscriptions, and plans. This capability is powerful and effective for business functions like Finance, Support, and Success functions, and these tools and experiences are very mature.
 
-Some BMS's also handle direct credit card payments through their own "Payment Gateway" linked to a "Merchant Account", and some provide integrations to other payment gateways (i.e. Stripe, PayPal, Shopify, etc).
+Some BMS's also handle direct credit card payments through their own "Payment Gateway" linked to a "Merchant Account", and some provide integrations to other payment gateways (i.e. Stripe, PayPal, Shopify, etc.).
 
-> For example, Stripe is both a "Payment Gateway" (supports "Merchant Accounts") as well as having a "Subscription Management" service (albeit a more limited one). Whereas Chargebee and Maxio are just "Subscription Management" services, and thus require further integration with a "Payment Gateway" service like Stripe.
+> For example, Stripe is a "Payment Gateway" (supports "Merchant Accounts") as well as being a "Subscription Management" service (albeit a more limited one). Whereas Chargebee and Maxio are just "Subscription Management" services, and thus require further integration with a "Payment Gateway" service like Stripe.
 
 To use any of these 3rd party BMSs requires SaaS businesses to immediately purchase, manage, and configure them, and that may be an additional distraction/roadblock to getting the first versions of your product off of the ground in the first few months/years of development. Even though many provide simple plugins into products to capture credit cards, and process payments.
 
@@ -193,9 +193,9 @@ Since business functions in the SaaS business can easily manipulate customer, su
 
 **Product -> BMS:** When changes are made in the product that would affect the BMS data, these changes are sent to the current billing provider over HTTP using service clients (e.g. via the `ChargebeeHttpServiceClient`).
 
-**BMS -> Product:** When data changes changes in the BMS, these changed will need to be sent to the product's `Subscriptions` API, via webhooks events, and the internal state maintained by the product about the subscriptions in the BMS must be updated.
+**BMS -> Product:** When data changes in the BMS, these changed will need to be sent to the product's `Subscriptions` API, via webhooks events, and the internal state maintained by the product about the subscriptions in the BMS must be updated.
 
-> See the `ChargebeeWebhookService` for how we handle webhooks from www.Chargebee.com, and see how the data that is kept for the Chargebee BMS (`ChargebeeStateInterpreter`), might be different than the set of data kept for, say a Stripe Connect BMS.
+> See the `ChargebeeWebhookService` for how we handle webhooks from www.Chargebee.com, and see how the data that is kept for the Chargebee BMS (`ChargebeeStateInterpreter`), might be different from the set of data kept for, say a Stripe Connect BMS.
 
 # Implementation
 
@@ -210,7 +210,7 @@ Let's start with the API through which all billing subscription activities occur
 
 As you can see from the relationships built into [Multitenancy](0130-multitenancy.md) in SaaStack, by default, a `Subscription` is related one-to-one with a `Organization` (or per tenant).
 
-> This is simply the default, and can be changed for your product. For example if you provide a concept like "projects" in your product and and organization can have several distinct projects, and you wanted a billing subscription defined for each "project". Its might not be common, but it is a possibility.
+> This is simply the default, and can be changed for your product. For example if you provide a concept like "projects" in your product and organization can have several distinct projects, and you wanted a billing subscription defined for each "project". Its might not be common, but it is a possibility.
 
 Through this API, end-users (members of an organization, by default) can perform various actions, like upgrade, downgrade, cancel, and view invoices for their billing subscription.
 
@@ -224,8 +224,8 @@ Lastly, in order to maintain eventual consistency between data changing in the B
 
 The billing provider (`IBillingProvider`) is an abstraction that provides two services:
 
-1. Provides a HTTP service client to a (`IBillingGatewayService`) to directly access to the BMS to perform transactional commands.
-2. Provides an `IBillingStateInterpreter` to manage the internal [cached] state of the subscription, plans and limits, quotas, etc from the BMS, in the product over time, as things change.
+1. Provides an HTTP service client to a (`IBillingGatewayService`) to directly access to the BMS to perform transactional commands.
+2. Provides an `IBillingStateInterpreter` to manage the internal [cached] state of the subscription, plans and limits, quotas, etc. from the BMS, in the product over time, as things change.
 
 By default, the built-in `SimpleBillingProvider` is configured, and injected at runtime.
 
@@ -239,14 +239,14 @@ It also defines one hardcoded plan, that has zero cost, no trial period and no l
 
 It supports all the features any `IBillingProvider` could have, but it works in a limited way like this:
 
-![Plan Flow](../Images/BillingIntegration-Flows.png)
+![Plan Flow](../images/BillingIntegration-Flows.png)
 
 > Note: For any custom billing provider, the optional flows available to it are numerous. Each provider can determine its own flows.
 
 The `SimpleBillingProvider` works like this:
 
 - It defines a single `Standard` plan (named `_simple_standard`).
-- Every `Organization` that gets created gets created with a new billing `Subscription` with the plan: `_simple_standard`.
+- Every `Organization` that gets created, gets created with a new billing `Subscription` with the plan: `_simple_standard`.
 - The `Organization` assigns the creator the org, the following default roles: `BillingAdmin` (also `Owner` and `Member`).
 - The new `Subscription` is automatically created (via a notification) with a `BuyerId` to be the `CreatedById` of the new `Organization`.
 - Any Upgrade (or downgrade) results in the same plan (`_simple_default`) and the same Tier (`Standard`).
@@ -279,7 +279,7 @@ Access to features of any SaaS product can be controlled by three mechanisms:
 * RBAC (roles and permissions of each individual user)
 * Billing subscription plans (defined by the plan of the subscription for each organization)
 
-> You can find out more about how these things work in [Declarative Authorization Syntax](0090-authentication-authorization.md/#declarative-authorization-syntax)
+> You can find out more about how these things work in [Declarative Authorization Syntax](0090-authentication-authorization.md#declarative-authorization-syntax)
 
 Each of these mechanisms works differently, and is configured differently. But together they provide the controls needed to permit or deny access to any one feature of the product for each user (an `EndUser`), and to each member of an `Organization` (tenant).
 
@@ -350,7 +350,7 @@ Bottom line, we recommend supporting Trials or Free plans to defer the need to s
 
 ## Subscription Lifecycle
 
-Like most things a billing subscription has a well defined lifecycle, from "creation" to "unsubscribing".
+Like most things a billing subscription has a well-defined lifecycle, from "creation" to "unsubscribing".
 
 ### Creating Subscriptions
 
@@ -444,7 +444,7 @@ There will always be cases where the financial responsibility cannot be met by a
 
 In these scenarios, the support function of the business will have to employ some out-of-band authentication process to verify the claim (by an existing member of the organization) and resolve it manually, which eventually affects the necessary transfer of financial responsibility to another person in the `Organization`.
 
-In the case where the support/success function of the business wishes to "force-cancel" a customer's `Subscription`, they can use the API: `PUT /subscriptions/{Id}/force-cancel` with a privileged `EndUser` with the `PlatformRoles.Operator` role. This will "force-cancel" the subscription and then it gives the customer the opportunity to "reclaim" the `Subscription` with an existing `BillingAdmin` of their `Organization`.
+In the case where the support/success function of the business wishes to "force-cancel" a customer's `Subscription`, they can use the API: `PUT /subscriptions/{Id}/force-cancel` with a privileged `EndUser` with the `PlatformRoles.Operator` role. This will "force-cancel" the subscription, and then it gives the customer the opportunity to "reclaim" the `Subscription` with an existing `BillingAdmin` of their `Organization`.
 
 > In these cases, if support/success teams enact these resolutions, some interruption to the service (for all members) may be necessary while the financial responsibility is resolved.
 
@@ -511,7 +511,7 @@ Rules:
 
 * **Upgrade/Downgrade** of the `Subscription` (or its plan) can only be performed by the "Buyer".
 
-* **Cancellation** of the  `Subscription` can only be performed by the "Buyer". Any change to the plan can be done at any time, and the BMS can resolve any charges (pro-rata, etc) on future invoices.
+* **Cancellation** of the  `Subscription` can only be performed by the "Buyer". Any change to the plan can be done at any time, and the BMS can resolve any charges (pro rata, etc.) on future invoices.
 * If a `Subscription` (or plan) is changed and a corresponding subscription (or plan) does not exist in the BMS, a new subscription is automatically created in the BMS.
 * **Transferal** of the `Subscription` can only be performed by the "Buyer". When that happens, new billing details for the new buyer are usually required by the BMS, and they are transferred to the BMS from the new buyer's `UserProfile`.
 
@@ -529,7 +529,7 @@ As long as the SaaS business is charging in advance, subscriptions will always b
 
 When the `Subscription` is finally canceled in the product, the `Subscription` is automatically reverted to the `Unsubscribed` "Tier" of service.
 
-In this state, the "Buyer" (or any "Billing Administrator" of the `Organization` can subscribe again, or can upgrade to any other "Tier", and normal service is restored.
+In this state, the "Buyer" (or any "Billing Administrator" of the `Organization`) can subscribe again, or can upgrade to any other "Tier", and normal service is restored.
 
 #### Forced-Cancellation
 
@@ -537,7 +537,7 @@ As discussed at length above, a `Subscription` can be "force-canceled" if and wh
 
 When this occurs, the `Subscription` is automatically reverted to the `Unsubscribed` "Tier" of service.
 
-In this state, the "Buyer" (or any "Billing Administrator" of the `Organization` can subscribe again, or can upgrade to any other "Tier", and normal service is restored.
+In this state, the "Buyer" (or any "Billing Administrator" of the `Organization`) can subscribe again, or can upgrade to any other "Tier", and normal service is restored.
 
 #### Forced-Unsubscribed
 

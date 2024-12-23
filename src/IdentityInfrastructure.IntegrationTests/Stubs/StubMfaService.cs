@@ -48,24 +48,24 @@ public class StubMfaService : IMfaService
         return _mfaService.GetTotpMaxTimeSteps();
     }
 
+    public TotpResult VerifyTotp(string secret, IReadOnlyList<long> previousTimeSteps, string confirmationCode)
+    {
+        return _mfaService.VerifyTotp(secret, previousTimeSteps, confirmationCode);
+    }
+
     public string GetOtpCodeNow(MfaService.TimeStep timeStep = MfaService.TimeStep.Now)
     {
         if (LastOtpSecret.NotExists())
         {
             return string.Empty;
         }
-        
+
 #if TESTINGONLY
         var confirmationCode = MfaService.CalculateTotp(LastOtpSecret, timeStep);
 #else
         var confirmationCode = "";
 #endif
         return confirmationCode;
-    }
-
-    public TotpResult VerifyTotp(string secret, IReadOnlyList<long> previousTimeSteps, string confirmationCode)
-    {
-        return _mfaService.VerifyTotp(secret, previousTimeSteps, confirmationCode);
     }
 
     public void Reset()

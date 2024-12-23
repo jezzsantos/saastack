@@ -58,7 +58,7 @@ public class PasswordCredentialMfaAuthenticatorChallenge
 
 public class PasswordCredentialMfaAuthenticatorConfirmation
 {
-    public AuthenticateTokens? Tokens { get; set; }
-
     public List<PasswordCredentialMfaAuthenticator>? Authenticators { get; set; }
+
+    public AuthenticateTokens? Tokens { get; set; }
 }

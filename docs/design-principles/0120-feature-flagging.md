@@ -2,8 +2,8 @@
 
 ## Design Principles
 
-* We want to be able to deploy code which includes features/code that we dont want visible/available/enabled for end users.
-* We want to be able to progressively roll-out certain features to specific users, or segments of the market to manage any risk of deploying new features
+* We want to be able to deploy code which includes features/code that we don't want visible/available/enabled for end users.
+* We want to be able to progressively roll out certain features to specific users, or segments of the market to manage any risk of deploying new features
 * This optionality can be attributed to all end-users, or specific end-users, or even all users within a specific tenant
 * We want those features to be configured externally to the running system, without changing what has been deployed
 * We want to have those flags managed separately to our system, so that we don't have to build this kind of infrastructure ourselves

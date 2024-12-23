@@ -14,7 +14,7 @@ It should align with [Microsoft's support strategy](https://dotnet.microsoft.com
 
 It should provide the functionality we are basing the patterns in the codebase on
 
-It should NOT be a re-release version, it should be a stable version(a.k.a not on the bleeding edge), and well supported in the .NET eco-system of 3rd party libraries and frameworks.
+It should NOT be a re-release version, it should be a stable version(a.k.a. not on the bleeding edge), and well-supported in the .NET ecosystem of 3rd party libraries and frameworks.
 
 ## Considered Options
 

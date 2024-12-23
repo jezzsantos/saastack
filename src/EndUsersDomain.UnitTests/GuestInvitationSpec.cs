@@ -11,9 +11,9 @@ namespace EndUsersDomain.UnitTests;
 [Trait("Category", "Unit")]
 public class GuestInvitationSpec
 {
-    private readonly EmailAddress _inviteeEmailAddress;
     private const string TestingToken = "Ll4qhv77XhiXSqsTUc6icu56ZLrqu5p1gH9kT5IlHio";
-    
+    private readonly EmailAddress _inviteeEmailAddress;
+
     public GuestInvitationSpec()
     {
         _inviteeEmailAddress = EmailAddress.Create("auser@company.com").Value;
