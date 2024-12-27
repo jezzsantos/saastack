@@ -33,7 +33,7 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
         _caller.Setup(cc => cc.Features).Returns(new ICallerContext.CallerFeatures());
         var requirement = new RolesAndFeaturesRequirement(new ICallerContext.CallerRoles(),
             new ICallerContext.CallerFeatures());
-        var context = new AuthorizationHandlerContext(new IAuthorizationRequirement[] { requirement },
+        var context = new AuthorizationHandlerContext([requirement],
             ClaimsPrincipal.Current!, null);
 
         _handler.HandleAsync(context);
@@ -47,9 +47,9 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
         _caller.Setup(cc => cc.Roles).Returns(new ICallerContext.CallerRoles());
         _caller.Setup(cc => cc.Features).Returns(new ICallerContext.CallerFeatures());
         var requirement = new RolesAndFeaturesRequirement(
-            new ICallerContext.CallerRoles(new[] { new RoleLevel("arole") }, Array.Empty<RoleLevel>()),
+            new ICallerContext.CallerRoles([new RoleLevel("arole")], []),
             new ICallerContext.CallerFeatures());
-        var context = new AuthorizationHandlerContext(new IAuthorizationRequirement[] { requirement },
+        var context = new AuthorizationHandlerContext([requirement],
             ClaimsPrincipal.Current!, null);
 
         _handler.HandleAsync(context);
@@ -65,8 +65,8 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
         _caller.Setup(cc => cc.Roles).Returns(new ICallerContext.CallerRoles());
         _caller.Setup(cc => cc.Features).Returns(new ICallerContext.CallerFeatures());
         var requirement = new RolesAndFeaturesRequirement(new ICallerContext.CallerRoles(),
-            new ICallerContext.CallerFeatures(new[] { new FeatureLevel("afeature") }, Array.Empty<FeatureLevel>()));
-        var context = new AuthorizationHandlerContext(new IAuthorizationRequirement[] { requirement },
+            new ICallerContext.CallerFeatures([new FeatureLevel("afeature")], []));
+        var context = new AuthorizationHandlerContext([requirement],
             ClaimsPrincipal.Current!, null);
 
         _handler.HandleAsync(context);
@@ -80,13 +80,13 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
     public void WhenHandleRequirementAsyncAndCallerHasSameRoleAsRequirement_ThenSucceeds()
     {
         _caller.Setup(cc => cc.Roles)
-            .Returns(new ICallerContext.CallerRoles(new[] { new RoleLevel("arole") }, Array.Empty<RoleLevel>()));
+            .Returns(new ICallerContext.CallerRoles([new RoleLevel("arole")], []));
         _caller.Setup(cc => cc.Features)
             .Returns(new ICallerContext.CallerFeatures());
         var requirement = new RolesAndFeaturesRequirement(
-            new ICallerContext.CallerRoles(new[] { new RoleLevel("arole") }, Array.Empty<RoleLevel>()),
+            new ICallerContext.CallerRoles([new RoleLevel("arole")], []),
             new ICallerContext.CallerFeatures());
-        var context = new AuthorizationHandlerContext(new IAuthorizationRequirement[] { requirement },
+        var context = new AuthorizationHandlerContext([requirement],
             ClaimsPrincipal.Current!, null);
 
         _handler.HandleAsync(context);
@@ -98,13 +98,13 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
     public void WhenHandleRequirementAsyncAndCallerHasDifferentRoleAsRequirement_ThenFailed()
     {
         _caller.Setup(cc => cc.Roles)
-            .Returns(new ICallerContext.CallerRoles(new[] { new RoleLevel("arole") }, Array.Empty<RoleLevel>()));
+            .Returns(new ICallerContext.CallerRoles([new RoleLevel("arole")], []));
         _caller.Setup(cc => cc.Features)
             .Returns(new ICallerContext.CallerFeatures());
         var requirement = new RolesAndFeaturesRequirement(
-            new ICallerContext.CallerRoles(new[] { new RoleLevel("anotherrole") }, Array.Empty<RoleLevel>()),
+            new ICallerContext.CallerRoles([new RoleLevel("anotherrole")], []),
             new ICallerContext.CallerFeatures());
-        var context = new AuthorizationHandlerContext(new IAuthorizationRequirement[] { requirement },
+        var context = new AuthorizationHandlerContext([requirement],
             ClaimsPrincipal.Current!, null);
 
         _handler.HandleAsync(context);
@@ -119,14 +119,14 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
     {
 #if TESTINGONLY
         _caller.Setup(cc => cc.Roles).Returns(new ICallerContext.CallerRoles(
-            new[] { PlatformRoles.TestingOnlySuperUser },
-            Array.Empty<RoleLevel>()));
+            [PlatformRoles.TestingOnlySuperUser],
+            []));
         _caller.Setup(cc => cc.Features)
             .Returns(new ICallerContext.CallerFeatures());
         var requirement = new RolesAndFeaturesRequirement(
-            new ICallerContext.CallerRoles(new[] { PlatformRoles.TestingOnly }, Array.Empty<RoleLevel>()),
+            new ICallerContext.CallerRoles([PlatformRoles.TestingOnly], []),
             new ICallerContext.CallerFeatures());
-        var context = new AuthorizationHandlerContext(new IAuthorizationRequirement[] { requirement },
+        var context = new AuthorizationHandlerContext([requirement],
             ClaimsPrincipal.Current!, null);
 
         _handler.HandleAsync(context);
@@ -139,14 +139,14 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
     public void WhenHandleRequirementAsyncAndCallerHasChildRoleOfRequirement_ThenFails()
     {
 #if TESTINGONLY
-        _caller.Setup(cc => cc.Roles).Returns(new ICallerContext.CallerRoles(new[] { PlatformRoles.TestingOnly },
-            Array.Empty<RoleLevel>()));
+        _caller.Setup(cc => cc.Roles).Returns(new ICallerContext.CallerRoles([PlatformRoles.TestingOnly],
+            []));
         _caller.Setup(cc => cc.Features)
             .Returns(new ICallerContext.CallerFeatures());
         var requirement = new RolesAndFeaturesRequirement(
-            new ICallerContext.CallerRoles(new[] { PlatformRoles.TestingOnlySuperUser }, Array.Empty<RoleLevel>()),
+            new ICallerContext.CallerRoles([PlatformRoles.TestingOnlySuperUser], []),
             new ICallerContext.CallerFeatures());
-        var context = new AuthorizationHandlerContext(new IAuthorizationRequirement[] { requirement },
+        var context = new AuthorizationHandlerContext([requirement],
             ClaimsPrincipal.Current!, null);
 
         _handler.HandleAsync(context);
@@ -162,11 +162,11 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
     {
         _caller.Setup(cc => cc.Roles).Returns(new ICallerContext.CallerRoles());
         _caller.Setup(cc => cc.Features)
-            .Returns(new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Paid3 },
-                Array.Empty<FeatureLevel>()));
+            .Returns(new ICallerContext.CallerFeatures([PlatformFeatures.Paid3],
+                []));
         var requirement = new RolesAndFeaturesRequirement(new ICallerContext.CallerRoles(),
-            new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Paid3 }, Array.Empty<FeatureLevel>()));
-        var context = new AuthorizationHandlerContext(new IAuthorizationRequirement[] { requirement },
+            new ICallerContext.CallerFeatures([PlatformFeatures.Paid3], []));
+        var context = new AuthorizationHandlerContext([requirement],
             ClaimsPrincipal.Current!, null);
 
         _handler.HandleAsync(context);
@@ -179,12 +179,12 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
     {
         _caller.Setup(cc => cc.Roles).Returns(new ICallerContext.CallerRoles());
         _caller.Setup(cc => cc.Features)
-            .Returns(new ICallerContext.CallerFeatures(new[] { new FeatureLevel("afeature") },
-                Array.Empty<FeatureLevel>()));
+            .Returns(new ICallerContext.CallerFeatures([new FeatureLevel("afeature")],
+                []));
         var requirement = new RolesAndFeaturesRequirement(new ICallerContext.CallerRoles(),
-            new ICallerContext.CallerFeatures(new[] { new FeatureLevel("anotherfeature") },
-                Array.Empty<FeatureLevel>()));
-        var context = new AuthorizationHandlerContext(new IAuthorizationRequirement[] { requirement },
+            new ICallerContext.CallerFeatures([new FeatureLevel("anotherfeature")],
+                []));
+        var context = new AuthorizationHandlerContext([requirement],
             ClaimsPrincipal.Current!, null);
 
         _handler.HandleAsync(context);
@@ -199,11 +199,11 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
     {
         _caller.Setup(cc => cc.Roles).Returns(new ICallerContext.CallerRoles());
         _caller.Setup(cc => cc.Features)
-            .Returns(new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Paid3 },
-                Array.Empty<FeatureLevel>()));
+            .Returns(new ICallerContext.CallerFeatures([PlatformFeatures.Paid3],
+                []));
         var requirement = new RolesAndFeaturesRequirement(new ICallerContext.CallerRoles(),
-            new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Basic }, Array.Empty<FeatureLevel>()));
-        var context = new AuthorizationHandlerContext(new IAuthorizationRequirement[] { requirement },
+            new ICallerContext.CallerFeatures([PlatformFeatures.Basic], []));
+        var context = new AuthorizationHandlerContext([requirement],
             ClaimsPrincipal.Current!, null);
 
         _handler.HandleAsync(context);
@@ -216,11 +216,11 @@ public class RolesAndFeaturesAuthorizationHandlerSpec
     {
         _caller.Setup(cc => cc.Roles).Returns(new ICallerContext.CallerRoles());
         _caller.Setup(cc => cc.Features)
-            .Returns(new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Basic },
-                Array.Empty<FeatureLevel>()));
+            .Returns(new ICallerContext.CallerFeatures([PlatformFeatures.Basic],
+                []));
         var requirement = new RolesAndFeaturesRequirement(new ICallerContext.CallerRoles(),
-            new ICallerContext.CallerFeatures(new[] { PlatformFeatures.Paid3 }, Array.Empty<FeatureLevel>()));
-        var context = new AuthorizationHandlerContext(new IAuthorizationRequirement[] { requirement },
+            new ICallerContext.CallerFeatures([PlatformFeatures.Paid3], []));
+        var context = new AuthorizationHandlerContext([requirement],
             ClaimsPrincipal.Current!, null);
 
         _handler.HandleAsync(context);

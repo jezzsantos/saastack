@@ -114,15 +114,6 @@ namespace WebsiteHost {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The file &apos;{0}&apos; cannot be found in the directory {rootPath}.  Please make sure you have pre-built the JS application by running `npm run build`.
-        /// </summary>
-        internal static string HomeController_IndexPageNotBuilt {
-            get {
-                return ResourceManager.GetString("HomeController_IndexPageNotBuilt", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The &apos;Message&apos; was either missing or invalid.
         /// </summary>
         internal static string RecordCrashRequestValidator_InvalidMessage {
@@ -173,6 +164,15 @@ namespace WebsiteHost {
         internal static string RecordTraceRequestValidator_InvalidMessageTemplate {
             get {
                 return ResourceManager.GetString("RecordTraceRequestValidator_InvalidMessageTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Webpack output file &apos;{0}&apos; was not found in the project. Please run `npm build` to produce this output file from WebPack.
+        /// </summary>
+        internal static string WebPackBundler_InvalidBundle {
+            get {
+                return ResourceManager.GetString("WebPackBundler_InvalidBundle", resourceCulture);
             }
         }
     }

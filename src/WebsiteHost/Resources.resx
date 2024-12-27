@@ -57,10 +57,10 @@
     <data name="AuthenticateRequestValidator_InvalidPassword" xml:space="preserve">
         <value>The 'Password' is either missing or invalid</value>
     </data>
-    <data name="HomeController_IndexPageNotBuilt" xml:space="preserve">
-        <value>The file '{0}' cannot be found in the directory {rootPath}.  Please make sure you have pre-built the JS application by running `npm run build`</value>
-    </data>
     <data name="GetFeatureFlagForCallerRequestValidator_InvalidName" xml:space="preserve">
         <value>The 'Name' is either missing or invalid</value>
+    </data>
+    <data name="WebPackBundler_InvalidBundle" xml:space="preserve">
+        <value>Webpack output file '{0}' was not found in the project. Please run `npm build` to produce this output file from WebPack</value>
     </data>
 </root>

@@ -136,14 +136,16 @@ public static class WebsiteTestingExtensions
     {
         var tokens = csrfService.CreateTokens(userId);
 
-        WithCSRF(message, cookies, tokens.Token, tokens.Signature);
+        WithCSRF(message, cookies, tokens.Token, tokens.Signature, userId);
     }
 
     public static void WithCSRF(this HttpRequestMessage message, CookieContainer cookies,
-        string token, string signature)
+        string token, string signature, string? userId)
     {
         var host = message.RequestUri!.Host;
-        cookies.Add(new Cookie(CSRFConstants.Cookies.AntiCSRF, signature, "/", host));
+        var cookieValue = new CSRFMiddleware.CSRFCookie(userId, signature).ToCookieValue();
+        var cookie = new Cookie(CSRFConstants.Cookies.AntiCSRF, cookieValue, "/", host);
+        cookies.Add(cookie);
         message.Headers.Add(CSRFConstants.Headers.AntiCSRF, token);
         var origin = $"{message.RequestUri.Scheme}{Uri.SchemeDelimiter}{message.RequestUri.Authority}";
         message.Headers.Add(HttpConstants.Headers.Origin, origin);

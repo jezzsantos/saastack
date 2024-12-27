@@ -17,7 +17,67 @@ interface AxiosInterceptorHandleItem<V> {
   synchronous: boolean;
 }
 
-describe("Handle Unauthorized", () => {
+describe("Handle 403 Forbidden", () => {
+  let handler: AxiosInterceptorHandleItem<any>;
+
+  beforeEach(() => {
+    initializeApiClient();
+    // @ts-ignore
+    handler = apiHost1.instance.interceptors.response.handlers[0];
+  });
+
+  it("should ignore ordinary request that succeeds", async () =>
+    expect(handler.fulfilled({ data: "adata" })).toStrictEqual({
+      data: "adata"
+    }));
+
+  it("should reject an ordinary request that fails", async () =>
+    await expect(
+      handler.rejected({
+        config: { url: "aurl" },
+        response: {},
+        status: 404
+      })
+    ).rejects.toMatchObject({
+      response: {}
+    }));
+
+  it("should reject a forbidden request that is not CSRF", async () => {
+    await expect(
+      handler.rejected({
+        config: { url: "aurl" },
+        response: {
+          data: {
+            title: "atitle"
+          }
+        },
+        status: 403
+      })
+    ).rejects.toMatchObject({
+      response: {}
+    });
+    expect(window.location.assign).not.toHaveBeenCalled();
+  });
+
+  it("should redirect to login, when a forbidden request that is CSRF", async () => {
+    await expect(
+      handler.rejected({
+        config: { url: "aurl" },
+        response: {
+          data: {
+            title: "csrf_violation"
+          }
+        },
+        status: 403
+      })
+    ).rejects.toMatchObject({
+      response: {}
+    });
+    expect(window.location.assign).toHaveBeenCalledWith("/login");
+  });
+});
+
+describe("Handle 401 Unauthorized", () => {
   let handler: AxiosInterceptorHandleItem<any>;
 
   beforeEach(() => {

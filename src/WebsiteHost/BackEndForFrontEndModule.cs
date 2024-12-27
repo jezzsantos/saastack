@@ -9,6 +9,7 @@ using Infrastructure.Web.Hosting.Common;
 using Infrastructure.Web.Hosting.Common.Pipeline;
 using WebsiteHost.Api.Recording;
 using WebsiteHost.Application;
+using WebsiteHost.ApplicationServices;
 
 namespace WebsiteHost;
 
@@ -50,6 +51,7 @@ public class BackEndForFrontEndModule : ISubdomainModule
             return (_, services) =>
             {
                 services.AddControllersWithViews();
+                services.AddSingleton<IWebPackBundler, WebPackBundler>();
                 services.AddSingleton<IFeatureFlagsApplication, FeatureFlagsApplication>();
                 services.AddSingleton<IRecordingApplication, RecordingApplication>();
                 services.AddSingleton<IAuthenticationApplication, AuthenticationApplication>();

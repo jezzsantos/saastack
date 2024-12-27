@@ -1,3 +1,4 @@
+using System.Text;
 using Application.Common.Extensions;
 using Application.Interfaces;
 using Application.Interfaces.Services;
@@ -20,12 +21,13 @@ namespace Infrastructure.Web.Hosting.Common.Pipeline;
 /// </summary>
 public sealed class CSRFMiddleware
 {
+    internal const string CSRFViolation = "csrf_violation";
     private static readonly string[] IgnoredMethods =
-    {
+    [
         HttpMethods.Get,
         HttpMethods.Head,
         HttpMethods.Options
-    };
+    ];
     private readonly ICSRFService _csrfService;
     private readonly IHostSettings _hostSettings;
     private readonly RequestDelegate _next;
@@ -72,26 +74,27 @@ public sealed class CSRFMiddleware
             return hostName.Error;
         }
 
-        var csrfCookie = GetCookie(request);
+        var csrfCookie = GetCSRFCookie(request);
         if (csrfCookie.IsFailure)
         {
             return csrfCookie.Error;
         }
 
-        var csrfHeader = GetHeader(request);
+        var csrfHeader = GetCSRFHeader(request);
         if (csrfHeader.IsFailure)
         {
             return csrfHeader.Error;
         }
 
-        var userId = request.GetUserIdFromAuthNCookie();
-        if (userId.IsFailure)
+        var currentUserId = request.GetUserIdFromAuthNCookie();
+        if (currentUserId.IsFailure)
         {
-            return userId.Error;
+            return Error.ForbiddenAccess(Resources.CSRFMiddleware_InvalidAuthCookie, CSRFViolation);
         }
 
         var verifiedCookie =
-            VerifyCookieAndHeaderForUser(_recorder, _csrfService, csrfCookie.Value, csrfHeader.Value, userId.Value);
+            VerifyCookieAndHeaderForUser(_recorder, _csrfService, csrfCookie.Value, csrfHeader.Value,
+                currentUserId.Value);
         if (verifiedCookie.IsFailure)
         {
             return verifiedCookie.Error;
@@ -114,7 +117,7 @@ public sealed class CSRFMiddleware
     {
         if (!origin.HasValue && !referer.HasValue)
         {
-            return Error.ForbiddenAccess(Resources.CSRFMiddleware_MissingOriginAndReferer);
+            return Error.ForbiddenAccess(Resources.CSRFMiddleware_MissingOriginAndReferer, CSRFViolation);
         }
 
         if (origin.HasValue)
@@ -125,7 +128,7 @@ public sealed class CSRFMiddleware
                 recorder.TraceError(null,
                     $"Request '{HttpConstants.Headers.Origin}' is not from a trusted site: '{{Origin}}'",
                     origin);
-                return Error.ForbiddenAccess(Resources.CSRFMiddleware_OriginMismatched);
+                return Error.ForbiddenAccess(Resources.CSRFMiddleware_OriginMismatched, CSRFViolation);
             }
         }
 
@@ -137,33 +140,45 @@ public sealed class CSRFMiddleware
                 recorder.TraceError(null,
                     $"Request '{HttpConstants.Headers.Referer}' is not from a trusted site: '{{Referer}}'",
                     origin);
-                return Error.ForbiddenAccess(Resources.CSRFMiddleware_RefererMismatched);
+                return Error.ForbiddenAccess(Resources.CSRFMiddleware_RefererMismatched, CSRFViolation);
             }
         }
 
         return Result.Ok;
     }
 
+    /// <summary>
+    ///     Verifies the CSRF header and cookie values, for the authenticated/unauthenticated user
+    ///     Note: It is possible that the current authenticated user (from the auth-tok), by now, has expired (and
+    ///     the cookie has disappeared),
+    ///     so, we need to fall back to the last user id from when the CSRF cookie was created.
+    /// </summary>
     private static Result<Error> VerifyCookieAndHeaderForUser(IRecorder recorder, ICSRFService csrfService,
-        string csrfCookie, string csrfHeader, Optional<string> userId)
+        CSRFCookie csrfCookie, string csrfHeader, Optional<string> authenticatedUserId)
     {
-        if (csrfCookie.HasNoValue() || csrfHeader.HasNoValue())
+        if (csrfCookie.Signature.HasNoValue()
+            || csrfHeader.HasNoValue())
         {
-            return Error.ForbiddenAccess(Resources.CSRFMiddleware_MissingCSRFCredentials);
+            return Error.ForbiddenAccess(Resources.CSRFMiddleware_MissingCSRFCredentials, CSRFViolation);
         }
 
-        var isVerified = csrfService.VerifyTokens(csrfHeader, csrfCookie, userId);
+        var userId = authenticatedUserId.HasValue
+            ? authenticatedUserId.Value.ToOptional()
+            : csrfCookie.LastUserId.ToOptional();
+
+        var isVerified = csrfService.VerifyTokens(csrfHeader, csrfCookie.Signature, userId);
         if (isVerified)
         {
             return Result.Ok;
         }
 
         recorder.TraceError(null,
-            "Request contains an invalid CSRF cookie signature for the CSRF token, and for the current user");
-        return Error.ForbiddenAccess(Resources.CSRFMiddleware_InvalidSignature.Format(userId));
+            "Request contains an invalid CSRF cookie signature for the user {UserId}",
+            userId.ValueOrNull ?? "unauthenticated");
+        return Error.ForbiddenAccess(Resources.CSRFMiddleware_InvalidSignature, CSRFViolation);
     }
 
-    private static Result<string, Error> GetHeader(HttpRequest request)
+    private static Result<string, Error> GetCSRFHeader(HttpRequest request)
     {
         var header = GetHeader(request, CSRFConstants.Headers.AntiCSRF);
         if (header.HasValue)
@@ -171,7 +186,7 @@ public sealed class CSRFMiddleware
             return header.Value;
         }
 
-        return Error.ForbiddenAccess(Resources.CSRFMiddleware_MissingCSRFHeaderValue);
+        return Error.ForbiddenAccess(Resources.CSRFMiddleware_MissingCSRFHeaderValue, CSRFViolation);
     }
 
     private static Optional<string> GetHeader(HttpRequest request, string name)
@@ -188,14 +203,20 @@ public sealed class CSRFMiddleware
         return Optional<string>.None;
     }
 
-    private static Result<string, Error> GetCookie(HttpRequest request)
+    private static Result<CSRFCookie, Error> GetCSRFCookie(HttpRequest request)
     {
         if (request.Cookies.TryGetValue(CSRFConstants.Cookies.AntiCSRF, out var value))
         {
-            return value;
+            var signatureData = CSRFCookie.FromCookieValue(value);
+            if (signatureData.IsFailure)
+            {
+                return signatureData.Error;
+            }
+
+            return signatureData;
         }
 
-        return Error.ForbiddenAccess(Resources.CSRFMiddleware_MissingCSRFCookieValue);
+        return Error.ForbiddenAccess(Resources.CSRFMiddleware_MissingCSRFCookieValue, CSRFViolation);
     }
 
     private static Result<string, Error> GetHostName(IHostSettings settings)
@@ -233,5 +254,42 @@ public sealed class CSRFMiddleware
         CSRFTokenPair CreateTokens(Optional<string> userId);
 
         bool VerifyTokens(Optional<string> token, Optional<string> signature, Optional<string> userId);
+    }
+
+    /// <summary>
+    ///     Defines the CSRF signature data
+    /// </summary>
+    public record CSRFCookie(string? LastUserId, string Signature)
+    {
+        /// <summary>
+        ///     Converts the specified <see cref="cookieValue" /> to a new instance
+        /// </summary>
+        public static Result<CSRFCookie, Error> FromCookieValue(string cookieValue)
+        {
+            try
+            {
+                return Encoding.UTF8.GetString(
+                        Convert.FromBase64String(cookieValue))
+                    .FromJson<CSRFCookie>()!;
+            }
+            catch (Exception ex)
+            {
+                return ex.ToError(ErrorCode.Unexpected);
+            }
+        }
+
+        /// <summary>
+        ///     Converts this instance to a value that can be inserted into a request or response cookie
+        ///     Note: Request cookies (in particular) cannot contain either a semicolon or a comma,
+        ///     which is why we have to base64 encode this JSON value
+        /// </summary>
+        public string ToCookieValue()
+        {
+            return Convert.ToBase64String(
+                Encoding.UTF8.GetBytes(new CSRFCookie(
+                    LastUserId.Exists()
+                        ? LastUserId
+                        : null, Signature).ToJson(false)!));
+        }
     }
 }

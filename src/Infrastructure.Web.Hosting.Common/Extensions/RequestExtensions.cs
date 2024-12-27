@@ -9,7 +9,8 @@ namespace Infrastructure.Web.Hosting.Common.Extensions;
 public static class RequestExtensions
 {
     /// <summary>
-    ///     Returns the ID of the user from the JWT token in the Cookie
+    ///     Returns the ID of the user from the JWT token that is stored in the cookie,
+    ///     while the cookie has not expired
     /// </summary>
     public static Result<Optional<string>, Error> GetUserIdFromAuthNCookie(this HttpRequest request)
     {
@@ -20,14 +21,18 @@ public static class RequestExtensions
         }
 
         var userId = GetUserIdClaim(token);
-        if (userId.IsFailure)
+        if (!userId.HasValue)
         {
-            return userId.Error;
+            return Error.ForbiddenAccess(Resources.RequestExtensions_InvalidToken);
         }
-
+        
         return userId.Value.ToOptional();
     }
 
+    /// <summary>
+    ///     Returns the cookie containing the JWT token.
+    ///     If the cookie has expired (same expiry as the JWT token) then cookie no longer exists, and this will return None.
+    /// </summary>
     private static Optional<string> GetAuthNCookie(HttpRequest request)
     {
         if (request.Cookies.TryGetValue(AuthenticationConstants.Cookies.Token, out var value))
@@ -38,7 +43,7 @@ public static class RequestExtensions
         return Optional<string>.None;
     }
 
-    private static Result<string, Error> GetUserIdClaim(string token)
+    private static Optional<string> GetUserIdClaim(string token)
     {
         try
         {
@@ -47,14 +52,14 @@ public static class RequestExtensions
                 .FirstOrDefault(claim => claim.Type == AuthenticationConstants.Claims.ForId);
             if (userClaim.NotExists())
             {
-                return Error.ForbiddenAccess(Resources.CSRFMiddleware_InvalidToken);
+                return Optional<string>.None;
             }
 
-            return userClaim.Value;
+            return userClaim.Value.ToOptional();
         }
         catch (Exception)
         {
-            return Error.ForbiddenAccess(Resources.CSRFMiddleware_InvalidToken);
+            return Optional<string>.None;
         }
     }
 }

@@ -2,6 +2,7 @@ import axios, { AxiosError, HttpStatusCode } from "axios";
 import { client as apiHost1 } from "./apiHost1/services.gen";
 import { client as websiteHost, refreshToken } from "./websiteHost/services.gen";
 import { recorder } from "../recorder";
+import { ProblemDetails } from "./websiteHost";
 
 const unRetryableRequestUrls: string[] = ["/api/auth/refresh", "/api/auth"];
 const loginPath = "/login";
@@ -36,12 +37,23 @@ function initializeApiClient() {
 async function handleUnauthorizedResponse(error: AxiosError) {
   const requestConfig = error.config;
 
+  //Handle 403's for CSRF
+  const problem = error as AxiosError<ProblemDetails>;
+  if (
+    error.status === HttpStatusCode.Forbidden &&
+    problem != undefined &&
+    problem.response?.data.title === "csrf_violation"
+  ) {
+    forceLogin();
+    return Promise.reject(error);
+  }
+
   // Only handle 401s
   if (error.status !== HttpStatusCode.Unauthorized) {
     return Promise.reject(error);
   }
 
-  // Check its an axios response (i.e. has config)
+  // Check it is an axios response (i.e. has config)
   if (!requestConfig) {
     return Promise.reject(error);
   }

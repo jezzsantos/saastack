@@ -1,33 +1,37 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using Common;
-using Common.Extensions;
+﻿using Common;
 using Infrastructure.Web.Hosting.Common.Extensions;
 using Infrastructure.Web.Hosting.Common.Pipeline;
-using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
+using WebsiteHost.ApplicationServices;
 using WebsiteHost.Models;
 
 namespace WebsiteHost.Controllers;
 
 public abstract class CSRFController : Controller
 {
-    private const string WebPackOutputLocation = @"ClientApp\webpack.build.json";
     private readonly CSRFMiddleware.ICSRFService _csrfService;
     private readonly IHostEnvironment _hostEnvironment;
+    private readonly IWebPackBundler _webpackBundler;
 
-    protected CSRFController(IHostEnvironment hostEnvironment, CSRFMiddleware.ICSRFService csrfCSRFService)
+    protected internal CSRFController(IHostEnvironment hostEnvironment, CSRFMiddleware.ICSRFService csrfService,
+        IWebPackBundler webpackBundler)
     {
         _hostEnvironment = hostEnvironment;
-        _csrfService = csrfCSRFService;
+        _csrfService = csrfService;
+        _webpackBundler = webpackBundler;
+    }
+
+    protected CSRFController(IHostEnvironment hostEnvironment, CSRFMiddleware.ICSRFService csrfService) : this(
+        hostEnvironment, csrfService, new WebPackBundler())
+    {
     }
 
     protected IActionResult CSRFResult()
     {
         var userId = Request.GetUserIdFromAuthNCookie()
-            .Match(optional => optional, _ => Optional<Optional<string>>.None);
+            .Match(optional => optional.Value, _ => Optional<string>.None);
         var csrfTokenPair = _csrfService.CreateTokens(userId);
-        WriteSignatureToCookie(csrfTokenPair.Signature);
+        WriteCSRFCookie(csrfTokenPair.Signature, userId);
         var bundleName = GetWebPackBundleName();
 
         var model = new IndexSpaPage
@@ -45,7 +49,7 @@ public abstract class CSRFController : Controller
             IsHostedOn = "UNKNOWN",
 #endif
             CSRFFieldName = CSRFConstants.Html.CSRFRequestFieldName,
-            CSRFHeaderToken = CSRFToken(),
+            CSRFHeaderToken = csrfTokenPair.Token,
             JsBundleName = bundleName
         };
         return View(model);
@@ -54,34 +58,16 @@ public abstract class CSRFController : Controller
     private string GetWebPackBundleName()
     {
         var applicationBasePath = _hostEnvironment.ContentRootPath;
-        var webPackOutputFilePath = Path.Combine(applicationBasePath, WebPackOutputLocation);
-
-        using var webPackOutputContent = System.IO.File.OpenText(webPackOutputFilePath);
-        var outputData = JsonSerializer.Deserialize<WebPackOutputJsonData>(webPackOutputContent.BaseStream);
-
-        var bundleName = outputData?.Main?.Js;
-        if (bundleName.HasValue())
-        {
-            return bundleName;
-        }
-
-        throw new InvalidOperationException(
-            $"Webpack output file '{WebPackOutputLocation}' was not found in the project. Please run `npm build` to produce this output file from WebPack");
+        return _webpackBundler.GetBundleName(applicationBasePath);
     }
 
-    private string CSRFToken()
+    private void WriteCSRFCookie(string signature, Optional<string> userId)
     {
-        var userId = Request.GetUserIdFromAuthNCookie()
-            .Match(optional => optional, _ => Optional<Optional<string>>.None);
-        var csrfTokenPair = _csrfService.CreateTokens(userId);
-        WriteSignatureToCookie(csrfTokenPair.Signature);
-
-        return csrfTokenPair.Token;
-    }
-
-    private void WriteSignatureToCookie(string signature)
-    {
-        Response.Cookies.Append(CSRFConstants.Cookies.AntiCSRF, signature, new CookieOptions
+        var cookieValue = new CSRFMiddleware.CSRFCookie(
+            userId.HasValue
+                ? userId.Value
+                : null, signature).ToCookieValue();
+        Response.Cookies.Append(CSRFConstants.Cookies.AntiCSRF, cookieValue, new CookieOptions
         {
             Secure = true,
             HttpOnly = true,
@@ -89,16 +75,4 @@ public abstract class CSRFController : Controller
             SameSite = SameSiteMode.Lax
         });
     }
-}
-
-[UsedImplicitly]
-public class WebPackOutputJsonData
-{
-    [JsonPropertyName("main")] public Bundle? Main { get; set; }
-}
-
-[UsedImplicitly]
-public class Bundle
-{
-    [JsonPropertyName("js")] public string? Js { get; set; }
 }

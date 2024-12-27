@@ -105,6 +105,15 @@ namespace Infrastructure.Web.Hosting.Common {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Authentication cookies are invalid in the request.
+        /// </summary>
+        internal static string CSRFMiddleware_InvalidAuthCookie {
+            get {
+                return ResourceManager.GetString("CSRFMiddleware_InvalidAuthCookie", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Host of the base URL could not be determined from: &apos;{0}&apos;.
         /// </summary>
         internal static string CSRFMiddleware_InvalidHostName {
@@ -114,20 +123,11 @@ namespace Infrastructure.Web.Hosting.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The CSRF cookie and/or header are invalid for the current user: &apos;{0}&apos;.
+        ///   Looks up a localized string similar to The CSRF cookie and/or header are invalid for the current user.
         /// </summary>
         internal static string CSRFMiddleware_InvalidSignature {
             get {
                 return ResourceManager.GetString("CSRFMiddleware_InvalidSignature", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The JWT access_token is invalid in the request.
-        /// </summary>
-        internal static string CSRFMiddleware_InvalidToken {
-            get {
-                return ResourceManager.GetString("CSRFMiddleware_InvalidToken", resourceCulture);
             }
         }
         
@@ -299,6 +299,15 @@ namespace Infrastructure.Web.Hosting.Common {
         internal static string MultiTenancyMiddleware_UserNotAMember {
             get {
                 return ResourceManager.GetString("MultiTenancyMiddleware_UserNotAMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The JWT access_token is invalid in the request.
+        /// </summary>
+        internal static string RequestExtensions_InvalidToken {
+            get {
+                return ResourceManager.GetString("RequestExtensions_InvalidToken", resourceCulture);
             }
         }
         

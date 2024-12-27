@@ -6,6 +6,7 @@ using Infrastructure.Web.Api.Operations.Shared.TestingOnly;
 using Infrastructure.Web.Common.Extensions;
 using Infrastructure.Web.Hosting.Common.Pipeline;
 using IntegrationTesting.WebApi.Common;
+using IntegrationTesting.WebApi.Common.Extensions;
 using IntegrationTesting.Website.Common;
 using JetBrains.Annotations;
 using Xunit;
@@ -113,34 +114,7 @@ public class CSRFApiSpec
             var problem = await result.AsProblemAsync(JsonOptions);
             problem!.Detail.Should()
                 .Be(Infrastructure.Web.Hosting.Common.Resources.CSRFMiddleware_MissingCSRFHeaderValue);
-#endif
-        }
-
-        [Fact]
-        public async Task WhenRequestedCSRFToken_ThenSucceeds()
-        {
-#if TESTINGONLY
-            var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
-                (message, cookies) => message.WithCSRF(cookies, CSRFService));
-
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-#endif
-        }
-
-        [Fact]
-        public async Task WhenRequestedWithMismatchedCookieAndHeaderForAnonymous_ThenSucceeds()
-        {
-#if TESTINGONLY
-            var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
-                (message, cookies) =>
-                {
-                    var anonymous1 = CSRFService.CreateTokens(null);
-                    var anonymous2 = CSRFService.CreateTokens(null);
-
-                    message.WithCSRF(cookies, anonymous1.Token, anonymous2.Signature);
-                });
-
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
+            problem.Title.Should().Be(CSRFMiddleware.CSRFViolation);
 #endif
         }
 
@@ -154,13 +128,14 @@ public class CSRFApiSpec
                     var anonymous = CSRFService.CreateTokens(null);
                     var user = CSRFService.CreateTokens("auserid");
 
-                    message.WithCSRF(cookies, anonymous.Token, user.Signature);
+                    message.WithCSRF(cookies, anonymous.Token, user.Signature, null);
                 });
 
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             var problem = await result.AsProblemAsync(JsonOptions);
             problem!.Detail.Should()
-                .Be(Infrastructure.Web.Hosting.Common.Resources.CSRFMiddleware_InvalidSignature.Format("None"));
+                .Be(Infrastructure.Web.Hosting.Common.Resources.CSRFMiddleware_InvalidSignature);
+            problem.Title.Should().Be(CSRFMiddleware.CSRFViolation);
 #endif
         }
 
@@ -174,27 +149,78 @@ public class CSRFApiSpec
                     var anonymous = CSRFService.CreateTokens(null);
                     var user = CSRFService.CreateTokens("auserid");
 
-                    message.WithCSRF(cookies, user.Token, anonymous.Signature);
+                    message.WithCSRF(cookies, user.Token, anonymous.Signature, null);
                 });
 
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             var problem = await result.AsProblemAsync(JsonOptions);
             problem!.Detail.Should()
-                .Be(Infrastructure.Web.Hosting.Common.Resources.CSRFMiddleware_InvalidSignature.Format("None"));
+                .Be(Infrastructure.Web.Hosting.Common.Resources.CSRFMiddleware_InvalidSignature);
+            problem.Title.Should().Be(CSRFMiddleware.CSRFViolation);
 #endif
         }
 
         [Fact]
-        public async Task WhenRequestedWithUserCSRFToken_ThenForbidden()
+        public async Task WhenRequestedWithUserHeaderAndCookie_ThenForbidden()
         {
 #if TESTINGONLY
             var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
-                (message, cookies) => message.WithCSRF(cookies, CSRFService, "auserid"));
+                (message, cookies) =>
+                {
+                    var user = CSRFService.CreateTokens("auserid");
+                    message.WithCSRF(cookies, user.Token, user.Signature, null);
+                });
 
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             var problem = await result.AsProblemAsync(JsonOptions);
             problem!.Detail.Should()
-                .Be(Infrastructure.Web.Hosting.Common.Resources.CSRFMiddleware_InvalidSignature.Format("None"));
+                .Be(Infrastructure.Web.Hosting.Common.Resources.CSRFMiddleware_InvalidSignature);
+            problem.Title.Should().Be(CSRFMiddleware.CSRFViolation);
+#endif
+        }
+
+        [Fact]
+        public async Task WhenRequestedWithDifferentAnonymousHeaderThanCookie_ThenSucceeds()
+        {
+#if TESTINGONLY
+            var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
+                (message, cookies) =>
+                {
+                    var anonymous1 = CSRFService.CreateTokens(null);
+                    var anonymous2 = CSRFService.CreateTokens(null);
+
+                    message.WithCSRF(cookies, anonymous1.Token, anonymous2.Signature, null);
+                });
+
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+#endif
+        }
+
+        [Fact]
+        public async Task WhenRequestedWithDifferentAnonymousHCookieThanHeader_ThenSucceeds()
+        {
+#if TESTINGONLY
+            var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
+                (message, cookies) =>
+                {
+                    var anonymous1 = CSRFService.CreateTokens(null);
+                    var anonymous2 = CSRFService.CreateTokens(null);
+
+                    message.WithCSRF(cookies, anonymous2.Token, anonymous1.Signature, null);
+                });
+
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+#endif
+        }
+
+        [Fact]
+        public async Task WhenRequestedWithAnonymousHeaderAndCookie_ThenSucceeds()
+        {
+#if TESTINGONLY
+            var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
+                (message, cookies) => message.WithCSRF(cookies, CSRFService));
+
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
 #endif
         }
     }
@@ -213,7 +239,7 @@ public class CSRFApiSpec
         }
 
         [Fact]
-        public async Task WhenRequestedWithAnonymousCSRFToken_ThenForbidden()
+        public async Task WhenRequestedWithAnonymousHeaderAndCookie_ThenForbidden()
         {
 #if TESTINGONLY
             var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
@@ -222,12 +248,55 @@ public class CSRFApiSpec
             result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
             var problem = await result.AsProblemAsync(JsonOptions);
             problem!.Detail.Should()
-                .Be(Infrastructure.Web.Hosting.Common.Resources.CSRFMiddleware_InvalidSignature.Format(_userId));
+                .Be(Infrastructure.Web.Hosting.Common.Resources.CSRFMiddleware_InvalidSignature);
+            problem.Title.Should().Be(CSRFMiddleware.CSRFViolation);
 #endif
         }
 
         [Fact]
-        public async Task WhenRequestedWithUsersCSRFToken_ThenSucceeds()
+        public async Task WhenRequestedWithDifferentUserHeaderThanCookie_ThenSucceeds()
+        {
+#if TESTINGONLY
+            var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
+                (message, cookies) =>
+                {
+                    var user1 = CSRFService.CreateTokens(_userId);
+                    var user2 = CSRFService.CreateTokens("anotheruserid");
+
+                    message.WithCSRF(cookies, user1.Token, user2.Signature, _userId);
+                });
+
+            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            var problem = await result.AsProblemAsync(JsonOptions);
+            problem!.Detail.Should()
+                .Be(Infrastructure.Web.Hosting.Common.Resources.CSRFMiddleware_InvalidSignature);
+            problem.Title.Should().Be(CSRFMiddleware.CSRFViolation);
+#endif
+        }
+
+        [Fact]
+        public async Task WhenRequestedWithDifferentUserCookieThanHeader_ThenSucceeds()
+        {
+#if TESTINGONLY
+            var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
+                (message, cookies) =>
+                {
+                    var user1 = CSRFService.CreateTokens(_userId);
+                    var user2 = CSRFService.CreateTokens("anotheruserid");
+
+                    message.WithCSRF(cookies, user2.Token, user1.Signature, _userId);
+                });
+
+            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            var problem = await result.AsProblemAsync(JsonOptions);
+            problem!.Detail.Should()
+                .Be(Infrastructure.Web.Hosting.Common.Resources.CSRFMiddleware_InvalidSignature);
+            problem.Title.Should().Be(CSRFMiddleware.CSRFViolation);
+#endif
+        }
+
+        [Fact]
+        public async Task WhenRequestedWithUserHeaderAndCookie_ThenSucceeds()
         {
 #if TESTINGONLY
             var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
@@ -238,36 +307,14 @@ public class CSRFApiSpec
         }
 
         [Fact]
-        public async Task WhenRequestedWithMismatchedCookieAndHeaderForDifferentUsers_ThenForbidden()
+        public async Task WhenRequestedWithExpiredAuthenticationAndUserHeaderAndCookie_ThenForbidden()
         {
 #if TESTINGONLY
             var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
                 (message, cookies) =>
                 {
-                    var user1 = CSRFService.CreateTokens(_userId);
-                    var user2 = CSRFService.CreateTokens("anotheruserid");
-
-                    message.WithCSRF(cookies, user1.Token, user2.Signature);
-                });
-
-            result.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-            var problem = await result.AsProblemAsync(JsonOptions);
-            problem!.Detail.Should()
-                .Be(Infrastructure.Web.Hosting.Common.Resources.CSRFMiddleware_InvalidSignature.Format(_userId));
-#endif
-        }
-
-        [Fact]
-        public async Task WhenRequestedWithMismatchedCookieAndHeaderForSameUser_ThenSucceeds()
-        {
-#if TESTINGONLY
-            var result = await HttpApi.PostEmptyJsonAsync(new PostInsecureTestingOnlyRequest().MakeApiRoute(),
-                (message, cookies) =>
-                {
-                    var user1 = CSRFService.CreateTokens(_userId);
-                    var user2 = CSRFService.CreateTokens(_userId);
-
-                    message.WithCSRF(cookies, user1.Token, user2.Signature);
+                    cookies.Clear(HttpApi);
+                    message.WithCSRF(cookies, CSRFService, _userId);
                 });
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
