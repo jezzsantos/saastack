@@ -129,12 +129,13 @@ public static class HostExtensions
 
         void RegisterConfiguration(bool isMultiTenanted)
         {
-            appBuilder.Configuration.AddJsonFile("appsettings.local.json", true);
 #if HOSTEDONAZURE
             appBuilder.Configuration.AddJsonFile("appsettings.Azure.json", true);
 #elif HOSTEDONAWS
             appBuilder.Configuration.AddJsonFile("appsettings.AWS.json", true);
 #endif
+            appBuilder.Configuration.AddJsonFile("appsettings.Deploy.json", true);
+            appBuilder.Configuration.AddJsonFile("appsettings.local.json", true);
 
             if (isMultiTenanted)
             {
