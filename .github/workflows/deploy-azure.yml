@@ -1,0 +1,124 @@
+name: Build and Deploy Azure
+
+on: [ push ]
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
+env:
+  IS_CI_BUILD: 'true'
+  SOLUTION_PATH: 'src/SaaStack.sln'
+  DEPLOY_BUILD_CONFIGURATION: 'ReleaseForDeploy'
+  DOTNET_VERSION: 8.0.302
+  HOSTED_ON: 'HOSTEDONAZURE'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    environment: 'Demo'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{env.DOTNET_VERSION}}
+      - name: Install NodeJs
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Restore dependencies
+        run: dotnet restore "${{env.SOLUTION_PATH}}"
+      - name: Build Custom GitHub Actions
+        run: |
+          cd src/Tools.GitHubActions/VariableSubstitution
+          npm ci --cache .npm --prefer-offline
+          npm run build
+      - name: Build (Backend) for Deploy
+        run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=${{env.HOSTED_ON}}
+      - name: Build WebsiteHost (FrontEnd) for Deploy
+        run: |
+          cd src/WebsiteHost/ClientApp
+          cp .env.example .env
+          npm ci --cache .npm --prefer-offline
+          npm run build:releasefordeploy
+      - name: Substitute GitHub Secrets/Variables
+        uses: ./src/Tools.GitHubActions/VariableSubstitution
+        with:
+          files: '**/appsettings.json,**/appsettings.Azure.json'
+          variables: ${{ toJSON(vars)}}
+          secrets: ${{ toJSON(secrets)}}
+      - name: Package (ApiHost1) for Deploy
+        run: dotnet publish --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "src/ApiHost1/ApiHost1.csproj" --output ".\publish\ApiHost1" /p:HostingPlatform=${{env.HOSTED_ON}}
+      - name: Package (WebsiteHost) for Deploy
+        run: dotnet publish --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "src/WebsiteHost/WebsiteHost.csproj" --output ".\publish\WebsiteHost" /p:HostingPlatform=${{env.HOSTED_ON}}
+      - name: Package (AzureFunctions) for Deploy
+        run: dotnet publish --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "src/AzureFunctions.Api.WorkerHost/AzureFunctions.Api.WorkerHost.csproj" --output ".\publish\AzureFunctions.Api.WorkerHost" /p:HostingPlatform=${{env.HOSTED_ON}}
+      - name: Upload (ApiHost1) artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ApiHost1
+          path: ./publish/ApiHost1
+      - name: Upload (WebsiteHost) artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebsiteHost
+          path: ./publish/WebsiteHost
+      - name: Upload (AzureFunctions.Api.WorkerHost) artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: AzureFunctions.Api.WorkerHost
+          path: ./publish/AzureFunctions.Api.WorkerHost
+          include-hidden-files: true # HACK: see https://github.com/Azure/azure-functions-dotnet-worker/issues/1240
+# TODO: Deploy these artifacts 
+#  deploy:
+#    runs-on: windows-latest
+#    timeout-minutes: 30
+#    needs: build
+#    environment: 'Demo'
+#    steps:
+#      - name: Azure login
+#        uses: azure/login@v2
+#        with:
+#          client-id: "${{ vars.DEPLOY_AZURE_CLIENT_ID }}"
+#          tenant-id: "${{ vars.DEPLOY_AZURE_TENANT_ID }}"
+#          subscription-id: "${{ vars.DEPLOY_AZURE_SUBSCRIPTION_ID }}"
+#
+#      - name: Download ApiHost1 Artifacts
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: ApiHost1
+#          path: ./ApiHost1
+#      - name: Deploy ApiHost1
+#        uses: azure/webapps-deploy@v3
+#        with:
+#          app-name: "${{ vars.DEPLOY_APIHOST1_APP_NAME }}"
+#          package: ./ApiHost1
+#
+#      - name: Download WebsiteHost Artifacts
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: WebsiteHost
+#          path: ./WebsiteHost
+#      - name: Deploy WebsiteHost
+#        uses: azure/webapps-deploy@v3
+#        with:
+#          app-name: "${{ vars.DEPLOY_WEBSITEHOST_APP_NAME }}"
+#          package: ./WebsiteHost
+#
+#      - name: Download AzureFunctions.Api.WorkerHost Artifacts
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: AzureFunctions.Api.WorkerHost
+#          path: ./AzureFunctions.Api.WorkerHost
+#      - name: Deploy AzureFunctions.Api.WorkerHost
+#        uses: azure/webapps-deploy@v3
+#        with:
+#          app-name: "${{ vars.DEPLOY_AZUREFUNCTIONS_APP_NAME }}"
+#          package: ./AzureFunctions.Api.WorkerHost
+#
+#      - name: logout
+#        run: |
+#          az logout

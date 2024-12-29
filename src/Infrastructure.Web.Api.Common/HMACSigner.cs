@@ -35,6 +35,14 @@ public class HMACSigner
         _secret = secret;
     }
 
+#if TESTINGONLY
+    public static string GenerateKey()
+    {
+        var algorithm = new HMACSHA256();
+        return Convert.ToBase64String(algorithm.Key);
+    }
+#endif
+
     public string Sign()
     {
         var key = SignatureEncoding.GetBytes(_secret);

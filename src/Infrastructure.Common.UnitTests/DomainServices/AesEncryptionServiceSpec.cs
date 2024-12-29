@@ -13,7 +13,7 @@ public class AesEncryptionServiceSpec
     public AesEncryptionServiceSpec()
     {
 #if TESTINGONLY
-        _secret = AesEncryptionService.CreateAesSecret();
+        _secret = AesEncryptionService.GenerateAesSecret();
 #else
         _secret = string.Empty;
 #endif

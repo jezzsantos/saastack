@@ -24,7 +24,7 @@ public class JWTTokensServiceSpec
         var settings = new Mock<IConfigurationSettings>();
         settings.Setup(s => s.Platform.GetString(JWTTokensService.BaseUrlSettingName, null))
             .Returns("https://localhost");
-        settings.Setup(s => s.Platform.GetString(JWTTokensService.SecretSettingName, null))
+        settings.Setup(s => s.Platform.GetString(JWTTokensService.SigningSecretSettingName, null))
             .Returns("asecretsigningkeyasecretsigningkeyasecretsigningkeyasecretsigningkey");
         settings.Setup(s => s.Platform.GetNumber(It.IsAny<string>(), It.IsAny<double>()))
             .Returns((string _, double defaultValue) => defaultValue);
@@ -33,6 +33,16 @@ public class JWTTokensServiceSpec
             .Returns("arefreshtoken");
 
         _service = new JWTTokensService(settings.Object, _tokensService.Object);
+    }
+
+    [Fact]
+    public void WhenGenerateSigningKey_ThenReturnsKey()
+    {
+#if TESTINGONLY
+        var result = JWTTokensService.GenerateSigningKey();
+
+        result.Should().NotBeNullOrEmpty();
+#endif
     }
 
     [Fact]

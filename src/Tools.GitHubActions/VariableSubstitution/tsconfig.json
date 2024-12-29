@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "target": "ES2023",
+    "allowJs": false,
+    "baseUrl": "./src",
+    "rootDir": "src",
+    "outDir": "./built",
+    "sourceMap": true,
+    "strict": true,
+    "moduleResolution": "NodeNext",
+    "noImplicitAny": true,
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ]
+  },
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "./src/testing",
+    "./src/**/*.spec.ts"
+  ]
+}

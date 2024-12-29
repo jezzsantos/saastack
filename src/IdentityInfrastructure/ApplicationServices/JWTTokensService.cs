@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
 using System.Text;
 using Application.Resources.Shared;
 using Common;
@@ -14,8 +15,8 @@ namespace IdentityInfrastructure.ApplicationServices;
 public class JWTTokensService : IJWTTokensService
 {
     public const string BaseUrlSettingName = "Hosts:IdentityApi:BaseUrl";
-    public const string DefaultExpirySettingName = "Hosts:IdentityApi:JWT:DefaultExpiryInMinutes";
-    public const string SecretSettingName = "Hosts:IdentityApi:JWT:SigningSecret";
+    public const string SigningSecretSettingName = "Hosts:IdentityApi:JWT:SigningSecret";
+    private const string DefaultExpirySettingName = "Hosts:IdentityApi:JWT:DefaultExpiryInMinutes";
     private readonly TimeSpan _accessTokenExpiresAfter;
     private readonly string _baseUrl;
     private readonly string _signingSecret;
@@ -24,7 +25,7 @@ public class JWTTokensService : IJWTTokensService
     public JWTTokensService(IConfigurationSettings settings, ITokensService tokensService)
     {
         _tokensService = tokensService;
-        _signingSecret = settings.Platform.GetString(SecretSettingName);
+        _signingSecret = settings.Platform.GetString(SigningSecretSettingName);
         _baseUrl = settings.Platform.GetString(BaseUrlSettingName);
         _accessTokenExpiresAfter =
             TimeSpan.FromMinutes(settings.Platform.GetNumber(DefaultExpirySettingName,
@@ -37,6 +38,13 @@ public class JWTTokensService : IJWTTokensService
 
         return Task.FromResult(tokens);
     }
+
+#if TESTINGONLY
+    public static string GenerateSigningKey()
+    {
+        return RandomNumberGenerator.GetHexString(64);
+    }
+#endif
 
     private Result<AccessTokens, Error> IssueTokens(EndUserWithMemberships user)
     {

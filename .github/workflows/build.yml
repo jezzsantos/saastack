@@ -20,10 +20,14 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v3
-      - name: Setup .NET
+      - name: Install .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{env.DOTNET_VERSION}}
+      - name: Install NodeJs
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Restore dependencies
         run: dotnet restore "${{env.SOLUTION_PATH}}"
       - name: Build (Backend) for Azure Testing
@@ -34,21 +38,30 @@ jobs:
         run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAZURE
       - name: Build (Backend) for AWS Deploy
         run: dotnet build --configuration ${{env.DEPLOY_BUILD_CONFIGURATION}} "${{env.SOLUTION_PATH}}" /p:HostingPlatform=HOSTEDONAWS
-      - name: Build WebsiteHost (FrontEnd)
+      - name: Build WebsiteHost (FrontEnd) for Deploy
         run: |
           cd src/WebsiteHost/ClientApp
           cp .env.example .env
           npm ci --cache .npm --prefer-offline
           npm run build:releasefordeploy
+      - name: Build Custom GitHub Actions
+        run: |
+          cd src/Tools.GitHubActions/VariableSubstitution
+          npm ci --cache .npm --prefer-offline
+          npm run build
   test:
     runs-on: windows-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v3
-      - name: Setup .NET
+      - name: Install .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{env.DOTNET_VERSION}}
+      - name: Install NodeJs
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Restore dependencies
         run: dotnet restore "${{env.SOLUTION_PATH}}"
       - name: Build for CI Testing (for Azure)
@@ -78,6 +91,13 @@ jobs:
           cp .env.example .env
           npm ci --cache .npm --prefer-offline
           npm run build:releasefordeploy
+          npm run test:ci
+      - name: Test Custom GitHub Actions
+        continue-on-error: false
+        run: |
+          cd src/Tools.GitHubActions/VariableSubstitution
+          npm ci --cache .npm --prefer-offline
+          npm run build
           npm run test:ci
       - name: Testing Report
         uses: dorny/test-reporter@v1.7.0
