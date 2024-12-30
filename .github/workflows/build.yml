@@ -20,6 +20,15 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v3
+      - name: Build Custom Actions
+        run: |
+          cd src/Tools.GitHubActions/VariableSubstitution
+          npm ci --cache .npm --prefer-offline
+      - name: Variable Substitution
+        uses: ./src/Tools.GitHubActions/VariableSubstitution
+        with:
+          files: '**/appsettings.json,**/appsettings.Deploy.json'
+          environment: ''
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:

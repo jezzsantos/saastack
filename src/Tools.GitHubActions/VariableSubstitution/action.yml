@@ -1,0 +1,14 @@
+name: 'SaaStack Variable Substitution'
+description: 'Verifies and Substitutes all settings in files like `appsettings.json` with variables/secrets defined in the GitHub repository'
+inputs:
+  files:
+    description: 'A comma-delimited list of glob patterns that identify all the `appsettings.json` files to be processed, relative to the root of the repository'
+    required: true
+    default: '**/appsettings.json'
+  environment:
+    description: 'The name of the environment (in the GitHub repository) from which the variables and secrets should be substituted'
+    required: false
+    default: ''
+runs:
+  using: 'node20'
+  main: 'index.js'
