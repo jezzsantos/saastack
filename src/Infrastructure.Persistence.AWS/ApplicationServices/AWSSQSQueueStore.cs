@@ -1,4 +1,5 @@
 using Amazon;
+using Amazon.Runtime;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 using Common;
@@ -30,7 +31,7 @@ public class AWSSQSQueueStore : IQueueStore
             var remoteClient = new AmazonSQSClient(credentials, regionEndpoint);
             return new AWSSQSQueueStore(recorder, remoteClient);
         }
-
+        
         var localStackClient = new AmazonSQSClient(credentials,
             new AmazonSQSConfig
             {
@@ -40,6 +41,20 @@ public class AWSSQSQueueStore : IQueueStore
 
         return new AWSSQSQueueStore(recorder, localStackClient);
     }
+
+#if TESTINGONLY
+    public static AWSSQSQueueStore Create(IRecorder recorder, string localStackServiceUrl)
+    {
+        var localStackClient = new AmazonSQSClient(new AnonymousAWSCredentials(),
+            new AmazonSQSConfig
+            {
+                ServiceURL = localStackServiceUrl,
+                AuthenticationRegion = RegionEndpoint.USEast1.SystemName
+            });
+
+        return new AWSSQSQueueStore(recorder, localStackClient);
+    }
+#endif
 
     private AWSSQSQueueStore(IRecorder recorder, AmazonSQSClient serviceClient)
     {
@@ -194,6 +209,29 @@ public class AWSSQSQueueStore : IQueueStore
         return Result.Ok;
     }
 
+#if TESTINGONLY
+    public async Task<Result<Error>> ClearMessagesAsync(string queueName, CancellationToken cancellationToken)
+    {
+        var queueUrl = await GetQueueUrlAsync(queueName, cancellationToken);
+
+        try
+        {
+            await _serviceClient.PurgeQueueAsync(new PurgeQueueRequest
+            {
+                QueueUrl = queueUrl
+            }, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _recorder.TraceError(null,
+                ex, "Failed to clear messages from queue: {Queue}", queueUrl);
+            return ex.ToError(ErrorCode.Unexpected);
+        }
+
+        return Result.Ok;
+    }
+#endif
+    
     public async Task<Result<QueueIdentifiers, Error>> CreateQueueAsync(string queueName,
         CancellationToken cancellationToken)
     {
@@ -385,6 +423,7 @@ public class AWSSQSQueueStore : IQueueStore
                 queueUrl);
         }
     }
+
 }
 
 public record QueueIdentifiers(string QueueUrl, string QueueArn);

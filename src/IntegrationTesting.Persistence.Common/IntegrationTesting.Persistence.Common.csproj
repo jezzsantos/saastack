@@ -13,6 +13,8 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+        <PackageReference Include="Testcontainers.Azurite" Version="4.1.0" />
+        <PackageReference Include="Testcontainers.LocalStack" Version="4.1.0" />
     </ItemGroup>
 
     <ItemGroup>

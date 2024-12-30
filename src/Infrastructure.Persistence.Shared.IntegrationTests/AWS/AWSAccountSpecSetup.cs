@@ -1,7 +1,7 @@
 using Common.Recording;
 using FluentAssertions;
 using Infrastructure.Persistence.AWS.ApplicationServices;
-using Infrastructure.Persistence.Interfaces;
+using IntegrationTesting.Persistence.Common;
 using JetBrains.Annotations;
 using Xunit;
 
@@ -11,38 +11,34 @@ namespace Infrastructure.Persistence.Shared.IntegrationTests.AWS;
 public class AWSAccountSpecs : ICollectionFixture<AWSAccountSpecSetup>;
 
 [UsedImplicitly]
-public class AWSAccountSpecSetup : StoreSpecSetupBase, IDisposable
+public class AWSAccountSpecSetup : StoreSpecSetupBase, IAsyncLifetime
 {
-    public AWSAccountSpecSetup()
-    {
-        QueueStore = AWSSQSQueueStore.Create(NoOpRecorder.Instance, Settings);
-        MessageBusStore = AWSSNSMessageBusStore.Create(NoOpRecorder.Instance, Settings,
-            new AWSSNSMessageBusStoreOptions(SubscriberType.Queue));
-        AWSAccountBase.InitializeAllTests();
+    private readonly AWSLocalStackEmulator _localStack = new();
 
+    public AWSSNSMessageBusStore MessageBusStore { get; private set; } = null!;
+
+    public string[] MessageBusStoreTestQueues { get; private set; } = null!;
+
+    public AWSSQSQueueStore QueueStore { get; private set; } = null!;
+
+    public async Task InitializeAsync()
+    {
+        await _localStack.StartAsync();
+
+#if TESTINGONLY
+        var connectionString = _localStack.GetConnectionString();
+        QueueStore = AWSSQSQueueStore.Create(NoOpRecorder.Instance, connectionString);
+        MessageBusStore = AWSSNSMessageBusStore.Create(NoOpRecorder.Instance,
+            new AWSSNSMessageBusStoreOptions(SubscriberType.Queue), connectionString);
+#endif
         var store = QueueStore.As<AWSSQSQueueStore>();
         var queue1 = store.CreateQueueAsync("messagebus_queue1", CancellationToken.None).GetAwaiter().GetResult();
         var queue2 = store.CreateQueueAsync("messagebus_queue2", CancellationToken.None).GetAwaiter().GetResult();
         MessageBusStoreTestQueues = [queue1.Value.QueueArn, queue2.Value.QueueArn];
     }
 
-    public void Dispose()
+    public async Task DisposeAsync()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        await _localStack.StopAsync();
     }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            AWSAccountBase.CleanupAllTests();
-        }
-    }
-
-    public IMessageBusStore MessageBusStore { get; }
-
-    public string[] MessageBusStoreTestQueues { get; }
-
-    public IQueueStore QueueStore { get; }
 }

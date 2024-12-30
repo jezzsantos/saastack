@@ -18,7 +18,6 @@ public class KurrentSpecSetup : IAsyncLifetime
     // Server config: https://developers.eventstore.com/server/v24.10/configuration
     private readonly EventStoreDbContainer _eventStoreDb = new EventStoreDbBuilder()
         .WithImage(DockerImageName)
-        .WithPortBinding(2113, true)
         .WithEnvironment("EVENTSTORE_INSECURE", "true")
         .WithEnvironment("EVENTSTORE_MEM_DB", "true")
         .Build();

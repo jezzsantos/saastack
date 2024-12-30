@@ -10,31 +10,27 @@ namespace Infrastructure.Persistence.Shared.IntegrationTests.Azure;
 [CollectionDefinition("AzureStorageAccount", DisableParallelization = true)]
 public class AzureStorageAccountSpecs : ICollectionFixture<AzureStorageAccountSpecSetup>;
 
+
 [UsedImplicitly]
-public class AzureStorageAccountSpecSetup : StoreSpecSetupBase, IDisposable
+public class AzureStorageAccountSpecSetup : StoreSpecSetupBase, IAsyncLifetime
 {
-    public AzureStorageAccountSpecSetup()
+    private readonly AzuriteStorageEmulator _azurite = new();
+    public IBlobStore BlobStore { get; private set; } = null!;
+
+    public IQueueStore QueueStore { get; private set; } = null!;
+
+    public async Task InitializeAsync()
     {
-        QueueStore = AzureStorageAccountQueueStore.Create(NoOpRecorder.Instance, Settings);
-        BlobStore = AzureStorageAccountBlobStore.Create(NoOpRecorder.Instance, Settings);
-        AzuriteStorageEmulator.Start();
+        await _azurite.StartAsync();
+        var connectionString = _azurite.GetConnectionString();
+#if TESTINGONLY
+        QueueStore = AzureStorageAccountQueueStore.Create(NoOpRecorder.Instance, connectionString);
+        BlobStore = AzureStorageAccountBlobStore.Create(NoOpRecorder.Instance, connectionString);
+#endif
     }
 
-    public void Dispose()
+    public async Task DisposeAsync()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        await _azurite.StopAsync();
     }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            AzuriteStorageEmulator.Shutdown();
-        }
-    }
-
-    public IBlobStore BlobStore { get; }
-
-    public IQueueStore QueueStore { get; }
 }

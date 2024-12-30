@@ -31,6 +31,13 @@ public class AzureStorageAccountBlobStore : IBlobStore
         return new AzureStorageAccountBlobStore(recorder, connection);
     }
 
+#if TESTINGONLY
+    public static AzureStorageAccountBlobStore Create(IRecorder recorder, string connectionString)
+    {
+        return new AzureStorageAccountBlobStore(recorder, connectionString);
+    }
+#endif
+    
     private AzureStorageAccountBlobStore(IRecorder recorder, string connectionString)
     {
         _recorder = recorder;

@@ -9,6 +9,11 @@ namespace Infrastructure.Persistence.Shared.IntegrationTests;
 
 public abstract class AnyMessageBusStoreBaseSpec
 {
+    protected virtual Task WaitBetweenWritingAndReadingMessages()
+    {
+        return Task.CompletedTask;
+    }
+    
     protected AnyMessageBusStoreBaseSpec(IMessageBusStore messageBusStore,
         string subscriptionName = "asubscriptionname")
     {
@@ -80,7 +85,8 @@ public abstract class AnyMessageBusStoreBaseSpec
     public async Task WhenReceiveSingleAndMessageExists_ThenExecutesHandler()
     {
         await Info.Store.SendAsync(Info.TopicName, "amessage", CancellationToken.None);
-
+        await WaitBetweenWritingAndReadingMessages();
+        
 #if TESTINGONLY
         string? message = null;
         var result = await Info.Store.ReceiveSingleAsync(Info.TopicName, Info.SubscriptionName,
@@ -102,7 +108,7 @@ public abstract class AnyMessageBusStoreBaseSpec
     public async Task WhenReceiveSingleAndMessageExistsAndHandlerReturnsError_ThenLeavesMessageInSubscription()
     {
         await Info.Store.SendAsync(Info.TopicName, "amessage", CancellationToken.None);
-
+        await WaitBetweenWritingAndReadingMessages();
 #if TESTINGONLY
         var result1 = await Info.Store.ReceiveSingleAsync(Info.TopicName, Info.SubscriptionName,
             (_, _) => Task.FromResult<Result<Error>>(Error.RuleViolation("amessage")),
@@ -130,7 +136,7 @@ public abstract class AnyMessageBusStoreBaseSpec
     public async Task WhenReceiveSingleAndMessageExistsAndHandlerThrows_ThenLeavesMessageInSubscription()
     {
         await Info.Store.SendAsync(Info.TopicName, "amessage", CancellationToken.None);
-
+        await WaitBetweenWritingAndReadingMessages();
 #if TESTINGONLY
         var result1 = await Info.Store.ReceiveSingleAsync(Info.TopicName, Info.SubscriptionName,
             (_, _) => throw new Exception("amessage"),
@@ -199,6 +205,7 @@ public abstract class AnyMessageBusStoreBaseSpec
     public async Task WhenReceiveSingleAgainOnLastMessage_ThenReturnsFalse()
     {
         await Info.Store.SendAsync(Info.TopicName, "amessage", CancellationToken.None);
+        await WaitBetweenWritingAndReadingMessages();
 
 #if TESTINGONLY
         string? message = null;
@@ -208,7 +215,7 @@ public abstract class AnyMessageBusStoreBaseSpec
                 message = msg;
                 return Task.FromResult(Result.Ok);
             }, CancellationToken.None);
-
+        
         result1.Value.Should().BeTrue();
         message.Should().Be("amessage");
 

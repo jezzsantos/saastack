@@ -1,6 +1,5 @@
 using Amazon;
-using Amazon.CloudWatch;
-using Amazon.CloudWatch.Model;
+using Amazon.Runtime;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using Amazon.SQS;
@@ -24,7 +23,6 @@ namespace Infrastructure.Persistence.AWS.ApplicationServices;
 [UsedImplicitly]
 public class AWSSNSMessageBusStore : IMessageBusStore
 {
-    private readonly IAmazonCloudWatch _cloudWatchServiceClient;
     private readonly Dictionary<string, string> _knownTopicArns;
     private readonly AWSSNSMessageBusStoreOptions _options;
     private readonly AWSSQSQueueStore? _queueSubscriber;
@@ -34,12 +32,16 @@ public class AWSSNSMessageBusStore : IMessageBusStore
     public static AWSSNSMessageBusStore Create(IRecorder recorder, IConfigurationSettings settings,
         AWSSNSMessageBusStoreOptions options)
     {
+        var queueSubscriber = options.Type == SubscriberType.Queue
+            ? AWSSQSQueueStore.Create(recorder, settings)
+            : null;
+
         var (credentials, regionEndpoint) = settings.GetConnection();
         if (regionEndpoint.Exists())
         {
             var remoteClient = new AmazonSimpleNotificationServiceClient(credentials, regionEndpoint);
-            var remoteCloudWatchClient = new AmazonCloudWatchClient(credentials, regionEndpoint);
-            return new AWSSNSMessageBusStore(recorder, settings, remoteClient, remoteCloudWatchClient, options);
+            return new AWSSNSMessageBusStore(recorder, remoteClient, options,
+                queueSubscriber);
         }
 
         var localStackClient = new AmazonSimpleNotificationServiceClient(credentials,
@@ -48,97 +50,64 @@ public class AWSSNSMessageBusStore : IMessageBusStore
                 ServiceURL = AWSConstants.LocalStackServiceUrl,
                 AuthenticationRegion = RegionEndpoint.USEast1.SystemName
             });
-        var localCloudWatchClient = new AmazonCloudWatchClient(credentials, new AmazonCloudWatchConfig
-        {
-            ServiceURL = AWSConstants.LocalStackServiceUrl,
-            AuthenticationRegion = RegionEndpoint.USEast1.SystemName
-        });
-
-        return new AWSSNSMessageBusStore(recorder, settings, localStackClient, localCloudWatchClient, options);
-    }
-
-    private AWSSNSMessageBusStore(IRecorder recorder, IConfigurationSettings settings,
-        IAmazonSimpleNotificationService serviceClient,
-        IAmazonCloudWatch cloudWatchServiceClient, AWSSNSMessageBusStoreOptions options)
-    {
-        _recorder = recorder;
-        _serviceClient = serviceClient;
-        _cloudWatchServiceClient = cloudWatchServiceClient;
-        _options = options;
-        _knownTopicArns = new Dictionary<string, string>();
-        _queueSubscriber = options.Type == SubscriberType.Queue
-            ? AWSSQSQueueStore.Create(recorder, settings)
-            : null;
+        return new AWSSNSMessageBusStore(recorder, localStackClient, options,
+            queueSubscriber);
     }
 
 #if TESTINGONLY
-    public async Task<Result<long, Error>> CountAsync(string topicName, string subscriptionName,
+    public static AWSSNSMessageBusStore Create(IRecorder recorder,
+        AWSSNSMessageBusStoreOptions options, string localStackServiceUrl)
+    {
+        var credentials = new AnonymousAWSCredentials();
+        var localStackClient = new AmazonSimpleNotificationServiceClient(credentials,
+            new AmazonSimpleNotificationServiceConfig
+            {
+                ServiceURL = localStackServiceUrl,
+                AuthenticationRegion = RegionEndpoint.USEast1.SystemName
+            });
+        var queueSubscriber = options.Type == SubscriberType.Queue
+            ? AWSSQSQueueStore.Create(recorder, localStackServiceUrl)
+            : null;
+
+        return new AWSSNSMessageBusStore(recorder, localStackClient, options,
+            queueSubscriber);
+    }
+#endif
+
+    private AWSSNSMessageBusStore(IRecorder recorder,
+        IAmazonSimpleNotificationService serviceClient, AWSSNSMessageBusStoreOptions options,
+        AWSSQSQueueStore? queueSubscriber)
+    {
+        _recorder = recorder;
+        _serviceClient = serviceClient;
+        _options = options;
+        _knownTopicArns = new Dictionary<string, string>();
+        _queueSubscriber = queueSubscriber;
+    }
+
+#if TESTINGONLY
+    public async Task<Result<long, Error>> CountAsync(string _, string subscriptionName,
         CancellationToken cancellationToken)
     {
-        topicName.ThrowIfNotValuedParameter((string)nameof(topicName),
-            Resources.AWSSNSMessageBusStore_MissingTopicName);
         subscriptionName.ThrowIfNotValuedParameter((string)nameof(subscriptionName),
             Resources.AWSSNSMessageBusStore_MissingSubscriptionName);
 
-        var sanitizedTopicName = topicName.SanitizeAndValidateTopicName();
+        var sanitizedSubscriptionName = subscriptionName.SanitizeAndValidateSubscriptionName(_options);
 
-        var count = await _cloudWatchServiceClient.GetMetricDataAsync(new GetMetricDataRequest
+        if (_queueSubscriber.NotExists())
         {
-            StartTimeUtc = DateTime.UtcNow.AddMonths(-1),
-            EndTimeUtc = DateTime.UtcNow,
-            MetricDataQueries =
-            [
-                new MetricDataQuery
-                {
-                    Id = "m1",
-                    MetricStat = new MetricStat
-                    {
-                        Metric = new Metric
-                        {
-                            MetricName = "NumberOfMessagesPublished",
-                            Namespace = "AWS/SNS",
-                            Dimensions =
-                            [
-                                new Dimension
-                                {
-                                    Name = "TopicName",
-                                    Value = sanitizedTopicName
-                                }
-                            ]
-                        },
-                        Period = 86400,
-                        Stat = "Sum"
-                    }
-                },
-                new MetricDataQuery
-                {
-                    Id = "m2",
-                    MetricStat = new MetricStat
-                    {
-                        Metric = new Metric
-                        {
-                            MetricName = "NumberOfNotificationsDelivered",
-                            Namespace = "AWS/SNS",
-                            Dimensions =
-                            [
-                                new Dimension
-                                {
-                                    Name = "TopicName",
-                                    Value = sanitizedTopicName
-                                }
-                            ]
-                        },
-                        Period = 86400,
-                        Stat = "Sum"
-                    }
-                }
-            ]
-        }, cancellationToken);
+            return 0;
+        }
 
-        //var published = (long)count.MetricDataResults[0].Values.FirstOrDefault();
-        var delivered = (long)count.MetricDataResults[1].Values.FirstOrDefault();
+        if (!Arn.TryParse(sanitizedSubscriptionName, out var arn))
+        {
+            return 0;
+        }
 
-        return delivered;
+        var queueName = arn.Resource.Replace(".fifo", string.Empty);
+        var count = await _queueSubscriber.CountAsync(queueName, cancellationToken);
+
+        return count;
     }
 #endif
 
@@ -323,6 +292,7 @@ public class AWSSNSMessageBusStore : IMessageBusStore
         var protocol = _options.Type == SubscriberType.Lambda
             ? "lambda"
             : "sqs";
+
         await _serviceClient.SubscribeAsync(new SubscribeRequest
         {
             TopicArn = topicArn,

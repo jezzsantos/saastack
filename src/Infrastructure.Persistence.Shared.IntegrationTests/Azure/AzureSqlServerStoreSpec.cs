@@ -1,10 +1,9 @@
-using System.Diagnostics;
-using System.ServiceProcess;
-using Common.Extensions;
 using Common.Recording;
 using Infrastructure.Persistence.Azure.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
 using JetBrains.Annotations;
+using Microsoft.Data.SqlClient;
+using Testcontainers.MsSql;
 using Xunit;
 
 namespace Infrastructure.Persistence.Shared.IntegrationTests.Azure;
@@ -13,123 +12,65 @@ namespace Infrastructure.Persistence.Shared.IntegrationTests.Azure;
 public class AllAzureSqlServerStoreSpecs : ICollectionFixture<AzureSqlServerStoreSpecSetup>;
 
 [UsedImplicitly]
-public class AzureSqlServerStoreSpecSetup : StoreSpecSetupBase, IDisposable
+public class AzureSqlServerStoreSpecSetup : StoreSpecSetupBase, IAsyncLifetime
 {
-    private const string CreateDatabaseCliCommandArgs = "-Q \"CREATE DATABASE {0}\"";
-    private const string RegenerateCliCommandArgs = "-i \"{0}\\Azure\\TestDatabaseSchema.sql\"";
-    private const string SqlServiceCli = @"SQLCMD";
-    private readonly string _serviceName;
-    private readonly AzureSqlServerStore _store;
+    private const string DockerImageName = "mcr.microsoft.com/mssql/server:2022-latest";
+    private const int SuccessExitCode = 0;
 
-    public AzureSqlServerStoreSpecSetup()
-    {
-        _serviceName = Settings.GetString("ApplicationServices:Persistence:SqlServer:LocalServiceName");
-        var databaseName = Settings.GetString("ApplicationServices:Persistence:SqlServer:DbName");
-        EnsureLocalDatabaseServiceIsStarted(Environment.CurrentDirectory, _serviceName, databaseName);
+    private readonly MsSqlContainer _sqlServer = new MsSqlBuilder()
+        .WithImage(DockerImageName)
+        .Build();
 
-        _store = AzureSqlServerStore.Create(NoOpRecorder.Instance, Settings);
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            ShutdownLocalDatabaseService(_serviceName);
-        }
-    }
+    private AzureSqlServerStore _store = null!;
 
     public IDataStore DataStore => _store;
 
     public IEventStore EventStore => _store;
 
-    private static void EnsureLocalDatabaseServiceIsStarted(string deploymentDirectory, string serviceName,
-        string databaseName)
+    private async Task RebuildDatabaseSchema(string databaseName)
     {
-        if (!IsLocalDatabaseServiceRunning(serviceName))
+        await _sqlServer.ExecScriptAsync($"CREATE DATABASE {databaseName}");
+        var schemaScriptFileName = "TestDatabaseSchema.sql";
+        await _sqlServer.CopyAsync(Path.Combine(Environment.CurrentDirectory, "Azure", schemaScriptFileName), "/tmp/");
+
+        var sqlCmd = await _sqlServer.GetSqlCmdFilePathAsync(); // need full path to sqlcmd as it's not found in $PATH
+        var result = await _sqlServer.ExecAsync([
+            sqlCmd,
+            "-C", // trust the server certificate without validation
+            "-d", databaseName,
+            "-i", $"/tmp/{schemaScriptFileName}"
+        ]);
+
+        if (result.ExitCode != SuccessExitCode)
         {
-            StartLocalDatabaseService(serviceName);
-            while (!IsLocalDatabaseServiceRunning(serviceName))
-            {
-                Thread.Sleep(TimeSpan.FromSeconds(2));
-            }
-        }
-
-        RebuildDatabaseSchema(databaseName, deploymentDirectory);
-    }
-
-    private static bool IsLocalDatabaseServiceRunning(string serviceName)
-    {
-        if (!OperatingSystem.IsWindows())
-        {
-            throw new InvalidOperationException("Cannot run tests on SQLServer on a non-Windows platform");
-        }
-
-        using var controller = new ServiceController(serviceName);
-        return controller.Status == ServiceControllerStatus.Running;
-    }
-
-    private static void StartLocalDatabaseService(string serviceName)
-    {
-        if (!OperatingSystem.IsWindows())
-        {
-            throw new InvalidOperationException("Cannot run tests on SQLServer on a non-Windows platform");
-        }
-
-        using var controller = new ServiceController(serviceName);
-        if (controller.Status == ServiceControllerStatus.Stopped)
-        {
-            controller.Start();
-            controller.WaitForStatus(ServiceControllerStatus.Running);
+            throw new Exception($"Failed to execute {schemaScriptFileName}: {result.Stderr}");
         }
     }
 
-    private static void RebuildDatabaseSchema(string databaseName, string scriptPath)
+    public async Task InitializeAsync()
     {
-        ExecuteSqlCommand(SqlServiceCli, CreateDatabaseCliCommandArgs.Format(databaseName));
-        ExecuteSqlCommand(SqlServiceCli, RegenerateCliCommandArgs.Format(scriptPath));
+        await _sqlServer.StartAsync();
+        var databaseName = Settings.GetString("ApplicationServices:Persistence:SqlServer:DbName");
+        await RebuildDatabaseSchema(databaseName);
+
+        var connectionString = GetConnectionStringForDatabase(databaseName);
+
+#if TESTINGONLY
+        _store = AzureSqlServerStore.Create(NoOpRecorder.Instance, connectionString);
+#endif
     }
 
-    private static void ExecuteSqlCommand(string command, string arguments, bool waitForCompletion = true)
+    private string GetConnectionStringForDatabase(string databaseName)
     {
-        var process = Process.Start(new ProcessStartInfo
+        return new SqlConnectionStringBuilder(_sqlServer.GetConnectionString())
         {
-            Arguments = arguments,
-            FileName = command,
-            WindowStyle = ProcessWindowStyle.Hidden,
-            Verb = "runas",
-            UseShellExecute = false,
-            RedirectStandardError = true
-        });
-        if (waitForCompletion)
-        {
-            process!.WaitForExit();
-        }
-
-        if (process!.ExitCode != 0)
-        {
-            throw new Exception(process.StandardError.ReadToEnd());
-        }
+            InitialCatalog = databaseName
+        }.ToString();
     }
 
-    private static void ShutdownLocalDatabaseService(string serviceName)
+    public async Task DisposeAsync()
     {
-        if (!OperatingSystem.IsWindows())
-        {
-            throw new InvalidOperationException("Cannot run tests on SQLServer on a non-Windows platform");
-        }
-
-        using var controller = new ServiceController(serviceName);
-        if (controller.Status == ServiceControllerStatus.Running)
-        {
-            controller.Stop();
-            controller.WaitForStatus(ServiceControllerStatus.Stopped);
-        }
+        await _sqlServer.DisposeAsync();
     }
 }
 

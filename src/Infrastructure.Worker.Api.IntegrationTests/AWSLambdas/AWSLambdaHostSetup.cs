@@ -1,8 +1,8 @@
 using Common.Extensions;
 using Common.Recording;
-using Infrastructure.Hosting.Common;
 using Infrastructure.Persistence.AWS.ApplicationServices;
 using Infrastructure.Persistence.Interfaces;
+using IntegrationTesting.Persistence.Common;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,40 +15,13 @@ namespace Infrastructure.Worker.Api.IntegrationTests.AWSLambdas;
 public class AllAwsLambdaSpecs : ICollectionFixture<AWSLambdaHostSetup>;
 
 [UsedImplicitly]
-public class AWSLambdaHostSetup : IApiWorkerSpec, IDisposable
+public class AWSLambdaHostSetup : IApiWorkerSpec, IAsyncLifetime
 {
+    private readonly AWSLocalStackEmulator _localStack = new();
+
     private static readonly TimeSpan LambdaTriggerWaitLatency = TimeSpan.FromSeconds(5);
     private IHost? _host;
     private Action<IServiceCollection>? _overridenTestingDependencies;
-
-    public AWSLambdaHostSetup()
-    {
-        var settings = new AspNetDynamicConfigurationSettings(new ConfigurationBuilder()
-            .AddJsonFile("appsettings.Testing.json", true)
-            .AddJsonFile("appsettings.Testing.local.json", true)
-            .Build());
-        var recorder = NoOpRecorder.Instance;
-        QueueStore = AWSSQSQueueStore.Create(recorder, settings);
-        MessageBusStore =
-            AWSSNSMessageBusStore.Create(recorder, settings, new AWSSNSMessageBusStoreOptions(SubscriberType.Queue));
-        AWSAccountBase.InitializeAllTests();
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            _host?.StopAsync().GetAwaiter().GetResult();
-            _host?.Dispose();
-            AWSAccountBase.CleanupAllTests();
-        }
-    }
 
     public TService GetRequiredService<TService>()
         where TService : notnull
@@ -61,16 +34,16 @@ public class AWSLambdaHostSetup : IApiWorkerSpec, IDisposable
         return _host.Services.GetRequiredService<TService>();
     }
 
-    public IMessageBusStore MessageBusStore { get; }
+    public IMessageBusStore MessageBusStore { get; private set; } = null!;
 
     public void OverrideTestingDependencies(Action<IServiceCollection> overrideDependencies)
     {
         _overridenTestingDependencies = overrideDependencies;
     }
 
-    public IQueueStore QueueStore { get; }
+    public IQueueStore QueueStore { get; private set; } = null!;
 
-    public void Start()
+    public void StartHost()
     {
         _host = new HostBuilder()
             .ConfigureAppConfiguration(builder =>
@@ -94,5 +67,30 @@ public class AWSLambdaHostSetup : IApiWorkerSpec, IDisposable
     public void WaitForQueueProcessingToComplete()
     {
         Thread.Sleep(LambdaTriggerWaitLatency);
+    }
+
+    public async Task InitializeAsync()
+    {
+        await _localStack.StartAsync();
+        var recorder = NoOpRecorder.Instance;
+
+#if TESTINGONLY
+             var connectionString = _localStack.GetConnectionString();
+        QueueStore = AWSSQSQueueStore.Create(recorder, connectionString);
+        MessageBusStore =
+            AWSSNSMessageBusStore.Create(recorder, new AWSSNSMessageBusStoreOptions(SubscriberType.Queue),
+                connectionString);
+#endif
+    }
+
+    public async Task DisposeAsync()
+    {
+        if (_host.Exists())
+        {
+            await _host.StopAsync();
+            _host.Dispose();
+        }
+
+        await _localStack.StopAsync();
     }
 }

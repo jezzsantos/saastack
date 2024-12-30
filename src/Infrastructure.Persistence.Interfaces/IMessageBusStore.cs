@@ -28,7 +28,7 @@ public interface IMessageBusStore
 
 #if TESTINGONLY
     /// <summary>
-    ///     Recives the next waiting message from the specified topic and subscription, and processes it with the provided
+    ///     Receives the next waiting message from the specified topic and subscription, and processes it with the provided
     ///     handler.
     /// </summary>
     /// <returns>True when a message (exists) and is handled, False otherwise</returns>

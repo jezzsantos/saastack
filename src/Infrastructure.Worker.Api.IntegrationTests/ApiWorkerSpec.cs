@@ -16,7 +16,7 @@ public interface IApiWorkerSpec
 
     void OverrideTestingDependencies(Action<IServiceCollection> overrideDependencies);
 
-    void Start();
+    void StartHost();
 
     void WaitForQueueProcessingToComplete();
 }
@@ -33,7 +33,7 @@ public abstract class ApiWorkerSpec<TSetup> : IClassFixture<TSetup>, IDisposable
             setup.OverrideTestingDependencies(overrideDependencies);
         }
 
-        setup.Start();
+        setup.StartHost();
         Setup = setup;
     }
 
@@ -47,6 +47,7 @@ public abstract class ApiWorkerSpec<TSetup> : IClassFixture<TSetup>, IDisposable
     {
         if (disposing)
         {
+            // ReSharper disable once SuspiciousTypeConversion.Global
             if (Setup is IDisposable disposable)
             {
                 disposable.Dispose();
