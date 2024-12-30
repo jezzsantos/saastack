@@ -1,3 +1,4 @@
+using Amazon;
 using Common;
 using FluentAssertions;
 using Infrastructure.Persistence.AWS;
@@ -16,7 +17,21 @@ public class AWSSNSMessageBusStoreSpec : AnyMessageBusStoreBaseSpec
         setup.MessageBusStoreTestQueues[0])
     {
         _setup = setup;
+#if TESTINGONLY
+        ClearSubscriberQueues();
+#endif
     }
+#if TESTINGONLY
+    private void ClearSubscriberQueues()
+    {
+        foreach (var queue in _setup.MessageBusStoreTestQueues)
+        {
+            var arn = Arn.Parse(queue);
+            var queueName = arn.Resource.Replace(".fifo", string.Empty);
+            _setup.QueueStore.ClearMessagesAsync(queueName, CancellationToken.None).GetAwaiter().GetResult();
+        }
+    }
+#endif
 
     [Fact]
     public async Task WhenSendWithInvalidTopicName_ThenThrows()
@@ -54,13 +69,13 @@ public class AWSSNSMessageBusStoreSpec : AnyMessageBusStoreBaseSpec
     }
 
     [Fact]
-    public async Task WhenCountWithInvalidTopicName_ThenThrows()
+    public async Task WhenCountWithInvalidSubscriptionName_ThenThrows()
     {
 #if TESTINGONLY
         await _setup.MessageBusStore
-            .Invoking(x => x.CountAsync("^aninvalidtopicname^", "asubscriptionname", CancellationToken.None))
+            .Invoking(x => x.CountAsync("atopicname", "^aninvalidsubscriptionname", CancellationToken.None))
             .Should().ThrowAsync<ArgumentOutOfRangeException>()
-            .WithMessageLike(Resources.ValidationExtensions_InvalidMessageBusTopicName);
+            .WithMessageLike(Resources.ValidationExtensions_InvalidMessageBusSubscriptionName);
 #endif
     }
 
@@ -80,5 +95,10 @@ public class AWSSNSMessageBusStoreSpec : AnyMessageBusStoreBaseSpec
     {
         // We cannot run this because we need multiple queues
         return Task.CompletedTask;
+    }
+
+    protected override Task WaitBetweenWritingAndReadingMessages()
+    {
+        return Task.Delay(1000);
     }
 }

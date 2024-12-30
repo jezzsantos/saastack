@@ -35,6 +35,13 @@ public sealed partial class AzureSqlServerStore
         return new AzureSqlServerStore(recorder, connectionString);
     }
 
+#if TESTINGONLY
+    public static AzureSqlServerStore Create(IRecorder recorder, string connectionString)
+    {
+        return new AzureSqlServerStore(recorder, connectionString);
+    }
+#endif
+
     private AzureSqlServerStore(IRecorder recorder, string connectionString)
     {
         _recorder = recorder;

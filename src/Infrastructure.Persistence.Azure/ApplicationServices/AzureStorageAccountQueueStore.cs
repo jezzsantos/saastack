@@ -32,6 +32,13 @@ public class AzureStorageAccountQueueStore : IQueueStore
         return new AzureStorageAccountQueueStore(recorder, connection);
     }
 
+#if TESTINGONLY
+    public static AzureStorageAccountQueueStore Create(IRecorder recorder, string connectionString)
+    {
+        return new AzureStorageAccountQueueStore(recorder, connectionString);
+    }
+#endif
+    
     private AzureStorageAccountQueueStore(IRecorder recorder, string connectionString)
     {
         _recorder = recorder;
