@@ -51,12 +51,10 @@ Repeat for these directories:
 
 ## Optional Local Infrastructure
 
-You only need the tools below installed if you are going to run specific `Integration.Persistence` tests, for the persistence technology adapters you need to use in your codebase.
-
-* If using the `AzureSqlServerStore`, install `SQL Server 2019 Developer`. Available for [download here](https://go.microsoft.com/fwlink/?linkid=866662)
-* If using the `RedisDataStore`, install `Redis Server` locally to run the tests. Available for [download here](https://redis.io/download)
-
-> We would normally run these storage integration tests in CI periodically.
+You only need the tools below if you want to either:
+ - Work against alternative infrastructure during local development. For example `AzureSqlServerStore` instead of `LocalMachineJsonFileStore`.
+ - Run specific `Integration.Persistence` tests for the persistence technology adapters you need to use in your codebase. 
+  - We would normally run these storage integration tests in CI periodically.
 
 ### Docker
 
@@ -98,21 +96,25 @@ In the `AzureFunctions.Api.WorkersHost` project:
 
 > DO NOT add these two files to source control!
 
+### MSSQL Service 
+
+The docker `tools/compose.yml` file defines a service for MSSQL.
+
+You can use your IDE to launch it, or alternatively on the command line:
+
+```shell
+docker compose up -d mssql
+```
+
 ### Azurite (Azure Storage Emulator)
 
-> You only need to perform this step once, prior to running any of the `Integration.Persistence` tests against Azure infrastructure (e.g., Azure Queue Storage, Azure Blob Storage, and Azure Table Storage)
+The docker `tools/compose.yml` file defines a service for Azurite.
 
-In a Terminal window:
+You can use your IDE to launch it, or alternatively on the command line:
 
-1. Navigate up to the `tools` directory
-   1. `cd ..`
-   2. `cd /tools/azurite`
-
-2. Run: `npm install`
-
-Now, test that Azurite works by running: `azurite`
-
-> You only need to run the emulator in local development if you choose to run the AzureFunctions.Api.WorkerHost project locally. It will be run for you automatically in automated testing, when running the `Integration.Persistence` tests for Azure Storage
+```shell
+docker compose up -d azurite
+```
 
 ## AWS Local Development
 
@@ -121,20 +123,13 @@ Only if you are deploying your product to AWS
 
 ### LocalStack (AWS Emulator)
 
-> You only need to perform this step once, prior to running any of the `Integration.Persistence` tests against AWS infrastructure (e.g., CloudWatch, SQS queues, S3 Buckets, RDS/Dynamo databases, etc.)
+The docker `tools/compose.yml` file defines a service for localstack.
 
-In a Terminal window:
+You can use your IDE to launch it, or alternatively on the command line:
 
-1. [Install python](https://www.python.org/downloads/)
-2. [Install Python package manager](https://pip.pypa.io/en/stable/installation/)
-3. [Install docker](https://docs.docker.com/get-docker/)
-4. Install localstack: `python -m pip install localstack`
-
-> See: [LocalStack CLI setup instructions](https://docs.localstack.cloud/getting-started/installation/#localstack-cli)
-
-Now, test that LocalStack works by running: `localstack start`
-
-> When testing, Docker will need to be running for LocalStack to be used
+```shell
+docker compose up -d localstack
+```
 
 ### External Adapter Testing
 

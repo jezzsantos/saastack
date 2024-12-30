@@ -1,4 +1,5 @@
 services:
+  # See https://hub.docker.com/r/localstack/localstack
   localstack:
     image: localstack/localstack:stable
     ports:
@@ -10,7 +11,8 @@ services:
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume/localstack}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
-  
+  # See https://hub.docker.com/r/microsoft/mssql-server
+  # Guide: https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker
   mssql:
     build: ./images/mssql-custom
     environment:
@@ -23,6 +25,7 @@ services:
       # Database initialization scripts which will be run on container startup
       - ./init-scripts/mssql:/docker-entrypoint-initdb.d
   
+  # See https://hub.docker.com/r/eventstore/eventstore
   eventstoredb:
     image: eventstore/eventstore:latest
     environment:
@@ -36,7 +39,9 @@ services:
     volumes:
       - eventstore-data:/var/lib/eventstore
       - eventstore-logs:/var/log/eventstore
-
+  
+  # See https://hub.docker.com/r/microsoft/azure-storage-azurite
+  # Guide: https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite:latest
     ports:
