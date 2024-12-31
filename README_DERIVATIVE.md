@@ -17,7 +17,7 @@ You will need the following development tools to build, run, and test this proje
 * Install the .NET8.0 SDK (specifically version 8.0.6). Available for [Windows Download](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.302-windows-x64-installer)
 * Install NodeJs (18.20.4 LTS or later), available for [Download](https://nodejs.org/en/download/)
 
-> We have ensured that you won't need any other infrastructure running on your local machine (i.e., a Microsoft SQLServer database) unless you want to run infrastructure-specific integration tests.
+> We have ensured that you won't need any other infrastructure running on your local machine (i.e., a Microsoft SQLServer database) unless you want to run infrastructure-specific integration tests. See [Optional Local Infrastructure](#Optional-Local-Infrastructure) below.
 
 # Setup Environment
 
@@ -49,29 +49,10 @@ Repeat for these directories:
 * `C:\...\SaaStack\src\Tools.Templates\IntegrationTestProject`
 * `C:\...\SaaStack\src\Tools.Templates\UnitTestProject`
 
-## Optional Local Infrastructure
-
-You only need the tools below if you want to either:
- - Work against alternative infrastructure during local development. For example `AzureSqlServerStore` instead of `LocalMachineJsonFileStore`.
- - Run specific `Integration.Persistence` tests for the persistence technology adapters you need to use in your codebase. 
-  - We would normally run these storage integration tests in CI periodically.
-
-### Docker
-
-> You only need to perform this step once
-
-You will need to install docker to run certain kinds of integration tests against certain local/cloud infrastructure components. For example, all `Integration.Persistence` tests.
-
-Install [Docker Desktop](https://docs.docker.com/desktop/)
-
-We use [TestContainers](https://dotnet.testcontainers.org/) to create containers specifically for the tests.
-
-## Azure Local Development
+## Azure Functions Host
 
 Only if you are deploying your product to Azure.
 (Delete this section otherwise)
-
-### Azure Functions Host
 
 For security, and to ensure the Azure Functions can run when running locally, you need to create your own version of `local.settings.json`.
 
@@ -96,6 +77,27 @@ In the `AzureFunctions.Api.WorkersHost` project:
 
 > DO NOT add these two files to source control!
 
+## Optional Local Infrastructure
+
+You only need the tools below if you want to either:
+ - Work against alternative infrastructure during local development. For example `AzureSqlServerStore` instead of `LocalMachineJsonFileStore`.
+ - Run specific `Integration.Persistence` tests for the persistence technology adapters you need to use in your codebase. 
+   - We would normally run these storage integration tests in CI periodically.
+
+If you are running the `Integration.Persistence` integration tests, Docker will be used to fire up the relevant infrastructure components automatically for you. 
+
+### Docker
+
+> You only need to perform this step once
+
+You will need to install Docker on your local machine to run certain kinds of integration tests against certain local/cloud infrastructure components.
+
+For example, all `Integration.Persistence` tests.
+
+Install [Docker Desktop](https://docs.docker.com/desktop/)
+
+> We will be using [TestContainers](https://dotnet.testcontainers.org/) to create containers specifically for the tests.
+
 ### MSSQL Service 
 
 The docker `tools/compose.yml` file defines a service for MSSQL.
@@ -116,12 +118,10 @@ You can use your IDE to launch it, or alternatively on the command line:
 docker compose up -d azurite
 ```
 
-## AWS Local Development
+### LocalStack (AWS Emulator)
 
 Only if you are deploying your product to AWS
 (Delete this section otherwise)
-
-### LocalStack (AWS Emulator)
 
 The docker `tools/compose.yml` file defines a service for localstack.
 
@@ -131,9 +131,9 @@ You can use your IDE to launch it, or alternatively on the command line:
 docker compose up -d localstack
 ```
 
-### External Adapter Testing
+### External Adapter Integration Testing
 
-> You only need to perform this step once, prior to running any of the `Integration.External` tests against 3rd party adapters (e.g., Flagsmith, Twillio, etc.)
+> You only need to perform this step once, prior to running any of the `Integration.External` tests against 3rd party adapters (e.g., Flagsmith, Twilio, etc.)
 
 In the `Infrastructure.Shared.IntegrationTests` project, create a new file called `appsettings.Testing.local.json` and fill out the empty placeholders you see in `appsettings.TestingOnly.json` with values from service accounts that you have created for testing those 3rd party services.
 
@@ -285,7 +285,7 @@ The `LocalMachineFileDataStore` is configured to place your files in `Environmen
 
 #### Troubleshooting
 
-Sometimes (especially on MacOS), after manually testing, the processes do not shut down properly, leaving ports: `5001` and `5656` occupied. This then throws an exception when you try to run again later.
+Sometimes (especially on macOS), after manually testing, the processes do not shut down properly, leaving ports: `5001` and `5656` occupied. This then throws an exception when you try to run again later.
 
 The message looks something like this:
 
@@ -296,11 +296,11 @@ System.IO.IOException: Failed to bind to address https://127.0.0.1:5656: address
 To kill these processes:
 
 * On Windows, `taskkill /f /im dotnet.exe`
-* On MacOS:
+* On macOS:
    * Find the processes: `lsof -Pni | grep "5001\|5101\|5656"`
    * Kill the processes: `kill -9 <processid>` where `<processid>` is the ID of the process in the list
 
-   * Alternatively, in MacOS:
+   * Alternatively, in macOS:
 
       * Use `lsof -ti :[PORT]` and locate the PID of the process, e.g., `lsof -ti :5656`.
       * Open "Activity Monitor", locate the process with that PID, and stop that process.
@@ -353,22 +353,21 @@ Only run these kinds of tests when the code in the technology adapters changes. 
 
 > Note: We use the 2 dot [Semantic Versioning](https://semver.org/spec/v2.0.0.html) scheme.
 
-The latest changes for this new version are recorded in [CHANGELOG.md](CHANGELOG.md) and they follow a [keep a changelog](https://keepachangelog.com/en/1.0.0/) convention.
+The latest changes for this new version are recorded in [CHANGELOG.md](CHANGELOG.md), and they follow a [keep a changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
 > All assemblies and all hosts will share the same version number.
 >
 > We will be using a tool called [release-it](https://github.com/release-it/release-it) to update the version and changelog when creating new releases.
 
-First, make sure that all changes are documented in the various sections of the `[Unreleased]` section of the [CHANGELOG.md](CHANGELOG.md)
+1. First, make sure that all changes are documented in the various sections of the `[Unreleased]` section of the [CHANGELOG.md](CHANGELOG.md)
 
 2. Copy the new version number to `src/GlobalAssemblyInfo.cs`
 
-> For example:
+    > For example:
+    * `[assembly: AssemblyVersion("2.0.0.0")]`
+    * `[assembly: AssemblyFileVersion("2.0.0.0")]`
+    * `[assembly: AssemblyInformationalVersion("2.0.0")]`
 
-* `[assembly: AssemblyVersion("2.0.0.0")]`
-* `[assembly: AssemblyFileVersion("2.0.0.0")]`
-* `[assembly: AssemblyInformationalVersion("2.0.0")]`
-
-4. Commit, tag, and push the new version changes.
+3. Commit, tag, and push the new version changes.
 
 > Note: Each build in CI will automatically append the last build number to the SemVer and update the version in `GlobalAssemblyInfo.cs`

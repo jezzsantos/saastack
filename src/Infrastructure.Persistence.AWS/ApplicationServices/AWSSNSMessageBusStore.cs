@@ -1,5 +1,4 @@
 using Amazon;
-using Amazon.CloudWatch;
 using Amazon.Runtime;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
@@ -24,7 +23,6 @@ namespace Infrastructure.Persistence.AWS.ApplicationServices;
 [UsedImplicitly]
 public class AWSSNSMessageBusStore : IMessageBusStore
 {
-    private readonly IAmazonCloudWatch _cloudWatchServiceClient;
     private readonly Dictionary<string, string> _knownTopicArns;
     private readonly AWSSNSMessageBusStoreOptions _options;
     private readonly AWSSQSQueueStore? _queueSubscriber;
@@ -34,17 +32,15 @@ public class AWSSNSMessageBusStore : IMessageBusStore
     public static AWSSNSMessageBusStore Create(IRecorder recorder, IConfigurationSettings settings,
         AWSSNSMessageBusStoreOptions options)
     {
-        var (credentials, regionEndpoint) = settings.GetConnection();
-
         var queueSubscriber = options.Type == SubscriberType.Queue
             ? AWSSQSQueueStore.Create(recorder, settings)
             : null;
-        
+
+        var (credentials, regionEndpoint) = settings.GetConnection();
         if (regionEndpoint.Exists())
         {
             var remoteClient = new AmazonSimpleNotificationServiceClient(credentials, regionEndpoint);
-            var remoteCloudWatchClient = new AmazonCloudWatchClient(credentials, regionEndpoint);
-            return new AWSSNSMessageBusStore(recorder, settings, remoteClient, remoteCloudWatchClient, options,
+            return new AWSSNSMessageBusStore(recorder, settings, remoteClient, options,
                 queueSubscriber);
         }
 
@@ -54,12 +50,7 @@ public class AWSSNSMessageBusStore : IMessageBusStore
                 ServiceURL = AWSConstants.LocalStackServiceUrl,
                 AuthenticationRegion = RegionEndpoint.USEast1.SystemName
             });
-        var localCloudWatchClient = new AmazonCloudWatchClient(credentials, new AmazonCloudWatchConfig
-        {
-            ServiceURL = AWSConstants.LocalStackServiceUrl,
-            AuthenticationRegion = RegionEndpoint.USEast1.SystemName
-        });
-        return new AWSSNSMessageBusStore(recorder, settings, localStackClient, localCloudWatchClient, options,
+        return new AWSSNSMessageBusStore(recorder, settings, localStackClient, options,
             queueSubscriber);
     }
 
@@ -74,29 +65,21 @@ public class AWSSNSMessageBusStore : IMessageBusStore
                 ServiceURL = localStackServiceUrl,
                 AuthenticationRegion = RegionEndpoint.USEast1.SystemName
             });
-        var localCloudWatchClient = new AmazonCloudWatchClient(credentials, new AmazonCloudWatchConfig
-        {
-            ServiceURL = localStackServiceUrl,
-            AuthenticationRegion = RegionEndpoint.USEast1.SystemName
-        });
-
         var queueSubscriber = options.Type == SubscriberType.Queue
             ? AWSSQSQueueStore.Create(recorder, localStackServiceUrl)
             : null;
 
-        return new AWSSNSMessageBusStore(recorder, settings, localStackClient, localCloudWatchClient, options,
+        return new AWSSNSMessageBusStore(recorder, settings, localStackClient, options,
             queueSubscriber);
     }
 #endif
 
     private AWSSNSMessageBusStore(IRecorder recorder, IConfigurationSettings settings,
-        IAmazonSimpleNotificationService serviceClient,
-        IAmazonCloudWatch cloudWatchServiceClient, AWSSNSMessageBusStoreOptions options,
+        IAmazonSimpleNotificationService serviceClient, AWSSNSMessageBusStoreOptions options,
         AWSSQSQueueStore? queueSubscriber)
     {
         _recorder = recorder;
         _serviceClient = serviceClient;
-        _cloudWatchServiceClient = cloudWatchServiceClient;
         _options = options;
         _knownTopicArns = new Dictionary<string, string>();
         _queueSubscriber = queueSubscriber;
@@ -139,7 +122,7 @@ public class AWSSNSMessageBusStore : IMessageBusStore
         {
             return Result.Ok;
         }
-        
+
         try
         {
             await _serviceClient.DeleteTopicAsync(topicArn, cancellationToken);
@@ -309,7 +292,7 @@ public class AWSSNSMessageBusStore : IMessageBusStore
         var protocol = _options.Type == SubscriberType.Lambda
             ? "lambda"
             : "sqs";
-        
+
         await _serviceClient.SubscribeAsync(new SubscribeRequest
         {
             TopicArn = topicArn,
